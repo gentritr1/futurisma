@@ -85,9 +85,11 @@ export class GameUi {
     document.body.dataset.phase = "race";
   }
 
-  showResult(elapsedMs: number): void {
+  showResult(elapsedMs: number, totalLaps: number): void {
     this.resultTime.textContent = formatRaceTime(elapsedMs);
-    this.resultDetail.textContent = "TOTEM / WORKS 07 · TWO LAPS LOGGED";
+    this.resultDetail.textContent = `TOTEM / WORKS 07 · ${totalLaps} ${
+      totalLaps === 1 ? "LAP" : "LAPS"
+    } LOGGED`;
     this.resultScreen.hidden = false;
     this.countdown.textContent = "";
     this.systemStatus.textContent = "TRIAL COMPLETE";

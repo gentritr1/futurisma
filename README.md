@@ -20,7 +20,9 @@ Open the local URL printed by Vite.
 - `R` / gamepad Y: recover at the last cleared vector
 - `M` / gamepad Back: mute procedural engine audio
 
-Standard gamepad triggers control thrust and braking. The time trial is two laps.
+Standard gamepad triggers control thrust and braking. The Greenwater Strip time
+trial defaults to five laps. Add `?laps=1` through `?laps=9` to override the
+race length for testing.
 TOTEM now uses player-controlled heading with speed-sensitive steering, grip, and
 high-speed drift. Course vectors must be cleared in order for a lap to count.
 The HUD calls upcoming turns, the next gate, corrective edge steering, and the
@@ -28,8 +30,13 @@ remaining distance to the finish.
 
 ## Visual test mode
 
-Append `?demo=1` to the URL to run an automated throttle, steering, and boost pass for camera and rendering QA.
+Append `?demo=1&laps=1` to the URL to run an automated one-lap throttle,
+steering, and boost pass for camera and rendering QA.
 
 ## Production asset
 
 The accepted source handoff is preserved in `artifacts/TOTEM_Phase1_v1.0-patch1.zip`. Runtime copies are served from `public/assets/totem/`.
+
+The accepted Greenwater map handoff is preserved in
+`artifacts/GREENWATER_MAP01_v1.0.zip`. Its measured runtime centreline and
+validation report live in `src/game/data/`.

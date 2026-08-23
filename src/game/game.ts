@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { EngineAudio } from "./audio";
-import { SpeedCourse } from "./course";
+import { GreenwaterCourse } from "./course";
 import type { InputFrame } from "./input";
 import { InputController } from "./input";
 import { TotemVehicle } from "./totem";
@@ -9,15 +9,15 @@ import { GameUi } from "./ui";
 
 type RacePhase = "standby" | "countdown" | "running" | "finished";
 
-const TOTAL_LAPS = 2;
 const CRUISE_MAX_SPEED = 86;
 const BOOST_MAX_SPEED = 112;
 
 export class FuturismaGame {
   private readonly scene = new THREE.Scene();
-  private readonly camera = new THREE.PerspectiveCamera(58, 1, 0.1, 520);
+  private readonly camera = new THREE.PerspectiveCamera(58, 1, 0.1, 650);
   private readonly renderer: THREE.WebGLRenderer;
-  private readonly course = new SpeedCourse();
+  private readonly course = new GreenwaterCourse();
+  private readonly totalLaps = this.resolveLapCount();
   private readonly vehicle = new TotemVehicle();
   private readonly audio = new EngineAudio();
   private readonly timer = new THREE.Timer();
@@ -42,6 +42,8 @@ export class FuturismaGame {
   private elapsedMs = 0;
   private countdown = 3.7;
   private edgeContact = false;
+  private offCourseTime = 0;
+  private recoveryImmunity = 0;
   private impactShake = 0;
   private running = false;
   private animationFrame = 0;
@@ -62,8 +64,9 @@ export class FuturismaGame {
     this.renderer.toneMapping = THREE.AgXToneMapping;
     this.renderer.toneMappingExposure = 1.05;
     this.renderer.shadowMap.enabled = false;
-    this.scene.background = new THREE.Color(0x091013);
-    this.scene.fog = new THREE.Fog(0x091013, 24, 210);
+    const initialFog = this.course.fogAt(0);
+    this.scene.background = initialFog.color.clone();
+    this.scene.fog = new THREE.FogExp2(initialFog.color, initialFog.density);
 
     this.scene.add(this.course.group, this.vehicle.root);
     this.speedLines = this.createSpeedLines();
@@ -141,7 +144,7 @@ export class FuturismaGame {
       throttle: 1,
       brake: Math.abs(signedAngle) > 0.72 ? 0.42 : 0,
       steer: THREE.MathUtils.clamp(-signedAngle * 1.75, -1, 1),
-      boost: this.timer.getElapsed() % 12 > 8.5 && Math.abs(signedAngle) < 0.28,
+      boost: this.timer.getElapsed() % 10 < 3.4 && Math.abs(signedAngle) < 0.28,
     };
   }
 
@@ -153,6 +156,7 @@ export class FuturismaGame {
     this.updatePose(input, delta);
     this.updateCamera(delta, this.steerAmount);
     this.updateSpeedLines(delta);
+    this.updateFog(delta);
     this.audio.update(this.speed / BOOST_MAX_SPEED, input.throttle, this.boostActive);
     this.updateHud(input);
   }
@@ -180,6 +184,7 @@ export class FuturismaGame {
   }
 
   private updateRace(delta: number, input: InputFrame): void {
+    this.recoveryImmunity = Math.max(0, this.recoveryImmunity - delta);
     this.boostActive = input.boost && input.throttle > 0.1 && this.boostReserve > 0.012;
     const maxSpeed = this.boostActive ? BOOST_MAX_SPEED : CRUISE_MAX_SPEED;
 
@@ -237,9 +242,19 @@ export class FuturismaGame {
     this.lateral = afterMove.lateral;
     this.position.y = afterMove.position.y;
 
-    const lateralLimit = this.course.halfWidth - 2.05;
+    const edgeType = this.course.edgeType(afterMove, this.lateral);
+    const roadLimit = afterMove.halfWidth - 2.05;
+    const openEdge = edgeType === "C";
+    const lateralLimit = openEdge ? afterMove.halfWidth + 5.8 : roadLimit;
+    const beyondRoad = Math.abs(this.lateral) > roadLimit;
     const outside = Math.abs(this.lateral) > lateralLimit;
     const wasEdgeContact = this.edgeContact;
+    if (openEdge && beyondRoad && this.recoveryImmunity <= 0) {
+      this.offCourseTime += delta;
+      this.speed = Math.max(0, this.speed - delta * 8);
+    } else {
+      this.offCourseTime = 0;
+    }
     if (outside) {
       this.lateral = THREE.MathUtils.clamp(this.lateral, -lateralLimit, lateralLimit);
       this.position.copy(afterMove.position).addScaledVector(afterMove.right, this.lateral);
@@ -249,13 +264,17 @@ export class FuturismaGame {
         this.travelDirection.addScaledVector(outward, -outwardMotion * 1.45).normalize();
       }
       if (!wasEdgeContact) {
-        this.speed *= 0.78;
+        this.speed *= edgeType === "B" ? 0.6 : edgeType === "A" ? 0.82 : 0.9;
         this.impactShake = 1;
       }
-      this.speed = Math.max(0, this.speed - delta * 12);
+      this.speed = Math.max(0, this.speed - delta * (edgeType === "B" ? 22 : 12));
     }
-    this.edgeContact = outside
-      || (wasEdgeContact && Math.abs(this.lateral) > lateralLimit - 0.12);
+    this.edgeContact = beyondRoad
+      || (wasEdgeContact && Math.abs(this.lateral) > roadLimit - 0.12);
+    if (this.offCourseTime >= this.course.recoveryHoldSeconds) {
+      this.recoverVehicle();
+      return;
+    }
     this.alignDirectionToSurface(this.forward, afterMove.up, afterMove.tangent);
     this.alignDirectionToSurface(
       this.travelDirection,
@@ -290,7 +309,7 @@ export class FuturismaGame {
     if (progressDelta < -0.5) progressDelta += 1;
     if (progressDelta <= 0 || this.travelDirection.dot(courseTangent) < 0.2) return;
 
-    const targetProgress = this.nextCheckpointIndex / this.course.checkpointCount;
+    const targetProgress = this.course.checkpointProgress(this.nextCheckpointIndex);
     const distanceToTarget = THREE.MathUtils.euclideanModulo(
       targetProgress - previousProgress,
       1,
@@ -299,23 +318,26 @@ export class FuturismaGame {
 
     if (this.nextCheckpointIndex === 0) {
       this.lap += 1;
-      if (this.lap > TOTAL_LAPS) {
+      if (this.lap > this.totalLaps) {
         this.finishRace();
         return;
       }
       this.nextCheckpointIndex = 1;
+      this.course.setLapBoard(this.lap, this.totalLaps);
       return;
     }
 
-    this.nextCheckpointIndex = (this.nextCheckpointIndex + 1) % this.course.checkpointCount;
+    this.nextCheckpointIndex = this.nextCheckpointIndex < this.course.checkpointCount
+      ? this.nextCheckpointIndex + 1
+      : 0;
   }
 
   private recoverVehicle(): void {
     const previousCheckpoint = this.nextCheckpointIndex === 0
-      ? this.course.checkpointCount - 1
+      ? this.course.checkpointCount
       : Math.max(0, this.nextCheckpointIndex - 1);
     this.progress = THREE.MathUtils.euclideanModulo(
-      previousCheckpoint / this.course.checkpointCount + 0.004,
+      this.course.checkpointProgress(previousCheckpoint) + 0.004,
       1,
     );
     const recovery = this.course.sample(this.progress);
@@ -324,9 +346,11 @@ export class FuturismaGame {
     this.travelDirection.copy(recovery.tangent);
     this.lateral = 0;
     this.steerAmount = 0;
-    this.speed = Math.min(this.speed, 18);
+    this.speed = this.course.recoverySpeedMps;
     this.boostActive = false;
     this.edgeContact = false;
+    this.offCourseTime = 0;
+    this.recoveryImmunity = this.course.recoveryImmunitySeconds;
     this.impactShake = 0.25;
     this.updatePose({ throttle: 0, brake: 0, steer: 0, boost: false }, 0);
     this.snapCamera();
@@ -440,15 +464,15 @@ export class FuturismaGame {
     const turnCue = this.phase === "running" ? this.course.turnAhead(this.progress) : null;
     const finishDistanceMeters = this.phase === "finished"
       ? 0
-      : ((TOTAL_LAPS - Math.min(this.lap, TOTAL_LAPS)) + (1 - this.progress))
+      : ((this.totalLaps - Math.min(this.lap, this.totalLaps)) + (1 - this.progress))
         * this.course.length;
     this.ui.update({
       speedKph: this.speed * 3.6,
       boost: this.boostReserve,
       elapsedMs: this.elapsedMs,
       lap: this.lap,
-      totalLaps: TOTAL_LAPS,
-      progress: ((this.lap - 1) + this.progress) / TOTAL_LAPS,
+      totalLaps: this.totalLaps,
+      progress: ((this.lap - 1) + this.progress) / this.totalLaps,
       checkpoint,
       checkpointCount: this.course.checkpointCount,
       finishDistanceMeters,
@@ -466,7 +490,7 @@ export class FuturismaGame {
   private finishRace(): void {
     this.phase = "finished";
     this.boostActive = false;
-    this.ui.showResult(this.elapsedMs);
+    this.ui.showResult(this.elapsedMs, this.totalLaps);
   }
 
   private resetRaceState(): void {
@@ -480,17 +504,20 @@ export class FuturismaGame {
     this.lap = 1;
     this.elapsedMs = 0;
     this.edgeContact = false;
+    this.offCourseTime = 0;
+    this.recoveryImmunity = 0;
     this.impactShake = 0;
     const start = this.course.sample(this.progress);
     this.position.copy(start.position);
     this.forward.copy(start.tangent);
     this.travelDirection.copy(start.tangent);
+    this.course.setLapBoard(1, this.totalLaps);
   }
 
   private installLighting(): void {
-    const hemisphere = new THREE.HemisphereLight(0x7bb0bd, 0x06110c, 1.8);
-    const key = new THREE.DirectionalLight(0xc5ebf2, 2.5);
-    key.position.set(80, 130, 35);
+    const hemisphere = new THREE.HemisphereLight(0xa9bbb0, 0x10180e, 1.65);
+    const key = new THREE.DirectionalLight(0xd8e0ca, 2.25);
+    key.position.set(80, 130, -35);
     const rim = new THREE.DirectionalLight(0xc8ff2e, 0.65);
     rim.position.set(-100, 25, -80);
     this.scene.add(hemisphere, key, rim);
@@ -536,8 +563,33 @@ export class FuturismaGame {
       gltf.scene.quaternion.setFromRotationMatrix(this.poseMatrix);
       this.scene.add(gltf.scene);
     } catch {
-      // The neutral course remains playable if the optional prop lineup fails.
+      // Greenwater remains playable if the optional prop lineup fails.
     }
+  }
+
+  private updateFog(delta: number): void {
+    const fog = this.scene.fog;
+    if (!(fog instanceof THREE.FogExp2)) return;
+    const target = this.course.fogAt(this.progress);
+    const response = 1 - Math.exp(-delta * 1.8);
+    fog.density = THREE.MathUtils.lerp(fog.density, target.density, response);
+    fog.color.lerp(target.color, response);
+    if (this.scene.background instanceof THREE.Color) {
+      this.scene.background.lerp(target.color, response);
+    }
+  }
+
+  private resolveLapCount(): number {
+    const requested = Number.parseInt(
+      new URLSearchParams(window.location.search).get("laps") ?? "",
+      10,
+    );
+    if (!Number.isFinite(requested)) return this.course.defaultLapCount;
+    return THREE.MathUtils.clamp(
+      requested,
+      this.course.minimumLapCount,
+      this.course.maximumLapCount,
+    );
   }
 
   private readonly resize = (): void => {

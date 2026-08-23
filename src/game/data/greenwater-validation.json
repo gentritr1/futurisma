@@ -1,0 +1,142 @@
+{
+ "format": "FUTURISMA_MAP_VALIDATION",
+ "version": "1.0",
+ "source": "GREENWATER_BLOCKOUT.json",
+ "map": "MAP01_GREENWATER_STRIP",
+ "method": "every figure below is measured from the emitted centreline samples, not copied from the design document",
+ "centrelineLength": {
+  "value": 2515.982,
+  "unit": "m",
+  "designRange": [
+   2200,
+   2600
+  ],
+  "documentFigure": 2513,
+  "delta": 2.982,
+  "pass": true
+ },
+ "closureError": {
+  "x": 0,
+  "z": 0,
+  "magnitude": 2.3e-13,
+  "unit": "m",
+  "tolerance": 0.001,
+  "pass": true,
+  "note": "straight lengths in the canopy and Fuel Row were solved for closure; loop closes analytically and the residual is floating point only"
+ },
+ "sampleCount": {
+  "value": 1258,
+  "nominalSpacing": 2,
+  "actualSpacing": 2,
+  "spacingError": 0,
+  "pass": true,
+  "note": "spacing is L/N so the last sample joins the first exactly"
+ },
+ "widthRange": {
+  "min": 19,
+  "max": 24,
+  "designRange": [
+   19,
+   24
+  ],
+  "pass": true
+ },
+ "maximumGrade": {
+  "value": 7,
+  "unit": "percent",
+  "atDistance": 909.994,
+  "limit": 7,
+  "pass": true
+ },
+ "maximumBanking": {
+  "value": 12,
+  "unit": "degree",
+  "limit": 12,
+  "pass": true
+ },
+ "minimumTurnRadius": {
+  "value": 45,
+  "unit": "m",
+  "turn": "T5 The Crane",
+  "designMinimum": 45,
+  "pass": true
+ },
+ "selfIntersection": {
+  "result": "none",
+  "method": "pairwise planar distance between all sample pairs more than 80 m apart along the centreline",
+  "minimumSeparation": 76.056,
+  "atDistances": [
+   703.995,
+   785.994
+  ],
+  "clearanceRequired": 24,
+  "pass": true
+ },
+ "checkpointOrdering": {
+  "result": "ordered",
+  "count": 8,
+  "distances": [
+   298.54,
+   586.519,
+   700.519,
+   900.239,
+   1130.982,
+   1430.731,
+   1631.107,
+   2121.465
+  ],
+  "gapsIncludingGate": [
+   298.54,
+   287.979,
+   114,
+   199.72,
+   230.743,
+   299.749,
+   200.376,
+   490.358,
+   394.517
+  ],
+  "longestGap": 490.358,
+  "shortestGap": 114,
+  "gateAtZero": true,
+  "pass": true
+ },
+ "sectorLengthDeltas": {
+  "note": "the closure solve moved straight lengths only — every published radius, width, banking and checkpoint anchor is unchanged",
+  "canopyPassage": {
+   "emitted": 352.169,
+   "document": 313
+  },
+  "fuelRow": {
+   "emitted": 530.357,
+   "document": 567
+  }
+ },
+ "speedTargets": {
+  "lapLength": 2515.982,
+  "resolved": true,
+  "lapTimeSecondsTarget": [
+   34,
+   36
+  ],
+  "impliedAverage": {
+   "mps": [
+    69.888,
+    73.999
+   ],
+   "kph": [
+    251.598,
+    266.396
+   ]
+  },
+  "peakSpeedKph": 400,
+  "cornerEntryAboveKph": 300,
+  "lapCount": 5,
+  "raceLengthSeconds": 174.5,
+  "raceLengthTarget": "2-3 minutes",
+  "pass": true,
+  "history": "the document previously read 115-130 m/s against a 70-80 s lap, which was a unit error; the lap-time target was moved rather than the corner-entry figure",
+  "openRisk": "at a 400 km/h peak, T10's 300 m readable approach is about 2.7 s of sight time and the Elbow's 175 m is about 1.6 s. Both are now the first thing the in-engine test has to confirm."
+ },
+ "overall": "PASS"
+}
