@@ -1,0 +1,222 @@
+{
+  "project": "FUTURISMA",
+  "asset": "TOTEM",
+  "designation": "KAIRO DYNAMICS KD-0714 · CLASS II ANTIGRAV · HULL REV 12",
+  "status": "Phase 1 production vehicle — locked, shape corrections final",
+  "generated": "2026-08-23",
+  "byte_fields": "generated from the live export buffers at pack time — see futurisma-handoff.html section 08",
+  "names_provisional": ["Kairo Dynamics", "Totem Syndicate"],
+
+  "coordinate_setup": {
+    "unit": "1 unit = 1 metre",
+    "up": "+Y",
+    "facing": "-Z (nose). +X starboard, +Z aft",
+    "handedness": "right-handed, glTF 2.0 standard",
+    "origin": "approximate centre of mass — volume-weighted centroid of solid geometry, decal quads and empties excluded"
+  },
+
+  "dimensions": {
+    "length_m": 6.602,
+    "width_m": 3.400,
+    "height_m": 2.256,
+    "skid_pad_below_origin_m": 0.892,
+    "resting_ride_height_m": 0.18,
+    "hover_height_cruise_m": 0.45,
+    "hover_height_boost_m": 0.60,
+    "hover_height_min_before_scrape_m": 0.28,
+    "bounds_min": [-1.700, -0.892, -3.899],
+    "bounds_max": [1.700, 1.364, 2.704],
+    "keel_plane_local_y": -0.712
+  },
+
+  "models": {
+    "master": {
+      "file": "totem_master.glb",
+      "role": "editable master, full detail, every part named",
+      "triangles": 6186,
+      "draw_calls": 153,
+      "materials": 25,
+      "nodes": 199,
+      "bytes": 669296
+    },
+    "runtime": {
+      "file": "totem_runtime.glb",
+      "role": "optimised runtime — statics merged, movers preserved",
+      "triangles": 6186,
+      "draw_calls_drawn": 17,
+      "draw_calls_including_invisible_proxy": 18,
+      "materials": 4,
+      "nodes": 53,
+      "bytes": 950428,
+      "draw_call_list": [
+        "body_static", "emissive_static", "canopy_body", "canopy_glass",
+        "steering_fin_L_body", "steering_fin_R_body",
+        "engine_flap_L_0_body", "engine_flap_L_1_body", "engine_flap_R_0_body", "engine_flap_R_1_body",
+        "stabiliser_ring_body", "stabiliser_ring_emissive",
+        "airbrake_L_body", "airbrake_R_body", "elevon_L_body", "elevon_R_body", "skids_body"
+      ]
+    },
+    "asset_kit": {
+      "file": "futurisma_asset_kit.glb",
+      "role": "ten world props in the same visual language",
+      "triangles": 3052,
+      "draw_calls": 128,
+      "props": 10,
+      "bytes": 408736
+    }
+  },
+
+  "materials_runtime": [
+    {
+      "name": "TOTEM_body",
+      "map": "totem_decals_1024_<livery>.png",
+      "vertex_colors": true,
+      "alpha": "MASK, alphaTest 0.5",
+      "roughness": 0.62,
+      "metalness": 0.25,
+      "carries": "hull, mechanisms, all movable parts, all 18 decal quads",
+      "replaces": "8 paint materials + 12 decal materials in the master"
+    },
+    {
+      "name": "TOTEM_emissive",
+      "map": "totem_emissive_512.png",
+      "emissive_map": "totem_emissive_512.png",
+      "emissive_intensity": 1.6,
+      "carries": "exhaust cores, spine stripe, nav lamps, ring beacons"
+    },
+    {
+      "name": "TOTEM_glass",
+      "transparent": true,
+      "opacity": 0.60,
+      "carries": "canopy — the only transparent surface on the vehicle"
+    },
+    {
+      "name": "TOTEM_collision",
+      "visible": false,
+      "carries": "collision proxy — exported, never drawn, costs no draw call"
+    }
+  ],
+
+  "materials_master": [
+    { "name": "carbon_shell", "hex": "#212830", "roughness": 0.64, "metalness": 0.20, "use": "primary hull" },
+    { "name": "petrol_panel", "hex": "#164657", "roughness": 0.48, "metalness": 0.34, "use": "spine deck" },
+    { "name": "gunmetal_mech", "hex": "#707a82", "roughness": 0.38, "metalness": 0.40, "use": "mechanisms, intake lips, nozzle bells, struts, skid legs" },
+    { "name": "faded_grey", "hex": "#a2a8aa", "roughness": 0.74, "metalness": 0.12, "use": "stabiliser ring hoop — deliberately off-hull" },
+    { "name": "shadow_black", "hex": "#0e1114", "roughness": 0.85, "metalness": 0.06, "use": "keel, intake liners, cockpit tub, vents" },
+    { "name": "acid_paint", "hex": "#c4f230", "roughness": 0.52, "metalness": 0.10, "use": "team accent — steering fins, fin stripe" },
+    { "name": "warning_orange", "hex": "#f2641b", "roughness": 0.60, "metalness": 0.10, "use": "airbrakes, hazard hardware" },
+    { "name": "oxide_patch", "hex": "#6b4630", "roughness": 0.90, "metalness": 0.10, "use": "single repair patch on the ring" },
+    { "name": "emissive_cyan", "emissive": "#49e2ff", "intensity": 1.8, "use": "exhaust cores, starboard lamps, ring beacon" },
+    { "name": "emissive_acid", "emissive": "#c8ff2e", "intensity": 1.6, "use": "spine stripe, port ring beacon" },
+    { "name": "emissive_warn", "emissive": "#ff5a12", "intensity": 1.5, "use": "port nav lamps" },
+    { "name": "canopy_smoke", "hex": "#102e37", "opacity": 0.60, "use": "canopy" },
+    { "name": "decal_*", "count": 12, "map": "totem_decals_1024_<livery>.png", "use": "one material per atlas cell, KHR_texture_transform per cell" },
+    { "name": "TOTEM_collision", "visible": false, "use": "collision proxy" }
+  ],
+
+  "vertex_colours": {
+    "channel": "COLOR_0, present on every primitive in both GLBs",
+    "role": "shading multiplier around 1.0 — never the base colour",
+    "observed_range": [0.597, 1.134],
+    "components": {
+      "underside_darkening": "-26% as the world normal turns down",
+      "top_edge_lift": "+13% where the normal turns up",
+      "height_gradient": "0.86 → 1.00 from keel to deck",
+      "panel_variation": "±4.5%, hashed from each part name, stable across rebuilds",
+      "heat_staining": "warm shift within 1.25 m of the nozzle exits, soot darkening aft of z = 2.2"
+    }
+  },
+
+  "texture_assignments": {
+    "totem_decals_1024_works.png": { "slot": "TOTEM_body.map", "size": 1024, "format": "RGBA", "livery": "works — default hero, race number 07" },
+    "totem_decals_1024_privateer.png": { "slot": "TOTEM_body.map", "size": 1024, "format": "RGBA", "livery": "privateer — alternate, race number 13" },
+    "totem_decals_1024_nightform.png": { "slot": "TOTEM_body.map", "size": 1024, "format": "RGBA", "livery": "night form — unlock / high-speed variant, race number 24" },
+    "totem_emissive_512.png": { "slot": "TOTEM_emissive.map + .emissiveMap", "size": 512, "format": "RGB", "shared_with": "asset kit beacon and lamp family" },
+    "paint_chip_strip": {
+      "region_px": [8, 900, 896, 96],
+      "chip_size_px": 96,
+      "chip_pitch_px": 112,
+      "order": ["carbon_shell", "petrol_panel", "gunmetal_mech", "faded_grey", "shadow_black", "acid_paint", "warning_orange", "oxide_patch"],
+      "note": "runtime hull UVs collapse to a chip centre — this strip is the entire body palette"
+    },
+    "filtering": "mip filtering on, anisotropy 1 — the slight blur at distance is intentional"
+  },
+
+  "movable_nodes": [
+    { "node": "canopy_pivot", "pivot": [0, 0.316, -0.979], "transform": "rotate X", "range_deg": [-36, 0], "driver": "canopy", "primitives": 2 },
+    { "node": "airbrake_L_pivot", "pivot": [-0.95, 0.106, 0.791], "transform": "rotate X", "range_deg": [0, 60], "driver": "brake", "primitives": 1 },
+    { "node": "airbrake_R_pivot", "pivot": [0.95, 0.106, 0.791], "transform": "rotate X", "range_deg": [0, 60], "driver": "brake", "primitives": 1 },
+    { "node": "steering_fin_L_pivot", "pivot": [-1.38, 0.52, -2.62], "transform": "rotate Y", "range_deg": [-20, 20], "driver": "steer", "primitives": 1 },
+    { "node": "steering_fin_R_pivot", "pivot": [1.38, 0.52, -2.62], "transform": "rotate Y", "range_deg": [-20, 20], "driver": "steer", "primitives": 1 },
+    { "node": "elevon_L_pivot", "pivot": [-1.12, -0.124, 2.161], "transform": "rotate Y", "range_deg": [-15, 15], "driver": "pitch_roll", "primitives": 1 },
+    { "node": "elevon_R_pivot", "pivot": [1.12, -0.124, 2.161], "transform": "rotate Y", "range_deg": [-15, 15], "driver": "pitch_roll", "primitives": 1 },
+    { "node": "engine_flap_L_0_pivot", "pivot": [-0.45, 0.734, 2.035], "transform": "rotate X", "range_deg": [9, 29], "driver": "throttle", "primitives": 1 },
+    { "node": "engine_flap_L_1_pivot", "pivot": [-0.45, 0.746, 2.035], "transform": "rotate X", "range_deg": [9, 29], "driver": "throttle", "primitives": 1 },
+    { "node": "engine_flap_R_0_pivot", "pivot": [0.45, 0.734, 2.035], "transform": "rotate X", "range_deg": [9, 29], "driver": "throttle", "primitives": 1 },
+    { "node": "engine_flap_R_1_pivot", "pivot": [0.45, 0.746, 2.035], "transform": "rotate X", "range_deg": [9, 29], "driver": "throttle", "primitives": 1 },
+    { "node": "stabiliser_ring_pivot", "pivot": [0, 0.236, 2.361], "transform": "rotate Z", "range_deg": [-12, 12], "driver": "roll", "primitives": 2, "note": "ring hardware — rolls against the hull under lateral load" },
+    { "node": "skids_pivot", "pivot": [0, -0.524, -0.259], "transform": "translate Y", "range_m": [-0.22, 0], "driver": "gear", "primitives": 1, "note": "all three skids retract as one group above 40 km/h" }
+  ],
+
+  "attachment_nodes": [
+    { "node": "FX_engine_left", "position": [-0.45, 0.74, 2.52] },
+    { "node": "FX_engine_right", "position": [0.45, 0.74, 2.52] },
+    { "node": "FX_boost_center", "position": [0, 0.76, 2.62], "note": "hoop centre — merged plume draws through the ring" },
+    { "node": "FX_trail_wing_left", "position": [-1.52, 0.44, 2.20] },
+    { "node": "FX_trail_wing_right", "position": [1.52, 0.44, 2.20] },
+    { "node": "FX_trail_boom_left", "position": [-1.38, 0.44, -3.25] },
+    { "node": "FX_trail_boom_right", "position": [1.38, 0.44, -3.25] },
+    { "node": "FX_dust_front_left", "position": [-0.28, 0.10, -1.70], "note": "also hover raycast point" },
+    { "node": "FX_dust_front_right", "position": [0.28, 0.10, -1.70], "note": "also hover raycast point" },
+    { "node": "FX_dust_rear_left", "position": [-1.20, 0.10, 1.80], "note": "also hover raycast point" },
+    { "node": "FX_dust_rear_right", "position": [1.20, 0.10, 1.80], "note": "also hover raycast point" },
+    { "node": "FX_impact_nose", "position": [0, 0.44, -3.30] },
+    { "node": "FX_impact_left", "position": [-1.53, 0.44, 2.05] },
+    { "node": "FX_impact_right", "position": [1.53, 0.44, 2.05] },
+    { "node": "FX_spine_flare", "position": [0, 0.95, -0.35], "note": "pulses on boost" },
+    { "node": "LIGHT_nav_left", "position": [-1.38, 0.44, -3.25], "colour": "#ff5a12" },
+    { "node": "LIGHT_nav_right", "position": [1.38, 0.44, -3.25], "colour": "#49e2ff" },
+    { "node": "LIGHT_ring_left", "position": [-1.04, 0.76, 2.64], "colour": "#c8ff2e" },
+    { "node": "LIGHT_ring_right", "position": [1.04, 0.76, 2.64], "colour": "#49e2ff" },
+    { "node": "CAMERA_chase_target", "position": [0, 1.55, 4.60] }
+  ],
+
+  "collision": {
+    "node": "collision_proxy",
+    "shape": "compound of 6 boxes",
+    "triangles": 72,
+    "visible": false,
+    "parts": ["hull_core", "nose_blade", "shoulder_left", "shoulder_right", "boom_left", "boom_right"],
+    "excludes": "stabiliser ring — must never block the player"
+  },
+
+  "liveries": [
+    { "id": "works", "label": "Works", "number": "07", "team": "TOTEM SYNDICATE", "role": "default hero livery", "chips": ["#212830", "#164657", "#707a82", "#a2a8aa", "#0e1114", "#c4f230", "#f2641b", "#6b4630"] },
+    { "id": "privateer", "label": "Privateer", "number": "13", "team": "ROUTE 13 PRIVATEER", "role": "alternate", "chips": ["#2c3138", "#6b6f6a", "#7a828a", "#cfcabc", "#12161a", "#f2641b", "#f2641b", "#7a4a2c"] },
+    { "id": "nightform", "label": "Night form", "number": "24", "team": "TOTEM NIGHT FORM", "role": "unlock / high-speed variant", "chips": ["#14181c", "#122b36", "#5d666d", "#8d9498", "#0a0c0e", "#49e2ff", "#c2461a", "#4b3526"] }
+  ],
+
+  "source": {
+    "editable": ["totem.js", "kit-lib.js", "handoff.js", "kit-props.js"],
+    "generator_page": "futurisma-handoff.html",
+    "note": "geometry is authored procedurally — these files are the editable source of truth; the GLBs are build products"
+  },
+
+  "third_party": {
+    "fonts": [
+      { "name": "Saira", "licence": "SIL OFL 1.1", "author": "Héctor Gatti / Omnibus-Type", "use": "race number, team mark, display type" },
+      { "name": "JetBrains Mono", "licence": "SIL OFL 1.1", "author": "JetBrains s.r.o.", "use": "stencils, serials, technical labels" }
+    ],
+    "tooling": "three.js 0.184 (MIT) — tooling and viewer only, no runtime dependency in the exported assets",
+    "imagery": "none — every texture is drawn procedurally to canvas; no photographic, stock, scanned or AI-generated source",
+    "geometry": "original, authored for this project; no purchased or kitbashed base meshes",
+    "note": "both fonts are rasterised into the atlas PNGs, which OFL permits; ship both OFL.txt files with the game's third-party notices"
+  },
+
+  "validation": {
+    "method": "exported GLB buffers parsed back and checked: header, primitive count, NORMAL/TEXCOORD_0/COLOR_0 presence, image references, node scale drift, alpha modes, and world-space bounds recomputed through the node hierarchy",
+    "master": { "header": "glTF v2", "draw_calls": 153, "triangles": 6186, "materials": 25, "textures": 12, "images": 1, "missing_images": 0, "primitives_missing_normals": 0, "primitives_missing_uv": 0, "non_uniform_scaled_nodes": [], "nodes": 199, "dimensions_m": [3.400, 2.256, 6.602], "verdict": "PASS" },
+    "runtime": { "header": "glTF v2", "draw_calls": 18, "triangles": 6186, "materials": 4, "textures": 2, "images": 2, "missing_images": 0, "primitives_missing_normals": 0, "primitives_missing_uv": 0, "non_uniform_scaled_nodes": [], "nodes": 53, "dimensions_m": [3.400, 2.256, 6.602], "verdict": "PASS" },
+    "asset_kit": { "header": "glTF v2", "draw_calls": 128, "triangles": 3052, "materials": 19, "textures": 1, "images": 1, "missing_images": 0, "primitives_missing_normals": 0, "primitives_missing_uv": 0, "non_uniform_scaled_nodes": [], "nodes": 155, "dimensions_m": [15.180, 7.274, 6.477], "verdict": "PASS" }
+  }
+}
