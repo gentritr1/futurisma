@@ -23,6 +23,8 @@ Open the local URL printed by Vite.
 Standard gamepad triggers control thrust and braking. The time trial is two laps.
 TOTEM now uses player-controlled heading with speed-sensitive steering, grip, and
 high-speed drift. Course vectors must be cleared in order for a lap to count.
+The HUD calls upcoming turns, the next gate, corrective edge steering, and the
+remaining distance to the finish.
 
 ## Visual test mode
 

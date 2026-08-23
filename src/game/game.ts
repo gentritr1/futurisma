@@ -437,6 +437,11 @@ export class FuturismaGame {
     const checkpoint = this.nextCheckpointIndex === 0
       ? this.course.checkpointCount
       : this.nextCheckpointIndex;
+    const turnCue = this.phase === "running" ? this.course.turnAhead(this.progress) : null;
+    const finishDistanceMeters = this.phase === "finished"
+      ? 0
+      : ((TOTAL_LAPS - Math.min(this.lap, TOTAL_LAPS)) + (1 - this.progress))
+        * this.course.length;
     this.ui.update({
       speedKph: this.speed * 3.6,
       boost: this.boostReserve,
@@ -446,10 +451,15 @@ export class FuturismaGame {
       progress: ((this.lap - 1) + this.progress) / TOTAL_LAPS,
       checkpoint,
       checkpointCount: this.course.checkpointCount,
+      finishDistanceMeters,
+      turnDirection: turnCue?.direction ?? null,
+      turnDistanceMeters: turnCue?.distance ?? 0,
+      turnHard: turnCue?.hard ?? false,
       boostActive: this.boostActive,
       braking: input.brake > 0.1,
       skidsDown: this.speed < 11,
       edgeWarning: this.edgeContact,
+      edgeCorrection: this.edgeContact ? (this.lateral > 0 ? "LEFT" : "RIGHT") : null,
     });
   }
 

@@ -41,7 +41,10 @@
         </section>
 
         <section class="race-progress" aria-label="Course progress">
-          <span id="checkpoint-value">VECTOR 01 / 08</span>
+          <div class="race-progress__copy">
+            <span id="checkpoint-value">NEXT GATE 01 / 08</span>
+            <span id="finish-value">2 LAPS TO FINISH</span>
+          </div>
           <span class="race-progress__track"><span id="progress-fill"></span></span>
         </section>
 
@@ -53,7 +56,13 @@
           <div class="boost__track"><span id="boost-fill"></span></div>
         </section>
 
-        <div id="edge-warning" class="edge-warning" role="status">COURSE EDGE</div>
+        <div id="edge-warning" class="edge-warning" role="status" aria-hidden="true">
+          COURSE EDGE
+        </div>
+        <div id="turn-cue" class="turn-cue" role="status" aria-hidden="true">
+          <span id="turn-label">TURN LEFT</span>
+          <strong id="turn-distance">120 M</strong>
+        </div>
         <div id="countdown" class="countdown" aria-live="assertive"></div>
       </main>
 

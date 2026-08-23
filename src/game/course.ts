@@ -13,6 +13,12 @@ export interface CourseProjection extends CourseSample {
   lateral: number;
 }
 
+export interface TurnCue {
+  direction: "LEFT" | "RIGHT";
+  distance: number;
+  hard: boolean;
+}
+
 const WORLD_UP = new THREE.Vector3(0, 1, 0);
 const COURSE_POINTS = [
   [0, 0, 0],
@@ -28,8 +34,12 @@ const COURSE_POINTS = [
   [270, 10, 55],
   [275, 3, -70],
   [210, 0, -175],
-  [95, 2, -235],
-  [25, 0, -120],
+  [120, 2, -260],
+  [50, 0, -235],
+  [42, -1, -145],
+  [65, 0, -55],
+  [78, 1, 40],
+  [40, 1, 105],
 ] as const;
 
 function seededRandom(seed: number): () => number {
@@ -76,7 +86,9 @@ export class SpeedCourse {
     this.group.add(
       this.createTrackSurface(),
       this.createTrackUnderside(),
+      this.createEdgeRails(),
       this.createEdgeLights(),
+      this.createTurnMarkers(),
       this.createCheckpointGates(),
       this.createStartGrid(),
       this.createJungleSilhouette(),
@@ -157,6 +169,22 @@ export class SpeedCourse {
       + (position.y - sample.position.y) * sample.right.y
       + (position.z - sample.position.z) * sample.right.z;
     return { ...sample, progress: nearestProgress, lateral };
+  }
+
+  turnAhead(progress: number, maximumDistance = 190): TurnCue | null {
+    const step = 8;
+    for (let distance = 0; distance <= maximumDistance; distance += step) {
+      const sample = this.sample(progress + distance / this.length);
+      const strength = Math.abs(sample.curvature);
+      if (strength < 0.17) continue;
+
+      return {
+        direction: sample.curvature > 0 ? "LEFT" : "RIGHT",
+        distance,
+        hard: strength > 0.48,
+      };
+    }
+    return null;
   }
 
   private createTrackSurface(): THREE.Mesh {
@@ -244,6 +272,125 @@ export class SpeedCourse {
     return mesh;
   }
 
+  private createEdgeRails(): THREE.Group {
+    const group = new THREE.Group();
+    group.name = "course_edge_rails";
+    const segments = 720;
+    const railMaterial = new THREE.MeshStandardMaterial({
+      color: 0x11191d,
+      roughness: 0.78,
+      metalness: 0.22,
+      side: THREE.DoubleSide,
+    });
+
+    for (const side of [-1, 1]) {
+      const positions: number[] = [];
+      const indices: number[] = [];
+      const lightPoints: THREE.Vector3[] = [];
+
+      for (let index = 0; index < segments; index += 1) {
+        const sample = this.sample(index / segments);
+        const bottom = sample.position
+          .clone()
+          .addScaledVector(sample.right, side * (this.halfWidth - 0.12))
+          .addScaledVector(sample.up, 0.04);
+        const top = bottom.clone().addScaledVector(sample.up, 0.62);
+        positions.push(bottom.x, bottom.y, bottom.z, top.x, top.y, top.z);
+        lightPoints.push(top.clone().addScaledVector(sample.up, 0.04));
+
+        const nextIndex = (index + 1) % segments;
+        const offset = index * 2;
+        const nextOffset = nextIndex * 2;
+        indices.push(
+          offset,
+          nextOffset,
+          offset + 1,
+          nextOffset,
+          nextOffset + 1,
+          offset + 1,
+        );
+      }
+
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+      geometry.setIndex(indices);
+      geometry.computeVertexNormals();
+      geometry.computeBoundingSphere();
+      const rail = new THREE.Mesh(geometry, railMaterial);
+      rail.name = side < 0 ? "course_rail_left" : "course_rail_right";
+
+      const lightGeometry = new THREE.BufferGeometry().setFromPoints(lightPoints);
+      const lightMaterial = new THREE.LineBasicMaterial({
+        color: side < 0 ? 0x49e2ff : 0xc4f230,
+        transparent: true,
+        opacity: 0.82,
+      });
+      const light = new THREE.LineLoop(lightGeometry, lightMaterial);
+      light.name = side < 0 ? "course_rail_light_left" : "course_rail_light_right";
+      group.add(rail, light);
+    }
+
+    return group;
+  }
+
+  private createTurnMarkers(): THREE.Group {
+    const group = new THREE.Group();
+    group.name = "course_turn_markers";
+    const boardGeometry = new THREE.BoxGeometry(3.4, 1.65, 0.22);
+    const postGeometry = new THREE.BoxGeometry(0.18, 2.1, 0.18);
+    const boardMaterial = new THREE.MeshStandardMaterial({
+      color: 0x182126,
+      roughness: 0.7,
+      metalness: 0.3,
+    });
+    const postMaterial = new THREE.MeshStandardMaterial({
+      color: 0x2c373b,
+      roughness: 0.76,
+      metalness: 0.24,
+    });
+    const arrowMaterial = new THREE.MeshBasicMaterial({
+      color: 0xc4f230,
+      side: THREE.DoubleSide,
+    });
+    const arrowShape = new THREE.Shape();
+    arrowShape.moveTo(-1.25, -0.22);
+    arrowShape.lineTo(0.25, -0.22);
+    arrowShape.lineTo(0.25, -0.58);
+    arrowShape.lineTo(1.28, 0);
+    arrowShape.lineTo(0.25, 0.58);
+    arrowShape.lineTo(0.25, 0.22);
+    arrowShape.lineTo(-1.25, 0.22);
+    arrowShape.closePath();
+    const arrowGeometry = new THREE.ShapeGeometry(arrowShape);
+    let lastMarker = -20;
+    let markerCount = 0;
+
+    for (let index = 0; index < 180; index += 1) {
+      const sample = this.sample(index / 180);
+      if (Math.abs(sample.curvature) < 0.2 || index - lastMarker < 10) continue;
+
+      const marker = new THREE.Group();
+      marker.name = `turn_marker_${markerCount + 1}`;
+      poseObject(marker, sample);
+      const outside = sample.curvature > 0 ? 1 : -1;
+      const markerX = outside * (this.halfWidth + 1.7);
+
+      const board = new THREE.Mesh(boardGeometry, boardMaterial);
+      board.position.set(markerX, 2.2, 0);
+      const post = new THREE.Mesh(postGeometry, postMaterial);
+      post.position.set(markerX, 1.05, 0.08);
+      const arrow = new THREE.Mesh(arrowGeometry, arrowMaterial);
+      arrow.position.set(markerX, 2.2, 0.12);
+      if (sample.curvature > 0) arrow.scale.x = -1;
+      marker.add(board, post, arrow);
+      group.add(marker);
+      lastMarker = index;
+      markerCount += 1;
+    }
+
+    return group;
+  }
+
   private createEdgeLights(): THREE.Group {
     const group = new THREE.Group();
     group.name = "course_edge_lights";
@@ -291,6 +438,12 @@ export class SpeedCourse {
     group.name = "checkpoint_gates";
     const columnGeometry = new THREE.BoxGeometry(0.5, 6.2, 0.5);
     const beamGeometry = new THREE.BoxGeometry(this.halfWidth * 2 + 2.4, 0.34, 0.48);
+    const finishColumnGeometry = new THREE.BoxGeometry(0.72, 8.8, 0.72);
+    const finishBeamGeometry = new THREE.BoxGeometry(
+      this.halfWidth * 2 + 3.2,
+      0.62,
+      0.78,
+    );
     const darkMaterial = new THREE.MeshStandardMaterial({
       color: 0x273136,
       roughness: 0.72,
@@ -304,30 +457,57 @@ export class SpeedCourse {
       const gate = new THREE.Group();
       gate.name = `checkpoint_${index + 1}`;
       poseObject(gate, sample);
+      const isFinish = index === 0;
 
       for (const side of [-1, 1]) {
-        const column = new THREE.Mesh(columnGeometry, darkMaterial);
-        column.position.set(side * (this.halfWidth + 0.75), 3, 0);
+        const column = new THREE.Mesh(
+          isFinish ? finishColumnGeometry : columnGeometry,
+          darkMaterial,
+        );
+        column.position.set(
+          side * (this.halfWidth + (isFinish ? 1.05 : 0.75)),
+          isFinish ? 4.35 : 3,
+          0,
+        );
         gate.add(column);
 
         const lamp = new THREE.Mesh(
-          new THREE.BoxGeometry(0.62, 0.18, 0.7),
+          new THREE.BoxGeometry(isFinish ? 0.84 : 0.62, isFinish ? 5.8 : 0.18, 0.74),
           index % 2 === 0 ? acidMaterial : cyanMaterial,
         );
-        lamp.position.set(side * (this.halfWidth + 0.75), 5.2, -0.28);
+        lamp.position.set(
+          side * (this.halfWidth + (isFinish ? 1.05 : 0.75)),
+          isFinish ? 4.35 : 5.2,
+          -0.39,
+        );
         gate.add(lamp);
       }
 
-      const beam = new THREE.Mesh(beamGeometry, darkMaterial);
-      beam.position.y = 6.15;
+      const beam = new THREE.Mesh(
+        isFinish ? finishBeamGeometry : beamGeometry,
+        darkMaterial,
+      );
+      beam.position.y = isFinish ? 8.7 : 6.15;
       gate.add(beam);
 
       const centerLamp = new THREE.Mesh(
-        new THREE.BoxGeometry(3.6, 0.16, 0.72),
+        new THREE.BoxGeometry(isFinish ? 7.2 : 3.6, isFinish ? 0.34 : 0.16, 0.82),
         index % 2 === 0 ? cyanMaterial : acidMaterial,
       );
-      centerLamp.position.set(0, 5.94, -0.28);
+      centerLamp.position.set(0, isFinish ? 8.35 : 5.94, isFinish ? -0.5 : -0.28);
       gate.add(centerLamp);
+
+      if (isFinish) {
+        const finishLampGeometry = new THREE.BoxGeometry(0.9, 0.3, 0.86);
+        for (let lampIndex = -7; lampIndex <= 7; lampIndex += 1) {
+          const finishLamp = new THREE.Mesh(
+            finishLampGeometry,
+            lampIndex % 2 === 0 ? acidMaterial : cyanMaterial,
+          );
+          finishLamp.position.set(lampIndex * 1.2, 8.68, -0.52);
+          gate.add(finishLamp);
+        }
+      }
       group.add(gate);
     }
 

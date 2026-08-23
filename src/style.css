@@ -207,6 +207,21 @@ kbd {
   text-align: center;
 }
 
+.race-progress__copy {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  white-space: nowrap;
+}
+
+#finish-value {
+  color: var(--ink);
+}
+
+#finish-value[data-final="true"] {
+  color: var(--acid);
+}
+
 .race-progress__track,
 .boost__track {
   display: block;
@@ -265,6 +280,40 @@ kbd {
 }
 
 .edge-warning[data-active="true"] {
+  opacity: 1;
+}
+
+.turn-cue {
+  position: absolute;
+  left: 50%;
+  top: 19%;
+  min-width: 180px;
+  padding: 9px 13px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 20px;
+  transform: translate(-50%, 8px);
+  opacity: 0;
+  background: oklch(0.08 0.018 205 / 0.84);
+  border-top: 1px solid var(--acid);
+  border-bottom: 1px solid var(--line);
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  transition:
+    opacity 140ms ease,
+    transform 180ms var(--ease-out);
+}
+
+.turn-cue strong {
+  color: var(--cyan);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.turn-cue[data-active="true"] {
+  transform: translate(-50%, 0);
   opacity: 1;
 }
 
@@ -517,7 +566,12 @@ body[data-phase="result"] .boost {
 
   .race-progress {
     top: 58px;
-    width: 52vw;
+    width: min(68vw, 360px);
+  }
+
+  .race-progress__copy {
+    gap: 10px;
+    font-size: 0.58rem;
   }
 
   .telemetry {
@@ -543,6 +597,12 @@ body[data-phase="result"] .boost {
   .boost {
     bottom: 24px;
     width: 52vw;
+  }
+
+  .turn-cue {
+    top: 17%;
+    min-width: 166px;
+    padding: 8px 10px;
   }
 
   .screen {
@@ -588,7 +648,8 @@ body[data-phase="result"] .boost {
   .intro-panel,
   .result-panel,
   .launch-button,
-  .edge-warning {
+  .edge-warning,
+  .turn-cue {
     transition: opacity 200ms ease;
   }
 

@@ -7,10 +7,15 @@ export interface HudFrame {
   progress: number;
   checkpoint: number;
   checkpointCount: number;
+  finishDistanceMeters: number;
+  turnDirection: "LEFT" | "RIGHT" | null;
+  turnDistanceMeters: number;
+  turnHard: boolean;
   boostActive: boolean;
   braking: boolean;
   skidsDown: boolean;
   edgeWarning: boolean;
+  edgeCorrection: "LEFT" | "RIGHT" | null;
 }
 
 function requiredElement<T extends HTMLElement>(id: string): T {
@@ -43,10 +48,14 @@ export class GameUi {
   private readonly timeValue = requiredElement<HTMLElement>("time-value");
   private readonly lapValue = requiredElement<HTMLElement>("lap-value");
   private readonly checkpointValue = requiredElement<HTMLElement>("checkpoint-value");
+  private readonly finishValue = requiredElement<HTMLElement>("finish-value");
   private readonly progressFill = requiredElement<HTMLElement>("progress-fill");
   private readonly boostValue = requiredElement<HTMLElement>("boost-value");
   private readonly boostFill = requiredElement<HTMLElement>("boost-fill");
   private readonly edgeWarning = requiredElement<HTMLElement>("edge-warning");
+  private readonly turnCue = requiredElement<HTMLElement>("turn-cue");
+  private readonly turnLabel = requiredElement<HTMLElement>("turn-label");
+  private readonly turnDistance = requiredElement<HTMLElement>("turn-distance");
   private readonly countdown = requiredElement<HTMLElement>("countdown");
   private readonly errorPanel = requiredElement<HTMLElement>("error-panel");
   private readonly errorMessage = requiredElement<HTMLElement>("error-message");
@@ -55,6 +64,8 @@ export class GameUi {
   private lastDriveLabel = "";
   private lastBoostState = "";
   private lastEdgeState = "";
+  private lastTurnState = "";
+  private lastRaceStage = "";
 
   showReady(): void {
     this.loadingScreen.hidden = true;
@@ -104,7 +115,7 @@ export class GameUi {
     this.speedValue.textContent = Math.round(frame.speedKph).toString().padStart(3, "0");
     this.timeValue.textContent = formatRaceTime(frame.elapsedMs);
     const lapLabel = `LAP ${Math.min(frame.lap, frame.totalLaps)} / ${frame.totalLaps}`;
-    const checkpointLabel = `VECTOR ${frame.checkpoint
+    const checkpointLabel = `NEXT GATE ${frame.checkpoint
       .toString()
       .padStart(2, "0")} / ${frame.checkpointCount.toString().padStart(2, "0")}`;
     if (lapLabel !== this.lastLapLabel) {
@@ -115,6 +126,11 @@ export class GameUi {
       this.checkpointValue.textContent = checkpointLabel;
       this.lastCheckpointLabel = checkpointLabel;
     }
+    const finishDistance = Math.max(0, frame.finishDistanceMeters);
+    this.finishValue.textContent = finishDistance >= 1000
+      ? `${(finishDistance / 1000).toFixed(1)} KM TO FINISH`
+      : `${Math.ceil(finishDistance / 10) * 10} M TO FINISH`;
+    this.finishValue.dataset.final = frame.lap === frame.totalLaps ? "true" : "false";
     this.progressFill.style.transform = `scaleX(${Math.min(1, Math.max(0, frame.progress))})`;
     this.boostValue.textContent = `${Math.round(frame.boost * 100)}%`;
     this.boostFill.style.transform = `scaleX(${Math.min(1, Math.max(0, frame.boost))})`;
@@ -126,7 +142,30 @@ export class GameUi {
     }
     if (edgeState !== this.lastEdgeState) {
       this.edgeWarning.dataset.active = edgeState;
+      this.edgeWarning.setAttribute("aria-hidden", frame.edgeWarning ? "false" : "true");
       this.lastEdgeState = edgeState;
+    }
+    if (frame.edgeWarning && frame.edgeCorrection) {
+      this.edgeWarning.textContent = `COURSE EDGE · STEER ${frame.edgeCorrection}`;
+    }
+    const turnState = frame.turnDirection
+      ? `${frame.turnDirection}:${frame.turnHard}:${Math.round(frame.turnDistanceMeters / 10)}`
+      : "none";
+    if (turnState !== this.lastTurnState) {
+      this.turnCue.dataset.active = frame.turnDirection ? "true" : "false";
+      this.turnCue.setAttribute("aria-hidden", frame.turnDirection ? "false" : "true");
+      if (frame.turnDirection) {
+        this.turnLabel.textContent = `${frame.turnHard ? "HARD " : "TURN "}${frame.turnDirection}`;
+        this.turnDistance.textContent = frame.turnDistanceMeters < 12
+          ? "NOW"
+          : `${Math.ceil(frame.turnDistanceMeters / 10) * 10} M`;
+      }
+      this.lastTurnState = turnState;
+    }
+    const raceStage = frame.lap === frame.totalLaps ? "final" : "running";
+    if (raceStage !== this.lastRaceStage) {
+      if (raceStage === "final") this.systemStatus.textContent = "FINAL LAP";
+      this.lastRaceStage = raceStage;
     }
     const driveLabel = frame.skidsDown
       ? "SKIDS DOWN"
