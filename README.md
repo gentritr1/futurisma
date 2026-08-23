@@ -17,10 +17,12 @@ Open the local URL printed by Vite.
 - `A D` / Left Right: steer
 - `S` / Down: brake
 - `Shift` / gamepad A: boost
-- `R` / gamepad Y: reset the trial
+- `R` / gamepad Y: recover at the last cleared vector
 - `M` / gamepad Back: mute procedural engine audio
 
 Standard gamepad triggers control thrust and braking. The time trial is two laps.
+TOTEM now uses player-controlled heading with speed-sensitive steering, grip, and
+high-speed drift. Course vectors must be cleared in order for a lap to count.
 
 ## Visual test mode
 

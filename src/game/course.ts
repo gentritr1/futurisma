@@ -8,6 +8,11 @@ export interface CourseSample {
   curvature: number;
 }
 
+export interface CourseProjection extends CourseSample {
+  progress: number;
+  lateral: number;
+}
+
 const WORLD_UP = new THREE.Vector3(0, 1, 0);
 const COURSE_POINTS = [
   [0, 0, 0],
@@ -51,6 +56,8 @@ export class SpeedCourse {
   readonly length: number;
   readonly halfWidth = 9.5;
   readonly checkpointCount = 8;
+  private readonly projectionResolution = 1440;
+  private readonly projectionPoints: THREE.Vector3[] = [];
 
   constructor() {
     this.group.name = "neutral_speed_course";
@@ -62,6 +69,9 @@ export class SpeedCourse {
     );
     this.arcLengthDivisions = 1800;
     this.length = this.curve.getLength();
+    for (let index = 0; index < this.projectionResolution; index += 1) {
+      this.projectionPoints.push(this.curve.getPointAt(index / this.projectionResolution));
+    }
 
     this.group.add(
       this.createTrackSurface(),
@@ -94,6 +104,59 @@ export class SpeedCourse {
     );
 
     return { position, tangent, right, up, curvature };
+  }
+
+  project(position: THREE.Vector3, hintProgress: number): CourseProjection {
+    const segmentCount = this.projectionResolution;
+    const hintIndex = Math.round(THREE.MathUtils.euclideanModulo(hintProgress, 1) * segmentCount);
+    const localRadius = 36;
+    let nearestDistanceSq = Number.POSITIVE_INFINITY;
+    let nearestProgress = hintProgress;
+
+    const inspectSegment = (rawIndex: number): void => {
+      const index = THREE.MathUtils.euclideanModulo(rawIndex, segmentCount);
+      const nextIndex = (index + 1) % segmentCount;
+      const start = this.projectionPoints[index];
+      const end = this.projectionPoints[nextIndex];
+      const segmentX = end.x - start.x;
+      const segmentY = end.y - start.y;
+      const segmentZ = end.z - start.z;
+      const lengthSq = segmentX * segmentX + segmentY * segmentY + segmentZ * segmentZ;
+      const along = lengthSq > 0
+        ? THREE.MathUtils.clamp(
+            ((position.x - start.x) * segmentX
+              + (position.y - start.y) * segmentY
+              + (position.z - start.z) * segmentZ) / lengthSq,
+            0,
+            1,
+          )
+        : 0;
+      const differenceX = start.x + segmentX * along - position.x;
+      const differenceY = start.y + segmentY * along - position.y;
+      const differenceZ = start.z + segmentZ * along - position.z;
+      const distanceSq = differenceX * differenceX
+        + differenceY * differenceY
+        + differenceZ * differenceZ;
+      if (distanceSq >= nearestDistanceSq) return;
+
+      nearestDistanceSq = distanceSq;
+      nearestProgress = THREE.MathUtils.euclideanModulo((index + along) / segmentCount, 1);
+    };
+
+    for (let offset = -localRadius; offset <= localRadius; offset += 1) {
+      inspectSegment(hintIndex + offset);
+    }
+
+    const globalSearchThreshold = this.halfWidth + 20;
+    if (nearestDistanceSq > globalSearchThreshold * globalSearchThreshold) {
+      for (let index = 0; index < segmentCount; index += 1) inspectSegment(index);
+    }
+
+    const sample = this.sample(nearestProgress);
+    const lateral = (position.x - sample.position.x) * sample.right.x
+      + (position.y - sample.position.y) * sample.right.y
+      + (position.z - sample.position.z) * sample.right.z;
+    return { ...sample, progress: nearestProgress, lateral };
   }
 
   private createTrackSurface(): THREE.Mesh {

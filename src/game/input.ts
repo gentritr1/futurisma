@@ -13,6 +13,12 @@ const CONTROL_KEYS = new Set([
   "Space",
 ]);
 
+function applyDeadzone(value: number, deadzone = 0.16): number {
+  const magnitude = Math.abs(value);
+  if (magnitude <= deadzone) return 0;
+  return Math.sign(value) * ((magnitude - deadzone) / (1 - deadzone));
+}
+
 export class InputController {
   private readonly keys = new Set<string>();
   private startRequested = false;
@@ -51,7 +57,7 @@ export class InputController {
     if (gamepadButtons[8] && !this.previousGamepadButtons[8]) this.muteRequested = true;
     this.previousGamepadButtons = gamepadButtons;
 
-    const stick = Math.abs(gamepad.axes[0] ?? 0) > 0.12 ? gamepad.axes[0] ?? 0 : 0;
+    const stick = applyDeadzone(gamepad.axes[0] ?? 0);
     const triggerThrottle = gamepad.buttons[7]?.value ?? 0;
     const triggerBrake = gamepad.buttons[6]?.value ?? 0;
 
