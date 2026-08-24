@@ -28,6 +28,8 @@ is released, preventing depleted thrust, audio, and effects from pulsing. The
 reserve meter and drive-state readout both call for that release in amber.
 TOTEM now uses player-controlled heading with speed-sensitive steering, grip, and
 high-speed drift. Course vectors must be cleared in order for a lap to count.
+The chase lens expands with speed, boost, and drift, then compresses slightly
+under high-speed braking; reduced motion keeps the same states at lower range.
 The vehicle must also pass inside each authored gate span. Compatible gamepads
 receive restrained boost, checkpoint, impact, recovery, and finish rumble.
 The HUD calls upcoming turns, the next gate, corrective edge steering, and the

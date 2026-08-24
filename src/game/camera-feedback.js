@@ -4,6 +4,44 @@ function clamp(value, minimum, maximum) {
 }
 
 /**
+ * Arcade lens response with bounded speed expansion and a small speed-scaled
+ * braking compression. Reduced motion retains state readability at lower range.
+ * @param {number} speedRatio
+ * @param {boolean} boostActive
+ * @param {number} driftIntensity
+ * @param {number} brake
+ * @param {boolean} reducedMotion
+ */
+export function calculateDesiredCameraFov(
+  speedRatio,
+  boostActive,
+  driftIntensity,
+  brake,
+  reducedMotion,
+) {
+  const speed = Number.isFinite(speedRatio) ? clamp(speedRatio, 0, 1) : 0;
+  const drift = Number.isFinite(driftIntensity) ? clamp(driftIntensity, 0, 1) : 0;
+  const braking = Number.isFinite(brake) ? clamp(brake, 0, 1) : 0;
+  const speedRange = reducedMotion ? 5 : 10;
+  const boostRange = reducedMotion ? 2 : 7;
+  const driftRange = reducedMotion ? 0.6 : 3;
+  const brakeRange = reducedMotion ? 1 : 3;
+  return 56
+    + speed * speedRange
+    + (boostActive ? boostRange : 0)
+    + drift * driftRange
+    - braking * speed * brakeRange;
+}
+
+/** @param {number} currentFov @param {number} desiredFov @param {number} deltaSeconds */
+export function integrateCameraFov(currentFov, desiredFov, deltaSeconds) {
+  const current = Number.isFinite(currentFov) ? currentFov : 56;
+  const desired = Number.isFinite(desiredFov) ? desiredFov : 56;
+  const delta = Number.isFinite(deltaSeconds) ? Math.max(0, deltaSeconds) : 0;
+  return current + (desired - current) * (1 - Math.exp(-delta * 4.8));
+}
+
+/**
  * Deterministic, bounded impact vibration. Sampling the same timestamp always
  * returns the same offset, so camera feedback does not change with render rate.
  * @param {number} elapsedSeconds

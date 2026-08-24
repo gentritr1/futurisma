@@ -3,7 +3,11 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { ASSET_KIT_PROP_PLACEMENTS } from "./asset-kit-layout";
 import { EngineAudio } from "./audio";
-import { calculateImpactShakeOffset } from "./camera-feedback";
+import {
+  calculateDesiredCameraFov,
+  calculateImpactShakeOffset,
+  integrateCameraFov,
+} from "./camera-feedback";
 import { hasPlayerControlIntent } from "./control-mode";
 import { GreenwaterCourse, type TurnCue } from "./course";
 import { disposeObject3DResources } from "./graphics-resources";
@@ -294,6 +298,9 @@ export class FuturismaGame {
   private diagnosticEdgeSeconds = 0;
   private diagnosticWrongWaySeconds = 0;
   private diagnosticWrongWayEntries = 0;
+  private diagnosticMinimumCameraFov = 56;
+  private diagnosticMaximumCameraFov = 56;
+  private diagnosticMaximumBrakeFovCompression = 0;
   private diagnosticImpacts = 0;
   private diagnosticMissedGates = 0;
   private diagnosticRecoveries = 0;
@@ -598,7 +605,7 @@ export class FuturismaGame {
         ? this.demoInput
         : input;
     this.updatePose(presentationInput, delta);
-    this.updateCamera(delta, this.steerAmount);
+    this.updateCamera(delta, this.steerAmount, presentationInput.brake);
     this.updateSpeedLines(delta);
     this.updateImpactSparks(delta);
     this.updateFog(delta);
@@ -1098,7 +1105,7 @@ export class FuturismaGame {
     if (delta > 0) this.impactShake = Math.max(0, this.impactShake - delta * 3.6);
   }
 
-  private updateCamera(delta: number, steer: number): void {
+  private updateCamera(delta: number, steer: number, brake: number): void {
     const sample = this.course.project(
       this.presentationPosition,
       this.progress,
@@ -1158,18 +1165,42 @@ export class FuturismaGame {
     }
 
     this.camera.lookAt(this.cameraLook);
-    const desiredFov = 56
-      + (this.speed / BOOST_MAX_SPEED) * (this.reducedMotion ? 5 : 10)
-      + (this.boostActive ? (this.reducedMotion ? 2 : 7) : 0)
-      + this.driftIntensity * (this.reducedMotion ? 0.6 : 3);
-    const nextFov = THREE.MathUtils.lerp(
+    const desiredFov = calculateDesiredCameraFov(
+      this.speed / BOOST_MAX_SPEED,
+      this.boostActive,
+      this.driftIntensity,
+      brake,
+      this.reducedMotion,
+    );
+    const nextFov = integrateCameraFov(
       this.camera.fov,
       desiredFov,
-      1 - Math.exp(-delta * 4.8),
+      delta,
     );
     if (Math.abs(nextFov - this.camera.fov) > 0.001) {
       this.camera.fov = nextFov;
       this.camera.updateProjectionMatrix();
+    }
+    if (this.diagnosticsMode) {
+      const freeCameraFov = calculateDesiredCameraFov(
+        this.speed / BOOST_MAX_SPEED,
+        this.boostActive,
+        this.driftIntensity,
+        0,
+        this.reducedMotion,
+      );
+      this.diagnosticMinimumCameraFov = Math.min(
+        this.diagnosticMinimumCameraFov,
+        this.camera.fov,
+      );
+      this.diagnosticMaximumCameraFov = Math.max(
+        this.diagnosticMaximumCameraFov,
+        this.camera.fov,
+      );
+      this.diagnosticMaximumBrakeFovCompression = Math.max(
+        this.diagnosticMaximumBrakeFovCompression,
+        freeCameraFov - desiredFov,
+      );
     }
   }
 
@@ -1716,6 +1747,11 @@ export class FuturismaGame {
       edgeSeconds: Number(this.diagnosticEdgeSeconds.toFixed(2)),
       wrongWaySeconds: Number(this.diagnosticWrongWaySeconds.toFixed(2)),
       wrongWayEntries: this.diagnosticWrongWayEntries,
+      minimumCameraFov: Number(this.diagnosticMinimumCameraFov.toFixed(2)),
+      maximumCameraFov: Number(this.diagnosticMaximumCameraFov.toFixed(2)),
+      maximumBrakeFovCompression: Number(
+        this.diagnosticMaximumBrakeFovCompression.toFixed(2),
+      ),
       impacts: this.diagnosticImpacts,
       missedGates: this.diagnosticMissedGates,
       impactLocations: this.diagnosticImpactLocations,
@@ -1818,6 +1854,9 @@ export class FuturismaGame {
     this.diagnosticEdgeSeconds = 0;
     this.diagnosticWrongWaySeconds = 0;
     this.diagnosticWrongWayEntries = 0;
+    this.diagnosticMinimumCameraFov = this.camera.fov;
+    this.diagnosticMaximumCameraFov = this.camera.fov;
+    this.diagnosticMaximumBrakeFovCompression = 0;
     this.diagnosticImpacts = 0;
     this.diagnosticMissedGates = 0;
     this.diagnosticRecoveries = 0;
