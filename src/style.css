@@ -255,6 +255,10 @@ kbd {
   color: var(--acid);
 }
 
+#checkpoint-value[data-missed="true"] {
+  color: var(--warning);
+}
+
 #finish-value {
   color: var(--ink);
 }
@@ -602,11 +606,13 @@ body[data-phase="paused"] .hud::before {
   color: var(--muted);
 }
 
-body[data-phase="intro"] .hud,
-body[data-phase="result"] .telemetry,
-body[data-phase="result"] .race-progress,
-body[data-phase="result"] .boost {
+body[data-phase="intro"] .hud {
   opacity: 0.38;
+}
+
+body[data-phase="result"] .hud {
+  opacity: 0;
+  visibility: hidden;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -660,6 +666,10 @@ body[data-phase="result"] .boost {
 
   .time-readout {
     font-size: 1.12rem;
+  }
+
+  #last-lap-value {
+    display: none;
   }
 
   .boost {

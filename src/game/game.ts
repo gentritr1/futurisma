@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { EngineAudio } from "./audio";
-import { GreenwaterCourse } from "./course";
+import { GreenwaterCourse, type TurnCue } from "./course";
 import type { InputFrame } from "./input";
 import { InputController } from "./input";
 import {
@@ -14,7 +14,15 @@ import {
   integrateBoostReserve,
   integrateSpeed,
 } from "./physics";
-import { applyPs2MaterialTreatment, TotemVehicle } from "./totem";
+import {
+  calculateFinishDistanceMeters,
+  crossedForwardProgress,
+} from "./race-rules";
+import {
+  applyPs2MaterialTreatment,
+  TotemVehicle,
+  type TotemVisualState,
+} from "./totem";
 import { GameUi } from "./ui";
 
 type RacePhase = "standby" | "countdown" | "running" | "paused" | "finished";
@@ -78,6 +86,24 @@ export class FuturismaGame {
   private readonly camera = new THREE.PerspectiveCamera(58, 1, 0.1, 650);
   private readonly renderer: THREE.WebGLRenderer;
   private readonly course = new GreenwaterCourse();
+  private readonly demoProjection = this.course.createProjectionScratch();
+  private readonly demoLookAhead = this.course.createSampleScratch();
+  private readonly demoTurnCue: TurnCue = {
+    direction: "LEFT",
+    distance: 0,
+    hard: false,
+    radius: 0,
+  };
+  private readonly hudTurnCue: TurnCue = {
+    direction: "LEFT",
+    distance: 0,
+    hard: false,
+    radius: 0,
+  };
+  private readonly beforeMoveProjection = this.course.createProjectionScratch();
+  private readonly afterMoveProjection = this.course.createProjectionScratch();
+  private readonly poseProjection = this.course.createProjectionScratch();
+  private readonly cameraProjection = this.course.createProjectionScratch();
   private readonly totalLaps = this.resolveLapCount();
   private readonly vehicle = new TotemVehicle();
   private readonly audio = new EngineAudio();
@@ -104,6 +130,16 @@ export class FuturismaGame {
     steer: 0,
     boost: false,
   };
+  private readonly vehicleVisualState: TotemVisualState = {
+    steer: 0,
+    throttle: 0,
+    brake: 0,
+    speedRatio: 0,
+    boostActive: false,
+    lateralLoad: 0,
+    elapsed: 0,
+    delta: 0,
+  };
 
   private phase: RacePhase = "standby";
   private progress = 0.002;
@@ -111,11 +147,17 @@ export class FuturismaGame {
   private lateral = 0;
   private steerAmount = 0;
   private nextCheckpointIndex = 1;
+  private missedGateIndex: number | null = null;
   private boostReserve = 1;
   private boostActive = false;
   private driftActive = false;
+  private surfaceGrip = 1;
   private lap = 1;
   private elapsedMs = 0;
+  private lapStartElapsedMs = 0;
+  private lastLapMs: number | null = null;
+  private bestLapMs: number | null = null;
+  private readonly lapTimesMs: number[] = [];
   private countdown = 3.7;
   private countdownStage = "";
   private edgeContact = false;
@@ -126,6 +168,7 @@ export class FuturismaGame {
   private impactSparkCursor = 0;
   private physicsAccumulator = 0;
   private adaptiveQualityDebt = 0;
+  private adaptiveQualityCredit = 0;
   private smoothedFrameMs = 16.67;
   private nextDiagnosticsAt = 0;
   private nextHudAt = 0;
@@ -138,6 +181,7 @@ export class FuturismaGame {
   private diagnosticBoostSeconds = 0;
   private diagnosticEdgeSeconds = 0;
   private diagnosticImpacts = 0;
+  private diagnosticMissedGates = 0;
   private diagnosticRecoveries = 0;
   private diagnosticTopSpeed = 0;
   private diagnosticMaxLateralRatio = 0;
@@ -146,6 +190,7 @@ export class FuturismaGame {
   private readonly diagnosticImpactLocations: string[] = [];
   private readonly diagnosticRecoveryLocations: string[] = [];
   private diagnosticsOutput: HTMLOutputElement | null = null;
+  private diagnosticsFinalReported = false;
   private readonly diagnosticsPeak = {
     calls: 0,
     triangles: 0,
@@ -162,7 +207,8 @@ export class FuturismaGame {
   private readonly qualityOverride = new URLSearchParams(window.location.search).get(
     "quality",
   );
-  private renderPixelRatio = this.resolvePixelRatio();
+  private readonly preferredPixelRatio = this.resolvePixelRatio();
+  private renderPixelRatio = this.preferredPixelRatio;
   private readonly demoMode = new URLSearchParams(window.location.search).has("demo");
   private readonly diagnosticsMode = new URLSearchParams(window.location.search).has(
     "diagnostics",
@@ -173,7 +219,7 @@ export class FuturismaGame {
 
   constructor(
     canvas: HTMLCanvasElement,
-  private readonly input: InputController,
+    private readonly input: InputController,
     private readonly ui: GameUi,
   ) {
     this.renderer = new THREE.WebGLRenderer({
@@ -265,13 +311,22 @@ export class FuturismaGame {
   };
 
   private readDemoInput(): InputFrame {
-    const projection = this.course.project(this.position, this.progress);
+    const projection = this.course.project(
+      this.position,
+      this.progress,
+      this.demoProjection,
+    );
     const speedRatio = this.speed / BOOST_MAX_SPEED;
-    const turnCue = this.course.turnAhead(this.progress, 220);
-    const lookAheadDistance = THREE.MathUtils.lerp(20, 36, speedRatio)
-      - (turnCue?.hard ? 5 : 0);
+    const turnCue = this.course.turnAhead(
+      this.progress,
+      220,
+      this.demoTurnCue,
+    );
+    const lookAheadDistance = THREE.MathUtils.lerp(32, 52, speedRatio)
+      - (turnCue?.hard ? 4 : 0);
     const lookAhead = this.course.sample(
       this.progress + lookAheadDistance / this.course.length,
+      this.demoLookAhead,
     );
     const target = this.scratchA.copy(lookAhead.tangent);
     this.alignDirectionToSurface(target, projection.up, projection.tangent);
@@ -294,25 +349,30 @@ export class FuturismaGame {
       gateProgress - this.progress,
       1,
     ) * this.course.length;
+    // Flying laps begin at full speed, so the showcase controller trims its
+    // straight-line target after lap one to keep the authored race pace.
+    const cleanLineSpeed = this.lap === 1 ? 88 : 73;
     const turnTargetSpeed = turnCue
-      ? turnCue.radius <= 60
-        ? 64
-        : turnCue.radius <= 85
-          ? 70
-          : turnCue.radius <= 110
-            ? 78
-            : turnCue.radius <= 200
-              ? 86
-              : 92
-      : 92;
+      ? turnCue.radius <= 50
+        ? 52
+        : turnCue.radius <= 60
+          ? 56
+          : turnCue.radius <= 85
+            ? 64
+            : turnCue.radius <= 110
+              ? 72
+              : turnCue.radius <= 200
+                ? 82
+                : cleanLineSpeed
+      : cleanLineSpeed;
     const brakingDistance = Math.max(
       0,
       (this.speed * this.speed - turnTargetSpeed * turnTargetSpeed) / 28,
-    ) + 20;
+    ) + 30;
     const approachingTurnLimit = Boolean(
       turnCue && turnCue.distance < brakingDistance,
     );
-    const desiredSpeed = approachingTurnLimit ? turnTargetSpeed : 92;
+    const desiredSpeed = approachingTurnLimit ? turnTargetSpeed : cleanLineSpeed;
     if (gateDistance < 120 && Math.abs(lateralCorrection) > 0.5) {
       this.demoInput.brake = 0.2;
     } else if (this.speed > desiredSpeed) {
@@ -325,14 +385,14 @@ export class FuturismaGame {
       this.demoInput.brake = Math.abs(signedAngle) > 0.62 ? 0.3 : 0;
     }
 
-    this.demoInput.throttle = 1;
+    this.demoInput.throttle = this.speed > desiredSpeed + 3 ? 0.18 : 1;
     this.demoInput.steer = THREE.MathUtils.clamp(
-      -signedAngle * 1.8 - lateralCorrection * 0.58 - lateralSlip * 0.92,
+      -signedAngle * 2.05 - lateralCorrection * 0.72 - lateralSlip,
       -1,
       1,
     );
-    this.demoInput.boost = !turnCue
-      && this.elapsedMs / 1000 % 5 < 1.1
+    this.demoInput.boost = !approachingTurnLimit
+      && this.elapsedMs / 1000 % 5 < 0.55
       && this.speed < 88
       && Math.abs(signedAngle) < 0.12
       && Math.abs(lateralCorrection) < 0.24;
@@ -369,7 +429,9 @@ export class FuturismaGame {
     this.audio.update(
       this.speed / BOOST_MAX_SPEED,
       presentationInput.throttle,
+      presentationInput.brake,
       this.boostActive,
+      this.surfaceGrip,
     );
     this.audio.setMusicProfile(this.course.musicAt(this.progress));
     const now = this.timer.getElapsed();
@@ -414,7 +476,11 @@ export class FuturismaGame {
   private updateRace(delta: number, input: InputFrame): void {
     if (this.diagnosticsMode) this.diagnosticPhysicsSteps += 1;
     this.recoveryImmunity = Math.max(0, this.recoveryImmunity - delta);
-    const beforeMove = this.course.project(this.position, this.progress);
+    const beforeMove = this.course.project(
+      this.position,
+      this.progress,
+      this.beforeMoveProjection,
+    );
     if (this.course.isOnBoostPad(this.progress, this.lateral, beforeMove.halfWidth)) {
       this.padBoostTime = 0.38;
     } else {
@@ -423,6 +489,7 @@ export class FuturismaGame {
     const wasBoostActive = this.boostActive;
     const reserveBoost = input.boost
       && input.throttle > 0.1
+      && input.brake < 0.15
       && this.boostReserve > 0.012;
     this.boostActive = reserveBoost || this.padBoostTime > 0;
     if (this.boostActive && !wasBoostActive) {
@@ -467,6 +534,11 @@ export class FuturismaGame {
       this.lateral,
       beforeMove.halfWidth,
     );
+    const wasLowGrip = this.surfaceGrip < 0.95;
+    this.surfaceGrip = surfaceGrip;
+    if (!wasLowGrip && surfaceGrip < 0.95) {
+      this.input.pulse(0.06, 0.2, 90);
+    }
     const gripRate = calculateGripRate(
       speedRatio,
       driftIntent,
@@ -484,7 +556,11 @@ export class FuturismaGame {
 
     this.position.addScaledVector(this.travelDirection, this.speed * delta);
     const previousProgress = this.progress;
-    const afterMove = this.course.project(this.position, this.progress);
+    const afterMove = this.course.project(
+      this.position,
+      this.progress,
+      this.afterMoveProjection,
+    );
     this.progress = afterMove.progress;
     this.lateral = afterMove.lateral;
     this.position.y = afterMove.position.y;
@@ -558,12 +634,16 @@ export class FuturismaGame {
   private updateCoast(delta: number): void {
     this.speed = Math.max(0, this.speed - delta * 5.5);
     this.position.addScaledVector(this.travelDirection, this.speed * delta);
-    const projection = this.course.project(this.position, this.progress);
+    const projection = this.course.project(
+      this.position,
+      this.progress,
+      this.afterMoveProjection,
+    );
     this.progress = projection.progress;
     this.lateral = THREE.MathUtils.clamp(
       projection.lateral,
-      -this.course.halfWidth + 2.05,
-      this.course.halfWidth - 2.05,
+      -projection.halfWidth + 2.05,
+      projection.halfWidth - 2.05,
     );
     this.position.copy(projection.position).addScaledVector(projection.right, this.lateral);
     this.boostActive = false;
@@ -573,23 +653,33 @@ export class FuturismaGame {
     previousProgress: number,
     courseTangent: THREE.Vector3,
   ): void {
-    let progressDelta = this.progress - previousProgress;
-    if (progressDelta > 0.5) progressDelta -= 1;
-    if (progressDelta < -0.5) progressDelta += 1;
-    if (progressDelta <= 0 || this.travelDirection.dot(courseTangent) < 0.2) return;
-
     const targetProgress = this.course.checkpointProgress(this.nextCheckpointIndex);
-    const distanceToTarget = THREE.MathUtils.euclideanModulo(
-      targetProgress - previousProgress,
-      1,
-    );
-    if (distanceToTarget > progressDelta + 0.0015) return;
+    if (
+      this.travelDirection.dot(courseTangent) < 0.2
+      || !crossedForwardProgress(previousProgress, this.progress, targetProgress)
+    ) return;
     if (
       Math.abs(this.lateral)
       > this.course.checkpointHalfWidth(this.nextCheckpointIndex)
-    ) return;
+    ) {
+      if (this.missedGateIndex !== this.nextCheckpointIndex) {
+        this.missedGateIndex = this.nextCheckpointIndex;
+        if (this.diagnosticsMode) this.diagnosticMissedGates += 1;
+        this.ui.flashMissedGate(this.nextCheckpointIndex);
+        this.audio.playMissedGate();
+        this.input.pulse(0.44, 0.18, 170);
+      }
+      return;
+    }
+
+    this.missedGateIndex = null;
 
     if (this.nextCheckpointIndex === 0) {
+      const completedLapMs = Math.max(0, this.elapsedMs - this.lapStartElapsedMs);
+      this.lastLapMs = completedLapMs;
+      this.bestLapMs = Math.min(this.bestLapMs ?? completedLapMs, completedLapMs);
+      this.lapTimesMs.push(completedLapMs);
+      this.lapStartElapsedMs = this.elapsedMs;
       this.lap += 1;
       if (this.lap > this.totalLaps) {
         this.finishRace();
@@ -634,11 +724,12 @@ export class FuturismaGame {
       this.course.checkpointProgress(previousCheckpoint) + 0.004,
       1,
     );
-    const recovery = this.course.sample(this.progress);
+    const recovery = this.course.sample(this.progress, this.poseProjection);
     this.position.copy(recovery.position);
     this.forward.copy(recovery.tangent);
     this.travelDirection.copy(recovery.tangent);
     this.lateral = 0;
+    this.missedGateIndex = null;
     this.steerAmount = 0;
     this.speed = this.course.recoverySpeedMps;
     this.boostActive = false;
@@ -648,13 +739,18 @@ export class FuturismaGame {
     this.recoveryImmunity = this.course.recoveryImmunitySeconds;
     this.impactShake = 0.25;
     this.driftActive = false;
+    this.surfaceGrip = 1;
     this.input.pulse(0.42, 0.64, 180);
     this.updatePose({ throttle: 0, brake: 0, steer: 0, boost: false }, 0);
     this.snapCamera();
   }
 
   private updatePose(input: InputFrame, delta: number): void {
-    const sample = this.course.project(this.position, this.progress);
+    const sample = this.course.project(
+      this.position,
+      this.progress,
+      this.poseProjection,
+    );
     const speedRatio = this.speed / BOOST_MAX_SPEED;
     const hoverHeight = this.boostActive ? 0.6 : this.speed < 11 ? 0.18 : 0.45;
     const vehiclePosition = this.scratchA
@@ -675,22 +771,25 @@ export class FuturismaGame {
       -1,
       1,
     );
-    this.vehicle.updateVisual({
-      steer: this.steerAmount,
-      throttle: input.throttle,
-      brake: input.brake,
-      speedRatio,
-      boostActive: this.boostActive,
-      lateralLoad: this.steerAmount * 0.45 - slip,
-      elapsed: this.timer.getElapsed(),
-      delta,
-    });
+    this.vehicleVisualState.steer = this.steerAmount;
+    this.vehicleVisualState.throttle = input.throttle;
+    this.vehicleVisualState.brake = input.brake;
+    this.vehicleVisualState.speedRatio = speedRatio;
+    this.vehicleVisualState.boostActive = this.boostActive;
+    this.vehicleVisualState.lateralLoad = this.steerAmount * 0.45 - slip;
+    this.vehicleVisualState.elapsed = this.timer.getElapsed();
+    this.vehicleVisualState.delta = delta;
+    this.vehicle.updateVisual(this.vehicleVisualState);
 
     if (delta > 0) this.impactShake = Math.max(0, this.impactShake - delta * 3.6);
   }
 
   private updateCamera(delta: number, steer: number): void {
-    const sample = this.course.project(this.position, this.progress);
+    const sample = this.course.project(
+      this.position,
+      this.progress,
+      this.cameraProjection,
+    );
     const vehicleRight = this.scratchA.crossVectors(this.forward, sample.up).normalize();
     const fallback = this.scratchB
       .copy(this.vehicle.root.position)
@@ -744,7 +843,11 @@ export class FuturismaGame {
   }
 
   private snapCamera(): void {
-    const sample = this.course.project(this.position, this.progress);
+    const sample = this.course.project(
+      this.position,
+      this.progress,
+      this.cameraProjection,
+    );
     this.cameraTarget
       .copy(this.vehicle.root.position)
       .addScaledVector(this.forward, -9)
@@ -760,11 +863,12 @@ export class FuturismaGame {
   private updateSpeedLines(delta: number): void {
     const geometry = this.speedLines.geometry;
     const position = geometry.getAttribute("position") as THREE.BufferAttribute;
+    const values = position.array as Float32Array;
     const speedRatio = this.speed / BOOST_MAX_SPEED;
-    for (let index = 0; index < position.count; index += 1) {
-      let z = position.getZ(index) + delta * (10 + this.speed * 0.85);
+    for (let offset = 2; offset < values.length; offset += 3) {
+      let z = values[offset] + delta * (10 + this.speed * 0.85);
       if (z > -1.5) z = -52 - Math.random() * 32;
-      position.setZ(index, z);
+      values[offset] = z;
     }
     position.needsUpdate = true;
     const material = this.speedLines.material as THREE.PointsMaterial;
@@ -777,20 +881,32 @@ export class FuturismaGame {
     const checkpoint = this.nextCheckpointIndex === 0
       ? this.course.checkpointCount
       : this.nextCheckpointIndex;
-    const turnCue = this.phase === "running" ? this.course.turnAhead(this.progress) : null;
+    const turnCue = this.phase === "running"
+      ? this.course.turnAhead(this.progress, 240, this.hudTurnCue)
+      : null;
     const finishDistanceMeters = this.phase === "finished"
       ? 0
-      : ((this.totalLaps - Math.min(this.lap, this.totalLaps)) + (1 - this.progress))
-        * this.course.length;
+      : calculateFinishDistanceMeters(
+        this.progress,
+        this.lap,
+        this.totalLaps,
+        this.course.length,
+        this.nextCheckpointIndex === 0
+          ? null
+          : this.course.checkpointProgress(this.nextCheckpointIndex),
+      );
     this.ui.update({
       speedKph: this.speed * 3.6,
       boost: this.boostReserve,
       elapsedMs: this.elapsedMs,
+      lastLapMs: this.lastLapMs,
       lap: this.lap,
       totalLaps: this.totalLaps,
       progress: ((this.lap - 1) + this.progress) / this.totalLaps,
       checkpoint,
       checkpointCount: this.course.checkpointCount,
+      missedGate: this.missedGateIndex,
+      finishArmed: this.nextCheckpointIndex === 0,
       sector: this.course.sectorLabelAt(this.progress),
       finishDistanceMeters,
       turnDirection: turnCue?.direction ?? null,
@@ -800,6 +916,7 @@ export class FuturismaGame {
       braking: input.brake > 0.1,
       drifting: this.driftActive,
       skidsDown: this.speed < 11,
+      lowGrip: this.surfaceGrip < 0.95,
       edgeWarning: this.edgeContact,
       edgeCorrection: this.edgeContact ? (this.lateral > 0 ? "LEFT" : "RIGHT") : null,
     });
@@ -807,10 +924,15 @@ export class FuturismaGame {
 
   private finishRace(): void {
     this.phase = "finished";
+    this.nextDiagnosticsAt = 0;
     this.boostActive = false;
     this.audio.playFinish();
     this.input.pulse(0.3, 0.52, 260);
-    this.ui.showResult(this.elapsedMs, this.totalLaps);
+    this.ui.showResult(
+      this.elapsedMs,
+      this.totalLaps,
+      this.bestLapMs ?? this.elapsedMs,
+    );
   }
 
   private resetRaceState(): void {
@@ -819,19 +941,25 @@ export class FuturismaGame {
     this.lateral = 0;
     this.steerAmount = 0;
     this.nextCheckpointIndex = 1;
+    this.missedGateIndex = null;
     this.boostReserve = 1;
     this.boostActive = false;
     this.driftActive = false;
+    this.surfaceGrip = 1;
     this.padBoostTime = 0;
     this.lap = 1;
     this.elapsedMs = 0;
+    this.lapStartElapsedMs = 0;
+    this.lastLapMs = null;
+    this.bestLapMs = null;
+    this.lapTimesMs.length = 0;
     this.edgeContact = false;
     this.offCourseTime = 0;
     this.recoveryImmunity = 0;
     this.impactShake = 0;
     this.physicsAccumulator = 0;
     this.nextHudAt = 0;
-    const start = this.course.sample(this.progress);
+    const start = this.course.sample(this.progress, this.poseProjection);
     this.position.copy(start.position);
     this.forward.copy(start.tangent);
     this.travelDirection.copy(start.tangent);
@@ -1027,7 +1155,7 @@ export class FuturismaGame {
   };
 
   private reportDiagnostics(delta: number): void {
-    if (!this.diagnosticsMode) return;
+    if (!this.diagnosticsMode || this.diagnosticsFinalReported) return;
     const frameMs = delta * 1000;
     this.diagnosticFrameSamples[this.diagnosticFrameIndex] = frameMs;
     this.diagnosticFrameIndex = (
@@ -1080,21 +1208,25 @@ export class FuturismaGame {
       lateralMeters: Number(this.lateral.toFixed(2)),
       steer: Number(this.steerAmount.toFixed(3)),
       drifting: this.driftActive,
+      surfaceGrip: Number(this.surfaceGrip.toFixed(2)),
       boostActive: this.boostActive,
       nextCheckpoint: this.nextCheckpointIndex,
       averageSpeedKph: elapsedSeconds > 0
         ? Number((this.diagnosticDistanceTravelled / elapsedSeconds * 3.6).toFixed(1))
         : 0,
       topSpeedKph: Number((this.diagnosticTopSpeed * 3.6).toFixed(1)),
+      lapTimesMs: this.lapTimesMs.map((lapTime) => Math.round(lapTime)),
       boostSeconds: Number(this.diagnosticBoostSeconds.toFixed(2)),
       edgeSeconds: Number(this.diagnosticEdgeSeconds.toFixed(2)),
       impacts: this.diagnosticImpacts,
+      missedGates: this.diagnosticMissedGates,
       impactLocations: this.diagnosticImpactLocations,
       recoveries: this.diagnosticRecoveries,
       recoveryLocations: this.diagnosticRecoveryLocations,
       maxLateralRatio: Number(this.diagnosticMaxLateralRatio.toFixed(2)),
       physicsSteps: this.diagnosticPhysicsSteps,
       pixelRatio: Number(this.renderPixelRatio.toFixed(2)),
+      preferredPixelRatio: Number(this.preferredPixelRatio.toFixed(2)),
       reducedMotion: this.reducedMotion,
       heapMb: heapMb === null ? null : Number(heapMb.toFixed(1)),
       maxHeapMb: this.diagnosticMaxHeapMb === null
@@ -1130,6 +1262,7 @@ export class FuturismaGame {
       });
     }
     console.info("[FUTURISMA_DIAGNOSTICS]", JSON.stringify(report));
+    if (this.phase === "finished") this.diagnosticsFinalReported = true;
   }
 
   private resetDiagnosticsPeak(): void {
@@ -1149,6 +1282,7 @@ export class FuturismaGame {
     this.diagnosticBoostSeconds = 0;
     this.diagnosticEdgeSeconds = 0;
     this.diagnosticImpacts = 0;
+    this.diagnosticMissedGates = 0;
     this.diagnosticRecoveries = 0;
     this.diagnosticTopSpeed = 0;
     this.diagnosticMaxLateralRatio = 0;
@@ -1161,6 +1295,7 @@ export class FuturismaGame {
     this.diagnosticMaxHeapMb = this.diagnosticStartHeapMb;
     this.diagnosticImpactLocations.length = 0;
     this.diagnosticRecoveryLocations.length = 0;
+    this.diagnosticsFinalReported = false;
   }
 
   private readonly resize = (): void => {
@@ -1182,12 +1317,38 @@ export class FuturismaGame {
 
   private updateAdaptiveQuality(delta: number): void {
     if (this.qualityOverride === "high" || this.qualityOverride === "low") return;
-    if (delta > 1 / 48) this.adaptiveQualityDebt += delta;
-    else this.adaptiveQualityDebt = Math.max(0, this.adaptiveQualityDebt - delta * 2);
-    if (this.adaptiveQualityDebt < 1.5 || this.renderPixelRatio <= 0.65) return;
-    this.adaptiveQualityDebt = 0;
-    this.renderPixelRatio = Math.max(0.65, this.renderPixelRatio - 0.08);
-    this.resize();
+    if (this.phase !== "running" || document.hidden) {
+      this.adaptiveQualityDebt = Math.max(0, this.adaptiveQualityDebt - delta * 2);
+      this.adaptiveQualityCredit = 0;
+      return;
+    }
+    if (delta > 1 / 48) {
+      this.adaptiveQualityDebt += delta;
+      this.adaptiveQualityCredit = 0;
+    } else {
+      this.adaptiveQualityDebt = Math.max(0, this.adaptiveQualityDebt - delta * 2);
+      this.adaptiveQualityCredit = delta < 1 / 55
+        ? this.adaptiveQualityCredit + delta
+        : 0;
+    }
+    if (this.adaptiveQualityDebt >= 1.5 && this.renderPixelRatio > 0.65) {
+      this.adaptiveQualityDebt = 0;
+      this.adaptiveQualityCredit = 0;
+      this.renderPixelRatio = Math.max(0.65, this.renderPixelRatio - 0.08);
+      this.resize();
+      return;
+    }
+    if (
+      this.adaptiveQualityCredit >= 8
+      && this.renderPixelRatio < this.preferredPixelRatio
+    ) {
+      this.adaptiveQualityCredit = 0;
+      this.renderPixelRatio = Math.min(
+        this.preferredPixelRatio,
+        this.renderPixelRatio + 0.04,
+      );
+      this.resize();
+    }
   }
 
   dispose(): void {

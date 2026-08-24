@@ -127,6 +127,30 @@ export interface CourseProjection extends CourseSample {
   lateral: number;
 }
 
+function createCourseSampleValue(): CourseSample {
+  return {
+    position: new THREE.Vector3(),
+    tangent: new THREE.Vector3(0, 0, -1),
+    right: new THREE.Vector3(1, 0, 0),
+    up: new THREE.Vector3(0, 1, 0),
+    curvature: 0,
+    width: 0,
+    halfWidth: 0,
+    bank: 0,
+    sector: "",
+    edgeLeft: "A",
+    edgeRight: "A",
+  };
+}
+
+function createCourseProjectionValue(): CourseProjection {
+  return {
+    ...createCourseSampleValue(),
+    progress: 0,
+    lateral: 0,
+  };
+}
+
 export interface TurnCue {
   direction: "LEFT" | "RIGHT";
   distance: number;
@@ -303,7 +327,18 @@ export class GreenwaterCourse {
     this.setCheckpointProgress(1);
   }
 
-  sample(progress: number): CourseSample {
+  createSampleScratch(): CourseSample {
+    return createCourseSampleValue();
+  }
+
+  createProjectionScratch(): CourseProjection {
+    return createCourseProjectionValue();
+  }
+
+  sample(
+    progress: number,
+    target: CourseSample = createCourseSampleValue(),
+  ): CourseSample {
     const wrapped = THREE.MathUtils.euclideanModulo(progress, 1);
     const scaled = wrapped * this.samples.length;
     const index = Math.floor(scaled) % this.samples.length;
@@ -311,24 +346,22 @@ export class GreenwaterCourse {
     const alpha = scaled - Math.floor(scaled);
     const current = this.samples[index];
     const next = this.samples[nextIndex];
-    const position = this.projectionPoints[index].clone().lerp(
+    target.position.lerpVectors(
+      this.projectionPoints[index],
       this.projectionPoints[nextIndex],
       alpha,
     );
-    const tangent = this.projectionTangents[index]
-      .clone()
+    target.tangent
+      .copy(this.projectionTangents[index])
       .lerp(this.projectionTangents[nextIndex], alpha)
       .normalize();
-    const right = new THREE.Vector3().crossVectors(tangent, WORLD_UP).normalize();
-    const up = new THREE.Vector3().crossVectors(right, tangent).normalize();
+    target.right.crossVectors(target.tangent, WORLD_UP).normalize();
+    target.up.crossVectors(target.right, target.tangent).normalize();
     const bank = THREE.MathUtils.lerp(current.bank, next.bank, alpha);
     if (Math.abs(bank) > 0.001) {
-      const bankRotation = new THREE.Quaternion().setFromAxisAngle(
-        tangent,
-        THREE.MathUtils.degToRad(-bank),
-      );
-      right.applyQuaternion(bankRotation).normalize();
-      up.applyQuaternion(bankRotation).normalize();
+      const bankRadians = THREE.MathUtils.degToRad(-bank);
+      target.right.applyAxisAngle(target.tangent, bankRadians).normalize();
+      target.up.applyAxisAngle(target.tangent, bankRadians).normalize();
     }
 
     const curvature = THREE.MathUtils.lerp(
@@ -338,19 +371,14 @@ export class GreenwaterCourse {
     );
     const width = THREE.MathUtils.lerp(current.w, next.w, alpha);
 
-    return {
-      position,
-      tangent,
-      right,
-      up,
-      curvature,
-      width,
-      halfWidth: width / 2,
-      bank,
-      sector: current.sector,
-      edgeLeft: current.edgeL,
-      edgeRight: current.edgeR,
-    };
+    target.curvature = curvature;
+    target.width = width;
+    target.halfWidth = width / 2;
+    target.bank = bank;
+    target.sector = current.sector;
+    target.edgeLeft = current.edgeL;
+    target.edgeRight = current.edgeR;
+    return target;
   }
 
   sampleAtDistance(distance: number): CourseSample {
@@ -371,7 +399,11 @@ export class GreenwaterCourse {
     return checkpoint.gateWidth / 2;
   }
 
-  project(position: THREE.Vector3, hintProgress: number): CourseProjection {
+  project(
+    position: THREE.Vector3,
+    hintProgress: number,
+    target: CourseProjection = createCourseProjectionValue(),
+  ): CourseProjection {
     const segmentCount = this.projectionResolution;
     const hintIndex = Math.round(
       THREE.MathUtils.euclideanModulo(hintProgress, 1) * segmentCount,
@@ -380,56 +412,65 @@ export class GreenwaterCourse {
     let nearestDistanceSq = Number.POSITIVE_INFINITY;
     let nearestProgress = hintProgress;
 
-    const inspectSegment = (rawIndex: number): void => {
-      const index = THREE.MathUtils.euclideanModulo(rawIndex, segmentCount);
-      const nextIndex = (index + 1) % segmentCount;
-      const start = this.projectionPoints[index];
-      const end = this.projectionPoints[nextIndex];
-      const segmentX = end.x - start.x;
-      const segmentY = end.y - start.y;
-      const segmentZ = end.z - start.z;
-      const lengthSq = segmentX * segmentX + segmentY * segmentY + segmentZ * segmentZ;
-      const along = lengthSq > 0
-        ? THREE.MathUtils.clamp(
-          (
-            (position.x - start.x) * segmentX
-            + (position.y - start.y) * segmentY
-            + (position.z - start.z) * segmentZ
-          ) / lengthSq,
-          0,
-          1,
-        )
-        : 0;
-      const nearestX = start.x + segmentX * along;
-      const nearestY = start.y + segmentY * along;
-      const nearestZ = start.z + segmentZ * along;
-      const differenceX = nearestX - position.x;
-      const differenceY = nearestY - position.y;
-      const differenceZ = nearestZ - position.z;
-      const distanceSq = differenceX * differenceX
-        + differenceY * differenceY
-        + differenceZ * differenceZ;
-      if (distanceSq >= nearestDistanceSq) return;
-      nearestDistanceSq = distanceSq;
-      nearestProgress = THREE.MathUtils.euclideanModulo((index + along) / segmentCount, 1);
-    };
-
-    for (let offset = -localRadius; offset <= localRadius; offset += 1) {
-      inspectSegment(hintIndex + offset);
-    }
     const globalSearchThreshold = this.halfWidth + 24;
-    if (nearestDistanceSq > globalSearchThreshold * globalSearchThreshold) {
-      for (let index = 0; index < segmentCount; index += 1) inspectSegment(index);
+    const globalSearchThresholdSq = globalSearchThreshold * globalSearchThreshold;
+    for (let pass = 0; pass < 2; pass += 1) {
+      const globalSearch = pass === 1;
+      if (globalSearch && nearestDistanceSq <= globalSearchThresholdSq) break;
+      const first = globalSearch ? 0 : -localRadius;
+      const last = globalSearch ? segmentCount - 1 : localRadius;
+      for (let searchIndex = first; searchIndex <= last; searchIndex += 1) {
+        const rawIndex = globalSearch ? searchIndex : hintIndex + searchIndex;
+        const index = THREE.MathUtils.euclideanModulo(rawIndex, segmentCount);
+        const nextIndex = (index + 1) % segmentCount;
+        const start = this.projectionPoints[index];
+        const end = this.projectionPoints[nextIndex];
+        const segmentX = end.x - start.x;
+        const segmentY = end.y - start.y;
+        const segmentZ = end.z - start.z;
+        const lengthSq = segmentX * segmentX + segmentY * segmentY + segmentZ * segmentZ;
+        const along = lengthSq > 0
+          ? THREE.MathUtils.clamp(
+            (
+              (position.x - start.x) * segmentX
+              + (position.y - start.y) * segmentY
+              + (position.z - start.z) * segmentZ
+            ) / lengthSq,
+            0,
+            1,
+          )
+          : 0;
+        const nearestX = start.x + segmentX * along;
+        const nearestY = start.y + segmentY * along;
+        const nearestZ = start.z + segmentZ * along;
+        const differenceX = nearestX - position.x;
+        const differenceY = nearestY - position.y;
+        const differenceZ = nearestZ - position.z;
+        const distanceSq = differenceX * differenceX
+          + differenceY * differenceY
+          + differenceZ * differenceZ;
+        if (distanceSq >= nearestDistanceSq) continue;
+        nearestDistanceSq = distanceSq;
+        nearestProgress = THREE.MathUtils.euclideanModulo(
+          (index + along) / segmentCount,
+          1,
+        );
+      }
     }
 
-    const sample = this.sample(nearestProgress);
-    const lateral = (position.x - sample.position.x) * sample.right.x
-      + (position.y - sample.position.y) * sample.right.y
-      + (position.z - sample.position.z) * sample.right.z;
-    return { ...sample, progress: nearestProgress, lateral };
+    this.sample(nearestProgress, target);
+    target.progress = nearestProgress;
+    target.lateral = (position.x - target.position.x) * target.right.x
+      + (position.y - target.position.y) * target.right.y
+      + (position.z - target.position.z) * target.right.z;
+    return target;
   }
 
-  turnAhead(progress: number, maximumDistance = 240): TurnCue | null {
+  turnAhead(
+    progress: number,
+    maximumDistance = 240,
+    target?: TurnCue,
+  ): TurnCue | null {
     const distance = THREE.MathUtils.euclideanModulo(progress, 1) * this.length;
     let nearest: { turn: RawTurn; distance: number } | null = null;
     for (const turn of MAP.turns) {
@@ -442,12 +483,17 @@ export class GreenwaterCourse {
       if (!nearest || distanceAhead < nearest.distance) nearest = { turn, distance: distanceAhead };
     }
     if (!nearest) return null;
-    return {
-      direction: nearest.turn.direction === "left" ? "LEFT" : "RIGHT",
-      distance: nearest.distance,
-      hard: nearest.turn.radius <= 85,
-      radius: nearest.turn.radius,
+    const cue = target ?? {
+      direction: "LEFT",
+      distance: 0,
+      hard: false,
+      radius: 0,
     };
+    cue.direction = nearest.turn.direction === "left" ? "LEFT" : "RIGHT";
+    cue.distance = nearest.distance;
+    cue.hard = nearest.turn.radius <= 85;
+    cue.radius = nearest.turn.radius;
+    return cue;
   }
 
   fogAt(progress: number): FogProfile {

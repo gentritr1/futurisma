@@ -31,6 +31,7 @@ export class EngineAudio {
   private context: AudioContext | null = null;
   private master: GainNode | null = null;
   private engineGain: GainNode | null = null;
+  private engineFilter: BiquadFilterNode | null = null;
   private engineOscillator: OscillatorNode | null = null;
   private harmonicOscillator: OscillatorNode | null = null;
   private harmonicGain: GainNode | null = null;
@@ -38,7 +39,7 @@ export class EngineAudio {
   private musicFilter: BiquadFilterNode | null = null;
   private readonly stemGains = new Map<StemName, GainNode>();
   private readonly persistentSources: AudioScheduledSourceNode[] = [];
-  private musicProfileKey = "";
+  private musicProfileKey = -1;
   private muted = false;
   private paused = false;
 
@@ -105,6 +106,7 @@ export class EngineAudio {
     this.context = context;
     this.master = master;
     this.engineGain = engineGain;
+    this.engineFilter = filter;
     this.engineOscillator = engineOscillator;
     this.harmonicOscillator = harmonicOscillator;
     this.harmonicGain = harmonicGain;
@@ -112,7 +114,13 @@ export class EngineAudio {
     this.installMusic(context, master);
   }
 
-  update(speedRatio: number, throttle: number, boost: boolean): void {
+  update(
+    speedRatio: number,
+    throttle: number,
+    brake: number,
+    boost: boolean,
+    surfaceGrip: number,
+  ): void {
     if (!this.context || !this.engineOscillator || !this.harmonicOscillator) return;
     const now = this.context.currentTime;
     const baseFrequency = 52 + speedRatio * 118 + throttle * 24 + (boost ? 18 : 0);
@@ -120,7 +128,17 @@ export class EngineAudio {
     this.harmonicOscillator.frequency.setTargetAtTime(baseFrequency * 2.03, now, 0.04);
     this.engineGain?.gain.setTargetAtTime(0.025 + throttle * 0.035 + speedRatio * 0.025, now, 0.08);
     this.harmonicGain?.gain.setTargetAtTime(0.008 + speedRatio * 0.021 + (boost ? 0.02 : 0), now, 0.06);
-    this.windGain?.gain.setTargetAtTime(Math.pow(speedRatio, 2) * 0.055, now, 0.12);
+    this.windGain?.gain.setTargetAtTime(
+      Math.pow(speedRatio, 2) * (0.045 + brake * 0.035)
+        + (1 - surfaceGrip) * speedRatio * 0.07,
+      now,
+      0.1,
+    );
+    this.engineFilter?.frequency.setTargetAtTime(
+      820 + speedRatio * 1_850 + brake * 420 + (boost ? 1_400 : 0),
+      now,
+      0.08,
+    );
     this.musicFilter?.frequency.setTargetAtTime(
       boost ? 6200 : 2100 + speedRatio * 1600,
       now,
@@ -130,7 +148,10 @@ export class EngineAudio {
 
   setMusicProfile(profile: MusicProfile): void {
     if (!this.context) return;
-    const key = STEM_NAMES.map((name) => profile[name]).join(":");
+    const key = profile.trance
+      + profile.jungle * 4
+      + profile.deep_dnb * 16
+      + profile.techstep * 64;
     if (key === this.musicProfileKey) return;
     this.musicProfileKey = key;
     const now = this.context.currentTime;
@@ -146,6 +167,11 @@ export class EngineAudio {
 
   playGate(index: number): void {
     this.playTone(410 + index * 32, 0.11, 0.045, "square");
+  }
+
+  playMissedGate(): void {
+    this.playTone(150, 0.2, 0.038, "square", 0, 0.58);
+    this.playTone(94, 0.26, 0.03, "sawtooth", 0.08, 0.72);
   }
 
   playCountdown(go: boolean): void {
@@ -199,6 +225,7 @@ export class EngineAudio {
     void this.context?.close();
     this.context = null;
     this.master = null;
+    this.engineFilter = null;
   }
 
   private installMusic(context: AudioContext, master: GainNode): void {
@@ -321,6 +348,10 @@ export class EngineAudio {
     gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
     oscillator.connect(gain);
     gain.connect(this.master);
+    oscillator.addEventListener("ended", () => {
+      oscillator.disconnect();
+      gain.disconnect();
+    }, { once: true });
     oscillator.start(now);
     oscillator.stop(now + duration + 0.02);
   }

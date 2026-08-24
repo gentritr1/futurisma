@@ -18,6 +18,12 @@ interface NeutralTransform {
 }
 
 const DEG = Math.PI / 180;
+const ENGINE_FLAP_NAMES = [
+  "engine_flap_L_0_pivot",
+  "engine_flap_L_1_pivot",
+  "engine_flap_R_0_pivot",
+  "engine_flap_R_1_pivot",
+] as const;
 
 export function applyPs2MaterialTreatment(root: THREE.Object3D): void {
   root.traverse((object) => {
@@ -151,12 +157,7 @@ export class TotemVehicle {
     this.setRotation("stabiliser_ring_pivot", "z", -state.lateralLoad * 12 * DEG);
 
     const flapAngle = (9 + state.throttle * 20 + (state.boostActive ? 4 : 0)) * DEG;
-    for (const name of [
-      "engine_flap_L_0_pivot",
-      "engine_flap_L_1_pivot",
-      "engine_flap_R_0_pivot",
-      "engine_flap_R_1_pivot",
-    ]) {
+    for (const name of ENGINE_FLAP_NAMES) {
       this.setRotation(name, "x", flapAngle);
     }
 

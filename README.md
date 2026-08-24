@@ -19,7 +19,7 @@ Open the local URL printed by Vite.
 - `Shift` / gamepad A: boost
 - `R` / gamepad Y: recover at the last cleared vector
 - `Escape`, `P`, or gamepad Start: pause/resume
-- `M` / gamepad Back: mute procedural engine audio
+- `M` / gamepad Back: mute procedural audio
 
 Standard gamepad triggers control thrust and braking. The Greenwater Strip time
 trial defaults to five laps. Add `?laps=1` through `?laps=9` to override the
@@ -29,18 +29,23 @@ high-speed drift. Course vectors must be cleared in order for a lap to count.
 The vehicle must also pass inside each authored gate span. Compatible gamepads
 receive restrained boost, checkpoint, impact, recovery, and finish rumble.
 The HUD calls upcoming turns, the next gate, corrective edge steering, and the
-remaining distance to the finish.
+remaining distance to the finish. Multi-lap trials also report the last lap in
+the HUD and the best lap on the result screen. Airbrakes and the standing-water
+grip loss feed the procedural noise layer as well as handling feedback.
+If a gate is missed, the HUD keeps the failure visible, offers the recovery
+control, and includes the required extra circuit in the finish distance.
 
 ## Visual test mode
 
 Append `?demo=1&laps=1` to the URL to run an automated one-lap throttle,
 steering, and boost pass for camera and rendering QA. The deterministic QA line
-targets the authored 34–36 second lap window and still exercises edge impacts.
+targets the authored 34–36 second lap window without relying on wall contacts.
 
 Add `&diagnostics=1` to print draw calls, triangles, GPU resource counts and a
-frame-pacing, race-line, and heap summary once per second during a performance
-pass. Use `&quality=low` or `&quality=high` to lock render scale; the default
-scale steps down automatically only after sustained slow frames. Add
+frame-pacing, race-line, lap-split, and heap summary once per second during a
+performance pass. Use `&quality=low` or `&quality=high` to lock render scale; the default
+scale steps down after sustained slow frames and recovers after sustained fast
+frames while racing. Add
 `&motion=reduce` to exercise the same reduced-motion path as the operating-system
 preference.
 
@@ -51,9 +56,15 @@ npm test
 npm audit --audit-level=high
 ```
 
+`public/_headers` carries the production CSP, clickjacking, MIME-sniffing,
+cross-origin, referrer, and browser-permission policy for static hosts that
+support a `_headers` file. Configure equivalent response headers if the chosen
+host uses another format.
+
 The local suite verifies accepted asset hashes, measured map invariants,
-longitudinal handling at 60/120 Hz, strict browser security policy, pinned
-package versions, the production build, and gzip budgets. Browser diagnostics
+longitudinal handling at 60/120 Hz, checkpoint and finish-distance rules,
+strict browser security policy, pinned package versions, the production build,
+and gzip budgets. Browser diagnostics
 remain the source of truth for full-lap draw calls and frame pacing.
 
 ## Production asset

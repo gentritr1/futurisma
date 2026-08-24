@@ -2,11 +2,14 @@ export interface HudFrame {
   speedKph: number;
   boost: number;
   elapsedMs: number;
+  lastLapMs: number | null;
   lap: number;
   totalLaps: number;
   progress: number;
   checkpoint: number;
   checkpointCount: number;
+  missedGate: number | null;
+  finishArmed: boolean;
   sector: string;
   finishDistanceMeters: number;
   turnDirection: "LEFT" | "RIGHT" | null;
@@ -16,6 +19,7 @@ export interface HudFrame {
   braking: boolean;
   drifting: boolean;
   skidsDown: boolean;
+  lowGrip: boolean;
   edgeWarning: boolean;
   edgeCorrection: "LEFT" | "RIGHT" | null;
 }
@@ -50,6 +54,7 @@ export class GameUi {
   private readonly driveState = requiredElement<HTMLElement>("drive-state");
   private readonly timeValue = requiredElement<HTMLElement>("time-value");
   private readonly lapValue = requiredElement<HTMLElement>("lap-value");
+  private readonly lastLapValue = requiredElement<HTMLElement>("last-lap-value");
   private readonly checkpointValue = requiredElement<HTMLElement>("checkpoint-value");
   private readonly sectorValue = requiredElement<HTMLElement>("sector-value");
   private readonly finishValue = requiredElement<HTMLElement>("finish-value");
@@ -66,6 +71,7 @@ export class GameUi {
   private readonly errorPanel = requiredElement<HTMLElement>("error-panel");
   private readonly errorMessage = requiredElement<HTMLElement>("error-message");
   private lastLapLabel = "";
+  private lastLapTimeLabel = "";
   private lastCheckpointLabel = "";
   private lastDriveLabel = "";
   private lastBoostState = "";
@@ -93,17 +99,29 @@ export class GameUi {
     this.startScreen.hidden = true;
     this.resultScreen.hidden = true;
     this.countdown.textContent = "3";
+    this.countdown.dataset.paused = "false";
+    this.edgeWarning.dataset.active = "false";
+    this.edgeWarning.setAttribute("aria-hidden", "true");
+    this.turnCue.dataset.active = "false";
+    this.turnCue.setAttribute("aria-hidden", "true");
+    this.impactFlash.dataset.active = "false";
     this.systemStatus.textContent = "LAUNCH SEQUENCE";
     document.body.dataset.phase = "race";
   }
 
-  showResult(elapsedMs: number, totalLaps: number): void {
+  showResult(elapsedMs: number, totalLaps: number, bestLapMs: number): void {
     this.resultTime.textContent = formatRaceTime(elapsedMs);
     this.resultDetail.textContent = `TOTEM / WORKS 07 · ${totalLaps} ${
       totalLaps === 1 ? "LAP" : "LAPS"
-    } LOGGED`;
+    } LOGGED · BEST ${formatRaceTime(bestLapMs)}`;
     this.resultScreen.hidden = false;
     this.countdown.textContent = "";
+    this.countdown.dataset.paused = "false";
+    this.edgeWarning.dataset.active = "false";
+    this.edgeWarning.setAttribute("aria-hidden", "true");
+    this.turnCue.dataset.active = "false";
+    this.turnCue.setAttribute("aria-hidden", "true");
+    this.impactFlash.dataset.active = "false";
     this.systemStatus.textContent = "TRIAL COMPLETE";
     document.body.dataset.phase = "result";
     this.restartButton.focus({ preventScroll: true });
@@ -136,6 +154,16 @@ export class GameUi {
     this.gateFlashUntil = performance.now() + 620;
     this.checkpointValue.textContent = `GATE ${index.toString().padStart(2, "0")} CLEAR`;
     this.checkpointValue.dataset.cleared = "true";
+    this.checkpointValue.dataset.missed = "false";
+  }
+
+  flashMissedGate(index: number): void {
+    this.gateFlashUntil = 0;
+    this.checkpointValue.textContent = index === 0
+      ? "FINISH MISSED · RECOVER"
+      : `GATE ${index.toString().padStart(2, "0")} MISSED · RECOVER`;
+    this.checkpointValue.dataset.cleared = "false";
+    this.checkpointValue.dataset.missed = "true";
   }
 
   flashImpact(side: "LEFT" | "RIGHT"): void {
@@ -154,16 +182,31 @@ export class GameUi {
     this.speedValue.textContent = Math.round(frame.speedKph).toString().padStart(3, "0");
     this.timeValue.textContent = formatRaceTime(frame.elapsedMs);
     const lapLabel = `LAP ${Math.min(frame.lap, frame.totalLaps)} / ${frame.totalLaps}`;
-    const checkpointLabel = `NEXT GATE ${frame.checkpoint
-      .toString()
-      .padStart(2, "0")} / ${frame.checkpointCount.toString().padStart(2, "0")}`;
+    const lastLapTimeLabel = frame.lastLapMs === null
+      ? ""
+      : ` · LAST ${formatRaceTime(frame.lastLapMs)}`;
+    const checkpointLabel = frame.missedGate === null
+      ? frame.finishArmed
+        ? "FINISH VECTOR ARMED"
+        : `NEXT GATE ${frame.checkpoint
+          .toString()
+          .padStart(2, "0")} / ${frame.checkpointCount.toString().padStart(2, "0")}`
+      : frame.missedGate === 0
+        ? "FINISH MISSED · RECOVER"
+        : `GATE ${frame.missedGate.toString().padStart(2, "0")} MISSED · RECOVER`;
     if (lapLabel !== this.lastLapLabel) {
       this.lapValue.textContent = lapLabel;
       this.lastLapLabel = lapLabel;
     }
+    if (lastLapTimeLabel !== this.lastLapTimeLabel) {
+      this.lastLapValue.textContent = lastLapTimeLabel;
+      this.lastLapValue.hidden = lastLapTimeLabel.length === 0;
+      this.lastLapTimeLabel = lastLapTimeLabel;
+    }
     if (performance.now() >= this.gateFlashUntil && checkpointLabel !== this.lastCheckpointLabel) {
       this.checkpointValue.textContent = checkpointLabel;
       this.checkpointValue.dataset.cleared = "false";
+      this.checkpointValue.dataset.missed = frame.missedGate === null ? "false" : "true";
       this.lastCheckpointLabel = checkpointLabel;
     }
     this.sectorValue.textContent = frame.sector;
@@ -204,20 +247,27 @@ export class GameUi {
       }
       this.lastTurnState = turnState;
     }
-    const raceStage = frame.lap === frame.totalLaps ? "final" : "running";
+    const raceStage = frame.finishArmed && frame.lap === frame.totalLaps
+      ? "approach"
+      : frame.lap === frame.totalLaps
+        ? "final"
+        : "running";
     if (raceStage !== this.lastRaceStage) {
-      if (raceStage === "final") this.systemStatus.textContent = "FINAL LAP";
+      if (raceStage === "approach") this.systemStatus.textContent = "FINAL APPROACH";
+      else if (raceStage === "final") this.systemStatus.textContent = "FINAL LAP";
       this.lastRaceStage = raceStage;
     }
     const driveLabel = frame.skidsDown
       ? "SKIDS DOWN"
       : frame.boostActive
         ? "PLASMA OVERDRIVE"
-        : frame.drifting
-          ? "DRIFT VECTOR"
-        : frame.braking
-          ? "AIRBRAKES"
-          : "HOVER LOCK";
+        : frame.lowGrip
+          ? "SLIP SURFACE"
+          : frame.drifting
+            ? "DRIFT VECTOR"
+            : frame.braking
+              ? "AIRBRAKES"
+              : "HOVER LOCK";
     if (driveLabel !== this.lastDriveLabel) {
       this.driveState.textContent = driveLabel;
       this.lastDriveLabel = driveLabel;

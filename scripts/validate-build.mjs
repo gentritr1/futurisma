@@ -12,6 +12,7 @@ assert.ok(stylesheetName, "The production build must contain a stylesheet bundle
 const javascript = await readFile(new URL(javascriptName, assetsDirectory));
 const stylesheet = await readFile(new URL(stylesheetName, assetsDirectory));
 const html = await readFile(new URL("../dist/index.html", import.meta.url));
+const productionHeaders = await readFile(new URL("../dist/_headers", import.meta.url), "utf8");
 const javascriptGzip = gzipSync(javascript).byteLength;
 const stylesheetGzip = gzipSync(stylesheet).byteLength;
 const shellGzip = gzipSync(html).byteLength + javascriptGzip + stylesheetGzip;
@@ -27,6 +28,10 @@ assert.ok(
 assert.ok(
   shellGzip <= 235 * 1024,
   `Initial app shell exceeds 235 KiB gzip (${(shellGzip / 1024).toFixed(1)} KiB).`,
+);
+assert.ok(
+  productionHeaders.includes("frame-ancestors 'none'"),
+  "The production build must include the hardened response-header policy.",
 );
 
 console.log(

@@ -22,6 +22,12 @@ function applyDeadzone(value: number, deadzone = 0.16): number {
 
 export class InputController {
   private readonly keys = new Set<string>();
+  private readonly frame: InputFrame = {
+    throttle: 0,
+    brake: 0,
+    steer: 0,
+    boost: false,
+  };
   private startRequested = false;
   private resetRequested = false;
   private muteRequested = false;
@@ -35,39 +41,47 @@ export class InputController {
 
   read(): InputFrame {
     const keyboardSteer =
-      (this.isDown("KeyD", "ArrowRight") ? 1 : 0) -
-      (this.isDown("KeyA", "ArrowLeft") ? 1 : 0);
-    const keyboardThrottle = this.isDown("KeyW", "ArrowUp") ? 1 : 0;
-    const keyboardBrake = this.isDown("KeyS", "ArrowDown") ? 1 : 0;
-    const keyboardBoost = this.isDown("ShiftLeft", "ShiftRight", "Space");
+      (this.keys.has("KeyD") || this.keys.has("ArrowRight") ? 1 : 0) -
+      (this.keys.has("KeyA") || this.keys.has("ArrowLeft") ? 1 : 0);
+    const keyboardThrottle = this.keys.has("KeyW") || this.keys.has("ArrowUp") ? 1 : 0;
+    const keyboardBrake = this.keys.has("KeyS") || this.keys.has("ArrowDown") ? 1 : 0;
+    const keyboardBoost = this.keys.has("ShiftLeft")
+      || this.keys.has("ShiftRight")
+      || this.keys.has("Space");
 
     const gamepad = this.activeGamepad();
     if (!gamepad) {
-      this.previousGamepadButtons = [];
-      return {
-        throttle: keyboardThrottle,
-        brake: keyboardBrake,
-        steer: keyboardSteer,
-        boost: keyboardBoost,
-      };
+      this.previousGamepadButtons.length = 0;
+      this.frame.throttle = keyboardThrottle;
+      this.frame.brake = keyboardBrake;
+      this.frame.steer = keyboardSteer;
+      this.frame.boost = keyboardBoost;
+      return this.frame;
     }
 
-    const gamepadButtons = gamepad.buttons.map((button) => button.pressed);
-    if (gamepadButtons[9] && !this.previousGamepadButtons[9]) this.startRequested = true;
-    if (gamepadButtons[3] && !this.previousGamepadButtons[3]) this.resetRequested = true;
-    if (gamepadButtons[8] && !this.previousGamepadButtons[8]) this.muteRequested = true;
-    this.previousGamepadButtons = gamepadButtons;
+    if (gamepad.buttons[9]?.pressed && !this.previousGamepadButtons[9]) {
+      this.startRequested = true;
+    }
+    if (gamepad.buttons[3]?.pressed && !this.previousGamepadButtons[3]) {
+      this.resetRequested = true;
+    }
+    if (gamepad.buttons[8]?.pressed && !this.previousGamepadButtons[8]) {
+      this.muteRequested = true;
+    }
+    this.previousGamepadButtons.length = gamepad.buttons.length;
+    for (let index = 0; index < gamepad.buttons.length; index += 1) {
+      this.previousGamepadButtons[index] = gamepad.buttons[index].pressed;
+    }
 
     const stick = applyDeadzone(gamepad.axes[0] ?? 0);
     const triggerThrottle = gamepad.buttons[7]?.value ?? 0;
     const triggerBrake = gamepad.buttons[6]?.value ?? 0;
 
-    return {
-      throttle: Math.max(keyboardThrottle, triggerThrottle),
-      brake: Math.max(keyboardBrake, triggerBrake),
-      steer: Math.abs(keyboardSteer) > Math.abs(stick) ? keyboardSteer : stick,
-      boost: keyboardBoost || Boolean(gamepad.buttons[0]?.pressed),
-    };
+    this.frame.throttle = Math.max(keyboardThrottle, triggerThrottle);
+    this.frame.brake = Math.max(keyboardBrake, triggerBrake);
+    this.frame.steer = Math.abs(keyboardSteer) > Math.abs(stick) ? keyboardSteer : stick;
+    this.frame.boost = keyboardBoost || Boolean(gamepad.buttons[0]?.pressed);
+    return this.frame;
   }
 
   requestStart(): void {
@@ -119,14 +133,14 @@ export class InputController {
     return requested;
   }
 
-  private isDown(...codes: string[]): boolean {
-    return codes.some((code) => this.keys.has(code));
-  }
-
   private activeGamepad(): Gamepad | null {
-    return Array.from(navigator.getGamepads?.() ?? []).find(
-      (gamepad): gamepad is Gamepad => Boolean(gamepad),
-    ) ?? null;
+    const gamepads = navigator.getGamepads?.();
+    if (!gamepads) return null;
+    for (let index = 0; index < gamepads.length; index += 1) {
+      const gamepad = gamepads[index];
+      if (gamepad) return gamepad;
+    }
+    return null;
   }
 
   private readonly handleKeyDown = (event: KeyboardEvent): void => {
