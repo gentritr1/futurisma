@@ -32,7 +32,8 @@ window.addEventListener("keydown", handleWindowKeyDown);
 
 game
   .initialize()
-  .then(() => {
+  .then((initialized) => {
+    if (!initialized) return;
     const parameters = new URLSearchParams(window.location.search);
     const manualDemoStart = parameters.has("diagnostics")
       && parameters.has("demo")

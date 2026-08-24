@@ -4,6 +4,7 @@ import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { EngineAudio } from "./audio";
 import { calculateImpactShakeOffset } from "./camera-feedback";
 import { GreenwaterCourse, type TurnCue } from "./course";
+import { disposeObject3DResources } from "./graphics-resources";
 import type { InputFrame } from "./input";
 import { InputController } from "./input";
 import {
@@ -229,6 +230,7 @@ export class FuturismaGame {
     distanceMeters: 0,
   };
   private running = false;
+  private disposed = false;
   private trialStartPending = false;
   private animationFrame = 0;
   private readonly qualityOverride = new URLSearchParams(window.location.search).get(
@@ -291,14 +293,20 @@ export class FuturismaGame {
     document.addEventListener("visibilitychange", this.handleVisibilityChange);
   }
 
-  async initialize(): Promise<void> {
+  async initialize(): Promise<boolean> {
     await this.vehicle.load("/assets/totem/models/totem_runtime.glb");
+    if (this.disposed) {
+      disposeObject3DResources(this.vehicle.root);
+      this.vehicle.root.clear();
+      return false;
+    }
     this.resetRaceState();
     this.updatePose({ throttle: 0, brake: 0, steer: 0, boost: false }, 0);
     this.snapCamera();
     this.running = true;
     this.animationFrame = requestAnimationFrame(this.frame);
     void this.loadAssetKit();
+    return true;
   }
 
   async startTrial(): Promise<void> {
@@ -318,7 +326,8 @@ export class FuturismaGame {
   }
 
   canStart(): boolean {
-    return !this.trialStartPending
+    return !this.disposed
+      && !this.trialStartPending
       && (this.phase === "standby" || this.phase === "finished");
   }
 
@@ -1259,9 +1268,18 @@ export class FuturismaGame {
       const gltf = await new GLTFLoader().loadAsync(
         "/assets/totem/models/futurisma_asset_kit.glb",
       );
+      if (this.disposed) {
+        disposeObject3DResources(gltf.scene);
+        return;
+      }
       const sample = this.course.sample(0.985);
       applyPs2MaterialTreatment(gltf.scene);
       const pitDisplay = mergeStaticSceneByMaterial(gltf.scene);
+      if (this.disposed) {
+        disposeObject3DResources(pitDisplay);
+        disposeObject3DResources(gltf.scene);
+        return;
+      }
       pitDisplay.position.copy(sample.position).addScaledVector(sample.right, -22);
       this.poseMatrix.makeBasis(
         sample.right,
@@ -1600,6 +1618,8 @@ export class FuturismaGame {
   }
 
   dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
     this.running = false;
     cancelAnimationFrame(this.animationFrame);
     window.removeEventListener("resize", this.resize);
@@ -1608,7 +1628,11 @@ export class FuturismaGame {
     this.timer.dispose();
     this.audio.dispose();
     this.input.dispose();
+    disposeObject3DResources(this.scene);
+    this.scene.clear();
+    this.renderer.renderLists.dispose();
     this.renderer.dispose();
+    this.renderer.forceContextLoss();
     this.diagnosticsOutput?.remove();
   }
 }
