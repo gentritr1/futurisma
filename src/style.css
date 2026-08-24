@@ -226,6 +226,19 @@ kbd {
   color: var(--muted);
 }
 
+.telemetry__sub[data-state="boost"] {
+  color: var(--acid);
+}
+
+.telemetry__sub[data-state="drift"] {
+  color: var(--cyan);
+}
+
+.telemetry__sub[data-state="low-grip"],
+.telemetry__sub[data-state="hazard"] {
+  color: var(--warning);
+}
+
 .race-progress {
   position: absolute;
   top: 64px;

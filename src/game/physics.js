@@ -28,6 +28,17 @@ export function calculateDriftIntent(speedRatio, brake, steer) {
 }
 
 /**
+ * Uses separate enter and exit thresholds so noisy analogue input cannot flicker
+ * drift feedback while the underlying continuous physics stays unchanged.
+ * @param {boolean} previousActive
+ * @param {number} driftIntent
+ */
+export function resolveDriftActive(previousActive, driftIntent) {
+  const threshold = previousActive ? 0.14 : 0.26;
+  return clamp(driftIntent, 0, 1) >= threshold;
+}
+
+/**
  * @param {number} speed
  * @param {number} throttle
  * @param {number} brake

@@ -7,6 +7,7 @@ export interface TotemVisualState {
   brake: number;
   speedRatio: number;
   boostActive: boolean;
+  driftIntensity: number;
   lateralLoad: number;
   elapsed: number;
   delta: number;
@@ -128,7 +129,8 @@ export class TotemVehicle {
 
   updateVisual(state: TotemVisualState): void {
     const bank = THREE.MathUtils.clamp(
-      -state.steer * 0.2 - state.lateralLoad * 0.13,
+      -state.steer * (0.2 + state.driftIntensity * 0.08)
+        - state.lateralLoad * 0.13,
       -0.34,
       0.34,
     );
@@ -154,7 +156,11 @@ export class TotemVehicle {
     this.setRotation("airbrake_R_pivot", "x", state.brake * 60 * DEG);
     this.setRotation("elevon_L_pivot", "y", (-state.steer * 9 + state.brake * 6) * DEG);
     this.setRotation("elevon_R_pivot", "y", (-state.steer * 9 - state.brake * 6) * DEG);
-    this.setRotation("stabiliser_ring_pivot", "z", -state.lateralLoad * 12 * DEG);
+    this.setRotation(
+      "stabiliser_ring_pivot",
+      "z",
+      (-state.lateralLoad * 12 - state.steer * state.driftIntensity * 10) * DEG,
+    );
 
     const flapAngle = (9 + state.throttle * 20 + (state.boostActive ? 4 : 0)) * DEG;
     for (const name of ENGINE_FLAP_NAMES) {
@@ -175,8 +181,15 @@ export class TotemVehicle {
       material.opacity = 0.12 + state.throttle * 0.42 + state.speedRatio * 0.12;
     }
     if (this.boostPlume) {
-      this.boostPlume.visible = state.boostActive;
-      this.boostPlume.scale.setScalar(state.boostActive ? 1 + Math.sin(state.elapsed * 32) * 0.04 : 0.01);
+      const boostRead = THREE.MathUtils.smoothstep(state.speedRatio, 0.08, 0.28);
+      this.boostPlume.visible = state.boostActive && boostRead > 0.01;
+      this.boostPlume.scale.setScalar(
+        state.boostActive
+          ? (0.65 + boostRead * 0.35) * (1 + Math.sin(state.elapsed * 32) * 0.04)
+          : 0.01,
+      );
+      const boostMaterial = this.boostPlume.material as THREE.MeshBasicMaterial;
+      boostMaterial.opacity = 0.28 + boostRead * 0.22;
     }
   }
 

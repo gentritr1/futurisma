@@ -79,6 +79,7 @@ export class GameUi {
   private lastLapTimeLabel = "";
   private lastCheckpointLabel = "";
   private lastDriveLabel = "";
+  private lastDriveState = "";
   private lastBoostState = "";
   private lastEdgeState = "";
   private lastEdgeLabel = "";
@@ -286,7 +287,8 @@ export class GameUi {
       else if (raceStage === "final") this.systemStatus.textContent = "FINAL LAP";
       this.lastRaceStage = raceStage;
     }
-    const driveLabel = performance.now() < this.hazardUntil
+    const hazardActive = performance.now() < this.hazardUntil;
+    const driveLabel = hazardActive
       ? this.hazardLabel
       : frame.skidsDown
         ? "SKIDS DOWN"
@@ -299,9 +301,26 @@ export class GameUi {
               : frame.braking
                 ? "AIRBRAKES"
                 : "HOVER LOCK";
+    const driveState = hazardActive
+      ? "hazard"
+      : frame.skidsDown
+        ? "nominal"
+        : frame.boostActive
+          ? "boost"
+          : frame.lowGrip
+            ? "low-grip"
+            : frame.drifting
+              ? "drift"
+              : frame.braking
+                ? "braking"
+                : "nominal";
     if (driveLabel !== this.lastDriveLabel) {
       this.driveState.textContent = driveLabel;
       this.lastDriveLabel = driveLabel;
+    }
+    if (driveState !== this.lastDriveState) {
+      this.driveState.dataset.state = driveState;
+      this.lastDriveState = driveState;
     }
   }
 }

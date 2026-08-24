@@ -14,6 +14,7 @@ import {
   integrateBoostReserve,
   integrateSteering,
   integrateSpeed,
+  resolveDriftActive,
 } from "./physics";
 import {
   calculateFinishDistanceMeters,
@@ -144,6 +145,7 @@ export class FuturismaGame {
     brake: 0,
     speedRatio: 0,
     boostActive: false,
+    driftIntensity: 0,
     lateralLoad: 0,
     elapsed: 0,
     delta: 0,
@@ -159,6 +161,7 @@ export class FuturismaGame {
   private boostReserve = 1;
   private boostActive = false;
   private driftActive = false;
+  private driftIntensity = 0;
   private surfaceGrip = 1;
   private lap = 1;
   private elapsedMs = 0;
@@ -188,6 +191,9 @@ export class FuturismaGame {
   private diagnosticPhysicsSteps = 0;
   private diagnosticDistanceTravelled = 0;
   private diagnosticBoostSeconds = 0;
+  private diagnosticDriftSeconds = 0;
+  private diagnosticDriftEntries = 0;
+  private diagnosticMaxDriftIntensity = 0;
   private diagnosticEdgeSeconds = 0;
   private diagnosticImpacts = 0;
   private diagnosticMissedGates = 0;
@@ -450,6 +456,7 @@ export class FuturismaGame {
       presentationInput.brake,
       this.boostActive,
       this.surfaceGrip,
+      this.driftIntensity,
     );
     this.audio.setMusicProfile(this.course.musicAt(this.progress));
     const now = this.timer.getElapsed();
@@ -517,7 +524,21 @@ export class FuturismaGame {
     }
     const speedRatio = this.speed / BOOST_MAX_SPEED;
     const driftIntent = calculateDriftIntent(speedRatio, input.brake, input.steer);
-    this.driftActive = driftIntent > 0.18;
+    const wasDriftActive = this.driftActive;
+    this.driftActive = resolveDriftActive(wasDriftActive, driftIntent);
+    const driftResponse = 1 - Math.exp(
+      -delta * (driftIntent > this.driftIntensity ? 8.5 : 4.8),
+    );
+    this.driftIntensity = THREE.MathUtils.lerp(
+      this.driftIntensity,
+      driftIntent,
+      driftResponse,
+    );
+    if (this.driftActive && !wasDriftActive) {
+      if (this.diagnosticsMode) this.diagnosticDriftEntries += 1;
+      this.audio.playDriftEngage();
+      this.input.pulse(0.08, 0.18, 75);
+    }
     this.speed = integrateSpeed(
       this.speed,
       input.throttle,
@@ -530,6 +551,11 @@ export class FuturismaGame {
       this.diagnosticDistanceTravelled += this.speed * delta;
       this.diagnosticTopSpeed = Math.max(this.diagnosticTopSpeed, this.speed);
       if (this.boostActive) this.diagnosticBoostSeconds += delta;
+      if (this.driftActive) this.diagnosticDriftSeconds += delta;
+      this.diagnosticMaxDriftIntensity = Math.max(
+        this.diagnosticMaxDriftIntensity,
+        this.driftIntensity,
+      );
     }
 
     this.boostReserve = integrateBoostReserve(this.boostReserve, reserveBoost, delta);
@@ -822,6 +848,7 @@ export class FuturismaGame {
     this.vehicleVisualState.brake = input.brake;
     this.vehicleVisualState.speedRatio = speedRatio;
     this.vehicleVisualState.boostActive = this.boostActive;
+    this.vehicleVisualState.driftIntensity = this.driftIntensity;
     this.vehicleVisualState.lateralLoad = this.steerAmount * 0.45 - slip;
     this.vehicleVisualState.elapsed = this.timer.getElapsed();
     this.vehicleVisualState.delta = delta;
@@ -845,12 +872,16 @@ export class FuturismaGame {
     const desired = anchor
       .addScaledVector(this.forward, -2.7)
       .addScaledVector(sample.up, 1.25)
-      .addScaledVector(vehicleRight, -steer * 0.45);
+      .addScaledVector(
+        vehicleRight,
+        -steer * (0.45 + this.driftIntensity * 0.55),
+      );
     const target = this.scratchD
       .copy(this.vehicle.root.position)
       .addScaledVector(this.forward, 8 + this.speed * 0.075)
       .addScaledVector(this.travelDirection, this.speed * 0.025)
-      .addScaledVector(sample.up, 0.8);
+      .addScaledVector(sample.up, 0.8)
+      .addScaledVector(vehicleRight, steer * this.driftIntensity * 0.6);
 
     const speedRatio = this.speed / BOOST_MAX_SPEED;
     const positionDamping = 1 - Math.exp(-delta * (12 + speedRatio * 8));
@@ -860,7 +891,10 @@ export class FuturismaGame {
     this.camera.position.copy(this.cameraTarget);
     const desiredCameraUp = this.scratchB.copy(sample.up);
     if (!this.reducedMotion) {
-      desiredCameraUp.applyAxisAngle(this.forward, -steer * 0.035);
+      desiredCameraUp.applyAxisAngle(
+        this.forward,
+        -steer * (0.035 + this.driftIntensity * 0.045),
+      );
     }
     this.camera.up.lerp(
       desiredCameraUp,
@@ -876,7 +910,8 @@ export class FuturismaGame {
     this.camera.lookAt(this.cameraLook);
     const desiredFov = 56
       + (this.speed / BOOST_MAX_SPEED) * (this.reducedMotion ? 5 : 10)
-      + (this.boostActive ? (this.reducedMotion ? 2 : 7) : 0);
+      + (this.boostActive ? (this.reducedMotion ? 2 : 7) : 0)
+      + this.driftIntensity * (this.reducedMotion ? 0.6 : 3);
     const nextFov = THREE.MathUtils.lerp(
       this.camera.fov,
       desiredFov,
@@ -918,9 +953,21 @@ export class FuturismaGame {
     }
     position.needsUpdate = true;
     const material = this.speedLines.material as THREE.PointsMaterial;
-    material.opacity = THREE.MathUtils.smoothstep(speedRatio, 0.42, 0.92)
-      * (this.reducedMotion ? 0.16 : 0.48);
+    material.opacity = Math.min(
+      0.62,
+      THREE.MathUtils.smoothstep(speedRatio, 0.42, 0.92)
+        * (this.reducedMotion ? 0.16 : 0.48)
+        + this.driftIntensity * (this.reducedMotion ? 0.02 : 0.12),
+    );
     material.size = this.boostActive ? 0.1 : 0.065;
+    const speedLineRoll = this.reducedMotion
+      ? 0
+      : -this.steerAmount * this.driftIntensity * 0.12;
+    this.speedLines.rotation.z = THREE.MathUtils.lerp(
+      this.speedLines.rotation.z,
+      speedLineRoll,
+      1 - Math.exp(-delta * 7.2),
+    );
   }
 
   private updateHud(input: InputFrame): void {
@@ -1000,6 +1047,7 @@ export class FuturismaGame {
     this.boostReserve = 1;
     this.boostActive = false;
     this.driftActive = false;
+    this.driftIntensity = 0;
     this.surfaceGrip = 1;
     this.padBoostTime = 0;
     this.lap = 1;
@@ -1268,6 +1316,7 @@ export class FuturismaGame {
       lateralMeters: Number(this.lateral.toFixed(2)),
       steer: Number(this.steerAmount.toFixed(3)),
       drifting: this.driftActive,
+      driftIntensity: Number(this.driftIntensity.toFixed(2)),
       surfaceGrip: Number(this.surfaceGrip.toFixed(2)),
       boostActive: this.boostActive,
       nextCheckpoint: this.nextCheckpointIndex,
@@ -1277,6 +1326,9 @@ export class FuturismaGame {
       topSpeedKph: Number((this.diagnosticTopSpeed * 3.6).toFixed(1)),
       lapTimesMs: this.lapTimesMs.map((lapTime) => Math.round(lapTime)),
       boostSeconds: Number(this.diagnosticBoostSeconds.toFixed(2)),
+      driftSeconds: Number(this.diagnosticDriftSeconds.toFixed(2)),
+      driftEntries: this.diagnosticDriftEntries,
+      maxDriftIntensity: Number(this.diagnosticMaxDriftIntensity.toFixed(2)),
       edgeSeconds: Number(this.diagnosticEdgeSeconds.toFixed(2)),
       impacts: this.diagnosticImpacts,
       missedGates: this.diagnosticMissedGates,
@@ -1344,6 +1396,9 @@ export class FuturismaGame {
     this.diagnosticPhysicsSteps = 0;
     this.diagnosticDistanceTravelled = 0;
     this.diagnosticBoostSeconds = 0;
+    this.diagnosticDriftSeconds = 0;
+    this.diagnosticDriftEntries = 0;
+    this.diagnosticMaxDriftIntensity = 0;
     this.diagnosticEdgeSeconds = 0;
     this.diagnosticImpacts = 0;
     this.diagnosticMissedGates = 0;

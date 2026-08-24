@@ -73,6 +73,26 @@ const highSpeedDrift = physics.calculateDriftIntent(0.82, 1, 1);
 const noBrakeDrift = physics.calculateDriftIntent(0.82, 0, 1);
 assert.ok(highSpeedDrift > 0.5, "Brake plus steer at speed must engage drift authority.");
 assert.equal(noBrakeDrift, 0, "Steering alone must not engage the drift model.");
+assert.equal(
+  physics.resolveDriftActive(false, 0.25),
+  false,
+  "Drift feedback must not engage below its entry threshold.",
+);
+assert.equal(
+  physics.resolveDriftActive(false, 0.26),
+  true,
+  "Drift feedback must engage at its entry threshold.",
+);
+assert.equal(
+  physics.resolveDriftActive(true, 0.15),
+  true,
+  "Active drift feedback must survive small analogue-input noise.",
+);
+assert.equal(
+  physics.resolveDriftActive(true, 0.13),
+  false,
+  "Drift feedback must release below its exit threshold.",
+);
 assert.ok(
   physics.calculateTurnRate(0.82, highSpeedDrift)
     > physics.calculateTurnRate(0.82, 0),

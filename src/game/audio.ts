@@ -125,6 +125,7 @@ export class EngineAudio {
     brake: number,
     boost: boolean,
     surfaceGrip: number,
+    driftIntensity: number,
   ): void {
     if (!this.context || !this.engineOscillator || !this.harmonicOscillator) return;
     const now = this.context.currentTime;
@@ -135,12 +136,17 @@ export class EngineAudio {
     this.harmonicGain?.gain.setTargetAtTime(0.008 + speedRatio * 0.021 + (boost ? 0.02 : 0), now, 0.06);
     this.windGain?.gain.setTargetAtTime(
       Math.pow(speedRatio, 2) * (0.045 + brake * 0.035)
-        + (1 - surfaceGrip) * speedRatio * 0.07,
+        + (1 - surfaceGrip) * speedRatio * 0.07
+        + driftIntensity * speedRatio * 0.045,
       now,
       0.1,
     );
     this.engineFilter?.frequency.setTargetAtTime(
-      820 + speedRatio * 1_850 + brake * 420 + (boost ? 1_400 : 0),
+      820
+        + speedRatio * 1_850
+        + brake * 420
+        + driftIntensity * 480
+        + (boost ? 1_400 : 0),
       now,
       0.08,
     );
@@ -195,6 +201,10 @@ export class EngineAudio {
   playBoost(): void {
     this.playTone(115, 0.2, 0.04, "sawtooth", 0, 2.2);
     this.playTone(460, 0.14, 0.024, "square", 0.04, 1.5);
+  }
+
+  playDriftEngage(): void {
+    this.playTone(210, 0.11, 0.018, "square", 0, 0.74);
   }
 
   playImpact(intensity: number): void {
