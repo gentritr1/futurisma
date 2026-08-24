@@ -316,16 +316,21 @@ kbd {
   padding: 7px 10px;
   transform: translateX(-50%);
   opacity: 0;
+  visibility: hidden;
   color: var(--warning);
   border: 1px solid currentColor;
   font-family: "SFMono-Regular", Consolas, monospace;
   font-size: 0.7rem;
   letter-spacing: 0.1em;
-  transition: opacity 100ms ease;
+  transition:
+    opacity 100ms ease,
+    visibility 0s linear 100ms;
 }
 
 .edge-warning[data-active="true"] {
   opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
 }
 
 .turn-cue {
@@ -341,6 +346,7 @@ kbd {
   gap: 20px;
   transform: translate(-50%, 8px);
   opacity: 0;
+  visibility: hidden;
   background: oklch(0.08 0.018 205 / 0.84);
   border-top: 1px solid var(--acid);
   border-bottom: 1px solid var(--line);
@@ -349,7 +355,8 @@ kbd {
   letter-spacing: 0.08em;
   transition:
     opacity 140ms ease,
-    transform 180ms var(--ease-out);
+    transform 180ms var(--ease-out),
+    visibility 0s linear 180ms;
 }
 
 .turn-arrow {
@@ -367,6 +374,8 @@ kbd {
 .turn-cue[data-active="true"] {
   transform: translate(-50%, 0);
   opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
 }
 
 .countdown {

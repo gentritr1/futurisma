@@ -1,3 +1,5 @@
+import { nextQuantizedTime } from "./audio-timing";
+
 export interface MusicProfile {
   trance: number;
   jungle: number;
@@ -10,6 +12,7 @@ type WaveShape = "sine" | "metal";
 
 const BPM = 174;
 const BEAT_SECONDS = 60 / BPM;
+const BAR_SECONDS = BEAT_SECONDS * 4;
 const LOOP_BEATS = 8;
 const STEM_NAMES: StemName[] = ["trance", "jungle", "deep_dnb", "techstep"];
 const STEM_GAIN: Record<StemName, number> = {
@@ -38,8 +41,10 @@ export class EngineAudio {
   private windGain: GainNode | null = null;
   private musicFilter: BiquadFilterNode | null = null;
   private readonly stemGains = new Map<StemName, GainNode>();
+  private readonly stemTargets = new Map<StemName, number>();
   private readonly persistentSources: AudioScheduledSourceNode[] = [];
   private musicProfileKey = -1;
+  private musicStartTime = 0;
   private muted = false;
   private paused = false;
 
@@ -155,13 +160,22 @@ export class EngineAudio {
     if (key === this.musicProfileKey) return;
     this.musicProfileKey = key;
     const now = this.context.currentTime;
+    const transitionStart = nextQuantizedTime(
+      now,
+      this.musicStartTime,
+      BAR_SECONDS,
+    );
     for (const name of STEM_NAMES) {
       const level = Math.max(0, Math.min(3, profile[name]));
-      this.stemGains.get(name)?.gain.setTargetAtTime(
-        (level / 3) * STEM_GAIN[name],
-        now,
-        BEAT_SECONDS * 0.8,
-      );
+      const target = (level / 3) * STEM_GAIN[name];
+      const previousTarget = this.stemTargets.get(name) ?? 0;
+      const gain = this.stemGains.get(name)?.gain;
+      if (!gain) continue;
+      gain.cancelScheduledValues(now);
+      gain.setValueAtTime(previousTarget, now);
+      gain.setValueAtTime(previousTarget, transitionStart);
+      gain.linearRampToValueAtTime(target, transitionStart + BAR_SECONDS);
+      this.stemTargets.set(name, target);
     }
   }
 
@@ -222,6 +236,7 @@ export class EngineAudio {
     }
     this.persistentSources.length = 0;
     this.stemGains.clear();
+    this.stemTargets.clear();
     void this.context?.close();
     this.context = null;
     this.master = null;
@@ -237,6 +252,7 @@ export class EngineAudio {
     this.musicFilter = musicFilter;
 
     const startAt = context.currentTime + 0.08;
+    this.musicStartTime = startAt;
     for (const name of STEM_NAMES) {
       const gain = context.createGain();
       gain.gain.value = 0;

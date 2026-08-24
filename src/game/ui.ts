@@ -78,6 +78,8 @@ export class GameUi {
   private lastEdgeState = "";
   private lastTurnState = "";
   private lastRaceStage = "";
+  private hazardLabel = "";
+  private hazardUntil = 0;
   private gateFlashUntil = 0;
   private impactFlashUntil = 0;
 
@@ -105,6 +107,7 @@ export class GameUi {
     this.turnCue.dataset.active = "false";
     this.turnCue.setAttribute("aria-hidden", "true");
     this.impactFlash.dataset.active = "false";
+    this.hazardUntil = 0;
     this.systemStatus.textContent = "LAUNCH SEQUENCE";
     document.body.dataset.phase = "race";
   }
@@ -170,6 +173,11 @@ export class GameUi {
     this.impactFlashUntil = performance.now() + 150;
     this.impactFlash.dataset.active = "true";
     this.impactFlash.dataset.side = side.toLowerCase();
+  }
+
+  flashHazard(label: string, durationMs = 900): void {
+    this.hazardLabel = label;
+    this.hazardUntil = performance.now() + durationMs;
   }
 
   update(frame: HudFrame): void {
@@ -257,17 +265,19 @@ export class GameUi {
       else if (raceStage === "final") this.systemStatus.textContent = "FINAL LAP";
       this.lastRaceStage = raceStage;
     }
-    const driveLabel = frame.skidsDown
-      ? "SKIDS DOWN"
-      : frame.boostActive
-        ? "PLASMA OVERDRIVE"
-        : frame.lowGrip
-          ? "SLIP SURFACE"
-          : frame.drifting
-            ? "DRIFT VECTOR"
-            : frame.braking
-              ? "AIRBRAKES"
-              : "HOVER LOCK";
+    const driveLabel = performance.now() < this.hazardUntil
+      ? this.hazardLabel
+      : frame.skidsDown
+        ? "SKIDS DOWN"
+        : frame.boostActive
+          ? "PLASMA OVERDRIVE"
+          : frame.lowGrip
+            ? "SLIP SURFACE"
+            : frame.drifting
+              ? "DRIFT VECTOR"
+              : frame.braking
+                ? "AIRBRAKES"
+                : "HOVER LOCK";
     if (driveLabel !== this.lastDriveLabel) {
       this.driveState.textContent = driveLabel;
       this.lastDriveLabel = driveLabel;

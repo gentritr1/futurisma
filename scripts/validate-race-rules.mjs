@@ -4,6 +4,7 @@ import {
   checkpointRequiresExtraCircuit,
   crossedForwardProgress,
   forwardProgressDelta,
+  isCircularHazardContact,
 } from "../src/game/race-rules.js";
 
 const COURSE_LENGTH = 2_516;
@@ -46,4 +47,11 @@ const finishArmedDistance = calculateFinishDistanceMeters(
 );
 assert.equal(finishArmedDistance, COURSE_LENGTH * 0.25);
 
-console.log("Race rules PASS: forward crossings, wraparound, missed-gate penalty, finish distance.");
+assert.ok(isCircularHazardContact(781.2, -8.4, 781.24, -8.5, COURSE_LENGTH));
+assert.ok(isCircularHazardContact(0.8, 7, COURSE_LENGTH - 0.5, 7, COURSE_LENGTH));
+assert.ok(!isCircularHazardContact(781.2, 0, 781.24, -8.5, COURSE_LENGTH));
+assert.ok(!isCircularHazardContact(790, -8.5, 781.24, -8.5, COURSE_LENGTH));
+
+console.log(
+  "Race rules PASS: forward crossings, wraparound, missed-gate penalty, finish distance, cable contacts.",
+);

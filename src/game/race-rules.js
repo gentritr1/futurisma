@@ -65,3 +65,30 @@ export function calculateFinishDistanceMeters(
     (currentCircuitRemaining + laterLaps + missedCircuit) * courseLength,
   );
 }
+
+/**
+ * @param {number} distance
+ * @param {number} lateral
+ * @param {number} hazardDistance
+ * @param {number} hazardLateral
+ * @param {number} courseLength
+ * @param {number} [distanceRadius]
+ * @param {number} [lateralRadius]
+ */
+export function isCircularHazardContact(
+  distance,
+  lateral,
+  hazardDistance,
+  hazardLateral,
+  courseLength,
+  distanceRadius = 3.2,
+  lateralRadius = 3.1,
+) {
+  const distanceDelta = Math.abs(
+    ((distance - hazardDistance + courseLength / 2) % courseLength
+      + courseLength) % courseLength
+      - courseLength / 2,
+  );
+  return distanceDelta <= distanceRadius
+    && Math.abs(lateral - hazardLateral) <= lateralRadius;
+}

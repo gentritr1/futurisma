@@ -34,6 +34,11 @@ the HUD and the best lap on the result screen. Airbrakes and the standing-water
 grip loss feed the procedural noise layer as well as handling feedback.
 If a gate is missed, the HUD keeps the failure visible, offers the recovery
 control, and includes the required extra circuit in the finish distance.
+Hangar Six restores the authored warning-cycle steam vents and cosmetic cargo
+hook; the two outer-line cable coils now deliver a telegraphed hard trip without
+interfering with the clean racing line. Fog zones crossfade over the authored
+80 metres, while the trance, jungle, deep DnB, and techstep stem changes land on
+174 BPM bar boundaries.
 
 ## Visual test mode
 
@@ -62,7 +67,8 @@ support a `_headers` file. Configure equivalent response headers if the chosen
 host uses another format.
 
 The local suite verifies accepted asset hashes, measured map invariants,
-longitudinal handling at 60/120 Hz, checkpoint and finish-distance rules,
+longitudinal and steering response at 60/120 Hz, checkpoint, hazard, and
+finish-distance rules, music timing,
 strict browser security policy, pinned package versions, the production build,
 and gzip budgets. Browser diagnostics
 remain the source of truth for full-lap draw calls and frame pacing.

@@ -57,6 +57,35 @@ for (const trigger of blockout.music.triggers) {
   }
 }
 
+assert(blockout.fog.crossfadeMetres === 80, "fog crossfade must remain 80 m");
+for (let index = 1; index < blockout.fog.zones.length; index += 1) {
+  assert(
+    blockout.fog.zones[index - 1].toDistance === blockout.fog.zones[index].fromDistance,
+    `fog zones ${index} and ${index + 1} must meet without a gap`,
+  );
+}
+assert(blockout.music.bpm === 174, "music map must remain locked to 174 BPM");
+assert(blockout.music.quantize === "bar", "music transitions must remain bar-quantized");
+assert(blockout.music.crossfadeBars === 1, "music stem crossfades must remain one bar");
+
+const steamVents = blockout.hazards.filter((hazard) => hazard.type === "steam_vent");
+const cableTrips = blockout.hazards.filter((hazard) => hazard.type === "cable_coil");
+const cargoHook = blockout.hazards.find((hazard) => hazard.type === "swinging_hook");
+assert(steamVents.length === 2, "two authored steam vents are required");
+assert(cableTrips.length === 2, "two authored cable-trip hazards are required");
+for (const vent of steamVents) {
+  assert(Number.isFinite(vent.distance), `${vent.id} needs a course distance`);
+  assert(Number.isFinite(vent.lateralOffset), `${vent.id} needs a lateral offset`);
+  assert(vent.cycleSeconds > vent.telegraphSeconds, `${vent.id} needs warning time`);
+}
+for (const cable of cableTrips) {
+  assert(Number.isFinite(cable.distance), `${cable.id} needs a course distance`);
+  assert(Number.isFinite(cable.lateralOffset), `${cable.id} needs a lateral offset`);
+  assert(cable.effect === "hard_trip", `${cable.id} must retain its hard-trip response`);
+}
+assert(Number.isFinite(cargoHook?.distance), "the cargo hook needs a course distance");
+assert(cargoHook?.collision === false, "the cargo hook must remain a cosmetic near-miss");
+
 const finalSample = samples.at(-1);
 const closureSegment = Math.hypot(
   finalSample.x - samples[0].x,

@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import greenwaterJson from "./data/greenwater-blockout.json";
+import { isCircularHazardContact } from "./race-rules";
 
 type EdgeType = "A" | "B" | "C";
 
@@ -61,6 +62,18 @@ interface RawHazard {
   fromDistance?: number;
   toDistance?: number;
   lateralOffset?: number;
+  cycleSeconds?: number;
+  telegraphSeconds?: number;
+  effect?: string;
+  collision?: boolean;
+}
+
+interface SteamVentRuntime {
+  sample: CourseSample;
+  lateralOffset: number;
+  cycleSeconds: number;
+  telegraphSeconds: number;
+  phaseOffset: number;
 }
 
 export interface MusicProfile {
@@ -164,6 +177,8 @@ export interface FogProfile {
 }
 
 const WORLD_UP = new THREE.Vector3(0, 1, 0);
+const COURSE_BASIS = new THREE.Matrix4();
+const COURSE_BACK = new THREE.Vector3();
 const MAP = greenwaterJson as unknown as GreenwaterMapData;
 const GAMEPLAY_FOG_SCALE = 0.58;
 const BOOST_PAD_DISTANCES = [1705, 1815, 1925, 2035] as const;
@@ -191,13 +206,13 @@ function seededRandom(seed: number): () => number {
 }
 
 function poseObject(object: THREE.Object3D, sample: CourseSample): void {
-  const basis = new THREE.Matrix4().makeBasis(
+  COURSE_BASIS.makeBasis(
     sample.right,
     sample.up,
-    sample.tangent.clone().multiplyScalar(-1),
+    COURSE_BACK.copy(sample.tangent).multiplyScalar(-1),
   );
   object.position.copy(sample.position);
-  object.quaternion.setFromRotationMatrix(basis);
+  object.quaternion.setFromRotationMatrix(COURSE_BASIS);
 }
 
 function setCourseObjectTransform(
@@ -299,6 +314,18 @@ export class GreenwaterCourse {
       color: new THREE.Color(zone.color),
     },
   }));
+  private readonly fogProfileScratch: FogProfile = {
+    density: 0,
+    color: new THREE.Color(),
+  };
+  private readonly cableHazards = MAP.hazards.filter(
+    (hazard) => hazard.type === "cable_coil" && hazard.distance !== undefined,
+  );
+  private readonly steamVents: SteamVentRuntime[] = [];
+  private readonly atmosphereTransform = new THREE.Object3D();
+  private steamPuffs: THREE.InstancedMesh | null = null;
+  private steamWarnings: THREE.InstancedMesh | null = null;
+  private cargoHookPivot: THREE.Group | null = null;
   private lapBoardTexture: THREE.CanvasTexture | null = null;
   private lapBoardContext: CanvasRenderingContext2D | null = null;
 
@@ -498,10 +525,35 @@ export class GreenwaterCourse {
 
   fogAt(progress: number): FogProfile {
     const distance = THREE.MathUtils.euclideanModulo(progress, 1) * this.length;
-    const zone = this.fogProfiles.find(
-      (candidate) => distance >= candidate.fromDistance && distance < candidate.toDistance,
-    ) ?? this.fogProfiles[0];
-    return zone.profile;
+    let zoneIndex = 0;
+    for (let index = 0; index < this.fogProfiles.length; index += 1) {
+      const candidate = this.fogProfiles[index];
+      if (distance >= candidate.fromDistance && distance < candidate.toDistance) {
+        zoneIndex = index;
+        break;
+      }
+    }
+    const zone = this.fogProfiles[zoneIndex];
+    const next = this.fogProfiles[(zoneIndex + 1) % this.fogProfiles.length];
+    const crossfadeMetres = Math.min(
+      MAP.fog.crossfadeMetres,
+      zone.toDistance - zone.fromDistance,
+    );
+    const crossfadeStart = zone.toDistance - crossfadeMetres;
+    const amount = distance <= crossfadeStart
+      ? 0
+      : THREE.MathUtils.smoothstep(distance, crossfadeStart, zone.toDistance);
+    this.fogProfileScratch.density = THREE.MathUtils.lerp(
+      zone.profile.density,
+      next.profile.density,
+      amount,
+    );
+    this.fogProfileScratch.color.lerpColors(
+      zone.profile.color,
+      next.profile.color,
+      amount,
+    );
+    return this.fogProfileScratch;
   }
 
   edgeType(sample: CourseSample, lateral: number): EdgeType {
@@ -521,6 +573,24 @@ export class GreenwaterCourse {
       return 0.8;
     }
     return 1;
+  }
+
+  cableTripSideAt(progress: number, lateral: number): -1 | 0 | 1 {
+    const distance = THREE.MathUtils.euclideanModulo(progress, 1) * this.length;
+    for (const hazard of this.cableHazards) {
+      const hazardDistance = hazard.distance ?? 0;
+      const lateralOffset = hazard.lateralOffset ?? 0;
+      if (isCircularHazardContact(
+        distance,
+        lateral,
+        hazardDistance,
+        lateralOffset,
+        this.length,
+      )) {
+        return lateralOffset < 0 ? -1 : 1;
+      }
+    }
+    return 0;
   }
 
   isOnBoostPad(progress: number, lateral: number, halfWidth: number): boolean {
@@ -547,6 +617,67 @@ export class GreenwaterCourse {
       active = trigger;
     }
     return active.levels;
+  }
+
+  updateAtmosphere(elapsedSeconds: number, reducedMotion: boolean): void {
+    const puffs = this.steamPuffs;
+    const warnings = this.steamWarnings;
+    if (puffs && warnings) {
+      const puffsPerVent = 6;
+      for (let ventIndex = 0; ventIndex < this.steamVents.length; ventIndex += 1) {
+        const vent = this.steamVents[ventIndex];
+        const cycleTime = THREE.MathUtils.euclideanModulo(
+          elapsedSeconds + vent.phaseOffset,
+          vent.cycleSeconds,
+        );
+        const warningPulse = cycleTime < vent.telegraphSeconds
+          ? 0.72 + Math.sin(cycleTime * 18) * 0.18
+          : 0.32;
+        setCourseObjectTransform(
+          this.atmosphereTransform,
+          vent.sample,
+          vent.lateralOffset,
+          0.42,
+          0,
+          warningPulse,
+          0.16,
+          warningPulse,
+        );
+        warnings.setMatrixAt(ventIndex, this.atmosphereTransform.matrix);
+
+        for (let puffIndex = 0; puffIndex < puffsPerVent; puffIndex += 1) {
+          const instanceIndex = ventIndex * puffsPerVent + puffIndex;
+          const ageSeconds = cycleTime
+            - vent.telegraphSeconds
+            - puffIndex * 0.16;
+          const age = ageSeconds / 1.18;
+          const active = age >= 0 && age <= 1;
+          const fade = active ? Math.sin(age * Math.PI) : 0;
+          const scale = active
+            ? (1.1 + age * 2.4) * Math.max(0.2, fade)
+            : 0.001;
+          const wobble = reducedMotion ? 0 : Math.sin(age * 8 + ventIndex) * age * 0.7;
+          setCourseObjectTransform(
+            this.atmosphereTransform,
+            vent.sample,
+            vent.lateralOffset + wobble,
+            0.55 + Math.max(0, age) * 8.5,
+            reducedMotion ? 0 : Math.cos(age * 7 + puffIndex) * age * 0.45,
+            scale,
+            scale * 1.35,
+            scale,
+          );
+          puffs.setMatrixAt(instanceIndex, this.atmosphereTransform.matrix);
+        }
+      }
+      warnings.instanceMatrix.needsUpdate = true;
+      puffs.instanceMatrix.needsUpdate = true;
+    }
+
+    if (this.cargoHookPivot) {
+      const amplitude = reducedMotion ? 0.1 : 0.34;
+      this.cargoHookPivot.rotation.z = Math.sin(elapsedSeconds * 1.7) * amplitude;
+    }
   }
 
   setCheckpointProgress(nextCheckpointIndex: number): void {
@@ -1139,7 +1270,7 @@ export class GreenwaterCourse {
 
   private createHazards(): THREE.Group {
     const group = new THREE.Group();
-    group.name = "greenwater_hazard_blockout";
+    group.name = "greenwater_hazards";
     const water = MAP.hazards.find((hazard) => hazard.id === "HZ_WATER_SHEET");
     if (water?.fromDistance !== undefined && water.toDistance !== undefined) {
       const positions: number[] = [];
@@ -1172,19 +1303,135 @@ export class GreenwaterCourse {
       group.add(mesh);
     }
 
+    const steamHazards = MAP.hazards.filter(
+      (hazard) => hazard.type === "steam_vent"
+        && hazard.distance !== undefined
+        && hazard.lateralOffset !== undefined,
+    );
+    if (steamHazards.length > 0) {
+      const puffsPerVent = 6;
+      const puffGeometry = new THREE.DodecahedronGeometry(1, 0);
+      const puffMaterial = new THREE.MeshBasicMaterial({
+        color: 0xd1ded8,
+        transparent: true,
+        opacity: 0.42,
+        depthWrite: false,
+      });
+      const puffs = new THREE.InstancedMesh(
+        puffGeometry,
+        puffMaterial,
+        steamHazards.length * puffsPerVent,
+      );
+      puffs.name = "steam_vent_puffs";
+      puffs.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+      puffs.frustumCulled = false;
+      const warnings = new THREE.InstancedMesh(
+        new THREE.BoxGeometry(1, 1, 1),
+        new THREE.MeshBasicMaterial({ color: 0xffa22e }),
+        steamHazards.length,
+      );
+      warnings.name = "steam_vent_warning_lamps";
+      warnings.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+      const ventBases = new THREE.InstancedMesh(
+        new THREE.CylinderGeometry(0.8, 1.1, 0.42, 6),
+        new THREE.MeshLambertMaterial({ color: 0x384039 }),
+        steamHazards.length,
+      );
+      const ventObject = new THREE.Object3D();
+      for (let index = 0; index < steamHazards.length; index += 1) {
+        const hazard = steamHazards[index];
+        const sample = this.sampleAtDistance(hazard.distance ?? 0);
+        const lateralOffset = hazard.lateralOffset ?? 0;
+        this.steamVents.push({
+          sample,
+          lateralOffset,
+          cycleSeconds: Math.max(1, hazard.cycleSeconds ?? 4),
+          telegraphSeconds: Math.max(0.2, hazard.telegraphSeconds ?? 1),
+          phaseOffset: index * 1.7,
+        });
+        setCourseObjectTransform(
+          ventObject,
+          sample,
+          lateralOffset,
+          0.2,
+          0,
+          1,
+          1,
+          1,
+        );
+        ventBases.setMatrixAt(index, ventObject.matrix);
+      }
+      ventBases.instanceMatrix.needsUpdate = true;
+      this.steamPuffs = puffs;
+      this.steamWarnings = warnings;
+      group.add(ventBases, warnings, puffs);
+    }
+
     const cableMaterial = new THREE.MeshLambertMaterial({ color: 0x503d2d });
-    for (const hazard of MAP.hazards.filter((candidate) => candidate.type === "cable_coil")) {
+    const cableCoils = new THREE.InstancedMesh(
+      new THREE.TorusGeometry(1.5, 0.25, 5, 9),
+      cableMaterial,
+      this.cableHazards.length,
+    );
+    const cableWarnings = new THREE.InstancedMesh(
+      new THREE.BoxGeometry(1, 1, 1),
+      new THREE.MeshBasicMaterial({ color: 0xffa22e }),
+      this.cableHazards.length,
+    );
+    const cableObject = new THREE.Object3D();
+    for (let index = 0; index < this.cableHazards.length; index += 1) {
+      const hazard = this.cableHazards[index];
       if (hazard.distance === undefined || hazard.lateralOffset === undefined) continue;
       const sample = this.sampleAtDistance(hazard.distance);
-      const cable = new THREE.Mesh(
-        new THREE.TorusGeometry(1.5, 0.25, 5, 9),
-        cableMaterial,
+      poseObject(cableObject, sample);
+      cableObject.position.addScaledVector(sample.right, hazard.lateralOffset);
+      cableObject.position.addScaledVector(sample.up, 0.28);
+      cableObject.rotation.x += Math.PI / 2;
+      cableObject.updateMatrix();
+      cableCoils.setMatrixAt(index, cableObject.matrix);
+      setCourseObjectTransform(
+        cableObject,
+        sample,
+        hazard.lateralOffset,
+        1.25,
+        0,
+        0.16,
+        2.2,
+        0.16,
       );
-      poseObject(cable, sample);
-      cable.position.addScaledVector(sample.right, hazard.lateralOffset);
-      cable.position.addScaledVector(sample.up, 0.28);
-      cable.rotation.x += Math.PI / 2;
-      group.add(cable);
+      cableWarnings.setMatrixAt(index, cableObject.matrix);
+    }
+    cableCoils.name = "cable_trip_hazards";
+    cableWarnings.name = "cable_trip_warning_posts";
+    cableCoils.instanceMatrix.needsUpdate = true;
+    cableWarnings.instanceMatrix.needsUpdate = true;
+    group.add(cableCoils, cableWarnings);
+
+    const cargoHook = MAP.hazards.find((hazard) => hazard.type === "swinging_hook");
+    if (cargoHook?.distance !== undefined) {
+      const sample = this.sampleAtDistance(cargoHook.distance);
+      const root = new THREE.Group();
+      root.name = cargoHook.id;
+      poseObject(root, sample);
+      root.position.addScaledVector(sample.right, cargoHook.lateralOffset ?? 0);
+      root.position.addScaledVector(sample.up, 15.2);
+      const pivot = new THREE.Group();
+      pivot.name = `${cargoHook.id}_swing`;
+      const cable = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.08, 0.12, 7.4, 5),
+        new THREE.MeshLambertMaterial({ color: 0x302d28 }),
+      );
+      cable.position.y = -3.7;
+      const hook = new THREE.Mesh(
+        new THREE.TorusGeometry(0.78, 0.18, 5, 8, Math.PI * 1.55),
+        new THREE.MeshBasicMaterial({ color: 0xffa22e }),
+      );
+      hook.position.y = -7.55;
+      hook.rotation.z = Math.PI * 0.25;
+      pivot.add(cable, hook);
+      root.add(pivot);
+      this.cargoHookPivot = pivot;
+      group.add(root);
     }
 
     const boostMaterial = new THREE.MeshBasicMaterial({ color: 0xc8ff2e });
@@ -1211,6 +1458,7 @@ export class GreenwaterCourse {
     }
     boostPads.instanceMatrix.needsUpdate = true;
     group.add(boostPads);
+    this.updateAtmosphere(0, false);
     return group;
   }
 

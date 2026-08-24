@@ -12,6 +12,7 @@ import {
   calculateTurnAuthority,
   calculateTurnRate,
   integrateBoostReserve,
+  integrateSteering,
   integrateSpeed,
 } from "./physics";
 import {
@@ -163,6 +164,7 @@ export class FuturismaGame {
   private edgeContact = false;
   private offCourseTime = 0;
   private recoveryImmunity = 0;
+  private hazardTripCooldown = 0;
   private padBoostTime = 0;
   private impactShake = 0;
   private impactSparkCursor = 0;
@@ -426,6 +428,7 @@ export class FuturismaGame {
     this.updateSpeedLines(delta);
     this.updateImpactSparks(delta);
     this.updateFog(delta);
+    this.course.updateAtmosphere(this.elapsedMs / 1000, this.reducedMotion);
     this.audio.update(
       this.speed / BOOST_MAX_SPEED,
       presentationInput.throttle,
@@ -476,6 +479,7 @@ export class FuturismaGame {
   private updateRace(delta: number, input: InputFrame): void {
     if (this.diagnosticsMode) this.diagnosticPhysicsSteps += 1;
     this.recoveryImmunity = Math.max(0, this.recoveryImmunity - delta);
+    this.hazardTripCooldown = Math.max(0, this.hazardTripCooldown - delta);
     const beforeMove = this.course.project(
       this.position,
       this.progress,
@@ -515,11 +519,10 @@ export class FuturismaGame {
 
     this.boostReserve = integrateBoostReserve(this.boostReserve, reserveBoost, delta);
 
-    const steerResponse = 1 - Math.exp(-delta * (Math.abs(input.steer) > 0.01 ? 6.2 : 8.5));
-    this.steerAmount = THREE.MathUtils.lerp(
+    this.steerAmount = integrateSteering(
       this.steerAmount,
       input.steer,
-      steerResponse,
+      delta,
     );
     const turnAuthority = calculateTurnAuthority(speedRatio);
     const turnRate = calculateTurnRate(speedRatio, driftIntent);
@@ -564,6 +567,27 @@ export class FuturismaGame {
     this.progress = afterMove.progress;
     this.lateral = afterMove.lateral;
     this.position.y = afterMove.position.y;
+
+    const cableTripSide = this.hazardTripCooldown <= 0
+      ? this.course.cableTripSideAt(this.progress, this.lateral)
+      : 0;
+    if (cableTripSide !== 0) {
+      this.hazardTripCooldown = 0.85;
+      this.speed *= 0.58;
+      this.forward.applyAxisAngle(afterMove.up, cableTripSide * 0.11);
+      this.travelDirection.lerp(this.forward, 0.34).normalize();
+      this.impactShake = 0.9;
+      this.audio.playImpact(0.88);
+      this.input.pulse(0.68, 0.82, 150);
+      this.ui.flashImpact(cableTripSide < 0 ? "LEFT" : "RIGHT");
+      this.ui.flashHazard("CABLE STRIKE");
+      if (this.diagnosticsMode) {
+        this.diagnosticImpacts += 1;
+        this.diagnosticImpactLocations.push(
+          `CABLE STRIKE@${Math.round(this.progress * this.course.length)}m`,
+        );
+      }
+    }
 
     const edgeType = this.course.edgeType(afterMove, this.lateral);
     const roadLimit = afterMove.halfWidth - 2.05;
@@ -737,6 +761,7 @@ export class FuturismaGame {
     this.edgeContact = false;
     this.offCourseTime = 0;
     this.recoveryImmunity = this.course.recoveryImmunitySeconds;
+    this.hazardTripCooldown = 0.6;
     this.impactShake = 0.25;
     this.driftActive = false;
     this.surfaceGrip = 1;
@@ -956,6 +981,7 @@ export class FuturismaGame {
     this.edgeContact = false;
     this.offCourseTime = 0;
     this.recoveryImmunity = 0;
+    this.hazardTripCooldown = 0;
     this.impactShake = 0;
     this.physicsAccumulator = 0;
     this.nextHudAt = 0;
@@ -1114,7 +1140,7 @@ export class FuturismaGame {
     const fog = this.scene.fog;
     if (!(fog instanceof THREE.FogExp2)) return;
     const target = this.course.fogAt(this.progress);
-    const response = 1 - Math.exp(-delta * 1.8);
+    const response = 1 - Math.exp(-delta * 5.5);
     fog.density = THREE.MathUtils.lerp(fog.density, target.density, response);
     fog.color.lerp(target.color, response);
     if (this.scene.background instanceof THREE.Color) {

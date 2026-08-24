@@ -89,6 +89,38 @@ assert.ok(
   "Standing water must reduce available grip.",
 );
 
+function simulateSteering({ seconds, step, target, startingSteer = 0 }) {
+  let steer = startingSteer;
+  const iterations = Math.round(seconds / step);
+  for (let index = 0; index < iterations; index += 1) {
+    steer = physics.integrateSteering(steer, target, step);
+  }
+  return steer;
+}
+
+const steering120 = simulateSteering({ seconds: 0.25, step: 1 / 120, target: 1 });
+const steering60 = simulateSteering({ seconds: 0.25, step: 1 / 60, target: 1 });
+const releasedSteering = simulateSteering({
+  seconds: 0.3,
+  step: 1 / 120,
+  target: 0,
+  startingSteer: steering120,
+});
+assert.ok(
+  steering120 > 0.75 && steering120 < 0.85,
+  `Steering attack is outside the responsive arcade window (${steering120}).`,
+);
+assert.ok(
+  Math.abs(steering120 - steering60) < 0.001,
+  "Steering response must remain stable between 60 Hz and 120 Hz.",
+);
+assert.ok(releasedSteering < 0.07, "Released steering must settle quickly.");
+assert.equal(
+  physics.integrateSteering(0, 0, 1 / 120),
+  0,
+  "Neutral input must never create steering assistance.",
+);
+
 let reserve = 1;
 for (let index = 0; index < 1_200; index += 1) {
   reserve = physics.integrateBoostReserve(reserve, true, 1 / 120);
@@ -100,5 +132,5 @@ for (let index = 0; index < 2_400; index += 1) {
 assert.equal(reserve, 1, "Boost reserve must recharge and clamp at one.");
 
 console.log(
-  `Physics PASS: cruise ${(cruise120 * 3.6).toFixed(1)} km/h, boost ${(boosted * 3.6).toFixed(1)} km/h, 60/120 Hz drift ${Math.abs(cruise120 - cruise60).toFixed(3)} m/s.`,
+  `Physics PASS: cruise ${(cruise120 * 3.6).toFixed(1)} km/h, boost ${(boosted * 3.6).toFixed(1)} km/h, 60/120 Hz speed drift ${Math.abs(cruise120 - cruise60).toFixed(3)} m/s, steering drift ${Math.abs(steering120 - steering60).toFixed(4)}.`,
 );

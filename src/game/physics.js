@@ -67,6 +67,17 @@ export function integrateBoostReserve(reserve, reserveBoostActive, delta) {
     : Math.min(1, reserve + delta * 0.075);
 }
 
+/**
+ * @param {number} current
+ * @param {number} target
+ * @param {number} delta
+ */
+export function integrateSteering(current, target, delta) {
+  const responseRate = Math.abs(target) > 0.01 ? 6.2 : 8.5;
+  const response = 1 - Math.exp(-Math.max(0, delta) * responseRate);
+  return lerp(current, clamp(target, -1, 1), response);
+}
+
 /** @param {number} speedRatio */
 export function calculateTurnAuthority(speedRatio) {
   return lerp(0.32, 1, smoothstep(speedRatio, 0.015, 0.2));
