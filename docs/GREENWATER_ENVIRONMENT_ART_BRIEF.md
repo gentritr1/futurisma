@@ -22,8 +22,15 @@ This is an asset-production pass, not another map-design pass. Preserve the prov
 - World origin: centre of the start/finish line at surface height.
 - Race direction, elevations, widths, banking, checkpoints, hazards, and recovery anchors come only from the map JSON.
 - Target lap: 34–36 seconds; current clean autoplay lap: 34.499 seconds.
-- Current peak scene cost before authored environment art: 93 draw calls, 37,972 triangles, 88 geometries, and 17 textures.
+- Current measured peak after the Phase 1 fallback dressing: 92 draw calls, 42,688 triangles, 87 geometries, and 17 textures at 1280 × 720 adaptive quality.
 - The existing procedural course remains the collision and gameplay source of truth.
+
+The Phase 1 fallback dressing currently reuses TOTEM's accepted prop kit for 20
+sparse placements: the two cable hazards, wetland reeds, canopy plants, two
+off-track repair units, and the start-area pit lineup. Final environment
+integration must hide or replace the distributed fallback dressing so those
+objects are not duplicated; the pit lineup may remain if it still fits the
+authored start-area composition.
 
 Do not alter the centreline, widen or narrow the course, create alternate routes, move checkpoint gates, move hazards, change fog behavior, or edit TOTEM.
 

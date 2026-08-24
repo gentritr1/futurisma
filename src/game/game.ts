@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
+import { ASSET_KIT_PROP_PLACEMENTS } from "./asset-kit-layout";
 import { EngineAudio } from "./audio";
 import { calculateImpactShakeOffset } from "./camera-feedback";
 import { hasPlayerControlIntent } from "./control-mode";
@@ -88,7 +89,7 @@ function mergeStaticSceneByMaterial(source: THREE.Object3D): THREE.Group {
   });
 
   const mergedRoot = new THREE.Group();
-  mergedRoot.name = "totem_asset_kit_pit_display";
+  mergedRoot.name = "totem_asset_kit_course_dressing";
   for (const bucket of buckets.values()) {
     const geometry = mergeGeometries(bucket.geometries, false);
     for (const sourceGeometry of bucket.geometries) sourceGeometry.dispose();
@@ -97,6 +98,67 @@ function mergeStaticSceneByMaterial(source: THREE.Object3D): THREE.Group {
   }
   if (fallbackMeshes.length > 0) mergedRoot.add(...fallbackMeshes);
   return mergedRoot;
+}
+
+function placeCourseAlignedObject(
+  object: THREE.Object3D,
+  sample: ReturnType<GreenwaterCourse["sample"]>,
+  lateral: number,
+  yaw: number,
+  scale: number,
+): void {
+  object.position.copy(sample.position).addScaledVector(sample.right, lateral);
+  object.quaternion.setFromRotationMatrix(
+    new THREE.Matrix4().makeBasis(
+      sample.right,
+      sample.up,
+      sample.tangent.clone().multiplyScalar(-1),
+    ),
+  );
+  object.rotateY(yaw);
+  object.scale.setScalar(scale);
+}
+
+function createNormalizedPropInstance(
+  source: THREE.Object3D,
+  name: string,
+): THREE.Group {
+  const template = source.getObjectByName(name);
+  if (!template) throw new Error(`Accepted asset kit is missing ${name}.`);
+  const prop = template.clone(true);
+  const bounds = new THREE.Box3().setFromObject(prop);
+  if (bounds.isEmpty()) throw new Error(`Accepted asset kit prop ${name} has no bounds.`);
+  const center = bounds.getCenter(new THREE.Vector3());
+  prop.position.x -= center.x;
+  prop.position.y -= bounds.min.y;
+  prop.position.z -= center.z;
+  const root = new THREE.Group();
+  root.name = `${name}_course_instance`;
+  root.add(prop);
+  return root;
+}
+
+function createAssetKitCourseDressing(
+  source: THREE.Object3D,
+  course: GreenwaterCourse,
+): THREE.Group {
+  const dressing = new THREE.Group();
+  dressing.name = "totem_asset_kit_course_source";
+  for (const placement of ASSET_KIT_PROP_PLACEMENTS) {
+    const prop = createNormalizedPropInstance(source, placement.name);
+    placeCourseAlignedObject(
+      prop,
+      course.sampleAtDistance(placement.distance),
+      placement.lateral,
+      placement.yaw,
+      placement.scale,
+    );
+    dressing.add(prop);
+  }
+
+  placeCourseAlignedObject(source, course.sample(0.985), -22, 0, 1);
+  dressing.add(source);
+  return dressing;
 }
 
 export class FuturismaGame {
@@ -1353,24 +1415,18 @@ export class FuturismaGame {
         disposeObject3DResources(gltf.scene);
         return;
       }
-      const sample = this.course.sample(0.985);
       applyPs2MaterialTreatment(gltf.scene);
-      const pitDisplay = mergeStaticSceneByMaterial(gltf.scene);
+      const courseDressing = createAssetKitCourseDressing(gltf.scene, this.course);
+      const dressingDisplay = mergeStaticSceneByMaterial(courseDressing);
       if (this.disposed) {
-        disposeObject3DResources(pitDisplay);
-        disposeObject3DResources(gltf.scene);
+        disposeObject3DResources(dressingDisplay);
         return;
       }
-      pitDisplay.position.copy(sample.position).addScaledVector(sample.right, -22);
-      this.poseMatrix.makeBasis(
-        sample.right,
-        sample.up,
-        sample.tangent.clone().multiplyScalar(-1),
-      );
-      pitDisplay.quaternion.setFromRotationMatrix(this.poseMatrix);
-      this.scene.add(pitDisplay);
+      this.scene.add(dressingDisplay);
+      const proceduralCables = this.course.group.getObjectByName("cable_trip_hazards");
+      if (proceduralCables) proceduralCables.visible = false;
     } catch {
-      // Greenwater remains playable if the optional prop lineup fails.
+      // Greenwater retains its procedural cable visuals if optional dressing fails.
     }
   }
 

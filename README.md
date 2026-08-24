@@ -92,6 +92,11 @@ remain the source of truth for full-lap draw calls and frame pacing.
 ## Production asset
 
 The accepted source handoff is preserved in `artifacts/TOTEM_Phase1_v1.0-patch1.zip`. Runtime copies are served from `public/assets/totem/`.
+The accepted prop kit is merged by material into the start-area pit display and
+20 sparse course-dressing placements. It supplies the two cable-hazard meshes,
+wetland reeds, canopy plants, and two off-track repair units without changing
+collision or route logic. Procedural cable visuals remain the load-failure
+fallback, while their gameplay warning posts stay active in both paths.
 
 The accepted Greenwater map handoff is preserved in
 `artifacts/GREENWATER_MAP01_v1.0.zip`. Its measured runtime centreline and

@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
+import {
+  ASSET_KIT_PROP_PLACEMENTS,
+  ASSET_KIT_REQUIRED_PROP_NAMES,
+} from "../src/game/asset-kit-layout.js";
 
 const expectedHashes = {
   "models/futurisma_asset_kit.glb": "9cf2346b81ccbe2136fedaa78967d22a38a2017b043b005a2ab040fda1df5226",
@@ -15,12 +19,44 @@ const expectedHashes = {
   "logos/totem-syndicate.svg": "506a73cb8de719bf870d3841d51340265066645a6a87b5088189bd03dcc90b7d",
 };
 
+let assetKitBytes;
 for (const [relativePath, expectedHash] of Object.entries(expectedHashes)) {
   const bytes = await readFile(
     new URL(`../public/assets/totem/${relativePath}`, import.meta.url),
   );
+  if (relativePath === "models/futurisma_asset_kit.glb") assetKitBytes = bytes;
   const actualHash = createHash("sha256").update(bytes).digest("hex");
   assert.equal(actualHash, expectedHash, `${relativePath} differs from the accepted package.`);
 }
 
-console.log(`Assets PASS: ${Object.keys(expectedHashes).length} served files match the accepted Phase 1 bytes.`);
+assert.ok(assetKitBytes, "The accepted asset-kit GLB must be present.");
+assert.equal(assetKitBytes.subarray(0, 4).toString("utf8"), "glTF");
+assert.equal(assetKitBytes.readUInt32LE(4), 2, "The asset kit must be glTF 2.0.");
+let assetKitJson;
+let offset = 12;
+while (offset < assetKitBytes.length) {
+  const chunkLength = assetKitBytes.readUInt32LE(offset);
+  const chunkType = assetKitBytes.toString("utf8", offset + 4, offset + 8);
+  if (chunkType === "JSON") {
+    assetKitJson = JSON.parse(
+      assetKitBytes.subarray(offset + 8, offset + 8 + chunkLength).toString("utf8").trim(),
+    );
+    break;
+  }
+  offset += 8 + chunkLength;
+}
+assert.ok(assetKitJson, "The accepted asset kit must contain a JSON chunk.");
+const assetKitNodeNames = new Set(assetKitJson.nodes?.map((node) => node.name));
+for (const name of ASSET_KIT_REQUIRED_PROP_NAMES) {
+  assert.ok(assetKitNodeNames.has(name), `The accepted asset kit is missing ${name}.`);
+}
+for (const placement of ASSET_KIT_PROP_PLACEMENTS) {
+  assert.ok(Number.isFinite(placement.distance) && placement.distance >= 0);
+  assert.ok(Number.isFinite(placement.lateral));
+  assert.ok(Number.isFinite(placement.yaw));
+  assert.ok(Number.isFinite(placement.scale) && placement.scale > 0);
+}
+
+console.log(
+  `Assets PASS: ${Object.keys(expectedHashes).length} served files match the accepted Phase 1 bytes; ${ASSET_KIT_PROP_PLACEMENTS.length} authored prop placements resolve.`,
+);
