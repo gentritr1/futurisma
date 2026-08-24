@@ -101,8 +101,10 @@ physics soak, checkpoint, hazard, and finish-distance rules,
 showcase-to-manual control intent, music timing, high-refresh presentation
 cadence, render-resolution tiers,
 strict browser security policy, pinned package versions, the production build,
-and gzip budgets. Browser diagnostics
-remain the source of truth for full-lap draw calls and frame pacing.
+and gzip budgets. Browser diagnostics remain the source of truth for full-lap
+draw calls and frame pacing. The current five-lap adaptive and high-quality
+soak results, plus the gates to rerun after environment integration, are locked
+in [`docs/PERFORMANCE_BASELINE.md`](docs/PERFORMANCE_BASELINE.md).
 
 ## Production asset
 
