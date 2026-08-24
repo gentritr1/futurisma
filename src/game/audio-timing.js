@@ -6,15 +6,19 @@ export const MUSIC_STEM_SAMPLE_RATE = 24_000;
  * in the real-time update loop.
  * @param {number} speedRatio
  * @param {boolean} boost
+ * @param {{ lowpassHz: number; highShelfDb: number }} [target]
  */
-export function resolveMusicFilterTargets(speedRatio, boost) {
+export function resolveMusicFilterTargets(
+  speedRatio,
+  boost,
+  target = { lowpassHz: 2100, highShelfDb: 0 },
+) {
   const speed = Number.isFinite(speedRatio)
     ? Math.min(1, Math.max(0, speedRatio))
     : 0;
-  return {
-    lowpassHz: boost ? 6200 : 2100 + speed * 1600,
-    highShelfDb: boost ? 4.5 : 0,
-  };
+  target.lowpassHz = boost ? 6200 : 2100 + speed * 1600;
+  target.highShelfDb = boost ? 4.5 : 0;
+  return target;
 }
 
 /**

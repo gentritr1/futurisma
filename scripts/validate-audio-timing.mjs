@@ -54,6 +54,21 @@ assert.deepEqual(resolveMusicFilterTargets(0.5, true), {
 });
 assert.equal(resolveMusicFilterTargets(Number.NaN, false).lowpassHz, 2100);
 assert.equal(resolveMusicFilterTargets(2, false).lowpassHz, 3700);
+const reusableFilterTargets = { lowpassHz: 0, highShelfDb: 0 };
+assert.equal(
+  resolveMusicFilterTargets(0.25, false, reusableFilterTargets),
+  reusableFilterTargets,
+  "Real-time audio control must reuse its filter-target object.",
+);
+assert.deepEqual(reusableFilterTargets, {
+  lowpassHz: 2500,
+  highShelfDb: 0,
+});
+assert.equal(
+  resolveMusicFilterTargets(0.9, true, reusableFilterTargets),
+  reusableFilterTargets,
+  "Boost updates must preserve the same filter-target object.",
+);
 
 assert.equal(nextQuantizedTime(0, origin, bar), origin);
 assert.equal(nextQuantizedTime(origin, origin, bar), origin);

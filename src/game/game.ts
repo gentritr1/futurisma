@@ -9,7 +9,11 @@ import {
   integrateCameraFov,
 } from "./camera-feedback";
 import { hasPlayerControlIntent } from "./control-mode";
-import { GreenwaterCourse, type TurnCue } from "./course";
+import {
+  GreenwaterCourse,
+  type CourseProjection,
+  type TurnCue,
+} from "./course";
 import { disposeObject3DResources } from "./graphics-resources";
 import {
   phaseRunsContinuousPresentation,
@@ -312,6 +316,7 @@ export class FuturismaGame {
   private diagnosticContextRestores = 0;
   private diagnosticRenderedFrames = 0;
   private diagnosticIdleFramesSkipped = 0;
+  private diagnosticPresentationProjectionQueries = 0;
   private diagnosticTopSpeed = 0;
   private diagnosticMaxLateralRatio = 0;
   private diagnosticStartHeapMb: number | null = null;
@@ -631,8 +636,13 @@ export class FuturismaGame {
       : this.demoAutopilot
         ? this.demoInput
         : input;
-    this.updatePose(presentationInput, delta);
-    this.updateCamera(delta, this.steerAmount, presentationInput.brake);
+    const presentationProjection = this.updatePose(presentationInput, delta);
+    this.updateCamera(
+      delta,
+      this.steerAmount,
+      presentationInput.brake,
+      presentationProjection,
+    );
     this.updateSpeedLines(delta);
     this.updateImpactSparks(delta);
     this.updateFog(delta);
@@ -1094,12 +1104,13 @@ export class FuturismaGame {
     this.snapCamera();
   }
 
-  private updatePose(input: InputFrame, delta: number): void {
+  private updatePose(input: InputFrame, delta: number): CourseProjection {
     const sample = this.course.project(
       this.presentationPosition,
       this.progress,
       this.poseProjection,
     );
+    if (this.diagnosticsMode) this.diagnosticPresentationProjectionQueries += 1;
     const speedRatio = this.speed / BOOST_MAX_SPEED;
     const hoverHeight = this.boostActive ? 0.6 : this.speed < 11 ? 0.18 : 0.45;
     const vehiclePosition = this.scratchA
@@ -1136,14 +1147,15 @@ export class FuturismaGame {
     this.vehicle.updateVisual(this.vehicleVisualState);
 
     if (delta > 0) this.impactShake = Math.max(0, this.impactShake - delta * 3.6);
+    return sample;
   }
 
-  private updateCamera(delta: number, steer: number, brake: number): void {
-    const sample = this.course.project(
-      this.presentationPosition,
-      this.progress,
-      this.cameraProjection,
-    );
+  private updateCamera(
+    delta: number,
+    steer: number,
+    brake: number,
+    sample: CourseProjection,
+  ): void {
     const vehicleRight = this.scratchA
       .crossVectors(this.presentationForward, sample.up)
       .normalize();
@@ -1815,6 +1827,7 @@ export class FuturismaGame {
       contextRestores: this.diagnosticContextRestores,
       renderedFrames: this.diagnosticRenderedFrames,
       idleFramesSkipped: this.diagnosticIdleFramesSkipped,
+      presentationProjectionQueries: this.diagnosticPresentationProjectionQueries,
       recoveryLocations: this.diagnosticRecoveryLocations,
       maxLateralRatio: Number(this.diagnosticMaxLateralRatio.toFixed(2)),
       physicsSteps: this.diagnosticPhysicsSteps,
@@ -1920,6 +1933,7 @@ export class FuturismaGame {
     this.diagnosticContextRestores = 0;
     this.diagnosticRenderedFrames = 0;
     this.diagnosticIdleFramesSkipped = 0;
+    this.diagnosticPresentationProjectionQueries = 0;
     this.diagnosticTopSpeed = 0;
     this.diagnosticMaxLateralRatio = 0;
     const memory = performance as Performance & {

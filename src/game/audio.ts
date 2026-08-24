@@ -74,6 +74,7 @@ export class EngineAudio {
   private readonly stemGains = new Map<StemName, GainNode>();
   private readonly stemAutomation = new Map<StemName, StemAutomation>();
   private readonly persistentSources: AudioScheduledSourceNode[] = [];
+  private readonly musicFilterTargets = { lowpassHz: 2100, highShelfDb: 0 };
   private musicProfileKey = -1;
   private musicStartTime = 0;
   private nextControlUpdateTime = 0;
@@ -200,7 +201,11 @@ export class EngineAudio {
       now,
       0.08,
     );
-    const musicTargets = resolveMusicFilterTargets(speedRatio, boost);
+    const musicTargets = resolveMusicFilterTargets(
+      speedRatio,
+      boost,
+      this.musicFilterTargets,
+    );
     this.musicFilter?.frequency.setTargetAtTime(musicTargets.lowpassHz, now, 0.12);
     this.musicShelf?.gain.setTargetAtTime(musicTargets.highShelfDb, now, 0.08);
     this.diagnosticMaxMusicLowpassHz = Math.max(
