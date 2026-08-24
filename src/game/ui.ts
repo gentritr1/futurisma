@@ -1,3 +1,8 @@
+import {
+  resolveFinishPresentation,
+  resolveRaceStage,
+} from "./hud-presentation.js";
+
 export interface HudFrame {
   speedKph: number;
   boost: number;
@@ -271,14 +276,15 @@ export class GameUi {
     }
     this.sectorValue.textContent = frame.sector;
     const finishDistance = Math.max(0, frame.finishDistanceMeters);
-    const finishDistanceLabel = finishDistance >= 1000
-      ? `${(finishDistance / 1000).toFixed(1)} KM TO FINISH`
-      : `${Math.ceil(finishDistance / 10) * 10} M TO FINISH`;
-    const finalApproach = frame.finishArmed && frame.lap === frame.totalLaps;
-    this.finishValue.textContent = finalApproach
-      ? `${finishDistanceLabel.replace(" TO FINISH", "")} · THE CRADLE`
-      : finishDistanceLabel;
-    this.finishValue.dataset.final = frame.lap === frame.totalLaps ? "true" : "false";
+    const finishPresentation = resolveFinishPresentation(
+      finishDistance,
+      frame.lap,
+      frame.totalLaps,
+      frame.finishArmed,
+    );
+    const { finalApproach } = finishPresentation;
+    this.finishValue.textContent = finishPresentation.label;
+    this.finishValue.dataset.final = finishPresentation.finalLap ? "true" : "false";
     this.finishValue.dataset.approach = finalApproach ? "true" : "false";
     this.progressFill.style.transform = `scaleX(${Math.min(1, Math.max(0, frame.progress))})`;
     this.boostValue.textContent = `${Math.round(frame.boost * 100)}%`;
@@ -352,11 +358,11 @@ export class GameUi {
       }
       this.lastTurnState = turnState;
     }
-    const raceStage = frame.finishArmed && frame.lap === frame.totalLaps
-      ? "approach"
-      : frame.totalLaps > 1 && frame.lap === frame.totalLaps
-        ? "final"
-        : "running";
+    const raceStage = resolveRaceStage(
+      frame.finishArmed,
+      frame.lap,
+      frame.totalLaps,
+    );
     if (!frame.raceActive) {
       this.lastRaceStage = "";
     } else if (raceStage !== this.lastRaceStage) {

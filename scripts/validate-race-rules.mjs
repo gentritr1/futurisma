@@ -11,6 +11,10 @@ import {
   isTurnCueUrgent,
   resolveCountdownStage,
 } from "../src/game/race-rules.js";
+import {
+  resolveFinishPresentation,
+  resolveRaceStage,
+} from "../src/game/hud-presentation.js";
 
 const COURSE_LENGTH = 2_516;
 
@@ -75,6 +79,31 @@ const finishArmedDistance = calculateFinishDistanceMeters(
 );
 assert.equal(finishArmedDistance, COURSE_LENGTH * 0.25);
 
+assert.deepEqual(resolveFinishPresentation(COURSE_LENGTH * 5, 1, 5, false), {
+  label: "12.6 KM TO FINISH",
+  finalLap: false,
+  finalApproach: false,
+});
+assert.deepEqual(resolveFinishPresentation(630, 5, 5, false), {
+  label: "630 M TO FINISH",
+  finalLap: true,
+  finalApproach: false,
+});
+assert.deepEqual(resolveFinishPresentation(256, 5, 5, true), {
+  label: "260 M · THE CRADLE",
+  finalLap: true,
+  finalApproach: true,
+});
+assert.deepEqual(resolveFinishPresentation(Number.NaN, 1, 1, false), {
+  label: "0 M TO FINISH",
+  finalLap: true,
+  finalApproach: false,
+});
+assert.equal(resolveRaceStage(false, 1, 5), "running");
+assert.equal(resolveRaceStage(true, 4, 5), "running");
+assert.equal(resolveRaceStage(false, 5, 5), "final");
+assert.equal(resolveRaceStage(true, 5, 5), "approach");
+
 assert.ok(isCircularHazardContact(781.2, -8.4, 781.24, -8.5, COURSE_LENGTH));
 assert.ok(isCircularHazardContact(0.8, 7, COURSE_LENGTH - 0.5, 7, COURSE_LENGTH));
 assert.ok(!isCircularHazardContact(781.2, 0, 781.24, -8.5, COURSE_LENGTH));
@@ -102,5 +131,5 @@ assert.deepEqual(calculateRecoveryTelemetry(Number.NaN, 0), {
 });
 
 console.log(
-  "Race rules PASS: countdown, turn urgency, open-edge warning, final-route filtering, forward crossings, wraparound, missed-gate penalty, finish distance, cable contacts, recovery telemetry.",
+  "Race rules PASS: countdown, turn urgency, open-edge warning, final-route filtering, forward crossings, wraparound, missed-gate penalty, finish distance and presentation, cable contacts, recovery telemetry.",
 );
