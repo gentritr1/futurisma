@@ -435,6 +435,7 @@ kbd {
 
 .countdown[data-paused="true"] {
   z-index: 2;
+  max-width: calc(100vw - 32px);
   padding: 12px 18px;
   border-top: 1px solid var(--acid);
   border-bottom: 1px solid var(--line);
@@ -443,14 +444,21 @@ kbd {
   font-size: 0.88rem;
   font-weight: 700;
   letter-spacing: 0.18em;
+  text-align: center;
+  white-space: normal;
   text-shadow: none;
 }
 
-body[data-phase="paused"] .hud::before {
+body[data-phase="paused"] .hud::before,
+body[data-phase="resuming"] .hud::before {
   content: "";
   position: absolute;
   inset: 0;
   background: oklch(0.04 0.01 205 / 0.48);
+}
+
+body[data-phase="resuming"] .hud::before {
+  background: oklch(0.04 0.01 205 / 0.26);
 }
 
 .screen {

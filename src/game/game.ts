@@ -20,6 +20,7 @@ import {
   calculateFinishDistanceMeters,
   calculateRecoveryTelemetry,
   crossedForwardProgress,
+  resolveCountdownStage,
 } from "./race-rules";
 import {
   calculateMinimumPixelRatio,
@@ -33,11 +34,12 @@ import {
 } from "./totem";
 import { GameUi } from "./ui";
 
-type RacePhase = "standby" | "countdown" | "running" | "paused" | "finished";
+type RacePhase = "standby" | "countdown" | "running" | "paused" | "resuming" | "finished";
 
 const FIXED_STEP = 1 / 120;
 const MAX_PHYSICS_BACKLOG = 0.1;
 const RECOVERY_PROBE_DISTANCE_METERS = 900;
+const RESUME_COUNTDOWN_SECONDS = 2.7;
 const ZERO_INPUT: InputFrame = { throttle: 0, brake: 0, steer: 0, boost: false };
 
 interface StaticGeometryBucket {
@@ -170,7 +172,9 @@ export class FuturismaGame {
   private bestLapMs: number | null = null;
   private readonly lapTimesMs: number[] = [];
   private countdown = 3.7;
+  private resumeCountdown = 0;
   private countdownStage = "";
+  private pausedBeforeStart = false;
   private edgeContact = false;
   private offCourseTime = 0;
   private recoveryImmunity = 0;
@@ -275,6 +279,7 @@ export class FuturismaGame {
     this.timer.connect(document);
     this.resize();
     window.addEventListener("resize", this.resize);
+    window.addEventListener("blur", this.handleWindowBlur);
     document.addEventListener("visibilitychange", this.handleVisibilityChange);
   }
 
@@ -316,7 +321,12 @@ export class FuturismaGame {
     const input = this.input.read();
 
     if (this.input.consumeStart()) {
-      if (this.phase === "running" || this.phase === "paused") this.togglePause();
+      if (
+        this.phase === "running"
+        || this.phase === "countdown"
+        || this.phase === "paused"
+        || this.phase === "resuming"
+      ) this.togglePause();
       else if (this.canStart()) void this.startTrial();
     }
     if (this.input.consumeReset()) {
@@ -429,6 +439,7 @@ export class FuturismaGame {
     );
     while (this.physicsAccumulator >= FIXED_STEP) {
       if (this.phase === "countdown") this.updateCountdown(FIXED_STEP);
+      if (this.phase === "resuming") this.updateResumeCountdown(FIXED_STEP);
       if (this.phase === "running") {
         this.updateRace(
           FIXED_STEP,
@@ -439,7 +450,7 @@ export class FuturismaGame {
       this.physicsAccumulator -= FIXED_STEP;
     }
 
-    const presentationInput = this.phase === "paused"
+    const presentationInput = this.phase === "paused" || this.phase === "resuming"
       ? ZERO_INPUT
       : this.demoMode
         ? this.demoInput
@@ -468,15 +479,7 @@ export class FuturismaGame {
 
   private updateCountdown(delta: number): void {
     this.countdown -= delta;
-    const nextStage = this.countdown > 3
-      ? "3"
-      : this.countdown > 2
-        ? "2"
-        : this.countdown > 1
-          ? "1"
-          : this.countdown > 0
-            ? "GO"
-            : "";
+    const nextStage = resolveCountdownStage(this.countdown);
     if (nextStage !== this.countdownStage) {
       this.countdownStage = nextStage;
       this.ui.setCountdown(nextStage);
@@ -485,6 +488,21 @@ export class FuturismaGame {
     if (this.countdown <= 0) {
       this.phase = "running";
       this.resetDiagnosticsPeak();
+    }
+  }
+
+  private updateResumeCountdown(delta: number): void {
+    this.resumeCountdown -= delta;
+    const nextStage = resolveCountdownStage(this.resumeCountdown);
+    if (nextStage !== this.countdownStage) {
+      this.countdownStage = nextStage;
+      this.ui.setCountdown(nextStage);
+      if (nextStage) this.audio.playCountdown(nextStage === "GO");
+    }
+    if (this.resumeCountdown <= 0) {
+      this.phase = "running";
+      this.physicsAccumulator = 0;
+      this.ui.setPaused(false);
     }
   }
 
@@ -1062,6 +1080,8 @@ export class FuturismaGame {
     this.hazardTripCooldown = 0;
     this.impactShake = 0;
     this.physicsAccumulator = 0;
+    this.resumeCountdown = 0;
+    this.pausedBeforeStart = false;
     this.nextHudAt = 0;
     const start = this.course.sample(this.progress, this.poseProjection);
     this.position.copy(start.position);
@@ -1244,22 +1264,55 @@ export class FuturismaGame {
   }
 
   private togglePause(): void {
-    if (this.phase === "running") {
-      this.phase = "paused";
-      this.physicsAccumulator = 0;
-      this.audio.setPaused(true);
-      this.ui.setPaused(true);
+    if (
+      this.phase === "countdown"
+      || this.phase === "running"
+      || this.phase === "resuming"
+    ) {
+      this.pauseRace();
       return;
     }
     if (this.phase === "paused") {
-      this.phase = "running";
+      if (this.pausedBeforeStart) {
+        this.pausedBeforeStart = false;
+        this.phase = "countdown";
+        this.countdown = 3.7;
+        this.countdownStage = "";
+        this.physicsAccumulator = 0;
+        this.audio.setPaused(false);
+        this.ui.showRace();
+        return;
+      }
+      this.phase = "resuming";
+      this.resumeCountdown = RESUME_COUNTDOWN_SECONDS;
+      this.countdownStage = "";
+      this.physicsAccumulator = 0;
       this.audio.setPaused(false);
-      this.ui.setPaused(false);
+      this.ui.setResuming();
     }
   }
 
+  private pauseRace(reason?: "FOCUS LOST"): void {
+    if (
+      this.phase !== "countdown"
+      && this.phase !== "running"
+      && this.phase !== "resuming"
+    ) return;
+    this.pausedBeforeStart = this.phase === "countdown";
+    this.phase = "paused";
+    this.resumeCountdown = 0;
+    this.countdownStage = "";
+    this.physicsAccumulator = 0;
+    this.audio.setPaused(true);
+    this.ui.setPaused(true, reason);
+  }
+
   private readonly handleVisibilityChange = (): void => {
-    if (document.hidden && this.phase === "running") this.togglePause();
+    if (document.hidden) this.pauseRace("FOCUS LOST");
+  };
+
+  private readonly handleWindowBlur = (): void => {
+    this.pauseRace("FOCUS LOST");
   };
 
   private reportDiagnostics(delta: number): void {
@@ -1505,6 +1558,7 @@ export class FuturismaGame {
     this.running = false;
     cancelAnimationFrame(this.animationFrame);
     window.removeEventListener("resize", this.resize);
+    window.removeEventListener("blur", this.handleWindowBlur);
     document.removeEventListener("visibilitychange", this.handleVisibilityChange);
     this.timer.dispose();
     this.audio.dispose();

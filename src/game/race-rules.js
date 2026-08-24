@@ -3,6 +3,13 @@ function wrapProgress(value) {
   return ((value % 1) + 1) % 1;
 }
 
+/** @param {number} remainingSeconds */
+export function resolveCountdownStage(remainingSeconds) {
+  if (!Number.isFinite(remainingSeconds) || remainingSeconds <= 0) return "";
+  if (remainingSeconds <= 1) return "GO";
+  return String(Math.ceil(remainingSeconds - 1));
+}
+
 /** @param {number} previousProgress @param {number} currentProgress */
 export function forwardProgressDelta(previousProgress, currentProgress) {
   let delta = wrapProgress(currentProgress) - wrapProgress(previousProgress);

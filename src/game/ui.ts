@@ -155,11 +155,20 @@ export class GameUi {
     this.systemStatus.textContent = muted ? "AUDIO MUTED" : "AUDIO ONLINE";
   }
 
-  setPaused(paused: boolean): void {
-    this.countdown.textContent = paused ? "PAUSED" : "";
+  setPaused(paused: boolean, reason: "FOCUS LOST" | undefined = undefined): void {
+    this.countdown.textContent = paused
+      ? `${reason ?? "PAUSED"} · ENTER / START TO RESUME`
+      : "";
     this.countdown.dataset.paused = paused ? "true" : "false";
     this.systemStatus.textContent = paused ? "RACE PAUSED" : "TRIAL ACTIVE";
     document.body.dataset.phase = paused ? "paused" : "race";
+  }
+
+  setResuming(): void {
+    this.countdown.textContent = "";
+    this.countdown.dataset.paused = "false";
+    this.systemStatus.textContent = "RESUME SEQUENCE";
+    document.body.dataset.phase = "resuming";
   }
 
   flashGate(index: number): void {

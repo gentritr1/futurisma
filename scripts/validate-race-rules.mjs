@@ -6,6 +6,7 @@ import {
   crossedForwardProgress,
   forwardProgressDelta,
   isCircularHazardContact,
+  resolveCountdownStage,
 } from "../src/game/race-rules.js";
 
 const COURSE_LENGTH = 2_516;
@@ -16,6 +17,13 @@ assert.ok(!crossedForwardProgress(0.13, 0.1, 0.12));
 assert.ok(!crossedForwardProgress(0.1, 0.11, 0.12));
 assert.ok(forwardProgressDelta(0.99, 0.01) > 0);
 assert.ok(forwardProgressDelta(0.01, 0.99) < 0);
+
+assert.equal(resolveCountdownStage(3.7), "3");
+assert.equal(resolveCountdownStage(3), "2");
+assert.equal(resolveCountdownStage(2), "1");
+assert.equal(resolveCountdownStage(1), "GO");
+assert.equal(resolveCountdownStage(0), "");
+assert.equal(resolveCountdownStage(Number.NaN), "");
 
 assert.equal(checkpointRequiresExtraCircuit(0.4, 0.2), true);
 assert.equal(checkpointRequiresExtraCircuit(0.2, 0.4), false);
@@ -75,5 +83,5 @@ assert.deepEqual(calculateRecoveryTelemetry(Number.NaN, 0), {
 });
 
 console.log(
-  "Race rules PASS: forward crossings, wraparound, missed-gate penalty, finish distance, cable contacts, recovery telemetry.",
+  "Race rules PASS: countdown, forward crossings, wraparound, missed-gate penalty, finish distance, cable contacts, recovery telemetry.",
 );
