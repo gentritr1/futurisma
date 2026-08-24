@@ -22,6 +22,9 @@ export interface HudFrame {
   lowGrip: boolean;
   edgeWarning: boolean;
   edgeCorrection: "LEFT" | "RIGHT" | null;
+  recoveryActive: boolean;
+  recoveryProgress: number;
+  recoverySeconds: number;
 }
 
 function requiredElement<T extends HTMLElement>(id: string): T {
@@ -62,6 +65,8 @@ export class GameUi {
   private readonly boostValue = requiredElement<HTMLElement>("boost-value");
   private readonly boostFill = requiredElement<HTMLElement>("boost-fill");
   private readonly edgeWarning = requiredElement<HTMLElement>("edge-warning");
+  private readonly edgeWarningLabel = requiredElement<HTMLElement>("edge-warning-label");
+  private readonly edgeWarningFill = requiredElement<HTMLElement>("edge-warning-fill");
   private readonly turnCue = requiredElement<HTMLElement>("turn-cue");
   private readonly turnLabel = requiredElement<HTMLElement>("turn-label");
   private readonly turnArrow = requiredElement<HTMLElement>("turn-arrow");
@@ -76,6 +81,7 @@ export class GameUi {
   private lastDriveLabel = "";
   private lastBoostState = "";
   private lastEdgeState = "";
+  private lastEdgeLabel = "";
   private lastTurnState = "";
   private lastRaceStage = "";
   private hazardLabel = "";
@@ -103,6 +109,7 @@ export class GameUi {
     this.countdown.textContent = "3";
     this.countdown.dataset.paused = "false";
     this.edgeWarning.dataset.active = "false";
+    this.edgeWarning.dataset.recovery = "false";
     this.edgeWarning.setAttribute("aria-hidden", "true");
     this.turnCue.dataset.active = "false";
     this.turnCue.setAttribute("aria-hidden", "true");
@@ -121,6 +128,7 @@ export class GameUi {
     this.countdown.textContent = "";
     this.countdown.dataset.paused = "false";
     this.edgeWarning.dataset.active = "false";
+    this.edgeWarning.dataset.recovery = "false";
     this.edgeWarning.setAttribute("aria-hidden", "true");
     this.turnCue.dataset.active = "false";
     this.turnCue.setAttribute("aria-hidden", "true");
@@ -227,19 +235,32 @@ export class GameUi {
     this.boostValue.textContent = `${Math.round(frame.boost * 100)}%`;
     this.boostFill.style.transform = `scaleX(${Math.min(1, Math.max(0, frame.boost))})`;
     const boostState = frame.boostActive ? "true" : "false";
-    const edgeState = frame.edgeWarning ? "true" : "false";
+    const edgeState = `${frame.edgeWarning}:${frame.recoveryActive}`;
     if (boostState !== this.lastBoostState) {
       this.boostFill.dataset.active = boostState;
       this.lastBoostState = boostState;
     }
     if (edgeState !== this.lastEdgeState) {
-      this.edgeWarning.dataset.active = edgeState;
+      this.edgeWarning.dataset.active = frame.edgeWarning ? "true" : "false";
+      this.edgeWarning.dataset.recovery = frame.recoveryActive ? "true" : "false";
       this.edgeWarning.setAttribute("aria-hidden", frame.edgeWarning ? "false" : "true");
       this.lastEdgeState = edgeState;
     }
-    if (frame.edgeWarning && frame.edgeCorrection) {
-      this.edgeWarning.textContent = `COURSE EDGE · STEER ${frame.edgeCorrection}`;
+    const edgeLabel = frame.recoveryActive
+      ? `OFF COURSE · AUTO RECOVERY · ${(
+        Math.ceil(frame.recoverySeconds * 2) / 2
+      ).toFixed(1)} S`
+      : frame.edgeWarning && frame.edgeCorrection
+        ? `COURSE EDGE · STEER ${frame.edgeCorrection}`
+        : "COURSE EDGE";
+    if (edgeLabel !== this.lastEdgeLabel) {
+      this.edgeWarningLabel.textContent = edgeLabel;
+      this.lastEdgeLabel = edgeLabel;
     }
+    this.edgeWarningFill.style.transform = `scaleX(${Math.min(
+      1,
+      Math.max(0, frame.recoveryProgress),
+    )})`;
     const turnState = frame.turnDirection
       ? `${frame.turnDirection}:${frame.turnHard}:${Math.round(frame.turnDistanceMeters / 10)}`
       : "none";

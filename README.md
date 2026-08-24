@@ -55,6 +55,10 @@ frames while racing. The HTML telemetry remains full-resolution. Add
 `&motion=reduce` to exercise the same reduced-motion path as the operating-system
 preference.
 
+For focused QA, `&diagnostics=1&probe=recovery` starts TOTEM just beyond
+Greenwater's open edge and exercises the production auto-recovery countdown and
+reinsertion path. The probe is ignored unless diagnostics are enabled.
+
 ## Verification
 
 ```sh

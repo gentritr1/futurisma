@@ -67,6 +67,27 @@ export function calculateFinishDistanceMeters(
 }
 
 /**
+ * @param {number} offCourseSeconds
+ * @param {number} recoveryHoldSeconds
+ */
+export function calculateRecoveryTelemetry(
+  offCourseSeconds,
+  recoveryHoldSeconds,
+) {
+  const holdSeconds = Number.isFinite(recoveryHoldSeconds)
+    ? Math.max(0.001, recoveryHoldSeconds)
+    : 0.001;
+  const elapsedSeconds = Number.isFinite(offCourseSeconds)
+    ? Math.min(holdSeconds, Math.max(0, offCourseSeconds))
+    : 0;
+  return {
+    active: elapsedSeconds > 0,
+    progress: elapsedSeconds / holdSeconds,
+    remainingSeconds: Math.max(0, holdSeconds - elapsedSeconds),
+  };
+}
+
+/**
  * @param {number} distance
  * @param {number} lateral
  * @param {number} hazardDistance

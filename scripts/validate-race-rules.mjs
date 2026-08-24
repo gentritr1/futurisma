@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import {
   calculateFinishDistanceMeters,
+  calculateRecoveryTelemetry,
   checkpointRequiresExtraCircuit,
   crossedForwardProgress,
   forwardProgressDelta,
@@ -52,6 +53,27 @@ assert.ok(isCircularHazardContact(0.8, 7, COURSE_LENGTH - 0.5, 7, COURSE_LENGTH)
 assert.ok(!isCircularHazardContact(781.2, 0, 781.24, -8.5, COURSE_LENGTH));
 assert.ok(!isCircularHazardContact(790, -8.5, 781.24, -8.5, COURSE_LENGTH));
 
+assert.deepEqual(calculateRecoveryTelemetry(0, 1.4), {
+  active: false,
+  progress: 0,
+  remainingSeconds: 1.4,
+});
+assert.deepEqual(calculateRecoveryTelemetry(0.7, 1.4), {
+  active: true,
+  progress: 0.5,
+  remainingSeconds: 0.7,
+});
+assert.deepEqual(calculateRecoveryTelemetry(2, 1.4), {
+  active: true,
+  progress: 1,
+  remainingSeconds: 0,
+});
+assert.deepEqual(calculateRecoveryTelemetry(Number.NaN, 0), {
+  active: false,
+  progress: 0,
+  remainingSeconds: 0.001,
+});
+
 console.log(
-  "Race rules PASS: forward crossings, wraparound, missed-gate penalty, finish distance, cable contacts.",
+  "Race rules PASS: forward crossings, wraparound, missed-gate penalty, finish distance, cable contacts, recovery telemetry.",
 );

@@ -17,6 +17,7 @@ import {
 } from "./physics";
 import {
   calculateFinishDistanceMeters,
+  calculateRecoveryTelemetry,
   crossedForwardProgress,
 } from "./race-rules";
 import {
@@ -35,6 +36,7 @@ type RacePhase = "standby" | "countdown" | "running" | "paused" | "finished";
 
 const FIXED_STEP = 1 / 120;
 const MAX_PHYSICS_BACKLOG = 0.1;
+const RECOVERY_PROBE_DISTANCE_METERS = 900;
 const ZERO_INPUT: InputFrame = { throttle: 0, brake: 0, steer: 0, boost: false };
 
 interface StaticGeometryBucket {
@@ -226,6 +228,8 @@ export class FuturismaGame {
   private readonly diagnosticsMode = new URLSearchParams(window.location.search).has(
     "diagnostics",
   );
+  private readonly recoveryProbe = this.diagnosticsMode
+    && new URLSearchParams(window.location.search).get("probe") === "recovery";
   private readonly reducedMotion = window.matchMedia(
     "(prefers-reduced-motion: reduce)",
   ).matches || new URLSearchParams(window.location.search).get("motion") === "reduce";
@@ -744,6 +748,7 @@ export class FuturismaGame {
       this.snapCamera();
       return;
     }
+    const automaticRecovery = this.offCourseTime >= this.course.recoveryHoldSeconds;
     if (this.diagnosticsMode && this.phase === "running") {
       this.diagnosticRecoveries += 1;
       this.diagnosticRecoveryLocations.push(
@@ -777,6 +782,11 @@ export class FuturismaGame {
     this.driftActive = false;
     this.surfaceGrip = 1;
     this.input.pulse(0.42, 0.64, 180);
+    this.audio.playRecovery();
+    this.ui.flashHazard(
+      automaticRecovery ? "COURSE LINK RESTORED" : "MANUAL RECOVERY",
+      1_100,
+    );
     this.updatePose({ throttle: 0, brake: 0, steer: 0, boost: false }, 0);
     this.snapCamera();
   }
@@ -931,6 +941,10 @@ export class FuturismaGame {
           ? null
           : this.course.checkpointProgress(this.nextCheckpointIndex),
       );
+    const recovery = calculateRecoveryTelemetry(
+      this.offCourseTime,
+      this.course.recoveryHoldSeconds,
+    );
     this.ui.update({
       speedKph: this.speed * 3.6,
       boost: this.boostReserve,
@@ -955,6 +969,9 @@ export class FuturismaGame {
       lowGrip: this.surfaceGrip < 0.95,
       edgeWarning: this.edgeContact,
       edgeCorrection: this.edgeContact ? (this.lateral > 0 ? "LEFT" : "RIGHT") : null,
+      recoveryActive: recovery.active,
+      recoveryProgress: recovery.progress,
+      recoverySeconds: recovery.remainingSeconds,
     });
   }
 
@@ -972,7 +989,9 @@ export class FuturismaGame {
   }
 
   private resetRaceState(): void {
-    this.progress = 0.002;
+    this.progress = this.recoveryProbe
+      ? RECOVERY_PROBE_DISTANCE_METERS / this.course.length
+      : 0.002;
     this.speed = 0;
     this.lateral = 0;
     this.steerAmount = 0;
@@ -998,6 +1017,10 @@ export class FuturismaGame {
     this.nextHudAt = 0;
     const start = this.course.sample(this.progress, this.poseProjection);
     this.position.copy(start.position);
+    if (this.recoveryProbe) {
+      this.lateral = start.halfWidth + 1;
+      this.position.addScaledVector(start.right, this.lateral);
+    }
     this.forward.copy(start.tangent);
     this.travelDirection.copy(start.tangent);
     this.course.setLapBoard(1, this.totalLaps);

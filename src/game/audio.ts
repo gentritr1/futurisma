@@ -213,6 +213,11 @@ export class EngineAudio {
     this.playTone(660, 0.38, 0.038, "sine", 0.12);
   }
 
+  playRecovery(): void {
+    this.playTone(190, 0.16, 0.034, "square", 0, 1.7);
+    this.playTone(380, 0.2, 0.028, "triangle", 0.1, 1.32);
+  }
+
   toggleMute(): boolean {
     this.muted = !this.muted;
     this.updateMasterGain();
