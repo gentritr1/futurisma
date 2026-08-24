@@ -11,6 +11,7 @@ const CONTROL_KEYS = new Set([
   "ArrowLeft",
   "ArrowRight",
   "Space",
+  "Escape",
 ]);
 
 function applyDeadzone(value: number, deadzone = 0.16): number {
@@ -100,7 +101,9 @@ export class InputController {
     this.keys.add(event.code);
     if (event.repeat) return;
 
-    if (event.code === "Enter") this.startRequested = true;
+    if (event.code === "Enter" || event.code === "Escape" || event.code === "KeyP") {
+      this.startRequested = true;
+    }
     if (event.code === "KeyR") this.resetRequested = true;
     if (event.code === "KeyM") this.muteRequested = true;
   };

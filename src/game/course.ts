@@ -63,6 +63,19 @@ interface RawHazard {
   lateralOffset?: number;
 }
 
+export interface MusicProfile {
+  trance: number;
+  jungle: number;
+  deep_dnb: number;
+  techstep: number;
+}
+
+interface RawMusicTrigger {
+  distance: number;
+  sector: string;
+  levels: MusicProfile;
+}
+
 interface GreenwaterMapData {
   map: { id: string; name: string };
   race: {
@@ -92,6 +105,7 @@ interface GreenwaterMapData {
   };
   landmarkProxies: RawLandmark[];
   hazards: RawHazard[];
+  music: { triggers: RawMusicTrigger[] };
 }
 
 export interface CourseSample {
@@ -127,6 +141,21 @@ export interface FogProfile {
 const WORLD_UP = new THREE.Vector3(0, 1, 0);
 const MAP = greenwaterJson as unknown as GreenwaterMapData;
 const GAMEPLAY_FOG_SCALE = 0.58;
+const BOOST_PAD_DISTANCES = [1705, 1815, 1925, 2035] as const;
+const SECTOR_LABELS: Record<string, string> = {
+  RUNWAY_START: "RUNWAY 09",
+  T1_CRADLE_BEND: "CRADLE BEND",
+  WATER_TABLE: "WATER TABLE",
+  LINK_APRON: "LINK APRON",
+  HANGAR_SIX: "HANGAR SIX",
+  HANGAR_EXIT: "HANGAR EXIT",
+  GREENWATER_SWEEP: "GREENWATER SWEEP",
+  CANOPY_PASSAGE: "CANOPY PASSAGE",
+  THE_ELBOW: "THE ELBOW",
+  FUEL_ROW: "FUEL ROW",
+  T10_TOTEM_TURN: "TOTEM TURN",
+  RUNWAY_HOME: "HOME STRAIGHT",
+};
 
 function seededRandom(seed: number): () => number {
   let value = seed >>> 0;
@@ -144,6 +173,25 @@ function poseObject(object: THREE.Object3D, sample: CourseSample): void {
   );
   object.position.copy(sample.position);
   object.quaternion.setFromRotationMatrix(basis);
+}
+
+function setCourseObjectTransform(
+  object: THREE.Object3D,
+  sample: CourseSample,
+  localX: number,
+  localY: number,
+  localZ: number,
+  scaleX = 1,
+  scaleY = 1,
+  scaleZ = 1,
+): void {
+  poseObject(object, sample);
+  object.position
+    .addScaledVector(sample.right, localX)
+    .addScaledVector(sample.up, localY)
+    .addScaledVector(sample.tangent, -localZ);
+  object.scale.set(scaleX, scaleY, scaleZ);
+  object.updateMatrix();
 }
 
 function createLabelMaterial(
@@ -192,6 +240,18 @@ export class GreenwaterCourse {
     (sample) => new THREE.Vector3(sample.x, sample.y, sample.z),
   );
   private readonly projectionResolution = this.samples.length;
+  private checkpointIndicatorMesh: THREE.InstancedMesh | null = null;
+  private readonly waterHazard = MAP.hazards.find(
+    (hazard) => hazard.id === "HZ_WATER_SHEET",
+  );
+  private readonly fogProfiles = MAP.fog.zones.map((zone) => ({
+    fromDistance: zone.fromDistance,
+    toDistance: zone.toDistance,
+    profile: {
+      density: zone.density * GAMEPLAY_FOG_SCALE,
+      color: new THREE.Color(zone.color),
+    },
+  }));
   private lapBoardTexture: THREE.CanvasTexture | null = null;
   private lapBoardContext: CanvasRenderingContext2D | null = null;
 
@@ -217,6 +277,7 @@ export class GreenwaterCourse {
       this.createGroundPlane(),
     );
     this.setLapBoard(1, this.defaultLapCount);
+    this.setCheckpointProgress(1);
   }
 
   sample(progress: number): CourseSample {
@@ -327,6 +388,7 @@ export class GreenwaterCourse {
     const distance = THREE.MathUtils.euclideanModulo(progress, 1) * this.length;
     let nearest: { turn: RawTurn; distance: number } | null = null;
     for (const turn of MAP.turns) {
+      if (turn.radius >= 300) continue;
       const inside = distance >= turn.entryDistance && distance <= turn.exitDistance;
       const distanceAhead = inside
         ? 0
@@ -344,17 +406,75 @@ export class GreenwaterCourse {
 
   fogAt(progress: number): FogProfile {
     const distance = THREE.MathUtils.euclideanModulo(progress, 1) * this.length;
-    const zone = MAP.fog.zones.find(
+    const zone = this.fogProfiles.find(
       (candidate) => distance >= candidate.fromDistance && distance < candidate.toDistance,
-    ) ?? MAP.fog.zones[0];
-    return {
-      density: zone.density * GAMEPLAY_FOG_SCALE,
-      color: new THREE.Color(zone.color),
-    };
+    ) ?? this.fogProfiles[0];
+    return zone.profile;
   }
 
   edgeType(sample: CourseSample, lateral: number): EdgeType {
     return lateral >= 0 ? sample.edgeRight : sample.edgeLeft;
+  }
+
+  surfaceGripAt(progress: number, lateral: number, halfWidth: number): number {
+    const distance = THREE.MathUtils.euclideanModulo(progress, 1) * this.length;
+    const water = this.waterHazard;
+    if (
+      water?.fromDistance !== undefined
+      && water.toDistance !== undefined
+      && distance >= water.fromDistance
+      && distance <= water.toDistance
+      && lateral < -halfWidth * 0.25
+    ) {
+      return 0.8;
+    }
+    return 1;
+  }
+
+  isOnBoostPad(progress: number, lateral: number, halfWidth: number): boolean {
+    if (lateral < halfWidth * 0.12 || lateral > halfWidth * 0.78) return false;
+    const distance = THREE.MathUtils.euclideanModulo(progress, 1) * this.length;
+    return BOOST_PAD_DISTANCES.some(
+      (padDistance) => Math.abs(distance - padDistance) <= 10,
+    );
+  }
+
+  sectorLabelAt(progress: number): string {
+    const index = Math.floor(
+      THREE.MathUtils.euclideanModulo(progress, 1) * this.samples.length,
+    ) % this.samples.length;
+    const sector = this.samples[index].sector;
+    return SECTOR_LABELS[sector] ?? sector.replaceAll("_", " ");
+  }
+
+  musicAt(progress: number): MusicProfile {
+    const distance = THREE.MathUtils.euclideanModulo(progress, 1) * this.length;
+    let active = MAP.music.triggers[0];
+    for (const trigger of MAP.music.triggers) {
+      if (trigger.distance > distance) break;
+      active = trigger;
+    }
+    return active.levels;
+  }
+
+  setCheckpointProgress(nextCheckpointIndex: number): void {
+    const indicators = this.checkpointIndicatorMesh;
+    if (!indicators) return;
+    for (let index = 0; index < MAP.checkpoints.length; index += 1) {
+      const checkpointIndex = index + 1;
+      const color = new THREE.Color();
+      if (nextCheckpointIndex === 0 || checkpointIndex < nextCheckpointIndex) {
+        color.setHex(0xc8ff2e);
+      } else if (checkpointIndex === nextCheckpointIndex) {
+        color.setHex(0xffa22e);
+      } else {
+        color.setHex(0x5b4528);
+      }
+      for (let side = 0; side < 2; side += 1) {
+        indicators.setColorAt(index * 2 + side, color);
+      }
+    }
+    if (indicators.instanceColor) indicators.instanceColor.needsUpdate = true;
   }
 
   setLapBoard(current: number, total: number): void {
@@ -588,8 +708,7 @@ export class GreenwaterCourse {
   private createTurnMarkers(): THREE.Group {
     const group = new THREE.Group();
     group.name = "greenwater_turn_grammar";
-    const boardGeometry = new THREE.BoxGeometry(3.5, 1.7, 0.24);
-    const postGeometry = new THREE.BoxGeometry(0.18, 2.2, 0.18);
+    const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
     const boardMaterial = new THREE.MeshLambertMaterial({ color: 0x1b201d });
     const postMaterial = new THREE.MeshLambertMaterial({ color: 0x333a35 });
     const arrowMaterial = new THREE.MeshBasicMaterial({ color: 0xffa22e, side: THREE.DoubleSide });
@@ -603,25 +722,66 @@ export class GreenwaterCourse {
     arrowShape.lineTo(-1.25, 0.22);
     arrowShape.closePath();
     const arrowGeometry = new THREE.ShapeGeometry(arrowShape);
+    const chevronCount = MAP.turns.reduce((total, turn) => total + turn.chevronCount, 0);
+    const boardCount = MAP.turns.reduce((total, turn) => total + turn.boards.length, 0);
+    const chevronBoards = new THREE.InstancedMesh(
+      cubeGeometry,
+      boardMaterial,
+      chevronCount,
+    );
+    const chevronPosts = new THREE.InstancedMesh(
+      cubeGeometry,
+      postMaterial,
+      chevronCount,
+    );
+    const chevronArrows = new THREE.InstancedMesh(
+      arrowGeometry,
+      arrowMaterial,
+      chevronCount,
+    );
+    const approachArrows = new THREE.InstancedMesh(
+      arrowGeometry,
+      arrowMaterial,
+      boardCount,
+    );
+    const labelGeometry = new THREE.PlaneGeometry(1, 1);
+    const boardLabels = new Map<number, { mesh: THREE.InstancedMesh; count: number }>();
+    for (const label of new Set(MAP.turns.flatMap((turn) => turn.boards.map((value) => value / 50)))) {
+      boardLabels.set(label, {
+        mesh: new THREE.InstancedMesh(
+          labelGeometry,
+          createLabelMaterial(String(label), "#ffa22e"),
+          boardCount,
+        ),
+        count: 0,
+      });
+    }
+    const object = new THREE.Object3D();
+    let chevronIndex = 0;
+    let approachIndex = 0;
 
     for (const turn of MAP.turns) {
       const outside = turn.direction === "left" ? 1 : -1;
       for (let index = 0; index < turn.chevronCount; index += 1) {
         const markerDistance = turn.apexDistance + (index - (turn.chevronCount - 1) / 2) * 7;
         const sample = this.sampleAtDistance(markerDistance);
-        const marker = new THREE.Group();
-        marker.name = `${turn.id}_chevron_${index + 1}`;
-        poseObject(marker, sample);
         const markerX = outside * (sample.halfWidth + 1.8);
-        const board = new THREE.Mesh(boardGeometry, boardMaterial);
-        board.position.set(markerX, 2.3, 0);
-        const post = new THREE.Mesh(postGeometry, postMaterial);
-        post.position.set(markerX, 1.1, 0.08);
-        const arrow = new THREE.Mesh(arrowGeometry, arrowMaterial);
-        arrow.position.set(markerX, 2.3, -0.14);
-        if (turn.direction === "left") arrow.scale.x = -1;
-        marker.add(board, post, arrow);
-        group.add(marker);
+        setCourseObjectTransform(object, sample, markerX, 2.3, 0, 3.5, 1.7, 0.24);
+        chevronBoards.setMatrixAt(chevronIndex, object.matrix);
+        setCourseObjectTransform(object, sample, markerX, 1.1, 0.08, 0.18, 2.2, 0.18);
+        chevronPosts.setMatrixAt(chevronIndex, object.matrix);
+        setCourseObjectTransform(
+          object,
+          sample,
+          markerX,
+          2.3,
+          0.14,
+          turn.direction === "left" ? -1 : 1,
+          1,
+          1,
+        );
+        chevronArrows.setMatrixAt(chevronIndex, object.matrix);
+        chevronIndex += 1;
       }
 
       for (const boardDistance of turn.boards) {
@@ -630,22 +790,37 @@ export class GreenwaterCourse {
           this.length,
         );
         const sample = this.sampleAtDistance(distance);
-        const board = new THREE.Group();
-        poseObject(board, sample);
         const side = turn.direction === "left" ? 1 : -1;
-        const sign = new THREE.Mesh(
-          new THREE.PlaneGeometry(2.4, 2.4),
-          createLabelMaterial(String(boardDistance / 50), "#ffa22e"),
+        const markerX = side * (sample.halfWidth + 2.1);
+        const label = boardDistance / 50;
+        const labelBatch = boardLabels.get(label);
+        if (!labelBatch) throw new Error(`Missing Greenwater braking-board label ${label}.`);
+        setCourseObjectTransform(object, sample, markerX, 2.2, 0.08, 2.4, 2.4, 1);
+        labelBatch.mesh.setMatrixAt(labelBatch.count, object.matrix);
+        labelBatch.count += 1;
+        setCourseObjectTransform(
+          object,
+          sample,
+          markerX,
+          0.72,
+          0.1,
+          turn.direction === "left" ? -0.78 : 0.78,
+          0.78,
+          0.78,
         );
-        sign.position.set(side * (sample.halfWidth + 2.1), 2.2, -0.08);
-        const approachArrow = new THREE.Mesh(arrowGeometry, arrowMaterial);
-        approachArrow.position.set(side * (sample.halfWidth + 2.1), 0.72, -0.1);
-        approachArrow.scale.setScalar(0.78);
-        if (turn.direction === "left") approachArrow.scale.x *= -1;
-        board.add(sign, approachArrow);
-        group.add(board);
+        approachArrows.setMatrixAt(approachIndex, object.matrix);
+        approachIndex += 1;
       }
     }
+    for (const mesh of [chevronBoards, chevronPosts, chevronArrows, approachArrows]) {
+      mesh.instanceMatrix.needsUpdate = true;
+    }
+    for (const batch of boardLabels.values()) {
+      batch.mesh.count = batch.count;
+      batch.mesh.instanceMatrix.needsUpdate = true;
+      group.add(batch.mesh);
+    }
+    group.add(chevronBoards, chevronPosts, chevronArrows, approachArrows);
     return group;
   }
 
@@ -653,35 +828,72 @@ export class GreenwaterCourse {
     const group = new THREE.Group();
     group.name = "greenwater_gates";
     group.add(this.createFinishGate());
+    const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
+    const labelGeometry = new THREE.PlaneGeometry(1, 1);
     const postMaterial = new THREE.MeshLambertMaterial({ color: 0x28312d });
-    const pendingMaterial = new THREE.MeshBasicMaterial({ color: 0xffa22e });
-    for (const checkpoint of MAP.checkpoints) {
+    const postCount = MAP.checkpoints.length * 2;
+    const posts = new THREE.InstancedMesh(cubeGeometry, postMaterial, postCount);
+    const indicators = new THREE.InstancedMesh(
+      cubeGeometry,
+      new THREE.MeshBasicMaterial({ color: 0xffffff }),
+      postCount,
+    );
+    const object = new THREE.Object3D();
+    for (let checkpointIndex = 0; checkpointIndex < MAP.checkpoints.length; checkpointIndex += 1) {
+      const checkpoint = MAP.checkpoints[checkpointIndex];
       const sample = this.sampleAtDistance(checkpoint.distance);
-      const gate = new THREE.Group();
-      gate.name = checkpoint.id;
-      gate.userData.name = checkpoint.name;
-      poseObject(gate, sample);
-      for (const side of [-1, 1]) {
+      const labels = new THREE.InstancedMesh(
+        labelGeometry,
+        createLabelMaterial(checkpoint.index.toString().padStart(2, "0"), "#ffa22e"),
+        2,
+      );
+      labels.name = `${checkpoint.id}_label`;
+      labels.userData.name = checkpoint.name;
+      for (let sideIndex = 0; sideIndex < 2; sideIndex += 1) {
+        const side = sideIndex === 0 ? -1 : 1;
+        const instanceIndex = checkpointIndex * 2 + sideIndex;
         const x = side * (checkpoint.gateWidth / 2 + 0.7);
-        const post = new THREE.Mesh(
-          new THREE.BoxGeometry(0.55, checkpoint.mastHeight, 0.55),
-          postMaterial,
+        setCourseObjectTransform(
+          object,
+          sample,
+          x,
+          checkpoint.mastHeight / 2,
+          0,
+          0.55,
+          checkpoint.mastHeight,
+          0.55,
         );
-        post.position.set(x, checkpoint.mastHeight / 2, 0);
-        const bar = new THREE.Mesh(
-          new THREE.BoxGeometry(0.78, 3.2, 0.72),
-          pendingMaterial,
+        posts.setMatrixAt(instanceIndex, object.matrix);
+        setCourseObjectTransform(
+          object,
+          sample,
+          x,
+          checkpoint.mastHeight - 2,
+          0,
+          0.78,
+          3.2,
+          0.72,
         );
-        bar.position.set(x, checkpoint.mastHeight - 2, -0.34);
-        const number = new THREE.Mesh(
-          new THREE.PlaneGeometry(1.9, 1.2),
-          createLabelMaterial(checkpoint.index.toString().padStart(2, "0"), "#ffa22e"),
+        indicators.setMatrixAt(instanceIndex, object.matrix);
+        setCourseObjectTransform(
+          object,
+          sample,
+          x,
+          checkpoint.mastHeight - 0.9,
+          0.38,
+          1.9,
+          1.2,
+          1,
         );
-        number.position.set(x, checkpoint.mastHeight - 0.9, -0.32);
-        gate.add(post, bar, number);
+        labels.setMatrixAt(sideIndex, object.matrix);
       }
-      group.add(gate);
+      labels.instanceMatrix.needsUpdate = true;
+      group.add(labels);
     }
+    posts.instanceMatrix.needsUpdate = true;
+    indicators.instanceMatrix.needsUpdate = true;
+    this.checkpointIndicatorMesh = indicators;
+    group.add(posts, indicators);
     return group;
   }
 
@@ -699,7 +911,7 @@ export class GreenwaterCourse {
       const column = new THREE.Mesh(new THREE.BoxGeometry(1.2, height, 1.2), structure);
       column.position.set(side * span / 2, height / 2, 0);
       const vertical = new THREE.Mesh(new THREE.BoxGeometry(0.34, height - 4, 1.3), acid);
-      vertical.position.set(side * span / 2, height / 2, -0.72);
+      vertical.position.set(side * span / 2, height / 2, 0.72);
       const beacon = new THREE.Mesh(new THREE.SphereGeometry(0.65, 8, 6), amber);
       beacon.position.set(side * span / 2, height + 1.1, 0);
       gate.add(column, vertical, beacon);
@@ -708,11 +920,27 @@ export class GreenwaterCourse {
     beam.position.y = height - 0.65;
     gate.add(beam);
     const stripeGeometry = new THREE.BoxGeometry(1.05, 0.42, 1.5);
+    const acidStripes = new THREE.InstancedMesh(stripeGeometry, acid, 16);
+    const amberStripes = new THREE.InstancedMesh(stripeGeometry, amber, 16);
+    const stripeObject = new THREE.Object3D();
+    let acidIndex = 0;
+    let amberIndex = 0;
     for (let index = -15; index <= 15; index += 1) {
-      const stripe = new THREE.Mesh(stripeGeometry, index % 2 === 0 ? acid : amber);
-      stripe.position.set(index * 1.08, height - 0.65, -0.9);
-      gate.add(stripe);
+      stripeObject.position.set(index * 1.08, height - 0.65, 0.9);
+      stripeObject.updateMatrix();
+      if (index % 2 === 0) {
+        acidStripes.setMatrixAt(acidIndex, stripeObject.matrix);
+        acidIndex += 1;
+      } else {
+        amberStripes.setMatrixAt(amberIndex, stripeObject.matrix);
+        amberIndex += 1;
+      }
     }
+    acidStripes.count = acidIndex;
+    amberStripes.count = amberIndex;
+    acidStripes.instanceMatrix.needsUpdate = true;
+    amberStripes.instanceMatrix.needsUpdate = true;
+    gate.add(acidStripes, amberStripes);
 
     const canvas = document.createElement("canvas");
     canvas.width = 512;
@@ -728,7 +956,7 @@ export class GreenwaterCourse {
       new THREE.PlaneGeometry(9.5, 3.55),
       new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide }),
     );
-    board.position.set(0, height - 3.2, -0.82);
+    board.position.set(0, height - 3.2, 0.82);
     gate.add(board);
     return gate;
   }
@@ -738,20 +966,30 @@ export class GreenwaterCourse {
     group.name = "greenwater_start_grid";
     const acid = new THREE.MeshBasicMaterial({ color: 0xc8ff2e });
     const white = new THREE.MeshBasicMaterial({ color: 0xb9c1bb });
+    const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
+    const capacity = 64;
+    const acidMarkers = new THREE.InstancedMesh(cubeGeometry, acid, capacity);
+    const whiteMarkers = new THREE.InstancedMesh(cubeGeometry, white, capacity);
+    const counts = new Map<THREE.InstancedMesh, number>([
+      [acidMarkers, 0],
+      [whiteMarkers, 0],
+    ]);
+    const addMarker = (
+      mesh: THREE.InstancedMesh,
+      object: THREE.Object3D,
+    ): void => {
+      const index = counts.get(mesh) ?? 0;
+      mesh.setMatrixAt(index, object.matrix);
+      counts.set(mesh, index + 1);
+    };
+    const object = new THREE.Object3D();
     const chequerSample = this.sample(0);
-    const chequer = new THREE.Group();
-    poseObject(chequer, chequerSample);
     for (let row = -2; row <= 2; row += 1) {
       for (let column = -11; column <= 11; column += 1) {
-        const tile = new THREE.Mesh(
-          new THREE.BoxGeometry(1, 0.035, 1),
-          (row + column) % 2 === 0 ? white : acid,
-        );
-        tile.position.set(column, 0.05, row);
-        chequer.add(tile);
+        setCourseObjectTransform(object, chequerSample, column, 0.05, row, 1, 0.035, 1);
+        addMarker((row + column) % 2 === 0 ? whiteMarkers : acidMarkers, object);
       }
     }
-    group.add(chequer);
 
     for (let index = 0; index < MAP.startFinish.gridPads; index += 1) {
       const distance = THREE.MathUtils.euclideanModulo(
@@ -759,15 +997,22 @@ export class GreenwaterCourse {
         this.length,
       );
       const sample = this.sampleAtDistance(distance);
-      const pad = new THREE.Group();
-      poseObject(pad, sample);
-      const marker = new THREE.Mesh(
-        new THREE.BoxGeometry(3.3, 0.04, 5.4),
-        index % 2 === 0 ? acid : white,
+      setCourseObjectTransform(
+        object,
+        sample,
+        index % 2 === 0 ? -3.2 : 3.2,
+        0.055,
+        0,
+        3.3,
+        0.04,
+        5.4,
       );
-      marker.position.set(index % 2 === 0 ? -3.2 : 3.2, 0.055, 0);
-      pad.add(marker);
-      group.add(pad);
+      addMarker(index % 2 === 0 ? acidMarkers : whiteMarkers, object);
+    }
+    for (const mesh of [acidMarkers, whiteMarkers]) {
+      mesh.count = counts.get(mesh) ?? 0;
+      mesh.instanceMatrix.needsUpdate = true;
+      group.add(mesh);
     }
     return group;
   }
@@ -872,15 +1117,29 @@ export class GreenwaterCourse {
     }
 
     const boostMaterial = new THREE.MeshBasicMaterial({ color: 0xc8ff2e });
-    for (const distance of [1705, 1815, 1925, 2035]) {
+    const boostPads = new THREE.InstancedMesh(
+      new THREE.BoxGeometry(1, 1, 1),
+      boostMaterial,
+      BOOST_PAD_DISTANCES.length,
+    );
+    const boostObject = new THREE.Object3D();
+    for (let index = 0; index < BOOST_PAD_DISTANCES.length; index += 1) {
+      const distance = BOOST_PAD_DISTANCES[index];
       const sample = this.sampleAtDistance(distance);
-      const pad = new THREE.Group();
-      poseObject(pad, sample);
-      const mesh = new THREE.Mesh(new THREE.BoxGeometry(4.8, 0.035, 18), boostMaterial);
-      mesh.position.set(sample.halfWidth * 0.44, 0.06, 0);
-      pad.add(mesh);
-      group.add(pad);
+      setCourseObjectTransform(
+        boostObject,
+        sample,
+        sample.halfWidth * 0.44,
+        0.06,
+        0,
+        4.8,
+        0.035,
+        18,
+      );
+      boostPads.setMatrixAt(index, boostObject.matrix);
     }
+    boostPads.instanceMatrix.needsUpdate = true;
+    group.add(boostPads);
     return group;
   }
 
@@ -945,18 +1204,28 @@ export class GreenwaterCourse {
     }
 
     const tankMaterial = new THREE.MeshLambertMaterial({ color: 0x3a4037 });
+    const tanks = new THREE.InstancedMesh(
+      new THREE.CylinderGeometry(1, 1, 1, 8),
+      tankMaterial,
+      9,
+    );
+    const tankObject = new THREE.Object3D();
     for (let index = 0; index < 9; index += 1) {
       const distance = 1640 + index * 55;
       const sample = this.sampleAtDistance(distance);
       const height = THREE.MathUtils.lerp(18, 7, index / 8);
       const radius = height * 0.34;
-      const tank = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, height, 8), tankMaterial);
-      tank.name = `fuel_tank_${index + 1}`;
-      tank.position.copy(sample.position)
+      tankObject.position.copy(sample.position)
         .addScaledVector(sample.right, -40)
         .addScaledVector(sample.up, height / 2);
-      group.add(tank);
+      tankObject.quaternion.identity();
+      tankObject.scale.set(radius, height, radius);
+      tankObject.updateMatrix();
+      tanks.setMatrixAt(index, tankObject.matrix);
     }
+    tanks.name = "fuel_tanks";
+    tanks.instanceMatrix.needsUpdate = true;
+    group.add(tanks);
     return group;
   }
 

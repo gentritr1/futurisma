@@ -7,6 +7,7 @@ export interface HudFrame {
   progress: number;
   checkpoint: number;
   checkpointCount: number;
+  sector: string;
   finishDistanceMeters: number;
   turnDirection: "LEFT" | "RIGHT" | null;
   turnDistanceMeters: number;
@@ -48,6 +49,7 @@ export class GameUi {
   private readonly timeValue = requiredElement<HTMLElement>("time-value");
   private readonly lapValue = requiredElement<HTMLElement>("lap-value");
   private readonly checkpointValue = requiredElement<HTMLElement>("checkpoint-value");
+  private readonly sectorValue = requiredElement<HTMLElement>("sector-value");
   private readonly finishValue = requiredElement<HTMLElement>("finish-value");
   private readonly progressFill = requiredElement<HTMLElement>("progress-fill");
   private readonly boostValue = requiredElement<HTMLElement>("boost-value");
@@ -55,6 +57,7 @@ export class GameUi {
   private readonly edgeWarning = requiredElement<HTMLElement>("edge-warning");
   private readonly turnCue = requiredElement<HTMLElement>("turn-cue");
   private readonly turnLabel = requiredElement<HTMLElement>("turn-label");
+  private readonly turnArrow = requiredElement<HTMLElement>("turn-arrow");
   private readonly turnDistance = requiredElement<HTMLElement>("turn-distance");
   private readonly countdown = requiredElement<HTMLElement>("countdown");
   private readonly errorPanel = requiredElement<HTMLElement>("error-panel");
@@ -66,6 +69,7 @@ export class GameUi {
   private lastEdgeState = "";
   private lastTurnState = "";
   private lastRaceStage = "";
+  private gateFlashUntil = 0;
 
   showReady(): void {
     this.loadingScreen.hidden = true;
@@ -113,6 +117,19 @@ export class GameUi {
     this.systemStatus.textContent = muted ? "AUDIO MUTED" : "AUDIO ONLINE";
   }
 
+  setPaused(paused: boolean): void {
+    this.countdown.textContent = paused ? "PAUSED" : "";
+    this.countdown.dataset.paused = paused ? "true" : "false";
+    this.systemStatus.textContent = paused ? "RACE PAUSED" : "TRIAL ACTIVE";
+    document.body.dataset.phase = paused ? "paused" : "race";
+  }
+
+  flashGate(index: number): void {
+    this.gateFlashUntil = performance.now() + 620;
+    this.checkpointValue.textContent = `GATE ${index.toString().padStart(2, "0")} CLEAR`;
+    this.checkpointValue.dataset.cleared = "true";
+  }
+
   update(frame: HudFrame): void {
     this.speedValue.textContent = Math.round(frame.speedKph).toString().padStart(3, "0");
     this.timeValue.textContent = formatRaceTime(frame.elapsedMs);
@@ -124,10 +141,12 @@ export class GameUi {
       this.lapValue.textContent = lapLabel;
       this.lastLapLabel = lapLabel;
     }
-    if (checkpointLabel !== this.lastCheckpointLabel) {
+    if (performance.now() >= this.gateFlashUntil && checkpointLabel !== this.lastCheckpointLabel) {
       this.checkpointValue.textContent = checkpointLabel;
+      this.checkpointValue.dataset.cleared = "false";
       this.lastCheckpointLabel = checkpointLabel;
     }
+    this.sectorValue.textContent = frame.sector;
     const finishDistance = Math.max(0, frame.finishDistanceMeters);
     this.finishValue.textContent = finishDistance >= 1000
       ? `${(finishDistance / 1000).toFixed(1)} KM TO FINISH`
@@ -157,6 +176,7 @@ export class GameUi {
       this.turnCue.dataset.active = frame.turnDirection ? "true" : "false";
       this.turnCue.setAttribute("aria-hidden", frame.turnDirection ? "false" : "true");
       if (frame.turnDirection) {
+        this.turnArrow.textContent = frame.turnDirection === "LEFT" ? "←" : "→";
         this.turnLabel.textContent = `${frame.turnHard ? "HARD " : "TURN "}${frame.turnDirection}`;
         this.turnDistance.textContent = frame.turnDistanceMeters < 12
           ? "NOW"

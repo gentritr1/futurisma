@@ -6,14 +6,16 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "validate:map": "node scripts/validate-map.mjs",
+    "test": "npm run validate:map && npm run build"
   },
   "dependencies": {
     "three": "0.184.0"
   },
   "devDependencies": {
-    "@types/three": "latest",
-    "typescript": "latest",
-    "vite": "latest"
+    "@types/three": "0.185.4",
+    "typescript": "7.0.2",
+    "vite": "8.2.2"
   }
 }

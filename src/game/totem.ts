@@ -9,6 +9,7 @@ export interface TotemVisualState {
   boostActive: boolean;
   lateralLoad: number;
   elapsed: number;
+  delta: number;
 }
 
 interface NeutralTransform {
@@ -17,6 +18,39 @@ interface NeutralTransform {
 }
 
 const DEG = Math.PI / 180;
+
+export function applyPs2MaterialTreatment(root: THREE.Object3D): void {
+  root.traverse((object) => {
+    if (!(object instanceof THREE.Mesh)) return;
+    const materials = Array.isArray(object.material) ? object.material : [object.material];
+    for (const material of materials) {
+      material.dithering = true;
+      const textured = material as THREE.Material & {
+        map?: THREE.Texture | null;
+        emissiveMap?: THREE.Texture | null;
+        normalMap?: THREE.Texture | null;
+        roughnessMap?: THREE.Texture | null;
+        metalnessMap?: THREE.Texture | null;
+        alphaMap?: THREE.Texture | null;
+      };
+      for (const texture of [
+        textured.map,
+        textured.emissiveMap,
+        textured.normalMap,
+        textured.roughnessMap,
+        textured.metalnessMap,
+        textured.alphaMap,
+      ]) {
+        if (!texture) continue;
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestMipmapLinearFilter;
+        texture.anisotropy = 1;
+        texture.needsUpdate = true;
+      }
+      material.needsUpdate = true;
+    }
+  });
+}
 
 export class TotemVehicle {
   readonly root = new THREE.Group();
@@ -39,6 +73,7 @@ export class TotemVehicle {
     this.model = gltf.scene;
     this.model.name = "TOTEM_runtime";
     this.visual.add(this.model);
+    applyPs2MaterialTreatment(this.model);
 
     this.model.traverse((object) => {
       if (object.name) this.nodes.set(object.name, object);
@@ -94,8 +129,18 @@ export class TotemVehicle {
     const pitch = state.brake * 0.055 - state.throttle * 0.025;
     const bob = Math.sin(state.elapsed * 4.1) * 0.026 * (0.25 + state.speedRatio);
     this.visual.position.y = bob;
-    this.visual.rotation.x = THREE.MathUtils.lerp(this.visual.rotation.x, pitch, 0.12);
-    this.visual.rotation.z = THREE.MathUtils.lerp(this.visual.rotation.z, bank, 0.1);
+    const pitchResponse = 1 - Math.exp(-state.delta * 8.5);
+    const bankResponse = 1 - Math.exp(-state.delta * 7.2);
+    this.visual.rotation.x = THREE.MathUtils.lerp(
+      this.visual.rotation.x,
+      pitch,
+      pitchResponse,
+    );
+    this.visual.rotation.z = THREE.MathUtils.lerp(
+      this.visual.rotation.z,
+      bank,
+      bankResponse,
+    );
 
     this.setRotation("steering_fin_L_pivot", "y", state.steer * 20 * DEG);
     this.setRotation("steering_fin_R_pivot", "y", state.steer * 20 * DEG);

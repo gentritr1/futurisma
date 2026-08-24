@@ -18,6 +18,7 @@ Open the local URL printed by Vite.
 - `S` / Down: brake
 - `Shift` / gamepad A: boost
 - `R` / gamepad Y: recover at the last cleared vector
+- `Escape`, `P`, or gamepad Start: pause/resume
 - `M` / gamepad Back: mute procedural engine audio
 
 Standard gamepad triggers control thrust and braking. The Greenwater Strip time
@@ -32,6 +33,9 @@ remaining distance to the finish.
 
 Append `?demo=1&laps=1` to the URL to run an automated one-lap throttle,
 steering, and boost pass for camera and rendering QA.
+
+Add `&diagnostics=1` to print draw calls, triangles, GPU resource counts and a
+smoothed frame time once per second during a performance pass.
 
 ## Production asset
 

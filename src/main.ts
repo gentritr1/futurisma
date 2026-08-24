@@ -1,4 +1,3 @@
-import "./style.css";
 import { FuturismaGame } from "./game/game";
 import { InputController } from "./game/input";
 import { GameUi } from "./game/ui";

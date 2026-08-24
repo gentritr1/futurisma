@@ -4,10 +4,16 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#090d10" />
+    <meta name="referrer" content="no-referrer" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' blob: ws://127.0.0.1:* ws://localhost:*; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'"
+    />
     <meta
       name="description"
       content="FUTURISMA: a PS2-inspired anti-gravity time trial built with Three.js."
     />
+    <link rel="stylesheet" href="/src/style.css" />
     <title>FUTURISMA · Greenwater Strip</title>
   </head>
   <body>
@@ -45,6 +51,7 @@
             <span id="checkpoint-value">NEXT GATE 01 / 08</span>
             <span id="finish-value">12.6 KM TO FINISH</span>
           </div>
+          <span id="sector-value" class="sector-value">RUNWAY 09</span>
           <span class="race-progress__track"><span id="progress-fill"></span></span>
         </section>
 
@@ -60,6 +67,7 @@
           COURSE EDGE
         </div>
         <div id="turn-cue" class="turn-cue" role="status" aria-hidden="true">
+          <span id="turn-arrow" class="turn-arrow" aria-hidden="true">←</span>
           <span id="turn-label">TURN LEFT</span>
           <strong id="turn-distance">120 M</strong>
         </div>
@@ -92,6 +100,7 @@
             <div><dt>BRAKE</dt><dd>S / ↓</dd></div>
             <div><dt>BOOST</dt><dd>SHIFT / A</dd></div>
             <div><dt>RECOVER</dt><dd>R / Y</dd></div>
+            <div><dt>PAUSE</dt><dd>ESC / START</dd></div>
           </dl>
         </div>
         <p class="intro-footer">WORKS LIVERY 07 · MAP 01 CALIBRATION RUN</p>
