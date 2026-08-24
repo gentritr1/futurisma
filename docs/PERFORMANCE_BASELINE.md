@@ -67,6 +67,22 @@ geometries / 17 textures. All eight gates cleared on every lap with zero
 impacts, recoveries, wrong-way events, missed gates, or WebGL context faults.
 The fresh package advisory check on 2026-08-24 reported zero vulnerabilities.
 
+## Input and effect lifecycle acceptance
+
+Keyboard launch now has one action owner: a real Enter press progresses from
+countdown into racing without the same event immediately pausing the trial. A
+forced WebGL loss/restoration then held the race paused, reported one loss and
+one restore, and resumed into racing only after a fresh Enter press.
+
+Inactive impact sparks are no longer submitted to the renderer. A clean
+1440 × 900 high-quality lap completed in 34.483 seconds at 10.0 ms p95, peaked
+at 90 draw calls / 42,664 triangles, reported zero point vertices, and uploaded
+86 geometries / 17 textures. The diagnostics-only rail-impact probe separately
+recorded one collision and one spark burst at 5 m, then returned to zero point
+vertices after the burst expired. Six alternating portrait and landscape
+resizes matched canvas dimensions exactly while the loaded standby scene stayed
+fixed at 58 geometries / 8 textures.
+
 ## Runtime invariants
 
 Keep these true while integrating the authored Greenwater environment:

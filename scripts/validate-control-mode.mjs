@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import { resolveActionSuppression } from "../src/game/action-gate.js";
 import { hasPlayerControlIntent } from "../src/game/control-mode.js";
 import {
@@ -62,6 +63,13 @@ assert.equal(
   "A fresh action after rearming must be accepted.",
 );
 
+const mainSource = await readFile(new URL("../src/main.ts", import.meta.url), "utf8");
+assert.doesNotMatch(
+  mainSource,
+  /window\.addEventListener\(["']keydown["']/,
+  "Keyboard actions must have one owner so a launch press cannot also pause the trial.",
+);
+
 console.log(
-  "Control mode PASS: sanitized analogue input, deliberate manual takeover, keyboard override, and interruption-safe action edges.",
+  "Control mode PASS: single-owner keyboard actions, sanitized analogue input, deliberate manual takeover, keyboard override, and interruption-safe action edges.",
 );

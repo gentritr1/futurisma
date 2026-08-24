@@ -84,6 +84,8 @@ Greenwater's open edge and exercises the production auto-recovery countdown and
 reinsertion path. The probe is ignored unless diagnostics are enabled.
 Use `&diagnostics=1&probe=wrong-way` to start TOTEM moving backward on the
 opening straight and verify warning engagement plus manual recovery.
+Use `&diagnostics=1&probe=impact` to start against the opening rail and verify
+impact feedback, spark emission, and automatic spark-buffer culling.
 Use `&diagnostics=1&probe=context` to force one real WebGL context loss and
 restore during the opening straight. The race remains paused after restoration
 until the player explicitly resumes it. Focus, visibility, and graphics-link

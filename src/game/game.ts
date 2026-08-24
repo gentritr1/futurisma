@@ -314,6 +314,7 @@ export class FuturismaGame {
   private diagnosticMaximumCameraFov = 56;
   private diagnosticMaximumBrakeFovCompression = 0;
   private diagnosticImpacts = 0;
+  private diagnosticImpactSparkBursts = 0;
   private diagnosticMissedGates = 0;
   private diagnosticRecoveries = 0;
   private diagnosticContextLosses = 0;
@@ -376,6 +377,8 @@ export class FuturismaGame {
     && new URLSearchParams(window.location.search).get("probe") === "recovery";
   private readonly wrongWayProbe = this.diagnosticsMode
     && new URLSearchParams(window.location.search).get("probe") === "wrong-way";
+  private readonly impactProbe = this.diagnosticsMode
+    && new URLSearchParams(window.location.search).get("probe") === "impact";
   private readonly contextLossProbe = this.diagnosticsMode
     && new URLSearchParams(window.location.search).get("probe") === "context";
   private readonly focusLossProbe = this.diagnosticsMode
@@ -1445,6 +1448,11 @@ export class FuturismaGame {
       this.speed = 22;
       this.courseAlignment = -1;
     }
+    if (this.impactProbe) {
+      this.lateral = start.halfWidth - 1;
+      this.position.copy(start.position).addScaledVector(start.right, this.lateral);
+      this.speed = 22;
+    }
     this.syncPresentationPose();
     this.course.setLapBoard(1, this.totalLaps);
     this.course.setCheckpointProgress(1);
@@ -1510,6 +1518,7 @@ export class FuturismaGame {
     const sparks = new THREE.Points(geometry, material);
     sparks.name = "totem_impact_sparks";
     sparks.frustumCulled = false;
+    sparks.visible = false;
     return sparks;
   }
 
@@ -1550,12 +1559,15 @@ export class FuturismaGame {
         + spread;
       this.impactSparkLife[particle] = (0.22 + Math.random() * 0.28) * strength;
     }
+    this.impactSparks.visible = true;
+    if (this.diagnosticsMode) this.diagnosticImpactSparkBursts += 1;
     const position = this.impactSparks.geometry.getAttribute("position");
     position.needsUpdate = true;
   }
 
   private updateImpactSparks(delta: number): void {
     let changed = false;
+    let active = false;
     for (let particle = 0; particle < this.impactSparkLife.length; particle += 1) {
       if (this.impactSparkLife[particle] <= 0) continue;
       const offset = particle * 3;
@@ -1566,6 +1578,7 @@ export class FuturismaGame {
       if (this.impactSparkLife[particle] === 0) {
         this.impactSparkPositions[offset + 1] = -10_000;
       } else {
+        active = true;
         this.impactSparkPositions[offset] += this.impactSparkVelocities[offset] * delta;
         this.impactSparkPositions[offset + 1] += this.impactSparkVelocities[offset + 1] * delta;
         this.impactSparkPositions[offset + 2] += this.impactSparkVelocities[offset + 2] * delta;
@@ -1573,6 +1586,7 @@ export class FuturismaGame {
       }
       changed = true;
     }
+    this.impactSparks.visible = active;
     if (changed) {
       this.impactSparks.geometry.getAttribute("position").needsUpdate = true;
     }
@@ -1837,6 +1851,7 @@ export class FuturismaGame {
         this.diagnosticMaximumBrakeFovCompression.toFixed(2),
       ),
       impacts: this.diagnosticImpacts,
+      impactSparkBursts: this.diagnosticImpactSparkBursts,
       missedGates: this.diagnosticMissedGates,
       impactLocations: this.diagnosticImpactLocations,
       recoveries: this.diagnosticRecoveries,
@@ -1945,6 +1960,7 @@ export class FuturismaGame {
     this.diagnosticMaximumCameraFov = this.camera.fov;
     this.diagnosticMaximumBrakeFovCompression = 0;
     this.diagnosticImpacts = 0;
+    this.diagnosticImpactSparkBursts = 0;
     this.diagnosticMissedGates = 0;
     this.diagnosticRecoveries = 0;
     this.diagnosticContextLosses = 0;

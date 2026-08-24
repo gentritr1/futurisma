@@ -22,13 +22,8 @@ const handleStartClick = (): void => {
   void beginTrial();
 };
 
-const handleWindowKeyDown = (event: KeyboardEvent): void => {
-  if (event.code === "Enter" && !event.repeat) void beginTrial();
-};
-
 ui.startButton.addEventListener("click", handleStartClick);
 ui.restartButton.addEventListener("click", handleStartClick);
-window.addEventListener("keydown", handleWindowKeyDown);
 
 game
   .initialize()
@@ -50,7 +45,6 @@ if (import.meta.hot) {
   import.meta.hot.dispose(() => {
     ui.startButton.removeEventListener("click", handleStartClick);
     ui.restartButton.removeEventListener("click", handleStartClick);
-    window.removeEventListener("keydown", handleWindowKeyDown);
     game.dispose();
   });
 }
