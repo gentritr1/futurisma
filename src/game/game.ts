@@ -1242,6 +1242,7 @@ export class FuturismaGame {
         ? isTurnCueUrgent(turnCue.distance, this.speed, turnCue.hard)
         : false,
       boostActive: this.boostActive,
+      boostLocked: this.boostLockedUntilRelease,
       braking: input.brake > 0.1,
       drifting: this.driftActive,
       skidsDown: this.speed < 11,
@@ -1654,6 +1655,7 @@ export class FuturismaGame {
       driftIntensity: Number(this.driftIntensity.toFixed(2)),
       surfaceGrip: Number(this.surfaceGrip.toFixed(2)),
       boostActive: this.boostActive,
+      boostLocked: this.boostLockedUntilRelease,
       nextCheckpoint: this.nextCheckpointIndex,
       averageSpeedKph: elapsedSeconds > 0
         ? Number((this.diagnosticDistanceTravelled / elapsedSeconds * 3.6).toFixed(1))

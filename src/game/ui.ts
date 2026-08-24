@@ -1,4 +1,5 @@
 import {
+  resolveBoostPresentation,
   resolveFinishPresentation,
   resolveRaceStage,
 } from "./hud-presentation.js";
@@ -24,6 +25,7 @@ export interface HudFrame {
   turnHard: boolean;
   turnUrgent: boolean;
   boostActive: boolean;
+  boostLocked: boolean;
   braking: boolean;
   drifting: boolean;
   skidsDown: boolean;
@@ -73,6 +75,8 @@ export class GameUi {
   private readonly sectorValue = requiredElement<HTMLElement>("sector-value");
   private readonly finishValue = requiredElement<HTMLElement>("finish-value");
   private readonly progressFill = requiredElement<HTMLElement>("progress-fill");
+  private readonly boostMeter = requiredElement<HTMLElement>("boost-meter");
+  private readonly boostLabel = requiredElement<HTMLElement>("boost-label");
   private readonly boostValue = requiredElement<HTMLElement>("boost-value");
   private readonly boostFill = requiredElement<HTMLElement>("boost-fill");
   private readonly edgeWarning = requiredElement<HTMLElement>("edge-warning");
@@ -289,10 +293,13 @@ export class GameUi {
     this.progressFill.style.transform = `scaleX(${Math.min(1, Math.max(0, frame.progress))})`;
     this.boostValue.textContent = `${Math.round(frame.boost * 100)}%`;
     this.boostFill.style.transform = `scaleX(${Math.min(1, Math.max(0, frame.boost))})`;
-    const boostState = frame.boostActive ? "true" : "false";
+    const boostPresentation = resolveBoostPresentation(frame.boostActive, frame.boostLocked);
+    const boostState = boostPresentation.state;
     const edgeState = `${frame.edgeWarning}:${frame.edgeOpen}:${frame.recoveryActive}`;
     if (boostState !== this.lastBoostState) {
-      this.boostFill.dataset.active = boostState;
+      this.boostMeter.dataset.state = boostState;
+      this.boostLabel.textContent = boostPresentation.label;
+      this.boostFill.dataset.active = boostState === "active" ? "true" : "false";
       this.lastBoostState = boostState;
     }
     if (edgeState !== this.lastEdgeState) {
@@ -377,26 +384,30 @@ export class GameUi {
         ? "SKIDS DOWN"
         : frame.boostActive
           ? "PLASMA OVERDRIVE"
-          : frame.lowGrip
-            ? "SLIP SURFACE"
-            : frame.drifting
-              ? "DRIFT VECTOR"
-              : frame.braking
-                ? "AIRBRAKES"
-                : "HOVER LOCK";
+          : frame.boostLocked
+            ? "RELEASE BOOST"
+            : frame.lowGrip
+              ? "SLIP SURFACE"
+              : frame.drifting
+                ? "DRIFT VECTOR"
+                : frame.braking
+                  ? "AIRBRAKES"
+                  : "HOVER LOCK";
     const driveState = hazardActive
       ? "hazard"
       : frame.skidsDown
         ? "nominal"
         : frame.boostActive
           ? "boost"
-          : frame.lowGrip
-            ? "low-grip"
-            : frame.drifting
-              ? "drift"
-              : frame.braking
-                ? "braking"
-                : "nominal";
+          : frame.boostLocked
+            ? "lockout"
+            : frame.lowGrip
+              ? "low-grip"
+              : frame.drifting
+                ? "drift"
+                : frame.braking
+                  ? "braking"
+                  : "nominal";
     if (driveLabel !== this.lastDriveLabel) {
       this.driveState.textContent = driveLabel;
       this.lastDriveLabel = driveLabel;

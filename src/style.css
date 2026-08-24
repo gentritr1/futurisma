@@ -253,7 +253,8 @@ body[data-graphics-context="lost"] .system-state__lamp {
 }
 
 .telemetry__sub[data-state="low-grip"],
-.telemetry__sub[data-state="hazard"] {
+.telemetry__sub[data-state="hazard"],
+.telemetry__sub[data-state="lockout"] {
   color: var(--warning);
 }
 
@@ -360,6 +361,14 @@ body[data-graphics-context="lost"] .system-state__lamp {
 .boost__track span[data-active="true"] {
   background: var(--cyan);
   box-shadow: 0 0 7px oklch(0.86 0.13 210 / 0.62);
+}
+
+.boost[data-state="locked"] {
+  color: var(--warning);
+}
+
+.boost[data-state="locked"] .boost__track span {
+  background: var(--warning);
 }
 
 .edge-warning {

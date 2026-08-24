@@ -24,7 +24,8 @@ Open the local URL printed by Vite.
 Standard gamepad triggers control thrust and braking. The Greenwater Strip time
 trial defaults to five laps. Add `?laps=1` through `?laps=9` to override the
 race length for testing. Emptying the boost reserve locks boost until the input
-is released, preventing depleted thrust, audio, and effects from pulsing.
+is released, preventing depleted thrust, audio, and effects from pulsing. The
+reserve meter and drive-state readout both call for that release in amber.
 TOTEM now uses player-controlled heading with speed-sensitive steering, grip, and
 high-speed drift. Course vectors must be cleared in order for a lap to count.
 The vehicle must also pass inside each authored gate span. Compatible gamepads

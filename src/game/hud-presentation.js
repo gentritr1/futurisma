@@ -48,3 +48,16 @@ export function resolveRaceStage(finishArmed, lap, totalLaps) {
   if (totalLaps > 1 && lap === totalLaps) return "final";
   return "running";
 }
+
+/**
+ * The reserve meter communicates depletion lockout independently from vehicle
+ * boost, because a course pad can still boost TOTEM while manual boost is locked.
+ * @param {boolean} boostActive
+ * @param {boolean} boostLocked
+ * @returns {{ label: string; state: "ready" | "active" | "locked" }}
+ */
+export function resolveBoostPresentation(boostActive, boostLocked) {
+  if (boostLocked) return { label: "BOOST LOCKOUT · RELEASE", state: "locked" };
+  if (boostActive) return { label: "PLASMA DISCHARGE", state: "active" };
+  return { label: "PLASMA RESERVE", state: "ready" };
+}

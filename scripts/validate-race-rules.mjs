@@ -12,6 +12,7 @@ import {
   resolveCountdownStage,
 } from "../src/game/race-rules.js";
 import {
+  resolveBoostPresentation,
   resolveFinishPresentation,
   resolveRaceStage,
 } from "../src/game/hud-presentation.js";
@@ -103,6 +104,23 @@ assert.equal(resolveRaceStage(false, 1, 5), "running");
 assert.equal(resolveRaceStage(true, 4, 5), "running");
 assert.equal(resolveRaceStage(false, 5, 5), "final");
 assert.equal(resolveRaceStage(true, 5, 5), "approach");
+assert.deepEqual(resolveBoostPresentation(false, false), {
+  label: "PLASMA RESERVE",
+  state: "ready",
+});
+assert.deepEqual(resolveBoostPresentation(true, false), {
+  label: "PLASMA DISCHARGE",
+  state: "active",
+});
+assert.deepEqual(resolveBoostPresentation(false, true), {
+  label: "BOOST LOCKOUT · RELEASE",
+  state: "locked",
+});
+assert.deepEqual(
+  resolveBoostPresentation(true, true),
+  { label: "BOOST LOCKOUT · RELEASE", state: "locked" },
+  "Manual lockout must remain visible while a course pad supplies boost.",
+);
 
 assert.ok(isCircularHazardContact(781.2, -8.4, 781.24, -8.5, COURSE_LENGTH));
 assert.ok(isCircularHazardContact(0.8, 7, COURSE_LENGTH - 0.5, 7, COURSE_LENGTH));
@@ -131,5 +149,5 @@ assert.deepEqual(calculateRecoveryTelemetry(Number.NaN, 0), {
 });
 
 console.log(
-  "Race rules PASS: countdown, turn urgency, open-edge warning, final-route filtering, forward crossings, wraparound, missed-gate penalty, finish distance and presentation, cable contacts, recovery telemetry.",
+  "Race rules PASS: countdown, turn urgency, open-edge warning, final-route filtering, forward crossings, wraparound, missed-gate penalty, finish and boost presentation, cable contacts, recovery telemetry.",
 );
