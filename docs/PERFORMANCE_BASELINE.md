@@ -114,6 +114,30 @@ draw calls / 42,696 triangles, retained 86 geometries / 17 textures, and ended
 with 1.2 MB sampled heap growth. All gameplay, particle, and WebGL fault
 counters remained at zero.
 
+## Suspended-audio lifecycle acceptance
+
+Real-time engine automation, sector-profile lookup, music ramps, and transient
+cue creation now require an advancing AudioContext clock. Autoplay/demo sessions
+whose context remains `suspended` perform no audio-control work and create no
+inaudible oscillator nodes. Sector music is evaluated only after a real 30 Hz
+audio-control tick and remains on its final authored state during result-screen
+coasting.
+
+A click-started 1440 × 900 high-quality lap kept the context `running`, measured
+exactly 30.0 Hz across 1,065 control updates, performed eight authored music
+transitions, reached six concurrent transient voices, and settled at zero active
+voices after the finish sting. It completed in 34.483 seconds at 9.8 ms p95 /
+10.4 ms maximum with zero skipped cues, impacts, or recoveries.
+
+The complementary suspended-context five-lap soak performed zero audio-control
+updates and zero music transitions. It safely rejected 78 attempted cues while
+active and peak transient-node counts remained zero for the entire run. The
+locked 02:52.799 lap sequence held 9.7 ms p95 / 10.5 ms maximum, peaked at 92
+draw calls / 42,696 triangles, and retained 86 geometries / 17 textures with
+zero impacts, recoveries, or WebGL context faults. The diagnostics-enabled
+browser reported 8.3 MB sampled heap growth; direct audio-node and GPU-resource
+counters did not grow.
+
 ## Runtime invariants
 
 Keep these true while integrating the authored Greenwater environment:
@@ -128,6 +152,7 @@ Keep these true while integrating the authored Greenwater environment:
 - Pose and chase-camera presentation share one course projection per rendered frame; real-time audio control reuses its filter-target storage.
 - Water Table reaches the authored 0.8 grip floor and recovers over 0.8 seconds without a one-step handling snap.
 - Ambient steam, warning lamps, and cargo-hook motion remain locked to 30 Hz without changing vehicle, camera, or input cadence.
+- Suspended or interrupted audio clocks create no transient nodes or automation work; a running context releases every transient voice back to zero.
 
 ## Environment integration gates
 

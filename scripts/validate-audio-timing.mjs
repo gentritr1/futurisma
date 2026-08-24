@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import {
   advanceFixedRateDeadline,
+  audioClockAdvances,
   encodeMusicProfileKey,
   fixedRateUpdateDue,
   MUSIC_LOOP_BEATS,
@@ -21,6 +22,15 @@ import {
 
 const bar = 60 / MUSIC_BPM * 4;
 const origin = 0.08;
+
+assert.equal(audioClockAdvances("running"), true);
+for (const state of ["suspended", "interrupted", "closed", "uninitialized"]) {
+  assert.equal(
+    audioClockAdvances(state),
+    false,
+    `${state} audio clocks must not receive real-time nodes or automation.`,
+  );
+}
 
 assert.equal(MUSIC_BPM, 174);
 assert.equal(MUSIC_KEY, "F minor");
@@ -113,5 +123,5 @@ assert.equal(sampleLinearAutomation(5, 0.2, 0.8, 2, 4), 0.8);
 assert.equal(sampleLinearAutomation(2, 0.2, 0.8, 2, 2), 0.8);
 
 console.log(
-  "Audio timing PASS: 174 BPM F-minor tonal plan, boost filter/shelf targets, unique stem profiles, interruption-safe ramps, and stable 30 Hz control at 60/120 Hz rendering.",
+  "Audio timing PASS: advancing-clock node safety, 174 BPM F-minor tonal plan, boost filter/shelf targets, unique stem profiles, interruption-safe ramps, and stable 30 Hz control at 60/120 Hz rendering.",
 );

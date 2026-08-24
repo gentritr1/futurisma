@@ -55,7 +55,9 @@ interfering with the clean racing line. Fog zones crossfade over the authored
 80 metres, while the trance, jungle, deep DnB, and techstep stem changes land on
 174 BPM bar boundaries. Their shared four-bar tonal plan is locked to F minor;
 boost opens both the music low-pass filter and a restrained high shelf without
-starting another layer.
+starting another layer. If browser policy suspends the AudioContext, transient
+cues and real-time automation are skipped until its clock is running; this
+prevents inaudible oscillator nodes from accumulating behind autoplay blocks.
 
 ## Visual test mode
 
@@ -80,7 +82,9 @@ lowering vehicle, camera, or input presentation rates. Add
 preference.
 Diagnostics also report course assembly, critical vehicle fetch/load, total
 startup-ready, optional asset-kit load timing, and the measured atmosphere
-update rate. The production shell preloads
+update rate. Audio diagnostics include the context state, 30 Hz control cadence,
+music-transition count, active/peak transient voices, and safely skipped cues.
+The production shell preloads
 the required TOTEM runtime GLB so its transfer overlaps module parsing.
 
 For focused QA, `&diagnostics=1&probe=recovery` starts TOTEM just beyond

@@ -1,5 +1,6 @@
 import {
   advanceFixedRateDeadline,
+  audioClockAdvances,
   encodeMusicProfileKey,
   fixedRateUpdateDue,
   MUSIC_LOOP_BEATS,
@@ -84,6 +85,9 @@ export class EngineAudio {
   private diagnosticInitializationMs = 0;
   private diagnosticMaxMusicLowpassHz = 0;
   private diagnosticMaxMusicHighShelfDb = 0;
+  private activeOneShots = 0;
+  private diagnosticPeakActiveOneShots = 0;
+  private diagnosticSkippedOneShots = 0;
   private musicSampleRate = 0;
   private muted = false;
   private paused = false;
@@ -168,11 +172,16 @@ export class EngineAudio {
     boost: boolean,
     surfaceGrip: number,
     driftIntensity: number,
-  ): void {
-    if (!this.context || !this.engineOscillator || !this.harmonicOscillator) return;
+  ): boolean {
+    if (
+      !this.context
+      || !audioClockAdvances(this.context.state)
+      || !this.engineOscillator
+      || !this.harmonicOscillator
+    ) return false;
     const now = this.context.currentTime;
     if (!fixedRateUpdateDue(now, this.nextControlUpdateTime, CONTROL_INTERVAL_SECONDS)) {
-      return;
+      return false;
     }
     this.nextControlUpdateTime = advanceFixedRateDeadline(
       now,
@@ -216,10 +225,11 @@ export class EngineAudio {
       this.diagnosticMaxMusicHighShelfDb,
       musicTargets.highShelfDb,
     );
+    return true;
   }
 
   setMusicProfile(profile: MusicProfile): void {
-    if (!this.context) return;
+    if (!this.context || !audioClockAdvances(this.context.state)) return;
     const key = encodeMusicProfileKey(
       profile.trance,
       profile.jungle,
@@ -328,6 +338,8 @@ export class EngineAudio {
     this.diagnosticMusicTransitions = 0;
     this.diagnosticMaxMusicLowpassHz = 0;
     this.diagnosticMaxMusicHighShelfDb = 0;
+    this.diagnosticPeakActiveOneShots = this.activeOneShots;
+    this.diagnosticSkippedOneShots = 0;
   }
 
   diagnostics(): {
@@ -343,6 +355,9 @@ export class EngineAudio {
     musicKey: string;
     maxMusicLowpassHz: number;
     maxMusicHighShelfDb: number;
+    activeOneShots: number;
+    peakActiveOneShots: number;
+    skippedOneShots: number;
     initializationMs: number;
   } {
     const elapsed = this.context
@@ -363,6 +378,9 @@ export class EngineAudio {
       musicKey: MUSIC_KEY,
       maxMusicLowpassHz: this.diagnosticMaxMusicLowpassHz,
       maxMusicHighShelfDb: this.diagnosticMaxMusicHighShelfDb,
+      activeOneShots: this.activeOneShots,
+      peakActiveOneShots: this.diagnosticPeakActiveOneShots,
+      skippedOneShots: this.diagnosticSkippedOneShots,
       initializationMs: this.diagnosticInitializationMs,
     };
   }
@@ -399,6 +417,9 @@ export class EngineAudio {
     this.diagnosticInitializationMs = 0;
     this.diagnosticMaxMusicLowpassHz = 0;
     this.diagnosticMaxMusicHighShelfDb = 0;
+    this.activeOneShots = 0;
+    this.diagnosticPeakActiveOneShots = 0;
+    this.diagnosticSkippedOneShots = 0;
     this.musicSampleRate = 0;
   }
 
@@ -587,6 +608,10 @@ export class EngineAudio {
     endFrequencyRatio = 1.35,
   ): void {
     if (!this.context || !this.master) return;
+    if (!audioClockAdvances(this.context.state)) {
+      this.diagnosticSkippedOneShots += 1;
+      return;
+    }
     const now = this.context.currentTime + delay;
     const oscillator = this.context.createOscillator();
     const gain = this.context.createGain();
@@ -601,7 +626,13 @@ export class EngineAudio {
     gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
     oscillator.connect(gain);
     gain.connect(this.master);
+    this.activeOneShots += 1;
+    this.diagnosticPeakActiveOneShots = Math.max(
+      this.diagnosticPeakActiveOneShots,
+      this.activeOneShots,
+    );
     oscillator.addEventListener("ended", () => {
+      this.activeOneShots = Math.max(0, this.activeOneShots - 1);
       oscillator.disconnect();
       gain.disconnect();
     }, { once: true });

@@ -2,6 +2,15 @@ export const MUSIC_LOOP_BEATS = 16;
 export const MUSIC_STEM_SAMPLE_RATE = 24_000;
 
 /**
+ * One-shot cleanup and real-time automation depend on an advancing audio clock.
+ * Suspended or interrupted contexts must not receive nodes that cannot finish.
+ * @param {string} state
+ */
+export function audioClockAdvances(state) {
+  return state === "running";
+}
+
+/**
  * Implements the map-authored boost treatment without allocating audio nodes
  * in the real-time update loop.
  * @param {number} speedRatio

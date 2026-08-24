@@ -662,7 +662,7 @@ export class FuturismaGame {
     if (this.course.updateAtmosphere(this.elapsedMs / 1000, this.reducedMotion)) {
       this.diagnosticAtmosphereUpdates += 1;
     }
-    this.audio.update(
+    const audioControlUpdated = this.audio.update(
       this.speed / BOOST_MAX_SPEED,
       presentationInput.throttle,
       presentationInput.brake,
@@ -670,7 +670,9 @@ export class FuturismaGame {
       this.surfaceGrip,
       this.driftIntensity,
     );
-    this.audio.setMusicProfile(this.course.musicAt(this.progress));
+    if (audioControlUpdated && this.phase !== "finished") {
+      this.audio.setMusicProfile(this.course.musicAt(this.progress));
+    }
     const now = this.timer.getElapsed();
     if (now >= this.nextHudAt) {
       this.nextHudAt = now + 1 / 30;
@@ -1908,6 +1910,9 @@ export class FuturismaGame {
       musicKey: audioDiagnostics.musicKey,
       maxMusicLowpassHz: Number(audioDiagnostics.maxMusicLowpassHz.toFixed(1)),
       maxMusicHighShelfDb: Number(audioDiagnostics.maxMusicHighShelfDb.toFixed(1)),
+      activeAudioOneShots: audioDiagnostics.activeOneShots,
+      peakAudioOneShots: audioDiagnostics.peakActiveOneShots,
+      skippedAudioOneShots: audioDiagnostics.skippedOneShots,
       audioInitializationMs: Number(audioDiagnostics.initializationMs.toFixed(1)),
       startupReadyMs: Number(this.diagnosticStartupReadyMs.toFixed(1)),
       courseAssemblyMs: Number(this.diagnosticCourseAssemblyMs.toFixed(1)),
@@ -1964,7 +1969,12 @@ export class FuturismaGame {
       });
     }
     console.info("[FUTURISMA_DIAGNOSTICS]", JSON.stringify(report));
-    if (this.phase === "finished") this.diagnosticsFinalReported = true;
+    // Keep diagnostics live through the short finish sting so the final
+    // snapshot proves that every transient audio node released. This only
+    // affects diagnostics mode; normal result presentation is unchanged.
+    if (this.phase === "finished" && report.activeAudioOneShots === 0) {
+      this.diagnosticsFinalReported = true;
+    }
   }
 
   private resetDiagnosticsPeak(): void {
