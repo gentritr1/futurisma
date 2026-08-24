@@ -96,3 +96,8 @@ The accepted source handoff is preserved in `artifacts/TOTEM_Phase1_v1.0-patch1.
 The accepted Greenwater map handoff is preserved in
 `artifacts/GREENWATER_MAP01_v1.0.zip`. Its measured runtime centreline and
 validation report live in `src/game/data/`.
+
+The production contract for Greenwater's authored environment art is in
+`docs/GREENWATER_ENVIRONMENT_ART_BRIEF.md`. It preserves the accepted route and
+defines the modular kit, landmark anchors, navigation grammar, runtime budgets,
+and validated export package required for integration.
