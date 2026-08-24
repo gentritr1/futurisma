@@ -139,7 +139,10 @@ export class TotemVehicle {
   setPose(position: THREE.Vector3, quaternion: THREE.Quaternion): void {
     this.root.position.copy(position);
     this.root.quaternion.copy(quaternion);
-    this.root.updateMatrixWorld(true);
+    // updateVisual changes child transforms immediately after this call. The
+    // chase-camera anchor performs the single authoritative world-matrix sync
+    // once those changes are complete; an update here would traverse the full
+    // vehicle hierarchy twice per active frame.
   }
 
   updateVisual(state: TotemVisualState): void {

@@ -154,6 +154,20 @@ handoff, zero active transient audio nodes, and stable 86-geometry / 17-texture
 resource counts. The complete lap plus run-out rendered 4,516 frames at 9.9 ms
 p95 / 10.4 ms maximum with zero impacts or recoveries.
 
+## Vehicle hierarchy acceptance
+
+TOTEM pose changes and its moving-node visual response now complete before one
+authoritative world-matrix synchronization for the chase-camera attachment. The
+previous pose setter forced a complete 151-node traversal and the camera repeated
+the same traversal immediately after child transforms changed, making the first
+pass both stale and redundant.
+
+A high-quality browser lap retained the 34.483-second deterministic line, the
+56.02–70.48° camera range, 9.9 ms p95 / 10.4 ms maximum frame time, 86 geometries,
+17 textures, and the settled 97-metre finish run-out. It recorded zero impacts,
+recoveries, or WebGL context losses and showed no chase-anchor or moving-part
+regression.
+
 ## Runtime invariants
 
 Keep these true while integrating the authored Greenwater environment:
@@ -170,6 +184,7 @@ Keep these true while integrating the authored Greenwater environment:
 - Ambient steam, warning lamps, and cargo-hook motion remain locked to 30 Hz without changing vehicle, camera, or input cadence.
 - Suspended or interrupted audio clocks create no transient nodes or automation work; a running context releases every transient voice back to zero.
 - Final driving input is neutral, and the visible run-out settles within 3.5 seconds and roughly 100 metres before simulation, audio control, and WebGL drawing become idle.
+- Vehicle pose and moving-node changes batch before one authoritative pre-camera world-matrix synchronization per presented frame.
 
 ## Environment integration gates
 

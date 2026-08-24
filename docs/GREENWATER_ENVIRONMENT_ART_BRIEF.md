@@ -23,7 +23,7 @@ This is an asset-production pass, not another map-design pass. Preserve the prov
 - Race direction, elevations, widths, banking, checkpoints, hazards, and recovery anchors come only from the map JSON.
 - Target lap: 34–36 seconds; current clean autoplay lap: 34.499 seconds.
 - Current measured peak after the Phase 1 fallback dressing: 92 draw calls,
-  42,688 triangles, 87 geometries, and 17 textures during a five-lap
+  42,696 triangles, 86 geometries, and 17 textures during a five-lap
   1280 × 720 high-quality soak. The full measurement record and
   post-integration regression gates are in `docs/PERFORMANCE_BASELINE.md`.
 - The existing procedural course remains the collision and gameplay source of truth.
