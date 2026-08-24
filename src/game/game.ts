@@ -33,7 +33,11 @@ import {
   resolveBoostLockout,
   resolveDriftActive,
 } from "./physics";
-import { calculatePresentationAlpha } from "./presentation";
+import {
+  calculatePresentationAlpha,
+  calculateSpeedStreakLength,
+  calculateSpeedStreakOpacity,
+} from "./presentation";
 import {
   calculateFinishDistanceMeters,
   calculateRecoveryTelemetry,
@@ -213,7 +217,7 @@ export class FuturismaGame {
   private readonly vehicle = new TotemVehicle();
   private readonly audio = new EngineAudio();
   private readonly timer = new THREE.Timer();
-  private readonly speedLines: THREE.Points;
+  private readonly speedLines: THREE.LineSegments;
   private readonly impactSparks: THREE.Points;
   private readonly impactSparkPositions = new Float32Array(48 * 3);
   private readonly impactSparkVelocities = new Float32Array(48 * 3);
@@ -1272,20 +1276,13 @@ export class FuturismaGame {
     const position = geometry.getAttribute("position") as THREE.BufferAttribute;
     const values = position.array as Float32Array;
     const speedRatio = this.speed / BOOST_MAX_SPEED;
-    for (let offset = 2; offset < values.length; offset += 3) {
-      let z = values[offset] + delta * (10 + this.speed * 0.85);
-      if (z > -1.5) z = -52 - Math.random() * 32;
-      values[offset] = z;
-    }
-    position.needsUpdate = true;
-    const material = this.speedLines.material as THREE.PointsMaterial;
-    material.opacity = Math.min(
-      0.62,
-      THREE.MathUtils.smoothstep(speedRatio, 0.42, 0.92)
-        * (this.reducedMotion ? 0.16 : 0.48)
-        + this.driftIntensity * (this.reducedMotion ? 0.02 : 0.12),
+    const material = this.speedLines.material as THREE.LineBasicMaterial;
+    material.opacity = calculateSpeedStreakOpacity(
+      speedRatio,
+      this.driftIntensity,
+      this.reducedMotion,
     );
-    material.size = this.boostActive ? 0.1 : 0.065;
+    this.speedLines.visible = material.opacity > 0.005;
     const speedLineRoll = this.reducedMotion
       ? 0
       : -this.steerAmount * this.driftIntensity * 0.12;
@@ -1294,6 +1291,21 @@ export class FuturismaGame {
       speedLineRoll,
       1 - Math.exp(-delta * 7.2),
     );
+    if (!this.speedLines.visible) return;
+
+    const streakLength = calculateSpeedStreakLength(
+      speedRatio,
+      this.boostActive,
+      this.reducedMotion,
+    );
+    const travel = delta * (10 + this.speed * 0.85);
+    for (let offset = 0; offset < values.length; offset += 6) {
+      let z = values[offset + 2] + travel;
+      if (z > -1.5) z -= 80;
+      values[offset + 2] = z;
+      values[offset + 5] = z - streakLength;
+    }
+    position.needsUpdate = true;
   }
 
   private updateHud(input: InputFrame): void {
@@ -1447,28 +1459,34 @@ export class FuturismaGame {
     this.scene.add(hemisphere, key, rim);
   }
 
-  private createSpeedLines(): THREE.Points {
-    const count = 160;
-    const positions = new Float32Array(count * 3);
+  private createSpeedLines(): THREE.LineSegments {
+    const count = 96;
+    const positions = new Float32Array(count * 6);
     for (let index = 0; index < count; index += 1) {
-      positions[index * 3] = (Math.random() - 0.5) * 22;
-      positions[index * 3 + 1] = (Math.random() - 0.5) * 12;
-      positions[index * 3 + 2] = -3 - Math.random() * 78;
+      const offset = index * 6;
+      const x = ((index * 0.61803398875) % 1 - 0.5) * 22;
+      const y = ((index * 0.41421356237) % 1 - 0.5) * 12;
+      const z = -3 - ((index * 0.75487766625) % 1) * 78;
+      positions[offset] = x;
+      positions[offset + 1] = y;
+      positions[offset + 2] = z;
+      positions[offset + 3] = x;
+      positions[offset + 4] = y;
+      positions[offset + 5] = z - 1;
     }
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-    const material = new THREE.PointsMaterial({
+    const material = new THREE.LineBasicMaterial({
       color: 0xc5f4ff,
-      size: 0.065,
       transparent: true,
       opacity: 0,
       depthWrite: false,
       blending: THREE.AdditiveBlending,
-      sizeAttenuation: true,
     });
-    const points = new THREE.Points(geometry, material);
-    points.frustumCulled = false;
-    return points;
+    const lines = new THREE.LineSegments(geometry, material);
+    lines.frustumCulled = false;
+    lines.visible = false;
+    return lines;
   }
 
   private createImpactSparks(): THREE.Points {

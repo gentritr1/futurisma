@@ -1,5 +1,9 @@
 import assert from "node:assert/strict";
-import { calculatePresentationAlpha } from "../src/game/presentation.js";
+import {
+  calculatePresentationAlpha,
+  calculateSpeedStreakLength,
+  calculateSpeedStreakOpacity,
+} from "../src/game/presentation.js";
 
 const FIXED_STEP = 1 / 120;
 
@@ -38,6 +42,22 @@ assert.equal(calculatePresentationAlpha(FIXED_STEP * 2, FIXED_STEP), 1);
 assert.equal(calculatePresentationAlpha(Number.NaN, FIXED_STEP), 0);
 assert.equal(calculatePresentationAlpha(0.1, 0), 0);
 
+assert.equal(calculateSpeedStreakOpacity(0.4, 0, false), 0);
+assert.ok(calculateSpeedStreakOpacity(0.75, 0, false) > 0.1);
+assert.ok(
+  calculateSpeedStreakOpacity(0.75, 0, true)
+    < calculateSpeedStreakOpacity(0.75, 0, false),
+);
+assert.equal(calculateSpeedStreakOpacity(Number.NaN, Number.NaN, false), 0);
+assert.ok(
+  calculateSpeedStreakLength(0.8, true, false)
+    > calculateSpeedStreakLength(0.8, false, false),
+);
+assert.ok(
+  calculateSpeedStreakLength(0.8, true, true)
+    < calculateSpeedStreakLength(0.8, false, false),
+);
+
 const summaries = [];
 for (const refreshRate of [144, 165, 240]) {
   const stepped = simulatePresentation(refreshRate, false);
@@ -60,4 +80,6 @@ for (const refreshRate of [144, 165, 240]) {
   );
 }
 
-console.log(`Presentation PASS: ${summaries.join(", ")}.`);
+console.log(
+  `Presentation PASS: ${summaries.join(", ")}; bounded directional speed streaks.`,
+);
