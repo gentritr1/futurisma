@@ -31,6 +31,8 @@ export interface HudFrame {
   recoverySeconds: number;
 }
 
+type PauseReason = "FOCUS LOST" | "GRAPHICS LINK LOST" | "GRAPHICS LINK RESTORED";
+
 function requiredElement<T extends HTMLElement>(id: string): T {
   const element = document.getElementById(id);
   if (!element) throw new Error(`Missing required UI element: #${id}`);
@@ -167,13 +169,31 @@ export class GameUi {
     this.setSystemStatus(muted ? "AUDIO MUTED" : "AUDIO ONLINE");
   }
 
-  setPaused(paused: boolean, reason: "FOCUS LOST" | undefined = undefined): void {
+  setPaused(paused: boolean, reason: PauseReason | undefined = undefined): void {
     this.countdown.textContent = paused
-      ? `${reason ?? "PAUSED"} · ENTER / START TO RESUME`
+      ? reason === "GRAPHICS LINK LOST"
+        ? "GRAPHICS LINK LOST · WAITING FOR RESTORE"
+        : `${reason ?? "PAUSED"} · ENTER / START TO RESUME`
       : "";
     this.countdown.dataset.paused = paused ? "true" : "false";
     this.setSystemStatus(paused ? "RACE PAUSED" : "TRIAL ACTIVE");
     document.body.dataset.phase = paused ? "paused" : "race";
+  }
+
+  setGraphicsContextLost(lost: boolean): void {
+    document.body.dataset.graphicsContext = lost ? "lost" : "ready";
+    if (lost) {
+      this.setSystemStatus("GRAPHICS LINK LOST");
+      return;
+    }
+
+    const phase = document.body.dataset.phase;
+    if (!phase) this.setSystemStatus("SYSTEM STANDBY");
+    else if (phase === "intro") this.setSystemStatus("TOTEM READY");
+    else if (phase === "result") this.setSystemStatus("TRIAL COMPLETE");
+    else if (phase === "paused") this.setSystemStatus("RACE PAUSED");
+    else if (phase === "resuming") this.setSystemStatus("RESUME SEQUENCE");
+    else this.setSystemStatus("TRIAL ACTIVE");
   }
 
   setResuming(): void {

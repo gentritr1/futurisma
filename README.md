@@ -63,6 +63,9 @@ preference.
 For focused QA, `&diagnostics=1&probe=recovery` starts TOTEM just beyond
 Greenwater's open edge and exercises the production auto-recovery countdown and
 reinsertion path. The probe is ignored unless diagnostics are enabled.
+Use `&diagnostics=1&probe=context` to force one real WebGL context loss and
+restore during the opening straight. The race remains paused after restoration
+until the player explicitly resumes it.
 Use `?demo=1&diagnostics=1&start=manual` when audio diagnostics must run with
 a user-activated AudioContext while retaining the showcase controller.
 

@@ -176,6 +176,15 @@ body[data-control-mode="autopilot"] .system-state__lamp {
   box-shadow: 0 0 6px oklch(0.86 0.13 210 / 0.72);
 }
 
+body[data-graphics-context="lost"] .system-state {
+  color: var(--warning);
+}
+
+body[data-graphics-context="lost"] .system-state__lamp {
+  background: var(--warning);
+  box-shadow: 0 0 6px oklch(0.7 0.2 38 / 0.72);
+}
+
 .hud {
   position: fixed;
   inset: 0;

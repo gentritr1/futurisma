@@ -219,6 +219,8 @@ export class FuturismaGame {
   private diagnosticImpacts = 0;
   private diagnosticMissedGates = 0;
   private diagnosticRecoveries = 0;
+  private diagnosticContextLosses = 0;
+  private diagnosticContextRestores = 0;
   private diagnosticTopSpeed = 0;
   private diagnosticMaxLateralRatio = 0;
   private diagnosticStartHeapMb: number | null = null;
@@ -239,6 +241,10 @@ export class FuturismaGame {
   };
   private running = false;
   private disposed = false;
+  private contextLost = false;
+  private contextPausedRace = false;
+  private contextLossProbeStarted = false;
+  private contextRestoreAt = 0;
   private trialStartPending = false;
   private animationFrame = 0;
   private readonly qualityOverride = new URLSearchParams(window.location.search).get(
@@ -259,6 +265,8 @@ export class FuturismaGame {
   );
   private readonly recoveryProbe = this.diagnosticsMode
     && new URLSearchParams(window.location.search).get("probe") === "recovery";
+  private readonly contextLossProbe = this.diagnosticsMode
+    && new URLSearchParams(window.location.search).get("probe") === "context";
   private readonly reducedMotion = window.matchMedia(
     "(prefers-reduced-motion: reduce)",
   ).matches || new URLSearchParams(window.location.search).get("motion") === "reduce";
@@ -280,6 +288,7 @@ export class FuturismaGame {
     this.renderer.shadowMap.enabled = false;
     this.ui.setRaceFormat(this.totalLaps);
     this.ui.setDemoAutopilot(this.demoAutopilot);
+    this.ui.setGraphicsContextLost(false);
     const initialFog = this.course.fogAt(0);
     this.scene.background = initialFog.color.clone();
     this.scene.fog = new THREE.FogExp2(initialFog.color, initialFog.density);
@@ -301,6 +310,11 @@ export class FuturismaGame {
     window.addEventListener("resize", this.resize);
     window.addEventListener("blur", this.handleWindowBlur);
     document.addEventListener("visibilitychange", this.handleVisibilityChange);
+    this.renderer.domElement.addEventListener("webglcontextlost", this.handleContextLost);
+    this.renderer.domElement.addEventListener(
+      "webglcontextrestored",
+      this.handleContextRestored,
+    );
   }
 
   async initialize(): Promise<boolean> {
@@ -324,6 +338,7 @@ export class FuturismaGame {
     this.trialStartPending = true;
     try {
       await this.audio.start().catch(() => undefined);
+      if (this.contextLost || this.disposed) return;
       this.audio.setPaused(false);
       this.resetRaceState();
       this.phase = "countdown";
@@ -337,6 +352,7 @@ export class FuturismaGame {
 
   canStart(): boolean {
     return !this.disposed
+      && !this.contextLost
       && !this.trialStartPending
       && (this.phase === "standby" || this.phase === "finished");
   }
@@ -347,7 +363,7 @@ export class FuturismaGame {
     const delta = Math.min(this.timer.getDelta(), 0.05);
     const input = this.input.read();
 
-    if (this.input.consumeStart()) {
+    if (this.input.consumeStart() && !this.contextLost) {
       if (
         this.phase === "running"
         || this.phase === "countdown"
@@ -365,7 +381,8 @@ export class FuturismaGame {
 
     this.update(delta, input);
     this.updateAdaptiveQuality(delta);
-    this.renderer.render(this.scene, this.camera);
+    this.updateContextLossProbe();
+    if (!this.contextLost) this.renderer.render(this.scene, this.camera);
     this.reportDiagnostics(delta);
     this.animationFrame = requestAnimationFrame(this.frame);
   };
@@ -1411,7 +1428,9 @@ export class FuturismaGame {
     }
   }
 
-  private pauseRace(reason?: "FOCUS LOST"): void {
+  private pauseRace(
+    reason?: "FOCUS LOST" | "GRAPHICS LINK LOST",
+  ): void {
     if (
       this.phase !== "countdown"
       && this.phase !== "running"
@@ -1433,6 +1452,57 @@ export class FuturismaGame {
   private readonly handleWindowBlur = (): void => {
     this.pauseRace("FOCUS LOST");
   };
+
+  private readonly handleContextLost = (event: Event): void => {
+    if (this.disposed) return;
+    event.preventDefault();
+    if (this.contextLost) return;
+    this.contextLost = true;
+    this.diagnosticContextLosses += 1;
+    this.contextPausedRace = this.phase === "countdown"
+      || this.phase === "running"
+      || this.phase === "resuming";
+    if (this.contextPausedRace) this.pauseRace("GRAPHICS LINK LOST");
+    this.ui.setGraphicsContextLost(true);
+  };
+
+  private readonly handleContextRestored = (): void => {
+    if (this.disposed || !this.contextLost) return;
+    this.contextLost = false;
+    this.diagnosticContextRestores += 1;
+    this.renderer.resetState();
+    this.resize();
+    this.syncPresentationPose();
+    this.updatePose(ZERO_INPUT, 0);
+    this.snapCamera();
+    this.ui.setGraphicsContextLost(false);
+    if (this.contextPausedRace && this.phase === "paused") {
+      this.ui.setPaused(true, "GRAPHICS LINK RESTORED");
+    }
+    this.contextPausedRace = false;
+  };
+
+  private updateContextLossProbe(): void {
+    if (
+      this.contextLossProbe
+      && !this.contextLossProbeStarted
+      && this.phase === "running"
+      && this.elapsedMs >= 1_000
+    ) {
+      this.contextLossProbeStarted = true;
+      this.contextRestoreAt = this.timer.getElapsed() + 0.75;
+      this.renderer.forceContextLoss();
+      return;
+    }
+    if (
+      this.contextLost
+      && this.contextRestoreAt > 0
+      && this.timer.getElapsed() >= this.contextRestoreAt
+    ) {
+      this.contextRestoreAt = 0;
+      this.renderer.forceContextRestore();
+    }
+  }
 
   private reportDiagnostics(delta: number): void {
     if (!this.diagnosticsMode || this.diagnosticsFinalReported) return;
@@ -1508,6 +1578,9 @@ export class FuturismaGame {
       missedGates: this.diagnosticMissedGates,
       impactLocations: this.diagnosticImpactLocations,
       recoveries: this.diagnosticRecoveries,
+      contextLost: this.contextLost,
+      contextLosses: this.diagnosticContextLosses,
+      contextRestores: this.diagnosticContextRestores,
       recoveryLocations: this.diagnosticRecoveryLocations,
       maxLateralRatio: Number(this.diagnosticMaxLateralRatio.toFixed(2)),
       physicsSteps: this.diagnosticPhysicsSteps,
@@ -1589,6 +1662,8 @@ export class FuturismaGame {
     this.diagnosticImpacts = 0;
     this.diagnosticMissedGates = 0;
     this.diagnosticRecoveries = 0;
+    this.diagnosticContextLosses = 0;
+    this.diagnosticContextRestores = 0;
     this.diagnosticTopSpeed = 0;
     this.diagnosticMaxLateralRatio = 0;
     const memory = performance as Performance & {
@@ -1690,6 +1765,11 @@ export class FuturismaGame {
     window.removeEventListener("resize", this.resize);
     window.removeEventListener("blur", this.handleWindowBlur);
     document.removeEventListener("visibilitychange", this.handleVisibilityChange);
+    this.renderer.domElement.removeEventListener("webglcontextlost", this.handleContextLost);
+    this.renderer.domElement.removeEventListener(
+      "webglcontextrestored",
+      this.handleContextRestored,
+    );
     this.timer.dispose();
     this.audio.dispose();
     this.input.dispose();
