@@ -1,7 +1,11 @@
 import {
   advanceFixedRateDeadline,
+  encodeMusicProfileKey,
   fixedRateUpdateDue,
+  MUSIC_LOOP_BEATS,
+  MUSIC_STEM_SAMPLE_RATE,
   nextQuantizedTime,
+  sampleLinearAutomation,
 } from "./audio-timing";
 
 export interface MusicProfile {
@@ -14,17 +18,29 @@ export interface MusicProfile {
 type StemName = keyof MusicProfile;
 type WaveShape = "sine" | "metal";
 
+interface StemAutomation {
+  from: number;
+  target: number;
+  start: number;
+  end: number;
+}
+
 const BPM = 174;
 const BEAT_SECONDS = 60 / BPM;
 const BAR_SECONDS = BEAT_SECONDS * 4;
 const CONTROL_INTERVAL_SECONDS = 1 / 30;
-const LOOP_BEATS = 8;
 const STEM_NAMES: StemName[] = ["trance", "jungle", "deep_dnb", "techstep"];
 const STEM_GAIN: Record<StemName, number> = {
   trance: 0.075,
   jungle: 0.085,
   deep_dnb: 0.09,
   techstep: 0.075,
+};
+const STEM_PAN: Record<StemName, number> = {
+  trance: -0.18,
+  jungle: 0.12,
+  deep_dnb: 0,
+  techstep: 0.2,
 };
 
 function seededRandom(seed: number): () => number {
@@ -46,13 +62,16 @@ export class EngineAudio {
   private windGain: GainNode | null = null;
   private musicFilter: BiquadFilterNode | null = null;
   private readonly stemGains = new Map<StemName, GainNode>();
-  private readonly stemTargets = new Map<StemName, number>();
+  private readonly stemAutomation = new Map<StemName, StemAutomation>();
   private readonly persistentSources: AudioScheduledSourceNode[] = [];
   private musicProfileKey = -1;
   private musicStartTime = 0;
   private nextControlUpdateTime = 0;
   private diagnosticControlUpdates = 0;
   private diagnosticControlStartedAt = 0;
+  private diagnosticMusicTransitions = 0;
+  private diagnosticInitializationMs = 0;
+  private musicSampleRate = 0;
   private muted = false;
   private paused = false;
 
@@ -62,6 +81,7 @@ export class EngineAudio {
       return;
     }
 
+    const initializationStartedAt = performance.now();
     const context = new AudioContext();
     const master = context.createGain();
     master.gain.value = 0.34;
@@ -125,6 +145,7 @@ export class EngineAudio {
     this.harmonicGain = harmonicGain;
     this.windGain = windGain;
     this.installMusic(context, master);
+    this.diagnosticInitializationMs = performance.now() - initializationStartedAt;
   }
 
   update(
@@ -176,12 +197,15 @@ export class EngineAudio {
 
   setMusicProfile(profile: MusicProfile): void {
     if (!this.context) return;
-    const key = profile.trance
-      + profile.jungle * 4
-      + profile.deep_dnb * 16
-      + profile.techstep * 64;
+    const key = encodeMusicProfileKey(
+      profile.trance,
+      profile.jungle,
+      profile.deep_dnb,
+      profile.techstep,
+    );
     if (key === this.musicProfileKey) return;
     this.musicProfileKey = key;
+    this.diagnosticMusicTransitions += 1;
     const now = this.context.currentTime;
     const transitionStart = nextQuantizedTime(
       now,
@@ -191,14 +215,32 @@ export class EngineAudio {
     for (const name of STEM_NAMES) {
       const level = Math.max(0, Math.min(3, profile[name]));
       const target = (level / 3) * STEM_GAIN[name];
-      const previousTarget = this.stemTargets.get(name) ?? 0;
       const gain = this.stemGains.get(name)?.gain;
       if (!gain) continue;
+      const previous = this.stemAutomation.get(name) ?? {
+        from: gain.value,
+        target: gain.value,
+        start: now,
+        end: now,
+      };
+      const heldValue = sampleLinearAutomation(
+        now,
+        previous.from,
+        previous.target,
+        previous.start,
+        previous.end,
+      );
       gain.cancelScheduledValues(now);
-      gain.setValueAtTime(previousTarget, now);
-      gain.setValueAtTime(previousTarget, transitionStart);
-      gain.linearRampToValueAtTime(target, transitionStart + BAR_SECONDS);
-      this.stemTargets.set(name, target);
+      gain.setValueAtTime(heldValue, now);
+      gain.setValueAtTime(heldValue, transitionStart);
+      const transitionEnd = transitionStart + BAR_SECONDS;
+      gain.linearRampToValueAtTime(target, transitionEnd);
+      this.stemAutomation.set(name, {
+        from: heldValue,
+        target,
+        start: transitionStart,
+        end: transitionEnd,
+      });
     }
   }
 
@@ -260,6 +302,7 @@ export class EngineAudio {
   resetDiagnostics(): void {
     this.diagnosticControlUpdates = 0;
     this.diagnosticControlStartedAt = this.context?.currentTime ?? 0;
+    this.diagnosticMusicTransitions = 0;
   }
 
   diagnostics(): {
@@ -267,6 +310,12 @@ export class EngineAudio {
     controlUpdates: number;
     controlHz: number;
     controlTargetHz: number;
+    musicTransitions: number;
+    musicProfileKey: number;
+    musicLoopBeats: number;
+    musicLoopSeconds: number;
+    musicSampleRate: number;
+    initializationMs: number;
   } {
     const elapsed = this.context
       ? Math.max(0, this.context.currentTime - this.diagnosticControlStartedAt)
@@ -278,6 +327,12 @@ export class EngineAudio {
         ? this.diagnosticControlUpdates / elapsed
         : 0,
       controlTargetHz: 1 / CONTROL_INTERVAL_SECONDS,
+      musicTransitions: this.diagnosticMusicTransitions,
+      musicProfileKey: this.musicProfileKey,
+      musicLoopBeats: MUSIC_LOOP_BEATS,
+      musicLoopSeconds: BEAT_SECONDS * MUSIC_LOOP_BEATS,
+      musicSampleRate: this.musicSampleRate,
+      initializationMs: this.diagnosticInitializationMs,
     };
   }
 
@@ -292,7 +347,7 @@ export class EngineAudio {
     }
     this.persistentSources.length = 0;
     this.stemGains.clear();
-    this.stemTargets.clear();
+    this.stemAutomation.clear();
     void this.context?.close();
     this.context = null;
     this.master = null;
@@ -308,6 +363,9 @@ export class EngineAudio {
     this.nextControlUpdateTime = 0;
     this.diagnosticControlUpdates = 0;
     this.diagnosticControlStartedAt = 0;
+    this.diagnosticMusicTransitions = 0;
+    this.diagnosticInitializationMs = 0;
+    this.musicSampleRate = 0;
   }
 
   private installMusic(context: AudioContext, master: GainNode): void {
@@ -323,7 +381,10 @@ export class EngineAudio {
     for (const name of STEM_NAMES) {
       const gain = context.createGain();
       gain.gain.value = 0;
-      gain.connect(musicFilter);
+      const panner = context.createStereoPanner();
+      panner.pan.value = STEM_PAN[name];
+      gain.connect(panner);
+      panner.connect(musicFilter);
       const source = context.createBufferSource();
       source.buffer = this.createStemBuffer(context, name);
       source.loop = true;
@@ -331,13 +392,21 @@ export class EngineAudio {
       source.start(startAt);
       this.persistentSources.push(source);
       this.stemGains.set(name, gain);
+      this.stemAutomation.set(name, {
+        from: 0,
+        target: 0,
+        start: startAt,
+        end: startAt,
+      });
     }
   }
 
   private createStemBuffer(context: AudioContext, stem: StemName): AudioBuffer {
-    const duration = BEAT_SECONDS * LOOP_BEATS;
-    const length = Math.ceil(duration * context.sampleRate);
-    const buffer = context.createBuffer(1, length, context.sampleRate);
+    const duration = BEAT_SECONDS * MUSIC_LOOP_BEATS;
+    const sampleRate = Math.min(context.sampleRate, MUSIC_STEM_SAMPLE_RATE);
+    this.musicSampleRate = sampleRate;
+    const length = Math.ceil(duration * sampleRate);
+    const buffer = context.createBuffer(1, length, sampleRate);
     const channel = buffer.getChannelData(0);
     const random = seededRandom(
       stem === "trance" ? 101 : stem === "jungle" ? 202 : stem === "deep_dnb" ? 303 : 404,
@@ -350,11 +419,11 @@ export class EngineAudio {
       amplitude: number,
       shape: WaveShape = "sine",
     ): void => {
-      const start = Math.floor(beat * BEAT_SECONDS * context.sampleRate);
+      const start = Math.floor(beat * BEAT_SECONDS * sampleRate);
       const sampleDuration = beatDuration * BEAT_SECONDS;
-      const count = Math.min(length - start, Math.floor(sampleDuration * context.sampleRate));
+      const count = Math.min(length - start, Math.floor(sampleDuration * sampleRate));
       for (let index = 0; index < count; index += 1) {
-        const time = index / context.sampleRate;
+        const time = index / sampleRate;
         const progress = time / sampleDuration;
         const envelope = Math.exp(-progress * 5.2) * Math.min(1, progress * 34);
         const phase = Math.PI * 2 * frequency * time;
@@ -366,9 +435,9 @@ export class EngineAudio {
     };
 
     const addNoise = (beat: number, beatDuration: number, amplitude: number): void => {
-      const start = Math.floor(beat * BEAT_SECONDS * context.sampleRate);
+      const start = Math.floor(beat * BEAT_SECONDS * sampleRate);
       const sampleDuration = beatDuration * BEAT_SECONDS;
-      const count = Math.min(length - start, Math.floor(sampleDuration * context.sampleRate));
+      const count = Math.min(length - start, Math.floor(sampleDuration * sampleRate));
       let previous = 0;
       for (let index = 0; index < count; index += 1) {
         const progress = index / Math.max(1, count);
@@ -379,31 +448,85 @@ export class EngineAudio {
       }
     };
 
+    const addKick = (beat: number, amplitude: number): void => {
+      const start = Math.floor(beat * BEAT_SECONDS * sampleRate);
+      const sampleDuration = BEAT_SECONDS * 0.52;
+      const count = Math.min(length - start, Math.floor(sampleDuration * sampleRate));
+      let phase = 0;
+      for (let index = 0; index < count; index += 1) {
+        const time = index / sampleRate;
+        const progress = time / sampleDuration;
+        const frequency = 46 + 108 * Math.exp(-progress * 13);
+        phase += Math.PI * 2 * frequency / sampleRate;
+        const envelope = Math.exp(-progress * 8.4) * Math.min(1, progress * 45);
+        channel[start + index] += Math.sin(phase) * envelope * amplitude;
+      }
+    };
+
+    const addPad = (
+      beat: number,
+      beatDuration: number,
+      frequencies: readonly number[],
+      amplitude: number,
+    ): void => {
+      const start = Math.floor(beat * BEAT_SECONDS * sampleRate);
+      const sampleDuration = beatDuration * BEAT_SECONDS;
+      const count = Math.min(length - start, Math.floor(sampleDuration * sampleRate));
+      for (let index = 0; index < count; index += 1) {
+        const time = index / sampleRate;
+        const progress = time / sampleDuration;
+        const envelope = Math.min(1, progress * 5) * Math.min(1, (1 - progress) * 5);
+        let wave = 0;
+        for (const frequency of frequencies) {
+          wave += Math.sin(Math.PI * 2 * frequency * time)
+            + Math.sin(Math.PI * 2 * frequency * 1.006 * time) * 0.34;
+        }
+        channel[start + index] += wave / frequencies.length * envelope * amplitude;
+      }
+    };
+
     if (stem === "trance") {
-      for (let beat = 0; beat < LOOP_BEATS; beat += 1) {
-        addTone(beat, 0.55, 58, 0.62);
-        addTone(beat + 0.5, 0.22, beat % 2 === 0 ? 220 : 247, 0.18, "metal");
+      const chords = [
+        [110, 164.81, 220],
+        [98, 146.83, 196],
+        [82.41, 123.47, 164.81],
+        [98, 146.83, 220],
+      ] as const;
+      for (let bar = 0; bar < 4; bar += 1) {
+        addPad(bar * 4, 4, chords[bar], 0.12);
+      }
+      for (let beat = 0; beat < MUSIC_LOOP_BEATS; beat += 1) {
+        addKick(beat, 0.62);
+        const pluckNotes = [220, 247, 277.18, 329.63];
+        addTone(beat + 0.5, 0.22, pluckNotes[beat % 4], 0.16, "metal");
       }
     } else if (stem === "jungle") {
-      for (const beat of [0, 1.5, 2, 2.75, 4, 5.5, 6, 7.25]) {
-        addTone(beat, 0.34, 72, 0.55);
+      for (const beat of [0, 1.5, 2.75, 4, 5.5, 6.75, 8, 9.25, 10.75, 12, 13.5, 14.25, 15.25]) {
+        addKick(beat, beat >= 8 ? 0.5 : 0.56);
       }
-      for (const beat of [1, 3, 5, 7]) addNoise(beat, 0.42, 0.46);
-      for (let beat = 0.25; beat < LOOP_BEATS; beat += 0.5) addNoise(beat, 0.1, 0.14);
+      for (const beat of [1, 3, 5, 7, 9, 11, 13, 15]) addNoise(beat, 0.42, 0.46);
+      for (let beat = 0.25; beat < MUSIC_LOOP_BEATS; beat += 0.5) {
+        addNoise(beat, 0.1, beat % 2 === 0.25 ? 0.15 : 0.11);
+      }
     } else if (stem === "deep_dnb") {
-      for (const beat of [0, 1.75, 4, 5.5]) addTone(beat, 1.4, 49, 0.72);
-      for (const beat of [2, 6]) addNoise(beat, 0.65, 0.38);
-      for (const beat of [0, 4]) addTone(beat, 0.38, 64, 0.46);
+      const bassEvents = [
+        [0, 49], [1.75, 55], [4, 43.65], [5.5, 49],
+        [8, 49], [9.5, 55], [12, 43.65], [13.75, 46.25],
+      ] as const;
+      for (const [beat, frequency] of bassEvents) addTone(beat, 1.55, frequency, 0.72);
+      for (const beat of [2, 6, 10, 14]) addNoise(beat, 0.65, 0.38);
+      for (const beat of [0, 4, 8, 12]) addTone(beat, 0.38, 64, 0.42);
     } else {
-      for (const beat of [0, 0.75, 1.5, 2.75, 4, 4.5, 5.75, 7]) {
+      for (const beat of [0, 0.75, 1.5, 2.75, 4, 4.5, 5.75, 7, 8, 8.5, 9.75, 10.5, 12, 13.25, 14.5, 15.25]) {
         addTone(beat, 0.24, beat % 1 === 0 ? 610 : 830, 0.34, "metal");
       }
-      for (const beat of [1, 3, 5, 7]) addNoise(beat, 0.24, 0.3);
+      for (const beat of [0, 4, 8, 12]) addKick(beat, 0.5);
+      for (const beat of [1, 3, 5, 7, 9, 11, 13, 15]) addNoise(beat, 0.24, 0.3);
     }
 
     let peak = 0;
     for (const sample of channel) peak = Math.max(peak, Math.abs(sample));
-    const scale = peak > 0 ? 0.82 / peak : 1;
+    const scale = peak > 0 ? 0.78 / peak : 1;
     for (let index = 0; index < channel.length; index += 1) channel[index] *= scale;
     return buffer;
   }
