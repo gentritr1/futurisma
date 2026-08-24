@@ -134,6 +134,8 @@ and gzip budgets. Browser diagnostics remain the source of truth for full-lap
 draw calls and frame pacing. The current five-lap adaptive and high-quality
 soak results, plus the gates to rerun after environment integration, are locked
 in [`docs/PERFORMANCE_BASELINE.md`](docs/PERFORMANCE_BASELINE.md).
+The requirement-by-requirement closeout for this core-runtime phase is in
+[`docs/CORE_RUNTIME_COMPLETION_AUDIT.md`](docs/CORE_RUNTIME_COMPLETION_AUDIT.md).
 
 ## Production asset
 
