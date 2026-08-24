@@ -6,14 +6,54 @@ import {
   MUSIC_LOOP_BEATS,
   MUSIC_STEM_SAMPLE_RATE,
   nextQuantizedTime,
+  resolveMusicFilterTargets,
   sampleLinearAutomation,
 } from "../src/game/audio-timing.js";
+import {
+  DEEP_DNB_BASS_EVENTS,
+  MUSIC_BPM,
+  MUSIC_KEY,
+  TECHSTEP_HIT_MIDI,
+  TRANCE_CHORD_MIDI,
+  TRANCE_PLUCK_MIDI,
+  frequencyForMidiNote,
+} from "../src/game/music-plan.js";
 
-const bar = 60 / 174 * 4;
+const bar = 60 / MUSIC_BPM * 4;
 const origin = 0.08;
 
+assert.equal(MUSIC_BPM, 174);
+assert.equal(MUSIC_KEY, "F minor");
 assert.equal(MUSIC_LOOP_BEATS, 16);
 assert.equal(MUSIC_STEM_SAMPLE_RATE, 24_000);
+assert.ok(Math.abs(frequencyForMidiNote(69) - 440) < 1e-9);
+
+const fNaturalMinorPitchClasses = new Set([0, 2, 3, 5, 7, 8, 10]);
+const relativeToF = (midiNote) => (midiNote - 5 + 120) % 12;
+const tonalNotes = [
+  ...TRANCE_CHORD_MIDI.flat(),
+  ...TRANCE_PLUCK_MIDI,
+  ...DEEP_DNB_BASS_EVENTS.map((event) => event.midiNote),
+  TECHSTEP_HIT_MIDI.downbeat,
+  TECHSTEP_HIT_MIDI.offbeat,
+];
+for (const midiNote of tonalNotes) {
+  assert.ok(
+    fNaturalMinorPitchClasses.has(relativeToF(midiNote)),
+    `MIDI note ${midiNote} must belong to F natural minor.`,
+  );
+}
+
+assert.deepEqual(resolveMusicFilterTargets(0.5, false), {
+  lowpassHz: 2900,
+  highShelfDb: 0,
+});
+assert.deepEqual(resolveMusicFilterTargets(0.5, true), {
+  lowpassHz: 6200,
+  highShelfDb: 4.5,
+});
+assert.equal(resolveMusicFilterTargets(Number.NaN, false).lowpassHz, 2100);
+assert.equal(resolveMusicFilterTargets(2, false).lowpassHz, 3700);
 
 assert.equal(nextQuantizedTime(0, origin, bar), origin);
 assert.equal(nextQuantizedTime(origin, origin, bar), origin);
@@ -58,5 +98,5 @@ assert.equal(sampleLinearAutomation(5, 0.2, 0.8, 2, 4), 0.8);
 assert.equal(sampleLinearAutomation(2, 0.2, 0.8, 2, 2), 0.8);
 
 console.log(
-  "Audio timing PASS: 174 BPM boundaries, unique stem profiles, interruption-safe ramps, and stable 30 Hz control at 60/120 Hz rendering.",
+  "Audio timing PASS: 174 BPM F-minor tonal plan, boost filter/shelf targets, unique stem profiles, interruption-safe ramps, and stable 30 Hz control at 60/120 Hz rendering.",
 );

@@ -5,8 +5,18 @@ import {
   MUSIC_LOOP_BEATS,
   MUSIC_STEM_SAMPLE_RATE,
   nextQuantizedTime,
+  resolveMusicFilterTargets,
   sampleLinearAutomation,
 } from "./audio-timing";
+import {
+  DEEP_DNB_BASS_EVENTS,
+  MUSIC_BPM,
+  MUSIC_KEY,
+  TECHSTEP_HIT_MIDI,
+  TRANCE_CHORD_MIDI,
+  TRANCE_PLUCK_MIDI,
+  frequencyForMidiNote,
+} from "./music-plan";
 
 export interface MusicProfile {
   trance: number;
@@ -25,8 +35,7 @@ interface StemAutomation {
   end: number;
 }
 
-const BPM = 174;
-const BEAT_SECONDS = 60 / BPM;
+const BEAT_SECONDS = 60 / MUSIC_BPM;
 const BAR_SECONDS = BEAT_SECONDS * 4;
 const CONTROL_INTERVAL_SECONDS = 1 / 30;
 const STEM_NAMES: StemName[] = ["trance", "jungle", "deep_dnb", "techstep"];
@@ -61,6 +70,7 @@ export class EngineAudio {
   private harmonicGain: GainNode | null = null;
   private windGain: GainNode | null = null;
   private musicFilter: BiquadFilterNode | null = null;
+  private musicShelf: BiquadFilterNode | null = null;
   private readonly stemGains = new Map<StemName, GainNode>();
   private readonly stemAutomation = new Map<StemName, StemAutomation>();
   private readonly persistentSources: AudioScheduledSourceNode[] = [];
@@ -71,6 +81,8 @@ export class EngineAudio {
   private diagnosticControlStartedAt = 0;
   private diagnosticMusicTransitions = 0;
   private diagnosticInitializationMs = 0;
+  private diagnosticMaxMusicLowpassHz = 0;
+  private diagnosticMaxMusicHighShelfDb = 0;
   private musicSampleRate = 0;
   private muted = false;
   private paused = false;
@@ -188,10 +200,16 @@ export class EngineAudio {
       now,
       0.08,
     );
-    this.musicFilter?.frequency.setTargetAtTime(
-      boost ? 6200 : 2100 + speedRatio * 1600,
-      now,
-      0.12,
+    const musicTargets = resolveMusicFilterTargets(speedRatio, boost);
+    this.musicFilter?.frequency.setTargetAtTime(musicTargets.lowpassHz, now, 0.12);
+    this.musicShelf?.gain.setTargetAtTime(musicTargets.highShelfDb, now, 0.08);
+    this.diagnosticMaxMusicLowpassHz = Math.max(
+      this.diagnosticMaxMusicLowpassHz,
+      musicTargets.lowpassHz,
+    );
+    this.diagnosticMaxMusicHighShelfDb = Math.max(
+      this.diagnosticMaxMusicHighShelfDb,
+      musicTargets.highShelfDb,
     );
   }
 
@@ -303,6 +321,8 @@ export class EngineAudio {
     this.diagnosticControlUpdates = 0;
     this.diagnosticControlStartedAt = this.context?.currentTime ?? 0;
     this.diagnosticMusicTransitions = 0;
+    this.diagnosticMaxMusicLowpassHz = 0;
+    this.diagnosticMaxMusicHighShelfDb = 0;
   }
 
   diagnostics(): {
@@ -315,6 +335,9 @@ export class EngineAudio {
     musicLoopBeats: number;
     musicLoopSeconds: number;
     musicSampleRate: number;
+    musicKey: string;
+    maxMusicLowpassHz: number;
+    maxMusicHighShelfDb: number;
     initializationMs: number;
   } {
     const elapsed = this.context
@@ -332,6 +355,9 @@ export class EngineAudio {
       musicLoopBeats: MUSIC_LOOP_BEATS,
       musicLoopSeconds: BEAT_SECONDS * MUSIC_LOOP_BEATS,
       musicSampleRate: this.musicSampleRate,
+      musicKey: MUSIC_KEY,
+      maxMusicLowpassHz: this.diagnosticMaxMusicLowpassHz,
+      maxMusicHighShelfDb: this.diagnosticMaxMusicHighShelfDb,
       initializationMs: this.diagnosticInitializationMs,
     };
   }
@@ -358,6 +384,7 @@ export class EngineAudio {
     this.harmonicGain = null;
     this.windGain = null;
     this.musicFilter = null;
+    this.musicShelf = null;
     this.musicProfileKey = -1;
     this.musicStartTime = 0;
     this.nextControlUpdateTime = 0;
@@ -365,6 +392,8 @@ export class EngineAudio {
     this.diagnosticControlStartedAt = 0;
     this.diagnosticMusicTransitions = 0;
     this.diagnosticInitializationMs = 0;
+    this.diagnosticMaxMusicLowpassHz = 0;
+    this.diagnosticMaxMusicHighShelfDb = 0;
     this.musicSampleRate = 0;
   }
 
@@ -373,8 +402,14 @@ export class EngineAudio {
     musicFilter.type = "lowpass";
     musicFilter.frequency.value = 2100;
     musicFilter.Q.value = 0.78;
-    musicFilter.connect(master);
+    const musicShelf = context.createBiquadFilter();
+    musicShelf.type = "highshelf";
+    musicShelf.frequency.value = 1800;
+    musicShelf.gain.value = 0;
+    musicFilter.connect(musicShelf);
+    musicShelf.connect(master);
     this.musicFilter = musicFilter;
+    this.musicShelf = musicShelf;
 
     const startAt = context.currentTime + 0.08;
     this.musicStartTime = startAt;
@@ -486,19 +521,23 @@ export class EngineAudio {
     };
 
     if (stem === "trance") {
-      const chords = [
-        [110, 164.81, 220],
-        [98, 146.83, 196],
-        [82.41, 123.47, 164.81],
-        [98, 146.83, 220],
-      ] as const;
       for (let bar = 0; bar < 4; bar += 1) {
-        addPad(bar * 4, 4, chords[bar], 0.12);
+        addPad(
+          bar * 4,
+          4,
+          TRANCE_CHORD_MIDI[bar].map(frequencyForMidiNote),
+          0.12,
+        );
       }
       for (let beat = 0; beat < MUSIC_LOOP_BEATS; beat += 1) {
         addKick(beat, 0.62);
-        const pluckNotes = [220, 247, 277.18, 329.63];
-        addTone(beat + 0.5, 0.22, pluckNotes[beat % 4], 0.16, "metal");
+        addTone(
+          beat + 0.5,
+          0.22,
+          frequencyForMidiNote(TRANCE_PLUCK_MIDI[beat]),
+          0.16,
+          "metal",
+        );
       }
     } else if (stem === "jungle") {
       for (const beat of [0, 1.5, 2.75, 4, 5.5, 6.75, 8, 9.25, 10.75, 12, 13.5, 14.25, 15.25]) {
@@ -509,16 +548,19 @@ export class EngineAudio {
         addNoise(beat, 0.1, beat % 2 === 0.25 ? 0.15 : 0.11);
       }
     } else if (stem === "deep_dnb") {
-      const bassEvents = [
-        [0, 49], [1.75, 55], [4, 43.65], [5.5, 49],
-        [8, 49], [9.5, 55], [12, 43.65], [13.75, 46.25],
-      ] as const;
-      for (const [beat, frequency] of bassEvents) addTone(beat, 1.55, frequency, 0.72);
+      for (const event of DEEP_DNB_BASS_EVENTS) {
+        addTone(event.beat, 1.55, frequencyForMidiNote(event.midiNote), 0.72);
+      }
       for (const beat of [2, 6, 10, 14]) addNoise(beat, 0.65, 0.38);
-      for (const beat of [0, 4, 8, 12]) addTone(beat, 0.38, 64, 0.42);
+      for (const beat of [0, 4, 8, 12]) {
+        addTone(beat, 0.38, frequencyForMidiNote(36), 0.42);
+      }
     } else {
       for (const beat of [0, 0.75, 1.5, 2.75, 4, 4.5, 5.75, 7, 8, 8.5, 9.75, 10.5, 12, 13.25, 14.5, 15.25]) {
-        addTone(beat, 0.24, beat % 1 === 0 ? 610 : 830, 0.34, "metal");
+        const midiNote = beat % 1 === 0
+          ? TECHSTEP_HIT_MIDI.downbeat
+          : TECHSTEP_HIT_MIDI.offbeat;
+        addTone(beat, 0.24, frequencyForMidiNote(midiNote), 0.34, "metal");
       }
       for (const beat of [0, 4, 8, 12]) addKick(beat, 0.5);
       for (const beat of [1, 3, 5, 7, 9, 11, 13, 15]) addNoise(beat, 0.24, 0.3);

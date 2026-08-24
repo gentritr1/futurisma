@@ -38,7 +38,9 @@ Hangar Six restores the authored warning-cycle steam vents and cosmetic cargo
 hook; the two outer-line cable coils now deliver a telegraphed hard trip without
 interfering with the clean racing line. Fog zones crossfade over the authored
 80 metres, while the trance, jungle, deep DnB, and techstep stem changes land on
-174 BPM bar boundaries.
+174 BPM bar boundaries. Their shared four-bar tonal plan is locked to F minor;
+boost opens both the music low-pass filter and a restrained high shelf without
+starting another layer.
 
 ## Visual test mode
 

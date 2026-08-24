@@ -2,6 +2,22 @@ export const MUSIC_LOOP_BEATS = 16;
 export const MUSIC_STEM_SAMPLE_RATE = 24_000;
 
 /**
+ * Implements the map-authored boost treatment without allocating audio nodes
+ * in the real-time update loop.
+ * @param {number} speedRatio
+ * @param {boolean} boost
+ */
+export function resolveMusicFilterTargets(speedRatio, boost) {
+  const speed = Number.isFinite(speedRatio)
+    ? Math.min(1, Math.max(0, speedRatio))
+    : 0;
+  return {
+    lowpassHz: boost ? 6200 : 2100 + speed * 1600,
+    highShelfDb: boost ? 4.5 : 0,
+  };
+}
+
+/**
  * Returns the current or next rhythmic boundary relative to a shared origin.
  * @param {number} now
  * @param {number} origin
