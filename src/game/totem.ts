@@ -179,11 +179,15 @@ export class TotemVehicle {
     }
   }
 
-  worldPosition(name: string, fallback: THREE.Vector3): THREE.Vector3 {
+  worldPosition(
+    name: string,
+    fallback: THREE.Vector3,
+    target: THREE.Vector3,
+  ): THREE.Vector3 {
     const node = this.nodes.get(name);
-    if (!node) return fallback.clone();
+    if (!node) return target.copy(fallback);
     this.root.updateMatrixWorld(true);
-    return node.getWorldPosition(new THREE.Vector3());
+    return node.getWorldPosition(target);
   }
 
   private setRotation(name: string, axis: "x" | "y" | "z", offset: number): void {

@@ -34,3 +34,7 @@ game
     const message = error instanceof Error ? error.message : "Unknown assembly error";
     ui.showError(message);
   });
+
+if (import.meta.hot) {
+  import.meta.hot.dispose(() => game.dispose());
+}

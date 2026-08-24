@@ -7,8 +7,12 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
+    "validate:assets": "node scripts/validate-assets.mjs",
+    "validate:build": "node scripts/validate-build.mjs",
     "validate:map": "node scripts/validate-map.mjs",
-    "test": "npm run validate:map && npm run build"
+    "validate:physics": "node scripts/validate-physics.mjs",
+    "validate:security": "node scripts/validate-security.mjs",
+    "test": "npm run validate:assets && npm run validate:map && npm run validate:physics && npm run validate:security && npm run build && npm run validate:build"
   },
   "dependencies": {
     "three": "0.184.0"

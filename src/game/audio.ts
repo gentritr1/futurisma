@@ -37,6 +37,7 @@ export class EngineAudio {
   private windGain: GainNode | null = null;
   private musicFilter: BiquadFilterNode | null = null;
   private readonly stemGains = new Map<StemName, GainNode>();
+  private readonly persistentSources: AudioScheduledSourceNode[] = [];
   private musicProfileKey = "";
   private muted = false;
   private paused = false;
@@ -50,7 +51,14 @@ export class EngineAudio {
     const context = new AudioContext();
     const master = context.createGain();
     master.gain.value = 0.34;
-    master.connect(context.destination);
+    const compressor = context.createDynamicsCompressor();
+    compressor.threshold.value = -12;
+    compressor.knee.value = 10;
+    compressor.ratio.value = 6;
+    compressor.attack.value = 0.003;
+    compressor.release.value = 0.12;
+    master.connect(compressor);
+    compressor.connect(context.destination);
 
     const filter = context.createBiquadFilter();
     filter.type = "lowpass";
@@ -66,6 +74,7 @@ export class EngineAudio {
     engineOscillator.frequency.value = 54;
     engineOscillator.connect(engineGain);
     engineOscillator.start();
+    this.persistentSources.push(engineOscillator);
 
     const harmonicGain = context.createGain();
     harmonicGain.gain.value = 0.012;
@@ -75,6 +84,7 @@ export class EngineAudio {
     harmonicOscillator.frequency.value = 108;
     harmonicOscillator.connect(harmonicGain);
     harmonicOscillator.start();
+    this.persistentSources.push(harmonicOscillator);
 
     const windGain = context.createGain();
     windGain.gain.value = 0;
@@ -90,6 +100,7 @@ export class EngineAudio {
     wind.loop = true;
     wind.connect(windGain);
     wind.start();
+    this.persistentSources.push(wind);
 
     this.context = context;
     this.master = master;
@@ -137,6 +148,20 @@ export class EngineAudio {
     this.playTone(410 + index * 32, 0.11, 0.045, "square");
   }
 
+  playCountdown(go: boolean): void {
+    this.playTone(go ? 520 : 260, go ? 0.16 : 0.09, go ? 0.045 : 0.028, "square");
+  }
+
+  playBoost(): void {
+    this.playTone(115, 0.2, 0.04, "sawtooth", 0, 2.2);
+    this.playTone(460, 0.14, 0.024, "square", 0.04, 1.5);
+  }
+
+  playImpact(intensity: number): void {
+    const strength = Math.min(1, Math.max(0, intensity));
+    this.playTone(105 + strength * 35, 0.13, 0.025 + strength * 0.04, "square", 0, 0.58);
+  }
+
   playLap(): void {
     this.playTone(330, 0.18, 0.05, "triangle");
     this.playTone(495, 0.24, 0.04, "sine", 0.08);
@@ -156,7 +181,24 @@ export class EngineAudio {
 
   setPaused(paused: boolean): void {
     this.paused = paused;
+    if (!paused) void this.context?.resume().catch(() => undefined);
     this.updateMasterGain();
+  }
+
+  dispose(): void {
+    for (const source of this.persistentSources) {
+      try {
+        source.stop();
+      } catch {
+        // A source that already ended needs no further cleanup.
+      }
+      source.disconnect();
+    }
+    this.persistentSources.length = 0;
+    this.stemGains.clear();
+    void this.context?.close();
+    this.context = null;
+    this.master = null;
   }
 
   private installMusic(context: AudioContext, master: GainNode): void {
@@ -177,6 +219,7 @@ export class EngineAudio {
       source.loop = true;
       source.connect(gain);
       source.start(startAt);
+      this.persistentSources.push(source);
       this.stemGains.set(name, gain);
     }
   }
@@ -261,6 +304,7 @@ export class EngineAudio {
     amplitude: number,
     type: OscillatorType,
     delay = 0,
+    endFrequencyRatio = 1.35,
   ): void {
     if (!this.context || !this.master) return;
     const now = this.context.currentTime + delay;
@@ -268,7 +312,10 @@ export class EngineAudio {
     const gain = this.context.createGain();
     oscillator.type = type;
     oscillator.frequency.setValueAtTime(frequency, now);
-    oscillator.frequency.exponentialRampToValueAtTime(frequency * 1.35, now + duration);
+    oscillator.frequency.exponentialRampToValueAtTime(
+      frequency * endFrequencyRatio,
+      now + duration,
+    );
     gain.gain.setValueAtTime(0.0001, now);
     gain.gain.exponentialRampToValueAtTime(amplitude, now + 0.012);
     gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);

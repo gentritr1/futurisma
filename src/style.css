@@ -75,6 +75,35 @@ kbd {
   );
 }
 
+.impact-flash {
+  position: fixed;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 90ms ease-out;
+}
+
+.impact-flash[data-side="left"] {
+  background: radial-gradient(
+    circle at 0 62%,
+    oklch(0.7 0.2 38 / 0.42),
+    transparent 42%
+  );
+}
+
+.impact-flash[data-side="right"] {
+  background: radial-gradient(
+    circle at 100% 62%,
+    oklch(0.7 0.2 38 / 0.42),
+    transparent 42%
+  );
+}
+
+.impact-flash[data-active="true"] {
+  opacity: 1;
+}
+
 .race-header {
   position: fixed;
   z-index: 10;
@@ -690,6 +719,10 @@ body[data-phase="result"] .boost {
   .edge-warning,
   .turn-cue {
     transition: opacity 200ms ease;
+  }
+
+  .impact-flash {
+    transition: none;
   }
 
   @starting-style {

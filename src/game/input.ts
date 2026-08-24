@@ -41,7 +41,7 @@ export class InputController {
     const keyboardBrake = this.isDown("KeyS", "ArrowDown") ? 1 : 0;
     const keyboardBoost = this.isDown("ShiftLeft", "ShiftRight", "Space");
 
-    const gamepad = navigator.getGamepads?.()[0];
+    const gamepad = this.activeGamepad();
     if (!gamepad) {
       this.previousGamepadButtons = [];
       return {
@@ -74,6 +74,33 @@ export class InputController {
     this.startRequested = true;
   }
 
+  pulse(strongMagnitude: number, weakMagnitude: number, duration: number): void {
+    const gamepad = this.activeGamepad();
+    const actuator = gamepad?.vibrationActuator as GamepadHapticActuator & {
+      playEffect?: (
+        effect: "dual-rumble",
+        parameters: {
+          duration: number;
+          strongMagnitude: number;
+          weakMagnitude: number;
+        },
+      ) => Promise<unknown>;
+    } | undefined;
+    if (!actuator?.playEffect) return;
+    void actuator.playEffect("dual-rumble", {
+      duration,
+      strongMagnitude: Math.min(1, Math.max(0, strongMagnitude)),
+      weakMagnitude: Math.min(1, Math.max(0, weakMagnitude)),
+    }).catch(() => undefined);
+  }
+
+  dispose(): void {
+    window.removeEventListener("keydown", this.handleKeyDown);
+    window.removeEventListener("keyup", this.handleKeyUp);
+    window.removeEventListener("blur", this.clearKeys);
+    this.clearKeys();
+  }
+
   consumeStart(): boolean {
     const requested = this.startRequested;
     this.startRequested = false;
@@ -94,6 +121,12 @@ export class InputController {
 
   private isDown(...codes: string[]): boolean {
     return codes.some((code) => this.keys.has(code));
+  }
+
+  private activeGamepad(): Gamepad | null {
+    return Array.from(navigator.getGamepads?.() ?? []).find(
+      (gamepad): gamepad is Gamepad => Boolean(gamepad),
+    ) ?? null;
   }
 
   private readonly handleKeyDown = (event: KeyboardEvent): void => {

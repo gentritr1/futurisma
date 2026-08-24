@@ -16,6 +16,9 @@ assert(blockout.format === "FUTURISMA_MAP_BLOCKOUT", "unexpected format");
 assert(blockout.centreline.closed === true, "centreline must be closed");
 assert(samples.length === blockout.centreline.sampleCount, "sample count mismatch");
 assert(blockout.checkpoints.length === 8, "eight checkpoints are required");
+for (const checkpoint of blockout.checkpoints) {
+  assert(checkpoint.gateWidth > 0, `${checkpoint.id} must have a positive gate width`);
+}
 assert(blockout.race.lapCountConfigurable === true, "lap count must remain configurable");
 assert(blockout.race.lapCount >= 1 && blockout.race.lapCount <= 9, "default lap count is invalid");
 assert(validation.overall === "PASS", "source validation is not PASS");

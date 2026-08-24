@@ -21,19 +21,20 @@
       <canvas id="game-canvas" aria-label="FUTURISMA race view" tabindex="0"></canvas>
 
       <div class="image-treatment" aria-hidden="true"></div>
+      <div id="impact-flash" class="impact-flash" aria-hidden="true"></div>
 
       <header class="race-header" aria-label="Course status">
         <div class="race-header__identity">
           <span class="wordmark">FUTURISMA</span>
           <span class="course-name">GREENWATER STRIP / MAP 01</span>
         </div>
-        <div class="system-state">
+        <div class="system-state" role="status" aria-live="polite">
           <span class="system-state__lamp" aria-hidden="true"></span>
           <span id="system-status">SYSTEM STANDBY</span>
         </div>
       </header>
 
-      <main class="hud" aria-live="polite">
+      <main class="hud">
         <section class="telemetry telemetry--speed" aria-label="Speed">
           <span class="telemetry__label">VELOCITY</span>
           <span class="speed-readout"><strong id="speed-value">000</strong><small>KM/H</small></span>
@@ -84,7 +85,7 @@
         <div class="intro-panel">
           <p class="intro-code">KAIRO DYNAMICS · KD-0714</p>
           <h1>TOTEM</h1>
-          <p class="intro-deck">
+          <p id="intro-deck" class="intro-deck">
             Five laps through Greenwater Strip. Read the amber turn grammar, clear all
             eight gates, and bring TOTEM home through The Cradle.
           </p>

@@ -131,6 +131,7 @@ export interface TurnCue {
   direction: "LEFT" | "RIGHT";
   distance: number;
   hard: boolean;
+  radius: number;
 }
 
 export interface FogProfile {
@@ -239,6 +240,28 @@ export class GreenwaterCourse {
   private readonly projectionPoints = this.samples.map(
     (sample) => new THREE.Vector3(sample.x, sample.y, sample.z),
   );
+  private readonly projectionTangents = this.projectionPoints.map((_, index) => {
+    const before = this.projectionPoints[
+      THREE.MathUtils.euclideanModulo(index - 1, this.projectionPoints.length)
+    ];
+    const after = this.projectionPoints[(index + 1) % this.projectionPoints.length];
+    return after.clone().sub(before).normalize();
+  });
+  private readonly sampleCurvatures = this.projectionTangents.map((_, index) => {
+    const sampleSpacing = this.length / this.projectionPoints.length;
+    const offset = Math.max(1, Math.round(8 / sampleSpacing));
+    const before = this.projectionTangents[
+      THREE.MathUtils.euclideanModulo(index - offset, this.projectionTangents.length)
+    ];
+    const after = this.projectionTangents[
+      (index + offset) % this.projectionTangents.length
+    ];
+    return THREE.MathUtils.clamp(
+      new THREE.Vector3().crossVectors(before, after).dot(WORLD_UP) * 4,
+      -1,
+      1,
+    );
+  });
   private readonly projectionResolution = this.samples.length;
   private checkpointIndicatorMesh: THREE.InstancedMesh | null = null;
   private readonly waterHazard = MAP.hazards.find(
@@ -292,7 +315,10 @@ export class GreenwaterCourse {
       this.projectionPoints[nextIndex],
       alpha,
     );
-    const tangent = this.tangentAt(wrapped);
+    const tangent = this.projectionTangents[index]
+      .clone()
+      .lerp(this.projectionTangents[nextIndex], alpha)
+      .normalize();
     const right = new THREE.Vector3().crossVectors(tangent, WORLD_UP).normalize();
     const up = new THREE.Vector3().crossVectors(right, tangent).normalize();
     const bank = THREE.MathUtils.lerp(current.bank, next.bank, alpha);
@@ -305,16 +331,10 @@ export class GreenwaterCourse {
       up.applyQuaternion(bankRotation).normalize();
     }
 
-    const before = this.tangentAt(
-      THREE.MathUtils.euclideanModulo(wrapped - 8 / this.length, 1),
-    );
-    const after = this.tangentAt(
-      THREE.MathUtils.euclideanModulo(wrapped + 8 / this.length, 1),
-    );
-    const curvature = THREE.MathUtils.clamp(
-      new THREE.Vector3().crossVectors(before, after).dot(WORLD_UP) * 4,
-      -1,
-      1,
+    const curvature = THREE.MathUtils.lerp(
+      this.sampleCurvatures[index],
+      this.sampleCurvatures[nextIndex],
+      alpha,
     );
     const width = THREE.MathUtils.lerp(current.w, next.w, alpha);
 
@@ -344,6 +364,13 @@ export class GreenwaterCourse {
     return checkpoint.distance / this.length;
   }
 
+  checkpointHalfWidth(index: number): number {
+    if (index === 0) return MAP.startFinish.clearSpan / 2;
+    const checkpoint = MAP.checkpoints[index - 1];
+    if (!checkpoint) throw new Error(`Unknown Greenwater checkpoint ${index}.`);
+    return checkpoint.gateWidth / 2;
+  }
+
   project(position: THREE.Vector3, hintProgress: number): CourseProjection {
     const segmentCount = this.projectionResolution;
     const hintIndex = Math.round(
@@ -358,13 +385,30 @@ export class GreenwaterCourse {
       const nextIndex = (index + 1) % segmentCount;
       const start = this.projectionPoints[index];
       const end = this.projectionPoints[nextIndex];
-      const segment = end.clone().sub(start);
-      const lengthSq = segment.lengthSq();
+      const segmentX = end.x - start.x;
+      const segmentY = end.y - start.y;
+      const segmentZ = end.z - start.z;
+      const lengthSq = segmentX * segmentX + segmentY * segmentY + segmentZ * segmentZ;
       const along = lengthSq > 0
-        ? THREE.MathUtils.clamp(position.clone().sub(start).dot(segment) / lengthSq, 0, 1)
+        ? THREE.MathUtils.clamp(
+          (
+            (position.x - start.x) * segmentX
+            + (position.y - start.y) * segmentY
+            + (position.z - start.z) * segmentZ
+          ) / lengthSq,
+          0,
+          1,
+        )
         : 0;
-      const nearest = start.clone().addScaledVector(segment, along);
-      const distanceSq = nearest.distanceToSquared(position);
+      const nearestX = start.x + segmentX * along;
+      const nearestY = start.y + segmentY * along;
+      const nearestZ = start.z + segmentZ * along;
+      const differenceX = nearestX - position.x;
+      const differenceY = nearestY - position.y;
+      const differenceZ = nearestZ - position.z;
+      const distanceSq = differenceX * differenceX
+        + differenceY * differenceY
+        + differenceZ * differenceZ;
       if (distanceSq >= nearestDistanceSq) return;
       nearestDistanceSq = distanceSq;
       nearestProgress = THREE.MathUtils.euclideanModulo((index + along) / segmentCount, 1);
@@ -379,8 +423,9 @@ export class GreenwaterCourse {
     }
 
     const sample = this.sample(nearestProgress);
-    const difference = position.clone().sub(sample.position);
-    const lateral = difference.dot(sample.right);
+    const lateral = (position.x - sample.position.x) * sample.right.x
+      + (position.y - sample.position.y) * sample.right.y
+      + (position.z - sample.position.z) * sample.right.z;
     return { ...sample, progress: nearestProgress, lateral };
   }
 
@@ -401,6 +446,7 @@ export class GreenwaterCourse {
       direction: nearest.turn.direction === "left" ? "LEFT" : "RIGHT",
       distance: nearest.distance,
       hard: nearest.turn.radius <= 85,
+      radius: nearest.turn.radius,
     };
   }
 
@@ -494,27 +540,6 @@ export class GreenwaterCourse {
     context.font = "600 24px monospace";
     context.fillText("GREENWATER STRIP", 256, 145);
     this.lapBoardTexture.needsUpdate = true;
-  }
-
-  private tangentAt(progress: number): THREE.Vector3 {
-    const offset = 1 / this.samples.length;
-    const before = this.positionAt(
-      THREE.MathUtils.euclideanModulo(progress - offset, 1),
-    );
-    const after = this.positionAt(
-      THREE.MathUtils.euclideanModulo(progress + offset, 1),
-    );
-    return after.sub(before).normalize();
-  }
-
-  private positionAt(progress: number): THREE.Vector3 {
-    const scaled = progress * this.samples.length;
-    const index = Math.floor(scaled) % this.samples.length;
-    const alpha = scaled - Math.floor(scaled);
-    return this.projectionPoints[index].clone().lerp(
-      this.projectionPoints[(index + 1) % this.samples.length],
-      alpha,
-    );
   }
 
   private createTrackSurface(): THREE.Mesh {

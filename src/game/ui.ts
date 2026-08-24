@@ -14,6 +14,7 @@ export interface HudFrame {
   turnHard: boolean;
   boostActive: boolean;
   braking: boolean;
+  drifting: boolean;
   skidsDown: boolean;
   edgeWarning: boolean;
   edgeCorrection: "LEFT" | "RIGHT" | null;
@@ -43,6 +44,7 @@ export class GameUi {
   private readonly resultScreen = requiredElement<HTMLElement>("result-screen");
   private readonly resultTime = requiredElement<HTMLElement>("result-time");
   private readonly resultDetail = requiredElement<HTMLElement>("result-detail");
+  private readonly introDeck = requiredElement<HTMLElement>("intro-deck");
   private readonly systemStatus = requiredElement<HTMLElement>("system-status");
   private readonly speedValue = requiredElement<HTMLElement>("speed-value");
   private readonly driveState = requiredElement<HTMLElement>("drive-state");
@@ -60,6 +62,7 @@ export class GameUi {
   private readonly turnArrow = requiredElement<HTMLElement>("turn-arrow");
   private readonly turnDistance = requiredElement<HTMLElement>("turn-distance");
   private readonly countdown = requiredElement<HTMLElement>("countdown");
+  private readonly impactFlash = requiredElement<HTMLElement>("impact-flash");
   private readonly errorPanel = requiredElement<HTMLElement>("error-panel");
   private readonly errorMessage = requiredElement<HTMLElement>("error-message");
   private lastLapLabel = "";
@@ -70,6 +73,11 @@ export class GameUi {
   private lastTurnState = "";
   private lastRaceStage = "";
   private gateFlashUntil = 0;
+  private impactFlashUntil = 0;
+
+  setRaceFormat(totalLaps: number): void {
+    this.introDeck.textContent = `${totalLaps} ${totalLaps === 1 ? "lap" : "laps"} through Greenwater Strip. Read the amber turn grammar, clear all eight gates, and bring TOTEM home through The Cradle.`;
+  }
 
   showReady(): void {
     this.loadingScreen.hidden = true;
@@ -130,7 +138,19 @@ export class GameUi {
     this.checkpointValue.dataset.cleared = "true";
   }
 
+  flashImpact(side: "LEFT" | "RIGHT"): void {
+    this.impactFlashUntil = performance.now() + 150;
+    this.impactFlash.dataset.active = "true";
+    this.impactFlash.dataset.side = side.toLowerCase();
+  }
+
   update(frame: HudFrame): void {
+    if (
+      this.impactFlash.dataset.active === "true"
+      && performance.now() >= this.impactFlashUntil
+    ) {
+      this.impactFlash.dataset.active = "false";
+    }
     this.speedValue.textContent = Math.round(frame.speedKph).toString().padStart(3, "0");
     this.timeValue.textContent = formatRaceTime(frame.elapsedMs);
     const lapLabel = `LAP ${Math.min(frame.lap, frame.totalLaps)} / ${frame.totalLaps}`;
@@ -193,6 +213,8 @@ export class GameUi {
       ? "SKIDS DOWN"
       : frame.boostActive
         ? "PLASMA OVERDRIVE"
+        : frame.drifting
+          ? "DRIFT VECTOR"
         : frame.braking
           ? "AIRBRAKES"
           : "HOVER LOCK";
