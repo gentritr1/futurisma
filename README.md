@@ -42,7 +42,8 @@ remaining distance to the finish. Multi-lap trials also report the last lap in
 the HUD, surface a dedicated lap/final-lap split at The Cradle, and retain a
 lap-by-lap best-time ledger on the result screen. Airbrakes and the
 standing-water grip loss feed the procedural noise layer as well as handling
-feedback.
+feedback. Water Table now uses its authored 80% grip floor and 0.8-second
+recovery instead of switching lateral response instantly at the sheet boundary.
 If a gate is missed, the HUD keeps the failure visible, offers the recovery
 control, and includes the required extra circuit in the finish distance.
 A sustained high-speed route reversal suppresses normal turn calls and displays
@@ -86,6 +87,8 @@ Use `&diagnostics=1&probe=wrong-way` to start TOTEM moving backward on the
 opening straight and verify warning engagement plus manual recovery.
 Use `&diagnostics=1&probe=impact` to start against the opening rail and verify
 impact feedback, spark emission, and automatic spark-buffer culling.
+Use `&diagnostics=1&probe=water` to cross the authored Water Table sheet and
+verify the 80% grip floor plus the 0.8-second recovery response.
 Use `&diagnostics=1&probe=context` to force one real WebGL context loss and
 restore during the opening straight. The race remains paused after restoration
 until the player explicitly resumes it. Focus, visibility, and graphics-link

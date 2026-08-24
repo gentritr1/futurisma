@@ -159,6 +159,65 @@ assert.ok(
   "Standing water must reduce available grip.",
 );
 
+function simulateSurfaceGrip({ seconds, step, startingGrip, targetGrip }) {
+  let grip = startingGrip;
+  const iterations = Math.round(seconds / step);
+  for (let index = 0; index < iterations; index += 1) {
+    grip = physics.integrateSurfaceGrip(grip, targetGrip, 0.8, step);
+  }
+  return grip;
+}
+
+const wetGripFirstStep = simulateSurfaceGrip({
+  seconds: 1 / 120,
+  step: 1 / 120,
+  startingGrip: 1,
+  targetGrip: 0.8,
+});
+const wetGrip120 = simulateSurfaceGrip({
+  seconds: 0.2,
+  step: 1 / 120,
+  startingGrip: 1,
+  targetGrip: 0.8,
+});
+const wetGrip60 = simulateSurfaceGrip({
+  seconds: 0.2,
+  step: 1 / 60,
+  startingGrip: 1,
+  targetGrip: 0.8,
+});
+const recoveredGrip120 = simulateSurfaceGrip({
+  seconds: 0.8,
+  step: 1 / 120,
+  startingGrip: wetGrip120,
+  targetGrip: 1,
+});
+const recoveredGrip60 = simulateSurfaceGrip({
+  seconds: 0.8,
+  step: 1 / 60,
+  startingGrip: wetGrip60,
+  targetGrip: 1,
+});
+assert.ok(
+  wetGripFirstStep > 0.8 && wetGripFirstStep < 1,
+  "Water entry must begin immediately without snapping grip in one step.",
+);
+assert.ok(wetGrip120 < 0.81, "Wet grip must take hold within 0.2 seconds.");
+assert.ok(
+  recoveredGrip120 > 0.98 && recoveredGrip120 < 1,
+  "Grip must recover smoothly across the authored 0.8-second duration.",
+);
+assert.ok(
+  Math.abs(wetGrip120 - wetGrip60) < 0.001
+    && Math.abs(recoveredGrip120 - recoveredGrip60) < 0.001,
+  "Surface-grip transitions must remain stable between 60 Hz and 120 Hz.",
+);
+assert.equal(
+  physics.integrateSurfaceGrip(Number.NaN, Number.NaN, Number.NaN, Number.NaN),
+  1,
+  "Invalid surface state must fall back to full grip.",
+);
+
 function simulateSteering({ seconds, step, target, startingSteer = 0 }) {
   let steer = startingSteer;
   const iterations = Math.round(seconds / step);
@@ -252,6 +311,7 @@ function simulateControlSoak(step) {
   let speed = 0;
   let reserve = 1;
   let steer = 0;
+  let surfaceGrip = 1;
   let driftActive = false;
   let boostLockedUntilRelease = false;
   let distance = 0;
@@ -286,10 +346,16 @@ function simulateControlSoak(step) {
     driftActive = physics.resolveDriftActive(driftActive, driftIntent);
     const turnAuthority = physics.calculateTurnAuthority(speedRatio);
     const turnRate = physics.calculateTurnRate(speedRatio, driftIntent);
+    surfaceGrip = physics.integrateSurfaceGrip(
+      surfaceGrip,
+      controls.surfaceGrip,
+      0.8,
+      step,
+    );
     const gripRate = physics.calculateGripRate(
       speedRatio,
       driftIntent,
-      controls.surfaceGrip,
+      surfaceGrip,
       controls.brake,
       steer,
     );
@@ -312,6 +378,7 @@ function simulateControlSoak(step) {
       driftIntent,
       turnAuthority,
       turnRate,
+      surfaceGrip,
       gripRate,
       distance,
     ];
@@ -325,6 +392,7 @@ function simulateControlSoak(step) {
     assert.ok(driftIntent >= 0 && driftIntent <= 1, "Soak drift intent escaped its bounds.");
     assert.ok(turnAuthority >= 0.32 && turnAuthority <= 1, "Soak turn authority escaped its bounds.");
     assert.ok(turnRate > 0 && turnRate < 3, "Soak turn rate escaped its arcade handling window.");
+    assert.ok(surfaceGrip >= 0.2 && surfaceGrip <= 1, "Soak surface grip escaped its bounds.");
     assert.ok(gripRate > 0 && gripRate < 10, "Soak grip rate escaped its handling window.");
 
     if (!previousBoostLockout && boostLockedUntilRelease) boostExhaustions += 1;
@@ -341,6 +409,7 @@ function simulateControlSoak(step) {
     speed,
     reserve,
     steer,
+    surfaceGrip,
     driftActive,
     distance,
     boostExhaustions,
@@ -401,10 +470,14 @@ assert.ok(
   "Final steering state must remain stable between 60 Hz and 120 Hz.",
 );
 assert.ok(
+  Math.abs(soak120.surfaceGrip - soak60.surfaceGrip) < 0.001,
+  "Final surface-grip state must remain stable between 60 Hz and 120 Hz.",
+);
+assert.ok(
   Math.abs(soak120.distance - soak60.distance) / soak120.distance < 0.002,
   "Soak distance must remain within 0.2% between 60 Hz and 120 Hz.",
 );
 
 console.log(
-  `Physics PASS: cruise ${(cruise120 * 3.6).toFixed(1)} km/h, boost ${(boosted * 3.6).toFixed(1)} km/h, post-boost ${(releasedBoostHalfSecond * 3.6).toFixed(1)}→${(releasedBoostTwoSeconds120 * 3.6).toFixed(1)} km/h, 60/120 Hz speed drift ${Math.abs(cruise120 - cruise60).toFixed(3)} m/s, steering drift ${Math.abs(steering120 - steering60).toFixed(4)}, 240 s soak ${soak120.boostExhaustions} boost exhaustions / ${soak120.driftEntries} drift entries / ${(Math.abs(soak120.distance - soak60.distance) / soak120.distance * 100).toFixed(3)}% distance drift.`,
+  `Physics PASS: cruise ${(cruise120 * 3.6).toFixed(1)} km/h, boost ${(boosted * 3.6).toFixed(1)} km/h, post-boost ${(releasedBoostHalfSecond * 3.6).toFixed(1)}→${(releasedBoostTwoSeconds120 * 3.6).toFixed(1)} km/h, wet grip ${wetGrip120.toFixed(3)}→${recoveredGrip120.toFixed(3)}, 60/120 Hz speed drift ${Math.abs(cruise120 - cruise60).toFixed(3)} m/s, steering drift ${Math.abs(steering120 - steering60).toFixed(4)}, 240 s soak ${soak120.boostExhaustions} boost exhaustions / ${soak120.driftEntries} drift entries / ${(Math.abs(soak120.distance - soak60.distance) / soak120.distance * 100).toFixed(3)}% distance drift.`,
 );

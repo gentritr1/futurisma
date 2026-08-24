@@ -83,6 +83,22 @@ vertices after the burst expired. Six alternating portrait and landscape
 resizes matched canvas dimensions exactly while the loaded standby scene stayed
 fixed at 58 geometries / 8 textures.
 
+## Wet-surface continuity acceptance
+
+Water Table now consumes the authored `0.8` grip multiplier and `0.8 s`
+recovery. The deterministic response reaches 0.805 grip after 0.2 seconds on
+the sheet and recovers to 0.990 across the authored recovery window, with less
+than 0.001 difference between 60 and 120 Hz. Dry frames return directly from
+the neutral fast path without evaluating an exponential response.
+
+The isolated browser probe reached 0.800 grip at 586 m and returned to 1.000 at
+595 m without an impact. A subsequent normal-motion, high-quality five-lap run
+repeated a 0.801 minimum and finished at 1.000 grip. It completed in
+02:52.799 with laps of 34.483, 34.433, 34.517, 34.683, and 34.683 seconds,
+held 9.7 ms p95 / 10.4 ms maximum frame time, peaked at 93 draw calls / 42,720
+triangles, and retained 86 geometries / 17 textures. It recorded zero impacts,
+missed gates, recoveries, wrong-way events, spark bursts, or WebGL faults.
+
 ## Runtime invariants
 
 Keep these true while integrating the authored Greenwater environment:
@@ -95,6 +111,7 @@ Keep these true while integrating the authored Greenwater environment:
 - WebGL context recovery, reduced motion, manual control handoff, and one-lap probes remain independently testable.
 - Ready, paused, and settled-result screens perform no simulation, presentation, audio-control, or WebGL draw work until invalidated or resumed.
 - Pose and chase-camera presentation share one course projection per rendered frame; real-time audio control reuses its filter-target storage.
+- Water Table reaches the authored 0.8 grip floor and recovers over 0.8 seconds without a one-step handling snap.
 
 ## Environment integration gates
 

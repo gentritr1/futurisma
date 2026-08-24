@@ -28,6 +28,7 @@ import {
   calculateTurnAuthority,
   calculateTurnRate,
   integrateBoostReserve,
+  integrateSurfaceGrip,
   integrateSteering,
   integrateSpeed,
   resolveBoostLockout,
@@ -70,6 +71,7 @@ const FIXED_STEP = 1 / 120;
 const MAX_PHYSICS_BACKLOG = 0.1;
 const RECOVERY_PROBE_DISTANCE_METERS = 900;
 const WRONG_WAY_PROBE_DISTANCE_METERS = 100;
+const WATER_GRIP_PROBE_DISTANCE_METERS = 580;
 const RESUME_COUNTDOWN_SECONDS = 2.7;
 const ZERO_INPUT: InputFrame = { throttle: 0, brake: 0, steer: 0, boost: false };
 
@@ -307,6 +309,7 @@ export class FuturismaGame {
   private diagnosticDriftSeconds = 0;
   private diagnosticDriftEntries = 0;
   private diagnosticMaxDriftIntensity = 0;
+  private diagnosticMinimumSurfaceGrip = 1;
   private diagnosticEdgeSeconds = 0;
   private diagnosticWrongWaySeconds = 0;
   private diagnosticWrongWayEntries = 0;
@@ -379,6 +382,8 @@ export class FuturismaGame {
     && new URLSearchParams(window.location.search).get("probe") === "wrong-way";
   private readonly impactProbe = this.diagnosticsMode
     && new URLSearchParams(window.location.search).get("probe") === "impact";
+  private readonly waterGripProbe = this.diagnosticsMode
+    && new URLSearchParams(window.location.search).get("probe") === "water";
   private readonly contextLossProbe = this.diagnosticsMode
     && new URLSearchParams(window.location.search).get("probe") === "context";
   private readonly focusLossProbe = this.diagnosticsMode
@@ -833,20 +838,31 @@ export class FuturismaGame {
     );
     this.alignDirectionToSurface(this.forward, beforeMove.up, beforeMove.tangent);
 
-    const surfaceGrip = this.course.surfaceGripAt(
+    const targetSurfaceGrip = this.course.surfaceGripAt(
       this.progress,
       this.lateral,
       beforeMove.halfWidth,
     );
     const wasLowGrip = this.surfaceGrip < 0.95;
-    this.surfaceGrip = surfaceGrip;
-    if (!wasLowGrip && surfaceGrip < 0.95) {
+    this.surfaceGrip = integrateSurfaceGrip(
+      this.surfaceGrip,
+      targetSurfaceGrip,
+      this.course.surfaceGripRecoverySeconds,
+      delta,
+    );
+    if (this.diagnosticsMode) {
+      this.diagnosticMinimumSurfaceGrip = Math.min(
+        this.diagnosticMinimumSurfaceGrip,
+        this.surfaceGrip,
+      );
+    }
+    if (!wasLowGrip && this.surfaceGrip < 0.95) {
       this.input.pulse(0.06, 0.2, 90);
     }
     const gripRate = calculateGripRate(
       speedRatio,
       driftIntent,
-      surfaceGrip,
+      this.surfaceGrip,
       input.brake,
       input.steer,
     );
@@ -1402,7 +1418,9 @@ export class FuturismaGame {
       ? RECOVERY_PROBE_DISTANCE_METERS / this.course.length
       : this.wrongWayProbe
         ? WRONG_WAY_PROBE_DISTANCE_METERS / this.course.length
-        : 0.002;
+        : this.waterGripProbe
+          ? WATER_GRIP_PROBE_DISTANCE_METERS / this.course.length
+          : 0.002;
     this.speed = 0;
     this.lateral = 0;
     this.steerAmount = 0;
@@ -1452,6 +1470,11 @@ export class FuturismaGame {
       this.lateral = start.halfWidth - 1;
       this.position.copy(start.position).addScaledVector(start.right, this.lateral);
       this.speed = 22;
+    }
+    if (this.waterGripProbe) {
+      this.lateral = -start.halfWidth * 0.65;
+      this.position.copy(start.position).addScaledVector(start.right, this.lateral);
+      this.speed = 10;
     }
     this.syncPresentationPose();
     this.course.setLapBoard(1, this.totalLaps);
@@ -1842,6 +1865,7 @@ export class FuturismaGame {
       driftSeconds: Number(this.diagnosticDriftSeconds.toFixed(2)),
       driftEntries: this.diagnosticDriftEntries,
       maxDriftIntensity: Number(this.diagnosticMaxDriftIntensity.toFixed(2)),
+      minimumSurfaceGrip: Number(this.diagnosticMinimumSurfaceGrip.toFixed(3)),
       edgeSeconds: Number(this.diagnosticEdgeSeconds.toFixed(2)),
       wrongWaySeconds: Number(this.diagnosticWrongWaySeconds.toFixed(2)),
       wrongWayEntries: this.diagnosticWrongWayEntries,
@@ -1953,6 +1977,7 @@ export class FuturismaGame {
     this.diagnosticDriftSeconds = 0;
     this.diagnosticDriftEntries = 0;
     this.diagnosticMaxDriftIntensity = 0;
+    this.diagnosticMinimumSurfaceGrip = 1;
     this.diagnosticEdgeSeconds = 0;
     this.diagnosticWrongWaySeconds = 0;
     this.diagnosticWrongWayEntries = 0;

@@ -71,6 +71,7 @@ assert(blockout.music.crossfadeBars === 1, "music stem crossfades must remain on
 const steamVents = blockout.hazards.filter((hazard) => hazard.type === "steam_vent");
 const cableTrips = blockout.hazards.filter((hazard) => hazard.type === "cable_coil");
 const cargoHook = blockout.hazards.find((hazard) => hazard.type === "swinging_hook");
+const standingWater = blockout.hazards.find((hazard) => hazard.type === "standing_water");
 assert(steamVents.length === 2, "two authored steam vents are required");
 assert(cableTrips.length === 2, "two authored cable-trip hazards are required");
 for (const vent of steamVents) {
@@ -85,6 +86,8 @@ for (const cable of cableTrips) {
 }
 assert(Number.isFinite(cargoHook?.distance), "the cargo hook needs a course distance");
 assert(cargoHook?.collision === false, "the cargo hook must remain a cosmetic near-miss");
+assert(standingWater?.gripMultiplier === 0.8, "standing water must retain 80% grip");
+assert(standingWater?.durationSeconds === 0.8, "wet grip must retain its 0.8 s recovery");
 
 const finalSample = samples.at(-1);
 const closureSegment = Math.hypot(

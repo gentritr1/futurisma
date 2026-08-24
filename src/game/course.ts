@@ -66,6 +66,8 @@ interface RawHazard {
   telegraphSeconds?: number;
   effect?: string;
   collision?: boolean;
+  gripMultiplier?: number;
+  durationSeconds?: number;
 }
 
 interface SteamVentRuntime {
@@ -307,6 +309,7 @@ export class GreenwaterCourse {
   private readonly waterHazard = MAP.hazards.find(
     (hazard) => hazard.id === "HZ_WATER_SHEET",
   );
+  readonly surfaceGripRecoverySeconds = this.waterHazard?.durationSeconds ?? 0.8;
   private readonly fogProfiles = MAP.fog.zones.map((zone) => ({
     fromDistance: zone.fromDistance,
     toDistance: zone.toDistance,
@@ -585,7 +588,7 @@ export class GreenwaterCourse {
       && distance <= water.toDistance
       && lateral < -halfWidth * 0.25
     ) {
-      return 0.8;
+      return water.gripMultiplier ?? 0.8;
     }
     return 1;
   }

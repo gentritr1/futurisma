@@ -138,3 +138,28 @@ export function calculateGripRate(
     * surfaceGrip
     + brake * 2.2 * (1 - Math.abs(steer));
 }
+
+/**
+ * Wet surfaces take hold quickly, while recovery uses the authored duration so
+ * crossing the water boundary cannot snap lateral response in one step.
+ * @param {number} currentGrip
+ * @param {number} targetGrip
+ * @param {number} recoverySeconds
+ * @param {number} delta
+ */
+export function integrateSurfaceGrip(
+  currentGrip,
+  targetGrip,
+  recoverySeconds,
+  delta,
+) {
+  const current = Number.isFinite(currentGrip) ? clamp(currentGrip, 0.2, 1) : 1;
+  const target = Number.isFinite(targetGrip) ? clamp(targetGrip, 0.2, 1) : 1;
+  if (Math.abs(current - target) < 1e-6) return target;
+  const recovery = Number.isFinite(recoverySeconds) && recoverySeconds > 0
+    ? recoverySeconds
+    : 0.8;
+  const step = Number.isFinite(delta) ? Math.max(0, delta) : 0;
+  const responseRate = target < current ? 18 : 3 / recovery;
+  return lerp(current, target, 1 - Math.exp(-step * responseRate));
+}
