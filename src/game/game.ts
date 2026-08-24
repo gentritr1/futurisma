@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { EngineAudio } from "./audio";
+import { calculateImpactShakeOffset } from "./camera-feedback";
 import { GreenwaterCourse, type TurnCue } from "./course";
 import type { InputFrame } from "./input";
 import { InputController } from "./input";
@@ -100,6 +101,7 @@ export class FuturismaGame {
   private readonly camera = new THREE.PerspectiveCamera(58, 1, 0.1, 650);
   private readonly renderer: THREE.WebGLRenderer;
   private readonly course = new GreenwaterCourse();
+  private readonly coursePs2Treatment = applyPs2MaterialTreatment(this.course.group);
   private readonly demoProjection = this.course.createProjectionScratch();
   private readonly demoLookAhead = this.course.createSampleScratch();
   private readonly demoTurnCue: TurnCue = {
@@ -930,9 +932,16 @@ export class FuturismaGame {
     ).normalize();
 
     if (this.impactShake > 0 && !this.reducedMotion) {
-      const shake = this.impactShake * 0.12;
-      this.camera.position.x += (Math.random() - 0.5) * shake;
-      this.camera.position.y += (Math.random() - 0.5) * shake;
+      const elapsed = this.timer.getElapsed();
+      this.camera.position
+        .addScaledVector(
+          vehicleRight,
+          calculateImpactShakeOffset(elapsed, this.impactShake, "lateral"),
+        )
+        .addScaledVector(
+          sample.up,
+          calculateImpactShakeOffset(elapsed, this.impactShake, "vertical"),
+        );
     }
 
     this.camera.lookAt(this.cameraLook);
@@ -1430,6 +1439,8 @@ export class FuturismaGame {
       internalHeight: this.renderer.domElement.height,
       qualityMode: this.qualityMode,
       reducedMotion: this.reducedMotion,
+      ps2CourseMaterials: this.coursePs2Treatment.materials,
+      ps2CourseTextures: this.coursePs2Treatment.textures,
       heapMb: heapMb === null ? null : Number(heapMb.toFixed(1)),
       maxHeapMb: this.diagnosticMaxHeapMb === null
         ? null

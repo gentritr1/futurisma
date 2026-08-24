@@ -18,6 +18,11 @@ interface NeutralTransform {
   position: THREE.Vector3;
 }
 
+export interface Ps2MaterialTreatmentStats {
+  materials: number;
+  textures: number;
+}
+
 const DEG = Math.PI / 180;
 const ENGINE_FLAP_NAMES = [
   "engine_flap_L_0_pivot",
@@ -26,11 +31,16 @@ const ENGINE_FLAP_NAMES = [
   "engine_flap_R_1_pivot",
 ] as const;
 
-export function applyPs2MaterialTreatment(root: THREE.Object3D): void {
+export function applyPs2MaterialTreatment(
+  root: THREE.Object3D,
+): Ps2MaterialTreatmentStats {
+  const treatedMaterials = new Set<THREE.Material>();
+  const treatedTextures = new Set<THREE.Texture>();
   root.traverse((object) => {
     if (!(object instanceof THREE.Mesh)) return;
     const materials = Array.isArray(object.material) ? object.material : [object.material];
     for (const material of materials) {
+      treatedMaterials.add(material);
       material.dithering = true;
       const textured = material as THREE.Material & {
         map?: THREE.Texture | null;
@@ -49,6 +59,7 @@ export function applyPs2MaterialTreatment(root: THREE.Object3D): void {
         textured.alphaMap,
       ]) {
         if (!texture) continue;
+        treatedTextures.add(texture);
         texture.magFilter = THREE.NearestFilter;
         texture.minFilter = THREE.NearestMipmapLinearFilter;
         texture.anisotropy = 1;
@@ -57,6 +68,10 @@ export function applyPs2MaterialTreatment(root: THREE.Object3D): void {
       material.needsUpdate = true;
     }
   });
+  return {
+    materials: treatedMaterials.size,
+    textures: treatedTextures.size,
+  };
 }
 
 export class TotemVehicle {
