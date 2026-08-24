@@ -23,7 +23,8 @@ Open the local URL printed by Vite.
 
 Standard gamepad triggers control thrust and braking. The Greenwater Strip time
 trial defaults to five laps. Add `?laps=1` through `?laps=9` to override the
-race length for testing.
+race length for testing. Emptying the boost reserve locks boost until the input
+is released, preventing depleted thrust, audio, and effects from pulsing.
 TOTEM now uses player-controlled heading with speed-sensitive steering, grip, and
 high-speed drift. Course vectors must be cleared in order for a lap to count.
 The vehicle must also pass inside each authored gate span. Compatible gamepads
@@ -84,9 +85,10 @@ support a `_headers` file. Configure equivalent response headers if the chosen
 host uses another format.
 
 The local suite verifies accepted asset hashes, measured map invariants,
-longitudinal and steering response at 60/120 Hz, checkpoint, hazard, and
-finish-distance rules, showcase-to-manual control intent, music timing,
-high-refresh presentation cadence, render-resolution tiers,
+longitudinal and steering response at 60/120 Hz, a 240-second mixed-control
+physics soak, checkpoint, hazard, and finish-distance rules,
+showcase-to-manual control intent, music timing, high-refresh presentation
+cadence, render-resolution tiers,
 strict browser security policy, pinned package versions, the production build,
 and gzip budgets. Browser diagnostics
 remain the source of truth for full-lap draw calls and frame pacing.

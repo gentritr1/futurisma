@@ -1,5 +1,6 @@
 export const CRUISE_MAX_SPEED = 86;
 export const BOOST_MAX_SPEED = 112;
+export const BOOST_RESERVE_CUTOFF = 0.012;
 const NON_BOOST_SPEED_LIMIT = 92;
 
 /** @param {number} value @param {number} minimum @param {number} maximum */
@@ -76,6 +77,19 @@ export function integrateBoostReserve(reserve, reserveBoostActive, delta) {
   return reserveBoostActive
     ? Math.max(0, reserve - delta * 0.2)
     : Math.min(1, reserve + delta * 0.075);
+}
+
+/**
+ * Once the reserve reaches its cutoff, boost stays locked until the player
+ * releases the input. This prevents empty-reserve boost from chattering between
+ * one recharge frame and one drain frame while the button remains held.
+ * @param {boolean} boostRequested
+ * @param {number} reserve
+ * @param {boolean} previousLockout
+ */
+export function resolveBoostLockout(boostRequested, reserve, previousLockout) {
+  if (!boostRequested) return false;
+  return previousLockout || reserve <= BOOST_RESERVE_CUTOFF;
 }
 
 /**

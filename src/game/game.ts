@@ -18,6 +18,7 @@ import {
   integrateBoostReserve,
   integrateSteering,
   integrateSpeed,
+  resolveBoostLockout,
   resolveDriftActive,
 } from "./physics";
 import { calculatePresentationAlpha } from "./presentation";
@@ -240,6 +241,7 @@ export class FuturismaGame {
   private missedGateIndex: number | null = null;
   private boostReserve = 1;
   private boostActive = false;
+  private boostLockedUntilRelease = false;
   private driftActive = false;
   private driftIntensity = 0;
   private surfaceGrip = 1;
@@ -682,10 +684,16 @@ export class FuturismaGame {
       this.padBoostTime = Math.max(0, this.padBoostTime - delta);
     }
     const wasBoostActive = this.boostActive;
+    this.boostLockedUntilRelease = resolveBoostLockout(
+      input.boost,
+      this.boostReserve,
+      this.boostLockedUntilRelease,
+    );
     const reserveBoost = input.boost
+      && !this.boostLockedUntilRelease
       && input.throttle > 0.1
       && input.brake < 0.15
-      && this.boostReserve > 0.012;
+      && this.boostReserve > 0;
     this.boostActive = reserveBoost || this.padBoostTime > 0;
     if (this.boostActive && !wasBoostActive) {
       this.audio.playBoost();
@@ -1251,6 +1259,7 @@ export class FuturismaGame {
     this.missedGateIndex = null;
     this.boostReserve = 1;
     this.boostActive = false;
+    this.boostLockedUntilRelease = false;
     this.driftActive = false;
     this.driftIntensity = 0;
     this.surfaceGrip = 1;
