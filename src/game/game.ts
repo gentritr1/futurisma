@@ -19,6 +19,7 @@ import {
   integrateSpeed,
   resolveDriftActive,
 } from "./physics";
+import { calculatePresentationAlpha } from "./presentation";
 import {
   calculateFinishDistanceMeters,
   calculateRecoveryTelemetry,
@@ -140,6 +141,12 @@ export class FuturismaGame {
   private readonly position = new THREE.Vector3();
   private readonly forward = new THREE.Vector3(0, 0, -1);
   private readonly travelDirection = new THREE.Vector3(0, 0, -1);
+  private readonly previousPosition = new THREE.Vector3();
+  private readonly previousForward = new THREE.Vector3(0, 0, -1);
+  private readonly previousTravelDirection = new THREE.Vector3(0, 0, -1);
+  private readonly presentationPosition = new THREE.Vector3();
+  private readonly presentationForward = new THREE.Vector3(0, 0, -1);
+  private readonly presentationTravelDirection = new THREE.Vector3(0, 0, -1);
   private readonly scratchA = new THREE.Vector3();
   private readonly scratchB = new THREE.Vector3();
   private readonly scratchC = new THREE.Vector3();
@@ -458,6 +465,7 @@ export class FuturismaGame {
       MAX_PHYSICS_BACKLOG,
     );
     while (this.physicsAccumulator >= FIXED_STEP) {
+      this.capturePreviousSimulationPose();
       if (this.phase === "countdown") this.updateCountdown(FIXED_STEP);
       if (this.phase === "resuming") this.updateResumeCountdown(FIXED_STEP);
       if (this.phase === "running") {
@@ -466,6 +474,10 @@ export class FuturismaGame {
       if (this.phase === "finished") this.updateCoast(FIXED_STEP);
       this.physicsAccumulator -= FIXED_STEP;
     }
+
+    this.interpolatePresentationPose(
+      calculatePresentationAlpha(this.physicsAccumulator, FIXED_STEP),
+    );
 
     const presentationInput = this.phase === "paused" || this.phase === "resuming"
       ? ZERO_INPUT
@@ -543,6 +555,37 @@ export class FuturismaGame {
     direction.addScaledVector(up, -direction.dot(up));
     if (direction.lengthSq() < 0.0001) direction.copy(fallback);
     direction.normalize();
+  }
+
+  private capturePreviousSimulationPose(): void {
+    this.previousPosition.copy(this.position);
+    this.previousForward.copy(this.forward);
+    this.previousTravelDirection.copy(this.travelDirection);
+  }
+
+  private syncPresentationPose(): void {
+    this.capturePreviousSimulationPose();
+    this.presentationPosition.copy(this.position);
+    this.presentationForward.copy(this.forward);
+    this.presentationTravelDirection.copy(this.travelDirection);
+  }
+
+  private interpolatePresentationPose(alpha: number): void {
+    this.presentationPosition.lerpVectors(
+      this.previousPosition,
+      this.position,
+      alpha,
+    );
+    this.presentationForward.lerpVectors(
+      this.previousForward,
+      this.forward,
+      alpha,
+    ).normalize();
+    this.presentationTravelDirection.lerpVectors(
+      this.previousTravelDirection,
+      this.travelDirection,
+      alpha,
+    ).normalize();
   }
 
   private updateRace(delta: number, input: InputFrame): void {
@@ -864,33 +907,38 @@ export class FuturismaGame {
       automaticRecovery ? "COURSE LINK RESTORED" : "MANUAL RECOVERY",
       1_100,
     );
+    this.syncPresentationPose();
     this.updatePose({ throttle: 0, brake: 0, steer: 0, boost: false }, 0);
     this.snapCamera();
   }
 
   private updatePose(input: InputFrame, delta: number): void {
     const sample = this.course.project(
-      this.position,
+      this.presentationPosition,
       this.progress,
       this.poseProjection,
     );
     const speedRatio = this.speed / BOOST_MAX_SPEED;
     const hoverHeight = this.boostActive ? 0.6 : this.speed < 11 ? 0.18 : 0.45;
     const vehiclePosition = this.scratchA
-      .copy(this.position)
+      .copy(this.presentationPosition)
       .addScaledVector(sample.up, hoverHeight + 0.71);
-    const vehicleRight = this.scratchB.crossVectors(this.forward, sample.up).normalize();
-    const vehicleUp = this.scratchC.crossVectors(vehicleRight, this.forward).normalize();
+    const vehicleRight = this.scratchB
+      .crossVectors(this.presentationForward, sample.up)
+      .normalize();
+    const vehicleUp = this.scratchC
+      .crossVectors(vehicleRight, this.presentationForward)
+      .normalize();
 
     this.poseMatrix.makeBasis(
       vehicleRight,
       vehicleUp,
-      this.scratchD.copy(this.forward).multiplyScalar(-1),
+      this.scratchD.copy(this.presentationForward).multiplyScalar(-1),
     );
     this.poseQuaternion.setFromRotationMatrix(this.poseMatrix);
     this.vehicle.setPose(vehiclePosition, this.poseQuaternion);
     const slip = THREE.MathUtils.clamp(
-      this.travelDirection.dot(vehicleRight) * speedRatio * 2.4,
+      this.presentationTravelDirection.dot(vehicleRight) * speedRatio * 2.4,
       -1,
       1,
     );
@@ -910,18 +958,20 @@ export class FuturismaGame {
 
   private updateCamera(delta: number, steer: number): void {
     const sample = this.course.project(
-      this.position,
+      this.presentationPosition,
       this.progress,
       this.cameraProjection,
     );
-    const vehicleRight = this.scratchA.crossVectors(this.forward, sample.up).normalize();
+    const vehicleRight = this.scratchA
+      .crossVectors(this.presentationForward, sample.up)
+      .normalize();
     const fallback = this.scratchB
       .copy(this.vehicle.root.position)
-      .addScaledVector(this.forward, -5)
+      .addScaledVector(this.presentationForward, -5)
       .addScaledVector(sample.up, 2.2);
     const anchor = this.vehicle.worldPosition("CAMERA_chase_target", fallback, this.scratchC);
     const desired = anchor
-      .addScaledVector(this.forward, -2.7)
+      .addScaledVector(this.presentationForward, -2.7)
       .addScaledVector(sample.up, 1.25)
       .addScaledVector(
         vehicleRight,
@@ -929,8 +979,8 @@ export class FuturismaGame {
       );
     const target = this.scratchD
       .copy(this.vehicle.root.position)
-      .addScaledVector(this.forward, 8 + this.speed * 0.075)
-      .addScaledVector(this.travelDirection, this.speed * 0.025)
+      .addScaledVector(this.presentationForward, 8 + this.speed * 0.075)
+      .addScaledVector(this.presentationTravelDirection, this.speed * 0.025)
       .addScaledVector(sample.up, 0.8)
       .addScaledVector(vehicleRight, steer * this.driftIntensity * 0.6);
 
@@ -943,7 +993,7 @@ export class FuturismaGame {
     const desiredCameraUp = this.scratchB.copy(sample.up);
     if (!this.reducedMotion) {
       desiredCameraUp.applyAxisAngle(
-        this.forward,
+        this.presentationForward,
         -steer * (0.035 + this.driftIntensity * 0.045),
       );
     }
@@ -983,17 +1033,17 @@ export class FuturismaGame {
 
   private snapCamera(): void {
     const sample = this.course.project(
-      this.position,
+      this.presentationPosition,
       this.progress,
       this.cameraProjection,
     );
     this.cameraTarget
       .copy(this.vehicle.root.position)
-      .addScaledVector(this.forward, -9)
+      .addScaledVector(this.presentationForward, -9)
       .addScaledVector(sample.up, 4);
     this.cameraLook
       .copy(this.vehicle.root.position)
-      .addScaledVector(this.forward, 10)
+      .addScaledVector(this.presentationForward, 10)
       .addScaledVector(sample.up, 0.8);
     this.camera.position.copy(this.cameraTarget);
     this.camera.lookAt(this.cameraLook);
@@ -1150,6 +1200,7 @@ export class FuturismaGame {
     }
     this.forward.copy(start.tangent);
     this.travelDirection.copy(start.tangent);
+    this.syncPresentationPose();
     this.course.setLapBoard(1, this.totalLaps);
     this.course.setCheckpointProgress(1);
   }

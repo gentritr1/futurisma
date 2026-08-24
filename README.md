@@ -54,7 +54,9 @@ frame-pacing, race-line, lap-split, and heap summary once per second during a
 performance pass. Use `&quality=low` or `&quality=high` to lock render scale.
 The default targets a deliberately pixelated 540-line 3D layer, can step down
 to 360 lines after sustained slow frames, and recovers after sustained fast
-frames while racing. The HTML telemetry remains full-resolution. Add
+frames while racing. A presentation interpolation layer keeps the deterministic
+120 Hz handling model visually even on 144/165/240 Hz displays. The HTML
+telemetry remains full-resolution. Add
 `&motion=reduce` to exercise the same reduced-motion path as the operating-system
 preference.
 
@@ -79,7 +81,7 @@ host uses another format.
 The local suite verifies accepted asset hashes, measured map invariants,
 longitudinal and steering response at 60/120 Hz, checkpoint, hazard, and
 finish-distance rules, showcase-to-manual control intent, music timing,
-render-resolution tiers,
+high-refresh presentation cadence, render-resolution tiers,
 strict browser security policy, pinned package versions, the production build,
 and gzip budgets. Browser diagnostics
 remain the source of truth for full-lap draw calls and frame pacing.
