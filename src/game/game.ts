@@ -3,6 +3,7 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { EngineAudio } from "./audio";
 import { calculateImpactShakeOffset } from "./camera-feedback";
+import { hasPlayerControlIntent } from "./control-mode";
 import { GreenwaterCourse, type TurnCue } from "./course";
 import { disposeObject3DResources } from "./graphics-resources";
 import type { InputFrame } from "./input";
@@ -245,6 +246,7 @@ export class FuturismaGame {
   private minimumPixelRatio = this.resolveMinimumPixelRatio();
   private renderPixelRatio = this.preferredPixelRatio;
   private readonly demoMode = new URLSearchParams(window.location.search).has("demo");
+  private demoAutopilot = this.demoMode;
   private readonly diagnosticsMode = new URLSearchParams(window.location.search).has(
     "diagnostics",
   );
@@ -270,6 +272,7 @@ export class FuturismaGame {
     this.renderer.toneMappingExposure = 1.05;
     this.renderer.shadowMap.enabled = false;
     this.ui.setRaceFormat(this.totalLaps);
+    this.ui.setDemoAutopilot(this.demoAutopilot);
     const initialFog = this.course.fogAt(0);
     this.scene.background = initialFog.color.clone();
     this.scene.fog = new THREE.FogExp2(initialFog.color, initialFog.density);
@@ -458,10 +461,7 @@ export class FuturismaGame {
       if (this.phase === "countdown") this.updateCountdown(FIXED_STEP);
       if (this.phase === "resuming") this.updateResumeCountdown(FIXED_STEP);
       if (this.phase === "running") {
-        this.updateRace(
-          FIXED_STEP,
-          this.demoMode ? this.readDemoInput() : input,
-        );
+        this.updateRace(FIXED_STEP, this.resolveRaceInput(input));
       }
       if (this.phase === "finished") this.updateCoast(FIXED_STEP);
       this.physicsAccumulator -= FIXED_STEP;
@@ -469,7 +469,7 @@ export class FuturismaGame {
 
     const presentationInput = this.phase === "paused" || this.phase === "resuming"
       ? ZERO_INPUT
-      : this.demoMode
+      : this.demoAutopilot
         ? this.demoInput
         : input;
     this.updatePose(presentationInput, delta);
@@ -506,6 +506,18 @@ export class FuturismaGame {
       this.phase = "running";
       this.resetDiagnosticsPeak();
     }
+  }
+
+  private resolveRaceInput(input: InputFrame): InputFrame {
+    if (!this.demoAutopilot) return input;
+    const requestedTakeover = this.input.consumeControlIntent()
+      || hasPlayerControlIntent(input);
+    if (!requestedTakeover) return this.readDemoInput();
+
+    this.demoAutopilot = false;
+    this.ui.setDemoAutopilot(false);
+    this.ui.flashHazard("MANUAL CONTROL", 1_200);
+    return input;
   }
 
   private updateResumeCountdown(delta: number): void {
@@ -1060,6 +1072,7 @@ export class FuturismaGame {
       checkpointCount: this.course.checkpointCount,
       missedGate: this.missedGateIndex,
       finishArmed: this.nextCheckpointIndex === 0,
+      raceActive: this.phase === "running",
       sector: this.course.sectorLabelAt(this.progress),
       finishDistanceMeters,
       turnDirection: turnCue?.direction ?? null,
@@ -1419,6 +1432,7 @@ export class FuturismaGame {
       p95FrameMs: Number(p95FrameMs.toFixed(2)),
       maxFrameMs: Number(this.diagnosticMaxFrameMs.toFixed(2)),
       phase: this.phase,
+      controlMode: this.demoAutopilot ? "autopilot" : "manual",
       sector: this.course.sectorLabelAt(this.progress),
       distanceMeters: Math.round(this.progress * this.course.length),
       speedKph: Number((this.speed * 3.6).toFixed(1)),

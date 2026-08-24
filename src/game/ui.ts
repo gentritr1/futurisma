@@ -10,6 +10,7 @@ export interface HudFrame {
   checkpointCount: number;
   missedGate: number | null;
   finishArmed: boolean;
+  raceActive: boolean;
   sector: string;
   finishDistanceMeters: number;
   turnDirection: "LEFT" | "RIGHT" | null;
@@ -92,6 +93,14 @@ export class GameUi {
   private hazardUntil = 0;
   private gateFlashUntil = 0;
   private impactFlashUntil = 0;
+  private systemStatusLabel = "SYSTEM STANDBY";
+  private demoAutopilot = false;
+
+  setDemoAutopilot(active: boolean): void {
+    this.demoAutopilot = active;
+    document.body.dataset.controlMode = active ? "autopilot" : "manual";
+    this.setSystemStatus(this.systemStatusLabel);
+  }
 
   setRaceFormat(totalLaps: number): void {
     this.introDeck.textContent = `${totalLaps} ${totalLaps === 1 ? "lap" : "laps"} through Greenwater Strip. Read the amber turn grammar, clear all eight gates, and bring TOTEM home through The Cradle.`;
@@ -101,7 +110,7 @@ export class GameUi {
     this.loadingScreen.hidden = true;
     this.startScreen.hidden = false;
     this.resultScreen.hidden = true;
-    this.systemStatus.textContent = "TOTEM READY";
+    this.setSystemStatus("TOTEM READY");
     document.body.dataset.phase = "intro";
     this.startButton.focus({ preventScroll: true });
   }
@@ -119,7 +128,7 @@ export class GameUi {
     this.turnCue.setAttribute("aria-hidden", "true");
     this.impactFlash.dataset.active = "false";
     this.hazardUntil = 0;
-    this.systemStatus.textContent = "LAUNCH SEQUENCE";
+    this.setSystemStatus("LAUNCH SEQUENCE");
     document.body.dataset.phase = "race";
   }
 
@@ -137,7 +146,7 @@ export class GameUi {
     this.turnCue.dataset.active = "false";
     this.turnCue.setAttribute("aria-hidden", "true");
     this.impactFlash.dataset.active = "false";
-    this.systemStatus.textContent = "TRIAL COMPLETE";
+    this.setSystemStatus("TRIAL COMPLETE");
     document.body.dataset.phase = "result";
     this.restartButton.focus({ preventScroll: true });
   }
@@ -146,16 +155,16 @@ export class GameUi {
     this.loadingScreen.hidden = true;
     this.errorMessage.textContent = message;
     this.errorPanel.hidden = false;
-    this.systemStatus.textContent = "ASSEMBLY FAILURE";
+    this.setSystemStatus("ASSEMBLY FAILURE");
   }
 
   setCountdown(value: string): void {
     this.countdown.textContent = value;
-    if (value === "GO") this.systemStatus.textContent = "TRIAL ACTIVE";
+    if (value === "GO") this.setSystemStatus("TRIAL ACTIVE");
   }
 
   setAudioMuted(muted: boolean): void {
-    this.systemStatus.textContent = muted ? "AUDIO MUTED" : "AUDIO ONLINE";
+    this.setSystemStatus(muted ? "AUDIO MUTED" : "AUDIO ONLINE");
   }
 
   setPaused(paused: boolean, reason: "FOCUS LOST" | undefined = undefined): void {
@@ -163,14 +172,14 @@ export class GameUi {
       ? `${reason ?? "PAUSED"} · ENTER / START TO RESUME`
       : "";
     this.countdown.dataset.paused = paused ? "true" : "false";
-    this.systemStatus.textContent = paused ? "RACE PAUSED" : "TRIAL ACTIVE";
+    this.setSystemStatus(paused ? "RACE PAUSED" : "TRIAL ACTIVE");
     document.body.dataset.phase = paused ? "paused" : "race";
   }
 
   setResuming(): void {
     this.countdown.textContent = "";
     this.countdown.dataset.paused = "false";
-    this.systemStatus.textContent = "RESUME SEQUENCE";
+    this.setSystemStatus("RESUME SEQUENCE");
     document.body.dataset.phase = "resuming";
   }
 
@@ -325,12 +334,14 @@ export class GameUi {
     }
     const raceStage = frame.finishArmed && frame.lap === frame.totalLaps
       ? "approach"
-      : frame.lap === frame.totalLaps
+      : frame.totalLaps > 1 && frame.lap === frame.totalLaps
         ? "final"
         : "running";
-    if (raceStage !== this.lastRaceStage) {
-      if (raceStage === "approach") this.systemStatus.textContent = "FINAL APPROACH";
-      else if (raceStage === "final") this.systemStatus.textContent = "FINAL LAP";
+    if (!frame.raceActive) {
+      this.lastRaceStage = "";
+    } else if (raceStage !== this.lastRaceStage) {
+      if (raceStage === "approach") this.setSystemStatus("FINAL APPROACH");
+      else if (raceStage === "final") this.setSystemStatus("FINAL LAP");
       this.lastRaceStage = raceStage;
     }
     const hazardActive = performance.now() < this.hazardUntil;
@@ -368,5 +379,12 @@ export class GameUi {
       this.driveState.dataset.state = driveState;
       this.lastDriveState = driveState;
     }
+  }
+
+  private setSystemStatus(label: string): void {
+    this.systemStatusLabel = label;
+    this.systemStatus.textContent = this.demoAutopilot
+      ? `${label} · AUTOPILOT`
+      : label;
   }
 }

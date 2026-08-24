@@ -14,6 +14,20 @@ const CONTROL_KEYS = new Set([
   "Escape",
 ]);
 
+const DRIVING_KEYS = new Set([
+  "KeyW",
+  "KeyA",
+  "KeyS",
+  "KeyD",
+  "ArrowUp",
+  "ArrowDown",
+  "ArrowLeft",
+  "ArrowRight",
+  "ShiftLeft",
+  "ShiftRight",
+  "Space",
+]);
+
 function applyDeadzone(value: number, deadzone = 0.16): number {
   const magnitude = Math.abs(value);
   if (magnitude <= deadzone) return 0;
@@ -31,6 +45,7 @@ export class InputController {
   private startRequested = false;
   private resetRequested = false;
   private muteRequested = false;
+  private controlIntentRequested = false;
   private previousGamepadButtons: boolean[] = [];
 
   constructor() {
@@ -133,6 +148,12 @@ export class InputController {
     return requested;
   }
 
+  consumeControlIntent(): boolean {
+    const requested = this.controlIntentRequested;
+    this.controlIntentRequested = false;
+    return requested;
+  }
+
   private activeGamepad(): Gamepad | null {
     const gamepads = navigator.getGamepads?.();
     if (!gamepads) return null;
@@ -146,6 +167,7 @@ export class InputController {
   private readonly handleKeyDown = (event: KeyboardEvent): void => {
     if (CONTROL_KEYS.has(event.code)) event.preventDefault();
     this.keys.add(event.code);
+    if (DRIVING_KEYS.has(event.code)) this.controlIntentRequested = true;
     if (event.repeat) return;
 
     if (event.code === "Enter" || event.code === "Escape" || event.code === "KeyP") {

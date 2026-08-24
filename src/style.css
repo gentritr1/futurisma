@@ -167,6 +167,15 @@ kbd {
   box-shadow: 0 0 6px oklch(0.89 0.22 123 / 0.72);
 }
 
+body[data-control-mode="autopilot"] .system-state {
+  color: var(--cyan);
+}
+
+body[data-control-mode="autopilot"] .system-state__lamp {
+  background: var(--cyan);
+  box-shadow: 0 0 6px oklch(0.86 0.13 210 / 0.72);
+}
+
 .hud {
   position: fixed;
   inset: 0;

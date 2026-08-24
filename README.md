@@ -45,6 +45,9 @@ interfering with the clean racing line. Fog zones crossfade over the authored
 Append `?demo=1&laps=1` to the URL to run an automated one-lap throttle,
 steering, and boost pass for camera and rendering QA. The deterministic QA line
 targets the authored 34–36 second lap window without relying on wall contacts.
+The HUD labels this path `AUTOPILOT`. Any deliberate thrust, steering, braking,
+or boost input hands control to the player for the rest of the page session, so
+the showcase controller never competes with manual driving.
 
 Add `&diagnostics=1` to print draw calls, triangles, GPU resource counts and a
 frame-pacing, race-line, lap-split, and heap summary once per second during a
@@ -75,7 +78,8 @@ host uses another format.
 
 The local suite verifies accepted asset hashes, measured map invariants,
 longitudinal and steering response at 60/120 Hz, checkpoint, hazard, and
-finish-distance rules, music timing, render-resolution tiers,
+finish-distance rules, showcase-to-manual control intent, music timing,
+render-resolution tiers,
 strict browser security policy, pinned package versions, the production build,
 and gzip budgets. Browser diagnostics
 remain the source of truth for full-lap draw calls and frame pacing.
