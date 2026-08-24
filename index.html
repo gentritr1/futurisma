@@ -86,6 +86,10 @@
           <span id="turn-label">TURN LEFT</span>
           <strong id="turn-distance">120 M</strong>
         </div>
+        <div id="lap-event" class="lap-event" role="status" aria-hidden="true">
+          <strong id="lap-event-label">LAP 2 / 5</strong>
+          <span id="lap-event-time">LAST 00:34.500</span>
+        </div>
         <div id="countdown" class="countdown" aria-live="assertive"></div>
       </main>
 
@@ -127,6 +131,7 @@
           <p class="result-status">TRIAL COMPLETE</p>
           <h2 id="result-time">00:00.000</h2>
           <p id="result-detail">TOTEM / WORKS 07</p>
+          <ol id="result-laps" class="result-laps" aria-label="Lap times" hidden></ol>
           <button id="restart-button" class="launch-button" type="button">
             <span>RUN AGAIN</span>
             <kbd>ENTER</kbd>

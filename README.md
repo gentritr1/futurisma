@@ -34,8 +34,10 @@ The vehicle must also pass inside each authored gate span. Compatible gamepads
 receive restrained boost, checkpoint, impact, recovery, and finish rumble.
 The HUD calls upcoming turns, the next gate, corrective edge steering, and the
 remaining distance to the finish. Multi-lap trials also report the last lap in
-the HUD and the best lap on the result screen. Airbrakes and the standing-water
-grip loss feed the procedural noise layer as well as handling feedback.
+the HUD, surface a dedicated lap/final-lap split at The Cradle, and retain a
+lap-by-lap best-time ledger on the result screen. Airbrakes and the
+standing-water grip loss feed the procedural noise layer as well as handling
+feedback.
 If a gate is missed, the HUD keeps the failure visible, offers the recovery
 control, and includes the required extra circuit in the finish distance.
 A sustained high-speed route reversal suppresses normal turn calls and displays

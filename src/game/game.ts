@@ -992,6 +992,12 @@ export class FuturismaGame {
       }
       this.audio.playLap();
       this.input.pulse(0.12, 0.3, 110);
+      this.ui.flashLap(
+        this.lap,
+        this.totalLaps,
+        completedLapMs,
+        this.bestLapMs ?? completedLapMs,
+      );
       this.nextCheckpointIndex = 1;
       this.course.setLapBoard(this.lap, this.totalLaps);
       this.course.setCheckpointProgress(1);
@@ -1333,6 +1339,7 @@ export class FuturismaGame {
       this.elapsedMs,
       this.totalLaps,
       this.bestLapMs ?? this.elapsedMs,
+      this.lapTimesMs,
     );
   }
 

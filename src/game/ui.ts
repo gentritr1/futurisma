@@ -65,6 +65,7 @@ export class GameUi {
   private readonly resultScreen = requiredElement<HTMLElement>("result-screen");
   private readonly resultTime = requiredElement<HTMLElement>("result-time");
   private readonly resultDetail = requiredElement<HTMLElement>("result-detail");
+  private readonly resultLaps = requiredElement<HTMLOListElement>("result-laps");
   private readonly introDeck = requiredElement<HTMLElement>("intro-deck");
   private readonly systemStatus = requiredElement<HTMLElement>("system-status");
   private readonly speedValue = requiredElement<HTMLElement>("speed-value");
@@ -87,6 +88,9 @@ export class GameUi {
   private readonly turnLabel = requiredElement<HTMLElement>("turn-label");
   private readonly turnArrow = requiredElement<HTMLElement>("turn-arrow");
   private readonly turnDistance = requiredElement<HTMLElement>("turn-distance");
+  private readonly lapEvent = requiredElement<HTMLElement>("lap-event");
+  private readonly lapEventLabel = requiredElement<HTMLElement>("lap-event-label");
+  private readonly lapEventTime = requiredElement<HTMLElement>("lap-event-time");
   private readonly countdown = requiredElement<HTMLElement>("countdown");
   private readonly impactFlash = requiredElement<HTMLElement>("impact-flash");
   private readonly errorPanel = requiredElement<HTMLElement>("error-panel");
@@ -104,6 +108,7 @@ export class GameUi {
   private hazardLabel = "";
   private hazardUntil = 0;
   private gateFlashUntil = 0;
+  private lapEventUntil = 0;
   private impactFlashUntil = 0;
   private systemStatusLabel = "SYSTEM STANDBY";
   private demoAutopilot = false;
@@ -139,17 +144,24 @@ export class GameUi {
     this.edgeWarning.setAttribute("aria-hidden", "true");
     this.turnCue.dataset.active = "false";
     this.turnCue.setAttribute("aria-hidden", "true");
+    this.hideLapEvent();
     this.impactFlash.dataset.active = "false";
     this.hazardUntil = 0;
     this.setSystemStatus("LAUNCH SEQUENCE");
     document.body.dataset.phase = "race";
   }
 
-  showResult(elapsedMs: number, totalLaps: number, bestLapMs: number): void {
+  showResult(
+    elapsedMs: number,
+    totalLaps: number,
+    bestLapMs: number,
+    lapTimesMs: readonly number[],
+  ): void {
     this.resultTime.textContent = formatRaceTime(elapsedMs);
     this.resultDetail.textContent = `TOTEM / WORKS 07 · ${totalLaps} ${
       totalLaps === 1 ? "LAP" : "LAPS"
     } LOGGED · BEST ${formatRaceTime(bestLapMs)}`;
+    this.updateResultLaps(lapTimesMs, bestLapMs);
     this.resultScreen.hidden = false;
     this.countdown.textContent = "";
     this.countdown.dataset.paused = "false";
@@ -159,6 +171,7 @@ export class GameUi {
     this.edgeWarning.setAttribute("aria-hidden", "true");
     this.turnCue.dataset.active = "false";
     this.turnCue.setAttribute("aria-hidden", "true");
+    this.hideLapEvent();
     this.impactFlash.dataset.active = "false";
     this.setSystemStatus("TRIAL COMPLETE");
     document.body.dataset.phase = "result";
@@ -237,12 +250,38 @@ export class GameUi {
     this.impactFlash.dataset.side = side.toLowerCase();
   }
 
+  flashLap(
+    lap: number,
+    totalLaps: number,
+    completedLapMs: number,
+    bestLapMs: number,
+  ): void {
+    const isFinalLap = lap === totalLaps;
+    const isSessionBest = completedLapMs <= bestLapMs + 0.5;
+    this.lapEventLabel.textContent = isFinalLap
+      ? "FINAL LAP"
+      : `LAP ${lap} / ${totalLaps}`;
+    this.lapEventTime.textContent = `LAST ${formatRaceTime(completedLapMs)}${
+      isSessionBest ? " · SESSION BEST" : ""
+    }`;
+    this.lapEvent.dataset.final = isFinalLap ? "true" : "false";
+    this.lapEvent.dataset.active = "true";
+    this.lapEvent.setAttribute("aria-hidden", "false");
+    this.lapEventUntil = performance.now() + 1_500;
+  }
+
   flashHazard(label: string, durationMs = 900): void {
     this.hazardLabel = label;
     this.hazardUntil = performance.now() + durationMs;
   }
 
   update(frame: HudFrame): void {
+    if (
+      this.lapEvent.dataset.active === "true"
+      && performance.now() >= this.lapEventUntil
+    ) {
+      this.hideLapEvent();
+    }
     if (
       this.impactFlash.dataset.active === "true"
       && performance.now() >= this.impactFlashUntil
@@ -429,6 +468,40 @@ export class GameUi {
       this.driveState.dataset.state = driveState;
       this.lastDriveState = driveState;
     }
+  }
+
+  private hideLapEvent(): void {
+    this.lapEvent.dataset.active = "false";
+    this.lapEvent.setAttribute("aria-hidden", "true");
+    this.lapEventUntil = 0;
+  }
+
+  private updateResultLaps(
+    lapTimesMs: readonly number[],
+    bestLapMs: number,
+  ): void {
+    this.resultLaps.replaceChildren();
+    this.resultLaps.hidden = lapTimesMs.length <= 1;
+    if (this.resultLaps.hidden) return;
+
+    const fragment = document.createDocumentFragment();
+    lapTimesMs.forEach((lapTimeMs, index) => {
+      const row = document.createElement("li");
+      const lap = document.createElement("span");
+      const time = document.createElement("time");
+      const status = document.createElement("strong");
+      const isBest = lapTimeMs <= bestLapMs + 0.5;
+
+      lap.textContent = `LAP ${(index + 1).toString().padStart(2, "0")}`;
+      time.textContent = formatRaceTime(lapTimeMs);
+      status.textContent = isBest
+        ? "BEST"
+        : `+${formatRaceTime(Math.max(0, lapTimeMs - bestLapMs))}`;
+      row.dataset.best = isBest ? "true" : "false";
+      row.append(lap, time, status);
+      fragment.append(row);
+    });
+    this.resultLaps.append(fragment);
   }
 
   private setSystemStatus(label: string): void {
