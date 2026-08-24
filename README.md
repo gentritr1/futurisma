@@ -26,6 +26,8 @@ trial defaults to five laps. Add `?laps=1` through `?laps=9` to override the
 race length for testing. Emptying the boost reserve locks boost until the input
 is released, preventing depleted thrust, audio, and effects from pulsing. The
 reserve meter and drive-state readout both call for that release in amber.
+Gamepad axes use a rescaled 16% deadzone and reject invalid driver values;
+while a keyboard direction is held it wins over an opposing analogue axis.
 TOTEM now uses player-controlled heading with speed-sensitive steering, grip, and
 high-speed drift. Course vectors must be cleared in order for a lap to count.
 The chase lens expands with speed, boost, and drift, then compresses slightly

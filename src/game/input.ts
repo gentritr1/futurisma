@@ -1,4 +1,5 @@
 import { resolveActionSuppression } from "./action-gate";
+import { resolveSteeringInput, sanitizeTrigger } from "./input-shaping";
 
 export interface InputFrame {
   throttle: number;
@@ -32,12 +33,6 @@ const DRIVING_KEYS = new Set([
 
 const START_KEYS = new Set(["Enter", "Escape", "KeyP"]);
 const ACTION_KEYS = new Set([...START_KEYS, "KeyR", "KeyM"]);
-
-function applyDeadzone(value: number, deadzone = 0.16): number {
-  const magnitude = Math.abs(value);
-  if (magnitude <= deadzone) return 0;
-  return Math.sign(value) * ((magnitude - deadzone) / (1 - deadzone));
-}
 
 function hasHeldKeyboardAction(keys: ReadonlySet<string>): boolean {
   for (const code of ACTION_KEYS) {
@@ -125,13 +120,15 @@ export class InputController {
       this.previousGamepadButtons[index] = gamepad.buttons[index].pressed;
     }
 
-    const stick = applyDeadzone(gamepad.axes[0] ?? 0);
-    const triggerThrottle = gamepad.buttons[7]?.value ?? 0;
-    const triggerBrake = gamepad.buttons[6]?.value ?? 0;
+    const triggerThrottle = sanitizeTrigger(gamepad.buttons[7]?.value ?? 0);
+    const triggerBrake = sanitizeTrigger(gamepad.buttons[6]?.value ?? 0);
 
     this.frame.throttle = Math.max(keyboardThrottle, triggerThrottle);
     this.frame.brake = Math.max(keyboardBrake, triggerBrake);
-    this.frame.steer = Math.abs(keyboardSteer) > Math.abs(stick) ? keyboardSteer : stick;
+    this.frame.steer = resolveSteeringInput(
+      keyboardSteer,
+      gamepad.axes[0] ?? 0,
+    );
     this.frame.boost = keyboardBoost || Boolean(gamepad.buttons[0]?.pressed);
     return this.frame;
   }
