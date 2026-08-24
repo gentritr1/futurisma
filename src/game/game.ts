@@ -325,6 +325,7 @@ export class FuturismaGame {
   private diagnosticRenderedFrames = 0;
   private diagnosticIdleFramesSkipped = 0;
   private diagnosticPresentationProjectionQueries = 0;
+  private diagnosticAtmosphereUpdates = 0;
   private diagnosticTopSpeed = 0;
   private diagnosticMaxLateralRatio = 0;
   private diagnosticStartHeapMb: number | null = null;
@@ -658,7 +659,9 @@ export class FuturismaGame {
     this.updateSpeedLines(delta);
     this.updateImpactSparks(delta);
     this.updateFog(delta);
-    this.course.updateAtmosphere(this.elapsedMs / 1000, this.reducedMotion);
+    if (this.course.updateAtmosphere(this.elapsedMs / 1000, this.reducedMotion)) {
+      this.diagnosticAtmosphereUpdates += 1;
+    }
     this.audio.update(
       this.speed / BOOST_MAX_SPEED,
       presentationInput.throttle,
@@ -1589,6 +1592,7 @@ export class FuturismaGame {
   }
 
   private updateImpactSparks(delta: number): void {
+    if (!this.impactSparks.visible) return;
     let changed = false;
     let active = false;
     for (let particle = 0; particle < this.impactSparkLife.length; particle += 1) {
@@ -1885,6 +1889,10 @@ export class FuturismaGame {
       renderedFrames: this.diagnosticRenderedFrames,
       idleFramesSkipped: this.diagnosticIdleFramesSkipped,
       presentationProjectionQueries: this.diagnosticPresentationProjectionQueries,
+      atmosphereUpdates: this.diagnosticAtmosphereUpdates,
+      atmosphereHz: elapsedSeconds > 0
+        ? Number((this.diagnosticAtmosphereUpdates / elapsedSeconds).toFixed(1))
+        : 0,
       recoveryLocations: this.diagnosticRecoveryLocations,
       maxLateralRatio: Number(this.diagnosticMaxLateralRatio.toFixed(2)),
       physicsSteps: this.diagnosticPhysicsSteps,
@@ -1993,6 +2001,7 @@ export class FuturismaGame {
     this.diagnosticRenderedFrames = 0;
     this.diagnosticIdleFramesSkipped = 0;
     this.diagnosticPresentationProjectionQueries = 0;
+    this.diagnosticAtmosphereUpdates = 0;
     this.diagnosticTopSpeed = 0;
     this.diagnosticMaxLateralRatio = 0;
     const memory = performance as Performance & {

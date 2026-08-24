@@ -184,6 +184,7 @@ const COURSE_BASIS = new THREE.Matrix4();
 const COURSE_BACK = new THREE.Vector3();
 const MAP = greenwaterJson as unknown as GreenwaterMapData;
 const GAMEPLAY_FOG_SCALE = 0.58;
+const ATMOSPHERE_UPDATE_INTERVAL_SECONDS = 1 / 30;
 const BOOST_PAD_DISTANCES = [1705, 1815, 1925, 2035] as const;
 const SECTOR_LABELS: Record<string, string> = {
   RUNWAY_START: "RUNWAY 09",
@@ -327,6 +328,8 @@ export class GreenwaterCourse {
   );
   private readonly steamVents: SteamVentRuntime[] = [];
   private readonly atmosphereTransform = new THREE.Object3D();
+  private atmospherePreviousElapsedSeconds = -1;
+  private atmosphereNextUpdateAt = 0;
   private steamPuffs: THREE.InstancedMesh | null = null;
   private steamWarnings: THREE.InstancedMesh | null = null;
   private cargoHookPivot: THREE.Group | null = null;
@@ -637,7 +640,17 @@ export class GreenwaterCourse {
     return active.levels;
   }
 
-  updateAtmosphere(elapsedSeconds: number, reducedMotion: boolean): void {
+  updateAtmosphere(elapsedSeconds: number, reducedMotion: boolean): boolean {
+    const elapsed = Number.isFinite(elapsedSeconds)
+      ? Math.max(0, elapsedSeconds)
+      : 0;
+    if (elapsed < this.atmospherePreviousElapsedSeconds) {
+      this.atmosphereNextUpdateAt = elapsed;
+    }
+    this.atmospherePreviousElapsedSeconds = elapsed;
+    if (elapsed + 1e-6 < this.atmosphereNextUpdateAt) return false;
+    this.atmosphereNextUpdateAt = elapsed + ATMOSPHERE_UPDATE_INTERVAL_SECONDS;
+
     const puffs = this.steamPuffs;
     const warnings = this.steamWarnings;
     if (puffs && warnings) {
@@ -645,7 +658,7 @@ export class GreenwaterCourse {
       for (let ventIndex = 0; ventIndex < this.steamVents.length; ventIndex += 1) {
         const vent = this.steamVents[ventIndex];
         const cycleTime = THREE.MathUtils.euclideanModulo(
-          elapsedSeconds + vent.phaseOffset,
+          elapsed + vent.phaseOffset,
           vent.cycleSeconds,
         );
         const warningPulse = cycleTime < vent.telegraphSeconds
@@ -694,8 +707,9 @@ export class GreenwaterCourse {
 
     if (this.cargoHookPivot) {
       const amplitude = reducedMotion ? 0.1 : 0.34;
-      this.cargoHookPivot.rotation.z = Math.sin(elapsedSeconds * 1.7) * amplitude;
+      this.cargoHookPivot.rotation.z = Math.sin(elapsed * 1.7) * amplitude;
     }
+    return true;
   }
 
   setCheckpointProgress(nextCheckpointIndex: number): void {

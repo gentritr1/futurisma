@@ -73,11 +73,14 @@ The default targets a deliberately pixelated 540-line 3D layer, can step down
 to 360 lines after sustained slow frames, and recovers after sustained fast
 frames while racing. A presentation interpolation layer keeps the deterministic
 120 Hz handling model visually even on 144/165/240 Hz displays. The HTML
-telemetry remains full-resolution. Add
+telemetry remains full-resolution. Steam, warning-lamp, and cargo-hook ambience
+uses an absolute-time 30 Hz cadence, reducing dynamic instance uploads without
+lowering vehicle, camera, or input presentation rates. Add
 `&motion=reduce` to exercise the same reduced-motion path as the operating-system
 preference.
 Diagnostics also report course assembly, critical vehicle fetch/load, total
-startup-ready, and optional asset-kit load timing. The production shell preloads
+startup-ready, optional asset-kit load timing, and the measured atmosphere
+update rate. The production shell preloads
 the required TOTEM runtime GLB so its transfer overlaps module parsing.
 
 For focused QA, `&diagnostics=1&probe=recovery` starts TOTEM just beyond

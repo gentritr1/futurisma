@@ -99,6 +99,21 @@ held 9.7 ms p95 / 10.4 ms maximum frame time, peaked at 93 draw calls / 42,720
 triangles, and retained 86 geometries / 17 textures. It recorded zero impacts,
 missed gates, recoveries, wrong-way events, spark bursts, or WebGL faults.
 
+## Ambient animation cadence acceptance
+
+Steam puffs, vent warning lamps, and the Hangar Six cargo hook now sample their
+absolute-time animation at 30 Hz. Vehicle motion, camera presentation, input,
+and the fixed 120 Hz physics model remain independent. Both normal and reduced
+motion measured exactly 30.0 Hz through Hangar Six.
+
+The five-lap high-quality acceptance recorded 5,184 atmosphere updates across
+20,736 rendered frames: one dynamic ambient upload for every four presented
+frames, a 75% reduction from the previous per-frame path. It completed the
+locked 02:52.799 lap sequence at 10.0 ms p95 / 10.4 ms maximum, peaked at 92
+draw calls / 42,696 triangles, retained 86 geometries / 17 textures, and ended
+with 1.2 MB sampled heap growth. All gameplay, particle, and WebGL fault
+counters remained at zero.
+
 ## Runtime invariants
 
 Keep these true while integrating the authored Greenwater environment:
@@ -112,6 +127,7 @@ Keep these true while integrating the authored Greenwater environment:
 - Ready, paused, and settled-result screens perform no simulation, presentation, audio-control, or WebGL draw work until invalidated or resumed.
 - Pose and chase-camera presentation share one course projection per rendered frame; real-time audio control reuses its filter-target storage.
 - Water Table reaches the authored 0.8 grip floor and recovers over 0.8 seconds without a one-step handling snap.
+- Ambient steam, warning lamps, and cargo-hook motion remain locked to 30 Hz without changing vehicle, camera, or input cadence.
 
 ## Environment integration gates
 
