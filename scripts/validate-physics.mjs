@@ -59,11 +59,61 @@ const braking = simulateSpeed({
   boostActive: false,
   startingSpeed: 85,
 });
+const releasedBoostFirstStep = simulateSpeed({
+  seconds: 1 / 120,
+  step: 1 / 120,
+  throttle: 1,
+  brake: 0,
+  boostActive: false,
+  startingSpeed: physics.BOOST_MAX_SPEED,
+});
+const releasedBoostHalfSecond = simulateSpeed({
+  seconds: 0.5,
+  step: 1 / 120,
+  throttle: 1,
+  brake: 0,
+  boostActive: false,
+  startingSpeed: physics.BOOST_MAX_SPEED,
+});
+const releasedBoostTwoSeconds120 = simulateSpeed({
+  seconds: 2,
+  step: 1 / 120,
+  throttle: 1,
+  brake: 0,
+  boostActive: false,
+  startingSpeed: physics.BOOST_MAX_SPEED,
+});
+const releasedBoostTwoSeconds60 = simulateSpeed({
+  seconds: 2,
+  step: 1 / 60,
+  throttle: 1,
+  brake: 0,
+  boostActive: false,
+  startingSpeed: physics.BOOST_MAX_SPEED,
+});
 
 assert.ok(cruise120 > 70 && cruise120 <= 92, `Unexpected cruise speed ${cruise120}.`);
 assert.ok(boosted > cruise120, "Boost must produce a higher terminal speed than cruise.");
 assert.ok(boosted <= physics.BOOST_MAX_SPEED, "Boost must respect its speed cap.");
 assert.ok(braking < 45, `Full braking should shed meaningful speed; got ${braking}.`);
+assert.ok(
+  releasedBoostFirstStep > 110,
+  `Boost release must preserve momentum instead of snapping to cruise speed (${releasedBoostFirstStep}).`,
+);
+assert.ok(
+  releasedBoostHalfSecond < releasedBoostFirstStep
+    && releasedBoostHalfSecond > 100,
+  "Released boost must begin a controlled overspeed bleed.",
+);
+assert.ok(
+  releasedBoostTwoSeconds120 < releasedBoostHalfSecond
+    && releasedBoostTwoSeconds120 > 92,
+  "Overspeed must continue decaying smoothly without an artificial cruise clamp.",
+);
+assert.ok(
+  Math.abs(releasedBoostTwoSeconds120 - releasedBoostTwoSeconds60) < 0.2,
+  "Post-boost momentum decay must remain stable between 60 Hz and 120 Hz.",
+);
 assert.ok(
   Math.abs(cruise120 - cruise60) < 0.2,
   "Longitudinal integration must remain stable between 60 Hz and 120 Hz.",
@@ -356,5 +406,5 @@ assert.ok(
 );
 
 console.log(
-  `Physics PASS: cruise ${(cruise120 * 3.6).toFixed(1)} km/h, boost ${(boosted * 3.6).toFixed(1)} km/h, 60/120 Hz speed drift ${Math.abs(cruise120 - cruise60).toFixed(3)} m/s, steering drift ${Math.abs(steering120 - steering60).toFixed(4)}, 240 s soak ${soak120.boostExhaustions} boost exhaustions / ${soak120.driftEntries} drift entries / ${(Math.abs(soak120.distance - soak60.distance) / soak120.distance * 100).toFixed(3)}% distance drift.`,
+  `Physics PASS: cruise ${(cruise120 * 3.6).toFixed(1)} km/h, boost ${(boosted * 3.6).toFixed(1)} km/h, post-boost ${(releasedBoostHalfSecond * 3.6).toFixed(1)}→${(releasedBoostTwoSeconds120 * 3.6).toFixed(1)} km/h, 60/120 Hz speed drift ${Math.abs(cruise120 - cruise60).toFixed(3)} m/s, steering drift ${Math.abs(steering120 - steering60).toFixed(4)}, 240 s soak ${soak120.boostExhaustions} boost exhaustions / ${soak120.driftEntries} drift entries / ${(Math.abs(soak120.distance - soak60.distance) / soak120.distance * 100).toFixed(3)}% distance drift.`,
 );

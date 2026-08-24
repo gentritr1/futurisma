@@ -1,7 +1,7 @@
 export const CRUISE_MAX_SPEED = 86;
 export const BOOST_MAX_SPEED = 112;
 export const BOOST_RESERVE_CUTOFF = 0.012;
-const NON_BOOST_SPEED_LIMIT = 92;
+const OVERSPEED_DRAG_RATE = 0.45;
 
 /** @param {number} value @param {number} minimum @param {number} maximum */
 function clamp(value, minimum, maximum) {
@@ -60,12 +60,17 @@ export function integrateSpeed(
   const boostForce = boostActive ? 34 : 0;
   const brakeForce = brake * lerp(46, 25, driftIntent);
   const drag = 1.2 + speed * 0.038 + speed * speed * 0.0007;
-  const nextSpeed = speed + (engineForce + boostForce - brakeForce - drag) * delta;
-  return clamp(
-    nextSpeed,
-    0,
-    boostActive ? BOOST_MAX_SPEED : NON_BOOST_SPEED_LIMIT,
-  );
+  const overspeedDrag = boostActive
+    ? 0
+    : Math.max(0, speed - CRUISE_MAX_SPEED) * OVERSPEED_DRAG_RATE;
+  const nextSpeed = speed + (
+    engineForce
+    + boostForce
+    - brakeForce
+    - drag
+    - overspeedDrag
+  ) * delta;
+  return clamp(nextSpeed, 0, BOOST_MAX_SPEED);
 }
 
 /**

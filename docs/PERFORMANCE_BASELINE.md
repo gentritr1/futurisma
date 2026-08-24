@@ -51,6 +51,22 @@ The post-scheduler five-lap high-quality acceptance rerun reproduced the exact l
 
 The active-frame projection/allocation pass then removed the duplicate chase-camera course search and reused one audio filter-target object across all 30 Hz control updates. A normal-motion one-lap probe logged exactly 4,139 presentation projections for 4,139 rendered frames, completed in 00:34.499, and retained the approved 56.02–70.47° camera range. A five-lap reduced-motion soak logged exactly 20,739 projections for 20,739 rendered frames, reproduced the locked lap sequence, held 9.7 ms p95 / 10.4 ms maximum, and retained the same 92-call / 42,688-triangle peak envelope with zero gameplay or WebGL faults.
 
+## Post-boost momentum acceptance
+
+The boost-release physics pass removed the one-step non-boost speed clamp. At
+120 Hz, a full-speed release now carries 379.9 km/h after 0.5 seconds and
+decays to 346.2 km/h after 2 seconds before settling at the existing 330.0 km/h
+cruise speed. The 60/120 Hz post-boost result differs by less than 0.2 m/s, and
+the mixed-control 240-second physics soak remains within 0.017% distance drift.
+
+A normal-motion, high-quality five-lap browser acceptance run completed in
+02:52.816 with laps of 34.483, 34.442, 34.525, 34.683, and 34.683 seconds. It
+held 9.8 ms p95 / 10.4 ms maximum frame time at a 1045 × 1138 internal buffer,
+peaked at 81 draw calls and 41,544 visible triangles, and finished at 87
+geometries / 17 textures. All eight gates cleared on every lap with zero
+impacts, recoveries, wrong-way events, missed gates, or WebGL context faults.
+The fresh package advisory check on 2026-08-24 reported zero vulnerabilities.
+
 ## Runtime invariants
 
 Keep these true while integrating the authored Greenwater environment:
