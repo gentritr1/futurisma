@@ -1,4 +1,8 @@
-import { nextQuantizedTime } from "./audio-timing";
+import {
+  advanceFixedRateDeadline,
+  fixedRateUpdateDue,
+  nextQuantizedTime,
+} from "./audio-timing";
 
 export interface MusicProfile {
   trance: number;
@@ -13,6 +17,7 @@ type WaveShape = "sine" | "metal";
 const BPM = 174;
 const BEAT_SECONDS = 60 / BPM;
 const BAR_SECONDS = BEAT_SECONDS * 4;
+const CONTROL_INTERVAL_SECONDS = 1 / 30;
 const LOOP_BEATS = 8;
 const STEM_NAMES: StemName[] = ["trance", "jungle", "deep_dnb", "techstep"];
 const STEM_GAIN: Record<StemName, number> = {
@@ -45,6 +50,9 @@ export class EngineAudio {
   private readonly persistentSources: AudioScheduledSourceNode[] = [];
   private musicProfileKey = -1;
   private musicStartTime = 0;
+  private nextControlUpdateTime = 0;
+  private diagnosticControlUpdates = 0;
+  private diagnosticControlStartedAt = 0;
   private muted = false;
   private paused = false;
 
@@ -129,6 +137,15 @@ export class EngineAudio {
   ): void {
     if (!this.context || !this.engineOscillator || !this.harmonicOscillator) return;
     const now = this.context.currentTime;
+    if (!fixedRateUpdateDue(now, this.nextControlUpdateTime, CONTROL_INTERVAL_SECONDS)) {
+      return;
+    }
+    this.nextControlUpdateTime = advanceFixedRateDeadline(
+      now,
+      this.nextControlUpdateTime,
+      CONTROL_INTERVAL_SECONDS,
+    );
+    this.diagnosticControlUpdates += 1;
     const baseFrequency = 52 + speedRatio * 118 + throttle * 24 + (boost ? 18 : 0);
     this.engineOscillator.frequency.setTargetAtTime(baseFrequency, now, 0.045);
     this.harmonicOscillator.frequency.setTargetAtTime(baseFrequency * 2.03, now, 0.04);
@@ -240,6 +257,30 @@ export class EngineAudio {
     this.updateMasterGain();
   }
 
+  resetDiagnostics(): void {
+    this.diagnosticControlUpdates = 0;
+    this.diagnosticControlStartedAt = this.context?.currentTime ?? 0;
+  }
+
+  diagnostics(): {
+    contextState: AudioContextState | "uninitialized";
+    controlUpdates: number;
+    controlHz: number;
+    controlTargetHz: number;
+  } {
+    const elapsed = this.context
+      ? Math.max(0, this.context.currentTime - this.diagnosticControlStartedAt)
+      : 0;
+    return {
+      contextState: this.context?.state ?? "uninitialized",
+      controlUpdates: this.diagnosticControlUpdates,
+      controlHz: elapsed > 0
+        ? this.diagnosticControlUpdates / elapsed
+        : 0,
+      controlTargetHz: 1 / CONTROL_INTERVAL_SECONDS,
+    };
+  }
+
   dispose(): void {
     for (const source of this.persistentSources) {
       try {
@@ -255,7 +296,18 @@ export class EngineAudio {
     void this.context?.close();
     this.context = null;
     this.master = null;
+    this.engineGain = null;
     this.engineFilter = null;
+    this.engineOscillator = null;
+    this.harmonicOscillator = null;
+    this.harmonicGain = null;
+    this.windGain = null;
+    this.musicFilter = null;
+    this.musicProfileKey = -1;
+    this.musicStartTime = 0;
+    this.nextControlUpdateTime = 0;
+    this.diagnosticControlUpdates = 0;
+    this.diagnosticControlStartedAt = 0;
   }
 
   private installMusic(context: AudioContext, master: GainNode): void {

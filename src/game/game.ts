@@ -1290,6 +1290,7 @@ export class FuturismaGame {
       ? frameWindow[Math.min(frameWindow.length - 1, Math.floor(frameWindow.length * 0.95))]
       : 0;
     const elapsedSeconds = this.elapsedMs / 1000;
+    const audioDiagnostics = this.audio.diagnostics();
     const memory = performance as Performance & {
       memory?: { usedJSHeapSize: number };
     };
@@ -1337,6 +1338,10 @@ export class FuturismaGame {
       recoveryLocations: this.diagnosticRecoveryLocations,
       maxLateralRatio: Number(this.diagnosticMaxLateralRatio.toFixed(2)),
       physicsSteps: this.diagnosticPhysicsSteps,
+      audioContextState: audioDiagnostics.contextState,
+      audioControlUpdates: audioDiagnostics.controlUpdates,
+      audioControlHz: Number(audioDiagnostics.controlHz.toFixed(1)),
+      audioControlTargetHz: audioDiagnostics.controlTargetHz,
       pixelRatio: Number(this.renderPixelRatio.toFixed(2)),
       preferredPixelRatio: Number(this.preferredPixelRatio.toFixed(2)),
       minimumPixelRatio: Number(this.minimumPixelRatio.toFixed(2)),
@@ -1414,6 +1419,7 @@ export class FuturismaGame {
     this.diagnosticMaxHeapMb = this.diagnosticStartHeapMb;
     this.diagnosticImpactLocations.length = 0;
     this.diagnosticRecoveryLocations.length = 0;
+    this.audio.resetDiagnostics();
     this.diagnosticsFinalReported = false;
   }
 
