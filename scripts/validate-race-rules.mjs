@@ -5,7 +5,10 @@ import {
   checkpointRequiresExtraCircuit,
   crossedForwardProgress,
   forwardProgressDelta,
+  isOpenEdgeWarningActive,
   isCircularHazardContact,
+  isTurnCueBeyondFinish,
+  isTurnCueUrgent,
   resolveCountdownStage,
 } from "../src/game/race-rules.js";
 
@@ -24,6 +27,22 @@ assert.equal(resolveCountdownStage(2), "1");
 assert.equal(resolveCountdownStage(1), "GO");
 assert.equal(resolveCountdownStage(0), "");
 assert.equal(resolveCountdownStage(Number.NaN), "");
+
+assert.equal(isTurnCueUrgent(210, 90, true), true);
+assert.equal(isTurnCueUrgent(230, 90, true), false);
+assert.equal(isTurnCueUrgent(120, 20, true), true);
+assert.equal(isTurnCueUrgent(80, 90, false), false);
+assert.equal(isTurnCueUrgent(Number.NaN, 90, true), false);
+
+assert.equal(isOpenEdgeWarningActive(6.5, 10), true);
+assert.equal(isOpenEdgeWarningActive(6.3, 10), false);
+assert.equal(isOpenEdgeWarningActive(-6.5, 10), true);
+assert.equal(isOpenEdgeWarningActive(Number.NaN, 10), false);
+
+assert.equal(isTurnCueBeyondFinish(280, 60, true), true);
+assert.equal(isTurnCueBeyondFinish(0, 360, true), false);
+assert.equal(isTurnCueBeyondFinish(280, 60, false), false);
+assert.equal(isTurnCueBeyondFinish(Number.NaN, 60, true), false);
 
 assert.equal(checkpointRequiresExtraCircuit(0.4, 0.2), true);
 assert.equal(checkpointRequiresExtraCircuit(0.2, 0.4), false);
@@ -83,5 +102,5 @@ assert.deepEqual(calculateRecoveryTelemetry(Number.NaN, 0), {
 });
 
 console.log(
-  "Race rules PASS: countdown, forward crossings, wraparound, missed-gate penalty, finish distance, cable contacts, recovery telemetry.",
+  "Race rules PASS: countdown, turn urgency, open-edge warning, final-route filtering, forward crossings, wraparound, missed-gate penalty, finish distance, cable contacts, recovery telemetry.",
 );

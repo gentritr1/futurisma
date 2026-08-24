@@ -20,6 +20,9 @@ import {
   calculateFinishDistanceMeters,
   calculateRecoveryTelemetry,
   crossedForwardProgress,
+  isOpenEdgeWarningActive,
+  isTurnCueBeyondFinish,
+  isTurnCueUrgent,
   resolveCountdownStage,
 } from "./race-rules";
 import {
@@ -101,12 +104,14 @@ export class FuturismaGame {
   private readonly demoLookAhead = this.course.createSampleScratch();
   private readonly demoTurnCue: TurnCue = {
     direction: "LEFT",
+    followingDirection: null,
     distance: 0,
     hard: false,
     radius: 0,
   };
   private readonly hudTurnCue: TurnCue = {
     direction: "LEFT",
+    followingDirection: null,
     distance: 0,
     hard: false,
     radius: 0,
@@ -176,6 +181,7 @@ export class FuturismaGame {
   private countdownStage = "";
   private pausedBeforeStart = false;
   private edgeContact = false;
+  private openEdgeWarning = false;
   private offCourseTime = 0;
   private recoveryImmunity = 0;
   private hazardTripCooldown = 0;
@@ -651,6 +657,10 @@ export class FuturismaGame {
     const edgeType = this.course.edgeType(afterMove, this.lateral);
     const roadLimit = afterMove.halfWidth - 2.05;
     const openEdge = edgeType === "C";
+    this.openEdgeWarning = openEdge && isOpenEdgeWarningActive(
+      this.lateral,
+      afterMove.halfWidth,
+    );
     const lateralLimit = openEdge ? afterMove.halfWidth + 5.8 : roadLimit;
     const beyondRoad = Math.abs(this.lateral) > roadLimit;
     const outside = Math.abs(this.lateral) > lateralLimit;
@@ -992,8 +1002,9 @@ export class FuturismaGame {
     const checkpoint = this.nextCheckpointIndex === 0
       ? this.course.checkpointCount
       : this.nextCheckpointIndex;
-    const turnCue = this.phase === "running"
-      ? this.course.turnAhead(this.progress, 240, this.hudTurnCue)
+    const turnLookAheadMeters = THREE.MathUtils.clamp(this.speed * 3.4, 260, 380);
+    let turnCue = this.phase === "running"
+      ? this.course.turnAhead(this.progress, turnLookAheadMeters, this.hudTurnCue)
       : null;
     const finishDistanceMeters = this.phase === "finished"
       ? 0
@@ -1006,6 +1017,15 @@ export class FuturismaGame {
           ? null
           : this.course.checkpointProgress(this.nextCheckpointIndex),
       );
+    const finalFinishArmed = this.nextCheckpointIndex === 0
+      && this.lap === this.totalLaps;
+    if (turnCue && isTurnCueBeyondFinish(
+      turnCue.distance,
+      finishDistanceMeters,
+      finalFinishArmed,
+    )) {
+      turnCue = null;
+    }
     const recovery = calculateRecoveryTelemetry(
       this.offCourseTime,
       this.course.recoveryHoldSeconds,
@@ -1025,15 +1045,22 @@ export class FuturismaGame {
       sector: this.course.sectorLabelAt(this.progress),
       finishDistanceMeters,
       turnDirection: turnCue?.direction ?? null,
+      turnFollowingDirection: turnCue?.followingDirection ?? null,
       turnDistanceMeters: turnCue?.distance ?? 0,
       turnHard: turnCue?.hard ?? false,
+      turnUrgent: turnCue
+        ? isTurnCueUrgent(turnCue.distance, this.speed, turnCue.hard)
+        : false,
       boostActive: this.boostActive,
       braking: input.brake > 0.1,
       drifting: this.driftActive,
       skidsDown: this.speed < 11,
       lowGrip: this.surfaceGrip < 0.95,
-      edgeWarning: this.edgeContact,
-      edgeCorrection: this.edgeContact ? (this.lateral > 0 ? "LEFT" : "RIGHT") : null,
+      edgeWarning: this.edgeContact || this.openEdgeWarning,
+      edgeOpen: this.openEdgeWarning,
+      edgeCorrection: this.edgeContact || this.openEdgeWarning
+        ? this.lateral > 0 ? "LEFT" : "RIGHT"
+        : null,
       recoveryActive: recovery.active,
       recoveryProgress: recovery.progress,
       recoverySeconds: recovery.remainingSeconds,
@@ -1078,6 +1105,7 @@ export class FuturismaGame {
     this.offCourseTime = 0;
     this.recoveryImmunity = 0;
     this.hazardTripCooldown = 0;
+    this.openEdgeWarning = false;
     this.impactShake = 0;
     this.physicsAccumulator = 0;
     this.resumeCountdown = 0;

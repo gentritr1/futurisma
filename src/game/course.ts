@@ -166,6 +166,7 @@ function createCourseProjectionValue(): CourseProjection {
 
 export interface TurnCue {
   direction: "LEFT" | "RIGHT";
+  followingDirection: "LEFT" | "RIGHT" | null;
   distance: number;
   hard: boolean;
   radius: number;
@@ -499,26 +500,40 @@ export class GreenwaterCourse {
     target?: TurnCue,
   ): TurnCue | null {
     const distance = THREE.MathUtils.euclideanModulo(progress, 1) * this.length;
-    let nearest: { turn: RawTurn; distance: number } | null = null;
-    for (const turn of MAP.turns) {
+    let nearest: { turn: RawTurn; index: number; distance: number } | null = null;
+    for (let index = 0; index < MAP.turns.length; index += 1) {
+      const turn = MAP.turns[index];
       if (turn.radius >= 300) continue;
       const inside = distance >= turn.entryDistance && distance <= turn.exitDistance;
       const distanceAhead = inside
         ? 0
         : THREE.MathUtils.euclideanModulo(turn.entryDistance - distance, this.length);
       if (distanceAhead > maximumDistance) continue;
-      if (!nearest || distanceAhead < nearest.distance) nearest = { turn, distance: distanceAhead };
+      if (!nearest || distanceAhead < nearest.distance) {
+        nearest = { turn, index, distance: distanceAhead };
+      }
     }
     if (!nearest) return null;
     const cue = target ?? {
       direction: "LEFT",
+      followingDirection: null,
       distance: 0,
       hard: false,
       radius: 0,
     };
     cue.direction = nearest.turn.direction === "left" ? "LEFT" : "RIGHT";
+    const followingTurn = MAP.turns[(nearest.index + 1) % MAP.turns.length];
+    const followingGap = THREE.MathUtils.euclideanModulo(
+      followingTurn.entryDistance - nearest.turn.exitDistance,
+      this.length,
+    );
+    cue.followingDirection = followingGap <= 70
+      && followingTurn.radius < 300
+      && followingTurn.direction !== nearest.turn.direction
+      ? followingTurn.direction === "left" ? "LEFT" : "RIGHT"
+      : null;
     cue.distance = nearest.distance;
-    cue.hard = nearest.turn.radius <= 85;
+    cue.hard = nearest.turn.radius <= 110;
     cue.radius = nearest.turn.radius;
     return cue;
   }
@@ -882,17 +897,37 @@ export class GreenwaterCourse {
   private createOpenEdgeMarkers(): THREE.Group {
     const group = new THREE.Group();
     group.name = "greenwater_open_edge_markers";
-    const geometry = new THREE.BoxGeometry(0.28, 1.4, 0.28);
-    const material = new THREE.MeshBasicMaterial({ color: 0xff5a3c });
-    const markers = new THREE.InstancedMesh(geometry, material, this.samples.length);
+    const markerGeometry = new THREE.BoxGeometry(0.28, 1.4, 0.28);
+    const markerMaterial = new THREE.MeshBasicMaterial({ color: 0xff5a3c });
+    const markers = new THREE.InstancedMesh(
+      markerGeometry,
+      markerMaterial,
+      this.samples.length,
+    );
+    const stripGeometry = new THREE.BoxGeometry(0.58, 0.06, 4.2);
+    const stripMaterial = new THREE.MeshBasicMaterial({ color: 0xff8a2e });
+    const warningStrips = new THREE.InstancedMesh(
+      stripGeometry,
+      stripMaterial,
+      this.samples.length,
+    );
     const object = new THREE.Object3D();
     let count = 0;
-    for (let index = 0; index < this.samples.length; index += 5) {
+    let stripCount = 0;
+    for (let index = 0; index < this.samples.length; index += 4) {
       const raw = this.samples[index];
       const sample = this.sample(index / this.samples.length);
       for (const side of [-1, 1]) {
         const edge = side < 0 ? raw.edgeL : raw.edgeR;
         if (edge !== "C") continue;
+        poseObject(object, sample);
+        object.position.addScaledVector(sample.right, side * (sample.halfWidth - 0.2));
+        object.position.addScaledVector(sample.up, 0.09);
+        object.updateMatrix();
+        warningStrips.setMatrixAt(stripCount, object.matrix);
+        stripCount += 1;
+
+        if (index % 8 !== 0) continue;
         poseObject(object, sample);
         object.position.addScaledVector(sample.right, side * (sample.halfWidth + 5.8));
         object.position.addScaledVector(sample.up, 0.7);
@@ -903,7 +938,9 @@ export class GreenwaterCourse {
     }
     markers.count = count;
     markers.instanceMatrix.needsUpdate = true;
-    group.add(markers);
+    warningStrips.count = stripCount;
+    warningStrips.instanceMatrix.needsUpdate = true;
+    group.add(warningStrips, markers);
     return group;
   }
 

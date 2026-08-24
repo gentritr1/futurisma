@@ -10,6 +10,57 @@ export function resolveCountdownStage(remainingSeconds) {
   return String(Math.ceil(remainingSeconds - 1));
 }
 
+/**
+ * Hard turns need enough warning to react at race speed, while a fixed minimum
+ * keeps the instruction useful after braking has already begun.
+ * @param {number} distanceMeters
+ * @param {number} speedMetersPerSecond
+ * @param {boolean} hardTurn
+ */
+export function isTurnCueUrgent(distanceMeters, speedMetersPerSecond, hardTurn) {
+  if (!hardTurn || !Number.isFinite(distanceMeters) || !Number.isFinite(speedMetersPerSecond)) {
+    return false;
+  }
+  return distanceMeters <= Math.max(140, Math.max(0, speedMetersPerSecond) * 2.4);
+}
+
+/**
+ * Warn before an open runoff begins, without changing the collision boundary.
+ * @param {number} lateralMeters
+ * @param {number} halfWidthMeters
+ * @param {number} [roadInsetMeters]
+ * @param {number} [warningMarginMeters]
+ */
+export function isOpenEdgeWarningActive(
+  lateralMeters,
+  halfWidthMeters,
+  roadInsetMeters = 2.05,
+  warningMarginMeters = 1.6,
+) {
+  if (!Number.isFinite(lateralMeters) || !Number.isFinite(halfWidthMeters)) return false;
+  const roadLimit = Math.max(0, halfWidthMeters - Math.max(0, roadInsetMeters));
+  const warningLimit = Math.max(0, roadLimit - Math.max(0, warningMarginMeters));
+  return Math.abs(lateralMeters) > warningLimit;
+}
+
+/**
+ * A closed course can wrap its look-ahead into the next lap. Once the final
+ * gate is armed, instructions beyond the finish line must stay hidden.
+ * @param {number} turnDistanceMeters
+ * @param {number} finishDistanceMeters
+ * @param {boolean} finalFinishArmed
+ */
+export function isTurnCueBeyondFinish(
+  turnDistanceMeters,
+  finishDistanceMeters,
+  finalFinishArmed,
+) {
+  return finalFinishArmed
+    && Number.isFinite(turnDistanceMeters)
+    && Number.isFinite(finishDistanceMeters)
+    && turnDistanceMeters > Math.max(0, finishDistanceMeters);
+}
+
 /** @param {number} previousProgress @param {number} currentProgress */
 export function forwardProgressDelta(previousProgress, currentProgress) {
   let delta = wrapProgress(currentProgress) - wrapProgress(previousProgress);

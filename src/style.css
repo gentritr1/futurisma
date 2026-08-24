@@ -280,6 +280,11 @@ kbd {
   color: var(--acid);
 }
 
+#finish-value[data-approach="true"] {
+  color: var(--ink);
+  text-shadow: 0 0 7px oklch(0.86 0.18 130 / 0.52);
+}
+
 .race-progress__track,
 .boost__track {
   display: block;
@@ -287,6 +292,23 @@ kbd {
   margin-top: 8px;
   background: oklch(0.8 0.02 210 / 0.16);
   overflow: hidden;
+}
+
+.race-progress__track {
+  position: relative;
+  overflow: visible;
+}
+
+.race-progress__finish-marker {
+  position: absolute;
+  top: 7px;
+  right: -2px;
+  color: var(--acid);
+  font-size: 0.45rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  transform: translateX(50%);
 }
 
 .race-progress__track span,
@@ -419,6 +441,24 @@ kbd {
   opacity: 1;
   visibility: visible;
   transition-delay: 0s;
+}
+
+.turn-cue[data-urgent="true"] {
+  border-color: var(--warning);
+  background: oklch(0.09 0.028 38 / 0.9);
+}
+
+.turn-cue[data-urgent="true"] strong {
+  color: var(--warning);
+}
+
+.turn-cue[data-mode="finish"] {
+  border-color: var(--acid);
+}
+
+.turn-cue[data-mode="finish"] .turn-arrow,
+.turn-cue[data-mode="finish"] strong {
+  color: var(--acid);
 }
 
 .countdown {

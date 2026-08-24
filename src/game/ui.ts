@@ -13,14 +13,17 @@ export interface HudFrame {
   sector: string;
   finishDistanceMeters: number;
   turnDirection: "LEFT" | "RIGHT" | null;
+  turnFollowingDirection: "LEFT" | "RIGHT" | null;
   turnDistanceMeters: number;
   turnHard: boolean;
+  turnUrgent: boolean;
   boostActive: boolean;
   braking: boolean;
   drifting: boolean;
   skidsDown: boolean;
   lowGrip: boolean;
   edgeWarning: boolean;
+  edgeOpen: boolean;
   edgeCorrection: "LEFT" | "RIGHT" | null;
   recoveryActive: boolean;
   recoveryProgress: number;
@@ -213,7 +216,9 @@ export class GameUi {
       : ` · LAST ${formatRaceTime(frame.lastLapMs)}`;
     const checkpointLabel = frame.missedGate === null
       ? frame.finishArmed
-        ? "FINISH VECTOR ARMED"
+        ? frame.lap === frame.totalLaps
+          ? "FINISH VECTOR ARMED"
+          : "LAP GATE ARMED"
         : `NEXT GATE ${frame.checkpoint
           .toString()
           .padStart(2, "0")} / ${frame.checkpointCount.toString().padStart(2, "0")}`
@@ -237,15 +242,20 @@ export class GameUi {
     }
     this.sectorValue.textContent = frame.sector;
     const finishDistance = Math.max(0, frame.finishDistanceMeters);
-    this.finishValue.textContent = finishDistance >= 1000
+    const finishDistanceLabel = finishDistance >= 1000
       ? `${(finishDistance / 1000).toFixed(1)} KM TO FINISH`
       : `${Math.ceil(finishDistance / 10) * 10} M TO FINISH`;
+    const finalApproach = frame.finishArmed && frame.lap === frame.totalLaps;
+    this.finishValue.textContent = finalApproach
+      ? `${finishDistanceLabel.replace(" TO FINISH", "")} · THE CRADLE`
+      : finishDistanceLabel;
     this.finishValue.dataset.final = frame.lap === frame.totalLaps ? "true" : "false";
+    this.finishValue.dataset.approach = finalApproach ? "true" : "false";
     this.progressFill.style.transform = `scaleX(${Math.min(1, Math.max(0, frame.progress))})`;
     this.boostValue.textContent = `${Math.round(frame.boost * 100)}%`;
     this.boostFill.style.transform = `scaleX(${Math.min(1, Math.max(0, frame.boost))})`;
     const boostState = frame.boostActive ? "true" : "false";
-    const edgeState = `${frame.edgeWarning}:${frame.recoveryActive}`;
+    const edgeState = `${frame.edgeWarning}:${frame.edgeOpen}:${frame.recoveryActive}`;
     if (boostState !== this.lastBoostState) {
       this.boostFill.dataset.active = boostState;
       this.lastBoostState = boostState;
@@ -260,6 +270,8 @@ export class GameUi {
       ? `OFF COURSE · AUTO RECOVERY · ${(
         Math.ceil(frame.recoverySeconds * 2) / 2
       ).toFixed(1)} S`
+      : frame.edgeWarning && frame.edgeOpen && frame.edgeCorrection
+        ? `OPEN EDGE · STEER ${frame.edgeCorrection}`
       : frame.edgeWarning && frame.edgeCorrection
         ? `COURSE EDGE · STEER ${frame.edgeCorrection}`
         : "COURSE EDGE";
@@ -271,18 +283,43 @@ export class GameUi {
       1,
       Math.max(0, frame.recoveryProgress),
     )})`;
+    const finishCueActive = finalApproach
+      && finishDistance <= 700
+      && !frame.turnDirection;
+    const cueActive = Boolean(frame.turnDirection) || finishCueActive;
     const turnState = frame.turnDirection
-      ? `${frame.turnDirection}:${frame.turnHard}:${Math.round(frame.turnDistanceMeters / 10)}`
-      : "none";
+      ? `${frame.turnDirection}:${frame.turnFollowingDirection}:${frame.turnHard}:${frame.turnUrgent}:${Math.round(frame.turnDistanceMeters / 10)}:${finalApproach}`
+      : finishCueActive
+        ? `finish:${Math.round(finishDistance / 10)}`
+        : "none";
     if (turnState !== this.lastTurnState) {
-      this.turnCue.dataset.active = frame.turnDirection ? "true" : "false";
-      this.turnCue.setAttribute("aria-hidden", frame.turnDirection ? "false" : "true");
+      this.turnCue.dataset.active = cueActive ? "true" : "false";
+      this.turnCue.setAttribute("aria-hidden", cueActive ? "false" : "true");
       if (frame.turnDirection) {
-        this.turnArrow.textContent = frame.turnDirection === "LEFT" ? "←" : "→";
-        this.turnLabel.textContent = `${frame.turnHard ? "HARD " : "TURN "}${frame.turnDirection}`;
+        const primaryArrow = frame.turnDirection === "LEFT" ? "←" : "→";
+        const followingArrow = frame.turnFollowingDirection === "LEFT"
+          ? "←"
+          : frame.turnFollowingDirection === "RIGHT"
+            ? "→"
+            : "";
+        const sequenceLabel = frame.turnFollowingDirection
+          ? `${frame.turnDirection} → ${frame.turnFollowingDirection}`
+          : frame.turnDirection;
+        this.turnCue.dataset.mode = "turn";
+        this.turnCue.dataset.urgent = frame.turnUrgent ? "true" : "false";
+        this.turnArrow.textContent = `${primaryArrow}${followingArrow ? ` ${followingArrow}` : ""}`;
+        this.turnLabel.textContent = finalApproach
+          ? `FINAL TURN · ${frame.turnHard ? "HARD " : ""}${sequenceLabel}`
+          : `${frame.turnUrgent ? "BRAKE · " : ""}${frame.turnHard ? "HARD " : "TURN "}${sequenceLabel}`;
         this.turnDistance.textContent = frame.turnDistanceMeters < 12
           ? "NOW"
           : `${Math.ceil(frame.turnDistanceMeters / 10) * 10} M`;
+      } else if (finishCueActive) {
+        this.turnCue.dataset.mode = "finish";
+        this.turnCue.dataset.urgent = "false";
+        this.turnArrow.textContent = "◆";
+        this.turnLabel.textContent = "THE CRADLE · FINISH";
+        this.turnDistance.textContent = `${Math.ceil(finishDistance / 10) * 10} M`;
       }
       this.lastTurnState = turnState;
     }
