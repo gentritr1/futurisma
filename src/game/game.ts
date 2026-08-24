@@ -457,7 +457,7 @@ export class FuturismaGame {
       return false;
     }
     this.resetRaceState();
-    this.updatePose({ throttle: 0, brake: 0, steer: 0, boost: false }, 0);
+    this.updatePose(ZERO_INPUT, 0);
     this.snapCamera();
     this.running = true;
     this.animationFrame = requestAnimationFrame(this.frame);
@@ -474,6 +474,8 @@ export class FuturismaGame {
       if (this.contextLost || this.disposed) return;
       this.audio.setPaused(false);
       this.resetRaceState();
+      this.updatePose(ZERO_INPUT, 0);
+      this.snapCamera();
       this.phase = "countdown";
       this.countdown = 3.7;
       this.countdownStage = "";
@@ -1442,6 +1444,10 @@ export class FuturismaGame {
     this.driftIntensity = 0;
     this.surfaceGrip = 1;
     this.padBoostTime = 0;
+    this.demoInput.throttle = 1;
+    this.demoInput.brake = 0;
+    this.demoInput.steer = 0;
+    this.demoInput.boost = false;
     this.lap = 1;
     this.elapsedMs = 0;
     this.lapStartElapsedMs = 0;
@@ -1461,6 +1467,7 @@ export class FuturismaGame {
     this.resumeCountdown = 0;
     this.pausedBeforeStart = false;
     this.nextHudAt = 0;
+    this.resetImpactSparks();
     const start = this.course.sample(this.progress, this.poseProjection);
     this.position.copy(start.position);
     if (this.recoveryProbe) {
@@ -1623,6 +1630,20 @@ export class FuturismaGame {
     if (changed) {
       this.impactSparks.geometry.getAttribute("position").needsUpdate = true;
     }
+  }
+
+  private resetImpactSparks(): void {
+    this.impactSparkCursor = 0;
+    this.impactSparkLife.fill(0);
+    this.impactSparkVelocities.fill(0);
+    for (let particle = 0; particle < this.impactSparkLife.length; particle += 1) {
+      const offset = particle * 3;
+      this.impactSparkPositions[offset] = 0;
+      this.impactSparkPositions[offset + 1] = -10_000;
+      this.impactSparkPositions[offset + 2] = 0;
+    }
+    this.impactSparks.visible = false;
+    this.impactSparks.geometry.getAttribute("position").needsUpdate = true;
   }
 
   private async loadAssetKit(): Promise<void> {

@@ -46,7 +46,9 @@ feedback. Water Table now uses its authored 80% grip floor and 0.8-second
 recovery instead of switching lateral response instantly at the sheet boundary.
 Crossing the final gantry neutralizes held driving input, carries a short
 speed-dependent run-out, and settles TOTEM near The Cradle before the world
-enters its idle result state.
+enters its idle result state. “Run Again” rebuilds the canonical launch input,
+camera framing, and transient-effect buffers while reusing the loaded vehicle,
+course, audio graph, and GPU resources.
 If a gate is missed, the HUD keeps the failure visible, offers the recovery
 control, and includes the required extra circuit in the finish distance.
 A sustained high-speed route reversal suppresses normal turn calls and displays

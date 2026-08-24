@@ -168,6 +168,23 @@ A high-quality browser lap retained the 34.483-second deterministic line, the
 recoveries, or WebGL context losses and showed no chase-anchor or moving-part
 regression.
 
+## Repeated-trial lifecycle acceptance
+
+Every trial reset now restores the canonical showcase command, clears all impact
+spark life/velocity/position slots, updates the neutral vehicle pose, and snaps
+the chase camera to the Runway 09 launch frame before countdown presentation.
+This prevents a second trial from inheriting the previous finish's steering or
+braking command, interpolating the camera backward from the 97-metre run-out, or
+displaying stale transient effects.
+
+Two consecutive click-linked browser trials in one page session both completed
+in 34.483 seconds with the same 56.02–70.49° camera range, 9.8 ms p95 / 10.4 ms
+maximum frame time, 54 settled draw calls, 86 geometries, and 17 textures. The
+vehicle remained at one network request and the asset kit loaded once. Trial two
+finished with 30.0 Hz audio control, zero active transient voices, zero particle
+points, and zero impacts, recoveries, or WebGL faults. The separate impact probe
+still produced one burst at 5 metres and culled back to zero points.
+
 ## Runtime invariants
 
 Keep these true while integrating the authored Greenwater environment:
@@ -185,6 +202,7 @@ Keep these true while integrating the authored Greenwater environment:
 - Suspended or interrupted audio clocks create no transient nodes or automation work; a running context releases every transient voice back to zero.
 - Final driving input is neutral, and the visible run-out settles within 3.5 seconds and roughly 100 metres before simulation, audio control, and WebGL drawing become idle.
 - Vehicle pose and moving-node changes batch before one authoritative pre-camera world-matrix synchronization per presented frame.
+- Consecutive trials restore canonical launch input/camera/transient state while reusing the same vehicle request, scene resources, and audio graph.
 
 ## Environment integration gates
 
