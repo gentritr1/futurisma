@@ -11,6 +11,15 @@ export function phaseRunsContinuousPresentation(phase, speed) {
 }
 
 /**
+ * Countdown revs and live racing may present driving input. Paused, resuming,
+ * and finished states must never leave a held player/autopilot command latched.
+ * @param {string} phase
+ */
+export function phasePresentsDrivingInput(phase) {
+  return phase === "countdown" || phase === "running";
+}
+
+/**
  * Idle phases only draw when a resize, asset arrival, pause, or context restore
  * has explicitly invalidated the last canvas image.
  * @param {string} phase

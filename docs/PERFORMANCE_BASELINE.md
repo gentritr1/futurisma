@@ -138,6 +138,22 @@ zero impacts, recoveries, or WebGL context faults. The diagnostics-enabled
 browser reported 8.3 MB sampled heap growth; direct audio-node and GPU-resource
 counters did not grow.
 
+## Finish run-out acceptance
+
+The previous fixed 5.5 m/s² result coast could carry an 86 m/s finish for nearly
+16 seconds and roughly 680 metres after the result overlay appeared. The new
+speed-dependent run-out preserves visible momentum for its first second, travels
+98.1 metres in the deterministic 120 Hz model, and reaches a complete stop within
+3.5 seconds. Its 60/120 Hz stopping-distance difference remains below 0.7 metres.
+
+The result state also presents neutral driving input, so a held player control or
+the showcase controller cannot leave throttle animation, exhaust plumes, braking,
+or boost feedback latched after the finish. A high-quality browser lap stopped at
+97 metres past The Cradle with fully retracted plumes, one clean idle-frame
+handoff, zero active transient audio nodes, and stable 86-geometry / 17-texture
+resource counts. The complete lap plus run-out rendered 4,516 frames at 9.9 ms
+p95 / 10.4 ms maximum with zero impacts or recoveries.
+
 ## Runtime invariants
 
 Keep these true while integrating the authored Greenwater environment:
@@ -153,6 +169,7 @@ Keep these true while integrating the authored Greenwater environment:
 - Water Table reaches the authored 0.8 grip floor and recovers over 0.8 seconds without a one-step handling snap.
 - Ambient steam, warning lamps, and cargo-hook motion remain locked to 30 Hz without changing vehicle, camera, or input cadence.
 - Suspended or interrupted audio clocks create no transient nodes or automation work; a running context releases every transient voice back to zero.
+- Final driving input is neutral, and the visible run-out settles within 3.5 seconds and roughly 100 metres before simulation, audio control, and WebGL drawing become idle.
 
 ## Environment integration gates
 

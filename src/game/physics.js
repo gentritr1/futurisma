@@ -2,6 +2,9 @@ export const CRUISE_MAX_SPEED = 86;
 export const BOOST_MAX_SPEED = 112;
 export const BOOST_RESERVE_CUTOFF = 0.012;
 const OVERSPEED_DRAG_RATE = 0.45;
+const COAST_BASE_DECELERATION = 10;
+const COAST_SPEED_DRAG_RATE = 0.55;
+const COAST_STOP_SPEED = 0.35;
 
 /** @param {number} value @param {number} minimum @param {number} maximum */
 function clamp(value, minimum, maximum) {
@@ -71,6 +74,29 @@ export function integrateSpeed(
     - overspeedDrag
   ) * delta;
   return clamp(nextSpeed, 0, BOOST_MAX_SPEED);
+}
+
+/**
+ * Carries visible finish-line momentum, then settles the result presentation
+ * close to The Cradle instead of simulating another sector behind the overlay.
+ * @param {number} speed
+ * @param {number} delta
+ */
+export function integrateCoastSpeed(speed, delta) {
+  const currentSpeed = Number.isFinite(speed)
+    ? clamp(speed, 0, BOOST_MAX_SPEED)
+    : 0;
+  const step = Number.isFinite(delta) ? clamp(delta, 0, 0.1) : 0;
+  if (currentSpeed <= COAST_STOP_SPEED || step === 0) {
+    return currentSpeed <= COAST_STOP_SPEED ? 0 : currentSpeed;
+  }
+  const nextSpeed = Math.max(
+    0,
+    currentSpeed - (
+      COAST_BASE_DECELERATION + currentSpeed * COAST_SPEED_DRAG_RATE
+    ) * step,
+  );
+  return nextSpeed <= COAST_STOP_SPEED ? 0 : nextSpeed;
 }
 
 /**

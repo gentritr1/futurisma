@@ -44,6 +44,9 @@ lap-by-lap best-time ledger on the result screen. Airbrakes and the
 standing-water grip loss feed the procedural noise layer as well as handling
 feedback. Water Table now uses its authored 80% grip floor and 0.8-second
 recovery instead of switching lateral response instantly at the sheet boundary.
+Crossing the final gantry neutralizes held driving input, carries a short
+speed-dependent run-out, and settles TOTEM near The Cradle before the world
+enters its idle result state.
 If a gate is missed, the HUD keeps the failure visible, offers the recovery
 control, and includes the required extra circuit in the finish distance.
 A sustained high-speed route reversal suppresses normal turn calls and displays

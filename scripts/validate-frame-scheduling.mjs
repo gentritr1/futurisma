@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import {
+  phasePresentsDrivingInput,
   phaseRunsContinuousPresentation,
   shouldRenderGameFrame,
 } from "../src/game/frame-scheduling.js";
@@ -32,6 +33,22 @@ for (const phase of ["countdown", "running", "resuming"]) {
     shouldRenderGameFrame(phase, 0, false, false),
     true,
     `${phase} must render continuously.`,
+  );
+}
+
+for (const phase of ["countdown", "running"]) {
+  assert.equal(
+    phasePresentsDrivingInput(phase),
+    true,
+    `${phase} must present current driving input.`,
+  );
+}
+
+for (const phase of ["standby", "paused", "resuming", "finished"]) {
+  assert.equal(
+    phasePresentsDrivingInput(phase),
+    false,
+    `${phase} must present neutral input.`,
   );
 }
 

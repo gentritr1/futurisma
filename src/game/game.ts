@@ -16,6 +16,7 @@ import {
 } from "./course";
 import { disposeObject3DResources } from "./graphics-resources";
 import {
+  phasePresentsDrivingInput,
   phaseRunsContinuousPresentation,
   shouldRenderGameFrame,
 } from "./frame-scheduling";
@@ -28,6 +29,7 @@ import {
   calculateTurnAuthority,
   calculateTurnRate,
   integrateBoostReserve,
+  integrateCoastSpeed,
   integrateSurfaceGrip,
   integrateSteering,
   integrateSpeed,
@@ -644,11 +646,11 @@ export class FuturismaGame {
       calculatePresentationAlpha(this.physicsAccumulator, FIXED_STEP),
     );
 
-    const presentationInput = this.phase === "paused" || this.phase === "resuming"
-      ? ZERO_INPUT
-      : this.demoAutopilot
+    const presentationInput = phasePresentsDrivingInput(this.phase)
+      ? this.demoAutopilot
         ? this.demoInput
-        : input;
+        : input
+      : ZERO_INPUT;
     const presentationProjection = this.updatePose(presentationInput, delta);
     this.updateCamera(
       delta,
@@ -1002,7 +1004,8 @@ export class FuturismaGame {
   }
 
   private updateCoast(delta: number): void {
-    this.speed = Math.max(0, this.speed - delta * 5.5);
+    const previousSpeed = this.speed;
+    this.speed = integrateCoastSpeed(this.speed, delta);
     this.position.addScaledVector(this.travelDirection, this.speed * delta);
     const projection = this.course.project(
       this.position,
@@ -1017,6 +1020,7 @@ export class FuturismaGame {
     );
     this.position.copy(projection.position).addScaledVector(projection.right, this.lateral);
     this.boostActive = false;
+    if (previousSpeed > 0 && this.speed === 0) this.nextDiagnosticsAt = 0;
   }
 
   private updateCheckpointProgress(
@@ -1972,7 +1976,11 @@ export class FuturismaGame {
     // Keep diagnostics live through the short finish sting so the final
     // snapshot proves that every transient audio node released. This only
     // affects diagnostics mode; normal result presentation is unchanged.
-    if (this.phase === "finished" && report.activeAudioOneShots === 0) {
+    if (
+      this.phase === "finished"
+      && this.speed === 0
+      && report.activeAudioOneShots === 0
+    ) {
       this.diagnosticsFinalReported = true;
     }
   }

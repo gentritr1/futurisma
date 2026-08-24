@@ -92,6 +92,33 @@ const releasedBoostTwoSeconds60 = simulateSpeed({
   startingSpeed: physics.BOOST_MAX_SPEED,
 });
 
+function simulateCoast({ seconds, step, startingSpeed }) {
+  let speed = startingSpeed;
+  let distance = 0;
+  const iterations = Math.round(seconds / step);
+  for (let index = 0; index < iterations; index += 1) {
+    speed = physics.integrateCoastSpeed(speed, step);
+    distance += speed * step;
+  }
+  return { speed, distance };
+}
+
+const coastOneSecond = simulateCoast({
+  seconds: 1,
+  step: 1 / 120,
+  startingSpeed: physics.CRUISE_MAX_SPEED,
+});
+const coast120 = simulateCoast({
+  seconds: 3.5,
+  step: 1 / 120,
+  startingSpeed: physics.CRUISE_MAX_SPEED,
+});
+const coast60 = simulateCoast({
+  seconds: 3.5,
+  step: 1 / 60,
+  startingSpeed: physics.CRUISE_MAX_SPEED,
+});
+
 assert.ok(cruise120 > 70 && cruise120 <= 92, `Unexpected cruise speed ${cruise120}.`);
 assert.ok(boosted > cruise120, "Boost must produce a higher terminal speed than cruise.");
 assert.ok(boosted <= physics.BOOST_MAX_SPEED, "Boost must respect its speed cap.");
@@ -117,6 +144,25 @@ assert.ok(
 assert.ok(
   Math.abs(cruise120 - cruise60) < 0.2,
   "Longitudinal integration must remain stable between 60 Hz and 120 Hz.",
+);
+assert.ok(
+  coastOneSecond.speed > 35 && coastOneSecond.speed < 55,
+  "The result run-out must visibly carry finish-line momentum for its first second.",
+);
+assert.equal(coast120.speed, 0, "The result run-out must settle within 3.5 seconds.");
+assert.equal(coast60.speed, 0, "The 60 Hz result run-out must settle within 3.5 seconds.");
+assert.ok(
+  coast120.distance > 85 && coast120.distance < 115,
+  `The result run-out must stay near The Cradle; got ${coast120.distance} m.`,
+);
+assert.ok(
+  Math.abs(coast120.distance - coast60.distance) < 0.7,
+  "Result run-out distance must remain stable between 60 Hz and 120 Hz.",
+);
+assert.equal(
+  physics.integrateCoastSpeed(Number.NaN, Number.NaN),
+  0,
+  "Invalid result run-out state must settle safely.",
 );
 
 const highSpeedDrift = physics.calculateDriftIntent(0.82, 1, 1);
@@ -479,5 +525,5 @@ assert.ok(
 );
 
 console.log(
-  `Physics PASS: cruise ${(cruise120 * 3.6).toFixed(1)} km/h, boost ${(boosted * 3.6).toFixed(1)} km/h, post-boost ${(releasedBoostHalfSecond * 3.6).toFixed(1)}→${(releasedBoostTwoSeconds120 * 3.6).toFixed(1)} km/h, wet grip ${wetGrip120.toFixed(3)}→${recoveredGrip120.toFixed(3)}, 60/120 Hz speed drift ${Math.abs(cruise120 - cruise60).toFixed(3)} m/s, steering drift ${Math.abs(steering120 - steering60).toFixed(4)}, 240 s soak ${soak120.boostExhaustions} boost exhaustions / ${soak120.driftEntries} drift entries / ${(Math.abs(soak120.distance - soak60.distance) / soak120.distance * 100).toFixed(3)}% distance drift.`,
+  `Physics PASS: cruise ${(cruise120 * 3.6).toFixed(1)} km/h, boost ${(boosted * 3.6).toFixed(1)} km/h, post-boost ${(releasedBoostHalfSecond * 3.6).toFixed(1)}→${(releasedBoostTwoSeconds120 * 3.6).toFixed(1)} km/h, finish run-out ${coast120.distance.toFixed(1)} m / ${(3.5).toFixed(1)} s settled, wet grip ${wetGrip120.toFixed(3)}→${recoveredGrip120.toFixed(3)}, 60/120 Hz speed drift ${Math.abs(cruise120 - cruise60).toFixed(3)} m/s, steering drift ${Math.abs(steering120 - steering60).toFixed(4)}, 240 s soak ${soak120.boostExhaustions} boost exhaustions / ${soak120.driftEntries} drift entries / ${(Math.abs(soak120.distance - soak60.distance) / soak120.distance * 100).toFixed(3)}% distance drift.`,
 );
