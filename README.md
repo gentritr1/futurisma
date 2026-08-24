@@ -132,3 +132,7 @@ The production contract for Greenwater's authored environment art is in
 `docs/GREENWATER_ENVIRONMENT_ART_BRIEF.md`. It preserves the accepted route and
 defines the modular kit, landmark anchors, navigation grammar, runtime budgets,
 and validated export package required for integration.
+Attach `artifacts/GREENWATER_ENVIRONMENT_PRODUCTION_INPUT_v1.0.zip` to the design
+agent and use `docs/GREENWATER_ENVIRONMENT_DESIGN_AGENT_PROMPT.md`; the bundle
+contains the locked map data, validation, performance baseline, and accepted
+TOTEM scale/material reference needed for production.
