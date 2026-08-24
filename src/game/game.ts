@@ -395,7 +395,7 @@ export class FuturismaGame {
     this.renderer.toneMapping = THREE.AgXToneMapping;
     this.renderer.toneMappingExposure = 1.05;
     this.renderer.shadowMap.enabled = false;
-    this.ui.setRaceFormat(this.totalLaps);
+    this.ui.setRaceFormat(this.totalLaps, this.course.length);
     this.ui.setDemoAutopilot(this.demoAutopilot);
     this.ui.setGraphicsContextLost(false);
     const initialFog = this.course.fogAt(0);

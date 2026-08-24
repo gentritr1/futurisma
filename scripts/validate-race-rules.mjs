@@ -16,6 +16,7 @@ import {
 import {
   resolveBoostPresentation,
   resolveFinishPresentation,
+  resolveInitialRacePresentation,
   resolveRaceStage,
 } from "../src/game/hud-presentation.js";
 
@@ -130,6 +131,21 @@ assert.deepEqual(resolveFinishPresentation(Number.NaN, 1, 1, false), {
   label: "0 M TO FINISH",
   finalLap: true,
   finalApproach: false,
+});
+assert.deepEqual(resolveInitialRacePresentation(1, COURSE_LENGTH), {
+  totalLaps: 1,
+  lapLabel: "LAP 1 / 1",
+  finishLabel: "2.5 KM TO FINISH",
+});
+assert.deepEqual(resolveInitialRacePresentation(5, COURSE_LENGTH), {
+  totalLaps: 5,
+  lapLabel: "LAP 1 / 5",
+  finishLabel: "12.6 KM TO FINISH",
+});
+assert.deepEqual(resolveInitialRacePresentation(Number.NaN, Number.NaN), {
+  totalLaps: 1,
+  lapLabel: "LAP 1 / 1",
+  finishLabel: "0 M TO FINISH",
 });
 assert.equal(resolveRaceStage(false, 1, 5), "running");
 assert.equal(resolveRaceStage(true, 4, 5), "running");

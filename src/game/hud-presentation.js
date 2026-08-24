@@ -1,6 +1,31 @@
 /** @typedef {"running" | "final" | "approach"} RaceStage */
 
 /**
+ * Initializes the dimmed HUD behind the launch screen from the requested race
+ * format so it never contradicts the intro copy before the first HUD update.
+ * @param {number} totalLaps
+ * @param {number} courseLengthMeters
+ */
+export function resolveInitialRacePresentation(totalLaps, courseLengthMeters) {
+  const laps = Number.isFinite(totalLaps)
+    ? Math.max(1, Math.floor(totalLaps))
+    : 1;
+  const courseLength = Number.isFinite(courseLengthMeters)
+    ? Math.max(0, courseLengthMeters)
+    : 0;
+  return {
+    totalLaps: laps,
+    lapLabel: `LAP 1 / ${laps}`,
+    finishLabel: resolveFinishPresentation(
+      courseLength * laps,
+      1,
+      laps,
+      false,
+    ).label,
+  };
+}
+
+/**
  * Keeps the finish readout stable at race speed: kilometres for the long view,
  * ten-metre steps once the finish is close enough to act on.
  * @param {number} finishDistanceMeters

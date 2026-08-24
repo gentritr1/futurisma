@@ -1,6 +1,7 @@
 import {
   resolveBoostPresentation,
   resolveFinishPresentation,
+  resolveInitialRacePresentation,
   resolveRaceStage,
 } from "./hud-presentation.js";
 
@@ -119,8 +120,18 @@ export class GameUi {
     this.setSystemStatus(this.systemStatusLabel);
   }
 
-  setRaceFormat(totalLaps: number): void {
-    this.introDeck.textContent = `${totalLaps} ${totalLaps === 1 ? "lap" : "laps"} through Greenwater Strip. Read the amber turn grammar, clear all eight gates, and bring TOTEM home through The Cradle.`;
+  setRaceFormat(totalLaps: number, courseLengthMeters: number): void {
+    const presentation = resolveInitialRacePresentation(
+      totalLaps,
+      courseLengthMeters,
+    );
+    this.introDeck.textContent = `${presentation.totalLaps} ${
+      presentation.totalLaps === 1 ? "lap" : "laps"
+    } through Greenwater Strip. Read the amber turn grammar, clear all eight gates, and bring TOTEM home through The Cradle.`;
+    this.lapValue.textContent = presentation.lapLabel;
+    this.finishValue.textContent = presentation.finishLabel;
+    this.lastLapValue.hidden = true;
+    this.progressFill.style.transform = "scaleX(0)";
   }
 
   showReady(): void {

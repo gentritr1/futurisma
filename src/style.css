@@ -379,7 +379,6 @@ body[data-graphics-context="lost"] .system-state__lamp {
   padding: 7px 10px;
   display: flex;
   flex-direction: column;
-  align-items: stretch;
   gap: 6px;
   transform: translateX(-50%);
   opacity: 0;
@@ -790,7 +789,6 @@ body[data-phase="resuming"] .hud::before {
 .result-laps strong {
   justify-self: end;
   color: var(--muted);
-  font-size: inherit;
   font-weight: 500;
 }
 
@@ -977,6 +975,28 @@ body[data-phase="result"] .hud {
 
   .result-panel .launch-button {
     min-height: 44px;
+  }
+}
+
+@media (max-height: 520px) and (min-width: 701px) {
+  .intro-panel {
+    padding: 16px 28px;
+  }
+
+  .intro-panel h1 {
+    font-size: 3.4rem;
+  }
+
+  .intro-deck {
+    margin-block: 12px 14px;
+  }
+
+  .controls-list {
+    margin-top: 14px;
+  }
+
+  .intro-footer {
+    display: none;
   }
 }
 
