@@ -11,6 +11,10 @@ import {
 import { hasPlayerControlIntent } from "./control-mode";
 import { GreenwaterCourse, type TurnCue } from "./course";
 import { disposeObject3DResources } from "./graphics-resources";
+import {
+  phaseRunsContinuousPresentation,
+  shouldRenderGameFrame,
+} from "./frame-scheduling";
 import type { InputFrame } from "./input";
 import { InputController } from "./input";
 import {
@@ -306,6 +310,8 @@ export class FuturismaGame {
   private diagnosticRecoveries = 0;
   private diagnosticContextLosses = 0;
   private diagnosticContextRestores = 0;
+  private diagnosticRenderedFrames = 0;
+  private diagnosticIdleFramesSkipped = 0;
   private diagnosticTopSpeed = 0;
   private diagnosticMaxLateralRatio = 0;
   private diagnosticStartHeapMb: number | null = null;
@@ -340,6 +346,7 @@ export class FuturismaGame {
   private contextRestoreAt = 0;
   private trialStartPending = false;
   private animationFrame = 0;
+  private renderRequested = true;
   private readonly qualityOverride = new URLSearchParams(window.location.search).get(
     "quality",
   );
@@ -489,7 +496,18 @@ export class FuturismaGame {
     this.updateAdaptiveQuality(delta);
     this.updateContextLossProbe();
     this.updateFocusLossProbe();
-    if (!this.contextLost) this.renderer.render(this.scene, this.camera);
+    if (shouldRenderGameFrame(
+      this.phase,
+      this.speed,
+      this.renderRequested,
+      this.contextLost,
+    )) {
+      this.renderer.render(this.scene, this.camera);
+      this.renderRequested = false;
+      this.diagnosticRenderedFrames += 1;
+    } else if (!this.contextLost) {
+      this.diagnosticIdleFramesSkipped += 1;
+    }
     this.reportDiagnostics(delta);
     this.animationFrame = requestAnimationFrame(this.frame);
   };
@@ -584,6 +602,11 @@ export class FuturismaGame {
   }
 
   private update(delta: number, input: InputFrame): void {
+    if (!phaseRunsContinuousPresentation(this.phase, this.speed)) {
+      this.physicsAccumulator = 0;
+      return;
+    }
+
     this.physicsAccumulator = Math.min(
       this.physicsAccumulator + delta,
       MAX_PHYSICS_BACKLOG,
@@ -1546,6 +1569,7 @@ export class FuturismaGame {
       const proceduralCables = this.course.group.getObjectByName("cable_trip_hazards");
       if (proceduralCables) proceduralCables.visible = false;
       this.diagnosticAssetKitReady = true;
+      this.renderRequested = true;
     } catch {
       // Greenwater retains its procedural cable visuals if optional dressing fails.
     } finally {
@@ -1622,6 +1646,7 @@ export class FuturismaGame {
     this.physicsAccumulator = 0;
     this.audio.setPaused(true);
     this.ui.setPaused(true, reason);
+    this.renderRequested = true;
   }
 
   private readonly handleVisibilityChange = (): void => {
@@ -1788,6 +1813,8 @@ export class FuturismaGame {
       contextLost: this.contextLost,
       contextLosses: this.diagnosticContextLosses,
       contextRestores: this.diagnosticContextRestores,
+      renderedFrames: this.diagnosticRenderedFrames,
+      idleFramesSkipped: this.diagnosticIdleFramesSkipped,
       recoveryLocations: this.diagnosticRecoveryLocations,
       maxLateralRatio: Number(this.diagnosticMaxLateralRatio.toFixed(2)),
       physicsSteps: this.diagnosticPhysicsSteps,
@@ -1891,6 +1918,8 @@ export class FuturismaGame {
     this.diagnosticRecoveries = 0;
     this.diagnosticContextLosses = 0;
     this.diagnosticContextRestores = 0;
+    this.diagnosticRenderedFrames = 0;
+    this.diagnosticIdleFramesSkipped = 0;
     this.diagnosticTopSpeed = 0;
     this.diagnosticMaxLateralRatio = 0;
     const memory = performance as Performance & {
@@ -1924,6 +1953,7 @@ export class FuturismaGame {
     this.renderer.setSize(width, height, false);
     this.camera.aspect = width / Math.max(1, height);
     this.camera.updateProjectionMatrix();
+    this.renderRequested = true;
   };
 
   private resolvePreferredPixelRatio(): number {

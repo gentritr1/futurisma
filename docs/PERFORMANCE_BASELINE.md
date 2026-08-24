@@ -36,6 +36,19 @@ This is the regression baseline for the current Greenwater Strip vertical slice 
 
 Both runs completed with zero impacts, missed gates, recoveries, wrong-way events, WebGL context losses, or context restores. The high-quality run held its requested 1280 × 720 internal resolution for the full race without adaptive fallback. Geometry and texture counts stayed fixed, the vehicle was requested once, and neither soak showed sustained heap growth.
 
+## Idle and interruption results
+
+The frame scheduler keeps input polling live while suppressing unchanged world work:
+
+| State | Observation window | Extra WebGL draws | Extra physics steps | Extra audio control updates |
+| --- | ---: | ---: | ---: | ---: |
+| Ready screen | 1.5 s / 121 input frames | 0 | 0 | 0 |
+| Focus-loss pause | 1.6 s / 120 input frames | 0 | 0 | 0 |
+
+The focus-loss probe froze at 00:00.983 and only accepted a fresh Enter after interruption-safe input release. Its recovered one-lap run completed in 00:34.499 with a 9.9 ms p95 frame time, zero impacts or missed gates, 87 geometries, 17 textures, and one vehicle request. The result screen continues rendering during its visible vehicle coast, then becomes idle when speed reaches zero.
+
+The post-scheduler five-lap high-quality acceptance rerun reproduced the exact locked lap sequence and renderer envelope: 9.9 ms p95 / 10.4 ms maximum, 92 peak calls, 42,688 peak triangles, 87 geometries, 17 textures, 20,739 physics steps, 5,185 audio updates at 30 Hz, and one vehicle request. Heap ended 0.3 MB below its race-start sample, with every gameplay and WebGL fault counter at zero.
+
 ## Runtime invariants
 
 Keep these true while integrating the authored Greenwater environment:
@@ -46,6 +59,7 @@ Keep these true while integrating the authored Greenwater environment:
 - No missed gates, recoveries, wrong-way warnings, or impacts occur on the deterministic clean line.
 - High-quality mode must not silently lower its requested render scale.
 - WebGL context recovery, reduced motion, manual control handoff, and one-lap probes remain independently testable.
+- Ready, paused, and settled-result screens perform no simulation, presentation, audio-control, or WebGL draw work until invalidated or resumed.
 
 ## Environment integration gates
 
