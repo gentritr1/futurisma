@@ -13,8 +13,9 @@
     "validate:map": "node scripts/validate-map.mjs",
     "validate:physics": "node scripts/validate-physics.mjs",
     "validate:race": "node scripts/validate-race-rules.mjs",
+    "validate:render": "node scripts/validate-render-quality.mjs",
     "validate:security": "node scripts/validate-security.mjs",
-    "test": "npm run validate:assets && npm run validate:map && npm run validate:physics && npm run validate:race && npm run validate:audio && npm run validate:security && npm run build && npm run validate:build"
+    "test": "npm run validate:assets && npm run validate:map && npm run validate:physics && npm run validate:race && npm run validate:audio && npm run validate:render && npm run validate:security && npm run build && npm run validate:build"
   },
   "dependencies": {
     "three": "0.184.0"

@@ -20,6 +20,11 @@ import {
   crossedForwardProgress,
 } from "./race-rules";
 import {
+  calculateMinimumPixelRatio,
+  calculatePreferredPixelRatio,
+  reconcilePixelRatioAfterResize,
+} from "./render-quality";
+import {
   applyPs2MaterialTreatment,
   TotemVehicle,
   type TotemVisualState,
@@ -209,7 +214,13 @@ export class FuturismaGame {
   private readonly qualityOverride = new URLSearchParams(window.location.search).get(
     "quality",
   );
-  private readonly preferredPixelRatio = this.resolvePixelRatio();
+  private readonly qualityMode = this.qualityOverride === "high"
+    ? "high"
+    : this.qualityOverride === "low"
+      ? "low"
+      : "adaptive";
+  private preferredPixelRatio = this.resolvePreferredPixelRatio();
+  private minimumPixelRatio = this.resolveMinimumPixelRatio();
   private renderPixelRatio = this.preferredPixelRatio;
   private readonly demoMode = new URLSearchParams(window.location.search).has("demo");
   private readonly diagnosticsMode = new URLSearchParams(window.location.search).has(
@@ -1253,6 +1264,10 @@ export class FuturismaGame {
       physicsSteps: this.diagnosticPhysicsSteps,
       pixelRatio: Number(this.renderPixelRatio.toFixed(2)),
       preferredPixelRatio: Number(this.preferredPixelRatio.toFixed(2)),
+      minimumPixelRatio: Number(this.minimumPixelRatio.toFixed(2)),
+      internalWidth: this.renderer.domElement.width,
+      internalHeight: this.renderer.domElement.height,
+      qualityMode: this.qualityMode,
       reducedMotion: this.reducedMotion,
       heapMb: heapMb === null ? null : Number(heapMb.toFixed(1)),
       maxHeapMb: this.diagnosticMaxHeapMb === null
@@ -1327,18 +1342,37 @@ export class FuturismaGame {
   private readonly resize = (): void => {
     const width = window.innerWidth;
     const height = window.innerHeight;
+    const previousPreferred = this.preferredPixelRatio;
+    const nextPreferred = this.resolvePreferredPixelRatio();
+    const nextMinimum = this.resolveMinimumPixelRatio();
+    this.renderPixelRatio = reconcilePixelRatioAfterResize(
+      this.renderPixelRatio,
+      previousPreferred,
+      nextPreferred,
+      nextMinimum,
+    );
+    this.preferredPixelRatio = nextPreferred;
+    this.minimumPixelRatio = nextMinimum;
     this.renderer.setPixelRatio(this.renderPixelRatio);
     this.renderer.setSize(width, height, false);
     this.camera.aspect = width / Math.max(1, height);
     this.camera.updateProjectionMatrix();
   };
 
-  private resolvePixelRatio(): number {
-    if (this.qualityOverride === "high") {
-      return Math.min(window.devicePixelRatio, 1.25);
-    }
-    if (this.qualityOverride === "low") return 0.65;
-    return 0.82;
+  private resolvePreferredPixelRatio(): number {
+    return calculatePreferredPixelRatio(
+      window.innerHeight,
+      window.devicePixelRatio,
+      this.qualityMode,
+    );
+  }
+
+  private resolveMinimumPixelRatio(): number {
+    return calculateMinimumPixelRatio(
+      window.innerHeight,
+      window.devicePixelRatio,
+      this.qualityMode,
+    );
   }
 
   private updateAdaptiveQuality(delta: number): void {
@@ -1357,10 +1391,16 @@ export class FuturismaGame {
         ? this.adaptiveQualityCredit + delta
         : 0;
     }
-    if (this.adaptiveQualityDebt >= 1.5 && this.renderPixelRatio > 0.65) {
+    if (
+      this.adaptiveQualityDebt >= 1.5
+      && this.renderPixelRatio > this.minimumPixelRatio
+    ) {
       this.adaptiveQualityDebt = 0;
       this.adaptiveQualityCredit = 0;
-      this.renderPixelRatio = Math.max(0.65, this.renderPixelRatio - 0.08);
+      this.renderPixelRatio = Math.max(
+        this.minimumPixelRatio,
+        this.renderPixelRatio - 0.08,
+      );
       this.resize();
       return;
     }
