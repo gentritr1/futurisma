@@ -5,10 +5,12 @@ import {
   checkpointRequiresExtraCircuit,
   crossedForwardProgress,
   forwardProgressDelta,
+  integrateWrongWayEvidence,
   isOpenEdgeWarningActive,
   isCircularHazardContact,
   isTurnCueBeyondFinish,
   isTurnCueUrgent,
+  resolveWrongWayActive,
   resolveCountdownStage,
 } from "../src/game/race-rules.js";
 import {
@@ -43,6 +45,35 @@ assert.equal(isOpenEdgeWarningActive(6.5, 10), true);
 assert.equal(isOpenEdgeWarningActive(6.3, 10), false);
 assert.equal(isOpenEdgeWarningActive(-6.5, 10), true);
 assert.equal(isOpenEdgeWarningActive(Number.NaN, 10), false);
+
+let wrongWayEvidence120 = 0;
+for (let index = 0; index < 78; index += 1) {
+  wrongWayEvidence120 = integrateWrongWayEvidence(wrongWayEvidence120, -0.7, 24, 1 / 120);
+}
+let wrongWayEvidence60 = 0;
+for (let index = 0; index < 39; index += 1) {
+  wrongWayEvidence60 = integrateWrongWayEvidence(wrongWayEvidence60, -0.7, 24, 1 / 60);
+}
+assert.ok(resolveWrongWayActive(false, wrongWayEvidence120));
+assert.ok(resolveWrongWayActive(false, wrongWayEvidence60));
+assert.ok(
+  Math.abs(wrongWayEvidence120 - wrongWayEvidence60) < 0.001,
+  "Wrong-way evidence must remain stable between 60 Hz and 120 Hz.",
+);
+assert.equal(
+  integrateWrongWayEvidence(0, -1, 7.9, 1),
+  0,
+  "Low-speed rotation must not trigger wrong-way evidence.",
+);
+assert.equal(
+  integrateWrongWayEvidence(0, -0.34, 40, 1),
+  0,
+  "Hard-turn heading error must not trigger below the reversal threshold.",
+);
+assert.equal(resolveWrongWayActive(false, 0.64), false);
+assert.equal(resolveWrongWayActive(false, 0.65), true);
+assert.equal(resolveWrongWayActive(true, 0.18), true);
+assert.equal(resolveWrongWayActive(true, 0.17), false);
 
 assert.equal(isTurnCueBeyondFinish(280, 60, true), true);
 assert.equal(isTurnCueBeyondFinish(0, 360, true), false);
@@ -149,5 +180,5 @@ assert.deepEqual(calculateRecoveryTelemetry(Number.NaN, 0), {
 });
 
 console.log(
-  "Race rules PASS: countdown, turn urgency, open-edge warning, final-route filtering, forward crossings, wraparound, missed-gate penalty, finish and boost presentation, cable contacts, recovery telemetry.",
+  "Race rules PASS: countdown, turn urgency, open-edge and hysteretic wrong-way warnings, final-route filtering, forward crossings, wraparound, missed-gate penalty, finish and boost presentation, cable contacts, recovery telemetry.",
 );

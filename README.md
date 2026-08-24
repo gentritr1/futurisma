@@ -36,6 +36,9 @@ the HUD and the best lap on the result screen. Airbrakes and the standing-water
 grip loss feed the procedural noise layer as well as handling feedback.
 If a gate is missed, the HUD keeps the failure visible, offers the recovery
 control, and includes the required extra circuit in the finish distance.
+A sustained high-speed route reversal suppresses normal turn calls and displays
+an explicit turn-around or recovery instruction; brief spins and low-speed
+rotation do not trigger it.
 Hangar Six restores the authored warning-cycle steam vents and cosmetic cargo
 hook; the two outer-line cable coils now deliver a telegraphed hard trip without
 interfering with the clean racing line. Fog zones crossfade over the authored
@@ -70,6 +73,8 @@ the required TOTEM runtime GLB so its transfer overlaps module parsing.
 For focused QA, `&diagnostics=1&probe=recovery` starts TOTEM just beyond
 Greenwater's open edge and exercises the production auto-recovery countdown and
 reinsertion path. The probe is ignored unless diagnostics are enabled.
+Use `&diagnostics=1&probe=wrong-way` to start TOTEM moving backward on the
+opening straight and verify warning engagement plus manual recovery.
 Use `&diagnostics=1&probe=context` to force one real WebGL context loss and
 restore during the opening straight. The race remains paused after restoration
 until the player explicitly resumes it.

@@ -415,6 +415,10 @@ body[data-graphics-context="lost"] .system-state__lamp {
   background: oklch(0.09 0.025 38 / 0.9);
 }
 
+.edge-warning[data-wrong-way="true"] {
+  background: oklch(0.09 0.028 38 / 0.92);
+}
+
 .edge-warning[data-recovery="true"] .edge-warning__track {
   display: block;
 }

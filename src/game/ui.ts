@@ -30,6 +30,7 @@ export interface HudFrame {
   drifting: boolean;
   skidsDown: boolean;
   lowGrip: boolean;
+  wrongWay: boolean;
   edgeWarning: boolean;
   edgeOpen: boolean;
   edgeCorrection: "LEFT" | "RIGHT" | null;
@@ -134,6 +135,7 @@ export class GameUi {
     this.countdown.dataset.paused = "false";
     this.edgeWarning.dataset.active = "false";
     this.edgeWarning.dataset.recovery = "false";
+    this.edgeWarning.dataset.wrongWay = "false";
     this.edgeWarning.setAttribute("aria-hidden", "true");
     this.turnCue.dataset.active = "false";
     this.turnCue.setAttribute("aria-hidden", "true");
@@ -153,6 +155,7 @@ export class GameUi {
     this.countdown.dataset.paused = "false";
     this.edgeWarning.dataset.active = "false";
     this.edgeWarning.dataset.recovery = "false";
+    this.edgeWarning.dataset.wrongWay = "false";
     this.edgeWarning.setAttribute("aria-hidden", "true");
     this.turnCue.dataset.active = "false";
     this.turnCue.setAttribute("aria-hidden", "true");
@@ -295,7 +298,8 @@ export class GameUi {
     this.boostFill.style.transform = `scaleX(${Math.min(1, Math.max(0, frame.boost))})`;
     const boostPresentation = resolveBoostPresentation(frame.boostActive, frame.boostLocked);
     const boostState = boostPresentation.state;
-    const edgeState = `${frame.edgeWarning}:${frame.edgeOpen}:${frame.recoveryActive}`;
+    const edgeActive = frame.edgeWarning || frame.wrongWay;
+    const edgeState = `${frame.edgeWarning}:${frame.edgeOpen}:${frame.recoveryActive}:${frame.wrongWay}`;
     if (boostState !== this.lastBoostState) {
       this.boostMeter.dataset.state = boostState;
       this.boostLabel.textContent = boostPresentation.label;
@@ -303,20 +307,23 @@ export class GameUi {
       this.lastBoostState = boostState;
     }
     if (edgeState !== this.lastEdgeState) {
-      this.edgeWarning.dataset.active = frame.edgeWarning ? "true" : "false";
+      this.edgeWarning.dataset.active = edgeActive ? "true" : "false";
       this.edgeWarning.dataset.recovery = frame.recoveryActive ? "true" : "false";
-      this.edgeWarning.setAttribute("aria-hidden", frame.edgeWarning ? "false" : "true");
+      this.edgeWarning.dataset.wrongWay = frame.wrongWay ? "true" : "false";
+      this.edgeWarning.setAttribute("aria-hidden", edgeActive ? "false" : "true");
       this.lastEdgeState = edgeState;
     }
     const edgeLabel = frame.recoveryActive
       ? `OFF COURSE · AUTO RECOVERY · ${(
         Math.ceil(frame.recoverySeconds * 2) / 2
       ).toFixed(1)} S`
-      : frame.edgeWarning && frame.edgeOpen && frame.edgeCorrection
-        ? `OPEN EDGE · STEER ${frame.edgeCorrection}`
-      : frame.edgeWarning && frame.edgeCorrection
-        ? `COURSE EDGE · STEER ${frame.edgeCorrection}`
-        : "COURSE EDGE";
+      : frame.wrongWay
+        ? "WRONG WAY · TURN AROUND / R RECOVER"
+        : frame.edgeWarning && frame.edgeOpen && frame.edgeCorrection
+          ? `OPEN EDGE · STEER ${frame.edgeCorrection}`
+          : frame.edgeWarning && frame.edgeCorrection
+            ? `COURSE EDGE · STEER ${frame.edgeCorrection}`
+            : "COURSE EDGE";
     if (edgeLabel !== this.lastEdgeLabel) {
       this.edgeWarningLabel.textContent = edgeLabel;
       this.lastEdgeLabel = edgeLabel;
@@ -328,12 +335,14 @@ export class GameUi {
     const finishCueActive = finalApproach
       && finishDistance <= 700
       && !frame.turnDirection;
-    const cueActive = Boolean(frame.turnDirection) || finishCueActive;
-    const turnState = frame.turnDirection
-      ? `${frame.turnDirection}:${frame.turnFollowingDirection}:${frame.turnHard}:${frame.turnUrgent}:${Math.round(frame.turnDistanceMeters / 10)}:${finalApproach}`
-      : finishCueActive
-        ? `finish:${Math.round(finishDistance / 10)}`
-        : "none";
+    const cueActive = !frame.wrongWay && (Boolean(frame.turnDirection) || finishCueActive);
+    const turnState = frame.wrongWay
+      ? "wrong-way"
+      : frame.turnDirection
+        ? `${frame.turnDirection}:${frame.turnFollowingDirection}:${frame.turnHard}:${frame.turnUrgent}:${Math.round(frame.turnDistanceMeters / 10)}:${finalApproach}`
+        : finishCueActive
+          ? `finish:${Math.round(finishDistance / 10)}`
+          : "none";
     if (turnState !== this.lastTurnState) {
       this.turnCue.dataset.active = cueActive ? "true" : "false";
       this.turnCue.setAttribute("aria-hidden", cueActive ? "false" : "true");
@@ -380,34 +389,38 @@ export class GameUi {
     const hazardActive = performance.now() < this.hazardUntil;
     const driveLabel = hazardActive
       ? this.hazardLabel
-      : frame.skidsDown
-        ? "SKIDS DOWN"
-        : frame.boostActive
-          ? "PLASMA OVERDRIVE"
-          : frame.boostLocked
-            ? "RELEASE BOOST"
-            : frame.lowGrip
-              ? "SLIP SURFACE"
-              : frame.drifting
-                ? "DRIFT VECTOR"
-                : frame.braking
-                  ? "AIRBRAKES"
-                  : "HOVER LOCK";
+      : frame.wrongWay
+        ? "WRONG WAY"
+        : frame.skidsDown
+          ? "SKIDS DOWN"
+          : frame.boostActive
+            ? "PLASMA OVERDRIVE"
+            : frame.boostLocked
+              ? "RELEASE BOOST"
+              : frame.lowGrip
+                ? "SLIP SURFACE"
+                : frame.drifting
+                  ? "DRIFT VECTOR"
+                  : frame.braking
+                    ? "AIRBRAKES"
+                    : "HOVER LOCK";
     const driveState = hazardActive
       ? "hazard"
-      : frame.skidsDown
-        ? "nominal"
-        : frame.boostActive
-          ? "boost"
-          : frame.boostLocked
-            ? "lockout"
-            : frame.lowGrip
-              ? "low-grip"
-              : frame.drifting
-                ? "drift"
-                : frame.braking
-                  ? "braking"
-                  : "nominal";
+      : frame.wrongWay
+        ? "hazard"
+        : frame.skidsDown
+          ? "nominal"
+          : frame.boostActive
+            ? "boost"
+            : frame.boostLocked
+              ? "lockout"
+              : frame.lowGrip
+                ? "low-grip"
+                : frame.drifting
+                  ? "drift"
+                  : frame.braking
+                    ? "braking"
+                    : "nominal";
     if (driveLabel !== this.lastDriveLabel) {
       this.driveState.textContent = driveLabel;
       this.lastDriveLabel = driveLabel;

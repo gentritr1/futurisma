@@ -44,6 +44,40 @@ export function isOpenEdgeWarningActive(
 }
 
 /**
+ * Builds evidence for a real route reversal while rejecting low-speed rotation,
+ * brief impacts, and the large heading changes required by authored hairpins.
+ * @param {number} previousEvidenceSeconds
+ * @param {number} courseAlignment
+ * @param {number} speedMetersPerSecond
+ * @param {number} deltaSeconds
+ */
+export function integrateWrongWayEvidence(
+  previousEvidenceSeconds,
+  courseAlignment,
+  speedMetersPerSecond,
+  deltaSeconds,
+) {
+  const evidence = Number.isFinite(previousEvidenceSeconds)
+    ? Math.max(0, previousEvidenceSeconds)
+    : 0;
+  const delta = Number.isFinite(deltaSeconds)
+    ? Math.min(0.1, Math.max(0, deltaSeconds))
+    : 0;
+  if (!Number.isFinite(courseAlignment) || !Number.isFinite(speedMetersPerSecond)) return 0;
+  if (speedMetersPerSecond >= 8 && courseAlignment <= -0.35) {
+    return Math.min(1.5, evidence + delta);
+  }
+  const releaseRate = speedMetersPerSecond < 8 || courseAlignment >= 0.1 ? 2.5 : 0.5;
+  return Math.max(0, evidence - delta * releaseRate);
+}
+
+/** @param {boolean} previousActive @param {number} evidenceSeconds */
+export function resolveWrongWayActive(previousActive, evidenceSeconds) {
+  const evidence = Number.isFinite(evidenceSeconds) ? Math.max(0, evidenceSeconds) : 0;
+  return evidence >= (previousActive ? 0.18 : 0.65);
+}
+
+/**
  * A closed course can wrap its look-ahead into the next lap. Once the final
  * gate is armed, instructions beyond the finish line must stay hidden.
  * @param {number} turnDistanceMeters

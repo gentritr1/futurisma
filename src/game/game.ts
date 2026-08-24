@@ -26,9 +26,11 @@ import {
   calculateFinishDistanceMeters,
   calculateRecoveryTelemetry,
   crossedForwardProgress,
+  integrateWrongWayEvidence,
   isOpenEdgeWarningActive,
   isTurnCueBeyondFinish,
   isTurnCueUrgent,
+  resolveWrongWayActive,
   resolveCountdownStage,
 } from "./race-rules";
 import {
@@ -51,6 +53,7 @@ type RacePhase = "standby" | "countdown" | "running" | "paused" | "resuming" | "
 const FIXED_STEP = 1 / 120;
 const MAX_PHYSICS_BACKLOG = 0.1;
 const RECOVERY_PROBE_DISTANCE_METERS = 900;
+const WRONG_WAY_PROBE_DISTANCE_METERS = 100;
 const RESUME_COUNTDOWN_SECONDS = 2.7;
 const ZERO_INPUT: InputFrame = { throttle: 0, brake: 0, steer: 0, boost: false };
 
@@ -263,6 +266,9 @@ export class FuturismaGame {
   private pausedBeforeStart = false;
   private edgeContact = false;
   private openEdgeWarning = false;
+  private wrongWayEvidence = 0;
+  private wrongWayActive = false;
+  private courseAlignment = 1;
   private offCourseTime = 0;
   private recoveryImmunity = 0;
   private hazardTripCooldown = 0;
@@ -286,6 +292,8 @@ export class FuturismaGame {
   private diagnosticDriftEntries = 0;
   private diagnosticMaxDriftIntensity = 0;
   private diagnosticEdgeSeconds = 0;
+  private diagnosticWrongWaySeconds = 0;
+  private diagnosticWrongWayEntries = 0;
   private diagnosticImpacts = 0;
   private diagnosticMissedGates = 0;
   private diagnosticRecoveries = 0;
@@ -342,6 +350,8 @@ export class FuturismaGame {
   );
   private readonly recoveryProbe = this.diagnosticsMode
     && new URLSearchParams(window.location.search).get("probe") === "recovery";
+  private readonly wrongWayProbe = this.diagnosticsMode
+    && new URLSearchParams(window.location.search).get("probe") === "wrong-way";
   private readonly contextLossProbe = this.diagnosticsMode
     && new URLSearchParams(window.location.search).get("probe") === "context";
   private readonly reducedMotion = window.matchMedia(
@@ -895,6 +905,26 @@ export class FuturismaGame {
       this.forward,
     );
 
+    const wasWrongWayActive = this.wrongWayActive;
+    this.courseAlignment = this.travelDirection.dot(afterMove.tangent);
+    this.wrongWayEvidence = integrateWrongWayEvidence(
+      this.wrongWayEvidence,
+      this.courseAlignment,
+      this.speed,
+      delta,
+    );
+    this.wrongWayActive = resolveWrongWayActive(
+      wasWrongWayActive,
+      this.wrongWayEvidence,
+    );
+    if (this.wrongWayActive && !wasWrongWayActive) {
+      this.input.pulse(0.12, 0.32, 120);
+      if (this.diagnosticsMode) this.diagnosticWrongWayEntries += 1;
+    }
+    if (this.diagnosticsMode && this.wrongWayActive) {
+      this.diagnosticWrongWaySeconds += delta;
+    }
+
     this.elapsedMs += delta * 1000;
     this.updateCheckpointProgress(previousProgress, afterMove.tangent);
   }
@@ -1003,6 +1033,9 @@ export class FuturismaGame {
     this.speed = this.course.recoverySpeedMps;
     this.boostActive = false;
     this.padBoostTime = 0;
+    this.wrongWayEvidence = 0;
+    this.wrongWayActive = false;
+    this.courseAlignment = 1;
     this.edgeContact = false;
     this.offCourseTime = 0;
     this.recoveryImmunity = this.course.recoveryImmunitySeconds;
@@ -1247,6 +1280,7 @@ export class FuturismaGame {
       drifting: this.driftActive,
       skidsDown: this.speed < 11,
       lowGrip: this.surfaceGrip < 0.95,
+      wrongWay: this.wrongWayActive,
       edgeWarning: this.edgeContact || this.openEdgeWarning,
       edgeOpen: this.openEdgeWarning,
       edgeCorrection: this.edgeContact || this.openEdgeWarning
@@ -1274,7 +1308,9 @@ export class FuturismaGame {
   private resetRaceState(): void {
     this.progress = this.recoveryProbe
       ? RECOVERY_PROBE_DISTANCE_METERS / this.course.length
-      : 0.002;
+      : this.wrongWayProbe
+        ? WRONG_WAY_PROBE_DISTANCE_METERS / this.course.length
+        : 0.002;
     this.speed = 0;
     this.lateral = 0;
     this.steerAmount = 0;
@@ -1298,6 +1334,9 @@ export class FuturismaGame {
     this.recoveryImmunity = 0;
     this.hazardTripCooldown = 0;
     this.openEdgeWarning = false;
+    this.wrongWayEvidence = 0;
+    this.wrongWayActive = false;
+    this.courseAlignment = 1;
     this.impactShake = 0;
     this.physicsAccumulator = 0;
     this.resumeCountdown = 0;
@@ -1311,6 +1350,12 @@ export class FuturismaGame {
     }
     this.forward.copy(start.tangent);
     this.travelDirection.copy(start.tangent);
+    if (this.wrongWayProbe) {
+      this.forward.multiplyScalar(-1);
+      this.travelDirection.multiplyScalar(-1);
+      this.speed = 22;
+      this.courseAlignment = -1;
+    }
     this.syncPresentationPose();
     this.course.setLapBoard(1, this.totalLaps);
     this.course.setCheckpointProgress(1);
@@ -1656,6 +1701,8 @@ export class FuturismaGame {
       surfaceGrip: Number(this.surfaceGrip.toFixed(2)),
       boostActive: this.boostActive,
       boostLocked: this.boostLockedUntilRelease,
+      wrongWay: this.wrongWayActive,
+      courseAlignment: Number(this.courseAlignment.toFixed(2)),
       nextCheckpoint: this.nextCheckpointIndex,
       averageSpeedKph: elapsedSeconds > 0
         ? Number((this.diagnosticDistanceTravelled / elapsedSeconds * 3.6).toFixed(1))
@@ -1667,6 +1714,8 @@ export class FuturismaGame {
       driftEntries: this.diagnosticDriftEntries,
       maxDriftIntensity: Number(this.diagnosticMaxDriftIntensity.toFixed(2)),
       edgeSeconds: Number(this.diagnosticEdgeSeconds.toFixed(2)),
+      wrongWaySeconds: Number(this.diagnosticWrongWaySeconds.toFixed(2)),
+      wrongWayEntries: this.diagnosticWrongWayEntries,
       impacts: this.diagnosticImpacts,
       missedGates: this.diagnosticMissedGates,
       impactLocations: this.diagnosticImpactLocations,
@@ -1767,6 +1816,8 @@ export class FuturismaGame {
     this.diagnosticDriftEntries = 0;
     this.diagnosticMaxDriftIntensity = 0;
     this.diagnosticEdgeSeconds = 0;
+    this.diagnosticWrongWaySeconds = 0;
+    this.diagnosticWrongWayEntries = 0;
     this.diagnosticImpacts = 0;
     this.diagnosticMissedGates = 0;
     this.diagnosticRecoveries = 0;
