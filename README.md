@@ -62,6 +62,9 @@ frames while racing. A presentation interpolation layer keeps the deterministic
 telemetry remains full-resolution. Add
 `&motion=reduce` to exercise the same reduced-motion path as the operating-system
 preference.
+Diagnostics also report course assembly, critical vehicle fetch/load, total
+startup-ready, and optional asset-kit load timing. The production shell preloads
+the required TOTEM runtime GLB so its transfer overlaps module parsing.
 
 For focused QA, `&diagnostics=1&probe=recovery` starts TOTEM just beyond
 Greenwater's open edge and exercises the production auto-recovery countdown and

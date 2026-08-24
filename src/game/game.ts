@@ -43,6 +43,9 @@ import {
 } from "./totem";
 import { GameUi } from "./ui";
 
+const VEHICLE_MODEL_URL = "/assets/totem/models/totem_runtime.glb";
+const ASSET_KIT_MODEL_URL = "/assets/totem/models/futurisma_asset_kit.glb";
+
 type RacePhase = "standby" | "countdown" | "running" | "paused" | "resuming" | "finished";
 
 const FIXED_STEP = 1 / 120;
@@ -166,7 +169,10 @@ export class FuturismaGame {
   private readonly scene = new THREE.Scene();
   private readonly camera = new THREE.PerspectiveCamera(58, 1, 0.1, 650);
   private readonly renderer: THREE.WebGLRenderer;
+  private readonly courseAssemblyStartedAt = performance.now();
   private readonly course = new GreenwaterCourse();
+  private readonly diagnosticCourseAssemblyMs = performance.now()
+    - this.courseAssemblyStartedAt;
   private readonly coursePs2Treatment = applyPs2MaterialTreatment(this.course.group);
   private readonly demoProjection = this.course.createProjectionScratch();
   private readonly demoLookAhead = this.course.createSampleScratch();
@@ -289,6 +295,13 @@ export class FuturismaGame {
   private diagnosticMaxLateralRatio = 0;
   private diagnosticStartHeapMb: number | null = null;
   private diagnosticMaxHeapMb: number | null = null;
+  private diagnosticStartupReadyMs = 0;
+  private diagnosticVehicleLoadStartedMs = 0;
+  private diagnosticVehicleLoadMs = 0;
+  private diagnosticVehicleRequestStartMs: number | null = null;
+  private diagnosticVehicleResourceRequests = 0;
+  private diagnosticAssetKitLoadMs: number | null = null;
+  private diagnosticAssetKitReady = false;
   private readonly diagnosticImpactLocations: string[] = [];
   private readonly diagnosticRecoveryLocations: string[] = [];
   private diagnosticsOutput: HTMLOutputElement | null = null;
@@ -382,7 +395,15 @@ export class FuturismaGame {
   }
 
   async initialize(): Promise<boolean> {
-    await this.vehicle.load("/assets/totem/models/totem_runtime.glb");
+    const vehicleLoadStartedAt = performance.now();
+    this.diagnosticVehicleLoadStartedMs = vehicleLoadStartedAt;
+    await this.vehicle.load(VEHICLE_MODEL_URL);
+    this.diagnosticVehicleLoadMs = performance.now() - vehicleLoadStartedAt;
+    const vehicleResourceUrl = new URL(VEHICLE_MODEL_URL, window.location.href).href;
+    const vehicleResources = performance.getEntriesByName(vehicleResourceUrl, "resource");
+    const vehicleResource = vehicleResources[0];
+    this.diagnosticVehicleResourceRequests = vehicleResources.length;
+    this.diagnosticVehicleRequestStartMs = vehicleResource?.startTime ?? null;
     if (this.disposed) {
       disposeObject3DResources(this.vehicle.root);
       this.vehicle.root.clear();
@@ -394,6 +415,7 @@ export class FuturismaGame {
     this.running = true;
     this.animationFrame = requestAnimationFrame(this.frame);
     void this.loadAssetKit();
+    this.diagnosticStartupReadyMs = performance.now();
     return true;
   }
 
@@ -1416,9 +1438,10 @@ export class FuturismaGame {
   }
 
   private async loadAssetKit(): Promise<void> {
+    const assetKitLoadStartedAt = performance.now();
     try {
       const gltf = await new GLTFLoader().loadAsync(
-        "/assets/totem/models/futurisma_asset_kit.glb",
+        ASSET_KIT_MODEL_URL,
       );
       if (this.disposed) {
         disposeObject3DResources(gltf.scene);
@@ -1434,8 +1457,11 @@ export class FuturismaGame {
       this.scene.add(dressingDisplay);
       const proceduralCables = this.course.group.getObjectByName("cable_trip_hazards");
       if (proceduralCables) proceduralCables.visible = false;
+      this.diagnosticAssetKitReady = true;
     } catch {
       // Greenwater retains its procedural cable visuals if optional dressing fails.
+    } finally {
+      this.diagnosticAssetKitLoadMs = performance.now() - assetKitLoadStartedAt;
     }
   }
 
@@ -1662,6 +1688,18 @@ export class FuturismaGame {
       maxMusicLowpassHz: Number(audioDiagnostics.maxMusicLowpassHz.toFixed(1)),
       maxMusicHighShelfDb: Number(audioDiagnostics.maxMusicHighShelfDb.toFixed(1)),
       audioInitializationMs: Number(audioDiagnostics.initializationMs.toFixed(1)),
+      startupReadyMs: Number(this.diagnosticStartupReadyMs.toFixed(1)),
+      courseAssemblyMs: Number(this.diagnosticCourseAssemblyMs.toFixed(1)),
+      vehicleLoadStartedMs: Number(this.diagnosticVehicleLoadStartedMs.toFixed(1)),
+      vehicleLoadMs: Number(this.diagnosticVehicleLoadMs.toFixed(1)),
+      vehicleRequestStartMs: this.diagnosticVehicleRequestStartMs === null
+        ? null
+        : Number(this.diagnosticVehicleRequestStartMs.toFixed(1)),
+      vehicleResourceRequests: this.diagnosticVehicleResourceRequests,
+      assetKitLoadMs: this.diagnosticAssetKitLoadMs === null
+        ? null
+        : Number(this.diagnosticAssetKitLoadMs.toFixed(1)),
+      assetKitReady: this.diagnosticAssetKitReady,
       pixelRatio: Number(this.renderPixelRatio.toFixed(2)),
       preferredPixelRatio: Number(this.preferredPixelRatio.toFixed(2)),
       minimumPixelRatio: Number(this.minimumPixelRatio.toFixed(2)),

@@ -30,6 +30,13 @@ assert.ok(
   `Initial app shell exceeds 235 KiB gzip (${(shellGzip / 1024).toFixed(1)} KiB).`,
 );
 assert.ok(
+  html.includes('rel="preload"')
+    && html.includes('href="/assets/totem/models/totem_runtime.glb"')
+    && html.includes('as="fetch"')
+    && html.includes('crossorigin="anonymous"'),
+  "The production shell must overlap the critical TOTEM fetch with module loading.",
+);
+assert.ok(
   productionHeaders.includes("frame-ancestors 'none'"),
   "The production build must include the hardened response-header policy.",
 );
