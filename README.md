@@ -81,7 +81,12 @@ Use `&diagnostics=1&probe=wrong-way` to start TOTEM moving backward on the
 opening straight and verify warning engagement plus manual recovery.
 Use `&diagnostics=1&probe=context` to force one real WebGL context loss and
 restore during the opening straight. The race remains paused after restoration
-until the player explicitly resumes it.
+until the player explicitly resumes it. Focus, visibility, and graphics-link
+interruptions also discard queued pause/reset/mute edges and require action
+controls to be released before they can resume the simulation.
+Use `&diagnostics=1&probe=focus` to queue an action around a production
+focus-loss pause and verify that the race stays frozen until a fresh resume
+press.
 Use `?demo=1&diagnostics=1&start=manual` when audio diagnostics must run with
 a user-activated AudioContext while retaining the showcase controller.
 

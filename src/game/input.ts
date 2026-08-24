@@ -1,3 +1,5 @@
+import { resolveActionSuppression } from "./action-gate";
+
 export interface InputFrame {
   throttle: number;
   brake: number;
@@ -28,10 +30,20 @@ const DRIVING_KEYS = new Set([
   "Space",
 ]);
 
+const START_KEYS = new Set(["Enter", "Escape", "KeyP"]);
+const ACTION_KEYS = new Set([...START_KEYS, "KeyR", "KeyM"]);
+
 function applyDeadzone(value: number, deadzone = 0.16): number {
   const magnitude = Math.abs(value);
   if (magnitude <= deadzone) return 0;
   return Math.sign(value) * ((magnitude - deadzone) / (1 - deadzone));
+}
+
+function hasHeldKeyboardAction(keys: ReadonlySet<string>): boolean {
+  for (const code of ACTION_KEYS) {
+    if (keys.has(code)) return true;
+  }
+  return false;
 }
 
 export class InputController {
@@ -46,6 +58,7 @@ export class InputController {
   private resetRequested = false;
   private muteRequested = false;
   private controlIntentRequested = false;
+  private actionsSuppressedUntilRelease = false;
   private previousGamepadButtons: boolean[] = [];
 
   constructor() {
@@ -65,6 +78,18 @@ export class InputController {
       || this.keys.has("Space");
 
     const gamepad = this.activeGamepad();
+    const actionControlHeld = hasHeldKeyboardAction(this.keys)
+      || Boolean(gamepad?.buttons[9]?.pressed)
+      || Boolean(gamepad?.buttons[3]?.pressed)
+      || Boolean(gamepad?.buttons[8]?.pressed);
+    const actionsWereSuppressed = this.actionsSuppressedUntilRelease;
+    this.actionsSuppressedUntilRelease = resolveActionSuppression(
+      actionsWereSuppressed,
+      actionControlHeld,
+    );
+    const acceptActions = !actionsWereSuppressed;
+    if (!acceptActions) this.clearPendingActions();
+
     if (!gamepad) {
       this.previousGamepadButtons.length = 0;
       this.frame.throttle = keyboardThrottle;
@@ -74,13 +99,25 @@ export class InputController {
       return this.frame;
     }
 
-    if (gamepad.buttons[9]?.pressed && !this.previousGamepadButtons[9]) {
+    if (
+      acceptActions
+      && gamepad.buttons[9]?.pressed
+      && !this.previousGamepadButtons[9]
+    ) {
       this.startRequested = true;
     }
-    if (gamepad.buttons[3]?.pressed && !this.previousGamepadButtons[3]) {
+    if (
+      acceptActions
+      && gamepad.buttons[3]?.pressed
+      && !this.previousGamepadButtons[3]
+    ) {
       this.resetRequested = true;
     }
-    if (gamepad.buttons[8]?.pressed && !this.previousGamepadButtons[8]) {
+    if (
+      acceptActions
+      && gamepad.buttons[8]?.pressed
+      && !this.previousGamepadButtons[8]
+    ) {
       this.muteRequested = true;
     }
     this.previousGamepadButtons.length = gamepad.buttons.length;
@@ -100,7 +137,13 @@ export class InputController {
   }
 
   requestStart(): void {
-    this.startRequested = true;
+    if (!this.actionsSuppressedUntilRelease) this.startRequested = true;
+  }
+
+  suspendActionsUntilRelease(): void {
+    this.keys.clear();
+    this.clearPendingActions();
+    this.actionsSuppressedUntilRelease = true;
   }
 
   pulse(strongMagnitude: number, weakMagnitude: number, duration: number): void {
@@ -169,8 +212,9 @@ export class InputController {
     this.keys.add(event.code);
     if (DRIVING_KEYS.has(event.code)) this.controlIntentRequested = true;
     if (event.repeat) return;
+    if (this.actionsSuppressedUntilRelease && ACTION_KEYS.has(event.code)) return;
 
-    if (event.code === "Enter" || event.code === "Escape" || event.code === "KeyP") {
+    if (START_KEYS.has(event.code)) {
       this.startRequested = true;
     }
     if (event.code === "KeyR") this.resetRequested = true;
@@ -184,4 +228,11 @@ export class InputController {
   private readonly clearKeys = (): void => {
     this.keys.clear();
   };
+
+  private clearPendingActions(): void {
+    this.startRequested = false;
+    this.resetRequested = false;
+    this.muteRequested = false;
+    this.controlIntentRequested = false;
+  }
 }

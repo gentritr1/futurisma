@@ -336,6 +336,7 @@ export class FuturismaGame {
   private contextLost = false;
   private contextPausedRace = false;
   private contextLossProbeStarted = false;
+  private focusLossProbeStarted = false;
   private contextRestoreAt = 0;
   private trialStartPending = false;
   private animationFrame = 0;
@@ -361,6 +362,8 @@ export class FuturismaGame {
     && new URLSearchParams(window.location.search).get("probe") === "wrong-way";
   private readonly contextLossProbe = this.diagnosticsMode
     && new URLSearchParams(window.location.search).get("probe") === "context";
+  private readonly focusLossProbe = this.diagnosticsMode
+    && new URLSearchParams(window.location.search).get("probe") === "focus";
   private readonly reducedMotion = window.matchMedia(
     "(prefers-reduced-motion: reduce)",
   ).matches || new URLSearchParams(window.location.search).get("motion") === "reduce";
@@ -485,6 +488,7 @@ export class FuturismaGame {
     this.update(delta, input);
     this.updateAdaptiveQuality(delta);
     this.updateContextLossProbe();
+    this.updateFocusLossProbe();
     if (!this.contextLost) this.renderer.render(this.scene, this.camera);
     this.reportDiagnostics(delta);
     this.animationFrame = requestAnimationFrame(this.frame);
@@ -1621,10 +1625,13 @@ export class FuturismaGame {
   }
 
   private readonly handleVisibilityChange = (): void => {
-    if (document.hidden) this.pauseRace("FOCUS LOST");
+    if (!document.hidden) return;
+    this.input.suspendActionsUntilRelease();
+    this.pauseRace("FOCUS LOST");
   };
 
   private readonly handleWindowBlur = (): void => {
+    this.input.suspendActionsUntilRelease();
     this.pauseRace("FOCUS LOST");
   };
 
@@ -1633,6 +1640,7 @@ export class FuturismaGame {
     event.preventDefault();
     if (this.contextLost) return;
     this.contextLost = true;
+    this.input.suspendActionsUntilRelease();
     this.diagnosticContextLosses += 1;
     this.contextPausedRace = this.phase === "countdown"
       || this.phase === "running"
@@ -1677,6 +1685,20 @@ export class FuturismaGame {
       this.contextRestoreAt = 0;
       this.renderer.forceContextRestore();
     }
+  }
+
+  private updateFocusLossProbe(): void {
+    if (
+      !this.focusLossProbe
+      || this.focusLossProbeStarted
+      || this.phase !== "running"
+      || this.elapsedMs < 1_000
+    ) return;
+
+    this.focusLossProbeStarted = true;
+    this.input.requestStart();
+    this.handleWindowBlur();
+    this.input.requestStart();
   }
 
   private reportDiagnostics(delta: number): void {
