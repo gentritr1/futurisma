@@ -43,6 +43,9 @@ export interface DiagnosticsCore {
   boostSeconds: number;
   driftSeconds: number;
   driftEntries: number;
+  driftCharge: number;
+  driftRewards: number;
+  driftRewardTotal: number;
   maxDriftIntensity: number;
   minimumSurfaceGrip: number;
   edgeSeconds: number;
@@ -266,6 +269,9 @@ export function buildDiagnosticsReport(
     boostSeconds: Number(core.boostSeconds.toFixed(2)),
     driftSeconds: Number(core.driftSeconds.toFixed(2)),
     driftEntries: core.driftEntries,
+    driftCharge: Number(core.driftCharge.toFixed(3)),
+    driftRewards: core.driftRewards,
+    driftRewardTotal: Number(core.driftRewardTotal.toFixed(2)),
     maxDriftIntensity: Number(core.maxDriftIntensity.toFixed(2)),
     minimumSurfaceGrip: Number(core.minimumSurfaceGrip.toFixed(3)),
     edgeSeconds: Number(core.edgeSeconds.toFixed(2)),

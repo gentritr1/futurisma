@@ -1,6 +1,26 @@
 export const CRUISE_MAX_SPEED = 86;
 export const BOOST_MAX_SPEED = 112;
 export const BOOST_RESERVE_CUTOFF = 0.012;
+
+/*
+ * P5 drift economy — the whole drift/boost tradeoff lives in these seven
+ * numbers and nowhere else, so a tuning pass edits one block instead of
+ * hunting constants through the race loop. Every one of them is a pre-
+ * authorised proposal pending the P5 taste gate (a human drives three laps),
+ * so treat this block as the single edit point when those answers come back.
+ *
+ * Derived durations, for reference when re-tuning:
+ *   full charge from empty at driftIntensity 1 = 1 / 0.55   = 1.818 s
+ *   full decay  from 1.0 while off drift       = 1 / 1.2    = 0.833 s
+ *   one reward vs passive regen                = 0.30/0.045 = 6.7 s of regen
+ */
+export const DRIFT_CHARGE_RATE = 0.55;
+export const DRIFT_CHARGE_CAP = 1;
+export const DRIFT_CHARGE_DECAY_RATE = 1.2;
+export const DRIFT_REWARD_MINIMUM_CHARGE = 0.35;
+export const DRIFT_RELEASE_REWARD = 0.3;
+export const BOOST_RESERVE_DRAIN_RATE = 0.26;
+export const BOOST_RESERVE_REGEN_RATE = 0.045;
 const OVERSPEED_DRAG_RATE = 0.45;
 const COAST_BASE_DECELERATION = 10;
 const COAST_SPEED_DRAG_RATE = 0.55;
@@ -100,14 +120,63 @@ export function integrateCoastSpeed(speed, delta) {
 }
 
 /**
+ * Banks committed drift. Linear in delta so 60 Hz and 120 Hz charge and decay
+ * the same bank over the same wall-clock drift, and clamped at both ends so the
+ * caller never has to guard the stored value.
+ * @param {number} charge
+ * @param {number} driftIntensity zero (or less) means off drift, and decays
+ * @param {number} delta
+ */
+export function integrateDriftCharge(charge, driftIntensity, delta) {
+  const current = Number.isFinite(charge)
+    ? clamp(charge, 0, DRIFT_CHARGE_CAP)
+    : 0;
+  const intensity = Number.isFinite(driftIntensity)
+    ? clamp(driftIntensity, 0, 1)
+    : 0;
+  const step = Number.isFinite(delta) ? Math.max(0, delta) : 0;
+  const rate = intensity > 0
+    ? intensity * DRIFT_CHARGE_RATE
+    : -DRIFT_CHARGE_DECAY_RATE;
+  return clamp(current + rate * step, 0, DRIFT_CHARGE_CAP);
+}
+
+/**
+ * Pays the bank out on the drift-release edge only. A release under the
+ * minimum charge pays nothing and consumes nothing — the bank is left to the
+ * off-drift decay — so a twitch of brake-and-steer cannot farm reserve.
+ * @param {number} charge
+ * @param {boolean} wasDrifting
+ * @param {boolean} isDrifting
+ * @returns {{ reward: number, consumed: boolean }}
+ */
+export function resolveDriftRelease(charge, wasDrifting, isDrifting) {
+  const current = Number.isFinite(charge)
+    ? clamp(charge, 0, DRIFT_CHARGE_CAP)
+    : 0;
+  const released = Boolean(wasDrifting) && !isDrifting;
+  if (!released || current < DRIFT_REWARD_MINIMUM_CHARGE) {
+    return { reward: 0, consumed: false };
+  }
+  return { reward: DRIFT_RELEASE_REWARD, consumed: true };
+}
+
+/**
+ * The reserve integrator owns the drift reward too, so every path that can move
+ * the reserve shares one clamp and the stored value can never leave [0, 1].
  * @param {number} reserve
  * @param {boolean} reserveBoostActive
  * @param {number} delta
+ * @param {number} [reward] drift-release payout applied this step
  */
-export function integrateBoostReserve(reserve, reserveBoostActive, delta) {
-  return reserveBoostActive
-    ? Math.max(0, reserve - delta * 0.2)
-    : Math.min(1, reserve + delta * 0.075);
+export function integrateBoostReserve(reserve, reserveBoostActive, delta, reward = 0) {
+  const current = Number.isFinite(reserve) ? clamp(reserve, 0, 1) : 0;
+  const payout = Number.isFinite(reward) ? Math.max(0, reward) : 0;
+  const step = Number.isFinite(delta) ? Math.max(0, delta) : 0;
+  const rate = reserveBoostActive
+    ? -BOOST_RESERVE_DRAIN_RATE
+    : BOOST_RESERVE_REGEN_RATE;
+  return clamp(current + payout + rate * step, 0, 1);
 }
 
 /**

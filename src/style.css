@@ -360,6 +360,38 @@ body[data-graphics-context="lost"] .system-state__lamp {
 }
 
 /*
+ * P5 drift bank. A 1px acid lip riding the top edge of the plasma bar, so the
+ * reserve fill underneath is never obscured and nothing new is added to the
+ * HUD's silhouette. It is deliberately not readable as a number: the glanceable
+ * signal is the armed state, which lights the lip and throws a short bloom the
+ * moment the bank clears its reward minimum. That bloom is what a driver in a
+ * corner sees in peripheral vision — the length is only there for the debrief.
+ */
+.boost__track {
+  position: relative;
+  overflow: visible;
+}
+
+.boost__track .boost__charge {
+  position: absolute;
+  top: -2px;
+  left: 0;
+  height: 1px;
+  opacity: 0.4;
+}
+
+.boost[data-charge="armed"] .boost__track .boost__charge {
+  opacity: 1;
+  box-shadow: 0 0 6px oklch(0.86 0.18 130 / 0.8);
+}
+
+/* Locked recolours the reserve fill to warning; the bank stays acid, because a
+ * locked reserve is exactly the state where earning one back is the read. */
+.boost[data-state="locked"] .boost__track .boost__charge {
+  background: var(--acid);
+}
+
+/*
  * P6 minimap / radar. Right rail, stacked above RACE TIME: the bottom-left
  * corner is VELOCITY, bottom-centre is the boost meter and the vertical middle
  * of the right rail is the field-order ladder, so this is the one free corner.

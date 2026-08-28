@@ -6,6 +6,7 @@ import {
   resolveInitialRacePresentation,
   resolveRaceStage,
 } from "./hud-presentation.js";
+import { DRIFT_REWARD_MINIMUM_CHARGE } from "./physics";
 
 export interface HudFrame {
   speedKph: number;
@@ -29,6 +30,7 @@ export interface HudFrame {
   turnUrgent: boolean;
   boostActive: boolean;
   boostLocked: boolean;
+  driftCharge: number;
   braking: boolean;
   drifting: boolean;
   skidsDown: boolean;
@@ -122,6 +124,7 @@ export class GameUi {
   private readonly boostLabel = requiredElement<HTMLElement>("boost-label");
   private readonly boostValue = requiredElement<HTMLElement>("boost-value");
   private readonly boostFill = requiredElement<HTMLElement>("boost-fill");
+  private readonly driftChargeFill = requiredElement<HTMLElement>("drift-charge");
   private readonly edgeWarning = requiredElement<HTMLElement>("edge-warning");
   private readonly edgeWarningLabel = requiredElement<HTMLElement>("edge-warning-label");
   private readonly edgeWarningFill = requiredElement<HTMLElement>("edge-warning-fill");
@@ -144,6 +147,7 @@ export class GameUi {
   private lastDriveLabel = "";
   private lastDriveState = "";
   private lastBoostState = "";
+  private lastDriftArmed: boolean | null = null;
   private lastEdgeState = "";
   private lastEdgeLabel = "";
   private lastTurnState = "";
@@ -471,6 +475,15 @@ export class GameUi {
     this.progressFill.style.transform = `scaleX(${Math.min(1, Math.max(0, frame.progress))})`;
     this.boostValue.textContent = `${Math.round(frame.boost * 100)}%`;
     this.boostFill.style.transform = `scaleX(${Math.min(1, Math.max(0, frame.boost))})`;
+    const driftCharge = Math.min(1, Math.max(0, frame.driftCharge));
+    this.driftChargeFill.style.transform = `scaleX(${driftCharge})`;
+    // The armed state is the glanceable half of the bank, so it only touches the
+    // DOM on the threshold crossing rather than every frame.
+    const driftArmed = driftCharge >= DRIFT_REWARD_MINIMUM_CHARGE;
+    if (driftArmed !== this.lastDriftArmed) {
+      this.boostMeter.dataset.charge = driftArmed ? "armed" : "idle";
+      this.lastDriftArmed = driftArmed;
+    }
     const boostPresentation = resolveBoostPresentation(frame.boostActive, frame.boostLocked);
     const boostState = boostPresentation.state;
     const edgeActive = frame.edgeWarning || frame.wrongWay;
