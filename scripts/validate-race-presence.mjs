@@ -224,6 +224,141 @@ assert.match(presenceSource, /depthWrite: false/);
 assert.match(presenceSource, /THREE\.AdditiveBlending/);
 assert.match(presenceSource, /THREE\.NormalBlending/);
 
+// Rivals articulate a left/right pair from one instanced mesh, which only works
+// while (a) each pivot is a rigid unit-scale transform — otherwise
+// `pose * pivot * rotation(axis, angle)` stops matching what the player's node
+// hierarchy does — and (b) both sides carry byte-identical pivot-local
+// geometry, which is what lets them share it. Re-exported art that breaks
+// either falls back to a welded hull, so assert it at the asset instead.
+const meshIndexByNodeName = new Map(
+  json.nodes.filter((node) => node.mesh !== undefined).map((node) => [node.name, node.mesh]),
+);
+const floatAttribute = (meshIndex, name) => {
+  const primitive = json.meshes[meshIndex].primitives[0];
+  const accessor = json.accessors[primitive.attributes[name]];
+  assert.ok(accessor, `TOTEM primitive is missing ${name}.`);
+  assert.equal(accessor.componentType, 5126, `TOTEM ${name} must be float32.`);
+  const components = { SCALAR: 1, VEC2: 2, VEC3: 3, VEC4: 4 }[accessor.type];
+  const view = json.bufferViews[accessor.bufferView];
+  assert.equal(
+    view.byteStride ?? components * 4,
+    components * 4,
+    `TOTEM ${name} must be tightly packed.`,
+  );
+  const start = (view.byteOffset ?? 0) + (accessor.byteOffset ?? 0);
+  const values = new Float32Array(accessor.count * components);
+  for (let index = 0; index < values.length; index += 1) {
+    values[index] = runtime.binary.readFloatLE(start + index * 4);
+  }
+  return values;
+};
+const maximumDifference = (left, right) => {
+  assert.equal(left.length, right.length, "Attribute lengths differ.");
+  let worst = 0;
+  for (let index = 0; index < left.length; index += 1) {
+    worst = Math.max(worst, Math.abs(left[index] - right[index]));
+  }
+  return worst;
+};
+/**
+ * Measured on the v1.6 freeze: the sides' baked shading diverges by at most
+ * 0.162 (steering fins) because the panel variation is hashed per part name.
+ * The runtime restores each side's mean brightness through the instance colour
+ * and accepts the finer variation of the reference side; this ceiling exists so
+ * a genuinely different right-hand side gets caught rather than silently
+ * inheriting the left's shading.
+ */
+const MAXIMUM_SIDE_SHADING_DIVERGENCE = 0.25;
+
+// The rival draw-call and triangle budget is computed from this split, so pin
+// it: 5 body/emissive/glass batches plus the engine glow and the shared shadow
+// blobs is 7 rival draw calls, and 6,114 visible triangles per craft is 18,342
+// across the field however they are partitioned.
+const parentByChild = new Map();
+json.nodes.forEach((node, index) => {
+  for (const child of node.children ?? []) parentByChild.set(child, index);
+});
+const ARTICULATED_PIVOTS = new Set([
+  "steering_fin_L_pivot", "steering_fin_R_pivot",
+  "airbrake_L_pivot", "airbrake_R_pivot",
+]);
+const rivalBatchTriangles = new Map();
+json.nodes.forEach((node, index) => {
+  if (node.mesh === undefined) return;
+  for (const primitive of json.meshes[node.mesh].primitives) {
+    const material = json.materials[primitive.material]?.name;
+    if (material === "TOTEM_collision") continue;
+    let group = "hull";
+    for (let cursor = index; cursor !== undefined; cursor = parentByChild.get(cursor)) {
+      const name = json.nodes[cursor].name;
+      if (ARTICULATED_PIVOTS.has(name)) {
+        group = name.startsWith("steering_fin") ? "steering_fins" : "airbrakes";
+        break;
+      }
+    }
+    const key = `${material}/${group}`;
+    const accessor = json.accessors[
+      primitive.indices ?? primitive.attributes.POSITION
+    ];
+    rivalBatchTriangles.set(key, (rivalBatchTriangles.get(key) ?? 0) + accessor.count / 3);
+  }
+});
+assert.deepEqual(
+  Object.fromEntries([...rivalBatchTriangles.entries()].sort()),
+  {
+    "TOTEM_body/airbrakes": 56,
+    "TOTEM_body/hull": 5794,
+    "TOTEM_body/steering_fins": 56,
+    "TOTEM_emissive/hull": 108,
+    "TOTEM_glass/hull": 100,
+  },
+  "The rival batch split changed; the P2 draw-call and triangle budget is "
+    + "derived from it.",
+);
+for (const [left, right] of [
+  ["steering_fin_L", "steering_fin_R"],
+  ["airbrake_L", "airbrake_R"],
+]) {
+  for (const side of [left, right]) {
+    const node = json.nodes.find((candidate) => candidate.name === `${side}_pivot`);
+    assert.ok(node?.matrix, `${side}_pivot must carry a baked matrix.`);
+    for (const [index, label] of [[0, "x"], [4, "y"], [8, "z"]]) {
+      const length = Math.hypot(
+        node.matrix[index],
+        node.matrix[index + 1],
+        node.matrix[index + 2],
+      );
+      assert.ok(
+        Math.abs(length - 1) < 1e-6,
+        `${side}_pivot ${label} basis is scaled (${length}); instanced rival `
+          + "articulation requires a rigid pivot.",
+      );
+    }
+  }
+  const leftMesh = meshIndexByNodeName.get(`${left}_body`);
+  const rightMesh = meshIndexByNodeName.get(`${right}_body`);
+  for (const attribute of ["POSITION", "NORMAL", "TEXCOORD_0"]) {
+    assert.ok(
+      maximumDifference(
+        floatAttribute(leftMesh, attribute),
+        floatAttribute(rightMesh, attribute),
+      ) < 1e-6,
+      `${left}_body and ${right}_body no longer share pivot-local ${attribute}; `
+        + "the rival pair would cost two draw calls instead of one.",
+    );
+  }
+  const shadingDivergence = maximumDifference(
+    floatAttribute(leftMesh, "COLOR_0"),
+    floatAttribute(rightMesh, "COLOR_0"),
+  );
+  assert.ok(
+    shadingDivergence <= MAXIMUM_SIDE_SHADING_DIVERGENCE,
+    `${left}_body and ${right}_body baked shading now diverges by `
+      + `${shadingDivergence.toFixed(3)}, past the ${MAXIMUM_SIDE_SHADING_DIVERGENCE} `
+      + "ceiling for sharing one geometry between the sides.",
+  );
+}
+
 console.log(
   `Race Presence v1.6 PASS: ${provenanceSummary}; baked steering pivots, 6,114 visible triangles, 108 collision lines, one 256px eight-slot effects atlas, three blend-family batches, and NEEDLE 16 rival identity match ${raceArchive.available ? "the accepted archive" : "the served bytes and source contracts"}.`,
 );

@@ -66,7 +66,7 @@ import {
 import { playerRaceDistanceMeters as calculatePlayerRaceDistance } from "./rival-race.js";
 import {
   RivalFleet,
-  loadRivalLiveryTextures,
+  loadRivalLiveryAtlas,
   type RivalRaceStatus,
 } from "./rivals";
 import {
@@ -415,16 +415,16 @@ export class FuturismaGame {
         batch.material.dispose();
       }
     };
-    let rivalLiveryTextures: THREE.Texture[];
+    let rivalLiveryAtlas: THREE.Texture;
     try {
-      rivalLiveryTextures = await loadRivalLiveryTextures();
+      rivalLiveryAtlas = await loadRivalLiveryAtlas();
     } catch (error) {
       disposeRivalVisualBatches();
       throw error;
     }
     if (this.disposed) {
       disposeRivalVisualBatches();
-      for (const texture of rivalLiveryTextures) texture.dispose();
+      rivalLiveryAtlas.dispose();
       disposeObject3DResources(this.vehicle.root);
       this.vehicle.root.clear();
       return false;
@@ -433,7 +433,7 @@ export class FuturismaGame {
       this.course,
       this.totalLaps,
       rivalVisualBatches,
-      rivalLiveryTextures,
+      rivalLiveryAtlas,
       this.vehicle.effectsAtlas(),
     );
     this.scene.add(this.rivalFleet.root);
@@ -1161,6 +1161,16 @@ export class FuturismaGame {
     this.vehicleVisualState.elapsed = this.timer.getElapsed();
     this.vehicleVisualState.delta = delta;
     this.vehicle.updateVisual(this.vehicleVisualState);
+    // The player's ground blob rides in the fleet's shared instanced mesh, so
+    // it is placed here where the on-surface point and vehicle basis already
+    // exist. scratchB/C/D still hold right, up and backward from above.
+    this.rivalFleet?.setPlayerShadow(
+      this.presentationPosition,
+      vehicleRight,
+      vehicleUp,
+      this.scratchD,
+      this.vehicle.hoverHeightMeters(this.vehicleVisualState),
+    );
 
     if (delta > 0) this.impactShake = Math.max(0, this.impactShake - delta * 3.6);
     return sample;

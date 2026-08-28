@@ -27,16 +27,100 @@ export type TotemRivalMaterialRole =
   | "TOTEM_emissive"
   | "TOTEM_glass";
 
+/**
+ * How a rival batch moves. `hull` is welded to the craft; the others turn about
+ * their authored pivots, driven by the rival's pose signals.
+ */
+export type TotemRivalArticulationGroup =
+  | "hull"
+  | "steering_fins"
+  | "airbrakes";
+
+export interface TotemRivalArticulationSlot {
+  /** Authored pivot node this slot stands in for, e.g. `steering_fin_L_pivot`. */
+  pivot: string;
+  /** The pivot's neutral transform in model space. Batch geometry is pivot-local. */
+  pivotMatrix: THREE.Matrix4;
+  /** Local axis the pivot turns about, per the MANIFEST `movable_nodes` contract. */
+  axis: "x" | "y" | "z";
+  /**
+   * Brightness correction for this slot. Both sides of a pair share one
+   * geometry, so they also share the reference side's baked `COLOR_0` shading.
+   * This restores each side's own authored mean brightness through the instance
+   * colour; the finer per-vertex panel variation is the price of the shared
+   * geometry and stays with the reference side.
+   */
+  shadingScale: number;
+}
+
 export interface TotemRivalVisualBatch {
   role: TotemRivalMaterialRole;
+  group: TotemRivalArticulationGroup;
   geometry: THREE.BufferGeometry;
   material: THREE.Material;
   triangles: number;
+  /**
+   * One entry per copy of this batch's geometry on a single craft. `hull` has a
+   * single identity slot; an articulated group has one slot per side, and every
+   * side shares the one pivot-local geometry — which is what lets a left/right
+   * pair cost a single draw call instead of two.
+   */
+  slots: readonly TotemRivalArticulationSlot[];
 }
+
+/**
+ * The left/right pairs worth articulating on a rival, in slot order. Both sides
+ * of a pair are driven by the same signal, so they can share one instanced mesh.
+ *
+ * Elevons are deliberately absent: they are authored movers, but a third
+ * articulated pair would cost a seventh rival body draw call and the phase
+ * budget has no room for it. They ride with the hull on rivals; the player's
+ * own vehicle still articulates all of them through `updateVisual`.
+ */
+const RIVAL_ARTICULATION_GROUPS: ReadonlyArray<{
+  group: Exclude<TotemRivalArticulationGroup, "hull">;
+  pivots: readonly string[];
+  axis: "x" | "y" | "z";
+}> = [
+  {
+    group: "steering_fins",
+    pivots: ["steering_fin_L_pivot", "steering_fin_R_pivot"],
+    axis: "y",
+  },
+  {
+    group: "airbrakes",
+    pivots: ["airbrake_L_pivot", "airbrake_R_pivot"],
+    axis: "x",
+  },
+];
+
+const IDENTITY_SLOT: TotemRivalArticulationSlot = {
+  pivot: "",
+  pivotMatrix: new THREE.Matrix4(),
+  axis: "y",
+  shadingScale: 1,
+};
+
+/** Mean of a geometry's baked vertex-shading multiplier, or 1 when unshaded. */
+function meanVertexShading(geometry: THREE.BufferGeometry): number {
+  const color = geometry.getAttribute("color");
+  if (!color || color.count === 0) return 1;
+  let total = 0;
+  for (let index = 0; index < color.count; index += 1) {
+    total += color.getX(index) + color.getY(index) + color.getZ(index);
+  }
+  const mean = total / (color.count * 3);
+  return Number.isFinite(mean) && mean > 1e-6 ? mean : 1;
+}
+
+/** Positions must agree to this many metres for two sides to share geometry. */
+const SHARED_SIDE_TOLERANCE_METERS = 1e-5;
 
 interface OriginalVisibleMesh {
   mesh: THREE.Mesh;
   modelLocalMatrix: THREE.Matrix4;
+  /** Nearest enclosing articulation pivot, or `null` when welded to the hull. */
+  pivot: string | null;
 }
 
 const DEG = Math.PI / 180;
@@ -110,10 +194,10 @@ export class TotemVehicle {
   private readonly nodes = new Map<string, THREE.Object3D>();
   private readonly neutral = new Map<string, NeutralTransform>();
   private readonly rotationOffset = new THREE.Quaternion();
-  private hoverShadow: THREE.Mesh | null = null;
   private racePresence: TotemRacePresence | null = null;
   private model: THREE.Object3D | null = null;
   private originalVisibleMeshes: OriginalVisibleMesh[] = [];
+  private readonly pivotMatrices = new Map<string, THREE.Matrix4>();
 
   constructor() {
     this.root.name = "totem_vehicle_root";
@@ -185,7 +269,15 @@ export class TotemVehicle {
       this.nodes,
       effectsAtlas,
     );
-    this.installHoverShadow();
+  }
+
+  /**
+   * Ground-blob placement for the shared instanced shadow mesh: how far the
+   * craft is floating above the deck right now, matching the hover the pose
+   * uses. The blob itself is owned by the rival fleet.
+   */
+  hoverHeightMeters(state: TotemVisualState): number {
+    return state.boostActive ? 0.6 : state.speedRatio < 0.1 ? 0.18 : 0.45;
   }
 
   effectsAtlas(): THREE.Texture {
@@ -200,11 +292,8 @@ export class TotemVehicle {
       throw new Error("TOTEM must be loaded before creating rival visual batches.");
     }
 
-    const geometriesByRole = new Map<TotemRivalMaterialRole, THREE.BufferGeometry[]>();
     const materialByRole = new Map<TotemRivalMaterialRole, THREE.Material>();
-    for (const role of RIVAL_MATERIAL_ROLES) geometriesByRole.set(role, []);
-
-    for (const source of this.originalVisibleMeshes) {
+    const roleOf = (source: OriginalVisibleMesh): TotemRivalMaterialRole => {
       if (Array.isArray(source.mesh.material)) {
         throw new Error(`TOTEM mesh ${source.mesh.name} has unsupported material groups.`);
       }
@@ -219,18 +308,78 @@ export class TotemVehicle {
         throw new Error(`TOTEM material role ${material.name} uses multiple materials.`);
       }
       materialByRole.set(material.name, material);
+      return material.name;
+    };
 
+    const hullSources: OriginalVisibleMesh[] = [];
+    const sourcesByPivot = new Map<string, OriginalVisibleMesh[]>();
+    for (const source of this.originalVisibleMeshes) {
+      roleOf(source);
+      if (source.pivot === null) {
+        hullSources.push(source);
+        continue;
+      }
+      const existing = sourcesByPivot.get(source.pivot);
+      if (existing) existing.push(source);
+      else sourcesByPivot.set(source.pivot, [source]);
+    }
+
+    // Scratch geometries are tracked centrally so every exit path disposes them.
+    const scratch: THREE.BufferGeometry[] = [];
+    const bake = (
+      source: OriginalVisibleMesh,
+      matrix: THREE.Matrix4,
+    ): THREE.BufferGeometry => {
       const geometry = source.mesh.geometry.index
         ? source.mesh.geometry.toNonIndexed()
         : source.mesh.geometry.clone();
-      geometry.applyMatrix4(source.modelLocalMatrix);
-      geometriesByRole.get(material.name)?.push(geometry);
-    }
+      geometry.applyMatrix4(matrix);
+      scratch.push(geometry);
+      return geometry;
+    };
 
     const batches: TotemRivalVisualBatch[] = [];
+    const pivotLocal = new THREE.Matrix4();
     try {
+      for (const definition of RIVAL_ARTICULATION_GROUPS) {
+        const merged = this.mergeArticulationGroup(
+          definition,
+          sourcesByPivot,
+          bake,
+          scratch,
+          pivotLocal,
+        );
+        if (!merged) {
+          // The group is not shareable as authored, so the parts stay welded to
+          // the hull rather than costing a draw call each. The soak's
+          // `rivalArticulation` reading is what surfaces this if it happens.
+          for (const pivot of definition.pivots) {
+            for (const source of sourcesByPivot.get(pivot) ?? []) hullSources.push(source);
+          }
+          continue;
+        }
+        const material = materialByRole.get("TOTEM_body");
+        if (!material) {
+          merged.geometry.dispose();
+          throw new Error("TOTEM is missing required rival material role TOTEM_body.");
+        }
+        batches.push({
+          role: "TOTEM_body",
+          group: definition.group,
+          geometry: merged.geometry,
+          material,
+          triangles: merged.triangles,
+          slots: merged.slots,
+        });
+      }
+
+      const hullByRole = new Map<TotemRivalMaterialRole, THREE.BufferGeometry[]>();
+      for (const role of RIVAL_MATERIAL_ROLES) hullByRole.set(role, []);
+      for (const source of hullSources) {
+        hullByRole.get(roleOf(source))?.push(bake(source, source.modelLocalMatrix));
+      }
       for (const role of RIVAL_MATERIAL_ROLES) {
-        const sourceGeometries = geometriesByRole.get(role) ?? [];
+        const sourceGeometries = hullByRole.get(role) ?? [];
         const sourceMaterial = materialByRole.get(role);
         if (sourceGeometries.length === 0 || !sourceMaterial) {
           throw new Error(`TOTEM is missing required rival material role ${role}.`);
@@ -239,31 +388,112 @@ export class TotemVehicle {
         if (!geometry) {
           throw new Error(`TOTEM ${role} geometry could not be merged safely.`);
         }
-        const position = geometry.getAttribute("position");
-        const triangles = position.count / 3;
+        const triangles = geometry.getAttribute("position").count / 3;
         if (!Number.isInteger(triangles)) {
           geometry.dispose();
           throw new Error(`TOTEM ${role} geometry does not contain complete triangles.`);
         }
         batches.push({
           role,
+          group: "hull",
           geometry,
-          material: sourceMaterial.clone(),
+          material: sourceMaterial,
           triangles,
+          slots: [{ ...IDENTITY_SLOT, pivotMatrix: new THREE.Matrix4() }],
         });
       }
-    } catch (error) {
+
+      // Every batch of a role shares that role's material, so clone once per
+      // role after the set is known and hand the clones out.
+      const clonesByRole = new Map<TotemRivalMaterialRole, THREE.Material>();
       for (const batch of batches) {
-        batch.geometry.dispose();
-        batch.material.dispose();
+        let clone = clonesByRole.get(batch.role);
+        if (!clone) {
+          clone = batch.material.clone();
+          clonesByRole.set(batch.role, clone);
+        }
+        batch.material = clone;
       }
+    } catch (error) {
+      // Batches carry the model's own materials until the clone pass at the end
+      // of the try block, so a throw can only ever leave geometry to release.
+      for (const batch of batches) batch.geometry.dispose();
       throw error;
     } finally {
-      for (const geometries of geometriesByRole.values()) {
-        for (const geometry of geometries) geometry.dispose();
-      }
+      for (const geometry of scratch) geometry.dispose();
     }
     return batches;
+  }
+
+  /**
+   * Builds one shared pivot-local geometry for a left/right articulation pair.
+   * Returns `null` when the pair cannot share geometry, which is the caller's
+   * signal to weld those parts to the hull instead.
+   */
+  private mergeArticulationGroup(
+    definition: (typeof RIVAL_ARTICULATION_GROUPS)[number],
+    sourcesByPivot: ReadonlyMap<string, OriginalVisibleMesh[]>,
+    bake: (source: OriginalVisibleMesh, matrix: THREE.Matrix4) => THREE.BufferGeometry,
+    scratch: THREE.BufferGeometry[],
+    pivotLocal: THREE.Matrix4,
+  ): {
+    geometry: THREE.BufferGeometry;
+    triangles: number;
+    slots: TotemRivalArticulationSlot[];
+  } | null {
+    const slots: TotemRivalArticulationSlot[] = [];
+    const perPivot: THREE.BufferGeometry[] = [];
+    for (const pivot of definition.pivots) {
+      const sources = sourcesByPivot.get(pivot);
+      const pivotMatrix = this.pivotMatrices.get(pivot);
+      if (!sources || sources.length === 0 || !pivotMatrix) return null;
+      // A mirrored pivot would flip winding on the shared geometry.
+      if (pivotMatrix.determinant() <= 0) return null;
+      if (sources.some((source) => (
+        Array.isArray(source.mesh.material) || source.mesh.material.name !== "TOTEM_body"
+      ))) return null;
+      pivotLocal.copy(pivotMatrix).invert();
+      const baked = sources.map((source) => (
+        bake(source, pivotLocal.clone().multiply(source.modelLocalMatrix))
+      ));
+      let merged = baked[0];
+      if (baked.length > 1) {
+        const combined = mergeGeometries(baked, false);
+        if (!combined) return null;
+        scratch.push(combined);
+        merged = combined;
+      }
+      perPivot.push(merged);
+      slots.push({
+        pivot,
+        pivotMatrix: pivotMatrix.clone(),
+        axis: definition.axis,
+        shadingScale: 1,
+      });
+    }
+
+    const reference = perPivot[0];
+    const referenceShading = meanVertexShading(reference);
+    for (let index = 0; index < perPivot.length; index += 1) {
+      slots[index].shadingScale = meanVertexShading(perPivot[index]) / referenceShading;
+    }
+    const referencePositions = reference.getAttribute("position");
+    for (let index = 1; index < perPivot.length; index += 1) {
+      const positions = perPivot[index].getAttribute("position");
+      if (positions.count !== referencePositions.count) return null;
+      for (let component = 0; component < positions.array.length; component += 1) {
+        const difference = Math.abs(
+          (positions.array as ArrayLike<number>)[component]
+            - (referencePositions.array as ArrayLike<number>)[component],
+        );
+        if (difference > SHARED_SIDE_TOLERANCE_METERS) return null;
+      }
+    }
+
+    const triangles = referencePositions.count / 3;
+    if (!Number.isInteger(triangles)) return null;
+    // The reference is scratch-owned; hand back a copy the batch can own.
+    return { geometry: reference.clone(), triangles, slots };
   }
 
   setPose(position: THREE.Vector3, quaternion: THREE.Quaternion): void {
@@ -322,15 +552,9 @@ export class TotemVehicle {
       skid.position.y = skidNeutral.position.y - retract * 0.22;
     }
 
-    const hoverHeight = state.boostActive
-      ? 0.6
-      : state.speedRatio < 0.1 ? 0.18 : 0.45;
-    const trackOffset = -(hoverHeight + 0.68);
-    if (this.hoverShadow) {
-      this.hoverShadow.position.y = trackOffset;
-      const shadowMaterial = this.hoverShadow.material as THREE.MeshBasicMaterial;
-      shadowMaterial.opacity = state.boostActive ? 0.11 : 0.18;
-    }
+    // The ground blob used to be a 12-triangle circle parented here. It now
+    // rides in the fleet's shared instanced blob mesh alongside the rivals, so
+    // every craft on track reads the same way for one draw call in total.
     this.racePresence?.update(state);
   }
 
@@ -365,14 +589,36 @@ export class TotemVehicle {
     if (!this.model) return;
     this.model.updateMatrixWorld(true);
     const modelWorldInverse = this.model.matrixWorld.clone().invert();
+    const articulated = new Set(
+      RIVAL_ARTICULATION_GROUPS.flatMap((entry) => entry.pivots),
+    );
     this.originalVisibleMeshes = [];
+    this.pivotMatrices.clear();
     this.model.traverse((object) => {
+      if (articulated.has(object.name)) {
+        this.pivotMatrices.set(
+          object.name,
+          modelWorldInverse.clone().multiply(object.matrixWorld),
+        );
+      }
       if (!(object instanceof THREE.Mesh) || !object.visible) return;
       const materials = Array.isArray(object.material) ? object.material : [object.material];
       if (materials.some((material) => material.name === "TOTEM_collision")) return;
+      let pivot: string | null = null;
+      for (
+        let ancestor: THREE.Object3D | null = object;
+        ancestor && ancestor !== this.model;
+        ancestor = ancestor.parent
+      ) {
+        if (articulated.has(ancestor.name)) {
+          pivot = ancestor.name;
+          break;
+        }
+      }
       this.originalVisibleMeshes.push({
         mesh: object,
         modelLocalMatrix: modelWorldInverse.clone().multiply(object.matrixWorld),
+        pivot,
       });
     });
   }
@@ -400,27 +646,6 @@ export class TotemVehicle {
         material.needsUpdate = true;
       }
     });
-  }
-
-  private installHoverShadow(): void {
-    const shadowMaterial = new THREE.MeshBasicMaterial({
-      color: 0x07100c,
-      transparent: true,
-      opacity: 0.18,
-      depthWrite: false,
-      side: THREE.DoubleSide,
-      toneMapped: false,
-    });
-    this.hoverShadow = new THREE.Mesh(
-      new THREE.CircleGeometry(1, 12),
-      shadowMaterial,
-    );
-    this.hoverShadow.name = "totem_hover_shadow";
-    this.hoverShadow.rotation.x = -Math.PI / 2;
-    this.hoverShadow.position.set(0, -1.13, 0.28);
-    this.hoverShadow.scale.set(1.55, 3.05, 1);
-    this.hoverShadow.renderOrder = 1;
-    this.root.add(this.hoverShadow);
   }
 
 }

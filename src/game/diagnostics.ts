@@ -144,6 +144,18 @@ function rivalFields(
       (rivals?.minimumSeparationMeters ?? 0).toFixed(2),
     ),
     rivalCatchUpMultiplier: rivals?.catchUpMultiplier ?? 1,
+    rivalArticulatedGroups: rivals?.articulatedGroups ?? [],
+    // Peak fin deflection seen since the last reset. A soak that leaves this at
+    // zero has rivals whose control surfaces never moved, whatever the frame
+    // looks like.
+    rivalMaximumSteerRadians: Number(
+      (rivals?.maximumSteerRadians ?? 0).toFixed(4),
+    ),
+    rivalArticulation: (rivals?.articulation ?? []).map((entry) => ({
+      id: entry.id,
+      steerRadians: Number(entry.steerRadians.toFixed(4)),
+      brakeRadians: Number(entry.brakeRadians.toFixed(4)),
+    })),
     rivals: (rivals?.states ?? []).map((state) => ({
       ...state,
       raceDistanceMeters: Number(state.raceDistanceMeters.toFixed(2)),
