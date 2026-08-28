@@ -66,7 +66,6 @@ import {
 import { playerRaceDistanceMeters as calculatePlayerRaceDistance } from "./rival-race.js";
 import {
   RivalFleet,
-  loadRivalLiveryAtlas,
   type RivalRaceStatus,
 } from "./rivals";
 import {
@@ -408,34 +407,18 @@ export class FuturismaGame {
       this.vehicle.root.clear();
       return false;
     }
-    const rivalVisualBatches = this.vehicle.createRivalVisualBatches();
-    const disposeRivalVisualBatches = (): void => {
-      for (const batch of rivalVisualBatches) {
-        batch.geometry.dispose();
-        batch.material.dispose();
-      }
-    };
-    let rivalLiveryAtlas: THREE.Texture;
-    try {
-      rivalLiveryAtlas = await loadRivalLiveryAtlas();
-    } catch (error) {
-      disposeRivalVisualBatches();
-      throw error;
-    }
-    if (this.disposed) {
-      disposeRivalVisualBatches();
-      rivalLiveryAtlas.dispose();
+    const rivalFleet = await RivalFleet.create(
+      this.course,
+      this.totalLaps,
+      this.vehicle,
+      () => this.disposed,
+    );
+    if (!rivalFleet) {
       disposeObject3DResources(this.vehicle.root);
       this.vehicle.root.clear();
       return false;
     }
-    this.rivalFleet = new RivalFleet(
-      this.course,
-      this.totalLaps,
-      rivalVisualBatches,
-      rivalLiveryAtlas,
-      this.vehicle.effectsAtlas(),
-    );
+    this.rivalFleet = rivalFleet;
     this.scene.add(this.rivalFleet.root);
     this.ui.setRaceFormat(
       this.totalLaps,

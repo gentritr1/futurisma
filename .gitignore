@@ -12,3 +12,4 @@ artifacts/**
 !artifacts/GREENWATER_MAP01_v1.0.zip
 !artifacts/TOTEM_Phase1_v1.0-patch1.zip
 !artifacts/TOTEM_Phase1_v1.0.zip
+.claude/worktrees/

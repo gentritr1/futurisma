@@ -297,6 +297,42 @@ export class RivalFleet {
     triangles: number;
   };
 
+  /**
+   * Assemble a fleet from the loaded vehicle: builds the rival visual batches,
+   * loads the livery atlas, and owns cleanup when the game is disposed while
+   * the atlas is still in flight. Returns null when disposed mid-assembly.
+   */
+  static async create(
+    course: RaceCourse,
+    totalLaps: number,
+    vehicle: {
+      createRivalVisualBatches(): TotemRivalVisualBatch[];
+      effectsAtlas(): THREE.Texture;
+    },
+    isDisposed: () => boolean,
+  ): Promise<RivalFleet | null> {
+    const visualBatches = vehicle.createRivalVisualBatches();
+    const disposeBatches = (): void => {
+      for (const batch of visualBatches) {
+        batch.geometry.dispose();
+        batch.material.dispose();
+      }
+    };
+    let liveryAtlas: THREE.Texture;
+    try {
+      liveryAtlas = await loadRivalLiveryAtlas();
+    } catch (error) {
+      disposeBatches();
+      throw error;
+    }
+    if (isDisposed()) {
+      disposeBatches();
+      liveryAtlas.dispose();
+      return null;
+    }
+    return new RivalFleet(course, totalLaps, visualBatches, liveryAtlas, vehicle.effectsAtlas());
+  }
+
   constructor(
     private readonly course: RaceCourse,
     private readonly totalLaps: number,
