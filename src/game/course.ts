@@ -1,5 +1,11 @@
 import * as THREE from "three";
 import greenwaterJson from "./data/greenwater-blockout.json";
+import {
+  createApronResolution,
+  resolveApron,
+  resolveApronProfile,
+} from "./apron.js";
+import type { ApronResolution, ApronTable } from "./apron.js";
 import { isCircularHazardContact } from "./race-rules";
 
 export type EdgeType = "A" | "B" | "C";
@@ -121,7 +127,10 @@ interface GreenwaterMapData {
   landmarkProxies: RawLandmark[];
   hazards: RawHazard[];
   music: { triggers: RawMusicTrigger[] };
+  apron: ApronTable;
 }
+
+export type { ApronResolution } from "./apron.js";
 
 export interface CourseSample {
   position: THREE.Vector3;
@@ -135,6 +144,12 @@ export interface CourseSample {
   sector: string;
   edgeLeft: EdgeType;
   edgeRight: EdgeType;
+  /** Authored run-off beyond `halfWidth`, in metres, per side. */
+  apronLeft: number;
+  apronRight: number;
+  /** Grip multiplier once past `halfWidth - deckMargin`, per side. */
+  apronGripLeft: number;
+  apronGripRight: number;
 }
 
 export interface CourseProjection extends CourseSample {
@@ -155,6 +170,10 @@ function createCourseSampleValue(): CourseSample {
     sector: "",
     edgeLeft: "A",
     edgeRight: "A",
+    apronLeft: 0,
+    apronRight: 0,
+    apronGripLeft: 1,
+    apronGripRight: 1,
   };
 }
 
@@ -232,6 +251,16 @@ export interface RaceCourse {
   fogAt(progress: number): FogProfile;
   lightingAt(progress: number): CourseLightingProfile;
   edgeType(sample: CourseSample, lateral: number): EdgeType;
+  /**
+   * Authored run-off at this sample and lateral. Drives the lateral clamp, the
+   * grip cost of leaving the deck and the wall response, so the boundary is
+   * course data rather than a rule baked into the race loop.
+   */
+  apronAt(
+    sample: CourseSample,
+    lateral: number,
+    target?: ApronResolution,
+  ): ApronResolution;
   surfaceGripAt(progress: number, lateral: number, halfWidth: number): number;
   cableTripSideAt(progress: number, lateral: number): -1 | 0 | 1;
   isOnBoostPad(progress: number, lateral: number, halfWidth: number): boolean;
@@ -249,8 +278,11 @@ const WORLD_UP = new THREE.Vector3(0, 1, 0);
 const COURSE_BASIS = new THREE.Matrix4();
 const COURSE_BACK = new THREE.Vector3();
 const MAP = greenwaterJson as unknown as GreenwaterMapData;
+const APRON = MAP.apron;
 const ATMOSPHERE_UPDATE_INTERVAL_SECONDS = 1 / 30;
 const LIGHTING_CROSSFADE_METRES = 90;
+// The run-off tucks just under the deck edge so the seam cannot open a crack.
+const APRON_SEAM_OVERLAP_METRES = 0.06;
 const EDGE_FURNITURE_CLEARANCE_METRES = 4.5;
 const EDGE_FURNITURE_SAFETY_MARGIN_METRES = 0.25;
 const TURN_CHEVRON_CLEARANCE_METRES = 9;
@@ -590,6 +622,14 @@ export class GreenwaterCourse implements RaceCourse {
   readonly recoveryImmunitySeconds = MAP.recovery.immunitySeconds;
 
   private readonly samples = MAP.centreline.samples;
+  /**
+   * Authored apron width and grip per side, resolved once at assembly. `sample`
+   * runs several times per frame, so the per-station lookup is a table read.
+   */
+  private readonly apronProfiles = this.samples.map((sample) => ({
+    left: resolveApronProfile(APRON, sample.edgeL, sample.sector),
+    right: resolveApronProfile(APRON, sample.edgeR, sample.sector),
+  }));
   private readonly projectionPoints = this.samples.map(
     (sample) => new THREE.Vector3(sample.x, sample.y, sample.z),
   );
@@ -673,6 +713,7 @@ export class GreenwaterCourse implements RaceCourse {
     this.group.name = "map01_greenwater_strip";
     this.group.add(
       this.createTrackSurface(),
+      this.createApronDecks(),
       this.createTrackUnderside(),
       this.createEdgeRails(),
       this.createEdgeLights(),
@@ -742,6 +783,11 @@ export class GreenwaterCourse implements RaceCourse {
     target.sector = current.sector;
     target.edgeLeft = current.edgeL;
     target.edgeRight = current.edgeR;
+    const apron = this.apronProfiles[index];
+    target.apronLeft = apron.left.widthMetres;
+    target.apronRight = apron.right.widthMetres;
+    target.apronGripLeft = apron.left.grip;
+    target.apronGripRight = apron.right.grip;
     return target;
   }
 
@@ -965,6 +1011,21 @@ export class GreenwaterCourse implements RaceCourse {
 
   edgeType(sample: CourseSample, lateral: number): EdgeType {
     return lateral >= 0 ? sample.edgeRight : sample.edgeLeft;
+  }
+
+  apronAt(
+    sample: CourseSample,
+    lateral: number,
+    target: ApronResolution = createApronResolution(),
+  ): ApronResolution {
+    return resolveApron(
+      APRON,
+      this.edgeType(sample, lateral),
+      sample.sector,
+      sample.halfWidth,
+      lateral,
+      target,
+    );
   }
 
   surfaceGripAt(progress: number, lateral: number, halfWidth: number): number {
@@ -1210,6 +1271,136 @@ export class GreenwaterCourse implements RaceCourse {
     return mesh;
   }
 
+  /**
+   * The authored run-off, merged into one mesh per apron surface so the whole
+   * boundary removal costs two draw calls.
+   *
+   * The two surfaces must be told apart without relying on colour, so they
+   * differ in three colour-free channels at once: cross-section (the gravel
+   * shoulder falls away from the deck, the rumble strip steps up), band pitch
+   * (a 10 m irregular mottle against hard 2 m transverse bars) and contrast
+   * (a shallow ramp against a near-black/near-white alternation). Both also
+   * darken outward, so the deck edge stays the brightest line in the frame.
+   */
+  private createApronDecks(): THREE.Group {
+    const group = new THREE.Group();
+    group.name = "greenwater_aprons";
+    const surfaces: Array<{
+      type: EdgeType;
+      color: THREE.Color;
+      outerRise: number;
+      innerDrop: number;
+    }> = [
+      {
+        type: "A",
+        color: new THREE.Color(0x4a4c42),
+        outerRise: -0.35,
+        innerDrop: 0.04,
+      },
+      {
+        type: "B",
+        color: new THREE.Color(0x565954),
+        outerRise: 0.14,
+        innerDrop: 0.02,
+      },
+    ];
+    for (const surface of surfaces) {
+      const positions: number[] = [];
+      const normals: number[] = [];
+      const colors: number[] = [];
+      const indices: number[] = [];
+      for (let index = 0; index < this.samples.length; index += 1) {
+        const nextIndex = (index + 1) % this.samples.length;
+        for (const side of [-1, 1] as const) {
+          const raw = this.samples[index];
+          const nextRaw = this.samples[nextIndex];
+          const edge = side < 0 ? raw.edgeL : raw.edgeR;
+          if (edge !== surface.type) continue;
+          const profile = side < 0
+            ? this.apronProfiles[index].left
+            : this.apronProfiles[index].right;
+          if (profile.widthMetres <= 0) continue;
+          const nextEdge = side < 0 ? nextRaw.edgeL : nextRaw.edgeR;
+          const nextProfile = side < 0
+            ? this.apronProfiles[nextIndex].left
+            : this.apronProfiles[nextIndex].right;
+          // Taper to nothing where the authored edge type changes, so the two
+          // surfaces never overlap at a sector seam.
+          const nextWidth = nextEdge === surface.type
+            ? nextProfile.widthMetres
+            : -APRON_SEAM_OVERLAP_METRES;
+          const current = this.sample(index / this.samples.length);
+          const next = this.sample(nextIndex / this.samples.length);
+          const band = surface.type === "B"
+            ? (index % 2 === 0 ? 1 : 0.42)
+            : 0.86 + 0.14 * (((index * 7 + (side < 0 ? 3 : 0)) % 5) / 4);
+          const outerShade = surface.type === "B" ? 0.9 : 0.74;
+          const offset = positions.length / 3;
+          const corners = [
+            { sample: current, width: -APRON_SEAM_OVERLAP_METRES, shade: 1 },
+            { sample: next, width: -APRON_SEAM_OVERLAP_METRES, shade: 1 },
+            { sample: current, width: profile.widthMetres, shade: outerShade },
+            { sample: next, width: nextWidth, shade: outerShade },
+          ];
+          for (const corner of corners) {
+            const outward = corner.width > 0;
+            const point = corner.sample.position
+              .clone()
+              .addScaledVector(
+                corner.sample.right,
+                side * (corner.sample.halfWidth + corner.width),
+              )
+              .addScaledVector(
+                corner.sample.up,
+                outward
+                  ? surface.outerRise * (corner.width / profile.widthMetres)
+                  : -surface.innerDrop,
+              );
+            positions.push(point.x, point.y, point.z);
+            normals.push(
+              corner.sample.up.x,
+              corner.sample.up.y,
+              corner.sample.up.z,
+            );
+            const shade = band * corner.shade;
+            colors.push(
+              surface.color.r * shade,
+              surface.color.g * shade,
+              surface.color.b * shade,
+            );
+          }
+          if (side < 0) {
+            indices.push(offset, offset + 2, offset + 1, offset + 1, offset + 2, offset + 3);
+          } else {
+            indices.push(offset, offset + 1, offset + 2, offset + 1, offset + 3, offset + 2);
+          }
+        }
+      }
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+      // Shared with the deck: the run-off is lit as ground, so the shallow
+      // camber never reads as a differently lit material.
+      geometry.setAttribute("normal", new THREE.Float32BufferAttribute(normals, 3));
+      geometry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
+      geometry.setIndex(indices);
+      geometry.computeBoundingSphere();
+      const mesh = new THREE.Mesh(
+        geometry,
+        new THREE.MeshLambertMaterial({
+          color: 0xffffff,
+          vertexColors: true,
+          side: THREE.DoubleSide,
+        }),
+      );
+      mesh.name = `apron_${surface.type}_${
+        surface.type === "A" ? "gravel" : "rumble"
+      }`;
+      mesh.receiveShadow = true;
+      group.add(mesh);
+    }
+    return group;
+  }
+
   private createTrackUnderside(): THREE.Mesh {
     const positions: number[] = [];
     const indices: number[] = [];
@@ -1257,13 +1448,18 @@ export class GreenwaterCourse implements RaceCourse {
           const nextIndex = (index + 1) % this.samples.length;
           const current = this.sample(index / this.samples.length);
           const next = this.sample(nextIndex / this.samples.length);
+          // The barrier stands at the far side of the authored run-off, which
+          // is where the clamp now is. Where no apron is authored (the hangar
+          // interior) the offset stays zero and the wall does not move.
+          const currentApron = side < 0 ? current.apronLeft : current.apronRight;
+          const nextApron = side < 0 ? next.apronLeft : next.apronRight;
           const currentBottom = current.position
             .clone()
-            .addScaledVector(current.right, side * current.halfWidth)
+            .addScaledVector(current.right, side * (current.halfWidth + currentApron))
             .addScaledVector(current.up, 0.03);
           const nextBottom = next.position
             .clone()
-            .addScaledVector(next.right, side * next.halfWidth)
+            .addScaledVector(next.right, side * (next.halfWidth + nextApron))
             .addScaledVector(next.up, 0.03);
           const currentTop = currentBottom.clone().addScaledVector(current.up, definition.height);
           const nextTop = nextBottom.clone().addScaledVector(next.up, definition.height);

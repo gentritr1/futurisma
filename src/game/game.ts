@@ -32,12 +32,19 @@ import {
   calculateTurnRate,
   integrateBoostReserve,
   integrateCoastSpeed,
+  integrateEdgeScrub,
   integrateSurfaceGrip,
   integrateSteering,
   integrateSpeed,
   resolveBoostLockout,
   resolveDriftActive,
+  resolveTargetSurfaceGrip,
 } from "./physics";
+import {
+  accumulateApronTelemetry,
+  createApronResolution,
+  createApronTelemetry,
+} from "./apron.js";
 import { calculatePresentationAlpha } from "./presentation";
 import {
   calculateFinishDistanceMeters,
@@ -78,8 +85,20 @@ const MAX_PHYSICS_BACKLOG = 0.1;
 const RECOVERY_PROBE_DISTANCE_METERS = 900;
 const WRONG_WAY_PROBE_DISTANCE_METERS = 100;
 const WATER_GRIP_PROBE_DISTANCE_METERS = 580;
+// FUEL_ROW, A/A edges: the widest authored apron, and the sector the verified
+// edge map shows as the biggest offender for the old invisible wall.
+const APRON_PROBE_DISTANCE_METERS = 1700;
+const APRON_PROBE_LATERAL_METERS = 13.5;
+const APRON_PROBE_SPEED_METERS_PER_SECOND = 60;
 const RESUME_COUNTDOWN_SECONDS = 2.7;
 const ZERO_INPUT: InputFrame = { throttle: 0, brake: 0, steer: 0, boost: false };
+
+function readProbeNumber(parameter: string, fallback: number): number {
+  const value = Number.parseFloat(
+    new URLSearchParams(window.location.search).get(parameter) ?? "",
+  );
+  return Number.isFinite(value) ? value : fallback;
+}
 
 export class FuturismaGame {
   private readonly scene = new THREE.Scene();
@@ -155,6 +174,9 @@ export class FuturismaGame {
   private driftActive = false;
   private driftIntensity = 0;
   private surfaceGrip = 1;
+  private readonly beforeMoveApron = createApronResolution();
+  private readonly afterMoveApron = createApronResolution();
+  private apronTelemetry = createApronTelemetry();
   private lap = 1;
   private elapsedMs = 0;
   private lapStartElapsedMs = 0;
@@ -178,6 +200,9 @@ export class FuturismaGame {
   private countdownStage = "";
   private pausedBeforeStart = false;
   private edgeContact = false;
+  // Contact with the authored boundary itself. `edgeContact` now begins one
+  // apron width earlier, and would otherwise suppress the wall impact.
+  private wallContact = false;
   private openEdgeWarning = false;
   private wrongWayEvidence = 0;
   private wrongWayActive = false;
@@ -258,6 +283,18 @@ export class FuturismaGame {
     && new URLSearchParams(window.location.search).get("probe") === "impact";
   private readonly waterGripProbe = this.diagnosticsMode
     && new URLSearchParams(window.location.search).get("probe") === "water";
+  private readonly apronProbe = this.diagnosticsMode
+    && new URLSearchParams(window.location.search).get("probe") === "apron";
+  // `&probeDistance=` / `&probeLateral=` drive the apron probe's three
+  // authored scenarios without a rebuild.
+  private readonly apronProbeDistance = readProbeNumber(
+    "probeDistance",
+    APRON_PROBE_DISTANCE_METERS,
+  );
+  private readonly apronProbeLateral = readProbeNumber(
+    "probeLateral",
+    APRON_PROBE_LATERAL_METERS,
+  );
   private readonly contextLossProbe = this.diagnosticsMode
     && new URLSearchParams(window.location.search).get("probe") === "context";
   private readonly focusLossProbe = this.diagnosticsMode
@@ -760,10 +797,11 @@ export class FuturismaGame {
     );
     this.alignDirectionToSurface(this.forward, beforeMove.up, beforeMove.tangent);
 
-    const targetSurfaceGrip = this.course.surfaceGripAt(
-      this.progress,
-      this.lateral,
-      beforeMove.halfWidth,
+    // The apron's grip cost enters the same integrator as standing water, so
+    // leaving the deck reads as a surface change rather than a special case.
+    const targetSurfaceGrip = resolveTargetSurfaceGrip(
+      this.course.surfaceGripAt(this.progress, this.lateral, beforeMove.halfWidth),
+      this.course.apronAt(beforeMove, this.lateral, this.beforeMoveApron).grip,
     );
     const wasLowGrip = this.surfaceGrip < 0.95;
     this.surfaceGrip = integrateSurfaceGrip(
@@ -829,17 +867,27 @@ export class FuturismaGame {
       }
     }
 
+    // The boundary is authored, not hardcoded: `apron` carries the run-off
+    // width, its grip, and whether anything stands at the end of it. Only the
+    // hangar interior still clamps at the old deck margin, because that wall is
+    // diegetically correct.
     const edgeType = this.course.edgeType(afterMove, this.lateral);
-    const roadLimit = afterMove.halfWidth - 2.05;
+    const apron = this.course.apronAt(afterMove, this.lateral, this.afterMoveApron);
     const openEdge = edgeType === "C";
     this.openEdgeWarning = openEdge && isOpenEdgeWarningActive(
       this.lateral,
       afterMove.halfWidth,
     );
-    const lateralLimit = openEdge ? afterMove.halfWidth + 5.8 : roadLimit;
-    const beyondRoad = Math.abs(this.lateral) > roadLimit;
-    const outside = Math.abs(this.lateral) > lateralLimit;
+    const beyondRoad = Math.abs(this.lateral) > apron.roadLimit;
+    const outside = Math.abs(this.lateral) > apron.lateralLimit;
     const wasEdgeContact = this.edgeContact;
+    const wasWallContact = this.wallContact;
+    const wasOnApron = this.apronTelemetry.onApron;
+    this.apronTelemetry = accumulateApronTelemetry(this.apronTelemetry, apron, delta);
+    if (apron.onApron && !wasOnApron && !openEdge) {
+      this.ui.flashHazard("RUN-OFF");
+      this.audio.playImpact(0.25);
+    }
     if (openEdge && beyondRoad && this.recoveryImmunity <= 0) {
       this.offCourseTime += delta;
       this.speed = Math.max(0, this.speed - delta * 8);
@@ -847,7 +895,8 @@ export class FuturismaGame {
       this.offCourseTime = 0;
     }
     if (outside) {
-      this.lateral = THREE.MathUtils.clamp(this.lateral, -lateralLimit, lateralLimit);
+      const limit = apron.lateralLimit;
+      this.lateral = THREE.MathUtils.clamp(this.lateral, -limit, limit);
       this.position.copy(afterMove.position).addScaledVector(afterMove.right, this.lateral);
       const outward = this.scratchA
         .copy(afterMove.right)
@@ -856,9 +905,9 @@ export class FuturismaGame {
       if (outwardMotion > 0) {
         this.travelDirection.addScaledVector(outward, -outwardMotion * 1.45).normalize();
       }
-      if (!wasEdgeContact) {
-        const impactStrength = edgeType === "B" ? 1 : edgeType === "A" ? 0.62 : 0.42;
-        this.speed *= edgeType === "B" ? 0.6 : edgeType === "A" ? 0.82 : 0.9;
+      if (apron.wall && !wasWallContact) {
+        const impactStrength = apron.wallImpactStrength;
+        this.speed *= apron.wallSpeedMultiplier;
         this.impactShake = 1;
         this.emitImpactSparks(afterMove, Math.sign(this.lateral) || 1, impactStrength);
         this.audio.playImpact(impactStrength);
@@ -873,10 +922,13 @@ export class FuturismaGame {
           );
         }
       }
-      this.speed = Math.max(0, this.speed - delta * (edgeType === "B" ? 22 : 12));
+      const scrub = apron.wallScrubMetresPerSecondSquared;
+      this.speed = integrateEdgeScrub(this.speed, scrub, delta);
     }
+    this.wallContact = outside
+      || (wasWallContact && Math.abs(this.lateral) > apron.lateralLimit - 0.12);
     this.edgeContact = beyondRoad
-      || (wasEdgeContact && Math.abs(this.lateral) > roadLimit - 0.12);
+      || (wasEdgeContact && Math.abs(this.lateral) > apron.roadLimit - 0.12);
     if (this.diagnosticsMode) {
       if (this.edgeContact) this.diagnosticEdgeSeconds += delta;
       this.diagnosticMaxLateralRatio = Math.max(
@@ -1036,6 +1088,7 @@ export class FuturismaGame {
     this.wrongWayActive = false;
     this.courseAlignment = 1;
     this.edgeContact = false;
+    this.wallContact = false;
     this.offCourseTime = 0;
     this.recoveryImmunity = this.course.recoveryImmunitySeconds;
     this.hazardTripCooldown = 0.6;
@@ -1414,10 +1467,12 @@ export class FuturismaGame {
         ? WRONG_WAY_PROBE_DISTANCE_METERS / this.course.length
         : this.waterGripProbe
           ? WATER_GRIP_PROBE_DISTANCE_METERS / this.course.length
-          : this.course.startProgress;
+          : this.apronProbe
+            ? this.apronProbeDistance / this.course.length
+            : this.course.startProgress;
     this.speed = 0;
     this.lateral = this.recoveryProbe || this.wrongWayProbe
-      || this.impactProbe || this.waterGripProbe
+      || this.impactProbe || this.waterGripProbe || this.apronProbe
       ? 0
       : this.course.startLateral;
     this.steerAmount = 0;
@@ -1456,6 +1511,8 @@ export class FuturismaGame {
     this.lastPositionCueAtMs = -Infinity;
     this.finalStandings = [];
     this.edgeContact = false;
+    this.wallContact = false;
+    this.apronTelemetry = createApronTelemetry();
     this.offCourseTime = 0;
     this.recoveryImmunity = 0;
     this.hazardTripCooldown = 0;
@@ -1494,6 +1551,11 @@ export class FuturismaGame {
       this.lateral = -start.halfWidth * 0.65;
       this.position.copy(start.position).addScaledVector(start.right, this.lateral);
       this.speed = 10;
+    }
+    if (this.apronProbe) {
+      this.lateral = this.apronProbeLateral;
+      this.position.copy(start.position).addScaledVector(start.right, this.lateral);
+      this.speed = APRON_PROBE_SPEED_METERS_PER_SECOND;
     }
     this.syncPresentationPose();
     this.course.setLapBoard(1, this.totalLaps);
@@ -1721,6 +1783,7 @@ export class FuturismaGame {
         renderer: this.renderer,
         audio: this.audio.diagnostics(),
         rivals: this.rivalFleet?.diagnostics(),
+        apron: this.apronTelemetry,
         assetKit: this.sceneAssets.assetKitDiagnostics(),
         environment: this.sceneAssets.environmentDiagnostics(),
         livingWorld: this.sceneAssets.livingWorldDiagnostics(),

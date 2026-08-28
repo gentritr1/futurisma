@@ -552,3 +552,29 @@ five-lap soaks and compare:
 6. Impacts, missed gates, recoveries, wrong-way entries, and WebGL context failures.
 
 A visual improvement is not accepted if it causes resource counts or heap use to grow per lap, breaks the deterministic line, exceeds the art brief's hard budgets, or forces high-quality mode to reduce its render scale.
+
+## P1 authored apron — pending browser re-baseline
+
+The apron pass replaced the hardcoded lateral clamp with the authored `apron`
+table in `greenwater-blockout.json`. The static cost is known and bounded:
+`createApronDecks` merges 1,738 run-off quads into **two** meshes, adding
+**+2 draw calls and +3,476 triangles** (budget: +3 calls / +18,000 triangles).
+No texture, geometry beyond those two buffers, or per-frame allocation was
+added; `accumulateApronTelemetry` returns its input object unchanged while the
+vehicle is on the deck.
+
+The runtime numbers below are **not yet recorded** — they need a browser stage
+that this pass could not run. Do not treat the previous sequence as still
+locked until they are:
+
+1. `?demo=1&diagnostics=1&laps=5&quality=high&start=manual` — the lap sequence
+   must reproduce **34.483 / 34.433 / 34.517 / 34.683 / 34.683** within
+   ±0.010 s, with `peak.calls ≤ 95` and `peak.triangles ≤ 85,000`.
+2. The same run must report the new **`apronSeconds: 0`** and
+   `apronEntries: 0`. That is the decisive check: the apron only changes grip
+   beyond `halfWidth - 2.05 m`, so a soak that never enters it cannot have
+   moved the lap times. A non-zero value means the showcase line does clip a
+   run-off — investigate before accepting any lap-time delta.
+3. `?diagnostics=1&probe=apron` at the three authored scenarios
+   (`&probeLateral=13.5`, `&probeLateral=17.5`, and
+   `&probeDistance=700&probeLateral=11`).
