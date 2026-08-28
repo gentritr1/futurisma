@@ -3,14 +3,21 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { ASSET_KIT_PROP_PLACEMENTS } from "./asset-kit-layout";
 import { type RaceCourse } from "./course";
-import type { GreenwaterEnvironment, RaceEnvironment } from "./environment";
+import type { RaceEnvironment } from "./environment";
 import { disposeObject3DResources } from "./graphics-resources";
-import type { GreenwaterLivingWorld } from "./living-world";
+import type { LivingWorld, LivingWorldTextures } from "./living-world";
 import type { GreenwaterSurfaceCharacter } from "./surface-character";
 import { applyPs2MaterialTreatment } from "./totem";
 
 const ASSET_KIT_MODEL_URL = "/assets/totem/models/futurisma_asset_kit.glb";
 const ENVIRONMENT_MODEL_URL = "/assets/greenwater/models/greenwater_environment_runtime.glb";
+/**
+ * The mist / steam / rain / glint motion atlas. Authored for Greenwater and
+ * frozen inside `GREENWATER_LIVING_WORLD_v1.3.zip`, but the four quadrants are
+ * generic soft shapes, so Bitterpan's zone set draws its heat, salt dust,
+ * conveyor spill and lamps out of the same sheet rather than shipping a second
+ * 512 for the same four blobs.
+ */
 const LIVING_WORLD_MOTION_URL = "/assets/greenwater/textures/greenwater_motion_512.png";
 const SURFACE_CHARACTER_MODEL_URL = "/assets/greenwater/models/greenwater_surface_character_runtime.glb";
 const BITTERPAN_TRACK_MODEL_URL = "/assets/map02/models/bitterpan_blockout.glb";
@@ -135,7 +142,7 @@ function createAssetKitCourseDressing(
  */
 export class SceneAssets {
   authoredEnvironment: RaceEnvironment | null = null;
-  livingWorld: GreenwaterLivingWorld | null = null;
+  livingWorld: LivingWorld | null = null;
   surfaceCharacter: GreenwaterSurfaceCharacter | null = null;
   private assetKitLoadMs: number | null = null;
   private assetKitReady = false;
@@ -175,6 +182,10 @@ export class SceneAssets {
         this.scene.add(environment.root);
         this.environmentReady = true;
         this.requestRender();
+        // Bitterpan's zone set names only the shared motion atlas, so it needs
+        // nothing off the accepted blockout the way Greenwater needs its jungle
+        // and emissive maps.
+        await this.loadLivingWorld({});
         return;
       }
 
@@ -198,7 +209,7 @@ export class SceneAssets {
       this.environmentReady = true;
       this.requestRender();
       await Promise.all([
-        this.loadLivingWorld(environment),
+        this.loadLivingWorld(environment.livingTextures),
         this.loadSurfaceCharacter(),
       ]);
     } catch (error) {
@@ -217,13 +228,13 @@ export class SceneAssets {
     }
   }
 
-  private async loadLivingWorld(environment: GreenwaterEnvironment): Promise<void> {
+  private async loadLivingWorld(textures: LivingWorldTextures): Promise<void> {
     const loadStartedAt = performance.now();
     try {
-      const { GreenwaterLivingWorld } = await import("./living-world");
-      const livingWorld = await GreenwaterLivingWorld.load(
+      const { LivingWorld: LivingWorldRuntime } = await import("./living-world");
+      const livingWorld = await LivingWorldRuntime.load(
         this.course,
-        environment.livingTextures,
+        textures,
         LIVING_WORLD_MOTION_URL,
       );
       if (this.isDisposed()) {
@@ -237,8 +248,11 @@ export class SceneAssets {
     } catch (error) {
       this.livingWorldError = error instanceof Error
         ? error.message
-        : "Unknown Greenwater living-world load error";
-      console.warn("Greenwater living-world layer failed to load.", error);
+        : `Unknown ${this.course.mapName} living-world load error`;
+      console.warn(
+        `${this.course.mapName} living-world layer failed to load.`,
+        error,
+      );
     } finally {
       this.livingWorldLoadMs = performance.now() - loadStartedAt;
     }
