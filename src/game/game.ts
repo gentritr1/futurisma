@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { RaceAtmosphere } from "./atmosphere";
+import { RaceAtmosphere, configureToneMapping } from "./atmosphere";
 import { EngineAudio } from "./audio";
 import { DemoAutopilot, alignDirectionToSurface } from "./autopilot";
 import {
@@ -70,6 +70,8 @@ import {
 } from "./rivals";
 import {
   applyPs2MaterialTreatment,
+  ps2TreatmentDiagnostics,
+  updatePs2SnapGrid,
   TotemVehicle,
   type TotemVisualState,
 } from "./totem";
@@ -320,7 +322,9 @@ export class FuturismaGame {
       this.course.kind === "bitterpan" ? 1800 : 650,
     );
     this.diagnosticCourseAssemblyMs = courseAssemblyMs;
-    this.coursePs2Treatment = applyPs2MaterialTreatment(this.course.group);
+    this.coursePs2Treatment = applyPs2MaterialTreatment(this.course.group, {
+      worldGeometry: true,
+    });
     this.autopilot = new DemoAutopilot(this.course);
     this.beforeMoveProjection = this.course.createProjectionScratch();
     this.afterMoveProjection = this.course.createProjectionScratch();
@@ -338,8 +342,7 @@ export class FuturismaGame {
       powerPreference: "high-performance",
     });
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
-    this.renderer.toneMapping = THREE.AgXToneMapping;
-    this.renderer.toneMappingExposure = 1.05;
+    configureToneMapping(this.renderer);
     this.renderer.shadowMap.enabled = false;
     this.ui.setRaceFormat(
       this.totalLaps,
@@ -1794,6 +1797,7 @@ export class FuturismaGame {
         surfaceCharacter: this.sceneAssets.surfaceCharacterDiagnostics(),
         minimap: this.minimap.diagnostics(),
         atmosphere: this.atmosphere.diagnostics(),
+        ps2: ps2TreatmentDiagnostics(),
       },
     );
   }
@@ -1853,6 +1857,7 @@ export class FuturismaGame {
     this.minimumPixelRatio = nextMinimum;
     this.renderer.setPixelRatio(this.renderPixelRatio);
     this.renderer.setSize(width, height, false);
+    updatePs2SnapGrid(this.renderer.domElement.width, this.renderer.domElement.height);
     this.camera.aspect = width / Math.max(1, height);
     this.camera.updateProjectionMatrix();
     this.renderRequested = true;

@@ -279,7 +279,7 @@ export class SceneAssets {
         disposeObject3DResources(gltf.scene);
         return;
       }
-      applyPs2MaterialTreatment(gltf.scene);
+      applyPs2MaterialTreatment(gltf.scene, { worldGeometry: true });
       const courseDressing = createAssetKitCourseDressing(gltf.scene, this.course);
       const dressingDisplay = mergeStaticSceneByMaterial(courseDressing);
       if (this.isDisposed()) {

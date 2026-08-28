@@ -9,6 +9,28 @@ import {
   resolveLapProgress,
   resolveTimeOfDayDrift,
 } from "./lighting-motion.js";
+import {
+  activeRenderMode,
+  ps2ColorGradeChunk,
+  PS2_TONE_MAPPING_ANCHOR,
+} from "./render-mode.js";
+
+/** The exposure the AgX path has run at since the renderer was set up. */
+const AGX_TONE_MAPPING_EXPOSURE = 1.05;
+
+/**
+ * P4b. `agx` keeps the 2023 filmic curve the project shipped with; `ps2`
+ * replaces it with the hand-authored grade that `render-mode.js` owns, which is
+ * injected per material instead of running on the renderer. Presentation only —
+ * neither branch is visible to physics or lap timing.
+ */
+export function configureToneMapping(renderer: THREE.WebGLRenderer): void {
+  const ps2 = activeRenderMode() === "ps2";
+  renderer.toneMapping = ps2 ? THREE.NoToneMapping : THREE.AgXToneMapping;
+  // Ignored under `NoToneMapping`; the grade applies `PS2_EXPOSURE` itself, set
+  // to the same 1.05 so the A/B compares curves rather than gain.
+  renderer.toneMappingExposure = ps2 ? 1 : AGX_TONE_MAPPING_EXPOSURE;
+}
 
 const SKY_ZENITH_TINT = new THREE.Color(0x0a1216);
 const WHITE = new THREE.Color(0xffffff);
@@ -187,7 +209,17 @@ export class RaceAtmosphere {
           #include <tonemapping_fragment>
           #include <colorspace_fragment>
         }
-      `,
+      `.replace(
+        PS2_TONE_MAPPING_ANCHOR,
+        // The dome already ran through tone mapping, so in `ps2` it takes the
+        // replacement grade too — leaving it raw would blow the sky out and
+        // poison the A/B. It is deliberately *not* vertex-snapped or dithered:
+        // a stepping horizon reads as a bug, and a 24x12 dome has no edges the
+        // raster would flatter.
+        activeRenderMode() === "ps2"
+          ? ps2ColorGradeChunk()
+          : PS2_TONE_MAPPING_ANCHOR,
+      ),
     });
     const dome = new THREE.Mesh(geometry, material);
     dome.name = "sky_backdrop";

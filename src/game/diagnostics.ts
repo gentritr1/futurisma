@@ -6,6 +6,7 @@ import type { RaceCourse } from "./course";
 import type { MinimapDiagnostics } from "./minimap";
 import type { RivalFleetDiagnostics } from "./rivals";
 import type { SceneAssets } from "./scene-assets";
+import type { Ps2TreatmentDiagnostics } from "./totem";
 import type { RaceStandingEntry } from "./ui";
 
 const FRAME_SAMPLE_WINDOW = 720;
@@ -107,6 +108,9 @@ export interface DiagnosticsContributors {
   surfaceCharacter: ReturnType<SceneAssets["surfaceCharacterDiagnostics"]>;
   minimap: MinimapDiagnostics;
   atmosphere: AtmosphereDiagnostics;
+  // P4b: `?render=` mode plus the PS2 shader-arming counts. Owned by the
+  // material treatment in totem.ts, not by the race loop.
+  ps2: Ps2TreatmentDiagnostics;
 }
 
 function courseFields(course: RaceCourse) {
@@ -311,6 +315,7 @@ export function buildDiagnosticsReport(
     ...contributors.surfaceCharacter,
     ...contributors.minimap,
     ...contributors.atmosphere,
+    ...contributors.ps2,
     pixelRatio: Number(core.pixelRatio.toFixed(2)),
     preferredPixelRatio: Number(core.preferredPixelRatio.toFixed(2)),
     minimumPixelRatio: Number(core.minimumPixelRatio.toFixed(2)),

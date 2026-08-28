@@ -6,6 +6,18 @@ import {
   TotemRacePresence,
   type RacePresenceVisualState,
 } from "./race-presence";
+import {
+  activeRenderMode,
+  ps2ColorGradeChunk,
+  ps2DitherChunk,
+  ps2VertexSnapChunk,
+  ps2VertexSnapUniformDeclaration,
+  resolvePs2SnapGrid,
+  PS2_DITHERING_ANCHOR,
+  PS2_PROJECT_VERTEX_ANCHOR,
+  PS2_SNAP_UNIFORM_NAME,
+  PS2_TONE_MAPPING_ANCHOR,
+} from "./render-mode.js";
 
 export interface TotemVisualState extends RacePresenceVisualState {
   steer: number;
@@ -20,6 +32,26 @@ interface NeutralTransform {
 export interface Ps2MaterialTreatmentStats {
   materials: number;
   textures: number;
+  /** Materials this call armed with vertex snapping. Always 0 in `agx` mode. */
+  snapMaterials: number;
+  /** Materials this call armed with the RGB565 dither. Always 0 in `agx` mode. */
+  ditherMaterials: number;
+}
+
+export interface Ps2MaterialTreatmentOptions {
+  /**
+   * Course, environment and dressing geometry opts in; the player craft, the
+   * rivals and the sky do not. Vertex snapping and framebuffer dither ride on
+   * this flag — the colour grade does not, because a ship graded differently
+   * from the world it sits in reads as a bug.
+   */
+  worldGeometry?: boolean;
+}
+
+export interface Ps2TreatmentDiagnostics {
+  renderMode: string;
+  ps2SnapMaterials: number;
+  ps2DitherMaterials: number;
 }
 
 export type TotemRivalMaterialRole =
@@ -145,15 +177,109 @@ function isRivalMaterialRole(name: string): name is TotemRivalMaterialRole {
   return RIVAL_MATERIAL_ROLES.includes(name as TotemRivalMaterialRole);
 }
 
+/**
+ * One shared uniform object handed to every snapped program, so the whole world
+ * agrees on the raster and a resize costs one `Vector2.set` rather than a walk
+ * over the material graph.
+ */
+const ps2SnapGridUniform = { value: new THREE.Vector2(427, 240) };
+
+/** Re-derives the snap raster from the backbuffer. Called on every resize. */
+export function updatePs2SnapGrid(
+  internalWidth: number,
+  internalHeight: number,
+): void {
+  const grid = resolvePs2SnapGrid(internalWidth, internalHeight);
+  ps2SnapGridUniform.value.set(grid.x, grid.y);
+}
+
+let ps2SnapMaterialCount = 0;
+let ps2DitherMaterialCount = 0;
+const ps2PatchedMaterials = new WeakSet<THREE.Material>();
+
+/** `renderMode` plus the counts P4b's acceptance checks read off the soak. */
+export function ps2TreatmentDiagnostics(): Ps2TreatmentDiagnostics {
+  return {
+    renderMode: activeRenderMode(),
+    ps2SnapMaterials: ps2SnapMaterialCount,
+    ps2DitherMaterials: ps2DitherMaterialCount,
+  };
+}
+
+/**
+ * Injects the PS2 presentation shaders. A no-op outside `?render=ps2`, so the
+ * AgX path compiles exactly the programs it did before this phase.
+ *
+ * `Material.clone()` copies neither `onBeforeCompile` nor
+ * `customProgramCacheKey`, so anything that clones a treated material has to
+ * come back through here — see the rival batch clone pass.
+ */
+function applyPs2ShaderTreatment(
+  material: THREE.Material,
+  worldGeometry: boolean,
+): { snapped: boolean; dithered: boolean } {
+  if (activeRenderMode() !== "ps2") return { snapped: false, dithered: false };
+  if (ps2PatchedMaterials.has(material)) {
+    return { snapped: false, dithered: false };
+  }
+  ps2PatchedMaterials.add(material);
+  // A material that opted out of tone mapping stays opted out: it was authored
+  // against the raw linear value in both modes.
+  const graded = material.toneMapped !== false;
+  const snapped = worldGeometry;
+  const dithered = worldGeometry;
+  // three keys the program cache on `onBeforeCompile.toString()` by default.
+  // Every variant here shares one function body, so without an explicit key a
+  // snapped course material and an unsnapped hull material would collide on the
+  // same compiled program.
+  const cacheKey = `ps2|${graded ? "g" : ""}${snapped ? "s" : ""}${dithered ? "d" : ""}`;
+  material.onBeforeCompile = (shader) => {
+    if (snapped && shader.vertexShader.includes(PS2_PROJECT_VERTEX_ANCHOR)) {
+      shader.uniforms[PS2_SNAP_UNIFORM_NAME] = ps2SnapGridUniform;
+      shader.vertexShader = (
+        ps2VertexSnapUniformDeclaration() + shader.vertexShader
+      ).replace(
+        PS2_PROJECT_VERTEX_ANCHOR,
+        `${PS2_PROJECT_VERTEX_ANCHOR}\n${ps2VertexSnapChunk()}`,
+      );
+    }
+    if (graded && shader.fragmentShader.includes(PS2_TONE_MAPPING_ANCHOR)) {
+      shader.fragmentShader = shader.fragmentShader.replace(
+        PS2_TONE_MAPPING_ANCHOR,
+        ps2ColorGradeChunk(),
+      );
+    }
+    if (dithered && shader.fragmentShader.includes(PS2_DITHERING_ANCHOR)) {
+      shader.fragmentShader = shader.fragmentShader.replace(
+        PS2_DITHERING_ANCHOR,
+        `${PS2_DITHERING_ANCHOR}\n${ps2DitherChunk()}`,
+      );
+    }
+  };
+  material.customProgramCacheKey = () => cacheKey;
+  if (snapped) ps2SnapMaterialCount += 1;
+  if (dithered) ps2DitherMaterialCount += 1;
+  return { snapped, dithered };
+}
+
 export function applyPs2MaterialTreatment(
   root: THREE.Object3D,
+  options: Ps2MaterialTreatmentOptions = {},
 ): Ps2MaterialTreatmentStats {
+  const worldGeometry = options.worldGeometry === true;
   const treatedMaterials = new Set<THREE.Material>();
   const treatedTextures = new Set<THREE.Texture>();
+  let snapMaterials = 0;
+  let ditherMaterials = 0;
   root.traverse((object) => {
     if (!(object instanceof THREE.Mesh)) return;
     const materials = Array.isArray(object.material) ? object.material : [object.material];
     for (const material of materials) {
+      if (!treatedMaterials.has(material)) {
+        const armed = applyPs2ShaderTreatment(material, worldGeometry);
+        if (armed.snapped) snapMaterials += 1;
+        if (armed.dithered) ditherMaterials += 1;
+      }
       treatedMaterials.add(material);
       material.dithering = true;
       const textured = material as THREE.Material & {
@@ -185,6 +311,8 @@ export function applyPs2MaterialTreatment(
   return {
     materials: treatedMaterials.size,
     textures: treatedTextures.size,
+    snapMaterials,
+    ditherMaterials,
   };
 }
 
@@ -410,6 +538,11 @@ export class TotemVehicle {
         let clone = clonesByRole.get(batch.role);
         if (!clone) {
           clone = batch.material.clone();
+          // `Material.copy` carries neither `onBeforeCompile` nor the cache key,
+          // so a fresh clone would render the rivals ungraded next to a graded
+          // player craft. Re-arm it — without `worldGeometry`, because rivals
+          // must not snap either.
+          applyPs2ShaderTreatment(clone, false);
           clonesByRole.set(batch.role, clone);
         }
         batch.material = clone;
