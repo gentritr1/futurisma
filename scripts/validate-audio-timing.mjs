@@ -150,14 +150,37 @@ assert.equal(sampleLinearAutomation(2, 0.2, 0.8, 2, 2), 0.8);
 const blockout = JSON.parse(
   readFileSync(new URL("../src/game/data/greenwater-blockout.json", import.meta.url), "utf8"),
 );
-
-// The map file is the authored source; the engine constants must not drift from
-// it. Asserting both directions is what stops a silent re-tune of one side.
-assert.deepEqual(
-  blockout.audio.profiles,
-  AUDIO_ZONE_PROFILES,
-  "greenwater-blockout.json audio.profiles must match AUDIO_ZONE_PROFILES.",
+const bitterpanProduction = JSON.parse(
+  readFileSync(
+    new URL("../src/game/data/map02/BITTERPAN_PRODUCTION.json", import.meta.url),
+    "utf8",
+  ),
 );
+
+// The map files are the authored source; the engine constants must not drift
+// from them. Both directions still hold, but the engine table is now shared by
+// two maps (P8 added Bitterpan's `underpass`), so it is no longer equal to any
+// single map's block. Direction one: every room Greenwater authors matches the
+// engine exactly. Direction two: every room the engine holds is authored by
+// some map, so an orphan profile cannot appear in code alone.
+const authoredAudioProfiles = {
+  ...bitterpanProduction.audio.profiles,
+  ...blockout.audio.profiles,
+};
+for (const [zone, profile] of Object.entries(blockout.audio.profiles)) {
+  assert.deepEqual(
+    profile,
+    AUDIO_ZONE_PROFILES[zone],
+    `greenwater-blockout.json audio room ${zone} must match AUDIO_ZONE_PROFILES.`,
+  );
+}
+for (const [zone, profile] of Object.entries(AUDIO_ZONE_PROFILES)) {
+  assert.deepEqual(
+    profile,
+    authoredAudioProfiles[zone],
+    `AUDIO_ZONE_PROFILES room ${zone} is not authored by any map.`,
+  );
+}
 assert.equal(blockout.audio.defaultZone, "open");
 assert.equal(blockout.audio.quantize, "bar");
 assert.equal(blockout.audio.crossfadeSeconds, ZONE_CROSSFADE_SECONDS);

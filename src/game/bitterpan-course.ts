@@ -3,24 +3,25 @@ import centrelineJson from "./data/map02/CENTRELINE_STATIONS.json";
 import checkpointsJson from "./data/map02/CHECKPOINTS.json";
 import gridAndRecoveryJson from "./data/map02/GRID_AND_RECOVERY.json";
 import sectorsJson from "./data/map02/SECTORS_AND_SEQUENCES.json";
-import { createApronResolution } from "./apron.js";
+import productionJson from "./data/map02/BITTERPAN_PRODUCTION.json";
+import { createApronResolution, resolveApron, resolveApronProfile } from "./apron.js";
 import type { ApronResolution } from "./apron.js";
+import { resolveAudioZone } from "./audio-space.js";
 import type { AudioZone } from "./audio-space.js";
-import { DEFAULT_KEY_DIRECTION } from "./lighting-motion.js";
+import { lerpKeyDirection } from "./lighting-motion.js";
+import { isCircularHazardContact } from "./race-rules";
 import type {
   CourseLightingProfile,
   CourseProjection,
   CourseSample,
+  EdgeType,
   FogProfile,
   MusicProfile,
   RaceCourse,
   RivalGridStart,
+  TimeOfDayStop,
   TurnCue,
 } from "./course";
-
-/** Pre-apron open-edge boundary, kept until the P8 Bitterpan authoring pass. */
-const BITTERPAN_OPEN_RUNOFF_METRES = 5.8;
-const BITTERPAN_DECK_MARGIN_METRES = 2.05;
 
 interface BitterpanStation {
   i: number;
@@ -107,10 +108,149 @@ interface BitterpanTurn {
   direction: "left" | "right";
 }
 
+/* ------------------------------------------------------------------ */
+/* P8 authored production sidecar                                      */
+/* ------------------------------------------------------------------ */
+
+interface BitterpanApronEdgeProfile {
+  label: string;
+  surface: string;
+  widthMetres: number;
+  grip: number;
+  wall: boolean;
+  wallSpeedMultiplier: number;
+  wallImpactStrength: number;
+  wallScrubMetresPerSecondSquared: number;
+}
+
+interface BitterpanEdgeSpan {
+  id: string;
+  sequence: string;
+  fromDistance: number;
+  toDistance: number;
+  edgeLeft: EdgeType;
+  edgeRight: EdgeType;
+}
+
+interface BitterpanGripHazard {
+  id: string;
+  type: "salt_drift";
+  fromDistance: number;
+  toDistance: number;
+  lateralFromFraction: number;
+  lateralToFraction: number;
+  gripMultiplier: number;
+}
+
+interface BitterpanCableHazard {
+  id: string;
+  type: "cable_coil";
+  distance: number;
+  lateralOffset: number;
+}
+
+type BitterpanHazard = BitterpanGripHazard | BitterpanCableHazard;
+
+interface BitterpanBoostPad {
+  id: string;
+  distance: number;
+  sequence: string;
+  lateralFraction: number;
+}
+
+interface BitterpanMusicTrigger {
+  distance: number;
+  sequence: string;
+  sector: string;
+  levels: MusicProfile;
+}
+
+interface BitterpanLightingProfileData {
+  sector: string;
+  name: string;
+  distance: number;
+  sky: string;
+  ground: string;
+  key: string;
+  rim: string;
+  hemisphereIntensity: number;
+  keyIntensity: number;
+  rimIntensity: number;
+  keyElevationDegrees: number;
+  keyAzimuthDegrees: number;
+  keyDirection: { x: number; y: number; z: number };
+  fog: { density: number; color: string };
+}
+
+interface BitterpanProductionData {
+  format: string;
+  apron: {
+    deckMarginMetres: number;
+    gripFloor: number;
+    edges: Record<string, BitterpanApronEdgeProfile>;
+    overrides: (BitterpanApronEdgeProfile & {
+      id?: string;
+      edges?: string[];
+      sectors?: string[];
+    })[];
+  };
+  edges: {
+    default: { edgeLeft: EdgeType; edgeRight: EdgeType };
+    spans: BitterpanEdgeSpan[];
+  };
+  hazards: { gripRecoverySeconds: number; entries: BitterpanHazard[] };
+  boostPads: {
+    halfLengthMetres: number;
+    lateralHalfFraction: number;
+    pads: BitterpanBoostPad[];
+  };
+  music: { triggers: BitterpanMusicTrigger[] };
+  audio: {
+    zones: { name: AudioZone; startDistance: number; endDistance: number }[];
+    defaultZone: AudioZone;
+  };
+  lighting: { crossfadeMetres: number; profiles: BitterpanLightingProfileData[] };
+  timeOfDay: { stops: TimeOfDayStop[] };
+  lapBoard: {
+    template: string;
+    subtitle: string;
+    distance: number;
+    lateralOffset: number;
+    heightMetres: number;
+    widthMetres: number;
+    boardHeightMetres: number;
+    foreground: string;
+    background: string;
+  };
+  culling: {
+    baseDistanceMetres: number;
+    radiusMultiplier: number;
+    maximumDistanceMetres: number;
+  };
+}
+
+/** One resolved sector lighting zone, in lap order, including the wrap run. */
+interface BitterpanLightingZone {
+  distance: number;
+  sector: string;
+  sky: THREE.Color;
+  ground: THREE.Color;
+  key: THREE.Color;
+  rim: THREE.Color;
+  hemisphereIntensity: number;
+  keyIntensity: number;
+  rimIntensity: number;
+  direction: { x: number; y: number; z: number };
+  fogDensity: number;
+  fogColor: THREE.Color;
+}
+
 const CENTRELINE = centrelineJson as unknown as BitterpanCentrelineData;
 const CHECKPOINTS = checkpointsJson as unknown as BitterpanCheckpointData;
 const GRID_AND_RECOVERY = gridAndRecoveryJson as unknown as BitterpanGridRecoveryData;
 const SECTORS = sectorsJson as unknown as BitterpanSectorData;
+const PRODUCTION = productionJson as unknown as BitterpanProductionData;
+const APRON = PRODUCTION.apron;
 const WORLD_UP = new THREE.Vector3(0, 1, 0);
 const COURSE_LENGTH_METRES = 3050;
 const CRUISE_SPEED_METRES_PER_SECOND = 86;
@@ -124,69 +264,91 @@ const ROUTE_DECK_BY_SECTOR: Record<string, THREE.Color> = {
   S2: new THREE.Color(0x414946),
   S3: new THREE.Color(0x3d4c4d),
 };
-const MUSIC_PROFILE: MusicProfile = {
-  trance: 1,
-  jungle: 0,
-  deep_dnb: 1,
-  techstep: 1,
-};
-
-const FOG_BY_SECTOR: Record<string, FogProfile> = {
-  S1: { density: 0.00072, color: new THREE.Color(0xc7b997) },
-  S2: { density: 0.00048, color: new THREE.Color(0xd5cfb9) },
-  S3: { density: 0.00082, color: new THREE.Color(0xaeb8b2) },
-};
-
-/**
- * Bitterpan authors no key-direction sweep — P8 owns its lighting pass — so all
- * three sectors reuse the pre-P4a fixed sun. Nothing about its look changes.
- */
-function bitterpanKeyDirection(): THREE.Vector3 {
-  return new THREE.Vector3(
-    DEFAULT_KEY_DIRECTION.x,
-    DEFAULT_KEY_DIRECTION.y,
-    DEFAULT_KEY_DIRECTION.z,
-  );
-}
-
-const LIGHTING_BY_SECTOR: Record<string, CourseLightingProfile> = {
-  S1: {
-    sky: new THREE.Color(0xc9b994),
-    ground: new THREE.Color(0x665c48),
-    key: new THREE.Color(0xffe0a8),
-    rim: new THREE.Color(0xd9904d),
-    hemisphereIntensity: 1.25,
-    keyIntensity: 1.55,
-    rimIntensity: 0.7,
-    keyDirection: bitterpanKeyDirection(),
-  },
-  S2: {
-    sky: new THREE.Color(0xd7d2bf),
-    ground: new THREE.Color(0x6f6b60),
-    key: new THREE.Color(0xffedc7),
-    rim: new THREE.Color(0xb6c3be),
-    hemisphereIntensity: 1.35,
-    keyIntensity: 1.45,
-    rimIntensity: 0.55,
-    keyDirection: bitterpanKeyDirection(),
-  },
-  S3: {
-    sky: new THREE.Color(0xb6c0bb),
-    ground: new THREE.Color(0x555e5a),
-    key: new THREE.Color(0xe4eadc),
-    rim: new THREE.Color(0x86aaa7),
-    hemisphereIntensity: 1.2,
-    keyIntensity: 1.3,
-    rimIntensity: 0.8,
-    keyDirection: bitterpanKeyDirection(),
-  },
-};
-
 const SECTOR_LABELS: Record<string, string> = {
   S1: "HARVEST BASIN",
   S2: "THE LONG BASIN",
   S3: "LOADOUT BASIN",
 };
+const BOOST_PAD_COLOR = new THREE.Color(0x77dce3);
+const CABLE_COIL_COLOR = new THREE.Color(0xf06a32);
+const SALT_DRIFT_COLOR = new THREE.Color(0xe8e2cf);
+
+/**
+ * Per-station edge types, resolved once from the authored span table. `sample`
+ * runs several times per frame, so this has to be a table read rather than a
+ * span scan: 610 stations x 2 sides, built at module scope alongside the
+ * authored apron profile each one resolves to.
+ */
+const STATION_EDGES: {
+  left: EdgeType;
+  right: EdgeType;
+  apronLeft: BitterpanApronEdgeProfile;
+  apronRight: BitterpanApronEdgeProfile;
+}[] = CENTRELINE.stations.map((station) => {
+  let left = PRODUCTION.edges.default.edgeLeft;
+  let right = PRODUCTION.edges.default.edgeRight;
+  for (const span of PRODUCTION.edges.spans) {
+    if (station.s < span.fromDistance || station.s > span.toDistance) continue;
+    left = span.edgeLeft;
+    right = span.edgeRight;
+  }
+  return {
+    left,
+    right,
+    apronLeft: resolveApronProfile(APRON, left, station.sector),
+    apronRight: resolveApronProfile(APRON, right, station.sector),
+  };
+});
+
+const GRIP_HAZARDS = PRODUCTION.hazards.entries.filter(
+  (hazard): hazard is BitterpanGripHazard => hazard.type === "salt_drift",
+);
+const CABLE_HAZARDS = PRODUCTION.hazards.entries.filter(
+  (hazard): hazard is BitterpanCableHazard => hazard.type === "cable_coil",
+);
+
+/**
+ * Sector lighting zones in lap order, derived from the accepted station table
+ * rather than authored twice. Bitterpan's S3 owns both the 0-55 m start apron
+ * and the 2550-3045 m loadout run, so the zone list is S3, S1, S2, S3 and the
+ * lap wrap is a zero-delta seam — the same property Greenwater gets by making
+ * RUNWAY_HOME repeat RUNWAY_START.
+ */
+const LIGHTING_ZONES: BitterpanLightingZone[] = (() => {
+  const bySector = new Map(
+    PRODUCTION.lighting.profiles.map((profile) => [profile.sector, profile]),
+  );
+  const zones: BitterpanLightingZone[] = [];
+  let previousSector: string | null = null;
+  for (const station of CENTRELINE.stations) {
+    if (station.sector === previousSector) continue;
+    previousSector = station.sector;
+    const profile = bySector.get(station.sector);
+    if (!profile) {
+      throw new Error(`Bitterpan sector ${station.sector} has no authored lighting.`);
+    }
+    zones.push({
+      distance: station.s,
+      sector: profile.sector,
+      sky: new THREE.Color(profile.sky),
+      ground: new THREE.Color(profile.ground),
+      key: new THREE.Color(profile.key),
+      rim: new THREE.Color(profile.rim),
+      hemisphereIntensity: profile.hemisphereIntensity,
+      keyIntensity: profile.keyIntensity,
+      rimIntensity: profile.rimIntensity,
+      direction: profile.keyDirection,
+      fogDensity: profile.fog.density,
+      fogColor: new THREE.Color(profile.fog.color),
+    });
+  }
+  return zones;
+})();
+
+const KEY_DIRECTION_ZONES = LIGHTING_ZONES.map((zone) => ({
+  distance: zone.distance,
+  direction: zone.direction,
+}));
 
 function createCourseSampleValue(): CourseSample {
   return {
@@ -199,10 +361,10 @@ function createCourseSampleValue(): CourseSample {
     halfWidth: 0,
     bank: 0,
     sector: "",
-    edgeLeft: "C",
-    edgeRight: "C",
-    apronLeft: BITTERPAN_OPEN_RUNOFF_METRES,
-    apronRight: BITTERPAN_OPEN_RUNOFF_METRES,
+    edgeLeft: PRODUCTION.edges.default.edgeLeft,
+    edgeRight: PRODUCTION.edges.default.edgeRight,
+    apronLeft: APRON.edges[PRODUCTION.edges.default.edgeLeft].widthMetres,
+    apronRight: APRON.edges[PRODUCTION.edges.default.edgeRight].widthMetres,
     apronGripLeft: 1,
     apronGripRight: 1,
   };
@@ -246,9 +408,8 @@ export class BitterpanCourse implements RaceCourse {
   readonly recoverySpeedMps = CRUISE_SPEED_METRES_PER_SECOND
     * GRID_AND_RECOVERY.recovery.rejoin_speed_fraction;
   readonly recoveryImmunitySeconds = 1.2;
-  readonly surfaceGripRecoverySeconds = 0.8;
-  /** No authored time-of-day ramp until P8, so nothing drifts on Bitterpan. */
-  readonly timeOfDayStops = null;
+  readonly surfaceGripRecoverySeconds = PRODUCTION.hazards.gripRecoverySeconds;
+  readonly timeOfDayStops: readonly TimeOfDayStop[] = PRODUCTION.timeOfDay.stops;
 
   private readonly stations = CENTRELINE.stations;
   private readonly projectionPoints = this.stations.map(
@@ -263,6 +424,22 @@ export class BitterpanCourse implements RaceCourse {
   });
   private readonly turns = this.createTurns();
   private checkpointIndicatorMesh: THREE.InstancedMesh | null = null;
+  private lapBoardTexture: THREE.CanvasTexture | null = null;
+  private lapBoardContext: CanvasRenderingContext2D | null = null;
+  private readonly lightingProfileScratch: CourseLightingProfile = {
+    sky: new THREE.Color(),
+    ground: new THREE.Color(),
+    key: new THREE.Color(),
+    rim: new THREE.Color(),
+    hemisphereIntensity: 1,
+    keyIntensity: 1,
+    rimIntensity: 1,
+    keyDirection: new THREE.Vector3(0, 1, 0),
+  };
+  private readonly fogProfileScratch: FogProfile = {
+    density: 0,
+    color: new THREE.Color(),
+  };
 
   constructor() {
     if (
@@ -284,7 +461,12 @@ export class BitterpanCourse implements RaceCourse {
     this.group.name = "map02_bitterpan_runtime_markers";
     this.group.add(this.createRouteReadLayer());
     this.group.add(this.createCheckpointMarkers());
+    this.group.add(this.createSaltDrifts());
+    this.group.add(this.createBoostPads());
+    this.group.add(this.createCableCoils());
+    this.group.add(this.createLapBoard());
     this.setCheckpointProgress(1);
+    this.setLapBoard(1, this.defaultLapCount);
   }
 
   createSampleScratch(): CourseSample {
@@ -334,12 +516,15 @@ export class BitterpanCourse implements RaceCourse {
     target.halfWidth = width / 2;
     target.bank = bank;
     target.sector = current.sector;
-    target.edgeLeft = "C";
-    target.edgeRight = "C";
-    target.apronLeft = BITTERPAN_OPEN_RUNOFF_METRES;
-    target.apronRight = BITTERPAN_OPEN_RUNOFF_METRES;
-    target.apronGripLeft = 1;
-    target.apronGripRight = 1;
+    // Edges resolve per station rather than per interpolated metre: an edge type
+    // is a discrete authored fact and lerping between A and B has no meaning.
+    const edges = STATION_EDGES[index];
+    target.edgeLeft = edges.left;
+    target.edgeRight = edges.right;
+    target.apronLeft = edges.apronLeft.widthMetres;
+    target.apronRight = edges.apronRight.widthMetres;
+    target.apronGripLeft = edges.apronLeft.grip;
+    target.apronGripRight = edges.apronRight.grip;
     return target;
   }
 
@@ -465,55 +650,148 @@ export class BitterpanCourse implements RaceCourse {
     return cue;
   }
 
+  /** Index of the lighting zone covering `distance`, and its crossfade amount. */
+  private zoneBlendAt(distance: number): { index: number; amount: number } {
+    let index = 0;
+    for (let candidate = 1; candidate < LIGHTING_ZONES.length; candidate += 1) {
+      if (LIGHTING_ZONES[candidate].distance > distance) break;
+      index = candidate;
+    }
+    const zone = LIGHTING_ZONES[index];
+    const zoneEnd = index === LIGHTING_ZONES.length - 1
+      ? this.length
+      : LIGHTING_ZONES[index + 1].distance;
+    const crossfadeStart = Math.max(
+      zone.distance,
+      zoneEnd - PRODUCTION.lighting.crossfadeMetres,
+    );
+    const amount = distance <= crossfadeStart
+      ? 0
+      : THREE.MathUtils.smoothstep(distance, crossfadeStart, zoneEnd);
+    return { index, amount };
+  }
+
   fogAt(progress: number): FogProfile {
-    return FOG_BY_SECTOR[this.stationAtProgress(progress).sector] ?? FOG_BY_SECTOR.S2;
+    const distance = THREE.MathUtils.euclideanModulo(progress, 1) * this.length;
+    const { index, amount } = this.zoneBlendAt(distance);
+    const zone = LIGHTING_ZONES[index];
+    const next = LIGHTING_ZONES[(index + 1) % LIGHTING_ZONES.length];
+    this.fogProfileScratch.density = THREE.MathUtils.lerp(
+      zone.fogDensity,
+      next.fogDensity,
+      amount,
+    );
+    this.fogProfileScratch.color.lerpColors(zone.fogColor, next.fogColor, amount);
+    return this.fogProfileScratch;
   }
 
   lightingAt(progress: number): CourseLightingProfile {
-    return LIGHTING_BY_SECTOR[this.stationAtProgress(progress).sector]
-      ?? LIGHTING_BY_SECTOR.S2;
+    const distance = THREE.MathUtils.euclideanModulo(progress, 1) * this.length;
+    const { index, amount } = this.zoneBlendAt(distance);
+    const zone = LIGHTING_ZONES[index];
+    const next = LIGHTING_ZONES[(index + 1) % LIGHTING_ZONES.length];
+    const target = this.lightingProfileScratch;
+    target.sky.lerpColors(zone.sky, next.sky, amount);
+    target.ground.lerpColors(zone.ground, next.ground, amount);
+    target.key.lerpColors(zone.key, next.key, amount);
+    target.rim.lerpColors(zone.rim, next.rim, amount);
+    target.hemisphereIntensity = THREE.MathUtils.lerp(
+      zone.hemisphereIntensity,
+      next.hemisphereIntensity,
+      amount,
+    );
+    target.keyIntensity = THREE.MathUtils.lerp(
+      zone.keyIntensity,
+      next.keyIntensity,
+      amount,
+    );
+    target.rimIntensity = THREE.MathUtils.lerp(
+      zone.rimIntensity,
+      next.rimIntensity,
+      amount,
+    );
+    // The sun rides the same window as the palette, so the swing across the
+    // three basins reads as one move rather than a colour change plus a jump.
+    lerpKeyDirection(
+      KEY_DIRECTION_ZONES,
+      distance,
+      this.length,
+      target.keyDirection,
+      PRODUCTION.lighting.crossfadeMetres,
+    );
+    return target;
   }
 
-  edgeType(): "C" {
-    return "C";
+  edgeType(sample: CourseSample, lateral: number): EdgeType {
+    return lateral >= 0 ? sample.edgeRight : sample.edgeLeft;
   }
 
-  /**
-   * Bitterpan is not authored yet (P8 owns that pass), so this reports exactly
-   * the pre-apron open-edge boundary: the same 5.8 m run-off, full grip, and
-   * the same soft contact at `halfWidth + 5.8`.
-   */
   apronAt(
     sample: CourseSample,
     lateral: number,
     target: ApronResolution = createApronResolution(),
   ): ApronResolution {
-    const roadLimit = Math.max(0, sample.halfWidth - BITTERPAN_DECK_MARGIN_METRES);
-    target.width = BITTERPAN_OPEN_RUNOFF_METRES;
-    target.grip = 1;
-    // Open runoff: the ribbon still bounds the vehicle, but contact is silent
-    // and auto-recovery handles it, exactly as before the apron pass.
-    target.wall = false;
-    target.onApron = Math.abs(lateral) > roadLimit;
-    target.roadLimit = roadLimit;
-    target.lateralLimit = sample.halfWidth + BITTERPAN_OPEN_RUNOFF_METRES;
-    target.depth = target.onApron ? Math.abs(lateral) - roadLimit : 0;
-    target.wallSpeedMultiplier = 0.9;
-    target.wallImpactStrength = 0.42;
-    target.wallScrubMetresPerSecondSquared = 12;
-    target.surface = "open";
-    return target;
+    return resolveApron(
+      APRON,
+      this.edgeType(sample, lateral),
+      sample.sector,
+      sample.halfWidth,
+      lateral,
+      target,
+    );
   }
 
-  surfaceGripAt(): number {
-    return 1;
+  /**
+   * Salt drift. The authored patches are lateral *bands* rather than a single
+   * "left third" rule, because Bitterpan's deck ranges 22-30 m wide and a fixed
+   * fraction would mean something different in the chicane than on the pan.
+   */
+  surfaceGripAt(progress: number, lateral: number, halfWidth: number): number {
+    const distance = THREE.MathUtils.euclideanModulo(progress, 1) * this.length;
+    let grip = 1;
+    for (const hazard of GRIP_HAZARDS) {
+      if (distance < hazard.fromDistance || distance > hazard.toDistance) continue;
+      const from = hazard.lateralFromFraction * halfWidth;
+      const to = hazard.lateralToFraction * halfWidth;
+      const low = Math.min(from, to);
+      const high = Math.max(from, to);
+      if (lateral < low || lateral > high) continue;
+      grip = Math.min(grip, hazard.gripMultiplier);
+    }
+    return grip;
   }
 
-  cableTripSideAt(): 0 {
+  cableTripSideAt(progress: number, lateral: number): -1 | 0 | 1 {
+    const distance = THREE.MathUtils.euclideanModulo(progress, 1) * this.length;
+    for (const hazard of CABLE_HAZARDS) {
+      if (isCircularHazardContact(
+        distance,
+        lateral,
+        hazard.distance,
+        hazard.lateralOffset,
+        this.length,
+      )) {
+        return hazard.lateralOffset < 0 ? -1 : 1;
+      }
+    }
     return 0;
   }
 
-  isOnBoostPad(): boolean {
+  isOnBoostPad(progress: number, lateral: number, halfWidth: number): boolean {
+    const distance = THREE.MathUtils.euclideanModulo(progress, 1) * this.length;
+    const pads = PRODUCTION.boostPads;
+    for (const pad of pads.pads) {
+      const along = Math.abs(
+        THREE.MathUtils.euclideanModulo(
+          distance - pad.distance + this.length / 2,
+          this.length,
+        ) - this.length / 2,
+      );
+      if (along > pads.halfLengthMetres) continue;
+      const centre = pad.lateralFraction * halfWidth;
+      const reach = pads.lateralHalfFraction * halfWidth;
+      if (Math.abs(lateral - centre) <= reach) return true;
+    }
     return false;
   }
 
@@ -522,16 +800,27 @@ export class BitterpanCourse implements RaceCourse {
     return station.sequence_name || SECTOR_LABELS[station.sector] || station.sector;
   }
 
-  musicAt(): MusicProfile {
-    return MUSIC_PROFILE;
+  musicAt(progress: number): MusicProfile {
+    const distance = THREE.MathUtils.euclideanModulo(progress, 1) * this.length;
+    let active = PRODUCTION.music.triggers[0];
+    for (const trigger of PRODUCTION.music.triggers) {
+      if (trigger.distance > distance) break;
+      active = trigger;
+    }
+    return active.levels;
   }
 
   /**
-   * Bitterpan is authored open-air throughout. Its interiors arrive with the
-   * production pass (P8); until then a single honest room beats a guessed one.
+   * One authored room: the conveyor underpass, continued across the lap wrap
+   * because the accepted massing puts a support 4 m behind the start line. The
+   * rest of the pan is open air, which is the point of the map.
    */
-  audioZoneAt(): AudioZone {
-    return "open";
+  audioZoneAt(progress: number): AudioZone {
+    return resolveAudioZone(
+      THREE.MathUtils.euclideanModulo(progress, 1) * this.length,
+      PRODUCTION.audio.zones,
+      PRODUCTION.audio.defaultZone,
+    ) as AudioZone;
   }
 
   updateAtmosphere(): boolean {
@@ -560,9 +849,30 @@ export class BitterpanCourse implements RaceCourse {
     if (indicators.instanceColor) indicators.instanceColor.needsUpdate = true;
   }
 
-  setLapBoard(): void {
-    // The v0.2a.1 blockout provides no authored lap-board surface. HUD timing
-    // remains authoritative until the Map 02 art phase supplies one.
+  setLapBoard(current: number, total: number): void {
+    const context = this.lapBoardContext;
+    if (!context || !this.lapBoardTexture) return;
+    const board = PRODUCTION.lapBoard;
+    context.fillStyle = board.background;
+    context.fillRect(0, 0, 512, 192);
+    context.strokeStyle = board.foreground;
+    context.lineWidth = 10;
+    context.strokeRect(7, 7, 498, 178);
+    context.fillStyle = board.foreground;
+    context.font = "700 68px monospace";
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    context.fillText(
+      board.template
+        .replace("{current}", String(Math.min(current, total)))
+        .replace("{total}", String(total)),
+      256,
+      86,
+    );
+    context.fillStyle = "#9c8f7c";
+    context.font = "600 24px monospace";
+    context.fillText(board.subtitle, 256, 145);
+    this.lapBoardTexture.needsUpdate = true;
   }
 
   recoveryProgressFor(progress: number): number {
@@ -765,6 +1075,193 @@ export class BitterpanCourse implements RaceCourse {
     });
     const mesh = new THREE.Mesh(geometry, material);
     mesh.name = "map02_route_edge_bands";
+    return mesh;
+  }
+
+  /**
+   * The authored salt drift, drawn as one ribbon per patch merged into a single
+   * mesh. A grip penalty the driver cannot see is just an unfair surprise, so
+   * the low-grip band is exactly the band `surfaceGripAt` tests.
+   */
+  private createSaltDrifts(): THREE.Mesh {
+    const positions: number[] = [];
+    const colors: number[] = [];
+    const indices: number[] = [];
+    const surfaceLift = 0.055;
+    const stepMetres = 5;
+    for (const hazard of GRIP_HAZARDS) {
+      const firstVertex = positions.length / 3;
+      const steps = Math.max(
+        1,
+        Math.round((hazard.toDistance - hazard.fromDistance) / stepMetres),
+      );
+      // Darker crust where the grip loss is worst, so the three patches read as
+      // three different costs rather than one repeated decal.
+      const shade = SALT_DRIFT_COLOR.clone().multiplyScalar(
+        0.72 + hazard.gripMultiplier * 0.28,
+      );
+      for (let step = 0; step <= steps; step += 1) {
+        const distance = hazard.fromDistance
+          + ((hazard.toDistance - hazard.fromDistance) * step) / steps;
+        const sample = this.sampleAtDistance(distance);
+        // The authored band is clamped into the deck so the drift never floats
+        // over the run-off it is not authored to cover.
+        const inner = THREE.MathUtils.clamp(
+          hazard.lateralToFraction * sample.halfWidth,
+          -sample.halfWidth + 0.35,
+          sample.halfWidth - 0.35,
+        );
+        const outer = THREE.MathUtils.clamp(
+          hazard.lateralFromFraction * sample.halfWidth,
+          -sample.halfWidth + 0.35,
+          sample.halfWidth - 0.35,
+        );
+        for (const offset of [inner, outer]) {
+          const point = sample.position.clone()
+            .addScaledVector(sample.right, offset)
+            .addScaledVector(sample.up, surfaceLift);
+          positions.push(point.x, point.y, point.z);
+          colors.push(shade.r, shade.g, shade.b);
+        }
+      }
+      for (let step = 0; step < steps; step += 1) {
+        const a = firstVertex + step * 2;
+        const b = a + 1;
+        const c = firstVertex + (step + 1) * 2;
+        const d = c + 1;
+        indices.push(a, b, d, a, d, c);
+      }
+    }
+
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+    geometry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
+    geometry.setIndex(indices);
+    geometry.computeBoundingSphere();
+    const mesh = new THREE.Mesh(
+      geometry,
+      new THREE.MeshBasicMaterial({
+        vertexColors: true,
+        fog: true,
+        toneMapped: false,
+        side: THREE.DoubleSide,
+      }),
+    );
+    mesh.name = "map02_salt_drift_patches";
+    return mesh;
+  }
+
+  /** The four authored pads, one instanced draw, sized from the live half-width. */
+  private createBoostPads(): THREE.InstancedMesh {
+    const pads = PRODUCTION.boostPads;
+    const mesh = new THREE.InstancedMesh(
+      new THREE.BoxGeometry(1, 0.07, 1),
+      new THREE.MeshBasicMaterial({
+        color: BOOST_PAD_COLOR,
+        fog: true,
+        toneMapped: false,
+      }),
+      pads.pads.length,
+    );
+    mesh.name = "map02_boost_pads";
+    const transform = new THREE.Object3D();
+    const basis = new THREE.Matrix4();
+    for (let index = 0; index < pads.pads.length; index += 1) {
+      const pad = pads.pads[index];
+      const sample = this.sampleAtDistance(pad.distance);
+      transform.position.copy(sample.position)
+        .addScaledVector(sample.right, pad.lateralFraction * sample.halfWidth)
+        .addScaledVector(sample.up, 0.085);
+      basis.makeBasis(
+        sample.right,
+        sample.up,
+        sample.tangent.clone().multiplyScalar(-1),
+      );
+      transform.quaternion.setFromRotationMatrix(basis);
+      transform.scale.set(
+        pads.lateralHalfFraction * sample.halfWidth * 2,
+        1,
+        pads.halfLengthMetres * 2,
+      );
+      transform.updateMatrix();
+      mesh.setMatrixAt(index, transform.matrix);
+    }
+    mesh.instanceMatrix.needsUpdate = true;
+    return mesh;
+  }
+
+  /** The authored cable coils, at the exact lateral `cableTripSideAt` tests. */
+  private createCableCoils(): THREE.InstancedMesh {
+    const mesh = new THREE.InstancedMesh(
+      new THREE.TorusGeometry(1.35, 0.4, 5, 9),
+      new THREE.MeshBasicMaterial({
+        color: CABLE_COIL_COLOR,
+        fog: true,
+        toneMapped: false,
+      }),
+      CABLE_HAZARDS.length,
+    );
+    mesh.name = "map02_cable_coils";
+    const transform = new THREE.Object3D();
+    const basis = new THREE.Matrix4();
+    for (let index = 0; index < CABLE_HAZARDS.length; index += 1) {
+      const hazard = CABLE_HAZARDS[index];
+      const sample = this.sampleAtDistance(hazard.distance);
+      transform.position.copy(sample.position)
+        .addScaledVector(sample.right, hazard.lateralOffset)
+        .addScaledVector(sample.up, 0.4);
+      // The torus lies flat on the deck: its local +Z becomes the surface up.
+      basis.makeBasis(sample.right, sample.tangent, sample.up);
+      transform.quaternion.setFromRotationMatrix(basis);
+      transform.scale.set(1, 1, 1);
+      transform.updateMatrix();
+      mesh.setMatrixAt(index, transform.matrix);
+    }
+    mesh.instanceMatrix.needsUpdate = true;
+    return mesh;
+  }
+
+  /**
+   * The lap board hangs under the accepted `OCC2_conveyor_span` soffit — the one
+   * authored element already over the drivable corridor — so Map 02 gets a
+   * world-space lap read without introducing massing the freeze does not have.
+   */
+  private createLapBoard(): THREE.Mesh {
+    const board = PRODUCTION.lapBoard;
+    const canvas = document.createElement("canvas");
+    canvas.width = 512;
+    canvas.height = 192;
+    const context = canvas.getContext("2d");
+    if (!context) throw new Error("Could not create the Bitterpan lap board.");
+    context.imageSmoothingEnabled = false;
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    texture.magFilter = THREE.NearestFilter;
+    this.lapBoardContext = context;
+    this.lapBoardTexture = texture;
+
+    const mesh = new THREE.Mesh(
+      new THREE.PlaneGeometry(board.widthMetres, board.boardHeightMetres),
+      new THREE.MeshBasicMaterial({
+        map: texture,
+        fog: true,
+        toneMapped: false,
+        side: THREE.DoubleSide,
+      }),
+    );
+    mesh.name = "map02_lap_board";
+    const sample = this.sampleAtDistance(board.distance);
+    mesh.position.copy(sample.position)
+      .addScaledVector(sample.right, board.lateralOffset)
+      .addScaledVector(sample.up, board.heightMetres);
+    // Local +Z faces back down the course, so the board reads to a driver on
+    // approach rather than to the empty pan behind the underpass.
+    const basis = new THREE.Matrix4().makeBasis(
+      sample.right,
+      sample.up,
+      sample.tangent.clone().multiplyScalar(-1),
+    );
+    mesh.quaternion.setFromRotationMatrix(basis);
     return mesh;
   }
 

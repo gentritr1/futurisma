@@ -7,9 +7,11 @@ import { nextQuantizedTime } from "./audio-timing.js";
  */
 
 /**
- * The authored rooms. Adding a third means authoring an impulse response and a
- * `audio.zones` entry, not editing the race loop.
- * @typedef {"open" | "hangar"} AudioZone
+ * The authored rooms. Adding one means authoring an impulse response and an
+ * `audio.zones` entry, not editing the race loop. `underpass` is P8's: Bitterpan
+ * has exactly one covered stretch and it is a trestle soffit with open sides,
+ * so it gets its own milder room rather than borrowing Greenwater's hangar.
+ * @typedef {"open" | "hangar" | "underpass"} AudioZone
  */
 
 /** Rival voices that carry a panner. One per authored rival. */
@@ -22,12 +24,18 @@ export const IMPULSE_RESPONSE_SEED = 714;
 export const ZONE_CROSSFADE_SECONDS = 0.6;
 
 /**
- * Two authored rooms. `wet` is a send level into the shared convolver, so the
+ * The authored rooms. `wet` is a send level into the shared convolver, so the
  * dry path never moves and a zone change cannot duck the racing mix.
+ *
+ * `underpass` sits deliberately between the two: a conveyor trestle closes the
+ * sky over Bitterpan's corridor but never the sides, so it slaps back rather
+ * than ringing. Giving it Greenwater's 1.9 s hangar would have been the easy
+ * reuse and the wrong room.
  */
 export const AUDIO_ZONE_PROFILES = {
   open: { decaySeconds: 0.4, wet: 0.08, highPassHz: 40 },
   hangar: { decaySeconds: 1.9, wet: 0.34, highPassHz: 240 },
+  underpass: { decaySeconds: 1.05, wet: 0.2, highPassHz: 150 },
 };
 
 /**

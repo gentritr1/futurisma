@@ -667,16 +667,18 @@ export class EngineAudio {
   }
 
   /**
-   * One convolver, two pre-built impulse responses. Building both buffers at
-   * start-up is what keeps a zone change allocation-free: the 5-lap soak crosses
-   * ten boundaries and must not grow the heap by doing so.
+   * One convolver, one pre-built impulse response per authored room. Building
+   * them all at start-up is what keeps a zone change allocation-free: the 5-lap
+   * soak crosses ten boundaries and must not grow the heap by doing so. The
+   * loop reads the profile table rather than a hardcoded pair, so authoring a
+   * room is a data edit — P8's `underpass` needed no change here.
    */
   private installReverb(
     context: AudioContext,
     master: GainNode,
     engineFilter: BiquadFilterNode,
   ): void {
-    for (const zone of ["open", "hangar"] as const) {
+    for (const zone of Object.keys(AUDIO_ZONE_PROFILES) as AudioZone[]) {
       const profile = AUDIO_ZONE_PROFILES[zone];
       const buffer = context.createBuffer(
         2,

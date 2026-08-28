@@ -109,18 +109,64 @@ assert.deepEqual(
   "RUNWAY_HOME and RUNWAY_START must share a direction or the lap wrap pops.",
 );
 
-// Bitterpan type-checks against the same profile shape and must keep the
-// pre-P4a fixed sun until P8 authors its own.
+// The legacy fixed sun is still the P4a fallback for any course that authors no
+// sweep. Bitterpan used it until P8; the constant itself must not move.
 assert.deepEqual(
   DEFAULT_KEY_DIRECTION,
   SECTOR_KEY_DIRECTIONS.RUNWAY_START,
-  "DEFAULT_KEY_DIRECTION (used by Bitterpan) must be the legacy fixed sun.",
+  "DEFAULT_KEY_DIRECTION must remain the legacy fixed sun.",
 );
+
+// P8 replaced Bitterpan's three copies of that fixed sun with an authored sweep
+// in BITTERPAN_PRODUCTION.json. The placeholder assertion here used to count
+// `keyDirection:` literals in the course source; now that the directions are
+// data, assert the data instead — and assert it is a genuine swing rather than
+// three copies of the default wearing an authored label.
 const bitterpanSource = read("src/game/bitterpan-course.ts");
+const bitterpanProfiles = JSON.parse(
+  read("src/game/data/map02/BITTERPAN_PRODUCTION.json"),
+).lighting.profiles;
 assert.equal(
-  (bitterpanSource.match(/keyDirection:/g) ?? []).length,
+  bitterpanProfiles.length,
   3,
-  "All three Bitterpan lighting profiles must declare a keyDirection.",
+  "All three Bitterpan sectors must author a lighting profile.",
+);
+for (const profile of bitterpanProfiles) {
+  const direction = profile.keyDirection;
+  assert.ok(direction, `Bitterpan sector ${profile.sector} declares no keyDirection.`);
+  const length = Math.hypot(direction.x, direction.y, direction.z);
+  assert.ok(
+    Math.abs(length - 1) <= 1e-5,
+    `Bitterpan ${profile.sector} keyDirection is not normalized (${length.toFixed(8)}).`,
+  );
+  assert.ok(
+    direction.y > 0,
+    `Bitterpan ${profile.sector} keyDirection points at or below the horizon.`,
+  );
+  assert.notDeepEqual(
+    direction,
+    { x: DEFAULT_KEY_DIRECTION.x, y: DEFAULT_KEY_DIRECTION.y, z: DEFAULT_KEY_DIRECTION.z },
+    `Bitterpan ${profile.sector} is still the pre-P8 fixed sun.`,
+  );
+}
+for (let index = 1; index < bitterpanProfiles.length; index += 1) {
+  assert.notDeepEqual(
+    bitterpanProfiles[index].keyDirection,
+    bitterpanProfiles[index - 1].keyDirection,
+    "consecutive Bitterpan sectors must move the sun, or there is no sweep.",
+  );
+}
+// ...and the authored sweep has to reach the light through the same crossfade
+// Greenwater uses, or it is data nothing reads.
+assert.ok(
+  bitterpanSource.includes("lerpKeyDirection("),
+  "BitterpanCourse.lightingAt must crossfade its key direction through "
+    + "lerpKeyDirection, the same path Greenwater takes.",
+);
+assert.ok(
+  bitterpanSource.includes("target.keyDirection")
+    || bitterpanSource.includes("target.keyDirection,"),
+  "BitterpanCourse.lightingAt must write the crossfaded direction into its scratch.",
 );
 
 /* ------------------------------------------------------------------ */
