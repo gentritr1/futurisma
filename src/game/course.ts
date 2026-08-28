@@ -6,6 +6,12 @@ import {
   resolveApronProfile,
 } from "./apron.js";
 import type { ApronResolution, ApronTable } from "./apron.js";
+import {
+  ATMOSPHERE_UPDATE_INTERVAL_SECONDS,
+  LIGHTING_CROSSFADE_METRES,
+  SECTOR_KEY_DIRECTIONS,
+  lerpKeyDirection,
+} from "./lighting-motion.js";
 import { isCircularHazardContact } from "./race-rules";
 
 export type EdgeType = "A" | "B" | "C";
@@ -119,6 +125,7 @@ interface GreenwaterMapData {
   checkpoints: RawCheckpoint[];
   turns: RawTurn[];
   fog: { zones: RawFogZone[]; crossfadeMetres: number };
+  timeOfDay: { stops: TimeOfDayStop[] };
   recovery: {
     holdSeconds: number;
     reinsertSpeedKph: number;
@@ -206,6 +213,29 @@ export interface CourseLightingProfile {
   hemisphereIntensity: number;
   keyIntensity: number;
   rimIntensity: number;
+  /**
+   * Normalized world-space direction the key light comes *from*, crossfaded
+   * around the lap with the same `LIGHTING_CROSSFADE_METRES` window as the
+   * colours above. Before P4a this was a constant `(80, 130, -35)` nailed into
+   * `atmosphere.ts`; it is course data now so the sun can swing per sector.
+   */
+  keyDirection: THREE.Vector3;
+}
+
+/**
+ * One authored stop of the P4a lap-based time-of-day ramp. Every tint is a
+ * multiplier over the sector palette, so a course that authors no ramp simply
+ * reports `timeOfDayStops: null` and nothing drifts.
+ */
+export interface TimeOfDayStop {
+  lapProgress: number;
+  label: string;
+  keyTint: readonly [number, number, number];
+  skyTint: readonly [number, number, number];
+  groundTint: readonly [number, number, number];
+  fogTint: readonly [number, number, number];
+  hemisphereScale: number;
+  keyScale: number;
 }
 
 export type CourseKind = "greenwater" | "bitterpan";
@@ -236,6 +266,12 @@ export interface RaceCourse {
   readonly recoverySpeedMps: number;
   readonly recoveryImmunitySeconds: number;
   readonly surfaceGripRecoverySeconds: number;
+  /**
+   * Authored time-of-day ramp, or `null` for a course that has not authored one
+   * (Bitterpan until P8). `atmosphere.ts` applies it multiplicatively over
+   * whatever `lightingAt` / `fogAt` return.
+   */
+  readonly timeOfDayStops: readonly TimeOfDayStop[] | null;
   createSampleScratch(): CourseSample;
   createProjectionScratch(): CourseProjection;
   sample(progress: number, target?: CourseSample): CourseSample;
@@ -279,8 +315,10 @@ const COURSE_BASIS = new THREE.Matrix4();
 const COURSE_BACK = new THREE.Vector3();
 const MAP = greenwaterJson as unknown as GreenwaterMapData;
 const APRON = MAP.apron;
-const ATMOSPHERE_UPDATE_INTERVAL_SECONDS = 1 / 30;
-const LIGHTING_CROSSFADE_METRES = 90;
+// The 30 Hz atmosphere tick and the 90 m lighting crossfade window now live in
+// lighting-motion.js: the P4a key-direction sweep and hangar flicker have to
+// agree with them exactly, and scripts/validate-lighting.mjs has to be able to
+// import them from Node.
 // The run-off tucks just under the deck edge so the seam cannot open a crack.
 const APRON_SEAM_OVERLAP_METRES = 0.06;
 const EDGE_FURNITURE_CLEARANCE_METRES = 4.5;
@@ -304,6 +342,7 @@ const SECTOR_LABELS: Record<string, string> = {
 const SECTOR_PALETTE_DEFINITIONS = [
   {
     sector: "RUNWAY_START",
+    keyDirection: SECTOR_KEY_DIRECTIONS.RUNWAY_START,
     distance: 0,
     key: 0xf4f7f9,
     keyIntensity: 1.75,
@@ -315,6 +354,7 @@ const SECTOR_PALETTE_DEFINITIONS = [
   },
   {
     sector: "T1_CRADLE_BEND",
+    keyDirection: SECTOR_KEY_DIRECTIONS.T1_CRADLE_BEND,
     distance: 221.998,
     key: 0xeef2ea,
     keyIntensity: 1.7,
@@ -326,6 +366,7 @@ const SECTOR_PALETTE_DEFINITIONS = [
   },
   {
     sector: "WATER_TABLE",
+    keyDirection: SECTOR_KEY_DIRECTIONS.WATER_TABLE,
     distance: 377.997,
     key: 0xd2e2e0,
     keyIntensity: 1.5,
@@ -337,6 +378,7 @@ const SECTOR_PALETTE_DEFINITIONS = [
   },
   {
     sector: "LINK_APRON",
+    keyDirection: SECTOR_KEY_DIRECTIONS.LINK_APRON,
     distance: 587.996,
     key: 0xcedcd6,
     keyIntensity: 1.45,
@@ -348,6 +390,7 @@ const SECTOR_PALETTE_DEFINITIONS = [
   },
   {
     sector: "HANGAR_SIX",
+    keyDirection: SECTOR_KEY_DIRECTIONS.HANGAR_SIX,
     distance: 617.996,
     key: 0xffbd63,
     keyIntensity: 0.85,
@@ -359,6 +402,7 @@ const SECTOR_PALETTE_DEFINITIONS = [
   },
   {
     sector: "HANGAR_EXIT",
+    keyDirection: SECTOR_KEY_DIRECTIONS.HANGAR_EXIT,
     distance: 817.994,
     key: 0xffd08a,
     keyIntensity: 1.3,
@@ -370,6 +414,7 @@ const SECTOR_PALETTE_DEFINITIONS = [
   },
   {
     sector: "GREENWATER_SWEEP",
+    keyDirection: SECTOR_KEY_DIRECTIONS.GREENWATER_SWEEP,
     distance: 847.994,
     key: 0xe6f0d8,
     keyIntensity: 1.6,
@@ -381,6 +426,7 @@ const SECTOR_PALETTE_DEFINITIONS = [
   },
   {
     sector: "CANOPY_PASSAGE",
+    keyDirection: SECTOR_KEY_DIRECTIONS.CANOPY_PASSAGE,
     distance: 1129.992,
     key: 0xffe9a8,
     keyIntensity: 1.2,
@@ -392,6 +438,7 @@ const SECTOR_PALETTE_DEFINITIONS = [
   },
   {
     sector: "THE_ELBOW",
+    keyDirection: SECTOR_KEY_DIRECTIONS.THE_ELBOW,
     distance: 1481.99,
     key: 0xf0e8b4,
     keyIntensity: 1.4,
@@ -403,6 +450,7 @@ const SECTOR_PALETTE_DEFINITIONS = [
   },
   {
     sector: "FUEL_ROW",
+    keyDirection: SECTOR_KEY_DIRECTIONS.FUEL_ROW,
     distance: 1591.989,
     key: 0xffb970,
     keyIntensity: 1.6,
@@ -414,6 +462,7 @@ const SECTOR_PALETTE_DEFINITIONS = [
   },
   {
     sector: "T10_TOTEM_TURN",
+    keyDirection: SECTOR_KEY_DIRECTIONS.T10_TOTEM_TURN,
     distance: 2121.985,
     key: 0xd9dee4,
     keyIntensity: 1.25,
@@ -425,6 +474,7 @@ const SECTOR_PALETTE_DEFINITIONS = [
   },
   {
     sector: "RUNWAY_HOME",
+    keyDirection: SECTOR_KEY_DIRECTIONS.RUNWAY_HOME,
     distance: 2255.984,
     key: 0xf4f7f9,
     keyIntensity: 1.8,
@@ -678,6 +728,16 @@ export class GreenwaterCourse implements RaceCourse {
     ground: new THREE.Color(zone.ground),
     key: new THREE.Color(zone.key),
   }));
+  /**
+   * The same 12 zones, reduced to what the key-direction crossfade needs. Kept
+   * separate so the pure `lerpKeyDirection` in lighting-motion.js takes plain
+   * data and stays runnable in the validator.
+   */
+  private readonly keyDirectionZones = SECTOR_PALETTE_DEFINITIONS.map((zone) => ({
+    distance: zone.distance,
+    direction: zone.keyDirection,
+  }));
+  readonly timeOfDayStops: readonly TimeOfDayStop[] = MAP.timeOfDay.stops;
   private readonly rimLightingProfiles = RIM_LIGHTING_ZONE_DEFINITIONS.map((zone) => ({
     distance: zone.distance,
     rim: new THREE.Color(zone.rim),
@@ -691,6 +751,7 @@ export class GreenwaterCourse implements RaceCourse {
     hemisphereIntensity: 0,
     keyIntensity: 0,
     rimIntensity: 0,
+    keyDirection: new THREE.Vector3(),
   };
   private readonly cableHazards = MAP.hazards.filter(
     (hazard) => hazard.type === "cable_coil" && hazard.distance !== undefined,
@@ -979,6 +1040,15 @@ export class GreenwaterCourse implements RaceCourse {
       zone.keyIntensity,
       next.keyIntensity,
       amount,
+    );
+    // Direction rides the *same* crossfade window as the colours above, so the
+    // sun swings and the palette changes as one move rather than two.
+    lerpKeyDirection(
+      this.keyDirectionZones,
+      distance,
+      this.length,
+      target.keyDirection,
+      LIGHTING_CROSSFADE_METRES,
     );
 
     let rimZoneIndex = 0;

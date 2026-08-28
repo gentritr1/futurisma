@@ -5,6 +5,7 @@ import gridAndRecoveryJson from "./data/map02/GRID_AND_RECOVERY.json";
 import sectorsJson from "./data/map02/SECTORS_AND_SEQUENCES.json";
 import { createApronResolution } from "./apron.js";
 import type { ApronResolution } from "./apron.js";
+import { DEFAULT_KEY_DIRECTION } from "./lighting-motion.js";
 import type {
   CourseLightingProfile,
   CourseProjection,
@@ -135,6 +136,18 @@ const FOG_BY_SECTOR: Record<string, FogProfile> = {
   S3: { density: 0.00082, color: new THREE.Color(0xaeb8b2) },
 };
 
+/**
+ * Bitterpan authors no key-direction sweep — P8 owns its lighting pass — so all
+ * three sectors reuse the pre-P4a fixed sun. Nothing about its look changes.
+ */
+function bitterpanKeyDirection(): THREE.Vector3 {
+  return new THREE.Vector3(
+    DEFAULT_KEY_DIRECTION.x,
+    DEFAULT_KEY_DIRECTION.y,
+    DEFAULT_KEY_DIRECTION.z,
+  );
+}
+
 const LIGHTING_BY_SECTOR: Record<string, CourseLightingProfile> = {
   S1: {
     sky: new THREE.Color(0xc9b994),
@@ -144,6 +157,7 @@ const LIGHTING_BY_SECTOR: Record<string, CourseLightingProfile> = {
     hemisphereIntensity: 1.25,
     keyIntensity: 1.55,
     rimIntensity: 0.7,
+    keyDirection: bitterpanKeyDirection(),
   },
   S2: {
     sky: new THREE.Color(0xd7d2bf),
@@ -153,6 +167,7 @@ const LIGHTING_BY_SECTOR: Record<string, CourseLightingProfile> = {
     hemisphereIntensity: 1.35,
     keyIntensity: 1.45,
     rimIntensity: 0.55,
+    keyDirection: bitterpanKeyDirection(),
   },
   S3: {
     sky: new THREE.Color(0xb6c0bb),
@@ -162,6 +177,7 @@ const LIGHTING_BY_SECTOR: Record<string, CourseLightingProfile> = {
     hemisphereIntensity: 1.2,
     keyIntensity: 1.3,
     rimIntensity: 0.8,
+    keyDirection: bitterpanKeyDirection(),
   },
 };
 
@@ -230,6 +246,8 @@ export class BitterpanCourse implements RaceCourse {
     * GRID_AND_RECOVERY.recovery.rejoin_speed_fraction;
   readonly recoveryImmunitySeconds = 1.2;
   readonly surfaceGripRecoverySeconds = 0.8;
+  /** No authored time-of-day ramp until P8, so nothing drifts on Bitterpan. */
+  readonly timeOfDayStops = null;
 
   private readonly stations = CENTRELINE.stations;
   private readonly projectionPoints = this.stations.map(

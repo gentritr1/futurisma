@@ -369,6 +369,7 @@ export class FuturismaGame {
       this.course,
       this.progress,
       this.vehicle.root,
+      this.reducedMotion,
     );
     this.sceneAssets = new SceneAssets(
       this.scene,
@@ -588,7 +589,7 @@ export class FuturismaGame {
       this.boostActive,
     );
     this.effects.updateImpactSparks(delta);
-    this.atmosphere.updateFog(delta, this.progress);
+    this.atmosphere.updateFog(delta, this.progress, this.lap, this.totalLaps, this.phase);
     // Reduced motion freezes the effect clock, but the cards still need to face
     // the moving chase camera so the approved still frame remains visible.
     this.sceneAssets.livingWorld?.update(delta, this.camera, !this.reducedMotion);
@@ -1792,6 +1793,7 @@ export class FuturismaGame {
         livingWorld: this.sceneAssets.livingWorldDiagnostics(),
         surfaceCharacter: this.sceneAssets.surfaceCharacterDiagnostics(),
         minimap: this.minimap.diagnostics(),
+        atmosphere: this.atmosphere.diagnostics(),
       },
     );
   }
