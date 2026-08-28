@@ -86,6 +86,9 @@ const contributorOrder = [
   "...contributors.environment,",
   "...contributors.livingWorld,",
   "...contributors.surfaceCharacter,",
+  // P4a: lighting motion telemetry is contributed by atmosphere.ts, not by the
+  // race loop, so it appends here rather than growing DiagnosticsCore.
+  "...contributors.atmosphere,",
 ];
 let cursor = -1;
 for (const spread of contributorOrder) {

@@ -16196,6 +16196,75 @@
   ],
   "crossfadeMetres": 80
  },
+ "timeOfDay": {
+  "note": "P4a lap-based drift. lapProgress is the whole race (lap N of total, 0 at the green light, 1 at the flag). Every value is a MULTIPLIER over the sector palette, never a replacement, so sector identity survives the drift: the ramp only says how far through the day the race has got. Stop 0 is the identity stop, so reduced motion and the menu (no lap data) both collapse to no drift at all.",
+  "model": "multiplicative",
+  "appliesTo": [
+   "hemisphereLight.color",
+   "hemisphereLight.groundColor",
+   "hemisphereLight.intensity",
+   "keyLight.color",
+   "keyLight.intensity",
+   "fog.color",
+   "scene.background",
+   "skyDome.horizonColor",
+   "skyDome.topColor",
+   "skyDome.bandColor"
+  ],
+  "rimNote": "the navigation rim light keeps its accepted colour language and is NOT tinted; the sky dome accent band takes the ramp at reduced strength so the horizon line still drifts with the rest of the sky.",
+  "stops": [
+   {
+    "lapProgress": 0,
+    "label": "OVERCAST_NOON",
+    "keyTint": [1, 1, 1],
+    "skyTint": [1, 1, 1],
+    "groundTint": [1, 1, 1],
+    "fogTint": [1, 1, 1],
+    "hemisphereScale": 1,
+    "keyScale": 1
+   },
+   {
+    "lapProgress": 0.25,
+    "label": "AFTERNOON",
+    "keyTint": [1.02, 0.985, 0.935],
+    "skyTint": [1.01, 0.99, 0.955],
+    "groundTint": [1.01, 0.985, 0.955],
+    "fogTint": [1, 0.985, 0.955],
+    "hemisphereScale": 0.98,
+    "keyScale": 0.99
+   },
+   {
+    "lapProgress": 0.5,
+    "label": "LOW_SUN",
+    "keyTint": [1.04, 0.945, 0.845],
+    "skyTint": [1.02, 0.955, 0.885],
+    "groundTint": [1, 0.945, 0.885],
+    "fogTint": [0.985, 0.94, 0.885],
+    "hemisphereScale": 0.93,
+    "keyScale": 0.94
+   },
+   {
+    "lapProgress": 0.75,
+    "label": "GOLDEN_FALL",
+    "keyTint": [1.05, 0.885, 0.735],
+    "skyTint": [1, 0.9, 0.8],
+    "groundTint": [0.95, 0.885, 0.8],
+    "fogTint": [0.94, 0.87, 0.795],
+    "hemisphereScale": 0.85,
+    "keyScale": 0.83
+   },
+   {
+    "lapProgress": 1,
+    "label": "DUSK",
+    "keyTint": [1.03, 0.79, 0.615],
+    "skyTint": [0.9, 0.8, 0.695],
+    "groundTint": [0.83, 0.74, 0.66],
+    "fogTint": [0.84, 0.765, 0.7],
+    "hemisphereScale": 0.74,
+    "keyScale": 0.66
+   }
+  ]
+ },
  "landmarkProxies": [
   {
    "id": "LM_CRADLE",
