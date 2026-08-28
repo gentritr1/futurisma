@@ -175,12 +175,57 @@ cross-origin, HSTS, referrer, and browser-permission policy for static hosts tha
 support a `_headers` file. Configure equivalent response headers if the chosen
 host uses another format.
 
+### The browser-storage exemption
+
+`validate:security` used to ban `localStorage` and `sessionStorage` across all of
+`src/`, which was the right rule while the game had nothing to remember. The meta
+layer has to keep settings, a chosen livery, a chosen circuit and best laps across
+a reload, so the ban was **narrowed rather than lifted**: exactly one file,
+`src/game/persistence.ts`, may touch `localStorage`, and it is held to four extra
+assertions the validator enforces on every run.
+
+- **One file.** Storage in any other `src/` file still fails the build.
+  `sessionStorage` stays banned everywhere, including in the exempt file, as do
+  `localStorage.clear()` and `localStorage.key()` — both reach keys this game
+  never wrote.
+- **Namespaced keys.** Every key must be a string literal (or a file-local string
+  constant, which the validator resolves) beginning `futurisma.`, so the origin
+  stays partitioned from anything served beside it.
+- **A versioned payload.** The file must declare an integer `SCHEMA_VERSION` and
+  store a `schemaVersion` field. A payload written by any other version is
+  discarded whole rather than half-read.
+- **Nothing identity-shaped.** The exempt file may not contain the words
+  `email`, `name`, `user`, `id` or `token`. The save file is four settings, two
+  selections and per-course lap times; there is no account, no server and no
+  upload, which is also why the game needs no consent banner.
+
+Five negative fixtures run on every invocation and prove the rule still bites:
+storage outside the owner, `sessionStorage` inside it, an un-prefixed key, a
+missing schema version, and an identity-shaped field are each asserted to be
+*rejected*. A validator that only ever passes is not evidence.
+
+The Content Security Policy is deliberately unchanged by this. **CSP has no Web
+Storage directive** — neither the `index.html` meta policy nor `public/_headers`
+has ever governed `localStorage`, and no directive could be added that would —
+so `validate:security` is the only thing standing between this game and an
+unbounded storage surface, which is why the assertions above live there.
+
+`validate:persistence` covers the other half: `src/game/save-schema.js` holds
+every decision the save layer makes (defaults, per-field guards, the discard
+rule, the degrade-to-memory rule) in plain JS so Node can attack it with 25
+hostile payloads — truncated JSON, a 5 MB string, a schema from the future,
+poisoned records, a prototype-pollution attempt — plus stubbed storage ports that
+throw on read and on write. The invariant is that every one of them yields a
+usable save and no exception; a refused write drops the session to
+`persistenceMode: "memory"`, which the diagnostics line reports.
+
 The local suite verifies accepted asset hashes, measured map invariants,
 longitudinal and steering response at 60/120 Hz, a 240-second mixed-control
 physics soak, checkpoint, hazard, and finish-distance rules,
 showcase-to-manual control intent, music timing, high-refresh presentation
 cadence, render-resolution tiers,
-strict browser security policy, pinned package versions, the production build,
+strict browser security policy, the single-file browser-storage exemption and
+its hostile save-file fixtures, pinned package versions, the production build,
 raw and gzip startup budgets across every HTML-referenced asset, and hostile
 asset-package fixtures. The Greenwater package
 validator reads the ZIP without extracting it, rejects traversal, duplicate,

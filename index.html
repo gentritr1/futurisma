@@ -124,6 +124,30 @@
             markers, clear all eight gates, and bring TOTEM home through The Cradle.
           </p>
 
+          <div class="dispatch">
+            <div class="dispatch__row">
+              <span class="dispatch__key" id="track-select-label">CIRCUIT</span>
+              <div
+                id="track-select"
+                class="chip-row"
+                role="radiogroup"
+                aria-labelledby="track-select-label"
+              ></div>
+            </div>
+            <div class="dispatch__row">
+              <span class="dispatch__key" id="livery-select-label">LIVERY</span>
+              <div
+                id="livery-select"
+                class="chip-row"
+                role="radiogroup"
+                aria-labelledby="livery-select-label"
+              ></div>
+            </div>
+            <p id="dispatch-record" class="dispatch__record" data-recorded="false">
+              GREENWATER STRIP · NO CLASSIFIED LAP ON FILE
+            </p>
+          </div>
+
           <ol id="grid-order" class="result-laps" aria-label="Starting grid">
             <li><span>P1 · YOU</span><span class="n">TOTEM</span><strong>WORKS 07</strong></li>
             <li><span>P2</span><span class="n">TOTEM</span><strong>FIELD</strong></li>
@@ -134,6 +158,11 @@
           <button id="start-button" class="launch-button" type="button">
             <span>LAUNCH RACE</span>
             <kbd>ENTER</kbd>
+          </button>
+
+          <button id="options-button" class="ghost-button" type="button">
+            <span>SYSTEM OPTIONS</span>
+            <kbd>O</kbd>
           </button>
 
           <dl class="controls-list">
@@ -155,10 +184,97 @@
           <p class="result-status">CLASSIFICATION LOCKED</p>
           <h2 id="result-time">00:00.000</h2>
           <p id="result-detail">TOTEM / WORKS 07</p>
+          <p id="result-best" class="result-best" data-active="false" hidden>
+            NEW BEST LAP · ENTERED ON FILE
+          </p>
           <ol id="result-laps" class="result-laps" aria-label="Race classification" hidden></ol>
           <button id="restart-button" class="launch-button" type="button">
             <span>RACE AGAIN</span>
             <kbd>ENTER</kbd>
+          </button>
+        </div>
+      </section>
+
+      <section
+        id="options-screen"
+        class="screen screen--options"
+        aria-label="System configuration"
+        hidden
+      >
+        <div class="intro-panel options-panel">
+          <p class="intro-code">KAIRO DYNAMICS · KD-0714 · SERVICE TERMINAL</p>
+          <h2 class="options-title">SYSTEM OPTIONS</h2>
+
+          <div class="option">
+            <label class="option__key" for="option-master">MASTER LEVEL</label>
+            <input
+              id="option-master"
+              class="option__slider"
+              type="range"
+              min="0"
+              max="1"
+              step="0.05"
+              value="1"
+            />
+            <output id="option-master-value" class="option__value">100</output>
+          </div>
+
+          <div class="option">
+            <label class="option__key" for="option-music">MUSIC LEVEL</label>
+            <input
+              id="option-music"
+              class="option__slider"
+              type="range"
+              min="0"
+              max="1"
+              step="0.05"
+              value="1"
+            />
+            <output id="option-music-value" class="option__value">100</output>
+          </div>
+
+          <div class="option option--choice">
+            <span class="option__key" id="option-motion-label">MOTION DAMPING</span>
+            <div
+              id="option-motion"
+              class="chip-row"
+              role="radiogroup"
+              aria-labelledby="option-motion-label"
+            ></div>
+          </div>
+
+          <div class="option option--choice">
+            <span class="option__key" id="option-quality-label">RESOLUTION LOCK</span>
+            <div
+              id="option-quality"
+              class="chip-row"
+              role="radiogroup"
+              aria-labelledby="option-quality-label"
+            ></div>
+          </div>
+
+          <div class="option option--choice">
+            <span class="option__key" id="option-render-label">IMAGE PIPELINE</span>
+            <div
+              id="option-render"
+              class="chip-row"
+              role="radiogroup"
+              aria-labelledby="option-render-label"
+            ></div>
+          </div>
+
+          <p id="options-note" class="options-note" data-pending="false">
+            LEVELS APPLY LIVE · DAMPING, RESOLUTION AND PIPELINE ON NEXT RELINK
+          </p>
+
+          <button id="options-relink" class="launch-button" type="button" hidden>
+            <span>RELINK SYSTEM</span>
+            <kbd>APPLY</kbd>
+          </button>
+
+          <button id="options-close" class="ghost-button" type="button">
+            <span>RETURN TO PADDOCK</span>
+            <kbd>ESC</kbd>
           </button>
         </div>
       </section>
