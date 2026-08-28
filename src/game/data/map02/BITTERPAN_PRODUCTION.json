@@ -1,0 +1,347 @@
+{
+  "format": "FUTURISMA_MAP02_BITTERPAN_PRODUCTION",
+  "version": "1.0",
+  "phase": "P8",
+  "map": { "id": "bitterpan", "name": "Bitterpan Works", "code": "MAP 02" },
+  "note": "P8 authoring sidecar. The accepted v0.2a.1 route and v0.2b.2 massing payloads are hash-pinned by scripts/validate-map02.mjs and are never edited; everything P8 authors lives here. Distances are metres along the accepted 3050 m centreline. Lateral is the RUNTIME basis (tangent x up): positive is right, negative is left. The accepted massing payload uses the opposite +X station normal, so an authored placement at side +1 sits on the runtime LEFT.",
+  "sentence": "Greenwater is humid enclosure; Bitterpan is exposed emptiness at speed.",
+
+  "apron": {
+    "note": "Bitterpan's own edge table, same schema as the Greenwater P1 apron block so apron.js resolves both without a branch. C is the pan itself: the widest run-off on either map, because the whole design promise is that leaving the line out here costs time rather than the race.",
+    "deckMarginMetres": 2.05,
+    "gripFloor": 0.2,
+    "edges": {
+      "A": {
+        "label": "SALT_BERM",
+        "surface": "salt",
+        "widthMetres": 4.6,
+        "grip": 0.64,
+        "wall": true,
+        "wallSpeedMultiplier": 0.86,
+        "wallImpactStrength": 0.58,
+        "wallScrubMetresPerSecondSquared": 14
+      },
+      "B": {
+        "label": "WORKS_STAND",
+        "surface": "rumble",
+        "widthMetres": 2.1,
+        "grip": 0.52,
+        "wall": true,
+        "wallSpeedMultiplier": 0.6,
+        "wallImpactStrength": 1,
+        "wallScrubMetresPerSecondSquared": 22
+      },
+      "C": {
+        "label": "OPEN_PAN",
+        "surface": "open",
+        "widthMetres": 5.8,
+        "grip": 0.8,
+        "wall": false,
+        "wallSpeedMultiplier": 0.9,
+        "wallImpactStrength": 0.42,
+        "wallScrubMetresPerSecondSquared": 12
+      }
+    },
+    "overrides": []
+  },
+
+  "edges": {
+    "note": "Per-station edge types, authored as spans over a C default. Every station outside a span resolves C on both sides: 524 of 610 stations (86%) are open pan, which is the sector identity stated as a number. A span is only authored where the accepted massing actually closes on the deck, measured as clear_of_boundary_m in MASSING_PLACEMENTS.json.",
+    "default": { "edgeLeft": "C", "edgeRight": "C" },
+    "spans": [
+      {
+        "id": "EDGE_HARVESTER_CHICANE",
+        "sequence": "Q3",
+        "fromDistance": 2405,
+        "toDistance": 2548,
+        "edgeLeft": "B",
+        "edgeRight": "A",
+        "note": "16 S1_harvester_rigs stand between 2410 m and 2500 m, all on authored side +1 (runtime LEFT), closing to 5.55 m of the recovery boundary. The right side takes the salt berm so the technical compression is bounded on both hands."
+      },
+      {
+        "id": "EDGE_BRINE_CUT",
+        "sequence": "Q4",
+        "fromDistance": 2722,
+        "toDistance": 2960,
+        "edgeLeft": "A",
+        "edgeRight": "A",
+        "note": "The accepted sequence role for Q4 is recovery_risk. The salt berm gives that role a mechanical consequence instead of open run-off, on the one bend where the route says overrunning should hurt."
+      },
+      {
+        "id": "EDGE_CONVEYOR_UNDERPASS",
+        "sequence": "Q5",
+        "fromDistance": 3005,
+        "toDistance": 3050,
+        "edgeLeft": "B",
+        "edgeRight": "B",
+        "note": "The underpass supports at 3010 m and 3046 m sit at authored lateral +/-24 m on both sides with clear_of_boundary_m 5.0 - the tightest structure on the lap. This is the only place on Bitterpan where both hands are walled."
+      }
+    ]
+  },
+
+  "hazards": {
+    "note": "Sparser than Greenwater by design: no steam, no fog bank, no cosmetic hook. Six entries over a 3050 m lap against Greenwater's seven over 2516 m. Salt drift is the map's own hazard language - it is already in the accepted massing as the WIND_salt_drift family, banked by a steady 292-degree wind, so the low-grip patches sit where the accepted payload already says salt collects.",
+    "gripRecoverySeconds": 0.8,
+    "entries": [
+      {
+        "id": "HZ_SALT_DRIFT_PAN",
+        "type": "salt_drift",
+        "fromDistance": 300,
+        "toDistance": 430,
+        "lateralFromFraction": -1,
+        "lateralToFraction": -0.3,
+        "gripMultiplier": 0.78,
+        "telegraph": "white crust brightens against the grey deck well before entry"
+      },
+      {
+        "id": "HZ_SALT_DRIFT_SWEEP",
+        "type": "salt_drift",
+        "fromDistance": 1290,
+        "toDistance": 1400,
+        "lateralFromFraction": -1,
+        "lateralToFraction": -0.3,
+        "gripMultiplier": 0.74,
+        "telegraph": "drift banks across the inside of the committed sweep"
+      },
+      {
+        "id": "HZ_SALT_DRIFT_BRINE",
+        "type": "salt_drift",
+        "fromDistance": 2820,
+        "toDistance": 2940,
+        "lateralFromFraction": -1,
+        "lateralToFraction": -0.3,
+        "gripMultiplier": 0.7,
+        "telegraph": "wet pan sheen on the inside of the Brine Cut"
+      },
+      {
+        "id": "HZ_CABLE_CHICANE",
+        "type": "cable_coil",
+        "distance": 2465,
+        "lateralOffset": -7.6,
+        "effect": "hard_trip",
+        "note": "under the rig stands, outside the chicane line"
+      },
+      {
+        "id": "HZ_CABLE_BRINE",
+        "type": "cable_coil",
+        "distance": 2860,
+        "lateralOffset": 8.4,
+        "effect": "hard_trip",
+        "note": "outer hand of the Brine Cut, opposite the drift"
+      },
+      {
+        "id": "HZ_CABLE_UNDERPASS",
+        "type": "cable_coil",
+        "distance": 3020,
+        "lateralOffset": -9.4,
+        "effect": "hard_trip",
+        "note": "loose conveyor cable at the underpass support"
+      }
+    ]
+  },
+
+  "boostPads": {
+    "note": "Four pads, all on the two authored straights - Q1 THE LONG PAN and L1 RETURN LEG. Bitterpan rewards commitment on the long stuff, so nothing is offered in a bend. Sides alternate so a pad is a line choice rather than a lane to sit in. Every pad clears its nearest checkpoint by at least 105 m and its nearest neighbour by at least 240 m.",
+    "halfLengthMetres": 10,
+    "lateralHalfFraction": 0.28,
+    "minimumSpacingMetres": 40,
+    "minimumCheckpointClearanceMetres": 60,
+    "pads": [
+      { "id": "BP_LONG_PAN_EARLY", "distance": 150, "sequence": "Q1", "lateralFraction": 0.45 },
+      { "id": "BP_LONG_PAN_LATE", "distance": 640, "sequence": "Q1", "lateralFraction": -0.45 },
+      { "id": "BP_RETURN_LEG_EARLY", "distance": 1660, "sequence": "L1", "lateralFraction": 0.45 },
+      { "id": "BP_RETURN_LEG_LATE", "distance": 1900, "sequence": "L1", "lateralFraction": -0.45 }
+    ]
+  },
+
+  "music": {
+    "note": "Same 174 BPM / F-minor / 4-stem 0-3 schema as Greenwater. Ten triggers, one per authored sequence boundary, so the score is cut by the route rather than by round numbers. Trance leads the two long straights and drops away through the chicane; techstep takes over under the conveyor. Every trigger differs from the one before it, including across the lap wrap, so a 5-lap race crosses fifty boundaries.",
+    "bpm": 174,
+    "quantize": "bar",
+    "crossfadeBars": 1,
+    "stems": ["trance", "jungle", "deep_dnb", "techstep"],
+    "levelScale": "0-3",
+    "boostEffect": { "type": "filter_open_and_high_shelf", "newLayer": false },
+    "gateRetrigger": true,
+    "triggers": [
+      { "distance": 0, "sequence": "L0", "sector": "S3", "levels": { "trance": 2, "jungle": 0, "deep_dnb": 2, "techstep": 1 } },
+      { "distance": 60, "sequence": "Q1", "sector": "S1", "levels": { "trance": 3, "jungle": 0, "deep_dnb": 2, "techstep": 0 } },
+      { "distance": 723.6215642663627, "sequence": "T1", "sector": "S1", "levels": { "trance": 3, "jungle": 1, "deep_dnb": 2, "techstep": 1 } },
+      { "distance": 965.9052245725055, "sequence": "Q2", "sector": "S1", "levels": { "trance": 3, "jungle": 1, "deep_dnb": 3, "techstep": 1 } },
+      { "distance": 1607.0290626083156, "sequence": "L1", "sector": "S2", "levels": { "trance": 3, "jungle": 0, "deep_dnb": 3, "techstep": 0 } },
+      { "distance": 2145.398521474069, "sequence": "T2", "sector": "S2", "levels": { "trance": 2, "jungle": 2, "deep_dnb": 3, "techstep": 1 } },
+      { "distance": 2407.4152260949204, "sequence": "Q3", "sector": "S2", "levels": { "trance": 1, "jungle": 3, "deep_dnb": 2, "techstep": 2 } },
+      { "distance": 2548.266742301019, "sequence": "T3", "sector": "S3", "levels": { "trance": 2, "jungle": 2, "deep_dnb": 2, "techstep": 2 } },
+      { "distance": 2722.412748609303, "sequence": "Q4", "sector": "S3", "levels": { "trance": 2, "jungle": 1, "deep_dnb": 3, "techstep": 2 } },
+      { "distance": 3006, "sequence": "Q5", "sector": "S3", "levels": { "trance": 1, "jungle": 1, "deep_dnb": 2, "techstep": 3 } }
+    ]
+  },
+
+  "audio": {
+    "note": "One authored room on a map whose whole subject is exposure. The accepted massing is explicit that OCC2_conveyor_span is 'the only element over the drivable corridor'; every other S3 structure stands 18 m or more clear of the recovery boundary. So the zone covers the covered corridor - the loadout approach where the trestles converge, then the span itself - and stops there. The profile is deliberately milder than Greenwater's hangar: a trestle soffit with open sides is a slapback, not a sealed shed.",
+    "zones": [
+      {
+        "name": "underpass",
+        "startDistance": 2965,
+        "endDistance": 3050,
+        "sequences": ["L3", "Q5"],
+        "note": "L3 LOADOUT APPROACH plus Q5 CONVEYOR UNDERPASS; the soffit closes the sky at 15.5 m over the last 40 m."
+      },
+      {
+        "name": "underpass",
+        "startDistance": 0,
+        "endDistance": 40,
+        "sequences": ["L0"],
+        "note": "Same room continued across the lap wrap - the 3046 m support stands 4 m behind the start line, so the apron is still inside the structure."
+      }
+    ],
+    "defaultZone": "open",
+    "quantize": "bar",
+    "crossfadeSeconds": 0.6,
+    "profiles": {
+      "underpass": { "decaySeconds": 1.05, "wet": 0.2, "highPassHz": 150 }
+    }
+  },
+
+  "lighting": {
+    "note": "Three sector profiles, one per accepted sector. The accepted post-readability-repair palettes are carried over unchanged - P8 adds the authored key direction and the lap ramp, it does not re-grade a look that was already accepted. The sun is high and hard because a salt pan at noon has no soft light in it: elevation falls 74 -> 69 -> 63 degrees and the azimuth swings 20 -> 38 -> 56 degrees around the lap, so the shadow direction turns visibly across the three basins and wraps back over the start line.",
+    "crossfadeMetres": 90,
+    "profiles": [
+      {
+        "sector": "S1",
+        "name": "HARVEST BASIN",
+        "distance": 60,
+        "sky": "#c9b994",
+        "ground": "#665c48",
+        "key": "#ffe0a8",
+        "rim": "#d9904d",
+        "hemisphereIntensity": 1.25,
+        "keyIntensity": 1.55,
+        "rimIntensity": 0.7,
+        "keyElevationDegrees": 74,
+        "keyAzimuthDegrees": 20,
+        "keyDirection": { "x": 0.259012, "y": 0.961262, "z": -0.094273 },
+        "fog": { "density": 0.00072, "color": "#c7b997" }
+      },
+      {
+        "sector": "S2",
+        "name": "THE LONG BASIN",
+        "distance": 1610,
+        "sky": "#d7d2bf",
+        "ground": "#6f6b60",
+        "key": "#ffedc7",
+        "rim": "#b6c3be",
+        "hemisphereIntensity": 1.35,
+        "keyIntensity": 1.45,
+        "rimIntensity": 0.55,
+        "keyElevationDegrees": 69,
+        "keyAzimuthDegrees": 38,
+        "keyDirection": { "x": 0.282398, "y": 0.93358, "z": -0.220633 },
+        "fog": { "density": 0.00048, "color": "#d5cfb9" }
+      },
+      {
+        "sector": "S3",
+        "name": "LOADOUT BASIN",
+        "distance": 2550,
+        "sky": "#b6c0bb",
+        "ground": "#555e5a",
+        "key": "#e4eadc",
+        "rim": "#86aaa7",
+        "hemisphereIntensity": 1.2,
+        "keyIntensity": 1.3,
+        "rimIntensity": 0.8,
+        "keyElevationDegrees": 63,
+        "keyAzimuthDegrees": 56,
+        "keyDirection": { "x": 0.253868, "y": 0.891007, "z": -0.376372 },
+        "fog": { "density": 0.00082, "color": "#aeb8b2" }
+      }
+    ]
+  },
+
+  "timeOfDay": {
+    "note": "Same multiplicative 5-stop model as Greenwater, tuned harder. Greenwater drifts to a soft dusk under a canopy; Bitterpan has nothing between the pan and the sky, so the ramp runs further into amber (blue falls to 0.50 against Greenwater's 0.615) and the hemisphere drops further (0.70 against 0.74). Stop 0 is the identity stop, so reduced motion and the menu both collapse to the accepted noon look with no drift at all.",
+    "model": "multiplicative",
+    "appliesTo": [
+      "hemisphereLight.color",
+      "hemisphereLight.groundColor",
+      "hemisphereLight.intensity",
+      "keyLight.color",
+      "keyLight.intensity",
+      "fog.color",
+      "scene.background"
+    ],
+    "stops": [
+      {
+        "lapProgress": 0,
+        "label": "HARD_NOON",
+        "keyTint": [1, 1, 1],
+        "skyTint": [1, 1, 1],
+        "groundTint": [1, 1, 1],
+        "fogTint": [1, 1, 1],
+        "hemisphereScale": 1,
+        "keyScale": 1
+      },
+      {
+        "lapProgress": 0.25,
+        "label": "PAN_GLARE",
+        "keyTint": [1.03, 0.995, 0.945],
+        "skyTint": [1.015, 0.995, 0.955],
+        "groundTint": [1.015, 0.99, 0.955],
+        "fogTint": [1.005, 0.99, 0.955],
+        "hemisphereScale": 0.985,
+        "keyScale": 1
+      },
+      {
+        "lapProgress": 0.5,
+        "label": "LONG_LIGHT",
+        "keyTint": [1.06, 0.935, 0.815],
+        "skyTint": [1.03, 0.945, 0.86],
+        "groundTint": [1.01, 0.935, 0.86],
+        "fogTint": [0.99, 0.925, 0.86],
+        "hemisphereScale": 0.92,
+        "keyScale": 0.95
+      },
+      {
+        "lapProgress": 0.75,
+        "label": "AMBER_PAN",
+        "keyTint": [1.08, 0.86, 0.665],
+        "skyTint": [1.02, 0.875, 0.755],
+        "groundTint": [0.955, 0.86, 0.755],
+        "fogTint": [0.945, 0.845, 0.75],
+        "hemisphereScale": 0.83,
+        "keyScale": 0.85
+      },
+      {
+        "lapProgress": 1,
+        "label": "HARSH_EVENING",
+        "keyTint": [1.09, 0.745, 0.5],
+        "skyTint": [0.93, 0.765, 0.635],
+        "groundTint": [0.845, 0.71, 0.61],
+        "fogTint": [0.855, 0.73, 0.645],
+        "hemisphereScale": 0.7,
+        "keyScale": 0.68
+      }
+    ]
+  },
+
+  "lapBoard": {
+    "note": "Hung under the accepted OCC2_conveyor_span soffit at 3028 m, lateral 0 - the one authored element already over the drivable corridor, and the last thing read before the line. No new massing is introduced; the board is a signage plane on structure the accepted payload already places there.",
+    "template": "LAP {current}/{total}",
+    "subtitle": "BITTERPAN WORKS",
+    "distance": 3028,
+    "lateralOffset": 0,
+    "heightMetres": 9.4,
+    "widthMetres": 10.5,
+    "boardHeightMetres": 3.9,
+    "foreground": "#ffb347",
+    "background": "#141210",
+    "anchor": "OCC2_conveyor_span"
+  },
+
+  "culling": {
+    "note": "No cull distance is authored anywhere in the accepted Map 02 payload, so it is derived from each primitive's own bounding sphere at load. The accepted GLBs merge geometry by family across the whole 589 x 1214 m site, so most primitives carry 400-800 m radii and only the frustum test can move them; this is recorded here so a later art pass that splits the massing spatially knows the derivation is the thing to replace.",
+    "baseDistanceMetres": 900,
+    "radiusMultiplier": 8,
+    "maximumDistanceMetres": 1800
+  }
+}

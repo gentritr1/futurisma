@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import productionJson from "./data/map02/BITTERPAN_PRODUCTION.json";
 import type { RaceEnvironment, RaceEnvironmentStats } from "./environment";
 import { disposeObject3DResources } from "./graphics-resources";
 import { applyPs2MaterialTreatment } from "./totem";
@@ -7,6 +8,71 @@ import { applyPs2MaterialTreatment } from "./totem";
 const EXPECTED_TRACK_PRIMITIVES = 5;
 const EXPECTED_MASSING_PRIMITIVES = 15;
 const EXPECTED_VISIBLE_TRIANGLES = 11_268;
+const CULLING = (productionJson as unknown as {
+  culling: {
+    baseDistanceMetres: number;
+    radiusMultiplier: number;
+    maximumDistanceMetres: number;
+  };
+}).culling;
+
+/**
+ * One cullable primitive. Mirrors `CullGroup` in environment.ts, but Greenwater
+ * reads an authored `userData.cull` off every mesh and Map 02 has none — the
+ * accepted payload never authored one — so the distance is derived from the
+ * primitive's own bounding sphere instead.
+ */
+interface BitterpanCullGroup {
+  mesh: THREE.Mesh;
+  sphere: THREE.Sphere;
+  maximumDistanceSquared: number;
+  triangles: number;
+}
+
+/**
+ * Derived cull distance. Bitterpan renders at `camera.far = 1800` against
+ * Greenwater's 650, so the far plane cannot be relied on to bound anything: a
+ * distance test is the only thing that will ever retire the small props.
+ *
+ * The multiplier is on the radius rather than a fixed distance because the
+ * accepted GLBs merge geometry *by family across the whole 589 x 1214 m site*.
+ * A 30 m loadout tower and a 675 m track ribbon are both single primitives, and
+ * only the small ones can honestly be retired early; everything else is left to
+ * the frustum.
+ */
+function deriveCullDistance(radius: number): number {
+  return Math.min(
+    CULLING.maximumDistanceMetres,
+    CULLING.baseDistanceMetres + radius * CULLING.radiusMultiplier,
+  );
+}
+
+/** Builds a world-space cull group for every visible mesh under `root`. */
+function collectCullGroups(root: THREE.Object3D): BitterpanCullGroup[] {
+  const groups: BitterpanCullGroup[] = [];
+  root.updateMatrixWorld(true);
+  root.traverse((object) => {
+    if (!(object instanceof THREE.Mesh) || !object.visible) return;
+    const geometry = object.geometry;
+    if (!geometry.boundingSphere) geometry.computeBoundingSphere();
+    const localSphere = geometry.boundingSphere;
+    if (!localSphere) return;
+    const scale = object.matrixWorld.getMaxScaleOnAxis();
+    const radius = localSphere.radius * scale;
+    groups.push({
+      mesh: object,
+      sphere: new THREE.Sphere(
+        localSphere.center.clone().applyMatrix4(object.matrixWorld),
+        radius,
+      ),
+      maximumDistanceSquared: (deriveCullDistance(radius) + radius) ** 2,
+      triangles: (
+        geometry.index?.count ?? geometry.getAttribute("position").count
+      ) / 3,
+    });
+  });
+  return groups;
+}
 const ROUTE_PALETTE = {
   deck: new THREE.Color(0x252c29),
   kerb: new THREE.Color(0xd7f05a),
@@ -127,6 +193,9 @@ function countVisibleResources(root: THREE.Object3D): {
 export class BitterpanEnvironment implements RaceEnvironment {
   readonly root: THREE.Group;
   readonly stats: RaceEnvironmentStats;
+  private readonly cullGroups: BitterpanCullGroup[];
+  private readonly frustum = new THREE.Frustum();
+  private readonly viewProjection = new THREE.Matrix4();
 
   private constructor(
     root: THREE.Group,
@@ -135,6 +204,7 @@ export class BitterpanEnvironment implements RaceEnvironment {
     contractDrift: string[],
   ) {
     this.root = root;
+    this.cullGroups = collectCullGroups(root);
     replaceStandardMaterials(root);
     // The accepted GLBs stay byte-identical. Their pale review palette was
     // authored for diagrams and disappears against the live fog/sky. Runtime
@@ -230,9 +300,37 @@ export class BitterpanEnvironment implements RaceEnvironment {
     }
   }
 
-  updateVisibility(_camera: THREE.Camera): void {
-    // Both accepted GLBs are static and already sit below the combined
-    // 24-call ceiling. Keeping all 20 primitives resident avoids a per-frame
-    // culling allocator and preserves the review's no-batching accounting.
+  /**
+   * Distance + frustum culling, the same test Greenwater runs, allocation-free.
+   *
+   * Honest note on what this buys: the accepted Map 02 GLBs merge geometry by
+   * family across the whole site, so 15 of the 20 primitives carry 240-816 m
+   * bounding radii and only the three small ones (the loadout tower and two
+   * prop batches) are ever retired. `visibleGroups` therefore drops below
+   * `meshes`, but the triangle saving is small by construction. Splitting the
+   * merged primitives spatially would fix that and is an art-phase change: it
+   * would break the accepted-byte freeze and trade real draw calls for the
+   * saving, which at 11,268 triangles against a 140,000 ceiling is not a trade
+   * worth making yet.
+   */
+  updateVisibility(camera: THREE.Camera): void {
+    camera.updateMatrixWorld();
+    this.viewProjection.multiplyMatrices(
+      camera.projectionMatrix,
+      camera.matrixWorldInverse,
+    );
+    this.frustum.setFromProjectionMatrix(this.viewProjection);
+    let visibleGroups = 0;
+    let visibleTriangles = 0;
+    for (const group of this.cullGroups) {
+      group.mesh.visible = camera.position.distanceToSquared(group.sphere.center)
+        <= group.maximumDistanceSquared
+        && this.frustum.intersectsSphere(group.sphere);
+      if (!group.mesh.visible) continue;
+      visibleGroups += 1;
+      visibleTriangles += group.triangles;
+    }
+    this.stats.visibleGroups = visibleGroups;
+    this.stats.visibleTriangles = visibleTriangles;
   }
 }
