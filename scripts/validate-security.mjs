@@ -36,6 +36,7 @@ for (const policy of [
   "Cross-Origin-Resource-Policy: same-origin",
   "Permissions-Policy:",
   "Referrer-Policy: no-referrer",
+  "Strict-Transport-Security: max-age=31536000",
   "X-Content-Type-Options: nosniff",
   "X-Frame-Options: DENY",
 ]) {

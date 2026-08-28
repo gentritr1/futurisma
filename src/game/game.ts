@@ -10,11 +10,17 @@ import {
 } from "./camera-feedback";
 import { hasPlayerControlIntent } from "./control-mode";
 import {
-  GreenwaterCourse,
   type CourseProjection,
+  type RaceCourse,
   type TurnCue,
 } from "./course";
+import type {
+  GreenwaterEnvironment,
+  RaceEnvironment,
+} from "./environment";
 import { disposeObject3DResources } from "./graphics-resources";
+import type { GreenwaterLivingWorld } from "./living-world";
+import type { GreenwaterSurfaceCharacter } from "./surface-character";
 import {
   phasePresentsDrivingInput,
   phaseRunsContinuousPresentation,
@@ -57,15 +63,27 @@ import {
   calculatePreferredPixelRatio,
   reconcilePixelRatioAfterResize,
 } from "./render-quality";
+import { playerRaceDistanceMeters as calculatePlayerRaceDistance } from "./rival-race.js";
+import {
+  RivalFleet,
+  loadRivalLiveryTextures,
+  type RivalRaceStatus,
+} from "./rivals";
 import {
   applyPs2MaterialTreatment,
   TotemVehicle,
   type TotemVisualState,
 } from "./totem";
-import { GameUi } from "./ui";
+import { GameUi, type RaceStandingEntry } from "./ui";
 
 const VEHICLE_MODEL_URL = "/assets/totem/models/totem_runtime.glb";
+const RACE_PRESENCE_FX_ATLAS_URL = "/assets/totem/textures/totem_race_presence_fx_256.png";
 const ASSET_KIT_MODEL_URL = "/assets/totem/models/futurisma_asset_kit.glb";
+const ENVIRONMENT_MODEL_URL = "/assets/greenwater/models/greenwater_environment_runtime.glb";
+const LIVING_WORLD_MOTION_URL = "/assets/greenwater/textures/greenwater_motion_512.png";
+const SURFACE_CHARACTER_MODEL_URL = "/assets/greenwater/models/greenwater_surface_character_runtime.glb";
+const BITTERPAN_TRACK_MODEL_URL = "/assets/map02/models/bitterpan_blockout.glb";
+const BITTERPAN_MASSING_MODEL_URL = "/assets/map02/models/bitterpan_massing.glb";
 
 type RacePhase = "standby" | "countdown" | "running" | "paused" | "resuming" | "finished";
 
@@ -76,6 +94,13 @@ const WRONG_WAY_PROBE_DISTANCE_METERS = 100;
 const WATER_GRIP_PROBE_DISTANCE_METERS = 580;
 const RESUME_COUNTDOWN_SECONDS = 2.7;
 const ZERO_INPUT: InputFrame = { throttle: 0, brake: 0, steer: 0, boost: false };
+const SPEED_LINE_COLOR = new THREE.Color(0x94bdb7);
+const BOOST_LINE_COLOR = new THREE.Color(0x78d6de);
+const SKY_ZENITH_TINT = new THREE.Color(0x0a1216);
+const WHITE = new THREE.Color(0xffffff);
+const SUN_DIRECTION = new THREE.Vector3(80, 130, -35).normalize();
+const RIM_PRESENCE_BOOST = 1.85;
+const HEMISPHERE_TRIM = 0.88;
 
 interface StaticGeometryBucket {
   material: THREE.Material;
@@ -129,7 +154,7 @@ function mergeStaticSceneByMaterial(source: THREE.Object3D): THREE.Group {
 
 function placeCourseAlignedObject(
   object: THREE.Object3D,
-  sample: ReturnType<GreenwaterCourse["sample"]>,
+  sample: ReturnType<RaceCourse["sample"]>,
   lateral: number,
   yaw: number,
   scale: number,
@@ -167,7 +192,7 @@ function createNormalizedPropInstance(
 
 function createAssetKitCourseDressing(
   source: THREE.Object3D,
-  course: GreenwaterCourse,
+  course: RaceCourse,
 ): THREE.Group {
   const dressing = new THREE.Group();
   dressing.name = "totem_asset_kit_course_source";
@@ -190,15 +215,16 @@ function createAssetKitCourseDressing(
 
 export class FuturismaGame {
   private readonly scene = new THREE.Scene();
-  private readonly camera = new THREE.PerspectiveCamera(58, 1, 0.1, 650);
+  private readonly camera: THREE.PerspectiveCamera;
   private readonly renderer: THREE.WebGLRenderer;
-  private readonly courseAssemblyStartedAt = performance.now();
-  private readonly course = new GreenwaterCourse();
-  private readonly diagnosticCourseAssemblyMs = performance.now()
-    - this.courseAssemblyStartedAt;
-  private readonly coursePs2Treatment = applyPs2MaterialTreatment(this.course.group);
-  private readonly demoProjection = this.course.createProjectionScratch();
-  private readonly demoLookAhead = this.course.createSampleScratch();
+  private readonly course: RaceCourse;
+  private readonly diagnosticCourseAssemblyMs: number;
+  private readonly coursePs2Treatment: ReturnType<typeof applyPs2MaterialTreatment>;
+  private authoredEnvironment: RaceEnvironment | null = null;
+  private livingWorld: GreenwaterLivingWorld | null = null;
+  private surfaceCharacter: GreenwaterSurfaceCharacter | null = null;
+  private readonly demoProjection: CourseProjection;
+  private readonly demoLookAhead: ReturnType<RaceCourse["createSampleScratch"]>;
   private readonly demoTurnCue: TurnCue = {
     direction: "LEFT",
     followingDirection: null,
@@ -213,14 +239,30 @@ export class FuturismaGame {
     hard: false,
     radius: 0,
   };
-  private readonly beforeMoveProjection = this.course.createProjectionScratch();
-  private readonly afterMoveProjection = this.course.createProjectionScratch();
-  private readonly poseProjection = this.course.createProjectionScratch();
-  private readonly cameraProjection = this.course.createProjectionScratch();
-  private readonly totalLaps = this.resolveLapCount();
+  private readonly beforeMoveProjection: CourseProjection;
+  private readonly afterMoveProjection: CourseProjection;
+  private readonly poseProjection: CourseProjection;
+  private readonly cameraProjection: CourseProjection;
+  private readonly cameraSurfaceProjection: CourseProjection;
+  private readonly cameraLookAhead: ReturnType<RaceCourse["createSampleScratch"]>;
+  private readonly totalLaps: number;
   private readonly vehicle = new TotemVehicle();
+  private rivalFleet: RivalFleet | null = null;
   private readonly audio = new EngineAudio();
   private readonly timer = new THREE.Timer();
+  private readonly hemisphereLight = new THREE.HemisphereLight();
+  private readonly keyLight = new THREE.DirectionalLight();
+  private readonly rimLight = new THREE.DirectionalLight();
+  private readonly skyUniforms = {
+    topColor: { value: new THREE.Color(0x1a2226) },
+    horizonColor: { value: new THREE.Color(0xa9bbb0) },
+    bandColor: { value: new THREE.Color(0xc8ff2e) },
+  };
+  private readonly skyDome: THREE.Mesh;
+  private readonly sunDisc: THREE.Mesh;
+  private readonly skyTopTarget = new THREE.Color();
+  private readonly skyBandTarget = new THREE.Color();
+  private readonly presenceLight = new THREE.PointLight(0xffffff, 0, 26, 1.8);
   private readonly speedLines: THREE.LineSegments;
   private readonly impactSparks: THREE.Points;
   private readonly impactSparkPositions = new Float32Array(48 * 3);
@@ -257,14 +299,16 @@ export class FuturismaGame {
     boostActive: false,
     driftIntensity: 0,
     lateralLoad: 0,
+    surfaceGrip: 1,
+    reducedMotion: false,
     elapsed: 0,
     delta: 0,
   };
 
   private phase: RacePhase = "standby";
-  private progress = 0.002;
+  private progress: number;
   private speed = 0;
-  private lateral = 0;
+  private lateral: number;
   private steerAmount = 0;
   private nextCheckpointIndex = 1;
   private missedGateIndex: number | null = null;
@@ -280,6 +324,18 @@ export class FuturismaGame {
   private lastLapMs: number | null = null;
   private bestLapMs: number | null = null;
   private readonly lapTimesMs: number[] = [];
+  private raceStatus: RivalRaceStatus = {
+    position: 1,
+    racerCount: 4,
+    gapToAheadMs: null,
+    gapToBehindMs: null,
+  };
+  private lastPositionCue = 1;
+  private lastPositionCueAtMs = -Infinity;
+  private diagnosticPositionChanges = 0;
+  private diagnosticPositionsGained = 0;
+  private diagnosticPositionsLost = 0;
+  private finalStandings: RaceStandingEntry[] = [];
   private countdown = 3.7;
   private resumeCountdown = 0;
   private countdownStage = "";
@@ -301,6 +357,7 @@ export class FuturismaGame {
   private smoothedFrameMs = 16.67;
   private nextDiagnosticsAt = 0;
   private nextHudAt = 0;
+  private nextFieldOrderAt = 0;
   private readonly diagnosticFrameSamples = new Float32Array(720);
   private diagnosticFrameIndex = 0;
   private diagnosticFrameCount = 0;
@@ -339,6 +396,15 @@ export class FuturismaGame {
   private diagnosticVehicleResourceRequests = 0;
   private diagnosticAssetKitLoadMs: number | null = null;
   private diagnosticAssetKitReady = false;
+  private diagnosticEnvironmentLoadMs: number | null = null;
+  private diagnosticEnvironmentReady = false;
+  private diagnosticEnvironmentError: string | null = null;
+  private diagnosticLivingWorldLoadMs: number | null = null;
+  private diagnosticLivingWorldReady = false;
+  private diagnosticLivingWorldError: string | null = null;
+  private diagnosticSurfaceCharacterLoadMs: number | null = null;
+  private diagnosticSurfaceCharacterReady = false;
+  private diagnosticSurfaceCharacterError: string | null = null;
   private readonly diagnosticImpactLocations: string[] = [];
   private readonly diagnosticRecoveryLocations: string[] = [];
   private diagnosticsOutput: HTMLOutputElement | null = null;
@@ -348,6 +414,8 @@ export class FuturismaGame {
     triangles: 0,
     geometries: 0,
     textures: 0,
+    environmentGroups: 0,
+    environmentTriangles: 0,
     frameMs: 0,
     phase: "standby" as RacePhase,
     sector: "",
@@ -399,7 +467,29 @@ export class FuturismaGame {
     canvas: HTMLCanvasElement,
     private readonly input: InputController,
     private readonly ui: GameUi,
+    course: RaceCourse,
+    courseAssemblyMs = 0,
   ) {
+    this.course = course;
+    this.camera = new THREE.PerspectiveCamera(
+      58,
+      1,
+      0.1,
+      this.course.kind === "bitterpan" ? 1800 : 650,
+    );
+    this.diagnosticCourseAssemblyMs = courseAssemblyMs;
+    this.coursePs2Treatment = applyPs2MaterialTreatment(this.course.group);
+    this.demoProjection = this.course.createProjectionScratch();
+    this.demoLookAhead = this.course.createSampleScratch();
+    this.beforeMoveProjection = this.course.createProjectionScratch();
+    this.afterMoveProjection = this.course.createProjectionScratch();
+    this.poseProjection = this.course.createProjectionScratch();
+    this.cameraProjection = this.course.createProjectionScratch();
+    this.cameraSurfaceProjection = this.course.createProjectionScratch();
+    this.cameraLookAhead = this.course.createSampleScratch();
+    this.totalLaps = this.resolveLapCount();
+    this.progress = this.course.startProgress;
+    this.lateral = this.course.startLateral;
     this.renderer = new THREE.WebGLRenderer({
       canvas,
       antialias: false,
@@ -410,7 +500,18 @@ export class FuturismaGame {
     this.renderer.toneMapping = THREE.AgXToneMapping;
     this.renderer.toneMappingExposure = 1.05;
     this.renderer.shadowMap.enabled = false;
-    this.ui.setRaceFormat(this.totalLaps, this.course.length);
+    this.ui.setRaceFormat(
+      this.totalLaps,
+      this.course.length,
+      [],
+      {
+        mapName: this.course.mapName,
+        mapCode: this.course.mapCode,
+        checkpointCount: this.course.checkpointCount,
+        finishName: this.course.finishName,
+        startLabel: this.course.startLabel,
+      },
+    );
     this.ui.setDemoAutopilot(this.demoAutopilot);
     this.ui.setGraphicsContextLost(false);
     const initialFog = this.course.fogAt(0);
@@ -423,6 +524,11 @@ export class FuturismaGame {
     this.camera.add(this.speedLines);
     this.scene.add(this.camera, this.impactSparks);
     this.installLighting();
+    this.skyDome = this.createSkyBackdrop();
+    this.sunDisc = this.createSunDisc();
+    this.scene.add(this.skyDome, this.sunDisc);
+    this.presenceLight.position.set(0, 2.3, 0.9);
+    this.vehicle.root.add(this.presenceLight);
     if (this.diagnosticsMode) {
       this.diagnosticsOutput = document.createElement("output");
       this.diagnosticsOutput.id = "futurisma-diagnostics";
@@ -444,7 +550,7 @@ export class FuturismaGame {
   async initialize(): Promise<boolean> {
     const vehicleLoadStartedAt = performance.now();
     this.diagnosticVehicleLoadStartedMs = vehicleLoadStartedAt;
-    await this.vehicle.load(VEHICLE_MODEL_URL);
+    await this.vehicle.load(VEHICLE_MODEL_URL, RACE_PRESENCE_FX_ATLAS_URL);
     this.diagnosticVehicleLoadMs = performance.now() - vehicleLoadStartedAt;
     const vehicleResourceUrl = new URL(VEHICLE_MODEL_URL, window.location.href).href;
     const vehicleResources = performance.getEntriesByName(vehicleResourceUrl, "resource");
@@ -456,12 +562,57 @@ export class FuturismaGame {
       this.vehicle.root.clear();
       return false;
     }
+    const rivalVisualBatches = this.vehicle.createRivalVisualBatches();
+    const disposeRivalVisualBatches = (): void => {
+      for (const batch of rivalVisualBatches) {
+        batch.geometry.dispose();
+        batch.material.dispose();
+      }
+    };
+    let rivalLiveryTextures: THREE.Texture[];
+    try {
+      rivalLiveryTextures = await loadRivalLiveryTextures();
+    } catch (error) {
+      disposeRivalVisualBatches();
+      throw error;
+    }
+    if (this.disposed) {
+      disposeRivalVisualBatches();
+      for (const texture of rivalLiveryTextures) texture.dispose();
+      disposeObject3DResources(this.vehicle.root);
+      this.vehicle.root.clear();
+      return false;
+    }
+    this.rivalFleet = new RivalFleet(
+      this.course,
+      this.totalLaps,
+      rivalVisualBatches,
+      rivalLiveryTextures,
+      this.vehicle.effectsAtlas(),
+    );
+    this.scene.add(this.rivalFleet.root);
+    this.ui.setRaceFormat(
+      this.totalLaps,
+      this.course.length,
+      this.rivalFleet.gridEntries,
+      {
+        mapName: this.course.mapName,
+        mapCode: this.course.mapCode,
+        checkpointCount: this.course.checkpointCount,
+        finishName: this.course.finishName,
+        startLabel: this.course.startLabel,
+      },
+    );
     this.resetRaceState();
     this.updatePose(ZERO_INPUT, 0);
     this.snapCamera();
+    if (this.course.kind === "bitterpan") {
+      await this.loadAuthoredEnvironment();
+      if (this.disposed) return false;
+    }
     this.running = true;
     this.animationFrame = requestAnimationFrame(this.frame);
-    void this.loadAssetKit();
+    if (this.course.kind === "greenwater") void this.loadAuthoredEnvironment();
     this.diagnosticStartupReadyMs = performance.now();
     return true;
   }
@@ -524,6 +675,7 @@ export class FuturismaGame {
       this.renderRequested,
       this.contextLost,
     )) {
+      this.authoredEnvironment?.updateVisibility(this.camera);
       this.renderer.render(this.scene, this.camera);
       this.renderRequested = false;
       this.diagnosticRenderedFrames += 1;
@@ -638,14 +790,29 @@ export class FuturismaGame {
       if (this.phase === "countdown") this.updateCountdown(FIXED_STEP);
       if (this.phase === "resuming") this.updateResumeCountdown(FIXED_STEP);
       if (this.phase === "running") {
+        this.rivalFleet?.step(
+          FIXED_STEP,
+          this.playerRaceDistance(),
+          this.lateral,
+        );
         this.updateRace(FIXED_STEP, this.resolveRaceInput(input));
+      } else if (this.phase === "finished") {
+        this.rivalFleet?.step(
+          FIXED_STEP,
+          this.playerRaceDistance(),
+          this.lateral,
+        );
+        this.updateCoast(FIXED_STEP);
       }
-      if (this.phase === "finished") this.updateCoast(FIXED_STEP);
       this.physicsAccumulator -= FIXED_STEP;
     }
 
     this.interpolatePresentationPose(
       calculatePresentationAlpha(this.physicsAccumulator, FIXED_STEP),
+    );
+    this.rivalFleet?.updatePresentation(
+      calculatePresentationAlpha(this.physicsAccumulator, FIXED_STEP),
+      this.timer.getElapsed(),
     );
 
     const presentationInput = phasePresentsDrivingInput(this.phase)
@@ -663,6 +830,9 @@ export class FuturismaGame {
     this.updateSpeedLines(delta);
     this.updateImpactSparks(delta);
     this.updateFog(delta);
+    // Reduced motion freezes the effect clock, but the cards still need to face
+    // the moving chase camera so the approved still frame remains visible.
+    this.livingWorld?.update(delta, this.camera, !this.reducedMotion);
     if (this.course.updateAtmosphere(this.elapsedMs / 1000, this.reducedMotion)) {
       this.diagnosticAtmosphereUpdates += 1;
     }
@@ -680,7 +850,16 @@ export class FuturismaGame {
     const now = this.timer.getElapsed();
     if (now >= this.nextHudAt) {
       this.nextHudAt = now + 1 / 30;
+      this.refreshRaceStatus(this.phase === "running");
       this.updateHud(presentationInput);
+      if (now >= this.nextFieldOrderAt) {
+        this.nextFieldOrderAt = now + 0.25;
+        if (this.rivalFleet) {
+          this.ui.updateFieldOrder(
+            this.rivalFleet.fieldOrder(this.playerRaceDistance(), this.speed),
+          );
+        }
+      }
     }
   }
 
@@ -903,6 +1082,7 @@ export class FuturismaGame {
       this.forward.applyAxisAngle(afterMove.up, cableTripSide * 0.11);
       this.travelDirection.lerp(this.forward, 0.34).normalize();
       this.impactShake = 0.9;
+      this.vehicle.triggerImpactEffect(cableTripSide, 0.88);
       this.audio.playImpact(0.88);
       this.input.pulse(0.68, 0.82, 150);
       this.ui.flashImpact(cableTripSide < 0 ? "LEFT" : "RIGHT");
@@ -1062,6 +1242,7 @@ export class FuturismaGame {
         return;
       }
       this.audio.playLap();
+      if (this.lap === this.totalLaps) this.audio.playFinalLap();
       this.input.pulse(0.12, 0.3, 110);
       this.ui.flashLap(
         this.lap,
@@ -1103,9 +1284,9 @@ export class FuturismaGame {
     const previousCheckpoint = this.nextCheckpointIndex === 0
       ? this.course.checkpointCount
       : Math.max(0, this.nextCheckpointIndex - 1);
-    this.progress = THREE.MathUtils.euclideanModulo(
-      this.course.checkpointProgress(previousCheckpoint) + 0.004,
-      1,
+    this.progress = this.course.recoveryProgressFor(
+      this.progress,
+      previousCheckpoint,
     );
     const recovery = this.course.sample(this.progress, this.poseProjection);
     this.position.copy(recovery.position);
@@ -1146,10 +1327,12 @@ export class FuturismaGame {
     );
     if (this.diagnosticsMode) this.diagnosticPresentationProjectionQueries += 1;
     const speedRatio = this.speed / BOOST_MAX_SPEED;
-    const hoverHeight = this.boostActive ? 0.6 : this.speed < 11 ? 0.18 : 0.45;
     const vehiclePosition = this.scratchA
       .copy(this.presentationPosition)
-      .addScaledVector(sample.up, hoverHeight + 0.71);
+      .addScaledVector(
+        sample.up,
+        this.course.vehicleHoverHeight(this.speed, this.boostActive),
+      );
     const vehicleRight = this.scratchB
       .crossVectors(this.presentationForward, sample.up)
       .normalize();
@@ -1176,6 +1359,8 @@ export class FuturismaGame {
     this.vehicleVisualState.boostActive = this.boostActive;
     this.vehicleVisualState.driftIntensity = this.driftIntensity;
     this.vehicleVisualState.lateralLoad = this.steerAmount * 0.45 - slip;
+    this.vehicleVisualState.surfaceGrip = this.surfaceGrip;
+    this.vehicleVisualState.reducedMotion = this.reducedMotion;
     this.vehicleVisualState.elapsed = this.timer.getElapsed();
     this.vehicleVisualState.delta = delta;
     this.vehicle.updateVisual(this.vehicleVisualState);
@@ -1198,9 +1383,10 @@ export class FuturismaGame {
       .addScaledVector(this.presentationForward, -5)
       .addScaledVector(sample.up, 2.2);
     const anchor = this.vehicle.worldPosition("CAMERA_chase_target", fallback, this.scratchC);
+    const bitterpan = this.course.kind === "bitterpan";
     const desired = anchor
-      .addScaledVector(this.presentationForward, -2.7)
-      .addScaledVector(sample.up, 1.25)
+      .addScaledVector(this.presentationForward, bitterpan ? -4.2 : -2.7)
+      .addScaledVector(sample.up, bitterpan ? 1.8 : 1.25)
       .addScaledVector(
         vehicleRight,
         -steer * (0.45 + this.driftIntensity * 0.55),
@@ -1211,6 +1397,30 @@ export class FuturismaGame {
       .addScaledVector(this.presentationTravelDirection, this.speed * 0.025)
       .addScaledVector(sample.up, 0.8)
       .addScaledVector(vehicleRight, steer * this.driftIntensity * 0.6);
+
+    if (bitterpan) {
+      const lookAheadDistance = 42 + this.speed * 0.42;
+      const routeLook = this.course.sample(
+        sample.progress + lookAheadDistance / this.course.length,
+        this.cameraLookAhead,
+      );
+      target.lerp(
+        routeLook.position.addScaledVector(routeLook.up, 1.35),
+        0.58,
+      );
+    }
+
+    const cameraSurface = this.course.project(
+      desired,
+      sample.progress,
+      this.cameraSurfaceProjection,
+    );
+    const cameraClearance = this.scratchA.copy(desired)
+      .sub(cameraSurface.position)
+      .dot(cameraSurface.up);
+    if (cameraClearance < 2.1) {
+      desired.addScaledVector(cameraSurface.up, 2.1 - cameraClearance);
+    }
 
     const speedRatio = this.speed / BOOST_MAX_SPEED;
     const positionDamping = 1 - Math.exp(-delta * (12 + speedRatio * 8));
@@ -1291,8 +1501,11 @@ export class FuturismaGame {
     );
     this.cameraTarget
       .copy(this.vehicle.root.position)
-      .addScaledVector(this.presentationForward, -9)
-      .addScaledVector(sample.up, 4);
+      .addScaledVector(
+        this.presentationForward,
+        this.course.kind === "bitterpan" ? -10.5 : -9,
+      )
+      .addScaledVector(sample.up, this.course.kind === "bitterpan" ? 4.6 : 4);
     this.cameraLook
       .copy(this.vehicle.root.position)
       .addScaledVector(this.presentationForward, 10)
@@ -1307,6 +1520,11 @@ export class FuturismaGame {
     const values = position.array as Float32Array;
     const speedRatio = this.speed / BOOST_MAX_SPEED;
     const material = this.speedLines.material as THREE.LineBasicMaterial;
+    material.color.lerpColors(
+      SPEED_LINE_COLOR,
+      BOOST_LINE_COLOR,
+      this.boostActive ? 1 : 0,
+    );
     material.opacity = calculateSpeedStreakOpacity(
       speedRatio,
       this.driftIntensity,
@@ -1377,7 +1595,9 @@ export class FuturismaGame {
       lastLapMs: this.lastLapMs,
       lap: this.lap,
       totalLaps: this.totalLaps,
-      progress: ((this.lap - 1) + this.progress) / this.totalLaps,
+      progress: (
+        (this.lap - 1) + this.raceProgressFromStart(this.progress)
+      ) / this.totalLaps,
       checkpoint,
       checkpointCount: this.course.checkpointCount,
       missedGate: this.missedGateIndex,
@@ -1407,6 +1627,10 @@ export class FuturismaGame {
       recoveryActive: recovery.active,
       recoveryProgress: recovery.progress,
       recoverySeconds: recovery.remainingSeconds,
+      position: this.raceStatus.position,
+      racerCount: this.raceStatus.racerCount,
+      gapToAheadMs: this.raceStatus.gapToAheadMs,
+      gapToBehindMs: this.raceStatus.gapToBehindMs,
     });
   }
 
@@ -1414,6 +1638,17 @@ export class FuturismaGame {
     this.phase = "finished";
     this.nextDiagnosticsAt = 0;
     this.boostActive = false;
+    const standings = this.rivalFleet?.classification(this.elapsedMs / 1000) ?? [];
+    this.finalStandings = standings;
+    const playerStanding = standings.find((standing) => standing.player);
+    if (playerStanding) {
+      this.raceStatus = {
+        ...this.raceStatus,
+        position: playerStanding.position,
+        racerCount: standings.length,
+      };
+    }
+    this.audio.playClassification();
     this.audio.playFinish();
     this.input.pulse(0.3, 0.52, 260);
     this.ui.showResult(
@@ -1421,7 +1656,63 @@ export class FuturismaGame {
       this.totalLaps,
       this.bestLapMs ?? this.elapsedMs,
       this.lapTimesMs,
+      this.raceStatus.position,
+      this.raceStatus.racerCount,
+      standings,
     );
+  }
+
+  private playerRaceDistance(): number {
+    const raceProgress = this.raceProgressFromStart(this.progress);
+    const nextCheckpointProgress = this.nextCheckpointIndex === 0
+      ? null
+      : this.raceProgressFromStart(
+        this.course.checkpointProgress(this.nextCheckpointIndex),
+      );
+    return calculatePlayerRaceDistance({
+      progress: raceProgress,
+      lap: this.lap,
+      totalLaps: this.totalLaps,
+      courseLengthMeters: this.course.length,
+      nextCheckpointProgress,
+      finished: this.phase === "finished",
+    });
+  }
+
+  private raceProgressFromStart(progress: number): number {
+    return THREE.MathUtils.euclideanModulo(
+      progress - this.course.startProgress,
+      1,
+    );
+  }
+
+  private refreshRaceStatus(announceChange: boolean): void {
+    if (!this.rivalFleet) return;
+    const nextStatus = this.rivalFleet.raceStatus(
+      this.playerRaceDistance(),
+      this.speed,
+      this.phase === "finished",
+      this.phase === "finished" ? this.elapsedMs / 1000 : null,
+    );
+    if (
+      announceChange
+      && nextStatus.position !== this.lastPositionCue
+      && this.elapsedMs - this.lastPositionCueAtMs >= 420
+    ) {
+      const gained = nextStatus.position < this.lastPositionCue;
+      this.audio.playPositionChange(gained);
+      this.ui.flashHazard(
+        `${gained ? "POSITION GAINED" : "POSITION LOST"} · P${nextStatus.position}`,
+        850,
+      );
+      this.ui.announcePosition(nextStatus.position, gained);
+      this.diagnosticPositionChanges += 1;
+      if (gained) this.diagnosticPositionsGained += 1;
+      else this.diagnosticPositionsLost += 1;
+      this.lastPositionCueAtMs = this.elapsedMs;
+    }
+    this.lastPositionCue = nextStatus.position;
+    this.raceStatus = nextStatus;
   }
 
   private resetRaceState(): void {
@@ -1431,9 +1722,12 @@ export class FuturismaGame {
         ? WRONG_WAY_PROBE_DISTANCE_METERS / this.course.length
         : this.waterGripProbe
           ? WATER_GRIP_PROBE_DISTANCE_METERS / this.course.length
-          : 0.002;
+          : this.course.startProgress;
     this.speed = 0;
-    this.lateral = 0;
+    this.lateral = this.recoveryProbe || this.wrongWayProbe
+      || this.impactProbe || this.waterGripProbe
+      ? 0
+      : this.course.startLateral;
     this.steerAmount = 0;
     this.nextCheckpointIndex = 1;
     this.missedGateIndex = null;
@@ -1454,6 +1748,24 @@ export class FuturismaGame {
     this.lastLapMs = null;
     this.bestLapMs = null;
     this.lapTimesMs.length = 0;
+    this.rivalFleet?.reset();
+    this.raceStatus = this.rivalFleet?.raceStatus(
+      calculatePlayerRaceDistance({
+        progress: this.raceProgressFromStart(this.progress),
+        lap: 1,
+        totalLaps: this.totalLaps,
+        courseLengthMeters: this.course.length,
+      }),
+      0,
+    ) ?? {
+      position: 1,
+      racerCount: 4,
+      gapToAheadMs: null,
+      gapToBehindMs: null,
+    };
+    this.lastPositionCue = this.raceStatus.position;
+    this.lastPositionCueAtMs = -Infinity;
+    this.finalStandings = [];
     this.edgeContact = false;
     this.offCourseTime = 0;
     this.recoveryImmunity = 0;
@@ -1467,9 +1779,10 @@ export class FuturismaGame {
     this.resumeCountdown = 0;
     this.pausedBeforeStart = false;
     this.nextHudAt = 0;
+    this.nextFieldOrderAt = 0;
     this.resetImpactSparks();
     const start = this.course.sample(this.progress, this.poseProjection);
-    this.position.copy(start.position);
+    this.position.copy(start.position).addScaledVector(start.right, this.lateral);
     if (this.recoveryProbe) {
       this.lateral = start.halfWidth + 1;
       this.position.addScaledVector(start.right, this.lateral);
@@ -1498,12 +1811,77 @@ export class FuturismaGame {
   }
 
   private installLighting(): void {
-    const hemisphere = new THREE.HemisphereLight(0xa9bbb0, 0x10180e, 1.65);
-    const key = new THREE.DirectionalLight(0xd8e0ca, 2.25);
-    key.position.set(80, 130, -35);
-    const rim = new THREE.DirectionalLight(0xc8ff2e, 0.65);
-    rim.position.set(-100, 25, -80);
-    this.scene.add(hemisphere, key, rim);
+    const lighting = this.course.lightingAt(this.progress);
+    this.hemisphereLight.color.copy(lighting.sky);
+    this.hemisphereLight.groundColor.copy(lighting.ground);
+    this.hemisphereLight.intensity = lighting.hemisphereIntensity * HEMISPHERE_TRIM;
+    this.keyLight.color.copy(lighting.key);
+    this.keyLight.intensity = lighting.keyIntensity;
+    this.keyLight.position.set(80, 130, -35);
+    this.rimLight.color.copy(lighting.rim);
+    this.rimLight.intensity = lighting.rimIntensity * RIM_PRESENCE_BOOST;
+    this.rimLight.position.set(-100, 25, -80);
+    this.scene.add(this.hemisphereLight, this.keyLight, this.rimLight);
+  }
+
+  /**
+   * Graded sky dome + horizon accent band. The horizon matches the sector fog
+   * colour so geometry melts into it, while the zenith drops toward a cool
+   * near-black and a restrained sector-accent band glows at the horizon line.
+   */
+  private createSkyBackdrop(): THREE.Mesh {
+    const radius = this.camera.far * 0.8;
+    const geometry = new THREE.SphereGeometry(radius, 24, 12);
+    const material = new THREE.ShaderMaterial({
+      uniforms: this.skyUniforms,
+      side: THREE.BackSide,
+      depthWrite: false,
+      vertexShader: `
+        varying vec3 vDirection;
+        void main() {
+          vDirection = position;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        uniform vec3 topColor;
+        uniform vec3 horizonColor;
+        uniform vec3 bandColor;
+        varying vec3 vDirection;
+        void main() {
+          float h = normalize(vDirection).y;
+          vec3 color = mix(horizonColor, topColor, smoothstep(0.0, 0.42, h));
+          color = mix(color * 0.82, color, smoothstep(-0.12, 0.0, h));
+          float band = exp(-pow((h - 0.035) * 16.0, 2.0));
+          color += bandColor * band * 0.38;
+          gl_FragColor = vec4(color, 1.0);
+          #include <tonemapping_fragment>
+          #include <colorspace_fragment>
+        }
+      `,
+    });
+    const dome = new THREE.Mesh(geometry, material);
+    dome.name = "sky_backdrop";
+    dome.frustumCulled = false;
+    dome.renderOrder = -1000;
+    return dome;
+  }
+
+  /** Small additive key-light disc that anchors the sky composition. */
+  private createSunDisc(): THREE.Mesh {
+    const geometry = new THREE.CircleGeometry(this.camera.far * 0.055, 20);
+    const material = new THREE.MeshBasicMaterial({
+      color: this.keyLight.color.clone(),
+      transparent: true,
+      opacity: 0.5,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      fog: false,
+    });
+    const disc = new THREE.Mesh(geometry, material);
+    disc.name = "sun_disc";
+    disc.renderOrder = -999;
+    return disc;
   }
 
   private createSpeedLines(): THREE.LineSegments {
@@ -1562,7 +1940,7 @@ export class FuturismaGame {
   }
 
   private emitImpactSparks(
-    sample: ReturnType<GreenwaterCourse["sample"]>,
+    sample: ReturnType<RaceCourse["sample"]>,
     side: number,
     strength: number,
   ): void {
@@ -1599,6 +1977,7 @@ export class FuturismaGame {
       this.impactSparkLife[particle] = (0.22 + Math.random() * 0.28) * strength;
     }
     this.impactSparks.visible = true;
+    this.vehicle.triggerImpactEffect(side, strength);
     if (this.diagnosticsMode) this.diagnosticImpactSparkBursts += 1;
     const position = this.impactSparks.geometry.getAttribute("position");
     position.needsUpdate = true;
@@ -1633,6 +2012,7 @@ export class FuturismaGame {
   }
 
   private resetImpactSparks(): void {
+    this.vehicle.resetEffects();
     this.impactSparkCursor = 0;
     this.impactSparkLife.fill(0);
     this.impactSparkVelocities.fill(0);
@@ -1644,6 +2024,118 @@ export class FuturismaGame {
     }
     this.impactSparks.visible = false;
     this.impactSparks.geometry.getAttribute("position").needsUpdate = true;
+  }
+
+  private async loadAuthoredEnvironment(): Promise<void> {
+    const environmentLoadStartedAt = performance.now();
+    try {
+      if (this.course.kind === "bitterpan") {
+        const { BitterpanEnvironment } = await import("./bitterpan-environment");
+        const environment = await BitterpanEnvironment.load(
+          BITTERPAN_TRACK_MODEL_URL,
+          BITTERPAN_MASSING_MODEL_URL,
+        );
+        this.diagnosticEnvironmentLoadMs = performance.now() - environmentLoadStartedAt;
+        if (this.disposed) {
+          disposeObject3DResources(environment.root);
+          return;
+        }
+        this.authoredEnvironment = environment;
+        this.scene.add(environment.root);
+        this.diagnosticEnvironmentReady = true;
+        this.renderRequested = true;
+        return;
+      }
+
+      const {
+        GreenwaterEnvironment: GreenwaterEnvironmentRuntime,
+        setProceduralEnvironmentVisible,
+      } = await import("./environment");
+      const environment = await GreenwaterEnvironmentRuntime.load(
+        ENVIRONMENT_MODEL_URL,
+        this.course,
+      );
+      this.diagnosticEnvironmentLoadMs = performance.now() - environmentLoadStartedAt;
+      if (this.disposed) {
+        disposeObject3DResources(environment.root);
+        return;
+      }
+      this.authoredEnvironment = environment;
+      setProceduralEnvironmentVisible(this.course.group, false);
+      environment.updateVisibility(this.camera);
+      this.scene.add(environment.root);
+      this.diagnosticEnvironmentReady = true;
+      this.renderRequested = true;
+      await Promise.all([
+        this.loadLivingWorld(environment),
+        this.loadSurfaceCharacter(),
+      ]);
+    } catch (error) {
+      this.diagnosticEnvironmentError = error instanceof Error
+        ? error.message
+        : `Unknown ${this.course.mapName} environment load error`;
+      if (this.course.kind === "bitterpan") {
+        console.error("Bitterpan accepted blockout environment failed to load.", error);
+        throw error;
+      }
+      console.warn("Greenwater authored environment failed to load; using Phase 1 fallback.", error);
+      // The accepted Phase 1 prop dressing remains a recoverable visual fallback.
+      await this.loadAssetKit();
+    } finally {
+      this.diagnosticEnvironmentLoadMs ??= performance.now() - environmentLoadStartedAt;
+    }
+  }
+
+  private async loadLivingWorld(environment: GreenwaterEnvironment): Promise<void> {
+    const loadStartedAt = performance.now();
+    try {
+      const { GreenwaterLivingWorld } = await import("./living-world");
+      const livingWorld = await GreenwaterLivingWorld.load(
+        this.course,
+        environment.livingTextures,
+        LIVING_WORLD_MOTION_URL,
+      );
+      if (this.disposed) {
+        disposeObject3DResources(livingWorld.root);
+        return;
+      }
+      this.livingWorld = livingWorld;
+      this.scene.add(livingWorld.root);
+      this.diagnosticLivingWorldReady = true;
+      this.renderRequested = true;
+    } catch (error) {
+      this.diagnosticLivingWorldError = error instanceof Error
+        ? error.message
+        : "Unknown Greenwater living-world load error";
+      console.warn("Greenwater living-world layer failed to load.", error);
+    } finally {
+      this.diagnosticLivingWorldLoadMs = performance.now() - loadStartedAt;
+    }
+  }
+
+  private async loadSurfaceCharacter(): Promise<void> {
+    const loadStartedAt = performance.now();
+    try {
+      const { GreenwaterSurfaceCharacter } = await import("./surface-character");
+      const surfaceCharacter = await GreenwaterSurfaceCharacter.load(
+        SURFACE_CHARACTER_MODEL_URL,
+      );
+      if (this.disposed) {
+        disposeObject3DResources(surfaceCharacter.root);
+        return;
+      }
+      this.surfaceCharacter = surfaceCharacter;
+      this.scene.add(surfaceCharacter.root);
+      this.diagnosticSurfaceCharacterReady = true;
+      this.renderRequested = true;
+    } catch (error) {
+      this.diagnosticSurfaceCharacterError = error instanceof Error
+        ? error.message
+        : "Unknown Greenwater surface-character load error";
+      console.warn("Greenwater surface-character layer failed to load.", error);
+    } finally {
+      this.diagnosticSurfaceCharacterLoadMs = performance.now() - loadStartedAt;
+    }
   }
 
   private async loadAssetKit(): Promise<void> {
@@ -1685,6 +2177,53 @@ export class FuturismaGame {
     if (this.scene.background instanceof THREE.Color) {
       this.scene.background.lerp(target.color, response);
     }
+    const lighting = this.course.lightingAt(this.progress);
+    const lightingResponse = 1 - Math.exp(-delta * 2.8);
+    this.hemisphereLight.color.lerp(lighting.sky, lightingResponse);
+    this.hemisphereLight.groundColor.lerp(lighting.ground, lightingResponse);
+    this.hemisphereLight.intensity = THREE.MathUtils.lerp(
+      this.hemisphereLight.intensity,
+      lighting.hemisphereIntensity * HEMISPHERE_TRIM,
+      lightingResponse,
+    );
+    this.keyLight.color.lerp(lighting.key, lightingResponse);
+    this.keyLight.intensity = THREE.MathUtils.lerp(
+      this.keyLight.intensity,
+      lighting.keyIntensity,
+      lightingResponse,
+    );
+    this.rimLight.color.lerp(lighting.rim, lightingResponse);
+    this.rimLight.intensity = THREE.MathUtils.lerp(
+      this.rimLight.intensity,
+      lighting.rimIntensity * RIM_PRESENCE_BOOST,
+      lightingResponse,
+    );
+
+    // Sky gradient follows the sector palette: the horizon stays glued to the
+    // fog colour, the zenith drops cool and dark, and the accent band picks up
+    // the sector rim hue so each sector gets a contrasting sky accent.
+    this.skyTopTarget.copy(target.color).multiplyScalar(0.3).lerp(SKY_ZENITH_TINT, 0.45);
+    this.skyBandTarget.copy(lighting.rim);
+    this.skyUniforms.horizonColor.value.lerp(target.color, response);
+    this.skyUniforms.topColor.value.lerp(this.skyTopTarget, response);
+    this.skyUniforms.bandColor.value.lerp(this.skyBandTarget, response);
+    this.skyDome.position.set(this.camera.position.x, 0, this.camera.position.z);
+    const sunMaterial = this.sunDisc.material as THREE.MeshBasicMaterial;
+    sunMaterial.color.lerp(lighting.key, lightingResponse);
+    this.sunDisc.position
+      .copy(this.camera.position)
+      .addScaledVector(SUN_DIRECTION, this.camera.far * 0.72);
+    this.sunDisc.lookAt(this.camera.position);
+
+    // A restrained craft-following light lifts TOTEM off the bright deck and
+    // pools a sector-tinted glow beneath it as a grounding cue.
+    this.skyBandTarget.copy(lighting.rim).lerp(WHITE, 0.45);
+    this.presenceLight.color.lerp(this.skyBandTarget, lightingResponse);
+    this.presenceLight.intensity = THREE.MathUtils.lerp(
+      this.presenceLight.intensity,
+      14,
+      lightingResponse,
+    );
   }
 
   private resolveLapCount(): number {
@@ -1853,6 +2392,7 @@ export class FuturismaGame {
       : 0;
     const elapsedSeconds = this.elapsedMs / 1000;
     const audioDiagnostics = this.audio.diagnostics();
+    const rivalDiagnostics = this.rivalFleet?.diagnostics();
     const memory = performance as Performance & {
       memory?: { usedJSHeapSize: number };
     };
@@ -1863,6 +2403,11 @@ export class FuturismaGame {
       this.diagnosticMaxHeapMb = Math.max(this.diagnosticMaxHeapMb ?? heapMb, heapMb);
     }
     const report = {
+      mapCode: this.course.mapCode,
+      mapName: this.course.mapName,
+      mapKind: this.course.kind,
+      finalMap02NativeBlockoutFreeze: false,
+      orderedCheckpointCount: this.course.orderedCheckpointCount,
       calls: render.calls,
       triangles: render.triangles,
       points: render.points,
@@ -1887,6 +2432,38 @@ export class FuturismaGame {
       wrongWay: this.wrongWayActive,
       courseAlignment: Number(this.courseAlignment.toFixed(2)),
       nextCheckpoint: this.nextCheckpointIndex,
+      raceSeed: 714,
+      fieldSize: this.raceStatus.racerCount,
+      playerPosition: this.raceStatus.position,
+      positionChanges: this.diagnosticPositionChanges,
+      positionsGained: this.diagnosticPositionsGained,
+      positionsLost: this.diagnosticPositionsLost,
+      finalClassification: this.finalStandings.map((standing) => ({
+        position: standing.position,
+        name: standing.name,
+        player: standing.player,
+        finishTimeMs: Math.round(standing.finishTimeMs),
+        gapMs: Math.round(standing.gapMs),
+      })),
+      rivalDrawCalls: rivalDiagnostics?.drawCalls ?? 0,
+      rivalTriangles: rivalDiagnostics?.triangles ?? 0,
+      rivalUpdateSteps: rivalDiagnostics?.updateSteps ?? 0,
+      rivalUpdateHz: elapsedSeconds > 0
+        ? Number(((rivalDiagnostics?.updateSteps ?? 0) / elapsedSeconds).toFixed(1))
+        : 0,
+      rivalMinimumSeparationMeters: Number(
+        (rivalDiagnostics?.minimumSeparationMeters ?? 0).toFixed(2),
+      ),
+      rivalCatchUpMultiplier: rivalDiagnostics?.catchUpMultiplier ?? 1,
+      rivals: (rivalDiagnostics?.states ?? []).map((state) => ({
+        ...state,
+        raceDistanceMeters: Number(state.raceDistanceMeters.toFixed(2)),
+        speedKph: Number(state.speedKph.toFixed(1)),
+        lateralMeters: Number(state.lateralMeters.toFixed(2)),
+        finishTimeMs: state.finishTimeMs === null
+          ? null
+          : Math.round(state.finishTimeMs),
+      })),
       averageSpeedKph: elapsedSeconds > 0
         ? Number((this.diagnosticDistanceTravelled / elapsedSeconds * 3.6).toFixed(1))
         : 0,
@@ -1938,6 +2515,8 @@ export class FuturismaGame {
       activeAudioOneShots: audioDiagnostics.activeOneShots,
       peakAudioOneShots: audioDiagnostics.peakActiveOneShots,
       skippedAudioOneShots: audioDiagnostics.skippedOneShots,
+      raceEventAudioCues: audioDiagnostics.raceEventCues,
+      audioPreparationMs: Number(audioDiagnostics.musicPreparationMs.toFixed(1)),
       audioInitializationMs: Number(audioDiagnostics.initializationMs.toFixed(1)),
       startupReadyMs: Number(this.diagnosticStartupReadyMs.toFixed(1)),
       courseAssemblyMs: Number(this.diagnosticCourseAssemblyMs.toFixed(1)),
@@ -1951,6 +2530,42 @@ export class FuturismaGame {
         ? null
         : Number(this.diagnosticAssetKitLoadMs.toFixed(1)),
       assetKitReady: this.diagnosticAssetKitReady,
+      environmentLoadMs: this.diagnosticEnvironmentLoadMs === null
+        ? null
+        : Number(this.diagnosticEnvironmentLoadMs.toFixed(1)),
+      environmentReady: this.diagnosticEnvironmentReady,
+      environmentError: this.diagnosticEnvironmentError,
+      environmentMeshes: this.authoredEnvironment?.stats.meshes ?? 0,
+      environmentTriangles: this.authoredEnvironment?.stats.triangles ?? 0,
+      environmentMaterials: this.authoredEnvironment?.stats.materials ?? 0,
+      environmentTextures: this.authoredEnvironment?.stats.textures ?? 0,
+      environmentVisibleGroups: this.authoredEnvironment?.stats.visibleGroups ?? 0,
+      environmentVisibleTriangles: this.authoredEnvironment?.stats.visibleTriangles ?? 0,
+      environmentShaderModel: this.authoredEnvironment?.stats.shaderModel ?? null,
+      environmentSignageSource:
+        this.authoredEnvironment?.stats.signageSource ?? null,
+      livingWorldLoadMs: this.diagnosticLivingWorldLoadMs === null
+        ? null
+        : Number(this.diagnosticLivingWorldLoadMs.toFixed(1)),
+      livingWorldReady: this.diagnosticLivingWorldReady,
+      livingWorldError: this.diagnosticLivingWorldError,
+      livingWorldDrawCalls: this.livingWorld?.stats.drawCalls ?? 0,
+      livingWorldCards: this.livingWorld?.stats.cards ?? 0,
+      livingWorldTriangles: this.livingWorld?.stats.triangles ?? 0,
+      livingWorldUpdateHz: this.livingWorld?.stats.updateHz ?? 0,
+      livingWorldUpdateSteps: this.livingWorld?.stats.updateSteps ?? 0,
+      surfaceCharacterLoadMs: this.diagnosticSurfaceCharacterLoadMs === null
+        ? null
+        : Number(this.diagnosticSurfaceCharacterLoadMs.toFixed(1)),
+      surfaceCharacterReady: this.diagnosticSurfaceCharacterReady,
+      surfaceCharacterError: this.diagnosticSurfaceCharacterError,
+      surfaceCharacterDrawCalls: this.surfaceCharacter?.stats.drawCalls ?? 0,
+      surfaceCharacterMeshes: this.surfaceCharacter?.stats.meshes ?? 0,
+      surfaceCharacterTriangles: this.surfaceCharacter?.stats.triangles ?? 0,
+      surfaceCharacterMaterials: this.surfaceCharacter?.stats.materials ?? 0,
+      surfaceCharacterTextures: this.surfaceCharacter?.stats.textures ?? 0,
+      surfaceCharacterShaderModel: this.surfaceCharacter?.stats.shaderModel ?? null,
+      surfaceCharacterAnimated: this.surfaceCharacter?.stats.animated ?? false,
       pixelRatio: Number(this.renderPixelRatio.toFixed(2)),
       preferredPixelRatio: Number(this.preferredPixelRatio.toFixed(2)),
       minimumPixelRatio: Number(this.minimumPixelRatio.toFixed(2)),
@@ -1986,6 +2601,14 @@ export class FuturismaGame {
       this.diagnosticsPeak.textures,
       report.textures,
     );
+    this.diagnosticsPeak.environmentGroups = Math.max(
+      this.diagnosticsPeak.environmentGroups,
+      report.environmentVisibleGroups,
+    );
+    this.diagnosticsPeak.environmentTriangles = Math.max(
+      this.diagnosticsPeak.environmentTriangles,
+      report.environmentVisibleTriangles,
+    );
     this.diagnosticsPeak.frameMs = Math.max(this.diagnosticsPeak.frameMs, report.frameMs);
     if (this.diagnosticsOutput) {
       this.diagnosticsOutput.textContent = JSON.stringify({
@@ -2011,6 +2634,8 @@ export class FuturismaGame {
     this.diagnosticsPeak.triangles = 0;
     this.diagnosticsPeak.geometries = 0;
     this.diagnosticsPeak.textures = 0;
+    this.diagnosticsPeak.environmentGroups = 0;
+    this.diagnosticsPeak.environmentTriangles = 0;
     this.diagnosticsPeak.frameMs = 0;
     this.diagnosticsPeak.phase = this.phase;
     this.diagnosticsPeak.sector = this.course.sectorLabelAt(this.progress);
@@ -2043,6 +2668,9 @@ export class FuturismaGame {
     this.diagnosticAtmosphereUpdates = 0;
     this.diagnosticTopSpeed = 0;
     this.diagnosticMaxLateralRatio = 0;
+    this.diagnosticPositionChanges = 0;
+    this.diagnosticPositionsGained = 0;
+    this.diagnosticPositionsLost = 0;
     const memory = performance as Performance & {
       memory?: { usedJSHeapSize: number };
     };

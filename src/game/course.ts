@@ -2,7 +2,7 @@ import * as THREE from "three";
 import greenwaterJson from "./data/greenwater-blockout.json";
 import { isCircularHazardContact } from "./race-rules";
 
-type EdgeType = "A" | "B" | "C";
+export type EdgeType = "A" | "B" | "C";
 
 interface RawCourseSample {
   d: number;
@@ -179,12 +179,81 @@ export interface FogProfile {
   color: THREE.Color;
 }
 
+export interface CourseLightingProfile {
+  sky: THREE.Color;
+  ground: THREE.Color;
+  key: THREE.Color;
+  rim: THREE.Color;
+  hemisphereIntensity: number;
+  keyIntensity: number;
+  rimIntensity: number;
+}
+
+export type CourseKind = "greenwater" | "bitterpan";
+
+export interface RivalGridStart {
+  raceDistanceMeters: number;
+  courseDistanceMeters: number;
+  lateralMeters: number;
+}
+
+export interface RaceCourse {
+  readonly kind: CourseKind;
+  readonly group: THREE.Group;
+  readonly length: number;
+  readonly halfWidth: number;
+  readonly checkpointCount: number;
+  readonly orderedCheckpointCount: number;
+  readonly defaultLapCount: number;
+  readonly minimumLapCount: number;
+  readonly maximumLapCount: number;
+  readonly mapName: string;
+  readonly mapCode: string;
+  readonly finishName: string;
+  readonly startLabel: string;
+  readonly startProgress: number;
+  readonly startLateral: number;
+  readonly recoveryHoldSeconds: number;
+  readonly recoverySpeedMps: number;
+  readonly recoveryImmunitySeconds: number;
+  readonly surfaceGripRecoverySeconds: number;
+  createSampleScratch(): CourseSample;
+  createProjectionScratch(): CourseProjection;
+  sample(progress: number, target?: CourseSample): CourseSample;
+  sampleAtDistance(distance: number): CourseSample;
+  checkpointProgress(index: number): number;
+  checkpointHalfWidth(index: number): number;
+  project(
+    position: THREE.Vector3,
+    hintProgress: number,
+    target?: CourseProjection,
+  ): CourseProjection;
+  turnAhead(progress: number, maximumDistance?: number, target?: TurnCue): TurnCue | null;
+  fogAt(progress: number): FogProfile;
+  lightingAt(progress: number): CourseLightingProfile;
+  edgeType(sample: CourseSample, lateral: number): EdgeType;
+  surfaceGripAt(progress: number, lateral: number, halfWidth: number): number;
+  cableTripSideAt(progress: number, lateral: number): -1 | 0 | 1;
+  isOnBoostPad(progress: number, lateral: number, halfWidth: number): boolean;
+  sectorLabelAt(progress: number): string;
+  musicAt(progress: number): MusicProfile;
+  updateAtmosphere(elapsedSeconds: number, reducedMotion: boolean): boolean;
+  vehicleHoverHeight(speedMetersPerSecond: number, boostActive: boolean): number;
+  setCheckpointProgress(nextCheckpointIndex: number): void;
+  setLapBoard(current: number, total: number): void;
+  recoveryProgressFor(progress: number, previousCheckpointIndex: number): number;
+  rivalGridStart(identity: string): RivalGridStart | null;
+}
+
 const WORLD_UP = new THREE.Vector3(0, 1, 0);
 const COURSE_BASIS = new THREE.Matrix4();
 const COURSE_BACK = new THREE.Vector3();
 const MAP = greenwaterJson as unknown as GreenwaterMapData;
-const GAMEPLAY_FOG_SCALE = 0.58;
 const ATMOSPHERE_UPDATE_INTERVAL_SECONDS = 1 / 30;
+const LIGHTING_CROSSFADE_METRES = 90;
+const EDGE_FURNITURE_CLEARANCE_METRES = 4.5;
+const EDGE_FURNITURE_SAFETY_MARGIN_METRES = 0.25;
+const TURN_CHEVRON_CLEARANCE_METRES = 9;
 const BOOST_PAD_DISTANCES = [1705, 1815, 1925, 2035] as const;
 const SECTOR_LABELS: Record<string, string> = {
   RUNWAY_START: "RUNWAY 09",
@@ -200,6 +269,226 @@ const SECTOR_LABELS: Record<string, string> = {
   T10_TOTEM_TURN: "TOTEM TURN",
   RUNWAY_HOME: "HOME STRAIGHT",
 };
+const SECTOR_PALETTE_DEFINITIONS = [
+  {
+    sector: "RUNWAY_START",
+    distance: 0,
+    key: 0xf4f7f9,
+    keyIntensity: 1.75,
+    sky: 0xd6e0e6,
+    ground: 0x4d5852,
+    hemisphereIntensity: 1.45,
+    fog: 0x8e9ba0,
+    fogDensity: 0.0016,
+  },
+  {
+    sector: "T1_CRADLE_BEND",
+    distance: 221.998,
+    key: 0xeef2ea,
+    keyIntensity: 1.7,
+    sky: 0xc9d6c4,
+    ground: 0x475044,
+    hemisphereIntensity: 1.5,
+    fog: 0x8a958f,
+    fogDensity: 0.0018,
+  },
+  {
+    sector: "WATER_TABLE",
+    distance: 377.997,
+    key: 0xd2e2e0,
+    keyIntensity: 1.5,
+    sky: 0x86bab2,
+    ground: 0x24403a,
+    hemisphereIntensity: 1.55,
+    fog: 0x7fa8a2,
+    fogDensity: 0.00215,
+  },
+  {
+    sector: "LINK_APRON",
+    distance: 587.996,
+    key: 0xcedcd6,
+    keyIntensity: 1.45,
+    sky: 0x7fada6,
+    ground: 0x243630,
+    hemisphereIntensity: 1.45,
+    fog: 0x6f938e,
+    fogDensity: 0.00295,
+  },
+  {
+    sector: "HANGAR_SIX",
+    distance: 617.996,
+    key: 0xffbd63,
+    keyIntensity: 0.85,
+    sky: 0x6f6355,
+    ground: 0x1b1a18,
+    hemisphereIntensity: 1,
+    fog: 0x3f3a34,
+    fogDensity: 0.0042,
+  },
+  {
+    sector: "HANGAR_EXIT",
+    distance: 817.994,
+    key: 0xffd08a,
+    keyIntensity: 1.3,
+    sky: 0x8e8371,
+    ground: 0x272420,
+    hemisphereIntensity: 1.2,
+    fog: 0x4d4a41,
+    fogDensity: 0.00355,
+  },
+  {
+    sector: "GREENWATER_SWEEP",
+    distance: 847.994,
+    key: 0xe6f0d8,
+    keyIntensity: 1.6,
+    sky: 0x8fb8b0,
+    ground: 0x25423c,
+    hemisphereIntensity: 1.65,
+    fog: 0x6f8a83,
+    fogDensity: 0.0026,
+  },
+  {
+    sector: "CANOPY_PASSAGE",
+    distance: 1129.992,
+    key: 0xffe9a8,
+    keyIntensity: 1.2,
+    sky: 0x7fa06a,
+    ground: 0x1e3320,
+    hemisphereIntensity: 1.7,
+    fog: 0x51684a,
+    fogDensity: 0.003,
+  },
+  {
+    sector: "THE_ELBOW",
+    distance: 1481.99,
+    key: 0xf0e8b4,
+    keyIntensity: 1.4,
+    sky: 0x92ab7e,
+    ground: 0x283a28,
+    hemisphereIntensity: 1.6,
+    fog: 0x60755a,
+    fogDensity: 0.0027,
+  },
+  {
+    sector: "FUEL_ROW",
+    distance: 1591.989,
+    key: 0xffb970,
+    keyIntensity: 1.6,
+    sky: 0xa8a48c,
+    ground: 0x3a3428,
+    hemisphereIntensity: 1.35,
+    fog: 0x77776b,
+    fogDensity: 0.0019,
+  },
+  {
+    sector: "T10_TOTEM_TURN",
+    distance: 2121.985,
+    key: 0xd9dee4,
+    keyIntensity: 1.25,
+    sky: 0x77828c,
+    ground: 0x22262a,
+    hemisphereIntensity: 1.15,
+    fog: 0x4a5358,
+    fogDensity: 0.0023,
+  },
+  {
+    sector: "RUNWAY_HOME",
+    distance: 2255.984,
+    key: 0xf4f7f9,
+    keyIntensity: 1.8,
+    sky: 0xd6e0e6,
+    ground: 0x4d5852,
+    hemisphereIntensity: 1.5,
+    fog: 0x8e9ba0,
+    fogDensity: 0.0016,
+  },
+] as const;
+
+// The living-world review does not replace the accepted navigation rim light.
+// Keep its existing color language while the reviewed palette drives the sun,
+// hemisphere and fog columns above.
+const RIM_LIGHTING_ZONE_DEFINITIONS = [
+  {
+    distance: 0,
+    sky: 0xa9bbb0,
+    ground: 0x10180e,
+    key: 0xd8e0ca,
+    rim: 0xc8ff2e,
+    hemisphereIntensity: 1.65,
+    keyIntensity: 2.25,
+    rimIntensity: 0.65,
+  },
+  {
+    distance: 586.519,
+    sky: 0x71807c,
+    ground: 0x120f0d,
+    key: 0xaab5ae,
+    rim: 0xff7138,
+    hemisphereIntensity: 1.05,
+    keyIntensity: 1.6,
+    rimIntensity: 0.95,
+  },
+  {
+    distance: 846.239,
+    sky: 0xa6b79b,
+    ground: 0x09150b,
+    key: 0xd1debf,
+    rim: 0x9aff57,
+    hemisphereIntensity: 1.6,
+    keyIntensity: 2.05,
+    rimIntensity: 0.72,
+  },
+  {
+    distance: 1128.982,
+    sky: 0x879d7e,
+    ground: 0x071008,
+    key: 0xb9cda9,
+    rim: 0x67d99b,
+    hemisphereIntensity: 1.22,
+    keyIntensity: 1.82,
+    rimIntensity: 0.56,
+  },
+  {
+    distance: 1481.152,
+    sky: 0x78867a,
+    ground: 0x130f0c,
+    key: 0xbac4b6,
+    rim: 0xff693d,
+    hemisphereIntensity: 1.16,
+    keyIntensity: 1.78,
+    rimIntensity: 0.86,
+  },
+  {
+    distance: 1591.107,
+    sky: 0x9b9d80,
+    ground: 0x16120a,
+    key: 0xe1d6ae,
+    rim: 0xff9a38,
+    hemisphereIntensity: 1.42,
+    keyIntensity: 2.08,
+    rimIntensity: 0.9,
+  },
+  {
+    distance: 2121.465,
+    sky: 0x6d7978,
+    ground: 0x0a0d0d,
+    key: 0xafbab6,
+    rim: 0xc8ff2e,
+    hemisphereIntensity: 1.12,
+    keyIntensity: 1.8,
+    rimIntensity: 1,
+  },
+  {
+    distance: 2254.982,
+    sky: 0xa2b7ad,
+    ground: 0x0d160d,
+    key: 0xdbe4cf,
+    rim: 0xc8ff2e,
+    hemisphereIntensity: 1.72,
+    keyIntensity: 2.32,
+    rimIntensity: 0.78,
+  },
+] as const;
 
 function seededRandom(seed: number): () => number {
   let value = seed >>> 0;
@@ -238,6 +527,20 @@ function setCourseObjectTransform(
   object.updateMatrix();
 }
 
+function edgeFurnitureOffset(
+  sample: CourseSample,
+  side: -1 | 1,
+  visibleWidth: number,
+  clearance = EDGE_FURNITURE_CLEARANCE_METRES,
+): number {
+  return side * (
+    sample.halfWidth
+    + clearance
+    + EDGE_FURNITURE_SAFETY_MARGIN_METRES
+    + visibleWidth / 2
+  );
+}
+
 function createLabelMaterial(
   text: string,
   foreground = "#c8ff2e",
@@ -266,15 +569,22 @@ function createLabelMaterial(
   return new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
 }
 
-export class GreenwaterCourse {
+export class GreenwaterCourse implements RaceCourse {
+  readonly kind = "greenwater" as const;
   readonly group = new THREE.Group();
   readonly length = MAP.centreline.lapLength;
   readonly halfWidth = 12;
   readonly checkpointCount = MAP.checkpoints.length;
+  readonly orderedCheckpointCount = MAP.checkpoints.length + 1;
   readonly defaultLapCount = MAP.race.lapCount;
   readonly minimumLapCount = MAP.race.lapCountRange[0];
   readonly maximumLapCount = MAP.race.lapCountRange[1];
   readonly mapName = MAP.map.name;
+  readonly mapCode = "MAP 01";
+  readonly finishName = "The Cradle";
+  readonly startLabel = "RUNWAY 09";
+  readonly startProgress = 0.002;
+  readonly startLateral = 0;
   readonly recoveryHoldSeconds = MAP.recovery.holdSeconds;
   readonly recoverySpeedMps = MAP.recovery.reinsertSpeedKph / 3.6;
   readonly recoveryImmunitySeconds = MAP.recovery.immunitySeconds;
@@ -311,17 +621,36 @@ export class GreenwaterCourse {
     (hazard) => hazard.id === "HZ_WATER_SHEET",
   );
   readonly surfaceGripRecoverySeconds = this.waterHazard?.durationSeconds ?? 0.8;
-  private readonly fogProfiles = MAP.fog.zones.map((zone) => ({
-    fromDistance: zone.fromDistance,
-    toDistance: zone.toDistance,
+  private readonly fogProfiles = SECTOR_PALETTE_DEFINITIONS.map((zone) => ({
+    distance: zone.distance,
     profile: {
-      density: zone.density * GAMEPLAY_FOG_SCALE,
-      color: new THREE.Color(zone.color),
+      density: zone.fogDensity,
+      color: new THREE.Color(zone.fog),
     },
   }));
   private readonly fogProfileScratch: FogProfile = {
     density: 0,
     color: new THREE.Color(),
+  };
+  private readonly lightingProfiles = SECTOR_PALETTE_DEFINITIONS.map((zone) => ({
+    ...zone,
+    sky: new THREE.Color(zone.sky),
+    ground: new THREE.Color(zone.ground),
+    key: new THREE.Color(zone.key),
+  }));
+  private readonly rimLightingProfiles = RIM_LIGHTING_ZONE_DEFINITIONS.map((zone) => ({
+    distance: zone.distance,
+    rim: new THREE.Color(zone.rim),
+    rimIntensity: zone.rimIntensity,
+  }));
+  private readonly lightingProfileScratch: CourseLightingProfile = {
+    sky: new THREE.Color(),
+    ground: new THREE.Color(),
+    key: new THREE.Color(),
+    rim: new THREE.Color(),
+    hemisphereIntensity: 0,
+    keyIntensity: 0,
+    rimIntensity: 0,
   };
   private readonly cableHazards = MAP.hazards.filter(
     (hazard) => hazard.type === "cable_coil" && hazard.distance !== undefined,
@@ -348,6 +677,7 @@ export class GreenwaterCourse {
       this.createEdgeRails(),
       this.createEdgeLights(),
       this.createOpenEdgeMarkers(),
+      this.createTurnGuideLights(),
       this.createTurnMarkers(),
       this.createCheckpointGates(),
       this.createStartGrid(),
@@ -547,23 +877,20 @@ export class GreenwaterCourse {
   fogAt(progress: number): FogProfile {
     const distance = THREE.MathUtils.euclideanModulo(progress, 1) * this.length;
     let zoneIndex = 0;
-    for (let index = 0; index < this.fogProfiles.length; index += 1) {
-      const candidate = this.fogProfiles[index];
-      if (distance >= candidate.fromDistance && distance < candidate.toDistance) {
-        zoneIndex = index;
-        break;
-      }
+    for (let index = 1; index < this.fogProfiles.length; index += 1) {
+      if (this.fogProfiles[index].distance > distance) break;
+      zoneIndex = index;
     }
     const zone = this.fogProfiles[zoneIndex];
     const next = this.fogProfiles[(zoneIndex + 1) % this.fogProfiles.length];
-    const crossfadeMetres = Math.min(
-      MAP.fog.crossfadeMetres,
-      zone.toDistance - zone.fromDistance,
-    );
-    const crossfadeStart = zone.toDistance - crossfadeMetres;
+    const zoneEnd = zoneIndex === this.fogProfiles.length - 1
+      ? this.length
+      : next.distance;
+    const crossfadeMetres = Math.min(MAP.fog.crossfadeMetres, zoneEnd - zone.distance);
+    const crossfadeStart = zoneEnd - crossfadeMetres;
     const amount = distance <= crossfadeStart
       ? 0
-      : THREE.MathUtils.smoothstep(distance, crossfadeStart, zone.toDistance);
+      : THREE.MathUtils.smoothstep(distance, crossfadeStart, zoneEnd);
     this.fogProfileScratch.density = THREE.MathUtils.lerp(
       zone.profile.density,
       next.profile.density,
@@ -575,6 +902,65 @@ export class GreenwaterCourse {
       amount,
     );
     return this.fogProfileScratch;
+  }
+
+  lightingAt(progress: number): CourseLightingProfile {
+    const distance = THREE.MathUtils.euclideanModulo(progress, 1) * this.length;
+    let zoneIndex = 0;
+    for (let index = 1; index < this.lightingProfiles.length; index += 1) {
+      if (this.lightingProfiles[index].distance > distance) break;
+      zoneIndex = index;
+    }
+    const zone = this.lightingProfiles[zoneIndex];
+    const next = this.lightingProfiles[(zoneIndex + 1) % this.lightingProfiles.length];
+    const zoneEnd = zoneIndex === this.lightingProfiles.length - 1
+      ? this.length
+      : next.distance;
+    const crossfadeStart = Math.max(zone.distance, zoneEnd - LIGHTING_CROSSFADE_METRES);
+    const amount = distance <= crossfadeStart
+      ? 0
+      : THREE.MathUtils.smoothstep(distance, crossfadeStart, zoneEnd);
+    const target = this.lightingProfileScratch;
+    target.sky.lerpColors(zone.sky, next.sky, amount);
+    target.ground.lerpColors(zone.ground, next.ground, amount);
+    target.key.lerpColors(zone.key, next.key, amount);
+    target.hemisphereIntensity = THREE.MathUtils.lerp(
+      zone.hemisphereIntensity,
+      next.hemisphereIntensity,
+      amount,
+    );
+    target.keyIntensity = THREE.MathUtils.lerp(
+      zone.keyIntensity,
+      next.keyIntensity,
+      amount,
+    );
+
+    let rimZoneIndex = 0;
+    for (let index = 1; index < this.rimLightingProfiles.length; index += 1) {
+      if (this.rimLightingProfiles[index].distance > distance) break;
+      rimZoneIndex = index;
+    }
+    const rimZone = this.rimLightingProfiles[rimZoneIndex];
+    const rimNext = this.rimLightingProfiles[
+      (rimZoneIndex + 1) % this.rimLightingProfiles.length
+    ];
+    const rimZoneEnd = rimZoneIndex === this.rimLightingProfiles.length - 1
+      ? this.length
+      : rimNext.distance;
+    const rimCrossfadeStart = Math.max(
+      rimZone.distance,
+      rimZoneEnd - LIGHTING_CROSSFADE_METRES,
+    );
+    const rimAmount = distance <= rimCrossfadeStart
+      ? 0
+      : THREE.MathUtils.smoothstep(distance, rimCrossfadeStart, rimZoneEnd);
+    target.rim.lerpColors(rimZone.rim, rimNext.rim, rimAmount);
+    target.rimIntensity = THREE.MathUtils.lerp(
+      rimZone.rimIntensity,
+      rimNext.rimIntensity,
+      rimAmount,
+    );
+    return target;
   }
 
   edgeType(sample: CourseSample, lateral: number): EdgeType {
@@ -684,8 +1070,10 @@ export class GreenwaterCourse {
           const age = ageSeconds / 1.18;
           const active = age >= 0 && age <= 1;
           const fade = active ? Math.sin(age * Math.PI) : 0;
+          // Keep the vent readable as a hazard without letting its overlapping
+          // low-poly puffs merge into a solid, rock-like silhouette.
           const scale = active
-            ? (1.1 + age * 2.4) * Math.max(0.2, fade)
+            ? (0.82 + age * 1.78) * Math.max(0.16, fade)
             : 0.001;
           const wobble = reducedMotion ? 0 : Math.sin(age * 8 + ventIndex) * age * 0.7;
           setCourseObjectTransform(
@@ -695,7 +1083,7 @@ export class GreenwaterCourse {
             0.55 + Math.max(0, age) * 8.5,
             reducedMotion ? 0 : Math.cos(age * 7 + puffIndex) * age * 0.45,
             scale,
-            scale * 1.35,
+            scale * 1.5,
             scale,
           );
           puffs.setMatrixAt(instanceIndex, this.atmosphereTransform.matrix);
@@ -710,6 +1098,11 @@ export class GreenwaterCourse {
       this.cargoHookPivot.rotation.z = Math.sin(elapsed * 1.7) * amplitude;
     }
     return true;
+  }
+
+  vehicleHoverHeight(speedMetersPerSecond: number, boostActive: boolean): number {
+    const dynamicHeight = boostActive ? 0.6 : speedMetersPerSecond < 11 ? 0.18 : 0.45;
+    return dynamicHeight + 0.71;
   }
 
   setCheckpointProgress(nextCheckpointIndex: number): void {
@@ -749,6 +1142,17 @@ export class GreenwaterCourse {
     context.font = "600 24px monospace";
     context.fillText("GREENWATER STRIP", 256, 145);
     this.lapBoardTexture.needsUpdate = true;
+  }
+
+  recoveryProgressFor(_progress: number, previousCheckpointIndex: number): number {
+    return THREE.MathUtils.euclideanModulo(
+      this.checkpointProgress(previousCheckpointIndex) + 0.004,
+      1,
+    );
+  }
+
+  rivalGridStart(_identity: string): RivalGridStart | null {
+    return null;
   }
 
   private createTrackSurface(): THREE.Mesh {
@@ -961,10 +1365,61 @@ export class GreenwaterCourse {
     return group;
   }
 
+  private createTurnGuideLights(): THREE.InstancedMesh {
+    const guidedTurns = MAP.turns.filter((turn) => turn.radius < 300);
+    const spacingMetres = 7;
+    const markerCount = guidedTurns.reduce(
+      (total, turn) => total + Math.floor(
+        (turn.exitDistance - turn.entryDistance) / spacingMetres,
+      ) + 1,
+      0,
+    );
+    const markers = new THREE.InstancedMesh(
+      new THREE.BoxGeometry(1, 1, 1),
+      new THREE.MeshBasicMaterial({ color: 0xffa22e }),
+      markerCount,
+    );
+    markers.name = "greenwater_turn_vector_lights";
+    const marker = new THREE.Object3D();
+    let markerIndex = 0;
+    for (const turn of guidedTurns) {
+      const inside = turn.direction === "left" ? -1 : 1;
+      for (
+        let distance = turn.entryDistance;
+        distance <= turn.exitDistance + 0.001;
+        distance += spacingMetres
+      ) {
+        const sample = this.sampleAtDistance(distance);
+        setCourseObjectTransform(
+          marker,
+          sample,
+          inside * sample.halfWidth * 0.68,
+          0.085,
+          0,
+          0.34,
+          0.045,
+          1.55,
+        );
+        markers.setMatrixAt(markerIndex, marker.matrix);
+        markerIndex += 1;
+      }
+    }
+    markers.count = markerIndex;
+    markers.instanceMatrix.needsUpdate = true;
+    return markers;
+  }
+
   private createTurnMarkers(): THREE.Group {
     const group = new THREE.Group();
     group.name = "greenwater_turn_grammar";
     const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
+    // Chevron faces only need to read on approach. A one-sided plane removes
+    // the large blank backside after TOTEM passes without changing the arrow,
+    // placement, scale, or accepted braking-distance language.
+    const boardFaceGeometry = new THREE.PlaneGeometry(1, 1);
+    const chevronBoardWidth = 3;
+    const chevronBoardHeight = 1.45;
+    const distanceBoardWidth = 1.7 * 1.45;
     const boardMaterial = new THREE.MeshLambertMaterial({ color: 0x1b201d });
     const postMaterial = new THREE.MeshLambertMaterial({ color: 0x333a35 });
     const arrowMaterial = new THREE.MeshBasicMaterial({ color: 0xffa22e, side: THREE.DoubleSide });
@@ -981,7 +1436,7 @@ export class GreenwaterCourse {
     const chevronCount = MAP.turns.reduce((total, turn) => total + turn.chevronCount, 0);
     const boardCount = MAP.turns.reduce((total, turn) => total + turn.boards.length, 0);
     const chevronBoards = new THREE.InstancedMesh(
-      cubeGeometry,
+      boardFaceGeometry,
       boardMaterial,
       chevronCount,
     );
@@ -1000,13 +1455,12 @@ export class GreenwaterCourse {
       arrowMaterial,
       boardCount,
     );
-    const labelGeometry = new THREE.PlaneGeometry(1, 1);
     const boardLabels = new Map<number, { mesh: THREE.InstancedMesh; count: number }>();
-    for (const label of new Set(MAP.turns.flatMap((turn) => turn.boards.map((value) => value / 50)))) {
-      boardLabels.set(label, {
+    for (const distanceMetres of new Set(MAP.turns.flatMap((turn) => turn.boards))) {
+      boardLabels.set(distanceMetres, {
         mesh: new THREE.InstancedMesh(
-          labelGeometry,
-          createLabelMaterial(String(label), "#ffa22e"),
+          boardFaceGeometry,
+          createLabelMaterial(`${distanceMetres}M`, "#ffa22e"),
           boardCount,
         ),
         count: 0,
@@ -1021,10 +1475,27 @@ export class GreenwaterCourse {
       for (let index = 0; index < turn.chevronCount; index += 1) {
         const markerDistance = turn.apexDistance + (index - (turn.chevronCount - 1) / 2) * 7;
         const sample = this.sampleAtDistance(markerDistance);
-        const markerX = outside * (sample.halfWidth + 1.8);
-        setCourseObjectTransform(object, sample, markerX, 2.3, 0, 3.5, 1.7, 0.24);
+        // These panels repeat around bends. The structural gap keeps their
+        // projected silhouettes out of the route opening, even when several
+        // boards stack in the chase camera through a fast chicane.
+        const markerX = edgeFurnitureOffset(
+          sample,
+          outside,
+          chevronBoardWidth,
+          TURN_CHEVRON_CLEARANCE_METRES,
+        );
+        setCourseObjectTransform(
+          object,
+          sample,
+          markerX,
+          2.3,
+          0,
+          chevronBoardWidth,
+          chevronBoardHeight,
+          0.24,
+        );
         chevronBoards.setMatrixAt(chevronIndex, object.matrix);
-        setCourseObjectTransform(object, sample, markerX, 1.1, 0.08, 0.18, 2.2, 0.18);
+        setCourseObjectTransform(object, sample, markerX, 1.05, 0.08, 0.18, 2.1, 0.18);
         chevronPosts.setMatrixAt(chevronIndex, object.matrix);
         setCourseObjectTransform(
           object,
@@ -1047,22 +1518,32 @@ export class GreenwaterCourse {
         );
         const sample = this.sampleAtDistance(distance);
         const side = turn.direction === "left" ? 1 : -1;
-        const markerX = side * (sample.halfWidth + 2.1);
-        const label = boardDistance / 50;
-        const labelBatch = boardLabels.get(label);
-        if (!labelBatch) throw new Error(`Missing Greenwater braking-board label ${label}.`);
-        setCourseObjectTransform(object, sample, markerX, 2.2, 0.08, 2.4, 2.4, 1);
+        const markerX = edgeFurnitureOffset(sample, side, distanceBoardWidth);
+        const labelBatch = boardLabels.get(boardDistance);
+        if (!labelBatch) {
+          throw new Error(`Missing Greenwater braking-board label ${boardDistance}M.`);
+        }
+        setCourseObjectTransform(
+          object,
+          sample,
+          markerX,
+          2.05,
+          0.08,
+          distanceBoardWidth,
+          1.28,
+          1,
+        );
         labelBatch.mesh.setMatrixAt(labelBatch.count, object.matrix);
         labelBatch.count += 1;
         setCourseObjectTransform(
           object,
           sample,
           markerX,
-          0.72,
+          0.62,
           0.1,
           turn.direction === "left" ? -0.78 : 0.78,
-          0.78,
-          0.78,
+          0.58,
+          0.58,
         );
         approachArrows.setMatrixAt(approachIndex, object.matrix);
         approachIndex += 1;
@@ -1366,9 +1847,9 @@ export class GreenwaterCourse {
       const puffsPerVent = 6;
       const puffGeometry = new THREE.DodecahedronGeometry(1, 0);
       const puffMaterial = new THREE.MeshBasicMaterial({
-        color: 0xd1ded8,
+        color: 0xa7b9b1,
         transparent: true,
-        opacity: 0.42,
+        opacity: 0.24,
         depthWrite: false,
       });
       const puffs = new THREE.InstancedMesh(

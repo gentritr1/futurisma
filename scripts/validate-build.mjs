@@ -1,22 +1,45 @@
 import assert from "node:assert/strict";
 import { gzipSync } from "node:zlib";
-import { readFile, readdir } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 
 const assetsDirectory = new URL("../dist/assets/", import.meta.url);
-const assetNames = await readdir(assetsDirectory);
-const javascriptName = assetNames.find((name) => name.endsWith(".js"));
-const stylesheetName = assetNames.find((name) => name.endsWith(".css"));
-assert.ok(javascriptName, "The production build must contain a JavaScript bundle.");
-assert.ok(stylesheetName, "The production build must contain a stylesheet bundle.");
-
-const javascript = await readFile(new URL(javascriptName, assetsDirectory));
-const stylesheet = await readFile(new URL(stylesheetName, assetsDirectory));
 const html = await readFile(new URL("../dist/index.html", import.meta.url));
 const productionHeaders = await readFile(new URL("../dist/_headers", import.meta.url), "utf8");
-const javascriptGzip = gzipSync(javascript).byteLength;
-const stylesheetGzip = gzipSync(stylesheet).byteLength;
+const htmlSource = html.toString("utf8");
+const initialAssetNames = [...htmlSource.matchAll(
+  /(?:src|href)="\/assets\/([^"?]+\.(?:js|css))"/g,
+)].map((match) => match[1]);
+const javascriptNames = initialAssetNames.filter((name) => name.endsWith(".js"));
+const stylesheetNames = initialAssetNames.filter((name) => name.endsWith(".css"));
+assert.ok(javascriptNames.length > 0, "The production shell must reference JavaScript.");
+assert.ok(stylesheetNames.length > 0, "The production shell must reference a stylesheet.");
+assert.equal(
+  new Set(initialAssetNames).size,
+  initialAssetNames.length,
+  "The production shell repeats an initial asset reference.",
+);
+
+async function measureAssets(names) {
+  let rawBytes = 0;
+  let gzipBytes = 0;
+  for (const name of names) {
+    const bytes = await readFile(new URL(name, assetsDirectory));
+    rawBytes += bytes.byteLength;
+    gzipBytes += gzipSync(bytes).byteLength;
+  }
+  return { rawBytes, gzipBytes };
+}
+
+const javascript = await measureAssets(javascriptNames);
+const stylesheet = await measureAssets(stylesheetNames);
+const javascriptGzip = javascript.gzipBytes;
+const stylesheetGzip = stylesheet.gzipBytes;
 const shellGzip = gzipSync(html).byteLength + javascriptGzip + stylesheetGzip;
 
+assert.ok(
+  javascript.rawBytes <= 950 * 1024,
+  `Initial JavaScript exceeds 950 KiB raw (${(javascript.rawBytes / 1024).toFixed(1)} KiB).`,
+);
 assert.ok(
   javascriptGzip <= 225 * 1024,
   `JavaScript bundle exceeds 225 KiB gzip (${(javascriptGzip / 1024).toFixed(1)} KiB).`,
@@ -42,5 +65,9 @@ assert.ok(
 );
 
 console.log(
-  `Build PASS: ${(shellGzip / 1024).toFixed(1)} KiB gzip shell (${(javascriptGzip / 1024).toFixed(1)} KiB JS).`,
+  `Build PASS: ${(shellGzip / 1024).toFixed(1)} KiB gzip shell; ${(
+    javascript.rawBytes / 1024
+  ).toFixed(1)} KiB raw / ${(javascriptGzip / 1024).toFixed(1)} KiB gzip initial JS across ${
+    javascriptNames.length
+  } file(s).`,
 );

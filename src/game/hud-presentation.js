@@ -75,6 +75,36 @@ export function resolveRaceStage(finishArmed, lap, totalLaps) {
 }
 
 /**
+ * @param {number} position
+ * @param {number} racerCount
+ */
+export function formatRacePosition(position, racerCount) {
+  const count = Number.isFinite(racerCount)
+    ? Math.max(1, Math.floor(racerCount))
+    : 1;
+  const place = Number.isFinite(position)
+    ? Math.min(count, Math.max(1, Math.floor(position)))
+    : count;
+  return `P${place} / ${count}`;
+}
+
+/**
+ * @param {number} position
+ * @param {number | null} gapToAheadMs
+ * @param {number | null} gapToBehindMs
+ */
+export function formatRaceGap(position, gapToAheadMs, gapToBehindMs) {
+  if (position <= 1) {
+    return Number.isFinite(gapToBehindMs) && gapToBehindMs !== null
+      ? `${(Math.max(0, gapToBehindMs) / 1000).toFixed(2)} CLEAR`
+      : "FIELD LEAD";
+  }
+  return Number.isFinite(gapToAheadMs) && gapToAheadMs !== null
+    ? `+${(Math.max(0, gapToAheadMs) / 1000).toFixed(2)} TO P${Math.max(1, position - 1)}`
+    : "GAP ACQUIRING";
+}
+
+/**
  * The reserve meter communicates depletion lockout independently from vehicle
  * boost, because a course pad can still boost TOTEM while manual boost is locked.
  * @param {boolean} boostActive

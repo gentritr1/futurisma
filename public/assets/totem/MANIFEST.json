@@ -2,8 +2,13 @@
   "project": "FUTURISMA",
   "asset": "TOTEM",
   "designation": "KAIRO DYNAMICS KD-0714 · CLASS II ANTIGRAV · HULL REV 12",
-  "status": "Phase 1 production vehicle — locked, shape corrections final",
-  "generated": "2026-08-23",
+  "status": "Greenwater Race Presence v1.6 accepted final freeze",
+  "generated": "2026-08-28",
+  "final_v16_freeze": true,
+  "race_presence_review_sha256": "94c0b7d58dbb5f4e8cb549259ceabcbacee84cbadcc3393a93ebe4530cd395b9",
+  "race_presence_final_archive": "artifacts/GREENWATER_RACE_PRESENCE_v1.6.zip",
+  "race_presence_final_bytes": 14380913,
+  "race_presence_final_sha256": "2bd5adfd1350b2fd2a9302a8f4139918d1e1d0fe3a1b88b4b80f4cffeb4a6b8a",
   "byte_fields": "generated from the live export buffers at pack time — see futurisma-handoff.html section 08",
   "names_provisional": ["Kairo Dynamics", "Totem Syndicate"],
 
@@ -72,8 +77,8 @@
       "map": "totem_decals_1024_<livery>.png",
       "vertex_colors": true,
       "alpha": "MASK, alphaTest 0.5",
-      "roughness": 0.62,
-      "metalness": 0.25,
+      "roughness": 0.78,
+      "metalness": 0.14,
       "carries": "hull, mechanisms, all movable parts, all 18 decal quads",
       "replaces": "8 paint materials + 12 decal materials in the master"
     },
@@ -81,13 +86,16 @@
       "name": "TOTEM_emissive",
       "map": "totem_emissive_512.png",
       "emissive_map": "totem_emissive_512.png",
-      "emissive_intensity": 1.6,
+      "asset_emissive_intensity": 0.78,
+      "runtime_emissive_intensity": 0.62,
       "carries": "exhaust cores, spine stripe, nav lamps, ring beacons"
     },
     {
       "name": "TOTEM_glass",
       "transparent": true,
       "opacity": 0.60,
+      "roughness": 0.30,
+      "metalness": 0.08,
       "carries": "canopy — the only transparent surface on the vehicle"
     },
     {
@@ -131,7 +139,9 @@
     "totem_decals_1024_works.png": { "slot": "TOTEM_body.map", "size": 1024, "format": "RGBA", "livery": "works — default hero, race number 07" },
     "totem_decals_1024_privateer.png": { "slot": "TOTEM_body.map", "size": 1024, "format": "RGBA", "livery": "privateer — alternate, race number 13" },
     "totem_decals_1024_nightform.png": { "slot": "TOTEM_body.map", "size": 1024, "format": "RGBA", "livery": "night form — unlock / high-speed variant, race number 24" },
+    "totem_decals_1024_needle.png": { "slot": "TOTEM_body.map", "size": 1024, "format": "RGBA", "livery": "needle — rival, race number 16" },
     "totem_emissive_512.png": { "slot": "TOTEM_emissive.map + .emissiveMap", "size": 512, "format": "RGB", "shared_with": "asset kit beacon and lamp family" },
+    "totem_race_presence_fx_256.png": { "slot": "instanced race-presence layer", "size": 256, "format": "RGBA", "effects": 8, "maximum_draw_calls": 3 },
     "paint_chip_strip": {
       "region_px": [8, 900, 896, 96],
       "chip_size_px": 96,
@@ -146,8 +156,8 @@
     { "node": "canopy_pivot", "pivot": [0, 0.316, -0.979], "transform": "rotate X", "range_deg": [-36, 0], "driver": "canopy", "primitives": 2 },
     { "node": "airbrake_L_pivot", "pivot": [-0.95, 0.106, 0.791], "transform": "rotate X", "range_deg": [0, 60], "driver": "brake", "primitives": 1 },
     { "node": "airbrake_R_pivot", "pivot": [0.95, 0.106, 0.791], "transform": "rotate X", "range_deg": [0, 60], "driver": "brake", "primitives": 1 },
-    { "node": "steering_fin_L_pivot", "pivot": [-1.38, 0.52, -2.62], "transform": "rotate Y", "range_deg": [-20, 20], "driver": "steer", "primitives": 1 },
-    { "node": "steering_fin_R_pivot", "pivot": [1.38, 0.52, -2.62], "transform": "rotate Y", "range_deg": [-20, 20], "driver": "steer", "primitives": 1 },
+    { "node": "steering_fin_L_pivot", "pivot": [-1.38, 0.02, -2.62], "transform": "rotate Y", "range_deg": [-20, 20], "driver": "steer", "primitives": 1, "v16_baked": true },
+    { "node": "steering_fin_R_pivot", "pivot": [1.38, 0.02, -2.62], "transform": "rotate Y", "range_deg": [-20, 20], "driver": "steer", "primitives": 1, "v16_baked": true },
     { "node": "elevon_L_pivot", "pivot": [-1.12, -0.124, 2.161], "transform": "rotate Y", "range_deg": [-15, 15], "driver": "pitch_roll", "primitives": 1 },
     { "node": "elevon_R_pivot", "pivot": [1.12, -0.124, 2.161], "transform": "rotate Y", "range_deg": [-15, 15], "driver": "pitch_roll", "primitives": 1 },
     { "node": "engine_flap_L_0_pivot", "pivot": [-0.45, 0.734, 2.035], "transform": "rotate X", "range_deg": [9, 29], "driver": "throttle", "primitives": 1 },
@@ -193,7 +203,8 @@
   "liveries": [
     { "id": "works", "label": "Works", "number": "07", "team": "TOTEM SYNDICATE", "role": "default hero livery", "chips": ["#212830", "#164657", "#707a82", "#a2a8aa", "#0e1114", "#c4f230", "#f2641b", "#6b4630"] },
     { "id": "privateer", "label": "Privateer", "number": "13", "team": "ROUTE 13 PRIVATEER", "role": "alternate", "chips": ["#2c3138", "#6b6f6a", "#7a828a", "#cfcabc", "#12161a", "#f2641b", "#f2641b", "#7a4a2c"] },
-    { "id": "nightform", "label": "Night form", "number": "24", "team": "TOTEM NIGHT FORM", "role": "unlock / high-speed variant", "chips": ["#14181c", "#122b36", "#5d666d", "#8d9498", "#0a0c0e", "#49e2ff", "#c2461a", "#4b3526"] }
+    { "id": "nightform", "label": "Night form", "number": "24", "team": "TOTEM NIGHT FORM", "role": "unlock / high-speed variant", "chips": ["#14181c", "#122b36", "#5d666d", "#8d9498", "#0a0c0e", "#49e2ff", "#c2461a", "#4b3526"] },
+    { "id": "needle", "label": "Needle", "number": "16", "team": "FIELD TOTEM", "role": "restrained rival identity", "tint": "#d6cfbb", "exhaust": "#d2c8ad" }
   ],
 
   "source": {

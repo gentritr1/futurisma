@@ -36,3 +36,15 @@ export const TECHSTEP_HIT_MIDI = {
   downbeat: 77,
   offbeat: 80,
 };
+
+// Eight ascending course-gate confirmations, all voiced inside F natural minor.
+export const GATE_CHIME_MIDI = [65, 68, 72, 75, 77, 80, 84, 89];
+
+// Sparse race-state cues. These stay in F natural minor so they sit inside the
+// existing score instead of reading like a separate arcade sound bank.
+export const RACE_EVENT_MIDI = {
+  positionGain: [68, 72],
+  positionLoss: [63, 60],
+  finalLap: [77, 80],
+  classification: [65, 72],
+};

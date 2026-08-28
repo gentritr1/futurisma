@@ -1,0 +1,183 @@
+{
+  "format": "FUTURISMA_MAP02_BITTERPAN_MASSING_INTEGRATION_CONTRACT",
+  "version": "v0.2b.2-review",
+  "final_map02_massing_freeze": false,
+  "status": "Integration candidate for Codex audit. This has no authority over the game repository until Codex integrates it.",
+  "accepted_basis": {
+    "archive": "FUTURISMA_MAP_02_BITTERPAN_WORKS_BLOCKOUT_AND_RACING_LINE_v0.2a.1_REVIEW.zip",
+    "archive_sha256": "53f8e5f909a25185014f71310be04be11c8f25822777ba7354f963aa7ace95ce",
+    "candidates": {
+      "models/bitterpan_blockout.glb": {
+        "bytes": 341224,
+        "sha256": "56bb30f1aa3446366c80cb5661ae616a07bc30bb026c5e6266435de3fa1f92f9",
+        "expected_sha256": "56bb30f1aa3446366c80cb5661ae616a07bc30bb026c5e6266435de3fa1f92f9",
+        "comparison": "exact equality over all 64 characters",
+        "matches_accepted": true
+      },
+      "course/CENTRELINE_STATIONS.json": {
+        "bytes": 334766,
+        "sha256": "031ecef06520c8895b4aaa10507243df02c6f7e702636d9a0f2687e82663e4bf",
+        "expected_sha256": "031ecef06520c8895b4aaa10507243df02c6f7e702636d9a0f2687e82663e4bf",
+        "comparison": "exact equality over all 64 characters",
+        "matches_accepted": true
+      },
+      "course/CHECKPOINTS.json": {
+        "bytes": 5794,
+        "sha256": "3af5895e69910e77412178570009362572c96f5190a5e498888549b6366ea979",
+        "expected_sha256": "3af5895e69910e77412178570009362572c96f5190a5e498888549b6366ea979",
+        "comparison": "exact equality over all 64 characters",
+        "matches_accepted": true
+      },
+      "course/GRID_AND_RECOVERY.json": {
+        "bytes": 106155,
+        "sha256": "5c537f42a0d306ce6c668544001677fc5170a91456d7d027d6878158e8446748",
+        "expected_sha256": "5c537f42a0d306ce6c668544001677fc5170a91456d7d027d6878158e8446748",
+        "comparison": "exact equality over all 64 characters",
+        "matches_accepted": true
+      },
+      "course/SECTORS_AND_SEQUENCES.json": {
+        "bytes": 13870,
+        "sha256": "a27f7b5ff22880188b62dfe2eb440896c643e50fcb78116d5e026c8f7aab3711",
+        "expected_sha256": "a27f7b5ff22880188b62dfe2eb440896c643e50fcb78116d5e026c8f7aab3711",
+        "comparison": "exact equality over all 64 characters",
+        "matches_accepted": true
+      }
+    },
+    "treated_as_immutable": true,
+    "not_done": [
+      "re-solved",
+      "resampled",
+      "reshaped",
+      "re-exported",
+      "merged into the massing GLB"
+    ]
+  },
+  "new_production_candidates": [
+    {
+      "path": "models/bitterpan_massing.glb",
+      "bytes": 159820,
+      "target": "/assets/map02/models/bitterpan_massing.glb",
+      "operation": "add after Codex audit",
+      "node": "GW2_SITE_MASSING",
+      "visible_primitives": 15,
+      "visible_triangles": 5168,
+      "materials": 6
+    },
+    {
+      "path": "massing/PLACEMENTS.json",
+      "target": "/data/map02/MASSING_PLACEMENTS.json",
+      "operation": "add after Codex audit"
+    },
+    {
+      "path": "massing/LANDMARKS.json",
+      "target": "/data/map02/MASSING_LANDMARKS.json",
+      "operation": "add after Codex audit"
+    }
+  ],
+  "load_contract": {
+    "asynchronous_environment_loads": 1,
+    "note": "Track and massing GLBs load in the same asynchronous environment load, preserving the accepted invariant of one environment load.",
+    "per_frame_environment_allocation": "none",
+    "unbounded_updaters": "none",
+    "massing_is_static": true,
+    "massing_collision": "none authored in this phase"
+  },
+  "budget_contract": {
+    "basis": "Draw-call ceiling and massing allowances are set by the v0.2b brief. Triangle limits are derived from the accepted v0.1.2 PROPOSED_PRODUCTION_BUDGETS.json entry for BITTERPAN_WORKS.",
+    "accepted_v012_environment_proposal": {
+      "visible_draw_calls": "14-19",
+      "visible_triangles": "42,000-58,000",
+      "environment_meshes": "34-46",
+      "environment_materials": "5-6",
+      "environment_atlases": "3 (2 x 512 px + 1 x 256 px)"
+    },
+    "accepted_environment_ceilings": {
+      "visible_draw_calls": 24,
+      "visible_triangles": 175000
+    },
+    "draw_calls": {
+      "accepted_track_visible": 5,
+      "batching_assumed": false,
+      "batching_note": "Five is treated as the baseline exactly as instructed. No material batching is assumed anywhere in this budget, so every visible primitive is counted as one call.",
+      "massing_visible_actual": 15,
+      "massing_maximum_allowed": 19,
+      "massing_target": 16,
+      "massing_within_target": true,
+      "combined_visible_actual": 20,
+      "combined_hard_ceiling": 24,
+      "combined_within_ceiling": true,
+      "integration_headroom_calls": 4
+    },
+    "triangles": {
+      "derivation": "Proposed massing triangles = the v0.1.2 proposed environment range minus the accepted track render ribbon of 6100 visible triangles.",
+      "accepted_track_visible": 6100,
+      "proposed_massing_range": [
+        35900,
+        51900
+      ],
+      "massing_actual": 5168,
+      "combined_visible_actual": 11268,
+      "proposed_environment_range": [
+        42000,
+        58000
+      ],
+      "within_proposed_range": true,
+      "under_proposed_lower_bound": true,
+      "headroom_against_ceiling_pct": 93.56,
+      "note": "Actual sits well below the proposed lower bound because this is blockout massing, not final art. Proposed and actual are reported separately and the gap is headroom for the art phase, not a saving to claim."
+    },
+    "hidden_collision": {
+      "accepted_collision_triangles": 4880,
+      "reported_separately": true,
+      "massing_collision_authored": 0,
+      "note": "The accepted collision proxy is hidden and is not part of any visible figure. This phase authors no massing collision; massing is visual only until Codex decides which families need blockers."
+    },
+    "materials": {
+      "massing_actual": 6,
+      "accepted_v012_proposal": "5-6",
+      "within_proposal": true,
+      "names": [
+        "MASS_corroded_plant_steel",
+        "MASS_galvanised_sheet",
+        "MASS_weathered_canvas",
+        "MASS_bleached_fibreglass",
+        "MASS_sun_killed_paint",
+        "MASS_salt_crust"
+      ]
+    },
+    "textures_animations_skins_morphs": {
+      "textures": 0,
+      "animations": 0,
+      "skins": 0,
+      "morph_targets": 0,
+      "all_zero": true
+    }
+  },
+  "invariants_preserved": [
+    "one asynchronous environment load",
+    "no per-frame environment allocation",
+    "no unbounded updater",
+    "no new gameplay texture or material count without a specific visual reason"
+  ],
+  "totem_reference": {
+    "archive_asset": "source/reference/models/totem_runtime_accepted.glb",
+    "sha256": "4bec092f1c85c78b00a4974532b0dda5f1f89f756d9741535820368e3cfd35ec",
+    "use": "read-only scale and readability reference in evidence frames only",
+    "redesigned": false,
+    "new_production_geometry": false,
+    "posed_for_production": false
+  },
+  "out_of_scope_and_untouched": [
+    "game repository",
+    "final art",
+    "textures",
+    "handling",
+    "camera",
+    "HUD",
+    "music",
+    "TOTEM",
+    "Greenwater freezes",
+    "Map 02 freeze",
+    "accepted centreline, ribbon, collision proxy, checkpoints, grid, recovery, widths, banking, sectors, sequence boundaries"
+  ]
+}

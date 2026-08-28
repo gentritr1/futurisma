@@ -13,6 +13,7 @@
   --warning: oklch(0.7 0.2 38);
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
 }
 
 * {
@@ -59,6 +60,24 @@ kbd {
   background:
     radial-gradient(circle at 50% 48%, transparent 42%, oklch(0.04 0.01 210 / 0.48) 100%),
     linear-gradient(180deg, oklch(0.2 0.04 210 / 0.08), transparent 28%, oklch(0.05 0.01 210 / 0.12));
+}
+
+.image-treatment::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: radial-gradient(
+    ellipse at 50% 60%,
+    transparent 52%,
+    oklch(0.86 0.13 210 / 0.14) 82%,
+    oklch(0.89 0.22 123 / 0.18) 100%
+  );
+  transition: opacity 280ms var(--ease-out);
+}
+
+body[data-boost="true"] .image-treatment::before {
+  opacity: 1;
 }
 
 .image-treatment::after {
@@ -143,7 +162,7 @@ kbd {
 .controls-list,
 .result-status,
 .intro-footer {
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-family: var(--mono);
   font-size: 0.67rem;
   letter-spacing: 0.08em;
 }
@@ -229,13 +248,13 @@ body[data-graphics-context="lost"] .system-state__lamp {
 }
 
 .speed-readout small {
-  font-family: "SFMono-Regular", Consolas, monospace;
+  font-family: var(--mono);
   font-size: 0.65rem;
   color: var(--muted);
 }
 
 .time-readout {
-  font-family: "SFMono-Regular", Consolas, monospace;
+  font-family: var(--mono);
   font-size: clamp(1.25rem, 2.5vw, 2rem);
   letter-spacing: -0.02em;
 }
@@ -385,12 +404,12 @@ body[data-graphics-context="lost"] .system-state__lamp {
   visibility: hidden;
   color: var(--warning);
   border: 1px solid currentColor;
-  font-family: "SFMono-Regular", Consolas, monospace;
+  font-family: var(--mono);
   font-size: 0.7rem;
   letter-spacing: 0.1em;
   text-align: center;
   transition:
-    opacity 100ms ease,
+    opacity 100ms var(--ease-out),
     visibility 0s linear 100ms;
 }
 
@@ -445,19 +464,60 @@ body[data-graphics-context="lost"] .system-state__lamp {
   background: oklch(0.08 0.018 205 / 0.84);
   border-top: 1px solid var(--acid);
   border-bottom: 1px solid var(--line);
-  font-family: "SFMono-Regular", Consolas, monospace;
+  font-family: var(--mono);
   font-size: 0.7rem;
   letter-spacing: 0.08em;
   transition:
-    opacity 140ms ease,
+    opacity 140ms var(--ease-out),
     transform 180ms var(--ease-out),
     visibility 0s linear 180ms;
 }
 
 .turn-arrow {
+  position: relative;
+  width: 30px;
+  height: 12px;
   color: var(--warning);
-  font-size: 1rem;
-  line-height: 0.7;
+  font-size: 0;
+  line-height: 0;
+}
+
+.turn-arrow::before,
+.turn-arrow::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  width: 15px;
+  height: 8px;
+  background: currentColor;
+  clip-path: polygon(0 50%, 62% 0, 100% 0, 40% 50%, 100% 100%, 62% 100%);
+}
+
+.turn-arrow::before {
+  left: 0;
+}
+
+.turn-arrow::after {
+  right: 0;
+  display: none;
+  opacity: 0.55;
+}
+
+.turn-cue[data-direction="right"] .turn-arrow::before {
+  transform: scaleX(-1);
+}
+
+.turn-cue[data-follow="left"] .turn-arrow::after,
+.turn-cue[data-follow="right"] .turn-arrow::after {
+  display: block;
+}
+
+.turn-cue[data-follow="right"] .turn-arrow::after {
+  transform: scaleX(-1);
+}
+
+.turn-cue[data-mode="finish"] .turn-arrow::before {
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
 }
 
 .turn-cue strong {
@@ -508,10 +568,10 @@ body[data-graphics-context="lost"] .system-state__lamp {
   background: oklch(0.07 0.016 205 / 0.9);
   border-top: 1px solid var(--cyan);
   border-bottom: 1px solid var(--line);
-  font-family: "SFMono-Regular", Consolas, monospace;
+  font-family: var(--mono);
   text-align: center;
   transition:
-    opacity 160ms ease,
+    opacity 160ms var(--ease-out),
     transform 200ms var(--ease-out),
     visibility 0s linear 200ms;
 }
@@ -552,17 +612,32 @@ body[data-graphics-context="lost"] .system-state__lamp {
   font-size: clamp(4rem, 13vw, 8rem);
   font-weight: 800;
   letter-spacing: -0.03em;
-  text-shadow: 0 0 12px oklch(0.86 0.13 210 / 0.38);
+  text-shadow:
+    0 0 12px oklch(0.86 0.13 210 / 0.38),
+    0 0 46px oklch(0.86 0.13 210 / 0.2);
+}
+
+.countdown[data-value="count"],
+.countdown[data-value="go"] {
+  transform: translate(-50%, -50%) skewX(-7deg);
+}
+
+.countdown[data-value="go"] {
+  color: var(--acid);
+  text-shadow:
+    0 0 14px oklch(0.89 0.22 123 / 0.55),
+    0 0 52px oklch(0.89 0.22 123 / 0.3);
 }
 
 .countdown[data-paused="true"] {
   z-index: 2;
   max-width: calc(100vw - 32px);
   padding: 12px 18px;
+  transform: translate(-50%, -50%);
   border-top: 1px solid var(--acid);
   border-bottom: 1px solid var(--line);
   background: oklch(0.07 0.012 205 / 0.94);
-  font-family: "SFMono-Regular", Consolas, monospace;
+  font-family: var(--mono);
   font-size: 0.88rem;
   font-weight: 700;
   letter-spacing: 0.18em;
@@ -600,7 +675,7 @@ body[data-phase="resuming"] .hud::before {
   gap: 18px;
   background: var(--void);
   color: var(--muted);
-  font-family: "SFMono-Regular", Consolas, monospace;
+  font-family: var(--mono);
   font-size: 0.72rem;
   letter-spacing: 0.12em;
 }
@@ -689,8 +764,8 @@ body[data-phase="resuming"] .hud::before {
   letter-spacing: 0.07em;
   cursor: pointer;
   transition:
-    transform 140ms ease,
-    background-color 140ms ease;
+    transform 140ms var(--ease-out),
+    background-color 140ms var(--ease-out);
 }
 
 .launch-button kbd {
@@ -747,7 +822,7 @@ body[data-phase="resuming"] .hud::before {
 
 .result-panel h2 {
   margin: 0 0 10px;
-  font-family: "SFMono-Regular", Consolas, monospace;
+  font-family: var(--mono);
   font-size: clamp(2.4rem, 8vw, 4.8rem);
   font-weight: 500;
   letter-spacing: -0.04em;
@@ -766,7 +841,7 @@ body[data-phase="resuming"] .hud::before {
   padding: 0;
   list-style: none;
   border-top: 1px solid var(--line);
-  font-family: "SFMono-Regular", Consolas, monospace;
+  font-family: var(--mono);
   font-size: 0.68rem;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.06em;
@@ -782,7 +857,7 @@ body[data-phase="resuming"] .hud::before {
   color: var(--dim);
 }
 
-.result-laps time {
+.result-laps .n {
   color: var(--ink);
 }
 
@@ -790,6 +865,21 @@ body[data-phase="resuming"] .hud::before {
   justify-self: end;
   color: var(--muted);
   font-weight: 500;
+}
+
+.field-order {
+  position: absolute;
+  top: 50%;
+  right: clamp(16px, 2.4vw, 34px);
+  width: auto;
+  min-width: 132px;
+  margin: 0;
+  transform: translateY(-50%);
+}
+
+.field-order li {
+  grid-template-columns: auto 1fr;
+  min-height: 22px;
 }
 
 .result-laps li[data-best="true"] span,
@@ -894,6 +984,10 @@ body[data-phase="result"] .hud {
   .boost {
     bottom: 24px;
     width: 52vw;
+  }
+
+  .field-order {
+    display: none;
   }
 
   .turn-cue {
@@ -1021,10 +1115,11 @@ body[data-phase="result"] .hud {
   .edge-warning,
   .turn-cue,
   .lap-event {
-    transition: opacity 200ms ease;
+    transition: opacity 200ms var(--ease-out);
   }
 
-  .impact-flash {
+  .impact-flash,
+  .image-treatment::before {
     transition: none;
   }
 

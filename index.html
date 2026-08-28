@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#090d10" />
     <meta name="referrer" content="no-referrer" />
+    <link rel="icon" href="data:," />
     <meta
       http-equiv="Content-Security-Policy"
       content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; media-src 'none'; connect-src 'self' blob:; worker-src 'none'; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'"
     />
     <meta
       name="description"
-      content="FUTURISMA: a PS2-inspired anti-gravity time trial built with Three.js."
+      content="FUTURISMA: a PS2-inspired anti-gravity race built with Three.js."
     />
     <link
       rel="preload"
@@ -32,7 +33,7 @@
       <header class="race-header" aria-label="Course status">
         <div class="race-header__identity">
           <span class="wordmark">FUTURISMA</span>
-          <span class="course-name">GREENWATER STRIP / MAP 01</span>
+          <span id="course-name" class="course-name">GREENWATER STRIP / MAP 01</span>
         </div>
         <div class="system-state" role="status" aria-live="polite">
           <span class="system-state__lamp" aria-hidden="true"></span>
@@ -48,10 +49,13 @@
         </section>
 
         <section class="telemetry telemetry--timing" aria-label="Race timing">
-          <span class="telemetry__label">TRIAL TIME</span>
+          <span class="telemetry__label">RACE TIME</span>
           <time id="time-value" class="time-readout">00:00.000</time>
           <span class="telemetry__sub">
             <span id="lap-value">LAP 1 / 5</span><span id="last-lap-value" hidden></span>
+          </span>
+          <span class="telemetry__sub">
+            <span id="position-value">P1 / 4</span> · <span id="gap-value">FIELD LEAD</span>
           </span>
         </section>
 
@@ -91,6 +95,7 @@
           <span id="lap-event-time">LAST 00:34.500</span>
         </div>
         <div id="countdown" class="countdown" aria-live="assertive"></div>
+        <ol id="field-order" class="result-laps field-order" aria-label="Race positions"></ol>
       </main>
 
       <section id="loading-screen" class="screen screen--loading">
@@ -104,12 +109,19 @@
           <p class="intro-code">KAIRO DYNAMICS · KD-0714</p>
           <h1>TOTEM</h1>
           <p id="intro-deck" class="intro-deck">
-            Five laps through Greenwater Strip. Read the amber turn grammar, clear all
-            eight gates, and bring TOTEM home through The Cradle.
+            Four ships. Five laps through Greenwater Strip. Follow the amber turn
+            markers, clear all eight gates, and bring TOTEM home through The Cradle.
           </p>
 
+          <ol id="grid-order" class="result-laps" aria-label="Starting grid">
+            <li><span>P1 · YOU</span><span class="n">TOTEM</span><strong>WORKS 07</strong></li>
+            <li><span>P2</span><span class="n">TOTEM</span><strong>FIELD</strong></li>
+            <li><span>P3</span><span class="n">TOTEM</span><strong>FIELD</strong></li>
+            <li><span>P4</span><span class="n">TOTEM</span><strong>FIELD</strong></li>
+          </ol>
+
           <button id="start-button" class="launch-button" type="button">
-            <span>LAUNCH TRIAL</span>
+            <span>LAUNCH RACE</span>
             <kbd>ENTER</kbd>
           </button>
 
@@ -117,23 +129,24 @@
             <div><dt>THRUST</dt><dd>W / ↑</dd></div>
             <div><dt>STEER</dt><dd>A D / ← →</dd></div>
             <div><dt>BRAKE</dt><dd>S / ↓</dd></div>
+            <div><dt>DRIFT</dt><dd>BRAKE + STEER</dd></div>
             <div><dt>BOOST</dt><dd>SHIFT / A</dd></div>
             <div><dt>RECOVER</dt><dd>R / Y</dd></div>
             <div><dt>PAUSE</dt><dd>ESC / START</dd></div>
             <div><dt>MUTE</dt><dd>M / BACK</dd></div>
           </dl>
         </div>
-        <p class="intro-footer">WORKS LIVERY 07 · MAP 01 CALIBRATION RUN</p>
+        <p id="intro-footer" class="intro-footer">WORKS LIVERY 07 · GREENWATER FIELD RACE</p>
       </section>
 
       <section id="result-screen" class="screen screen--result" hidden>
         <div class="result-panel">
-          <p class="result-status">TRIAL COMPLETE</p>
+          <p class="result-status">CLASSIFICATION LOCKED</p>
           <h2 id="result-time">00:00.000</h2>
           <p id="result-detail">TOTEM / WORKS 07</p>
-          <ol id="result-laps" class="result-laps" aria-label="Lap times" hidden></ol>
+          <ol id="result-laps" class="result-laps" aria-label="Race classification" hidden></ol>
           <button id="restart-button" class="launch-button" type="button">
-            <span>RUN AGAIN</span>
+            <span>RACE AGAIN</span>
             <kbd>ENTER</kbd>
           </button>
         </div>

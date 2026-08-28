@@ -1,39 +1,98 @@
-# Greenwater Environment — Design Agent Prompt
+# Greenwater Environment — Completed Stage 3 Design Agent Prompt
 
-Neek, produce the actual authored environment package for FUTURISMA Map 01, Greenwater Strip.
+> Status: completed and accepted on 2026-08-24. Do not resend this prompt. The
+> returned `GREENWATER_ENVIRONMENT_v1.0.zip` includes all 18 acceptance renders,
+> the relocatable source snapshot, and the Stage 4 deck-winding correction. A
+> later route-readability pass is now scoped separately in
+> `GREENWATER_SIGNAGE_V1_1_DESIGN_AGENT_PROMPT.md`; keep this completed prompt
+> only as the production decision record.
 
-Use the attached `GREENWATER_ENVIRONMENT_PRODUCTION_INPUT_v1.0.zip`. Read `docs/GREENWATER_ENVIRONMENT_ART_BRIEF.md` completely before building. Treat these files as authority in this order:
+Neek, complete Stage 3 for FUTURISMA Map 01, Greenwater Strip, using the
+attached accepted `GREENWATER_ENVIRONMENT_STAGE2.zip` as the production source.
 
-1. `src/game/data/greenwater-blockout.json` for route geometry, world coordinates, sectors, checkpoints, hazards, fog zones, and landmark anchors.
-2. `src/game/data/greenwater-validation.json` for measured map validation.
-3. `docs/GREENWATER_ENVIRONMENT_ART_BRIEF.md` for art direction, the resolved 44-root kit contract, naming, placement, runtime budgets, package contents, and acceptance views.
-4. `docs/PERFORMANCE_BASELINE.md` for the locked in-engine baseline and post-integration gates.
-5. `artifacts/TOTEM_Phase1_v1.0-patch1.zip` only as the accepted scale, palette, material-language, and emissive reference. Do not edit or re-export TOTEM.
+Stage 2 is accepted and already integrated in the Three.js game. This is a
+presentation, acceptance-render and final-package pass. Do not redesign the map,
+rebuild the kit, change placements, or silently re-export accepted geometry.
 
-This is environment asset production, not another map-design or concept-document pass. Preserve the accepted 2,515.982 m route and all gameplay data exactly. Do not move, reshape, widen, narrow, bank, or reinterpret the course; do not move gates, hazards, recovery anchors, or landmark origins; do not change physics, music, fog logic, HUD, or TOTEM.
+## Accepted bytes and measured contract
 
-The target is a remembered early-2000s PS2 anti-gravity racer: humid wet concrete, repaired aerospace steel, sodium route lights, deep blue-green jungle masses, scarce cyan, controlled low-poly faceting, hand-painted low-resolution texture language, vertex-colour AO and weathering, strong silhouettes, and clean route readability at speed. Avoid generic neon cyberpunk, photoreal PBR, micro-greeble noise, bloom-dependent navigation, false openings, and foliage inside gameplay sightlines.
+- Stage 2 ZIP SHA-256:
+  `4eae06930b7e7f5ea487f0cdd6a9ade627aa3e155733c121f5d5459241ee9be0`
+- Runtime GLB SHA-256:
+  `4a92340a35f95ec0cad5f0e5640d3722f9e816d74413c2033613c3c81cf84841`
+- Runtime: 2,267 placements, 63 sector/material meshes, 55,488 triangles,
+  six materials, six embedded textures.
+- Art kit: 44 roots, 179 named meshes, 2,296 triangles.
+- Atlas contract: five 1024² sheets plus one 512² emissive sheet, 71 painted
+  slots and 25 reserved slots.
+- Authored-environment authoring measurement: 19 worst-case visible draw calls
+  and 23,772 worst-case visible triangles, within the 24 / 175,000 limits.
 
-Build and export the real `GREENWATER_ENVIRONMENT_v1.0.zip` specified in section 10 of the brief. It must include both GLBs, all six texture sheets, the complete placement JSON, six actual 1600 × 1000 in-scene chase-camera renders, manifest, byte-level validation, handoff notes, and a complete editable source snapshot. The art kit must contain exactly the resolved 44 top-level roots. The runtime GLB must be fully placed at locked world coordinates, grouped or merged per sector and material, indexed, vertex-coloured, non-colliding, and ready for Three.js integration.
+Independent validation also proved that the accepted Stage 1 geometry contract
+is preserved: 12 immutable files are byte-identical, the art-kit hierarchy and
+materials are semantically identical, and all 895 geometry buffers are
+byte-identical. The differing art-kit GLB hash comes only from reordered copies
+of the same six embedded PNG byte ranges.
 
-Hard runtime limits are not targets to exceed: no more than 24 simultaneously visible authored-environment draw calls, 175,000 simultaneously visible authored-environment triangles, six material roles, five 1024 RGBA base atlases, and one 512 RGBA emissive atlas. Use only the alpha modes and maps permitted by the brief. Preserve route visibility and the landmark silhouette test before spending budget on detail.
+## In-engine findings to work from
 
-Build the handoff page as the production source, following the successful TOTEM handoff pattern:
+The accepted runtime loads and renders correctly in the actual game. A
+high-quality deterministic five-lap run completed in 02:52.800 with a 00:34.433
+best lap, zero impacts, missed gates, recoveries, wrong-way events or WebGL
+failures. The complete scene peaked at 67 draw calls and 39,332 visible
+triangles. The authored deck, rails, navigation boards, jungle silhouettes and
+landmarks coexist with the retained gameplay gates and turn calls without
+obscuring the clean line.
 
-- It must generate geometry, atlases, placements, GLBs, counts, hashes, validation, previews, and ZIP contents from the same source state.
-- Validation must inspect the exact exported GLB bytes and report transforms, bounds, indexes, normals, UV0, vertex colours, alpha modes, embedded images, naming, material/texture counts, triangle counts, and package budgets.
-- “Freeze & download package” must assemble the ZIP from the same validated in-memory buffers, then parse the archive back, verify its central directory and CRC-32 values, and compare every generated byte count and SHA-256 hash with `MANIFEST.json` and `VALIDATION.json`.
-- All source and asset paths must remain relocatable when the source snapshot is opened outside its original folder.
-- Do not stage placeholder downloads, omit generated binaries, or return a document that only describes what should be modelled.
+Do not alter the runtime to chase those numbers. Stage 3 must preserve or improve
+them through presentation only.
 
-Before final freeze, show six acceptance views plus flat-black silhouette and unlit material-ID modes. In every chase view, the correct next opening must be the clearest value gap; at least one unique landmark must orient the player; fog and foliage must preserve the next 1.5 seconds of racing line; and no art may intersect the track envelope, gate centre, chevrons, distance boards, steam footprints, cable footprints, or clean line.
+## Stage 3 deliverables
 
-When finished, return:
+Build the final `GREENWATER_ENVIRONMENT_v1.0.zip` from the same validated
+in-memory source state. It must contain every accepted Stage 2 deliverable plus:
 
-1. A direct download for `GREENWATER_ENVIRONMENT_v1.0.zip`.
-2. Exact runtime and art-kit counts: roots, named meshes, triangles, materials, textures, bounds, placed instances, sector groups, and worst-case visible draw calls/triangles.
-3. A concise PASS/FAIL summary for every hard budget and validation category.
-4. Any known limitation or deliberate simplification, with the affected sector and reason.
-5. Confirmation that the map JSON, TOTEM package, gameplay, and existing accepted files were not modified.
+1. Six real 1600 × 1000 in-scene chase-camera PNG renders at the locked framing
+   stations in the art brief. They must be rendered from the actual runtime
+   geometry and textures, not painted concept art or framing diagrams.
+2. A flat-black silhouette view and an unlit material-ID view for each of the
+   six stations, either as additional PNGs or as clearly selectable render modes
+   whose exact outputs are included in the package.
+3. Updated `HANDOFF.md`, `MANIFEST.json` and `VALIDATION.json` generated from the
+   final bytes, plus the complete relocatable `source/` snapshot.
+4. A Stage 3 acceptance report naming the next opening, orientation landmark,
+   fog depth and any deliberate occluder at each station.
 
-If any requirement conflicts with the locked map or cannot be produced by your environment, stop and identify the exact conflict or missing capability. Do not silently redesign the course, relax a budget, substitute a concept page, or claim completion without downloadable generated bytes.
+The six standard views must use the approved chase-camera lens range and fog
+grammar. In every view:
+
+- the correct next opening is the clearest value gap;
+- at least one unique landmark gives orientation;
+- fog and foliage preserve at least the next 1.5 seconds of racing line;
+- no visual suggests a false exit or a route beyond the track boundary;
+- gates, chevrons and distance boards remain readable at gameplay scale;
+- no art intersects the track envelope, hazard footprint or clean line.
+
+## Freeze rules
+
+- Treat the accepted Stage 2 GLBs, placement JSON, atlas layout and map JSON as
+  locked. Do not change them for screenshot composition.
+- Keep the current deterministic code-painted atlases in v1.0. Hand-painted
+  replacement sheets are a later optional art pass and must use the frozen slot
+  layout without a geometry or UV re-export.
+- Generate all renders, byte counts, hashes, validation and ZIP entries from the
+  same source state.
+- The freeze button must require art-kit, runtime, placement, budget and render
+  validation to pass before packaging.
+- After assembling the ZIP, parse it back, verify the central directory, every
+  local header and CRC-32, then compare all bytes and SHA-256 values with the
+  generated manifest. Refuse the download on any mismatch.
+- Keep every source path relocatable. Do not return a project card that omits
+  generated GLBs, PNGs, validation or source.
+- Do not modify TOTEM, gameplay, physics, fog logic, music, HUD, gates, hazards,
+  recovery anchors or the accepted 2,515.982 m route.
+
+When finished, return the direct `GREENWATER_ENVIRONMENT_v1.0.zip` download,
+the exact archive SHA-256, complete counts and budgets, a concise PASS/FAIL table,
+and any remaining visual limitation by sector. If any accepted byte must change,
+stop and identify the exact file and reason before exporting.

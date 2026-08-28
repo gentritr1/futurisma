@@ -1,0 +1,634 @@
+{
+  "format": "FUTURISMA_MAP02_BITTERPAN_LANDMARKS",
+  "version": "v0.2b.2-review",
+  "final_map02_massing_freeze": false,
+  "purpose": "Orientation and occlusion landmarks. Long Pan and the return leg are given distant verticals rather than near-route density, so the racing space stays clear.",
+  "sector_identity": [
+    {
+      "id": "S1",
+      "name": "HARVEST BASIN",
+      "value_target": "warm",
+      "structure_density": "high",
+      "massing_families": [
+        "S1_harvester_rigs",
+        "S1_hoppers_and_sheds",
+        "S1_wind_screens",
+        "S1_brine_tanks",
+        "S1_hazard_markers"
+      ]
+    },
+    {
+      "id": "S2",
+      "name": "THE LONG BASIN",
+      "value_target": "neutral",
+      "structure_density": "low",
+      "massing_families": [
+        "S2_cone_stacks",
+        "S2_pump_stands",
+        "S2_horizon_markers"
+      ]
+    },
+    {
+      "id": "S3",
+      "name": "LOADOUT BASIN",
+      "value_target": "cool",
+      "structure_density": "high",
+      "massing_families": [
+        "S3_conveyor_trestles",
+        "S3_loadout_tower",
+        "S3_sheds_and_plant",
+        "S3_hood_covers",
+        "OCC2_conveyor_span"
+      ]
+    }
+  ],
+  "signature_sequences": [
+    "Q1 THE LONG PAN",
+    "Q2 CONE ROW SWEEP",
+    "Q3 HARVESTER CHICANE",
+    "Q4 BRINE CUT",
+    "Q5 CONVEYOR UNDERPASS"
+  ],
+  "occlusion_events": [
+    {
+      "id": "OCC1",
+      "name": "HARVESTER CHICANE RIG STANDS",
+      "sequence": "Q3",
+      "span_from_m": 2410,
+      "span_to_m": 2500,
+      "approximate_length_m": 90,
+      "elements": 16,
+      "mechanism": "paired rig stands and canvas screens close the forward horizon",
+      "reveals": "the wet pan and the Brine Cut kerb line beyond",
+      "measured_horizon_closure_pct": 23.1
+    },
+    {
+      "id": "OCC2",
+      "name": "CONVEYOR UNDERPASS",
+      "sequence": "Q5",
+      "span_from_m": 3010,
+      "span_to_m": 3046,
+      "approximate_length_m": 36,
+      "soffit_height_m": 15.5,
+      "elements": 5,
+      "mechanism": "conveyor trestle soffit closes the sky",
+      "reveals": "the loadout tower and the start/finish apron on exit",
+      "measured_horizon_closure_pct": 25.9
+    }
+  ],
+  "wind": {
+    "bearing_deg": 292,
+    "vector": [
+      -0.927184,
+      0,
+      0.374607
+    ],
+    "indicator_families": [
+      {
+        "family": "WIND_salt_drift",
+        "indicator": "salt drift banked against the windward flank"
+      },
+      {
+        "family": "S1_wind_screens",
+        "indicator": "canvas screens tattered on the lee edge only"
+      },
+      {
+        "family": "WIND_dust_masts",
+        "indicator": "dust lift trailing downwind of the rigs"
+      },
+      {
+        "family": "S3_hood_covers",
+        "indicator": "conveyor hood covers pulled to the windward side"
+      }
+    ]
+  },
+  "landmarks": [
+    {
+      "id": "S2_cone_stacks_000",
+      "kind": "cone",
+      "family": "S2_cone_stacks",
+      "sector": "S2",
+      "sequence": "L1",
+      "sequence_name": "RETURN LEG",
+      "station_m": 1655,
+      "position": [
+        813.3227,
+        0.3566,
+        392.368
+      ],
+      "height_m": 18.3465,
+      "occlusion_event": null,
+      "role": "distant orientation across the pan; the Cone Row that names the sweep"
+    },
+    {
+      "id": "S2_cone_stacks_001",
+      "kind": "cone",
+      "family": "S2_cone_stacks",
+      "sector": "S2",
+      "sequence": "L1",
+      "sequence_name": "RETURN LEG",
+      "station_m": 1800,
+      "position": [
+        353.0963,
+        1.2301,
+        247.368
+      ],
+      "height_m": 19.764,
+      "occlusion_event": null,
+      "role": "distant orientation across the pan; the Cone Row that names the sweep"
+    },
+    {
+      "id": "S2_cone_stacks_002",
+      "kind": "cone",
+      "family": "S2_cone_stacks",
+      "sector": "S2",
+      "sequence": "L1",
+      "sequence_name": "RETURN LEG",
+      "station_m": 1880,
+      "position": [
+        331.6873,
+        1.6971,
+        167.368
+      ],
+      "height_m": 14.4284,
+      "occlusion_event": null,
+      "role": "distant orientation across the pan; the Cone Row that names the sweep"
+    },
+    {
+      "id": "S2_cone_stacks_003",
+      "kind": "cone",
+      "family": "S2_cone_stacks",
+      "sector": "S2",
+      "sequence": "L1",
+      "sequence_name": "RETURN LEG",
+      "station_m": 2030,
+      "position": [
+        716.021,
+        1.6789,
+        17.368
+      ],
+      "height_m": 11.1366,
+      "occlusion_event": null,
+      "role": "distant orientation across the pan; the Cone Row that names the sweep"
+    },
+    {
+      "id": "S2_cone_stacks_004",
+      "kind": "cone",
+      "family": "S2_cone_stacks",
+      "sector": "S2",
+      "sequence": "L1",
+      "sequence_name": "RETURN LEG",
+      "station_m": 2140,
+      "position": [
+        732.3284,
+        0.8344,
+        -92.632
+      ],
+      "height_m": 11.2437,
+      "occlusion_event": null,
+      "role": "distant orientation across the pan; the Cone Row that names the sweep"
+    },
+    {
+      "id": "S2_cone_stacks_005",
+      "kind": "cone",
+      "family": "S2_cone_stacks",
+      "sector": "S2",
+      "sequence": "T2",
+      "sequence_name": "PUMP STAND BEND",
+      "station_m": 2270,
+      "position": [
+        428.4818,
+        -0.305,
+        -104.1773
+      ],
+      "height_m": 21.7426,
+      "occlusion_event": null,
+      "role": "distant orientation across the pan; the Cone Row that names the sweep"
+    },
+    {
+      "id": "S2_horizon_markers_000",
+      "kind": "mast",
+      "family": "S2_horizon_markers",
+      "sector": "S2",
+      "sequence": "L1",
+      "sequence_name": "RETURN LEG",
+      "station_m": 1655,
+      "position": [
+        1375.7222,
+        0.3566,
+        392.368
+      ],
+      "height_m": 36.6859,
+      "occlusion_event": null,
+      "role": "far orientation for the Long Pan and the return leg; clear racing space"
+    },
+    {
+      "id": "S2_horizon_markers_001",
+      "kind": "mast",
+      "family": "S2_horizon_markers",
+      "sector": "S2",
+      "sequence": "L1",
+      "sequence_name": "RETURN LEG",
+      "station_m": 1940,
+      "position": [
+        -107.0766,
+        1.8648,
+        107.368
+      ],
+      "height_m": 38.7476,
+      "occlusion_event": null,
+      "role": "far orientation for the Long Pan and the return leg; clear racing space"
+    },
+    {
+      "id": "S2_horizon_markers_002",
+      "kind": "mast",
+      "family": "S2_horizon_markers",
+      "sector": "S2",
+      "sequence": "L1",
+      "sequence_name": "RETURN LEG",
+      "station_m": 2105,
+      "position": [
+        -182.6378,
+        1.1516,
+        -57.632
+      ],
+      "height_m": 30.9868,
+      "occlusion_event": null,
+      "role": "far orientation for the Long Pan and the return leg; clear racing space"
+    },
+    {
+      "id": "S3_loadout_tower_000",
+      "kind": "tower",
+      "family": "S3_loadout_tower",
+      "sector": "S3",
+      "sequence": "Q4",
+      "sequence_name": "BRINE CUT",
+      "station_m": 2830,
+      "position": [
+        -44.0887,
+        -1.5026,
+        -257.9508
+      ],
+      "height_m": 46,
+      "occlusion_event": null,
+      "role": "the one tall bespoke asset; visible from most of the lap"
+    },
+    {
+      "id": "OCC1_rig_stand_2410",
+      "kind": "rigstand",
+      "family": "S1_harvester_rigs",
+      "sector": "S2",
+      "sequence": "Q3",
+      "sequence_name": "HARVESTER CHICANE",
+      "station_m": 2410,
+      "position": [
+        386.4184,
+        -0.8526,
+        -256.0459
+      ],
+      "height_m": 13.975,
+      "occlusion_event": "OCC1",
+      "role": "planned occlusion: closes the forward horizon for approximately 90 m through the chicane"
+    },
+    {
+      "id": "OCC1_rig_stand_2416",
+      "kind": "rigstand",
+      "family": "S1_harvester_rigs",
+      "sector": "S2",
+      "sequence": "Q3",
+      "sequence_name": "HARVESTER CHICANE",
+      "station_m": 2415,
+      "position": [
+        380.5792,
+        -0.8587,
+        -254.7336
+      ],
+      "height_m": 15.3375,
+      "occlusion_event": "OCC1",
+      "role": "planned occlusion: closes the forward horizon for approximately 90 m through the chicane"
+    },
+    {
+      "id": "OCC1_rig_stand_2422",
+      "kind": "rigstand",
+      "family": "S1_harvester_rigs",
+      "sector": "S2",
+      "sequence": "Q3",
+      "sequence_name": "HARVESTER CHICANE",
+      "station_m": 2420,
+      "position": [
+        378.2952,
+        -0.8642,
+        -259.5001
+      ],
+      "height_m": 15.1763,
+      "occlusion_event": "OCC1",
+      "role": "planned occlusion: closes the forward horizon for approximately 90 m through the chicane"
+    },
+    {
+      "id": "OCC1_rig_stand_2428",
+      "kind": "rigstand",
+      "family": "S1_harvester_rigs",
+      "sector": "S2",
+      "sequence": "Q3",
+      "sequence_name": "HARVESTER CHICANE",
+      "station_m": 2430,
+      "position": [
+        371.8739,
+        -0.8736,
+        -262.9362
+      ],
+      "height_m": 15.2401,
+      "occlusion_event": "OCC1",
+      "role": "planned occlusion: closes the forward horizon for approximately 90 m through the chicane"
+    },
+    {
+      "id": "OCC1_rig_stand_2434",
+      "kind": "rigstand",
+      "family": "S1_harvester_rigs",
+      "sector": "S2",
+      "sequence": "Q3",
+      "sequence_name": "HARVESTER CHICANE",
+      "station_m": 2435,
+      "position": [
+        368.6026,
+        -0.8776,
+        -262.9506
+      ],
+      "height_m": 15.0363,
+      "occlusion_event": "OCC1",
+      "role": "planned occlusion: closes the forward horizon for approximately 90 m through the chicane"
+    },
+    {
+      "id": "OCC1_rig_stand_2440",
+      "kind": "rigstand",
+      "family": "S1_harvester_rigs",
+      "sector": "S2",
+      "sequence": "Q3",
+      "sequence_name": "HARVESTER CHICANE",
+      "station_m": 2440,
+      "position": [
+        365.2485,
+        -0.8811,
+        -261.8401
+      ],
+      "height_m": 15.5815,
+      "occlusion_event": "OCC1",
+      "role": "planned occlusion: closes the forward horizon for approximately 90 m through the chicane"
+    },
+    {
+      "id": "OCC1_rig_stand_2446",
+      "kind": "rigstand",
+      "family": "S1_harvester_rigs",
+      "sector": "S2",
+      "sequence": "Q3",
+      "sequence_name": "HARVESTER CHICANE",
+      "station_m": 2445,
+      "position": [
+        362.5165,
+        -0.8843,
+        -263.7338
+      ],
+      "height_m": 16.0979,
+      "occlusion_event": "OCC1",
+      "role": "planned occlusion: closes the forward horizon for approximately 90 m through the chicane"
+    },
+    {
+      "id": "OCC1_rig_stand_2452",
+      "kind": "rigstand",
+      "family": "S1_harvester_rigs",
+      "sector": "S2",
+      "sequence": "Q3",
+      "sequence_name": "HARVESTER CHICANE",
+      "station_m": 2450,
+      "position": [
+        359.7066,
+        -0.8872,
+        -268.3834
+      ],
+      "height_m": 14.8016,
+      "occlusion_event": "OCC1",
+      "role": "planned occlusion: closes the forward horizon for approximately 90 m through the chicane"
+    },
+    {
+      "id": "OCC1_rig_stand_2458",
+      "kind": "rigstand",
+      "family": "S1_harvester_rigs",
+      "sector": "S2",
+      "sequence": "Q3",
+      "sequence_name": "HARVESTER CHICANE",
+      "station_m": 2460,
+      "position": [
+        353.1024,
+        -0.8921,
+        -263.5775
+      ],
+      "height_m": 14.0909,
+      "occlusion_event": "OCC1",
+      "role": "planned occlusion: closes the forward horizon for approximately 90 m through the chicane"
+    },
+    {
+      "id": "OCC1_rig_stand_2464",
+      "kind": "rigstand",
+      "family": "S1_harvester_rigs",
+      "sector": "S2",
+      "sequence": "Q3",
+      "sequence_name": "HARVESTER CHICANE",
+      "station_m": 2465,
+      "position": [
+        349.0907,
+        -0.8943,
+        -265.5107
+      ],
+      "height_m": 15.2564,
+      "occlusion_event": "OCC1",
+      "role": "planned occlusion: closes the forward horizon for approximately 90 m through the chicane"
+    },
+    {
+      "id": "OCC1_rig_stand_2470",
+      "kind": "rigstand",
+      "family": "S1_harvester_rigs",
+      "sector": "S2",
+      "sequence": "Q3",
+      "sequence_name": "HARVESTER CHICANE",
+      "station_m": 2470,
+      "position": [
+        345.0568,
+        -0.8963,
+        -263.9883
+      ],
+      "height_m": 14.896,
+      "occlusion_event": "OCC1",
+      "role": "planned occlusion: closes the forward horizon for approximately 90 m through the chicane"
+    },
+    {
+      "id": "OCC1_rig_stand_2476",
+      "kind": "rigstand",
+      "family": "S1_harvester_rigs",
+      "sector": "S2",
+      "sequence": "Q3",
+      "sequence_name": "HARVESTER CHICANE",
+      "station_m": 2475,
+      "position": [
+        340.3821,
+        -0.8982,
+        -264.1181
+      ],
+      "height_m": 13.8651,
+      "occlusion_event": "OCC1",
+      "role": "planned occlusion: closes the forward horizon for approximately 90 m through the chicane"
+    },
+    {
+      "id": "OCC1_rig_stand_2482",
+      "kind": "rigstand",
+      "family": "S1_harvester_rigs",
+      "sector": "S2",
+      "sequence": "Q3",
+      "sequence_name": "HARVESTER CHICANE",
+      "station_m": 2480,
+      "position": [
+        335.0148,
+        -0.9001,
+        -265.9339
+      ],
+      "height_m": 13.929,
+      "occlusion_event": "OCC1",
+      "role": "planned occlusion: closes the forward horizon for approximately 90 m through the chicane"
+    },
+    {
+      "id": "OCC1_rig_stand_2488",
+      "kind": "rigstand",
+      "family": "S1_harvester_rigs",
+      "sector": "S2",
+      "sequence": "Q3",
+      "sequence_name": "HARVESTER CHICANE",
+      "station_m": 2490,
+      "position": [
+        325.0808,
+        -0.9039,
+        -257.4165
+      ],
+      "height_m": 15.1428,
+      "occlusion_event": "OCC1",
+      "role": "planned occlusion: closes the forward horizon for approximately 90 m through the chicane"
+    },
+    {
+      "id": "OCC1_rig_stand_2494",
+      "kind": "rigstand",
+      "family": "S1_harvester_rigs",
+      "sector": "S2",
+      "sequence": "Q3",
+      "sequence_name": "HARVESTER CHICANE",
+      "station_m": 2495,
+      "position": [
+        318.5178,
+        -0.9058,
+        -260.3564
+      ],
+      "height_m": 13.4676,
+      "occlusion_event": "OCC1",
+      "role": "planned occlusion: closes the forward horizon for approximately 90 m through the chicane"
+    },
+    {
+      "id": "OCC1_rig_stand_2500",
+      "kind": "rigstand",
+      "family": "S1_harvester_rigs",
+      "sector": "S2",
+      "sequence": "Q3",
+      "sequence_name": "HARVESTER CHICANE",
+      "station_m": 2500,
+      "position": [
+        312.0002,
+        -0.9079,
+        -260.6502
+      ],
+      "height_m": 13.0775,
+      "occlusion_event": "OCC1",
+      "role": "planned occlusion: closes the forward horizon for approximately 90 m through the chicane"
+    },
+    {
+      "id": "OCC2_support_3010_L",
+      "kind": "support",
+      "family": "S3_conveyor_trestles",
+      "sector": "S3",
+      "sequence": "Q5",
+      "sequence_name": "CONVEYOR UNDERPASS",
+      "station_m": 3010,
+      "position": [
+        -24,
+        -0.414,
+        -40
+      ],
+      "height_m": 18.9,
+      "occlusion_event": "OCC2",
+      "role": "underpass support; carries the span clear of the recovery boundary"
+    },
+    {
+      "id": "OCC2_support_3010_R",
+      "kind": "support",
+      "family": "S3_conveyor_trestles",
+      "sector": "S3",
+      "sequence": "Q5",
+      "sequence_name": "CONVEYOR UNDERPASS",
+      "station_m": 3010,
+      "position": [
+        24,
+        -0.414,
+        -40
+      ],
+      "height_m": 18.9,
+      "occlusion_event": "OCC2",
+      "role": "underpass support; carries the span clear of the recovery boundary"
+    },
+    {
+      "id": "OCC2_support_3046_L",
+      "kind": "support",
+      "family": "S3_conveyor_trestles",
+      "sector": "S3",
+      "sequence": "Q5",
+      "sequence_name": "CONVEYOR UNDERPASS",
+      "station_m": 3046,
+      "position": [
+        -24,
+        -0.042,
+        -4
+      ],
+      "height_m": 18.9,
+      "occlusion_event": "OCC2",
+      "role": "underpass support; carries the span clear of the recovery boundary"
+    },
+    {
+      "id": "OCC2_support_3046_R",
+      "kind": "support",
+      "family": "S3_conveyor_trestles",
+      "sector": "S3",
+      "sequence": "Q5",
+      "sequence_name": "CONVEYOR UNDERPASS",
+      "station_m": 3046,
+      "position": [
+        24,
+        -0.042,
+        -4
+      ],
+      "height_m": 18.9,
+      "occlusion_event": "OCC2",
+      "role": "underpass support; carries the span clear of the recovery boundary"
+    },
+    {
+      "id": "OCC2_span",
+      "kind": "span",
+      "family": "OCC2_conveyor_span",
+      "sector": "S3",
+      "sequence": "Q5",
+      "sequence_name": "CONVEYOR UNDERPASS",
+      "station_m": 3028,
+      "position": [
+        0,
+        15.27,
+        -22
+      ],
+      "height_m": 3.2,
+      "occlusion_event": "OCC2",
+      "role": "the only element over the drivable corridor; soffit at the accepted 15.5 m intent, closing the sky for approximately 40 m"
+    }
+  ]
+}

@@ -14,6 +14,8 @@ import {
   resolveCountdownStage,
 } from "../src/game/race-rules.js";
 import {
+  formatRaceGap,
+  formatRacePosition,
   resolveBoostPresentation,
   resolveFinishPresentation,
   resolveInitialRacePresentation,
@@ -151,6 +153,14 @@ assert.equal(resolveRaceStage(false, 1, 5), "running");
 assert.equal(resolveRaceStage(true, 4, 5), "running");
 assert.equal(resolveRaceStage(false, 5, 5), "final");
 assert.equal(resolveRaceStage(true, 5, 5), "approach");
+assert.equal(formatRacePosition(1, 4), "P1 / 4");
+assert.equal(formatRacePosition(2.9, 4), "P2 / 4");
+assert.equal(formatRacePosition(12, 4), "P4 / 4");
+assert.equal(formatRacePosition(Number.NaN, Number.NaN), "P1 / 1");
+assert.equal(formatRaceGap(1, null, 614), "0.61 CLEAR");
+assert.equal(formatRaceGap(3, 421, 300), "+0.42 TO P2");
+assert.equal(formatRaceGap(4, null, null), "GAP ACQUIRING");
+assert.equal(formatRaceGap(1, Number.NaN, Number.NaN), "FIELD LEAD");
 assert.deepEqual(resolveBoostPresentation(false, false), {
   label: "PLASMA RESERVE",
   state: "ready",
@@ -196,5 +206,5 @@ assert.deepEqual(calculateRecoveryTelemetry(Number.NaN, 0), {
 });
 
 console.log(
-  "Race rules PASS: countdown, turn urgency, open-edge and hysteretic wrong-way warnings, final-route filtering, forward crossings, wraparound, missed-gate penalty, finish and boost presentation, cable contacts, recovery telemetry.",
+  "Race rules PASS: countdown, turn urgency, open-edge and hysteretic wrong-way warnings, final-route filtering, forward crossings, wraparound, missed-gate penalty, finish, position, gap and boost presentation, cable contacts, recovery telemetry.",
 );

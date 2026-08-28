@@ -12,8 +12,10 @@ import {
 } from "../src/game/audio-timing.js";
 import {
   DEEP_DNB_BASS_EVENTS,
+  GATE_CHIME_MIDI,
   MUSIC_BPM,
   MUSIC_KEY,
+  RACE_EVENT_MIDI,
   TECHSTEP_HIT_MIDI,
   TRANCE_CHORD_MIDI,
   TRANCE_PLUCK_MIDI,
@@ -46,6 +48,8 @@ const tonalNotes = [
   ...DEEP_DNB_BASS_EVENTS.map((event) => event.midiNote),
   TECHSTEP_HIT_MIDI.downbeat,
   TECHSTEP_HIT_MIDI.offbeat,
+  ...GATE_CHIME_MIDI,
+  ...Object.values(RACE_EVENT_MIDI).flat(),
 ];
 for (const midiNote of tonalNotes) {
   assert.ok(

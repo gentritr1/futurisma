@@ -1,0 +1,291 @@
+{
+  "format": "FUTURISMA_MAP02_BITTERPAN_CHECKPOINTS",
+  "version": "v0.2a.1-review",
+  "final_map02_blockout_freeze": false,
+  "count": 12,
+  "lap_trigger": "CP00 at station 0",
+  "ordered": true,
+  "gap_m": [
+    255,
+    255,
+    255,
+    250,
+    255,
+    255,
+    255,
+    255,
+    255,
+    250,
+    255,
+    255
+  ],
+  "maximum_gap_m": 255,
+  "minimum_gap_m": 250,
+  "coverage_note": "Consecutive gaps stay well under 300 m, so a craft cannot skip a checkpoint at any speed the handling basis allows (403 km/h boost covers 112 m/s).",
+  "checkpoints": [
+    {
+      "order": 0,
+      "id": "CP00",
+      "is_lap_trigger": true,
+      "station_m": 0,
+      "sector": "S3",
+      "sequence": "L0",
+      "sequence_name": "START APRON",
+      "position": [
+        0,
+        0.5,
+        0
+      ],
+      "plane_normal": [
+        0,
+        0,
+        1
+      ],
+      "heading_deg": 0,
+      "half_width_m": 17,
+      "height_m": 12
+    },
+    {
+      "order": 1,
+      "id": "CP01",
+      "is_lap_trigger": false,
+      "station_m": 255,
+      "sector": "S1",
+      "sequence": "Q1",
+      "sequence_name": "THE LONG PAN",
+      "position": [
+        6.044811,
+        2.007571,
+        254.897551
+      ],
+      "plane_normal": [
+        0.03645026,
+        0,
+        0.99933547
+      ],
+      "heading_deg": 2.088909,
+      "half_width_m": 17.7975,
+      "height_m": 12
+    },
+    {
+      "order": 2,
+      "id": "CP02",
+      "is_lap_trigger": false,
+      "station_m": 510,
+      "sector": "S1",
+      "sequence": "Q1",
+      "sequence_name": "THE LONG PAN",
+      "position": [
+        15.339627,
+        1.433225,
+        509.728095
+      ],
+      "plane_normal": [
+        0.03645026,
+        0,
+        0.99933547
+      ],
+      "heading_deg": 2.088909,
+      "half_width_m": 17.8475,
+      "height_m": 12
+    },
+    {
+      "order": 3,
+      "id": "CP03",
+      "is_lap_trigger": false,
+      "station_m": 765,
+      "sector": "S1",
+      "sequence": "T1",
+      "sequence_name": "BASIN ONE ENTRY",
+      "position": [
+        24.477482,
+        0.904168,
+        764.486127
+      ],
+      "plane_normal": [
+        0.17433765,
+        0,
+        0.98468593
+      ],
+      "heading_deg": 10.040116,
+      "half_width_m": 17,
+      "height_m": 12
+    },
+    {
+      "order": 4,
+      "id": "CP04",
+      "is_lap_trigger": false,
+      "station_m": 1015,
+      "sector": "S1",
+      "sequence": "Q2",
+      "sequence_name": "CONE ROW SWEEP",
+      "position": [
+        224.017804,
+        -1.152937,
+        858.441478
+      ],
+      "plane_normal": [
+        0.99041825,
+        0,
+        -0.13810032
+      ],
+      "heading_deg": 97.937935,
+      "half_width_m": 17.4765,
+      "height_m": 12
+    },
+    {
+      "order": 5,
+      "id": "CP05",
+      "is_lap_trigger": false,
+      "station_m": 1270,
+      "sector": "S1",
+      "sequence": "Q2",
+      "sequence_name": "CONE ROW SWEEP",
+      "position": [
+        448.329212,
+        -0.594078,
+        746.876718
+      ],
+      "plane_normal": [
+        0.70597815,
+        0,
+        -0.70823362
+      ],
+      "heading_deg": 135.091379,
+      "half_width_m": 18.9935,
+      "height_m": 12
+    },
+    {
+      "order": 6,
+      "id": "CP06",
+      "is_lap_trigger": false,
+      "station_m": 1525,
+      "sector": "S1",
+      "sequence": "Q2",
+      "sequence_name": "CONE ROW SWEEP",
+      "position": [
+        559.168807,
+        0.5,
+        522.209302
+      ],
+      "plane_normal": [
+        0.1324329,
+        0,
+        -0.99119197
+      ],
+      "heading_deg": 172.389797,
+      "half_width_m": 17.7824,
+      "height_m": 12
+    },
+    {
+      "order": 7,
+      "id": "CP07",
+      "is_lap_trigger": false,
+      "station_m": 1780,
+      "sector": "S2",
+      "sequence": "L1",
+      "sequence_name": "RETURN LEG",
+      "position": [
+        563.001923,
+        1.594078,
+        267.368014
+      ],
+      "plane_normal": [
+        0,
+        0,
+        -1
+      ],
+      "heading_deg": 180,
+      "half_width_m": 17,
+      "height_m": 12
+    },
+    {
+      "order": 8,
+      "id": "CP08",
+      "is_lap_trigger": false,
+      "station_m": 2035,
+      "sector": "S2",
+      "sequence": "L1",
+      "sequence_name": "RETURN LEG",
+      "position": [
+        563.001923,
+        2.152937,
+        12.368014
+      ],
+      "plane_normal": [
+        0,
+        0,
+        -1
+      ],
+      "heading_deg": 180,
+      "half_width_m": 17,
+      "height_m": 12
+    },
+    {
+      "order": 9,
+      "id": "CP09",
+      "is_lap_trigger": false,
+      "station_m": 2290,
+      "sector": "S2",
+      "sequence": "T2",
+      "sequence_name": "PUMP STAND BEND",
+      "position": [
+        504.206253,
+        0.06495,
+        -222.111155
+      ],
+      "plane_normal": [
+        -0.84421292,
+        0,
+        -0.53600797
+      ],
+      "heading_deg": 237.587705,
+      "half_width_m": 17,
+      "height_m": 12
+    },
+    {
+      "order": 10,
+      "id": "CP10",
+      "is_lap_trigger": false,
+      "station_m": 2540,
+      "sector": "S2",
+      "sequence": "Q3",
+      "sequence_name": "HARVESTER CHICANE",
+      "position": [
+        272.944819,
+        -0.433225,
+        -295.439445
+      ],
+      "plane_normal": [
+        -0.89231342,
+        0,
+        -0.45141639
+      ],
+      "heading_deg": 243.165405,
+      "half_width_m": 16.6333,
+      "height_m": 12
+    },
+    {
+      "order": 11,
+      "id": "CP11",
+      "is_lap_trigger": false,
+      "station_m": 2795,
+      "sector": "S3",
+      "sequence": "Q4",
+      "sequence_name": "BRINE CUT",
+      "position": [
+        47.919478,
+        -1.007571,
+        -243.307349
+      ],
+      "plane_normal": [
+        -0.66666821,
+        0,
+        0.74535461
+      ],
+      "heading_deg": 318.189566,
+      "half_width_m": 16.1809,
+      "height_m": 12
+    }
+  ]
+}

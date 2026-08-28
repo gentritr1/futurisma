@@ -1,0 +1,217 @@
+import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
+import { readFile } from "node:fs/promises";
+import {
+  parseGlb,
+  readZipArchive,
+  validateArchivePath,
+} from "./lib/greenwater-package-validator.mjs";
+
+const EXPECTED = Object.freeze({
+  runtimeGlb: "4bec092f1c85c78b00a4974532b0dda5f1f89f756d9741535820368e3cfd35ec",
+  effectsAtlas: "d5562ae064c9532fd447c89ae013642dc03f72f7354293caa952972ad5af8aa3",
+  needleLivery: "2f8b3528845eaa7167062e93ae43fedf74e0d6c2ddc14cea14d565e8ec95dc1c",
+  finalArchive: "2bd5adfd1350b2fd2a9302a8f4139918d1e1d0fe3a1b88b4b80f4cffeb4a6b8a",
+  finalArchiveBytes: 14_380_913,
+  reviewArchive: "94c0b7d58dbb5f4e8cb549259ceabcbacee84cbadcc3393a93ebe4530cd395b9",
+});
+
+function sha256(bytes) {
+  return createHash("sha256").update(bytes).digest("hex");
+}
+
+function assertPng(bytes, width, height, label) {
+  assert.equal(
+    bytes.subarray(0, 8).toString("hex"),
+    "89504e470d0a1a0a",
+    `${label} is not a PNG.`,
+  );
+  assert.equal(bytes.readUInt32BE(8), 13, `${label} has an invalid IHDR length.`);
+  assert.equal(bytes.subarray(12, 16).toString("ascii"), "IHDR");
+  assert.equal(bytes.readUInt32BE(16), width, `${label} width is wrong.`);
+  assert.equal(bytes.readUInt32BE(20), height, `${label} height is wrong.`);
+  assert.equal(bytes.readUInt8(24), 8, `${label} must use 8-bit channels.`);
+  assert.equal(bytes.readUInt8(25), 6, `${label} must be RGBA.`);
+}
+
+const runtimeBytes = await readFile(
+  new URL("../public/assets/totem/models/totem_runtime.glb", import.meta.url),
+);
+assert.equal(sha256(runtimeBytes), EXPECTED.runtimeGlb);
+const runtime = parseGlb(runtimeBytes, "Greenwater Race Presence v1.6 TOTEM");
+const { json } = runtime;
+assert.equal(json.nodes?.length, 53);
+assert.equal(json.meshes?.length, 18);
+assert.equal(json.materials?.length, 4);
+assert.equal(json.textures?.length, 2);
+assert.equal(json.images?.length, 2);
+assert.equal(json.animations, undefined);
+assert.equal(json.skins, undefined);
+
+const primitives = json.meshes.flatMap((mesh) => mesh.primitives ?? []);
+assert.equal(primitives.length, 18);
+const materialByName = new Map(json.materials.map((material) => [material.name, material]));
+const body = materialByName.get("TOTEM_body");
+assert.equal(body?.pbrMetallicRoughness?.roughnessFactor, 0.78);
+assert.equal(body?.pbrMetallicRoughness?.metallicFactor, 0.14);
+const emissive = materialByName.get("TOTEM_emissive");
+assert.equal(
+  emissive?.extensions?.KHR_materials_emissive_strength?.emissiveStrength,
+  0.78,
+);
+const glass = materialByName.get("TOTEM_glass");
+assert.equal(glass?.pbrMetallicRoughness?.roughnessFactor, 0.3);
+assert.equal(glass?.pbrMetallicRoughness?.metallicFactor, 0.08);
+
+for (const name of ["steering_fin_L_pivot", "steering_fin_R_pivot"]) {
+  const node = json.nodes.find((candidate) => candidate.name === name);
+  assert.ok(node, `The v1.6 runtime is missing ${name}.`);
+  assert.equal(node.matrix?.[13], 0.02, `${name} is not baked onto its boom.`);
+}
+
+let visibleTriangles = 0;
+let collisionLineSegments = 0;
+for (const primitive of primitives) {
+  const vertexOrIndexCount = primitive.indices === undefined
+    ? json.accessors[primitive.attributes.POSITION].count
+    : json.accessors[primitive.indices].count;
+  const material = json.materials[primitive.material];
+  if (material.name === "TOTEM_collision") {
+    assert.equal(primitive.mode, 1, "The collision proxy must remain line-only at runtime.");
+    collisionLineSegments += vertexOrIndexCount / 2;
+  } else {
+    assert.ok(primitive.mode === undefined || primitive.mode === 4);
+    visibleTriangles += vertexOrIndexCount / 3;
+  }
+}
+assert.equal(visibleTriangles, 6114);
+assert.equal(collisionLineSegments, 108);
+
+const effectsAtlasBytes = await readFile(
+  new URL("../public/assets/totem/textures/totem_race_presence_fx_256.png", import.meta.url),
+);
+assert.equal(sha256(effectsAtlasBytes), EXPECTED.effectsAtlas);
+assertPng(effectsAtlasBytes, 256, 256, "Race-presence effects atlas");
+
+const needleBytes = await readFile(
+  new URL("../public/assets/totem/textures/totem_decals_1024_needle.png", import.meta.url),
+);
+assert.equal(sha256(needleBytes), EXPECTED.needleLivery);
+assertPng(needleBytes, 1024, 1024, "NEEDLE 16 livery");
+
+const finalArchiveBytes = await readFile(
+  new URL("../artifacts/GREENWATER_RACE_PRESENCE_v1.6.zip", import.meta.url),
+);
+assert.equal(finalArchiveBytes.length, EXPECTED.finalArchiveBytes);
+assert.equal(
+  sha256(finalArchiveBytes),
+  EXPECTED.finalArchive,
+  "The preserved Race Presence v1.6 final freeze differs from the accepted archive.",
+);
+
+const archivedFiles = readZipArchive(finalArchiveBytes);
+assert.equal(archivedFiles.size, 65, "The v1.6 final freeze must contain 65 entries.");
+const finalRoot = "GREENWATER_RACE_PRESENCE_v1.6/";
+const finalFiles = new Map();
+for (const [archivePath, bytes] of archivedFiles) {
+  assert.ok(
+    archivePath.startsWith(finalRoot),
+    `The v1.6 final freeze contains a file outside ${finalRoot}.`,
+  );
+  const logicalPath = validateArchivePath(archivePath.slice(finalRoot.length));
+  assert.ok(!finalFiles.has(logicalPath), `The v1.6 final freeze repeats ${logicalPath}.`);
+  finalFiles.set(logicalPath, bytes);
+}
+
+const finalManifest = JSON.parse(finalFiles.get("MANIFEST.json").toString("utf8"));
+assert.equal(finalManifest.format, "GREENWATER_RACE_PRESENCE_V16_MANIFEST");
+assert.equal(finalManifest.version, "v1.6-final");
+assert.equal(finalManifest.package, "GREENWATER_RACE_PRESENCE_v1.6.zip");
+assert.equal(finalManifest.root_folder, finalRoot);
+assert.equal(finalManifest.final_v16_freeze, true);
+assert.equal(finalManifest.production_assets_identical, true);
+assert.equal(finalManifest.re_baselined, false);
+assert.equal(finalManifest.map_02_started, false);
+assert.equal(finalManifest.accepted_review.sha256, EXPECTED.reviewArchive);
+assert.equal(finalManifest.accepted_review.bytes, 12_023_478);
+assert.equal(finalManifest.accepted_review.zip_entries, 62);
+assert.equal(finalManifest.accepted_review.manifest_records, 61);
+assert.equal(finalManifest.entry_count, 65);
+assert.equal(finalManifest.manifest_record_count, 64);
+assert.equal(finalManifest.files.length, 64);
+assert.deepEqual(finalManifest.prior_freeze_flags, {
+  final_v12_freeze: true,
+  final_v13_freeze: true,
+  final_v14_freeze: true,
+  final_v15_freeze: true,
+});
+assert.equal(finalManifest.integration_measurement.recorded_verbatim, true);
+assert.equal(finalManifest.integration_measurement.measured_by, "Codex");
+assert.equal(finalManifest.integration_measurement.measured_by_design_agent, false);
+assert.equal(finalManifest.integration_measurement.integration_gates.length, 8);
+assert.ok(
+  finalManifest.integration_measurement.integration_gates.every((gate) => gate.status === "PASS"),
+  "Every v1.6 integration gate must remain passing.",
+);
+
+const declaredFinalPaths = new Set();
+for (const record of finalManifest.files) {
+  const logicalPath = validateArchivePath(record.path);
+  assert.notEqual(logicalPath, "MANIFEST.json", "The v1.6 manifest cannot hash itself.");
+  assert.ok(!declaredFinalPaths.has(logicalPath), `The v1.6 manifest repeats ${logicalPath}.`);
+  const bytes = finalFiles.get(logicalPath);
+  assert.ok(bytes, `The v1.6 manifest declares missing file ${logicalPath}.`);
+  assert.equal(bytes.length, record.bytes, `${logicalPath} differs from its v1.6 byte count.`);
+  assert.equal(sha256(bytes), record.sha256, `${logicalPath} differs from its v1.6 hash.`);
+  declaredFinalPaths.add(logicalPath);
+}
+assert.equal(finalFiles.size, declaredFinalPaths.size + 1);
+for (const logicalPath of finalFiles.keys()) {
+  assert.ok(
+    logicalPath === "MANIFEST.json" || declaredFinalPaths.has(logicalPath),
+    `The v1.6 final freeze contains undeclared file ${logicalPath}.`,
+  );
+}
+
+const archivedRuntime = finalFiles.get("models/totem_runtime.glb");
+const archivedEffects = finalFiles.get("textures/totem_race_presence_fx_256.png");
+const archivedNeedle = finalFiles.get("textures/totem_decals_1024_needle.png");
+assert.ok(archivedRuntime.equals(runtimeBytes), "The served TOTEM differs from the v1.6 freeze.");
+assert.ok(archivedEffects.equals(effectsAtlasBytes), "The served effects atlas differs from the v1.6 freeze.");
+assert.ok(archivedNeedle.equals(needleBytes), "The served NEEDLE 16 livery differs from the v1.6 freeze.");
+
+const [totemSource, presenceSource, rivalsSource, profilesSource] = await Promise.all([
+  readFile(new URL("../src/game/totem.ts", import.meta.url), "utf8"),
+  readFile(new URL("../src/game/race-presence.ts", import.meta.url), "utf8"),
+  readFile(new URL("../src/game/rivals.ts", import.meta.url), "utf8"),
+  readFile(new URL("../src/game/rival-race.js", import.meta.url), "utf8"),
+]);
+assert.doesNotMatch(totemSource, /STEERING_FIN_VERTICAL_CORRECTION_METERS/);
+assert.doesNotMatch(totemSource, /seatSteeringFinsOnBooms/);
+assert.match(rivalsSource, /totem_decals_1024_needle\.png/);
+assert.match(profilesSource, /id: "rival-needle"/);
+assert.match(profilesSource, /name: "NEEDLE 16"/);
+assert.match(profilesSource, /engineTint: "#d2c8ad"/);
+
+for (const slot of [
+  "idle_hover_discharge",
+  "acceleration_exhaust",
+  "boost_core_flare",
+  "braking_energy",
+  "wet_deck_spray",
+  "shallow_water_mist",
+  "impact_spark",
+  "ion_distortion_mask",
+]) {
+  assert.match(presenceSource, new RegExp(`\\b${slot}\\b`), `Missing effect slot ${slot}.`);
+}
+assert.match(presenceSource, /maximumDrawCalls: 3/);
+assert.match(presenceSource, /maximumInstances: 11/);
+assert.match(presenceSource, /NearestMipmapNearestFilter/);
+assert.match(presenceSource, /depthWrite: false/);
+assert.match(presenceSource, /THREE\.AdditiveBlending/);
+assert.match(presenceSource, /THREE\.NormalBlending/);
+
+console.log(
+  "Race Presence v1.6 PASS: the 65-entry final freeze and all 64 manifest records are byte-locked; baked steering pivots, 6,114 visible triangles, 108 collision lines, one 256px eight-slot effects atlas, three blend-family batches, and NEEDLE 16 rival identity match the accepted archive.",
+);

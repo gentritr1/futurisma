@@ -1,5 +1,7 @@
 import { FuturismaGame } from "./game/game";
+import type { RaceCourse } from "./game/course";
 import { InputController } from "./game/input";
+import { resolveMapSelection } from "./game/map-selection";
 import { GameUi } from "./game/ui";
 
 const canvasElement = document.getElementById("game-canvas");
@@ -10,7 +12,18 @@ const canvas: HTMLCanvasElement = canvasElement;
 
 const ui = new GameUi();
 const input = new InputController();
-const game = new FuturismaGame(canvas, input, ui);
+const courseAssemblyStartedAt = performance.now();
+const selection = resolveMapSelection(window.location.search);
+const course: RaceCourse = selection === "bitterpan"
+  ? new (await import("./game/bitterpan-course")).BitterpanCourse()
+  : new (await import("./game/course")).GreenwaterCourse();
+const game = new FuturismaGame(
+  canvas,
+  input,
+  ui,
+  course,
+  performance.now() - courseAssemblyStartedAt,
+);
 
 async function beginTrial(): Promise<void> {
   if (!game.canStart()) return;

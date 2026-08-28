@@ -1,0 +1,217 @@
+import * as THREE from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import type { RaceEnvironment, RaceEnvironmentStats } from "./environment";
+import { disposeObject3DResources } from "./graphics-resources";
+import { applyPs2MaterialTreatment } from "./totem";
+
+const EXPECTED_TRACK_PRIMITIVES = 5;
+const EXPECTED_MASSING_PRIMITIVES = 15;
+const EXPECTED_VISIBLE_TRIANGLES = 11_268;
+const ROUTE_PALETTE = {
+  deck: new THREE.Color(0x252c29),
+  kerb: new THREE.Color(0xd7f05a),
+  barrier: new THREE.Color(0xc85f32),
+} as const;
+
+function createLambertMaterial(source: THREE.MeshStandardMaterial): THREE.MeshLambertMaterial {
+  return new THREE.MeshLambertMaterial({
+    name: source.name,
+    color: source.color,
+    map: source.map,
+    emissive: source.emissive,
+    emissiveMap: source.emissiveMap,
+    emissiveIntensity: source.emissiveIntensity,
+    vertexColors: source.vertexColors,
+    transparent: source.transparent,
+    opacity: source.opacity,
+    alphaTest: source.alphaTest,
+    side: source.side,
+    depthTest: source.depthTest,
+    depthWrite: source.depthWrite,
+    colorWrite: source.colorWrite,
+    blending: source.blending,
+    toneMapped: source.toneMapped,
+    fog: source.fog,
+  });
+}
+
+function replaceStandardMaterials(root: THREE.Object3D): void {
+  const replacements = new Map<THREE.Material, THREE.Material>();
+  const replace = (source: THREE.Material): THREE.Material => {
+    const existing = replacements.get(source);
+    if (existing) return existing;
+    const replacement = source instanceof THREE.MeshStandardMaterial
+      ? createLambertMaterial(source)
+      : source;
+    replacements.set(source, replacement);
+    return replacement;
+  };
+  root.traverse((object) => {
+    if (!(object instanceof THREE.Mesh)) return;
+    object.material = Array.isArray(object.material)
+      ? object.material.map(replace)
+      : replace(object.material);
+  });
+  for (const [source, replacement] of replacements) {
+    if (source !== replacement) source.dispose();
+  }
+}
+
+function applyRuntimeRoutePalette(root: THREE.Object3D): void {
+  const styled = new Set<THREE.Material>();
+  root.traverse((object) => {
+    if (!(object instanceof THREE.Mesh)) return;
+    const materials = Array.isArray(object.material) ? object.material : [object.material];
+    for (const material of materials) {
+      if (styled.has(material) || !(material instanceof THREE.MeshLambertMaterial)) continue;
+      styled.add(material);
+      if (material.name === "BLOCKOUT_deck") {
+        material.color.copy(ROUTE_PALETTE.deck);
+        material.emissive.setHex(0x050806);
+        material.emissiveIntensity = 0.1;
+      } else if (material.name === "BLOCKOUT_kerb") {
+        material.color.copy(ROUTE_PALETTE.kerb);
+        material.emissive.setHex(0x3a470d);
+        material.emissiveIntensity = 0.5;
+      } else if (material.name === "BLOCKOUT_barrier") {
+        material.color.copy(ROUTE_PALETTE.barrier);
+        material.emissive.setHex(0x3d1307);
+        material.emissiveIntensity = 0.36;
+      } else {
+        continue;
+      }
+      material.needsUpdate = true;
+    }
+  });
+}
+
+function countVisibleMeshes(root: THREE.Object3D): {
+  meshes: number;
+  triangles: number;
+} {
+  let meshes = 0;
+  let triangles = 0;
+  root.traverse((object) => {
+    if (!(object instanceof THREE.Mesh) || !object.visible) return;
+    meshes += 1;
+    triangles += (
+      object.geometry.index?.count
+      ?? object.geometry.getAttribute("position").count
+    ) / 3;
+    object.castShadow = false;
+    object.receiveShadow = true;
+  });
+  return { meshes, triangles };
+}
+
+function countVisibleResources(root: THREE.Object3D): {
+  materials: number;
+  textures: number;
+} {
+  const materials = new Set<THREE.Material>();
+  const textures = new Set<THREE.Texture>();
+  root.traverse((object) => {
+    if (!(object instanceof THREE.Mesh) || !object.visible) return;
+    const meshMaterials = Array.isArray(object.material)
+      ? object.material
+      : [object.material];
+    for (const material of meshMaterials) {
+      materials.add(material);
+      const textured = material as THREE.Material & { map?: THREE.Texture | null };
+      if (textured.map) textures.add(textured.map);
+    }
+  });
+  return { materials: materials.size, textures: textures.size };
+}
+
+export class BitterpanEnvironment implements RaceEnvironment {
+  readonly root: THREE.Group;
+  readonly stats: RaceEnvironmentStats;
+
+  private constructor(root: THREE.Group, meshes: number, triangles: number) {
+    this.root = root;
+    replaceStandardMaterials(root);
+    // The accepted GLBs stay byte-identical. Their pale review palette was
+    // authored for diagrams and disappears against the live fog/sky. Runtime
+    // colors provide the value separation required to drive the blockout.
+    applyRuntimeRoutePalette(root);
+    applyPs2MaterialTreatment(root);
+    const resources = countVisibleResources(root);
+    this.stats = {
+      meshes,
+      triangles,
+      materials: resources.materials,
+      textures: resources.textures,
+      visibleGroups: meshes,
+      visibleTriangles: triangles,
+      shaderModel: "lambert",
+      signageSource: "none",
+    };
+  }
+
+  static async load(
+    trackUrl: string,
+    massingUrl: string,
+  ): Promise<BitterpanEnvironment> {
+    const loader = new GLTFLoader();
+    const [trackResult, massingResult] = await Promise.allSettled([
+      loader.loadAsync(trackUrl),
+      loader.loadAsync(massingUrl),
+    ]);
+    if (trackResult.status === "rejected" || massingResult.status === "rejected") {
+      if (trackResult.status === "fulfilled") {
+        disposeObject3DResources(trackResult.value.scene);
+      }
+      if (massingResult.status === "fulfilled") {
+        disposeObject3DResources(massingResult.value.scene);
+      }
+      throw trackResult.status === "rejected"
+        ? trackResult.reason
+        : massingResult.status === "rejected"
+          ? massingResult.reason
+          : new Error("Bitterpan environment load failed.");
+    }
+
+    const trackScene = trackResult.value.scene;
+    const massingScene = massingResult.value.scene;
+    try {
+      const track = trackScene.getObjectByName("GW2_TRACK_BLOCKOUT");
+      const collision = trackScene.getObjectByName("GW2_COLLISION_PROXY");
+      const massing = massingScene.getObjectByName("GW2_SITE_MASSING");
+      if (!track || !collision || !massing) {
+        throw new Error("Bitterpan GLBs are missing an accepted runtime node.");
+      }
+      collision.visible = false;
+      const trackStats = countVisibleMeshes(track);
+      const massingStats = countVisibleMeshes(massing);
+      if (
+        trackStats.meshes !== EXPECTED_TRACK_PRIMITIVES
+        || massingStats.meshes !== EXPECTED_MASSING_PRIMITIVES
+        || trackStats.triangles + massingStats.triangles !== EXPECTED_VISIBLE_TRIANGLES
+      ) {
+        throw new Error(
+          "Bitterpan visible primitive or triangle totals differ from the accepted review.",
+        );
+      }
+
+      const root = new THREE.Group();
+      root.name = "map02_bitterpan_authored_environment";
+      root.add(trackScene, massingScene);
+      return new BitterpanEnvironment(
+        root,
+        trackStats.meshes + massingStats.meshes,
+        trackStats.triangles + massingStats.triangles,
+      );
+    } catch (error) {
+      disposeObject3DResources(trackScene);
+      disposeObject3DResources(massingScene);
+      throw error;
+    }
+  }
+
+  updateVisibility(_camera: THREE.Camera): void {
+    // Both accepted GLBs are static and already sit below the combined
+    // 24-call ceiling. Keeping all 20 primitives resident avoids a per-frame
+    // culling allocator and preserves the review's no-batching accounting.
+  }
+}

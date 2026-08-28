@@ -1,20 +1,19 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
+import { disposeObject3DResources } from "./graphics-resources";
+import {
+  TotemRacePresence,
+  type RacePresenceVisualState,
+} from "./race-presence";
 
-export interface TotemVisualState {
+export interface TotemVisualState extends RacePresenceVisualState {
   steer: number;
-  throttle: number;
-  brake: number;
-  speedRatio: number;
-  boostActive: boolean;
-  driftIntensity: number;
   lateralLoad: number;
-  elapsed: number;
-  delta: number;
 }
 
 interface NeutralTransform {
-  rotation: THREE.Euler;
+  quaternion: THREE.Quaternion;
   position: THREE.Vector3;
 }
 
@@ -23,13 +22,44 @@ export interface Ps2MaterialTreatmentStats {
   textures: number;
 }
 
+export type TotemRivalMaterialRole =
+  | "TOTEM_body"
+  | "TOTEM_emissive"
+  | "TOTEM_glass";
+
+export interface TotemRivalVisualBatch {
+  role: TotemRivalMaterialRole;
+  geometry: THREE.BufferGeometry;
+  material: THREE.Material;
+  triangles: number;
+}
+
+interface OriginalVisibleMesh {
+  mesh: THREE.Mesh;
+  modelLocalMatrix: THREE.Matrix4;
+}
+
 const DEG = Math.PI / 180;
+const LOCAL_ROTATION_AXES = {
+  x: new THREE.Vector3(1, 0, 0),
+  y: new THREE.Vector3(0, 1, 0),
+  z: new THREE.Vector3(0, 0, 1),
+} as const;
 const ENGINE_FLAP_NAMES = [
   "engine_flap_L_0_pivot",
   "engine_flap_L_1_pivot",
   "engine_flap_R_0_pivot",
   "engine_flap_R_1_pivot",
 ] as const;
+const RIVAL_MATERIAL_ROLES: readonly TotemRivalMaterialRole[] = [
+  "TOTEM_body",
+  "TOTEM_emissive",
+  "TOTEM_glass",
+];
+
+function isRivalMaterialRole(name: string): name is TotemRivalMaterialRole {
+  return RIVAL_MATERIAL_ROLES.includes(name as TotemRivalMaterialRole);
+}
 
 export function applyPs2MaterialTreatment(
   root: THREE.Object3D,
@@ -79,9 +109,11 @@ export class TotemVehicle {
   private readonly visual = new THREE.Group();
   private readonly nodes = new Map<string, THREE.Object3D>();
   private readonly neutral = new Map<string, NeutralTransform>();
-  private readonly enginePlumes: THREE.Mesh[] = [];
-  private boostPlume: THREE.Mesh | null = null;
+  private readonly rotationOffset = new THREE.Quaternion();
+  private hoverShadow: THREE.Mesh | null = null;
+  private racePresence: TotemRacePresence | null = null;
   private model: THREE.Object3D | null = null;
+  private originalVisibleMeshes: OriginalVisibleMesh[] = [];
 
   constructor() {
     this.root.name = "totem_vehicle_root";
@@ -89,13 +121,26 @@ export class TotemVehicle {
     this.root.add(this.visual);
   }
 
-  async load(url: string): Promise<void> {
-    const loader = new GLTFLoader();
-    const gltf = await loader.loadAsync(url);
+  async load(url: string, effectsAtlasUrl: string): Promise<void> {
+    const [gltfResult, atlasResult] = await Promise.allSettled([
+      new GLTFLoader().loadAsync(url),
+      new THREE.TextureLoader().loadAsync(effectsAtlasUrl),
+    ]);
+    if (gltfResult.status === "rejected") {
+      if (atlasResult.status === "fulfilled") atlasResult.value.dispose();
+      throw gltfResult.reason;
+    }
+    if (atlasResult.status === "rejected") {
+      disposeObject3DResources(gltfResult.value.scene);
+      throw atlasResult.reason;
+    }
+    const gltf = gltfResult.value;
+    const effectsAtlas = atlasResult.value;
     this.model = gltf.scene;
     this.model.name = "TOTEM_runtime";
     this.visual.add(this.model);
     applyPs2MaterialTreatment(this.model);
+    this.calibrateVehicleMaterials();
 
     this.model.traverse((object) => {
       if (object.name) this.nodes.set(object.name, object);
@@ -109,6 +154,8 @@ export class TotemVehicle {
         object.visible = false;
       }
     });
+
+    this.captureOriginalVisibleMeshes();
 
     for (const name of [
       "canopy_pivot",
@@ -128,12 +175,95 @@ export class TotemVehicle {
       const node = this.nodes.get(name);
       if (!node) continue;
       this.neutral.set(name, {
-        rotation: node.rotation.clone(),
+        quaternion: node.quaternion.clone(),
         position: node.position.clone(),
       });
     }
 
-    this.installEngineEffects();
+    this.racePresence = new TotemRacePresence(
+      this.model,
+      this.nodes,
+      effectsAtlas,
+    );
+    this.installHoverShadow();
+  }
+
+  effectsAtlas(): THREE.Texture {
+    if (!this.racePresence) {
+      throw new Error("TOTEM race-presence effects must be loaded before use.");
+    }
+    return this.racePresence.atlas;
+  }
+
+  createRivalVisualBatches(): TotemRivalVisualBatch[] {
+    if (!this.model || this.originalVisibleMeshes.length === 0) {
+      throw new Error("TOTEM must be loaded before creating rival visual batches.");
+    }
+
+    const geometriesByRole = new Map<TotemRivalMaterialRole, THREE.BufferGeometry[]>();
+    const materialByRole = new Map<TotemRivalMaterialRole, THREE.Material>();
+    for (const role of RIVAL_MATERIAL_ROLES) geometriesByRole.set(role, []);
+
+    for (const source of this.originalVisibleMeshes) {
+      if (Array.isArray(source.mesh.material)) {
+        throw new Error(`TOTEM mesh ${source.mesh.name} has unsupported material groups.`);
+      }
+      const material = source.mesh.material;
+      if (!isRivalMaterialRole(material.name)) {
+        throw new Error(
+          `TOTEM mesh ${source.mesh.name} has unexpected visible material ${material.name}.`,
+        );
+      }
+      const existingMaterial = materialByRole.get(material.name);
+      if (existingMaterial && existingMaterial !== material) {
+        throw new Error(`TOTEM material role ${material.name} uses multiple materials.`);
+      }
+      materialByRole.set(material.name, material);
+
+      const geometry = source.mesh.geometry.index
+        ? source.mesh.geometry.toNonIndexed()
+        : source.mesh.geometry.clone();
+      geometry.applyMatrix4(source.modelLocalMatrix);
+      geometriesByRole.get(material.name)?.push(geometry);
+    }
+
+    const batches: TotemRivalVisualBatch[] = [];
+    try {
+      for (const role of RIVAL_MATERIAL_ROLES) {
+        const sourceGeometries = geometriesByRole.get(role) ?? [];
+        const sourceMaterial = materialByRole.get(role);
+        if (sourceGeometries.length === 0 || !sourceMaterial) {
+          throw new Error(`TOTEM is missing required rival material role ${role}.`);
+        }
+        const geometry = mergeGeometries(sourceGeometries, false);
+        if (!geometry) {
+          throw new Error(`TOTEM ${role} geometry could not be merged safely.`);
+        }
+        const position = geometry.getAttribute("position");
+        const triangles = position.count / 3;
+        if (!Number.isInteger(triangles)) {
+          geometry.dispose();
+          throw new Error(`TOTEM ${role} geometry does not contain complete triangles.`);
+        }
+        batches.push({
+          role,
+          geometry,
+          material: sourceMaterial.clone(),
+          triangles,
+        });
+      }
+    } catch (error) {
+      for (const batch of batches) {
+        batch.geometry.dispose();
+        batch.material.dispose();
+      }
+      throw error;
+    } finally {
+      for (const geometries of geometriesByRole.values()) {
+        for (const geometry of geometries) geometry.dispose();
+      }
+    }
+    return batches;
   }
 
   setPose(position: THREE.Vector3, quaternion: THREE.Quaternion): void {
@@ -192,23 +322,24 @@ export class TotemVehicle {
       skid.position.y = skidNeutral.position.y - retract * 0.22;
     }
 
-    const plumeStrength = 0.22 + state.throttle * 0.78 + state.speedRatio * 0.28;
-    for (const plume of this.enginePlumes) {
-      plume.scale.set(0.72 + state.throttle * 0.34, plumeStrength, 0.72 + state.throttle * 0.34);
-      const material = plume.material as THREE.MeshBasicMaterial;
-      material.opacity = 0.12 + state.throttle * 0.42 + state.speedRatio * 0.12;
+    const hoverHeight = state.boostActive
+      ? 0.6
+      : state.speedRatio < 0.1 ? 0.18 : 0.45;
+    const trackOffset = -(hoverHeight + 0.68);
+    if (this.hoverShadow) {
+      this.hoverShadow.position.y = trackOffset;
+      const shadowMaterial = this.hoverShadow.material as THREE.MeshBasicMaterial;
+      shadowMaterial.opacity = state.boostActive ? 0.11 : 0.18;
     }
-    if (this.boostPlume) {
-      const boostRead = THREE.MathUtils.smoothstep(state.speedRatio, 0.08, 0.28);
-      this.boostPlume.visible = state.boostActive && boostRead > 0.01;
-      this.boostPlume.scale.setScalar(
-        state.boostActive
-          ? (0.65 + boostRead * 0.35) * (1 + Math.sin(state.elapsed * 32) * 0.04)
-          : 0.01,
-      );
-      const boostMaterial = this.boostPlume.material as THREE.MeshBasicMaterial;
-      boostMaterial.opacity = 0.28 + boostRead * 0.22;
-    }
+    this.racePresence?.update(state);
+  }
+
+  triggerImpactEffect(side: number, strength: number): void {
+    this.racePresence?.triggerImpact(side, strength);
+  }
+
+  resetEffects(): void {
+    this.racePresence?.reset();
   }
 
   worldPosition(
@@ -226,46 +357,70 @@ export class TotemVehicle {
     const node = this.nodes.get(name);
     const neutral = this.neutral.get(name);
     if (!node || !neutral) return;
-    node.rotation[axis] = neutral.rotation[axis] + offset;
+    this.rotationOffset.setFromAxisAngle(LOCAL_ROTATION_AXES[axis], offset);
+    node.quaternion.copy(neutral.quaternion).multiply(this.rotationOffset);
   }
 
-  private installEngineEffects(): void {
-    const plumeMaterial = new THREE.MeshBasicMaterial({
-      color: 0x7cecff,
-      transparent: true,
-      opacity: 0.58,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-      side: THREE.DoubleSide,
+  private captureOriginalVisibleMeshes(): void {
+    if (!this.model) return;
+    this.model.updateMatrixWorld(true);
+    const modelWorldInverse = this.model.matrixWorld.clone().invert();
+    this.originalVisibleMeshes = [];
+    this.model.traverse((object) => {
+      if (!(object instanceof THREE.Mesh) || !object.visible) return;
+      const materials = Array.isArray(object.material) ? object.material : [object.material];
+      if (materials.some((material) => material.name === "TOTEM_collision")) return;
+      this.originalVisibleMeshes.push({
+        mesh: object,
+        modelLocalMatrix: modelWorldInverse.clone().multiply(object.matrixWorld),
+      });
     });
-    const plumeGeometry = new THREE.CylinderGeometry(0.05, 0.34, 2.8, 7, 1, true);
-    plumeGeometry.translate(0, 1.4, 0);
-
-    for (const anchorName of ["FX_engine_left", "FX_engine_right"]) {
-      const anchor = this.nodes.get(anchorName);
-      if (!anchor) continue;
-      const plume = new THREE.Mesh(plumeGeometry, plumeMaterial.clone());
-      plume.name = `${anchorName}_plume`;
-      plume.rotation.x = Math.PI / 2;
-      anchor.add(plume);
-      this.enginePlumes.push(plume);
-    }
-
-    const boostAnchor = this.nodes.get("FX_boost_center");
-    if (!boostAnchor) return;
-    const boostGeometry = new THREE.CylinderGeometry(0.04, 0.56, 5.5, 8, 1, true);
-    boostGeometry.translate(0, 2.75, 0);
-    const boostMaterial = new THREE.MeshBasicMaterial({
-      color: 0xc8ff2e,
-      transparent: true,
-      opacity: 0.5,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-      side: THREE.DoubleSide,
-    });
-    this.boostPlume = new THREE.Mesh(boostGeometry, boostMaterial);
-    this.boostPlume.rotation.x = Math.PI / 2;
-    this.boostPlume.visible = false;
-    boostAnchor.add(this.boostPlume);
   }
+
+  private calibrateVehicleMaterials(): void {
+    if (!this.model) return;
+    const calibrated = new Set<THREE.Material>();
+    this.model.traverse((object) => {
+      if (!(object instanceof THREE.Mesh)) return;
+      const materials = Array.isArray(object.material) ? object.material : [object.material];
+      for (const material of materials) {
+        if (calibrated.has(material) || !(material instanceof THREE.MeshStandardMaterial)) {
+          continue;
+        }
+        calibrated.add(material);
+        if (material.name === "TOTEM_body") {
+          material.roughness = Math.max(material.roughness, 0.72);
+          material.metalness = Math.min(material.metalness, 0.18);
+        } else if (material.name === "TOTEM_emissive") {
+          material.emissiveIntensity = 0.62;
+        } else if (material.name === "TOTEM_glass") {
+          material.roughness = Math.max(material.roughness, 0.25);
+          material.metalness = Math.min(material.metalness, 0.1);
+        }
+        material.needsUpdate = true;
+      }
+    });
+  }
+
+  private installHoverShadow(): void {
+    const shadowMaterial = new THREE.MeshBasicMaterial({
+      color: 0x07100c,
+      transparent: true,
+      opacity: 0.18,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+      toneMapped: false,
+    });
+    this.hoverShadow = new THREE.Mesh(
+      new THREE.CircleGeometry(1, 12),
+      shadowMaterial,
+    );
+    this.hoverShadow.name = "totem_hover_shadow";
+    this.hoverShadow.rotation.x = -Math.PI / 2;
+    this.hoverShadow.position.set(0, -1.13, 0.28);
+    this.hoverShadow.scale.set(1.55, 3.05, 1);
+    this.hoverShadow.renderOrder = 1;
+    this.root.add(this.hoverShadow);
+  }
+
 }

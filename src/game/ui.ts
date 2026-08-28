@@ -1,4 +1,6 @@
 import {
+  formatRaceGap,
+  formatRacePosition,
   resolveBoostPresentation,
   resolveFinishPresentation,
   resolveInitialRacePresentation,
@@ -38,6 +40,36 @@ export interface HudFrame {
   recoveryActive: boolean;
   recoveryProgress: number;
   recoverySeconds: number;
+  position: number;
+  racerCount: number;
+  gapToAheadMs: number | null;
+  gapToBehindMs: number | null;
+}
+
+export interface RaceGridEntry {
+  position: number;
+  name: string;
+  team: string;
+  player: boolean;
+}
+
+export interface RaceStandingEntry extends RaceGridEntry {
+  finishTimeMs: number;
+  gapMs: number;
+}
+
+export interface FieldOrderEntry {
+  position: number;
+  name: string;
+  player: boolean;
+}
+
+export interface RaceCoursePresentation {
+  mapName: string;
+  mapCode: string;
+  checkpointCount: number;
+  finishName: string;
+  startLabel: string;
 }
 
 type PauseReason = "FOCUS LOST" | "GRAPHICS LINK LOST" | "GRAPHICS LINK RESTORED";
@@ -67,13 +99,19 @@ export class GameUi {
   private readonly resultTime = requiredElement<HTMLElement>("result-time");
   private readonly resultDetail = requiredElement<HTMLElement>("result-detail");
   private readonly resultLaps = requiredElement<HTMLOListElement>("result-laps");
+  private readonly gridOrder = requiredElement<HTMLOListElement>("grid-order");
+  private readonly fieldOrder = requiredElement<HTMLOListElement>("field-order");
   private readonly introDeck = requiredElement<HTMLElement>("intro-deck");
+  private readonly introFooter = requiredElement<HTMLElement>("intro-footer");
+  private readonly courseName = requiredElement<HTMLElement>("course-name");
   private readonly systemStatus = requiredElement<HTMLElement>("system-status");
   private readonly speedValue = requiredElement<HTMLElement>("speed-value");
   private readonly driveState = requiredElement<HTMLElement>("drive-state");
   private readonly timeValue = requiredElement<HTMLElement>("time-value");
   private readonly lapValue = requiredElement<HTMLElement>("lap-value");
   private readonly lastLapValue = requiredElement<HTMLElement>("last-lap-value");
+  private readonly positionValue = requiredElement<HTMLElement>("position-value");
+  private readonly gapValue = requiredElement<HTMLElement>("gap-value");
   private readonly checkpointValue = requiredElement<HTMLElement>("checkpoint-value");
   private readonly sectorValue = requiredElement<HTMLElement>("sector-value");
   private readonly finishValue = requiredElement<HTMLElement>("finish-value");
@@ -98,6 +136,8 @@ export class GameUi {
   private readonly errorMessage = requiredElement<HTMLElement>("error-message");
   private lastLapLabel = "";
   private lastLapTimeLabel = "";
+  private lastPositionLabel = "";
+  private lastGapLabel = "";
   private lastCheckpointLabel = "";
   private lastDriveLabel = "";
   private lastDriveState = "";
@@ -113,6 +153,10 @@ export class GameUi {
   private impactFlashUntil = 0;
   private systemStatusLabel = "SYSTEM STANDBY";
   private demoAutopilot = false;
+  private lastFieldOrderKey = "";
+  private readonly reducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  ).matches;
 
   setDemoAutopilot(active: boolean): void {
     this.demoAutopilot = active;
@@ -120,18 +164,64 @@ export class GameUi {
     this.setSystemStatus(this.systemStatusLabel);
   }
 
-  setRaceFormat(totalLaps: number, courseLengthMeters: number): void {
+  setRaceFormat(
+    totalLaps: number,
+    courseLengthMeters: number,
+    grid: readonly RaceGridEntry[] = [],
+    course: RaceCoursePresentation = {
+      mapName: "Greenwater Strip",
+      mapCode: "MAP 01",
+      checkpointCount: 8,
+      finishName: "The Cradle",
+      startLabel: "RUNWAY 09",
+    },
+  ): void {
     const presentation = resolveInitialRacePresentation(
       totalLaps,
       courseLengthMeters,
     );
-    this.introDeck.textContent = `${presentation.totalLaps} ${
+    const lapLabel = `${presentation.totalLaps} ${
       presentation.totalLaps === 1 ? "lap" : "laps"
-    } through Greenwater Strip. Read the amber turn grammar, clear all eight gates, and bring TOTEM home through The Cradle.`;
+    }`;
+    this.introDeck.textContent = course.mapCode === "MAP 01"
+      ? `Four ships. ${lapLabel} through Greenwater Strip. Follow the amber turn markers, clear all eight gates, and bring TOTEM home through The Cradle.`
+      : `Four ships. ${lapLabel} through ${course.mapName}. Follow the amber turn markers, clear all ${course.checkpointCount} sector gates, and bring TOTEM home through ${course.finishName}.`;
+    this.courseName.textContent = `${course.mapName.toUpperCase()} / ${course.mapCode}`;
+    this.introFooter.textContent = course.mapCode === "MAP 01"
+      ? "WORKS LIVERY 07 · GREENWATER FIELD RACE"
+      : `WORKS LIVERY 07 · ${course.mapName.toUpperCase()} FIELD RACE`;
+    document.title = `FUTURISMA · ${course.mapName}`;
+    this.checkpointValue.textContent = `NEXT GATE 01 / ${course.checkpointCount
+      .toString()
+      .padStart(2, "0")}`;
+    this.sectorValue.textContent = course.startLabel;
     this.lapValue.textContent = presentation.lapLabel;
     this.finishValue.textContent = presentation.finishLabel;
     this.lastLapValue.hidden = true;
     this.progressFill.style.transform = "scaleX(0)";
+    if (grid.length > 0) {
+      this.updateGrid(grid);
+      this.updateFieldOrder(grid);
+    }
+  }
+
+  updateFieldOrder(entries: readonly FieldOrderEntry[]): void {
+    const key = entries.map((entry) => `${entry.player ? "Y" : "N"}${entry.name}`).join("|");
+    if (key === this.lastFieldOrderKey) return;
+    this.lastFieldOrderKey = key;
+    const fragment = document.createDocumentFragment();
+    for (const entry of entries) {
+      const row = document.createElement("li");
+      const position = document.createElement("span");
+      const name = document.createElement("span");
+      name.className = "n";
+      position.textContent = `P${entry.position}${entry.player ? " · YOU" : ""}`;
+      name.textContent = entry.name;
+      row.dataset.best = entry.player ? "true" : "false";
+      row.append(position, name);
+      fragment.append(row);
+    }
+    this.fieldOrder.replaceChildren(fragment);
   }
 
   showReady(): void {
@@ -158,6 +248,7 @@ export class GameUi {
     this.hideLapEvent();
     this.impactFlash.dataset.active = "false";
     this.hazardUntil = 0;
+    document.body.dataset.boost = "false";
     this.setSystemStatus("LAUNCH SEQUENCE");
     document.body.dataset.phase = "race";
   }
@@ -167,12 +258,15 @@ export class GameUi {
     totalLaps: number,
     bestLapMs: number,
     lapTimesMs: readonly number[],
+    position = 1,
+    racerCount = 1,
+    standings: readonly RaceStandingEntry[] = [],
   ): void {
     this.resultTime.textContent = formatRaceTime(elapsedMs);
-    this.resultDetail.textContent = `TOTEM / WORKS 07 · ${totalLaps} ${
+    this.resultDetail.textContent = `${formatRacePosition(position, racerCount)} · TOTEM / WORKS 07 · ${totalLaps} ${
       totalLaps === 1 ? "LAP" : "LAPS"
     } LOGGED · BEST ${formatRaceTime(bestLapMs)}`;
-    this.updateResultLaps(lapTimesMs, bestLapMs);
+    this.updateResultClassification(standings, lapTimesMs, bestLapMs);
     this.resultScreen.hidden = false;
     this.countdown.textContent = "";
     this.countdown.dataset.paused = "false";
@@ -184,7 +278,7 @@ export class GameUi {
     this.turnCue.setAttribute("aria-hidden", "true");
     this.hideLapEvent();
     this.impactFlash.dataset.active = "false";
-    this.setSystemStatus("TRIAL COMPLETE");
+    this.setSystemStatus("CLASSIFICATION LOCKED");
     document.body.dataset.phase = "result";
     this.restartButton.focus({ preventScroll: true });
   }
@@ -197,8 +291,19 @@ export class GameUi {
   }
 
   setCountdown(value: string): void {
+    const countable = value === "GO" || /^[0-9]$/.test(value);
+    if (countable) this.countdown.dataset.value = value === "GO" ? "go" : "count";
+    if (countable && value !== this.countdown.textContent && !this.reducedMotion) {
+      this.countdown.animate(
+        [
+          { transform: "translate(-50%, -50%) skewX(-7deg) scale(1.3)", opacity: 0.3 },
+          { transform: "translate(-50%, -50%) skewX(-7deg) scale(1)", opacity: 1 },
+        ],
+        { duration: 240, easing: "cubic-bezier(0.23, 1, 0.32, 1)" },
+      );
+    }
     this.countdown.textContent = value;
-    if (value === "GO") this.setSystemStatus("TRIAL ACTIVE");
+    if (value === "GO") this.setSystemStatus("RACE ACTIVE");
   }
 
   setAudioMuted(muted: boolean): void {
@@ -212,7 +317,7 @@ export class GameUi {
         : `${reason ?? "PAUSED"} · ENTER / START TO RESUME`
       : "";
     this.countdown.dataset.paused = paused ? "true" : "false";
-    this.setSystemStatus(paused ? "RACE PAUSED" : "TRIAL ACTIVE");
+    this.setSystemStatus(paused ? "RACE PAUSED" : "RACE ACTIVE");
     document.body.dataset.phase = paused ? "paused" : "race";
   }
 
@@ -226,10 +331,10 @@ export class GameUi {
     const phase = document.body.dataset.phase;
     if (!phase) this.setSystemStatus("SYSTEM STANDBY");
     else if (phase === "intro") this.setSystemStatus("TOTEM READY");
-    else if (phase === "result") this.setSystemStatus("TRIAL COMPLETE");
+    else if (phase === "result") this.setSystemStatus("CLASSIFICATION LOCKED");
     else if (phase === "paused") this.setSystemStatus("RACE PAUSED");
     else if (phase === "resuming") this.setSystemStatus("RESUME SEQUENCE");
-    else this.setSystemStatus("TRIAL ACTIVE");
+    else this.setSystemStatus("RACE ACTIVE");
   }
 
   setResuming(): void {
@@ -286,6 +391,10 @@ export class GameUi {
     this.hazardUntil = performance.now() + durationMs;
   }
 
+  announcePosition(position: number, gained: boolean): void {
+    this.setSystemStatus(`${gained ? "POSITION GAINED" : "POSITION LOST"} · P${position}`);
+  }
+
   update(frame: HudFrame): void {
     if (
       this.lapEvent.dataset.active === "true"
@@ -301,6 +410,20 @@ export class GameUi {
     }
     this.speedValue.textContent = Math.round(frame.speedKph).toString().padStart(3, "0");
     this.timeValue.textContent = formatRaceTime(frame.elapsedMs);
+    const positionLabel = formatRacePosition(frame.position, frame.racerCount);
+    const gapLabel = formatRaceGap(
+      frame.position,
+      frame.gapToAheadMs,
+      frame.gapToBehindMs,
+    );
+    if (positionLabel !== this.lastPositionLabel) {
+      this.positionValue.textContent = positionLabel;
+      this.lastPositionLabel = positionLabel;
+    }
+    if (gapLabel !== this.lastGapLabel) {
+      this.gapValue.textContent = gapLabel;
+      this.lastGapLabel = gapLabel;
+    }
     const lapLabel = `LAP ${Math.min(frame.lap, frame.totalLaps)} / ${frame.totalLaps}`;
     const lastLapTimeLabel = frame.lastLapMs === null
       ? ""
@@ -354,6 +477,7 @@ export class GameUi {
       this.boostMeter.dataset.state = boostState;
       this.boostLabel.textContent = boostPresentation.label;
       this.boostFill.dataset.active = boostState === "active" ? "true" : "false";
+      document.body.dataset.boost = boostState === "active" ? "true" : "false";
       this.lastBoostState = boostState;
     }
     if (edgeState !== this.lastEdgeState) {
@@ -407,6 +531,8 @@ export class GameUi {
           ? `${frame.turnDirection} → ${frame.turnFollowingDirection}`
           : frame.turnDirection;
         this.turnCue.dataset.mode = "turn";
+        this.turnCue.dataset.direction = frame.turnDirection.toLowerCase();
+        this.turnCue.dataset.follow = frame.turnFollowingDirection?.toLowerCase() ?? "none";
         this.turnCue.dataset.urgent = frame.turnUrgent ? "true" : "false";
         this.turnArrow.textContent = `${primaryArrow}${followingArrow ? ` ${followingArrow}` : ""}`;
         this.turnLabel.textContent = finalApproach
@@ -417,6 +543,8 @@ export class GameUi {
           : `${Math.ceil(frame.turnDistanceMeters / 10) * 10} M`;
       } else if (finishCueActive) {
         this.turnCue.dataset.mode = "finish";
+        this.turnCue.dataset.direction = "finish";
+        this.turnCue.dataset.follow = "none";
         this.turnCue.dataset.urgent = "false";
         this.turnArrow.textContent = "◆";
         this.turnLabel.textContent = "THE CRADLE · FINISH";
@@ -487,15 +615,53 @@ export class GameUi {
     this.lapEventUntil = 0;
   }
 
-  private updateResultLaps(
+  private updateGrid(grid: readonly RaceGridEntry[]): void {
+    const fragment = document.createDocumentFragment();
+    for (const entry of grid) {
+      const row = document.createElement("li");
+      const position = document.createElement("span");
+      const name = document.createElement("span");
+      name.className = "n";
+      const team = document.createElement("strong");
+      position.textContent = `P${entry.position}${entry.player ? " · YOU" : ""}`;
+      name.textContent = entry.name;
+      team.textContent = entry.team;
+      row.dataset.best = entry.player ? "true" : "false";
+      row.append(position, name, team);
+      fragment.append(row);
+    }
+    this.gridOrder.replaceChildren(fragment);
+  }
+
+  private updateResultClassification(
+    standings: readonly RaceStandingEntry[],
     lapTimesMs: readonly number[],
     bestLapMs: number,
   ): void {
     this.resultLaps.replaceChildren();
-    this.resultLaps.hidden = lapTimesMs.length <= 1;
+    this.resultLaps.hidden = standings.length === 0 && lapTimesMs.length <= 1;
     if (this.resultLaps.hidden) return;
 
     const fragment = document.createDocumentFragment();
+    if (standings.length > 0) {
+      for (const entry of standings) {
+        const row = document.createElement("li");
+        const position = document.createElement("span");
+        const name = document.createElement("span");
+        name.className = "n";
+        const gap = document.createElement("strong");
+        position.textContent = `P${entry.position}${entry.player ? " · YOU" : ""}`;
+        name.textContent = entry.name;
+        gap.textContent = entry.position === 1
+          ? formatRaceTime(entry.finishTimeMs)
+          : `+${formatRaceTime(entry.gapMs)}`;
+        row.dataset.best = entry.player ? "true" : "false";
+        row.append(position, name, gap);
+        fragment.append(row);
+      }
+      this.resultLaps.append(fragment);
+      return;
+    }
     lapTimesMs.forEach((lapTimeMs, index) => {
       const row = document.createElement("li");
       const lap = document.createElement("span");

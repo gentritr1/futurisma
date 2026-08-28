@@ -11,8 +11,10 @@ import {
 } from "./audio-timing";
 import {
   DEEP_DNB_BASS_EVENTS,
+  GATE_CHIME_MIDI,
   MUSIC_BPM,
   MUSIC_KEY,
+  RACE_EVENT_MIDI,
   TECHSTEP_HIT_MIDI,
   TRANCE_CHORD_MIDI,
   TRANCE_PLUCK_MIDI,
@@ -82,15 +84,26 @@ export class EngineAudio {
   private diagnosticControlUpdates = 0;
   private diagnosticControlStartedAt = 0;
   private diagnosticMusicTransitions = 0;
+  private diagnosticMusicPreparationMs = 0;
   private diagnosticInitializationMs = 0;
   private diagnosticMaxMusicLowpassHz = 0;
   private diagnosticMaxMusicHighShelfDb = 0;
   private activeOneShots = 0;
   private diagnosticPeakActiveOneShots = 0;
   private diagnosticSkippedOneShots = 0;
+  private diagnosticRaceEventCues = 0;
   private musicSampleRate = 0;
   private muted = false;
   private paused = false;
+  private readonly preparedStemSamples = new Map<StemName, Float32Array<ArrayBuffer>>();
+
+  constructor() {
+    const preparationStartedAt = performance.now();
+    for (const name of STEM_NAMES) {
+      this.preparedStemSamples.set(name, this.createStemSamples(name));
+    }
+    this.diagnosticMusicPreparationMs = performance.now() - preparationStartedAt;
+  }
 
   async start(): Promise<void> {
     if (this.context) {
@@ -278,7 +291,12 @@ export class EngineAudio {
   }
 
   playGate(index: number): void {
-    this.playTone(410 + index * 32, 0.11, 0.045, "square");
+    const noteIndex = ((index - 1) % GATE_CHIME_MIDI.length
+      + GATE_CHIME_MIDI.length) % GATE_CHIME_MIDI.length;
+    const note = GATE_CHIME_MIDI[noteIndex];
+    const frequency = frequencyForMidiNote(note);
+    this.playTone(frequency, 0.11, 0.038, "square", 0, 1.02);
+    this.playTone(frequency * 1.5, 0.15, 0.022, "sine", 0.045, 1.01);
   }
 
   playMissedGate(): void {
@@ -315,6 +333,55 @@ export class EngineAudio {
     this.playTone(660, 0.38, 0.038, "sine", 0.12);
   }
 
+  playPositionChange(gained: boolean): void {
+    const notes = gained
+      ? RACE_EVENT_MIDI.positionGain
+      : RACE_EVENT_MIDI.positionLoss;
+    this.playTone(frequencyForMidiNote(notes[0]), 0.11, 0.026, "square", 0, 1.01);
+    this.playTone(frequencyForMidiNote(notes[1]), 0.16, 0.02, "sine", 0.055, 1.01);
+    this.diagnosticRaceEventCues += 1;
+  }
+
+  playFinalLap(): void {
+    this.playTone(
+      frequencyForMidiNote(RACE_EVENT_MIDI.finalLap[0]),
+      0.16,
+      0.032,
+      "square",
+      0,
+      1.01,
+    );
+    this.playTone(
+      frequencyForMidiNote(RACE_EVENT_MIDI.finalLap[1]),
+      0.24,
+      0.026,
+      "triangle",
+      0.08,
+      1.01,
+    );
+    this.diagnosticRaceEventCues += 1;
+  }
+
+  playClassification(): void {
+    this.playTone(
+      frequencyForMidiNote(RACE_EVENT_MIDI.classification[0]),
+      0.2,
+      0.032,
+      "triangle",
+      0,
+      1.01,
+    );
+    this.playTone(
+      frequencyForMidiNote(RACE_EVENT_MIDI.classification[1]),
+      0.28,
+      0.024,
+      "sine",
+      0.09,
+      1.01,
+    );
+    this.diagnosticRaceEventCues += 1;
+  }
+
   playRecovery(): void {
     this.playTone(190, 0.16, 0.034, "square", 0, 1.7);
     this.playTone(380, 0.2, 0.028, "triangle", 0.1, 1.32);
@@ -340,6 +407,7 @@ export class EngineAudio {
     this.diagnosticMaxMusicHighShelfDb = 0;
     this.diagnosticPeakActiveOneShots = this.activeOneShots;
     this.diagnosticSkippedOneShots = 0;
+    this.diagnosticRaceEventCues = 0;
   }
 
   diagnostics(): {
@@ -358,6 +426,8 @@ export class EngineAudio {
     activeOneShots: number;
     peakActiveOneShots: number;
     skippedOneShots: number;
+    raceEventCues: number;
+    musicPreparationMs: number;
     initializationMs: number;
   } {
     const elapsed = this.context
@@ -381,6 +451,8 @@ export class EngineAudio {
       activeOneShots: this.activeOneShots,
       peakActiveOneShots: this.diagnosticPeakActiveOneShots,
       skippedOneShots: this.diagnosticSkippedOneShots,
+      raceEventCues: this.diagnosticRaceEventCues,
+      musicPreparationMs: this.diagnosticMusicPreparationMs,
       initializationMs: this.diagnosticInitializationMs,
     };
   }
@@ -395,6 +467,7 @@ export class EngineAudio {
       source.disconnect();
     }
     this.persistentSources.length = 0;
+    this.preparedStemSamples.clear();
     this.stemGains.clear();
     this.stemAutomation.clear();
     void this.context?.close();
@@ -420,6 +493,7 @@ export class EngineAudio {
     this.activeOneShots = 0;
     this.diagnosticPeakActiveOneShots = 0;
     this.diagnosticSkippedOneShots = 0;
+    this.diagnosticRaceEventCues = 0;
     this.musicSampleRate = 0;
   }
 
@@ -460,15 +534,27 @@ export class EngineAudio {
         end: startAt,
       });
     }
+    this.preparedStemSamples.clear();
   }
 
   private createStemBuffer(context: AudioContext, stem: StemName): AudioBuffer {
+    const samples = this.preparedStemSamples.get(stem);
+    if (!samples) throw new Error(`Prepared ${stem} music stem is missing.`);
+    const buffer = context.createBuffer(
+      1,
+      samples.length,
+      MUSIC_STEM_SAMPLE_RATE,
+    );
+    buffer.copyToChannel(samples, 0);
+    this.musicSampleRate = MUSIC_STEM_SAMPLE_RATE;
+    return buffer;
+  }
+
+  private createStemSamples(stem: StemName): Float32Array<ArrayBuffer> {
     const duration = BEAT_SECONDS * MUSIC_LOOP_BEATS;
-    const sampleRate = Math.min(context.sampleRate, MUSIC_STEM_SAMPLE_RATE);
-    this.musicSampleRate = sampleRate;
+    const sampleRate = MUSIC_STEM_SAMPLE_RATE;
     const length = Math.ceil(duration * sampleRate);
-    const buffer = context.createBuffer(1, length, sampleRate);
-    const channel = buffer.getChannelData(0);
+    const channel = new Float32Array(length);
     const random = seededRandom(
       stem === "trance" ? 101 : stem === "jungle" ? 202 : stem === "deep_dnb" ? 303 : 404,
     );
@@ -596,7 +682,7 @@ export class EngineAudio {
     for (const sample of channel) peak = Math.max(peak, Math.abs(sample));
     const scale = peak > 0 ? 0.78 / peak : 1;
     for (let index = 0; index < channel.length; index += 1) channel[index] *= scale;
-    return buffer;
+    return channel;
   }
 
   private playTone(

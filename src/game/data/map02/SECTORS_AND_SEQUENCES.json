@@ -1,0 +1,565 @@
+{
+  "format": "FUTURISMA_MAP02_BITTERPAN_SECTORS",
+  "version": "v0.2a.1-review",
+  "final_map02_blockout_freeze": false,
+  "sectors": [
+    {
+      "id": "S1",
+      "name": "HARVEST BASIN",
+      "value_target": "warm",
+      "structure_density": "high",
+      "furniture": "harvester rigs, brine pumps, hoppers, canvas screens",
+      "note": "ochre-biased salt crust; brine-stained concrete reads warmest here"
+    },
+    {
+      "id": "S2",
+      "name": "THE LONG BASIN",
+      "value_target": "neutral",
+      "structure_density": "low",
+      "furniture": "cone stacks at distance, isolated pump stands, nothing near the deck",
+      "note": "bleached crust at its flattest value; the reference sector"
+    },
+    {
+      "id": "S3",
+      "name": "LOADOUT BASIN",
+      "value_target": "cool",
+      "structure_density": "high",
+      "furniture": "conveyor trestles, loadout tower, sheds, stacked plant",
+      "note": "wet pan and shadowed galvanised sheet pull the crust cool"
+    }
+  ],
+  "sector_lengths_m": {
+    "S3": 560,
+    "S1": 1550,
+    "S2": 940
+  },
+  "sector_length_basis": "discrete station coverage at 5.000 m",
+  "authored_sequences": [
+    {
+      "id": "L0",
+      "name": "START APRON",
+      "role": "line",
+      "sector": "S3",
+      "from_m": 0,
+      "to_m": 60,
+      "length_m": 60,
+      "minimum_radius_m": null,
+      "primitives": [
+        "line"
+      ]
+    },
+    {
+      "id": "Q1",
+      "name": "THE LONG PAN",
+      "role": "transition",
+      "sector": "S1",
+      "from_m": 60,
+      "to_m": 723.6215642663627,
+      "length_m": 663.6215642663627,
+      "minimum_radius_m": 1200,
+      "primitives": [
+        "ease_in",
+        "true_tangent",
+        "ease_out"
+      ]
+    },
+    {
+      "id": "T1",
+      "name": "BASIN ONE ENTRY",
+      "role": "normal_bend",
+      "sector": "S1",
+      "from_m": 723.6215642663627,
+      "to_m": 965.9052245725055,
+      "length_m": 242.28366030614282,
+      "minimum_radius_m": 122,
+      "primitives": [
+        "transition_in",
+        "arc",
+        "transition_out"
+      ]
+    },
+    {
+      "id": "Q2",
+      "name": "CONE ROW SWEEP",
+      "role": "committed_sweep",
+      "sector": "S1",
+      "from_m": 965.9052245725055,
+      "to_m": 1607.0290626083156,
+      "length_m": 641.1238380358099,
+      "minimum_radius_m": 391.71697992818736,
+      "primitives": [
+        "transition_in",
+        "arc",
+        "transition_out"
+      ]
+    },
+    {
+      "id": "L1",
+      "name": "RETURN LEG",
+      "role": "line",
+      "sector": "S2",
+      "from_m": 1607.0290626083156,
+      "to_m": 2145.398521474069,
+      "length_m": 538.3694588657535,
+      "minimum_radius_m": null,
+      "primitives": [
+        "line"
+      ]
+    },
+    {
+      "id": "T2",
+      "name": "PUMP STAND BEND",
+      "role": "normal_bend",
+      "sector": "S2",
+      "from_m": 2145.398521474069,
+      "to_m": 2317.4152260949204,
+      "length_m": 172.0167046208511,
+      "minimum_radius_m": 122,
+      "primitives": [
+        "transition_in",
+        "arc",
+        "transition_out"
+      ]
+    },
+    {
+      "id": "L2",
+      "name": "CHICANE APPROACH",
+      "role": "line",
+      "sector": "S2",
+      "from_m": 2317.4152260949204,
+      "to_m": 2407.4152260949204,
+      "length_m": 90,
+      "minimum_radius_m": null,
+      "primitives": [
+        "line"
+      ]
+    },
+    {
+      "id": "Q3",
+      "name": "HARVESTER CHICANE",
+      "role": "technical_compression",
+      "sector": "S2",
+      "from_m": 2407.4152260949204,
+      "to_m": 2548.266742301019,
+      "length_m": 140.85151620609832,
+      "minimum_radius_m": 70,
+      "primitives": [
+        "transition_in",
+        "arc",
+        "transition_out",
+        "transition_in",
+        "arc",
+        "transition_out"
+      ]
+    },
+    {
+      "id": "T3",
+      "name": "WET PAN BEND",
+      "role": "normal_bend",
+      "sector": "S3",
+      "from_m": 2548.266742301019,
+      "to_m": 2722.412748609303,
+      "length_m": 174.14600630828417,
+      "minimum_radius_m": 122,
+      "primitives": [
+        "transition_in",
+        "arc",
+        "transition_out"
+      ]
+    },
+    {
+      "id": "Q4",
+      "name": "BRINE CUT",
+      "role": "recovery_risk",
+      "sector": "S3",
+      "from_m": 2722.412748609303,
+      "to_m": 2959.9999999997262,
+      "length_m": 237.58725139042303,
+      "minimum_radius_m": 185,
+      "primitives": [
+        "transition_in",
+        "arc",
+        "transition_out"
+      ]
+    },
+    {
+      "id": "L3",
+      "name": "LOADOUT APPROACH",
+      "role": "line",
+      "sector": "S3",
+      "from_m": 2959.9999999997262,
+      "to_m": 3005.9999999997262,
+      "length_m": 46,
+      "minimum_radius_m": null,
+      "primitives": [
+        "line"
+      ]
+    },
+    {
+      "id": "Q5",
+      "name": "CONVEYOR UNDERPASS",
+      "role": "signature_occlusion",
+      "sector": "S3",
+      "from_m": 3005.9999999997262,
+      "to_m": 3049.9999999997262,
+      "length_m": 44,
+      "minimum_radius_m": null,
+      "primitives": [
+        "line"
+      ]
+    }
+  ],
+  "authored_primitives": [
+    {
+      "id": "L0",
+      "name": "START APRON",
+      "role": "line",
+      "sector": "S3",
+      "kind": "line",
+      "from_m": 0,
+      "to_m": 60,
+      "length_m": 60,
+      "radius_m": null
+    },
+    {
+      "id": "Q1",
+      "name": "THE LONG PAN",
+      "role": "transition",
+      "sector": "S1",
+      "kind": "ease_in",
+      "from_m": 60,
+      "to_m": 147.5,
+      "length_m": 87.5,
+      "radius_m": 1200
+    },
+    {
+      "id": "Q1",
+      "name": "THE LONG PAN",
+      "role": "true_tangent",
+      "sector": "S1",
+      "kind": "true_tangent",
+      "from_m": 147.5,
+      "to_m": 636.1215642663627,
+      "length_m": 488.6215642663627,
+      "radius_m": null
+    },
+    {
+      "id": "Q1",
+      "name": "THE LONG PAN",
+      "role": "transition",
+      "sector": "S1",
+      "kind": "ease_out",
+      "from_m": 636.1215642663627,
+      "to_m": 723.6215642663627,
+      "length_m": 87.5,
+      "radius_m": 1200
+    },
+    {
+      "id": "T1",
+      "name": "BASIN ONE ENTRY",
+      "role": "normal_bend",
+      "sector": "S1",
+      "kind": "transition_in",
+      "from_m": 723.6215642663627,
+      "to_m": 763.6215642663627,
+      "length_m": 40,
+      "radius_m": 122
+    },
+    {
+      "id": "T1",
+      "name": "BASIN ONE ENTRY",
+      "role": "normal_bend",
+      "sector": "S1",
+      "kind": "arc",
+      "from_m": 763.6215642663627,
+      "to_m": 925.9052245725055,
+      "length_m": 162.28366030614282,
+      "radius_m": 122
+    },
+    {
+      "id": "T1",
+      "name": "BASIN ONE ENTRY",
+      "role": "normal_bend",
+      "sector": "S1",
+      "kind": "transition_out",
+      "from_m": 925.9052245725055,
+      "to_m": 965.9052245725055,
+      "length_m": 40,
+      "radius_m": 122
+    },
+    {
+      "id": "Q2",
+      "name": "CONE ROW SWEEP",
+      "role": "committed_sweep",
+      "sector": "S1",
+      "kind": "transition_in",
+      "from_m": 965.9052245725055,
+      "to_m": 1025.9052245725056,
+      "length_m": 60,
+      "radius_m": 391.71697992818736
+    },
+    {
+      "id": "Q2",
+      "name": "CONE ROW SWEEP",
+      "role": "committed_sweep",
+      "sector": "S1",
+      "kind": "arc",
+      "from_m": 1025.9052245725056,
+      "to_m": 1547.0290626083156,
+      "length_m": 521.1238380358099,
+      "radius_m": 391.71697992818736
+    },
+    {
+      "id": "Q2",
+      "name": "CONE ROW SWEEP",
+      "role": "committed_sweep",
+      "sector": "S1",
+      "kind": "transition_out",
+      "from_m": 1547.0290626083156,
+      "to_m": 1607.0290626083156,
+      "length_m": 60,
+      "radius_m": 391.71697992818736
+    },
+    {
+      "id": "L1",
+      "name": "RETURN LEG",
+      "role": "line",
+      "sector": "S2",
+      "kind": "line",
+      "from_m": 1607.0290626083156,
+      "to_m": 2145.398521474069,
+      "length_m": 538.3694588657535,
+      "radius_m": null
+    },
+    {
+      "id": "T2",
+      "name": "PUMP STAND BEND",
+      "role": "normal_bend",
+      "sector": "S2",
+      "kind": "transition_in",
+      "from_m": 2145.398521474069,
+      "to_m": 2185.398521474069,
+      "length_m": 40,
+      "radius_m": 122
+    },
+    {
+      "id": "T2",
+      "name": "PUMP STAND BEND",
+      "role": "normal_bend",
+      "sector": "S2",
+      "kind": "arc",
+      "from_m": 2185.398521474069,
+      "to_m": 2277.4152260949204,
+      "length_m": 92.01670462085109,
+      "radius_m": 122
+    },
+    {
+      "id": "T2",
+      "name": "PUMP STAND BEND",
+      "role": "normal_bend",
+      "sector": "S2",
+      "kind": "transition_out",
+      "from_m": 2277.4152260949204,
+      "to_m": 2317.4152260949204,
+      "length_m": 40,
+      "radius_m": 122
+    },
+    {
+      "id": "L2",
+      "name": "CHICANE APPROACH",
+      "role": "line",
+      "sector": "S2",
+      "kind": "line",
+      "from_m": 2317.4152260949204,
+      "to_m": 2407.4152260949204,
+      "length_m": 90,
+      "radius_m": null
+    },
+    {
+      "id": "Q3",
+      "name": "HARVESTER CHICANE",
+      "role": "technical_compression",
+      "sector": "S2",
+      "kind": "transition_in",
+      "from_m": 2407.4152260949204,
+      "to_m": 2431.4152260949204,
+      "length_m": 24,
+      "radius_m": 70
+    },
+    {
+      "id": "Q3",
+      "name": "HARVESTER CHICANE",
+      "role": "technical_compression",
+      "sector": "S2",
+      "kind": "arc",
+      "from_m": 2431.4152260949204,
+      "to_m": 2453.8409841979696,
+      "length_m": 22.42575810304917,
+      "radius_m": 70
+    },
+    {
+      "id": "Q3",
+      "name": "HARVESTER CHICANE",
+      "role": "technical_compression",
+      "sector": "S2",
+      "kind": "transition_out",
+      "from_m": 2453.8409841979696,
+      "to_m": 2477.8409841979696,
+      "length_m": 24,
+      "radius_m": 70
+    },
+    {
+      "id": "Q3",
+      "name": "HARVESTER CHICANE",
+      "role": "technical_compression",
+      "sector": "S2",
+      "kind": "transition_in",
+      "from_m": 2477.8409841979696,
+      "to_m": 2501.8409841979696,
+      "length_m": 24,
+      "radius_m": 70
+    },
+    {
+      "id": "Q3",
+      "name": "HARVESTER CHICANE",
+      "role": "technical_compression",
+      "sector": "S2",
+      "kind": "arc",
+      "from_m": 2501.8409841979696,
+      "to_m": 2524.266742301019,
+      "length_m": 22.42575810304917,
+      "radius_m": 70
+    },
+    {
+      "id": "Q3",
+      "name": "HARVESTER CHICANE",
+      "role": "technical_compression",
+      "sector": "S2",
+      "kind": "transition_out",
+      "from_m": 2524.266742301019,
+      "to_m": 2548.266742301019,
+      "length_m": 24,
+      "radius_m": 70
+    },
+    {
+      "id": "T3",
+      "name": "WET PAN BEND",
+      "role": "normal_bend",
+      "sector": "S3",
+      "kind": "transition_in",
+      "from_m": 2548.266742301019,
+      "to_m": 2588.266742301019,
+      "length_m": 40,
+      "radius_m": 122
+    },
+    {
+      "id": "T3",
+      "name": "WET PAN BEND",
+      "role": "normal_bend",
+      "sector": "S3",
+      "kind": "arc",
+      "from_m": 2588.266742301019,
+      "to_m": 2682.412748609303,
+      "length_m": 94.14600630828417,
+      "radius_m": 122
+    },
+    {
+      "id": "T3",
+      "name": "WET PAN BEND",
+      "role": "normal_bend",
+      "sector": "S3",
+      "kind": "transition_out",
+      "from_m": 2682.412748609303,
+      "to_m": 2722.412748609303,
+      "length_m": 40,
+      "radius_m": 122
+    },
+    {
+      "id": "Q4",
+      "name": "BRINE CUT",
+      "role": "recovery_risk",
+      "sector": "S3",
+      "kind": "transition_in",
+      "from_m": 2722.412748609303,
+      "to_m": 2782.412748609303,
+      "length_m": 60,
+      "radius_m": 185
+    },
+    {
+      "id": "Q4",
+      "name": "BRINE CUT",
+      "role": "recovery_risk",
+      "sector": "S3",
+      "kind": "arc",
+      "from_m": 2782.412748609303,
+      "to_m": 2899.9999999997262,
+      "length_m": 117.58725139042303,
+      "radius_m": 185
+    },
+    {
+      "id": "Q4",
+      "name": "BRINE CUT",
+      "role": "recovery_risk",
+      "sector": "S3",
+      "kind": "transition_out",
+      "from_m": 2899.9999999997262,
+      "to_m": 2959.9999999997262,
+      "length_m": 60,
+      "radius_m": 185
+    },
+    {
+      "id": "L3",
+      "name": "LOADOUT APPROACH",
+      "role": "line",
+      "sector": "S3",
+      "kind": "line",
+      "from_m": 2959.9999999997262,
+      "to_m": 3005.9999999997262,
+      "length_m": 46,
+      "radius_m": null
+    },
+    {
+      "id": "Q5",
+      "name": "CONVEYOR UNDERPASS",
+      "role": "signature_occlusion",
+      "sector": "S3",
+      "kind": "line",
+      "from_m": 3005.9999999997262,
+      "to_m": 3049.9999999997262,
+      "length_m": 44,
+      "radius_m": null
+    }
+  ],
+  "banking_deg": {
+    "CONE_ROW_SWEEP": 2.5,
+    "BRINE_CUT": 1.5
+  },
+  "banking_note": "Only the two committed sweeps are banked: Cone Row Sweep at 2.5 degrees and Brine Cut at 1.5 degrees. Basin One Entry is unbanked.",
+  "occlusion_events": [
+    {
+      "id": "OCC1",
+      "name": "HARVESTER CHICANE RIG STANDS",
+      "sequence": "Q3",
+      "mechanism": "paired rig stands and canvas screens close the forward horizon for roughly 90 m",
+      "reveals": "the wet pan and the Brine Cut kerb line beyond"
+    },
+    {
+      "id": "OCC2",
+      "name": "CONVEYOR UNDERPASS",
+      "sequence": "Q5",
+      "mechanism": "conveyor trestle soffit at 15.5 m closes the sky for roughly 40 m",
+      "reveals": "the loadout tower and the start/finish apron on exit"
+    }
+  ],
+  "prevailing_wind": {
+    "bearing_deg": 292,
+    "description": "west-north-west, steady across the pan",
+    "indicators": [
+      "canvas screens tattered on the lee edge only",
+      "salt drift banked against the windward face of every kerb block",
+      "dust lift trailing downwind of harvester rigs",
+      "conveyor hood covers pulled to the windward side"
+    ],
+    "note": "Temporary blockout indicators, not final art. They exist so the site has a felt orientation."
+  }
+}
