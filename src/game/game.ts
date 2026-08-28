@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { RaceAtmosphere } from "./atmosphere";
 import { EngineAudio } from "./audio";
 import { DemoAutopilot, alignDirectionToSurface } from "./autopilot";
+import { DriftBank } from "./drift-charge";
 import {
   calculateDesiredCameraFov,
   calculateImpactShakeOffset,
@@ -173,6 +174,7 @@ export class FuturismaGame {
   private boostActive = false;
   private boostLockedUntilRelease = false;
   private driftActive = false;
+  private readonly driftBank = new DriftBank();
   private driftIntensity = 0;
   private surfaceGrip = 1;
   private readonly beforeMoveApron = createApronResolution();
@@ -222,8 +224,6 @@ export class FuturismaGame {
   private diagnosticDistanceTravelled = 0;
   private diagnosticBoostSeconds = 0;
   private diagnosticDriftSeconds = 0;
-  private diagnosticDriftEntries = 0;
-  private diagnosticMaxDriftIntensity = 0;
   private diagnosticMinimumSurfaceGrip = 1;
   private diagnosticEdgeSeconds = 0;
   private diagnosticWrongWaySeconds = 0;
@@ -752,10 +752,18 @@ export class FuturismaGame {
       driftIntent,
       driftResponse,
     );
+    const driftReward = this.driftBank.update(this.driftActive, this.driftIntensity, delta);
     if (this.driftActive && !wasDriftActive) {
-      if (this.diagnosticsMode) this.diagnosticDriftEntries += 1;
       this.audio.playDriftEngage();
       this.input.pulse(0.08, 0.18, 75);
+    } else if (driftReward > 0) {
+      // Straight to the particle buffer, not through emitImpactSparks: a cashed
+      // drift is not a collision, so it must not fire the vehicle impact flash
+      // or count against the impact-spark telemetry.
+      const side = Math.sign(this.lateral) || 1;
+      this.audio.playDriftEngage(this.driftBank.releaseCharge);
+      this.effects.emitImpactSparks(beforeMove, this.position, this.speed, side, 0.22);
+      this.input.pulse(0.24, 0.12, 90);
     }
     this.speed = integrateSpeed(
       this.speed,
@@ -770,13 +778,9 @@ export class FuturismaGame {
       this.diagnosticTopSpeed = Math.max(this.diagnosticTopSpeed, this.speed);
       if (this.boostActive) this.diagnosticBoostSeconds += delta;
       if (this.driftActive) this.diagnosticDriftSeconds += delta;
-      this.diagnosticMaxDriftIntensity = Math.max(
-        this.diagnosticMaxDriftIntensity,
-        this.driftIntensity,
-      );
     }
 
-    this.boostReserve = integrateBoostReserve(this.boostReserve, reserveBoost, delta);
+    this.boostReserve = integrateBoostReserve(this.boostReserve, reserveBoost, delta, driftReward);
 
     this.steerAmount = integrateSteering(
       this.steerAmount,
@@ -1088,6 +1092,7 @@ export class FuturismaGame {
     this.hazardTripCooldown = 0.6;
     this.impactShake = 0.25;
     this.driftActive = false;
+    this.driftBank.abandon();
     this.surfaceGrip = 1;
     this.input.pulse(0.42, 0.64, 180);
     this.audio.playRecovery();
@@ -1363,6 +1368,7 @@ export class FuturismaGame {
         : false,
       boostActive: this.boostActive,
       boostLocked: this.boostLockedUntilRelease,
+      driftCharge: this.driftBank.charge,
       braking: input.brake > 0.1,
       drifting: this.driftActive,
       skidsDown: this.speed < 11,
@@ -1486,6 +1492,7 @@ export class FuturismaGame {
     this.boostActive = false;
     this.boostLockedUntilRelease = false;
     this.driftActive = false;
+    this.driftBank.reset();
     this.driftIntensity = 0;
     this.surfaceGrip = 1;
     this.padBoostTime = 0;
@@ -1744,8 +1751,7 @@ export class FuturismaGame {
         lapTimesMs: this.lapTimesMs,
         boostSeconds: this.diagnosticBoostSeconds,
         driftSeconds: this.diagnosticDriftSeconds,
-        driftEntries: this.diagnosticDriftEntries,
-        maxDriftIntensity: this.diagnosticMaxDriftIntensity,
+        ...this.driftBank.diagnostics(),
         minimumSurfaceGrip: this.diagnosticMinimumSurfaceGrip,
         edgeSeconds: this.diagnosticEdgeSeconds,
         wrongWaySeconds: this.diagnosticWrongWaySeconds,
@@ -1808,8 +1814,6 @@ export class FuturismaGame {
     this.diagnosticDistanceTravelled = 0;
     this.diagnosticBoostSeconds = 0;
     this.diagnosticDriftSeconds = 0;
-    this.diagnosticDriftEntries = 0;
-    this.diagnosticMaxDriftIntensity = 0;
     this.diagnosticMinimumSurfaceGrip = 1;
     this.diagnosticEdgeSeconds = 0;
     this.diagnosticWrongWaySeconds = 0;

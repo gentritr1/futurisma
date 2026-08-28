@@ -313,8 +313,22 @@ export class EngineAudio {
     this.playTone(460, 0.14, 0.024, "square", 0.04, 1.5);
   }
 
-  playDriftEngage(): void {
-    this.playTone(210, 0.11, 0.018, "square", 0, 0.74);
+  /**
+   * One cue serves both drift edges. Entry keeps the original 210 Hz square
+   * blip (`releaseCharge` 0); a rewarded release replays the same one-shot
+   * pitched and opened up by the bank it paid out, so a big drift cashes in an
+   * octave above a marginal one without adding a second voice to the mix.
+   */
+  playDriftEngage(releaseCharge = 0): void {
+    const charge = Math.min(1, Math.max(0, releaseCharge));
+    this.playTone(
+      210 * (1 + charge),
+      0.11 + charge * 0.05,
+      0.018 + charge * 0.014,
+      "square",
+      0,
+      0.74,
+    );
   }
 
   playImpact(intensity: number): void {

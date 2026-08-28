@@ -578,3 +578,83 @@ locked until they are:
 3. `?diagnostics=1&probe=apron` at the three authored scenarios
    (`&probeLateral=13.5`, `&probeLateral=17.5`, and
    `&probeDistance=700&probeLateral=11`).
+
+## P5 drift economy — pending browser re-baseline
+
+The P5 pass changed two constants that the demo autopilot's showcase line runs
+through: boost drain `0.20 → 0.26 /s` and passive regen `0.075 → 0.045 /s`. It
+also added the drift bank (`integrateDriftCharge` / `resolveDriftRelease`),
+whose only physical effect is adding `+0.30` to `boostReserve` on a rewarded
+drift release.
+
+**The expectation is that the locked lap sequence does not move**, and the
+reasoning is checkable rather than hopeful. `autopilot.ts` gates boost on
+`elapsedMs / 1000 % 5 < 0.55`, so it can request at most 0.55 s of boost in
+every 5 s; every other clause in that gate can only remove boost. Simulating
+that upper-bound duty cycle through the real `integrateBoostReserve` for 300 s:
+
+| | reserve low-water | boost seconds | lockout samples |
+|---|---:|---:|---:|
+| pre-P5 (0.20 / 0.075) | 0.888 | 33.27 | 0 |
+| P5 (0.26 / 0.045) | 0.855 | 33.27 | 0 |
+
+The reserve is never the binding constraint for the demo line under either
+regime, and `reserveBoost` only tests `boostReserve > 0`, so the boost boolean
+the autopilot sees is bit-identical. A drift reward can only *raise* a reserve
+that is already non-limiting, and its feedback (pitched one-shot, sparks, pad
+pulse) touches no physics state. **This is an argument from the code plus a
+reserve simulation, not an observed lap sequence** — the browser stage must
+confirm it before the sequence is treated as still locked:
+
+1. `?demo=1&diagnostics=1&laps=5&quality=high&start=manual` — the sequence must
+   still reproduce **34.483 / 34.433 / 34.517 / 34.683 / 34.683** within
+   ±0.010 s. If it moves, the reserve argument above is wrong and the cause is
+   in the drift bank, not the constants.
+2. The same run must report `boostSeconds` unchanged from its pre-P5 value and
+   `boostLocked` never true. A change in `boostSeconds` is the decisive signal
+   that the reserve did become binding for the demo.
+3. Record the new `driftCharge`, `driftEntries`, `driftRewards` and
+   `driftRewardTotal` for the demo line. **No prior value for demo drift
+   activity is recorded anywhere in this document, so these are first
+   measurements, not a comparison.** They are not a pass/fail gate — see below.
+
+### The demo autopilot is not the proof that the mechanic works
+
+`autopilot.ts` never sets `boost` for a drift and brakes at most `0.5`, so its
+drift intent peaks near `0.5 × |steer|`. Banking past the `0.35` reward minimum
+needs roughly 1.4 s of *continuous* drift at that intent, and the autopilot
+releases brake as soon as speed falls under its turn target, which cuts drift
+windows short. The mixed-control 240 s physics soak is the same shape of
+driver, and it measures a peak bank of **0.04 of 1.0 and zero rewards** across
+its eleven drift entries.
+
+So a roadmap-style assertion of `driftRewards ≥ 8` under the demo is very
+likely to fail, and **failing it would say nothing about the mechanic** — the
+autopilot exploiting the drift loop is an explicit non-goal of this phase.
+What replaces it:
+
+- **Automated, and already passing:** `scripts/validate-physics.mjs` runs a
+  second 240 s soak (`simulateDriftEconomySoak`) whose control script actually
+  commits to corners. It measures 40 drift entries and 20 payouts (+6.00
+  reserve) identically at 60 Hz and 120 Hz, with a reserve low-water mark of
+  0.011, and it covers both release branches — the long window banks past the
+  minimum, the short one deliberately does not. Anti-farming is pinned as a
+  boundary: 200 repeated 0.6 s stabs pay 0, and 200 repeated 0.7 s commitments
+  pay 200.
+- **Manual, and still owed** (this is also the roadmap's mandatory taste gate):
+  a human drives 3 laps at `?diagnostics=1` and reports (a) `driftRewards` and
+  `driftRewardTotal` > 0, proving the wired path fires in the real loop, which
+  no headless check can prove; (b) a HUD screenshot with the bank under 0.35
+  and one at or over it, confirming the armed lip is distinguishable; (c) the
+  three taste answers — is the charge readable without looking straight at it,
+  is 1.8 s to full too long for `T1_CRADLE_BEND`, and is boost scarce-but-fair.
+
+### Authored-table note
+
+`DRIFT_CHARGE_RATE = 0.55 /s` fills the bank in **1.818 s**, not 1.800 s. That
+satisfies the roadmap's `1.80 s ± 0.02 s` criterion, but only on the exact
+(continuous) reading; a naive "first frame at or past 1.0" measurement lands at
+1.825 s at 120 Hz and 1.833 s at 60 Hz and would miss the band at both rates.
+`validate-physics.mjs` therefore measures the crossing from the slope the
+integrator itself produces, and separately asserts that slope is constant. If
+exactly 1.800 s is wanted, the rate is `0.5556 /s`.
