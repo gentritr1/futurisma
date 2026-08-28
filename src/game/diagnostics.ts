@@ -202,6 +202,14 @@ function audioFields(audio: ReturnType<EngineAudio["diagnostics"]>) {
     raceEventAudioCues: audio.raceEventCues,
     audioPreparationMs: Number(audio.musicPreparationMs.toFixed(1)),
     audioInitializationMs: Number(audio.initializationMs.toFixed(1)),
+    rivalPanners: audio.rivalPanners,
+    // Listener-space X per rival: -1 hard left, +1 hard right. The only part of
+    // the HRTF chain a headless probe can read back, so it is what the
+    // `rival-audio` probe asserts.
+    rivalPanX: audio.rivalPanX.map((value) => Number(value.toFixed(3))),
+    reverbZone: audio.reverbZone,
+    reverbWet: Number(audio.reverbWet.toFixed(3)),
+    reverbZoneTransitions: audio.reverbZoneTransitions,
   };
 }
 

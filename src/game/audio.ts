@@ -1,3 +1,4 @@
+import * as THREE from "three";
 import {
   advanceFixedRateDeadline,
   audioClockAdvances,
@@ -9,6 +10,22 @@ import {
   resolveMusicFilterTargets,
   sampleLinearAutomation,
 } from "./audio-timing";
+import {
+  AUDIO_ZONE_PROFILES,
+  createImpulseResponseChannel,
+  IMPULSE_RESPONSE_SEED,
+  listenerPanX,
+  listenerRightVector,
+  playerEngineGains,
+  RIVAL_AUDIO_VOICES,
+  RIVAL_DETUNE_RATIOS,
+  resolveZoneCrossfade,
+  rivalEngineFrequency,
+  rivalEngineGains,
+  seededRandom,
+} from "./audio-space.js";
+import type { AudioZone } from "./audio-space.js";
+import { BOOST_MAX_SPEED } from "./physics.js";
 import {
   DEEP_DNB_BASS_EVENTS,
   GATE_CHIME_MIDI,
@@ -41,6 +58,8 @@ interface StemAutomation {
 const BEAT_SECONDS = 60 / MUSIC_BPM;
 const BAR_SECONDS = BEAT_SECONDS * 4;
 const CONTROL_INTERVAL_SECONDS = 1 / 30;
+/** Roughly half a control tick: tracks a passing rival without zippering. */
+const SPATIAL_SMOOTHING_SECONDS = 0.018;
 const STEM_NAMES: StemName[] = ["trance", "jungle", "deep_dnb", "techstep"];
 const STEM_GAIN: Record<StemName, number> = {
   trance: 0.075,
@@ -55,12 +74,27 @@ const STEM_PAN: Record<StemName, number> = {
   techstep: 0.2,
 };
 
-function seededRandom(seed: number): () => number {
-  let value = seed >>> 0;
-  return () => {
-    value = (value * 1664525 + 1013904223) >>> 0;
-    return value / 0x1_0000_0000;
-  };
+/**
+ * A rival source only has to publish where it is and how fast it is moving.
+ * Keeping the seam this narrow stops the audio graph from depending on the
+ * rival simulation, whose determinism is owned elsewhere.
+ */
+export interface RivalSpatialSource {
+  worldPosition(index: number, target: THREE.Vector3): THREE.Vector3;
+  worldVelocity(index: number, target: THREE.Vector3): THREE.Vector3;
+}
+
+interface EngineGainPair {
+  oscillator: number;
+  harmonic: number;
+}
+
+interface RivalVoice {
+  panner: PannerNode;
+  oscillator: OscillatorNode;
+  harmonic: OscillatorNode;
+  gain: GainNode;
+  harmonicGain: GainNode;
 }
 
 export class EngineAudio {
@@ -96,6 +130,38 @@ export class EngineAudio {
   private muted = false;
   private paused = false;
   private readonly preparedStemSamples = new Map<StemName, Float32Array<ArrayBuffer>>();
+  private readonly rivalVoices: RivalVoice[] = [];
+  private rivalBus: GainNode | null = null;
+  private rivalFilter: BiquadFilterNode | null = null;
+  private convolver: ConvolverNode | null = null;
+  private reverbSend: GainNode | null = null;
+  private reverbHighPass: BiquadFilterNode | null = null;
+  private reverbWetGain: GainNode | null = null;
+  private readonly impulseResponses = new Map<AudioZone, AudioBuffer>();
+  private reverbZone: AudioZone = "open";
+  private pendingReverbZone: AudioZone | null = null;
+  private reverbSwapAt = 0;
+  private reverbCrossfadeEnd = 0;
+  private readonly reverbAutomation: StemAutomation = {
+    from: AUDIO_ZONE_PROFILES.open.wet,
+    target: AUDIO_ZONE_PROFILES.open.wet,
+    start: 0,
+    end: 0,
+  };
+  private diagnosticReverbTransitions = 0;
+  private spatialSource: RivalSpatialSource | null = null;
+  private spatialCamera: THREE.Object3D | null = null;
+  private spatialListener: THREE.Vector3 | null = null;
+  private rivalProbeOffset: THREE.Vector3 | null = null;
+  private readonly rivalPanValues = RIVAL_DETUNE_RATIOS.map(() => 0);
+  private readonly playerGainPair: EngineGainPair = { oscillator: 0, harmonic: 0 };
+  private readonly rivalGainPair: EngineGainPair = { oscillator: 0, harmonic: 0 };
+  private readonly spatialForward = new THREE.Vector3(0, 0, -1);
+  private readonly spatialUp = new THREE.Vector3(0, 1, 0);
+  private readonly spatialRight = new THREE.Vector3(1, 0, 0);
+  private readonly spatialPosition = new THREE.Vector3();
+  private readonly spatialVelocity = new THREE.Vector3();
+  private readonly spatialDelta = new THREE.Vector3();
 
   constructor() {
     const preparationStartedAt = performance.now();
@@ -155,7 +221,7 @@ export class EngineAudio {
     windGain.connect(filter);
     const noise = context.createBuffer(1, context.sampleRate * 2, context.sampleRate);
     const channel = noise.getChannelData(0);
-    const random = seededRandom(714);
+    const random = seededRandom(IMPULSE_RESPONSE_SEED);
     for (let index = 0; index < channel.length; index += 1) {
       channel[index] = random() * 2 - 1;
     }
@@ -174,8 +240,39 @@ export class EngineAudio {
     this.harmonicOscillator = harmonicOscillator;
     this.harmonicGain = harmonicGain;
     this.windGain = windGain;
+    this.installReverb(context, master, filter);
+    this.installRivalVoices(context, master);
     this.installMusic(context, master);
     this.diagnosticInitializationMs = performance.now() - initializationStartedAt;
+  }
+
+  /**
+   * Binds the spatial field to the live scene once, so the 30 Hz control tick
+   * carries no extra arguments and no second tick is ever needed. `listener` is
+   * the live vehicle position vector; the ear rides the craft while the chase
+   * camera only supplies heading.
+   */
+  attachSpatialScene(
+    source: RivalSpatialSource,
+    camera: THREE.Object3D,
+    listener: THREE.Vector3,
+  ): void {
+    this.spatialSource = source;
+    this.spatialCamera = camera;
+    this.spatialListener = listener;
+  }
+
+  /**
+   * `?probe=rival-audio` pins the first rival a fixed distance off the player's
+   * beam so a headless run can assert the pan axis. The offset is captured from
+   * the course frame, never from the camera basis the pan is measured against,
+   * or the probe would be proving itself. It is stored relative to the craft so
+   * the reading survives the player rolling forward off the line.
+   */
+  setRivalAudioProbe(right: THREE.Vector3, lateralMeters: number): void {
+    this.rivalProbeOffset = new THREE.Vector3().copy(right)
+      .normalize()
+      .multiplyScalar(lateralMeters);
   }
 
   update(
@@ -185,6 +282,8 @@ export class EngineAudio {
     boost: boolean,
     surfaceGrip: number,
     driftIntensity: number,
+    zone: AudioZone = "open",
+    racing = false,
   ): boolean {
     if (
       !this.context
@@ -205,8 +304,9 @@ export class EngineAudio {
     const baseFrequency = 52 + speedRatio * 118 + throttle * 24 + (boost ? 18 : 0);
     this.engineOscillator.frequency.setTargetAtTime(baseFrequency, now, 0.045);
     this.harmonicOscillator.frequency.setTargetAtTime(baseFrequency * 2.03, now, 0.04);
-    this.engineGain?.gain.setTargetAtTime(0.025 + throttle * 0.035 + speedRatio * 0.025, now, 0.08);
-    this.harmonicGain?.gain.setTargetAtTime(0.008 + speedRatio * 0.021 + (boost ? 0.02 : 0), now, 0.06);
+    const playerGains = playerEngineGains(throttle, speedRatio, boost, this.playerGainPair);
+    this.engineGain?.gain.setTargetAtTime(playerGains.oscillator, now, 0.08);
+    this.harmonicGain?.gain.setTargetAtTime(playerGains.harmonic, now, 0.06);
     this.windGain?.gain.setTargetAtTime(
       Math.pow(speedRatio, 2) * (0.045 + brake * 0.035)
         + (1 - surfaceGrip) * speedRatio * 0.07
@@ -238,6 +338,8 @@ export class EngineAudio {
       this.diagnosticMaxMusicHighShelfDb,
       musicTargets.highShelfDb,
     );
+    this.updateReverbZone(now, zone);
+    this.updateRivals(now, racing);
     return true;
   }
 
@@ -408,6 +510,7 @@ export class EngineAudio {
     this.diagnosticPeakActiveOneShots = this.activeOneShots;
     this.diagnosticSkippedOneShots = 0;
     this.diagnosticRaceEventCues = 0;
+    this.diagnosticReverbTransitions = 0;
   }
 
   diagnostics(): {
@@ -429,6 +532,11 @@ export class EngineAudio {
     raceEventCues: number;
     musicPreparationMs: number;
     initializationMs: number;
+    rivalPanners: number;
+    rivalPanX: number[];
+    reverbZone: AudioZone;
+    reverbWet: number;
+    reverbZoneTransitions: number;
   } {
     const elapsed = this.context
       ? Math.max(0, this.context.currentTime - this.diagnosticControlStartedAt)
@@ -454,6 +562,21 @@ export class EngineAudio {
       raceEventCues: this.diagnosticRaceEventCues,
       musicPreparationMs: this.diagnosticMusicPreparationMs,
       initializationMs: this.diagnosticInitializationMs,
+      rivalPanners: this.rivalVoices.length,
+      rivalPanX: [...this.rivalPanValues],
+      reverbZone: this.reverbZone,
+      // Sampled from the scheduled ramp rather than read back off the param, so
+      // the number is the same on every engine and is honest mid-crossfade.
+      reverbWet: this.context
+        ? sampleLinearAutomation(
+          this.context.currentTime,
+          this.reverbAutomation.from,
+          this.reverbAutomation.target,
+          this.reverbAutomation.start,
+          this.reverbAutomation.end,
+        )
+        : 0,
+      reverbZoneTransitions: this.diagnosticReverbTransitions,
     };
   }
 
@@ -467,6 +590,38 @@ export class EngineAudio {
       source.disconnect();
     }
     this.persistentSources.length = 0;
+    for (const voice of this.rivalVoices) {
+      voice.gain.disconnect();
+      voice.harmonicGain.disconnect();
+      voice.panner.disconnect();
+    }
+    this.rivalVoices.length = 0;
+    this.rivalBus?.disconnect();
+    this.rivalFilter?.disconnect();
+    this.reverbSend?.disconnect();
+    this.reverbHighPass?.disconnect();
+    this.convolver?.disconnect();
+    this.reverbWetGain?.disconnect();
+    // The impulse responses are the only large buffers this phase allocates.
+    // Dropping them here is what keeps a disposed race off the heap.
+    if (this.convolver) this.convolver.buffer = null;
+    this.impulseResponses.clear();
+    this.rivalBus = null;
+    this.rivalFilter = null;
+    this.reverbSend = null;
+    this.reverbHighPass = null;
+    this.convolver = null;
+    this.reverbWetGain = null;
+    this.spatialSource = null;
+    this.spatialCamera = null;
+    this.spatialListener = null;
+    this.rivalProbeOffset = null;
+    this.rivalPanValues.fill(0);
+    this.reverbZone = "open";
+    this.pendingReverbZone = null;
+    this.reverbSwapAt = 0;
+    this.reverbCrossfadeEnd = 0;
+    this.diagnosticReverbTransitions = 0;
     this.preparedStemSamples.clear();
     this.stemGains.clear();
     this.stemAutomation.clear();
@@ -495,6 +650,261 @@ export class EngineAudio {
     this.diagnosticSkippedOneShots = 0;
     this.diagnosticRaceEventCues = 0;
     this.musicSampleRate = 0;
+  }
+
+  /**
+   * One convolver, two pre-built impulse responses. Building both buffers at
+   * start-up is what keeps a zone change allocation-free: the 5-lap soak crosses
+   * ten boundaries and must not grow the heap by doing so.
+   */
+  private installReverb(
+    context: AudioContext,
+    master: GainNode,
+    engineFilter: BiquadFilterNode,
+  ): void {
+    for (const zone of ["open", "hangar"] as const) {
+      const profile = AUDIO_ZONE_PROFILES[zone];
+      const buffer = context.createBuffer(
+        2,
+        Math.ceil(profile.decaySeconds * context.sampleRate),
+        context.sampleRate,
+      );
+      for (let channel = 0; channel < 2; channel += 1) {
+        buffer.copyToChannel(
+          createImpulseResponseChannel(
+            context.sampleRate,
+            profile.decaySeconds,
+            IMPULSE_RESPONSE_SEED + channel,
+          ),
+          channel,
+        );
+      }
+      this.impulseResponses.set(zone, buffer);
+    }
+
+    const send = context.createGain();
+    send.gain.value = 1;
+    const highPass = context.createBiquadFilter();
+    highPass.type = "highpass";
+    highPass.frequency.value = AUDIO_ZONE_PROFILES.open.highPassHz;
+    highPass.Q.value = 0.7;
+    const convolver = context.createConvolver();
+    convolver.normalize = true;
+    convolver.buffer = this.impulseResponses.get("open") ?? null;
+    const wet = context.createGain();
+    wet.gain.value = AUDIO_ZONE_PROFILES.open.wet;
+    send.connect(highPass);
+    highPass.connect(convolver);
+    convolver.connect(wet);
+    wet.connect(master);
+    // The engine bed and the rival field feed the room; the music stems do not.
+    // Readability-first applies to audio: a 1.9 s tail across the 174 BPM stems
+    // is the "muddy" failure the taste gate is watching for.
+    engineFilter.connect(send);
+
+    this.reverbSend = send;
+    this.reverbHighPass = highPass;
+    this.convolver = convolver;
+    this.reverbWetGain = wet;
+    this.reverbZone = "open";
+    this.reverbAutomation.from = AUDIO_ZONE_PROFILES.open.wet;
+    this.reverbAutomation.target = AUDIO_ZONE_PROFILES.open.wet;
+    this.reverbAutomation.start = context.currentTime;
+    this.reverbAutomation.end = context.currentTime;
+  }
+
+  /**
+   * Three panners, each fed by the same sawtooth + triangle pair the player
+   * engine uses, summed through one shared lowpass so the field reads as one
+   * pack rather than three separate sirens.
+   */
+  private installRivalVoices(context: AudioContext, master: GainNode): void {
+    const bus = context.createGain();
+    bus.gain.value = 1;
+    const filter = context.createBiquadFilter();
+    filter.type = "lowpass";
+    filter.frequency.value = 1_500;
+    filter.Q.value = 0.9;
+    bus.connect(filter);
+    filter.connect(master);
+    if (this.reverbSend) filter.connect(this.reverbSend);
+    this.rivalBus = bus;
+    this.rivalFilter = filter;
+
+    for (let index = 0; index < RIVAL_AUDIO_VOICES; index += 1) {
+      const panner = context.createPanner();
+      panner.panningModel = "HRTF";
+      panner.distanceModel = "inverse";
+      panner.refDistance = 4;
+      panner.maxDistance = 90;
+      panner.rolloffFactor = 1.4;
+      panner.connect(bus);
+
+      const detune = RIVAL_DETUNE_RATIOS[index];
+      const gain = context.createGain();
+      gain.gain.value = 0;
+      gain.connect(panner);
+      const oscillator = context.createOscillator();
+      oscillator.type = "sawtooth";
+      oscillator.frequency.value = rivalEngineFrequency(0, detune);
+      oscillator.connect(gain);
+      oscillator.start();
+
+      const harmonicGain = context.createGain();
+      harmonicGain.gain.value = 0;
+      harmonicGain.connect(panner);
+      const harmonic = context.createOscillator();
+      harmonic.type = "triangle";
+      harmonic.frequency.value = rivalEngineFrequency(0, detune) * 2.03;
+      harmonic.connect(harmonicGain);
+      harmonic.start();
+
+      this.persistentSources.push(oscillator, harmonic);
+      this.rivalVoices.push({ panner, oscillator, harmonic, gain, harmonicGain });
+    }
+  }
+
+  /**
+   * Bar-quantized room change. The send closes over the first half of the
+   * window, the single convolver swaps its pre-built buffer while it is silent,
+   * and the new room opens over the second half. The swap is observed on this
+   * same 30 Hz tick, so no second timer is introduced.
+   */
+  private updateReverbZone(now: number, zone: AudioZone): void {
+    const wet = this.reverbWetGain?.gain;
+    if (!wet || !this.convolver) return;
+    const automation = this.reverbAutomation;
+    if (zone !== this.reverbZone && zone !== this.pendingReverbZone) {
+      const held = sampleLinearAutomation(
+        now,
+        automation.from,
+        automation.target,
+        automation.start,
+        automation.end,
+      );
+      const window = resolveZoneCrossfade(now, this.musicStartTime, BAR_SECONDS);
+      wet.cancelScheduledValues(now);
+      wet.setValueAtTime(held, now);
+      wet.setValueAtTime(held, window.start);
+      wet.linearRampToValueAtTime(0, window.mute);
+      this.reverbHighPass?.frequency.setTargetAtTime(
+        AUDIO_ZONE_PROFILES[zone].highPassHz,
+        window.start,
+        0.18,
+      );
+      automation.from = held;
+      automation.target = 0;
+      automation.start = window.start;
+      automation.end = window.mute;
+      this.pendingReverbZone = zone;
+      this.reverbSwapAt = window.mute;
+      this.reverbCrossfadeEnd = window.end;
+      this.diagnosticReverbTransitions += 1;
+    }
+    if (!this.pendingReverbZone || now < this.reverbSwapAt) return;
+    const next = this.pendingReverbZone;
+    this.convolver.buffer = this.impulseResponses.get(next) ?? null;
+    const target = AUDIO_ZONE_PROFILES[next].wet;
+    const end = Math.max(this.reverbCrossfadeEnd, now + 0.05);
+    wet.cancelScheduledValues(now);
+    wet.setValueAtTime(0, now);
+    wet.linearRampToValueAtTime(target, end);
+    automation.from = 0;
+    automation.target = target;
+    automation.start = now;
+    automation.end = end;
+    this.reverbZone = next;
+    this.pendingReverbZone = null;
+  }
+
+  /**
+   * Places the three rival voices in listener space. The listener sits on the
+   * craft and takes its heading from the chase camera; rival gain is gated on an
+   * active race so the grid is silent through the countdown.
+   */
+  private updateRivals(now: number, racing: boolean): void {
+    const source = this.spatialSource;
+    const camera = this.spatialCamera;
+    const listener = this.spatialListener;
+    if (!this.context || !source || !camera || !listener) return;
+    // The chase camera renders unparented, so its world matrix is only rebuilt
+    // by the renderer. Rebuilding it here keeps the listener on this frame's
+    // heading rather than the previous frame's.
+    camera.updateMatrixWorld();
+    const basis = camera.matrixWorld.elements;
+    this.spatialForward.set(-basis[8], -basis[9], -basis[10]).normalize();
+    this.spatialUp.set(basis[4], basis[5], basis[6]).normalize();
+    listenerRightVector(this.spatialForward, this.spatialUp, this.spatialRight);
+    this.applyListener(this.context.listener, listener, now);
+
+    for (let index = 0; index < this.rivalVoices.length; index += 1) {
+      const voice = this.rivalVoices[index];
+      const position = index === 0 && this.rivalProbeOffset
+        ? this.spatialPosition.addVectors(listener, this.rivalProbeOffset)
+        : source.worldPosition(index, this.spatialPosition);
+      const speedRatio = source.worldVelocity(index, this.spatialVelocity).length()
+        / BOOST_MAX_SPEED;
+      const frequency = rivalEngineFrequency(speedRatio, RIVAL_DETUNE_RATIOS[index]);
+      voice.oscillator.frequency.setTargetAtTime(frequency, now, 0.05);
+      voice.harmonic.frequency.setTargetAtTime(frequency * 2.03, now, 0.05);
+      const gains = rivalEngineGains(speedRatio, this.rivalGainPair);
+      voice.gain.gain.setTargetAtTime(racing ? gains.oscillator : 0, now, 0.08);
+      voice.harmonicGain.gain.setTargetAtTime(racing ? gains.harmonic : 0, now, 0.08);
+      this.applyPanner(voice.panner, position, now);
+      this.rivalPanValues[index] = listenerPanX(
+        this.spatialDelta.subVectors(position, listener),
+        this.spatialRight,
+      );
+    }
+  }
+
+  /**
+   * Positions ramp with the same `setTargetAtTime` smoothing the engine control
+   * uses. A hard jump every 33 ms zippers audibly on a rival going past, and
+   * scheduling one automation per tick is the pattern the existing 5-lap soaks
+   * already exercise. Safari still ships the deprecated setters instead of the
+   * AudioParams, so both paths stay live.
+   */
+  private applyListener(
+    target: AudioListener,
+    position: THREE.Vector3,
+    now: number,
+  ): void {
+    if (!target.positionX) {
+      target.setPosition(position.x, position.y, position.z);
+      target.setOrientation(
+        this.spatialForward.x,
+        this.spatialForward.y,
+        this.spatialForward.z,
+        this.spatialUp.x,
+        this.spatialUp.y,
+        this.spatialUp.z,
+      );
+      return;
+    }
+    target.positionX.setTargetAtTime(position.x, now, SPATIAL_SMOOTHING_SECONDS);
+    target.positionY.setTargetAtTime(position.y, now, SPATIAL_SMOOTHING_SECONDS);
+    target.positionZ.setTargetAtTime(position.z, now, SPATIAL_SMOOTHING_SECONDS);
+    target.forwardX.setTargetAtTime(this.spatialForward.x, now, SPATIAL_SMOOTHING_SECONDS);
+    target.forwardY.setTargetAtTime(this.spatialForward.y, now, SPATIAL_SMOOTHING_SECONDS);
+    target.forwardZ.setTargetAtTime(this.spatialForward.z, now, SPATIAL_SMOOTHING_SECONDS);
+    target.upX.setTargetAtTime(this.spatialUp.x, now, SPATIAL_SMOOTHING_SECONDS);
+    target.upY.setTargetAtTime(this.spatialUp.y, now, SPATIAL_SMOOTHING_SECONDS);
+    target.upZ.setTargetAtTime(this.spatialUp.z, now, SPATIAL_SMOOTHING_SECONDS);
+  }
+
+  private applyPanner(
+    panner: PannerNode,
+    position: THREE.Vector3,
+    now: number,
+  ): void {
+    if (!panner.positionX) {
+      panner.setPosition(position.x, position.y, position.z);
+      return;
+    }
+    panner.positionX.setTargetAtTime(position.x, now, SPATIAL_SMOOTHING_SECONDS);
+    panner.positionY.setTargetAtTime(position.y, now, SPATIAL_SMOOTHING_SECONDS);
+    panner.positionZ.setTargetAtTime(position.z, now, SPATIAL_SMOOTHING_SECONDS);
   }
 
   private installMusic(context: AudioContext, master: GainNode): void {

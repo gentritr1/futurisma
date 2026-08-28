@@ -90,14 +90,23 @@ const WATER_GRIP_PROBE_DISTANCE_METERS = 580;
 const APRON_PROBE_DISTANCE_METERS = 1700;
 const APRON_PROBE_LATERAL_METERS = 13.5;
 const APRON_PROBE_SPEED_METERS_PER_SECOND = 60;
+// The panner reference distance, so the rival-audio probe sits at unity gain.
+const RIVAL_AUDIO_PROBE_METERS = 4;
 const RESUME_COUNTDOWN_SECONDS = 2.7;
 const ZERO_INPUT: InputFrame = { throttle: 0, brake: 0, steer: 0, boost: false };
 
+// Read once. The query string cannot change without a reload, and the repeated
+// re-parse was costing this file the seam-budget lines that new phases need.
+const SEARCH = new URLSearchParams(window.location.search);
+
 function readProbeNumber(parameter: string, fallback: number): number {
-  const value = Number.parseFloat(
-    new URLSearchParams(window.location.search).get(parameter) ?? "",
-  );
+  const value = Number.parseFloat(SEARCH.get(parameter) ?? "");
   return Number.isFinite(value) ? value : fallback;
+}
+
+/** A named diagnostics scenario. Probes only ever arm under `?diagnostics=1`. */
+function probeSelected(name: string): boolean {
+  return SEARCH.has("diagnostics") && SEARCH.get("probe") === name;
 }
 
 export class FuturismaGame {
@@ -260,9 +269,7 @@ export class FuturismaGame {
   private trialStartPending = false;
   private animationFrame = 0;
   private renderRequested = true;
-  private readonly qualityOverride = new URLSearchParams(window.location.search).get(
-    "quality",
-  );
+  private readonly qualityOverride = SEARCH.get("quality");
   private readonly qualityMode = this.qualityOverride === "high"
     ? "high"
     : this.qualityOverride === "low"
@@ -271,21 +278,14 @@ export class FuturismaGame {
   private preferredPixelRatio = this.resolvePreferredPixelRatio();
   private minimumPixelRatio = this.resolveMinimumPixelRatio();
   private renderPixelRatio = this.preferredPixelRatio;
-  private readonly demoMode = new URLSearchParams(window.location.search).has("demo");
+  private readonly demoMode = SEARCH.has("demo");
   private demoAutopilot = this.demoMode;
-  private readonly diagnosticsMode = new URLSearchParams(window.location.search).has(
-    "diagnostics",
-  );
-  private readonly recoveryProbe = this.diagnosticsMode
-    && new URLSearchParams(window.location.search).get("probe") === "recovery";
-  private readonly wrongWayProbe = this.diagnosticsMode
-    && new URLSearchParams(window.location.search).get("probe") === "wrong-way";
-  private readonly impactProbe = this.diagnosticsMode
-    && new URLSearchParams(window.location.search).get("probe") === "impact";
-  private readonly waterGripProbe = this.diagnosticsMode
-    && new URLSearchParams(window.location.search).get("probe") === "water";
-  private readonly apronProbe = this.diagnosticsMode
-    && new URLSearchParams(window.location.search).get("probe") === "apron";
+  private readonly diagnosticsMode = SEARCH.has("diagnostics");
+  private readonly recoveryProbe = probeSelected("recovery");
+  private readonly wrongWayProbe = probeSelected("wrong-way");
+  private readonly impactProbe = probeSelected("impact");
+  private readonly waterGripProbe = probeSelected("water");
+  private readonly apronProbe = probeSelected("apron");
   // `&probeDistance=` / `&probeLateral=` drive the apron probe's three
   // authored scenarios without a rebuild.
   private readonly apronProbeDistance = readProbeNumber(
@@ -296,13 +296,15 @@ export class FuturismaGame {
     "probeLateral",
     APRON_PROBE_LATERAL_METERS,
   );
-  private readonly contextLossProbe = this.diagnosticsMode
-    && new URLSearchParams(window.location.search).get("probe") === "context";
-  private readonly focusLossProbe = this.diagnosticsMode
-    && new URLSearchParams(window.location.search).get("probe") === "focus";
-  private readonly reducedMotion = window.matchMedia(
-    "(prefers-reduced-motion: reduce)",
-  ).matches || new URLSearchParams(window.location.search).get("motion") === "reduce";
+  // `?probe=rival-audio` parks the field's first rival abeam the player so a
+  // headless run can read the pan axis. `&probeSide=1` mirrors it to starboard.
+  private readonly rivalAudioProbeLateral = probeSelected("rival-audio")
+    ? RIVAL_AUDIO_PROBE_METERS * Math.sign(readProbeNumber("probeSide", -1) || -1)
+    : 0;
+  private readonly contextLossProbe = probeSelected("context");
+  private readonly focusLossProbe = probeSelected("focus");
+  private readonly reducedMotion = SEARCH.get("motion") === "reduce"
+    || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   constructor(
     canvas: HTMLCanvasElement,
@@ -420,6 +422,7 @@ export class FuturismaGame {
     }
     this.rivalFleet = rivalFleet;
     this.scene.add(this.rivalFleet.root);
+    this.audio.attachSpatialScene(rivalFleet, this.camera, this.vehicle.root.position);
     this.ui.setRaceFormat(
       this.totalLaps,
       this.course.length,
@@ -602,6 +605,8 @@ export class FuturismaGame {
       this.boostActive,
       this.surfaceGrip,
       this.driftIntensity,
+      this.course.audioZoneAt(this.progress),
+      this.phase === "running",
     );
     if (audioControlUpdated && this.phase !== "finished") {
       this.audio.setMusicProfile(this.course.musicAt(this.progress));
@@ -1560,6 +1565,9 @@ export class FuturismaGame {
       this.position.copy(start.position).addScaledVector(start.right, this.lateral);
       this.speed = APRON_PROBE_SPEED_METERS_PER_SECOND;
     }
+    if (this.rivalAudioProbeLateral !== 0) {
+      this.audio.setRivalAudioProbe(start.right, this.rivalAudioProbeLateral);
+    }
     this.syncPresentationPose();
     this.course.setLapBoard(1, this.totalLaps);
     this.course.setCheckpointProgress(1);
@@ -1576,10 +1584,7 @@ export class FuturismaGame {
   }
 
   private resolveLapCount(): number {
-    const requested = Number.parseInt(
-      new URLSearchParams(window.location.search).get("laps") ?? "",
-      10,
-    );
+    const requested = Number.parseInt(SEARCH.get("laps") ?? "", 10);
     if (!Number.isFinite(requested)) return this.course.defaultLapCount;
     return THREE.MathUtils.clamp(
       requested,

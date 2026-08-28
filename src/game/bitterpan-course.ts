@@ -5,6 +5,7 @@ import gridAndRecoveryJson from "./data/map02/GRID_AND_RECOVERY.json";
 import sectorsJson from "./data/map02/SECTORS_AND_SEQUENCES.json";
 import { createApronResolution } from "./apron.js";
 import type { ApronResolution } from "./apron.js";
+import type { AudioZone } from "./audio-space.js";
 import type {
   CourseLightingProfile,
   CourseProjection,
@@ -505,6 +506,14 @@ export class BitterpanCourse implements RaceCourse {
 
   musicAt(): MusicProfile {
     return MUSIC_PROFILE;
+  }
+
+  /**
+   * Bitterpan is authored open-air throughout. Its interiors arrive with the
+   * production pass (P8); until then a single honest room beats a guessed one.
+   */
+  audioZoneAt(): AudioZone {
+    return "open";
   }
 
   updateAtmosphere(): boolean {
