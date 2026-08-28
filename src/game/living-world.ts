@@ -3,71 +3,37 @@ import {
   type RaceCourse,
   type CourseSample,
 } from "./course";
-import type { GreenwaterLivingTextures } from "./environment";
+import {
+  ALPHA_ENVELOPES,
+  buildLivingWorld,
+  CARD_TRIANGLES,
+  LIVING_WORLD_SPECS,
+  LIVING_WORLD_UPDATE_HZ,
+  type AlphaKind,
+  type AtlasRect,
+  type AuthoredCard,
+  type LivingBatchSpec,
+  type LivingWorldSpec,
+} from "./living-world-zones.js";
 
-const UPDATE_HZ = 30;
-const UPDATE_STEP_SECONDS = 1 / UPDATE_HZ;
+const UPDATE_STEP_SECONDS = 1 / LIVING_WORLD_UPDATE_HZ;
 const CARD_VERTICES = 4;
-const CARD_TRIANGLES = 2;
+/** A dust devil turns on `card.speed` but climbs on this, shared with its alpha. */
+const DEVIL_CLIMB_HZ = 0.11;
+/** Heat shimmer breathes on its own slow cycle rather than on the card speed. */
+const SHIMMER_PERIOD_SECONDS = 6.5;
 
-type CardKind =
-  | "mist"
-  | "rise"
-  | "puff"
-  | "rain"
-  | "ripple"
-  | "flow"
-  | "pendulum"
-  | "shear"
-  | "sequence"
-  | "pulse"
-  | "blink";
-type AlphaKind = "mist" | "rise" | "puff" | "rain" | "ripple" | "flow";
-type MotionId =
-  | "MIST_WATER_TABLE"
-  | "MIST_CANOPY"
-  | "STEAM_HANGAR_VENTS"
-  | "RAIN_SWEEP"
-  | "GLINT_WATER_TABLE"
-  | "GLINT_SWEEP_DRAINAGE"
-  | "VINE_SWAY_CANOPY"
-  | "FROND_SWAY_SWEEP"
-  | "PUMP_LAMPS_FUEL_ROW"
-  | "CRANE_APEX_BEACON"
-  | "MACHINERY_DISTANT";
-
-interface AtlasRect {
-  x: number;
-  y: number;
-  size: number;
-  sheetSize: number;
+/**
+ * Textures a zone set may ask for by name. `motion` is loaded by `load` from
+ * the shared atlas URL; the rest come from an authored environment, so a course
+ * whose zones never name them (Bitterpan) does not need to supply them.
+ */
+export interface LivingWorldTextures {
+  jungle?: THREE.Texture;
+  emissive?: THREE.Texture;
 }
 
-interface MotionSpec {
-  id: MotionId;
-  from: number;
-  to: number;
-  cards: number;
-}
-
-interface LivingCard {
-  motionId: MotionId;
-  kind: CardKind;
-  distance: number;
-  side: number;
-  lateral: number;
-  base: number;
-  width: number;
-  height: number;
-  phase: number;
-  speed: number;
-  rect: AtlasRect;
-  tint: number;
-  seed: number;
-  amplitude?: number;
-  hang?: number;
-  alphaKind?: AlphaKind;
-  alphaInitial?: number;
+interface LivingCard extends AuthoredCard {
   anchorX: number;
   anchorY: number;
   anchorZ: number;
@@ -75,17 +41,8 @@ interface LivingCard {
   flowSample: CourseSample | null;
 }
 
-type LivingCardSeed = Omit<
-  LivingCard,
-  | "motionId"
-  | "anchorX"
-  | "anchorY"
-  | "anchorZ"
-  | "hangY"
-  | "flowSample"
->;
-
 interface LivingBatch {
+  spec: LivingBatchSpec;
   mesh: THREE.Mesh;
   cards: LivingCard[];
   positions: Float32Array;
@@ -95,91 +52,16 @@ interface LivingBatch {
   hasAnimatedAlpha: boolean;
 }
 
-export interface GreenwaterLivingStats {
-  drawCalls: 4;
-  cards: 155;
-  triangles: 310;
-  updateHz: 30;
+export interface LivingWorldStats {
+  drawCalls: number;
+  cards: number;
+  triangles: number;
+  updateHz: number;
   updateSteps: number;
 }
 
-const MOTION: Record<MotionId, MotionSpec> = {
-  MIST_WATER_TABLE: { id: "MIST_WATER_TABLE", from: 300, to: 470, cards: 14 },
-  MIST_CANOPY: { id: "MIST_CANOPY", from: 1180, to: 1330, cards: 12 },
-  STEAM_HANGAR_VENTS: {
-    id: "STEAM_HANGAR_VENTS",
-    from: 700,
-    to: 815,
-    cards: 10,
-  },
-  RAIN_SWEEP: { id: "RAIN_SWEEP", from: 860, to: 1030, cards: 22 },
-  GLINT_WATER_TABLE: { id: "GLINT_WATER_TABLE", from: 300, to: 470, cards: 26 },
-  GLINT_SWEEP_DRAINAGE: {
-    id: "GLINT_SWEEP_DRAINAGE",
-    from: 860,
-    to: 1030,
-    cards: 18,
-  },
-  VINE_SWAY_CANOPY: { id: "VINE_SWAY_CANOPY", from: 1180, to: 1330, cards: 20 },
-  FROND_SWAY_SWEEP: { id: "FROND_SWAY_SWEEP", from: 860, to: 1030, cards: 16 },
-  PUMP_LAMPS_FUEL_ROW: {
-    id: "PUMP_LAMPS_FUEL_ROW",
-    from: 1900,
-    to: 2100,
-    cards: 9,
-  },
-  CRANE_APEX_BEACON: { id: "CRANE_APEX_BEACON", from: 760, to: 800, cards: 2 },
-  MACHINERY_DISTANT: { id: "MACHINERY_DISTANT", from: 690, to: 820, cards: 6 },
-};
-
-const ALPHA_ENVELOPES: Record<AlphaKind, readonly [number, number]> = {
-  mist: [0.22, 0.46],
-  rise: [0.1, 0.34],
-  puff: [0, 0.5],
-  rain: [0.08, 0.22],
-  ripple: [0, 0.38],
-  flow: [0, 0.3],
-};
-
-function seededRandom(seed: number): () => number {
-  let value = seed >>> 0;
-  return () => {
-    value = (value + 0x6d2b79f5) >>> 0;
-    const first = (value ^ (value >>> 15)) * (1 | value);
-    const second = (
-      value + (((value ^ (value >>> 7)) * (61 | value)) >>> 0)
-    ) >>> 0;
-    return ((first ^ second) >>> 0) / 0x1_0000_0000;
-  };
-}
-
-function atlasRect(sheetSize: number, columns: number, slotIndex: number): AtlasRect {
-  const size = sheetSize / columns;
-  return {
-    x: (slotIndex % columns) * size,
-    y: Math.floor(slotIndex / columns) * size,
-    size,
-    sheetSize,
-  };
-}
-
-const MOTION_RECTS = {
-  mist: atlasRect(512, 2, 0),
-  steam: atlasRect(512, 2, 1),
-  rain: atlasRect(512, 2, 2),
-  glint: atlasRect(512, 2, 3),
-} as const;
-const JUNGLE_RECTS = {
-  fern: atlasRect(1024, 4, 3),
-  vine: atlasRect(1024, 4, 4),
-} as const;
-const EMISSIVE_RECTS = {
-  amberLamp: atlasRect(512, 4, 0),
-  redLamp: atlasRect(512, 4, 2),
-} as const;
-
 function makeBatch(
-  name: string,
+  spec: LivingBatchSpec,
   cards: LivingCard[],
   material: THREE.Material,
 ): LivingBatch {
@@ -190,7 +72,7 @@ function makeBatch(
 
   for (let cardIndex = 0; cardIndex < cards.length; cardIndex += 1) {
     const card = cards[cardIndex];
-    const { rect } = card;
+    const rect: AtlasRect = card.rect;
     const padding = 1.5;
     const u0 = (rect.x + padding) / rect.sheetSize;
     const v0 = (rect.y + padding) / rect.sheetSize;
@@ -233,10 +115,11 @@ function makeBatch(
   geometry.setAttribute("color", colorAttribute);
   geometry.setIndex(new THREE.BufferAttribute(indices, 1));
   const mesh = new THREE.Mesh(geometry, material);
-  mesh.name = name;
+  mesh.name = spec.meshName;
   mesh.frustumCulled = false;
   mesh.userData.alphaChannel = true;
   return {
+    spec,
     mesh,
     cards,
     positions,
@@ -245,6 +128,38 @@ function makeBatch(
     colorAttribute,
     hasAnimatedAlpha: cards.some((card) => card.alphaKind !== undefined),
   };
+}
+
+function makeMaterial(
+  spec: LivingBatchSpec,
+  motionTexture: THREE.Texture,
+  textures: LivingWorldTextures,
+): THREE.MeshBasicMaterial {
+  const map = spec.texture === "motion"
+    ? motionTexture
+    : spec.texture === "jungle"
+      ? textures.jungle
+      : textures.emissive;
+  if (!map) {
+    throw new Error(
+      `Living-world batch ${spec.meshName} needs the ${spec.texture} texture, `
+        + "which this course did not supply.",
+    );
+  }
+  const material = new THREE.MeshBasicMaterial({
+    map,
+    transparent: true,
+    depthWrite: spec.depthWrite,
+    blending: spec.blending === "additive"
+      ? THREE.AdditiveBlending
+      : THREE.NormalBlending,
+    vertexColors: true,
+    side: THREE.DoubleSide,
+    opacity: 1,
+    fog: spec.fog,
+  });
+  if (spec.alphaTest > 0) material.alphaTest = spec.alphaTest;
+  return material;
 }
 
 function writeCameraFacingCard(
@@ -301,15 +216,19 @@ function writeFlatCard(
   positions[offset + 11] = centerZ + halfZ;
 }
 
-export class GreenwaterLivingWorld {
+/**
+ * The card layer, for any course that has an authored zone set.
+ *
+ * Zones, counts, palettes and motions are data (`living-world-zones.js`); this
+ * class owns only the three.js side — one shared `Float32Array` per batch, one
+ * draw call per batch, and a fixed 30 Hz update that never allocates. The
+ * Greenwater zone set is accepted art and is reproduced bit-for-bit by the zone
+ * module, so P9's expansion is additive: it appends cards to the existing
+ * batches rather than re-authoring them.
+ */
+export class LivingWorld {
   readonly root = new THREE.Group();
-  readonly stats: GreenwaterLivingStats = {
-    drawCalls: 4,
-    cards: 155,
-    triangles: 310,
-    updateHz: UPDATE_HZ,
-    updateSteps: 0,
-  };
+  readonly stats: LivingWorldStats;
 
   private readonly batches: LivingBatch[];
   private readonly cameraRight = new THREE.Vector3(1, 0, 0);
@@ -318,258 +237,32 @@ export class GreenwaterLivingWorld {
 
   private constructor(
     private readonly course: RaceCourse,
+    spec: LivingWorldSpec,
     motionTexture: THREE.Texture,
-    textures: GreenwaterLivingTextures,
+    textures: LivingWorldTextures,
   ) {
-    this.root.name = "GW_LIVING_RUNTIME";
-    const random = seededRandom(0x13a7);
-    const air: LivingCard[] = [];
-    const water: LivingCard[] = [];
-    const foliage: LivingCard[] = [];
-    const lamps: LivingCard[] = [];
-
-    const spread = (
-      spec: MotionSpec,
-      target: LivingCard[],
-      makeCard: (
-        distance: number,
-        side: number,
-        index: number,
-        nextRandom: () => number,
-      ) => LivingCardSeed,
-    ): void => {
-      const span = spec.to - spec.from;
-      for (let index = 0; index < spec.cards; index += 1) {
-        const distance = spec.from + span * (index + 0.5) / spec.cards;
-        const side = index % 2 === 1 ? 1 : -1;
-        target.push({
-          ...makeCard(distance, side, index, random),
-          motionId: spec.id,
-          anchorX: 0,
-          anchorY: 0,
-          anchorZ: 0,
-          hangY: 0,
-          flowSample: null,
-        });
-      }
+    this.root.name = spec.rootName;
+    const authored = buildLivingWorld(spec);
+    this.stats = {
+      drawCalls: authored.drawCalls,
+      cards: authored.cards,
+      triangles: authored.triangles,
+      updateHz: LIVING_WORLD_UPDATE_HZ,
+      updateSteps: 0,
     };
 
-    spread(MOTION.MIST_WATER_TABLE, air, (distance, side, _index, next) => ({
-      kind: "mist",
-      distance,
-      side,
-      lateral: 17 + next() * 21,
-      base: 2 + next() * 9,
-      width: 17 + next() * 17,
-      height: 2.2 + next() * 2.3,
-      phase: next() * Math.PI * 2,
-      speed: 0.55,
-      rect: MOTION_RECTS.mist,
-      tint: 0xbcd4d0,
-      seed: next(),
-      alphaKind: "mist",
-      alphaInitial: ALPHA_ENVELOPES.mist[0],
-    }));
-    spread(MOTION.MIST_CANOPY, air, (distance, side, _index, next) => ({
-      kind: "rise",
-      distance,
-      side,
-      lateral: 15 + next() * 15,
-      base: 3 + next() * 11,
-      width: 14 + next() * 11,
-      height: 2.4 + next() * 1.8,
-      phase: next() * Math.PI * 2,
-      speed: 0.28,
-      rect: MOTION_RECTS.mist,
-      tint: 0x8fae86,
-      seed: next(),
-      alphaKind: "rise",
-      alphaInitial: ALPHA_ENVELOPES.rise[0],
-    }));
-    spread(MOTION.STEAM_HANGAR_VENTS, air, (distance, _side, index, next) => ({
-      kind: "puff",
-      distance,
-      side: index % 3 !== 0 ? -1 : 1,
-      lateral: 9 + (index % 6) * 1.2,
-      base: 1.4 + (index % 3) * 0.8,
-      width: 3.2,
-      height: 3.2,
-      phase: index / 10 * Math.PI * 2,
-      speed: 1 / 2.4,
-      rect: MOTION_RECTS.steam,
-      tint: 0xd8cbb2,
-      seed: next(),
-      alphaKind: "puff",
-      alphaInitial: ALPHA_ENVELOPES.puff[0],
-    }));
-    spread(MOTION.RAIN_SWEEP, air, (distance, side, _index, next) => ({
-      kind: "rain",
-      distance: distance + (next() - 0.5) * 11,
-      side,
-      lateral: 24 + next() * 28,
-      base: 3 + next() * 16,
-      width: 3.4 + next() * 2.4,
-      height: 12 + next() * 8,
-      phase: next(),
-      speed: 14,
-      rect: MOTION_RECTS.rain,
-      tint: 0xbfd6da,
-      seed: next(),
-      alphaKind: "rain",
-      alphaInitial: ALPHA_ENVELOPES.rain[0],
-    }));
-
-    spread(MOTION.GLINT_WATER_TABLE, water, (distance, side, _index, next) => ({
-      kind: "ripple",
-      distance,
-      side,
-      lateral: 12 + next() * 32,
-      base: 0.15,
-      width: 2.4 + next() * 3.1,
-      height: 0,
-      phase: next() * Math.PI * 2,
-      speed: 0.9,
-      rect: MOTION_RECTS.glint,
-      tint: 0x9fd8cc,
-      seed: next(),
-      alphaKind: "ripple",
-      alphaInitial: ALPHA_ENVELOPES.ripple[0],
-    }));
-    spread(MOTION.GLINT_SWEEP_DRAINAGE, water, (distance, side, index, next) => ({
-      kind: "flow",
-      distance,
-      side,
-      lateral: 11 + (index % 4) * 2.1,
-      base: 0.1,
-      width: 1.8 + next() * 1.6,
-      height: 0,
-      phase: next(),
-      speed: 3.2,
-      rect: MOTION_RECTS.glint,
-      tint: 0x8fd4c0,
-      seed: next(),
-      alphaKind: "flow",
-      alphaInitial: ALPHA_ENVELOPES.flow[0],
-    }));
-
-    spread(MOTION.VINE_SWAY_CANOPY, foliage, (distance, side, _index, next) => ({
-      kind: "pendulum",
-      distance,
-      side,
-      lateral: 8 + next() * 9,
-      base: 11,
-      hang: 17.4,
-      width: 3.4 + next() * 2.2,
-      height: 6.4,
-      phase: next() * Math.PI * 2,
-      speed: Math.PI * 2 / 5.5,
-      amplitude: THREE.MathUtils.degToRad(3.2),
-      rect: JUNGLE_RECTS.vine,
-      tint: 0x6f8f58,
-      seed: next(),
-    }));
-    spread(MOTION.FROND_SWAY_SWEEP, foliage, (distance, side, _index, next) => ({
-      kind: "shear",
-      distance,
-      side,
-      lateral: 20 + next() * 16,
-      base: 1.2 + next() * 3,
-      width: 5 + next() * 3.5,
-      height: 4.5 + next() * 3,
-      phase: next() * Math.PI * 2,
-      speed: Math.PI * 2 / 7.3,
-      amplitude: THREE.MathUtils.degToRad(2.4),
-      rect: JUNGLE_RECTS.fern,
-      tint: 0x5c7a4a,
-      seed: next(),
-    }));
-
-    spread(MOTION.PUMP_LAMPS_FUEL_ROW, lamps, (distance, side, index, next) => ({
-      kind: "sequence",
-      distance,
-      side,
-      lateral: 12 + (index % 5) * 3.1,
-      base: 3 + (index % 3) * 0.9,
-      width: 0.85,
-      height: 0.85,
-      phase: (index % 3) / 3,
-      speed: 1 / 1.1,
-      rect: index === 4 ? EMISSIVE_RECTS.redLamp : EMISSIVE_RECTS.amberLamp,
-      tint: index === 4 ? 0xff5a3c : 0xffb45a,
-      seed: next(),
-    }));
-    spread(MOTION.CRANE_APEX_BEACON, lamps, (distance, _side, index, next) => ({
-      kind: "pulse",
-      distance,
-      side: 1,
-      lateral: 25.4,
-      base: 34 + index * 1.6,
-      width: 1.15,
-      height: 1.15,
-      phase: index * 0.5,
-      speed: Math.PI * 2 / 2.6,
-      rect: EMISSIVE_RECTS.redLamp,
-      tint: 0xff4a34,
-      seed: next(),
-    }));
-    spread(MOTION.MACHINERY_DISTANT, lamps, (distance, _side, index, next) => ({
-      kind: "blink",
-      distance,
-      side: -1,
-      lateral: 40 + (index % 3) * 6,
-      base: 2.5 + (index % 4) * 2.2,
-      width: 0.7,
-      height: 0.7,
-      phase: (index % 3) * 0.37,
-      speed: 1 / (index % 2 !== 0 ? 3.7 : 5.2),
-      rect: index % 3 === 2 ? EMISSIVE_RECTS.amberLamp : EMISSIVE_RECTS.redLamp,
-      tint: index % 3 === 2 ? 0xffb45a : 0xff4a34,
-      seed: next(),
-    }));
-
-    const airMaterial = new THREE.MeshBasicMaterial({
-      map: motionTexture,
-      transparent: true,
-      depthWrite: false,
-      blending: THREE.NormalBlending,
-      vertexColors: true,
-      side: THREE.DoubleSide,
-      opacity: 1,
-      fog: true,
-    });
-    const waterMaterial = new THREE.MeshBasicMaterial({
-      map: motionTexture,
-      transparent: true,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-      vertexColors: true,
-      side: THREE.DoubleSide,
-      opacity: 1,
-      fog: true,
-    });
-    const foliageMaterial = new THREE.MeshBasicMaterial({
-      map: textures.jungle,
-      transparent: true,
-      alphaTest: 0.5,
-      vertexColors: true,
-      side: THREE.DoubleSide,
-      fog: true,
-    });
-    const lampMaterial = new THREE.MeshBasicMaterial({
-      map: textures.emissive,
-      transparent: true,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-      vertexColors: true,
-      side: THREE.DoubleSide,
-      fog: false,
-    });
-    this.batches = [
-      makeBatch("GW_LIVING_AIR", air, airMaterial),
-      makeBatch("GW_LIVING_WATER", water, waterMaterial),
-      makeBatch("GW_LIVING_FOLIAGE", foliage, foliageMaterial),
-      makeBatch("GW_LIVING_LAMPS", lamps, lampMaterial),
-    ];
+    this.batches = authored.batches.map((batch) => makeBatch(
+      batch.spec,
+      batch.cards.map((card) => ({
+        ...card,
+        anchorX: 0,
+        anchorY: 0,
+        anchorZ: 0,
+        hangY: 0,
+        flowSample: null,
+      })),
+      makeMaterial(batch.spec, motionTexture, textures),
+    ));
     for (const batch of this.batches) this.root.add(batch.mesh);
 
     for (const batch of this.batches) {
@@ -589,18 +282,22 @@ export class GreenwaterLivingWorld {
 
   static async load(
     course: RaceCourse,
-    textures: GreenwaterLivingTextures,
+    textures: LivingWorldTextures,
     motionTextureUrl: string,
-  ): Promise<GreenwaterLivingWorld> {
+  ): Promise<LivingWorld> {
+    const spec = LIVING_WORLD_SPECS[course.kind];
+    if (!spec) {
+      throw new Error(`No living-world zone set is authored for ${course.kind}.`);
+    }
     const motionTexture = await new THREE.TextureLoader().loadAsync(motionTextureUrl);
-    motionTexture.name = "greenwater_motion_512";
+    motionTexture.name = "living_world_motion_512";
     motionTexture.colorSpace = THREE.SRGBColorSpace;
     motionTexture.magFilter = THREE.NearestFilter;
     motionTexture.minFilter = THREE.NearestFilter;
     motionTexture.generateMipmaps = false;
     motionTexture.needsUpdate = true;
     try {
-      return new GreenwaterLivingWorld(course, motionTexture, textures);
+      return new LivingWorld(course, spec, motionTexture, textures);
     } catch (error) {
       motionTexture.dispose();
       throw error;
@@ -699,6 +396,21 @@ export class GreenwaterLivingWorld {
               this.elapsedSeconds * card.speed + card.phase,
             ) * Math.tan(card.amplitude ?? 0) * 4;
             break;
+          case "devil": {
+            // A column of cards orbiting the devil's axis: the orbit widens and
+            // the card grows as it climbs, so the four cards of one column read
+            // as a single turning body rather than four sprites.
+            const spin = this.elapsedSeconds * card.speed + card.phase;
+            const climb = (this.elapsedSeconds * DEVIL_CLIMB_HZ + card.seed) % 1;
+            const radius = (card.amplitude ?? 0) * (0.55 + 0.45 * climb);
+            x += Math.cos(spin) * radius;
+            z += Math.sin(spin) * radius;
+            y += climb * (card.hang ?? 0);
+            const scale = 0.65 + climb * 0.6;
+            halfWidth *= scale;
+            halfHeight *= scale;
+            break;
+          }
           default:
             break;
         }
@@ -731,7 +443,9 @@ export class GreenwaterLivingWorld {
       batch.positionAttribute.needsUpdate = true;
       if (batch.hasAnimatedAlpha) batch.colorAttribute.needsUpdate = true;
     }
-    this.updateLampColors(this.batches[3]);
+    for (const batch of this.batches) {
+      if (batch.spec.lamps) this.updateLampColors(batch);
+    }
     return true;
   }
 
@@ -740,7 +454,7 @@ export class GreenwaterLivingWorld {
     cardIndex: number,
     card: LivingCard,
   ): void {
-    const alphaKind = card.alphaKind;
+    const alphaKind: AlphaKind | undefined = card.alphaKind;
     if (!alphaKind) return;
     let amount = 0;
     switch (alphaKind) {
@@ -777,6 +491,18 @@ export class GreenwaterLivingWorld {
         amount = Math.sin(Math.PI * progress);
         break;
       }
+      case "devil": {
+        // Same climb clock the position uses, so the dust fades exactly where
+        // it thins out rather than on a clock of its own.
+        const climb = (this.elapsedSeconds * DEVIL_CLIMB_HZ + card.seed) % 1;
+        amount = Math.sin(Math.PI * climb);
+        break;
+      }
+      case "shimmer":
+        amount = 0.5 + 0.5 * Math.sin(
+          this.elapsedSeconds * (Math.PI * 2 / SHIMMER_PERIOD_SECONDS) + card.phase,
+        );
+        break;
     }
     const envelope = ALPHA_ENVELOPES[alphaKind];
     const alpha = envelope[0]
@@ -802,6 +528,12 @@ export class GreenwaterLivingWorld {
         brightness = (this.elapsedSeconds * card.speed + card.phase) % 1 < 0.42
           ? 1
           : 0.1;
+      } else if (card.kind === "strobe") {
+        // A travelling head with a short trail: `phase` is the lamp's place in
+        // the chase, `speed` is sweeps per second.
+        const head = (this.elapsedSeconds * card.speed) % 1;
+        const gap = (head - card.phase + 1) % 1;
+        brightness = gap < 0.1 ? 1 : gap < 0.24 ? 0.42 : 0.08;
       }
       const red = ((card.tint >> 16) & 255) / 255 * brightness;
       const green = ((card.tint >> 8) & 255) / 255 * brightness;
