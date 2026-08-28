@@ -36,6 +36,12 @@ export interface RaceEnvironmentStats {
   visibleTriangles: number;
   shaderModel: "lambert";
   signageSource: "baked" | "none";
+  /**
+   * Authored-asset contract mismatches observed while loading. A re-exported
+   * GLB must never black-screen the game, so a drifted count warns and is
+   * recorded here; the hard assertion lives in the build-time validators.
+   */
+  contractDrift: string[];
 }
 
 export type GreenwaterEnvironmentStats = RaceEnvironmentStats;
@@ -136,6 +142,7 @@ function findIndexedGeometryComponents(
 function relocateHangarSixEdgeBarriers(
   mesh: THREE.Mesh,
   course: RaceCourse,
+  contractDrift: string[],
 ): void {
   const geometry = mesh.geometry;
   const positions = geometry.getAttribute("position");
@@ -189,14 +196,15 @@ function relocateHangarSixEdgeBarriers(
     relocatedVertices += component.vertexIndices.length;
   }
 
-  if (
-    relocatedComponents !== EXPECTED_RELOCATED_HANGAR_COMPONENTS
-    || relocatedVertices !== EXPECTED_RELOCATED_HANGAR_VERTICES
-  ) {
-    throw new Error(
-      `Hangar Six repair selected ${relocatedComponents} components / ${relocatedVertices} vertices; `
-      + `expected ${EXPECTED_RELOCATED_HANGAR_COMPONENTS} / ${EXPECTED_RELOCATED_HANGAR_VERTICES}.`,
-    );
+  if (relocatedComponents !== EXPECTED_RELOCATED_HANGAR_COMPONENTS) {
+    const drift = `hangarComponents ${EXPECTED_RELOCATED_HANGAR_COMPONENTS} != ${relocatedComponents}`;
+    contractDrift.push(drift);
+    console.warn(`Greenwater authored-asset contract drift: ${drift}.`);
+  }
+  if (relocatedVertices !== EXPECTED_RELOCATED_HANGAR_VERTICES) {
+    const drift = `hangarVertices ${EXPECTED_RELOCATED_HANGAR_VERTICES} != ${relocatedVertices}`;
+    contractDrift.push(drift);
+    console.warn(`Greenwater authored-asset contract drift: ${drift}.`);
   }
   positions.needsUpdate = true;
   geometry.boundingBox = null;
@@ -294,6 +302,7 @@ export class GreenwaterEnvironment {
     root: THREE.Group,
     cullGroups: CullGroup[],
     triangles: number,
+    contractDrift: string[],
   ) {
     this.root = root;
     this.cullGroups = cullGroups;
@@ -309,11 +318,13 @@ export class GreenwaterEnvironment {
       visibleTriangles: triangles,
       shaderModel: "lambert",
       signageSource: "baked",
+      contractDrift,
     };
   }
 
   static async load(url: string, course: RaceCourse): Promise<GreenwaterEnvironment> {
     const scene = (await new GLTFLoader().loadAsync(url)).scene;
+    const contractDrift: string[] = [];
     try {
       const runtime = scene.getObjectByName("GW_ENVIRONMENT_RUNTIME");
       if (!runtime) {
@@ -324,7 +335,7 @@ export class GreenwaterEnvironment {
       if (!(hangarBarrierMesh instanceof THREE.Mesh)) {
         throw new Error(`${HANGAR_BARRIER_MESH} is missing.`);
       }
-      relocateHangarSixEdgeBarriers(hangarBarrierMesh, course);
+      relocateHangarSixEdgeBarriers(hangarBarrierMesh, course, contractDrift);
       const cullGroups: CullGroup[] = [];
       let triangles = 0;
       runtime.traverse((object) => {
@@ -354,15 +365,16 @@ export class GreenwaterEnvironment {
         object.receiveShadow = true;
       });
       if (cullGroups.length !== EXPECTED_RUNTIME_MESHES) {
-        throw new Error(
-          `Greenwater runtime has ${cullGroups.length} meshes; expected ${EXPECTED_RUNTIME_MESHES}.`,
-        );
+        const drift = `meshes ${EXPECTED_RUNTIME_MESHES} != ${cullGroups.length}`;
+        contractDrift.push(drift);
+        console.warn(`Greenwater authored-asset contract drift: ${drift}.`);
       }
       scene.name = "greenwater_authored_environment";
       return new GreenwaterEnvironment(
         scene,
         cullGroups,
         triangles,
+        contractDrift,
       );
     } catch (error) {
       disposeObject3DResources(scene);

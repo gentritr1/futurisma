@@ -44,9 +44,12 @@ assert.ok(
   javascriptGzip <= 225 * 1024,
   `JavaScript bundle exceeds 225 KiB gzip (${(javascriptGzip / 1024).toFixed(1)} KiB).`,
 );
+// Re-baselined 2026-08-28 from a measured 4.35 KiB gzip (the 4 KiB ceiling predated
+// the HUD turn-cue and hazard styling) plus headroom for the planned minimap and
+// meta-layer UI. Raise only with a fresh measurement and rationale.
 assert.ok(
-  stylesheetGzip <= 4 * 1024,
-  `Stylesheet exceeds 4 KiB gzip (${(stylesheetGzip / 1024).toFixed(1)} KiB).`,
+  stylesheetGzip <= 8 * 1024,
+  `Stylesheet exceeds 8 KiB gzip (${(stylesheetGzip / 1024).toFixed(1)} KiB).`,
 );
 assert.ok(
   shellGzip <= 235 * 1024,

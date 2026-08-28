@@ -128,7 +128,12 @@ export class BitterpanEnvironment implements RaceEnvironment {
   readonly root: THREE.Group;
   readonly stats: RaceEnvironmentStats;
 
-  private constructor(root: THREE.Group, meshes: number, triangles: number) {
+  private constructor(
+    root: THREE.Group,
+    meshes: number,
+    triangles: number,
+    contractDrift: string[],
+  ) {
     this.root = root;
     replaceStandardMaterials(root);
     // The accepted GLBs stay byte-identical. Their pale review palette was
@@ -146,6 +151,7 @@ export class BitterpanEnvironment implements RaceEnvironment {
       visibleTriangles: triangles,
       shaderModel: "lambert",
       signageSource: "none",
+      contractDrift,
     };
   }
 
@@ -184,14 +190,28 @@ export class BitterpanEnvironment implements RaceEnvironment {
       collision.visible = false;
       const trackStats = countVisibleMeshes(track);
       const massingStats = countVisibleMeshes(massing);
-      if (
-        trackStats.meshes !== EXPECTED_TRACK_PRIMITIVES
-        || massingStats.meshes !== EXPECTED_MASSING_PRIMITIVES
-        || trackStats.triangles + massingStats.triangles !== EXPECTED_VISIBLE_TRIANGLES
-      ) {
-        throw new Error(
-          "Bitterpan visible primitive or triangle totals differ from the accepted review.",
+      // A re-exported blockout must not black-screen the race. Count drift is
+      // reported to diagnostics; scripts/validate-map02.mjs keeps the hard
+      // build-time assertion on the accepted bytes.
+      const contractDrift: string[] = [];
+      const visibleTriangles = trackStats.triangles + massingStats.triangles;
+      if (trackStats.meshes !== EXPECTED_TRACK_PRIMITIVES) {
+        contractDrift.push(
+          `trackPrimitives ${EXPECTED_TRACK_PRIMITIVES} != ${trackStats.meshes}`,
         );
+      }
+      if (massingStats.meshes !== EXPECTED_MASSING_PRIMITIVES) {
+        contractDrift.push(
+          `massingPrimitives ${EXPECTED_MASSING_PRIMITIVES} != ${massingStats.meshes}`,
+        );
+      }
+      if (visibleTriangles !== EXPECTED_VISIBLE_TRIANGLES) {
+        contractDrift.push(
+          `visibleTriangles ${EXPECTED_VISIBLE_TRIANGLES} != ${visibleTriangles}`,
+        );
+      }
+      for (const drift of contractDrift) {
+        console.warn(`Bitterpan authored-asset contract drift: ${drift}.`);
       }
 
       const root = new THREE.Group();
@@ -200,7 +220,8 @@ export class BitterpanEnvironment implements RaceEnvironment {
       return new BitterpanEnvironment(
         root,
         trackStats.meshes + massingStats.meshes,
-        trackStats.triangles + massingStats.triangles,
+        visibleTriangles,
+        contractDrift,
       );
     } catch (error) {
       disposeObject3DResources(trackScene);

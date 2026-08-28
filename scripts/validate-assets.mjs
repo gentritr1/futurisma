@@ -10,12 +10,25 @@ import {
   readZipArchive,
   validateArchivePath,
 } from "./lib/greenwater-package-validator.mjs";
+import { readArchive, requireArchivesOrSkip } from "./lib/archive-root.mjs";
+
+// Every accepted art package this validator audits, named relative to the
+// archive root. A checkout without them skips provenance instead of failing;
+// a checkout that has them keeps the byte-for-byte assertions below.
+const REQUIRED_ARCHIVES = [
+  "GREENWATER_ENVIRONMENT_v1.0.zip",
+  "GREENWATER_VISUAL_IDENTITY_v1.2.zip",
+  "GREENWATER_LIVING_WORLD_v1.3.zip",
+  "GREENWATER_SURFACE_CHARACTER_v1.4_REVIEW.zip",
+  "GREENWATER_SURFACE_CHARACTER_v1.4.zip",
+  "GREENWATER_FACILITY_STORY_v1.5_PROVENANCE_GAP.json",
+  "quarantine/GREENWATER_FACILITY_STORY_v1.5_REVIEW_REJECTED_4c1f3da4.zip",
+  "GREENWATER_FACILITY_STORY_v1.5.zip",
+];
 
 const expectedHashes = {
   "models/futurisma_asset_kit.glb": "9cf2346b81ccbe2136fedaa78967d22a38a2017b043b005a2ab040fda1df5226",
-  "models/totem_master.glb": "633bd405bb6c3e676058ba1f89ea4807b2c010ae637d832aeee8ce5231eb80f9",
   "models/totem_runtime.glb": "4bec092f1c85c78b00a4974532b0dda5f1f89f756d9741535820368e3cfd35ec",
-  "textures/totem_decals_1024_base.png": "f34537951d842901cf79678f66117b6ef66ed12f985f60f15f1ba911cb3b3361",
   "textures/totem_decals_1024_needle.png": "2f8b3528845eaa7167062e93ae43fedf74e0d6c2ddc14cea14d565e8ec95dc1c",
   "textures/totem_decals_1024_nightform.png": "cac80bb0ffb70bbd23d2c216efb3a5d44379e5b7674d5badb02a36cc9253e1b4",
   "textures/totem_decals_1024_privateer.png": "98346872ed757bbe8db610ac35f2a6f243e8cfba681fdf5d936a6e0bdd1bd226",
@@ -64,18 +77,16 @@ for (const placement of ASSET_KIT_PROP_PLACEMENTS) {
   assert.ok(Number.isFinite(placement.scale) && placement.scale > 0);
 }
 
-const environmentPackageBytes = await readFile(
-  new URL("../artifacts/GREENWATER_ENVIRONMENT_v1.0.zip", import.meta.url),
-);
+const archives = requireArchivesOrSkip(REQUIRED_ARCHIVES);
+
+const environmentPackageBytes = await readArchive("GREENWATER_ENVIRONMENT_v1.0.zip");
 assert.equal(
   createHash("sha256").update(environmentPackageBytes).digest("hex"),
   "a773bf7f6f7e6ab160dfba385d67455e2ff7a9ade57369fafd416310825564af",
   "The preserved Greenwater v1.0 archive differs from the accepted package.",
 );
 
-const finalGreenwaterPackageBytes = await readFile(
-  new URL("../artifacts/GREENWATER_VISUAL_IDENTITY_v1.2.zip", import.meta.url),
-);
+const finalGreenwaterPackageBytes = await readArchive("GREENWATER_VISUAL_IDENTITY_v1.2.zip");
 assert.equal(
   createHash("sha256").update(finalGreenwaterPackageBytes).digest("hex"),
   "13da5c6212ab98e95956db063fa671cb0f484a9e3861abf0e40cf973de07782a",
@@ -145,9 +156,7 @@ const finalFreezeNotes = finalGreenwaterFiles.get("V12_FREEZE_NOTES.md")?.toStri
 assert.match(finalFreezeNotes, /accepted final v1\.2 freeze/i);
 assert.doesNotMatch(finalFreezeNotes, /not the final v1\.2 freeze/i);
 
-const finalLivingWorldPackageBytes = await readFile(
-  new URL("../artifacts/GREENWATER_LIVING_WORLD_v1.3.zip", import.meta.url),
-);
+const finalLivingWorldPackageBytes = await readArchive("GREENWATER_LIVING_WORLD_v1.3.zip");
 assert.equal(
   createHash("sha256").update(finalLivingWorldPackageBytes).digest("hex"),
   "72984328ef3005619e4c69991da46c1c9e21282a113d1b3ffc873a57e9b3191c",
@@ -348,8 +357,8 @@ for (const logicalPath of [
   );
 }
 
-const surfaceReviewPackageBytes = await readFile(
-  new URL("../GREENWATER_SURFACE_CHARACTER_v1.4_REVIEW.zip", import.meta.url),
+const surfaceReviewPackageBytes = await readArchive(
+  "GREENWATER_SURFACE_CHARACTER_v1.4_REVIEW.zip",
 );
 assert.equal(
   createHash("sha256").update(surfaceReviewPackageBytes).digest("hex"),
@@ -420,9 +429,7 @@ for (const logicalPath of surfaceReviewFiles.keys()) {
   );
 }
 
-const finalSurfacePackageBytes = await readFile(
-  new URL("../artifacts/GREENWATER_SURFACE_CHARACTER_v1.4.zip", import.meta.url),
-);
+const finalSurfacePackageBytes = await readArchive("GREENWATER_SURFACE_CHARACTER_v1.4.zip");
 assert.equal(
   createHash("sha256").update(finalSurfacePackageBytes).digest("hex"),
   "3e5f21868be3274116e096dc6b4a3bcc5c0011a7c7a5d8ef9ee93b759740458b",
@@ -625,13 +632,7 @@ assert.ok(
 const facilityStoryAcceptedReviewSha256 =
   "4c1b2ddd9cd5fc1fd50899c5caa5f1cc3440d6d4a824acd17c235f2e61723123";
 const facilityStoryProvenanceGap = JSON.parse(
-  await readFile(
-    new URL(
-      "../artifacts/GREENWATER_FACILITY_STORY_v1.5_PROVENANCE_GAP.json",
-      import.meta.url,
-    ),
-    "utf8",
-  ),
+  (await readArchive("GREENWATER_FACILITY_STORY_v1.5_PROVENANCE_GAP.json")).toString("utf8"),
 );
 assert.equal(
   facilityStoryProvenanceGap.format,
@@ -652,11 +653,8 @@ assert.equal(
   facilityStoryProvenanceGap.policy.quarantined_candidate_must_not_be_presented_as_accepted,
   true,
 );
-const facilityStoryQuarantinedPackageBytes = await readFile(
-  new URL(
-    "../artifacts/quarantine/GREENWATER_FACILITY_STORY_v1.5_REVIEW_REJECTED_4c1f3da4.zip",
-    import.meta.url,
-  ),
+const facilityStoryQuarantinedPackageBytes = await readArchive(
+  "quarantine/GREENWATER_FACILITY_STORY_v1.5_REVIEW_REJECTED_4c1f3da4.zip",
 );
 assert.equal(
   createHash("sha256").update(facilityStoryQuarantinedPackageBytes).digest("hex"),
@@ -761,9 +759,7 @@ for (const logicalPath of facilityStoryQuarantinedFiles.keys()) {
   );
 }
 
-const facilityStoryFinalPackageBytes = await readFile(
-  new URL("../artifacts/GREENWATER_FACILITY_STORY_v1.5.zip", import.meta.url),
-);
+const facilityStoryFinalPackageBytes = await readArchive("GREENWATER_FACILITY_STORY_v1.5.zip");
 assert.equal(
   facilityStoryProvenanceGap.accepted_final.sha256,
   "118bc6f00f4db5d5ec18ec805d0738aa672765a849b2f2169ccb1a47ad8ca2a9",
@@ -1217,5 +1213,5 @@ assert.equal(servedSurfaceAtlasBytes[24], 8, "The surface atlas must use 8-bit c
 assert.equal(servedSurfaceAtlasBytes[25], 6, "The surface atlas must be RGBA.");
 
 console.log(
-  `Assets PASS: ${Object.keys(expectedHashes).length} served files match the accepted Phase 1 bytes; ${ASSET_KIT_PROP_PLACEMENTS.length} fallback prop placements resolve; the preserved Greenwater v1.0 archive remains locked; the 59-file v1.2, 70-file Living World v1.3, 111-file Surface Character v1.4, and 185-file Facility Story v1.5 final freezes are byte-locked with every manifest entry; the v1.5 accepted-review hash remains recorded as unavailable and is not re-baselined, while the rejected candidate is quarantined and its final-source defect is verified; the served 60-mesh / 61,798-triangle environment, baked signage, living-world motion, and one-mesh / 776-triangle surface-character assets match their accepted final packages.`,
+  `Assets PASS: ${Object.keys(expectedHashes).length} served files match the accepted Phase 1 bytes; ${ASSET_KIT_PROP_PLACEMENTS.length} fallback prop placements resolve; the preserved Greenwater v1.0 archive remains locked; the 59-file v1.2, 70-file Living World v1.3, 111-file Surface Character v1.4, and 185-file Facility Story v1.5 final freezes are byte-locked with every manifest entry; the v1.5 accepted-review hash remains recorded as unavailable and is not re-baselined, while the rejected candidate is quarantined and its final-source defect is verified; the served 60-mesh / 61,798-triangle environment, baked signage, living-world motion, and one-mesh / 776-triangle surface-character assets match their accepted final packages. Archive root: ${archives.root}.`,
 );

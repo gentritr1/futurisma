@@ -35,14 +35,16 @@
   },
 
   "models": {
-    "master": {
+    "master_not_served": {
       "file": "totem_master.glb",
       "role": "editable master, full detail, every part named",
       "triangles": 6186,
       "draw_calls": 153,
       "materials": 25,
       "nodes": 199,
-      "bytes": 669296
+      "bytes": 669296,
+      "shipped": false,
+      "note": "The master is authoring input, never fetched at runtime. It is preserved in artifacts/TOTEM_Phase1_v1.0-patch1.zip and is no longer served from public/."
     },
     "runtime": {
       "file": "totem_runtime.glb",

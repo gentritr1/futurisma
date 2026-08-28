@@ -2544,6 +2544,7 @@ export class FuturismaGame {
       environmentShaderModel: this.authoredEnvironment?.stats.shaderModel ?? null,
       environmentSignageSource:
         this.authoredEnvironment?.stats.signageSource ?? null,
+      environmentContractDrift: this.authoredEnvironment?.stats.contractDrift ?? [],
       livingWorldLoadMs: this.diagnosticLivingWorldLoadMs === null
         ? null
         : Number(this.diagnosticLivingWorldLoadMs.toFixed(1)),

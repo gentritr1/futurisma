@@ -3,3 +3,12 @@ dist/
 .DS_Store
 *.log
 .vite/
+
+# Accepted art packages live under artifacts/ and are resolved through
+# scripts/lib/archive-root.mjs. Only the four already-tracked packages stay in
+# git; every other archive is a local provenance payload, not source.
+artifacts/**
+!artifacts/GREENWATER_ENVIRONMENT_PRODUCTION_INPUT_v1.0.zip
+!artifacts/GREENWATER_MAP01_v1.0.zip
+!artifacts/TOTEM_Phase1_v1.0-patch1.zip
+!artifacts/TOTEM_Phase1_v1.0.zip

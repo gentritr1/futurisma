@@ -144,11 +144,30 @@ a user-activated AudioContext while retaining the showcase controller.
 ## Verification
 
 ```sh
-npm test
+npm run test:code       # every code-only validator + the production build
+npm run test:archives   # accepted art-package provenance (needs the archives)
+npm test                # both, in that order
 npm audit --audit-level=high
-npm run validate:environment -- /absolute/path/to/GREENWATER_ENVIRONMENT_STAGE1.zip
-npm run validate:environment -- /absolute/path/to/GREENWATER_ENVIRONMENT_STAGE2.zip /absolute/path/to/GREENWATER_ENVIRONMENT_STAGE1.zip
-npm run validate:environment -- /absolute/path/to/GREENWATER_ENVIRONMENT_v1.0.zip /absolute/path/to/GREENWATER_ENVIRONMENT_STAGE2.zip
+npm run validate:environment -- GREENWATER_ENVIRONMENT_STAGE1.zip
+npm run validate:environment -- GREENWATER_ENVIRONMENT_STAGE2.zip GREENWATER_ENVIRONMENT_STAGE1.zip
+npm run validate:environment -- GREENWATER_ENVIRONMENT_v1.0.zip GREENWATER_ENVIRONMENT_STAGE2.zip
+```
+
+`test:code` is the gate every feature branch runs; it needs nothing but the
+tracked source, so it passes inside a bare `git worktree`.
+
+`test:archives` audits the accepted art packages, which are heavy untracked
+payloads. Every archive lookup resolves through `scripts/lib/archive-root.mjs`:
+the root defaults to `artifacts/` in this checkout and can be pointed anywhere
+with `FUTURISMA_ARCHIVE_ROOT`. When the root or a required package is **absent**
+the validator prints `ARCHIVES SKIPPED (<reason>)` and exits 0; when a package
+is **present but wrong** it still fails hard. Bare package names passed to
+`validate:environment` resolve under that root; absolute or path-bearing
+arguments are used as given.
+
+```sh
+# audit the main checkout's archives from a feature worktree
+FUTURISMA_ARCHIVE_ROOT=/path/to/main-checkout/artifacts npm run test:archives
 ```
 
 `public/_headers` carries the production CSP, clickjacking, MIME-sniffing,
@@ -184,7 +203,9 @@ The requirement-by-requirement closeout for this core-runtime phase is in
 
 ## Production asset
 
-The accepted source handoff is preserved in `artifacts/TOTEM_Phase1_v1.0-patch1.zip`. Runtime copies are served from `public/assets/totem/`.
+The accepted source handoff is preserved in `artifacts/TOTEM_Phase1_v1.0-patch1.zip`. Runtime copies are served from `public/assets/totem/`. The editable master
+(`totem_master.glb`) and the unused `totem_decals_1024_base.png` are authoring
+inputs only; they live in that archive and are no longer served.
 The accepted prop kit is merged by material into the start-area pit display and
 20 sparse course-dressing placements. It supplies the two cable-hazard meshes,
 wetland reeds, canopy plants, and two off-track repair units without changing
