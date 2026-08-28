@@ -359,6 +359,24 @@ body[data-graphics-context="lost"] .system-state__lamp {
   background: var(--acid);
 }
 
+/*
+ * P6 minimap / radar. Right rail, stacked above RACE TIME: the bottom-left
+ * corner is VELOCITY, bottom-centre is the boost meter and the vertical middle
+ * of the right rail is the field-order ladder, so this is the one free corner.
+ * Deliberately small and low contrast — PRODUCT.md's HUD anti-reference is
+ * "busy chrome that competes with the racing line", and the canvas itself
+ * decides when a nearby rival earns more brightness.
+ */
+.minimap {
+  position: absolute;
+  right: var(--pad);
+  bottom: calc(clamp(36px, 6vh, 74px) + 104px);
+  width: 120px;
+  height: 128px;
+  opacity: 0.82;
+  pointer-events: none;
+}
+
 .boost__track span[data-active="true"] {
   background: var(--cyan);
   box-shadow: 0 0 7px oklch(0.86 0.13 210 / 0.62);
@@ -924,6 +942,11 @@ body[data-phase="result"] .hud {
     display: none;
   }
 
+  /* Not enough right rail left once RACE TIME reflows; readability first. */
+  .minimap {
+    display: none;
+  }
+
   .turn-cue {
     top: 17%;
     min-width: 166px;
@@ -970,6 +993,11 @@ body[data-phase="result"] .hud {
 }
 
 @media (max-height: 520px) {
+  /* A 128px panel plus RACE TIME does not fit a short viewport. */
+  .minimap {
+    display: none;
+  }
+
   .screen--result {
     padding: 10px;
   }

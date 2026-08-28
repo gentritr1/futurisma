@@ -16,6 +16,7 @@ import {
 import { RaceDiagnostics } from "./diagnostics";
 import { RaceEffects } from "./effects";
 import { disposeObject3DResources } from "./graphics-resources";
+import { Minimap } from "./minimap";
 import { SceneAssets } from "./scene-assets";
 import {
   phasePresentsDrivingInput,
@@ -86,6 +87,7 @@ export class FuturismaGame {
   private readonly camera: THREE.PerspectiveCamera;
   private readonly renderer: THREE.WebGLRenderer;
   private readonly course: RaceCourse;
+  private readonly minimap: Minimap;
   private readonly diagnosticCourseAssemblyMs: number;
   private readonly coursePs2Treatment: ReturnType<typeof applyPs2MaterialTreatment>;
   private readonly sceneAssets: SceneAssets;
@@ -274,6 +276,7 @@ export class FuturismaGame {
     courseAssemblyMs = 0,
   ) {
     this.course = course;
+    this.minimap = new Minimap(ui.minimapCanvas, course, this.reducedMotion);
     this.camera = new THREE.PerspectiveCamera(
       58,
       1,
@@ -588,6 +591,13 @@ export class FuturismaGame {
       this.nextHudAt = now + 1 / 30;
       this.refreshRaceStatus(this.phase === "running");
       this.updateHud(presentationInput);
+      this.minimap.update(
+        this.playerRaceDistance(),
+        this.lateral,
+        this.progress,
+        this.rivalFleet?.readRadarContacts(this.minimap.contacts) ?? 0,
+        now,
+      );
       if (now >= this.nextFieldOrderAt) {
         this.nextFieldOrderAt = now + 0.25;
         if (this.rivalFleet) {
@@ -1725,6 +1735,7 @@ export class FuturismaGame {
         environment: this.sceneAssets.environmentDiagnostics(),
         livingWorld: this.sceneAssets.livingWorldDiagnostics(),
         surfaceCharacter: this.sceneAssets.surfaceCharacterDiagnostics(),
+        minimap: this.minimap.diagnostics(),
       },
     );
   }

@@ -13,6 +13,7 @@ import {
   rivalFinishRunOutDistanceMeters,
   stepRivalState,
 } from "./rival-race.js";
+import type { MinimapContact } from "./minimap";
 import type { TotemRivalVisualBatch } from "./totem";
 import type { FieldOrderEntry, RaceGridEntry, RaceStandingEntry } from "./ui";
 
@@ -422,6 +423,23 @@ export class RivalFleet {
       gapToAheadMs: gaps.gapToAheadMs,
       gapToBehindMs: gaps.gapToBehindMs,
     };
+  }
+
+  /**
+   * Zero-allocation spatial read for the P6 minimap radar: fills `out` in
+   * place with each rival's live race distance and lane offset and returns how
+   * many slots were written. Read-only by construction — the radar cannot
+   * perturb the field it is drawing.
+   */
+  readRadarContacts(out: MinimapContact[]): number {
+    const count = Math.min(out.length, this.states.length);
+    for (let index = 0; index < count; index += 1) {
+      const state = this.states[index];
+      const slot = out[index];
+      slot.raceDistanceMeters = state.raceDistanceMeters;
+      slot.lateralMeters = state.lateralMeters;
+    }
+    return count;
   }
 
   /** Live field ranking for the HUD position ladder. */
