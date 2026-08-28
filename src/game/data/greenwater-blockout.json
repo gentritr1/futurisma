@@ -16519,5 +16519,35 @@
     }
    }
   ]
+ },
+ "audio": {
+  "zones": [
+   {
+    "name": "hangar",
+    "startDistance": 588,
+    "endDistance": 846,
+    "sectors": [
+     "LINK_APRON",
+     "HANGAR_SIX",
+     "HANGAR_EXIT"
+    ],
+    "note": "the B-wall interior, closed interval; open air everywhere else"
+   }
+  ],
+  "defaultZone": "open",
+  "quantize": "bar",
+  "crossfadeSeconds": 0.6,
+  "profiles": {
+   "open": {
+    "decaySeconds": 0.4,
+    "wet": 0.08,
+    "highPassHz": 40
+   },
+   "hangar": {
+    "decaySeconds": 1.9,
+    "wet": 0.34,
+    "highPassHz": 240
+   }
+  }
  }
 }

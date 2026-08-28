@@ -6,6 +6,8 @@ import {
   resolveApronProfile,
 } from "./apron.js";
 import type { ApronResolution, ApronTable } from "./apron.js";
+import { resolveAudioZone } from "./audio-space.js";
+import type { AudioZone } from "./audio-space.js";
 import {
   ATMOSPHERE_UPDATE_INTERVAL_SECONDS,
   LIGHTING_CROSSFADE_METRES,
@@ -134,7 +136,18 @@ interface GreenwaterMapData {
   landmarkProxies: RawLandmark[];
   hazards: RawHazard[];
   music: { triggers: RawMusicTrigger[] };
+  audio: {
+    zones: RawAudioZone[];
+    defaultZone: AudioZone;
+    crossfadeSeconds: number;
+  };
   apron: ApronTable;
+}
+
+interface RawAudioZone {
+  name: AudioZone;
+  startDistance: number;
+  endDistance: number;
 }
 
 export type { ApronResolution } from "./apron.js";
@@ -302,6 +315,8 @@ export interface RaceCourse {
   isOnBoostPad(progress: number, lateral: number, halfWidth: number): boolean;
   sectorLabelAt(progress: number): string;
   musicAt(progress: number): MusicProfile;
+  /** Authored reverb room at this point on the lap. See `audio.zones` in the map. */
+  audioZoneAt(progress: number): AudioZone;
   updateAtmosphere(elapsedSeconds: number, reducedMotion: boolean): boolean;
   vehicleHoverHeight(speedMetersPerSecond: number, boostActive: boolean): number;
   setCheckpointProgress(nextCheckpointIndex: number): void;
@@ -1155,6 +1170,14 @@ export class GreenwaterCourse implements RaceCourse {
       active = trigger;
     }
     return active.levels;
+  }
+
+  audioZoneAt(progress: number): AudioZone {
+    return resolveAudioZone(
+      THREE.MathUtils.euclideanModulo(progress, 1) * this.length,
+      MAP.audio.zones,
+      MAP.audio.defaultZone,
+    ) as AudioZone;
   }
 
   updateAtmosphere(elapsedSeconds: number, reducedMotion: boolean): boolean {
