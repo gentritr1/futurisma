@@ -6,6 +6,7 @@
  * deliberately total: a missing fleet, a decal sheet that will not load, or a
  * course key the save file refuses are all ordinary outcomes, never throws.
  */
+import { ghostRuntime } from "./ghost-runtime";
 import { liveryFor } from "./liveries.js";
 import { save } from "./persistence";
 import type { RivalFleet } from "./rivals";
@@ -41,14 +42,29 @@ export async function applyRaceLivery(
  *
  * The return value is what drives the result screen's `NEW BEST` flash, so the
  * flash and the file can never disagree: the same comparison decides both.
+ *
+ * P10 hung the ghost off the same call for exactly that reason. The recording
+ * is offered here and `applyRaceResult` keeps it only when `newBestLap` — one
+ * comparison, three consequences: the flash, the stored time, and the replay
+ * the next race runs against. They cannot drift apart because there is nothing
+ * to drift.
+ *
+ * `lapTimesMs` arrives whole rather than as a count because the ghost needs the
+ * final lap's time: the race ends on the crossing that closes it, so that lap
+ * is still open in the recorder when this runs.
  */
 export function recordFinishedRace(
   mapCode: string,
   bestLapMs: number | null,
   raceMs: number,
-  laps: number,
+  lapTimesMs: readonly number[],
 ): boolean {
-  return save.recordRace(mapCode, { bestLapMs, raceMs, laps }).newBestLap;
+  return save.recordRace(mapCode, {
+    bestLapMs,
+    raceMs,
+    laps: lapTimesMs.length,
+    ghost: ghostRuntime.bestLapRecording(lapTimesMs[lapTimesMs.length - 1] ?? null),
+  }).newBestLap;
 }
 
 /** The stored best lap for a course, or null when nothing is on file yet. */

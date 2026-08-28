@@ -16,6 +16,7 @@ import {
 } from "./course";
 import { RaceDiagnostics } from "./diagnostics";
 import { RaceEffects } from "./effects";
+import { ghostRuntime } from "./ghost-runtime";
 import { disposeObject3DResources } from "./graphics-resources";
 import { Minimap } from "./minimap";
 import { SceneAssets } from "./scene-assets";
@@ -424,7 +425,7 @@ export class FuturismaGame {
       return false;
     }
     this.rivalFleet = rivalFleet;
-    this.scene.add(this.rivalFleet.root);
+    this.scene.add(this.rivalFleet.root, ghostRuntime.attach(this.course, this.vehicle));
     this.audio.attachSpatialScene(rivalFleet, this.camera, this.vehicle.root.position);
     this.ui.setRaceFormat(
       this.totalLaps,
@@ -573,6 +574,7 @@ export class FuturismaGame {
       calculatePresentationAlpha(this.physicsAccumulator, FIXED_STEP),
       this.timer.getElapsed(),
     );
+    ghostRuntime.updatePresentation(this.physicsAccumulator);
 
     const presentationInput = phasePresentsDrivingInput(this.phase)
       ? this.demoAutopilot
@@ -973,6 +975,7 @@ export class FuturismaGame {
     }
 
     this.elapsedMs += delta * 1000;
+    ghostRuntime.step(this.lap, this.progress, this.lateral, this.speed, this.steerAmount);
     this.updateCheckpointProgress(previousProgress, afterMove.tangent);
   }
 
@@ -1425,7 +1428,7 @@ export class FuturismaGame {
         this.course.mapCode,
         this.bestLapMs,
         this.elapsedMs,
-        this.lapTimesMs.length,
+        this.lapTimesMs,
       ),
     );
   }
@@ -1517,6 +1520,7 @@ export class FuturismaGame {
     this.bestLapMs = null;
     this.lapTimesMs.length = 0;
     this.rivalFleet?.reset();
+    ghostRuntime.reset();
     this.raceStatus = this.rivalFleet?.raceStatus(
       calculatePlayerRaceDistance({
         progress: this.raceProgressFromStart(this.progress),
@@ -1813,6 +1817,7 @@ export class FuturismaGame {
         surfaceCharacter: this.sceneAssets.surfaceCharacterDiagnostics(),
         minimap: this.minimap.diagnostics(),
         atmosphere: this.atmosphere.diagnostics(),
+        ghost: ghostRuntime.diagnostics(),
         ps2: ps2TreatmentDiagnostics(),
       },
     );
