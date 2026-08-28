@@ -2,6 +2,25 @@ export const RIVAL_FIXED_STEP_SECONDS = 1 / 120;
 export const RIVAL_FINISH_RUN_OUT_SECONDS = 3;
 
 /**
+ * How much of a rival's fin deflection comes from the bend it is sitting in,
+ * rather than from chasing its target line. Picked from a five-lap Greenwater
+ * measurement (scripts/validate-rivals.mjs prints the distribution): at 0.8 the
+ * median deflection is ~2.9 deg, the upper quartile ~8.7 deg and hard bends
+ * reach the authored 20 deg limit without pinning there.
+ */
+export const RIVAL_STEER_CURVATURE_GAIN = 0.8;
+
+/**
+ * Seconds of authored acceleration (or braking) that saturate the throttle and
+ * airbrake signals. A rival that is more than this far from its authored speed
+ * is asking for everything the profile has.
+ */
+export const RIVAL_DRIVE_RESPONSE_SECONDS = 0.35;
+
+/** Share of the engine-glow drive that tracks cruise speed rather than throttle. */
+export const RIVAL_GLOW_SPEED_SHARE = 0.55;
+
+/**
  * @typedef {{
  *   id: string;
  *   name: string;
@@ -168,6 +187,160 @@ function clamp(value, minimum, maximum) {
 }
 
 /**
+ * The speed the pacing model wants right now. Extracted so `stepRivalState` and
+ * the pose signals below read the identical expression — a rival's airbrakes
+ * must never disagree with the speed it is actually holding.
+ *
+ * @param {RivalState} state
+ * @param {RivalProfile} profile
+ * @param {number | undefined} courseSpeedFactor
+ */
+function authoredTargetSpeed(state, profile, courseSpeedFactor) {
+  const speedFactor = typeof courseSpeedFactor === "number"
+    && Number.isFinite(courseSpeedFactor)
+    ? clamp(courseSpeedFactor, 0.72, 1.05)
+    : 1;
+  const paceWave = Math.sin(
+    state.elapsedSeconds * 0.37 + profile.pacePhaseRadians,
+  ) * profile.paceVariationMetersPerSecond;
+  return Math.max(
+    0,
+    (profile.cruiseSpeedMetersPerSecond + paceWave) * speedFactor,
+  );
+}
+
+/**
+ * The lane the rival is allowed to aim at, resolved the same way
+ * `stepRivalState` resolves it.
+ *
+ * @param {RivalProfile} profile
+ * @param {{ targetLateralMeters?: number; laneHalfWidthMeters?: number }} input
+ */
+function authoredTargetLateral(profile, input) {
+  const laneHalfWidth = typeof input.laneHalfWidthMeters === "number"
+    && Number.isFinite(input.laneHalfWidthMeters)
+    ? Math.max(0, input.laneHalfWidthMeters)
+    : 8;
+  return typeof input.targetLateralMeters === "number"
+    && Number.isFinite(input.targetLateralMeters)
+    ? clamp(input.targetLateralMeters, -laneHalfWidth, laneHalfWidth)
+    : clamp(profile.startingLateralMeters, -laneHalfWidth, laneHalfWidth);
+}
+
+/**
+ * Fin deflection, as a signed fraction of the authored +/-20 deg travel.
+ *
+ * Two pure terms, both read from state and from the same authored inputs
+ * `stepRivalState` receives — never from `(current - previous) / deltaSeconds`,
+ * so the signal is identical whatever rate the renderer runs at:
+ *   - line chasing: the share of the profile's lateral authority the rival
+ *     needs this fixed step to reach its target lane (overtakes saturate it);
+ *   - bend holding: a sustained deflection into the curve, so a rival looks
+ *     like it is steering through a corner rather than only at turn-in.
+ *
+ * @param {RivalState} state
+ * @param {{
+ *   targetLateralMeters?: number;
+ *   laneHalfWidthMeters?: number;
+ *   curvature?: number;
+ * }} input
+ * @returns {number} signed, clamped to [-1, 1]
+ */
+export function rivalSteerSignal(state, input) {
+  const profile = profileForId(state.profileId);
+  const lateral = Number.isFinite(state.lateralMeters) ? state.lateralMeters : 0;
+  const target = authoredTargetLateral(profile, input);
+  const reach = profile.lateralSpeedMetersPerSecond * RIVAL_FIXED_STEP_SECONDS;
+  const line = reach > 0 ? clamp((target - lateral) / reach, -1, 1) : 0;
+  const curvature = typeof input.curvature === "number" ? input.curvature : 0;
+  const bend = Number.isFinite(curvature) ? clamp(curvature, -1, 1) : 0;
+  return clamp(line - bend * RIVAL_STEER_CURVATURE_GAIN, -1, 1);
+}
+
+/**
+ * Airbrake demand as a fraction of the authored 60 deg travel: how far the
+ * rival is above the speed its pacing model wants, measured in seconds of
+ * authored braking.
+ *
+ * @param {RivalState} state
+ * @param {{ courseSpeedFactor?: number }} input
+ * @returns {number} clamped to [0, 1]
+ */
+export function rivalBrakeSignal(state, input) {
+  const profile = profileForId(state.profileId);
+  const speed = Number.isFinite(state.speedMetersPerSecond)
+    ? state.speedMetersPerSecond
+    : 0;
+  const surplus = speed - authoredTargetSpeed(state, profile, input.courseSpeedFactor);
+  const window = profile.brakingMetersPerSecondSquared * RIVAL_DRIVE_RESPONSE_SECONDS;
+  return window > 0 ? clamp(surplus / window, 0, 1) : 0;
+}
+
+/**
+ * Throttle demand, the mirror of {@link rivalBrakeSignal}: how far the rival is
+ * below its authored speed, in seconds of authored acceleration.
+ *
+ * @param {RivalState} state
+ * @param {{ courseSpeedFactor?: number }} input
+ * @returns {number} clamped to [0, 1]
+ */
+export function rivalThrottleSignal(state, input) {
+  const profile = profileForId(state.profileId);
+  const speed = Number.isFinite(state.speedMetersPerSecond)
+    ? state.speedMetersPerSecond
+    : 0;
+  const deficit = authoredTargetSpeed(state, profile, input.courseSpeedFactor) - speed;
+  const window = profile.accelerationMetersPerSecondSquared
+    * RIVAL_DRIVE_RESPONSE_SECONDS;
+  return window > 0 ? clamp(deficit / window, 0, 1) : 0;
+}
+
+/**
+ * Engine-glow drive. Throttle alone sits at zero while a rival holds its cruise
+ * speed, which would read as a dead engine, so the glow rides on how fast the
+ * rival is actually travelling and surges with throttle out of a corner.
+ *
+ * @param {RivalState} state
+ * @param {{ courseSpeedFactor?: number }} input
+ * @returns {number} clamped to [0, 1]
+ */
+export function rivalGlowSignal(state, input) {
+  const profile = profileForId(state.profileId);
+  const speed = Number.isFinite(state.speedMetersPerSecond)
+    ? state.speedMetersPerSecond
+    : 0;
+  const cruise = Math.max(1, profile.cruiseSpeedMetersPerSecond);
+  const speedRatio = clamp(speed / cruise, 0, 1);
+  return clamp(
+    speedRatio * RIVAL_GLOW_SPEED_SHARE
+      + rivalThrottleSignal(state, input) * (1 - RIVAL_GLOW_SPEED_SHARE),
+    0,
+    1,
+  );
+}
+
+/**
+ * All four pose signals in one pass, for callers that need every one of them
+ * per rival per frame.
+ *
+ * @param {RivalState} state
+ * @param {{
+ *   targetLateralMeters?: number;
+ *   laneHalfWidthMeters?: number;
+ *   courseSpeedFactor?: number;
+ *   curvature?: number;
+ * }} input
+ */
+export function rivalPoseSignals(state, input) {
+  return {
+    steer: rivalSteerSignal(state, input),
+    brake: rivalBrakeSignal(state, input),
+    throttle: rivalThrottleSignal(state, input),
+    glow: rivalGlowSignal(state, input),
+  };
+}
+
+/**
  * Returns a restrained visual-only roll for a rival craft. Lateral motion
  * supplies the immediate response while course curvature keeps the ship
  * leaning into a bend after it settles onto its line.
@@ -235,17 +408,7 @@ export function stepRivalState(state, input) {
     state.fixedStepRemainderSeconds -= RIVAL_FIXED_STEP_SECONDS;
     const previousDistance = state.raceDistanceMeters;
     const previousElapsed = state.elapsedSeconds;
-    const speedFactor = typeof input.courseSpeedFactor === "number"
-      && Number.isFinite(input.courseSpeedFactor)
-      ? clamp(input.courseSpeedFactor, 0.72, 1.05)
-      : 1;
-    const paceWave = Math.sin(
-      state.elapsedSeconds * 0.37 + profile.pacePhaseRadians,
-    ) * profile.paceVariationMetersPerSecond;
-    const targetSpeed = Math.max(
-      0,
-      (profile.cruiseSpeedMetersPerSecond + paceWave) * speedFactor,
-    );
+    const targetSpeed = authoredTargetSpeed(state, profile, input.courseSpeedFactor);
     const acceleration = targetSpeed >= state.speedMetersPerSecond
       ? profile.accelerationMetersPerSecondSquared
       : profile.brakingMetersPerSecondSquared;
@@ -261,10 +424,7 @@ export function stepRivalState(state, input) {
       && Number.isFinite(input.laneHalfWidthMeters)
       ? Math.max(0, input.laneHalfWidthMeters)
       : 8;
-    const targetLateral = typeof input.targetLateralMeters === "number"
-      && Number.isFinite(input.targetLateralMeters)
-      ? clamp(input.targetLateralMeters, -laneHalfWidth, laneHalfWidth)
-      : clamp(profile.startingLateralMeters, -laneHalfWidth, laneHalfWidth);
+    const targetLateral = authoredTargetLateral(profile, input);
     state.lateralMeters = moveToward(
       state.lateralMeters,
       targetLateral,
