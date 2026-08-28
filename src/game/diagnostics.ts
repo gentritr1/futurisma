@@ -2,6 +2,7 @@ import * as THREE from "three";
 import type { ApronTelemetry } from "./apron.js";
 import type { EngineAudio } from "./audio";
 import type { RaceCourse } from "./course";
+import type { MinimapDiagnostics } from "./minimap";
 import type { RivalFleetDiagnostics } from "./rivals";
 import type { SceneAssets } from "./scene-assets";
 import type { RaceStandingEntry } from "./ui";
@@ -103,6 +104,7 @@ export interface DiagnosticsContributors {
   environment: ReturnType<SceneAssets["environmentDiagnostics"]>;
   livingWorld: ReturnType<SceneAssets["livingWorldDiagnostics"]>;
   surfaceCharacter: ReturnType<SceneAssets["surfaceCharacterDiagnostics"]>;
+  minimap: MinimapDiagnostics;
 }
 
 function courseFields(course: RaceCourse) {
@@ -293,6 +295,7 @@ export function buildDiagnosticsReport(
     ...contributors.environment,
     ...contributors.livingWorld,
     ...contributors.surfaceCharacter,
+    ...contributors.minimap,
     pixelRatio: Number(core.pixelRatio.toFixed(2)),
     preferredPixelRatio: Number(core.preferredPixelRatio.toFixed(2)),
     minimumPixelRatio: Number(core.minimumPixelRatio.toFixed(2)),

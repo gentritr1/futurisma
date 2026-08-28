@@ -93,6 +93,8 @@ export function formatRaceTime(milliseconds: number): string {
 export class GameUi {
   readonly startButton = requiredElement<HTMLButtonElement>("start-button");
   readonly restartButton = requiredElement<HTMLButtonElement>("restart-button");
+  /** Owned here so DOM lookups stay in the UI module; drawn by `Minimap`. */
+  readonly minimapCanvas = requiredElement<HTMLCanvasElement>("minimap");
   private readonly loadingScreen = requiredElement<HTMLElement>("loading-screen");
   private readonly startScreen = requiredElement<HTMLElement>("start-screen");
   private readonly resultScreen = requiredElement<HTMLElement>("result-screen");
