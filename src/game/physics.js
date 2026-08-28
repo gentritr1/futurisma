@@ -166,6 +166,38 @@ export function calculateGripRate(
 }
 
 /**
+ * Composes the authored course grip (standing water) with the authored apron
+ * grip into one target. Multiplying keeps both authored costs visible instead
+ * of letting the wider one mask the other, and the floor stops a compounded
+ * target from dropping below the handling model's usable range.
+ * @param {number} courseGrip
+ * @param {number} apronGrip
+ * @param {number} [gripFloor]
+ */
+export function resolveTargetSurfaceGrip(courseGrip, apronGrip, gripFloor = 0.2) {
+  const floor = Number.isFinite(gripFloor) ? clamp(gripFloor, 0.05, 1) : 0.2;
+  const course = Number.isFinite(courseGrip) ? clamp(courseGrip, floor, 1) : 1;
+  const apron = Number.isFinite(apronGrip) ? clamp(apronGrip, floor, 1) : 1;
+  return clamp(course * apron, floor, 1);
+}
+
+/**
+ * Speed lost while the vehicle is held against an authored boundary. Linear in
+ * delta, so 60 Hz and 120 Hz scrub the same amount over the same wall contact.
+ * @param {number} speed
+ * @param {number} scrubMetersPerSecondSquared
+ * @param {number} delta
+ */
+export function integrateEdgeScrub(speed, scrubMetersPerSecondSquared, delta) {
+  const currentSpeed = Number.isFinite(speed) ? Math.max(0, speed) : 0;
+  const scrub = Number.isFinite(scrubMetersPerSecondSquared)
+    ? Math.max(0, scrubMetersPerSecondSquared)
+    : 0;
+  const step = Number.isFinite(delta) ? Math.max(0, delta) : 0;
+  return Math.max(0, currentSpeed - scrub * step);
+}
+
+/**
  * Wet surfaces take hold quickly, while recovery uses the authored duration so
  * crossing the water boundary cannot snap lateral response in one step.
  * @param {number} currentGrip

@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "validate:assets": "node scripts/validate-assets.mjs",
     "validate:race-presence": "node scripts/validate-race-presence.mjs",
+    "validate:apron": "node scripts/validate-apron.mjs",
     "validate:audio": "node scripts/validate-audio-timing.mjs",
     "validate:camera": "node scripts/validate-camera-feedback.mjs",
     "validate:control": "node scripts/validate-control-mode.mjs",
@@ -28,7 +29,7 @@
     "validate:render": "node scripts/validate-render-quality.mjs",
     "validate:seams": "node scripts/validate-module-seams.mjs",
     "validate:security": "node scripts/validate-security.mjs",
-    "test:code": "npm run validate:race-presence && npm run validate:map && npm run validate:map02 && npm run validate:package-boundary && npm run validate:physics && npm run validate:race && npm run validate:rivals && npm run validate:control && npm run validate:audio && npm run validate:camera && npm run validate:presentation && npm run validate:graphics && npm run validate:frames && npm run validate:render && npm run validate:seams && npm run validate:security && npm run build && npm run validate:build",
+    "test:code": "npm run validate:race-presence && npm run validate:map && npm run validate:map02 && npm run validate:package-boundary && npm run validate:physics && npm run validate:apron && npm run validate:race && npm run validate:rivals && npm run validate:control && npm run validate:audio && npm run validate:camera && npm run validate:presentation && npm run validate:graphics && npm run validate:frames && npm run validate:render && npm run validate:seams && npm run validate:security && npm run build && npm run validate:build",
     "test:archives": "npm run validate:assets && npm run validate:environment:history && npm run validate:environment:accepted",
     "test": "npm run test:code && npm run test:archives"
   },

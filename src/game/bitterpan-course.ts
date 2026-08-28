@@ -3,6 +3,8 @@ import centrelineJson from "./data/map02/CENTRELINE_STATIONS.json";
 import checkpointsJson from "./data/map02/CHECKPOINTS.json";
 import gridAndRecoveryJson from "./data/map02/GRID_AND_RECOVERY.json";
 import sectorsJson from "./data/map02/SECTORS_AND_SEQUENCES.json";
+import { createApronResolution } from "./apron.js";
+import type { ApronResolution } from "./apron.js";
 import type {
   CourseLightingProfile,
   CourseProjection,
@@ -13,6 +15,10 @@ import type {
   RivalGridStart,
   TurnCue,
 } from "./course";
+
+/** Pre-apron open-edge boundary, kept until the P8 Bitterpan authoring pass. */
+const BITTERPAN_OPEN_RUNOFF_METRES = 5.8;
+const BITTERPAN_DECK_MARGIN_METRES = 2.05;
 
 interface BitterpanStation {
   i: number;
@@ -178,6 +184,10 @@ function createCourseSampleValue(): CourseSample {
     sector: "",
     edgeLeft: "C",
     edgeRight: "C",
+    apronLeft: BITTERPAN_OPEN_RUNOFF_METRES,
+    apronRight: BITTERPAN_OPEN_RUNOFF_METRES,
+    apronGripLeft: 1,
+    apronGripRight: 1,
   };
 }
 
@@ -307,6 +317,10 @@ export class BitterpanCourse implements RaceCourse {
     target.sector = current.sector;
     target.edgeLeft = "C";
     target.edgeRight = "C";
+    target.apronLeft = BITTERPAN_OPEN_RUNOFF_METRES;
+    target.apronRight = BITTERPAN_OPEN_RUNOFF_METRES;
+    target.apronGripLeft = 1;
+    target.apronGripRight = 1;
     return target;
   }
 
@@ -443,6 +457,33 @@ export class BitterpanCourse implements RaceCourse {
 
   edgeType(): "C" {
     return "C";
+  }
+
+  /**
+   * Bitterpan is not authored yet (P8 owns that pass), so this reports exactly
+   * the pre-apron open-edge boundary: the same 5.8 m run-off, full grip, and
+   * the same soft contact at `halfWidth + 5.8`.
+   */
+  apronAt(
+    sample: CourseSample,
+    lateral: number,
+    target: ApronResolution = createApronResolution(),
+  ): ApronResolution {
+    const roadLimit = Math.max(0, sample.halfWidth - BITTERPAN_DECK_MARGIN_METRES);
+    target.width = BITTERPAN_OPEN_RUNOFF_METRES;
+    target.grip = 1;
+    // Open runoff: the ribbon still bounds the vehicle, but contact is silent
+    // and auto-recovery handles it, exactly as before the apron pass.
+    target.wall = false;
+    target.onApron = Math.abs(lateral) > roadLimit;
+    target.roadLimit = roadLimit;
+    target.lateralLimit = sample.halfWidth + BITTERPAN_OPEN_RUNOFF_METRES;
+    target.depth = target.onApron ? Math.abs(lateral) - roadLimit : 0;
+    target.wallSpeedMultiplier = 0.9;
+    target.wallImpactStrength = 0.42;
+    target.wallScrubMetresPerSecondSquared = 12;
+    target.surface = "open";
+    return target;
   }
 
   surfaceGripAt(): number {

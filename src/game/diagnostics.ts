@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import type { ApronTelemetry } from "./apron.js";
 import type { EngineAudio } from "./audio";
 import type { RaceCourse } from "./course";
 import type { RivalFleetDiagnostics } from "./rivals";
@@ -97,6 +98,7 @@ export interface DiagnosticsContributors {
   renderer: THREE.WebGLRenderer;
   audio: ReturnType<EngineAudio["diagnostics"]>;
   rivals: RivalFleetDiagnostics | undefined;
+  apron: ApronTelemetry;
   assetKit: ReturnType<SceneAssets["assetKitDiagnostics"]>;
   environment: ReturnType<SceneAssets["environmentDiagnostics"]>;
   livingWorld: ReturnType<SceneAssets["livingWorldDiagnostics"]>;
@@ -149,6 +151,20 @@ function rivalFields(
         ? null
         : Math.round(state.finishTimeMs),
     })),
+  };
+}
+
+/**
+ * Authored-apron telemetry. `apronSeconds === 0` over a demo soak is the proof
+ * that widening the boundary did not move the racing line.
+ */
+function apronFields(apron: ApronTelemetry) {
+  return {
+    onApron: apron.onApron,
+    apronSeconds: Number(apron.seconds.toFixed(2)),
+    apronEntries: apron.entries,
+    maxApronDepthMeters: Number(apron.maxDepthMetres.toFixed(2)),
+    minimumApronGrip: Number(apron.minimumGrip.toFixed(3)),
   };
 }
 
@@ -227,6 +243,7 @@ export function buildDiagnosticsReport(
       gapMs: Math.round(standing.gapMs),
     })),
     ...rivalFields(contributors.rivals, elapsedSeconds),
+    ...apronFields(contributors.apron),
     averageSpeedKph: elapsedSeconds > 0
       ? Number((core.distanceTravelled / elapsedSeconds * 3.6).toFixed(1))
       : 0,

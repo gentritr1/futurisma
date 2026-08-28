@@ -13,6 +13,66 @@
   "axes": "+X east, +Y up, +Z south; north = -Z; right-handed",
   "origin": "centre of the start/finish line on the surface, y = 0"
  },
+ "apron": {
+  "note": "Authored run-off per edge type. Width is measured outward from halfWidth; grip applies once past halfWidth - deckMarginMetres, which is outside every racing line the route supports.",
+  "deckMarginMetres": 2.05,
+  "gripFloor": 0.2,
+  "edges": {
+   "A": {
+    "label": "RUNWAY_SHOULDER",
+    "surface": "gravel",
+    "widthMetres": 5,
+    "grip": 0.68,
+    "wall": true,
+    "wallSpeedMultiplier": 0.88,
+    "wallImpactStrength": 0.62,
+    "wallScrubMetresPerSecondSquared": 12
+   },
+   "B": {
+    "label": "STRUCTURE_RUMBLE",
+    "surface": "rumble",
+    "widthMetres": 2,
+    "grip": 0.55,
+    "wall": true,
+    "wallSpeedMultiplier": 0.6,
+    "wallImpactStrength": 1,
+    "wallScrubMetresPerSecondSquared": 22
+   },
+   "C": {
+    "label": "OPEN_RUNOFF",
+    "surface": "open",
+    "widthMetres": 5.8,
+    "grip": 0.8,
+    "wall": false,
+    "wallSpeedMultiplier": 0.9,
+    "wallImpactStrength": 0.42,
+    "wallScrubMetresPerSecondSquared": 12
+   }
+  },
+  "overrides": [
+   {
+    "id": "HANGAR_INTERIOR",
+    "note": "LINK_APRON and HANGAR_SIX are a diegetic interior. The wall is correct there, so no run-off is authored and the legacy deck-margin clamp is kept exactly.",
+    "label": "HANGAR_WALL",
+    "surface": "none",
+    "edges": [
+     "B"
+    ],
+    "sectors": [
+     "LINK_APRON",
+     "HANGAR_SIX"
+    ],
+    "fromDistance": 588,
+    "toDistance": 816,
+    "widthMetres": 0,
+    "grip": 1,
+    "wall": true,
+    "wallSpeedMultiplier": 0.6,
+    "wallImpactStrength": 1,
+    "wallScrubMetresPerSecondSquared": 22
+   }
+  ]
+ },
  "race": {
   "lapCount": 5,
   "lapCountConfigurable": true,
