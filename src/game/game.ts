@@ -25,6 +25,20 @@ import {
   shouldRenderGameFrame,
 } from "./frame-scheduling";
 import type { InputFrame } from "./input";
+import {
+  APRON_PROBE_DISTANCE_METERS,
+  APRON_PROBE_LATERAL_METERS,
+  APRON_PROBE_SPEED_METERS_PER_SECOND,
+  RECOVERY_PROBE_DISTANCE_METERS,
+  RIVAL_AUDIO_PROBE_METERS,
+  WATER_GRIP_PROBE_DISTANCE_METERS,
+  WRONG_WAY_PROBE_DISTANCE_METERS,
+  ZERO_INPUT,
+  probeSelected,
+  readProbeNumber,
+  searchFlag,
+  searchParam,
+} from "./query-probes";
 import { InputController } from "./input";
 import {
   BOOST_MAX_SPEED,
@@ -85,32 +99,7 @@ type RacePhase = "standby" | "countdown" | "running" | "paused" | "resuming" | "
 
 const FIXED_STEP = 1 / 120;
 const MAX_PHYSICS_BACKLOG = 0.1;
-const RECOVERY_PROBE_DISTANCE_METERS = 900;
-const WRONG_WAY_PROBE_DISTANCE_METERS = 100;
-const WATER_GRIP_PROBE_DISTANCE_METERS = 580;
-// FUEL_ROW, A/A edges: the widest authored apron, and the sector the verified
-// edge map shows as the biggest offender for the old invisible wall.
-const APRON_PROBE_DISTANCE_METERS = 1700;
-const APRON_PROBE_LATERAL_METERS = 13.5;
-const APRON_PROBE_SPEED_METERS_PER_SECOND = 60;
-// The panner reference distance, so the rival-audio probe sits at unity gain.
-const RIVAL_AUDIO_PROBE_METERS = 4;
 const RESUME_COUNTDOWN_SECONDS = 2.7;
-const ZERO_INPUT: InputFrame = { throttle: 0, brake: 0, steer: 0, boost: false };
-
-// Read once. The query string cannot change without a reload, and the repeated
-// re-parse was costing this file the seam-budget lines that new phases need.
-const SEARCH = new URLSearchParams(window.location.search);
-
-function readProbeNumber(parameter: string, fallback: number): number {
-  const value = Number.parseFloat(SEARCH.get(parameter) ?? "");
-  return Number.isFinite(value) ? value : fallback;
-}
-
-/** A named diagnostics scenario. Probes only ever arm under `?diagnostics=1`. */
-function probeSelected(name: string): boolean {
-  return SEARCH.has("diagnostics") && SEARCH.get("probe") === name;
-}
 
 export class FuturismaGame {
   private readonly scene = new THREE.Scene();
@@ -271,7 +260,7 @@ export class FuturismaGame {
   private trialStartPending = false;
   private animationFrame = 0;
   private renderRequested = true;
-  private readonly qualityOverride = SEARCH.get("quality");
+  private readonly qualityOverride = searchParam("quality");
   private readonly qualityMode = this.qualityOverride === "high"
     ? "high"
     : this.qualityOverride === "low"
@@ -280,9 +269,9 @@ export class FuturismaGame {
   private preferredPixelRatio = this.resolvePreferredPixelRatio();
   private minimumPixelRatio = this.resolveMinimumPixelRatio();
   private renderPixelRatio = this.preferredPixelRatio;
-  private readonly demoMode = SEARCH.has("demo");
+  private readonly demoMode = searchFlag("demo");
   private demoAutopilot = this.demoMode;
-  private readonly diagnosticsMode = SEARCH.has("diagnostics");
+  private readonly diagnosticsMode = searchFlag("diagnostics");
   private readonly recoveryProbe = probeSelected("recovery");
   private readonly wrongWayProbe = probeSelected("wrong-way");
   private readonly impactProbe = probeSelected("impact");
@@ -305,7 +294,7 @@ export class FuturismaGame {
     : 0;
   private readonly contextLossProbe = probeSelected("context");
   private readonly focusLossProbe = probeSelected("focus");
-  private readonly reducedMotion = SEARCH.get("motion") === "reduce"
+  private readonly reducedMotion = searchParam("motion") === "reduce"
     || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   constructor(
@@ -1595,7 +1584,7 @@ export class FuturismaGame {
   }
 
   private resolveLapCount(): number {
-    const requested = Number.parseInt(SEARCH.get("laps") ?? "", 10);
+    const requested = Number.parseInt(searchParam("laps") ?? "", 10);
     if (!Number.isFinite(requested)) return this.course.defaultLapCount;
     return THREE.MathUtils.clamp(
       requested,
