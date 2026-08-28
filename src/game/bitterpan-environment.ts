@@ -140,7 +140,7 @@ export class BitterpanEnvironment implements RaceEnvironment {
     // authored for diagrams and disappears against the live fog/sky. Runtime
     // colors provide the value separation required to drive the blockout.
     applyRuntimeRoutePalette(root);
-    applyPs2MaterialTreatment(root);
+    applyPs2MaterialTreatment(root, { worldGeometry: true });
     const resources = countVisibleResources(root);
     this.stats = {
       meshes,
