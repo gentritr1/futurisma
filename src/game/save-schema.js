@@ -29,6 +29,10 @@
  * @property {number | null} bestLapMs
  * @property {number | null} bestRaceMs
  * @property {number} laps Laps logged on this course, all sessions.
+ * @property {import("./ghost.js").GhostRecording | null} ghost Schema v2. The
+ *   position trace of the lap that set `bestLapMs`, or null when this build has
+ *   never stored one — every v1 file arrives here, and so does any file whose
+ *   ghost failed its guards.
  *
  * @typedef {object} SaveFile
  * @property {number} schemaVersion
@@ -41,6 +45,7 @@
  * @property {() => string | null} read
  * @property {(text: string) => void} write
  */
+import { MAX_GHOST_CHARACTERS, normalizeGhost } from "./ghost.js";
 import { LIVERY_CODES } from "./liveries.js";
 
 /** @type {readonly QualityMode[]} */
@@ -66,6 +71,15 @@ const MAX_PLAUSIBLE_MS = 6 * 60 * 60 * 1000;
 /** Course keys are authored codes such as `MAP 01`; nothing free-form. */
 const COURSE_KEY_PATTERN = /^[A-Z0-9 _-]{1,16}$/;
 const MAX_COURSE_KEYS = 16;
+/**
+ * P10 — how many courses may carry a ghost at once, and the reason the number
+ * is this small. `MAX_COURSE_KEYS` records at `MAX_GHOST_CHARACTERS` each would
+ * be 256 KB, four times what {@link MAX_PAYLOAD_CHARACTERS} will read back: the
+ * game would write a file it then refuses on the next load, wiping every record
+ * the player had. Two ghosts is both circuits, and caps a written save at about
+ * 33 KB — comfortably inside the ceiling with the shape unchanged.
+ */
+const MAX_GHOST_COURSES = 2;
 
 /** @returns {SaveSettings} */
 export function defaultSettings() {
@@ -94,7 +108,7 @@ export function defaultSave(schemaVersion) {
 
 /** @returns {CourseRecord} */
 export function defaultRecord() {
-  return { bestLapMs: null, bestRaceMs: null, laps: 0 };
+  return { bestLapMs: null, bestRaceMs: null, laps: 0, ghost: null };
 }
 
 /**
@@ -165,7 +179,27 @@ export function normalizeRecord(raw) {
   if (typeof laps === "number" && Number.isFinite(laps) && laps > 0) {
     record.laps = Math.min(Math.floor(laps), 1_000_000);
   }
+  record.ghost = normalizeStoredGhost(source.ghost);
   return record;
+}
+
+/**
+ * P10 — the ghost's own guard, kept separate from the record's because its
+ * failure mode is different. A record that fails scrubs to defaults; a ghost
+ * that fails is simply *absent*, and the lap times either side of it are
+ * untouched. Losing a replay must never cost anyone a personal best.
+ *
+ * @param {unknown} raw
+ * @returns {import("./ghost.js").GhostRecording | null}
+ */
+function normalizeStoredGhost(raw) {
+  if (raw === undefined || raw === null) return null;
+  const ghost = normalizeGhost(raw);
+  if (ghost === null) return null;
+  // A recording can pass every field guard and still be too big to store —
+  // 2,400 legal frames is 45 KB. The size limit is part of the shape.
+  if (JSON.stringify(ghost).length > MAX_GHOST_CHARACTERS) return null;
+  return ghost;
 }
 
 /**
@@ -177,11 +211,49 @@ function normalizeRecords(raw) {
   const records = {};
   if (!isPlainObject(raw)) return records;
   let kept = 0;
+  let ghosts = 0;
   for (const key of Object.keys(raw)) {
     if (kept >= MAX_COURSE_KEYS) break;
     if (!COURSE_KEY_PATTERN.test(key)) continue;
-    records[key] = normalizeRecord(raw[key]);
+    const record = normalizeRecord(raw[key]);
+    if (record.ghost !== null) {
+      // Past the budget the record still lands; only its replay is dropped.
+      if (ghosts >= MAX_GHOST_COURSES) record.ghost = null;
+      else ghosts += 1;
+    }
+    records[key] = record;
     kept += 1;
+  }
+  return records;
+}
+
+/**
+ * P10 — holds the written file inside {@link MAX_PAYLOAD_CHARACTERS}.
+ *
+ * `normalizeRecords` caps ghosts on the way *in*; this caps them on the way
+ * *out*, and the write side is the one that actually matters: a save the game
+ * writes but cannot read back is a total wipe on the next load, which is the
+ * one failure this whole module exists to prevent. The course just raced keeps
+ * its ghost by priority, so setting a personal best never silently discards the
+ * replay you set it with.
+ *
+ * @param {Record<string, CourseRecord>} records Freshly-copied; mutated in place.
+ * @param {string} priorityKey
+ * @returns {Record<string, CourseRecord>}
+ */
+function capGhostBudget(records, priorityKey) {
+  const keys = Object.keys(records);
+  const ordered = keys.includes(priorityKey)
+    ? [priorityKey, ...keys.filter((key) => key !== priorityKey)]
+    : keys;
+  let ghosts = 0;
+  for (const key of ordered) {
+    if (records[key].ghost === null) continue;
+    if (ghosts < MAX_GHOST_COURSES) {
+      ghosts += 1;
+      continue;
+    }
+    records[key] = { ...records[key], ghost: null };
   }
   return records;
 }
@@ -198,6 +270,56 @@ export function normalizeTrack(raw) {
   return TRACK_CODES.includes(/** @type {string} */ (raw))
     ? /** @type {string} */ (raw)
     : DEFAULT_TRACK;
+}
+
+/**
+ * P10 — the schema versions this build knows how to read, oldest first. A
+ * version outside this list is discarded whole, exactly as before.
+ *
+ * The migration ladder is deliberately data-shaped rather than a switch: each
+ * entry is one step, applied in order, from the stored version up to the
+ * current one. Adding v3 means adding one step, not editing `parseSave`.
+ */
+const MIGRATIONS = [
+  {
+    from: 1,
+    to: 2,
+    /**
+     * v1 → v2. Purely additive: v2 gave `records[course]` an optional `ghost`,
+     * and a v1 file simply has none. Every v1 field is carried through
+     * untouched, so a v1 payload survives the step with nothing lost — which is
+     * the property `scripts/validate-persistence.mjs` asserts field by field.
+     *
+     * @param {Record<string, unknown>} source
+     * @returns {Record<string, unknown>}
+     */
+    step: (source) => source,
+  },
+];
+
+/**
+ * Walks a stored payload up the migration ladder to `schemaVersion`.
+ *
+ * @param {Record<string, unknown>} source
+ * @param {unknown} storedVersion
+ * @param {number} schemaVersion
+ * @returns {Record<string, unknown> | null} Null when the ladder does not reach.
+ */
+function migrateSave(source, storedVersion, schemaVersion) {
+  if (typeof storedVersion !== "number" || !Number.isInteger(storedVersion)) return null;
+  if (storedVersion === schemaVersion) return source;
+  if (storedVersion > schemaVersion || storedVersion < 1) return null;
+  let migrated = source;
+  let version = storedVersion;
+  for (const migration of MIGRATIONS) {
+    if (migration.from !== version) continue;
+    migrated = migration.step(migrated);
+    version = migration.to;
+    if (version === schemaVersion) return migrated;
+  }
+  // The ladder ran out before reaching this build's shape. A partially-migrated
+  // file is worse than no file, so it is discarded rather than half-trusted.
+  return null;
 }
 
 /**
@@ -221,10 +343,12 @@ export function parseSave(text, schemaVersion) {
     return fresh;
   }
   if (!isPlainObject(parsed)) return fresh;
-  const source = /** @type {Record<string, unknown>} */ (parsed);
+  const raw = /** @type {Record<string, unknown>} */ (parsed);
   // An unrecognised version is discarded whole. Reading half of a shape this
-  // build does not understand is how save files get silently corrupted.
-  if (source.schemaVersion !== schemaVersion) return fresh;
+  // build does not understand is how save files get silently corrupted. A
+  // version the ladder *does* cover is walked forward instead of thrown away.
+  const source = migrateSave(raw, raw.schemaVersion, schemaVersion);
+  if (source === null) return fresh;
   return {
     schemaVersion,
     settings: normalizeSettings(source.settings),
@@ -246,8 +370,18 @@ export function serializeSave(save) {
  * Folds a finished race into a course record and reports what improved, so the
  * result screen can flash `NEW BEST` off the same decision the file stores.
  *
+ * P10 added `run.ghost`. The rule the record has to keep is that the stored
+ * ghost is *always* the lap that set `bestLapMs` — so a new best lap either
+ * brings its own recording or clears the one on file. A ghost that outlived the
+ * time it belongs to would replay a lap the board says you already beat.
+ *
  * @param {CourseRecord} record
- * @param {{ bestLapMs: number | null, raceMs: number | null, laps: number }} run
+ * @param {{
+ *   bestLapMs: number | null,
+ *   raceMs: number | null,
+ *   laps: number,
+ *   ghost?: unknown,
+ * }} run
  */
 export function applyRaceResult(record, run) {
   const lapMs = normalizeTimeMs(run.bestLapMs, null);
@@ -264,6 +398,7 @@ export function applyRaceResult(record, run) {
       bestLapMs: newBestLap ? lapMs : record.bestLapMs,
       bestRaceMs: newBestRace ? raceMs : record.bestRaceMs,
       laps: Math.min(record.laps + laps, 1_000_000),
+      ghost: newBestLap ? normalizeStoredGhost(run.ghost) : record.ghost,
     },
     newBestLap,
     newBestRace,
@@ -334,6 +469,17 @@ export function createSaveStore(port, schemaVersion) {
     recordFor(courseKey) {
       return { ...(save.records[courseKey] ?? defaultRecord()) };
     },
+    /**
+     * P10 — the stored best-lap ghost for a course, already normalized, or null.
+     * Separate from {@link recordFor} because the replay is read once at race
+     * start while the record is read on every result screen.
+     *
+     * @param {string} courseKey
+     * @returns {import("./ghost.js").GhostRecording | null}
+     */
+    ghostFor(courseKey) {
+      return save.records[courseKey]?.ghost ?? null;
+    },
     /** @param {Partial<SaveSettings>} patch */
     updateSettings(patch) {
       save = {
@@ -357,7 +503,12 @@ export function createSaveStore(port, schemaVersion) {
     },
     /**
      * @param {string} courseKey
-     * @param {{ bestLapMs: number | null, raceMs: number | null, laps: number }} run
+     * @param {{
+     *   bestLapMs: number | null,
+     *   raceMs: number | null,
+     *   laps: number,
+     *   ghost?: unknown,
+     * }} run
      */
     recordRace(courseKey, run) {
       if (!COURSE_KEY_PATTERN.test(courseKey)) {
@@ -367,7 +518,10 @@ export function createSaveStore(port, schemaVersion) {
       const applied = applyRaceResult(previous, run);
       save = {
         ...save,
-        records: { ...save.records, [courseKey]: applied.record },
+        records: capGhostBudget(
+          { ...save.records, [courseKey]: applied.record },
+          courseKey,
+        ),
       };
       flush();
       return applied;

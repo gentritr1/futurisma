@@ -25,14 +25,24 @@ import {
   type SaveSettings,
 } from "./save-schema.js";
 
-/** Bump when the stored shape changes. An older or newer file is discarded. */
-export const SCHEMA_VERSION = 1;
+/**
+ * Bump when the stored shape changes. A *newer* file is still discarded — this
+ * build cannot know what a future shape means. An older one is migrated:
+ * `save-schema.js` carries a ladder of one-version steps, and v2 is the first
+ * rung. P10 added an optional best-lap ghost to each course record, so v1 → v2
+ * is purely additive and a v1 file arrives with every field intact.
+ */
+export const SCHEMA_VERSION = 2;
 
 /**
  * The single storage key. Every key this game writes is prefixed `futurisma.`
- * so the origin stays partitioned from anything else served beside it, and the
- * `.v1` suffix means a future schema can land beside this one instead of
- * fighting it.
+ * so the origin stays partitioned from anything else served beside it.
+ *
+ * The `.v1` suffix is the *storage slot*, not the schema version, and it stays
+ * put through a migration on purpose: a v2 payload has to land back on the key
+ * the v1 payload was read from, or the migration would leave the old file
+ * orphaned beside a blank new one and read as a wipe. The suffix moves only for
+ * a break so total that no ladder can bridge it.
  */
 const STORAGE_KEY = "futurisma.save.v1";
 

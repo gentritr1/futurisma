@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import type { ApronTelemetry } from "./apron.js";
 import type { AtmosphereDiagnostics } from "./atmosphere";
+import type { GhostDiagnostics } from "./ghost-runtime";
 import type { EngineAudio } from "./audio";
 import type { RaceCourse } from "./course";
 import type { MinimapDiagnostics } from "./minimap";
@@ -112,6 +113,8 @@ export interface DiagnosticsContributors {
   surfaceCharacter: ReturnType<SceneAssets["surfaceCharacterDiagnostics"]>;
   minimap: MinimapDiagnostics;
   atmosphere: AtmosphereDiagnostics;
+  // P10: the ghost lap. Owned by ghost-runtime.ts, which also owns its mesh.
+  ghost: GhostDiagnostics;
   // P4b: `?render=` mode plus the PS2 shader-arming counts. Owned by the
   // material treatment in totem.ts, not by the race loop.
   ps2: Ps2TreatmentDiagnostics;
@@ -334,6 +337,7 @@ export function buildDiagnosticsReport(
     ...contributors.surfaceCharacter,
     ...contributors.minimap,
     ...contributors.atmosphere,
+    ...contributors.ghost,
     ...contributors.ps2,
     pixelRatio: Number(core.pixelRatio.toFixed(2)),
     preferredPixelRatio: Number(core.preferredPixelRatio.toFixed(2)),
