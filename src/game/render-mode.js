@@ -43,13 +43,33 @@ let cachedMode = null;
  * @returns {RenderMode}
  */
 export function activeRenderMode() {
-  if (cachedMode === null) {
-    cachedMode = resolveRenderMode(
-      typeof window === "undefined"
-        ? null
-        : new URLSearchParams(window.location.search).get("render"),
-    );
-  }
+  if (cachedMode === null) cachedMode = configureRenderMode(DEFAULT_RENDER_MODE);
+  return cachedMode;
+}
+
+/**
+ * P7 — seeds the memo from the stored setting.
+ *
+ * `?render=` stays the QA override and wins whenever it is present; a bare load
+ * falls through to whatever the options panel last stored. `main.ts` must call
+ * this **before** constructing the game, since the renderer setup and the
+ * material treatments read `activeRenderMode()` during construction and the
+ * answer is memoized on first read. Calling it twice is a no-op, so a late call
+ * can never silently re-grade a scene that is already built.
+ *
+ * The stored value arrives as an argument rather than being read here, so this
+ * module stays free of the save layer and importable under Node for
+ * `scripts/validate-render-quality.mjs`.
+ *
+ * @param {string | null | undefined} storedMode
+ * @returns {RenderMode}
+ */
+export function configureRenderMode(storedMode) {
+  if (cachedMode !== null) return cachedMode;
+  const requested = typeof window === "undefined"
+    ? null
+    : new URLSearchParams(window.location.search).get("render");
+  cachedMode = resolveRenderMode(requested ?? storedMode);
   return cachedMode;
 }
 

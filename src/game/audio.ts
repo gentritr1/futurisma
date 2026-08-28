@@ -55,6 +55,19 @@ interface StemAutomation {
   end: number;
 }
 
+/**
+ * The authored master ceiling. Predates P7 as a literal `0.34`; named here so
+ * the listener's master-volume setting is unambiguously a scalar *on* the mix
+ * rather than a rewrite of it.
+ */
+const MASTER_GAIN_CEILING = 0.34;
+
+/** @returns `volume` clamped into 0..1, or `fallback` when it is not a number. */
+function clampVolume(volume: number, fallback: number): number {
+  if (!Number.isFinite(volume)) return fallback;
+  return volume < 0 ? 0 : volume > 1 ? 1 : volume;
+}
+
 const BEAT_SECONDS = 60 / MUSIC_BPM;
 const BAR_SECONDS = BEAT_SECONDS * 4;
 const CONTROL_INTERVAL_SECONDS = 1 / 30;
@@ -108,6 +121,16 @@ export class EngineAudio {
   private windGain: GainNode | null = null;
   private musicFilter: BiquadFilterNode | null = null;
   private musicShelf: BiquadFilterNode | null = null;
+  /**
+   * P7 — the music bus. One gain node between the stem chain's high shelf and
+   * the master bus, so a music-volume setting can move the four stems without
+   * touching their level automation (which the music plan owns) and without
+   * moving the engine bed, the rival field or the race cues.
+   */
+  private musicBus: GainNode | null = null;
+  /** 0..1 listener settings, applied on top of the authored mix. */
+  private masterVolume = 1;
+  private musicVolume = 1;
   private readonly stemGains = new Map<StemName, GainNode>();
   private readonly stemAutomation = new Map<StemName, StemAutomation>();
   private readonly persistentSources: AudioScheduledSourceNode[] = [];
@@ -180,7 +203,7 @@ export class EngineAudio {
     const initializationStartedAt = performance.now();
     const context = new AudioContext();
     const master = context.createGain();
-    master.gain.value = 0.34;
+    master.gain.value = MASTER_GAIN_CEILING * this.masterVolume;
     const compressor = context.createDynamicsCompressor();
     compressor.threshold.value = -12;
     compressor.knee.value = 10;
@@ -509,6 +532,27 @@ export class EngineAudio {
     return this.muted;
   }
 
+  /**
+   * P7 — the two listener volumes. Both are scalars on top of the authored mix
+   * rather than replacements for it: `0.34` stays the ceiling the whole game was
+   * balanced against, and `1` reproduces the pre-P7 mix exactly. Safe to call
+   * before the context exists; the value is applied when it is built.
+   */
+  setMasterVolume(volume: number): void {
+    this.masterVolume = clampVolume(volume, this.masterVolume);
+    this.updateMasterGain();
+  }
+
+  setMusicVolume(volume: number): void {
+    this.musicVolume = clampVolume(volume, this.musicVolume);
+    if (!this.context || !this.musicBus) return;
+    this.musicBus.gain.setTargetAtTime(
+      this.musicVolume,
+      this.context.currentTime,
+      0.045,
+    );
+  }
+
   setPaused(paused: boolean): void {
     this.paused = paused;
     if (!paused) void this.context?.resume().catch(() => undefined);
@@ -551,6 +595,8 @@ export class EngineAudio {
     reverbZone: AudioZone;
     reverbWet: number;
     reverbZoneTransitions: number;
+    masterVolume: number;
+    musicVolume: number;
   } {
     const elapsed = this.context
       ? Math.max(0, this.context.currentTime - this.diagnosticControlStartedAt)
@@ -591,6 +637,8 @@ export class EngineAudio {
         )
         : 0,
       reverbZoneTransitions: this.diagnosticReverbTransitions,
+      masterVolume: this.masterVolume,
+      musicVolume: this.musicVolume,
     };
   }
 
@@ -650,6 +698,7 @@ export class EngineAudio {
     this.windGain = null;
     this.musicFilter = null;
     this.musicShelf = null;
+    this.musicBus = null;
     this.musicProfileKey = -1;
     this.musicStartTime = 0;
     this.nextControlUpdateTime = 0;
@@ -930,10 +979,14 @@ export class EngineAudio {
     musicShelf.type = "highshelf";
     musicShelf.frequency.value = 1800;
     musicShelf.gain.value = 0;
+    const musicBus = context.createGain();
+    musicBus.gain.value = this.musicVolume;
     musicFilter.connect(musicShelf);
-    musicShelf.connect(master);
+    musicShelf.connect(musicBus);
+    musicBus.connect(master);
     this.musicFilter = musicFilter;
     this.musicShelf = musicShelf;
+    this.musicBus = musicBus;
 
     const startAt = context.currentTime + 0.08;
     this.musicStartTime = startAt;
@@ -1153,7 +1206,7 @@ export class EngineAudio {
   private updateMasterGain(): void {
     if (!this.context || !this.master) return;
     this.master.gain.setTargetAtTime(
-      this.muted || this.paused ? 0 : 0.34,
+      this.muted || this.paused ? 0 : MASTER_GAIN_CEILING * this.masterVolume,
       this.context.currentTime,
       0.045,
     );

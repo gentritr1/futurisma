@@ -102,6 +102,8 @@ export class GameUi {
   private readonly resultScreen = requiredElement<HTMLElement>("result-screen");
   private readonly resultTime = requiredElement<HTMLElement>("result-time");
   private readonly resultDetail = requiredElement<HTMLElement>("result-detail");
+  private readonly resultBest = requiredElement<HTMLElement>("result-best");
+  private readonly dispatchRecord = requiredElement<HTMLElement>("dispatch-record");
   private readonly resultLaps = requiredElement<HTMLOListElement>("result-laps");
   private readonly gridOrder = requiredElement<HTMLOListElement>("grid-order");
   private readonly fieldOrder = requiredElement<HTMLOListElement>("field-order");
@@ -160,6 +162,12 @@ export class GameUi {
   private systemStatusLabel = "SYSTEM STANDBY";
   private demoAutopilot = false;
   private lastFieldOrderKey = "";
+  /** P7 — the issue the player is racing under; drives every label that used
+   * to read a hard-coded `WORKS 07`. */
+  private playerLiveryLabel = "WORKS 07";
+  /** The course half of the intro footer, kept so a livery swap can rebuild it
+   * without re-running `setRaceFormat`. */
+  private courseFooterLabel = "GREENWATER FIELD RACE";
   private readonly reducedMotion = window.matchMedia(
     "(prefers-reduced-motion: reduce)",
   ).matches;
@@ -193,9 +201,8 @@ export class GameUi {
       ? `Four ships. ${lapLabel} through Greenwater Strip. Follow the amber turn markers, clear all eight gates, and bring TOTEM home through The Cradle.`
       : `Four ships. ${lapLabel} through ${course.mapName}. Follow the amber turn markers, clear all ${course.checkpointCount} sector gates, and bring TOTEM home through ${course.finishName}.`;
     this.courseName.textContent = `${course.mapName.toUpperCase()} / ${course.mapCode}`;
-    this.introFooter.textContent = course.mapCode === "MAP 01"
-      ? "WORKS LIVERY 07 · GREENWATER FIELD RACE"
-      : `WORKS LIVERY 07 · ${course.mapName.toUpperCase()} FIELD RACE`;
+    this.courseFooterLabel = `${course.mapName.toUpperCase()} FIELD RACE`;
+    this.introFooter.textContent = `${this.playerLiveryLabel} · ${this.courseFooterLabel}`;
     document.title = `FUTURISMA · ${course.mapName}`;
     this.checkpointValue.textContent = `NEXT GATE 01 / ${course.checkpointCount
       .toString()
@@ -209,6 +216,31 @@ export class GameUi {
       this.updateGrid(grid);
       this.updateFieldOrder(grid);
     }
+  }
+
+  /**
+   * P7 — the livery the player is racing under. Rewrites the intro footer, the
+   * starting-grid list and the classification line so the whole panel follows
+   * the chosen issue instead of naming a works car that is no longer on track.
+   */
+  setPlayerLivery(label: string, grid: readonly RaceGridEntry[]): void {
+    this.playerLiveryLabel = label;
+    this.introFooter.textContent = `${label} · ${this.courseFooterLabel}`;
+    if (grid.length > 0) {
+      this.updateGrid(grid);
+      this.updateFieldOrder(grid);
+    }
+  }
+
+  /**
+   * P7 — the stored best lap for the dispatched circuit, shown on the start
+   * screen. `null` is a first visit, not an error, and reads as such.
+   */
+  setStoredBest(bestLapMs: number | null, courseLabel: string): void {
+    this.dispatchRecord.textContent = bestLapMs === null
+      ? `${courseLabel} · NO CLASSIFIED LAP ON FILE`
+      : `${courseLabel} · BEST LAP ${formatRaceTime(bestLapMs)}`;
+    this.dispatchRecord.dataset.recorded = bestLapMs === null ? "false" : "true";
   }
 
   updateFieldOrder(entries: readonly FieldOrderEntry[]): void {
@@ -267,11 +299,18 @@ export class GameUi {
     position = 1,
     racerCount = 1,
     standings: readonly RaceStandingEntry[] = [],
+    newBestLap = false,
   ): void {
     this.resultTime.textContent = formatRaceTime(elapsedMs);
-    this.resultDetail.textContent = `${formatRacePosition(position, racerCount)} · TOTEM / WORKS 07 · ${totalLaps} ${
+    this.resultDetail.textContent = `${formatRacePosition(position, racerCount)} · TOTEM / ${
+      this.playerLiveryLabel
+    } · ${totalLaps} ${
       totalLaps === 1 ? "LAP" : "LAPS"
     } LOGGED · BEST ${formatRaceTime(bestLapMs)}`;
+    // P7 — the flash and the file are decided by one comparison in the save
+    // layer, so a `NEW BEST` that is not on record is impossible.
+    this.resultBest.hidden = !newBestLap;
+    this.resultBest.dataset.active = newBestLap ? "true" : "false";
     this.updateResultClassification(standings, lapTimesMs, bestLapMs);
     this.resultScreen.hidden = false;
     this.countdown.textContent = "";

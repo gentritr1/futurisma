@@ -2,6 +2,10 @@ import { FuturismaGame } from "./game/game";
 import type { RaceCourse } from "./game/course";
 import { InputController } from "./game/input";
 import { resolveMapSelection } from "./game/map-selection";
+import { MetaUi } from "./game/meta-ui";
+import { save } from "./game/persistence";
+import { configureRenderMode } from "./game/render-mode.js";
+import { resolveQualityLock, resolveReducedMotion, searchParam } from "./game/query-probes";
 import { GameUi } from "./game/ui";
 
 const canvasElement = document.getElementById("game-canvas");
@@ -9,6 +13,11 @@ if (!(canvasElement instanceof HTMLCanvasElement)) {
   throw new Error("The game canvas is missing.");
 }
 const canvas: HTMLCanvasElement = canvasElement;
+
+// P7 — the image pipeline is memoized on first read and every material
+// treatment reads it during construction, so the stored choice has to be seeded
+// before anything below builds a renderer or a material. `?render=` still wins.
+const renderMode = configureRenderMode(save.settings.renderMode);
 
 const ui = new GameUi();
 const input = new InputController();
@@ -25,6 +34,28 @@ const game = new FuturismaGame(
   performance.now() - courseAssemblyStartedAt,
 );
 
+const meta = new MetaUi(
+  ui,
+  selection,
+  {
+    quality: resolveQualityLock(),
+    renderMode,
+    reducedMotion: resolveReducedMotion(),
+    // A QA override or an operating-system preference is holding these; the
+    // options panel stores a choice but a relink would not honour it.
+    qualityForced: searchParam("quality") !== null,
+    renderForced: searchParam("render") !== null,
+    motionForced: searchParam("motion") === "reduce"
+      || window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+  },
+  {
+    applyLivery: (code) => game.applyLivery(code),
+    setMasterVolume: (volume) => game.setMasterVolume(volume),
+    setMusicVolume: (volume) => game.setMusicVolume(volume),
+    suspendInput: () => input.suspendActionsUntilRelease(),
+  },
+);
+
 async function beginTrial(): Promise<void> {
   if (!game.canStart()) return;
   await game.startTrial();
@@ -35,8 +66,15 @@ const handleStartClick = (): void => {
   void beginTrial();
 };
 
+// A finished race may have entered a new best on file, so the paddock's record
+// line is repainted whenever the start screen could come back into view.
+const handleRestartClick = (): void => {
+  meta.syncRecord();
+  void beginTrial();
+};
+
 ui.startButton.addEventListener("click", handleStartClick);
-ui.restartButton.addEventListener("click", handleStartClick);
+ui.restartButton.addEventListener("click", handleRestartClick);
 
 game
   .initialize()
@@ -57,7 +95,8 @@ game
 if (import.meta.hot) {
   import.meta.hot.dispose(() => {
     ui.startButton.removeEventListener("click", handleStartClick);
-    ui.restartButton.removeEventListener("click", handleStartClick);
+    ui.restartButton.removeEventListener("click", handleRestartClick);
+    meta.dispose();
     game.dispose();
   });
 }

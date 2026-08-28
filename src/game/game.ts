@@ -36,6 +36,8 @@ import {
   ZERO_INPUT,
   probeSelected,
   readProbeNumber,
+  resolveQualityLock,
+  resolveReducedMotion,
   searchFlag,
   searchParam,
 } from "./query-probes";
@@ -74,10 +76,12 @@ import {
   resolveCountdownStage,
 } from "./race-rules";
 import {
-  calculateMinimumPixelRatio,
-  calculatePreferredPixelRatio,
+  minimumPixelRatioFor,
+  preferredPixelRatioFor,
   reconcilePixelRatioAfterResize,
 } from "./render-quality";
+import { applyRaceLivery, recordFinishedRace } from "./meta-runtime";
+import { save } from "./persistence";
 import { playerRaceDistanceMeters as calculatePlayerRaceDistance } from "./rival-race.js";
 import {
   RivalFleet,
@@ -261,13 +265,9 @@ export class FuturismaGame {
   private animationFrame = 0;
   private renderRequested = true;
   private readonly qualityOverride = searchParam("quality");
-  private readonly qualityMode = this.qualityOverride === "high"
-    ? "high"
-    : this.qualityOverride === "low"
-      ? "low"
-      : "adaptive";
-  private preferredPixelRatio = this.resolvePreferredPixelRatio();
-  private minimumPixelRatio = this.resolveMinimumPixelRatio();
+  private readonly qualityMode = resolveQualityLock();
+  private preferredPixelRatio = preferredPixelRatioFor(this.qualityMode);
+  private minimumPixelRatio = minimumPixelRatioFor(this.qualityMode);
   private renderPixelRatio = this.preferredPixelRatio;
   private readonly demoMode = searchFlag("demo");
   private demoAutopilot = this.demoMode;
@@ -294,8 +294,7 @@ export class FuturismaGame {
     : 0;
   private readonly contextLossProbe = probeSelected("context");
   private readonly focusLossProbe = probeSelected("focus");
-  private readonly reducedMotion = searchParam("motion") === "reduce"
-    || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  private readonly reducedMotion = resolveReducedMotion();
 
   constructor(
     canvas: HTMLCanvasElement,
@@ -387,6 +386,16 @@ export class FuturismaGame {
     );
   }
 
+  /** P7 — the two listener volumes; the authored mix ceiling stays in audio.ts. */
+  readonly setMasterVolume = (volume: number): void => this.audio.setMasterVolume(volume);
+  readonly setMusicVolume = (volume: number): void => this.audio.setMusicVolume(volume);
+
+  /** P7 — the meta layer's one hook into the live scene; see `meta-runtime`. */
+  readonly applyLivery = async (code: string): Promise<void> => {
+    await applyRaceLivery(this.vehicle, this.rivalFleet, code, this.ui);
+    this.renderRequested = true;
+  };
+
   async initialize(): Promise<boolean> {
     const vehicleLoadStartedAt = performance.now();
     this.diagnosticVehicleLoadStartedMs = vehicleLoadStartedAt;
@@ -407,6 +416,7 @@ export class FuturismaGame {
       this.totalLaps,
       this.vehicle,
       () => this.disposed,
+      save.livery,
     );
     if (!rivalFleet) {
       disposeObject3DResources(this.vehicle.root);
@@ -1411,6 +1421,12 @@ export class FuturismaGame {
       this.raceStatus.position,
       this.raceStatus.racerCount,
       standings,
+      recordFinishedRace(
+        this.course.mapCode,
+        this.bestLapMs,
+        this.elapsedMs,
+        this.lapTimesMs.length,
+      ),
     );
   }
 
@@ -1843,8 +1859,8 @@ export class FuturismaGame {
     const width = window.innerWidth;
     const height = window.innerHeight;
     const previousPreferred = this.preferredPixelRatio;
-    const nextPreferred = this.resolvePreferredPixelRatio();
-    const nextMinimum = this.resolveMinimumPixelRatio();
+    const nextPreferred = preferredPixelRatioFor(this.qualityMode);
+    const nextMinimum = minimumPixelRatioFor(this.qualityMode);
     this.renderPixelRatio = reconcilePixelRatioAfterResize(
       this.renderPixelRatio,
       previousPreferred,
@@ -1860,22 +1876,6 @@ export class FuturismaGame {
     this.camera.updateProjectionMatrix();
     this.renderRequested = true;
   };
-
-  private resolvePreferredPixelRatio(): number {
-    return calculatePreferredPixelRatio(
-      window.innerHeight,
-      window.devicePixelRatio,
-      this.qualityMode,
-    );
-  }
-
-  private resolveMinimumPixelRatio(): number {
-    return calculateMinimumPixelRatio(
-      window.innerHeight,
-      window.devicePixelRatio,
-      this.qualityMode,
-    );
-  }
 
   private updateAdaptiveQuality(delta: number): void {
     if (this.qualityOverride === "high" || this.qualityOverride === "low") return;

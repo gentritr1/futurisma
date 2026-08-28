@@ -914,10 +914,291 @@ body[data-phase="result"] .hud {
   visibility: hidden;
 }
 
+/* The service terminal is modal: the race read-out behind it goes quiet. */
+body[data-options="true"] .hud {
+  opacity: 0.12;
+}
+
+/* P7 — dispatch sheet, terminal chips and the service terminal. Same
+   vocabulary as the rest of the panel: mono, thin rules, acid accents. */
+.dispatch {
+  margin: 22px 0 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dispatch__row {
+  display: grid;
+  grid-template-columns: 68px minmax(0, 1fr);
+  align-items: start;
+  gap: 12px;
+}
+
+.dispatch__key,
+.option__key,
+.dispatch__record,
+.options-note,
+.chip,
+.ghost-button {
+  font-family: var(--mono);
+  letter-spacing: 0.09em;
+}
+
+.dispatch__key,
+.option__key {
+  padding-top: 7px;
+  color: var(--dim);
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* The dispatch sheet reads as a form with two columns, not a ragged wrap. */
+.dispatch .chip-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.chip {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 11px;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  clip-path: polygon(0 0, calc(100% - 7px) 0, 100% 7px, 100% 100%, 7px 100%, 0 calc(100% - 7px));
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.62rem;
+  text-align: left;
+  cursor: pointer;
+  transition: 140ms var(--ease-out);
+}
+
+.chip small {
+  color: var(--dim);
+  font-size: 0.53rem;
+  letter-spacing: 0.07em;
+}
+
+.chip[aria-checked="true"] {
+  border-color: var(--acid);
+  background: oklch(0.89 0.22 123 / 0.1);
+  color: var(--acid);
+}
+
+.chip[aria-checked="true"] small {
+  color: var(--muted);
+}
+
+.chip:focus-visible,
+.ghost-button:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 3px;
+}
+
+.dispatch__record {
+  margin: 6px 0 0;
+  padding-top: 9px;
+  border-top: 1px solid var(--line);
+  color: var(--dim);
+  font-size: 0.62rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.dispatch__record[data-recorded="true"] {
+  color: var(--cyan);
+}
+
+.ghost-button {
+  width: min(320px, 100%);
+  min-height: 40px;
+  margin-top: 10px;
+  padding: 0 12px 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.66rem;
+  cursor: pointer;
+  transition: 140ms var(--ease-out);
+}
+
+.ghost-button kbd {
+  padding: 4px 7px;
+  border: 1px solid var(--line);
+  color: var(--dim);
+  font-size: 0.58rem;
+}
+
+.screen--options {
+  z-index: 30;
+  align-items: center;
+  background: oklch(0.055 0.012 210 / 0.9);
+}
+
+.options-panel {
+  max-height: 88vh;
+  overflow-y: auto;
+}
+
+.options-title {
+  margin: 6px 0 18px;
+  font-size: clamp(1.6rem, 4.4vw, 2.3rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.option {
+  display: grid;
+  grid-template-columns: 118px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  padding: 9px 0;
+  border-bottom: 1px solid oklch(0.42 0.035 205 / 0.3);
+}
+
+.option--choice {
+  grid-template-columns: 118px minmax(0, 1fr);
+  align-items: start;
+}
+
+.option__value {
+  color: var(--acid);
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+}
+
+.option__slider {
+  width: 100%;
+  height: 2px;
+  appearance: none;
+  background: var(--line);
+  cursor: pointer;
+}
+
+.option__slider::-webkit-slider-thumb {
+  width: 12px;
+  height: 18px;
+  appearance: none;
+  background: var(--acid);
+}
+
+.option__slider::-moz-range-thumb {
+  width: 12px;
+  height: 18px;
+  border: 0;
+  border-radius: 0;
+  background: var(--acid);
+}
+
+.option__slider:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 6px;
+}
+
+.options-note {
+  margin: 16px 0 12px;
+  color: var(--dim);
+  font-size: 0.58rem;
+}
+
+.options-note[data-pending="true"] {
+  color: var(--warning);
+}
+
+.result-best {
+  margin: 10px 0 0;
+  color: var(--acid);
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+}
+
+.result-best[data-active="true"] {
+  animation: result-best 900ms var(--ease-out) 2;
+}
+
+/* The dispatch sheet made the intro panel ~250px taller. Below a laptop's worth
+   of height it compacts rather than running off the top of the viewport; the
+   scroll is the last-resort guarantee that nothing is ever unreachable. */
+.screen--intro,
+.screen--options {
+  overflow-y: auto;
+}
+
+@media (max-height: 900px) and (min-width: 701px) {
+  /* The screen's padding is horizontal-first (`5vw`); on a laptop that spends
+     128px of vertical room the panel needs more than the gutter does. */
+  .screen--intro {
+    padding-block: clamp(14px, 3vh, 36px);
+  }
+
+  .screen--intro .intro-panel {
+    padding-block: clamp(16px, 2.4vh, 28px);
+  }
+
+  .intro-panel h1 {
+    font-size: clamp(2.6rem, 6vw, 3.6rem);
+  }
+
+  .intro-deck {
+    margin-block: 14px 16px;
+    font-size: 0.88rem;
+  }
+
+  .dispatch {
+    margin-block: 14px 0;
+    gap: 8px;
+  }
+
+  .intro-panel .result-laps {
+    margin-block: 14px 16px;
+  }
+
+  .intro-panel .result-laps li {
+    min-height: 24px;
+  }
+
+  .controls-list {
+    margin-top: 18px;
+    gap: 8px 18px;
+  }
+}
+
+/* Below this the key legend is the first thing to go — the dispatch sheet is
+   what the screen is for, and the legend is reference rather than a decision.
+   `.intro-footer` goes with it because it is absolutely positioned and would
+   otherwise sit on top of whatever ends up last. */
+@media (max-height: 680px) and (min-width: 701px) {
+  .controls-list,
+  .intro-footer {
+    display: none;
+  }
+}
+
 @media (hover: hover) and (pointer: fine) {
   .launch-button:hover {
     transform: translateY(-2px);
     background: var(--cyan);
+  }
+
+  .chip:hover,
+  .ghost-button:hover {
+    border-color: var(--cyan);
+    color: var(--cyan);
   }
 }
 
@@ -1022,6 +1303,29 @@ body[data-phase="result"] .hud {
   .screen--result {
     align-items: center;
   }
+
+  /* The dispatch sheet stacks and drops its notes: on a phone the circuit and
+     livery names carry the choice on their own. */
+  .dispatch {
+    margin-block: 16px 0;
+  }
+
+  .dispatch__row,
+  .option,
+  .option--choice {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+  }
+
+  .dispatch__key,
+  .option__key {
+    padding-top: 0;
+  }
+
+  .chip small,
+  #grid-order {
+    display: none;
+  }
 }
 
 @media (max-height: 520px) {
@@ -1086,6 +1390,16 @@ body[data-phase="result"] .hud {
   .intro-footer {
     display: none;
   }
+
+  .dispatch {
+    margin-block: 12px 0;
+    gap: 6px;
+  }
+
+  .chip small,
+  #grid-order {
+    display: none;
+  }
 }
 
 @media (max-height: 520px) and (min-width: 560px) {
@@ -1099,7 +1413,8 @@ body[data-phase="result"] .hud {
 
 @media (prefers-reduced-motion: reduce) {
   .loading-mark,
-  .loading-line span {
+  .loading-line span,
+  .result-best[data-active="true"] {
     animation: none;
   }
 
@@ -1115,6 +1430,16 @@ body[data-phase="result"] .hud {
   .impact-flash,
   .image-treatment::before {
     transition: none;
+  }
+}
+
+@keyframes result-best {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
   }
 }
 

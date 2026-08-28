@@ -17,6 +17,11 @@ import {
   rivalThrottleSignal,
   stepRivalState,
 } from "./rival-race.js";
+import {
+  LIVERY_ATLAS_ORDER,
+  fieldLiveries,
+  liveryFor,
+} from "./liveries.js";
 import type { MinimapContact } from "./minimap";
 import type {
   TotemRivalArticulationGroup,
@@ -50,15 +55,11 @@ const LOCAL_ROTATION_AXES = {
 
 /**
  * The four liveries packed into the runtime atlas, in quadrant order. The three
- * rivals take the first three; `works` fills the fourth so the player's own
- * livery is already in the atlas when livery select lands.
+ * default rivals take the first three; `works` fills the fourth, which is what
+ * lets P7's livery select hand the player any sheet and give the displaced
+ * rival the works sheet in exchange — no new texture, no new draw call.
  */
-const RIVAL_LIVERY_URLS = [
-  "/assets/totem/textures/totem_decals_1024_privateer.png",
-  "/assets/totem/textures/totem_decals_1024_nightform.png",
-  "/assets/totem/textures/totem_decals_1024_needle.png",
-  "/assets/totem/textures/totem_decals_1024_works.png",
-] as const;
+const RIVAL_LIVERY_URLS = LIVERY_ATLAS_ORDER.map((code) => liveryFor(code).texture);
 
 const LIVERY_SOURCE_PIXELS = 1024;
 const LIVERY_ATLAS_PIXELS = LIVERY_SOURCE_PIXELS * 2;
@@ -251,7 +252,17 @@ interface RivalVisual {
 
 export class RivalFleet {
   readonly root = new THREE.Group();
-  readonly gridEntries: readonly RaceGridEntry[];
+  /** Rebuilt by {@link setPlayerLivery}, so the grid list follows the choice. */
+  gridEntries: readonly RaceGridEntry[] = [];
+  /** Livery code per rival slot, in `RIVAL_PROFILES` order. */
+  private fieldLiveryCodes: readonly string[];
+  /** The in-fiction issue each rival is announced as, same order. */
+  private liveryLabels: readonly string[];
+  /** One entry per instanced body batch: the atlas-quadrant offset buffer. */
+  private readonly liveryOffsetBuffers: {
+    attribute: THREE.InstancedBufferAttribute;
+    slotCount: number;
+  }[] = [];
   private readonly states: RivalState[];
   private readonly previousDistances = new Float64Array(RIVAL_COUNT);
   private readonly previousLaterals = new Float32Array(RIVAL_COUNT);
@@ -310,6 +321,7 @@ export class RivalFleet {
       effectsAtlas(): THREE.Texture;
     },
     isDisposed: () => boolean,
+    playerLivery = "works",
   ): Promise<RivalFleet | null> {
     const visualBatches = vehicle.createRivalVisualBatches();
     const disposeBatches = (): void => {
@@ -330,7 +342,14 @@ export class RivalFleet {
       liveryAtlas.dispose();
       return null;
     }
-    return new RivalFleet(course, totalLaps, visualBatches, liveryAtlas, vehicle.effectsAtlas());
+    return new RivalFleet(
+      course,
+      totalLaps,
+      visualBatches,
+      liveryAtlas,
+      vehicle.effectsAtlas(),
+      playerLivery,
+    );
   }
 
   constructor(
@@ -339,6 +358,7 @@ export class RivalFleet {
     visualBatches: readonly TotemRivalVisualBatch[],
     liveryAtlas: THREE.Texture,
     effectsAtlas: THREE.Texture,
+    playerLivery = "works",
   ) {
     if (visualBatches.length < 3) {
       throw new Error(
@@ -346,6 +366,11 @@ export class RivalFleet {
       );
     }
     this.root.name = "totem_rival_fleet";
+    // P7 — the field's three liveries, given what the player took. The chosen
+    // sheet is swapped one-for-one with the works sheet, so the grid is always
+    // four distinct liveries and no rival ever wears the player's.
+    this.fieldLiveryCodes = fieldLiveries(playerLivery);
+    this.liveryLabels = this.fieldLiveryCodes.map((code) => liveryFor(code).label);
     this.states = RIVAL_PROFILES.map((profile) => (
       createRivalState(profile.id, course.length, totalLaps)
     ));
@@ -398,7 +423,10 @@ export class RivalFleet {
         }
         const offsets = new Float32Array(instanceCount * 2);
         for (let index = 0; index < instanceCount; index += 1) {
-          const [offsetU, offsetV] = LIVERY_ATLAS_OFFSETS[Math.floor(index / slotCount)];
+          const rival = Math.floor(index / slotCount);
+          const [offsetU, offsetV] = LIVERY_ATLAS_OFFSETS[
+            LIVERY_ATLAS_ORDER.indexOf(this.fieldLiveryCodes[rival])
+          ];
           offsets[index * 2] = offsetU;
           offsets[index * 2 + 1] = offsetV;
           // Restores the authored mean brightness of the side this instance
@@ -409,10 +437,11 @@ export class RivalFleet {
           );
         }
         if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
-        batch.geometry.setAttribute(
-          "aLiveryOffset",
-          new THREE.InstancedBufferAttribute(offsets, 2),
-        );
+        const attribute = new THREE.InstancedBufferAttribute(offsets, 2);
+        batch.geometry.setAttribute("aLiveryOffset", attribute);
+        // Kept so P7's livery select can re-issue the field in place: the swap
+        // is a rewrite of this buffer, not a rebuild of the instanced mesh.
+        this.liveryOffsetBuffers.push({ attribute, slotCount });
       } else {
         for (let index = 0; index < instanceCount; index += 1) {
           const tint = new THREE.Color(RIVAL_PROFILES[Math.floor(index / slotCount)].tint);
@@ -499,15 +528,9 @@ export class RivalFleet {
         + perInstanceTriangles(glowGeometry) * RIVAL_COUNT
         + perInstanceTriangles(blobGeometry) * SHADOW_BLOB_COUNT,
     };
-    this.gridEntries = [
-      { position: 1, name: "TOTEM", team: "WORKS 07", player: true },
-      ...RIVAL_PROFILES.map((profile, index) => ({
-        position: index + 2,
-        name: profile.name,
-        team: "FIELD TOTEM",
-        player: false,
-      })),
-    ];
+    // Also builds `gridEntries`; the constructor and a later swap take exactly
+    // the same path, so the grid list cannot drift from what the field wears.
+    this.setPlayerLivery(playerLivery);
     this.reset();
   }
 
@@ -868,11 +891,10 @@ export class RivalFleet {
         finishTimeSeconds: playerFinishTimeSeconds,
       },
       ...this.states.map((state, index) => {
-        const profile = RIVAL_PROFILES[index];
         const projectedFinish = this.projectFinishTime(state, index);
         return {
           id: state.id,
-          name: profile.name,
+          name: this.liveryLabels[index],
           team: "FIELD TOTEM",
           player: false,
           raceDistanceMeters: totalDistance,
@@ -896,6 +918,44 @@ export class RivalFleet {
     }));
   }
 
+  /**
+   * P7 — re-issues the field for a new player livery, live.
+   *
+   * Costs one rewrite of each body batch's `aLiveryOffset` buffer: three
+   * instances' worth of two floats per slot, no geometry rebuild, no new
+   * texture, no change to the draw-call count. The grid list is rebuilt from
+   * the same assignment so the start screen and the craft can never disagree.
+   */
+  setPlayerLivery(playerLivery: string): void {
+    this.fieldLiveryCodes = fieldLiveries(playerLivery);
+    this.liveryLabels = this.fieldLiveryCodes.map((code) => liveryFor(code).label);
+    for (const { attribute, slotCount } of this.liveryOffsetBuffers) {
+      const offsets = attribute.array as Float32Array;
+      for (let index = 0; index * 2 < offsets.length; index += 1) {
+        const [offsetU, offsetV] = LIVERY_ATLAS_OFFSETS[
+          LIVERY_ATLAS_ORDER.indexOf(this.fieldLiveryCodes[Math.floor(index / slotCount)])
+        ];
+        offsets[index * 2] = offsetU;
+        offsets[index * 2 + 1] = offsetV;
+      }
+      attribute.needsUpdate = true;
+    }
+    this.gridEntries = [
+      {
+        position: 1,
+        name: "TOTEM",
+        team: liveryFor(playerLivery).label,
+        player: true,
+      },
+      ...this.liveryLabels.map((label, index) => ({
+        position: index + 2,
+        name: label,
+        team: "FIELD TOTEM",
+        player: false,
+      })),
+    ];
+  }
+
   diagnostics(): RivalFleetDiagnostics {
     return {
       drawCalls: this.stats.drawCalls,
@@ -916,7 +976,7 @@ export class RivalFleet {
       })),
       states: this.states.map((state, index) => ({
         id: state.id,
-        name: RIVAL_PROFILES[index].name,
+        name: this.liveryLabels[index],
         lap: state.lap,
         raceDistanceMeters: state.raceDistanceMeters,
         speedKph: state.speedMetersPerSecond * 3.6,

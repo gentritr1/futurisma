@@ -756,6 +756,70 @@ export class TotemVehicle {
     });
   }
 
+  /**
+   * P7 — swaps the player's decal sheet.
+   *
+   * `TOTEM_body.map` arrives baked into the runtime GLB as the works sheet, so
+   * livery select is a texture swap on that one material rather than a model
+   * variant. The replacement inherits every sampler setting from the sheet it
+   * replaces — colour space, flip, filters, anisotropy, wrap — so a chosen
+   * livery cannot read differently at distance from the shipped default, and
+   * the PS2 nearest-filter treatment survives.
+   *
+   * Returns false when the sheet could not be fetched; the works decal already
+   * on the model stays, and the race is unaffected. Must be called after
+   * `load()` and before `createRivalVisualBatches()`, which clones these
+   * materials for the field.
+   */
+  async applyLivery(textureUrl: string): Promise<boolean> {
+    const material = this.bodyMaterial();
+    if (!material) return false;
+    const previous = material.map;
+    let texture: THREE.Texture;
+    try {
+      texture = await new THREE.TextureLoader().loadAsync(textureUrl);
+    } catch {
+      return false;
+    }
+    if (previous) {
+      texture.colorSpace = previous.colorSpace;
+      texture.flipY = previous.flipY;
+      texture.wrapS = previous.wrapS;
+      texture.wrapT = previous.wrapT;
+      texture.magFilter = previous.magFilter;
+      texture.minFilter = previous.minFilter;
+      texture.anisotropy = previous.anisotropy;
+      texture.generateMipmaps = previous.generateMipmaps;
+    }
+    texture.needsUpdate = true;
+    material.map = texture;
+    material.needsUpdate = true;
+    // The baked sheet is never referenced again: the rival atlas is built from
+    // the served PNGs, not from this material's map.
+    previous?.dispose();
+    return true;
+  }
+
+  private bodyMaterial(): THREE.MeshStandardMaterial | null {
+    let found: THREE.MeshStandardMaterial | null = null;
+    this.model?.traverse((object) => {
+      if (found || !(object instanceof THREE.Mesh)) return;
+      const materials = Array.isArray(object.material)
+        ? object.material
+        : [object.material];
+      for (const material of materials) {
+        if (
+          material.name === "TOTEM_body"
+          && material instanceof THREE.MeshStandardMaterial
+        ) {
+          found = material;
+          return;
+        }
+      }
+    });
+    return found;
+  }
+
   private calibrateVehicleMaterials(): void {
     if (!this.model) return;
     const calibrated = new Set<THREE.Material>();

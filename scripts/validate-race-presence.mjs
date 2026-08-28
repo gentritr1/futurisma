@@ -7,6 +7,7 @@ import {
   validateArchivePath,
 } from "./lib/greenwater-package-validator.mjs";
 import { archiveAvailability, readArchive, skipArchives } from "./lib/archive-root.mjs";
+import { LIVERY_ATLAS_ORDER, liveryFor } from "../src/game/liveries.js";
 
 const RACE_PRESENCE_ARCHIVE = "GREENWATER_RACE_PRESENCE_v1.6.zip";
 
@@ -192,15 +193,46 @@ if (!raceArchive.available) {
   provenanceSummary = "the 65-entry final freeze and all 64 manifest records are byte-locked";
 }
 
-const [totemSource, presenceSource, rivalsSource, profilesSource] = await Promise.all([
+const [
+  totemSource,
+  presenceSource,
+  rivalsSource,
+  profilesSource,
+  liveriesSource,
+] = await Promise.all([
   readFile(new URL("../src/game/totem.ts", import.meta.url), "utf8"),
   readFile(new URL("../src/game/race-presence.ts", import.meta.url), "utf8"),
   readFile(new URL("../src/game/rivals.ts", import.meta.url), "utf8"),
   readFile(new URL("../src/game/rival-race.js", import.meta.url), "utf8"),
+  readFile(new URL("../src/game/liveries.js", import.meta.url), "utf8"),
 ]);
 assert.doesNotMatch(totemSource, /STEERING_FIN_VERTICAL_CORRECTION_METERS/);
 assert.doesNotMatch(totemSource, /seatSteeringFinsOnBooms/);
-assert.match(rivalsSource, /totem_decals_1024_needle\.png/);
+// P7 moved the decal-sheet table out of rivals.ts into liveries.js, which the
+// player's livery select and the rival atlas now both read. The served NEEDLE
+// sheet must still reach the field, so assert the table names it and that
+// rivals.ts still builds its atlas from that table.
+assert.equal(
+  liveryFor("needle").texture,
+  "/assets/totem/textures/totem_decals_1024_needle.png",
+  "The NEEDLE 16 livery must resolve to the served decal sheet.",
+);
+assert.equal(liveryFor("needle").label, "NEEDLE 16");
+assert.deepEqual(
+  LIVERY_ATLAS_ORDER,
+  ["privateer", "nightform", "needle", "works"],
+  "The atlas quadrant order is what decides which decal each rival wears.",
+);
+assert.match(
+  rivalsSource,
+  /LIVERY_ATLAS_ORDER\.map\(\(code\) => liveryFor\(code\)\.texture\)/,
+  "rivals.ts must build its livery atlas from the shared livery table.",
+);
+assert.doesNotMatch(
+  liveriesSource,
+  /https?:\/\//,
+  "The livery table must reference served paths, never a remote host.",
+);
 assert.match(profilesSource, /id: "rival-needle"/);
 assert.match(profilesSource, /name: "NEEDLE 16"/);
 assert.match(profilesSource, /engineTint: "#d2c8ad"/);

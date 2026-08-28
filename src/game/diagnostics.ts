@@ -4,6 +4,7 @@ import type { AtmosphereDiagnostics } from "./atmosphere";
 import type { EngineAudio } from "./audio";
 import type { RaceCourse } from "./course";
 import type { MinimapDiagnostics } from "./minimap";
+import { persistenceDiagnostics } from "./persistence";
 import type { RivalFleetDiagnostics } from "./rivals";
 import type { SceneAssets } from "./scene-assets";
 import type { Ps2TreatmentDiagnostics } from "./totem";
@@ -219,6 +220,10 @@ function audioFields(audio: ReturnType<EngineAudio["diagnostics"]>) {
     reverbZone: audio.reverbZone,
     reverbWet: Number(audio.reverbWet.toFixed(3)),
     reverbZoneTransitions: audio.reverbZoneTransitions,
+    // P7: the listener's own volume scalars, so a persistence round trip can be
+    // asserted from the diagnostics line rather than from the slider's own DOM.
+    masterVolume: Number(audio.masterVolume.toFixed(2)),
+    musicVolume: Number(audio.musicVolume.toFixed(2)),
   };
 }
 
@@ -337,6 +342,9 @@ export function buildDiagnosticsReport(
     internalHeight: contributors.renderer.domElement.height,
     qualityMode: core.qualityMode,
     reducedMotion: core.reducedMotion,
+    // P7: the save layer reports itself. `persistenceMode: "memory"` is the
+    // signal that a write was refused and this session will forget on reload.
+    ...persistenceDiagnostics(),
     ps2CourseMaterials: core.ps2CourseMaterials,
     ps2CourseTextures: core.ps2CourseTextures,
     heapMb: core.heapMb === null ? null : Number(core.heapMb.toFixed(1)),
