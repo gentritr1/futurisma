@@ -1,10 +1,12 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import {
+  apronSurfaceLift,
   bankedSurfaceLift,
   calculatePresentationAlpha,
   calculateSpeedStreakLength,
   calculateSpeedStreakOpacity,
+  presentationSurfaceLift,
 } from "../src/game/presentation.js";
 
 function read(relativePath) {
@@ -121,19 +123,68 @@ assert.ok(
 assert.equal(bankedSurfaceLift(Number.NaN, 4), 0);
 assert.equal(bankedSurfaceLift(0.2, Number.NaN), 0);
 
+// ---------------------------------------------------------------------------
+// P16 — the apron cross-section term.
+//
+// `bankedSurfaceLift` extrapolates the bank plane, which is exactly right on the
+// deck and incomplete past its edge: `createApronDecks` displaces the run-off
+// along `up` by the edge's `outerRise`. The craft hovered 0.12 m over a gravel
+// shoulder and sank 0.14 m into a structure rumble.
+//
+// It must be ZERO on the deck, which is what keeps every pinned on-deck pose —
+// including the P11 clamp probe's — bit-identical across this change.
+// ---------------------------------------------------------------------------
+assert.equal(
+  apronSurfaceLift(1, 0),
+  0,
+  "On the deck the apron cross-section is zero, so the lift must not move the "
+    + "craft. Every pinned on-deck pose depends on this.",
+);
+assert.equal(
+  presentationSurfaceLift(steepestSin, legalLateral, Math.cos(0), 0),
+  bankedSurfaceLift(steepestSin, legalLateral),
+  "With no cross-section the composed lift must equal the P11 bank lift alone.",
+);
+for (const outerRise of [-0.12, 0.14, 0]) {
+  assert.equal(
+    apronSurfaceLift(1, outerRise),
+    outerRise,
+    `An upright frame must pass the ${outerRise} m cross-section through whole.`,
+  );
+}
+// The authored cross-sections, so the term can never silently grow into
+// something that would move the craft a distance a player would notice.
+const APRON_OUTER_RISES = [-0.12, 0.14, 0];
+const worstApronLift = Math.max(
+  ...APRON_OUTER_RISES.map((rise) => Math.abs(apronSurfaceLift(1, rise))),
+);
+assert.ok(
+  worstApronLift > 0.13 && worstApronLift < 0.15,
+  `Worst-case apron lift is ${worstApronLift.toFixed(3)} m; expected ~0.14 m. `
+    + "This term corrects a cross-section, not a corridor: the P16 run-off "
+    + "report measured 5.24 m of overshoot past the visible wall, which is a "
+    + "clamp question and not this.",
+);
+assert.equal(apronSurfaceLift(Number.NaN, 0.14), 0);
+assert.equal(apronSurfaceLift(1, Number.NaN), 0);
+
 // Applied on the presentation path only. `this.position` is the simulation's
 // own state: `course.project()` and the demo autopilot both read it back, so
 // lifting it would move progress and lateral on the next fixed step and take
 // the lap clock with them.
 const gameSource = read("src/game/game.ts");
 assert.ok(
-  gameSource.includes("this.presentationPosition.y += bankedSurfaceLift("),
-  "game.ts must lift the interpolated presentation pose onto the banked deck.",
+  gameSource.includes("this.presentationPosition.y += presentationSurfaceLift("),
+  "game.ts must lift the interpolated presentation pose onto the drawn surface. "
+    + "P16 composed the bank plane and the apron cross-section into "
+    + "`presentationSurfaceLift`; the lift itself must still be applied here.",
 );
 assert.ok(
-  !/this\.position\.y\s*\+?=\s*[^;]*bankedSurfaceLift/.test(gameSource),
-  "game.ts must NOT apply the bank lift to `this.position`. That vector is the "
-    + "simulation's state; moving its y changes progress, lateral and lap times.",
+  !/this\.position\.y\s*\+?=\s*[^;]*(?:banked|presentation|apron)SurfaceLift/
+    .test(gameSource),
+  "game.ts must NOT apply any surface lift to `this.position`. That vector is "
+    + "the simulation's state; moving its y changes progress, lateral and lap "
+    + "times.",
 );
 assert.ok(
   gameSource.includes("this.position.y = afterMove.position.y;"),

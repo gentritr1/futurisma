@@ -373,18 +373,18 @@ export class SceneAssets {
    * Runs BEFORE `scene.add`, so no frame ever shows the unrepaired placement.
    */
   private async clearCorridorObstacles(root: THREE.Object3D): Promise<void> {
-    const { relocateCorridorObstacles } = await import("./course-repair");
     const {
-      CORRIDOR_LATERAL_MARGIN_METRES,
-      CORRIDOR_OBSTACLE_HEIGHT_MIN_METRES,
-      CORRIDOR_OBSTACLE_HEIGHT_MAX_METRES,
-      BOUNDARY_SEAM_TOLERANCE_METRES,
-    } = await import("./corridor-sweep");
+      relocateCorridorObstacles,
+      OBSTACLE_LATERAL_MARGIN_METRES,
+      OBSTACLE_HEIGHT_MIN_METRES,
+      OBSTACLE_HEIGHT_MAX_METRES,
+      OBSTACLE_SEAM_TOLERANCE_METRES,
+    } = await import("./course-repair");
     this.corridorRelocation = relocateCorridorObstacles(root, this.course, {
-      lateralMargin: CORRIDOR_LATERAL_MARGIN_METRES,
-      heightMin: CORRIDOR_OBSTACLE_HEIGHT_MIN_METRES,
-      heightMax: CORRIDOR_OBSTACLE_HEIGHT_MAX_METRES,
-      seamTolerance: BOUNDARY_SEAM_TOLERANCE_METRES,
+      lateralMargin: OBSTACLE_LATERAL_MARGIN_METRES,
+      heightMin: OBSTACLE_HEIGHT_MIN_METRES,
+      heightMax: OBSTACLE_HEIGHT_MAX_METRES,
+      seamTolerance: OBSTACLE_SEAM_TOLERANCE_METRES,
     });
   }
 

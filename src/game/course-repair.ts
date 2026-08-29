@@ -1,5 +1,9 @@
 import * as THREE from "three";
 
+import {
+  FLAT_FURNITURE_MAX_HEIGHT_METRES,
+  PLAQUE_BAND_BOTTOM_METRES,
+} from "./furniture-placement.js";
 import { surfaceHeightAtLateral } from "./course";
 import type { CourseProjection, RaceCourse } from "./course";
 
@@ -139,6 +143,23 @@ const RELOCATION_CLEARANCE_METRES = 0.35;
 
 /** Below this many vertices a component is noise, not a prop. */
 const MIN_COMPONENT_VERTICES = 3;
+
+/**
+ * The obstacle band, taken from the same two shipped constants
+ * `corridor-sweep.ts` classifies against — `furniture-placement.js` — rather
+ * than from `corridor-sweep.ts` itself.
+ *
+ * That indirection is load-bearing for the download, not style. This pass runs
+ * on every normal session, and importing the sweep for its constants dragged
+ * the sweep, its station grid and its projection machinery into the initial
+ * bundle: 1,037.8 KiB against a 950 KiB budget. Sharing the ROOT constants
+ * keeps the two in agreement without the diagnostics instrument shipping to
+ * players who never arm it.
+ */
+export const OBSTACLE_HEIGHT_MIN_METRES = FLAT_FURNITURE_MAX_HEIGHT_METRES;
+export const OBSTACLE_HEIGHT_MAX_METRES = PLAQUE_BAND_BOTTOM_METRES;
+export const OBSTACLE_LATERAL_MARGIN_METRES = 0.5;
+export const OBSTACLE_SEAM_TOLERANCE_METRES = 0.1;
 
 export interface RelocatedComponent {
   readonly mesh: string;

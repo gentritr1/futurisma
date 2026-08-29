@@ -9,11 +9,8 @@ import {
   integrateCameraFov,
 } from "./camera-feedback";
 import { hasPlayerControlIntent } from "./control-mode";
-import {
-  type CourseProjection,
-  type RaceCourse,
-  type TurnCue,
-} from "./course";
+import { surfaceHeightAtLateral } from "./apron-profile";
+import { type CourseProjection, type RaceCourse, type TurnCue } from "./course";
 import { RaceDiagnostics } from "./diagnostics";
 import { RaceEffects } from "./effects";
 import { ghostRuntime } from "./ghost-runtime";
@@ -59,7 +56,7 @@ import {
   createApronResolution,
   createApronTelemetry,
 } from "./apron.js";
-import { bankedSurfaceLift, calculatePresentationAlpha } from "./presentation";
+import { calculatePresentationAlpha, presentationSurfaceLift } from "./presentation";
 import {
   calculateFinishDistanceMeters,
   calculateRecoveryTelemetry,
@@ -1137,14 +1134,14 @@ export class FuturismaGame {
       this.poseProjection,
     );
     if (this.diagnosticsMode) this.diagnosticPresentationProjectionQueries += 1;
-    // P11 banked-deck height; see `bankedSurfaceLift`. `sample` is projected
-    // from the un-lifted point on purpose — its `lateral` is the horizontal
-    // offset the lift is defined against. `presentationPosition` is rewritten
-    // from the simulation pose every frame, so this never accumulates, and the
-    // craft mesh, shadow blob and camera anchor all read it after this line.
-    this.presentationPosition.y += bankedSurfaceLift(
+    // P11 bank plane + P16 apron cross-section; see `presentationSurfaceLift`.
+    // `sample` is projected from the un-lifted point on purpose, and this never
+    // accumulates: `presentationPosition` is rewritten from the sim each frame.
+    this.presentationPosition.y += presentationSurfaceLift(
       sample.right.y,
       sample.lateral,
+      sample.up.y,
+      surfaceHeightAtLateral(sample, sample.lateral),
     );
     const speedRatio = this.speed / BOOST_MAX_SPEED;
     const vehiclePosition = this.scratchA
