@@ -117,25 +117,25 @@
         "id": "HZ_CABLE_CHICANE",
         "type": "cable_coil",
         "distance": 2465,
-        "lateralOffset": -7.6,
+        "lateralOffset": -11.8,
         "effect": "hard_trip",
-        "note": "under the rig stands, outside the chicane line"
+        "note": "P15: -7.6 -> -11.8 m, off the deck entirely. Half-width here is 11.08 m, so the deck clears at 11.58 m and the coil sits 0.22 m beyond it, under the rig stands."
       },
       {
         "id": "HZ_CABLE_BRINE",
         "type": "cable_coil",
         "distance": 2860,
-        "lateralOffset": 8.4,
+        "lateralOffset": 12.8,
         "effect": "hard_trip",
-        "note": "outer hand of the Brine Cut, opposite the drift"
+        "note": "P15: +8.4 -> +12.8 m, off the deck entirely. Half-width here is 12.03 m, so the deck clears at 12.53 m and the coil sits 0.27 m beyond it, on the outer hand of the Brine Cut opposite the drift."
       },
       {
         "id": "HZ_CABLE_UNDERPASS",
         "type": "cable_coil",
         "distance": 3020,
-        "lateralOffset": -9.4,
+        "lateralOffset": -13.7,
         "effect": "hard_trip",
-        "note": "loose conveyor cable at the underpass support"
+        "note": "P15: -9.4 -> -13.7 m, off the deck entirely. Half-width here is 13.00 m, so the deck clears at 13.50 m and the coil sits 0.20 m beyond it, at the underpass support."
       }
     ]
   },

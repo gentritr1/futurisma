@@ -16117,36 +16117,37 @@
    "id": "HZ_STEAM_1",
    "type": "steam_vent",
    "distance": 674.519,
-   "lateralOffset": -8,
+   "lateralOffset": -10.2,
    "cycleSeconds": 4,
    "telegraphSeconds": 1,
-   "effect": "vision_only"
+   "effect": "vision_only",
+   "note": "P15: -8.0 -> -10.2 m. The deck exemption for hazards was revoked; nothing stands on the racing surface. Half-width here is 9.50 m, so the deck clears at 10.00 m and this sits 0.20 m beyond it, at the foot of the Hangar Six frame line."
   },
   {
    "id": "HZ_STEAM_2",
    "type": "steam_vent",
    "distance": 736.115,
-   "lateralOffset": 8.4,
+   "lateralOffset": 10.2,
    "cycleSeconds": 4,
    "telegraphSeconds": 1,
    "effect": "vision_only",
-      "note": "P11: moved from +7.0 to +8.4 m. The hangar interior clamps at halfWidth - deckMargin = 7.45 m, so +7.0 stood inside the drivable corridor."
+   "note": "P11 moved this +7.0 -> +8.4 m to leave the drivable clamp. P15: +8.4 -> +10.2 m, because the deck exemption for hazards was revoked entirely. Half-width here is 9.50 m, so the deck clears at 10.00 m and this sits 0.20 m beyond it."
   },
   {
    "id": "HZ_CABLE_1",
    "type": "cable_coil",
    "distance": 781.239,
-   "lateralOffset": -8.5,
+   "lateralOffset": -10.2,
    "effect": "hard_trip",
-   "note": "outer 3 m only, off the racing line"
+   "note": "P15: -8.5 -> -10.2 m, off the deck entirely. Half-width here is 9.50 m, so the deck clears at 10.00 m and the coil sits 0.20 m beyond it, against the hangar frame line."
   },
   {
    "id": "HZ_CABLE_2",
    "type": "cable_coil",
    "distance": 1278.982,
-   "lateralOffset": 9,
+   "lateralOffset": 10.5,
    "effect": "hard_trip",
-   "note": "outer 3 m only, off the racing line"
+   "note": "P15: +9.0 -> +10.5 m, off the deck entirely. Half-width here is 9.79 m, so the deck clears at 10.29 m and the coil sits 0.21 m beyond it, on the Canopy Passage run-off."
   },
   {
    "id": "HZ_FOG_BANK",

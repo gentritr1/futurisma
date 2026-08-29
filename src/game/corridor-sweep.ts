@@ -75,6 +75,15 @@ export const CORRIDOR_HEIGHT_MAX_METRES = 4.0;
 export type CorridorBand = "flush" | "obstacle" | "overhead" | "boundary";
 
 /**
+ * The obstacle band, re-exported under its own names so the relocation pass in
+ * `course-repair.ts` gates on exactly what this sweep counts. Two modules
+ * deciding "is this an obstacle" from two copies of 0.3 and 3.2 is how the
+ * DECK_HAZARDS whitelist drifted from the thing it was exempting.
+ */
+export const CORRIDOR_OBSTACLE_HEIGHT_MIN_METRES = FLAT_FURNITURE_MAX_HEIGHT_METRES;
+export const CORRIDOR_OBSTACLE_HEIGHT_MAX_METRES = PLAQUE_BAND_BOTTOM_METRES;
+
+/**
  * How far a vertex may sit inside the deck edge and still be the track's own
  * boundary rather than something standing on the road.
  *
@@ -83,7 +92,7 @@ export type CorridorBand = "flush" | "obstacle" | "overhead" | "boundary";
  * kerb measures 0.045 m inside its own deck edge. Without this tolerance every
  * one of those seams reads as an obstacle: 92 of Bitterpan's first 97.
  */
-const BOUNDARY_SEAM_TOLERANCE_METRES = 0.1;
+export const BOUNDARY_SEAM_TOLERANCE_METRES = 0.1;
 
 /**
  * Band edges are compared with a millimetre of slack.
@@ -209,6 +218,13 @@ export interface CorridorSweepResult {
   /** Intrusions from meshes hidden at sweep time, reported separately. */
   readonly hiddenIntrusions: number;
   readonly list: readonly CorridorIntrusion[];
+  /**
+   * Per-span innermost tall geometry, the input to the derived drivable limit.
+   * Emitted only when `?probe=corridor-sweep` runs with `spans=1`, because it is
+   * ~250 rows per map and belongs in a generation script's output, not in every
+   * diagnostics line.
+   */
+  readonly spans: readonly TallGeometrySpan[];
   readonly elapsedMs: number;
 }
 
@@ -226,6 +242,7 @@ export const EMPTY_CORRIDOR_SWEEP: CorridorSweepResult = Object.freeze({
   boundary: 0,
   hiddenIntrusions: 0,
   list: Object.freeze([]) as readonly CorridorIntrusion[],
+  spans: Object.freeze([]) as readonly TallGeometrySpan[],
   elapsedMs: 0,
 });
 
@@ -283,38 +300,34 @@ class StationGrid {
 }
 
 /**
- * How far out the craft can be driven and held, per side and per span.
+ * The span table task 6 derives the drivable limit from.
  *
- * On an UNWALLED edge (Greenwater's C / OPEN_RUNOFF, Bitterpan's OPEN_PAN) there
- * is nothing to stop the craft, so the whole run-off is drivable and the reach
- * is `halfWidth + width` — 5.8 m past the deck on both maps. Anything standing
- * in there is something the player drives into, which is the P16 (B) report:
- * held on the Cradle Bend run-off, the hull interpenetrated an edge wall board.
+ * One bucket per `TALL_GEOMETRY_SPAN_METRES` of lap per side, holding the
+ * innermost lateral at which geometry taller than
+ * `TALL_GEOMETRY_MIN_HEIGHT_METRES` was found anywhere inside the craft's clamp.
  *
- * On a WALLED edge (A, B) the wall is the boundary the player sees and hits, so
- * the visual reach is the deck itself.
- *
- * A MEASURED CAVEAT, and it is not small. `resolveApron` sets
- * `lateralLimit = halfWidth + width` for EVERY edge, walled or not, and
- * `game.ts:893` clamps `this.lateral` to it unconditionally — `apron.wall` only
- * gates the impact FX at line 905. So the simulation actually lets the craft's
- * CENTRE reach 16.0 m at Cradle Bend while the wall it just drove through
- * stands at 10.76 m. This function deliberately uses the visual boundary rather
- * than that clamp, because treating the clamp as the corridor would classify
- * every trackside wall on both maps as an obstacle in its own road. The clamp
- * overshoot is real, is pre-existing, and is a physics question — out of scope
- * here, reported instead.
+ * The height floor is the ruling's: a kerb, lip or marker at or below 0.5 m does
+ * NOT bound the craft — running over a low kerb onto the Bitterpan pan is a
+ * feature, and the pan floor exists to receive it. Only geometry the craft would
+ * visibly drive INTO counts.
  */
-function drivableReach(
-  halfWidth: number,
-  apron: ApronResolution,
-  lateralMargin: number,
-): number {
-  const outer = apron.wall || apron.width <= 0
-    ? halfWidth
-    : halfWidth + apron.width;
-  return outer + lateralMargin;
+export interface TallGeometrySpan {
+  /** Lap distance at the start of this span, metres. */
+  readonly distance: number;
+  /** Innermost tall lateral to the left (negative side), or null. */
+  readonly left: number | null;
+  /** Innermost tall lateral to the right (positive side), or null. */
+  readonly right: number | null;
+  readonly halfWidth: number;
+  /** `resolveApron`'s current clamp for this span. */
+  readonly clamp: number;
 }
+
+/** Lap resolution of the derived limit table. */
+export const TALL_GEOMETRY_SPAN_METRES = 10;
+
+/** Below this, geometry is a kerb the craft may run over, not a wall. */
+export const TALL_GEOMETRY_MIN_HEIGHT_METRES = 0.5;
 
 interface MeshAccumulator {
   mesh: string;
@@ -384,6 +397,8 @@ export interface CorridorSweepOptions {
   readonly lateralMargin?: number;
   readonly heightMin?: number;
   readonly heightMax?: number;
+  /** Emit the per-span tall-geometry table. Off by default; see `spans`. */
+  readonly collectSpans?: boolean;
 }
 
 /**
@@ -406,6 +421,7 @@ export function sweepCorridor(
   const heightMin = options.heightMin ?? CORRIDOR_HEIGHT_MIN_METRES;
   const heightMax = options.heightMax ?? CORRIDOR_HEIGHT_MAX_METRES;
   const excluded = new Set(options.exclude ?? []);
+  const collectSpans = options.collectSpans === true;
 
   // Station spacing tracks the authored tables: ~2 m on Greenwater, ~5 m on
   // Bitterpan. One station per 4 m of lap is finer than the grid cell either way.
@@ -422,6 +438,36 @@ export function sweepCorridor(
   const composed = new THREE.Matrix4();
 
   const accumulators = new Map<string, MeshAccumulator>();
+  interface SpanBucket {
+    left: number | null;
+    right: number | null;
+    halfWidth: number;
+    clamp: number;
+  }
+  const spanBuckets = new Map<number, SpanBucket>();
+  const recordTallGeometry = (
+    distance: number,
+    lateral: number,
+    halfWidth: number,
+    clamp: number,
+  ): void => {
+    const index = Math.floor(distance / TALL_GEOMETRY_SPAN_METRES);
+    let bucket = spanBuckets.get(index);
+    if (!bucket) {
+      bucket = { left: null, right: null, halfWidth, clamp };
+      spanBuckets.set(index, bucket);
+    }
+    // Narrowest half-width and clamp across the span: the limit has to hold
+    // everywhere in it, so the span takes its tightest station.
+    bucket.halfWidth = Math.min(bucket.halfWidth, halfWidth);
+    bucket.clamp = Math.min(bucket.clamp, clamp);
+    const magnitude = Math.abs(lateral);
+    if (lateral < 0) {
+      if (bucket.left === null || magnitude < bucket.left) bucket.left = magnitude;
+    } else if (bucket.right === null || magnitude < bucket.right) {
+      bucket.right = magnitude;
+    }
+  };
   let meshesSwept = 0;
   let instancesSwept = 0;
   let verticesSwept = 0;
@@ -447,19 +493,43 @@ export function sweepCorridor(
       verticesTested += 1;
       course.project(vertex, hint, projection);
       const lateral = projection.lateral;
-      // The corridor is the DRIVABLE REACH, not the deck. `apronAt` resolves
-      // this span's edge type from course data — nothing here hardcodes which
-      // spans are C — and returns both the run-off width and whether that edge
-      // ends in a wall.
+      // Two different limits, and keeping them apart is the point.
+      //
+      // The GATE is the deck: `halfWidth + margin`. That is what "nothing
+      // stands on the racing surface" means, and it is the count that must
+      // reach zero.
+      //
+      // The SWEEP is wider — out to the craft's clamp — because task 6 needs to
+      // know where tall geometry begins across the whole reach in order to
+      // derive the limit from it. `apronAt` resolves this span's edge type from
+      // course data, so nothing here hardcodes which spans are open run-off.
       course.apronAt(projection, lateral, apron);
-      const reach = drivableReach(projection.halfWidth, apron, lateralMargin);
-      const depth = reach - Math.abs(lateral);
-      if (depth <= 0) continue;
+      const gate = projection.halfWidth + lateralMargin;
+      const clamp = apron.lateralLimit;
+      const distance = projection.progress * course.length;
       const surface = surfaceHeightAtLateral(projection, lateral);
       const height = offset.subVectors(vertex, projection.position)
         .dot(projection.up) - surface;
+      // Tall geometry anywhere inside the clamp bounds the craft, whichever
+      // side of the deck edge it stands on. Recorded before the gate test,
+      // because most of it is legitimately outside the deck.
+      // Only geometry in the DRIVING band bounds the craft. The upper edge is
+      // the plaque band, not the sweep ceiling: the Cradle gantry's beam
+      // crosses the track at 3.5 m and would otherwise collapse the derived
+      // limit to lateral 0 on the start line, which is exactly what the first
+      // span table did (`d=0 left 0`).
+      if (
+        height >= TALL_GEOMETRY_MIN_HEIGHT_METRES
+        && height < PLAQUE_BAND_BOTTOM_METRES
+        && Math.abs(lateral) <= clamp
+      ) {
+        if (collectSpans) {
+          recordTallGeometry(distance, lateral, projection.halfWidth, clamp);
+        }
+      }
+      const depth = gate - Math.abs(lateral);
+      if (depth <= 0) continue;
       if (height < heightMin || height > heightMax) continue;
-      const distance = projection.progress * course.length;
       const key = `${meshKey}@${Math.floor(distance / INTRUSION_GROUP_METRES)}`;
       let accumulator = accumulators.get(key);
       if (!accumulator) {
@@ -477,7 +547,7 @@ export function sweepCorridor(
           heightMin: Infinity,
           heightMax: -Infinity,
           sector: projection.sector,
-          reach,
+          reach: clamp,
           innerExtent: Infinity,
         };
         accumulators.set(key, accumulator);
@@ -485,7 +555,7 @@ export function sweepCorridor(
       accumulator.vertices += 1;
       if (Math.abs(lateral) < accumulator.innerExtent) {
         accumulator.innerExtent = Math.abs(lateral);
-        accumulator.reach = reach;
+        accumulator.reach = clamp;
       }
       accumulator.heightMin = Math.min(accumulator.heightMin, height);
       accumulator.heightMax = Math.max(accumulator.heightMax, height);
@@ -572,6 +642,15 @@ export function sweepCorridor(
     hiddenIntrusions: ordered.length - visibleList.length,
     // Obstacles first: the list is capped, and the capped-out tail must never
     // be the thing that had to be fixed.
+    spans: [...spanBuckets.entries()]
+      .sort((a, b) => a[0] - b[0])
+      .map(([index, bucket]): TallGeometrySpan => ({
+        distance: index * TALL_GEOMETRY_SPAN_METRES,
+        left: bucket.left === null ? null : Number(bucket.left.toFixed(3)),
+        right: bucket.right === null ? null : Number(bucket.right.toFixed(3)),
+        halfWidth: Number(bucket.halfWidth.toFixed(3)),
+        clamp: Number(bucket.clamp.toFixed(3)),
+      })),
     list: [
       ...obstacles,
       ...visibleList.filter((entry) => entry.band !== "obstacle"),
