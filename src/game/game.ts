@@ -87,7 +87,7 @@ import {
 } from "./rivals";
 import {
   applyPs2MaterialTreatment,
-  ps2TreatmentDiagnostics,
+  ps2TreatmentDiagnostics, prefersMultisampling,
   updatePs2SnapGrid,
   TotemVehicle,
   type TotemVisualState,
@@ -313,7 +313,7 @@ export class FuturismaGame {
     this.lateral = this.course.startLateral;
     this.renderer = new THREE.WebGLRenderer({
       canvas,
-      antialias: false,
+      antialias: prefersMultisampling(), // P14. See totem.ts for why ps2 opts out.
       alpha: false,
       powerPreference: "high-performance",
     });

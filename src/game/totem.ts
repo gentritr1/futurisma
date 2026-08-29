@@ -46,7 +46,44 @@ export interface Ps2MaterialTreatmentOptions {
    * from the world it sits in reads as a bug.
    */
   worldGeometry?: boolean;
+  /**
+   * P14 — which texture class this root carries, following P12's `worldGeometry`
+   * pattern of an opt-in flag rather than a second entry point.
+   *
+   * `"pixel"` (the default) is for **pixel-authored** sheets: the runway and
+   * signage atlases, the motion/effects atlases, the livery decal sheets and the
+   * surface-character mask. They are drawn texel-by-texel by
+   * `scripts/design/atlas-draw.mjs` and a linear magnifier smears exactly the
+   * stem weights that script is careful about, so they keep `NearestFilter`.
+   *
+   * `"painterly"` is for the **baked/painted** GLB sheets — the Greenwater
+   * environment's concrete/metal/jungle/signage/water atlases. Those are painted
+   * at 1024 with sub-texel noise under crisp vector plates; nothing in them is
+   * authored to a screen texel, so point sampling only buys minification
+   * speckle. The asset kit is deliberately NOT in this class: its one texture is
+   * the livery decal sheet, which the craft wears too.
+   */
+  textureCharacter?: "pixel" | "painterly";
 }
+
+/**
+ * P14 — the two filter classes, declared as data so
+ * `scripts/validate-render-quality.mjs` can assert both without a GL context.
+ * Anisotropy stays at 1 in both: it is a per-sample cost on every surface in
+ * the scene and the A/B could not separate it from the min-filter change.
+ */
+export const TEXTURE_FILTER_CLASSES = {
+  pixel: {
+    magFilter: THREE.NearestFilter,
+    minFilter: THREE.NearestMipmapLinearFilter,
+    anisotropy: 1,
+  },
+  painterly: {
+    magFilter: THREE.LinearFilter,
+    minFilter: THREE.LinearMipmapLinearFilter,
+    anisotropy: 1,
+  },
+} as const;
 
 export interface Ps2TreatmentDiagnostics {
   renderMode: string;
@@ -197,6 +234,22 @@ let ps2SnapMaterialCount = 0;
 let ps2DitherMaterialCount = 0;
 const ps2PatchedMaterials = new WeakSet<THREE.Material>();
 
+/**
+ * P14 — whether the renderer should be built with MSAA.
+ *
+ * The AgX path takes it: geometry-edge shimmer at 200+ km/h is the single
+ * loudest "this looks worse than it should" artifact once the internal target
+ * is high enough to show it. `?render=ps2` does not: the mode's whole signature
+ * is snapped silhouettes stepping along a low-resolution raster, and smoothing
+ * those edges would take the era out of the era mode.
+ *
+ * Read at renderer construction, so it lives beside `activeRenderMode`'s other
+ * consumers rather than being a second place that parses the query string.
+ */
+export function prefersMultisampling(): boolean {
+  return activeRenderMode() !== "ps2";
+}
+
 /** `renderMode` plus the counts P4b's acceptance checks read off the soak. */
 export function ps2TreatmentDiagnostics(): Ps2TreatmentDiagnostics {
   return {
@@ -267,6 +320,11 @@ export function applyPs2MaterialTreatment(
   options: Ps2MaterialTreatmentOptions = {},
 ): Ps2MaterialTreatmentStats {
   const worldGeometry = options.worldGeometry === true;
+  // `?render=ps2` is the era-accurate opt-in and P14 must not move it: every
+  // texture stays on the point-sampled class there, whatever it was authored as.
+  const filter = activeRenderMode() === "ps2"
+    ? TEXTURE_FILTER_CLASSES.pixel
+    : TEXTURE_FILTER_CLASSES[options.textureCharacter ?? "pixel"];
   const treatedMaterials = new Set<THREE.Material>();
   const treatedTextures = new Set<THREE.Texture>();
   let snapMaterials = 0;
@@ -300,9 +358,9 @@ export function applyPs2MaterialTreatment(
       ]) {
         if (!texture) continue;
         treatedTextures.add(texture);
-        texture.magFilter = THREE.NearestFilter;
-        texture.minFilter = THREE.NearestMipmapLinearFilter;
-        texture.anisotropy = 1;
+        texture.magFilter = filter.magFilter;
+        texture.minFilter = filter.minFilter;
+        texture.anisotropy = filter.anisotropy;
         texture.needsUpdate = true;
       }
       material.needsUpdate = true;

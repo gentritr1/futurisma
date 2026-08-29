@@ -210,7 +210,12 @@ export class BitterpanEnvironment implements RaceEnvironment {
     // authored for diagrams and disappears against the live fog/sky. Runtime
     // colors provide the value separation required to drive the blockout.
     applyRuntimeRoutePalette(root);
-    applyPs2MaterialTreatment(root, { worldGeometry: true });
+    // The map-02 GLBs ship untextured, so the class is a no-op today; it is
+    // declared anyway because a baked sheet here would belong with Greenwater's.
+    applyPs2MaterialTreatment(root, {
+      worldGeometry: true,
+      textureCharacter: "painterly",
+    });
     const resources = countVisibleResources(root);
     this.stats = {
       meshes,
