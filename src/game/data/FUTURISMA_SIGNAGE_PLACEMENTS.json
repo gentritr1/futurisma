@@ -1,0 +1,443 @@
+{
+ "id": "FUTURISMA_TRACKSIDE_SIGNAGE_v0.1",
+ "texture": "/assets/greenwater/textures/futurisma_signage_1024.png",
+ "regionsFrom": "src/game/data/ATLAS_REGIONS.json#futurisma_signage_1024",
+ "sponsorFiction": {
+  "KAIRO_DYNAMICS": {
+   "status": "existing",
+   "role": "prime constructor of TOTEM",
+   "justification": "Already on all four accepted livery sheets and in public/assets/totem/logos/kairo-dynamics.svg. The atlas restates the accepted chevron rather than redrawing it."
+  },
+  "PALE_HARVEST": {
+   "status": "new",
+   "role": "solar salt operator, Bitterpan",
+   "justification": "Bitterpan is a working salt pan with harvester rigs and a loadout tower. Somebody harvests it. Bone-on-salt with a halite lozenge; the only board whose ground is the same colour as its site."
+  },
+  "SODIUM_ROW": {
+   "status": "new",
+   "role": "bulk propellant contractor, Greenwater",
+   "justification": "Greenwater already has a sector called FUEL_ROW and the lighting brief already warms it toward sodium service light. The name is read off the map instead of invented over it."
+  },
+  "AEROLIFT_VII": {
+   "status": "new",
+   "role": "airframe repair, Greenwater",
+   "justification": "Hangar Six is an aircraft hangar with a collapsed-boom crane. Naming the trade that occupies it is what turns the hangar from scenery into a tenant, and it is the direct source of 'repaired aerospace machinery'."
+  },
+  "GREENWATER_FIELD_AUTHORITY": {
+   "status": "new",
+   "role": "site operator, Greenwater",
+   "justification": "The only civic voice in the set. It owns the Cradle fascia, so the gate reads as a facility gate rather than a race arch."
+  }
+ },
+ "runtime": {
+  "meshName": "GW_SIGNAGE_BOARDS / BP_SIGNAGE_BOARDS",
+  "materialName": "FUTURISMA_SIGNAGE",
+  "shaderModel": "unlit",
+  "drawCallsPerMap": 1,
+  "trianglesPerBoard": 2,
+  "depthWrite": true,
+  "alphaTest": 0.5,
+  "doubleSided": false,
+  "note": "Board faces only. Posts and hoarding frames are geometry and are specified in GREENWATER_OPENING_GEOMETRY_SPEC.json."
+ },
+ "greenwater": {
+  "boards": 22,
+  "quads": 39,
+  "triangles": 78,
+  "placements": [
+   {
+    "id": "GW_CRADLE_FASCIA",
+    "slot": "CRADLE_BANNER",
+    "distance": 0,
+    "lateral": 0,
+    "height": 15.2,
+    "widthMetres": 38,
+    "heightMetres": 4.75,
+    "facing": "course",
+    "mount": "LM_CRADLE gantry beam, both faces",
+    "note": "The gate read the opening lacks. 38 m matches the authored LM_CRADLE footprint exactly; at 15.2 m it sits under the 22 m beam top and above the 8 m clear span, so it silhouettes against sky from 200 m out and is the last thing over the nose at the line."
+   },
+   {
+    "id": "GW_CRADLE_FASCIA_REAR",
+    "slot": "CRADLE_BANNER",
+    "distance": 0,
+    "lateral": 0,
+    "height": 15.2,
+    "widthMetres": 38,
+    "heightMetres": 4.75,
+    "facing": "reverse",
+    "mount": "LM_CRADLE gantry beam, rear face",
+    "note": "Read on the approach to the line each lap."
+   },
+   {
+    "id": "GW_CRADLE_PENNANTS",
+    "slot": "PENNANT_ROW",
+    "distance": 0,
+    "lateral": 0,
+    "height": 19.4,
+    "widthMetres": 38,
+    "heightMetres": 1.6,
+    "facing": "course",
+    "tileU": 6,
+    "mount": "gantry top chord"
+   },
+   {
+    "id": "GW_GRID_TOTEM_WORKS",
+    "slot": "TOTEM_WORKS",
+    "distance": 6,
+    "lateral": -13.6,
+    "height": 2.6,
+    "widthMetres": 2.4,
+    "heightMetres": 2.4,
+    "facing": "inward",
+    "mount": "pit wall panel, left shoulder",
+    "note": "Field totem beside its grid slot. Order follows LIVERY_ATLAS_ORDER so the wall never disagrees with the livery the player took."
+   },
+   {
+    "id": "GW_GRID_TOTEM_PRIVATEER",
+    "slot": "TOTEM_PRIVATEER",
+    "distance": 12.5,
+    "lateral": -13.6,
+    "height": 2.6,
+    "widthMetres": 2.4,
+    "heightMetres": 2.4,
+    "facing": "inward",
+    "mount": "pit wall panel, left shoulder",
+    "note": "Field totem beside its grid slot. Order follows LIVERY_ATLAS_ORDER so the wall never disagrees with the livery the player took."
+   },
+   {
+    "id": "GW_GRID_TOTEM_NIGHTFORM",
+    "slot": "TOTEM_NIGHTFORM",
+    "distance": 19,
+    "lateral": -13.6,
+    "height": 2.6,
+    "widthMetres": 2.4,
+    "heightMetres": 2.4,
+    "facing": "inward",
+    "mount": "pit wall panel, left shoulder",
+    "note": "Field totem beside its grid slot. Order follows LIVERY_ATLAS_ORDER so the wall never disagrees with the livery the player took."
+   },
+   {
+    "id": "GW_GRID_TOTEM_NEEDLE",
+    "slot": "TOTEM_NEEDLE",
+    "distance": 25.5,
+    "lateral": -13.6,
+    "height": 2.6,
+    "widthMetres": 2.4,
+    "heightMetres": 2.4,
+    "facing": "inward",
+    "mount": "pit wall panel, left shoulder",
+    "note": "Field totem beside its grid slot. Order follows LIVERY_ATLAS_ORDER so the wall never disagrees with the livery the player took."
+   },
+   {
+    "id": "GW_PITWALL_TAPE",
+    "slot": "SPONSOR_TAPE",
+    "distance": 34,
+    "lateral": -13.6,
+    "height": 1.9,
+    "widthMetres": 52,
+    "heightMetres": 1.2,
+    "facing": "inward",
+    "tileU": 13,
+    "mount": "pit wall capping"
+   },
+   {
+    "id": "GW_S_KAIRO",
+    "slot": "BOARD_KAIRO",
+    "distance": 62,
+    "lateral": -16.4,
+    "height": 4.4,
+    "widthMetres": 9.6,
+    "heightMetres": 2.4,
+    "facing": "inward",
+    "mount": "two-post board, 0.34 m box section"
+   },
+   {
+    "id": "GW_S_AUTHORITY",
+    "slot": "BOARD_GREENWATER_AUTH",
+    "distance": 108,
+    "lateral": 16.4,
+    "height": 4.4,
+    "widthMetres": 9.6,
+    "heightMetres": 2.4,
+    "facing": "inward",
+    "mount": "two-post board, 0.34 m box section"
+   },
+   {
+    "id": "GW_S_AEROLIFT_A",
+    "slot": "BOARD_AEROLIFT",
+    "distance": 178,
+    "lateral": -16.8,
+    "height": 4.4,
+    "widthMetres": 9.6,
+    "heightMetres": 2.4,
+    "facing": "inward",
+    "mount": "two-post board, 0.34 m box section"
+   },
+   {
+    "id": "GW_S_TECH",
+    "slot": "BOARD_TECH_PLATE",
+    "distance": 214,
+    "lateral": 16.8,
+    "height": 4.4,
+    "widthMetres": 9.6,
+    "heightMetres": 2.4,
+    "facing": "inward",
+    "mount": "two-post board, 0.34 m box section"
+   },
+   {
+    "id": "GW_S_AEROLIFT_B",
+    "slot": "BOARD_AEROLIFT",
+    "distance": 648,
+    "lateral": -17.5,
+    "height": 4.4,
+    "widthMetres": 9.6,
+    "heightMetres": 2.4,
+    "facing": "inward",
+    "mount": "two-post board, 0.34 m box section"
+   },
+   {
+    "id": "GW_S_KAIRO_B",
+    "slot": "BOARD_KAIRO",
+    "distance": 806,
+    "lateral": 16.2,
+    "height": 4.4,
+    "widthMetres": 9.6,
+    "heightMetres": 2.4,
+    "facing": "inward",
+    "mount": "two-post board, 0.34 m box section"
+   },
+   {
+    "id": "GW_S_SODIUM_A",
+    "slot": "BOARD_SODIUM_ROW",
+    "distance": 1712,
+    "lateral": -18.4,
+    "height": 4.4,
+    "widthMetres": 9.6,
+    "heightMetres": 2.4,
+    "facing": "inward",
+    "mount": "two-post board, 0.34 m box section"
+   },
+   {
+    "id": "GW_S_SODIUM_B",
+    "slot": "BOARD_SODIUM_ROW",
+    "distance": 1968,
+    "lateral": -18.4,
+    "height": 4.4,
+    "widthMetres": 9.6,
+    "heightMetres": 2.4,
+    "facing": "inward",
+    "mount": "two-post board, 0.34 m box section"
+   },
+   {
+    "id": "GW_S_AUTHORITY_B",
+    "slot": "BOARD_GREENWATER_AUTH",
+    "distance": 2364,
+    "lateral": 17.2,
+    "height": 4.4,
+    "widthMetres": 9.6,
+    "heightMetres": 2.4,
+    "facing": "inward",
+    "mount": "two-post board, 0.34 m box section"
+   },
+   {
+    "id": "GW_S_KAIRO_C",
+    "slot": "BOARD_KAIRO",
+    "distance": 2452,
+    "lateral": -16.6,
+    "height": 4.4,
+    "widthMetres": 9.6,
+    "heightMetres": 2.4,
+    "facing": "inward",
+    "mount": "two-post board, 0.34 m box section"
+   },
+   {
+    "id": "GW_M_T1",
+    "slot": "MARSHAL_PLATE",
+    "distance": 212,
+    "lateral": -15.2,
+    "height": 2.8,
+    "widthMetres": 2.2,
+    "heightMetres": 1.1,
+    "facing": "inward",
+    "mount": "single post"
+   },
+   {
+    "id": "GW_M_HANGAR",
+    "slot": "MARSHAL_PLATE",
+    "distance": 640,
+    "lateral": -16.4,
+    "height": 2.8,
+    "widthMetres": 2.2,
+    "heightMetres": 1.1,
+    "facing": "inward",
+    "mount": "single post"
+   },
+   {
+    "id": "GW_M_ELBOW",
+    "slot": "MARSHAL_PLATE",
+    "distance": 1520,
+    "lateral": 16.4,
+    "height": 2.8,
+    "widthMetres": 2.2,
+    "heightMetres": 1.1,
+    "facing": "inward",
+    "mount": "single post"
+   },
+   {
+    "id": "GW_M_T10",
+    "slot": "MARSHAL_PLATE",
+    "distance": 2140,
+    "lateral": 15.6,
+    "height": 2.8,
+    "widthMetres": 2.2,
+    "heightMetres": 1.1,
+    "facing": "inward",
+    "mount": "single post"
+   }
+  ]
+ },
+ "bitterpan": {
+  "boards": 12,
+  "quads": 12,
+  "triangles": 24,
+  "placements": [
+   {
+    "id": "BP_SITE_BOARD",
+    "slot": "BOARD_BITTERPAN_WORKS",
+    "distance": 64,
+    "lateral": -22,
+    "height": 6.2,
+    "widthMetres": 14,
+    "heightMetres": 3.5,
+    "facing": "inward",
+    "mount": "four-post hoarding on the pan"
+   },
+   {
+    "id": "BP_S_PALE_A",
+    "slot": "BOARD_PALE_HARVEST",
+    "distance": 420,
+    "lateral": -26,
+    "height": 5,
+    "widthMetres": 11,
+    "heightMetres": 2.75,
+    "facing": "inward",
+    "mount": "two-post board, guyed against the WNW wind"
+   },
+   {
+    "id": "BP_S_PALE_B",
+    "slot": "BOARD_PALE_HARVEST",
+    "distance": 1180,
+    "lateral": 24,
+    "height": 5,
+    "widthMetres": 11,
+    "heightMetres": 2.75,
+    "facing": "inward",
+    "mount": "two-post board, guyed against the WNW wind"
+   },
+   {
+    "id": "BP_S_KAIRO",
+    "slot": "BOARD_KAIRO",
+    "distance": 1740,
+    "lateral": -24,
+    "height": 5,
+    "widthMetres": 11,
+    "heightMetres": 2.75,
+    "facing": "inward",
+    "mount": "two-post board, guyed against the WNW wind"
+   },
+   {
+    "id": "BP_S_PALE_C",
+    "slot": "BOARD_PALE_HARVEST",
+    "distance": 2260,
+    "lateral": 26,
+    "height": 5,
+    "widthMetres": 11,
+    "heightMetres": 2.75,
+    "facing": "inward",
+    "mount": "two-post board, guyed against the WNW wind"
+   },
+   {
+    "id": "BP_S_TECH",
+    "slot": "BOARD_TECH_PLATE",
+    "distance": 2880,
+    "lateral": -20,
+    "height": 5,
+    "widthMetres": 11,
+    "heightMetres": 2.75,
+    "facing": "inward",
+    "mount": "two-post board, guyed against the WNW wind"
+   },
+   {
+    "id": "BP_HD_A",
+    "slot": "BOARD_HEAT_DEAD",
+    "distance": 760,
+    "lateral": -34,
+    "height": 4.6,
+    "widthMetres": 11,
+    "heightMetres": 2.75,
+    "facing": "inward",
+    "mount": "two-post board, leaning 4-9 deg",
+    "note": "Bleached copy of BP_S_PALE. Placed further out and at a lean so the pan reads as a site that has been signed twice and maintained once."
+   },
+   {
+    "id": "BP_HD_B",
+    "slot": "BOARD_HEAT_DEAD",
+    "distance": 1520,
+    "lateral": 32,
+    "height": 4.6,
+    "widthMetres": 11,
+    "heightMetres": 2.75,
+    "facing": "inward",
+    "mount": "two-post board, leaning 4-9 deg",
+    "note": "Bleached copy of BP_S_PALE. Placed further out and at a lean so the pan reads as a site that has been signed twice and maintained once."
+   },
+   {
+    "id": "BP_HD_C",
+    "slot": "BOARD_HEAT_DEAD",
+    "distance": 2060,
+    "lateral": -30,
+    "height": 4.6,
+    "widthMetres": 11,
+    "heightMetres": 2.75,
+    "facing": "inward",
+    "mount": "two-post board, leaning 4-9 deg",
+    "note": "Bleached copy of BP_S_PALE. Placed further out and at a lean so the pan reads as a site that has been signed twice and maintained once."
+   },
+   {
+    "id": "BP_M_Q2",
+    "slot": "MARSHAL_PLATE",
+    "distance": 640,
+    "lateral": -20,
+    "height": 2.8,
+    "widthMetres": 2.2,
+    "heightMetres": 1.1,
+    "facing": "inward",
+    "mount": "single post"
+   },
+   {
+    "id": "BP_M_BRINE_CUT",
+    "slot": "MARSHAL_PLATE",
+    "distance": 2620,
+    "lateral": 19,
+    "height": 2.8,
+    "widthMetres": 2.2,
+    "heightMetres": 1.1,
+    "facing": "inward",
+    "mount": "single post"
+   },
+   {
+    "id": "BP_M_UNDERPASS",
+    "slot": "MARSHAL_PLATE",
+    "distance": 2996,
+    "lateral": -14,
+    "height": 2.8,
+    "widthMetres": 2.2,
+    "heightMetres": 1.1,
+    "facing": "inward",
+    "mount": "single post"
+   }
+  ],
+  "reuses": "The accepted OCC2_conveyor_span soffit board at 3028 m is untouched; nothing here is placed over the drivable corridor."
+ }
+}
