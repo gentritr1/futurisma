@@ -69,6 +69,33 @@ export const APRON_PROBE_SPEED_METERS_PER_SECOND = 60;
 export const GATE_MISS_PROBE_DISTANCE_METERS = 878.7;
 export const GATE_MISS_PROBE_LATERAL_METERS = 14;
 export const GATE_MISS_PROBE_SPEED_METERS_PER_SECOND = 55;
+/**
+ * P16 — the boundary-hold probe, and the durable regression artifact for the
+ * whole drivable-limit system.
+ *
+ * Every other boundary probe SPAWNS at its lateral, and `resetRaceState` writes
+ * that lateral straight into the sim: the clamp only acts on movement, so a
+ * spawn outside the limit sits outside it until the first step. That is not a
+ * test of the limit, it is a test of the spawn — and it is what made the first
+ * "held at the limit" screenshot show the craft in void even though the clamp
+ * was working.
+ *
+ * This one spawns exactly AT the derived limit and is driven outward from
+ * there, so the only thing keeping the craft where it is, is the clamp.
+ *
+ * T1_CRADLE_BEND at 250 m is the place the user's report came from. The
+ * measured wall stands at 11.234 m, the derived limit is 11.000 m, and the old
+ * authored clamp was 16.0 m — 5.24 m of overshoot straight through the wall
+ * into black void. Held here the craft must sit ON the deck edge, hull fully
+ * visible, clear of the wall and out of the void.
+ *
+ * 20 m/s, not race pace: fast enough that the outward input has authority,
+ * slow enough that the craft holds the corner instead of running out of the
+ * sector before the screenshot.
+ */
+export const BOUNDARY_HOLD_PROBE_DISTANCE_METERS = 250;
+export const BOUNDARY_HOLD_PROBE_LATERAL_METERS = -11;
+export const BOUNDARY_HOLD_PROBE_SPEED_METERS_PER_SECOND = 20;
 // The panner reference distance, so the rival-audio probe sits at unity gain.
 export const RIVAL_AUDIO_PROBE_METERS = 4;
 export const ZERO_INPUT: InputFrame = {
@@ -167,6 +194,16 @@ export function resolveProbeSpawn(course: ProbeSpawnCourse): ProbeSpawn {
     return at(WRONG_WAY_PROBE_DISTANCE_METERS, 0, 0, 22, true);
   }
   if (probeSelected("water")) return at(WATER_GRIP_PROBE_DISTANCE_METERS, -0.65, 0, 10);
+  // Spawned AT the limit, not past it, so the clamp is the only thing holding
+  // it. `?probeDistance=` / `?probeLateral=` re-aim it at any other span.
+  if (probeSelected("boundary-hold")) {
+    return at(
+      readProbeNumber("probeDistance", BOUNDARY_HOLD_PROBE_DISTANCE_METERS),
+      0,
+      readProbeNumber("probeLateral", BOUNDARY_HOLD_PROBE_LATERAL_METERS),
+      BOUNDARY_HOLD_PROBE_SPEED_METERS_PER_SECOND,
+    );
+  }
   if (probeSelected("apron")) {
     return at(
       readProbeNumber("probeDistance", APRON_PROBE_DISTANCE_METERS),

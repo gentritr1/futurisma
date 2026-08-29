@@ -124,6 +124,34 @@ for (const mesh of bitterpanBounders) {
 }
 
 // ---------------------------------------------------------------------------
+// SANITY (a2): nothing the craft flies over may bound it.
+//
+// The derivation threshold is 0.85 m, just under the 0.89 m minimum hover. A
+// cable coil topping out at 0.78 m is cleared by 0.11 m, so putting an
+// invisible wall at one recreates the exact "invisible boundary" feel this
+// phase exists to kill — while the coil itself, being 0.78 m of obstacle on the
+// racing surface, still has to clear the deck and still trips you if you skim
+// it. Those are different questions and the two thresholds answer them
+// separately.
+//
+// Three Bitterpan spans were freed by the change, all coil-bounded. Asserted by
+// distance AND by the mesh that used to bound them, so a regression that
+// re-lowers the derivation threshold fails here by name.
+// ---------------------------------------------------------------------------
+const FREED_BY_HOVER_CLEARANCE = [2460, 3020, 3020];
+for (const distance of new Set(FREED_BY_HOVER_CLEARANCE)) {
+  const entry = bitterpan.entries.find((e) => e.distance === distance);
+  const bounder = entry?.left?.setBy ?? entry?.right?.setBy ?? null;
+  assert.ok(
+    !bounder || !/cable_coils/i.test(bounder),
+    `Bitterpan @${distance} m is limited by ${bounder}. That coil tops out below `
+      + "the craft's 0.89 m minimum hover, so the craft flies over it: a derived "
+      + "limit there is an invisible wall at a hazard you can visibly clear. The "
+      + "derivation threshold has regressed below 0.85 m.",
+  );
+}
+
+// ---------------------------------------------------------------------------
 // SANITY (b): Greenwater's walled corner trims.
 //
 // T1_CRADLE_BEND is where the report came from — 5.24 m of overshoot past a

@@ -6,40 +6,30 @@
   "hullMarginMetres": 1.6,
   "rule": "limit = max(halfWidth, min(clamp, tallGeometryLateral - hullMargin)); geometry at or below 0.5 m above the local deck plane does not bound.",
   "summary": {
-    "spans": 6,
-    "trimmedSides": 6,
-    "flooredToDeckEdge": 6,
+    "spans": 3,
+    "trimmedSides": 3,
+    "flooredToDeckEdge": 1,
     "maxTrimMetres": 5.8
   },
   "entries": [
     {
-      "distance": 2460,
-      "halfWidth": 11.069,
-      "clamp": 13.169,
-      "left": {
-        "limit": 11.069,
-        "setBy": "map02_cable_coils",
-        "tall": 12.122
-      }
-    },
-    {
       "distance": 2850,
-      "halfWidth": 12.027,
-      "clamp": 16.627,
+      "halfWidth": 12.029,
+      "clamp": 16.629,
       "right": {
-        "limit": 12.027,
+        "limit": 13.94,
         "setBy": "map02_cable_coils",
-        "tall": 13.02
+        "tall": 15.54
       }
     },
     {
       "distance": 2860,
-      "halfWidth": 12.031,
-      "clamp": 16.631,
+      "halfWidth": 12.033,
+      "clamp": 16.633,
       "right": {
-        "limit": 12.031,
+        "limit": 13.94,
         "setBy": "map02_cable_coils",
-        "tall": 13.02
+        "tall": 15.54
       }
     },
     {
@@ -50,26 +40,6 @@
         "limit": 13,
         "setBy": "BP_SIGNAGE_POSTS",
         "tall": 13.83
-      }
-    },
-    {
-      "distance": 3010,
-      "halfWidth": 13,
-      "clamp": 15.1,
-      "left": {
-        "limit": 13,
-        "setBy": "map02_cable_coils",
-        "tall": 14.026
-      }
-    },
-    {
-      "distance": 3020,
-      "halfWidth": 13,
-      "clamp": 15.1,
-      "left": {
-        "limit": 13,
-        "setBy": "map02_cable_coils",
-        "tall": 14.371
       }
     }
   ]

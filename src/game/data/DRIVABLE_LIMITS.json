@@ -6,9 +6,9 @@
   "hullMarginMetres": 1.6,
   "rule": "limit = max(halfWidth, min(clamp, tallGeometryLateral - hullMargin)); geometry at or below 0.5 m above the local deck plane does not bound.",
   "summary": {
-    "spans": 232,
-    "trimmedSides": 457,
-    "flooredToDeckEdge": 328,
+    "spans": 231,
+    "trimmedSides": 455,
+    "flooredToDeckEdge": 312,
     "maxTrimMetres": 5.8
   },
   "entries": [
@@ -288,28 +288,28 @@
       "clamp": 17,
       "left": {
         "limit": 12,
-        "setBy": "GW_SECTOR_RUNWAY_START_concrete",
-        "tall": 12.679
+        "setBy": "GW_SECTOR_RUNWAY_START_metal",
+        "tall": 12.71
       },
       "right": {
         "limit": 12,
         "setBy": "GW_SECTOR_RUNWAY_START_metal",
-        "tall": 12.73
+        "tall": 12.735
       }
     },
     {
       "distance": 190,
-      "halfWidth": 11.666,
-      "clamp": 16.666,
+      "halfWidth": 11.733,
+      "clamp": 16.733,
       "left": {
-        "limit": 11.666,
-        "setBy": "GW_SECTOR_RUNWAY_START_concrete",
-        "tall": 12.131
+        "limit": 11.733,
+        "setBy": "GW_SECTOR_RUNWAY_START_metal",
+        "tall": 12.413
       },
       "right": {
-        "limit": 11.666,
-        "setBy": "GW_SECTOR_RUNWAY_START_metal",
-        "tall": 12.488
+        "limit": 15.2,
+        "setBy": "barrier_A_right",
+        "tall": 16.8
       }
     },
     {
@@ -322,9 +322,9 @@
         "tall": 11.804
       },
       "right": {
-        "limit": 11.333,
-        "setBy": "GW_SECTOR_RUNWAY_START_metal",
-        "tall": 12.236
+        "limit": 14.733,
+        "setBy": "barrier_A_right",
+        "tall": 16.333
       }
     },
     {
@@ -603,13 +603,13 @@
       "clamp": 15.714,
       "left": {
         "limit": 10.714,
-        "setBy": "GW_SECTOR_WATER_TABLE_concrete",
-        "tall": 11.192
+        "setBy": "GW_SECTOR_WATER_TABLE_metal",
+        "tall": 11.194
       },
       "right": {
-        "limit": 10.714,
-        "setBy": "GW_SECTOR_WATER_TABLE_metal",
-        "tall": 11.543
+        "limit": 14.163,
+        "setBy": "barrier_A_right",
+        "tall": 15.763
       }
     },
     {
@@ -639,7 +639,7 @@
       "right": {
         "limit": 10.5,
         "setBy": "GW_SECTOR_WATER_TABLE_metal",
-        "tall": 11.305
+        "tall": 11.307
       }
     },
     {
@@ -945,11 +945,6 @@
         "limit": 10.788,
         "setBy": "GW_SECTOR_HANGAR_EXIT_metal",
         "tall": 11.625
-      },
-      "right": {
-        "limit": 11.235,
-        "setBy": "GW_SECTOR_HANGAR_EXIT_concrete",
-        "tall": 12.835
       }
     },
     {
@@ -972,9 +967,9 @@
       "halfWidth": 12,
       "clamp": 17,
       "left": {
-        "limit": 12,
-        "setBy": "GW_SECTOR_GREENWATER_SWEEP_water",
-        "tall": 12.85
+        "limit": 15.399,
+        "setBy": "barrier_A_left",
+        "tall": 16.999
       },
       "right": {
         "limit": 16.06,
@@ -1018,8 +1013,8 @@
       "clamp": 17,
       "left": {
         "limit": 12,
-        "setBy": "GW_SECTOR_GREENWATER_SWEEP_water",
-        "tall": 12.85
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_metal",
+        "tall": 12.86
       },
       "right": {
         "limit": 16.06,
@@ -1062,9 +1057,9 @@
       "halfWidth": 12,
       "clamp": 17,
       "left": {
-        "limit": 12,
-        "setBy": "GW_SECTOR_GREENWATER_SWEEP_water",
-        "tall": 12.85
+        "limit": 15.399,
+        "setBy": "barrier_A_left",
+        "tall": 16.999
       },
       "right": {
         "limit": 16.06,
@@ -1107,9 +1102,9 @@
       "halfWidth": 12,
       "clamp": 17,
       "left": {
-        "limit": 12,
-        "setBy": "GW_SECTOR_GREENWATER_SWEEP_water",
-        "tall": 12.85
+        "limit": 15.399,
+        "setBy": "barrier_A_left",
+        "tall": 16.999
       },
       "right": {
         "limit": 16.06,
@@ -1152,9 +1147,9 @@
       "halfWidth": 12,
       "clamp": 17,
       "left": {
-        "limit": 12,
-        "setBy": "GW_SECTOR_GREENWATER_SWEEP_water",
-        "tall": 12.85
+        "limit": 15.4,
+        "setBy": "barrier_A_left",
+        "tall": 17
       },
       "right": {
         "limit": 13.447,
@@ -1212,9 +1207,9 @@
       "halfWidth": 12,
       "clamp": 17,
       "left": {
-        "limit": 12,
-        "setBy": "GW_SECTOR_GREENWATER_SWEEP_water",
-        "tall": 12.85
+        "limit": 15.4,
+        "setBy": "barrier_A_left",
+        "tall": 17
       },
       "right": {
         "limit": 16.06,
@@ -1257,9 +1252,9 @@
       "halfWidth": 12,
       "clamp": 17,
       "left": {
-        "limit": 12,
-        "setBy": "GW_SECTOR_GREENWATER_SWEEP_water",
-        "tall": 12.85
+        "limit": 15.399,
+        "setBy": "barrier_A_left",
+        "tall": 16.999
       },
       "right": {
         "limit": 16.06,
@@ -1302,9 +1297,9 @@
       "halfWidth": 12,
       "clamp": 17,
       "left": {
-        "limit": 12,
-        "setBy": "GW_SECTOR_GREENWATER_SWEEP_water",
-        "tall": 12.85
+        "limit": 15.399,
+        "setBy": "barrier_A_left",
+        "tall": 16.999
       },
       "right": {
         "limit": 16.06,
@@ -1347,9 +1342,9 @@
       "halfWidth": 12,
       "clamp": 17,
       "left": {
-        "limit": 12,
-        "setBy": "GW_SECTOR_GREENWATER_SWEEP_water",
-        "tall": 12.85
+        "limit": 15.399,
+        "setBy": "barrier_A_left",
+        "tall": 16.999
       },
       "right": {
         "limit": 13.447,
@@ -1412,9 +1407,9 @@
         "tall": 11.839
       },
       "right": {
-        "limit": 11.547,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_emissive",
-        "tall": 13.147
+        "limit": 14.724,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 16.324
       }
     },
     {
@@ -1422,9 +1417,9 @@
       "halfWidth": 10.046,
       "clamp": 15.846,
       "left": {
-        "limit": 10.046,
+        "limit": 10.162,
         "setBy": "GW_SECTOR_CANOPY_PASSAGE_concrete",
-        "tall": 11.594
+        "tall": 11.762
       },
       "right": {
         "limit": 14.109,
@@ -1497,9 +1492,9 @@
       "halfWidth": 9.906,
       "clamp": 15.706,
       "left": {
-        "limit": 13.613,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
-        "tall": 15.213
+        "limit": 13.687,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_jungle",
+        "tall": 15.287
       },
       "right": {
         "limit": 13.97,
@@ -1524,12 +1519,12 @@
     },
     {
       "distance": 1230,
-      "halfWidth": 9.865,
-      "clamp": 15.665,
+      "halfWidth": 9.873,
+      "clamp": 15.673,
       "left": {
-        "limit": 13.564,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
-        "tall": 15.164
+        "limit": 13.904,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_jungle",
+        "tall": 15.504
       },
       "right": {
         "limit": 13.94,
@@ -1572,9 +1567,9 @@
       "halfWidth": 9.818,
       "clamp": 15.618,
       "left": {
-        "limit": 13.519,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
-        "tall": 15.119
+        "limit": 13.878,
+        "setBy": "greenwater_open_edge_markers/<unnamed>",
+        "tall": 15.478
       },
       "right": {
         "limit": 13.879,
@@ -1599,12 +1594,12 @@
     },
     {
       "distance": 1280,
-      "halfWidth": 9.773,
-      "clamp": 15.573,
+      "halfWidth": 9.788,
+      "clamp": 15.588,
       "left": {
-        "limit": 13.472,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
-        "tall": 15.072
+        "limit": 13.848,
+        "setBy": "greenwater_open_edge_markers/<unnamed>",
+        "tall": 15.448
       },
       "right": {
         "limit": 13.848,
@@ -1652,9 +1647,9 @@
         "tall": 15.387
       },
       "right": {
-        "limit": 13.429,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
-        "tall": 15.029
+        "limit": 13.787,
+        "setBy": "greenwater_open_edge_markers/<unnamed>",
+        "tall": 15.387
       }
     },
     {
@@ -1670,16 +1665,6 @@
         "limit": 13.388,
         "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
         "tall": 14.988
-      }
-    },
-    {
-      "distance": 1330,
-      "halfWidth": 9.682,
-      "clamp": 15.482,
-      "right": {
-        "limit": 13.383,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
-        "tall": 14.983
       }
     },
     {
@@ -1707,9 +1692,9 @@
         "tall": 15.295
       },
       "right": {
-        "limit": 13.335,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
-        "tall": 14.935
+        "limit": 13.695,
+        "setBy": "greenwater_open_edge_markers/<unnamed>",
+        "tall": 15.295
       }
     },
     {
@@ -1777,9 +1762,9 @@
         "tall": 13.619
       },
       "right": {
-        "limit": 13.243,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
-        "tall": 14.843
+        "limit": 13.603,
+        "setBy": "greenwater_open_edge_markers/<unnamed>",
+        "tall": 15.203
       }
     },
     {
@@ -2799,7 +2784,7 @@
       "right": {
         "limit": 11.5,
         "setBy": "GW_SECTOR_FUEL_ROW_metal",
-        "tall": 12.297
+        "tall": 12.302
       }
     },
     {
@@ -2808,13 +2793,13 @@
       "clamp": 16.5,
       "left": {
         "limit": 11.5,
-        "setBy": "GW_SECTOR_FUEL_ROW_concrete",
-        "tall": 12.237
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.257
       },
       "right": {
         "limit": 11.5,
         "setBy": "GW_SECTOR_FUEL_ROW_metal",
-        "tall": 12.31
+        "tall": 12.315
       }
     },
     {
@@ -2823,13 +2808,13 @@
       "clamp": 16.5,
       "left": {
         "limit": 11.5,
-        "setBy": "GW_SECTOR_FUEL_ROW_concrete",
-        "tall": 12.227
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.235
       },
       "right": {
-        "limit": 11.5,
-        "setBy": "GW_SECTOR_FUEL_ROW_metal",
-        "tall": 12.326
+        "limit": 14.9,
+        "setBy": "barrier_A_right",
+        "tall": 16.5
       }
     },
     {
@@ -2842,9 +2827,9 @@
         "tall": 12.185
       },
       "right": {
-        "limit": 11.5,
-        "setBy": "GW_SECTOR_FUEL_ROW_metal",
-        "tall": 12.334
+        "limit": 14.9,
+        "setBy": "barrier_A_right",
+        "tall": 16.5
       }
     },
     {
@@ -3067,9 +3052,9 @@
         "tall": 11.86
       },
       "right": {
-        "limit": 11.086,
-        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
-        "tall": 11.985
+        "limit": 14.516,
+        "setBy": "barrier_A_right",
+        "tall": 16.116
       }
     },
     {
@@ -3078,13 +3063,13 @@
       "clamp": 16.284,
       "left": {
         "limit": 11.284,
-        "setBy": "GW_SECTOR_RUNWAY_HOME_concrete",
-        "tall": 12.01
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.018
       },
       "right": {
-        "limit": 11.284,
-        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
-        "tall": 12.11
+        "limit": 14.683,
+        "setBy": "barrier_A_right",
+        "tall": 16.283
       }
     },
     {
@@ -3093,13 +3078,13 @@
       "clamp": 16.45,
       "left": {
         "limit": 11.45,
-        "setBy": "GW_SECTOR_RUNWAY_HOME_concrete",
-        "tall": 12.295
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.325
       },
       "right": {
         "limit": 11.45,
         "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
-        "tall": 12.347
+        "tall": 12.353
       }
     },
     {
@@ -3443,7 +3428,7 @@
       },
       "right": {
         "limit": 12,
-        "setBy": "GW_SECTOR_RUNWAY_START_metal",
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
         "tall": 12.79
       }
     }

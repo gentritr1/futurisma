@@ -424,13 +424,31 @@ export interface TallGeometrySpan {
    */
   readonly leftMesh: string | null;
   readonly rightMesh: string | null;
+  /** Height above the local deck plane at the bounding vertex, per side. */
+  readonly leftHeight: number | null;
+  readonly rightHeight: number | null;
 }
 
 /** Lap resolution of the derived limit table. */
 export const TALL_GEOMETRY_SPAN_METRES = 10;
 
-/** Below this, geometry is a kerb the craft may run over, not a wall. */
-export const TALL_GEOMETRY_MIN_HEIGHT_METRES = 0.5;
+/**
+ * Below this, geometry does not BOUND the craft — it is something the craft
+ * goes over rather than into.
+ *
+ * 0.85 m, just under the 0.89 m minimum hover height, and this is the
+ * DERIVATION threshold only: the sweep's own obstacle classification still
+ * starts at `FLAT_FURNITURE_MAX_HEIGHT_METRES` (0.3 m), so a 0.78 m cable coil
+ * standing on the racing surface is still an obstacle and still has to move.
+ * What it no longer does is generate an invisible wall.
+ *
+ * It was 0.5 m, and that put a derived limit at five Bitterpan spans where the
+ * only tall thing was a 0.78 m coil the craft physically clears by 0.11 m.
+ * An invisible boundary at a hazard you can visibly fly over is the exact feel
+ * this phase exists to kill — and skimming a coil by 0.11 m is a near miss,
+ * which is what the trip hazards are for.
+ */
+export const TALL_GEOMETRY_MIN_HEIGHT_METRES = 0.85;
 
 interface MeshAccumulator {
   mesh: string;
@@ -546,6 +564,7 @@ export function sweepCorridor(
     lateral: number;
     at: number;
     halfWidth: number;
+    height: number;
     mesh: string;
   }
   interface SpanBucket {
@@ -560,6 +579,7 @@ export function sweepCorridor(
     lateral: number,
     halfWidth: number,
     clamp: number,
+    height: number,
     mesh: string,
   ): void => {
     const index = Math.floor(distance / TALL_GEOMETRY_SPAN_METRES);
@@ -573,7 +593,9 @@ export function sweepCorridor(
     bucket.halfWidth = Math.min(bucket.halfWidth, halfWidth);
     bucket.clamp = Math.min(bucket.clamp, clamp);
     const magnitude = Math.abs(lateral);
-    const side: SpanSide = { lateral: magnitude, at: distance, halfWidth, mesh };
+    const side: SpanSide = {
+      lateral: magnitude, at: distance, halfWidth, height, mesh,
+    };
     if (lateral < 0) {
       if (bucket.left === null || magnitude < bucket.left.lateral) {
         bucket.left = side;
@@ -619,7 +641,19 @@ export function sweepCorridor(
       // course data, so nothing here hardcodes which spans are open run-off.
       course.apronAt(projection, lateral, apron);
       const gate = projection.halfWidth + lateralMargin;
-      const clamp = apron.lateralLimit;
+      // The AUTHORED reach, rebuilt from the apron width — deliberately NOT
+      // `apron.lateralLimit`, which now returns the DERIVED limit.
+      //
+      // The derivation must be idempotent, and using the live clamp made it
+      // catastrophically not. Once `DRIVABLE_LIMITS.json` was consumed, the
+      // sweep saw the already-narrowed limit, stopped recording the very wall
+      // geometry that set it — the wall sits just OUTSIDE the limit it produced,
+      // by the 1.6 m hull margin — and a re-derivation collapsed Greenwater from
+      // 232 bounded spans to 3. Committing that table would have silently
+      // restored the original over-wide clamp and the void with it.
+      const clamp = apron.width > 0
+        ? projection.halfWidth + apron.width
+        : apron.roadLimit;
       const distance = projection.progress * course.length;
       const surface = surfaceHeightAtLateral(projection, lateral);
       const height = offset.subVectors(vertex, projection.position)
@@ -643,6 +677,7 @@ export function sweepCorridor(
             lateral,
             projection.halfWidth,
             clamp,
+            height,
             displayName(mesh),
           );
         }
@@ -808,6 +843,12 @@ export function sweepCorridor(
         clamp: Number(bucket.clamp.toFixed(3)),
         leftMesh: bucket.left?.mesh ?? null,
         rightMesh: bucket.right?.mesh ?? null,
+        leftHeight: bucket.left === null
+          ? null
+          : Number(bucket.left.height.toFixed(3)),
+        rightHeight: bucket.right === null
+          ? null
+          : Number(bucket.right.height.toFixed(3)),
       })),
     // Obstacles first regardless of visibility — the capped tail must never be
     // the thing that had to be fixed, and a hidden obstacle is still an
