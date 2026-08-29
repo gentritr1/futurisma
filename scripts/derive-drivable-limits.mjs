@@ -25,6 +25,40 @@
  * is something the craft runs over, and Bitterpan's open pan run-off depends on
  * exactly that. Honest walls stop you; honest open ground does not.
  *
+ * ---------------------------------------------------------------------------
+ * DO NOT SHIP THE OUTPUT YET. The attribution is wrong on Bitterpan.
+ *
+ * The rule above is sound. The MEASUREMENT feeding it is not, and the first run
+ * proved it: Bitterpan came back with 525 of 525 side-spans floored to the deck
+ * edge — the entire pan run-off deleted — and the meshes named as the bounding
+ * geometry were `BITTERPAN_track_blockout`, `_3` and `_4`, i.e. the ROAD ITSELF,
+ * 523 times. A road cannot be the wall that bounds it.
+ *
+ * Ground truth, looked at rather than inferred: at 1250 m the Bitterpan deck
+ * edge is a flat painted stripe flush with the surface, opening onto continuous
+ * salt pan with no kerb and no wall in sight. There is nothing there at 1.3 m
+ * for the sweep to have found.
+ *
+ * The likely fault is in the span bucket, not the rule: it takes the innermost
+ * tall lateral over a 10 m run and the narrowest half-width in it, while
+ * Bitterpan's stations are 5 m apart and its half-width swings 11.0-15.0 m. On a
+ * curve a vertex at one end of the bucket projects to a lateral that is "inner"
+ * only relative to a station 10 m away. Greenwater is less exposed (2 m
+ * stations) but uses the same machinery, so its 328-of-457 floor count is under
+ * the same doubt.
+ *
+ * WHY THIS MATTERS MORE THAN A NORMAL BUG: the soak gate cannot catch it. The
+ * bounding experiment for this task clamped every limit to `halfWidth` — run-off
+ * removed everywhere — and Greenwater's five lap times came back bit-identical,
+ * because the autopilot never leaves the racing line. A wrong limit table would
+ * therefore pass every automated gate in the repo and only show up as a player
+ * hitting an invisible wall over open ground.
+ *
+ * Fix the bucket first: attribute tall geometry per STATION rather than per 10 m
+ * run, or record the distance of the bounding vertex so a mis-projection is
+ * visible. Then re-derive and check Bitterpan keeps its pan.
+ * ---------------------------------------------------------------------------
+ *
  * USAGE. Two steps, deliberately separable: the DERIVATION is dependency-free
  * and hermetic, and only the CAPTURE needs a browser.
  *
