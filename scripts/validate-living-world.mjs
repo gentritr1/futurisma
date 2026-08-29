@@ -45,8 +45,13 @@ const COURSE_LENGTHS = {
  * roadmap's +2,000; Bitterpan is a new layer and is bounded by its card count.
  */
 const BUDGETS = {
-  greenwater: { drawCalls: 8, cards: 280, triangles: 310 + 2000 },
-  bitterpan: { drawCalls: 6, cards: 160, triangles: 320 },
+  // P12 tightens both maps onto the art-pass-01 numbers. These are the measured
+  // post-integration costs, not headroom: Greenwater 4 accepted batches + the 2
+  // atlas-B batches, 215 accepted cards + the 31 opening-straight cards;
+  // Bitterpan 3 + 1 batches, 98 + 18 cards. A new zone now has to be argued for
+  // against a real ceiling rather than slipped into slack.
+  greenwater: { drawCalls: 6, cards: 246, triangles: 492 },
+  bitterpan: { drawCalls: 4, cards: 116, triangles: 232 },
 };
 
 /**
@@ -93,6 +98,31 @@ const P9_ZONES = [
   { id: "CONVEYOR_SPILL_WORKS", map: "bitterpan", batch: "glint", from: 2860, to: 3040, cards: 20, digest: "096a5474d691c95c" },
   { id: "UNDERPASS_HAZARD_LAMPS", map: "bitterpan", batch: "lamps", from: 3008, to: 3046, cards: 9, digest: "dc3d58ae81334218" },
   { id: "LOADOUT_TOWER_BEACON", map: "bitterpan", batch: "lamps", from: 2980, to: 3010, cards: 3, digest: "bbf2009fc05e8e91" },
+];
+
+/**
+ * P12 art pass 01. The batches appended after the accepted ones, per map. These
+ * are the only living-world batches that may name the second motion sheet, and
+ * `silhouette` is the only one in the layer that writes depth — a wreck on the
+ * shoulder has to occlude the mist behind it.
+ */
+const P12_BATCHES = {
+  greenwater: [
+    { id: "airB", meshName: "GW_LIVING_AIR_B", texture: "motionB", blending: "normal", depthWrite: false, fog: true, alphaTest: 0, lamps: false },
+    { id: "silhouette", meshName: "GW_LIVING_SILHOUETTE", texture: "motionB", blending: "normal", depthWrite: true, fog: true, alphaTest: 0.5, lamps: false },
+  ],
+  bitterpan: [
+    { id: "airB", meshName: "BP_LIVING_AIR_B", texture: "motionB", blending: "normal", depthWrite: false, fog: true, alphaTest: 0, lamps: false },
+  ],
+};
+
+/** P12 art pass 01 zones, pinned the same way P9's were. */
+const P12_ZONES = [
+  { id: "OPENING_WRECK_LINE", map: "greenwater", batch: "silhouette", from: 28, to: 206, cards: 14, digest: "858e30f79ba99ef7" },
+  { id: "OPENING_BIRD_FLOCK", map: "greenwater", batch: "airB", from: 44, to: 212, cards: 9, digest: "bb59783a361f2be0" },
+  { id: "OPENING_DECK_SCUD", map: "greenwater", batch: "airB", from: 6, to: 218, cards: 8, digest: "aeb28d1007059468" },
+  { id: "SALT_DEVIL_CORE", map: "bitterpan", batch: "airB", from: 340, to: 2290, cards: 8, digest: "979fe240083dc19d" },
+  { id: "PAN_CRUST_SCUD", map: "bitterpan", batch: "airB", from: 180, to: 2100, cards: 10, digest: "25baa6f85792d865" },
 ];
 
 const NUMERIC_FIELDS = [
@@ -325,10 +355,13 @@ for (const [map, spec] of Object.entries(LIVING_WORLD_SPECS)) {
 
 const greenwater = LIVING_WORLD_SPECS.greenwater;
 assert.deepEqual(
-  greenwater.batches.map((batch) => ({ ...batch })),
+  greenwater.batches
+    .slice(0, ACCEPTED_GREENWATER_BATCHES.length)
+    .map((batch) => ({ ...batch })),
   ACCEPTED_GREENWATER_BATCHES,
-  "The four accepted Greenwater batches changed. P9 adds cards to them, it does "
-    + "not re-author them, and each one is a draw call and a render state.",
+  "The four accepted Greenwater batches changed. P9 adds cards to them and P12 "
+    + "appends new ones after them; neither re-authors them, and each one is a "
+    + "draw call and a render state.",
 );
 
 const greenwaterZoneOrder = greenwater.zones.map((zone) => zone.id);
@@ -376,6 +409,77 @@ for (const authored of P9_ZONES) {
     `${authored.id} no longer authors the cards this validator pinned.`,
   );
 }
+
+// ---------------------------------------------------------------------------
+// The P12 art-pass-01 additions.
+// ---------------------------------------------------------------------------
+
+for (const [map, appended] of Object.entries(P12_BATCHES)) {
+  const spec = LIVING_WORLD_SPECS[map];
+  const accepted = map === "greenwater" ? ACCEPTED_GREENWATER_BATCHES.length : 3;
+  assert.equal(
+    spec.batches.length,
+    accepted + appended.length,
+    `${spec.id} declares ${spec.batches.length} batches; P12 authors `
+      + `${accepted} accepted plus ${appended.length} appended.`,
+  );
+  assert.deepEqual(
+    spec.batches.slice(accepted).map((batch) => ({ ...batch })),
+    appended,
+    `${spec.id} atlas-B batches changed. Each one is a draw call and a render `
+      + "state, and they must stay AFTER the accepted batches.",
+  );
+}
+
+// Only the appended batches may name the second sheet, and every batch that
+// names it must actually be one of them.
+for (const [map, spec] of Object.entries(LIVING_WORLD_SPECS)) {
+  const appendedIds = new Set((P12_BATCHES[map] ?? []).map((batch) => batch.id));
+  for (const batch of spec.batches) {
+    assert.equal(
+      batch.texture === "motionB",
+      appendedIds.has(batch.id),
+      `${spec.id} batch ${batch.id} disagrees with the atlas-B texture pin.`,
+    );
+  }
+}
+
+for (const authored of P12_ZONES) {
+  const spec = LIVING_WORLD_SPECS[authored.map];
+  const zone = spec.zones.find((candidate) => candidate.id === authored.id);
+  assert.ok(zone, `The P12 zone ${authored.id} is missing from ${authored.map}.`);
+  assert.equal(zone.batch, authored.batch, `${authored.id} changed batch.`);
+  assert.equal(zone.from, authored.from, `${authored.id} changed its start.`);
+  assert.equal(zone.to, authored.to, `${authored.id} changed its end.`);
+  assert.equal(zone.cards, authored.cards, `${authored.id} changed its card count.`);
+  assert.equal(
+    zoneDigests.get(`${authored.map}/${authored.id}`),
+    authored.digest,
+    `${authored.id} no longer authors the cards this validator pinned.`,
+  );
+}
+
+// The P12 zones append: they must be the LAST zones of their spec, or the
+// shared seeded stream reaches the accepted zones with different draws.
+for (const [map, spec] of Object.entries(LIVING_WORLD_SPECS)) {
+  const appended = P12_ZONES.filter((zone) => zone.map === map).map((zone) => zone.id);
+  assert.deepEqual(
+    spec.zones.slice(spec.zones.length - appended.length).map((zone) => zone.id),
+    appended,
+    `${spec.id} must keep its P12 zones last and in order.`,
+  );
+}
+
+// The opening straight (0-220 m) is what art pass 01 exists to dress. Assert
+// the coverage, not just that the zones parse.
+const openingCards = built.greenwater.batches
+  .flatMap((batch) => batch.cards)
+  .filter((card) => card.distance >= 0 && card.distance <= 220);
+assert.ok(
+  openingCards.length >= 31,
+  `The Greenwater opening straight holds ${openingCards.length} living cards; `
+    + "art pass 01 authors 31 there.",
+);
 
 // FUEL_ROW (1591-2121 m) and RUNWAY_HOME (2255-2516 m) were the two Greenwater
 // sectors with nothing alive in them. Assert the coverage, not just the zones.

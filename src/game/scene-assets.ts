@@ -6,6 +6,8 @@ import { type RaceCourse } from "./course";
 import type { RaceEnvironment } from "./environment";
 import { disposeObject3DResources } from "./graphics-resources";
 import type { LivingWorld, LivingWorldTextures } from "./living-world";
+import type { GreenwaterOpeningSurface } from "./opening-surface";
+import type { TracksideSignage } from "./signage";
 import type { GreenwaterSurfaceCharacter } from "./surface-character";
 import { applyPs2MaterialTreatment } from "./totem";
 
@@ -19,6 +21,16 @@ const ENVIRONMENT_MODEL_URL = "/assets/greenwater/models/greenwater_environment_
  * 512 for the same four blobs.
  */
 const LIVING_WORLD_MOTION_URL = "/assets/greenwater/textures/greenwater_motion_512.png";
+/**
+ * P12 art pass 01. The second motion sheet — birds, dust devils, far-field
+ * wrecks and dry scud. Shared by both maps for the same reason the first one
+ * is: the cells are generic, and a second 512 beats a second draw call.
+ */
+const LIVING_WORLD_MOTION_B_URL = "/assets/greenwater/textures/greenwater_motion_b_512.png";
+/** P12. Runway surface marking atlas, Greenwater opening straight only. */
+const OPENING_SURFACE_TEXTURE_URL = "/assets/greenwater/textures/greenwater_runway_1024.png";
+/** P12. Trackside board atlas, both maps. */
+const SIGNAGE_TEXTURE_URL = "/assets/greenwater/textures/futurisma_signage_1024.png";
 const SURFACE_CHARACTER_MODEL_URL = "/assets/greenwater/models/greenwater_surface_character_runtime.glb";
 const BITTERPAN_TRACK_MODEL_URL = "/assets/map02/models/bitterpan_blockout.glb";
 const BITTERPAN_MASSING_MODEL_URL = "/assets/map02/models/bitterpan_massing.glb";
@@ -144,6 +156,14 @@ export class SceneAssets {
   authoredEnvironment: RaceEnvironment | null = null;
   livingWorld: LivingWorld | null = null;
   surfaceCharacter: GreenwaterSurfaceCharacter | null = null;
+  openingSurface: GreenwaterOpeningSurface | null = null;
+  signage: TracksideSignage | null = null;
+  private openingSurfaceLoadMs: number | null = null;
+  private openingSurfaceReady = false;
+  private openingSurfaceError: string | null = null;
+  private signageLoadMs: number | null = null;
+  private signageReady = false;
+  private signageError: string | null = null;
   private assetKitLoadMs: number | null = null;
   private assetKitReady = false;
   private environmentLoadMs: number | null = null;
@@ -182,10 +202,10 @@ export class SceneAssets {
         this.scene.add(environment.root);
         this.environmentReady = true;
         this.requestRender();
-        // Bitterpan's zone set names only the shared motion atlas, so it needs
+        // Bitterpan's zone set names only the shared motion atlases, so it needs
         // nothing off the accepted blockout the way Greenwater needs its jungle
         // and emissive maps.
-        await this.loadLivingWorld({});
+        await Promise.all([this.loadLivingWorld({}), this.loadSignage()]);
         return;
       }
 
@@ -211,6 +231,8 @@ export class SceneAssets {
       await Promise.all([
         this.loadLivingWorld(environment.livingTextures),
         this.loadSurfaceCharacter(),
+        this.loadOpeningSurface(),
+        this.loadSignage(),
       ]);
     } catch (error) {
       this.environmentError = error instanceof Error
@@ -236,6 +258,7 @@ export class SceneAssets {
         this.course,
         textures,
         LIVING_WORLD_MOTION_URL,
+        LIVING_WORLD_MOTION_B_URL,
       );
       if (this.isDisposed()) {
         disposeObject3DResources(livingWorld.root);
@@ -280,6 +303,60 @@ export class SceneAssets {
       console.warn("Greenwater surface-character layer failed to load.", error);
     } finally {
       this.surfaceCharacterLoadMs = performance.now() - loadStartedAt;
+    }
+  }
+
+  /**
+   * P12. The painted opening straight. Greenwater only — the 200 decals are
+   * authored against RUNWAY_START, and Bitterpan's pan has no markings.
+   */
+  private async loadOpeningSurface(): Promise<void> {
+    const loadStartedAt = performance.now();
+    try {
+      const { GreenwaterOpeningSurface } = await import("./opening-surface");
+      const openingSurface = await GreenwaterOpeningSurface.load(
+        this.course,
+        OPENING_SURFACE_TEXTURE_URL,
+      );
+      if (this.isDisposed()) {
+        disposeObject3DResources(openingSurface.root);
+        return;
+      }
+      this.openingSurface = openingSurface;
+      this.scene.add(openingSurface.root);
+      this.openingSurfaceReady = true;
+      this.requestRender();
+    } catch (error) {
+      this.openingSurfaceError = error instanceof Error
+        ? error.message
+        : "Unknown Greenwater opening-surface load error";
+      console.warn("Greenwater opening-surface layer failed to load.", error);
+    } finally {
+      this.openingSurfaceLoadMs = performance.now() - loadStartedAt;
+    }
+  }
+
+  /** P12. Trackside boards and their posts. Both maps, one atlas. */
+  private async loadSignage(): Promise<void> {
+    const loadStartedAt = performance.now();
+    try {
+      const { TracksideSignage } = await import("./signage");
+      const signage = await TracksideSignage.load(this.course, SIGNAGE_TEXTURE_URL);
+      if (this.isDisposed()) {
+        disposeObject3DResources(signage.root);
+        return;
+      }
+      this.signage = signage;
+      this.scene.add(signage.root);
+      this.signageReady = true;
+      this.requestRender();
+    } catch (error) {
+      this.signageError = error instanceof Error
+        ? error.message
+        : `Unknown ${this.course.mapName} signage load error`;
+      console.warn(`${this.course.mapName} trackside signage failed to load.`, error);
+    } finally {
+      this.signageLoadMs = performance.now() - loadStartedAt;
     }
   }
 
@@ -338,6 +415,45 @@ export class SceneAssets {
       environmentShaderModel: stats?.shaderModel ?? null,
       environmentSignageSource: stats?.signageSource ?? null,
       environmentContractDrift: stats?.contractDrift ?? [],
+      ...this.artPassDiagnostics(),
+    };
+  }
+
+  /**
+   * P12 art-pass counters, folded into the environment contributor rather than
+   * registered as a contributor of their own: `game.ts` is at its 1,950-line
+   * seam budget and may not grow by a line, and `diagnostics.ts` spreads each
+   * contributor into the flat report, so fields added here surface unchanged.
+   *
+   * These exist because the soak cannot see this phase. Decals and boards are
+   * non-interactive, so lap times, impacts and frame timing are identical
+   * whether the layers rendered or silently caught an error on load — every
+   * count below reads ZERO on a no-op, which is the only automated signal that
+   * the art is actually in the scene.
+   */
+  private artPassDiagnostics() {
+    const opening = this.openingSurface?.stats;
+    const signage = this.signage?.stats;
+    return {
+      openingSurfaceLoadMs: this.openingSurfaceLoadMs === null
+        ? null
+        : Number(this.openingSurfaceLoadMs.toFixed(1)),
+      openingSurfaceReady: this.openingSurfaceReady,
+      openingSurfaceError: this.openingSurfaceError,
+      openingSurfaceDrawCalls: opening?.drawCalls ?? 0,
+      openingSurfaceDecals: opening?.decals ?? 0,
+      openingSurfaceTriangles: opening?.triangles ?? 0,
+      signageLoadMs: this.signageLoadMs === null
+        ? null
+        : Number(this.signageLoadMs.toFixed(1)),
+      signageReady: this.signageReady,
+      signageError: this.signageError,
+      signageDrawCalls: signage?.drawCalls ?? 0,
+      signageBoards: signage?.boards ?? 0,
+      signageQuads: signage?.quads ?? 0,
+      signageTriangles: signage?.triangles ?? 0,
+      signagePosts: signage?.posts ?? 0,
+      signagePostTriangles: signage?.postTriangles ?? 0,
     };
   }
 
