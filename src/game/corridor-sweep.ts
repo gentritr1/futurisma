@@ -5,7 +5,8 @@ import {
   PLAQUE_BAND_BOTTOM_METRES,
 } from "./furniture-placement.js";
 import { surfaceHeightAtLateral } from "./course";
-import type { CourseProjection, RaceCourse } from "./course";
+import type { ApronResolution, CourseProjection, RaceCourse } from "./course";
+import { createApronResolution } from "./apron.js";
 
 /**
  * P16 — the runtime corridor sweep.
@@ -123,10 +124,7 @@ export function classifyCorridorBand(
   if (heightMin >= PLAQUE_BAND_BOTTOM_METRES - BAND_EPSILON_METRES) {
     return "overhead";
   }
-  if (
-    depth
-    <= CORRIDOR_LATERAL_MARGIN_METRES + BOUNDARY_SEAM_TOLERANCE_METRES
-  ) {
+  if (depth <= CORRIDOR_LATERAL_MARGIN_METRES + BOUNDARY_SEAM_TOLERANCE_METRES) {
     return "boundary";
   }
   return "obstacle";
@@ -180,6 +178,10 @@ export interface CorridorIntrusion {
   readonly visible: boolean;
   readonly sector: string;
   readonly band: CorridorBand;
+  /** The craft's clamp limit for this side and span, metres from centreline. */
+  readonly reach: number;
+  /** |lateral| of this group's innermost vertex — its inner face. */
+  readonly innerExtent: number;
 }
 
 export interface CorridorSweepResult {
@@ -280,6 +282,40 @@ class StationGrid {
   }
 }
 
+/**
+ * How far out the craft can be driven and held, per side and per span.
+ *
+ * On an UNWALLED edge (Greenwater's C / OPEN_RUNOFF, Bitterpan's OPEN_PAN) there
+ * is nothing to stop the craft, so the whole run-off is drivable and the reach
+ * is `halfWidth + width` — 5.8 m past the deck on both maps. Anything standing
+ * in there is something the player drives into, which is the P16 (B) report:
+ * held on the Cradle Bend run-off, the hull interpenetrated an edge wall board.
+ *
+ * On a WALLED edge (A, B) the wall is the boundary the player sees and hits, so
+ * the visual reach is the deck itself.
+ *
+ * A MEASURED CAVEAT, and it is not small. `resolveApron` sets
+ * `lateralLimit = halfWidth + width` for EVERY edge, walled or not, and
+ * `game.ts:893` clamps `this.lateral` to it unconditionally — `apron.wall` only
+ * gates the impact FX at line 905. So the simulation actually lets the craft's
+ * CENTRE reach 16.0 m at Cradle Bend while the wall it just drove through
+ * stands at 10.76 m. This function deliberately uses the visual boundary rather
+ * than that clamp, because treating the clamp as the corridor would classify
+ * every trackside wall on both maps as an obstacle in its own road. The clamp
+ * overshoot is real, is pre-existing, and is a physics question — out of scope
+ * here, reported instead.
+ */
+function drivableReach(
+  halfWidth: number,
+  apron: ApronResolution,
+  lateralMargin: number,
+): number {
+  const outer = apron.wall || apron.width <= 0
+    ? halfWidth
+    : halfWidth + apron.width;
+  return outer + lateralMargin;
+}
+
 interface MeshAccumulator {
   mesh: string;
   root: string;
@@ -294,6 +330,8 @@ interface MeshAccumulator {
   heightMin: number;
   heightMax: number;
   sector: string;
+  reach: number;
+  innerExtent: number;
 }
 
 function displayName(object: THREE.Object3D): string {
@@ -377,6 +415,7 @@ export function sweepCorridor(
   scene.updateMatrixWorld(true);
 
   const projection: CourseProjection = course.createProjectionScratch();
+  const apron: ApronResolution = createApronResolution();
   const vertex = new THREE.Vector3();
   const offset = new THREE.Vector3();
   const instanceMatrix = new THREE.Matrix4();
@@ -408,8 +447,13 @@ export function sweepCorridor(
       verticesTested += 1;
       course.project(vertex, hint, projection);
       const lateral = projection.lateral;
-      const limit = projection.halfWidth + lateralMargin;
-      const depth = limit - Math.abs(lateral);
+      // The corridor is the DRIVABLE REACH, not the deck. `apronAt` resolves
+      // this span's edge type from course data — nothing here hardcodes which
+      // spans are C — and returns both the run-off width and whether that edge
+      // ends in a wall.
+      course.apronAt(projection, lateral, apron);
+      const reach = drivableReach(projection.halfWidth, apron, lateralMargin);
+      const depth = reach - Math.abs(lateral);
       if (depth <= 0) continue;
       const surface = surfaceHeightAtLateral(projection, lateral);
       const height = offset.subVectors(vertex, projection.position)
@@ -433,10 +477,16 @@ export function sweepCorridor(
           heightMin: Infinity,
           heightMax: -Infinity,
           sector: projection.sector,
+          reach,
+          innerExtent: Infinity,
         };
         accumulators.set(key, accumulator);
       }
       accumulator.vertices += 1;
+      if (Math.abs(lateral) < accumulator.innerExtent) {
+        accumulator.innerExtent = Math.abs(lateral);
+        accumulator.reach = reach;
+      }
       accumulator.heightMin = Math.min(accumulator.heightMin, height);
       accumulator.heightMax = Math.max(accumulator.heightMax, height);
       // Report the deepest vertex: that is the one a relocation has to clear.
@@ -495,6 +545,8 @@ export function sweepCorridor(
       vertices: entry.vertices,
       visible: entry.visible,
       sector: entry.sector,
+      reach: Number(entry.reach.toFixed(3)),
+      innerExtent: Number(entry.innerExtent.toFixed(3)),
       band: classifyCorridorBand(
         entry.heightMin,
         entry.heightMax,
