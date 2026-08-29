@@ -9,6 +9,13 @@ import type { ApronResolution, ApronTable } from "./apron.js";
 import { resolveAudioZone } from "./audio-space.js";
 import type { AudioZone } from "./audio-space.js";
 import {
+  EDGE_FURNITURE_CLEARANCE_METRES,
+  TURN_CHEVRON_CLEARANCE_METRES,
+  resolveFurniturePlacement,
+  resolveGatePostLateral,
+} from "./furniture-placement.js";
+import type { FurniturePlacement } from "./furniture-placement.js";
+import {
   ATMOSPHERE_UPDATE_INTERVAL_SECONDS,
   LIGHTING_CROSSFADE_METRES,
   SECTOR_KEY_DIRECTIONS,
@@ -385,23 +392,8 @@ const APRON_SURFACE_LABELS: Record<string, string> = {
   B: "rumble",
   C: "runoff",
 };
-const EDGE_FURNITURE_CLEARANCE_METRES = 4.5;
-const EDGE_FURNITURE_SAFETY_MARGIN_METRES = 0.25;
-const TURN_CHEVRON_CLEARANCE_METRES = 9;
 /** P11: turn guide lights hug the inside deck edge instead of the apex. */
 const TURN_GUIDE_EDGE_INSET_METRES = 0.9;
-/**
- * P11: inside the hangar the shell wall stands at `halfWidth + 0.9`, so edge
- * furniture placed at the open-air clearances (chevrons 20.25 m, braking boards
- * 15.48 m) sat *outside* the building. Inside these sectors the furniture is
- * pulled back against the wall instead.
- */
-const HANGAR_FURNITURE_SECTORS = new Set([
-  "LINK_APRON",
-  "HANGAR_SIX",
-  "HANGAR_EXIT",
-]);
-const HANGAR_FURNITURE_INSET_METRES = 0.35;
 const BOOST_PAD_DISTANCES = [1705, 1815, 1925, 2035] as const;
 const SECTOR_LABELS: Record<string, string> = {
   RUNWAY_START: "RUNWAY 09",
@@ -699,24 +691,28 @@ function setCourseObjectTransform(
   object.updateMatrix();
 }
 
-function edgeFurnitureOffset(
+/**
+ * P13: every piece of edge furniture resolves through one helper, against the
+ * authored apron rather than against a sector name. `furniture-placement.js`
+ * owns the rule; this wrapper only supplies the corridor at `sample`.
+ */
+function resolveEdgeFurniture(
   sample: CourseSample,
   side: -1 | 1,
   visibleWidth: number,
-  clearance = EDGE_FURNITURE_CLEARANCE_METRES,
-): number {
-  const outdoorOffset = sample.halfWidth
-    + clearance
-    + EDGE_FURNITURE_SAFETY_MARGIN_METRES
-    + visibleWidth / 2;
-  // The hangar has no verge to stand a sign on. Everything inside it mounts on
-  // the wall line, which is still 1.7 m clear of the interior's own lateral
-  // clamp at `halfWidth - deckMargin`.
-  return side * (
-    HANGAR_FURNITURE_SECTORS.has(sample.sector)
-      ? Math.min(outdoorOffset, sample.halfWidth - HANGAR_FURNITURE_INSET_METRES)
-      : outdoorOffset
-  );
+  centreHeight: number,
+  extentHeight: number,
+  clearance: number,
+): FurniturePlacement {
+  return resolveFurniturePlacement({
+    halfWidth: sample.halfWidth,
+    apronWidth: side < 0 ? sample.apronLeft : sample.apronRight,
+    side,
+    clearance,
+    footprintHalfWidth: visibleWidth / 2,
+    centreHeight,
+    extentHeight,
+  });
 }
 
 function createLabelMaterial(
@@ -1868,6 +1864,7 @@ export class GreenwaterCourse implements RaceCourse {
     }
     const object = new THREE.Object3D();
     let chevronIndex = 0;
+    let postIndex = 0;
     let approachIndex = 0;
 
     for (const turn of MAP.turns) {
@@ -1877,31 +1874,40 @@ export class GreenwaterCourse implements RaceCourse {
         const sample = this.sampleAtDistance(markerDistance);
         // These panels repeat around bends. The structural gap keeps their
         // projected silhouettes out of the route opening, even when several
-        // boards stack in the chase camera through a fast chicane.
-        const markerX = edgeFurnitureOffset(
+        // boards stack in the chase camera through a fast chicane. Inside the
+        // hangar there is no verge at all, so the panel becomes a wall plaque
+        // and the post that would have held it up is dropped — it would have
+        // been a 2.1 m pole standing on the racing surface.
+        const placement = resolveEdgeFurniture(
           sample,
           outside,
           chevronBoardWidth,
+          2.3,
+          chevronBoardHeight,
           TURN_CHEVRON_CLEARANCE_METRES,
         );
+        const markerX = placement.lateral;
         setCourseObjectTransform(
           object,
           sample,
           markerX,
-          2.3,
+          placement.centreHeight,
           0,
           chevronBoardWidth,
           chevronBoardHeight,
           0.24,
         );
         chevronBoards.setMatrixAt(chevronIndex, object.matrix);
-        setCourseObjectTransform(object, sample, markerX, 1.05, 0.08, 0.18, 2.1, 0.18);
-        chevronPosts.setMatrixAt(chevronIndex, object.matrix);
+        if (placement.groundMounted) {
+          setCourseObjectTransform(object, sample, markerX, 1.05, 0.08, 0.18, 2.1, 0.18);
+          chevronPosts.setMatrixAt(postIndex, object.matrix);
+          postIndex += 1;
+        }
         setCourseObjectTransform(
           object,
           sample,
           markerX,
-          2.3,
+          placement.centreHeight,
           0.14,
           turn.direction === "left" ? -1 : 1,
           1,
@@ -1918,7 +1924,15 @@ export class GreenwaterCourse implements RaceCourse {
         );
         const sample = this.sampleAtDistance(distance);
         const side = turn.direction === "left" ? 1 : -1;
-        const markerX = edgeFurnitureOffset(sample, side, distanceBoardWidth);
+        const placement = resolveEdgeFurniture(
+          sample,
+          side,
+          distanceBoardWidth,
+          2.05,
+          1.28,
+          EDGE_FURNITURE_CLEARANCE_METRES,
+        );
+        const markerX = placement.lateral;
         const labelBatch = boardLabels.get(boardDistance);
         if (!labelBatch) {
           throw new Error(`Missing Greenwater braking-board label ${boardDistance}M.`);
@@ -1927,7 +1941,7 @@ export class GreenwaterCourse implements RaceCourse {
           object,
           sample,
           markerX,
-          2.05,
+          placement.centreHeight,
           0.08,
           distanceBoardWidth,
           1.28,
@@ -1935,20 +1949,27 @@ export class GreenwaterCourse implements RaceCourse {
         );
         labelBatch.mesh.setMatrixAt(labelBatch.count, object.matrix);
         labelBatch.count += 1;
-        setCourseObjectTransform(
-          object,
-          sample,
-          markerX,
-          0.62,
-          0.1,
-          turn.direction === "left" ? -0.78 : 0.78,
-          0.58,
-          0.58,
-        );
-        approachArrows.setMatrixAt(approachIndex, object.matrix);
-        approachIndex += 1;
+        // The low approach arrow is deck paint standing on end. It belongs in
+        // front of a board on a verge; on a wall plaque it is an arrow lying in
+        // the road, so a barrier span drops it entirely.
+        if (placement.groundMounted) {
+          setCourseObjectTransform(
+            object,
+            sample,
+            markerX,
+            0.62,
+            0.1,
+            turn.direction === "left" ? -0.78 : 0.78,
+            0.58,
+            0.58,
+          );
+          approachArrows.setMatrixAt(approachIndex, object.matrix);
+          approachIndex += 1;
+        }
       }
     }
+    chevronPosts.count = postIndex;
+    approachArrows.count = approachIndex;
     for (const mesh of [chevronBoards, chevronPosts, chevronArrows, approachArrows]) {
       mesh.instanceMatrix.needsUpdate = true;
     }
@@ -1989,7 +2010,14 @@ export class GreenwaterCourse implements RaceCourse {
       for (let sideIndex = 0; sideIndex < 2; sideIndex += 1) {
         const side = sideIndex === 0 ? -1 : 1;
         const instanceIndex = checkpointIndex * 2 + sideIndex;
-        const x = side * (checkpoint.gateWidth / 2 + 0.7);
+        // The gate half-width is authored, but the deck is not constant, so a
+        // gate narrower than the road it crosses would stand its masts on the
+        // racing surface. The deck edge is the floor.
+        const x = resolveGatePostLateral(
+          sample.halfWidth,
+          checkpoint.gateWidth / 2 + 0.7,
+          side,
+        );
         setCourseObjectTransform(
           object,
           sample,
