@@ -392,6 +392,25 @@ export function composeShaderInjection(
  *   toward 1.0 — nightform asks for 34 of 45, because 45 on a near-black hull
  *   reads as mud rather than as service.
  */
+/**
+ * The orientation every SERVED sheet in the TOTEM texture family is authored
+ * in, as a `THREE.Texture.flipY`.
+ *
+ * `true` — the `TextureLoader` default — means UV `v = 0` samples the BOTTOM
+ * image row, so `v = 1 - imageY / height`. That is the convention
+ * `totem/MANIFEST.json` and `ATLAS_REGIONS.json` describe their rectangles in:
+ * the paint-chip strip at image rows 900-996 lands under the hull's authored
+ * `v = 0.07422` chip row, which is where the geometry actually samples.
+ *
+ * It is deliberately NOT the orientation of the sheet baked into
+ * `totem_runtime.glb`. That one is stored pre-flipped and loaded with
+ * `flipY = false`, because glTF puts its UV origin at the top of the image.
+ * The two conventions cancel and both land on the same texels — which is
+ * exactly why a texture swap between them must SET this rather than copy it.
+ * See `applyLivery`.
+ */
+export const SERVED_LIVERY_FLIP_Y = true;
+
 const LIVERY_WEAR_TEXTURE_URL = "/assets/totem/textures/totem_wear_1024.png";
 const LIVERY_WEAR = liveryWearJson as unknown as {
   intensity: number;
@@ -448,7 +467,9 @@ export async function loadLiveryWearMap(): Promise<THREE.Texture | null> {
   }
   texture.name = LIVERY_WEAR_SHEET_KEY;
   texture.colorSpace = THREE.SRGBColorSpace;
-  texture.flipY = true;
+  // The overlay is a served sheet in register with the served livery sheets, so
+  // it takes their orientation. One constant, so the two can never disagree.
+  texture.flipY = SERVED_LIVERY_FLIP_Y;
   texture.wrapS = THREE.ClampToEdgeWrapping;
   texture.wrapT = THREE.ClampToEdgeWrapping;
   // The spec's own filtering contract, matching the livery atlas it overlays:
@@ -1030,9 +1051,27 @@ export class TotemVehicle {
    * `TOTEM_body.map` arrives baked into the runtime GLB as the works sheet, so
    * livery select is a texture swap on that one material rather than a model
    * variant. The replacement inherits every sampler setting from the sheet it
-   * replaces — colour space, flip, filters, anisotropy, wrap — so a chosen
-   * livery cannot read differently at distance from the shipped default, and
-   * the PS2 nearest-filter treatment survives.
+   * replaces — colour space, filters, anisotropy, wrap — so a chosen livery
+   * cannot read differently at distance from the shipped default, and the PS2
+   * nearest-filter treatment survives.
+   *
+   * **`flipY` is the one setting that must NOT be inherited**, and P15.1 fixed
+   * the bug where it was. The two sheets do not live in the same orientation:
+   *
+   * - The GLB's embedded sheet is stored PRE-FLIPPED. glTF puts the UV origin
+   *   at the top of the image and `GLTFLoader` sets `flipY = false` to honour
+   *   that, so the exporter flipped the pixels to compensate. The hull's chip
+   *   row lands on embedded image row 76.
+   * - The served PNGs are stored the way `totem/MANIFEST.json` describes them,
+   *   origin at the top — the paint-chip strip really is at rows 900-996. They
+   *   are an exact vertical flip of the embedded sheet.
+   *
+   * So a served sheet needs the `TextureLoader` default `flipY = true` to put
+   * the same pixels under the same UVs. Copying the GLB's `false` sampled every
+   * hull material from the mirrored row instead: `NIGHTFORM` took the acid-paint
+   * chip for its whole body and rendered bright green, and every other swapped
+   * livery was wrong in its own way. Nothing caught it because the default path
+   * never swaps — the works sheet on the model at boot is the embedded one.
    *
    * Returns false when the sheet could not be fetched; the works decal already
    * on the model stays, and the race is unaffected. Must be called after
@@ -1051,7 +1090,6 @@ export class TotemVehicle {
     }
     if (previous) {
       texture.colorSpace = previous.colorSpace;
-      texture.flipY = previous.flipY;
       texture.wrapS = previous.wrapS;
       texture.wrapT = previous.wrapT;
       texture.magFilter = previous.magFilter;
@@ -1059,6 +1097,9 @@ export class TotemVehicle {
       texture.anisotropy = previous.anisotropy;
       texture.generateMipmaps = previous.generateMipmaps;
     }
+    // Set, never inherited. See the note above: the sheet being replaced may be
+    // the pre-flipped one baked into the GLB, and this one is not.
+    texture.flipY = SERVED_LIVERY_FLIP_Y;
     texture.needsUpdate = true;
     material.map = texture;
     material.needsUpdate = true;

@@ -444,6 +444,59 @@ console.log(
     + `airbrake peak=${quantile(courseRace.brakeRadians, 1).toFixed(4)} rad.`,
 );
 
+// ---------------------------------------------------------------------------
+// P15.1 — the livery sheet orientation, pinned in both consumers.
+//
+// The GLB's baked sheet is stored PRE-FLIPPED and loaded `flipY = false`; the
+// served PNGs are stored origin-at-top and need `flipY = true`. Getting this
+// wrong is invisible to every other check in the repo — lap times, counts and
+// frame timing are identical while every hull samples the mirrored paint-chip
+// row — and it shipped that way from P7 until P15.1. So both consumers are
+// pinned here rather than left to a comment.
+// ---------------------------------------------------------------------------
+
+const totemSource = readFileSync(
+  new URL("../src/game/totem.ts", import.meta.url),
+  "utf8",
+);
+const rivalsSource = readFileSync(
+  new URL("../src/game/rivals.ts", import.meta.url),
+  "utf8",
+);
+
+assert.match(
+  totemSource,
+  /export const SERVED_LIVERY_FLIP_Y = true;/,
+  "Served TOTEM sheets are authored origin-at-top and need flipY = true. This "
+    + "constant is the single place that decides it.",
+);
+assert.match(
+  totemSource,
+  /texture\.flipY = SERVED_LIVERY_FLIP_Y;/,
+  "applyLivery must SET the served orientation, never inherit it. Copying "
+    + "`previous.flipY` takes the GLB's pre-flipped `false` onto a served PNG, "
+    + "which is the P15.1 bug: every swapped livery sampled the mirrored "
+    + "paint-chip row and NIGHTFORM rendered flat acid-green.",
+);
+assert.ok(
+  !/flipY = previous\.flipY/.test(totemSource),
+  "applyLivery is inheriting flipY again — see the P15.1 note in totem.ts.",
+);
+assert.match(
+  rivalsSource,
+  /texture\.flipY = false;/,
+  "The rival atlas keeps flipY = false: the quadrant offsets in "
+    + "LIVERY_ATLAS_OFFSETS address the canvas in that orientation, so flipping "
+    + "the sampler here would swap which livery each quadrant addresses.",
+);
+assert.match(
+  rivalsSource,
+  /context\.scale\(1, -1\);/,
+  "The rival atlas must mirror each served sheet into its quadrant, because it "
+    + "cannot flip the sampler. Without this every rival body samples the "
+    + "mirrored paint-chip row.",
+);
+
 console.log(
-  "Rival race PASS: deterministic 120 Hz pacing, five-lap timing, bounded lanes, stable ranking/gaps, finish spread, safe-state recovery, bounded visual banking, rate-independent pose signals and unchanged pre/post-phase finish times.",
+  "Rival race PASS: deterministic 120 Hz pacing, five-lap timing, bounded lanes, stable ranking/gaps, finish spread, safe-state recovery, bounded visual banking, rate-independent pose signals and unchanged pre/post-phase finish times; livery sheet orientation pinned in both consumers (player swap sets flipY = true, rival atlas mirrors per quadrant at flipY = false).",
 );

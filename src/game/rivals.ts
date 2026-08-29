@@ -173,6 +173,24 @@ function createShadowBlobMaterial(): THREE.MeshBasicMaterial {
  * drawn by one instanced mesh instead of one mesh per livery texture. Built at
  * runtime from the shipped 1024 PNGs, so no new asset enters the served set and
  * no hash contract has to be re-baselined.
+ *
+ * **P15.1 — each quadrant is drawn upside down, on purpose.**
+ *
+ * The atlas keeps `flipY = false`, because that is what the hull UVs and the
+ * quadrant offsets in `LIVERY_ATLAS_OFFSETS` were authored against: the sheet
+ * baked into `totem_runtime.glb` is loaded that way by `GLTFLoader`, and it is
+ * stored PRE-FLIPPED to suit. The served PNGs are not — they are stored the way
+ * `totem/MANIFEST.json` describes them, origin at the top. Painting them into
+ * the canvas the obvious way put the hull's paint-chip row on image row 76
+ * instead of row 948, so every rival body sampled the mirrored strip: two of
+ * the field rendered in flat acid paint and the third in transparent black.
+ *
+ * The player's own swap fixes this by flipping the SAMPLER (`flipY = true`, see
+ * `TotemVehicle.applyLivery`). The atlas cannot: `flipY` here would also invert
+ * which half of the canvas each quadrant offset addresses, so the field would
+ * wear the wrong liveries and disagree with the grid list. So the pixels are
+ * flipped instead, per quadrant, inside its own 1024 block — the quadrant
+ * table, the UV inset and `setPlayerLivery`'s buffer rewrite are all untouched.
  */
 export async function loadRivalLiveryAtlas(): Promise<THREE.Texture> {
   const loader = new THREE.ImageLoader();
@@ -187,13 +205,16 @@ export async function loadRivalLiveryAtlas(): Promise<THREE.Texture> {
   context.imageSmoothingEnabled = false;
   for (let index = 0; index < images.length; index += 1) {
     const [offsetU, offsetV] = LIVERY_ATLAS_OFFSETS[index];
-    context.drawImage(
-      images[index],
-      offsetU * LIVERY_ATLAS_PIXELS,
-      offsetV * LIVERY_ATLAS_PIXELS,
-      LIVERY_SOURCE_PIXELS,
-      LIVERY_SOURCE_PIXELS,
-    );
+    const originX = offsetU * LIVERY_ATLAS_PIXELS;
+    const originY = offsetV * LIVERY_ATLAS_PIXELS;
+    // Mirror about this quadrant's own horizontal centre line, so the block
+    // lands pre-flipped exactly like the GLB's sheet and the quadrant keeps its
+    // place in the atlas.
+    context.save();
+    context.translate(originX, originY + LIVERY_SOURCE_PIXELS);
+    context.scale(1, -1);
+    context.drawImage(images[index], 0, 0, LIVERY_SOURCE_PIXELS, LIVERY_SOURCE_PIXELS);
+    context.restore();
   }
   const texture = new THREE.CanvasTexture(canvas);
   texture.name = "totem_liveries_2048_runtime";
