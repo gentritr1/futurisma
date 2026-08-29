@@ -1,0 +1,3436 @@
+{
+  "$generatedBy": "scripts/derive-drivable-limits.mjs",
+  "$doNotEditByHand": "Measured from the rendered scene. Re-run the script after any change to trackside geometry; do not hand-tune a number to make a test pass.",
+  "map": "greenwater",
+  "spanMetres": 10,
+  "hullMarginMetres": 1.6,
+  "rule": "limit = max(halfWidth, min(clamp, tallGeometryLateral - hullMargin)); geometry at or below 0.5 m above the local deck plane does not bound.",
+  "summary": {
+    "spans": 231,
+    "trimmedSides": 455,
+    "flooredToDeckEdge": 312,
+    "maxTrimMetres": 5.8
+  },
+  "entries": [
+    {
+      "distance": 0,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_START_metal",
+        "tall": 12.79
+      },
+      "right": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_START_metal",
+        "tall": 12.79
+      }
+    },
+    {
+      "distance": 10,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_START_metal",
+        "tall": 12.79
+      },
+      "right": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_START_metal",
+        "tall": 12.79
+      }
+    },
+    {
+      "distance": 20,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_START_metal",
+        "tall": 12.79
+      },
+      "right": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_START_metal",
+        "tall": 12.79
+      }
+    },
+    {
+      "distance": 30,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_START_metal",
+        "tall": 12.79
+      },
+      "right": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_START_metal",
+        "tall": 12.79
+      }
+    },
+    {
+      "distance": 40,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_START_metal",
+        "tall": 12.79
+      },
+      "right": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_START_metal",
+        "tall": 12.79
+      }
+    },
+    {
+      "distance": 50,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_START_metal",
+        "tall": 12.79
+      },
+      "right": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_START_metal",
+        "tall": 12.79
+      }
+    },
+    {
+      "distance": 60,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_START_metal",
+        "tall": 12.79
+      },
+      "right": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_START_metal",
+        "tall": 12.79
+      }
+    },
+    {
+      "distance": 70,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_START_metal",
+        "tall": 12.79
+      },
+      "right": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_START_metal",
+        "tall": 12.79
+      }
+    },
+    {
+      "distance": 80,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_START_metal",
+        "tall": 12.79
+      },
+      "right": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_START_metal",
+        "tall": 12.79
+      }
+    },
+    {
+      "distance": 90,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_START_metal",
+        "tall": 12.79
+      },
+      "right": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_START_metal",
+        "tall": 12.79
+      }
+    },
+    {
+      "distance": 100,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_START_metal",
+        "tall": 12.79
+      },
+      "right": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_START_metal",
+        "tall": 12.79
+      }
+    },
+    {
+      "distance": 110,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_START_metal",
+        "tall": 12.79
+      },
+      "right": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_START_metal",
+        "tall": 12.79
+      }
+    },
+    {
+      "distance": 120,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_START_metal",
+        "tall": 12.79
+      },
+      "right": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_START_metal",
+        "tall": 12.79
+      }
+    },
+    {
+      "distance": 130,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_START_metal",
+        "tall": 12.79
+      },
+      "right": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_START_metal",
+        "tall": 12.79
+      }
+    },
+    {
+      "distance": 140,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_START_metal",
+        "tall": 12.79
+      },
+      "right": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_START_metal",
+        "tall": 12.79
+      }
+    },
+    {
+      "distance": 150,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_START_metal",
+        "tall": 12.79
+      },
+      "right": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_START_metal",
+        "tall": 12.79
+      }
+    },
+    {
+      "distance": 160,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_START_metal",
+        "tall": 12.79
+      },
+      "right": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_START_metal",
+        "tall": 12.79
+      }
+    },
+    {
+      "distance": 170,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_START_metal",
+        "tall": 12.79
+      },
+      "right": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_START_metal",
+        "tall": 12.79
+      }
+    },
+    {
+      "distance": 180,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_START_metal",
+        "tall": 12.71
+      },
+      "right": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_START_metal",
+        "tall": 12.735
+      }
+    },
+    {
+      "distance": 190,
+      "halfWidth": 11.733,
+      "clamp": 16.733,
+      "left": {
+        "limit": 11.733,
+        "setBy": "GW_SECTOR_RUNWAY_START_metal",
+        "tall": 12.413
+      },
+      "right": {
+        "limit": 15.2,
+        "setBy": "barrier_A_right",
+        "tall": 16.8
+      }
+    },
+    {
+      "distance": 200,
+      "halfWidth": 11.333,
+      "clamp": 16.334,
+      "left": {
+        "limit": 11.333,
+        "setBy": "GW_SECTOR_RUNWAY_START_metal",
+        "tall": 11.804
+      },
+      "right": {
+        "limit": 14.733,
+        "setBy": "barrier_A_right",
+        "tall": 16.333
+      }
+    },
+    {
+      "distance": 210,
+      "halfWidth": 11.003,
+      "clamp": 16.003,
+      "left": {
+        "limit": 11.003,
+        "setBy": "GW_SECTOR_T1_CRADLE_BEND_metal",
+        "tall": 11.38
+      },
+      "right": {
+        "limit": 14.466,
+        "setBy": "barrier_A_right",
+        "tall": 16.066
+      }
+    },
+    {
+      "distance": 220,
+      "halfWidth": 11,
+      "clamp": 16,
+      "left": {
+        "limit": 11,
+        "setBy": "GW_SECTOR_T1_CRADLE_BEND_metal",
+        "tall": 11.235
+      },
+      "right": {
+        "limit": 14.4,
+        "setBy": "barrier_A_right",
+        "tall": 16
+      }
+    },
+    {
+      "distance": 230,
+      "halfWidth": 11,
+      "clamp": 16,
+      "left": {
+        "limit": 11,
+        "setBy": "GW_SECTOR_T1_CRADLE_BEND_metal",
+        "tall": 11.234
+      },
+      "right": {
+        "limit": 14.4,
+        "setBy": "barrier_A_right",
+        "tall": 16
+      }
+    },
+    {
+      "distance": 240,
+      "halfWidth": 11,
+      "clamp": 16,
+      "left": {
+        "limit": 11,
+        "setBy": "GW_SECTOR_T1_CRADLE_BEND_metal",
+        "tall": 11.235
+      },
+      "right": {
+        "limit": 14.4,
+        "setBy": "barrier_A_right",
+        "tall": 16
+      }
+    },
+    {
+      "distance": 250,
+      "halfWidth": 11,
+      "clamp": 16,
+      "left": {
+        "limit": 11,
+        "setBy": "GW_SECTOR_T1_CRADLE_BEND_metal",
+        "tall": 11.234
+      },
+      "right": {
+        "limit": 14.4,
+        "setBy": "barrier_A_right",
+        "tall": 16
+      }
+    },
+    {
+      "distance": 260,
+      "halfWidth": 11,
+      "clamp": 16,
+      "left": {
+        "limit": 11,
+        "setBy": "GW_SECTOR_T1_CRADLE_BEND_metal",
+        "tall": 11.236
+      },
+      "right": {
+        "limit": 14.4,
+        "setBy": "barrier_A_right",
+        "tall": 16
+      }
+    },
+    {
+      "distance": 270,
+      "halfWidth": 11,
+      "clamp": 16,
+      "left": {
+        "limit": 11,
+        "setBy": "GW_SECTOR_T1_CRADLE_BEND_metal",
+        "tall": 11.235
+      },
+      "right": {
+        "limit": 14.4,
+        "setBy": "barrier_A_right",
+        "tall": 16
+      }
+    },
+    {
+      "distance": 280,
+      "halfWidth": 11,
+      "clamp": 16,
+      "left": {
+        "limit": 11,
+        "setBy": "GW_SECTOR_T1_CRADLE_BEND_metal",
+        "tall": 11.235
+      },
+      "right": {
+        "limit": 14.4,
+        "setBy": "barrier_A_right",
+        "tall": 16
+      }
+    },
+    {
+      "distance": 290,
+      "halfWidth": 11,
+      "clamp": 16,
+      "left": {
+        "limit": 11,
+        "setBy": "GW_SECTOR_T1_CRADLE_BEND_metal",
+        "tall": 11.234
+      },
+      "right": {
+        "limit": 14.4,
+        "setBy": "barrier_A_right",
+        "tall": 16
+      }
+    },
+    {
+      "distance": 300,
+      "halfWidth": 11,
+      "clamp": 16,
+      "left": {
+        "limit": 11,
+        "setBy": "GW_SECTOR_T1_CRADLE_BEND_metal",
+        "tall": 11.237
+      },
+      "right": {
+        "limit": 14.4,
+        "setBy": "barrier_A_right",
+        "tall": 16
+      }
+    },
+    {
+      "distance": 310,
+      "halfWidth": 11,
+      "clamp": 16,
+      "left": {
+        "limit": 11,
+        "setBy": "GW_SECTOR_T1_CRADLE_BEND_metal",
+        "tall": 11.237
+      },
+      "right": {
+        "limit": 14.4,
+        "setBy": "barrier_A_right",
+        "tall": 16
+      }
+    },
+    {
+      "distance": 320,
+      "halfWidth": 11,
+      "clamp": 16,
+      "left": {
+        "limit": 11,
+        "setBy": "GW_SECTOR_T1_CRADLE_BEND_metal",
+        "tall": 11.237
+      },
+      "right": {
+        "limit": 14.4,
+        "setBy": "barrier_A_right",
+        "tall": 16
+      }
+    },
+    {
+      "distance": 330,
+      "halfWidth": 11,
+      "clamp": 16,
+      "left": {
+        "limit": 11,
+        "setBy": "GW_SECTOR_T1_CRADLE_BEND_metal",
+        "tall": 11.234
+      },
+      "right": {
+        "limit": 14.4,
+        "setBy": "barrier_A_right",
+        "tall": 16
+      }
+    },
+    {
+      "distance": 340,
+      "halfWidth": 11,
+      "clamp": 16,
+      "left": {
+        "limit": 11,
+        "setBy": "GW_SECTOR_T1_CRADLE_BEND_metal",
+        "tall": 11.236
+      },
+      "right": {
+        "limit": 14.4,
+        "setBy": "barrier_A_right",
+        "tall": 16
+      }
+    },
+    {
+      "distance": 350,
+      "halfWidth": 11,
+      "clamp": 16,
+      "left": {
+        "limit": 11,
+        "setBy": "GW_SECTOR_T1_CRADLE_BEND_metal",
+        "tall": 11.233
+      },
+      "right": {
+        "limit": 14.4,
+        "setBy": "barrier_A_right",
+        "tall": 16
+      }
+    },
+    {
+      "distance": 360,
+      "halfWidth": 11,
+      "clamp": 16,
+      "left": {
+        "limit": 11,
+        "setBy": "GW_SECTOR_T1_CRADLE_BEND_metal",
+        "tall": 11.24
+      },
+      "right": {
+        "limit": 14.4,
+        "setBy": "barrier_A_right",
+        "tall": 16
+      }
+    },
+    {
+      "distance": 370,
+      "halfWidth": 10.964,
+      "clamp": 15.964,
+      "left": {
+        "limit": 10.964,
+        "setBy": "GW_SECTOR_WATER_TABLE_metal",
+        "tall": 11.373
+      },
+      "right": {
+        "limit": 14.004,
+        "setBy": "GW_SECTOR_T1_CRADLE_BEND_jungle",
+        "tall": 15.604
+      }
+    },
+    {
+      "distance": 380,
+      "halfWidth": 10.839,
+      "clamp": 15.839,
+      "left": {
+        "limit": 10.839,
+        "setBy": "GW_SECTOR_WATER_TABLE_metal",
+        "tall": 11.323
+      },
+      "right": {
+        "limit": 14.288,
+        "setBy": "barrier_A_right",
+        "tall": 15.888
+      }
+    },
+    {
+      "distance": 390,
+      "halfWidth": 10.714,
+      "clamp": 15.714,
+      "left": {
+        "limit": 10.714,
+        "setBy": "GW_SECTOR_WATER_TABLE_metal",
+        "tall": 11.194
+      },
+      "right": {
+        "limit": 14.163,
+        "setBy": "barrier_A_right",
+        "tall": 15.763
+      }
+    },
+    {
+      "distance": 400,
+      "halfWidth": 10.589,
+      "clamp": 15.589,
+      "left": {
+        "limit": 10.589,
+        "setBy": "GW_SECTOR_WATER_TABLE_metal",
+        "tall": 11.121
+      },
+      "right": {
+        "limit": 10.589,
+        "setBy": "GW_SECTOR_WATER_TABLE_metal",
+        "tall": 11.428
+      }
+    },
+    {
+      "distance": 410,
+      "halfWidth": 10.5,
+      "clamp": 15.5,
+      "left": {
+        "limit": 10.5,
+        "setBy": "GW_SECTOR_WATER_TABLE_metal",
+        "tall": 11.13
+      },
+      "right": {
+        "limit": 10.5,
+        "setBy": "GW_SECTOR_WATER_TABLE_metal",
+        "tall": 11.307
+      }
+    },
+    {
+      "distance": 420,
+      "halfWidth": 10.5,
+      "clamp": 15.5,
+      "left": {
+        "limit": 10.5,
+        "setBy": "GW_SECTOR_WATER_TABLE_metal",
+        "tall": 11.136
+      },
+      "right": {
+        "limit": 10.5,
+        "setBy": "GW_SECTOR_WATER_TABLE_metal",
+        "tall": 11.29
+      }
+    },
+    {
+      "distance": 430,
+      "halfWidth": 10.5,
+      "clamp": 15.5,
+      "left": {
+        "limit": 10.5,
+        "setBy": "GW_SECTOR_WATER_TABLE_metal",
+        "tall": 11.134
+      },
+      "right": {
+        "limit": 10.5,
+        "setBy": "GW_SECTOR_WATER_TABLE_metal",
+        "tall": 11.29
+      }
+    },
+    {
+      "distance": 440,
+      "halfWidth": 10.5,
+      "clamp": 15.5,
+      "left": {
+        "limit": 10.5,
+        "setBy": "GW_SECTOR_WATER_TABLE_metal",
+        "tall": 11.135
+      },
+      "right": {
+        "limit": 10.5,
+        "setBy": "GW_SECTOR_WATER_TABLE_metal",
+        "tall": 11.29
+      }
+    },
+    {
+      "distance": 450,
+      "halfWidth": 10.5,
+      "clamp": 15.5,
+      "left": {
+        "limit": 10.5,
+        "setBy": "GW_SECTOR_WATER_TABLE_metal",
+        "tall": 11.136
+      },
+      "right": {
+        "limit": 10.5,
+        "setBy": "GW_SECTOR_WATER_TABLE_metal",
+        "tall": 11.29
+      }
+    },
+    {
+      "distance": 460,
+      "halfWidth": 10.5,
+      "clamp": 15.5,
+      "left": {
+        "limit": 10.5,
+        "setBy": "GW_SECTOR_WATER_TABLE_metal",
+        "tall": 11.135
+      },
+      "right": {
+        "limit": 10.5,
+        "setBy": "GW_SECTOR_WATER_TABLE_metal",
+        "tall": 11.29
+      }
+    },
+    {
+      "distance": 470,
+      "halfWidth": 10.5,
+      "clamp": 15.5,
+      "left": {
+        "limit": 10.5,
+        "setBy": "GW_SECTOR_WATER_TABLE_metal",
+        "tall": 11.135
+      },
+      "right": {
+        "limit": 10.5,
+        "setBy": "GW_SECTOR_WATER_TABLE_metal",
+        "tall": 11.29
+      }
+    },
+    {
+      "distance": 480,
+      "halfWidth": 10.5,
+      "clamp": 15.5,
+      "left": {
+        "limit": 10.5,
+        "setBy": "GW_SECTOR_WATER_TABLE_metal",
+        "tall": 11.29
+      },
+      "right": {
+        "limit": 10.5,
+        "setBy": "GW_SECTOR_WATER_TABLE_metal",
+        "tall": 11.205
+      }
+    },
+    {
+      "distance": 490,
+      "halfWidth": 10.5,
+      "clamp": 15.5,
+      "left": {
+        "limit": 10.5,
+        "setBy": "GW_SECTOR_WATER_TABLE_metal",
+        "tall": 11.29
+      },
+      "right": {
+        "limit": 10.5,
+        "setBy": "GW_SECTOR_WATER_TABLE_metal",
+        "tall": 11.098
+      }
+    },
+    {
+      "distance": 500,
+      "halfWidth": 10.5,
+      "clamp": 15.5,
+      "left": {
+        "limit": 10.5,
+        "setBy": "GW_SECTOR_WATER_TABLE_metal",
+        "tall": 11.29
+      },
+      "right": {
+        "limit": 10.5,
+        "setBy": "GW_SECTOR_WATER_TABLE_metal",
+        "tall": 11.1
+      }
+    },
+    {
+      "distance": 510,
+      "halfWidth": 10.5,
+      "clamp": 15.5,
+      "left": {
+        "limit": 10.5,
+        "setBy": "GW_SECTOR_WATER_TABLE_metal",
+        "tall": 11.29
+      },
+      "right": {
+        "limit": 10.5,
+        "setBy": "GW_SECTOR_WATER_TABLE_metal",
+        "tall": 11.098
+      }
+    },
+    {
+      "distance": 520,
+      "halfWidth": 10.5,
+      "clamp": 15.5,
+      "left": {
+        "limit": 10.5,
+        "setBy": "GW_SECTOR_WATER_TABLE_metal",
+        "tall": 11.29
+      },
+      "right": {
+        "limit": 10.5,
+        "setBy": "GW_SECTOR_WATER_TABLE_metal",
+        "tall": 11.098
+      }
+    },
+    {
+      "distance": 530,
+      "halfWidth": 10.5,
+      "clamp": 15.5,
+      "left": {
+        "limit": 10.5,
+        "setBy": "GW_SECTOR_WATER_TABLE_metal",
+        "tall": 11.29
+      },
+      "right": {
+        "limit": 10.5,
+        "setBy": "GW_SECTOR_WATER_TABLE_metal",
+        "tall": 11.101
+      }
+    },
+    {
+      "distance": 540,
+      "halfWidth": 10.5,
+      "clamp": 15.5,
+      "left": {
+        "limit": 10.5,
+        "setBy": "GW_SECTOR_WATER_TABLE_metal",
+        "tall": 11.29
+      },
+      "right": {
+        "limit": 10.5,
+        "setBy": "GW_SECTOR_WATER_TABLE_metal",
+        "tall": 11.099
+      }
+    },
+    {
+      "distance": 550,
+      "halfWidth": 10.5,
+      "clamp": 15.5,
+      "left": {
+        "limit": 10.5,
+        "setBy": "GW_SECTOR_WATER_TABLE_metal",
+        "tall": 11.29
+      },
+      "right": {
+        "limit": 10.5,
+        "setBy": "GW_SECTOR_WATER_TABLE_metal",
+        "tall": 11.098
+      }
+    },
+    {
+      "distance": 560,
+      "halfWidth": 10.5,
+      "clamp": 15.5,
+      "left": {
+        "limit": 10.5,
+        "setBy": "GW_SECTOR_WATER_TABLE_metal",
+        "tall": 11.29
+      },
+      "right": {
+        "limit": 10.5,
+        "setBy": "GW_SECTOR_WATER_TABLE_metal",
+        "tall": 11.099
+      }
+    },
+    {
+      "distance": 570,
+      "halfWidth": 10.5,
+      "clamp": 15.5,
+      "left": {
+        "limit": 10.5,
+        "setBy": "GW_SECTOR_WATER_TABLE_metal",
+        "tall": 11.29
+      },
+      "right": {
+        "limit": 10.5,
+        "setBy": "GW_SECTOR_WATER_TABLE_metal",
+        "tall": 11.098
+      }
+    },
+    {
+      "distance": 580,
+      "halfWidth": 9.993,
+      "clamp": 14.993,
+      "left": {
+        "limit": 9.993,
+        "setBy": "GW_SECTOR_LINK_APRON_concrete",
+        "tall": 10.428
+      },
+      "right": {
+        "limit": 9.993,
+        "setBy": "GW_SECTOR_LINK_APRON_concrete",
+        "tall": 10.491
+      }
+    },
+    {
+      "distance": 810,
+      "halfWidth": 9.588,
+      "clamp": 11.588,
+      "left": {
+        "limit": 9.588,
+        "setBy": "GW_SECTOR_HANGAR_SIX_concrete",
+        "tall": 9.862
+      }
+    },
+    {
+      "distance": 820,
+      "halfWidth": 9.787,
+      "clamp": 11.787,
+      "left": {
+        "limit": 9.787,
+        "setBy": "GW_SECTOR_HANGAR_SIX_concrete",
+        "tall": 10.007
+      },
+      "right": {
+        "limit": 9.787,
+        "setBy": "GW_SECTOR_HANGAR_EXIT_concrete",
+        "tall": 10.515
+      }
+    },
+    {
+      "distance": 830,
+      "halfWidth": 10.284,
+      "clamp": 12.286,
+      "left": {
+        "limit": 10.284,
+        "setBy": "GW_SECTOR_HANGAR_EXIT_metal",
+        "tall": 10.823
+      },
+      "right": {
+        "limit": 10.284,
+        "setBy": "GW_SECTOR_HANGAR_EXIT_concrete",
+        "tall": 10.963
+      }
+    },
+    {
+      "distance": 840,
+      "halfWidth": 10.788,
+      "clamp": 12.882,
+      "left": {
+        "limit": 10.788,
+        "setBy": "GW_SECTOR_HANGAR_EXIT_metal",
+        "tall": 11.625
+      }
+    },
+    {
+      "distance": 850,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 15.353,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_metal",
+        "tall": 16.953
+      },
+      "right": {
+        "limit": 13.434,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_metal",
+        "tall": 15.034
+      }
+    },
+    {
+      "distance": 860,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 15.399,
+        "setBy": "barrier_A_left",
+        "tall": 16.999
+      },
+      "right": {
+        "limit": 16.06,
+        "setBy": "greenwater_open_edge_markers/<unnamed>",
+        "tall": 17.66
+      }
+    },
+    {
+      "distance": 870,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 15.352,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_metal",
+        "tall": 16.952
+      },
+      "right": {
+        "limit": 16.06,
+        "setBy": "greenwater_open_edge_markers/<unnamed>",
+        "tall": 17.66
+      }
+    },
+    {
+      "distance": 880,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 15.399,
+        "setBy": "barrier_A_left",
+        "tall": 16.999
+      },
+      "right": {
+        "limit": 13.434,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_metal",
+        "tall": 15.034
+      }
+    },
+    {
+      "distance": 890,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_metal",
+        "tall": 12.86
+      },
+      "right": {
+        "limit": 16.06,
+        "setBy": "greenwater_open_edge_markers/<unnamed>",
+        "tall": 17.66
+      }
+    },
+    {
+      "distance": 900,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_metal",
+        "tall": 12.85
+      },
+      "right": {
+        "limit": 13.434,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_metal",
+        "tall": 15.034
+      }
+    },
+    {
+      "distance": 910,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 15.399,
+        "setBy": "barrier_A_left",
+        "tall": 16.999
+      },
+      "right": {
+        "limit": 16.06,
+        "setBy": "greenwater_open_edge_markers/<unnamed>",
+        "tall": 17.66
+      }
+    },
+    {
+      "distance": 920,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 15.399,
+        "setBy": "barrier_A_left",
+        "tall": 16.999
+      },
+      "right": {
+        "limit": 16.06,
+        "setBy": "greenwater_open_edge_markers/<unnamed>",
+        "tall": 17.66
+      }
+    },
+    {
+      "distance": 930,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 15.399,
+        "setBy": "barrier_A_left",
+        "tall": 16.999
+      },
+      "right": {
+        "limit": 13.447,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_metal",
+        "tall": 15.047
+      }
+    },
+    {
+      "distance": 940,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 15.399,
+        "setBy": "barrier_A_left",
+        "tall": 16.999
+      },
+      "right": {
+        "limit": 16.06,
+        "setBy": "greenwater_open_edge_markers/<unnamed>",
+        "tall": 17.66
+      }
+    },
+    {
+      "distance": 950,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 15.399,
+        "setBy": "barrier_A_left",
+        "tall": 16.999
+      },
+      "right": {
+        "limit": 16.06,
+        "setBy": "greenwater_open_edge_markers/<unnamed>",
+        "tall": 17.66
+      }
+    },
+    {
+      "distance": 960,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 15.4,
+        "setBy": "barrier_A_left",
+        "tall": 17
+      },
+      "right": {
+        "limit": 13.447,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_metal",
+        "tall": 15.047
+      }
+    },
+    {
+      "distance": 970,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 15.4,
+        "setBy": "barrier_A_left",
+        "tall": 17
+      },
+      "right": {
+        "limit": 16.06,
+        "setBy": "greenwater_open_edge_markers/<unnamed>",
+        "tall": 17.66
+      }
+    },
+    {
+      "distance": 980,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 15.4,
+        "setBy": "barrier_A_left",
+        "tall": 17
+      },
+      "right": {
+        "limit": 13.447,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_metal",
+        "tall": 15.047
+      }
+    },
+    {
+      "distance": 990,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 15.399,
+        "setBy": "barrier_A_left",
+        "tall": 16.999
+      },
+      "right": {
+        "limit": 16.06,
+        "setBy": "greenwater_open_edge_markers/<unnamed>",
+        "tall": 17.66
+      }
+    },
+    {
+      "distance": 1000,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 15.4,
+        "setBy": "barrier_A_left",
+        "tall": 17
+      },
+      "right": {
+        "limit": 16.06,
+        "setBy": "greenwater_open_edge_markers/<unnamed>",
+        "tall": 17.66
+      }
+    },
+    {
+      "distance": 1010,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 15.399,
+        "setBy": "barrier_A_left",
+        "tall": 16.999
+      },
+      "right": {
+        "limit": 13.447,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_metal",
+        "tall": 15.047
+      }
+    },
+    {
+      "distance": 1020,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 15.4,
+        "setBy": "barrier_A_left",
+        "tall": 17
+      },
+      "right": {
+        "limit": 16.06,
+        "setBy": "greenwater_open_edge_markers/<unnamed>",
+        "tall": 17.66
+      }
+    },
+    {
+      "distance": 1030,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 15.399,
+        "setBy": "barrier_A_left",
+        "tall": 16.999
+      },
+      "right": {
+        "limit": 13.451,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_metal",
+        "tall": 15.051
+      }
+    },
+    {
+      "distance": 1040,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 15.399,
+        "setBy": "barrier_A_left",
+        "tall": 16.999
+      },
+      "right": {
+        "limit": 13.447,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_metal",
+        "tall": 15.047
+      }
+    },
+    {
+      "distance": 1050,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 15.399,
+        "setBy": "barrier_A_left",
+        "tall": 16.999
+      },
+      "right": {
+        "limit": 16.06,
+        "setBy": "greenwater_open_edge_markers/<unnamed>",
+        "tall": 17.66
+      }
+    },
+    {
+      "distance": 1060,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 15.399,
+        "setBy": "barrier_A_left",
+        "tall": 16.999
+      },
+      "right": {
+        "limit": 13.447,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_metal",
+        "tall": 15.047
+      }
+    },
+    {
+      "distance": 1070,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 15.4,
+        "setBy": "barrier_A_left",
+        "tall": 17
+      },
+      "right": {
+        "limit": 16.06,
+        "setBy": "greenwater_open_edge_markers/<unnamed>",
+        "tall": 17.66
+      }
+    },
+    {
+      "distance": 1080,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 15.399,
+        "setBy": "barrier_A_left",
+        "tall": 16.999
+      },
+      "right": {
+        "limit": 16.06,
+        "setBy": "greenwater_open_edge_markers/<unnamed>",
+        "tall": 17.66
+      }
+    },
+    {
+      "distance": 1090,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 15.399,
+        "setBy": "barrier_A_left",
+        "tall": 16.999
+      },
+      "right": {
+        "limit": 13.447,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_metal",
+        "tall": 15.047
+      }
+    },
+    {
+      "distance": 1100,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 15.399,
+        "setBy": "barrier_A_left",
+        "tall": 16.999
+      },
+      "right": {
+        "limit": 16.06,
+        "setBy": "greenwater_open_edge_markers/<unnamed>",
+        "tall": 17.66
+      }
+    },
+    {
+      "distance": 1110,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 15.399,
+        "setBy": "barrier_A_left",
+        "tall": 16.999
+      },
+      "right": {
+        "limit": 13.447,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_metal",
+        "tall": 15.047
+      }
+    },
+    {
+      "distance": 1120,
+      "halfWidth": 11.95,
+      "clamp": 16.95,
+      "left": {
+        "limit": 15.349,
+        "setBy": "barrier_A_left",
+        "tall": 16.949
+      },
+      "right": {
+        "limit": 16.06,
+        "setBy": "greenwater_open_edge_markers/<unnamed>",
+        "tall": 17.66
+      }
+    },
+    {
+      "distance": 1130,
+      "halfWidth": 11.546,
+      "clamp": 17.346,
+      "left": {
+        "limit": 11.546,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_concrete",
+        "tall": 12.396
+      },
+      "right": {
+        "limit": 15.708,
+        "setBy": "greenwater_open_edge_markers/<unnamed>",
+        "tall": 17.308
+      }
+    },
+    {
+      "distance": 1140,
+      "halfWidth": 11.034,
+      "clamp": 16.834,
+      "left": {
+        "limit": 11.034,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_concrete",
+        "tall": 12.143
+      },
+      "right": {
+        "limit": 14.846,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 16.446
+      }
+    },
+    {
+      "distance": 1150,
+      "halfWidth": 10.548,
+      "clamp": 16.348,
+      "left": {
+        "limit": 10.548,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_concrete",
+        "tall": 11.839
+      },
+      "right": {
+        "limit": 14.724,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 16.324
+      }
+    },
+    {
+      "distance": 1160,
+      "halfWidth": 10.046,
+      "clamp": 15.846,
+      "left": {
+        "limit": 10.162,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_concrete",
+        "tall": 11.762
+      },
+      "right": {
+        "limit": 14.109,
+        "setBy": "greenwater_open_edge_markers/<unnamed>",
+        "tall": 15.709
+      }
+    },
+    {
+      "distance": 1170,
+      "halfWidth": 9.986,
+      "clamp": 15.786,
+      "left": {
+        "limit": 13.787,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 15.387
+      },
+      "right": {
+        "limit": 13.786,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 15.386
+      }
+    },
+    {
+      "distance": 1180,
+      "halfWidth": 9.965,
+      "clamp": 15.765,
+      "left": {
+        "limit": 13.124,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_jungle",
+        "tall": 14.724
+      },
+      "right": {
+        "limit": 12.917,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_jungle",
+        "tall": 14.517
+      }
+    },
+    {
+      "distance": 1190,
+      "halfWidth": 9.941,
+      "clamp": 15.741,
+      "left": {
+        "limit": 10.258,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_emissive",
+        "tall": 11.858
+      },
+      "right": {
+        "limit": 9.941,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_emissive",
+        "tall": 10.553
+      }
+    },
+    {
+      "distance": 1200,
+      "halfWidth": 9.932,
+      "clamp": 15.732,
+      "left": {
+        "limit": 10.141,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_emissive",
+        "tall": 11.741
+      },
+      "right": {
+        "limit": 9.932,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_emissive",
+        "tall": 10.475
+      }
+    },
+    {
+      "distance": 1210,
+      "halfWidth": 9.906,
+      "clamp": 15.706,
+      "left": {
+        "limit": 13.687,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_jungle",
+        "tall": 15.287
+      },
+      "right": {
+        "limit": 13.97,
+        "setBy": "greenwater_open_edge_markers/<unnamed>",
+        "tall": 15.57
+      }
+    },
+    {
+      "distance": 1220,
+      "halfWidth": 9.887,
+      "clamp": 15.687,
+      "left": {
+        "limit": 13.571,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 15.171
+      },
+      "right": {
+        "limit": 13.614,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 15.214
+      }
+    },
+    {
+      "distance": 1230,
+      "halfWidth": 9.873,
+      "clamp": 15.673,
+      "left": {
+        "limit": 13.904,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_jungle",
+        "tall": 15.504
+      },
+      "right": {
+        "limit": 13.94,
+        "setBy": "greenwater_open_edge_markers/<unnamed>",
+        "tall": 15.54
+      }
+    },
+    {
+      "distance": 1240,
+      "halfWidth": 9.848,
+      "clamp": 15.648,
+      "left": {
+        "limit": 10.049,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_emissive",
+        "tall": 11.649
+      },
+      "right": {
+        "limit": 9.848,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_emissive",
+        "tall": 10.383
+      }
+    },
+    {
+      "distance": 1250,
+      "halfWidth": 9.841,
+      "clamp": 15.641,
+      "left": {
+        "limit": 13.526,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 15.126
+      },
+      "right": {
+        "limit": 13.568,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 15.168
+      }
+    },
+    {
+      "distance": 1260,
+      "halfWidth": 9.818,
+      "clamp": 15.618,
+      "left": {
+        "limit": 13.878,
+        "setBy": "greenwater_open_edge_markers/<unnamed>",
+        "tall": 15.478
+      },
+      "right": {
+        "limit": 13.879,
+        "setBy": "greenwater_open_edge_markers/<unnamed>",
+        "tall": 15.479
+      }
+    },
+    {
+      "distance": 1270,
+      "halfWidth": 9.788,
+      "clamp": 15.588,
+      "left": {
+        "limit": 13.48,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 15.08
+      },
+      "right": {
+        "limit": 9.82,
+        "setBy": "cable_trip_warning_posts",
+        "tall": 11.42
+      }
+    },
+    {
+      "distance": 1280,
+      "halfWidth": 9.788,
+      "clamp": 15.588,
+      "left": {
+        "limit": 13.848,
+        "setBy": "greenwater_open_edge_markers/<unnamed>",
+        "tall": 15.448
+      },
+      "right": {
+        "limit": 13.848,
+        "setBy": "greenwater_open_edge_markers/<unnamed>",
+        "tall": 15.448
+      }
+    },
+    {
+      "distance": 1290,
+      "halfWidth": 9.75,
+      "clamp": 15.55,
+      "left": {
+        "limit": 9.958,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_emissive",
+        "tall": 11.558
+      },
+      "right": {
+        "limit": 9.75,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_emissive",
+        "tall": 10.291
+      }
+    },
+    {
+      "distance": 1300,
+      "halfWidth": 9.749,
+      "clamp": 15.549,
+      "left": {
+        "limit": 13.435,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 15.035
+      },
+      "right": {
+        "limit": 13.478,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 15.078
+      }
+    },
+    {
+      "distance": 1310,
+      "halfWidth": 9.727,
+      "clamp": 15.527,
+      "left": {
+        "limit": 13.787,
+        "setBy": "greenwater_open_edge_markers/<unnamed>",
+        "tall": 15.387
+      },
+      "right": {
+        "limit": 13.787,
+        "setBy": "greenwater_open_edge_markers/<unnamed>",
+        "tall": 15.387
+      }
+    },
+    {
+      "distance": 1320,
+      "halfWidth": 9.696,
+      "clamp": 15.496,
+      "left": {
+        "limit": 13.43,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 15.03
+      },
+      "right": {
+        "limit": 13.388,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 14.988
+      }
+    },
+    {
+      "distance": 1340,
+      "halfWidth": 9.657,
+      "clamp": 15.457,
+      "left": {
+        "limit": 9.866,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_emissive",
+        "tall": 11.466
+      },
+      "right": {
+        "limit": 9.657,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_emissive",
+        "tall": 10.199
+      }
+    },
+    {
+      "distance": 1350,
+      "halfWidth": 9.635,
+      "clamp": 15.435,
+      "left": {
+        "limit": 13.695,
+        "setBy": "greenwater_open_edge_markers/<unnamed>",
+        "tall": 15.295
+      },
+      "right": {
+        "limit": 13.695,
+        "setBy": "greenwater_open_edge_markers/<unnamed>",
+        "tall": 15.295
+      }
+    },
+    {
+      "distance": 1360,
+      "halfWidth": 9.62,
+      "clamp": 15.42,
+      "left": {
+        "limit": 13.28,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_jungle",
+        "tall": 14.88
+      },
+      "right": {
+        "limit": 13.42,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 15.02
+      }
+    },
+    {
+      "distance": 1370,
+      "halfWidth": 9.604,
+      "clamp": 15.404,
+      "left": {
+        "limit": 13.338,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 14.938
+      },
+      "right": {
+        "limit": 13.298,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 14.898
+      }
+    },
+    {
+      "distance": 1380,
+      "halfWidth": 9.58,
+      "clamp": 15.38,
+      "right": {
+        "limit": 13.173,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_jungle",
+        "tall": 14.773
+      }
+    },
+    {
+      "distance": 1390,
+      "halfWidth": 9.566,
+      "clamp": 15.366,
+      "left": {
+        "limit": 9.775,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_emissive",
+        "tall": 11.375
+      },
+      "right": {
+        "limit": 9.566,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_emissive",
+        "tall": 10.107
+      }
+    },
+    {
+      "distance": 1400,
+      "halfWidth": 9.543,
+      "clamp": 15.343,
+      "left": {
+        "limit": 12.019,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_jungle",
+        "tall": 13.619
+      },
+      "right": {
+        "limit": 13.603,
+        "setBy": "greenwater_open_edge_markers/<unnamed>",
+        "tall": 15.203
+      }
+    },
+    {
+      "distance": 1410,
+      "halfWidth": 9.521,
+      "clamp": 15.321,
+      "left": {
+        "limit": 13.246,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 14.846
+      },
+      "right": {
+        "limit": 13.327,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 14.927
+      }
+    },
+    {
+      "distance": 1420,
+      "halfWidth": 9.512,
+      "clamp": 15.312,
+      "left": {
+        "limit": 13.249,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 14.849
+      },
+      "right": {
+        "limit": 13.04,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_jungle",
+        "tall": 14.64
+      }
+    },
+    {
+      "distance": 1430,
+      "halfWidth": 9.513,
+      "clamp": 15.313,
+      "left": {
+        "limit": 9.793,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_emissive",
+        "tall": 11.393
+      },
+      "right": {
+        "limit": 9.513,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_emissive",
+        "tall": 10.126
+      }
+    },
+    {
+      "distance": 1440,
+      "halfWidth": 9.593,
+      "clamp": 15.393,
+      "left": {
+        "limit": 9.91,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_emissive",
+        "tall": 11.51
+      },
+      "right": {
+        "limit": 9.593,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_emissive",
+        "tall": 10.204
+      }
+    },
+    {
+      "distance": 1450,
+      "halfWidth": 9.749,
+      "clamp": 15.549,
+      "left": {
+        "limit": 13.63,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 15.23
+      },
+      "right": {
+        "limit": 13.63,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 15.23
+      }
+    },
+    {
+      "distance": 1460,
+      "halfWidth": 9.83,
+      "clamp": 15.63,
+      "left": {
+        "limit": 13.63,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 15.23
+      },
+      "right": {
+        "limit": 13.63,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 15.23
+      }
+    },
+    {
+      "distance": 1470,
+      "halfWidth": 9.908,
+      "clamp": 15.708,
+      "left": {
+        "limit": 13.507,
+        "setBy": "GW_SECTOR_THE_ELBOW_metal",
+        "tall": 15.107
+      },
+      "right": {
+        "limit": 13.969,
+        "setBy": "greenwater_open_edge_markers/<unnamed>",
+        "tall": 15.569
+      }
+    },
+    {
+      "distance": 1480,
+      "halfWidth": 10.01,
+      "clamp": 15.102,
+      "left": {
+        "limit": 10.426,
+        "setBy": "GW_SECTOR_THE_ELBOW_emissive",
+        "tall": 12.026
+      },
+      "right": {
+        "limit": 10.01,
+        "setBy": "GW_SECTOR_THE_ELBOW_metal",
+        "tall": 11.018
+      }
+    },
+    {
+      "distance": 1490,
+      "halfWidth": 10.361,
+      "clamp": 15.369,
+      "left": {
+        "limit": 13.759,
+        "setBy": "barrier_A_left",
+        "tall": 15.359
+      },
+      "right": {
+        "limit": 10.361,
+        "setBy": "GW_SECTOR_THE_ELBOW_metal",
+        "tall": 11.284
+      }
+    },
+    {
+      "distance": 1500,
+      "halfWidth": 10.635,
+      "clamp": 15.635,
+      "left": {
+        "limit": 14.025,
+        "setBy": "barrier_A_left",
+        "tall": 15.625
+      },
+      "right": {
+        "limit": 10.635,
+        "setBy": "GW_SECTOR_THE_ELBOW_metal",
+        "tall": 11.551
+      }
+    },
+    {
+      "distance": 1510,
+      "halfWidth": 11.011,
+      "clamp": 16.063,
+      "left": {
+        "limit": 14.458,
+        "setBy": "barrier_A_left",
+        "tall": 16.058
+      },
+      "right": {
+        "limit": 11.011,
+        "setBy": "GW_SECTOR_THE_ELBOW_metal",
+        "tall": 11.801
+      }
+    },
+    {
+      "distance": 1520,
+      "halfWidth": 11.113,
+      "clamp": 16.113,
+      "left": {
+        "limit": 14.508,
+        "setBy": "barrier_A_left",
+        "tall": 16.108
+      },
+      "right": {
+        "limit": 11.113,
+        "setBy": "GW_SECTOR_THE_ELBOW_metal",
+        "tall": 12.001
+      }
+    },
+    {
+      "distance": 1530,
+      "halfWidth": 11.238,
+      "clamp": 16.238,
+      "left": {
+        "limit": 11.509,
+        "setBy": "GW_SECTOR_THE_ELBOW_emissive",
+        "tall": 13.109
+      },
+      "right": {
+        "limit": 11.238,
+        "setBy": "GW_SECTOR_THE_ELBOW_metal",
+        "tall": 12.1
+      }
+    },
+    {
+      "distance": 1540,
+      "halfWidth": 11.363,
+      "clamp": 16.363,
+      "left": {
+        "limit": 14.758,
+        "setBy": "barrier_A_left",
+        "tall": 16.358
+      },
+      "right": {
+        "limit": 11.363,
+        "setBy": "GW_SECTOR_THE_ELBOW_metal",
+        "tall": 12.2
+      }
+    },
+    {
+      "distance": 1550,
+      "halfWidth": 11.488,
+      "clamp": 16.488,
+      "left": {
+        "limit": 14.883,
+        "setBy": "barrier_A_left",
+        "tall": 16.483
+      },
+      "right": {
+        "limit": 11.488,
+        "setBy": "GW_SECTOR_THE_ELBOW_metal",
+        "tall": 12.301
+      }
+    },
+    {
+      "distance": 1560,
+      "halfWidth": 11.614,
+      "clamp": 16.614,
+      "left": {
+        "limit": 15.008,
+        "setBy": "barrier_A_left",
+        "tall": 16.608
+      },
+      "right": {
+        "limit": 11.614,
+        "setBy": "GW_SECTOR_THE_ELBOW_metal",
+        "tall": 12.501
+      }
+    },
+    {
+      "distance": 1570,
+      "halfWidth": 11.761,
+      "clamp": 16.764,
+      "left": {
+        "limit": 15.158,
+        "setBy": "barrier_A_left",
+        "tall": 16.758
+      },
+      "right": {
+        "limit": 11.761,
+        "setBy": "GW_SECTOR_THE_ELBOW_metal",
+        "tall": 12.601
+      }
+    },
+    {
+      "distance": 1580,
+      "halfWidth": 11.889,
+      "clamp": 16.889,
+      "left": {
+        "limit": 11.889,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.357
+      },
+      "right": {
+        "limit": 11.889,
+        "setBy": "GW_SECTOR_THE_ELBOW_metal",
+        "tall": 12.701
+      }
+    },
+    {
+      "distance": 1590,
+      "halfWidth": 11.926,
+      "clamp": 16.926,
+      "left": {
+        "limit": 11.926,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.649
+      },
+      "right": {
+        "limit": 11.926,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.649
+      }
+    },
+    {
+      "distance": 1600,
+      "halfWidth": 11.842,
+      "clamp": 16.842,
+      "left": {
+        "limit": 11.842,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.582
+      },
+      "right": {
+        "limit": 11.842,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.583
+      }
+    },
+    {
+      "distance": 1610,
+      "halfWidth": 11.761,
+      "clamp": 16.761,
+      "left": {
+        "limit": 11.761,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.516
+      },
+      "right": {
+        "limit": 11.761,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.516
+      }
+    },
+    {
+      "distance": 1620,
+      "halfWidth": 11.691,
+      "clamp": 16.691,
+      "left": {
+        "limit": 11.691,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.45
+      },
+      "right": {
+        "limit": 11.691,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.45
+      }
+    },
+    {
+      "distance": 1630,
+      "halfWidth": 11.593,
+      "clamp": 16.593,
+      "left": {
+        "limit": 11.593,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.316
+      },
+      "right": {
+        "limit": 11.593,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.316
+      }
+    },
+    {
+      "distance": 1640,
+      "halfWidth": 11.526,
+      "clamp": 16.526,
+      "left": {
+        "limit": 11.526,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      },
+      "right": {
+        "limit": 11.526,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      }
+    },
+    {
+      "distance": 1650,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      },
+      "right": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      }
+    },
+    {
+      "distance": 1660,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      },
+      "right": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      }
+    },
+    {
+      "distance": 1670,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      },
+      "right": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      }
+    },
+    {
+      "distance": 1680,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      },
+      "right": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      }
+    },
+    {
+      "distance": 1690,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      },
+      "right": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      }
+    },
+    {
+      "distance": 1700,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.264
+      },
+      "right": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      }
+    },
+    {
+      "distance": 1710,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.235
+      },
+      "right": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      }
+    },
+    {
+      "distance": 1720,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.236
+      },
+      "right": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      }
+    },
+    {
+      "distance": 1730,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.234
+      },
+      "right": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      }
+    },
+    {
+      "distance": 1740,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.235
+      },
+      "right": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      }
+    },
+    {
+      "distance": 1750,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.235
+      },
+      "right": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      }
+    },
+    {
+      "distance": 1760,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.235
+      },
+      "right": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      }
+    },
+    {
+      "distance": 1770,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.233
+      },
+      "right": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      }
+    },
+    {
+      "distance": 1780,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.235
+      },
+      "right": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      }
+    },
+    {
+      "distance": 1790,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.234
+      },
+      "right": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      }
+    },
+    {
+      "distance": 1800,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.236
+      },
+      "right": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      }
+    },
+    {
+      "distance": 1810,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.236
+      },
+      "right": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      }
+    },
+    {
+      "distance": 1820,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.236
+      },
+      "right": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      }
+    },
+    {
+      "distance": 1830,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.234
+      },
+      "right": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      }
+    },
+    {
+      "distance": 1840,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.245
+      },
+      "right": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      }
+    },
+    {
+      "distance": 1850,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      },
+      "right": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.236
+      }
+    },
+    {
+      "distance": 1860,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      },
+      "right": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.233
+      }
+    },
+    {
+      "distance": 1870,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      },
+      "right": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.236
+      }
+    },
+    {
+      "distance": 1880,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      },
+      "right": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.235
+      }
+    },
+    {
+      "distance": 1890,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      },
+      "right": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.237
+      }
+    },
+    {
+      "distance": 1900,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      },
+      "right": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.236
+      }
+    },
+    {
+      "distance": 1910,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      },
+      "right": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.235
+      }
+    },
+    {
+      "distance": 1920,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      },
+      "right": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.235
+      }
+    },
+    {
+      "distance": 1930,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      },
+      "right": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.235
+      }
+    },
+    {
+      "distance": 1940,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      },
+      "right": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.235
+      }
+    },
+    {
+      "distance": 1950,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      },
+      "right": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.235
+      }
+    },
+    {
+      "distance": 1960,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      },
+      "right": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.237
+      }
+    },
+    {
+      "distance": 1970,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      },
+      "right": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.235
+      }
+    },
+    {
+      "distance": 1980,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      },
+      "right": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.235
+      }
+    },
+    {
+      "distance": 1990,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      },
+      "right": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.235
+      }
+    },
+    {
+      "distance": 2000,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      },
+      "right": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      }
+    },
+    {
+      "distance": 2010,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      },
+      "right": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      }
+    },
+    {
+      "distance": 2020,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      },
+      "right": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      }
+    },
+    {
+      "distance": 2030,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      },
+      "right": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      }
+    },
+    {
+      "distance": 2040,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      },
+      "right": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      }
+    },
+    {
+      "distance": 2050,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      },
+      "right": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      }
+    },
+    {
+      "distance": 2060,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      },
+      "right": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      }
+    },
+    {
+      "distance": 2070,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      },
+      "right": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.29
+      }
+    },
+    {
+      "distance": 2080,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.276
+      },
+      "right": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.302
+      }
+    },
+    {
+      "distance": 2090,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.257
+      },
+      "right": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.315
+      }
+    },
+    {
+      "distance": 2100,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.235
+      },
+      "right": {
+        "limit": 14.9,
+        "setBy": "barrier_A_right",
+        "tall": 16.5
+      }
+    },
+    {
+      "distance": 2110,
+      "halfWidth": 11.5,
+      "clamp": 16.5,
+      "left": {
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.185
+      },
+      "right": {
+        "limit": 14.9,
+        "setBy": "barrier_A_right",
+        "tall": 16.5
+      }
+    },
+    {
+      "distance": 2120,
+      "halfWidth": 11,
+      "clamp": 13,
+      "left": {
+        "limit": 11,
+        "setBy": "GW_SECTOR_T10_TOTEM_TURN_metal",
+        "tall": 11.245
+      },
+      "right": {
+        "limit": 11,
+        "setBy": "GW_SECTOR_T10_TOTEM_TURN_concrete",
+        "tall": 11.59
+      }
+    },
+    {
+      "distance": 2130,
+      "halfWidth": 11,
+      "clamp": 13,
+      "left": {
+        "limit": 11,
+        "setBy": "GW_SECTOR_T10_TOTEM_TURN_metal",
+        "tall": 11.247
+      },
+      "right": {
+        "limit": 11,
+        "setBy": "GW_SECTOR_T10_TOTEM_TURN_concrete",
+        "tall": 11.59
+      }
+    },
+    {
+      "distance": 2140,
+      "halfWidth": 11,
+      "clamp": 13,
+      "left": {
+        "limit": 11,
+        "setBy": "GW_SECTOR_T10_TOTEM_TURN_metal",
+        "tall": 11.245
+      },
+      "right": {
+        "limit": 11,
+        "setBy": "GW_SECTOR_T10_TOTEM_TURN_concrete",
+        "tall": 11.59
+      }
+    },
+    {
+      "distance": 2150,
+      "halfWidth": 11,
+      "clamp": 13,
+      "left": {
+        "limit": 11,
+        "setBy": "GW_SECTOR_T10_TOTEM_TURN_metal",
+        "tall": 11.245
+      },
+      "right": {
+        "limit": 11,
+        "setBy": "GW_SECTOR_T10_TOTEM_TURN_concrete",
+        "tall": 11.59
+      }
+    },
+    {
+      "distance": 2160,
+      "halfWidth": 11,
+      "clamp": 13,
+      "left": {
+        "limit": 11,
+        "setBy": "GW_SECTOR_T10_TOTEM_TURN_metal",
+        "tall": 11.246
+      },
+      "right": {
+        "limit": 11,
+        "setBy": "GW_SECTOR_T10_TOTEM_TURN_concrete",
+        "tall": 11.59
+      }
+    },
+    {
+      "distance": 2170,
+      "halfWidth": 11,
+      "clamp": 13,
+      "left": {
+        "limit": 11,
+        "setBy": "GW_SECTOR_T10_TOTEM_TURN_metal",
+        "tall": 11.245
+      },
+      "right": {
+        "limit": 11,
+        "setBy": "GW_SECTOR_T10_TOTEM_TURN_concrete",
+        "tall": 11.59
+      }
+    },
+    {
+      "distance": 2180,
+      "halfWidth": 11,
+      "clamp": 13,
+      "left": {
+        "limit": 11,
+        "setBy": "GW_SECTOR_T10_TOTEM_TURN_metal",
+        "tall": 11.246
+      },
+      "right": {
+        "limit": 11,
+        "setBy": "GW_SECTOR_T10_TOTEM_TURN_concrete",
+        "tall": 11.59
+      }
+    },
+    {
+      "distance": 2190,
+      "halfWidth": 11,
+      "clamp": 13,
+      "left": {
+        "limit": 11,
+        "setBy": "GW_SECTOR_T10_TOTEM_TURN_metal",
+        "tall": 11.244
+      },
+      "right": {
+        "limit": 11,
+        "setBy": "GW_SECTOR_T10_TOTEM_TURN_concrete",
+        "tall": 11.59
+      }
+    },
+    {
+      "distance": 2200,
+      "halfWidth": 11,
+      "clamp": 13,
+      "left": {
+        "limit": 11,
+        "setBy": "GW_SECTOR_T10_TOTEM_TURN_metal",
+        "tall": 11.245
+      },
+      "right": {
+        "limit": 11,
+        "setBy": "GW_SECTOR_T10_TOTEM_TURN_concrete",
+        "tall": 11.59
+      }
+    },
+    {
+      "distance": 2210,
+      "halfWidth": 11,
+      "clamp": 13,
+      "left": {
+        "limit": 11,
+        "setBy": "GW_SECTOR_T10_TOTEM_TURN_metal",
+        "tall": 11.246
+      },
+      "right": {
+        "limit": 11,
+        "setBy": "GW_SECTOR_T10_TOTEM_TURN_concrete",
+        "tall": 11.59
+      }
+    },
+    {
+      "distance": 2220,
+      "halfWidth": 11,
+      "clamp": 13,
+      "left": {
+        "limit": 11,
+        "setBy": "GW_SECTOR_T10_TOTEM_TURN_metal",
+        "tall": 11.245
+      },
+      "right": {
+        "limit": 11,
+        "setBy": "GW_SECTOR_T10_TOTEM_TURN_concrete",
+        "tall": 11.59
+      }
+    },
+    {
+      "distance": 2230,
+      "halfWidth": 11,
+      "clamp": 13,
+      "left": {
+        "limit": 11,
+        "setBy": "GW_SECTOR_T10_TOTEM_TURN_metal",
+        "tall": 11.245
+      },
+      "right": {
+        "limit": 11,
+        "setBy": "GW_SECTOR_T10_TOTEM_TURN_concrete",
+        "tall": 11.59
+      }
+    },
+    {
+      "distance": 2240,
+      "halfWidth": 11,
+      "clamp": 13,
+      "left": {
+        "limit": 11,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 11.376
+      },
+      "right": {
+        "limit": 11,
+        "setBy": "GW_SECTOR_T10_TOTEM_TURN_concrete",
+        "tall": 11.59
+      }
+    },
+    {
+      "distance": 2250,
+      "halfWidth": 11,
+      "clamp": 13,
+      "left": {
+        "limit": 11,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 11.701
+      },
+      "right": {
+        "limit": 11,
+        "setBy": "GW_SECTOR_T10_TOTEM_TURN_concrete",
+        "tall": 11.409
+      }
+    },
+    {
+      "distance": 2260,
+      "halfWidth": 11.086,
+      "clamp": 16.086,
+      "left": {
+        "limit": 11.086,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 11.86
+      },
+      "right": {
+        "limit": 14.516,
+        "setBy": "barrier_A_right",
+        "tall": 16.116
+      }
+    },
+    {
+      "distance": 2270,
+      "halfWidth": 11.284,
+      "clamp": 16.284,
+      "left": {
+        "limit": 11.284,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.018
+      },
+      "right": {
+        "limit": 14.683,
+        "setBy": "barrier_A_right",
+        "tall": 16.283
+      }
+    },
+    {
+      "distance": 2280,
+      "halfWidth": 11.45,
+      "clamp": 16.45,
+      "left": {
+        "limit": 11.45,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.325
+      },
+      "right": {
+        "limit": 11.45,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.353
+      }
+    },
+    {
+      "distance": 2290,
+      "halfWidth": 11.614,
+      "clamp": 16.614,
+      "left": {
+        "limit": 11.614,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.473
+      },
+      "right": {
+        "limit": 11.614,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.473
+      }
+    },
+    {
+      "distance": 2300,
+      "halfWidth": 11.752,
+      "clamp": 16.752,
+      "left": {
+        "limit": 11.752,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.607
+      },
+      "right": {
+        "limit": 11.752,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.607
+      }
+    },
+    {
+      "distance": 2310,
+      "halfWidth": 11.95,
+      "clamp": 16.95,
+      "left": {
+        "limit": 11.95,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.74
+      },
+      "right": {
+        "limit": 11.95,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.74
+      }
+    },
+    {
+      "distance": 2320,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.79
+      },
+      "right": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.79
+      }
+    },
+    {
+      "distance": 2330,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.79
+      },
+      "right": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.79
+      }
+    },
+    {
+      "distance": 2340,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.79
+      },
+      "right": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.79
+      }
+    },
+    {
+      "distance": 2350,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.79
+      },
+      "right": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.79
+      }
+    },
+    {
+      "distance": 2360,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.79
+      },
+      "right": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.79
+      }
+    },
+    {
+      "distance": 2370,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.79
+      },
+      "right": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.79
+      }
+    },
+    {
+      "distance": 2380,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.79
+      },
+      "right": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.79
+      }
+    },
+    {
+      "distance": 2390,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.79
+      },
+      "right": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.79
+      }
+    },
+    {
+      "distance": 2400,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.79
+      },
+      "right": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.79
+      }
+    },
+    {
+      "distance": 2410,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.79
+      },
+      "right": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.79
+      }
+    },
+    {
+      "distance": 2420,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.79
+      },
+      "right": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.79
+      }
+    },
+    {
+      "distance": 2430,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.79
+      },
+      "right": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.79
+      }
+    },
+    {
+      "distance": 2440,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.79
+      },
+      "right": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.79
+      }
+    },
+    {
+      "distance": 2450,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.79
+      },
+      "right": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.79
+      }
+    },
+    {
+      "distance": 2460,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.79
+      },
+      "right": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.79
+      }
+    },
+    {
+      "distance": 2470,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.79
+      },
+      "right": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.79
+      }
+    },
+    {
+      "distance": 2480,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.79
+      },
+      "right": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.79
+      }
+    },
+    {
+      "distance": 2490,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.79
+      },
+      "right": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.79
+      }
+    },
+    {
+      "distance": 2500,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_START_metal",
+        "tall": 12.789
+      },
+      "right": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.79
+      }
+    },
+    {
+      "distance": 2510,
+      "halfWidth": 12,
+      "clamp": 17,
+      "left": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.79
+      },
+      "right": {
+        "limit": 12,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 12.79
+      }
+    }
+  ]
+}

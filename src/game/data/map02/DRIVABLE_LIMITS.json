@@ -1,0 +1,46 @@
+{
+  "$generatedBy": "scripts/derive-drivable-limits.mjs",
+  "$doNotEditByHand": "Measured from the rendered scene. Re-run the script after any change to trackside geometry; do not hand-tune a number to make a test pass.",
+  "map": "bitterpan",
+  "spanMetres": 10,
+  "hullMarginMetres": 1.6,
+  "rule": "limit = max(halfWidth, min(clamp, tallGeometryLateral - hullMargin)); geometry at or below 0.5 m above the local deck plane does not bound.",
+  "summary": {
+    "spans": 3,
+    "trimmedSides": 3,
+    "flooredToDeckEdge": 1,
+    "maxTrimMetres": 5.8
+  },
+  "entries": [
+    {
+      "distance": 2850,
+      "halfWidth": 12.029,
+      "clamp": 16.629,
+      "right": {
+        "limit": 13.94,
+        "setBy": "map02_cable_coils",
+        "tall": 15.54
+      }
+    },
+    {
+      "distance": 2860,
+      "halfWidth": 12.033,
+      "clamp": 16.633,
+      "right": {
+        "limit": 13.94,
+        "setBy": "map02_cable_coils",
+        "tall": 15.54
+      }
+    },
+    {
+      "distance": 2990,
+      "halfWidth": 13,
+      "clamp": 18.8,
+      "left": {
+        "limit": 13,
+        "setBy": "BP_SIGNAGE_POSTS",
+        "tall": 13.83
+      }
+    }
+  ]
+}

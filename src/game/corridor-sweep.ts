@@ -305,12 +305,18 @@ class StationGrid {
 
   private readonly progressOf: number[] = [];
 
+  private readonly xOf: number[] = [];
+
+  private readonly zOf: number[] = [];
+
   constructor(course: RaceCourse, stationCount: number) {
     const scratch = course.createSampleScratch();
     for (let index = 0; index < stationCount; index += 1) {
       const progress = index / stationCount;
       const sample = course.sample(progress, scratch);
       this.progressOf.push(progress);
+      this.xOf.push(sample.position.x);
+      this.zOf.push(sample.position.z);
       // Register the station in its own cell and the eight around it, so a
       // single lookup always sees every station that could be nearest.
       const cellX = Math.floor(sample.position.x / GRID_CELL_METRES);
@@ -330,11 +336,41 @@ class StationGrid {
     return `${Math.floor(x / GRID_CELL_METRES)}:${Math.floor(z / GRID_CELL_METRES)}`;
   }
 
-  /** Progress hint for a world point, or null when nothing is near enough. */
+  /**
+   * Progress hint for a world point: the NEAREST station in the cell, or null
+   * when nothing is near enough.
+   *
+   * This returned `bucket[0]` — whichever station happened to be registered in
+   * the cell first — and that was the P16 task-6 attribution bug. Both courses
+   * pass near themselves, so one 24 m cell can hold stations from two different
+   * parts of the lap. A first-match hint pointed `project()` at the wrong
+   * section, and its local pass only searches 42 segments either side of the
+   * hint, so it locked onto the wrong one and never recovered. The visible
+   * symptom was Bitterpan's road appearing to be the wall that bounds it: road
+   * vertices from a neighbouring section projecting onto this station at a
+   * plausible lateral and at the ELEVATION DIFFERENCE between the two sections,
+   * which is where the phantom "1.3 m tall geometry" over open salt pan came
+   * from.
+   *
+   * The corridor gate never saw it because a mis-projected vertex lands at a
+   * large lateral and reads as off-deck. Only the derived limit table, which
+   * asks "what is the innermost tall thing", was sensitive to it.
+   */
   hint(x: number, z: number): number | null {
     const bucket = this.cells.get(StationGrid.key(x, z));
     if (!bucket || bucket.length === 0) return null;
-    return this.progressOf[bucket[0]];
+    let best = bucket[0];
+    let bestDistanceSquared = Infinity;
+    for (const index of bucket) {
+      const dx = this.xOf[index] - x;
+      const dz = this.zOf[index] - z;
+      const distanceSquared = dx * dx + dz * dz;
+      if (distanceSquared < bestDistanceSquared) {
+        bestDistanceSquared = distanceSquared;
+        best = index;
+      }
+    }
+    return this.progressOf[best];
   }
 
   /** True when no station registered a cell anywhere near this point. */
@@ -366,6 +402,19 @@ export interface TallGeometrySpan {
   /** `resolveApron`'s current clamp for this span. */
   readonly clamp: number;
   /**
+   * Distance and half-width AT THE BOUNDING VERTEX ITSELF, per side.
+   *
+   * The limit must be computed against the half-width where the bounding
+   * geometry actually stands, never against a bucket-wide minimum: mixing them
+   * is how a vertex 10 m away came to look "inner". Recording the vertex's own
+   * distance also makes a mis-projection visible in the table — a bounding
+   * distance far from its span's is the signature of one.
+   */
+  readonly leftAt: number | null;
+  readonly rightAt: number | null;
+  readonly leftHalfWidth: number | null;
+  readonly rightHalfWidth: number | null;
+  /**
    * The mesh whose vertex set the innermost tall lateral on each side.
    *
    * A derived physics limit has to be able to answer "what put it there". The
@@ -375,13 +424,31 @@ export interface TallGeometrySpan {
    */
   readonly leftMesh: string | null;
   readonly rightMesh: string | null;
+  /** Height above the local deck plane at the bounding vertex, per side. */
+  readonly leftHeight: number | null;
+  readonly rightHeight: number | null;
 }
 
 /** Lap resolution of the derived limit table. */
 export const TALL_GEOMETRY_SPAN_METRES = 10;
 
-/** Below this, geometry is a kerb the craft may run over, not a wall. */
-export const TALL_GEOMETRY_MIN_HEIGHT_METRES = 0.5;
+/**
+ * Below this, geometry does not BOUND the craft — it is something the craft
+ * goes over rather than into.
+ *
+ * 0.85 m, just under the 0.89 m minimum hover height, and this is the
+ * DERIVATION threshold only: the sweep's own obstacle classification still
+ * starts at `FLAT_FURNITURE_MAX_HEIGHT_METRES` (0.3 m), so a 0.78 m cable coil
+ * standing on the racing surface is still an obstacle and still has to move.
+ * What it no longer does is generate an invisible wall.
+ *
+ * It was 0.5 m, and that put a derived limit at five Bitterpan spans where the
+ * only tall thing was a 0.78 m coil the craft physically clears by 0.11 m.
+ * An invisible boundary at a hazard you can visibly fly over is the exact feel
+ * this phase exists to kill — and skimming a coil by 0.11 m is a near miss,
+ * which is what the trip hazards are for.
+ */
+export const TALL_GEOMETRY_MIN_HEIGHT_METRES = 0.85;
 
 interface MeshAccumulator {
   mesh: string;
@@ -493,11 +560,16 @@ export function sweepCorridor(
   const composed = new THREE.Matrix4();
 
   const accumulators = new Map<string, MeshAccumulator>();
+  interface SpanSide {
+    lateral: number;
+    at: number;
+    halfWidth: number;
+    height: number;
+    mesh: string;
+  }
   interface SpanBucket {
-    left: number | null;
-    right: number | null;
-    leftMesh: string | null;
-    rightMesh: string | null;
+    left: SpanSide | null;
+    right: SpanSide | null;
     halfWidth: number;
     clamp: number;
   }
@@ -507,19 +579,13 @@ export function sweepCorridor(
     lateral: number,
     halfWidth: number,
     clamp: number,
+    height: number,
     mesh: string,
   ): void => {
     const index = Math.floor(distance / TALL_GEOMETRY_SPAN_METRES);
     let bucket = spanBuckets.get(index);
     if (!bucket) {
-      bucket = {
-        left: null,
-        right: null,
-        leftMesh: null,
-        rightMesh: null,
-        halfWidth,
-        clamp,
-      };
+      bucket = { left: null, right: null, halfWidth, clamp };
       spanBuckets.set(index, bucket);
     }
     // Narrowest half-width and clamp across the span: the limit has to hold
@@ -527,14 +593,15 @@ export function sweepCorridor(
     bucket.halfWidth = Math.min(bucket.halfWidth, halfWidth);
     bucket.clamp = Math.min(bucket.clamp, clamp);
     const magnitude = Math.abs(lateral);
+    const side: SpanSide = {
+      lateral: magnitude, at: distance, halfWidth, height, mesh,
+    };
     if (lateral < 0) {
-      if (bucket.left === null || magnitude < bucket.left) {
-        bucket.left = magnitude;
-        bucket.leftMesh = mesh;
+      if (bucket.left === null || magnitude < bucket.left.lateral) {
+        bucket.left = side;
       }
-    } else if (bucket.right === null || magnitude < bucket.right) {
-      bucket.right = magnitude;
-      bucket.rightMesh = mesh;
+    } else if (bucket.right === null || magnitude < bucket.right.lateral) {
+      bucket.right = side;
     }
   };
   let meshesSwept = 0;
@@ -574,7 +641,19 @@ export function sweepCorridor(
       // course data, so nothing here hardcodes which spans are open run-off.
       course.apronAt(projection, lateral, apron);
       const gate = projection.halfWidth + lateralMargin;
-      const clamp = apron.lateralLimit;
+      // The AUTHORED reach, rebuilt from the apron width — deliberately NOT
+      // `apron.lateralLimit`, which now returns the DERIVED limit.
+      //
+      // The derivation must be idempotent, and using the live clamp made it
+      // catastrophically not. Once `DRIVABLE_LIMITS.json` was consumed, the
+      // sweep saw the already-narrowed limit, stopped recording the very wall
+      // geometry that set it — the wall sits just OUTSIDE the limit it produced,
+      // by the 1.6 m hull margin — and a re-derivation collapsed Greenwater from
+      // 232 bounded spans to 3. Committing that table would have silently
+      // restored the original over-wide clamp and the void with it.
+      const clamp = apron.width > 0
+        ? projection.halfWidth + apron.width
+        : apron.roadLimit;
       const distance = projection.progress * course.length;
       const surface = surfaceHeightAtLateral(projection, lateral);
       const height = offset.subVectors(vertex, projection.position)
@@ -598,6 +677,7 @@ export function sweepCorridor(
             lateral,
             projection.halfWidth,
             clamp,
+            height,
             displayName(mesh),
           );
         }
@@ -743,12 +823,32 @@ export function sweepCorridor(
       .sort((a, b) => a[0] - b[0])
       .map(([index, bucket]): TallGeometrySpan => ({
         distance: index * TALL_GEOMETRY_SPAN_METRES,
-        left: bucket.left === null ? null : Number(bucket.left.toFixed(3)),
-        right: bucket.right === null ? null : Number(bucket.right.toFixed(3)),
+        left: bucket.left === null
+          ? null
+          : Number(bucket.left.lateral.toFixed(3)),
+        right: bucket.right === null
+          ? null
+          : Number(bucket.right.lateral.toFixed(3)),
+        leftAt: bucket.left === null ? null : Number(bucket.left.at.toFixed(2)),
+        rightAt: bucket.right === null
+          ? null
+          : Number(bucket.right.at.toFixed(2)),
+        leftHalfWidth: bucket.left === null
+          ? null
+          : Number(bucket.left.halfWidth.toFixed(3)),
+        rightHalfWidth: bucket.right === null
+          ? null
+          : Number(bucket.right.halfWidth.toFixed(3)),
         halfWidth: Number(bucket.halfWidth.toFixed(3)),
         clamp: Number(bucket.clamp.toFixed(3)),
-        leftMesh: bucket.leftMesh,
-        rightMesh: bucket.rightMesh,
+        leftMesh: bucket.left?.mesh ?? null,
+        rightMesh: bucket.right?.mesh ?? null,
+        leftHeight: bucket.left === null
+          ? null
+          : Number(bucket.left.height.toFixed(3)),
+        rightHeight: bucket.right === null
+          ? null
+          : Number(bucket.right.height.toFixed(3)),
       })),
     // Obstacles first regardless of visibility — the capped tail must never be
     // the thing that had to be fixed, and a hidden obstacle is still an

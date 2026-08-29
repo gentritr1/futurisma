@@ -38,6 +38,28 @@ const CORRIDOR_SWEEP_EXCLUDED_NAMES: ReadonlySet<string> = new Set([
   // Excluded by construction, because a derived drivable limit must never be
   // set by something that is driving.
   "totem_ghost",
+  // P16 task 6 — Bitterpan's blockout GLB and its collision proxy.
+  //
+  // NOT the road the player drives. Greenwater calls
+  // `setProceduralEnvironmentVisible(course.group, false)` so its GLB replaces
+  // the procedural ribbon; the Bitterpan branch never does, so both exist at
+  // once and the ribbon — built from CENTRELINE_STATIONS, correctly banked — is
+  // what renders under the craft. Proven rather than assumed: the craft held at
+  // lateral -13 on the 2.5-degree station at 1250 m sits correctly on the road,
+  // which it could not if the blockout were the surface.
+  //
+  // The blockout's cross-section is MIRRORED against the course model — its
+  // left edge sits at the height of the model's right edge and vice versa, a
+  // constant 1.303 m at lateral 14.925, which is sin(5.0 deg), exactly twice the
+  // authored 2.5-degree bank. That phantom geometry was bounding 523 of 525
+  // Bitterpan span-sides and would have deleted the map's entire pan run-off.
+  //
+  // A drivable limit must come from the world the player experiences. This is a
+  // superseded duplicate representation, so it is excluded here rather than
+  // removed from the scene: `finalMap02NativeBlockoutFreeze` suggests a freeze
+  // contract around the asset, and taking it out is a separate decision.
+  "GW2_TRACK_BLOCKOUT",
+  "GW2_COLLISION_PROXY",
   // The living-world card layer is drifting atmosphere, not scenery, and its
   // position at any single frame is one sample of an animation rather than a
   // placement. Measured, not assumed: `GW_LIVING_AIR_B` reported lateral -11.104
@@ -659,9 +681,12 @@ export class SceneAssets {
    */
   private corridorSweepExclusions(): THREE.Object3D[] {
     const excluded: THREE.Object3D[] = [];
-    for (const child of this.scene.children) {
-      if (CORRIDOR_SWEEP_EXCLUDED_NAMES.has(child.name)) excluded.push(child);
-    }
+    // Traversed, not just top-level: the Bitterpan blockout roots hang inside
+    // `map02_bitterpan_authored_environment` rather than off the scene, and a
+    // children-only scan silently matched none of them.
+    this.scene.traverse((object) => {
+      if (CORRIDOR_SWEEP_EXCLUDED_NAMES.has(object.name)) excluded.push(object);
+    });
     return excluded;
   }
 

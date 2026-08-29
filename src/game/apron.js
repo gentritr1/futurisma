@@ -100,6 +100,10 @@ export function resolveApronProfile(table, edge, sector) {
  * @param {number} halfWidthMetres
  * @param {number} lateralMetres
  * @param {ApronResolution} [target]
+ * @param {number|null} [derivedLimitMetres] P16 — the measured drivable limit
+ * for this span and side, from `DRIVABLE_LIMITS.json`, or null where nothing
+ * tall stands within reach. It can only ever pull the clamp IN, and never below
+ * `roadLimit`, because the table is generated with the deck as a hard floor.
  * @returns {ApronResolution}
  */
 export function resolveApron(
@@ -109,6 +113,7 @@ export function resolveApron(
   halfWidthMetres,
   lateralMetres,
   target = createApronResolution(),
+  derivedLimitMetres = null,
 ) {
   const profile = resolveApronProfile(table, edge, sector);
   const halfWidth = Number.isFinite(halfWidthMetres)
@@ -127,7 +132,15 @@ export function resolveApron(
   target.wall = profile.wall === true;
   target.onApron = onApron;
   target.roadLimit = roadLimit;
-  target.lateralLimit = width > 0 ? halfWidth + width : roadLimit;
+  const authoredLimit = width > 0 ? halfWidth + width : roadLimit;
+  // P16 — the art is the authority on how far the run-off really goes. The
+  // authored width said 5 m of shoulder at Cradle Bend while the wall stood
+  // 0.24 m off the deck; the craft could be driven through it into void. Never
+  // widens, and never crosses the deck edge.
+  target.lateralLimit = Number.isFinite(derivedLimitMetres)
+    && derivedLimitMetres !== null
+    ? Math.max(roadLimit, Math.min(authoredLimit, derivedLimitMetres))
+    : authoredLimit;
   target.depth = onApron ? lateral - roadLimit : 0;
   target.wallSpeedMultiplier = clamp(profile.wallSpeedMultiplier, 0, 1);
   target.wallImpactStrength = clamp(profile.wallImpactStrength, 0, 1);

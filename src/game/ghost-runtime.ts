@@ -318,6 +318,12 @@ function isProbeRun(): boolean {
     "rival-audio",
     "context",
     "focus",
+    // P16 — both were missing. `gate-miss` has been staged since P11 and
+    // `boundary-hold` is new; a probe run is not a race, and a ghost craft
+    // sharing the deck is exactly what the corridor sweep flagged at lateral
+    // 0.000 on the start line.
+    "gate-miss",
+    "boundary-hold",
   ].some((name) => probeSelected(name));
 }
 
