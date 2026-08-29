@@ -1,0 +1,70 @@
+{
+ "id": "TOTEM_LIVERY_WEAR_v0.2",
+ "pass": "P02 art direction",
+ "intensity": 45,
+ "intensityScale": 0.45,
+ "sentence": "At 45 of 100 this is a machine that is serviced, not one that is abandoned.",
+ "deliveryForm": {
+  "form": "overlay sheet",
+  "texture": "/assets/totem/textures/totem_wear_1024.png",
+  "regionsFrom": "src/game/data/ATLAS_REGIONS.json#totem_wear_1024",
+  "liveryFilenamesChanged": false,
+  "silhouettesChanged": false,
+  "why": [
+   "The four livery sheets are build products of totem.js and the handoff generator (totem/MANIFEST.json 'source'), not of this pipeline. Compositing wear into them would not be idempotent, so build --check would pass once and fail on the second run.",
+   "Filenames must not change and silhouettes are validator-pinned. An overlay touches neither.",
+   "Intensity becomes one number. WEAR = 0.45 in atlas-draw-pass02.mjs scales every alpha on the sheet; re-authoring at 30 or 60 is a one-line change and a rebuild, not a re-draw."
+  ]
+ },
+ "blend": {
+  "mode": "multiply",
+  "note": "The sheet is authored dark-on-transparent so a straight multiply darkens and never lightens, except MISMATCH_PANEL, which is opaque primer and is meant to replace the paint under it.",
+  "appliesTo": "TOTEM_body.map, as a second map sampled with the same UVs",
+  "filtering": "mips on, anisotropy 1 - matching the livery atlas's own stated contract. Grain cells on this sheet are 5-6 px so the treatment still exists two mip levels down."
+ },
+ "chipStrip": {
+  "region": [8, 900, 896, 96],
+  "inRegisterWith": "totem/MANIFEST.json texture_assignments.paint_chip_strip",
+  "chipSizePx": 96,
+  "chipPitchPx": 112,
+  "note": "The runtime hull UVs COLLAPSE TO A CHIP CENTRE - the centre pixel is the only one ever sampled. Each chip carries ONE deliberate multiply value at its centre; all wear detail is pushed to the chip margins, visible in review and never sampled.",
+  "perMaterial": [
+   { "material": "carbon_shell", "multiply": 0.16, "effective": 0.072, "reason": "large painted areas hold up; this is dust, not damage" },
+   { "material": "petrol_panel", "multiply": 0.2, "effective": 0.09, "reason": "spine deck collects what falls on it" },
+   { "material": "gunmetal_mech", "multiply": 0.34, "effective": 0.153, "reason": "mechanisms, intake lips, nozzle bells - handled, hot, and never repainted" },
+   { "material": "faded_grey", "multiply": 0.3, "effective": 0.135, "reason": "the ring hoop is already deliberately off-hull; wear widens the mismatch" },
+   { "material": "shadow_black", "multiply": 0.07, "effective": 0.032, "reason": "already the darkest thing on the craft; more would just close the shadows" },
+   { "material": "acid_paint", "multiply": 0.26, "effective": 0.117, "reason": "the team accent fades first and is the read that matters, so it moves but does not die" },
+   { "material": "warning_orange", "multiply": 0.3, "effective": 0.135, "reason": "hazard hardware is touched constantly" },
+   { "material": "oxide_patch", "multiply": 0.38, "effective": 0.171, "reason": "the one authored repair patch spreads - plus a RUST blob at the chip centre" }
+  ],
+  "effectiveNote": "effective = multiply * 0.45. A 7-17% darkening per material is a real, visible shift under filmic tone mapping without touching hue or the silhouette."
+ },
+ "librarySlots": {
+  "note": "Everything outside the chip strip is a LIBRARY, addressed by name, to be placed on the 12 decal cells by whoever owns that UV layout. The cell rects are not published in totem/MANIFEST.json and are deliberately not guessed here.",
+  "openDependency": "the 12 decal_* cell rects from totem.js. Until those land, the wear pass is applied at the chip strip only, which is already the majority of the visible read.",
+  "slots": [
+   { "slot": "GRIME_SOFT", "use": "broad settled grime, any large cell" },
+   { "slot": "GRIME_STREAK", "use": "wash streaking hanging from a cell's top edge" },
+   { "slot": "GRIME_CORNER", "use": "accumulation against a cell edge" },
+   { "slot": "SOOT_FAN", "use": "exhaust soot aft of the nozzle exits; pairs with the vertex-colour heat staining already at z > 2.2" },
+   { "slot": "REPAIR_PATCH_A", "use": "bolted repair plate with oversprayed edge - the panel-repair read" },
+   { "slot": "REPAIR_PATCH_B", "use": "welded strap, ground back and left bare, rust weeping below the fixings" },
+   { "slot": "MISMATCH_PANEL", "use": "unpainted primer replacement panel, NEEDLE REPAIR stencil - the mismatched-part read" },
+   { "slot": "SCUFF_EDGE", "use": "abrasion along a leading edge, paint worn to metal" },
+   { "slot": "RIVET_ROW", "use": "tileable fixing line at 64 px pitch" },
+   { "slot": "STENCIL_REPAIR", "use": "REWORK 0714 service stencil applied over the livery" },
+   { "slot": "DUST_FILM", "use": "even settled dust, whole-cell multiply" },
+   { "slot": "OVERSPRAY", "use": "masking bleed and touch-up haze" }
+  ]
+ },
+ "perLivery": [
+  { "livery": "works", "number": "07", "sheet": "totem_decals_1024_works.png", "intensity": 45, "note": "the reference read. Factory car, worked hard, maintained properly." },
+  { "livery": "privateer", "number": "13", "sheet": "totem_decals_1024_privateer.png", "intensity": 45, "mismatchPanels": 2, "note": "the customer car carries both MISMATCH_PANEL placements - a privateer buys the part that is in stock." },
+  { "livery": "nightform", "number": "24", "sheet": "totem_decals_1024_nightform.png", "intensity": 34, "note": "held back deliberately. Nightform is the unlock; its whole identity is a cleaner, colder shell, and 45 on a near-black hull reads as mud rather than as service." },
+  { "livery": "needle", "number": "16", "sheet": "totem_decals_1024_needle.png", "intensity": 45, "note": "lightweight spec, so REPAIR_PATCH_B (welded strap) rather than REPAIR_PATCH_A (bolted plate) - you do not add plate to a car built to be light. NEEDLE teal #6FA8B0 is the stencil accent on MISMATCH_PANEL." }
+ ],
+ "outOfScope": {
+  "note": "Hull-level streaking that follows the FORM rather than the UV cells cannot be delivered on this texture at all, because the hull samples one pixel per material. It belongs in the COLOR_0 channel or a second UV set. Either is a modelling-spec change, not an art-direction one, and is flagged rather than attempted."
+ }
+}

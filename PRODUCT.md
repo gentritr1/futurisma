@@ -30,7 +30,10 @@ Hypnotic, technical, feral. Quiet atmospheric tension should give way to sharp m
 1. Speed must remain readable: silhouette, course edges, timing, and boost state survive fog and motion.
 2. Every visual effect has a racing purpose: feedback, orientation, danger, or atmosphere.
 3. Preserve the tension between humid organic space and repaired aerospace machinery.
-4. Prefer deliberate low-resolution character over modern rendering complexity.
+4. The PS2 era is the memory, not the method: capture its atmosphere — fog, restraint,
+   worn industrial fiction, honest geometry — with whatever rendering reads best today.
+   Coherence and legibility at speed beat era-accurate degradation; pixel-crisp
+   treatment belongs only on assets authored for it, never as a filter over everything.
 5. Rival presence should create pressure and overtaking decisions without rubber-banding, player collision, or route obstruction.
 
 ## Accessibility & Inclusion

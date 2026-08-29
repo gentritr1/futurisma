@@ -26,6 +26,12 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { buildRunwayAtlas, buildSignageAtlas, buildMotionAtlasB } from "./atlas-draw.mjs";
+import {
+  buildCrustTile,
+  buildBitterpanCrustAtlas,
+  buildHangarFixtures,
+  buildLiveryWearAtlas,
+} from "./atlas-draw-pass02.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 
@@ -34,6 +40,11 @@ const TARGETS = {
   greenwater_runway_1024: "public/assets/greenwater/textures/greenwater_runway_1024.png",
   futurisma_signage_1024: "public/assets/greenwater/textures/futurisma_signage_1024.png",
   greenwater_motion_b_512: "public/assets/greenwater/textures/greenwater_motion_b_512.png",
+  // Pass 02.
+  bitterpan_crust_tile_256: "public/assets/map02/textures/bitterpan_crust_tile_256.png",
+  bitterpan_crust_1024: "public/assets/map02/textures/bitterpan_crust_1024.png",
+  hangar_fixtures_512: "public/assets/greenwater/textures/hangar_fixtures_512.png",
+  totem_wear_1024: "public/assets/totem/textures/totem_wear_1024.png",
 };
 
 const REGIONS_TARGET = "src/game/data/ATLAS_REGIONS.json";
@@ -93,7 +104,20 @@ const check = args.includes("--check");
 const outIndex = args.indexOf("--out");
 const root = resolve(outIndex >= 0 ? args[outIndex + 1] : join(HERE, ".."));
 
-const sheets = [buildRunwayAtlas(), buildSignageAtlas(), buildMotionAtlasB()];
+// Pass 01 first and unchanged: its three sha256 values are registered in
+// scripts/validate-assets.mjs, and the Pass 02 builders live in a separate
+// module precisely so that neither their draw order nor their rng streams can
+// be disturbed. A `--check` run after this change must still print OK for all
+// three, which is the proof that Pass 02 was additive.
+const sheets = [
+  buildRunwayAtlas(),
+  buildSignageAtlas(),
+  buildMotionAtlasB(),
+  buildCrustTile(),
+  buildBitterpanCrustAtlas(),
+  buildHangarFixtures(),
+  buildLiveryWearAtlas(),
+];
 const regions = {};
 let failed = false;
 

@@ -1,0 +1,60 @@
+{
+ "id": "HANGAR_SIX_PLAQUE_BACKING_v0.2",
+ "pass": "P02 art direction",
+ "course": "greenwater",
+ "sentence": "Thirteen plaques inside Hangar Six are pinned to an open pillar frame with nothing behind them. This is the thing they are bolted to.",
+ "texture": "/assets/greenwater/textures/hangar_fixtures_512.png",
+ "regionsFrom": "src/game/data/ATLAS_REGIONS.json#hangar_fixtures_512",
+ "derivation": {
+  "note": "Not a position list. Positions for these 13 already exist and are resolved at runtime; duplicating them here is exactly the class of second source of truth that furniture-placement.js was written to remove. Instead: one backing panel per furniture group whose resolved placement.mode === 'wall', emitted from the same resolver call that placed the plaque.",
+  "rule": "for each edge-furniture group in course.ts createTurnMarkers(): const placement = resolveFurniturePlacement(...); if (placement.mode === 'wall') emit a backing panel with the class table below, at the same sample, at backingLateral, with bottomHeight = PLAQUE_BAND_BOTTOM_METRES.",
+  "expected": { "panels": 13, "chevronPanels": 7, "boardPanels": 6 }
+ },
+ "classes": [
+  {
+   "id": "PLAQUE_BACK_CHEVRON",
+   "slot": "PANEL_CHEVRON",
+   "backs": "turn chevron plaque, 3.00 x 1.45 m (course.ts chevronBoardWidth / chevronBoardHeight)",
+   "widthMetres": 3.9, "heightMetres": 1.95,
+   "sideMarginMetres": 0.45, "topMarginMetres": 0.5, "bottomMarginMetres": 0,
+   "bottomHeightMetres": 3.2, "centreHeightMetres": 4.175,
+   "expectedPlaqueCentreHeightMetres": 3.925
+  },
+  {
+   "id": "PLAQUE_BACK_BOARD",
+   "slot": "PANEL_BOARD",
+   "backs": "braking distance board, 2.465 x 1.28 m (course.ts distanceBoardWidth = 1.7 * 1.45)",
+   "widthMetres": 3.15, "heightMetres": 1.8,
+   "sideMarginMetres": 0.3425, "topMarginMetres": 0.52, "bottomMarginMetres": 0,
+   "bottomHeightMetres": 3.2, "centreHeightMetres": 4.1,
+   "expectedPlaqueCentreHeightMetres": 3.84
+  }
+ ],
+ "placement": {
+  "lateral": "side * (halfWidth - BACKING_INSET_METRES)",
+  "BACKING_INSET_METRES": 0.29,
+  "note": "0.06 m outboard of the plaque's own halfWidth - 0.35, so the plaque stands proud of its backing by 60 mm. That gap is the whole effect: it is what casts the shadow line the recess on the sheet is drawn to receive.",
+  "facing": "same as the plaque it backs; one-sided plane, no back face",
+  "renderOrder": "below the plaque; the plaque keeps its existing renderOrder"
+ },
+ "deckSafety": {
+  "note": "The panel grows upward only and its bottom edge is flush with the plaque's at exactly PLAQUE_BAND_BOTTOM_METRES; a symmetric margin would hang structure over the deck under the band, the precise P13 failure.",
+  "clearsDeck": "true, via the overhead-structure branch (bottomHeight >= PLAQUE_BAND_BOTTOM_METRES)",
+  "innerFaceInsideDeckEdgeMetres": 0.29,
+  "validatorAction": "add the two classes to the enumeration in validate-furniture.mjs as an EDGE class with bottomHeight 3.2 - they must be measured, not exempted."
+ },
+ "runtime": {
+  "meshes": [
+   { "name": "GW_HANGAR_PLAQUE_BACK_CHEVRON", "type": "InstancedMesh", "geometry": "PlaneGeometry(1,1) with PANEL_CHEVRON UVs baked", "instances": 7, "drawCalls": 1, "triangles": 14 },
+   { "name": "GW_HANGAR_PLAQUE_BACK_BOARD", "type": "InstancedMesh", "geometry": "PlaneGeometry(1,1) with PANEL_BOARD UVs baked", "instances": 6, "drawCalls": 1, "triangles": 12 }
+  ],
+  "materialName": "GW_HANGAR_FIXTURES",
+  "shaderModel": "MeshLambertMaterial - these are lit surfaces inside a lit shell, not unlit signage",
+  "magFilter": "NearestFilter", "minFilter": "NearestFilter", "generateMipmaps": false,
+  "totalDrawCalls": 2, "totalTriangles": 26
+ },
+ "spareSlots": {
+  "BOLT_PAIR": "fixing detail if a future plaque needs a wider panel than PANEL_CHEVRON",
+  "MOUNT_STRAP": "vertical strap tying a panel to a pillar, for the two placements nearest a frame column"
+ }
+}

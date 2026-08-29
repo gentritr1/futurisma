@@ -508,5 +508,300 @@
     "note": "served stores, near-field silhouette"
    }
   }
+ },
+ "bitterpan_crust_tile_256": {
+  "texture": "/assets/map02/textures/bitterpan_crust_tile_256.png",
+  "width": 256,
+  "height": 256,
+  "bytes": 75428,
+  "sha256": "e16c41b45f24debab80526d2d3fa9bc69005e40b270a8f1f0370483f0f74b6fb",
+  "regions": {
+   "CRUST_FIELD": {
+    "x": 0,
+    "y": 0,
+    "w": 256,
+    "h": 256,
+    "note": "seamless pan crust, 12 m across, repeat wrapped"
+   }
+  }
+ },
+ "bitterpan_crust_1024": {
+  "texture": "/assets/map02/textures/bitterpan_crust_1024.png",
+  "width": 1024,
+  "height": 1024,
+  "bytes": 249369,
+  "sha256": "59d3ca77abdcdc2550698b6fc1f10b58e8a9f13ccc31d8a356b4b7821c915ac6",
+  "regions": {
+   "CRACK_COARSE": {
+    "x": 0,
+    "y": 0,
+    "w": 256,
+    "h": 256,
+    "note": "crack overlay, 6x6 plates, tileable"
+   },
+   "CRACK_MID": {
+    "x": 256,
+    "y": 0,
+    "w": 256,
+    "h": 256,
+    "note": "crack overlay, 9x9 plates, tileable"
+   },
+   "CRACK_FINE": {
+    "x": 512,
+    "y": 0,
+    "w": 256,
+    "h": 256,
+    "note": "crack overlay, 13x13 plates, tileable"
+   },
+   "CRACK_SHATTER": {
+    "x": 768,
+    "y": 0,
+    "w": 256,
+    "h": 256,
+    "note": "crack overlay, 19x19 plates, tileable"
+   },
+   "SPILL_FAN_HEAVY": {
+    "x": 0,
+    "y": 256,
+    "w": 256,
+    "h": 256,
+    "note": "loadout drop, running chute"
+   },
+   "SPILL_FAN_LIGHT": {
+    "x": 256,
+    "y": 256,
+    "w": 256,
+    "h": 256,
+    "note": "loadout drop, trailing off"
+   },
+   "SPILL_FAN_SPLIT": {
+    "x": 512,
+    "y": 256,
+    "w": 256,
+    "h": 256,
+    "note": "twin chute, overlapping toes"
+   },
+   "HARVESTER_TURN": {
+    "x": 768,
+    "y": 256,
+    "w": 256,
+    "h": 256,
+    "note": "scraped turning arc at a windrow head"
+   },
+   "SCRAPE_BUNDLE_A": {
+    "x": 0,
+    "y": 512,
+    "w": 512,
+    "h": 128,
+    "note": "harvester corduroy, 9 passes, U-tileable"
+   },
+   "SCRAPE_BUNDLE_B": {
+    "x": 512,
+    "y": 512,
+    "w": 512,
+    "h": 128,
+    "note": "harvester corduroy, 6 passes, worn"
+   },
+   "WINDROW_LONG": {
+    "x": 0,
+    "y": 640,
+    "w": 512,
+    "h": 128,
+    "note": "continuous salt windrow, U-tileable"
+   },
+   "WINDROW_BROKEN": {
+    "x": 512,
+    "y": 640,
+    "w": 256,
+    "h": 128,
+    "note": "worked windrow, gapped"
+   },
+   "WINDROW_END": {
+    "x": 768,
+    "y": 640,
+    "w": 256,
+    "h": 128,
+    "note": "windrow head, tapered"
+   },
+   "CONVEYOR_SHADOW": {
+    "x": 0,
+    "y": 768,
+    "w": 1024,
+    "h": 128,
+    "note": "span shadow band across the deck, U-tileable"
+   },
+   "BRINE_STAIN": {
+    "x": 0,
+    "y": 896,
+    "w": 256,
+    "h": 128,
+    "note": "standing brine, crystallised rim"
+   },
+   "BRINE_SHEEN": {
+    "x": 256,
+    "y": 896,
+    "w": 256,
+    "h": 128,
+    "note": "wet pan sheen, the HZ_SALT_DRIFT telegraph"
+   },
+   "ROUTE_EDGE_CYAN": {
+    "x": 512,
+    "y": 896,
+    "w": 256,
+    "h": 128,
+    "note": "route edge line, U-tileable"
+   },
+   "ROUTE_ARROW_ORANGE": {
+    "x": 768,
+    "y": 896,
+    "w": 256,
+    "h": 128,
+    "note": "direction chevron pair, warning orange"
+   }
+  }
+ },
+ "hangar_fixtures_512": {
+  "texture": "/assets/greenwater/textures/hangar_fixtures_512.png",
+  "width": 512,
+  "height": 512,
+  "bytes": 20190,
+  "sha256": "296531d9bb2c80b979b2390c28fc097fb3dd2090e887207ca5b7d9baacb6629a",
+  "regions": {
+   "PANEL_CHEVRON": {
+    "x": 0,
+    "y": 0,
+    "w": 512,
+    "h": 256,
+    "note": "backing for the 3.00 x 1.45 m chevron plaque; 3.90 x 1.95 m"
+   },
+   "PANEL_BOARD": {
+    "x": 0,
+    "y": 256,
+    "w": 448,
+    "h": 256,
+    "note": "backing for the 2.465 x 1.28 m braking board; 3.15 x 1.80 m"
+   },
+   "BOLT_PAIR": {
+    "x": 448,
+    "y": 256,
+    "w": 64,
+    "h": 128,
+    "note": "spare fixing detail for a wider panel"
+   },
+   "MOUNT_STRAP": {
+    "x": 448,
+    "y": 384,
+    "w": 64,
+    "h": 128,
+    "note": "vertical strap, ties a panel to a pillar"
+   }
+  }
+ },
+ "totem_wear_1024": {
+  "texture": "/assets/totem/textures/totem_wear_1024.png",
+  "width": 1024,
+  "height": 1024,
+  "bytes": 67125,
+  "sha256": "093033d86282e20eb0e26dbb638ef9c528fd3942fed5d54559043d84e60fe123",
+  "regions": {
+   "GRIME_SOFT": {
+    "x": 0,
+    "y": 0,
+    "w": 256,
+    "h": 256,
+    "note": "broad settled grime, multiply"
+   },
+   "GRIME_STREAK": {
+    "x": 256,
+    "y": 0,
+    "w": 256,
+    "h": 256,
+    "note": "wash streaking, hangs from the top edge"
+   },
+   "SOOT_FAN": {
+    "x": 512,
+    "y": 0,
+    "w": 256,
+    "h": 256,
+    "note": "exhaust soot, aft of the nozzle exits"
+   },
+   "REPAIR_PATCH_A": {
+    "x": 768,
+    "y": 0,
+    "w": 256,
+    "h": 256,
+    "note": "bolted repair plate, oversprayed edge"
+   },
+   "REPAIR_PATCH_B": {
+    "x": 0,
+    "y": 256,
+    "w": 256,
+    "h": 256,
+    "note": "welded strap, ground back and left bare"
+   },
+   "MISMATCH_PANEL": {
+    "x": 256,
+    "y": 256,
+    "w": 512,
+    "h": 256,
+    "note": "unpainted replacement panel, primer grey"
+   },
+   "GRIME_CORNER": {
+    "x": 768,
+    "y": 256,
+    "w": 256,
+    "h": 256,
+    "note": "corner accumulation, for cell edges"
+   },
+   "SCUFF_EDGE": {
+    "x": 0,
+    "y": 512,
+    "w": 512,
+    "h": 128,
+    "note": "abraded leading edge, paint worn to metal"
+   },
+   "RIVET_ROW": {
+    "x": 512,
+    "y": 512,
+    "w": 512,
+    "h": 64,
+    "note": "tileable fixing line, 64 px pitch"
+   },
+   "STENCIL_REPAIR": {
+    "x": 512,
+    "y": 576,
+    "w": 512,
+    "h": 64,
+    "note": "service stencil applied over the livery"
+   },
+   "DUST_FILM": {
+    "x": 0,
+    "y": 640,
+    "w": 1024,
+    "h": 128,
+    "note": "even settled dust, whole-cell multiply"
+   },
+   "OVERSPRAY": {
+    "x": 0,
+    "y": 768,
+    "w": 1024,
+    "h": 128,
+    "note": "masking bleed and touch-up haze"
+   },
+   "CHIP_WEAR_STRIP": {
+    "x": 8,
+    "y": 900,
+    "w": 896,
+    "h": 96,
+    "note": "in register with livery paint-chip strip; one multiply per material"
+   },
+   "WEAR_KEY": {
+    "x": 8,
+    "y": 1000,
+    "w": 896,
+    "h": 20,
+    "note": "authoring key, never sampled at runtime"
+   }
+  }
  }
 }
