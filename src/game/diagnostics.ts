@@ -63,6 +63,8 @@ export interface DiagnosticsCore {
   missedGates: number;
   impactLocations: readonly string[];
   recoveries: number;
+  /** P11: the subset of `recoveries` a missed gate asked for. */
+  gateMissRecoveries: number;
   contextLost: boolean;
   contextLosses: number;
   contextRestores: number;
@@ -309,6 +311,7 @@ export function buildDiagnosticsReport(
     missedGates: core.missedGates,
     impactLocations: core.impactLocations,
     recoveries: core.recoveries,
+    gateMissRecoveries: core.gateMissRecoveries,
     contextLost: core.contextLost,
     contextLosses: core.contextLosses,
     contextRestores: core.contextRestores,

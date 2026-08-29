@@ -688,6 +688,188 @@ for (const field of [
   );
 }
 
+/* ------------------------------------------------------------------ */
+/* 6. P11 key/fill rebalance                                            */
+/* ------------------------------------------------------------------ */
+
+// NEW in P11, not a re-baseline: nothing here was previously pinned, which is
+// how the lap ended up with a hemisphere fill sitting within a whisker of the
+// key in every sector — lighting with no shadow side and therefore no form.
+// These assertions state the *relationship* the regrade established rather than
+// each number, so a future palette pass can move hues freely and only fails if
+// it flattens the lighting again.
+function paletteNumbers(field) {
+  return [...paletteBlock.matchAll(new RegExp(`${field}: ([0-9.]+),`, "g"))]
+    .map((match) => Number(match[1]));
+}
+const keyIntensities = paletteNumbers("keyIntensity");
+const hemisphereIntensities = paletteNumbers("hemisphereIntensity");
+assert.equal(keyIntensities.length, 12, "Every sector must author a keyIntensity.");
+assert.equal(
+  hemisphereIntensities.length,
+  12,
+  "Every sector must author a hemisphereIntensity.",
+);
+// The pre-P11 palette, kept so the regrade is checkable rather than asserted.
+// Ten sectors took one uniform ratio shift — key x1.18, hemisphere x0.82,
+// rounded to 2dp — which lifts modelling without touching hue identity. Two
+// were authored by hand because they were the specific complaints: HANGAR_SIX
+// was muddy, and GREENWATER_SWEEP's 12 degree camber had no shadow side to read
+// against. A future palette pass re-baselines BOTH tables together.
+const PRE_P11_PALETTE = {
+  RUNWAY_START: [1.75, 1.45],
+  T1_CRADLE_BEND: [1.7, 1.5],
+  WATER_TABLE: [1.5, 1.55],
+  LINK_APRON: [1.45, 1.45],
+  HANGAR_SIX: [0.85, 1],
+  HANGAR_EXIT: [1.3, 1.2],
+  GREENWATER_SWEEP: [1.6, 1.65],
+  CANOPY_PASSAGE: [1.2, 1.7],
+  THE_ELBOW: [1.4, 1.6],
+  FUEL_ROW: [1.6, 1.35],
+  T10_TOTEM_TURN: [1.25, 1.15],
+  RUNWAY_HOME: [1.8, 1.5],
+};
+const P11_KEY_FACTOR = 1.18;
+const P11_HEMISPHERE_FACTOR = 0.82;
+const P11_AUTHORED = {
+  HANGAR_SIX: [1.25, 0.8],
+  GREENWATER_SWEEP: [1.95, 1.2],
+};
+const round2 = (value) => Number(value.toFixed(2));
+let shiftedSectors = 0;
+for (let index = 0; index < 12; index += 1) {
+  const sector = authored[index].sector;
+  const before = PRE_P11_PALETTE[sector];
+  assert.ok(before, `No pre-P11 baseline recorded for ${sector}.`);
+  const [key, hemisphere] = P11_AUTHORED[sector] ?? [
+    round2(before[0] * P11_KEY_FACTOR),
+    round2(before[1] * P11_HEMISPHERE_FACTOR),
+  ];
+  // 0.01 of slack, not sloppiness: 1.75 x 1.18 and 1.25 x 1.18 both land exactly
+  // on a 2dp tie (2.065, 1.475), where half-up and IEEE-754 `toFixed` disagree.
+  // The tolerance is one unit in the last authored place, so a real palette edit
+  // still fails.
+  assert.ok(
+    Math.abs(keyIntensities[index] - key) <= 0.01 + 1e-9,
+    `${sector} keyIntensity is ${keyIntensities[index]}, expected ~${key}.`,
+  );
+  assert.ok(
+    Math.abs(hemisphereIntensities[index] - hemisphere) <= 0.01 + 1e-9,
+    `${sector} hemisphereIntensity is ${hemisphereIntensities[index]}, `
+      + `expected ~${hemisphere}.`,
+  );
+  // The point of the pass, stated as a relationship so it survives a re-tint:
+  // every sector's key must have gained on its fill.
+  const ratioBefore = before[0] / before[1];
+  const ratioAfter = keyIntensities[index] / hemisphereIntensities[index];
+  assert.ok(
+    ratioAfter > ratioBefore,
+    `${sector} did not gain key over fill (${ratioBefore.toFixed(2)} -> `
+      + `${ratioAfter.toFixed(2)}). A flat sector is the P11 complaint.`,
+  );
+  if (!P11_AUTHORED[sector]) shiftedSectors += 1;
+}
+assert.equal(shiftedSectors, 10, "Exactly ten sectors take the uniform shift.");
+assert.equal(
+  Number(
+    paletteBlock
+      .slice(paletteBlock.indexOf('sector: "HANGAR_SIX"'))
+      .match(/fogDensity: ([0-9.]+),/)[1],
+  ),
+  0.0036,
+  "HANGAR_SIX fog was thinned 0.0042 -> 0.0036 in P11; the shell was muddy.",
+);
+
+// The rim was standing in for the key. Pinned so a future pass cannot quietly
+// hand the job back to it and re-flatten everything above.
+const rimBoost = Number(
+  atmosphereSource.match(/const RIM_PRESENCE_BOOST = ([0-9.]+);/)[1],
+);
+assert.ok(
+  rimBoost <= 1.4,
+  `RIM_PRESENCE_BOOST is ${rimBoost}; above 1.4 the rim out-reads the key again `
+    + "(P11 took it from 1.85 to 1.35).",
+);
+
+// Hangar fixtures. Three lamps down the shell rather than two at the quarter
+// points: two left the middle third dark. Every lamp must sit inside the
+// authored [618, 816] range, and its falloff must die before the shell mouth or
+// it leaks onto LINK_APRON / HANGAR_EXIT.
+const lampDistances = atmosphereSource
+  .match(/const HANGAR_LAMP_DISTANCES_METRES = \[([^\]]+)\]/)[1]
+  .split(",")
+  .map((value) => Number(value.trim()));
+const lampRange = Number(
+  atmosphereSource.match(/const HANGAR_LAMP_RANGE_METRES = ([0-9.]+);/)[1],
+);
+const lampPeak = Number(
+  atmosphereSource.match(/const HANGAR_LAMP_PEAK_INTENSITY = ([0-9.]+);/)[1],
+);
+assert.ok(
+  lampDistances.length >= 3,
+  `${lampDistances.length} hangar lamps over `
+    + `${HANGAR_LAMP_TO_METRES - HANGAR_LAMP_FROM_METRES} m leaves a dark band.`,
+);
+for (const distance of lampDistances) {
+  assert.ok(
+    isInsideHangarRange(distance),
+    `Hangar lamp at d=${distance} m sits outside the authored shell.`,
+  );
+}
+// Coverage is a 3-D question, not an along-track one: the lamps hang
+// HANGAR_LAMP_HEIGHT_METRES above the deck, so a `distance` of R only reaches
+// sqrt(R^2 - h^2) along the deck. The pre-P11 pair left the shell's middle
+// third at 94% of range — all but fully attenuated — which is the dark band
+// the third fixture exists to fill.
+const lampHeight = Number(
+  atmosphereSource.match(/const HANGAR_LAMP_HEIGHT_METRES = ([0-9.]+);/)[1],
+);
+const deckReach = Math.sqrt(lampRange * lampRange - lampHeight * lampHeight);
+assert.ok(deckReach > 0, "The lamps must reach the deck they hang over.");
+let darkestFraction = 0;
+for (let index = 1; index < lampDistances.length; index += 1) {
+  const gap = lampDistances[index] - lampDistances[index - 1];
+  assert.ok(gap > 0, "Hangar lamp distances must be authored in order.");
+  const midpoint = Math.hypot(gap / 2, lampHeight);
+  darkestFraction = Math.max(darkestFraction, midpoint / lampRange);
+  assert.ok(
+    midpoint / lampRange <= 0.8,
+    `The deck midway between the lamps at ${lampDistances[index - 1]} m and `
+      + `${lampDistances[index]} m sits at ${(midpoint / lampRange * 100).toFixed(0)}% `
+      + "of the lamp range, i.e. all but unlit. Add a fixture or extend the range.",
+  );
+}
+// The falloff no longer dies inside the shell. Recorded, not forbidden: three
+// lamps that cover the middle cannot also be contained, and the lamps are only
+// visible while the player is inside anyway. Pinned so the spill cannot grow
+// unnoticed into a pop the player sees on the way out.
+const spillBefore = HANGAR_LAMP_FROM_METRES - (lampDistances[0] - deckReach);
+const spillAfter = lampDistances.at(-1) + deckReach - HANGAR_LAMP_TO_METRES;
+assert.ok(
+  Math.max(spillBefore, spillAfter) < 45,
+  `The hangar lamps reach ${Math.max(spillBefore, spillAfter).toFixed(1)} m past `
+    + "the shell mouth. Beyond ~45 m the spill is wider than the exit sector.",
+);
+assert.ok(
+  lampPeak > 0 && lampPeak * HANGAR_FLICKER_MIN > 0,
+  "The flicker floor must still light the shell.",
+);
+// The fixture geometry has to read lit, or the lamps have no visible source.
+const courseFixtureColor = courseSource.match(
+  /const sodiumMaterial = new THREE\.MeshBasicMaterial\(\{\s*color: (0x[0-9a-f]+),/,
+);
+const lampColor = atmosphereSource.match(
+  /const HANGAR_LAMP_COLOR = (0x[0-9a-f]+);/,
+);
+assert.ok(courseFixtureColor, "course.ts must build the hangar lamp strips.");
+assert.equal(
+  courseFixtureColor[1],
+  lampColor[1],
+  "The hangar lamp strips must be the same colour as the PointLights they "
+    + "stand for, or the fixture reads as unlit metal under a lit pool.",
+);
+
 console.log(
   "Lighting motion PASS: 12 normalized sector key directions, max "
     + `${maxDelta.toFixed(3)}°/m over ${samples} samples (budget `
@@ -696,5 +878,10 @@ console.log(
     + `ticks in [${minIntensity.toFixed(3)}, ${maxIntensity.toFixed(3)}] with `
     + `${fastDips} strikes and a ${(slowMaximum - slowMinimum).toFixed(3)} slow sag; `
     + `5-stop ramp warms ${(warmth(lapFive) / warmth(lapOne)).toFixed(2)}x lap 1 to `
-    + "lap 5 and zeroes under reduced motion.",
+    + `lap 5 and zeroes under reduced motion; P11 regrade verified on all 12 `
+    + `sectors (${shiftedSectors} x${P11_KEY_FACTOR}/x${P11_HEMISPHERE_FACTOR}, `
+    + `2 authored, rim boost ${rimBoost}), ${lampDistances.length} hangar lamps `
+    + `at ${lampDistances.join("/")} m over a ${lampRange} m range `
+    + `(darkest deck point ${(darkestFraction * 100).toFixed(0)}% of range, `
+    + `spill ${spillBefore.toFixed(1)}/${spillAfter.toFixed(1)} m past the mouths).`,
 );

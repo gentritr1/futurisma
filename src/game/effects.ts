@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import type { RaceCourse } from "./course";
+import { bankedSurfaceLift } from "./presentation";
 import { BOOST_MAX_SPEED } from "./physics";
 import {
   calculateSpeedStreakLength,
@@ -130,13 +131,23 @@ export class RaceEffects {
     position.needsUpdate = true;
   }
 
+  /**
+   * @param origin the craft's simulation position, whose `y` is the *centreline*
+   * height, and @param lateral its signed offset from that centreline. The deck
+   * is banked, so the surface the sparks should leave sits `right.y * lateral`
+   * above `origin` — see `bankedSurfaceLift` in presentation.js. Without it a
+   * wall strike on the 12 degree GREENWATER_SWEEP threw sparks up to 3 m below
+   * the wall it struck.
+   */
   emitImpactSparks(
     sample: ReturnType<RaceCourse["sample"]>,
     origin: THREE.Vector3,
+    lateral: number,
     speed: number,
     side: number,
     strength: number,
   ): void {
+    const originY = origin.y + bankedSurfaceLift(sample.right.y, lateral);
     const count = this.reducedMotion ? 5 : 14;
     for (let emitted = 0; emitted < count; emitted += 1) {
       const particle = this.sparkCursor;
@@ -146,7 +157,7 @@ export class RaceEffects {
       this.sparkPositions[offset] = origin.x
         + sample.right.x * side * 1.7
         + sample.up.x * 0.35;
-      this.sparkPositions[offset + 1] = origin.y
+      this.sparkPositions[offset + 1] = originY
         + sample.right.y * side * 1.7
         + sample.up.y * 0.35;
       this.sparkPositions[offset + 2] = origin.z

@@ -336,9 +336,29 @@ const APRON = MAP.apron;
 // import them from Node.
 // The run-off tucks just under the deck edge so the seam cannot open a crack.
 const APRON_SEAM_OVERLAP_METRES = 0.06;
+/** Mesh-name suffix per authored edge type. `C` gained a surface in P11. */
+const APRON_SURFACE_LABELS: Record<string, string> = {
+  A: "gravel",
+  B: "rumble",
+  C: "runoff",
+};
 const EDGE_FURNITURE_CLEARANCE_METRES = 4.5;
 const EDGE_FURNITURE_SAFETY_MARGIN_METRES = 0.25;
 const TURN_CHEVRON_CLEARANCE_METRES = 9;
+/** P11: turn guide lights hug the inside deck edge instead of the apex. */
+const TURN_GUIDE_EDGE_INSET_METRES = 0.9;
+/**
+ * P11: inside the hangar the shell wall stands at `halfWidth + 0.9`, so edge
+ * furniture placed at the open-air clearances (chevrons 20.25 m, braking boards
+ * 15.48 m) sat *outside* the building. Inside these sectors the furniture is
+ * pulled back against the wall instead.
+ */
+const HANGAR_FURNITURE_SECTORS = new Set([
+  "LINK_APRON",
+  "HANGAR_SIX",
+  "HANGAR_EXIT",
+]);
+const HANGAR_FURNITURE_INSET_METRES = 0.35;
 const BOOST_PAD_DISTANCES = [1705, 1815, 1925, 2035] as const;
 const SECTOR_LABELS: Record<string, string> = {
   RUNWAY_START: "RUNWAY 09",
@@ -354,16 +374,28 @@ const SECTOR_LABELS: Record<string, string> = {
   T10_TOTEM_TURN: "TOTEM TURN",
   RUNWAY_HOME: "HOME STRAIGHT",
 };
+/**
+ * P11 key/fill rebalance. The lap read flat because the hemisphere fill was
+ * within a whisker of the key everywhere: nothing cast a readable form. Every
+ * sector took the same ratio shift — key x1.18, hemisphere x0.82, rounded to
+ * 2dp — so hue identity is untouched and only the modelling changes. Two
+ * sectors are authored rather than scaled: HANGAR_SIX (key 0.85 -> 1.25,
+ * hemisphere 1.00 -> 0.80, fog 0.0042 -> 0.0036) was the darkest and muddiest
+ * point on the lap, and GREENWATER_SWEEP (key 1.60 -> 1.95, hemisphere
+ * 1.65 -> 1.20) is where the banking needs a shadow side to read at all.
+ * `RIM_PRESENCE_BOOST` in atmosphere.ts drops 1.85 -> 1.35 in the same pass;
+ * the rim was standing in for the key and has to give the ratio back.
+ */
 const SECTOR_PALETTE_DEFINITIONS = [
   {
     sector: "RUNWAY_START",
     keyDirection: SECTOR_KEY_DIRECTIONS.RUNWAY_START,
     distance: 0,
     key: 0xf4f7f9,
-    keyIntensity: 1.75,
+    keyIntensity: 2.07,
     sky: 0xd6e0e6,
     ground: 0x4d5852,
-    hemisphereIntensity: 1.45,
+    hemisphereIntensity: 1.19,
     fog: 0x8e9ba0,
     fogDensity: 0.0016,
   },
@@ -372,10 +404,10 @@ const SECTOR_PALETTE_DEFINITIONS = [
     keyDirection: SECTOR_KEY_DIRECTIONS.T1_CRADLE_BEND,
     distance: 221.998,
     key: 0xeef2ea,
-    keyIntensity: 1.7,
+    keyIntensity: 2.01,
     sky: 0xc9d6c4,
     ground: 0x475044,
-    hemisphereIntensity: 1.5,
+    hemisphereIntensity: 1.23,
     fog: 0x8a958f,
     fogDensity: 0.0018,
   },
@@ -384,10 +416,10 @@ const SECTOR_PALETTE_DEFINITIONS = [
     keyDirection: SECTOR_KEY_DIRECTIONS.WATER_TABLE,
     distance: 377.997,
     key: 0xd2e2e0,
-    keyIntensity: 1.5,
+    keyIntensity: 1.77,
     sky: 0x86bab2,
     ground: 0x24403a,
-    hemisphereIntensity: 1.55,
+    hemisphereIntensity: 1.27,
     fog: 0x7fa8a2,
     fogDensity: 0.00215,
   },
@@ -396,10 +428,10 @@ const SECTOR_PALETTE_DEFINITIONS = [
     keyDirection: SECTOR_KEY_DIRECTIONS.LINK_APRON,
     distance: 587.996,
     key: 0xcedcd6,
-    keyIntensity: 1.45,
+    keyIntensity: 1.71,
     sky: 0x7fada6,
     ground: 0x243630,
-    hemisphereIntensity: 1.45,
+    hemisphereIntensity: 1.19,
     fog: 0x6f938e,
     fogDensity: 0.00295,
   },
@@ -408,22 +440,22 @@ const SECTOR_PALETTE_DEFINITIONS = [
     keyDirection: SECTOR_KEY_DIRECTIONS.HANGAR_SIX,
     distance: 617.996,
     key: 0xffbd63,
-    keyIntensity: 0.85,
+    keyIntensity: 1.25,
     sky: 0x6f6355,
     ground: 0x1b1a18,
-    hemisphereIntensity: 1,
+    hemisphereIntensity: 0.8,
     fog: 0x3f3a34,
-    fogDensity: 0.0042,
+    fogDensity: 0.0036,
   },
   {
     sector: "HANGAR_EXIT",
     keyDirection: SECTOR_KEY_DIRECTIONS.HANGAR_EXIT,
     distance: 817.994,
     key: 0xffd08a,
-    keyIntensity: 1.3,
+    keyIntensity: 1.53,
     sky: 0x8e8371,
     ground: 0x272420,
-    hemisphereIntensity: 1.2,
+    hemisphereIntensity: 0.98,
     fog: 0x4d4a41,
     fogDensity: 0.00355,
   },
@@ -432,10 +464,10 @@ const SECTOR_PALETTE_DEFINITIONS = [
     keyDirection: SECTOR_KEY_DIRECTIONS.GREENWATER_SWEEP,
     distance: 847.994,
     key: 0xe6f0d8,
-    keyIntensity: 1.6,
+    keyIntensity: 1.95,
     sky: 0x8fb8b0,
     ground: 0x25423c,
-    hemisphereIntensity: 1.65,
+    hemisphereIntensity: 1.2,
     fog: 0x6f8a83,
     fogDensity: 0.0026,
   },
@@ -444,10 +476,10 @@ const SECTOR_PALETTE_DEFINITIONS = [
     keyDirection: SECTOR_KEY_DIRECTIONS.CANOPY_PASSAGE,
     distance: 1129.992,
     key: 0xffe9a8,
-    keyIntensity: 1.2,
+    keyIntensity: 1.42,
     sky: 0x7fa06a,
     ground: 0x1e3320,
-    hemisphereIntensity: 1.7,
+    hemisphereIntensity: 1.39,
     fog: 0x51684a,
     fogDensity: 0.003,
   },
@@ -456,10 +488,10 @@ const SECTOR_PALETTE_DEFINITIONS = [
     keyDirection: SECTOR_KEY_DIRECTIONS.THE_ELBOW,
     distance: 1481.99,
     key: 0xf0e8b4,
-    keyIntensity: 1.4,
+    keyIntensity: 1.65,
     sky: 0x92ab7e,
     ground: 0x283a28,
-    hemisphereIntensity: 1.6,
+    hemisphereIntensity: 1.31,
     fog: 0x60755a,
     fogDensity: 0.0027,
   },
@@ -468,10 +500,10 @@ const SECTOR_PALETTE_DEFINITIONS = [
     keyDirection: SECTOR_KEY_DIRECTIONS.FUEL_ROW,
     distance: 1591.989,
     key: 0xffb970,
-    keyIntensity: 1.6,
+    keyIntensity: 1.89,
     sky: 0xa8a48c,
     ground: 0x3a3428,
-    hemisphereIntensity: 1.35,
+    hemisphereIntensity: 1.11,
     fog: 0x77776b,
     fogDensity: 0.0019,
   },
@@ -480,10 +512,10 @@ const SECTOR_PALETTE_DEFINITIONS = [
     keyDirection: SECTOR_KEY_DIRECTIONS.T10_TOTEM_TURN,
     distance: 2121.985,
     key: 0xd9dee4,
-    keyIntensity: 1.25,
+    keyIntensity: 1.48,
     sky: 0x77828c,
     ground: 0x22262a,
-    hemisphereIntensity: 1.15,
+    hemisphereIntensity: 0.94,
     fog: 0x4a5358,
     fogDensity: 0.0023,
   },
@@ -492,10 +524,10 @@ const SECTOR_PALETTE_DEFINITIONS = [
     keyDirection: SECTOR_KEY_DIRECTIONS.RUNWAY_HOME,
     distance: 2255.984,
     key: 0xf4f7f9,
-    keyIntensity: 1.8,
+    keyIntensity: 2.12,
     sky: 0xd6e0e6,
     ground: 0x4d5852,
-    hemisphereIntensity: 1.5,
+    hemisphereIntensity: 1.23,
     fog: 0x8e9ba0,
     fogDensity: 0.0016,
   },
@@ -630,11 +662,17 @@ function edgeFurnitureOffset(
   visibleWidth: number,
   clearance = EDGE_FURNITURE_CLEARANCE_METRES,
 ): number {
-  return side * (
-    sample.halfWidth
+  const outdoorOffset = sample.halfWidth
     + clearance
     + EDGE_FURNITURE_SAFETY_MARGIN_METRES
-    + visibleWidth / 2
+    + visibleWidth / 2;
+  // The hangar has no verge to stand a sign on. Everything inside it mounts on
+  // the wall line, which is still 1.7 m clear of the interior's own lateral
+  // clamp at `halfWidth - deckMargin`.
+  return side * (
+    HANGAR_FURNITURE_SECTORS.has(sample.sector)
+      ? Math.min(outdoorOffset, sample.halfWidth - HANGAR_FURNITURE_INSET_METRES)
+      : outdoorOffset
   );
 }
 
@@ -1270,7 +1308,9 @@ export class GreenwaterCourse implements RaceCourse {
       } else if (checkpointIndex === nextCheckpointIndex) {
         color.setHex(0xffa22e);
       } else {
-        color.setHex(0x5b4528);
+        // P11: 0x5b4528 -> 0x8a6134. Still clearly the dim state next to the
+        // 0xffa22e live gate, but legible from far enough back to plan a line.
+        color.setHex(0x8a6134);
       }
       for (let side = 0; side < 2; side += 1) {
         indicators.setColorAt(index * 2 + side, color);
@@ -1386,8 +1426,12 @@ export class GreenwaterCourse implements RaceCourse {
     }> = [
       {
         type: "A",
+        // P11: the outward fall was 0.35 m, which read as a cliff edge from the
+        // deck at a hover height of 0.89-1.31 m. 0.12 m still falls away — the
+        // cross-section cue that tells gravel from rumble survives — without
+        // the craft appearing to drive off a ledge.
+        outerRise: -0.12,
         color: new THREE.Color(0x4a4c42),
-        outerRise: -0.35,
         innerDrop: 0.04,
       },
       {
@@ -1396,7 +1440,27 @@ export class GreenwaterCourse implements RaceCourse {
         outerRise: 0.14,
         innerDrop: 0.02,
       },
+      {
+        // P11: the open edge had no drawn surface at all — the JSON authors a
+        // 5.8 m hatched run-off and the marker posts stand at halfWidth + 5.8,
+        // so they floated over nothing. Flush at the deck edge (this run-off
+        // does not step or fall; what follows it is the drop to the water), and
+        // hatched on a wider, lower-contrast pitch than the B rumble so the two
+        // still read apart without colour.
+        type: "C",
+        color: new THREE.Color(0x424a45),
+        outerRise: 0,
+        innerDrop: 0.03,
+      },
     ];
+    // One material for all three strips: they differ only in vertex colour and
+    // cross-section, so sharing it keeps the run-off at one compiled program
+    // (and one PS2 shader variant) however many edge types exist.
+    const apronMaterial = new THREE.MeshLambertMaterial({
+      color: 0xffffff,
+      vertexColors: true,
+      side: THREE.DoubleSide,
+    });
     for (const surface of surfaces) {
       const positions: number[] = [];
       const normals: number[] = [];
@@ -1424,10 +1488,19 @@ export class GreenwaterCourse implements RaceCourse {
             : -APRON_SEAM_OVERLAP_METRES;
           const current = this.sample(index / this.samples.length);
           const next = this.sample(nextIndex / this.samples.length);
+          // Three colour-free treatments: A mottles on a 10 m irregular pitch,
+          // B alternates hard 2 m bars, C hatches on a 4 m pitch at half B's
+          // contrast — one station is ~2 m, so `index >> 1` is the 4 m bar.
           const band = surface.type === "B"
             ? (index % 2 === 0 ? 1 : 0.42)
-            : 0.86 + 0.14 * (((index * 7 + (side < 0 ? 3 : 0)) % 5) / 4);
-          const outerShade = surface.type === "B" ? 0.9 : 0.74;
+            : surface.type === "C"
+              ? (Math.floor(index / 2) % 2 === 0 ? 1 : 0.72)
+              : 0.86 + 0.14 * (((index * 7 + (side < 0 ? 3 : 0)) % 5) / 4);
+          const outerShade = surface.type === "B"
+            ? 0.9
+            : surface.type === "C"
+              ? 0.7
+              : 0.74;
           const offset = positions.length / 3;
           const corners = [
             { sample: current, width: -APRON_SEAM_OVERLAP_METRES, shade: 1 },
@@ -1477,17 +1550,8 @@ export class GreenwaterCourse implements RaceCourse {
       geometry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
       geometry.setIndex(indices);
       geometry.computeBoundingSphere();
-      const mesh = new THREE.Mesh(
-        geometry,
-        new THREE.MeshLambertMaterial({
-          color: 0xffffff,
-          vertexColors: true,
-          side: THREE.DoubleSide,
-        }),
-      );
-      mesh.name = `apron_${surface.type}_${
-        surface.type === "A" ? "gravel" : "rumble"
-      }`;
+      const mesh = new THREE.Mesh(geometry, apronMaterial);
+      mesh.name = `apron_${surface.type}_${APRON_SURFACE_LABELS[surface.type]}`;
       mesh.receiveShadow = true;
       group.add(mesh);
     }
@@ -1581,7 +1645,12 @@ export class GreenwaterCourse implements RaceCourse {
     const group = new THREE.Group();
     group.name = "greenwater_route_lights";
     const geometry = new THREE.BoxGeometry(0.18, 0.12, 1.8);
-    const material = new THREE.MeshBasicMaterial({ color: 0xc8ff2e });
+    // P11: emissive read. AgX rolls a saturated marker toward grey; opting
+    // out of tone mapping lets the route lights clip to glow instead.
+    const material = new THREE.MeshBasicMaterial({
+      color: 0xc8ff2e,
+      toneMapped: false,
+    });
     const capacity = Math.ceil(this.samples.length / 6) * 2;
     const lights = new THREE.InstancedMesh(geometry, material, capacity);
     const marker = new THREE.Object3D();
@@ -1608,14 +1677,20 @@ export class GreenwaterCourse implements RaceCourse {
     const group = new THREE.Group();
     group.name = "greenwater_open_edge_markers";
     const markerGeometry = new THREE.BoxGeometry(0.28, 1.4, 0.28);
-    const markerMaterial = new THREE.MeshBasicMaterial({ color: 0xff5a3c });
+    const markerMaterial = new THREE.MeshBasicMaterial({
+      color: 0xff5a3c,
+      toneMapped: false,
+    });
     const markers = new THREE.InstancedMesh(
       markerGeometry,
       markerMaterial,
       this.samples.length,
     );
     const stripGeometry = new THREE.BoxGeometry(0.58, 0.06, 4.2);
-    const stripMaterial = new THREE.MeshBasicMaterial({ color: 0xff8a2e });
+    const stripMaterial = new THREE.MeshBasicMaterial({
+      color: 0xff8a2e,
+      toneMapped: false,
+    });
     const warningStrips = new THREE.InstancedMesh(
       stripGeometry,
       stripMaterial,
@@ -1665,7 +1740,7 @@ export class GreenwaterCourse implements RaceCourse {
     );
     const markers = new THREE.InstancedMesh(
       new THREE.BoxGeometry(1, 1, 1),
-      new THREE.MeshBasicMaterial({ color: 0xffa22e }),
+      new THREE.MeshBasicMaterial({ color: 0xffa22e, toneMapped: false }),
       markerCount,
     );
     markers.name = "greenwater_turn_vector_lights";
@@ -1679,15 +1754,18 @@ export class GreenwaterCourse implements RaceCourse {
         distance += spacingMetres
       ) {
         const sample = this.sampleAtDistance(distance);
+        // P11: these sat at 0.68 of the half-width — on the racing line, where
+        // a 1.55 m slab reads as an obstacle to drive around. Moved to the
+        // inside edge and shrunk, they become a runway-style guidance line.
         setCourseObjectTransform(
           marker,
           sample,
-          inside * sample.halfWidth * 0.68,
+          inside * (sample.halfWidth - TURN_GUIDE_EDGE_INSET_METRES),
           0.085,
           0,
-          0.34,
-          0.045,
-          1.55,
+          0.24,
+          0.04,
+          0.9,
         );
         markers.setMatrixAt(markerIndex, marker.matrix);
         markerIndex += 1;
@@ -1861,7 +1939,7 @@ export class GreenwaterCourse implements RaceCourse {
     const posts = new THREE.InstancedMesh(cubeGeometry, postMaterial, postCount);
     const indicators = new THREE.InstancedMesh(
       cubeGeometry,
-      new THREE.MeshBasicMaterial({ color: 0xffffff }),
+      new THREE.MeshBasicMaterial({ color: 0xffffff, toneMapped: false }),
       postCount,
     );
     const object = new THREE.Object3D();
@@ -1931,8 +2009,8 @@ export class GreenwaterCourse implements RaceCourse {
     const span = MAP.startFinish.clearSpan;
     const height = MAP.startFinish.structureHeight;
     const structure = new THREE.MeshLambertMaterial({ color: 0x252e2a });
-    const acid = new THREE.MeshBasicMaterial({ color: 0xc8ff2e });
-    const amber = new THREE.MeshBasicMaterial({ color: 0xffa22e });
+    const acid = new THREE.MeshBasicMaterial({ color: 0xc8ff2e, toneMapped: false });
+    const amber = new THREE.MeshBasicMaterial({ color: 0xffa22e, toneMapped: false });
     for (const side of [-1, 1]) {
       const column = new THREE.Mesh(new THREE.BoxGeometry(1.2, height, 1.2), structure);
       column.position.set(side * span / 2, height / 2, 0);
@@ -1990,8 +2068,8 @@ export class GreenwaterCourse implements RaceCourse {
   private createStartGrid(): THREE.Group {
     const group = new THREE.Group();
     group.name = "greenwater_start_grid";
-    const acid = new THREE.MeshBasicMaterial({ color: 0xc8ff2e });
-    const white = new THREE.MeshBasicMaterial({ color: 0xb9c1bb });
+    const acid = new THREE.MeshBasicMaterial({ color: 0xc8ff2e, toneMapped: false });
+    const white = new THREE.MeshBasicMaterial({ color: 0xb9c1bb, toneMapped: false });
     const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
     const capacity = 64;
     const acidMarkers = new THREE.InstancedMesh(cubeGeometry, acid, capacity);
@@ -2047,7 +2125,13 @@ export class GreenwaterCourse implements RaceCourse {
     const group = new THREE.Group();
     group.name = "hangar_six_blockout";
     const frameMaterial = new THREE.MeshLambertMaterial({ color: 0x20231f });
-    const sodiumMaterial = new THREE.MeshBasicMaterial({ color: 0x9a6b2f });
+    // P11: 0x9a6b2f -> 0xffb154. These are the fixtures the hangar
+    // PointLights represent, so they have to read lit rather than as dull
+    // painted metal. Matches HANGAR_LAMP_COLOR in atmosphere.ts exactly.
+    const sodiumMaterial = new THREE.MeshBasicMaterial({
+      color: 0xffb154,
+      toneMapped: false,
+    });
     const frameDistances: number[] = [];
     for (let distance = 616.519; distance <= 816.239; distance += 10) {
       frameDistances.push(distance);
@@ -2151,7 +2235,7 @@ export class GreenwaterCourse implements RaceCourse {
       puffs.frustumCulled = false;
       const warnings = new THREE.InstancedMesh(
         new THREE.BoxGeometry(1, 1, 1),
-        new THREE.MeshBasicMaterial({ color: 0xffa22e }),
+        new THREE.MeshBasicMaterial({ color: 0xffa22e, toneMapped: false }),
         steamHazards.length,
       );
       warnings.name = "steam_vent_warning_lamps";
@@ -2199,7 +2283,7 @@ export class GreenwaterCourse implements RaceCourse {
     );
     const cableWarnings = new THREE.InstancedMesh(
       new THREE.BoxGeometry(1, 1, 1),
-      new THREE.MeshBasicMaterial({ color: 0xffa22e }),
+      new THREE.MeshBasicMaterial({ color: 0xffa22e, toneMapped: false }),
       this.cableHazards.length,
     );
     const cableObject = new THREE.Object3D();
@@ -2258,7 +2342,10 @@ export class GreenwaterCourse implements RaceCourse {
       group.add(root);
     }
 
-    const boostMaterial = new THREE.MeshBasicMaterial({ color: 0xc8ff2e });
+    const boostMaterial = new THREE.MeshBasicMaterial({
+      color: 0xc8ff2e,
+      toneMapped: false,
+    });
     const boostPads = new THREE.InstancedMesh(
       new THREE.BoxGeometry(1, 1, 1),
       boostMaterial,

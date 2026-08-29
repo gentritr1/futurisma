@@ -1,5 +1,8 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import {
+  GATE_MISS_RECOVERY_GRACE_SECONDS,
+  GATE_MISS_RECOVERY_INSTANT_SPEED_MPS,
   calculateFinishDistanceMeters,
   calculateRecoveryTelemetry,
   checkpointRequiresExtraCircuit,
@@ -10,6 +13,7 @@ import {
   isCircularHazardContact,
   isTurnCueBeyondFinish,
   isTurnCueUrgent,
+  resolveGateMissRecoveryDelay,
   resolveWrongWayActive,
   resolveCountdownStage,
 } from "../src/game/race-rules.js";
@@ -205,6 +209,114 @@ assert.deepEqual(calculateRecoveryTelemetry(Number.NaN, 0), {
   remainingSeconds: 0.001,
 });
 
+/* ------------------------------------------------------------------ */
+/* P11: a missed gate must not be able to softlock the race             */
+/* ------------------------------------------------------------------ */
+
+// The failing scenario, from the authored map. A gate is passed when
+// |lateral| <= gateWidth/2 at the crossing. Post-P1 the legal lateral limit is
+// halfWidth + the authored apron, which on every gate but CP03 is *wider* than
+// the gate itself: a player can be legally on the deck's run-off, miss the
+// gate, and have nothing in the race loop ever recover them, because the A
+// apron never arms the off-course timer. `nextCheckpointIndex` stays frozen and
+// the banner stays up for the rest of the race.
+const blockout = JSON.parse(
+  readFileSync(
+    new URL("../src/game/data/greenwater-blockout.json", import.meta.url),
+    "utf8",
+  ),
+);
+const stations = blockout.centreline.samples;
+const apronWidths = Object.fromEntries(
+  Object.entries(blockout.apron.edges).map(([edge, profile]) => [
+    edge,
+    profile.widthMetres,
+  ]),
+);
+const hangarOverride = blockout.apron.overrides.find(
+  (entry) => entry.id === "HANGAR_INTERIOR",
+);
+
+function stationAt(distanceMetres) {
+  let best = stations[0];
+  for (const station of stations) {
+    if (Math.abs(station.d - distanceMetres) < Math.abs(best.d - distanceMetres)) {
+      best = station;
+    }
+  }
+  return best;
+}
+
+let gatesNarrowerThanTheDeck = 0;
+for (const checkpoint of blockout.checkpoints) {
+  const station = stationAt(checkpoint.distance);
+  const inHangar = hangarOverride.sectors.includes(station.sector);
+  const legalLateral = station.w / 2
+    + (inHangar ? 0 : Math.max(apronWidths[station.edgeL], apronWidths[station.edgeR]));
+  if (legalLateral > checkpoint.gateWidth / 2 + 0.01) gatesNarrowerThanTheDeck += 1;
+}
+assert.ok(
+  gatesNarrowerThanTheDeck >= 7,
+  `Only ${gatesNarrowerThanTheDeck} of ${blockout.checkpoints.length} gates are `
+    + "narrower than the legal lateral limit around them. If this drops to zero "
+    + "the softlock is gone by construction and the recovery below is dead code; "
+    + "delete it deliberately rather than letting this assertion rot.",
+);
+
+// The grace itself. At racing pace the gate is left on screen long enough to be
+// read; at a crawl the reset is immediate, because sitting still under a banner
+// that never clears is the same softlock by another route.
+assert.equal(
+  resolveGateMissRecoveryDelay(55),
+  GATE_MISS_RECOVERY_GRACE_SECONDS,
+  "A miss at racing pace must leave the gate on screen before recovering.",
+);
+assert.equal(
+  resolveGateMissRecoveryDelay(GATE_MISS_RECOVERY_INSTANT_SPEED_MPS),
+  GATE_MISS_RECOVERY_GRACE_SECONDS,
+  "The instant-recovery band is strictly below the threshold speed.",
+);
+assert.equal(
+  resolveGateMissRecoveryDelay(GATE_MISS_RECOVERY_INSTANT_SPEED_MPS - 0.01),
+  0,
+  "Below the threshold the craft must be recovered on the next step.",
+);
+assert.equal(resolveGateMissRecoveryDelay(0), 0);
+assert.equal(resolveGateMissRecoveryDelay(Number.NaN), 0);
+assert.ok(
+  GATE_MISS_RECOVERY_GRACE_SECONDS > 0
+    && GATE_MISS_RECOVERY_GRACE_SECONDS <= 2,
+  "A grace of 0 s reads as a teleport and one over 2 s reads as a hang.",
+);
+
+// The wiring, in the race loop that owns the state machine.
+const gameSource = readFileSync(
+  new URL("../src/game/game.ts", import.meta.url),
+  "utf8",
+);
+assert.ok(
+  gameSource.includes("resolveGateMissRecoveryDelay(this.speed)"),
+  "game.ts must arm the gate-miss recovery from the miss branch.",
+);
+assert.ok(
+  gameSource.includes('this.recoverVehicle("gate-miss")'),
+  "A missed gate must run the EXISTING recovery flow, not a second placement.",
+);
+assert.ok(
+  /if \(this\.recoveryImmunity > 0\) \{\n\s*this\.gateMissRecoveryCountdown = -1;/
+    .test(gameSource),
+  "Recovery immunity must disarm a pending gate-miss recovery, or a recovery "
+    + "that lands short of the gate can loop.",
+);
+assert.ok(
+  !/recoverVehicle\("gate-miss"\)[\s\S]{0,400}nextCheckpointIndex =/.test(gameSource),
+  "The gate-miss recovery must not advance nextCheckpointIndex; the gate has to "
+    + "be cleared for real.",
+);
+
 console.log(
-  "Race rules PASS: countdown, turn urgency, open-edge and hysteretic wrong-way warnings, final-route filtering, forward crossings, wraparound, missed-gate penalty, finish, position, gap and boost presentation, cable contacts, recovery telemetry.",
+  "Race rules PASS: countdown, turn urgency, open-edge and hysteretic wrong-way warnings, final-route filtering, forward crossings, wraparound, missed-gate penalty, finish, position, gap and boost presentation, cable contacts, recovery telemetry, "
+    + `gate-miss recovery (${gatesNarrowerThanTheDeck} gates narrower than their `
+    + `legal lateral, ${GATE_MISS_RECOVERY_GRACE_SECONDS} s grace above `
+    + `${GATE_MISS_RECOVERY_INSTANT_SPEED_MPS} m/s).`,
 );

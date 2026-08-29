@@ -217,6 +217,19 @@ export interface RivalRaceStatus {
   gapToBehindMs: number | null;
 }
 
+/**
+ * The status a race shows before anyone has moved. A solo session has no fleet
+ * at all, so the race loop needs a defined standing either way; extracted here
+ * in P11 because the fallback shape belongs with the type that defines it.
+ */
+export function openingRaceStatus(
+  fleet: { raceStatus: RivalFleet["raceStatus"] } | null | undefined,
+  playerRaceDistanceMeters: number,
+): RivalRaceStatus {
+  return fleet?.raceStatus(playerRaceDistanceMeters, 0)
+    ?? { position: 1, racerCount: 4, gapToAheadMs: null, gapToBehindMs: null };
+}
+
 export interface RivalFleetDiagnostics {
   drawCalls: number;
   triangles: number;

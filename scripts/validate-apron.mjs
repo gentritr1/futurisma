@@ -295,11 +295,72 @@ assert.ok(
   `an 11 m lateral in HANGAR_SIX must still hit the wall at ${hangarApron.lateralLimit} m.`,
 );
 
+/* ------------------------------------------------------------------ */
+/* P11: every authored run-off has to be DRAWN, not only simulated      */
+/* ------------------------------------------------------------------ */
+
+// `C` authored 5.8 m of open run-off and `createApronDecks` only ever emitted
+// strips for A and B, so the open edge had grip, a lateral limit and marker
+// posts standing at halfWidth + 5.8 m over nothing at all. The surface table is
+// scraped rather than restated: a new edge type in the JSON now fails here
+// until it is given a strip.
+const courseSource = readFileSync(
+  new URL("../src/game/course.ts", import.meta.url),
+  "utf8",
+);
+const decksStart = courseSource.indexOf("private createApronDecks(): THREE.Group {");
+assert.ok(decksStart >= 0, "course.ts must declare createApronDecks.");
+const surfaceTable = courseSource.slice(
+  decksStart,
+  courseSource.indexOf("for (const surface of surfaces)", decksStart),
+);
+const drawnEdges = [...surfaceTable.matchAll(/type: "([A-Z])",/g)].map(
+  (match) => match[1],
+);
+for (const [edge, profile] of Object.entries(table.edges)) {
+  if (profile.widthMetres <= 0) continue;
+  assert.ok(
+    drawnEdges.includes(edge),
+    `edge ${edge} authors ${profile.widthMetres} m of run-off but `
+      + `createApronDecks draws no surface for it (draws: ${drawnEdges.join(", ")}).`,
+  );
+}
+assert.equal(
+  new Set(drawnEdges).size,
+  drawnEdges.length,
+  "createApronDecks lists an edge type twice; the strips would z-fight.",
+);
+
+// The A gravel's outward fall. Re-baselined in P11 from -0.35 m to -0.12 m: at
+// a hover height of 0.89-1.31 m a 0.35 m step read as a cliff at the deck edge.
+// It must still fall away — that cross-section is how gravel is told from the
+// rumble strip without colour — and it must stay clear of the 0.55 m
+// understructure the deck sits on.
+const outerRises = Object.fromEntries(
+  [...surfaceTable.matchAll(/type: "([A-Z])",[\s\S]*?outerRise: (-?[0-9.]+),/g)]
+    .map((match) => [match[1], Number(match[2])]),
+);
+assert.equal(
+  outerRises.A,
+  -0.12,
+  `The A gravel's outward fall is ${outerRises.A} m, expected -0.12 m (P11).`,
+);
+assert.ok(
+  outerRises.B > 0,
+  "The B rumble must still step UP; the falling/rising pair is the colour-free cue.",
+);
+assert.equal(
+  outerRises.C,
+  0,
+  "The C open run-off must stay flush with the deck: what follows it is the drop.",
+);
+
 console.log(
   `Apron PASS: ${apronedEdgeOccurrences} of ${samples.length * 2} edge `
     + `occurrences opened to authored run-off, ${walledEdgeOccurrences} hangar `
     + `occurrences still walled, A=${table.edges.A.widthMetres} m @ `
     + `${table.edges.A.grip} grip, boundary at `
     + `${onApron.lateralLimit.toFixed(2)} m in FUEL_ROW over a `
-    + `${lapLength.toFixed(3)} m lap.`,
+    + `${lapLength.toFixed(3)} m lap; run-off drawn for ${drawnEdges.join("/")} `
+    + `(A falls ${outerRises.A} m, B rises ${outerRises.B} m, C flush).`,
 );
