@@ -305,12 +305,18 @@ class StationGrid {
 
   private readonly progressOf: number[] = [];
 
+  private readonly xOf: number[] = [];
+
+  private readonly zOf: number[] = [];
+
   constructor(course: RaceCourse, stationCount: number) {
     const scratch = course.createSampleScratch();
     for (let index = 0; index < stationCount; index += 1) {
       const progress = index / stationCount;
       const sample = course.sample(progress, scratch);
       this.progressOf.push(progress);
+      this.xOf.push(sample.position.x);
+      this.zOf.push(sample.position.z);
       // Register the station in its own cell and the eight around it, so a
       // single lookup always sees every station that could be nearest.
       const cellX = Math.floor(sample.position.x / GRID_CELL_METRES);
@@ -330,11 +336,41 @@ class StationGrid {
     return `${Math.floor(x / GRID_CELL_METRES)}:${Math.floor(z / GRID_CELL_METRES)}`;
   }
 
-  /** Progress hint for a world point, or null when nothing is near enough. */
+  /**
+   * Progress hint for a world point: the NEAREST station in the cell, or null
+   * when nothing is near enough.
+   *
+   * This returned `bucket[0]` — whichever station happened to be registered in
+   * the cell first — and that was the P16 task-6 attribution bug. Both courses
+   * pass near themselves, so one 24 m cell can hold stations from two different
+   * parts of the lap. A first-match hint pointed `project()` at the wrong
+   * section, and its local pass only searches 42 segments either side of the
+   * hint, so it locked onto the wrong one and never recovered. The visible
+   * symptom was Bitterpan's road appearing to be the wall that bounds it: road
+   * vertices from a neighbouring section projecting onto this station at a
+   * plausible lateral and at the ELEVATION DIFFERENCE between the two sections,
+   * which is where the phantom "1.3 m tall geometry" over open salt pan came
+   * from.
+   *
+   * The corridor gate never saw it because a mis-projected vertex lands at a
+   * large lateral and reads as off-deck. Only the derived limit table, which
+   * asks "what is the innermost tall thing", was sensitive to it.
+   */
   hint(x: number, z: number): number | null {
     const bucket = this.cells.get(StationGrid.key(x, z));
     if (!bucket || bucket.length === 0) return null;
-    return this.progressOf[bucket[0]];
+    let best = bucket[0];
+    let bestDistanceSquared = Infinity;
+    for (const index of bucket) {
+      const dx = this.xOf[index] - x;
+      const dz = this.zOf[index] - z;
+      const distanceSquared = dx * dx + dz * dz;
+      if (distanceSquared < bestDistanceSquared) {
+        bestDistanceSquared = distanceSquared;
+        best = index;
+      }
+    }
+    return this.progressOf[best];
   }
 
   /** True when no station registered a cell anywhere near this point. */
@@ -365,6 +401,19 @@ export interface TallGeometrySpan {
   readonly halfWidth: number;
   /** `resolveApron`'s current clamp for this span. */
   readonly clamp: number;
+  /**
+   * Distance and half-width AT THE BOUNDING VERTEX ITSELF, per side.
+   *
+   * The limit must be computed against the half-width where the bounding
+   * geometry actually stands, never against a bucket-wide minimum: mixing them
+   * is how a vertex 10 m away came to look "inner". Recording the vertex's own
+   * distance also makes a mis-projection visible in the table — a bounding
+   * distance far from its span's is the signature of one.
+   */
+  readonly leftAt: number | null;
+  readonly rightAt: number | null;
+  readonly leftHalfWidth: number | null;
+  readonly rightHalfWidth: number | null;
   /**
    * The mesh whose vertex set the innermost tall lateral on each side.
    *
@@ -493,11 +542,15 @@ export function sweepCorridor(
   const composed = new THREE.Matrix4();
 
   const accumulators = new Map<string, MeshAccumulator>();
+  interface SpanSide {
+    lateral: number;
+    at: number;
+    halfWidth: number;
+    mesh: string;
+  }
   interface SpanBucket {
-    left: number | null;
-    right: number | null;
-    leftMesh: string | null;
-    rightMesh: string | null;
+    left: SpanSide | null;
+    right: SpanSide | null;
     halfWidth: number;
     clamp: number;
   }
@@ -512,14 +565,7 @@ export function sweepCorridor(
     const index = Math.floor(distance / TALL_GEOMETRY_SPAN_METRES);
     let bucket = spanBuckets.get(index);
     if (!bucket) {
-      bucket = {
-        left: null,
-        right: null,
-        leftMesh: null,
-        rightMesh: null,
-        halfWidth,
-        clamp,
-      };
+      bucket = { left: null, right: null, halfWidth, clamp };
       spanBuckets.set(index, bucket);
     }
     // Narrowest half-width and clamp across the span: the limit has to hold
@@ -527,14 +573,13 @@ export function sweepCorridor(
     bucket.halfWidth = Math.min(bucket.halfWidth, halfWidth);
     bucket.clamp = Math.min(bucket.clamp, clamp);
     const magnitude = Math.abs(lateral);
+    const side: SpanSide = { lateral: magnitude, at: distance, halfWidth, mesh };
     if (lateral < 0) {
-      if (bucket.left === null || magnitude < bucket.left) {
-        bucket.left = magnitude;
-        bucket.leftMesh = mesh;
+      if (bucket.left === null || magnitude < bucket.left.lateral) {
+        bucket.left = side;
       }
-    } else if (bucket.right === null || magnitude < bucket.right) {
-      bucket.right = magnitude;
-      bucket.rightMesh = mesh;
+    } else if (bucket.right === null || magnitude < bucket.right.lateral) {
+      bucket.right = side;
     }
   };
   let meshesSwept = 0;
@@ -743,12 +788,26 @@ export function sweepCorridor(
       .sort((a, b) => a[0] - b[0])
       .map(([index, bucket]): TallGeometrySpan => ({
         distance: index * TALL_GEOMETRY_SPAN_METRES,
-        left: bucket.left === null ? null : Number(bucket.left.toFixed(3)),
-        right: bucket.right === null ? null : Number(bucket.right.toFixed(3)),
+        left: bucket.left === null
+          ? null
+          : Number(bucket.left.lateral.toFixed(3)),
+        right: bucket.right === null
+          ? null
+          : Number(bucket.right.lateral.toFixed(3)),
+        leftAt: bucket.left === null ? null : Number(bucket.left.at.toFixed(2)),
+        rightAt: bucket.right === null
+          ? null
+          : Number(bucket.right.at.toFixed(2)),
+        leftHalfWidth: bucket.left === null
+          ? null
+          : Number(bucket.left.halfWidth.toFixed(3)),
+        rightHalfWidth: bucket.right === null
+          ? null
+          : Number(bucket.right.halfWidth.toFixed(3)),
         halfWidth: Number(bucket.halfWidth.toFixed(3)),
         clamp: Number(bucket.clamp.toFixed(3)),
-        leftMesh: bucket.leftMesh,
-        rightMesh: bucket.rightMesh,
+        leftMesh: bucket.left?.mesh ?? null,
+        rightMesh: bucket.right?.mesh ?? null,
       })),
     // Obstacles first regardless of visibility — the capped tail must never be
     // the thing that had to be fixed, and a hidden obstacle is still an
