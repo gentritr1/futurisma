@@ -892,6 +892,9 @@ export class FuturismaGame {
       const limit = apron.lateralLimit;
       this.lateral = THREE.MathUtils.clamp(this.lateral, -limit, limit);
       this.position.copy(afterMove.position).addScaledVector(afterMove.right, this.lateral);
+      // Keep the sim's centreline-Y convention: the banked `right` added
+      // sin(bank)·lateral, which the presentation lift would double-apply.
+      this.position.y = afterMove.position.y;
       const outward = this.scratchA
         .copy(afterMove.right)
         .multiplyScalar(Math.sign(afterMove.lateral));
