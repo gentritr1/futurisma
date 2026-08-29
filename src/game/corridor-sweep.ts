@@ -72,7 +72,41 @@ export const CORRIDOR_HEIGHT_MAX_METRES = 4.0;
  * to `obstacle` and shows up, which is the whole point of separating them by
  * measured geometry instead of by a name whitelist.
  */
-export type CorridorBand = "flush" | "obstacle" | "overhead" | "boundary";
+export type CorridorBand =
+  | "flush"
+  | "obstacle"
+  | "overhead"
+  | "boundary"
+  | "vfx";
+
+/**
+ * True for a mesh that cannot be an obstacle because it does not occupy space:
+ * transparent AND not writing depth. That is the signature of an overlay —
+ * steam puffs, drifting scud, spark billboards — which draw through everything
+ * behind them and which the craft passes through by design. The Greenwater
+ * blockout says so in its own words: the steam vents are authored
+ * `"effect": "vision_only"`.
+ *
+ * Two properties of the mesh, not a list of names. That matters, because a
+ * name whitelist is exactly what the deck-hazard exemption was, and this must
+ * not become one: anything that starts writing depth or turns opaque
+ * immediately reclassifies itself as scenery and shows up in the count.
+ *
+ * The class is REPORTED, never hidden — `corridorVfx`, and every entry stays in
+ * the list. That is deliberate. The surface-character decal layer would have
+ * landed here (it is transparent with `depthWrite: false`), and it was a real
+ * bug worth fixing rather than filing away; a class you can still see is a class
+ * you can still audit.
+ */
+function isNonOccludingOverlay(mesh: THREE.Mesh): boolean {
+  const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+  return materials.length > 0 && materials.every((material) => (
+    material !== null
+    && material !== undefined
+    && material.transparent === true
+    && material.depthWrite === false
+  ));
+}
 
 /**
  * The obstacle band, re-exported under its own names so the relocation pass in
@@ -126,7 +160,9 @@ export function classifyCorridorBand(
   heightMin: number,
   heightMax: number,
   depth: number,
+  nonOccluding = false,
 ): CorridorBand {
+  if (nonOccluding) return "vfx";
   if (heightMax <= FLAT_FURNITURE_MAX_HEIGHT_METRES + BAND_EPSILON_METRES) {
     return "flush";
   }
@@ -215,6 +251,8 @@ export interface CorridorSweepResult {
    * walls and barriers. Reported, not an obstacle.
    */
   readonly boundary: number;
+  /** Visible non-occluding overlays (steam, scud, sparks). Reported. */
+  readonly vfx: number;
   /** Intrusions from meshes hidden at sweep time, reported separately. */
   readonly hiddenIntrusions: number;
   readonly list: readonly CorridorIntrusion[];
@@ -240,6 +278,7 @@ export const EMPTY_CORRIDOR_SWEEP: CorridorSweepResult = Object.freeze({
   flush: 0,
   overhead: 0,
   boundary: 0,
+  vfx: 0,
   hiddenIntrusions: 0,
   list: Object.freeze([]) as readonly CorridorIntrusion[],
   spans: Object.freeze([]) as readonly TallGeometrySpan[],
@@ -335,6 +374,7 @@ interface MeshAccumulator {
   material: string;
   instance: number | null;
   visible: boolean;
+  nonOccluding: boolean;
   vertices: number;
   depth: number;
   distance: number;
@@ -539,6 +579,7 @@ export function sweepCorridor(
           material: materialName(mesh),
           instance,
           visible,
+          nonOccluding: isNonOccludingOverlay(mesh),
           vertices: 0,
           depth: -Infinity,
           distance: 0,
@@ -621,6 +662,7 @@ export function sweepCorridor(
         entry.heightMin,
         entry.heightMax,
         entry.depth,
+        entry.nonOccluding,
       ),
     }))
     .sort((a, b) => b.depth - a.depth);
@@ -639,6 +681,7 @@ export function sweepCorridor(
     flush: visibleList.filter((entry) => entry.band === "flush").length,
     overhead: visibleList.filter((entry) => entry.band === "overhead").length,
     boundary: visibleList.filter((entry) => entry.band === "boundary").length,
+    vfx: visibleList.filter((entry) => entry.band === "vfx").length,
     hiddenIntrusions: ordered.length - visibleList.length,
     // Obstacles first: the list is capped, and the capped-out tail must never
     // be the thing that had to be fixed.
