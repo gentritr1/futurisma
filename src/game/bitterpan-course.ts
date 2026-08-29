@@ -8,6 +8,7 @@ import { createApronResolution, resolveApron, resolveApronProfile } from "./apro
 import type { ApronResolution } from "./apron.js";
 import { resolveAudioZone } from "./audio-space.js";
 import type { AudioZone } from "./audio-space.js";
+import { resolveGatePostLateral } from "./furniture-placement.js";
 import { lerpKeyDirection } from "./lighting-motion.js";
 import { isCircularHazardContact } from "./race-rules";
 import type {
@@ -950,8 +951,17 @@ export class BitterpanCourse implements RaceCourse {
       quaternion.setFromRotationMatrix(basis);
       for (let sideIndex = 0; sideIndex < 2; sideIndex += 1) {
         const side = sideIndex === 0 ? -1 : 1;
+        // P13: the pan's deck width varies station to station, so the authored
+        // gate half-width is a floor-checked value, not a free one. Measured
+        // against the authored stations, the tightest Map 02 gate is CP06 at
+        // 4.00 m of centre clearance (3.74 m to the pylon's inner face), so this
+        // floor binds nowhere today — it is here so a re-authored station cannot
+        // quietly stand a 12 m pylon on the racing surface.
         transform.position.copy(sample.position)
-          .addScaledVector(sample.right, checkpoint.half_width_m * side)
+          .addScaledVector(
+            sample.right,
+            resolveGatePostLateral(sample.halfWidth, checkpoint.half_width_m, side),
+          )
           .addScaledVector(sample.up, checkpoint.height_m / 2);
         transform.quaternion.copy(quaternion);
         transform.scale.set(1, checkpoint.height_m, 1);
