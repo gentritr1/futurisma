@@ -180,6 +180,29 @@ export function calculateRecoveryTelemetry(
 }
 
 /**
+ * P11 — how long a missed gate is left on screen before the craft is handed to
+ * the recovery flow.
+ *
+ * A miss freezes `nextCheckpointIndex` by design, and on an A edge nothing else
+ * ever fires: the run-off is legal, so `offCourseTime` never accumulates and
+ * the automatic recovery never arms. Before this the banner simply stayed up
+ * for the rest of the race. The grace exists so the player *sees* the gate go
+ * past before the world resets, and it is skipped when the craft is already
+ * slow, because standing still staring at a banner is the same softlock.
+ */
+export const GATE_MISS_RECOVERY_GRACE_SECONDS = 1;
+/** Below this the miss is already obvious; recover on the next step. */
+export const GATE_MISS_RECOVERY_INSTANT_SPEED_MPS = 15;
+
+/** @param {number} speedMetersPerSecond */
+export function resolveGateMissRecoveryDelay(speedMetersPerSecond) {
+  if (!Number.isFinite(speedMetersPerSecond)) return 0;
+  return speedMetersPerSecond < GATE_MISS_RECOVERY_INSTANT_SPEED_MPS
+    ? 0
+    : GATE_MISS_RECOVERY_GRACE_SECONDS;
+}
+
+/**
  * @param {number} distance
  * @param {number} lateral
  * @param {number} hazardDistance

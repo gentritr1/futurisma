@@ -27,18 +27,13 @@ import {
 } from "./frame-scheduling";
 import type { InputFrame } from "./input";
 import {
-  APRON_PROBE_DISTANCE_METERS,
-  APRON_PROBE_LATERAL_METERS,
-  APRON_PROBE_SPEED_METERS_PER_SECOND,
-  RECOVERY_PROBE_DISTANCE_METERS,
-  RIVAL_AUDIO_PROBE_METERS,
-  WATER_GRIP_PROBE_DISTANCE_METERS,
-  WRONG_WAY_PROBE_DISTANCE_METERS,
   ZERO_INPUT,
   probeSelected,
-  readProbeNumber,
+  probeSpawnLateral,
+  resolveProbeSpawn,
   resolveQualityLock,
   resolveReducedMotion,
+  resolveRivalAudioProbeLateral,
   searchFlag,
   searchParam,
 } from "./query-probes";
@@ -64,7 +59,7 @@ import {
   createApronResolution,
   createApronTelemetry,
 } from "./apron.js";
-import { calculatePresentationAlpha } from "./presentation";
+import { bankedSurfaceLift, calculatePresentationAlpha } from "./presentation";
 import {
   calculateFinishDistanceMeters,
   calculateRecoveryTelemetry,
@@ -73,6 +68,7 @@ import {
   isOpenEdgeWarningActive,
   isTurnCueBeyondFinish,
   isTurnCueUrgent,
+  resolveGateMissRecoveryDelay,
   resolveWrongWayActive,
   resolveCountdownStage,
 } from "./race-rules";
@@ -86,6 +82,7 @@ import { save } from "./persistence";
 import { playerRaceDistanceMeters as calculatePlayerRaceDistance } from "./rival-race.js";
 import {
   RivalFleet,
+  openingRaceStatus,
   type RivalRaceStatus,
 } from "./rivals";
 import {
@@ -175,6 +172,11 @@ export class FuturismaGame {
   private steerAmount = 0;
   private nextCheckpointIndex = 1;
   private missedGateIndex: number | null = null;
+  /**
+   * P11. Seconds until a missed gate hands the craft to the recovery flow;
+   * negative means none is pending. See `resolveGateMissRecoveryDelay`.
+   */
+  private gateMissRecoveryCountdown = -1;
   private boostReserve = 1;
   private boostActive = false;
   private boostLockedUntilRelease = false;
@@ -240,6 +242,7 @@ export class FuturismaGame {
   private diagnosticImpactSparkBursts = 0;
   private diagnosticMissedGates = 0;
   private diagnosticRecoveries = 0;
+  private diagnosticGateMissRecoveries = 0;
   private diagnosticContextLosses = 0;
   private diagnosticContextRestores = 0;
   private diagnosticRenderedFrames = 0;
@@ -273,26 +276,8 @@ export class FuturismaGame {
   private readonly demoMode = searchFlag("demo");
   private demoAutopilot = this.demoMode;
   private readonly diagnosticsMode = searchFlag("diagnostics");
-  private readonly recoveryProbe = probeSelected("recovery");
-  private readonly wrongWayProbe = probeSelected("wrong-way");
-  private readonly impactProbe = probeSelected("impact");
-  private readonly waterGripProbe = probeSelected("water");
-  private readonly apronProbe = probeSelected("apron");
-  // `&probeDistance=` / `&probeLateral=` drive the apron probe's three
-  // authored scenarios without a rebuild.
-  private readonly apronProbeDistance = readProbeNumber(
-    "probeDistance",
-    APRON_PROBE_DISTANCE_METERS,
-  );
-  private readonly apronProbeLateral = readProbeNumber(
-    "probeLateral",
-    APRON_PROBE_LATERAL_METERS,
-  );
-  // `?probe=rival-audio` parks the field's first rival abeam the player so a
-  // headless run can read the pan axis. `&probeSide=1` mirrors it to starboard.
-  private readonly rivalAudioProbeLateral = probeSelected("rival-audio")
-    ? RIVAL_AUDIO_PROBE_METERS * Math.sign(readProbeNumber("probeSide", -1) || -1)
-    : 0;
+  // Every `?probe=` spawn pose is resolved by query-probes.ts; see ProbeSpawn.
+  private readonly rivalAudioProbeLateral = resolveRivalAudioProbeLateral();
   private readonly contextLossProbe = probeSelected("context");
   private readonly focusLossProbe = probeSelected("focus");
   private readonly reducedMotion = resolveReducedMotion();
@@ -771,7 +756,9 @@ export class FuturismaGame {
       // or count against the impact-spark telemetry.
       const side = Math.sign(this.lateral) || 1;
       this.audio.playDriftEngage(this.driftBank.releaseCharge);
-      this.effects.emitImpactSparks(beforeMove, this.position, this.speed, side, 0.22);
+      this.effects.emitImpactSparks(
+        beforeMove, this.position, this.lateral, this.speed, side, 0.22,
+      );
       this.input.pulse(0.24, 0.12, 90);
     }
     this.speed = integrateSpeed(
@@ -947,6 +934,20 @@ export class FuturismaGame {
       this.recoverVehicle();
       return;
     }
+    // P11. A missed gate runs the same recovery after a short grace.
+    // `recoveryImmunity` disarms it, which is what stops it looping.
+    if (this.gateMissRecoveryCountdown >= 0) {
+      if (this.recoveryImmunity > 0) {
+        this.gateMissRecoveryCountdown = -1;
+      } else {
+        this.gateMissRecoveryCountdown -= delta;
+        if (this.gateMissRecoveryCountdown < 0) {
+          if (this.diagnosticsMode) this.diagnosticGateMissRecoveries += 1;
+          this.recoverVehicle("gate-miss");
+          return;
+        }
+      }
+    }
     this.alignDirectionToSurface(this.forward, afterMove.up, afterMove.tangent);
     this.alignDirectionToSurface(
       this.travelDirection,
@@ -1018,11 +1019,17 @@ export class FuturismaGame {
         this.ui.flashMissedGate(this.nextCheckpointIndex);
         this.audio.playMissedGate();
         this.input.pulse(0.44, 0.18, 170);
+        // P11. `nextCheckpointIndex` still does not advance — the gate has to
+        // be cleared for real — but the craft is put back upstream of it.
+        if (this.recoveryImmunity <= 0) {
+          this.gateMissRecoveryCountdown = resolveGateMissRecoveryDelay(this.speed);
+        }
       }
       return;
     }
 
     this.missedGateIndex = null;
+    this.gateMissRecoveryCountdown = -1;
 
     if (this.nextCheckpointIndex === 0) {
       const completedLapMs = Math.max(0, this.elapsedMs - this.lapStartElapsedMs);
@@ -1060,7 +1067,7 @@ export class FuturismaGame {
     this.input.pulse(0.08, 0.22, 70);
   }
 
-  private recoverVehicle(): void {
+  private recoverVehicle(cause: "off-course" | "gate-miss" = "off-course"): void {
     if (this.phase === "countdown") {
       this.resetRaceState();
       this.snapCamera();
@@ -1088,6 +1095,7 @@ export class FuturismaGame {
     this.travelDirection.copy(recovery.tangent);
     this.lateral = 0;
     this.missedGateIndex = null;
+    this.gateMissRecoveryCountdown = -1;
     this.steerAmount = 0;
     this.speed = this.course.recoverySpeedMps;
     this.boostActive = false;
@@ -1107,7 +1115,11 @@ export class FuturismaGame {
     this.input.pulse(0.42, 0.64, 180);
     this.audio.playRecovery();
     this.ui.flashHazard(
-      automaticRecovery ? "COURSE LINK RESTORED" : "MANUAL RECOVERY",
+      cause === "gate-miss"
+        ? `GATE ${this.nextCheckpointIndex} MISSED · RETRY`
+        : automaticRecovery
+          ? "COURSE LINK RESTORED"
+          : "MANUAL RECOVERY",
       1_100,
     );
     this.syncPresentationPose();
@@ -1122,6 +1134,15 @@ export class FuturismaGame {
       this.poseProjection,
     );
     if (this.diagnosticsMode) this.diagnosticPresentationProjectionQueries += 1;
+    // P11 banked-deck height; see `bankedSurfaceLift`. `sample` is projected
+    // from the un-lifted point on purpose — its `lateral` is the horizontal
+    // offset the lift is defined against. `presentationPosition` is rewritten
+    // from the simulation pose every frame, so this never accumulates, and the
+    // craft mesh, shadow blob and camera anchor all read it after this line.
+    this.presentationPosition.y += bankedSurfaceLift(
+      sample.right.y,
+      sample.lateral,
+    );
     const speedRatio = this.speed / BOOST_MAX_SPEED;
     const vehiclePosition = this.scratchA
       .copy(this.presentationPosition)
@@ -1487,23 +1508,14 @@ export class FuturismaGame {
   }
 
   private resetRaceState(): void {
-    this.progress = this.recoveryProbe
-      ? RECOVERY_PROBE_DISTANCE_METERS / this.course.length
-      : this.wrongWayProbe
-        ? WRONG_WAY_PROBE_DISTANCE_METERS / this.course.length
-        : this.waterGripProbe
-          ? WATER_GRIP_PROBE_DISTANCE_METERS / this.course.length
-          : this.apronProbe
-            ? this.apronProbeDistance / this.course.length
-            : this.course.startProgress;
-    this.speed = 0;
-    this.lateral = this.recoveryProbe || this.wrongWayProbe
-      || this.impactProbe || this.waterGripProbe || this.apronProbe
-      ? 0
-      : this.course.startLateral;
+    const spawn = resolveProbeSpawn(this.course);
+    this.progress = spawn.progress;
+    this.speed = spawn.speedMps;
+    this.lateral = 0;
     this.steerAmount = 0;
     this.nextCheckpointIndex = 1;
     this.missedGateIndex = null;
+    this.gateMissRecoveryCountdown = -1;
     this.boostReserve = 1;
     this.boostActive = false;
     this.boostLockedUntilRelease = false;
@@ -1521,20 +1533,15 @@ export class FuturismaGame {
     this.lapTimesMs.length = 0;
     this.rivalFleet?.reset();
     ghostRuntime.reset();
-    this.raceStatus = this.rivalFleet?.raceStatus(
+    this.raceStatus = openingRaceStatus(
+      this.rivalFleet,
       calculatePlayerRaceDistance({
         progress: this.raceProgressFromStart(this.progress),
         lap: 1,
         totalLaps: this.totalLaps,
         courseLengthMeters: this.course.length,
       }),
-      0,
-    ) ?? {
-      position: 1,
-      racerCount: 4,
-      gapToAheadMs: null,
-      gapToBehindMs: null,
-    };
+    );
     this.lastPositionCue = this.raceStatus.position;
     this.lastPositionCueAtMs = -Infinity;
     this.finalStandings = [];
@@ -1557,34 +1564,20 @@ export class FuturismaGame {
     this.vehicle.resetEffects();
     this.effects.resetImpactSparks();
     const start = this.course.sample(this.progress, this.poseProjection);
+    this.lateral = probeSpawnLateral(spawn, start.halfWidth);
     this.position.copy(start.position).addScaledVector(start.right, this.lateral);
-    if (this.recoveryProbe) {
-      this.lateral = start.halfWidth + 1;
-      this.position.addScaledVector(start.right, this.lateral);
-    }
     this.forward.copy(start.tangent);
     this.travelDirection.copy(start.tangent);
-    if (this.wrongWayProbe) {
+    if (spawn.reversed) {
       this.forward.multiplyScalar(-1);
       this.travelDirection.multiplyScalar(-1);
-      this.speed = 22;
       this.courseAlignment = -1;
     }
-    if (this.impactProbe) {
-      this.lateral = start.halfWidth - 1;
-      this.position.copy(start.position).addScaledVector(start.right, this.lateral);
-      this.speed = 22;
-    }
-    if (this.waterGripProbe) {
-      this.lateral = -start.halfWidth * 0.65;
-      this.position.copy(start.position).addScaledVector(start.right, this.lateral);
-      this.speed = 10;
-    }
-    if (this.apronProbe) {
-      this.lateral = this.apronProbeLateral;
-      this.position.copy(start.position).addScaledVector(start.right, this.lateral);
-      this.speed = APRON_PROBE_SPEED_METERS_PER_SECOND;
-    }
+    while (
+      spawn.alignCheckpoint
+      && this.nextCheckpointIndex < this.course.checkpointCount
+      && this.course.checkpointProgress(this.nextCheckpointIndex) <= this.progress
+    ) this.nextCheckpointIndex += 1;
     if (this.rivalAudioProbeLateral !== 0) {
       this.audio.setRivalAudioProbe(start.right, this.rivalAudioProbeLateral);
     }
@@ -1598,7 +1591,9 @@ export class FuturismaGame {
     side: number,
     strength: number,
   ): void {
-    this.effects.emitImpactSparks(sample, this.position, this.speed, side, strength);
+    this.effects.emitImpactSparks(
+      sample, this.position, this.lateral, this.speed, side, strength,
+    );
     this.vehicle.triggerImpactEffect(side, strength);
     if (this.diagnosticsMode) this.diagnosticImpactSparkBursts += 1;
   }
@@ -1781,6 +1776,7 @@ export class FuturismaGame {
         missedGates: this.diagnosticMissedGates,
         impactLocations: this.diagnosticImpactLocations,
         recoveries: this.diagnosticRecoveries,
+        gateMissRecoveries: this.diagnosticGateMissRecoveries,
         contextLost: this.contextLost,
         contextLosses: this.diagnosticContextLosses,
         contextRestores: this.diagnosticContextRestores,
@@ -1844,6 +1840,7 @@ export class FuturismaGame {
     this.diagnosticImpactSparkBursts = 0;
     this.diagnosticMissedGates = 0;
     this.diagnosticRecoveries = 0;
+    this.diagnosticGateMissRecoveries = 0;
     this.diagnosticContextLosses = 0;
     this.diagnosticContextRestores = 0;
     this.diagnosticRenderedFrames = 0;

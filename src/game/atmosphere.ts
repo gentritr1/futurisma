@@ -16,7 +16,9 @@ import {
 } from "./render-mode.js";
 
 /** The exposure the AgX path has run at since the renderer was set up. */
-const AGX_TONE_MAPPING_EXPOSURE = 1.05;
+// P11: 1.05 -> 1.10. A half-stop of headroom under AgX; the markers that now
+// opt out of tone mapping clip to glow rather than being rolled grey.
+const AGX_TONE_MAPPING_EXPOSURE = 1.1;
 
 /**
  * P4b. `agx` keeps the 2023 filmic curve the project shipped with; `ps2`
@@ -27,14 +29,20 @@ const AGX_TONE_MAPPING_EXPOSURE = 1.05;
 export function configureToneMapping(renderer: THREE.WebGLRenderer): void {
   const ps2 = activeRenderMode() === "ps2";
   renderer.toneMapping = ps2 ? THREE.NoToneMapping : THREE.AgXToneMapping;
-  // Ignored under `NoToneMapping`; the grade applies `PS2_EXPOSURE` itself, set
-  // to the same 1.05 so the A/B compares curves rather than gain.
+  // Ignored under `NoToneMapping`; the grade applies `PS2_EXPOSURE` itself.
+  // P11 lifted the AgX exposure to 1.10 and left `PS2_EXPOSURE` at 1.05, so the
+  // A/B is no longer gain-matched — `ps2` is now the darker of the two by a
+  // twentieth of a stop. Deliberate: the PS2 grade already has its own
+  // black-crush and highlight knee, and raising its exposure would move the
+  // knees this project's render-quality validator pins.
   renderer.toneMappingExposure = ps2 ? 1 : AGX_TONE_MAPPING_EXPOSURE;
 }
 
 const SKY_ZENITH_TINT = new THREE.Color(0x0a1216);
 const WHITE = new THREE.Color(0xffffff);
-const RIM_PRESENCE_BOOST = 1.85;
+// P11: 1.85 -> 1.35. The rim was doing the work the key should: pulling it back
+// and pushing key intensity up per sector is what gives the deck form again.
+const RIM_PRESENCE_BOOST = 1.35;
 const HEMISPHERE_TRIM = 0.88;
 const KEY_LIGHT_DISTANCE = 160;
 const SUN_DISC_DISTANCE_RATIO = 0.72;
@@ -46,16 +54,28 @@ const SUN_DISC_DISTANCE_RATIO = 0.72;
  */
 const HANGAR_LAMP_COLOR = 0xffb154;
 /**
- * Two lamps at the quarter points of the 618-816 m shell, hung just under the
- * 15.5 m lamp strips. `distance` is set so their falloff dies before the shell
- * mouth, which keeps them from leaking onto `LINK_APRON` / `HANGAR_EXIT`.
+ * P11: three lamps down the 618-816 m shell rather than two at the quarter
+ * points, hung just under the 15.5 m lamp strips. The lamps hang 14.2 m up, so
+ * a `distance` of R only reaches sqrt(R² - 14.2²) along the deck: the old pair
+ * left the shell's middle third at 94% of range, all but unlit. Three fixtures
+ * at a 62 m range put the darkest deck point at 65%.
+ *
+ * The trade, stated because the old comment claimed the opposite: the falloff
+ * no longer dies before the shell mouth. It now reaches ~38 m back onto
+ * `LINK_APRON` and ~34 m forward onto `HANGAR_EXIT`, which three lamps covering
+ * the middle cannot avoid. The lamps are only visible while the player is
+ * inside 618-816 m, so the spill appears and vanishes with them;
+ * validate-lighting.mjs pins it so it cannot grow unnoticed.
+ *
+ * Cost: the in-shell lit-light count goes 6 -> 7, i.e. one extra shader
+ * recompile on first entry.
  */
-const HANGAR_LAMP_DISTANCES_METRES = [668, 766] as const;
+const HANGAR_LAMP_DISTANCES_METRES = [640, 715, 790] as const;
 const HANGAR_LAMP_HEIGHT_METRES = 14.2;
-const HANGAR_LAMP_RANGE_METRES = 54;
+const HANGAR_LAMP_RANGE_METRES = 62;
 const HANGAR_LAMP_DECAY = 1.35;
 /** Peak candela, i.e. the value the flicker in [0.55, 1.0] scales. */
-const HANGAR_LAMP_PEAK_INTENSITY = 110;
+const HANGAR_LAMP_PEAK_INTENSITY = 150;
 
 /** The one flat object `atmosphere.ts` contributes to the diagnostics report. */
 export interface AtmosphereDiagnostics {
@@ -148,10 +168,10 @@ export class RaceAtmosphere {
   }
 
   /**
-   * Two conditional sodium lamps inside `HANGAR_SIX`. They are added to the
+   * Three conditional sodium lamps inside `HANGAR_SIX`. They are added to the
    * scene once, hidden, and only ever become visible between 618 m and 816 m —
    * an invisible light is skipped by the renderer's object traversal, so the
-   * lit-light count is 4 everywhere except inside the shell, where it is 6.
+   * lit-light count is 4 everywhere except inside the shell, where it is 7.
    *
    * Greenwater only: Bitterpan has no hangar and P8 owns its lighting.
    */
@@ -204,7 +224,7 @@ export class RaceAtmosphere {
           vec3 color = mix(horizonColor, topColor, smoothstep(0.0, 0.42, h));
           color = mix(color * 0.82, color, smoothstep(-0.12, 0.0, h));
           float band = exp(-pow((h - 0.035) * 16.0, 2.0));
-          color += bandColor * band * 0.38;
+          color += bandColor * band * 0.52;
           gl_FragColor = vec4(color, 1.0);
           #include <tonemapping_fragment>
           #include <colorspace_fragment>
@@ -234,7 +254,8 @@ export class RaceAtmosphere {
     const material = new THREE.MeshBasicMaterial({
       color: this.keyLight.color.clone(),
       transparent: true,
-      opacity: 0.5,
+      // P11: 0.5 -> 0.62.
+      opacity: 0.62,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
       fog: false,
@@ -365,7 +386,8 @@ export class RaceAtmosphere {
     this.presenceLight.color.lerp(this.skyBandTarget, lightingResponse);
     this.presenceLight.intensity = THREE.MathUtils.lerp(
       this.presenceLight.intensity,
-      14,
+      // P11: 14 -> 17, to keep the craft reading against the lifted key.
+      17,
       lightingResponse,
     );
 

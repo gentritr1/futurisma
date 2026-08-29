@@ -16126,10 +16126,11 @@
    "id": "HZ_STEAM_2",
    "type": "steam_vent",
    "distance": 736.115,
-   "lateralOffset": 7,
+   "lateralOffset": 8.4,
    "cycleSeconds": 4,
    "telegraphSeconds": 1,
-   "effect": "vision_only"
+   "effect": "vision_only",
+      "note": "P11: moved from +7.0 to +8.4 m. The hangar interior clamps at halfWidth - deckMargin = 7.45 m, so +7.0 stood inside the drivable corridor."
   },
   {
    "id": "HZ_CABLE_1",
