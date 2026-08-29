@@ -23,6 +23,8 @@ import type {
   TimeOfDayStop,
   TurnCue,
 } from "./course";
+import DRIVABLE_LIMIT_TABLE from "./data/map02/DRIVABLE_LIMITS.json";
+import { DrivableLimits } from "./drivable-limits";
 
 interface BitterpanStation {
   i: number;
@@ -727,6 +729,34 @@ export class BitterpanCourse implements RaceCourse {
     return lateral >= 0 ? sample.edgeRight : sample.edgeLeft;
   }
 
+  /**
+   * P16 — the measured drivable limit for this span, or null where nothing tall
+   * stands within reach.
+   *
+   * The distance comes off the sample when it is a `CourseProjection`, which
+   * every runtime caller passes: the race loop resolves the apron from
+   * `beforeMove` / `afterMove`, and the corridor sweep from its own projection.
+   * A bare `CourseSample` carries no progress, so it falls back to the authored
+   * width rather than guessing a distance.
+   */
+  /**
+   * P16 — the measured drivable limit table for this map. Built once: the
+   * lookup runs twice per fixed step at 120 Hz for the whole race.
+   */
+  private readonly drivableLimits = new DrivableLimits(
+    DRIVABLE_LIMIT_TABLE,
+    this.length,
+  );
+
+  private derivedLimitAt(sample: CourseSample, lateral: number): number | null {
+    const progress = (sample as Partial<CourseProjection>).progress;
+    if (!Number.isFinite(progress)) return null;
+    return this.drivableLimits.limitAt(
+      THREE.MathUtils.euclideanModulo(progress as number, 1) * this.length,
+      lateral,
+    );
+  }
+
   apronAt(
     sample: CourseSample,
     lateral: number,
@@ -739,6 +769,7 @@ export class BitterpanCourse implements RaceCourse {
       sample.halfWidth,
       lateral,
       target,
+      this.derivedLimitAt(sample, lateral),
     );
   }
 

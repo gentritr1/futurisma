@@ -1,0 +1,76 @@
+{
+  "$generatedBy": "scripts/derive-drivable-limits.mjs",
+  "$doNotEditByHand": "Measured from the rendered scene. Re-run the script after any change to trackside geometry; do not hand-tune a number to make a test pass.",
+  "map": "bitterpan",
+  "spanMetres": 10,
+  "hullMarginMetres": 1.6,
+  "rule": "limit = max(halfWidth, min(clamp, tallGeometryLateral - hullMargin)); geometry at or below 0.5 m above the local deck plane does not bound.",
+  "summary": {
+    "spans": 6,
+    "trimmedSides": 6,
+    "flooredToDeckEdge": 6,
+    "maxTrimMetres": 5.8
+  },
+  "entries": [
+    {
+      "distance": 2460,
+      "halfWidth": 11.069,
+      "clamp": 13.169,
+      "left": {
+        "limit": 11.069,
+        "setBy": "map02_cable_coils",
+        "tall": 12.122
+      }
+    },
+    {
+      "distance": 2850,
+      "halfWidth": 12.027,
+      "clamp": 16.627,
+      "right": {
+        "limit": 12.027,
+        "setBy": "map02_cable_coils",
+        "tall": 13.02
+      }
+    },
+    {
+      "distance": 2860,
+      "halfWidth": 12.031,
+      "clamp": 16.631,
+      "right": {
+        "limit": 12.031,
+        "setBy": "map02_cable_coils",
+        "tall": 13.02
+      }
+    },
+    {
+      "distance": 2990,
+      "halfWidth": 13,
+      "clamp": 18.8,
+      "left": {
+        "limit": 13,
+        "setBy": "BP_SIGNAGE_POSTS",
+        "tall": 13.83
+      }
+    },
+    {
+      "distance": 3010,
+      "halfWidth": 13,
+      "clamp": 15.1,
+      "left": {
+        "limit": 13,
+        "setBy": "map02_cable_coils",
+        "tall": 14.026
+      }
+    },
+    {
+      "distance": 3020,
+      "halfWidth": 13,
+      "clamp": 15.1,
+      "left": {
+        "limit": 13,
+        "setBy": "map02_cable_coils",
+        "tall": 14.371
+      }
+    }
+  ]
+}

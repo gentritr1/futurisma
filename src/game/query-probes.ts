@@ -6,10 +6,21 @@ import type { RenderQualityMode } from "./render-quality";
 export const RECOVERY_PROBE_DISTANCE_METERS = 900;
 export const WRONG_WAY_PROBE_DISTANCE_METERS = 100;
 export const WATER_GRIP_PROBE_DISTANCE_METERS = 580;
-// FUEL_ROW, A/A edges: the widest authored apron, and the sector the verified
-// edge map shows as the biggest offender for the old invisible wall.
-export const APRON_PROBE_DISTANCE_METERS = 1700;
-export const APRON_PROBE_LATERAL_METERS = 13.5;
+/**
+ * P16 — re-derived, not deleted, from the measured drivable limits.
+ *
+ * It used to spawn at FUEL_ROW d 1700, lateral +13.5. That sector's authored
+ * apron is 5 m of A either side, but the measured wall there stands at 13.1 m
+ * against an 11.5 m half-width, so the derived limit is 11.5 — exactly the deck
+ * edge. There is no drivable apron left at 1700 to test, and the old spawn sat
+ * 2 m outside the clamp: the probe could not reach its own precondition.
+ *
+ * GREENWATER_SWEEP at d 878.7 is where the widest run-off actually survives
+ * measurement: half-width 12.0 m, derived limit 16.06 m to starboard, so
+ * +14.0 m is 2.0 m onto the apron and 2.06 m inside the clamp.
+ */
+export const APRON_PROBE_DISTANCE_METERS = 878.7;
+export const APRON_PROBE_LATERAL_METERS = 14;
 export const APRON_PROBE_SPEED_METERS_PER_SECOND = 60;
 /**
  * P11 gate-miss probe. WATER_TABLE, 21.5 m short of CP02 (d 586.519), whose
@@ -30,8 +41,33 @@ export const APRON_PROBE_SPEED_METERS_PER_SECOND = 60;
  * the hangar approach wall and is inherent to missing CP02 wide — LINK_APRON
  * authors no run-off, so its clamp is 2.05 m inside a 9.9 m half-width.
  */
-export const GATE_MISS_PROBE_DISTANCE_METERS = 565;
-export const GATE_MISS_PROBE_LATERAL_METERS = -12.5;
+/**
+ * P16 — re-derived, not deleted. The scenario is preserved; only the place it
+ * can be staged has moved.
+ *
+ * The CP02 staging above is no longer reachable. P16 derived the drivable limit
+ * from the measured world, and at d 565 the wall stands at 12.1 m, giving a
+ * limit of 10.5 m — exactly CP02's own gate half-width. There is no lateral
+ * there that is both inside the clamp and outside the gate, so the probe
+ * spawned 2 m beyond the clamp, was pulled back to the deck edge and sailed
+ * through the gate it was written to miss. Measured at runtime rather than
+ * assumed: `gateMissRecoveries` went to 0 with `maxLateralRatio` pinned at 1.00,
+ * while `test:code` stayed green throughout — `validate-race.mjs` runs its own
+ * model of the course and never loads the limit table, so it cannot see this.
+ *
+ * CP04 (d 900.239, gate 24 m wide, half-width 12.0 m) is the widest surviving
+ * margin on the lap: the derived limit 21.5 m short of it is 16.06 m to
+ * starboard, so lateral +14.0 m is 2.0 m outside the gate and 2.06 m inside the
+ * clamp — legal run-off the gate does not accept, which is exactly the P11
+ * scenario. The 21.5 m run-up and the 55 m/s coast are unchanged.
+ *
+ * STARBOARD, and the side was measured rather than chosen. Port drifts INWARD
+ * through this bend: spawned at -13.5 m the craft crossed CP04 cleanly and
+ * `gateMissRecoveries` stayed 0. From +14.0 m it misses, and the gate-miss
+ * recovery fires at GREENWATER SWEEP@952m — `gateMissRecoveries: 1`.
+ */
+export const GATE_MISS_PROBE_DISTANCE_METERS = 878.7;
+export const GATE_MISS_PROBE_LATERAL_METERS = 14;
 export const GATE_MISS_PROBE_SPEED_METERS_PER_SECOND = 55;
 // The panner reference distance, so the rival-audio probe sits at unity gain.
 export const RIVAL_AUDIO_PROBE_METERS = 4;
