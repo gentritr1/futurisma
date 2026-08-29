@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import greenwaterJson from "./data/greenwater-blockout.json";
+import plaqueBackingJson from "./data/HANGAR_SIX_PLAQUE_BACKING.json";
 import {
   createApronResolution,
   resolveApron,
@@ -335,6 +336,12 @@ export interface RaceCourse {
    * whatever `lightingAt` / `fogAt` return.
    */
   readonly timeOfDayStops: readonly TimeOfDayStop[] | null;
+  /**
+   * P15 — Greenwater only. Backing panels for the wall plaques, emitted by the
+   * course's own furniture resolver as it places them. Bitterpan authors no
+   * barrier span, so it resolves no wall plaques and declares none.
+   */
+  readonly wallPlaqueBackings?: readonly PlaqueBackingPlacement[];
   createSampleScratch(): CourseSample;
   createProjectionScratch(): CourseProjection;
   sample(progress: number, target?: CourseSample): CourseSample;
@@ -715,6 +722,70 @@ function resolveEdgeFurniture(
   });
 }
 
+/**
+ * P15 — one Hangar Six backing panel, in the class its plaque belongs to plus
+ * the world matrix that puts it behind that plaque.
+ *
+ * The matrix rather than the position: it is produced by the same
+ * `setCourseObjectTransform` call the plaque uses, so the panel inherits the
+ * plaque's bank, facing and station exactly instead of re-deriving them.
+ */
+export interface PlaqueBackingPlacement {
+  klass: "chevron" | "board";
+  matrix: THREE.Matrix4;
+  /** Signed lateral of the panel centre; asserted by validate-furniture.mjs. */
+  lateral: number;
+  /** Lower edge above the deck. Flush with the plaque band, never below it. */
+  bottomHeight: number;
+}
+
+/**
+ * How far inside the wall line a BACKING panel sits, in metres.
+ *
+ * 0.06 m outboard of the plaque's own `WALL_PLAQUE_INSET_METRES`, so the plaque
+ * stands proud of its backing by 60 mm. That gap is the whole effect: it is
+ * what the shadow recess drawn on `hangar_fixtures_512` is there to receive.
+ */
+const BACKING_INSET_METRES = 0.29;
+/**
+ * The same 60 mm, taken along the panel's facing normal as well as across it.
+ *
+ * The spec expresses the offset as lateral only, but a plaque and its backing
+ * both face down the course: separated only laterally they would be coplanar
+ * and z-fight over the whole overlap. Setting the panel 60 mm further from the
+ * viewer resolves that with the exact number the spec already names, and makes
+ * "stands proud" true in the direction a player can actually see it.
+ */
+const BACKING_STANDOFF_METRES = 0.06;
+
+/**
+ * The authored panel sizes, read straight out of the delivery spec so the
+ * runtime and `validate-art-pass.mjs` cannot disagree about them.
+ */
+export const PLAQUE_BACKING_CLASSES = Object.freeze(
+  Object.fromEntries(
+    (plaqueBackingJson.classes as ReadonlyArray<{
+      id: string;
+      slot: string;
+      widthMetres: number;
+      heightMetres: number;
+      bottomHeightMetres: number;
+    }>).map((entry) => [
+      entry.id === "PLAQUE_BACK_CHEVRON" ? "chevron" : "board",
+      Object.freeze({
+        slot: entry.slot,
+        width: entry.widthMetres,
+        height: entry.heightMetres,
+        bottomHeight: entry.bottomHeightMetres,
+      }),
+    ]),
+  ) as Record<
+    "chevron" | "board",
+    { readonly slot: string; readonly width: number; readonly height: number;
+      readonly bottomHeight: number }
+  >,
+);
+
 function createLabelMaterial(
   text: string,
   foreground = "#c8ff2e",
@@ -762,6 +833,21 @@ export class GreenwaterCourse implements RaceCourse {
   readonly recoveryHoldSeconds = MAP.recovery.holdSeconds;
   readonly recoverySpeedMps = MAP.recovery.reinsertSpeedKph / 3.6;
   readonly recoveryImmunitySeconds = MAP.recovery.immunitySeconds;
+  /**
+   * P15 — the Hangar Six plaque backings, emitted by the SAME resolver calls
+   * that place the plaques.
+   *
+   * `HANGAR_SIX_PLAQUE_BACKING.json` is deliberately not a position list: the
+   * 13 positions already exist and are resolved at runtime, and duplicating
+   * them in data is exactly the second source of truth `furniture-placement.js`
+   * was written to remove. So `createTurnMarkers` fills this as it runs, one
+   * entry per group whose placement came back `mode === "wall"`, and
+   * `plaque-backing.ts` turns the matrices into two instanced meshes once the
+   * fixtures sheet has loaded. The panels cannot end up anywhere but behind the
+   * plaques, because they were computed from the same `sample` and the same
+   * `placement`.
+   */
+  readonly wallPlaqueBackings: PlaqueBackingPlacement[] = [];
 
   private readonly samples = MAP.centreline.samples;
   /**
@@ -1805,6 +1891,48 @@ export class GreenwaterCourse implements RaceCourse {
     return markers;
   }
 
+  /**
+   * P15 — records the backing panel for one plaque, and only for a plaque.
+   *
+   * A verge placement returns early: on a verge the sign stands on a post in
+   * the open and there is nothing to bolt it to. `plaqueZ` is the plaque's own
+   * offset along the course (0 for a chevron face, 0.08 for a braking board
+   * label); the panel sits `BACKING_STANDOFF_METRES` behind whatever that is.
+   *
+   * The panel grows UPWARD only, from a lower edge flush with the plaque band.
+   * A symmetric margin would hang structure over the deck under the band, which
+   * is the precise failure P13 was written to close.
+   */
+  private recordPlaqueBacking(
+    placement: FurniturePlacement,
+    sample: CourseSample,
+    klass: "chevron" | "board",
+    side: -1 | 1,
+    plaqueZ: number,
+  ): void {
+    if (placement.mode !== "wall") return;
+    const backing = PLAQUE_BACKING_CLASSES[klass];
+    const lateral = side * Math.max(0, sample.halfWidth - BACKING_INSET_METRES);
+    const centreHeight = backing.bottomHeight + backing.height / 2;
+    const object = new THREE.Object3D();
+    setCourseObjectTransform(
+      object,
+      sample,
+      lateral,
+      centreHeight,
+      plaqueZ - BACKING_STANDOFF_METRES,
+      backing.width,
+      backing.height,
+      1,
+    );
+    this.wallPlaqueBackings.push({
+      klass,
+      matrix: object.matrix.clone(),
+      lateral,
+      bottomHeight: backing.bottomHeight,
+    });
+  }
+
   private createTurnMarkers(): THREE.Group {
     const group = new THREE.Group();
     group.name = "greenwater_turn_grammar";
@@ -1898,6 +2026,10 @@ export class GreenwaterCourse implements RaceCourse {
           0.24,
         );
         chevronBoards.setMatrixAt(chevronIndex, object.matrix);
+        // P15: a wall plaque is bolted to an open pillar frame with nothing
+        // behind it. Emitted here, from this resolver call, so the panel and
+        // the plaque can never be placed against different corridors.
+        this.recordPlaqueBacking(placement, sample, "chevron", outside, 0);
         if (placement.groundMounted) {
           setCourseObjectTransform(object, sample, markerX, 1.05, 0.08, 0.18, 2.1, 0.18);
           chevronPosts.setMatrixAt(postIndex, object.matrix);
@@ -1949,6 +2081,7 @@ export class GreenwaterCourse implements RaceCourse {
         );
         labelBatch.mesh.setMatrixAt(labelBatch.count, object.matrix);
         labelBatch.count += 1;
+        this.recordPlaqueBacking(placement, sample, "board", side, 0.08);
         // The low approach arrow is deck paint standing on end. It belongs in
         // front of a board on a verge; on a wall plaque it is an arrow lying in
         // the road, so a barrier span drops it entirely.

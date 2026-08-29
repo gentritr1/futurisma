@@ -23,6 +23,7 @@ import {
   liveryFor,
 } from "./liveries.js";
 import type { MinimapContact } from "./minimap";
+import { composeShaderInjection } from "./totem";
 import type {
   TotemRivalArticulationGroup,
   TotemRivalArticulationSlot,
@@ -417,7 +418,12 @@ export class RivalFleet {
         if (material.map !== liveryAtlas) {
           material.map = liveryAtlas;
           material.color.set(0xffffff);
-          material.onBeforeCompile = (shader) => {
+          // Composed rather than assigned. `material.onBeforeCompile = fn`
+          // would drop the PS2 grade and P15's wear multiply that totem.ts
+          // already armed on this clone — and leave their cache key behind, so
+          // the material would then reuse a program carrying NEITHER this
+          // quadrant offset nor the injections it just deleted.
+          composeShaderInjection(material, "livery-atlas", (shader) => {
             shader.vertexShader = shader.vertexShader
               .replace(
                 "#include <common>",
@@ -431,8 +437,7 @@ export class RivalFleet {
                   + `${(1 - LIVERY_UV_INSET).toFixed(10)} ) * 0.5 + aLiveryOffset;\n`
                   + "\t#endif",
               );
-          };
-          material.needsUpdate = true;
+          });
         }
         const offsets = new Float32Array(instanceCount * 2);
         for (let index = 0; index < instanceCount; index += 1) {

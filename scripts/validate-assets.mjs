@@ -40,9 +40,9 @@ const expectedHashes = {
 };
 
 /**
- * P12 art pass 01 sheets, under `public/assets/greenwater/textures/`.
+ * Art-pass sheets, under `public/assets/`.
  *
- * These three are NOT archive-provenanced like the accepted Greenwater
+ * These seven are NOT archive-provenanced like the accepted Greenwater
  * packages: they are emitted by `scripts/design/build-futurisma-atlases.mjs`,
  * which is deterministic and ships in the repo, so the builder is the
  * provenance and these are the hashes it printed. Regenerate with
@@ -50,6 +50,10 @@ const expectedHashes = {
  * editing a PNG — `scripts/validate-art-pass.mjs` additionally pins each sheet
  * against the sha256 recorded beside its regions in ATLAS_REGIONS.json, so a
  * sheet and its UV rectangles can never drift apart.
+ *
+ * The first three are P12 (art pass 01); the last four are P15 (art pass 02) —
+ * the Bitterpan pan crust tile and its decal sheet, the Hangar Six fixture
+ * panels, and the TOTEM livery wear overlay.
  */
 const expectedArtPassHashes = {
   "greenwater/textures/greenwater_runway_1024.png":
@@ -58,6 +62,14 @@ const expectedArtPassHashes = {
     "b1652c713929aae661e6d5ce3a2c47444f322f095f3c4fd22faf7d0d8101614f",
   "greenwater/textures/greenwater_motion_b_512.png":
     "a5b4442a7286b3c597abc42bd7cd4373db85f126478561de6cdf9694e9583dfd",
+  "map02/textures/bitterpan_crust_tile_256.png":
+    "e16c41b45f24debab80526d2d3fa9bc69005e40b270a8f1f0370483f0f74b6fb",
+  "map02/textures/bitterpan_crust_1024.png":
+    "59d3ca77abdcdc2550698b6fc1f10b58e8a9f13ccc31d8a356b4b7821c915ac6",
+  "greenwater/textures/hangar_fixtures_512.png":
+    "296531d9bb2c80b979b2390c28fc097fb3dd2090e887207ca5b7d9baacb6629a",
+  "totem/textures/totem_wear_1024.png":
+    "093033d86282e20eb0e26dbb638ef9c528fd3942fed5d54559043d84e60fe123",
 };
 
 for (const [relativePath, expectedHash] of Object.entries(expectedArtPassHashes)) {

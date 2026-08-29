@@ -7,6 +7,7 @@ import {
   FLAT_FURNITURE_MAX_HEIGHT_METRES,
   GATE_POST_DECK_CLEARANCE_METRES,
   PLAQUE_BAND_BOTTOM_METRES,
+  WALL_PLAQUE_INSET_METRES,
   TURN_CHEVRON_CLEARANCE_METRES,
   clearsDeck,
   clearsRunOff,
@@ -55,6 +56,7 @@ const readJson = (path) => JSON.parse(readFileSync(new URL(path, root), "utf8"))
 
 const blockout = readJson("src/game/data/greenwater-blockout.json");
 const signage = readJson("src/game/data/FUTURISMA_SIGNAGE_PLACEMENTS.json");
+const plaqueBacking = readJson("src/game/data/HANGAR_SIX_PLAQUE_BACKING.json");
 const stations = readJson("src/game/data/map02/CENTRELINE_STATIONS.json");
 const production = readJson("src/game/data/map02/BITTERPAN_PRODUCTION.json");
 const checkpoints02 = readJson("src/game/data/map02/CHECKPOINTS.json");
@@ -179,6 +181,43 @@ let approachArrows = 0;
 let chevrons = 0;
 let brakingBoards = 0;
 
+/**
+ * P15 — the Hangar Six plaque backing panels.
+ *
+ * These are DERIVED, not authored: `course.ts#recordPlaqueBacking` emits one
+ * per group whose placement came back `mode === "wall"`, from the same resolver
+ * call, so the sweep below re-derives them the same way rather than reading a
+ * position list. They are added to `items` as EDGE furniture and MEASURED, not
+ * exempted — a panel is a 3.9 x 1.95 m plate hanging over the hangar, and the
+ * only thing keeping it legal is that its lower edge is flush with the plaque
+ * band. If a future pass ever gives it a bottom margin it will fail here.
+ */
+const BACKING_CLASSES = Object.fromEntries(
+  plaqueBacking.classes.map((entry) => [
+    entry.id === "PLAQUE_BACK_CHEVRON" ? "chevron" : "board",
+    entry,
+  ]),
+);
+const BACKING_INSET_METRES = plaqueBacking.placement.BACKING_INSET_METRES;
+const backingCounts = { chevron: 0, board: 0 };
+
+/** Adds the backing panel for one wall plaque, or nothing for a verge one. */
+const addPlaqueBacking = (placement, sample, klass, side, shared) => {
+  if (placement.mode !== "wall") return;
+  const backing = BACKING_CLASSES[klass];
+  backingCounts[klass] += 1;
+  add({
+    ...shared,
+    class: "edge",
+    id: `${shared.id}_BACKING`,
+    lateral: side * Math.max(0, sample.halfWidth - BACKING_INSET_METRES),
+    mode: placement.mode,
+    footprintHalfWidth: backing.widthMetres / 2,
+    bottomHeight: backing.bottomHeightMetres,
+    topHeight: backing.bottomHeightMetres + backing.heightMetres,
+  });
+};
+
 for (const turn of blockout.turns) {
   const outside = turn.direction === "left" ? 1 : -1;
   for (let index = 0; index < turn.chevronCount; index += 1) {
@@ -216,6 +255,10 @@ for (const turn of blockout.turns) {
       footprintHalfWidth: CHEVRON_ARROW_HALF_WIDTH,
       bottomHeight: placement.centreHeight - CHEVRON_ARROW_HEIGHT / 2,
       topHeight: placement.centreHeight + CHEVRON_ARROW_HEIGHT / 2,
+    });
+    addPlaqueBacking(placement, sample, "chevron", outside, {
+      ...shared,
+      id: `${turn.id}_CHEVRON_${index}`,
     });
     // The post is what would hold the panel up on a verge. On a wall plaque it
     // is a 2.1 m pole standing on the racing surface, so it is not built.
@@ -261,6 +304,10 @@ for (const turn of blockout.turns) {
       footprintHalfWidth: DISTANCE_BOARD_WIDTH / 2,
       bottomHeight: placement.centreHeight - DISTANCE_BOARD_HEIGHT / 2,
       topHeight: placement.centreHeight + DISTANCE_BOARD_HEIGHT / 2,
+    });
+    addPlaqueBacking(placement, sample, "board", side, {
+      ...shared,
+      id: `${turn.id}_BOARD_${boardDistance}M`,
     });
     // The low approach arrow is deck paint stood on end. A wall plaque drops it.
     if (placement.groundMounted) {
@@ -608,6 +655,63 @@ assert.equal(
 );
 
 // ---------------------------------------------------------------------------
+// P15's backing panels, tied to the count above rather than declared beside it.
+//
+// One panel per wall plaque, and the same 7/6 split — the two numbers come from
+// the same resolver pass, so they cannot drift. `HANGAR_SIX_PLAQUE_BACKING.json`
+// declares what it expects, and that declaration is checked against what the
+// resolver actually produced rather than trusted.
+// ---------------------------------------------------------------------------
+
+const backingPanels = backingCounts.chevron + backingCounts.board;
+assert.equal(
+  backingPanels,
+  wallPlaques,
+  `${backingPanels} backing panels for ${wallPlaques} wall plaques. Every plaque `
+    + "bolts to a panel and every panel backs a plaque; a spare panel is a plate "
+    + "on an empty wall and a missing one is a plaque floating in a pillar gap.",
+);
+assert.equal(backingCounts.chevron, 7, "7 chevron plaques take a PANEL_CHEVRON.");
+assert.equal(backingCounts.board, 6, "6 braking boards take a PANEL_BOARD.");
+assert.equal(
+  plaqueBacking.derivation.expected.panels,
+  backingPanels,
+  "The backing spec's declared panel count disagrees with the resolver.",
+);
+assert.equal(plaqueBacking.derivation.expected.chevronPanels, backingCounts.chevron);
+assert.equal(plaqueBacking.derivation.expected.boardPanels, backingCounts.board);
+
+// Every panel went through the sweep above as EDGE furniture, so it has already
+// been measured against `clearsDeck` and `clearsRunOff` with the rest. What is
+// asserted here is the reason it passes: the lower edge is flush with the band,
+// nothing hangs below it, and the panel really is behind its plaque.
+const backingItems = items.filter((item) => item.id.endsWith("_BACKING"));
+assert.equal(backingItems.length, backingPanels, "The sweep lost a backing panel.");
+for (const item of backingItems) {
+  assert.ok(
+    item.bottomHeight >= PLAQUE_BAND_BOTTOM_METRES,
+    `${item.id} hangs to ${item.bottomHeight} m, below the `
+      + `${PLAQUE_BAND_BOTTOM_METRES} m plaque band. A backing panel grows upward `
+      + "only; a symmetric margin would put structure over the deck, which is "
+      + "the precise P13 failure this phase must not reintroduce.",
+  );
+  assert.equal(
+    item.mode,
+    "wall",
+    `${item.id} was emitted for a ${item.mode} placement; only a wall plaque has `
+      + "anything to be bolted to.",
+  );
+  // Outboard of the plaque it backs, by exactly the 60 mm the sheet's shadow
+  // recess is drawn for. Inboard would put the panel in front of the plaque.
+  assert.equal(
+    Number((Math.abs(item.lateral) - (item.halfWidth - WALL_PLAQUE_INSET_METRES)).toFixed(4)),
+    Number((WALL_PLAQUE_INSET_METRES - BACKING_INSET_METRES).toFixed(4)),
+    `${item.id} does not stand ${WALL_PLAQUE_INSET_METRES - BACKING_INSET_METRES} m `
+      + "outboard of its plaque.",
+  );
+}
+
+// ---------------------------------------------------------------------------
 // P12's trackside signage answers to the same deck rule.
 //
 // Its 13 pinned run-off intrusions stay pinned — validate-art-pass.mjs owns
@@ -657,5 +761,10 @@ console.log(
     + `placements resolve as wall plaques, dropping 7 posts and 6 deck-level `
     + `approach arrows; ${Object.keys(DECK_HAZARDS).length} designed hazards are `
     + `pinned on the deck by id; ${signageChecked} P12 boards re-checked against `
-    + "the same deck predicate.",
+    + `the same deck predicate. P15: ${backingPanels} plaque backings `
+    + `(${backingCounts.chevron} chevron + ${backingCounts.board} board) derived `
+    + `from those same wall placements, measured not exempted — every lower edge `
+    + `flush at ${PLAQUE_BAND_BOTTOM_METRES} m and every panel `
+    + `${WALL_PLAQUE_INSET_METRES - BACKING_INSET_METRES} m outboard of the plaque `
+    + "it backs.",
 );
