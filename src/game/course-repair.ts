@@ -291,7 +291,17 @@ export function relocateCorridorObstacles(
       components += 1;
       if (component.length < MIN_COMPONENT_VERTICES) continue;
 
-      // Pass one: does any vertex stand in the corridor, and how deep?
+      // Pass one: does this component stand in the corridor, and how deep?
+      //
+      // The test is on the component's height SPAN, not on individual vertices,
+      // and matching the sweep's group-level classification here is load-bearing.
+      // A slim post has vertices only at its base and its cap: a 6-vertex
+      // `GW_SECTOR_FUEL_ROW_metal` component at 1829.91 m measured 0.093 m and
+      // 3.563 m and NOTHING between, so an in-band vertex test saw nothing while
+      // the post itself passed straight through the driving volume. It swept as
+      // an obstacle and was skipped by the mover — the two disagreed, which is
+      // precisely the failure this pass exists to prevent. Geometry that crosses
+      // the band is in the band.
       let worstShift = 0;
       let side = 0;
       let atDistance = 0;
@@ -299,6 +309,12 @@ export function relocateCorridorObstacles(
       let bandMin = Infinity;
       let bandMax = -Infinity;
       let hint = 0;
+      const samples: {
+        lateral: number;
+        height: number;
+        depth: number;
+        distance: number;
+      }[] = [];
       for (const vertex of component) {
         world.fromBufferAttribute(positions, vertex)
           .applyMatrix4(object.matrixWorld);
@@ -308,20 +324,34 @@ export function relocateCorridorObstacles(
         const height = offset.subVectors(world, projection.position)
           .dot(projection.up)
           - surfaceHeightAtLateral(projection, lateral);
-        if (height < options.heightMin || height > options.heightMax) continue;
-        const limit = projection.halfWidth + options.lateralMargin;
-        const depth = limit - Math.abs(lateral);
-        if (depth <= options.lateralMargin + options.seamTolerance) continue;
-        if (depth > worstShift) {
-          worstShift = depth;
-          // Push toward the nearer edge. A slab lying across the centreline has
-          // no natural side, and the shorter move disturbs less of the scene.
-          side = lateral === 0 ? 1 : Math.sign(lateral);
-          atDistance = projection.progress * course.length;
-          atLateral = lateral;
-        }
         bandMin = Math.min(bandMin, height);
         bandMax = Math.max(bandMax, height);
+        samples.push({
+          lateral,
+          height,
+          depth: projection.halfWidth + options.lateralMargin - Math.abs(lateral),
+          distance: projection.progress * course.length,
+        });
+      }
+      // Overlap, not containment: below the band AND above it still crosses it.
+      const crossesBand = bandMax > options.heightMin
+        && bandMin < options.heightMax;
+      if (!crossesBand) continue;
+      // Size the shift from vertices actually inside the band where there are
+      // any; otherwise the post is only known by its ends, so use them.
+      const inBand = samples.filter((entry) => (
+        entry.height >= options.heightMin && entry.height <= options.heightMax
+      ));
+      for (const entry of (inBand.length > 0 ? inBand : samples)) {
+        if (entry.depth <= options.lateralMargin + options.seamTolerance) continue;
+        if (entry.depth > worstShift) {
+          worstShift = entry.depth;
+          // Push toward the nearer edge. A slab lying across the centreline has
+          // no natural side, and the shorter move disturbs less of the scene.
+          side = entry.lateral === 0 ? 1 : Math.sign(entry.lateral);
+          atDistance = entry.distance;
+          atLateral = entry.lateral;
+        }
       }
       if (worstShift <= 0) continue;
 
