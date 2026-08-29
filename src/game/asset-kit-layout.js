@@ -4,8 +4,12 @@
  * gameplay authority until the final authored environment arrives.
  */
 export const ASSET_KIT_PROP_PLACEMENTS = [
-  { name: "PROP_cable_bundle", distance: 781.239, lateral: -8.5, yaw: -0.5, scale: 1 },
-  { name: "PROP_cable_bundle", distance: 1278.982, lateral: 9, yaw: 0.65, scale: 1 },
+  // These two bundles dress the authored cable-trip coils (HZ_CABLE_1 at
+  // 781.239 m, HZ_CABLE_2 at 1278.982 m) and must track their lateral, or the
+  // dressing points at a piece of road the hazard no longer occupies. P15 moved
+  // both coils off the deck (-8.5 -> -10.2, +9 -> +10.5); these follow.
+  { name: "PROP_cable_bundle", distance: 781.239, lateral: -11.9, yaw: -0.5, scale: 1 },
+  { name: "PROP_cable_bundle", distance: 1278.982, lateral: 11.5, yaw: 0.65, scale: 1 },
 
   { name: "PROP_plant_reeds", distance: 445, lateral: -16, yaw: 0.1, scale: 1.15 },
   { name: "PROP_plant_reeds", distance: 485, lateral: -18, yaw: -0.35, scale: 1.3 },

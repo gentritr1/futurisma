@@ -35,6 +35,33 @@ export function bankedSurfaceLift(rightY, lateral) {
   return rightY * lateral;
 }
 
+/**
+ * P16 — the apron cross-section's contribution to that height. A correctness
+ * fix in its own right, and NOT the fix for the run-off report.
+ *
+ * `bankedSurfaceLift` extrapolates the deck's bank plane at any lateral, which
+ * is right on the deck and incomplete past its edge: `createApronDecks` builds
+ * the run-off in that same banked plane but then displaces it along `up` by the
+ * edge's cross-section — `outerRise`, which is -0.12 m on a gravel shoulder,
+ * +0.14 m on a structure rumble and 0 on open run-off. Presentation never added
+ * that term, so on the shoulder the craft hovered 0.12 m over the drawn gravel
+ * and on the rumble it sank 0.14 m into it.
+ *
+ * That is worth fixing and worth being honest about: at 0.14 m it is nowhere
+ * near the reported symptom, which measured 5.24 m of overshoot past the
+ * visible wall. Shipping this as the answer to that report would have been a
+ * fix aimed at the wrong order of magnitude.
+ *
+ * Zero on the deck, so the P11 clamp probe's pinned pose is untouched.
+ *
+ * @param {number} upY `sample.up.y`, i.e. cos(bank).
+ * @param {number} surfaceHeight `surfaceHeightAtLateral(sample, lateral)`.
+ */
+export function apronSurfaceLift(upY, surfaceHeight) {
+  if (!Number.isFinite(upY) || !Number.isFinite(surfaceHeight)) return 0;
+  return upY * surfaceHeight;
+}
+
 /** @param {number} value @param {number} minimum @param {number} maximum */
 function clamp(value, minimum, maximum) {
   return Math.min(maximum, Math.max(minimum, value));
@@ -82,4 +109,19 @@ export function calculateSpeedStreakLength(
   const speed = Number.isFinite(speedRatio) ? clamp(speedRatio, 0, 1) : 0;
   if (reducedMotion) return 0.45 + speed * 0.55 + (boostActive ? 0.2 : 0);
   return 0.65 + speed * 2.6 + (boostActive ? 1.6 : 0);
+}
+
+/**
+ * The full presentation height offset for a pose on the drivable surface: the
+ * bank plane plus the apron cross-section. Composed here rather than at the call
+ * site because `game.ts` sits on a hard 1,950-line seam budget, and because the
+ * two terms are one answer to one question — where is the drawn surface.
+ *
+ * @param {number} rightY `sample.right.y`.
+ * @param {number} lateral signed metres from the centreline.
+ * @param {number} upY `sample.up.y`.
+ * @param {number} surfaceHeight `surfaceHeightAtLateral(sample, lateral)`.
+ */
+export function presentationSurfaceLift(rightY, lateral, upY, surfaceHeight) {
+  return bankedSurfaceLift(rightY, lateral) + apronSurfaceLift(upY, surfaceHeight);
 }

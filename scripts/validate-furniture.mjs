@@ -45,10 +45,14 @@ import {
  * - FLAT furniture (route lights, guide lights, warning strips, grid chequer,
  *   boost pads) is painted road and is exempt by height. Exempt, but still
  *   enumerated: the exemption is measured here, not assumed.
- * - HAZARDS (steam vents, cable coils and their warning posts) are SUPPOSED to
- *   be on the deck. They are named one by one below with their authored
- *   positions, and the list has a completeness assertion, so a new obstacle
- *   cannot arrive by being quietly added to a hazard mesh.
+ * - HAZARDS (steam vents, cable coils and their warning posts) used to be the
+ *   one exempt class: a whitelist named seven of them and let them stand on the
+ *   racing surface "by design". P15 revoked that. The whitelist is gone, and
+ *   there is no shape left in this file for a replacement — every authored
+ *   hazard with a lateral, on both maps, is measured against its own station's
+ *   half-width like everything else. The check is a named predicate so a
+ *   negative test can drive it, because an assertion nobody has ever seen fail
+ *   is an assertion nobody has evidence for.
  */
 
 const root = new URL("../", import.meta.url);
@@ -449,20 +453,50 @@ for (let distance = 12.5; distance < stations.total_length_m; distance += 25) {
 }
 
 // ---------------------------------------------------------------------------
-// Designed hazards. These stand ON the deck on purpose — that is what makes
-// them hazards — so they are named individually with their authored positions
-// rather than covered by a class rule.
+// Designed hazards.
+//
+// There is no whitelist here any more. Until P15 this file carried a
+// `DECK_HAZARDS` table naming seven hazards that were allowed to stand on the
+// racing surface, and the loop below checked a hazard AGAINST that table rather
+// than against the road. That is the failure mode the whole file exists to
+// prevent, running as a feature: the exemption was the thing being verified, so
+// no measurement of the deck could ever fail for those seven.
+//
+// The rule now has no class of thing outside it. A hazard is measured at its
+// own sampled station — half-widths vary 9.5-12.0 m on Greenwater and
+// 11.0-15.0 m on Bitterpan, so a single constant would be measuring most
+// hazards against the wrong road.
 // ---------------------------------------------------------------------------
 
-const DECK_HAZARDS = {
-  HZ_STEAM_1: { map: "greenwater", lateral: -8, note: "vent base + warning lamp, Hangar Six" },
-  HZ_STEAM_2: { map: "greenwater", lateral: 8.4, note: "P11 moved it out of the drivable clamp; still on deck by design" },
-  HZ_CABLE_1: { map: "greenwater", lateral: -8.5, note: "coil + warning post, outer 3 m of Hangar Six" },
-  HZ_CABLE_2: { map: "greenwater", lateral: 9, note: "coil + warning post, Canopy Passage" },
-  HZ_CABLE_CHICANE: { map: "bitterpan", lateral: -7.6, note: "under the rig stands" },
-  HZ_CABLE_BRINE: { map: "bitterpan", lateral: 8.4, note: "outer hand of the Brine Cut" },
-  HZ_CABLE_UNDERPASS: { map: "bitterpan", lateral: -9.4, note: "underpass approach" },
-};
+/**
+ * The deck predicate for hazards, as a pure function of one record so the
+ * negative test below can run the SAME code over a synthetic hazard pinned back
+ * onto the road. Returns the measurement; `assertHazardOffDeck` turns a failure
+ * into the message.
+ */
+function measureHazardClearance({ lateral, halfWidth }) {
+  const required = halfWidth + DECK_CLEARANCE_METRES;
+  const reach = Math.abs(lateral);
+  return { required, reach, shortfall: required - reach, clears: reach >= required };
+}
+
+function assertHazardOffDeck({ id, map, distance, lateral, halfWidth }) {
+  const { required, reach, shortfall } = measureHazardClearance({ lateral, halfWidth });
+  assert.ok(
+    Number.isFinite(lateral) && Number.isFinite(halfWidth),
+    `${map}/${id} has a non-finite lateral or half-width, so its clearance is `
+      + "NaN and every comparison against it passes silently.",
+  );
+  assert.ok(
+    reach >= required,
+    `${map}/${id} at ${distance} m stands ${reach.toFixed(3)} m from the `
+      + `centreline against a ${halfWidth.toFixed(3)} m half-width. It needs `
+      + `${required.toFixed(3)} m (half-width + ${DECK_CLEARANCE_METRES} m deck `
+      + `clearance) and falls ${shortfall.toFixed(3)} m short, so it is an `
+      + "obstacle standing on the racing surface. Nothing stands on the deck — "
+      + "move it outboard. There is no exemption list to add it to.",
+  );
+}
 
 // The cargo hook is authored as a hazard but is not one: it swings from the
 // hangar ceiling as a cosmetic near-miss and is explicitly `collision: false`.
@@ -485,43 +519,94 @@ const DECK_HAZARDS = {
 const authoredHazards = [
   ...blockout.hazards
     .filter((hazard) => hazard.lateralOffset !== undefined)
-    .map((hazard) => [hazard.id, hazard.lateralOffset, "greenwater", hazard.distance]),
+    .map((hazard) => ({
+      id: hazard.id,
+      map: "greenwater",
+      distance: hazard.distance,
+      lateral: hazard.lateralOffset,
+      halfWidth: greenwaterAt(hazard.distance).halfWidth,
+    })),
   ...production.hazards.entries
     .filter((hazard) => hazard.lateralOffset !== undefined)
-    .map((hazard) => [hazard.id, hazard.lateralOffset, "bitterpan", hazard.distance]),
+    .map((hazard) => ({
+      id: hazard.id,
+      map: "bitterpan",
+      distance: hazard.distance,
+      lateral: hazard.lateralOffset,
+      halfWidth: bitterpanAt(hazard.distance).halfWidth,
+    })),
 ];
 
-for (const [id, lateral, map, distance] of authoredHazards) {
-  const pinned = DECK_HAZARDS[id];
-  const sample = map === "greenwater" ? greenwaterAt(distance) : bitterpanAt(distance);
-  const onDeck = Math.abs(lateral) < sample.halfWidth;
-  assert.ok(
-    pinned,
-    `${map}/${id} places an obstacle at lateral ${lateral} m and is not a pinned `
-      + "deck hazard. Anything with height standing inside the deck has to be a "
-      + "designed hazard named in DECK_HAZARDS, or it is furniture and belongs "
-      + "off the road.",
-  );
-  assert.equal(pinned.map, map, `${id} is pinned against the wrong map.`);
-  assert.equal(
-    pinned.lateral,
-    lateral,
-    `${map}/${id} moved to ${lateral} m; the reviewed position is ${pinned.lateral} m.`,
-  );
-  assert.ok(
-    onDeck,
-    `${map}/${id} is pinned as a deck hazard but now stands at ${lateral} m, `
-      + `outside a ${sample.halfWidth.toFixed(2)} m half-width. Delete its `
-      + "DECK_HAZARDS entry — a stale exemption is how a rule stops binding.",
-  );
+// The sweep is only worth its assertion if it found the hazards. Seven laterals
+// are authored across the two maps; a filter that silently matched none would
+// make the loop below a no-op that reports PASS.
+assert.equal(
+  authoredHazards.length,
+  7,
+  `The hazard sweep collected ${authoredHazards.length} authored laterals, not the `
+    + "7 the two maps author. Either a hazard was added or removed without this "
+    + "count being re-argued, or the filter stopped matching and the deck rule "
+    + "below is asserting nothing.",
+);
+
+let tightestHazard = Number.POSITIVE_INFINITY;
+for (const hazard of authoredHazards) {
+  assertHazardOffDeck(hazard);
+  tightestHazard = Math.min(tightestHazard, -measureHazardClearance(hazard).shortfall);
 }
 
-assert.deepEqual(
-  authoredHazards.map(([id]) => id).sort(),
-  Object.keys(DECK_HAZARDS).sort(),
-  "DECK_HAZARDS names a hazard that is no longer authored, or the maps author "
-    + "one it does not name.",
-);
+// ---------------------------------------------------------------------------
+// Negative test: prove the rule above can fail.
+//
+// The seven authored hazards all pass, so running them proves only that the
+// loop executes — not that the predicate binds. So re-pin one onto the deck
+// IN MEMORY, at the centreline, and assert that the SAME function throws, with
+// a message naming the hazard, its lateral, the half-width it was measured
+// against and the shortfall. The real JSON is never touched: the synthetic
+// record is built from the real half-width of a real station so it is measured
+// against the same road, and thrown away.
+// ---------------------------------------------------------------------------
+
+{
+  const victim = authoredHazards[0];
+  const repinned = { ...victim, id: `${victim.id}__SYNTHETIC_REPIN`, lateral: 0 };
+  const measured = measureHazardClearance(repinned);
+  assert.equal(
+    measured.clears,
+    false,
+    "The synthetic re-pin at lateral 0 was measured as clearing the deck, so the "
+      + "negative test is not testing anything.",
+  );
+  assert.throws(
+    () => assertHazardOffDeck(repinned),
+    (error) => {
+      assert.ok(error instanceof assert.AssertionError, "The deck rule threw the wrong error type.");
+      const message = String(error.message);
+      for (const fragment of [
+        repinned.id,
+        "0.000 m from the centreline",
+        `${victim.halfWidth.toFixed(3)} m half-width`,
+        `falls ${measured.shortfall.toFixed(3)} m short`,
+      ]) {
+        assert.ok(
+          message.includes(fragment),
+          `The deck-rule failure message does not name "${fragment}". A failure `
+            + "nobody can read is a failure nobody acts on. Got: " + message,
+        );
+      }
+      return true;
+    },
+    "A hazard re-pinned onto the centreline did NOT fail the deck rule. The rule "
+      + "cannot fail, so it has never proved anything about the seven that pass.",
+  );
+  // And the failure has to come from the re-pin, not from the record shape:
+  // the untouched original must still pass through the same function.
+  assert.doesNotThrow(
+    () => assertHazardOffDeck(victim),
+    `${victim.map}/${victim.id} fails the deck rule unchanged, so the negative `
+      + "test above proved nothing about the re-pin.",
+  );
+}
 
 // ---------------------------------------------------------------------------
 // The rule.
@@ -759,8 +844,10 @@ console.log(
     + `${tightestGate.toFixed(3)} m) or sits above the `
     + `${PLAQUE_BAND_BOTTOM_METRES} m plaque band. ${wallPlaques} hangar `
     + `placements resolve as wall plaques, dropping 7 posts and 6 deck-level `
-    + `approach arrows; ${Object.keys(DECK_HAZARDS).length} designed hazards are `
-    + `pinned on the deck by id; ${signageChecked} P12 boards re-checked against `
+    + `approach arrows; ${authoredHazards.length} authored hazards measured off `
+    + `the deck with no exemption list (tightest ${tightestHazard.toFixed(3)} m `
+    + `spare), the rule proved failable by a synthetic re-pin at lateral 0; `
+    + `${signageChecked} P12 boards re-checked against `
     + `the same deck predicate. P15: ${backingPanels} plaque backings `
     + `(${backingCounts.chevron} chevron + ${backingCounts.board} board) derived `
     + `from those same wall placements, measured not exempted — every lower edge `

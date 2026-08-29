@@ -2,10 +2,13 @@
   "format": "FUTURISMA_MAP02_BITTERPAN_PRODUCTION",
   "version": "1.0",
   "phase": "P8",
-  "map": { "id": "bitterpan", "name": "Bitterpan Works", "code": "MAP 02" },
+  "map": {
+    "id": "bitterpan",
+    "name": "Bitterpan Works",
+    "code": "MAP 02"
+  },
   "note": "P8 authoring sidecar. The accepted v0.2a.1 route and v0.2b.2 massing payloads are hash-pinned by scripts/validate-map02.mjs and are never edited; everything P8 authors lives here. Distances are metres along the accepted 3050 m centreline. Lateral is the RUNTIME basis (tangent x up): positive is right, negative is left. The accepted massing payload uses the opposite +X station normal, so an authored placement at side +1 sits on the runtime LEFT.",
   "sentence": "Greenwater is humid enclosure; Bitterpan is exposed emptiness at speed.",
-
   "apron": {
     "note": "Bitterpan's own edge table, same schema as the Greenwater P1 apron block so apron.js resolves both without a branch. C is the pan itself: the widest run-off on either map, because the whole design promise is that leaving the line out here costs time rather than the race.",
     "deckMarginMetres": 2.05,
@@ -44,10 +47,12 @@
     },
     "overrides": []
   },
-
   "edges": {
     "note": "Per-station edge types, authored as spans over a C default. Every station outside a span resolves C on both sides: 524 of 610 stations (86%) are open pan, which is the sector identity stated as a number. A span is only authored where the accepted massing actually closes on the deck, measured as clear_of_boundary_m in MASSING_PLACEMENTS.json.",
-    "default": { "edgeLeft": "C", "edgeRight": "C" },
+    "default": {
+      "edgeLeft": "C",
+      "edgeRight": "C"
+    },
     "spans": [
       {
         "id": "EDGE_HARVESTER_CHICANE",
@@ -78,7 +83,6 @@
       }
     ]
   },
-
   "hazards": {
     "note": "Sparser than Greenwater by design: no steam, no fog bank, no cosmetic hook. Six entries over a 3050 m lap against Greenwater's seven over 2516 m. Salt drift is the map's own hazard language - it is already in the accepted massing as the WIND_salt_drift family, banked by a steady 292-degree wind, so the low-grip patches sit where the accepted payload already says salt collects.",
     "gripRecoverySeconds": 0.8,
@@ -117,29 +121,28 @@
         "id": "HZ_CABLE_CHICANE",
         "type": "cable_coil",
         "distance": 2465,
-        "lateralOffset": -7.6,
+        "lateralOffset": -13.6,
         "effect": "hard_trip",
-        "note": "under the rig stands, outside the chicane line"
+        "note": "P16: -11.8 -> -13.6 m, from the corridor sweep's measured mesh inner extent rather than the authored centre."
       },
       {
         "id": "HZ_CABLE_BRINE",
         "type": "cable_coil",
         "distance": 2860,
-        "lateralOffset": 8.4,
+        "lateralOffset": 14.4,
         "effect": "hard_trip",
-        "note": "outer hand of the Brine Cut, opposite the drift"
+        "note": "P16: 12.8 -> 14.4 m, from the corridor sweep's measured mesh inner extent rather than the authored centre."
       },
       {
         "id": "HZ_CABLE_UNDERPASS",
         "type": "cable_coil",
         "distance": 3020,
-        "lateralOffset": -9.4,
+        "lateralOffset": -15.5,
         "effect": "hard_trip",
-        "note": "loose conveyor cable at the underpass support"
+        "note": "P16: -13.7 -> -15.5 m, from the corridor sweep's measured mesh inner extent rather than the authored centre."
       }
     ]
   },
-
   "boostPads": {
     "note": "Four pads, all on the two authored straights - Q1 THE LONG PAN and L1 RETURN LEG. Bitterpan rewards commitment on the long stuff, so nothing is offered in a bend. Sides alternate so a pad is a line choice rather than a lane to sit in. Every pad clears its nearest checkpoint by at least 105 m and its nearest neighbour by at least 240 m.",
     "halfLengthMetres": 10,
@@ -147,36 +150,162 @@
     "minimumSpacingMetres": 40,
     "minimumCheckpointClearanceMetres": 60,
     "pads": [
-      { "id": "BP_LONG_PAN_EARLY", "distance": 150, "sequence": "Q1", "lateralFraction": 0.45 },
-      { "id": "BP_LONG_PAN_LATE", "distance": 640, "sequence": "Q1", "lateralFraction": -0.45 },
-      { "id": "BP_RETURN_LEG_EARLY", "distance": 1660, "sequence": "L1", "lateralFraction": 0.45 },
-      { "id": "BP_RETURN_LEG_LATE", "distance": 1900, "sequence": "L1", "lateralFraction": -0.45 }
+      {
+        "id": "BP_LONG_PAN_EARLY",
+        "distance": 150,
+        "sequence": "Q1",
+        "lateralFraction": 0.45
+      },
+      {
+        "id": "BP_LONG_PAN_LATE",
+        "distance": 640,
+        "sequence": "Q1",
+        "lateralFraction": -0.45
+      },
+      {
+        "id": "BP_RETURN_LEG_EARLY",
+        "distance": 1660,
+        "sequence": "L1",
+        "lateralFraction": 0.45
+      },
+      {
+        "id": "BP_RETURN_LEG_LATE",
+        "distance": 1900,
+        "sequence": "L1",
+        "lateralFraction": -0.45
+      }
     ]
   },
-
   "music": {
     "note": "Same 174 BPM / F-minor / 4-stem 0-3 schema as Greenwater. Ten triggers, one per authored sequence boundary, so the score is cut by the route rather than by round numbers. Trance leads the two long straights and drops away through the chicane; techstep takes over under the conveyor. Every trigger differs from the one before it, including across the lap wrap, so a 5-lap race crosses fifty boundaries.",
     "bpm": 174,
     "quantize": "bar",
     "crossfadeBars": 1,
-    "stems": ["trance", "jungle", "deep_dnb", "techstep"],
+    "stems": [
+      "trance",
+      "jungle",
+      "deep_dnb",
+      "techstep"
+    ],
     "levelScale": "0-3",
-    "boostEffect": { "type": "filter_open_and_high_shelf", "newLayer": false },
+    "boostEffect": {
+      "type": "filter_open_and_high_shelf",
+      "newLayer": false
+    },
     "gateRetrigger": true,
     "triggers": [
-      { "distance": 0, "sequence": "L0", "sector": "S3", "levels": { "trance": 2, "jungle": 0, "deep_dnb": 2, "techstep": 1 } },
-      { "distance": 60, "sequence": "Q1", "sector": "S1", "levels": { "trance": 3, "jungle": 0, "deep_dnb": 2, "techstep": 0 } },
-      { "distance": 723.6215642663627, "sequence": "T1", "sector": "S1", "levels": { "trance": 3, "jungle": 1, "deep_dnb": 2, "techstep": 1 } },
-      { "distance": 965.9052245725055, "sequence": "Q2", "sector": "S1", "levels": { "trance": 3, "jungle": 1, "deep_dnb": 3, "techstep": 1 } },
-      { "distance": 1607.0290626083156, "sequence": "L1", "sector": "S2", "levels": { "trance": 3, "jungle": 0, "deep_dnb": 3, "techstep": 0 } },
-      { "distance": 2145.398521474069, "sequence": "T2", "sector": "S2", "levels": { "trance": 2, "jungle": 2, "deep_dnb": 3, "techstep": 1 } },
-      { "distance": 2407.4152260949204, "sequence": "Q3", "sector": "S2", "levels": { "trance": 1, "jungle": 3, "deep_dnb": 2, "techstep": 2 } },
-      { "distance": 2548.266742301019, "sequence": "T3", "sector": "S3", "levels": { "trance": 2, "jungle": 2, "deep_dnb": 2, "techstep": 2 } },
-      { "distance": 2722.412748609303, "sequence": "Q4", "sector": "S3", "levels": { "trance": 2, "jungle": 1, "deep_dnb": 3, "techstep": 2 } },
-      { "distance": 3006, "sequence": "Q5", "sector": "S3", "levels": { "trance": 1, "jungle": 1, "deep_dnb": 2, "techstep": 3 } }
+      {
+        "distance": 0,
+        "sequence": "L0",
+        "sector": "S3",
+        "levels": {
+          "trance": 2,
+          "jungle": 0,
+          "deep_dnb": 2,
+          "techstep": 1
+        }
+      },
+      {
+        "distance": 60,
+        "sequence": "Q1",
+        "sector": "S1",
+        "levels": {
+          "trance": 3,
+          "jungle": 0,
+          "deep_dnb": 2,
+          "techstep": 0
+        }
+      },
+      {
+        "distance": 723.6215642663627,
+        "sequence": "T1",
+        "sector": "S1",
+        "levels": {
+          "trance": 3,
+          "jungle": 1,
+          "deep_dnb": 2,
+          "techstep": 1
+        }
+      },
+      {
+        "distance": 965.9052245725055,
+        "sequence": "Q2",
+        "sector": "S1",
+        "levels": {
+          "trance": 3,
+          "jungle": 1,
+          "deep_dnb": 3,
+          "techstep": 1
+        }
+      },
+      {
+        "distance": 1607.0290626083156,
+        "sequence": "L1",
+        "sector": "S2",
+        "levels": {
+          "trance": 3,
+          "jungle": 0,
+          "deep_dnb": 3,
+          "techstep": 0
+        }
+      },
+      {
+        "distance": 2145.398521474069,
+        "sequence": "T2",
+        "sector": "S2",
+        "levels": {
+          "trance": 2,
+          "jungle": 2,
+          "deep_dnb": 3,
+          "techstep": 1
+        }
+      },
+      {
+        "distance": 2407.4152260949204,
+        "sequence": "Q3",
+        "sector": "S2",
+        "levels": {
+          "trance": 1,
+          "jungle": 3,
+          "deep_dnb": 2,
+          "techstep": 2
+        }
+      },
+      {
+        "distance": 2548.266742301019,
+        "sequence": "T3",
+        "sector": "S3",
+        "levels": {
+          "trance": 2,
+          "jungle": 2,
+          "deep_dnb": 2,
+          "techstep": 2
+        }
+      },
+      {
+        "distance": 2722.412748609303,
+        "sequence": "Q4",
+        "sector": "S3",
+        "levels": {
+          "trance": 2,
+          "jungle": 1,
+          "deep_dnb": 3,
+          "techstep": 2
+        }
+      },
+      {
+        "distance": 3006,
+        "sequence": "Q5",
+        "sector": "S3",
+        "levels": {
+          "trance": 1,
+          "jungle": 1,
+          "deep_dnb": 2,
+          "techstep": 3
+        }
+      }
     ]
   },
-
   "audio": {
     "note": "One authored room on a map whose whole subject is exposure. The accepted massing is explicit that OCC2_conveyor_span is 'the only element over the drivable corridor'; every other S3 structure stands 18 m or more clear of the recovery boundary. So the zone covers the covered corridor - the loadout approach where the trestles converge, then the span itself - and stops there. The profile is deliberately milder than Greenwater's hangar: a trestle soffit with open sides is a slapback, not a sealed shed.",
     "zones": [
@@ -184,14 +313,19 @@
         "name": "underpass",
         "startDistance": 2965,
         "endDistance": 3050,
-        "sequences": ["L3", "Q5"],
+        "sequences": [
+          "L3",
+          "Q5"
+        ],
         "note": "L3 LOADOUT APPROACH plus Q5 CONVEYOR UNDERPASS; the soffit closes the sky at 15.5 m over the last 40 m."
       },
       {
         "name": "underpass",
         "startDistance": 0,
         "endDistance": 40,
-        "sequences": ["L0"],
+        "sequences": [
+          "L0"
+        ],
         "note": "Same room continued across the lap wrap - the 3046 m support stands 4 m behind the start line, so the apron is still inside the structure."
       }
     ],
@@ -199,10 +333,13 @@
     "quantize": "bar",
     "crossfadeSeconds": 0.6,
     "profiles": {
-      "underpass": { "decaySeconds": 1.05, "wet": 0.2, "highPassHz": 150 }
+      "underpass": {
+        "decaySeconds": 1.05,
+        "wet": 0.2,
+        "highPassHz": 150
+      }
     }
   },
-
   "lighting": {
     "note": "Three sector profiles, one per accepted sector. The accepted post-readability-repair palettes are carried over unchanged - P8 adds the authored key direction and the lap ramp, it does not re-grade a look that was already accepted. The sun is high and hard because a salt pan at noon has no soft light in it: elevation falls 74 -> 69 -> 63 degrees and the azimuth swings 20 -> 38 -> 56 degrees around the lap, so the shadow direction turns visibly across the three basins and wraps back over the start line.",
     "crossfadeMetres": 90,
@@ -220,8 +357,15 @@
         "rimIntensity": 0.7,
         "keyElevationDegrees": 74,
         "keyAzimuthDegrees": 20,
-        "keyDirection": { "x": 0.259012, "y": 0.961262, "z": -0.094273 },
-        "fog": { "density": 0.00072, "color": "#c7b997" }
+        "keyDirection": {
+          "x": 0.259012,
+          "y": 0.961262,
+          "z": -0.094273
+        },
+        "fog": {
+          "density": 0.00072,
+          "color": "#c7b997"
+        }
       },
       {
         "sector": "S2",
@@ -236,8 +380,15 @@
         "rimIntensity": 0.55,
         "keyElevationDegrees": 69,
         "keyAzimuthDegrees": 38,
-        "keyDirection": { "x": 0.282398, "y": 0.93358, "z": -0.220633 },
-        "fog": { "density": 0.00048, "color": "#d5cfb9" }
+        "keyDirection": {
+          "x": 0.282398,
+          "y": 0.93358,
+          "z": -0.220633
+        },
+        "fog": {
+          "density": 0.00048,
+          "color": "#d5cfb9"
+        }
       },
       {
         "sector": "S3",
@@ -252,12 +403,18 @@
         "rimIntensity": 0.8,
         "keyElevationDegrees": 63,
         "keyAzimuthDegrees": 56,
-        "keyDirection": { "x": 0.253868, "y": 0.891007, "z": -0.376372 },
-        "fog": { "density": 0.00082, "color": "#aeb8b2" }
+        "keyDirection": {
+          "x": 0.253868,
+          "y": 0.891007,
+          "z": -0.376372
+        },
+        "fog": {
+          "density": 0.00082,
+          "color": "#aeb8b2"
+        }
       }
     ]
   },
-
   "timeOfDay": {
     "note": "Same multiplicative 5-stop model as Greenwater, tuned harder. Greenwater drifts to a soft dusk under a canopy; Bitterpan has nothing between the pan and the sky, so the ramp runs further into amber (blue falls to 0.50 against Greenwater's 0.615) and the hemisphere drops further (0.70 against 0.74). Stop 0 is the identity stop, so reduced motion and the menu both collapse to the accepted noon look with no drift at all.",
     "model": "multiplicative",
@@ -274,56 +431,135 @@
       {
         "lapProgress": 0,
         "label": "HARD_NOON",
-        "keyTint": [1, 1, 1],
-        "skyTint": [1, 1, 1],
-        "groundTint": [1, 1, 1],
-        "fogTint": [1, 1, 1],
+        "keyTint": [
+          1,
+          1,
+          1
+        ],
+        "skyTint": [
+          1,
+          1,
+          1
+        ],
+        "groundTint": [
+          1,
+          1,
+          1
+        ],
+        "fogTint": [
+          1,
+          1,
+          1
+        ],
         "hemisphereScale": 1,
         "keyScale": 1
       },
       {
         "lapProgress": 0.25,
         "label": "PAN_GLARE",
-        "keyTint": [1.03, 0.995, 0.945],
-        "skyTint": [1.015, 0.995, 0.955],
-        "groundTint": [1.015, 0.99, 0.955],
-        "fogTint": [1.005, 0.99, 0.955],
+        "keyTint": [
+          1.03,
+          0.995,
+          0.945
+        ],
+        "skyTint": [
+          1.015,
+          0.995,
+          0.955
+        ],
+        "groundTint": [
+          1.015,
+          0.99,
+          0.955
+        ],
+        "fogTint": [
+          1.005,
+          0.99,
+          0.955
+        ],
         "hemisphereScale": 0.985,
         "keyScale": 1
       },
       {
         "lapProgress": 0.5,
         "label": "LONG_LIGHT",
-        "keyTint": [1.06, 0.935, 0.815],
-        "skyTint": [1.03, 0.945, 0.86],
-        "groundTint": [1.01, 0.935, 0.86],
-        "fogTint": [0.99, 0.925, 0.86],
+        "keyTint": [
+          1.06,
+          0.935,
+          0.815
+        ],
+        "skyTint": [
+          1.03,
+          0.945,
+          0.86
+        ],
+        "groundTint": [
+          1.01,
+          0.935,
+          0.86
+        ],
+        "fogTint": [
+          0.99,
+          0.925,
+          0.86
+        ],
         "hemisphereScale": 0.92,
         "keyScale": 0.95
       },
       {
         "lapProgress": 0.75,
         "label": "AMBER_PAN",
-        "keyTint": [1.08, 0.86, 0.665],
-        "skyTint": [1.02, 0.875, 0.755],
-        "groundTint": [0.955, 0.86, 0.755],
-        "fogTint": [0.945, 0.845, 0.75],
+        "keyTint": [
+          1.08,
+          0.86,
+          0.665
+        ],
+        "skyTint": [
+          1.02,
+          0.875,
+          0.755
+        ],
+        "groundTint": [
+          0.955,
+          0.86,
+          0.755
+        ],
+        "fogTint": [
+          0.945,
+          0.845,
+          0.75
+        ],
         "hemisphereScale": 0.83,
         "keyScale": 0.85
       },
       {
         "lapProgress": 1,
         "label": "HARSH_EVENING",
-        "keyTint": [1.09, 0.745, 0.5],
-        "skyTint": [0.93, 0.765, 0.635],
-        "groundTint": [0.845, 0.71, 0.61],
-        "fogTint": [0.855, 0.73, 0.645],
+        "keyTint": [
+          1.09,
+          0.745,
+          0.5
+        ],
+        "skyTint": [
+          0.93,
+          0.765,
+          0.635
+        ],
+        "groundTint": [
+          0.845,
+          0.71,
+          0.61
+        ],
+        "fogTint": [
+          0.855,
+          0.73,
+          0.645
+        ],
         "hemisphereScale": 0.7,
         "keyScale": 0.68
       }
     ]
   },
-
   "lapBoard": {
     "note": "Hung under the accepted OCC2_conveyor_span soffit at 3028 m, lateral 0 - the one authored element already over the drivable corridor, and the last thing read before the line. No new massing is introduced; the board is a signage plane on structure the accepted payload already places there.",
     "template": "LAP {current}/{total}",
@@ -337,7 +573,6 @@
     "background": "#141210",
     "anchor": "OCC2_conveyor_span"
   },
-
   "culling": {
     "note": "No cull distance is authored anywhere in the accepted Map 02 payload, so it is derived from each primitive's own bounding sphere at load. The accepted GLBs merge geometry by family across the whole 589 x 1214 m site, so most primitives carry 400-800 m radii and only the frustum test can move them; this is recorded here so a later art pass that splits the massing spatially knows the derivation is the thing to replace.",
     "baseDistanceMetres": 900,

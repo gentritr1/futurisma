@@ -176,12 +176,14 @@ Build the environment around the exact twelve sector ranges in the map JSON:
 Preserve clear, readable space around these functional hazards:
 
 - Standing water: 432.271–586.519 m, left third of surface.
-- Steam vents: 674.519 m at -8 m lateral and 736.115 m at +7 m lateral.
-- Cable coils: 781.239 m at -8.5 m lateral and 1,278.982 m at +9 m lateral.
+- Steam vents: 674.519 m at -10.2 m lateral and 736.115 m at +10.2 m lateral.
+- Cable coils: 781.239 m at -10.2 m lateral and 1,278.982 m at +10.5 m lateral.
 - Dense fog bank: 1,391.152–1,451.152 m.
 - Cosmetic cargo hook: 724.115 m; it must remain non-colliding.
 
-Art may improve the visual telegraph but must not change the hazard footprint or block the clean racing line.
+Every vent and coil lateral above is authored OUTSIDE the deck: as of P15 nothing with height stands on the racing surface, so each one clears its own station half-width by at least `DECK_CLEARANCE_METRES` (0.5 m). `scripts/validate-furniture.mjs` asserts that on both maps and there is no exemption list to add to.
+
+Art may improve the visual telegraph but must not change the hazard footprint, pull a hazard back onto the deck, or block the clean racing line.
 
 ## 8. Runtime budgets
 

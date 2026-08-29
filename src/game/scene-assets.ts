@@ -3,15 +3,65 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { ASSET_KIT_PROP_PLACEMENTS } from "./asset-kit-layout";
 import type { BitterpanSurface } from "./bitterpan-surface";
+import type { CorridorSweepResult } from "./corridor-sweep";
+import type {
+  CourseRelocationStats,
+  CourseReprojectionStats,
+} from "./course-repair";
 import { type RaceCourse } from "./course";
 import type { RaceEnvironment } from "./environment";
 import { disposeObject3DResources } from "./graphics-resources";
 import type { LivingWorld, LivingWorldTextures } from "./living-world";
 import type { GreenwaterOpeningSurface } from "./opening-surface";
 import type { HangarPlaqueBacking } from "./plaque-backing";
+import { probeSelected, searchFlag } from "./query-probes";
 import type { TracksideSignage } from "./signage";
 import type { GreenwaterSurfaceCharacter } from "./surface-character";
 import { applyPs2MaterialTreatment } from "./totem";
+
+/**
+ * P16 — scene roots the corridor sweep does not treat as scenery.
+ *
+ * Filled from the sweep's own first run: these are the objects that legitimately
+ * occupy the driving volume. Named roots rather than a class test, so anything
+ * new that appears in the corridor shows up in the report instead of being
+ * quietly absorbed by a category.
+ */
+const CORRIDOR_SWEEP_EXCLUDED_NAMES: ReadonlySet<string> = new Set([
+  "totem_vehicle_root",
+  "totem_rival_fleet",
+  // The living-world card layer is drifting atmosphere, not scenery, and its
+  // position at any single frame is one sample of an animation rather than a
+  // placement. Measured, not assumed: `GW_LIVING_AIR_B` reported lateral -11.104
+  // on one sweep and -8.036 on another at the same 72.25 m. A sweep that fires
+  // once cannot say anything useful about geometry that moves every frame, and
+  // a transparent scud card is not something the craft drives into.
+  "GW_LIVING_RUNTIME",
+]);
+
+/**
+ * The "not swept" reading, declared here rather than imported so that
+ * `corridor-sweep.ts` stays entirely out of the initial bundle. `ran: false` is
+ * the load-bearing field: every zero below means "no measurement", never "clean".
+ */
+const CORRIDOR_SWEEP_NOT_RUN: CorridorSweepResult = Object.freeze({
+  ran: false,
+  map: "",
+  meshesSwept: 0,
+  instancesSwept: 0,
+  verticesSwept: 0,
+  verticesTested: 0,
+  skippedMeshes: 0,
+  intrusions: 0,
+  flush: 0,
+  overhead: 0,
+  boundary: 0,
+  vfx: 0,
+  hiddenIntrusions: 0,
+  list: Object.freeze([]) as CorridorSweepResult["list"],
+  spans: Object.freeze([]) as CorridorSweepResult["spans"],
+  elapsedMs: 0,
+});
 
 const ASSET_KIT_MODEL_URL = "/assets/totem/models/futurisma_asset_kit.glb";
 const ENVIRONMENT_MODEL_URL = "/assets/greenwater/models/greenwater_environment_runtime.glb";
@@ -195,6 +245,8 @@ export class SceneAssets {
   private surfaceCharacterLoadMs: number | null = null;
   private surfaceCharacterReady = false;
   private surfaceCharacterError: string | null = null;
+  private surfaceCharacterReprojection: CourseReprojectionStats | null = null;
+  private corridorRelocation: CourseRelocationStats | null = null;
 
   constructor(
     private readonly scene: THREE.Scene,
@@ -219,6 +271,7 @@ export class SceneAssets {
           return;
         }
         this.authoredEnvironment = environment;
+        await this.clearCorridorObstacles(environment.root);
         this.scene.add(environment.root);
         this.environmentReady = true;
         this.requestRender();
@@ -247,6 +300,7 @@ export class SceneAssets {
         return;
       }
       this.authoredEnvironment = environment;
+      await this.clearCorridorObstacles(environment.root);
       setProceduralEnvironmentVisible(this.course.group, false);
       environment.updateVisibility(this.camera);
       this.scene.add(environment.root);
@@ -306,6 +360,35 @@ export class SceneAssets {
     }
   }
 
+  /**
+   * P16 task 3 — moves environment geometry off the racing surface, at load.
+   *
+   * Both objects the player reported at Hangar Six are baked into
+   * `greenwater_environment_runtime.glb`: a concrete box at 639.9 m / lateral
+   * -3.11 m standing 1.24-1.58 m tall, and a low slab at 702.2 m / lateral
+   * +0.31 m — dead centre of the road, on gate 03. The GLB's sha256 is pinned by
+   * `validate-assets.mjs` and its contract is accepted, so the repair happens at
+   * runtime rather than in a re-bake, exactly as `relocateHangarSixEdgeBarriers`
+   * already does for the hangar edge barriers.
+   *
+   * Runs BEFORE `scene.add`, so no frame ever shows the unrepaired placement.
+   */
+  private async clearCorridorObstacles(root: THREE.Object3D): Promise<void> {
+    const {
+      relocateCorridorObstacles,
+      OBSTACLE_LATERAL_MARGIN_METRES,
+      OBSTACLE_HEIGHT_MIN_METRES,
+      OBSTACLE_HEIGHT_MAX_METRES,
+      OBSTACLE_SEAM_TOLERANCE_METRES,
+    } = await import("./course-repair");
+    this.corridorRelocation = relocateCorridorObstacles(root, this.course, {
+      lateralMargin: OBSTACLE_LATERAL_MARGIN_METRES,
+      heightMin: OBSTACLE_HEIGHT_MIN_METRES,
+      heightMax: OBSTACLE_HEIGHT_MAX_METRES,
+      seamTolerance: OBSTACLE_SEAM_TOLERANCE_METRES,
+    });
+  }
+
   private async loadSurfaceCharacter(): Promise<void> {
     const loadStartedAt = performance.now();
     try {
@@ -317,6 +400,15 @@ export class SceneAssets {
         disposeObject3DResources(surfaceCharacter.root);
         return;
       }
+      // P16 — re-seat the paint onto the banked deck before it is shown. The
+      // sheet is authored flat, so on the 12-degree Greenwater Sweep it hung
+      // 1.8 m off the road it is printed on; the corridor sweep read that as 31
+      // separate obstacles. See `reprojectOntoBankedDeck`.
+      const { reprojectOntoBankedDeck } = await import("./course-repair");
+      this.surfaceCharacterReprojection = reprojectOntoBankedDeck(
+        surfaceCharacter.root,
+        this.course,
+      );
       this.surfaceCharacter = surfaceCharacter;
       this.scene.add(surfaceCharacter.root);
       this.surfaceCharacterReady = true;
@@ -486,7 +578,109 @@ export class SceneAssets {
     };
   }
 
+  /**
+   * P16 — the corridor sweep runs from here, once, when the scene stops growing.
+   *
+   * It needs three things at the same moment: the whole scene graph, the course,
+   * and every async load already in it. `SceneAssets` holds the first two and is
+   * the last thing to finish adding to the third, but its loads are independent
+   * promises and the craft and rival field are added by the race loop, so there
+   * is no single "everything is in" callback to hang this on. Rather than invent
+   * one (and spend `game.ts` lines it does not have), the sweep waits for the
+   * graph itself to settle: two consecutive diagnostics reports — one second
+   * apart — with an identical descendant count, and the environment ready.
+   *
+   * That is a real readiness signal rather than a timer, and it self-reports:
+   * `corridorSweepRan` stays false if it never fired, so an empty intrusion list
+   * can never be mistaken for a clean one.
+   *
+   * The module is imported DYNAMICALLY and only once the probe is armed. It was
+   * a static import first, and that put ~90 KiB of sweep and grid code into the
+   * initial bundle for every player who will never run it — enough to fail the
+   * 950 KiB initial-JavaScript budget in `validate-performance.mjs` at
+   * 1,038 KiB. A diagnostics instrument must not cost the shipped download.
+   */
+  private corridorSweep: CorridorSweepResult = CORRIDOR_SWEEP_NOT_RUN;
+
+  private corridorSweepModule: typeof import("./corridor-sweep") | null = null;
+
+  private corridorSweepRequested = false;
+
+  private corridorSweepPreviousCount = -1;
+
+  private maybeRunCorridorSweep(): void {
+    if (this.corridorSweep.ran || !probeSelected("corridor-sweep")) return;
+    if (!this.environmentReady) return;
+    if (!this.corridorSweepModule) {
+      if (this.corridorSweepRequested) return;
+      this.corridorSweepRequested = true;
+      void import("./corridor-sweep").then((module) => {
+        if (!this.isDisposed()) this.corridorSweepModule = module;
+      });
+      return;
+    }
+    let count = 0;
+    this.scene.traverse(() => {
+      count += 1;
+    });
+    if (count !== this.corridorSweepPreviousCount) {
+      this.corridorSweepPreviousCount = count;
+      return;
+    }
+    this.corridorSweep = this.corridorSweepModule.sweepCorridor(
+      this.scene,
+      this.course,
+      {
+        // The craft and the rival field hover 0.89-1.31 m over the deck by
+        // design. Excluded by identity, not by name, so a renamed mesh cannot
+        // silently re-enter the report.
+        exclude: this.corridorSweepExclusions(),
+        // `?spans=1` adds the per-span tall-geometry table. Only
+        // `scripts/derive-drivable-limits.mjs` asks for it — it is ~250 rows a
+        // map, which does not belong in a once-a-second diagnostics line.
+        collectSpans: searchFlag("spans"),
+      },
+    );
+  }
+
+  /**
+   * Everything in the scene that is allowed in the corridor because it is not
+   * scenery: the player craft, the rival field, and the effect systems that draw
+   * over the deck (sparks, spray, the shadow blob).
+   */
+  private corridorSweepExclusions(): THREE.Object3D[] {
+    const excluded: THREE.Object3D[] = [];
+    for (const child of this.scene.children) {
+      if (CORRIDOR_SWEEP_EXCLUDED_NAMES.has(child.name)) excluded.push(child);
+    }
+    return excluded;
+  }
+
+  corridorSweepDiagnostics() {
+    const sweep = this.corridorSweep;
+    return {
+      corridorSweepRan: sweep.ran,
+      corridorIntrusions: sweep.intrusions,
+      corridorFlush: sweep.flush,
+      corridorOverhead: sweep.overhead,
+      corridorBoundary: sweep.boundary,
+      corridorVfx: sweep.vfx,
+      corridorHiddenIntrusions: sweep.hiddenIntrusions,
+      corridorSweepMeshes: sweep.meshesSwept,
+      corridorSweepInstances: sweep.instancesSwept,
+      corridorSweepVertices: sweep.verticesSwept,
+      corridorSweepVerticesTested: sweep.verticesTested,
+      corridorSweepMs: sweep.elapsedMs,
+      corridorIntrusionList: sweep.list,
+      corridorSpans: sweep.spans,
+      corridorRelocated: this.corridorRelocation?.relocated ?? 0,
+      corridorRelocationMaxShift: this.corridorRelocation?.maxShiftMetres ?? 0,
+      corridorRelocationList: this.corridorRelocation?.moved ?? [],
+    };
+  }
+
   environmentDiagnostics() {
+    this.maybeRunCorridorSweep();
     const stats = this.authoredEnvironment?.stats;
     return {
       environmentLoadMs: this.environmentLoadMs === null
@@ -503,6 +697,7 @@ export class SceneAssets {
       environmentShaderModel: stats?.shaderModel ?? null,
       environmentSignageSource: stats?.signageSource ?? null,
       environmentContractDrift: stats?.contractDrift ?? [],
+      ...this.corridorSweepDiagnostics(),
       ...this.artPassDiagnostics(),
     };
   }
@@ -597,6 +792,9 @@ export class SceneAssets {
         ? null
         : Number(this.surfaceCharacterLoadMs.toFixed(1)),
       surfaceCharacterReady: this.surfaceCharacterReady,
+      surfaceCharacterReseated: this.surfaceCharacterReprojection?.moved ?? 0,
+      surfaceCharacterMaxLiftFix: this.surfaceCharacterReprojection
+        ?.maxCorrectionMetres ?? 0,
       surfaceCharacterError: this.surfaceCharacterError,
       surfaceCharacterDrawCalls: stats?.drawCalls ?? 0,
       surfaceCharacterMeshes: stats?.meshes ?? 0,

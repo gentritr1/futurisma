@@ -5,6 +5,7 @@ import { parseGlb } from "./lib/greenwater-package-validator.mjs";
 import { resolveApron, resolveApronProfile } from "../src/game/apron.js";
 import { AUDIO_ZONE_PROFILES, resolveAudioZone } from "../src/game/audio-space.js";
 import { isCircularHazardContact } from "../src/game/race-rules.js";
+import { DECK_CLEARANCE_METRES } from "../src/game/furniture-placement.js";
 
 const expectedHashes = {
   "../public/assets/map02/models/bitterpan_blockout.glb":
@@ -391,16 +392,28 @@ for (const hazard of gripHazards) {
 }
 for (const hazard of cableHazards) {
   const halfWidth = halfWidthAt(hazard.distance);
-  // 3.1 m is the lateral contact radius isCircularHazardContact applies.
+  // P15: the coil body stands OFF the deck. This check used to read
+  // `|lateral| + 3.1 <= halfWidth` — it required the coil's whole contact disc
+  // to fit inside the racing surface, which is the on-deck exemption written as
+  // geometry. The owner revoked that exemption, so the coil now has to clear
+  // the deck like any other object with height. `validate-furniture.mjs` owns
+  // the deck rule itself; what is asserted here is that this file's own numbers
+  // agree with it rather than pulling the other way.
   assert.ok(
-    Math.abs(hazard.lateralOffset) + 3.1 <= halfWidth,
-    `Cable coil ${hazard.id} at lateral ${hazard.lateralOffset} m reaches outside `
-      + `the ${halfWidth.toFixed(2)} m half-width.`,
+    Math.abs(hazard.lateralOffset) >= halfWidth + DECK_CLEARANCE_METRES,
+    `Cable coil ${hazard.id} at lateral ${hazard.lateralOffset} m stands inside `
+      + `the ${halfWidth.toFixed(2)} m half-width + ${DECK_CLEARANCE_METRES} m deck `
+      + "clearance. Nothing with height stands on the racing surface.",
   );
-  // ...and it has to be off the racing line, or it is a roadblock.
+  // ...and its contact disc still has to touch the drivable ribbon, or the
+  // hazard costs nothing and is decoration pretending to be risk. 3.1 m is the
+  // lateral contact radius isCircularHazardContact applies.
   assert.ok(
-    Math.abs(hazard.lateralOffset) >= halfWidth * 0.55,
-    `Cable coil ${hazard.id} sits on the racing line.`,
+    Math.abs(hazard.lateralOffset) - 3.1 < halfWidth,
+    `Cable coil ${hazard.id} at lateral ${hazard.lateralOffset} m is ${(
+      Math.abs(hazard.lateralOffset) - 3.1 - halfWidth
+    ).toFixed(2)} m outside the ${halfWidth.toFixed(2)} m half-width even at the `
+      + "edge of its contact disc, so no car on the deck can ever trip on it.",
   );
   assert.equal(
     isCircularHazardContact(

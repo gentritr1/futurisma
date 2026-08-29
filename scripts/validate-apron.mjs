@@ -343,11 +343,35 @@ assert.equal(
 // cross-section is scraped from the exported table — the real source of truth —
 // and `createApronDecks` is separately asserted to consume it rather than
 // carrying its own copy.
-const crossSectionStart = courseSource.indexOf("export const APRON_EDGE_CROSS_SECTION");
-assert.ok(crossSectionStart >= 0, "course.ts must export APRON_EDGE_CROSS_SECTION.");
-const crossSectionTable = courseSource.slice(
+// P16 moved the table into `apron-profile.ts`, a leaf module, so the
+// presentation lift could read it without dragging the whole course builder
+// into the initial bundle (it cost 208 KiB against a 950 KiB budget). Still one
+// table with three consumers; `course.ts` re-exports it, so this now scrapes
+// the definition where it lives and separately pins the re-export.
+const apronProfileSource = readFileSync(
+  new URL("../src/game/apron-profile.ts", import.meta.url),
+  "utf8",
+);
+const crossSectionStart = apronProfileSource.indexOf(
+  "export const APRON_EDGE_CROSS_SECTION",
+);
+assert.ok(
+  crossSectionStart >= 0,
+  "apron-profile.ts must export APRON_EDGE_CROSS_SECTION.",
+);
+assert.match(
+  courseSource,
+  /export \{ APRON_EDGE_CROSS_SECTION, surfaceHeightAtLateral \} from "\.\/apron-profile";/,
+  "course.ts must re-export the apron profile so existing importers keep one "
+    + "source of truth for the cross-section.",
+);
+assert.ok(
+  !/export const APRON_EDGE_CROSS_SECTION/.test(courseSource),
+  "course.ts must not carry a second copy of the cross-section table.",
+);
+const crossSectionTable = apronProfileSource.slice(
   crossSectionStart,
-  courseSource.indexOf("});", crossSectionStart),
+  apronProfileSource.indexOf("});", crossSectionStart),
 );
 const outerRises = Object.fromEntries(
   [...crossSectionTable.matchAll(/([A-Z]): Object\.freeze\(\{ outerRise: (-?[0-9.]+),/g)]

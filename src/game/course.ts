@@ -23,51 +23,14 @@ import {
   lerpKeyDirection,
 } from "./lighting-motion.js";
 import { isCircularHazardContact } from "./race-rules";
+import { APRON_EDGE_CROSS_SECTION, type EdgeType } from "./apron-profile";
 
-export type EdgeType = "A" | "B" | "C";
-
-/**
- * The drawn cross-section of each run-off surface, in metres, relative to the
- * deck edge at `halfWidth`. `outerRise` is the height at the OUTER lip and
- * interpolates linearly across the apron's authored width; `innerDrop` is the
- * step down at the deck edge itself.
- *
- * Exported because two systems have to agree on it: `createApronDecks` draws
- * these surfaces, and P12's opening-surface decals have to LIE on them — a
- * shoulder chevron at 13.8 m or a hazard band at 16.5 m is past `halfWidth`, so
- * a decal that ignored this would float over an A-apron by up to 0.12 m.
- *
- * P11 notes preserved: A's outward fall was 0.35 m, which read as a cliff edge
- * at a 0.89-1.31 m hover height; 0.12 m keeps the gravel-vs-rumble cue without
- * the craft appearing to drive off a ledge. C is flush because what follows its
- * run-off is the drop to the water, not a step.
- */
-export const APRON_EDGE_CROSS_SECTION: Readonly<
-  Record<EdgeType, { readonly outerRise: number; readonly innerDrop: number }>
-> = Object.freeze({
-  A: Object.freeze({ outerRise: -0.12, innerDrop: 0.04 }),
-  B: Object.freeze({ outerRise: 0.14, innerDrop: 0.02 }),
-  C: Object.freeze({ outerRise: 0, innerDrop: 0.03 }),
-});
-
-/**
- * Height of the drawn surface at `lateral`, relative to `sample.position`, along
- * `sample.up`. Inside the deck this is 0; past `halfWidth` it follows the apron
- * cross-section above, clamped at the apron's outer lip.
- */
-export function surfaceHeightAtLateral(
-  sample: CourseSample,
-  lateral: number,
-): number {
-  const side = lateral < 0 ? -1 : 1;
-  const beyond = Math.abs(lateral) - sample.halfWidth;
-  if (beyond <= 0) return 0;
-  const apronWidth = side < 0 ? sample.apronLeft : sample.apronRight;
-  if (apronWidth <= 0) return 0;
-  const edge = side < 0 ? sample.edgeLeft : sample.edgeRight;
-  const { outerRise } = APRON_EDGE_CROSS_SECTION[edge];
-  return outerRise * Math.min(beyond, apronWidth) / apronWidth;
-}
+// P16 — the run-off cross-section moved to `apron-profile.ts`, a leaf module,
+// so the presentation path can read it without pulling the whole course builder
+// into the initial bundle. Re-exported here: every existing import still works,
+// and there is still exactly one table.
+export type { EdgeType } from "./apron-profile";
+export { APRON_EDGE_CROSS_SECTION, surfaceHeightAtLateral } from "./apron-profile";
 
 interface RawCourseSample {
   d: number;
