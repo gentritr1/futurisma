@@ -133,13 +133,16 @@ function makeBatch(
 function makeMaterial(
   spec: LivingBatchSpec,
   motionTexture: THREE.Texture,
+  motionBTexture: THREE.Texture,
   textures: LivingWorldTextures,
 ): THREE.MeshBasicMaterial {
   const map = spec.texture === "motion"
     ? motionTexture
-    : spec.texture === "jungle"
-      ? textures.jungle
-      : textures.emissive;
+    : spec.texture === "motionB"
+      ? motionBTexture
+      : spec.texture === "jungle"
+        ? textures.jungle
+        : textures.emissive;
   if (!map) {
     throw new Error(
       `Living-world batch ${spec.meshName} needs the ${spec.texture} texture, `
@@ -239,6 +242,7 @@ export class LivingWorld {
     private readonly course: RaceCourse,
     spec: LivingWorldSpec,
     motionTexture: THREE.Texture,
+    motionBTexture: THREE.Texture,
     textures: LivingWorldTextures,
   ) {
     this.root.name = spec.rootName;
@@ -261,7 +265,7 @@ export class LivingWorld {
         hangY: 0,
         flowSample: null,
       })),
-      makeMaterial(batch.spec, motionTexture, textures),
+      makeMaterial(batch.spec, motionTexture, motionBTexture, textures),
     ));
     for (const batch of this.batches) this.root.add(batch.mesh);
 
@@ -280,26 +284,44 @@ export class LivingWorld {
     this.update(UPDATE_STEP_SECONDS, null);
   }
 
+  /**
+   * Loads a motion atlas the way every card sheet wants to be sampled: sRGB,
+   * nearest on both filters, no mipmaps. A card is a handful of pixels blown up
+   * to metres, so a mip chain only smears the authored dither.
+   */
+  private static async loadMotionAtlas(
+    url: string,
+    name: string,
+  ): Promise<THREE.Texture> {
+    const texture = await new THREE.TextureLoader().loadAsync(url);
+    texture.name = name;
+    texture.colorSpace = THREE.SRGBColorSpace;
+    texture.magFilter = THREE.NearestFilter;
+    texture.minFilter = THREE.NearestFilter;
+    texture.generateMipmaps = false;
+    texture.needsUpdate = true;
+    return texture;
+  }
+
   static async load(
     course: RaceCourse,
     textures: LivingWorldTextures,
     motionTextureUrl: string,
+    motionBTextureUrl: string,
   ): Promise<LivingWorld> {
     const spec = LIVING_WORLD_SPECS[course.kind];
     if (!spec) {
       throw new Error(`No living-world zone set is authored for ${course.kind}.`);
     }
-    const motionTexture = await new THREE.TextureLoader().loadAsync(motionTextureUrl);
-    motionTexture.name = "living_world_motion_512";
-    motionTexture.colorSpace = THREE.SRGBColorSpace;
-    motionTexture.magFilter = THREE.NearestFilter;
-    motionTexture.minFilter = THREE.NearestFilter;
-    motionTexture.generateMipmaps = false;
-    motionTexture.needsUpdate = true;
+    const [motionTexture, motionBTexture] = await Promise.all([
+      LivingWorld.loadMotionAtlas(motionTextureUrl, "living_world_motion_512"),
+      LivingWorld.loadMotionAtlas(motionBTextureUrl, "living_world_motion_b_512"),
+    ]);
     try {
-      return new LivingWorld(course, spec, motionTexture, textures);
+      return new LivingWorld(course, spec, motionTexture, motionBTexture, textures);
     } catch (error) {
       motionTexture.dispose();
+      motionBTexture.dispose();
       throw error;
     }
   }

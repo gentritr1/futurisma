@@ -71,7 +71,7 @@
  * @typedef {object} LivingBatchSpec
  * @property {string} id
  * @property {string} meshName
- * @property {"motion" | "jungle" | "emissive"} texture
+ * @property {"motion" | "motionB" | "jungle" | "emissive"} texture
  * @property {"normal" | "additive"} blending
  * @property {boolean} depthWrite
  * @property {boolean} fog
@@ -184,6 +184,31 @@ export const JUNGLE_RECTS = Object.freeze({
 export const EMISSIVE_RECTS = Object.freeze({
   amberLamp: atlasRect(512, 4, 0),
   redLamp: atlasRect(512, 4, 2),
+});
+
+/**
+ * P12 art pass 01. Slot indices into `atlasRect(512, 4, slot)` on
+ * `greenwater_motion_b_512` — the second motion sheet, whose sixteen 128 px
+ * cells hold birds, dust devils, distant wrecks and dry scud. Both maps draw
+ * from it, the same way both already share `greenwater_motion_512`.
+ */
+export const MOTION_B_RECTS = Object.freeze({
+  birdsA: atlasRect(512, 4, 0),
+  birdsB: atlasRect(512, 4, 1),
+  birdsC: atlasRect(512, 4, 2),
+  gull: atlasRect(512, 4, 3),
+  devilWispA: atlasRect(512, 4, 4),
+  devilWispB: atlasRect(512, 4, 5),
+  flickerFull: atlasRect(512, 4, 6),
+  flickerHalf: atlasRect(512, 4, 7),
+  flickerDead: atlasRect(512, 4, 8),
+  wreckFuselage: atlasRect(512, 4, 9),
+  wreckTailfin: atlasRect(512, 4, 10),
+  wreckNacelle: atlasRect(512, 4, 11),
+  wreckGantry: atlasRect(512, 4, 12),
+  dustScud: atlasRect(512, 4, 13),
+  vaporThin: atlasRect(512, 4, 14),
+  crateStack: atlasRect(512, 4, 15),
 });
 
 const TAU = Math.PI * 2;
@@ -605,6 +630,163 @@ const GREENWATER_ZONES = Object.freeze([
   },
 ]);
 
+// ===========================================================================
+// P12 art pass 01 — GREENWATER atlas B. APPEND ONLY.
+//
+// These zones are concatenated AFTER `GREENWATER_ZONES` when the spec is built
+// (see `GREENWATER_LIVING_WORLD` below), so the shared `seededRandom(0x13a7)`
+// stream reaches every legacy zone with exactly the draws it saw before and
+// the 155 accepted cards stay bit-exact. Nothing above this line moved.
+//
+// Two new batches = two new draw calls, paid honestly: these cards need a
+// different texture, so they cannot ride an existing batch.
+// ===========================================================================
+
+/** @type {readonly LivingBatchSpec[]} */
+export const GREENWATER_BATCHES_B = Object.freeze([
+  {
+    // Air-suspended cards on the new sheet: birds and low scud. Same treatment
+    // as the accepted `air` batch, different texture.
+    id: "airB",
+    meshName: "GW_LIVING_AIR_B",
+    texture: "motionB",
+    blending: "normal",
+    depthWrite: false,
+    fog: true,
+    alphaTest: 0,
+    lamps: false,
+  },
+  {
+    // Ground-standing silhouettes. This is the only living-world batch that
+    // writes depth and alpha-tests, because a wreck sitting on the shoulder
+    // has to occlude the mist behind it or it reads as a decal in the air.
+    id: "silhouette",
+    meshName: "GW_LIVING_SILHOUETTE",
+    texture: "motionB",
+    blending: "normal",
+    depthWrite: true,
+    fog: true,
+    alphaTest: 0.5,
+    lamps: false,
+  },
+]);
+
+/** @type {readonly LivingZone[]} */
+export const GREENWATER_ZONES_B = Object.freeze([
+  {
+    /**
+     * The served-machinery line off the left shoulder of RUNWAY_START.
+     *
+     * This is the far-field half of the wreck brief; the four hero pieces are
+     * geometry and are specified separately. Everything here sits 34-78 m out,
+     * which at Greenwater's 650 m far plane and the opening's fog is past the
+     * distance where a card and a mesh are distinguishable. They exist to give
+     * the eye something that is not gray fog on the outside of the opening
+     * straight, and to establish before T1 that this field is a place where
+     * airframes are taken apart.
+     *
+     * `shear` at 0.4 deg is deliberately almost-static. These are not alive.
+     * The tiny lean is there so they settle with the same air the mist does
+     * rather than sitting perfectly rigid against a moving world.
+     */
+    id: "OPENING_WRECK_LINE",
+    batch: "silhouette",
+    from: 28,
+    to: 206,
+    cards: 14,
+    card: (distance, _side, index, next) => {
+      const kinds = [
+        MOTION_B_RECTS.wreckFuselage,
+        MOTION_B_RECTS.wreckTailfin,
+        MOTION_B_RECTS.wreckNacelle,
+        MOTION_B_RECTS.crateStack,
+        MOTION_B_RECTS.wreckGantry,
+      ];
+      const rect = kinds[index % kinds.length];
+      const scale = rect === MOTION_B_RECTS.wreckFuselage ? 1.55
+        : rect === MOTION_B_RECTS.wreckGantry ? 1.2
+          : rect === MOTION_B_RECTS.crateStack ? 0.62 : 0.95;
+      return {
+        kind: "shear",
+        distance,
+        side: -1,
+        lateral: 34 + next() * 44,
+        base: 0,
+        width: (11 + next() * 5) * scale,
+        height: (9 + next() * 4) * scale,
+        phase: next() * TAU,
+        speed: TAU / 9.4,
+        amplitude: degToRad(0.4),
+        rect,
+        tint: 0x6c7a70,
+        seed: next(),
+      };
+    },
+  },
+  {
+    /**
+     * A flock over the wetland, crossing the opening straight.
+     *
+     * The sheet holds three wingbeat frames. The card system fixes one rect
+     * per card, so the frames are used as VARIATION ACROSS the flock rather
+     * than animation within a card — nine birds, wings at three different
+     * points, rocking on `shear`. At 30-60 m that reads as a flock beating,
+     * which is the whole ask, and it costs no new card kind.
+     */
+    id: "OPENING_BIRD_FLOCK",
+    batch: "airB",
+    from: 44,
+    to: 212,
+    cards: 9,
+    card: (distance, side, index, next) => ({
+      kind: "shear",
+      distance,
+      side,
+      lateral: 22 + next() * 30,
+      base: 13 + next() * 15,
+      width: 7 + next() * 6,
+      height: 4.5 + next() * 3.5,
+      phase: next() * TAU,
+      speed: TAU / (1.4 + next() * 0.5),
+      amplitude: degToRad(6.5),
+      rect: [MOTION_B_RECTS.birdsA, MOTION_B_RECTS.birdsB,
+        MOTION_B_RECTS.birdsC, MOTION_B_RECTS.gull][index % 4],
+      tint: 0x4d564e,
+      seed: next(),
+    }),
+  },
+  {
+    /**
+     * Dry scud lifting off the deck, low and wide, the whole sector.
+     *
+     * The opening is currently gray fog at every height. This puts something
+     * moving at ankle height where the eye is already looking — at the racing
+     * line — without putting anything in front of it.
+     */
+    id: "OPENING_DECK_SCUD",
+    batch: "airB",
+    from: 6,
+    to: 218,
+    cards: 8,
+    card: (distance, side, _index, next) => ({
+      kind: "mist",
+      distance,
+      side,
+      lateral: 13 + next() * 12,
+      base: 0.5 + next() * 1.1,
+      width: 15 + next() * 13,
+      height: 1.6 + next() * 1.2,
+      phase: next() * TAU,
+      speed: 0.62,
+      rect: MOTION_B_RECTS.dustScud,
+      tint: 0xc3c2b4,
+      seed: next(),
+      alphaKind: "mist",
+      alphaInitial: ALPHA_ENVELOPES.mist[0],
+    }),
+  },
+]);
+
 /** @type {readonly LivingBatchSpec[]} */
 const BITTERPAN_BATCHES = Object.freeze([
   {
@@ -830,15 +1012,106 @@ const BITTERPAN_ZONES = Object.freeze([
   },
 ]);
 
-/** @type {LivingWorldSpec} */
+// ===========================================================================
+// P12 art pass 01 — BITTERPAN atlas B. APPEND ONLY, same rule as Greenwater.
+// ===========================================================================
+
+/** @type {readonly LivingBatchSpec[]} */
+export const BITTERPAN_BATCHES_B = Object.freeze([
+  {
+    id: "airB",
+    meshName: "BP_LIVING_AIR_B",
+    texture: "motionB",
+    blending: "normal",
+    depthWrite: false,
+    fog: true,
+    alphaTest: 0,
+    lamps: false,
+  },
+]);
+
+/** @type {readonly LivingZone[]} */
+export const BITTERPAN_ZONES_B = Object.freeze([
+  {
+    /**
+     * The salt devils get their own shape.
+     *
+     * SALT_DUST_DEVILS currently borrows `MOTION_RECTS.steam` — a soft round
+     * water-vapour puff — for a dry column of lifted crust. This zone runs
+     * the same four stations with the authored devil wisp instead: a narrow
+     * leaning column, dense and granular at the base, thinning as it climbs.
+     * The accepted zone is left in place and untouched; this layers over it,
+     * so the review can compare and the older zone can be retired later
+     * without disturbing the seeded stream in the meantime.
+     */
+    id: "SALT_DEVIL_CORE",
+    batch: "airB",
+    from: 340,
+    to: 2290,
+    cards: 8,
+    card: (_distance, _side, index, next) => ({
+      kind: "devil",
+      distance: 340 + Math.floor(index / 2) * 640 + (index % 2) * 8,
+      side: Math.floor(index / 2) % 2 === 1 ? 1 : -1,
+      lateral: 56 + (index % 2) * 4,
+      base: 1 + (index % 2) * 8,
+      width: 7 + (index % 2) * 2.5,
+      height: 13 + (index % 2) * 5,
+      phase: (index % 2) * 1.1 + Math.floor(index / 2) * 0.4,
+      speed: TAU / 7.5,
+      amplitude: 3.1 + (index % 2) * 1.2,
+      hang: 11,
+      rect: index % 2 === 0 ? MOTION_B_RECTS.devilWispA : MOTION_B_RECTS.devilWispB,
+      tint: 0xe4dcc6,
+      seed: next(),
+    }),
+  },
+  {
+    /**
+     * Crust scud across the long pan. Wider and lower than the heat shimmer
+     * it sits under, so the two do not read as one effect at two opacities.
+     */
+    id: "PAN_CRUST_SCUD",
+    batch: "airB",
+    from: 180,
+    to: 2100,
+    cards: 10,
+    card: (distance, side, _index, next) => ({
+      kind: "mist",
+      distance,
+      side,
+      lateral: 24 + next() * 40,
+      base: 0.3 + next() * 0.9,
+      width: 26 + next() * 22,
+      height: 2 + next() * 1.6,
+      phase: next() * TAU,
+      speed: 0.5,
+      rect: MOTION_B_RECTS.dustScud,
+      tint: 0xf0e9d8,
+      seed: next(),
+      alphaKind: "shimmer",
+      alphaInitial: ALPHA_ENVELOPES.shimmer[0],
+    }),
+  },
+]);
+
+/**
+ * @type {LivingWorldSpec}
+ *
+ * P12: the atlas-B batches and zones are CONCATENATED onto the accepted arrays
+ * rather than spliced into them. `buildLivingWorld` walks `zones` in order off
+ * one seeded stream, so appending is the only edit that leaves the 155 accepted
+ * Greenwater cards and the 98 Bitterpan cards bit-for-bit identical —
+ * `scripts/validate-living-world.mjs` pins all of them field by field.
+ */
 export const GREENWATER_LIVING_WORLD = Object.freeze({
   id: "GREENWATER",
   course: "greenwater",
   rootName: "GW_LIVING_RUNTIME",
   seed: 0x13a7,
   courseLength: 2515.982,
-  batches: GREENWATER_BATCHES,
-  zones: GREENWATER_ZONES,
+  batches: Object.freeze([...GREENWATER_BATCHES, ...GREENWATER_BATCHES_B]),
+  zones: Object.freeze([...GREENWATER_ZONES, ...GREENWATER_ZONES_B]),
 });
 
 /** @type {LivingWorldSpec} */
@@ -848,8 +1121,8 @@ export const BITTERPAN_LIVING_WORLD = Object.freeze({
   rootName: "BP_LIVING_RUNTIME",
   seed: 0x2b17,
   courseLength: 3050,
-  batches: BITTERPAN_BATCHES,
-  zones: BITTERPAN_ZONES,
+  batches: Object.freeze([...BITTERPAN_BATCHES, ...BITTERPAN_BATCHES_B]),
+  zones: Object.freeze([...BITTERPAN_ZONES, ...BITTERPAN_ZONES_B]),
 });
 
 /** @type {Readonly<Record<string, LivingWorldSpec>>} */

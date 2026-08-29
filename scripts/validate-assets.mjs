@@ -39,6 +39,39 @@ const expectedHashes = {
   "logos/totem-syndicate.svg": "506a73cb8de719bf870d3841d51340265066645a6a87b5088189bd03dcc90b7d",
 };
 
+/**
+ * P12 art pass 01 sheets, under `public/assets/greenwater/textures/`.
+ *
+ * These three are NOT archive-provenanced like the accepted Greenwater
+ * packages: they are emitted by `scripts/design/build-futurisma-atlases.mjs`,
+ * which is deterministic and ships in the repo, so the builder is the
+ * provenance and these are the hashes it printed. Regenerate with
+ * `node scripts/design/build-futurisma-atlases.mjs --check --out .` rather than
+ * editing a PNG — `scripts/validate-art-pass.mjs` additionally pins each sheet
+ * against the sha256 recorded beside its regions in ATLAS_REGIONS.json, so a
+ * sheet and its UV rectangles can never drift apart.
+ */
+const expectedArtPassHashes = {
+  "greenwater/textures/greenwater_runway_1024.png":
+    "2a77f5362b7750adc7777423cd1f80a521dc7f875053653d486be3874e034ae3",
+  "greenwater/textures/futurisma_signage_1024.png":
+    "b1652c713929aae661e6d5ce3a2c47444f322f095f3c4fd22faf7d0d8101614f",
+  "greenwater/textures/greenwater_motion_b_512.png":
+    "a5b4442a7286b3c597abc42bd7cd4373db85f126478561de6cdf9694e9583dfd",
+};
+
+for (const [relativePath, expectedHash] of Object.entries(expectedArtPassHashes)) {
+  const bytes = await readFile(
+    new URL(`../public/assets/${relativePath}`, import.meta.url),
+  );
+  const actualHash = createHash("sha256").update(bytes).digest("hex");
+  assert.equal(
+    actualHash,
+    expectedHash,
+    `${relativePath} is not the sheet the atlas builder emitted.`,
+  );
+}
+
 let assetKitBytes;
 for (const [relativePath, expectedHash] of Object.entries(expectedHashes)) {
   const bytes = await readFile(

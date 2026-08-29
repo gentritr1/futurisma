@@ -336,10 +336,32 @@ assert.equal(
 // It must still fall away — that cross-section is how gravel is told from the
 // rumble strip without colour — and it must stay clear of the 0.55 m
 // understructure the deck sits on.
+// P12 moved these numbers out of `createApronDecks` into the exported
+// `APRON_EDGE_CROSS_SECTION`, because a second system now has to agree with
+// them: the opening-surface decals lie on these surfaces, and a shoulder
+// chevron that ignored the fall would float over an A apron by 0.12 m. So the
+// cross-section is scraped from the exported table — the real source of truth —
+// and `createApronDecks` is separately asserted to consume it rather than
+// carrying its own copy.
+const crossSectionStart = courseSource.indexOf("export const APRON_EDGE_CROSS_SECTION");
+assert.ok(crossSectionStart >= 0, "course.ts must export APRON_EDGE_CROSS_SECTION.");
+const crossSectionTable = courseSource.slice(
+  crossSectionStart,
+  courseSource.indexOf("});", crossSectionStart),
+);
 const outerRises = Object.fromEntries(
-  [...surfaceTable.matchAll(/type: "([A-Z])",[\s\S]*?outerRise: (-?[0-9.]+),/g)]
+  [...crossSectionTable.matchAll(/([A-Z]): Object\.freeze\(\{ outerRise: (-?[0-9.]+),/g)]
     .map((match) => [match[1], Number(match[2])]),
 );
+for (const edge of drawnEdges) {
+  assert.ok(
+    new RegExp(`outerRise: APRON_EDGE_CROSS_SECTION\\.${edge}\\.outerRise`)
+      .test(surfaceTable),
+    `createApronDecks restates edge ${edge}'s outward fall instead of reading `
+      + "APRON_EDGE_CROSS_SECTION. The drawn surface and the decal layer must "
+      + "not be able to drift apart.",
+  );
+}
 assert.equal(
   outerRises.A,
   -0.12,
