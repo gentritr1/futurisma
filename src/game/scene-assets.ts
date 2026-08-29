@@ -30,6 +30,14 @@ import { applyPs2MaterialTreatment } from "./totem";
 const CORRIDOR_SWEEP_EXCLUDED_NAMES: ReadonlySet<string> = new Set([
   "totem_vehicle_root",
   "totem_rival_fleet",
+  // The ghost replay craft. A race entity like the other two: it is SUPPOSED to
+  // be on the deck, and it sits on the start line before the lap begins.
+  // Identified by the sweep rather than guessed at — the first span table
+  // reported tall geometry at lateral 0.000 on the start line and again at
+  // 2510 m, and naming the bounding mesh showed `totem_ghost_hull` both times.
+  // Excluded by construction, because a derived drivable limit must never be
+  // set by something that is driving.
+  "totem_ghost",
   // The living-world card layer is drifting atmosphere, not scenery, and its
   // position at any single frame is one sample of an animation rather than a
   // placement. Measured, not assumed: `GW_LIVING_AIR_B` reported lateral -11.104
@@ -58,6 +66,7 @@ const CORRIDOR_SWEEP_NOT_RUN: CorridorSweepResult = Object.freeze({
   boundary: 0,
   vfx: 0,
   hiddenIntrusions: 0,
+  hiddenByBand: Object.freeze({ flush: 0, obstacle: 0, overhead: 0, boundary: 0, vfx: 0 }),
   list: Object.freeze([]) as CorridorSweepResult["list"],
   spans: Object.freeze([]) as CorridorSweepResult["spans"],
   elapsedMs: 0,
@@ -666,6 +675,7 @@ export class SceneAssets {
       corridorBoundary: sweep.boundary,
       corridorVfx: sweep.vfx,
       corridorHiddenIntrusions: sweep.hiddenIntrusions,
+      corridorHiddenByBand: sweep.hiddenByBand,
       corridorSweepMeshes: sweep.meshesSwept,
       corridorSweepInstances: sweep.instancesSwept,
       corridorSweepVertices: sweep.verticesSwept,

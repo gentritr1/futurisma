@@ -253,8 +253,10 @@ export interface CorridorSweepResult {
   readonly boundary: number;
   /** Visible non-occluding overlays (steam, scud, sparks). Reported. */
   readonly vfx: number;
-  /** Intrusions from meshes hidden at sweep time, reported separately. */
+  /** Entries whose mesh was hidden at sweep time. Counted, not exempted. */
   readonly hiddenIntrusions: number;
+  /** Band composition of those hidden entries — the audit the gate depends on. */
+  readonly hiddenByBand: Readonly<Record<CorridorBand, number>>;
   readonly list: readonly CorridorIntrusion[];
   /**
    * Per-span innermost tall geometry, the input to the derived drivable limit.
@@ -280,6 +282,9 @@ export const EMPTY_CORRIDOR_SWEEP: CorridorSweepResult = Object.freeze({
   boundary: 0,
   vfx: 0,
   hiddenIntrusions: 0,
+  hiddenByBand: Object.freeze({
+    flush: 0, obstacle: 0, overhead: 0, boundary: 0, vfx: 0,
+  }),
   list: Object.freeze([]) as readonly CorridorIntrusion[],
   spans: Object.freeze([]) as readonly TallGeometrySpan[],
   elapsedMs: 0,
@@ -360,6 +365,16 @@ export interface TallGeometrySpan {
   readonly halfWidth: number;
   /** `resolveApron`'s current clamp for this span. */
   readonly clamp: number;
+  /**
+   * The mesh whose vertex set the innermost tall lateral on each side.
+   *
+   * A derived physics limit has to be able to answer "what put it there". The
+   * first table without this reported tall geometry at lateral 0.000 on the
+   * start line and there was no way to tell a gantry footing from a stray card
+   * without re-running the whole sweep.
+   */
+  readonly leftMesh: string | null;
+  readonly rightMesh: string | null;
 }
 
 /** Lap resolution of the derived limit table. */
@@ -481,6 +496,8 @@ export function sweepCorridor(
   interface SpanBucket {
     left: number | null;
     right: number | null;
+    leftMesh: string | null;
+    rightMesh: string | null;
     halfWidth: number;
     clamp: number;
   }
@@ -490,11 +507,19 @@ export function sweepCorridor(
     lateral: number,
     halfWidth: number,
     clamp: number,
+    mesh: string,
   ): void => {
     const index = Math.floor(distance / TALL_GEOMETRY_SPAN_METRES);
     let bucket = spanBuckets.get(index);
     if (!bucket) {
-      bucket = { left: null, right: null, halfWidth, clamp };
+      bucket = {
+        left: null,
+        right: null,
+        leftMesh: null,
+        rightMesh: null,
+        halfWidth,
+        clamp,
+      };
       spanBuckets.set(index, bucket);
     }
     // Narrowest half-width and clamp across the span: the limit has to hold
@@ -503,9 +528,13 @@ export function sweepCorridor(
     bucket.clamp = Math.min(bucket.clamp, clamp);
     const magnitude = Math.abs(lateral);
     if (lateral < 0) {
-      if (bucket.left === null || magnitude < bucket.left) bucket.left = magnitude;
+      if (bucket.left === null || magnitude < bucket.left) {
+        bucket.left = magnitude;
+        bucket.leftMesh = mesh;
+      }
     } else if (bucket.right === null || magnitude < bucket.right) {
       bucket.right = magnitude;
+      bucket.rightMesh = mesh;
     }
   };
   let meshesSwept = 0;
@@ -564,7 +593,13 @@ export function sweepCorridor(
         && Math.abs(lateral) <= clamp
       ) {
         if (collectSpans) {
-          recordTallGeometry(distance, lateral, projection.halfWidth, clamp);
+          recordTallGeometry(
+            distance,
+            lateral,
+            projection.halfWidth,
+            clamp,
+            displayName(mesh),
+          );
         }
       }
       const depth = gate - Math.abs(lateral);
@@ -668,7 +703,25 @@ export function sweepCorridor(
     .sort((a, b) => b.depth - a.depth);
 
   const visibleList = ordered.filter((entry) => entry.visible);
-  const obstacles = visibleList.filter((entry) => entry.band === "obstacle");
+  const hiddenList = ordered.filter((entry) => !entry.visible);
+  // P16 stage 2 — the gate counts hidden geometry exactly like visible.
+  //
+  // It did not, and that was a hole. `updateVisibility` culls distant sector
+  // groups, so at the moment the sweep fires a whole sector can be hidden; an
+  // obstacle standing on the deck in a culled sector swept as hidden, passed a
+  // gate that only looked at visible entries, and then popped into view mid-lap.
+  // Visibility is a render optimisation and says nothing about whether the
+  // world contains the thing.
+  //
+  // The only exclusions that survive are by CONSTRUCTION — race entities, which
+  // never enter the traversal at all, and non-occluding overlays, which are
+  // classified from their own material. Neither depends on what the camera
+  // could see at one instant.
+  const obstacles = ordered.filter((entry) => entry.band === "obstacle");
+  const hiddenByBand: Record<CorridorBand, number> = {
+    flush: 0, obstacle: 0, overhead: 0, boundary: 0, vfx: 0,
+  };
+  for (const entry of hiddenList) hiddenByBand[entry.band] += 1;
   return {
     ran: true,
     map: course.kind,
@@ -682,7 +735,8 @@ export function sweepCorridor(
     overhead: visibleList.filter((entry) => entry.band === "overhead").length,
     boundary: visibleList.filter((entry) => entry.band === "boundary").length,
     vfx: visibleList.filter((entry) => entry.band === "vfx").length,
-    hiddenIntrusions: ordered.length - visibleList.length,
+    hiddenIntrusions: hiddenList.length,
+    hiddenByBand,
     // Obstacles first: the list is capped, and the capped-out tail must never
     // be the thing that had to be fixed.
     spans: [...spanBuckets.entries()]
@@ -693,11 +747,16 @@ export function sweepCorridor(
         right: bucket.right === null ? null : Number(bucket.right.toFixed(3)),
         halfWidth: Number(bucket.halfWidth.toFixed(3)),
         clamp: Number(bucket.clamp.toFixed(3)),
+        leftMesh: bucket.leftMesh,
+        rightMesh: bucket.rightMesh,
       })),
+    // Obstacles first regardless of visibility — the capped tail must never be
+    // the thing that had to be fixed, and a hidden obstacle is still an
+    // obstacle.
     list: [
       ...obstacles,
       ...visibleList.filter((entry) => entry.band !== "obstacle"),
-      ...ordered.filter((entry) => !entry.visible),
+      ...hiddenList.filter((entry) => entry.band !== "obstacle"),
     ].slice(0, MAX_REPORTED_INTRUSIONS),
     elapsedMs: Number((performance.now() - startedAt).toFixed(1)),
   };

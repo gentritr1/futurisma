@@ -16126,12 +16126,12 @@
     {
       "id": "HZ_STEAM_2",
       "type": "steam_vent",
-      "distance": 736.115,
+      "distance": 731.519,
       "lateralOffset": 10.2,
       "cycleSeconds": 4,
       "telegraphSeconds": 1,
       "effect": "vision_only",
-      "note": "P11 moved this +7.0 -> +8.4 m to leave the drivable clamp. P15: +8.4 -> +10.2 m, because the deck exemption for hazards was revoked entirely. Half-width here is 9.50 m, so the deck clears at 10.00 m and this sits 0.20 m beyond it."
+      "note": "P16: 736.115 -> 731.519 m, along-track only; lateral stays +10.2. `createHangarShell` puts frame pillars every 10 m from 616.519 at halfWidth+0.9 with 0.7 m depth, so the pillar at 736.519 m spanned lateral 10.05-10.75 and sat 0.404 m along-track from the vent, whose base disc is r=1.1 \u2014 an interpenetration of 1.046 m. 731.519 is the midpoint between the 726.519 and 736.519 pillars, 5.0 m clear of both. HZ_STEAM_1 at 674.519 was measured against the same rule and already clears its nearest pillar by 0.550 m."
     },
     {
       "id": "HZ_CABLE_1",
