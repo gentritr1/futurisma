@@ -1,6 +1,8 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
+import atlasRegionsJson from "./data/ATLAS_REGIONS.json";
+import liveryWearJson from "./data/TOTEM_LIVERY_WEAR.json";
 import { disposeObject3DResources } from "./graphics-resources";
 import {
   TotemRacePresence,
@@ -85,10 +87,22 @@ export const TEXTURE_FILTER_CLASSES = {
   },
 } as const;
 
+/**
+ * What the material treatments in this module armed. The contributor is named
+ * `ps2` in `diagnostics.ts` because P4b got here first; it is really "whatever
+ * totem.ts patched into a program", which is where P15's wear overlay belongs
+ * too — the alternative was a new contributor, and `game.ts` is at its seam
+ * budget and may not grow by a line to register one.
+ */
 export interface Ps2TreatmentDiagnostics {
   renderMode: string;
   ps2SnapMaterials: number;
   ps2DitherMaterials: number;
+  /** P15: false means the overlay never loaded and no hull is wearing it. */
+  wearActive: boolean;
+  wearMaterials: number;
+  /** 1.0 at the authored 45/100; nightform holds it back to 34/45. */
+  wearScale: number;
 }
 
 export type TotemRivalMaterialRole =
@@ -250,12 +264,15 @@ export function prefersMultisampling(): boolean {
   return activeRenderMode() !== "ps2";
 }
 
-/** `renderMode` plus the counts P4b's acceptance checks read off the soak. */
+/** `renderMode` plus the counts P4b's and P15's acceptance checks read. */
 export function ps2TreatmentDiagnostics(): Ps2TreatmentDiagnostics {
   return {
     renderMode: activeRenderMode(),
     ps2SnapMaterials: ps2SnapMaterialCount,
     ps2DitherMaterials: ps2DitherMaterialCount,
+    wearActive: liveryWearMaterialCount > 0 && liveryWearMapUniform.value !== null,
+    wearMaterials: liveryWearMaterialCount,
+    wearScale: Number(liveryWearScaleUniform.value.toFixed(4)),
   };
 }
 
@@ -313,6 +330,188 @@ function applyPs2ShaderTreatment(
   if (snapped) ps2SnapMaterialCount += 1;
   if (dithered) ps2DitherMaterialCount += 1;
   return { snapped, dithered };
+}
+
+/**
+ * Adds one shader injection to a material WITHOUT throwing away whatever is
+ * already on it.
+ *
+ * three keeps exactly one `onBeforeCompile` per material and keys its program
+ * cache off `customProgramCacheKey`, so the naive `material.onBeforeCompile =
+ * fn` silently deletes any earlier injection — and, worse, leaves the earlier
+ * *cache key* in place, so the material then reuses a compiled program that has
+ * neither injection. Three separate passes now want to reach into the TOTEM
+ * body program (the PS2 grade, the rivals' livery-atlas quadrant offset, and
+ * this phase's wear multiply), so composition goes through here and the key
+ * grows a segment per pass.
+ */
+export function composeShaderInjection(
+  material: THREE.Material,
+  key: string,
+  inject: (shader: THREE.WebGLProgramParametersWithUniforms) => void,
+): void {
+  const previousCompile = material.onBeforeCompile;
+  const previousKey = material.customProgramCacheKey;
+  material.onBeforeCompile = function composed(shader, renderer) {
+    previousCompile.call(this, shader, renderer);
+    inject(shader);
+  };
+  material.customProgramCacheKey = function composedKey() {
+    return `${previousKey.call(this)}|${key}`;
+  };
+  material.needsUpdate = true;
+}
+
+/**
+ * P15 art pass 02 — the TOTEM livery wear overlay.
+ *
+ * `TOTEM_LIVERY_WEAR.json` ships as an OVERLAY sheet rather than as four
+ * recomposited livery sheets, and the reasoning is worth keeping next to the
+ * code: the livery PNGs are hash-pinned in `validate-assets.mjs` and baked into
+ * the runtime GLB, and compositing into them would not be idempotent, so the
+ * atlas builder's `--check` would pass once and fail on the second run.
+ *
+ * What the runtime does with it is one multiply, in one place, gated to one
+ * rectangle:
+ *
+ * - **Same UVs.** The sheet is in register with the livery sheet, so the wear
+ *   is sampled at the hull's own UV. It is sampled from the RAW `uv` attribute
+ *   rather than from `vMapUv`, because the rivals remap `vMapUv` into their
+ *   atlas quadrant in the vertex stage and the wear sheet is not quadranted.
+ * - **Chip strip only.** The hull's UVs collapse to the centre of one of the
+ *   eight paint chips — the centre texel is the only one ever sampled, and the
+ *   authored wear detail lives in the chip margins for review. Outside that
+ *   strip the factor is exactly 1.0, because the 12 decal-cell rects that would
+ *   place the library slots are unpublished; guessing them would leak grime,
+ *   repair plates and a NEEDLE REPAIR stencil onto whatever those cells hold.
+ *   That open dependency is recorded in the spec and asserted by
+ *   `validate-art-pass.mjs`; the library slots are NOT applied this phase.
+ * - **One intensity.** The sheet is authored at 45/100 with the 0.45 already
+ *   baked into every alpha, so a straight `mix(1, wearRGB, alpha)` reproduces
+ *   the spec's `effective` column. `uWearScale` only ever scales that back
+ *   toward 1.0 — nightform asks for 34 of 45, because 45 on a near-black hull
+ *   reads as mud rather than as service.
+ */
+const LIVERY_WEAR_TEXTURE_URL = "/assets/totem/textures/totem_wear_1024.png";
+const LIVERY_WEAR = liveryWearJson as unknown as {
+  intensity: number;
+  perLivery: readonly { livery: string; sheet: string; intensity: number }[];
+};
+const LIVERY_WEAR_SHEET_KEY = "totem_wear_1024";
+const LIVERY_WEAR_STRIP_SLOT = "CHIP_WEAR_STRIP";
+
+/**
+ * The chip strip in UV space.
+ *
+ * `flipY` is the whole of the subtlety here. The livery sheet baked into the
+ * GLB is stored pre-flipped (glTF loads with `flipY = false` and the exporter
+ * flipped the image to match), while the served PNGs — this wear sheet among
+ * them — are stored the way `ATLAS_REGIONS.json` describes them, origin at the
+ * top. Loaded with the `TextureLoader` default `flipY = true`, `v = 1 -
+ * imageY / height` puts this rectangle exactly under the hull's authored
+ * `v = 0.07422` chip row. Measured against the shipped sheets, not assumed.
+ */
+function resolveWearChipRect(): THREE.Vector4 {
+  const sheet = (atlasRegionsJson as unknown as Record<string, {
+    width: number;
+    height: number;
+    regions: Record<string, { x: number; y: number; w: number; h: number }>;
+  }>)[LIVERY_WEAR_SHEET_KEY];
+  const region = sheet?.regions[LIVERY_WEAR_STRIP_SLOT];
+  if (!sheet || !region) {
+    throw new Error(`The wear sheet is missing its ${LIVERY_WEAR_STRIP_SLOT} region.`);
+  }
+  return new THREE.Vector4(
+    region.x / sheet.width,
+    1 - (region.y + region.h) / sheet.height,
+    (region.x + region.w) / sheet.width,
+    1 - region.y / sheet.height,
+  );
+}
+
+const liveryWearMapUniform: { value: THREE.Texture | null } = { value: null };
+const liveryWearScaleUniform = { value: 1 };
+const liveryWearRectUniform = { value: resolveWearChipRect() };
+let liveryWearMaterialCount = 0;
+const liveryWearPatchedMaterials = new WeakSet<THREE.Material>();
+
+/** Loads the overlay sheet once. Resolves to null when it is unavailable. */
+export async function loadLiveryWearMap(): Promise<THREE.Texture | null> {
+  if (liveryWearMapUniform.value) return liveryWearMapUniform.value;
+  let texture: THREE.Texture;
+  try {
+    texture = await new THREE.TextureLoader().loadAsync(LIVERY_WEAR_TEXTURE_URL);
+  } catch {
+    // A missing overlay is cosmetic: the craft renders exactly as it did before
+    // this phase. `wearActive: false` in the soak is what surfaces it.
+    return null;
+  }
+  texture.name = LIVERY_WEAR_SHEET_KEY;
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.flipY = true;
+  texture.wrapS = THREE.ClampToEdgeWrapping;
+  texture.wrapT = THREE.ClampToEdgeWrapping;
+  // The spec's own filtering contract, matching the livery atlas it overlays:
+  // mips on, anisotropy 1. The grain cells are 5-6 px, so the treatment still
+  // exists two mip levels down.
+  texture.magFilter = THREE.NearestFilter;
+  texture.minFilter = THREE.NearestMipmapLinearFilter;
+  texture.anisotropy = 1;
+  texture.generateMipmaps = true;
+  texture.needsUpdate = true;
+  liveryWearMapUniform.value = texture;
+  return texture;
+}
+
+/** Per-livery hold-back, resolved from the sheet the player just put on. */
+export function setLiveryWearIntensity(liveryTextureUrl: string): void {
+  const sheet = liveryTextureUrl.split("/").pop() ?? "";
+  const entry = LIVERY_WEAR.perLivery.find((livery) => livery.sheet === sheet);
+  liveryWearScaleUniform.value = entry
+    ? entry.intensity / LIVERY_WEAR.intensity
+    : 1;
+}
+
+/**
+ * Arms the wear multiply on one `TOTEM_body` material.
+ *
+ * Idempotent per material, and a no-op until the sheet has loaded — a material
+ * armed without a map would sample texture unit 0 and multiply the hull by
+ * itself.
+ */
+export function applyLiveryWearTreatment(material: THREE.Material): boolean {
+  if (!liveryWearMapUniform.value) return false;
+  if (liveryWearPatchedMaterials.has(material)) return false;
+  liveryWearPatchedMaterials.add(material);
+  composeShaderInjection(material, "wear", (shader) => {
+    shader.uniforms.uWearMap = liveryWearMapUniform;
+    shader.uniforms.uWearScale = liveryWearScaleUniform;
+    shader.uniforms.uWearChipRect = liveryWearRectUniform;
+    shader.vertexShader = `varying vec2 vWearUv;\n${shader.vertexShader}`.replace(
+      "#include <uv_vertex>",
+      "#include <uv_vertex>\n\tvWearUv = uv;",
+    );
+    shader.fragmentShader = (
+      "uniform sampler2D uWearMap;\n"
+      + "uniform float uWearScale;\n"
+      + "uniform vec4 uWearChipRect;\n"
+      + "varying vec2 vWearUv;\n"
+      + shader.fragmentShader
+    ).replace(
+      "#include <map_fragment>",
+      "#include <map_fragment>\n"
+        + "\tvec4 wearTexel = texture2D( uWearMap, vWearUv );\n"
+        + "\tvec2 wearInside = step( uWearChipRect.xy, vWearUv )\n"
+        + "\t\t* step( vWearUv, uWearChipRect.zw );\n"
+        + "\tfloat wearAmount = wearInside.x * wearInside.y * uWearScale;\n"
+        + "\tdiffuseColor.rgb *= mix(\n"
+        + "\t\tvec3( 1.0 ),\n"
+        + "\t\tmix( vec3( 1.0 ), wearTexel.rgb, wearTexel.a ),\n"
+        + "\t\twearAmount );\n",
+    );
+  });
+  liveryWearMaterialCount += 1;
+  return true;
 }
 
 export function applyPs2MaterialTreatment(
@@ -411,6 +610,13 @@ export class TotemVehicle {
     this.visual.add(this.model);
     applyPs2MaterialTreatment(this.model);
     this.calibrateVehicleMaterials();
+    // P15 — the wear overlay, armed on the hull before the rival batches clone
+    // its material. Awaited here rather than in `game.ts` (which is at its seam
+    // budget) and non-fatal: a craft with no overlay is the craft this project
+    // shipped in P14, and the soak's `wearActive` is what reports the gap.
+    await loadLiveryWearMap();
+    const bodyMaterial = this.bodyMaterial();
+    if (bodyMaterial) applyLiveryWearTreatment(bodyMaterial);
 
     this.model.traverse((object) => {
       if (object.name) this.nodes.set(object.name, object);
@@ -601,6 +807,10 @@ export class TotemVehicle {
           // player craft. Re-arm it — without `worldGeometry`, because rivals
           // must not snap either.
           applyPs2ShaderTreatment(clone, false);
+          // Same reason for the wear multiply. The field is three more of the
+          // same craft out of the same works; a clean field behind a worn
+          // player would read as a bug rather than as a fleet.
+          if (batch.role === "TOTEM_body") applyLiveryWearTreatment(clone);
           clonesByRole.set(batch.role, clone);
         }
         batch.material = clone;
@@ -852,6 +1062,10 @@ export class TotemVehicle {
     texture.needsUpdate = true;
     material.map = texture;
     material.needsUpdate = true;
+    // P15 — the wear intensity travels with the livery, because it is a
+    // property of the paint rather than of the craft. Only ever a hold-back:
+    // three of the four sheets sit at the authored 45 and nightform at 34.
+    setLiveryWearIntensity(textureUrl);
     // The baked sheet is never referenced again: the rival atlas is built from
     // the served PNGs, not from this material's map.
     previous?.dispose();

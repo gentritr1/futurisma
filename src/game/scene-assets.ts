@@ -2,11 +2,13 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { ASSET_KIT_PROP_PLACEMENTS } from "./asset-kit-layout";
+import type { BitterpanSurface } from "./bitterpan-surface";
 import { type RaceCourse } from "./course";
 import type { RaceEnvironment } from "./environment";
 import { disposeObject3DResources } from "./graphics-resources";
 import type { LivingWorld, LivingWorldTextures } from "./living-world";
 import type { GreenwaterOpeningSurface } from "./opening-surface";
+import type { HangarPlaqueBacking } from "./plaque-backing";
 import type { TracksideSignage } from "./signage";
 import type { GreenwaterSurfaceCharacter } from "./surface-character";
 import { applyPs2MaterialTreatment } from "./totem";
@@ -31,6 +33,15 @@ const LIVING_WORLD_MOTION_B_URL = "/assets/greenwater/textures/greenwater_motion
 const OPENING_SURFACE_TEXTURE_URL = "/assets/greenwater/textures/greenwater_runway_1024.png";
 /** P12. Trackside board atlas, both maps. */
 const SIGNAGE_TEXTURE_URL = "/assets/greenwater/textures/futurisma_signage_1024.png";
+/**
+ * P15 art pass 02. The pan crust: a 256 seamless tile for the ground itself and
+ * a 1024 decal sheet for the 407 cracks, brine patches, windrows, scrape
+ * bundles, spill fans and conveyor shadows drawn over it. Bitterpan only.
+ */
+const BITTERPAN_CRUST_TILE_URL = "/assets/map02/textures/bitterpan_crust_tile_256.png";
+const BITTERPAN_CRUST_DECAL_URL = "/assets/map02/textures/bitterpan_crust_1024.png";
+/** P15. Hangar Six fixture panels — the plaque backings. Greenwater only. */
+const HANGAR_FIXTURES_TEXTURE_URL = "/assets/greenwater/textures/hangar_fixtures_512.png";
 const SURFACE_CHARACTER_MODEL_URL = "/assets/greenwater/models/greenwater_surface_character_runtime.glb";
 const BITTERPAN_TRACK_MODEL_URL = "/assets/map02/models/bitterpan_blockout.glb";
 const BITTERPAN_MASSING_MODEL_URL = "/assets/map02/models/bitterpan_massing.glb";
@@ -158,6 +169,15 @@ export class SceneAssets {
   surfaceCharacter: GreenwaterSurfaceCharacter | null = null;
   openingSurface: GreenwaterOpeningSurface | null = null;
   signage: TracksideSignage | null = null;
+  /** P15: the Bitterpan pan crust + set dressing, and the Hangar Six backings. */
+  bitterpanSurface: BitterpanSurface | null = null;
+  plaqueBacking: HangarPlaqueBacking | null = null;
+  private bitterpanSurfaceLoadMs: number | null = null;
+  private bitterpanSurfaceReady = false;
+  private bitterpanSurfaceError: string | null = null;
+  private plaqueBackingLoadMs: number | null = null;
+  private plaqueBackingReady = false;
+  private plaqueBackingError: string | null = null;
   private openingSurfaceLoadMs: number | null = null;
   private openingSurfaceReady = false;
   private openingSurfaceError: string | null = null;
@@ -205,7 +225,11 @@ export class SceneAssets {
         // Bitterpan's zone set names only the shared motion atlases, so it needs
         // nothing off the accepted blockout the way Greenwater needs its jungle
         // and emissive maps.
-        await Promise.all([this.loadLivingWorld({}), this.loadSignage()]);
+        await Promise.all([
+          this.loadLivingWorld({}),
+          this.loadSignage(),
+          this.loadBitterpanSurface(),
+        ]);
         return;
       }
 
@@ -233,6 +257,7 @@ export class SceneAssets {
         this.loadSurfaceCharacter(),
         this.loadOpeningSurface(),
         this.loadSignage(),
+        this.loadPlaqueBacking(),
       ]);
     } catch (error) {
       this.environmentError = error instanceof Error
@@ -336,6 +361,69 @@ export class SceneAssets {
     }
   }
 
+  /**
+   * P15. The pan crust and everything the works left on it. Bitterpan only —
+   * the ground tile is authored for the salt flat and Greenwater has had a
+   * ground plane since Phase 1.
+   */
+  private async loadBitterpanSurface(): Promise<void> {
+    const loadStartedAt = performance.now();
+    try {
+      const { BitterpanSurface } = await import("./bitterpan-surface");
+      const surface = await BitterpanSurface.load(
+        this.course,
+        BITTERPAN_CRUST_TILE_URL,
+        BITTERPAN_CRUST_DECAL_URL,
+      );
+      if (this.isDisposed()) {
+        disposeObject3DResources(surface.root);
+        return;
+      }
+      this.bitterpanSurface = surface;
+      this.scene.add(surface.root);
+      this.bitterpanSurfaceReady = true;
+      this.requestRender();
+    } catch (error) {
+      this.bitterpanSurfaceError = error instanceof Error
+        ? error.message
+        : "Unknown Bitterpan surface load error";
+      console.warn("Bitterpan pan-surface layer failed to load.", error);
+    } finally {
+      this.bitterpanSurfaceLoadMs = performance.now() - loadStartedAt;
+    }
+  }
+
+  /**
+   * P15. The panels the 13 Hangar Six wall plaques are bolted to. Greenwater
+   * only, and only because the hangar span authors no verge — the placements
+   * come off the course's own resolver, not out of a position list.
+   */
+  private async loadPlaqueBacking(): Promise<void> {
+    const loadStartedAt = performance.now();
+    try {
+      const { HangarPlaqueBacking } = await import("./plaque-backing");
+      const backing = await HangarPlaqueBacking.load(
+        this.course.wallPlaqueBackings ?? [],
+        HANGAR_FIXTURES_TEXTURE_URL,
+      );
+      if (this.isDisposed()) {
+        disposeObject3DResources(backing.root);
+        return;
+      }
+      this.plaqueBacking = backing;
+      this.scene.add(backing.root);
+      this.plaqueBackingReady = true;
+      this.requestRender();
+    } catch (error) {
+      this.plaqueBackingError = error instanceof Error
+        ? error.message
+        : "Unknown Hangar Six plaque-backing load error";
+      console.warn("Greenwater plaque-backing layer failed to load.", error);
+    } finally {
+      this.plaqueBackingLoadMs = performance.now() - loadStartedAt;
+    }
+  }
+
   /** P12. Trackside boards and their posts. Both maps, one atlas. */
   private async loadSignage(): Promise<void> {
     const loadStartedAt = performance.now();
@@ -434,7 +522,36 @@ export class SceneAssets {
   private artPassDiagnostics() {
     const opening = this.openingSurface?.stats;
     const signage = this.signage?.stats;
+    const bitterpanSurface = this.bitterpanSurface?.stats;
+    const plaqueBacking = this.plaqueBacking?.stats;
     return {
+      // P15, same reasoning as the P12 counters below: the pan crust, the set
+      // dressing and the plaque backings are all non-interactive, so a soak
+      // whose layer silently failed to load has identical lap times, faults and
+      // frame timing to one where it rendered. These counts reading nonzero is
+      // the only automated evidence the art is in the scene.
+      bitterpanSurfaceLoadMs: this.bitterpanSurfaceLoadMs === null
+        ? null
+        : Number(this.bitterpanSurfaceLoadMs.toFixed(1)),
+      bitterpanSurfaceReady: this.bitterpanSurfaceReady,
+      bitterpanSurfaceError: this.bitterpanSurfaceError,
+      bitterpanSurfaceDrawCalls: bitterpanSurface?.drawCalls ?? 0,
+      bpCrustDecals: bitterpanSurface?.decals ?? 0,
+      bpCrustOnlyDecals: bitterpanSurface?.crustDecals ?? 0,
+      bpDressingItems: bitterpanSurface?.dressingItems ?? 0,
+      bpCrustTriangles: bitterpanSurface?.triangles ?? 0,
+      bpGroundMetresPerTile: bitterpanSurface?.groundMetresPerTile ?? 0,
+      bpGroundAnisotropy: bitterpanSurface?.groundAnisotropy ?? 0,
+      plaqueBackingLoadMs: this.plaqueBackingLoadMs === null
+        ? null
+        : Number(this.plaqueBackingLoadMs.toFixed(1)),
+      plaqueBackingReady: this.plaqueBackingReady,
+      plaqueBackingError: this.plaqueBackingError,
+      plaqueBackingDrawCalls: plaqueBacking?.drawCalls ?? 0,
+      plaqueBackings: plaqueBacking?.panels ?? 0,
+      plaqueBackingChevrons: plaqueBacking?.chevronPanels ?? 0,
+      plaqueBackingBoards: plaqueBacking?.boardPanels ?? 0,
+      plaqueBackingTriangles: plaqueBacking?.triangles ?? 0,
       openingSurfaceLoadMs: this.openingSurfaceLoadMs === null
         ? null
         : Number(this.openingSurfaceLoadMs.toFixed(1)),
