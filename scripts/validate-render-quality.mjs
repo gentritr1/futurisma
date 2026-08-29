@@ -28,16 +28,45 @@ import {
   PS2_SNAP_UNIFORM_NAME,
 } from "../src/game/render-mode.js";
 
-assert.equal(calculatePreferredPixelRatio(720, 2, "adaptive"), 0.75);
+// P14 re-baseline: `adaptive` targets 720 lines with a 1.0 ratio cap (was 540
+// lines / 0.82), so a 720p window renders 1:1 instead of at 960x540.
+assert.equal(calculatePreferredPixelRatio(720, 2, "adaptive"), 1);
+// The adaptive *floor* is deliberately unchanged at 360 lines / 0.65, so the
+// p95 governor keeps the full downshift range it had before P14.
 assert.equal(calculateMinimumPixelRatio(720, 2, "adaptive"), 0.5);
-assert.equal(calculatePreferredPixelRatio(1_080, 2, "adaptive"), 0.5);
+assert.ok(
+  Math.abs(calculatePreferredPixelRatio(1_080, 2, "adaptive") - 2 / 3) < 1e-9,
+);
 assert.ok(
   Math.abs(calculateMinimumPixelRatio(1_080, 2, "adaptive") - 1 / 3) < 1e-9,
 );
-assert.equal(calculatePreferredPixelRatio(2_160, 2, "adaptive"), 0.25);
-assert.equal(calculatePreferredPixelRatio(720, 2, "low"), 0.5);
-assert.equal(calculateMinimumPixelRatio(720, 2, "low"), 0.5);
+assert.ok(
+  Math.abs(calculatePreferredPixelRatio(2_160, 2, "adaptive") - 1 / 3) < 1e-9,
+);
+// P14 re-baseline: `low` inherits the old adaptive target (540 lines, was 360)
+// and keeps its own 0.65 cap, so at 720p it is still a real step down.
+assert.equal(calculatePreferredPixelRatio(720, 2, "low"), 0.65);
+assert.equal(calculateMinimumPixelRatio(720, 2, "low"), 0.65);
+// `high` is untouched by P14.
 assert.equal(calculatePreferredPixelRatio(720, 2, "high"), 1.25);
+
+// The three modes must stay ordered, and adaptive must keep headroom to fall
+// into — a preferred ratio pinned to its own floor would make the governor a
+// no-op, which is the failure mode raising the target could have introduced.
+for (const height of [480, 720, 900, 1_080, 1_440, 2_160]) {
+  const low = calculatePreferredPixelRatio(height, 2, "low");
+  const adaptive = calculatePreferredPixelRatio(height, 2, "adaptive");
+  const high = calculatePreferredPixelRatio(height, 2, "high");
+  assert.ok(
+    low <= adaptive && adaptive <= high,
+    `Quality modes fell out of order at ${height}px: ${low} / ${adaptive} / ${high}.`,
+  );
+  assert.ok(
+    calculateMinimumPixelRatio(height, 2, "adaptive") < adaptive,
+    `Adaptive has no downshift headroom at ${height}px; the p95 governor could `
+      + "never reduce the render scale.",
+  );
+}
 
 assert.equal(reconcilePixelRatioAfterResize(0.75, 0.75, 0.5, 1 / 3), 0.5);
 assert.equal(reconcilePixelRatioAfterResize(0.58, 0.75, 0.6, 0.4), 0.58);
@@ -301,16 +330,23 @@ function read(path) {
   return readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
 }
 
-for (const [path, call] of [
-  ["src/game/game.ts", "applyPs2MaterialTreatment(this.course.group, {"],
-  ["src/game/environment.ts", "applyPs2MaterialTreatment(root, { worldGeometry: true })"],
-  ["src/game/bitterpan-environment.ts", "applyPs2MaterialTreatment(root, { worldGeometry: true })"],
-  ["src/game/scene-assets.ts", "applyPs2MaterialTreatment(gltf.scene, { worldGeometry: true })"],
+// P14 re-baseline: two of these call sites grew a second option, so the check
+// is now "the call opts world geometry in" rather than one exact string.
+for (const [path, receiver] of [
+  ["src/game/game.ts", "this.course.group"],
+  ["src/game/environment.ts", "root"],
+  ["src/game/bitterpan-environment.ts", "root"],
+  ["src/game/scene-assets.ts", "gltf.scene"],
 ]) {
   const source = read(path);
-  assert.ok(
-    source.includes(call),
-    `${path} must opt its world geometry into the PS2 vertex snap: \`${call}\`.`,
+  const call = new RegExp(
+    `applyPs2MaterialTreatment\\(\\s*${receiver.replace(".", "\\.")},\\s*\\{[^}]*worldGeometry:\\s*true`,
+  );
+  assert.match(
+    source,
+    call,
+    `${path} must opt its world geometry into the PS2 vertex snap via `
+      + `applyPs2MaterialTreatment(${receiver}, { worldGeometry: true, ... }).`,
   );
 }
 const totem = read("src/game/totem.ts");
@@ -341,10 +377,77 @@ assert.ok(
   "P4b must not touch the HUD or the CSS scanline layer.",
 );
 
+// ---------------------------------------------------------------------------
+// P14 — MSAA, and the surgical split between pixel-authored and painterly
+// texture classes. The point of the split is that it is *surgical*: the sheets
+// `scripts/design/atlas-draw.mjs` draws texel-by-texel keep point sampling, and
+// only the baked GLB sheets take the smooth class.
+// ---------------------------------------------------------------------------
+
+assert.match(
+  read("src/game/game.ts"),
+  /antialias:\s*prefersMultisampling\(\)/,
+  "P14 turns MSAA on through totem.ts's mode-aware helper, not a bare literal — "
+    + "geometry-edge shimmer at speed is the loudest artifact at the raised "
+    + "internal target, but `?render=ps2` has to keep its snapped, jagged edges.",
+);
+assert.match(
+  totem,
+  /export function prefersMultisampling\(\): boolean \{\s*return activeRenderMode\(\) !== "ps2";/,
+  "prefersMultisampling must be false in ps2 mode; smoothing the snapped "
+    + "silhouettes would take the era out of the era mode.",
+);
+
+// The two classes, and the exact filters each one carries.
+assert.match(
+  totem,
+  /pixel:\s*\{\s*magFilter:\s*THREE\.NearestFilter,\s*minFilter:\s*THREE\.NearestMipmapLinearFilter,\s*anisotropy:\s*1,/,
+  "The pixel class must stay point-sampled: the runway, signage and motion "
+    + "atlases plus the livery decal sheets are authored texel-by-texel and a "
+    + "linear magnifier smears exactly the stem weights atlas-draw.mjs protects.",
+);
+assert.match(
+  totem,
+  /painterly:\s*\{\s*magFilter:\s*THREE\.LinearFilter,\s*minFilter:\s*THREE\.LinearMipmapLinearFilter,\s*anisotropy:\s*1,/,
+  "The painterly class must be linear in both directions: the baked GLB sheets "
+    + "are painted at 1024 with sub-texel noise, so point sampling only buys "
+    + "minification speckle.",
+);
+assert.match(
+  totem,
+  /activeRenderMode\(\) === "ps2"\s*\?\s*TEXTURE_FILTER_CLASSES\.pixel/,
+  "`?render=ps2` must force the pixel class regardless of the authored "
+    + "character, or P14 would quietly re-grade the era-accurate opt-in.",
+);
+
+// Who takes which class. Only the baked environment GLBs opt into painterly.
+for (const path of ["src/game/environment.ts", "src/game/bitterpan-environment.ts"]) {
+  assert.match(
+    read(path),
+    /textureCharacter:\s*"painterly"/,
+    `${path} carries a baked/painted GLB atlas and must take the painterly class.`,
+  );
+}
+for (const path of [
+  // The course builds its own pixel atlases; the asset kit's only texture is
+  // the livery decal sheet; the craft wears that same sheet.
+  "src/game/game.ts",
+  "src/game/scene-assets.ts",
+  "src/game/totem.ts",
+]) {
+  assert.ok(
+    !/textureCharacter:\s*"painterly"/.test(read(path)),
+    `${path} carries pixel-authored sheets and must NOT take the painterly `
+      + "class — P14's split is surgical, not a blanket filter swap.",
+  );
+}
+
 console.log(
-  "Render quality PASS: 540-line adaptive target, 360-line floor, resize-safe "
+  "Render quality PASS: 720-line adaptive target, 360-line floor, resize-safe "
     + `degradation; ?render defaults to ${DEFAULT_RENDER_MODE}, snap grid clamps to `
     + `${PS2_SNAP_MIN_LINES}-${PS2_SNAP_MAX_LINES} lines, Bayer closed form matches `
     + "the canonical 4x4, grade is monotonic with an identity midrange, world "
-    + "geometry snaps and the craft, rivals, sky and HUD do not.",
+    + "geometry snaps and the craft, rivals, sky and HUD do not; MSAA is on "
+    + "outside ps2 and the painterly filter class reaches the baked GLB sheets "
+    + "only.",
 );

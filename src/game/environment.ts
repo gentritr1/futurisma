@@ -308,7 +308,10 @@ export class GreenwaterEnvironment {
     this.cullGroups = cullGroups;
     replaceEnvironmentMaterials(root);
     this.livingTextures = findLivingTextures(root);
-    const treatment = applyPs2MaterialTreatment(root, { worldGeometry: true });
+    const treatment = applyPs2MaterialTreatment(root, {
+      worldGeometry: true,
+      textureCharacter: "painterly",
+    });
     this.stats = {
       meshes: cullGroups.length,
       triangles,

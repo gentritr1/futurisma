@@ -1,5 +1,29 @@
 const MINIMUM_PIXEL_RATIO = 0.25;
 
+/**
+ * P14 — modern-legibility defaults. PRODUCT.md principle 4: "the PS2 era is the
+ * memory, not the method." Atmosphere stays; literal degradation goes wherever
+ * it costs legibility, and a 540-line default backbuffer stretched over a 720p
+ * window was the largest single legibility cost in the build.
+ *
+ * `adaptive` now targets 720 lines with the ratio cap opened to 1.0, so a
+ * 1280x720 window renders 1:1 instead of at 960x540. `low` inherits the old
+ * adaptive target (540 lines) and keeps its own 0.65 cap, so it is still a real
+ * step down. `high` is untouched.
+ */
+const ADAPTIVE_TARGET_LINES = 720;
+const ADAPTIVE_RATIO_CAP = 1;
+const LOW_TARGET_LINES = 540;
+const LOW_RATIO_CAP = 0.65;
+/**
+ * The adaptive *floor* is deliberately NOT moved with the target. The p95
+ * governor in `game.ts` is the safety net for a machine that cannot hold the new
+ * target, and narrowing its range would blunt exactly the mechanism that makes
+ * raising the target safe. It keeps its 360-line / 0.65 bound.
+ */
+const ADAPTIVE_FLOOR_LINES = 360;
+const ADAPTIVE_FLOOR_RATIO_CAP = 0.65;
+
 /** @typedef {"adaptive" | "high" | "low"} RenderQualityMode */
 
 /**
@@ -15,8 +39,8 @@ export function calculatePreferredPixelRatio(
   const height = Math.max(1, viewportHeight);
   const deviceRatio = Math.max(MINIMUM_PIXEL_RATIO, devicePixelRatio);
   if (mode === "high") return Math.min(deviceRatio, 1.25);
-  const targetHeight = mode === "low" ? 360 : 540;
-  const ratioCap = mode === "low" ? 0.65 : 0.82;
+  const targetHeight = mode === "low" ? LOW_TARGET_LINES : ADAPTIVE_TARGET_LINES;
+  const ratioCap = mode === "low" ? LOW_RATIO_CAP : ADAPTIVE_RATIO_CAP;
   return Math.max(
     MINIMUM_PIXEL_RATIO,
     Math.min(deviceRatio, ratioCap, targetHeight / height),
@@ -41,7 +65,11 @@ export function calculateMinimumPixelRatio(
   if (mode !== "adaptive") return preferred;
   return Math.max(
     MINIMUM_PIXEL_RATIO,
-    Math.min(preferred, 0.65, 360 / Math.max(1, viewportHeight)),
+    Math.min(
+      preferred,
+      ADAPTIVE_FLOOR_RATIO_CAP,
+      ADAPTIVE_FLOOR_LINES / Math.max(1, viewportHeight),
+    ),
   );
 }
 
