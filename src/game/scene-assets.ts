@@ -13,9 +13,12 @@ import type { RaceEnvironment } from "./environment";
 import { disposeObject3DResources } from "./graphics-resources";
 import type { LivingWorld, LivingWorldTextures } from "./living-world";
 import type { GreenwaterOpeningSurface } from "./opening-surface";
+import type { FacadeStats } from "./bitterpan-facades";
 import type { HangarPlaqueBacking } from "./plaque-backing";
 import { probeSelected, searchFlag } from "./query-probes";
+import type { BitterpanRoadEdgeBand } from "./road-edge-band";
 import type { TracksideSignage } from "./signage";
+import type { SignageBackPanels } from "./signage-backs";
 import type { GreenwaterSurfaceCharacter } from "./surface-character";
 import { applyPs2MaterialTreatment } from "./totem";
 
@@ -123,6 +126,20 @@ const BITTERPAN_CRUST_TILE_URL = "/assets/map02/textures/bitterpan_crust_tile_25
 const BITTERPAN_CRUST_DECAL_URL = "/assets/map02/textures/bitterpan_crust_1024.png";
 /** P15. Hangar Six fixture panels — the plaque backings. Greenwater only. */
 const HANGAR_FIXTURES_TEXTURE_URL = "/assets/greenwater/textures/hangar_fixtures_512.png";
+/**
+ * P18 art pass 03 — the world past the barriers.
+ *
+ * Three sheets. The facade sheet is Bitterpan's alone; the horizon card sheet
+ * and the trim sheet are shared by both maps, the same way the two motion
+ * atlases already are, and are served from the shared Greenwater texture
+ * directory rather than duplicated per map. The trim sheet carries BOTH the
+ * signage back panels and the Bitterpan road edge band, which is why it is
+ * loaded once here and handed to whichever layers a map has.
+ */
+const BITTERPAN_FACADES_TEXTURE_URL = "/assets/map02/textures/bitterpan_facades_1024.png";
+const BITTERPAN_MASSING_PLACEMENTS_URL = "/data/map02/MASSING_PLACEMENTS.json";
+const HORIZON_TEXTURE_URL = "/assets/greenwater/textures/futurisma_horizon_1024.png";
+const TRIM_TEXTURE_URL = "/assets/greenwater/textures/futurisma_trim_512.png";
 const SURFACE_CHARACTER_MODEL_URL = "/assets/greenwater/models/greenwater_surface_character_runtime.glb";
 const BITTERPAN_TRACK_MODEL_URL = "/assets/map02/models/bitterpan_blockout.glb";
 const BITTERPAN_MASSING_MODEL_URL = "/assets/map02/models/bitterpan_massing.glb";
@@ -253,6 +270,12 @@ export class SceneAssets {
   /** P15: the Bitterpan pan crust + set dressing, and the Hangar Six backings. */
   bitterpanSurface: BitterpanSurface | null = null;
   plaqueBacking: HangarPlaqueBacking | null = null;
+  /** P18: the two layers that sample futurisma_trim_512. */
+  signageBacks: SignageBackPanels | null = null;
+  roadEdgeBand: BitterpanRoadEdgeBand | null = null;
+  private trimLayersLoadMs: number | null = null;
+  private trimLayersReady = false;
+  private trimLayersError: string | null = null;
   private bitterpanSurfaceLoadMs: number | null = null;
   private bitterpanSurfaceReady = false;
   private bitterpanSurfaceError: string | null = null;
@@ -295,6 +318,8 @@ export class SceneAssets {
         const environment = await BitterpanEnvironment.load(
           BITTERPAN_TRACK_MODEL_URL,
           BITTERPAN_MASSING_MODEL_URL,
+          BITTERPAN_FACADES_TEXTURE_URL,
+          BITTERPAN_MASSING_PLACEMENTS_URL,
         );
         this.environmentLoadMs = performance.now() - environmentLoadStartedAt;
         if (this.isDisposed()) {
@@ -313,6 +338,7 @@ export class SceneAssets {
           this.loadLivingWorld({}),
           this.loadSignage(),
           this.loadBitterpanSurface(),
+          this.loadTrimLayers(),
         ]);
         return;
       }
@@ -343,6 +369,7 @@ export class SceneAssets {
         this.loadOpeningSurface(),
         this.loadSignage(),
         this.loadPlaqueBacking(),
+        this.loadTrimLayers(),
       ]);
     } catch (error) {
       this.environmentError = error instanceof Error
@@ -369,6 +396,7 @@ export class SceneAssets {
         textures,
         LIVING_WORLD_MOTION_URL,
         LIVING_WORLD_MOTION_B_URL,
+        HORIZON_TEXTURE_URL,
       );
       if (this.isDisposed()) {
         disposeObject3DResources(livingWorld.root);
@@ -544,6 +572,53 @@ export class SceneAssets {
       console.warn("Greenwater plaque-backing layer failed to load.", error);
     } finally {
       this.plaqueBackingLoadMs = performance.now() - loadStartedAt;
+    }
+  }
+
+  /**
+   * P18 art pass 03 — everything that samples `futurisma_trim_512`.
+   *
+   * Both layers ride one texture load because they are one sheet: the signage
+   * back panels on both maps, and the Bitterpan road edge band. Loaded together
+   * so the band and the board backs can never disagree about the sheet's
+   * filtering, and so a single failure reports once.
+   */
+  private async loadTrimLayers(): Promise<void> {
+    const loadStartedAt = performance.now();
+    try {
+      const [{ SignageBackPanels }, { BitterpanRoadEdgeBand }] = await Promise.all([
+        import("./signage-backs"),
+        import("./road-edge-band"),
+      ]);
+      const backs = await SignageBackPanels.load(this.course, TRIM_TEXTURE_URL);
+      if (this.isDisposed()) {
+        disposeObject3DResources(backs.root);
+        return;
+      }
+      this.signageBacks = backs;
+      this.scene.add(backs.root);
+
+      if (this.course.kind === "bitterpan") {
+        const material = (backs.root.children[0] as THREE.Mesh).material;
+        const texture = (material as THREE.MeshBasicMaterial).map;
+        if (!texture) throw new Error("The trim sheet did not resolve a texture.");
+        const band = await BitterpanRoadEdgeBand.load(this.course, texture);
+        if (this.isDisposed()) {
+          disposeObject3DResources(band.root);
+          return;
+        }
+        this.roadEdgeBand = band;
+        this.scene.add(band.root);
+      }
+      this.trimLayersReady = true;
+      this.requestRender();
+    } catch (error) {
+      this.trimLayersError = error instanceof Error
+        ? error.message
+        : `Unknown ${this.course.mapName} trim-layer load error`;
+      console.warn(`${this.course.mapName} Pass 03 trim layers failed to load.`, error);
+    } finally {
+      this.trimLayersLoadMs = performance.now() - loadStartedAt;
     }
   }
 
@@ -754,7 +829,57 @@ export class SceneAssets {
     const signage = this.signage?.stats;
     const bitterpanSurface = this.bitterpanSurface?.stats;
     const plaqueBacking = this.plaqueBacking?.stats;
+    const backs = this.signageBacks?.stats;
+    const band = this.roadEdgeBand?.stats;
+    const facades = (this.authoredEnvironment as { facades?: { stats: FacadeStats } | null })
+      ?.facades?.stats;
     return {
+      // P18 art pass 03. Same reasoning as every art-pass counter above: none
+      // of this is interactive, so a soak whose layer silently failed has
+      // identical lap times, faults and frame timing to one where it rendered.
+      // Each count reading nonzero is the only automated evidence the art is in
+      // the scene, and `blockoutRoadHidden` is the only automated evidence the
+      // duplicate road actually stopped drawing.
+      trimLayersLoadMs: this.trimLayersLoadMs === null
+        ? null
+        : Number(this.trimLayersLoadMs.toFixed(1)),
+      trimLayersReady: this.trimLayersReady,
+      trimLayersError: this.trimLayersError,
+      facadeAssignments: facades?.assignments ?? 0,
+      facadeMaterials: facades?.materials ?? 0,
+      facadeFamilies: facades?.families ?? 0,
+      facadeAlphaTestedFamilies: facades?.alphaTestedFamilies ?? 0,
+      facadeSkirtedPlacements: facades?.skirtedPlacements ?? 0,
+      facadePlinthedPlacements: facades?.plinthedPlacements ?? 0,
+      facadeWindowedPlacements: facades?.windowedPlacements ?? 0,
+      facadeTriangles: facades?.triangles ?? 0,
+      facadeSkirtTriangles: facades?.skirtTriangles ?? 0,
+      facadeElements: facades?.elements ?? 0,
+      facadeSheetsSampled: facades?.sheetsSampled ?? 0,
+      facadeWindowDuskBlend: facades?.windowDuskBlend ?? 0,
+      backPanelDrawCalls: backs?.drawCalls ?? 0,
+      backPanels: backs?.panels ?? 0,
+      backPanelsTagged: backs?.tagged ?? 0,
+      backPanelsBlank: backs?.blank ?? 0,
+      backPanelWallPlaqueSkips: backs?.wallPlaqueSkips ?? 0,
+      backPanelTriangles: backs?.triangles ?? 0,
+      edgeBandDrawCalls: band?.drawCalls ?? 0,
+      edgeStrips: band?.strips ?? 0,
+      edgeTicks: band?.ticks ?? 0,
+      cyanTicks: band?.cyanTicks ?? 0,
+      cyanTicksInSpan: band?.cyanTicksInSpan ?? 0,
+      chevronTicks: band?.chevronTicks ?? 0,
+      wearCapTicks: band?.wearCapTicks ?? 0,
+      edgeBlankStrips: band?.blankStrips ?? 0,
+      edgeDeckStrips: band?.deckStrips ?? 0,
+      edgePanStrips: band?.panStrips ?? 0,
+      edgeBermStrips: band?.bermStrips ?? 0,
+      edgeBandQuads: band?.quads ?? 0,
+      edgeBandTriangles: band?.triangles ?? 0,
+      edgeBandMaxLiftMetres: band?.maxLiftMetres ?? 0,
+      blockoutRoadHidden: this.course.kind === "bitterpan"
+        ? this.scene.getObjectByName("GW2_TRACK_BLOCKOUT")?.visible === false
+        : null,
       // P15, same reasoning as the P12 counters below: the pan crust, the set
       // dressing and the plaque backings are all non-interactive, so a soak
       // whose layer silently failed to load has identical lap times, faults and

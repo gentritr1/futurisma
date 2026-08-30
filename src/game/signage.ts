@@ -130,7 +130,7 @@ export function postCountFor(mount: string): number {
   return 0;
 }
 
-interface BoardFrame {
+export interface BoardFrame {
   origin: THREE.Vector3;
   widthAxis: THREE.Vector3;
   heightAxis: THREE.Vector3;
@@ -140,8 +140,12 @@ interface BoardFrame {
 /**
  * Builds the board's local frame from the course. `widthAxis x heightAxis` is
  * the board's outward normal, which is what fixes the winding below.
+ *
+ * Exported for P18: the back panels stand on the same frame as the board they
+ * sit behind, derived by the same call rather than re-resolved, so a board and
+ * its back can never disagree about station, lean or surface height.
  */
-function frameFor(
+export function frameFor(
   course: RaceCourse,
   placement: SignagePlacement,
   scratch: CourseSample,

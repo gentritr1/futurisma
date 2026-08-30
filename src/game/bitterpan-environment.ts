@@ -2,7 +2,11 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import productionJson from "./data/map02/BITTERPAN_PRODUCTION.json";
 import type { RaceEnvironment, RaceEnvironmentStats } from "./environment";
+import { BitterpanFacades } from "./bitterpan-facades";
 import { disposeObject3DResources } from "./graphics-resources";
+import { searchFlag } from "./query-probes";
+import { activeRenderMode } from "./render-mode.js";
+import { timeOfDayDrift } from "./time-of-day";
 import { applyPs2MaterialTreatment } from "./totem";
 
 const EXPECTED_TRACK_PRIMITIVES = 5;
@@ -45,6 +49,32 @@ function deriveCullDistance(radius: number): number {
     CULLING.maximumDistanceMetres,
     CULLING.baseDistanceMetres + radius * CULLING.radiusMultiplier,
   );
+}
+
+/**
+ * The accepted massing placement table, served rather than bundled.
+ *
+ * `public/data/map02/MASSING_PLACEMENTS.json` is 156 KB and is hash-pinned by
+ * `scripts/validate-map02.mjs`. The facade mapper needs it to tell which
+ * structure a merged element belongs to, and only on Bitterpan, so it is
+ * fetched beside the GLBs instead of import-bundled into every map's payload.
+ */
+async function loadPlacements(url: string): Promise<readonly {
+  id: string;
+  family: string;
+  position: [number, number, number];
+  height_m: number;
+  footprint_m: [number, number];
+}[]> {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Bitterpan massing placements ${url} returned ${response.status}.`);
+  }
+  const payload = await response.json();
+  if (!Array.isArray(payload?.placements)) {
+    throw new Error("Bitterpan massing placements payload has no placement list.");
+  }
+  return payload.placements;
 }
 
 /** Builds a world-space cull group for every visible mesh under `root`. */
@@ -202,6 +232,7 @@ export class BitterpanEnvironment implements RaceEnvironment {
     meshes: number,
     triangles: number,
     contractDrift: string[],
+    readonly facades: BitterpanFacades | null,
   ) {
     this.root = root;
     this.cullGroups = collectCullGroups(root);
@@ -216,6 +247,13 @@ export class BitterpanEnvironment implements RaceEnvironment {
       worldGeometry: true,
       textureCharacter: "painterly",
     });
+    // P18 — the treatment's "painterly" class is already linear + mipped, which
+    // is what the facade sheet asks for, but it pins anisotropy to 1. These
+    // faces are read from 8 m to 900 m in the same frame and almost all of them
+    // are seen at a grazing angle; the delivery names anisotropy 4 for exactly
+    // that. Restored here, in one place, and only outside `?render=ps2` — that
+    // mode's whole contract is that nothing escapes the raster.
+    if (facades && activeRenderMode() !== "ps2") facades.restoreAnisotropy();
     const resources = countVisibleResources(root);
     this.stats = {
       meshes,
@@ -233,6 +271,8 @@ export class BitterpanEnvironment implements RaceEnvironment {
   static async load(
     trackUrl: string,
     massingUrl: string,
+    facadeTextureUrl: string,
+    placementsUrl: string,
   ): Promise<BitterpanEnvironment> {
     const loader = new GLTFLoader();
     const [trackResult, massingResult] = await Promise.allSettled([
@@ -289,14 +329,69 @@ export class BitterpanEnvironment implements RaceEnvironment {
         console.warn(`Bitterpan authored-asset contract drift: ${drift}.`);
       }
 
+      // P18 task 5 — the vestigial blockout ROAD stops rendering.
+      //
+      // `GW2_TRACK_BLOCKOUT` is not the road the player drives. Greenwater
+      // calls `setProceduralEnvironmentVisible(course.group, false)` so its GLB
+      // replaces the procedural ribbon; the Bitterpan branch never did, so both
+      // existed at once and the ribbon — built from CENTRELINE_STATIONS,
+      // correctly banked — is what renders under the craft. P16 measured the
+      // duplicate's cross-section as MIRRORED against the course model (a
+      // constant 1.303 m at lateral 14.925 = sin(5.0 deg), exactly twice the
+      // authored 2.5-degree bank) and excluded it from the corridor sweep for
+      // that reason. What was left was a second road drawn through the real
+      // one, and with it the legacy `BLOCKOUT_barrier` orange edge banding.
+      //
+      // Removed from RENDER, not from LOAD, and deliberately so: the accepted
+      // GLB keeps being parsed, its five primitives and 6,100 triangles keep
+      // being counted, and `contractDrift` above is still computed from the
+      // full accepted payload. The freeze contract that
+      // `finalMap02NativeBlockoutFreeze` stands for is a contract about the
+      // BYTES — `scripts/validate-map02.mjs` asserts them against the file —
+      // and nothing about it is weakened by not drawing the mesh. Dropping the
+      // load would have weakened it.
+      //
+      // The replacement is authored and lands in the same change:
+      // BITTERPAN_ROAD_EDGE_BAND, painted on the ribbon itself. Two orange edge
+      // languages in one frame is worse than either alone.
+      //
+      // Hidden on every descendant, not just the group: `collectCullGroups`,
+      // `countVisibleMeshes` and `countVisibleResources` all test the object's
+      // own `visible`, and `updateVisibility` writes it every frame — a group
+      // flag alone would stop the draw but leave all three counters lying.
+      //
+      // `?diagnostics=1&legacyBlockout=1` keeps it drawn. That is the A/B lever
+      // for this change and nothing else: it exists because "the old orange
+      // banding is gone and the authored band replaced it" is a claim only a
+      // before/after pair can settle, and a reviewer should not have to check
+      // out the previous commit to see the before. Gated on diagnostics, so no
+      // player can reach it.
+      const keepLegacyBlockout = searchFlag("diagnostics") && searchFlag("legacyBlockout");
+      if (!keepLegacyBlockout) {
+        track.traverse((object) => {
+          object.visible = false;
+        });
+      }
+
+      const facades = await BitterpanFacades.load(
+        massing,
+        await loadPlacements(placementsUrl),
+        facadeTextureUrl,
+      );
+
       const root = new THREE.Group();
       root.name = "map02_bitterpan_authored_environment";
       root.add(trackScene, massingScene);
+      // Recounted AFTER the blockout road is hidden, so `environmentMeshes` and
+      // `environmentTriangles` report what is drawn rather than what was
+      // loaded. The accepted-contract numbers above are untouched.
+      const drawn = countVisibleMeshes(root);
       return new BitterpanEnvironment(
         root,
-        trackStats.meshes + massingStats.meshes,
-        visibleTriangles,
+        drawn.meshes,
+        drawn.triangles,
         contractDrift,
+        facades,
       );
     } catch (error) {
       disposeObject3DResources(trackScene);
@@ -319,6 +414,14 @@ export class BitterpanEnvironment implements RaceEnvironment {
    * worth making yet.
    */
   updateVisibility(camera: THREE.Camera): void {
+    // P18 — the facade window strips ride the existing time-of-day stop
+    // mechanism. WINDOW_STRIP_DUSK and WINDOW_STRIP_DEAD are the same eight
+    // bays at the same pitch, cross-faded on the drift the atmosphere already
+    // resolves, rather than tinted: an amber-tinted dead window is a dead
+    // window, not a lit one. Driven from here because this is the one
+    // Bitterpan-only per-frame call that already exists, and `game.ts` is on a
+    // hard line budget.
+    this.facades?.setWindowBlend(timeOfDayDrift());
     camera.updateMatrixWorld();
     this.viewProjection.multiplyMatrices(
       camera.projectionMatrix,

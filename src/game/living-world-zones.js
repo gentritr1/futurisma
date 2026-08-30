@@ -71,12 +71,30 @@
  * @typedef {object} LivingBatchSpec
  * @property {string} id
  * @property {string} meshName
- * @property {"motion" | "motionB" | "jungle" | "emissive"} texture
+ * @property {"motion" | "motionB" | "jungle" | "emissive" | "horizon"} texture
  * @property {"normal" | "additive"} blending
  * @property {boolean} depthWrite
  * @property {boolean} fog
  * @property {number} alphaTest 0 disables the alpha test
  * @property {boolean} lamps emissive batch: colour is driven per frame
+ * @property {"bottom"} [anchor] P18.1. Where `base` puts the card.
+ *
+ *   The card system has always CENTRED a quad on `sample.position.y + base`,
+ *   which is right for drifting atmosphere — mist, steam, rain, glint all want
+ *   a centre. It is wrong for a ground-standing silhouette: a 50 m mesa card at
+ *   base 0 spans -25 m to +25 m and shows half its authored height, which is
+ *   how P18 shipped and why the Long Basin still read as gradient.
+ *
+ *   `anchor: "bottom"` moves the card up by its own half-height so its BOTTOM
+ *   edge sits at `base`. The cells are authored bottom-anchored — their grade
+ *   contact is drawn at the cell's own bottom edge — so this is what makes
+ *   `base: 0` mean "on the ground" instead of "half buried", and it keeps
+ *   base 0 the verifiable convention the delivery asks for.
+ *
+ *   A BATCH property, not a card one: it is a property of what the cells on a
+ *   sheet mean, every card in a batch shares it, and putting it here keeps it
+ *   out of `canonicalCard` — so the 155 accepted Greenwater cards and every
+ *   P9/P12 digest are untouched by definition rather than by inspection.
  *
  * @typedef {object} LivingWorldSpec
  * @property {string} id
@@ -209,6 +227,52 @@ export const MOTION_B_RECTS = Object.freeze({
   dustScud: atlasRect(512, 4, 13),
   vaporThin: atlasRect(512, 4, 14),
   crateStack: atlasRect(512, 4, 15),
+});
+
+/**
+ * P18 art pass 03. Slot indices into `atlasRect(1024, 4, slot)` on
+ * `futurisma_horizon_1024` — the distant-silhouette card sheet, sixteen 256 px
+ * cells, shared by both maps exactly as the two motion sheets already are. Slot
+ * numbers are copied from `PASS03_LAYOUT.futurisma_horizon_1024` in
+ * `scripts/design/atlas-draw-pass03.mjs`; `validate-art-pass.mjs` asserts the
+ * rect this produces is the rect the builder drew.
+ */
+export const HORIZON_RECTS = Object.freeze({
+  treelineDense: atlasRect(1024, 4, 0),
+  treelineBroken: atlasRect(1024, 4, 1),
+  treelineSnag: atlasRect(1024, 4, 2),
+  pylonRun: atlasRect(1024, 4, 3),
+  gantryFar: atlasRect(1024, 4, 4),
+  hangarMass: atlasRect(1024, 4, 5),
+  siloPair: atlasRect(1024, 4, 6),
+  tankFarmFar: atlasRect(1024, 4, 7),
+  stackCluster: atlasRect(1024, 4, 8),
+  stackSingle: atlasRect(1024, 4, 9),
+  plantMass: atlasRect(1024, 4, 10),
+  rigFar: atlasRect(1024, 4, 11),
+  mesaLong: atlasRect(1024, 4, 12),
+  mesaBluff: atlasRect(1024, 4, 13),
+  shimmerBand: atlasRect(1024, 4, 14),
+  hazeBand: atlasRect(1024, 4, 15),
+});
+
+/**
+ * The four parallax bands of FUTURISMA_HORIZON_LAYERS.json, as authored.
+ *
+ * `tintRule` in that file explains how the values were derived (each map's fog
+ * colour pulled toward its silhouette base by 0.55 / 0.35 / 0.18 / 0.10); the
+ * hex values below are the delivery's own output of that rule and are used
+ * verbatim rather than re-derived, because fog colour is per-sector at runtime
+ * and re-deriving would make a signed-off tint move with the sector.
+ */
+const HORIZON_BANDS = Object.freeze({
+  GW_NEAR: 0x74827a,
+  GW_MID: 0x8b968c,
+  GW_FAR: 0xa1aa9f,
+  BP_NEAR: 0x8c8474,
+  BP_MID: 0xa79f8c,
+  BP_FAR: 0xbdb5a1,
+  BP_HORIZON: 0xc9c1ae,
 });
 
 const TAU = Math.PI * 2;
@@ -1095,6 +1159,314 @@ export const BITTERPAN_ZONES_B = Object.freeze([
   },
 ]);
 
+// ===========================================================================
+// P18 art pass 03 — the world past the barriers. APPEND ONLY.
+//
+// Distant silhouette cards, authored in this same card idiom so no new runtime
+// path exists: `FUTURISMA_HORIZON_LAYERS.json` states the batches, the bands
+// and the numeric ranges, and the authors below are the mechanical reading of
+// them. The precedent named by the spec is GREENWATER_ZONES_B.OPENING_WRECK_LINE
+// — ground-anchored `shear` silhouettes — pushed out from 34-78 m to 180-1400 m.
+//
+// The append rule is the same one P12 wrote down and is the reason these zones
+// are declared here rather than merged into the arrays above: the shared seeded
+// stream reaches every legacy zone with exactly the draws it saw before, so
+// Greenwater's 155 accepted cards and the P9/P12 additions stay bit-exact.
+// Nothing above this line moved.
+//
+// `base: 0` on every silhouette zone is load-bearing, not a default: the cells
+// are authored bottom-anchored so their grade contact is at the cell's own
+// bottom edge, and a non-zero base floats the silhouette off the ground.
+// ===========================================================================
+
+/** @type {readonly LivingBatchSpec[]} */
+export const GREENWATER_BATCHES_C = Object.freeze([
+  {
+    // depthWrite false, unlike the P12 `silhouette` batch: at 180 m and beyond
+    // nothing needs to occlude anything, and writing depth from a card that far
+    // out only risks fighting the sky dome. alphaTest 0.5 keeps the edge hard.
+    id: "horizon",
+    meshName: "GW_LIVING_HORIZON",
+    texture: "horizon",
+    blending: "normal",
+    depthWrite: false,
+    fog: true,
+    alphaTest: 0.5,
+    lamps: false,
+    anchor: "bottom",
+  },
+]);
+
+/** @type {readonly LivingZone[]} */
+export const GREENWATER_ZONES_C = Object.freeze([
+  {
+    // The base layer. Fourteen cards over 2.4 km is one card every 170 m, which
+    // closes the horizon without ever putting two in frame at the same size.
+    id: "HORIZON_TREELINE_FAR",
+    batch: "horizon",
+    from: 60,
+    to: 2440,
+    cards: 14,
+    card: (distance, side, index, next) => ({
+      kind: "shear",
+      distance,
+      side,
+      lateral: 480 + next() * 120,
+      base: 0,
+      width: 78 + next() * 26,
+      height: 16 + next() * 6,
+      phase: next() * TAU,
+      speed: TAU / 11.5,
+      amplitude: degToRad(0.25),
+      rect: [HORIZON_RECTS.treelineDense, HORIZON_RECTS.treelineBroken,
+        HORIZON_RECTS.treelineSnag][index % 3],
+      tint: HORIZON_BANDS.GW_FAR,
+      seed: next(),
+    }),
+  },
+  {
+    // The parallax. Two bands moving at different rates is what makes the far
+    // one read as far; one band alone reads as wallpaper.
+    id: "HORIZON_TREELINE_MID",
+    batch: "horizon",
+    from: 120,
+    to: 2360,
+    cards: 9,
+    card: (distance, side, index, next) => ({
+      kind: "shear",
+      distance,
+      side,
+      lateral: 300 + next() * 80,
+      base: 0,
+      width: 54 + next() * 18,
+      height: 13 + next() * 5,
+      phase: next() * TAU,
+      speed: TAU / 9.4,
+      amplitude: degToRad(0.4),
+      rect: [HORIZON_RECTS.treelineBroken, HORIZON_RECTS.treelineSnag][index % 2],
+      tint: HORIZON_BANDS.GW_MID,
+      seed: next(),
+    }),
+  },
+  {
+    // One side only, so consecutive pylons imply a line running away from the
+    // course rather than a fence beside it. `sides: "left"` in the spec, and
+    // left is side -1 — the same hand OPENING_WRECK_LINE stands its wrecks on.
+    id: "HORIZON_PYLON_LINE",
+    batch: "horizon",
+    from: 300,
+    to: 1900,
+    cards: 5,
+    card: (distance, _side, _index, next) => ({
+      kind: "shear",
+      distance,
+      side: -1,
+      lateral: 320 + next() * 40,
+      base: 0,
+      width: 38 + next() * 6,
+      height: 30 + next() * 6,
+      phase: next() * TAU,
+      speed: TAU / 13,
+      amplitude: degToRad(0.15),
+      rect: HORIZON_RECTS.pylonRun,
+      tint: HORIZON_BANDS.GW_MID,
+      seed: next(),
+    }),
+  },
+  {
+    // Greenwater is a facility, so its horizon is a facility: the far-field
+    // answer to the question the wreck line answers up close.
+    id: "HORIZON_FAR_INDUSTRY",
+    batch: "horizon",
+    from: 420,
+    to: 2300,
+    cards: 6,
+    card: (distance, side, index, next) => ({
+      kind: "shear",
+      distance,
+      side,
+      lateral: 500 + next() * 90,
+      base: 0,
+      width: 46 + next() * 42,
+      height: 20 + next() * 14,
+      phase: next() * TAU,
+      speed: TAU / 12.2,
+      amplitude: degToRad(0.2),
+      rect: [HORIZON_RECTS.gantryFar, HORIZON_RECTS.hangarMass,
+        HORIZON_RECTS.siloPair, HORIZON_RECTS.tankFarmFar][index % 4],
+      tint: HORIZON_BANDS.GW_FAR,
+      seed: next(),
+    }),
+  },
+]);
+
+/** @type {readonly LivingBatchSpec[]} */
+export const BITTERPAN_BATCHES_C = Object.freeze([
+  {
+    id: "horizon",
+    meshName: "BP_LIVING_HORIZON",
+    texture: "horizon",
+    blending: "normal",
+    depthWrite: false,
+    fog: true,
+    alphaTest: 0.5,
+    lamps: false,
+    anchor: "bottom",
+  },
+  {
+    // `fog: false` is deliberate and is the ONLY fog exemption in Pass 03: this
+    // batch IS the far-field air. Fogging an additive haze band multiplies the
+    // effect by itself and the horizon goes milky. Greenwater does not get this
+    // batch — its far plane is 650 m and its own fog already does the job.
+    //
+    // No `anchor` either, and that is the delivery's own carve-out: the two
+    // band cells are "the exception: they are additive and authored as tone",
+    // not as silhouettes with a grade contact. They keep the centred card
+    // convention every other drifting-atmosphere batch uses, and they are the
+    // two zones that author a non-zero base for exactly that reason.
+    id: "horizonAir",
+    meshName: "BP_LIVING_HORIZON_AIR",
+    texture: "horizon",
+    blending: "additive",
+    depthWrite: false,
+    fog: false,
+    alphaTest: 0,
+    lamps: false,
+  },
+]);
+
+/** @type {readonly LivingZone[]} */
+export const BITTERPAN_ZONES_C = Object.freeze([
+  {
+    // The pan's edge. Eight MESA_LONG to two MESA_BLUFF: the bluff is the one
+    // vertical out there and it should be rare enough to be a landmark. Index 4
+    // and index 9 take it, so the two are never adjacent. This layer alone
+    // changes Bitterpan from a white plane into a basin.
+    id: "PAN_MESA_LINE",
+    batch: "horizon",
+    from: 0,
+    to: 3050,
+    cards: 10,
+    card: (distance, side, index, next) => ({
+      kind: "shear",
+      distance,
+      side,
+      lateral: 1200 + next() * 200,
+      base: 0,
+      width: 240 + next() * 80,
+      height: 44 + next() * 18,
+      phase: next() * TAU,
+      speed: TAU / 15,
+      amplitude: degToRad(0.1),
+      rect: index % 5 === 4 ? HORIZON_RECTS.mesaBluff : HORIZON_RECTS.mesaLong,
+      tint: HORIZON_BANDS.BP_HORIZON,
+      seed: next(),
+    }),
+  },
+  {
+    // Where the salt goes. The works on this map start and end at the loadout;
+    // a refinery on the horizon is what makes the harvest look like it has a
+    // customer.
+    id: "PAN_REFINERY_FAR",
+    batch: "horizon",
+    from: 180,
+    to: 2900,
+    cards: 8,
+    card: (distance, side, index, next) => ({
+      kind: "shear",
+      distance,
+      side,
+      lateral: 760 + next() * 140,
+      base: 0,
+      width: 54 + next() * 38,
+      height: 42 + next() * 24,
+      phase: next() * TAU,
+      speed: TAU / 12.6,
+      amplitude: degToRad(0.15),
+      rect: [HORIZON_RECTS.stackCluster, HORIZON_RECTS.stackSingle,
+        HORIZON_RECTS.plantMass][index % 3],
+      tint: HORIZON_BANDS.BP_FAR,
+      seed: next(),
+    }),
+  },
+  {
+    // RIG_FAR is the same stance as LATTICE_RIG on the facade sheet, so the 36
+    // textured rigs beside the deck and the field of them on the horizon read
+    // as one operation at two distances. The cheapest continuity in the pass.
+    id: "PAN_RIG_FIELD_FAR",
+    batch: "horizon",
+    from: 240,
+    to: 2620,
+    cards: 8,
+    card: (distance, side, _index, next) => ({
+      kind: "shear",
+      distance,
+      side,
+      lateral: 460 + next() * 140,
+      base: 0,
+      width: 30 + next() * 12,
+      height: 18 + next() * 8,
+      phase: next() * TAU,
+      speed: TAU / 10.4,
+      amplitude: degToRad(0.3),
+      rect: HORIZON_RECTS.rigFar,
+      tint: HORIZON_BANDS.BP_MID,
+      seed: next(),
+    }),
+  },
+  {
+    // Sits behind and under the silhouettes: the band that makes 800 m look
+    // like 800 m without touching fog density. Additive and unfogged.
+    id: "PAN_HAZE_BAND",
+    batch: "horizonAir",
+    from: 0,
+    to: 3050,
+    cards: 7,
+    card: (distance, side, _index, next) => ({
+      kind: "mist",
+      distance,
+      side,
+      lateral: 700 + next() * 120,
+      base: 2 + next() * 4,
+      width: 180 + next() * 60,
+      height: 18 + next() * 8,
+      phase: next() * TAU,
+      speed: 0.24,
+      rect: HORIZON_RECTS.hazeBand,
+      tint: 0xd9cfb4,
+      seed: next(),
+      alphaKind: "shimmer",
+      alphaInitial: ALPHA_ENVELOPES.shimmer[0],
+    }),
+  },
+  {
+    // Bottom-weighted heat off the pan, at the base of the mid-band silhouettes
+    // so the rig feet dissolve rather than sitting on a hard line. Tint matches
+    // PAN_CRUST_SCUD so the two are one atmosphere at two heights.
+    id: "PAN_HEAT_SHIMMER_FAR",
+    batch: "horizonAir",
+    from: 180,
+    to: 2400,
+    cards: 5,
+    card: (distance, side, _index, next) => ({
+      kind: "mist",
+      distance,
+      side,
+      lateral: 420 + next() * 140,
+      base: next() * 1.5,
+      width: 120 + next() * 50,
+      height: 10 + next() * 5,
+      phase: next() * TAU,
+      speed: 0.3,
+      rect: HORIZON_RECTS.shimmerBand,
+      tint: 0xf0e9d8,
+      seed: next(),
+      alphaKind: "shimmer",
+      alphaInitial: ALPHA_ENVELOPES.shimmer[0],
+    }),
+  },
+]);
+
 /**
  * @type {LivingWorldSpec}
  *
@@ -1110,8 +1482,12 @@ export const GREENWATER_LIVING_WORLD = Object.freeze({
   rootName: "GW_LIVING_RUNTIME",
   seed: 0x13a7,
   courseLength: 2515.982,
-  batches: Object.freeze([...GREENWATER_BATCHES, ...GREENWATER_BATCHES_B]),
-  zones: Object.freeze([...GREENWATER_ZONES, ...GREENWATER_ZONES_B]),
+  batches: Object.freeze([
+    ...GREENWATER_BATCHES, ...GREENWATER_BATCHES_B, ...GREENWATER_BATCHES_C,
+  ]),
+  zones: Object.freeze([
+    ...GREENWATER_ZONES, ...GREENWATER_ZONES_B, ...GREENWATER_ZONES_C,
+  ]),
 });
 
 /** @type {LivingWorldSpec} */
@@ -1121,8 +1497,12 @@ export const BITTERPAN_LIVING_WORLD = Object.freeze({
   rootName: "BP_LIVING_RUNTIME",
   seed: 0x2b17,
   courseLength: 3050,
-  batches: Object.freeze([...BITTERPAN_BATCHES, ...BITTERPAN_BATCHES_B]),
-  zones: Object.freeze([...BITTERPAN_ZONES, ...BITTERPAN_ZONES_B]),
+  batches: Object.freeze([
+    ...BITTERPAN_BATCHES, ...BITTERPAN_BATCHES_B, ...BITTERPAN_BATCHES_C,
+  ]),
+  zones: Object.freeze([
+    ...BITTERPAN_ZONES, ...BITTERPAN_ZONES_B, ...BITTERPAN_ZONES_C,
+  ]),
 });
 
 /** @type {Readonly<Record<string, LivingWorldSpec>>} */

@@ -3,9 +3,11 @@ import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { resolveApronProfile } from "../src/game/apron.js";
 import {
+  FLAT_FURNITURE_MAX_HEIGHT_METRES,
   PLAQUE_BAND_BOTTOM_METRES,
   WALL_PLAQUE_INSET_METRES,
 } from "../src/game/furniture-placement.js";
+import { HORIZON_RECTS } from "../src/game/living-world-zones.js";
 
 /**
  * P12 art pass 01 guard.
@@ -59,6 +61,13 @@ const totemManifest = readJson("public/assets/totem/MANIFEST.json");
 // generated table the runtime actually imports. All three are written or checked
 // by scripts/derive-decal-cells.mjs.
 const decalCells = readJson("src/game/data/TOTEM_DECAL_CELLS.json");
+// P18 art pass 03 — the four staged deliverables, plus the accepted payloads
+// they are asserted against.
+const facades = readJson("src/game/data/BITTERPAN_STRUCTURE_FACADES.json");
+const horizon = readJson("src/game/data/FUTURISMA_HORIZON_LAYERS.json");
+const backPanels = readJson("src/game/data/FUTURISMA_SIGNAGE_BACK_PANELS.json");
+const edgeBand = readJson("src/game/data/BITTERPAN_ROAD_EDGE_BAND.json");
+const massing = readJson("public/data/map02/MASSING_PLACEMENTS.json");
 const wearPlacement = readJson("src/game/data/TOTEM_WEAR_PLACEMENT.json");
 const wearCells = readJson("src/game/data/TOTEM_WEAR_CELLS.json");
 
@@ -76,12 +85,16 @@ const EXPECTED_SHEETS = {
   bitterpan_crust_1024: { width: 1024, height: 1024, regions: 18 },
   hangar_fixtures_512: { width: 512, height: 512, regions: 4 },
   totem_wear_1024: { width: 1024, height: 1024, regions: 14 },
+  // P18, art pass 03 — the world past the barriers.
+  bitterpan_facades_1024: { width: 1024, height: 1024, regions: 15 },
+  futurisma_horizon_1024: { width: 1024, height: 1024, regions: 16 },
+  futurisma_trim_512: { width: 512, height: 512, regions: 6 },
 };
 
 assert.deepEqual(
   Object.keys(atlas).sort(),
   Object.keys(EXPECTED_SHEETS).sort(),
-  "ATLAS_REGIONS.json must describe exactly the seven art-pass sheets.",
+  "ATLAS_REGIONS.json must describe exactly the ten art-pass sheets.",
 );
 
 for (const [key, expected] of Object.entries(EXPECTED_SHEETS)) {
@@ -1126,8 +1139,408 @@ function bitterpanCorridorAt(distance) {
   return { halfWidth: best.width_m / 2, corridor: best.width_m / 2 + widest };
 }
 
+// ---------------------------------------------------------------------------
+// P18 art pass 03 — the world past the barriers.
+//
+// Same failure class as art pass 01 and 02, one map further out: every one of
+// these four deliverables is pure data pointed at pixel regions, and every way
+// they can be wrong renders as "no error". The runtime counters catch a layer
+// that failed to load; this catches a layer that loaded the wrong thing.
+// ---------------------------------------------------------------------------
+
+const facadeRegions = atlas.bitterpan_facades_1024.regions;
+const horizonRegions = atlas.futurisma_horizon_1024.regions;
+const trimRegions = atlas.futurisma_trim_512.regions;
+
+// --- Deliverable 1: the Bitterpan structure facades. -----------------------
+
+assert.equal(
+  facades.sheet.texture,
+  "bitterpan_facades_1024",
+  "The facade table must name the facade sheet.",
+);
+assert.equal(
+  facades.families.length,
+  massing.counts.visible_primitives,
+  `The facade table authors ${facades.families.length} families; the accepted `
+    + `massing merges into ${massing.counts.visible_primitives} primitives, and `
+    + "the mapping is one material per primitive.",
+);
+
+const massingByFamily = new Map();
+for (const placement of massing.placements) {
+  massingByFamily.set(placement.family, (massingByFamily.get(placement.family) ?? 0) + 1);
+}
+let facadePlacements = 0;
+const latticeFamilies = [];
+for (const family of facades.families) {
+  facadePlacements += family.placements;
+  assert.equal(
+    family.placements,
+    massingByFamily.get(family.id),
+    `Facade family ${family.id} declares ${family.placements} placements; the `
+      + `accepted table holds ${massingByFamily.get(family.id)}.`,
+  );
+  // One sheet, one material per family. Every face this family names has to
+  // resolve on the SINGLE facade sheet: if any assignment moved to a second
+  // sheet the family would split into two draw calls and the deliverable would
+  // be over budget by its own rule.
+  const usesLattice = Object.values(family.faces).includes("LATTICE_RIG");
+  for (const [face, region] of Object.entries(family.faces)) {
+    assert.ok(
+      facadeRegions[region],
+      `Facade family ${family.id} maps ${face} to ${region}, which is not a `
+        + "region on bitterpan_facades_1024.",
+    );
+  }
+  // BASE_SKIRT is applied to all 226 placements without exception — it is the
+  // region that stops a structure looking pasted onto the ground plane, and it
+  // is the cheapest thing in the pass. WIND_salt_drift carries it on `sides`
+  // rather than `base`, because a drift IS the skirt, so this looks for the
+  // region anywhere in the family's face map rather than for a `base` key.
+  assert.ok(
+    Object.values(family.faces).includes("BASE_SKIRT"),
+    `Facade family ${family.id} names no BASE_SKIRT face. The skirt is applied `
+      + "to all 226 placements without exception.",
+  );
+  // Only LATTICE_RIG uses alpha. A family that alpha-tests without it pays for
+  // a discard on an opaque surface; a lattice family that does not is a solid
+  // shipping container where an open frame was authored.
+  assert.equal(
+    family.alphaTest > 0,
+    usesLattice,
+    `Facade family ${family.id} sets alphaTest ${family.alphaTest} but `
+      + `${usesLattice ? "does" : "does not"} use LATTICE_RIG.`,
+  );
+  if (usesLattice) {
+    latticeFamilies.push(family.id);
+    assert.equal(family.alphaTest, 0.5, `${family.id} must alpha-test at 0.5.`);
+  }
+  assert.ok(
+    Array.isArray(family.uvMetresPerTile) && family.uvMetresPerTile.length === 2
+      && family.uvMetresPerTile.every((value) => value > 0),
+    `Facade family ${family.id} has a malformed uvMetresPerTile.`,
+  );
+}
+assert.equal(
+  facadePlacements,
+  massing.counts.placements,
+  `The facade families cover ${facadePlacements} placements; the accepted `
+    + `payload holds ${massing.counts.placements}.`,
+);
+assert.equal(facadePlacements, 226, "Art pass 03 faces 226 Bitterpan placements.");
+assert.equal(
+  facades.budget.drawCallsAdded.bitterpan,
+  0,
+  "Texturing a merged blockout family is a material swap and must cost nothing.",
+);
+// The dusk read is a cross-fade between two regions, not a tint on one, so both
+// have to exist and be the same size or the fade would resize the bays.
+assert.ok(facadeRegions.WINDOW_STRIP_DUSK && facadeRegions.WINDOW_STRIP_DEAD);
+assert.equal(facadeRegions.WINDOW_STRIP_DUSK.w, facadeRegions.WINDOW_STRIP_DEAD.w);
+assert.equal(facadeRegions.WINDOW_STRIP_DUSK.h, facadeRegions.WINDOW_STRIP_DEAD.h);
+
+// --- Deliverable 2: the horizon silhouette layers. -------------------------
+
+assert.equal(horizon.sheet.texture, "futurisma_horizon_1024");
+// The rects the runtime addresses and the rects the builder drew are the same
+// rects. `atlasRect(1024, 4, slot)` is a formula, not a lookup, so this is the
+// only thing standing between a renumbered cell and 34 cards of wrong art.
+const horizonBySlot = new Map();
+for (const [name, region] of Object.entries(horizonRegions)) {
+  horizonBySlot.set(`${region.x},${region.y}`, name);
+}
+for (const [id, rect] of Object.entries(HORIZON_RECTS)) {
+  const name = horizonBySlot.get(`${rect.x},${rect.y}`);
+  assert.ok(
+    name,
+    `HORIZON_RECTS.${id} addresses (${rect.x}, ${rect.y}), which is not a `
+      + "region on futurisma_horizon_1024.",
+  );
+  assert.equal(rect.sheetSize, 1024, `HORIZON_RECTS.${id} is cut for the wrong sheet.`);
+  assert.equal(
+    rect.size,
+    horizonRegions[name].w,
+    `HORIZON_RECTS.${id} is ${rect.size} px; ${name} is ${horizonRegions[name].w}.`,
+  );
+}
+assert.equal(
+  Object.keys(HORIZON_RECTS).length,
+  Object.keys(horizonRegions).length,
+  "Every horizon cell must be addressable, and nothing may address a cell that "
+    + "is not on the sheet.",
+);
+for (const map of ["greenwater", "bitterpan"]) {
+  const zones = horizon.zones[map];
+  const cards = zones.reduce((total, zone) => total + zone.cards, 0);
+  assert.equal(
+    cards,
+    horizon.counts[map].cards,
+    `${map} horizon zones author ${cards} cards; the delivery counts `
+      + `${horizon.counts[map].cards}.`,
+  );
+  assert.equal(
+    horizon.batches[map].length,
+    horizon.counts[map].batches,
+    `${map} declares ${horizon.batches[map].length} horizon batches against a `
+      + `count of ${horizon.counts[map].batches}.`,
+  );
+  for (const zone of zones) {
+    for (const rect of zone.rects) {
+      assert.ok(
+        horizonRegions[rect],
+        `${map} horizon zone ${zone.id} names cell ${rect}, which is not on the sheet.`,
+      );
+    }
+    // Bottom-anchored cells. A silhouette zone with a non-zero base floats.
+    if (horizon.batches[map].find((batch) => batch.id === zone.batch).alphaTest > 0) {
+      assert.equal(
+        zone.baseMetres,
+        0,
+        `${map} horizon zone ${zone.id} bases its silhouettes at `
+          + `${zone.baseMetres} m; the cells are bottom-anchored.`,
+      );
+    }
+  }
+}
+// The ONE fog exemption in Pass 03, pinned as one.
+const unfoggedHorizonBatches = Object.values(horizon.batches)
+  .flat()
+  .filter((batch) => batch.fog === false);
+assert.equal(
+  unfoggedHorizonBatches.length,
+  1,
+  "Pass 03 allows exactly one fog exemption; the horizon layer declares "
+    + `${unfoggedHorizonBatches.length}.`,
+);
+assert.equal(unfoggedHorizonBatches[0].id, "horizonAir");
+assert.equal(unfoggedHorizonBatches[0].blending, "additive");
+
+// --- Deliverable 3: the signage back panels. -------------------------------
+
+assert.equal(backPanels.sheet.texture, "futurisma_trim_512");
+
+/**
+ * The apply/exclude rule, restated from `FUTURISMA_SIGNAGE_BACK_PANELS.json`.
+ *
+ * Deliberately a second implementation of `backPanelApplies` in
+ * signage-backs.ts rather than an import of it — the runtime is TypeScript and
+ * this validator runs in bare Node, and the runtime cross-checks the same two
+ * sides at build time. Two independent readings of one rule agreeing is the
+ * evidence; one reading asserted against itself is not.
+ */
+function backPanelApplies(placement) {
+  if (/both faces/i.test(placement.mount)) return false;
+  if (placement.slot === "SPONSOR_TAPE" || placement.slot === "PENNANT_ROW") return false;
+  if (placement.slot.startsWith("TOTEM_")) return false;
+  if (!/post|hoarding/i.test(placement.mount)) return false;
+  return placement.facing === "inward" || placement.facing === "reverse";
+}
+
+const EXPECTED_BACK_PANELS = { greenwater: 14, bitterpan: 12 };
+let backPanelTotal = 0;
+for (const map of ["greenwater", "bitterpan"]) {
+  const authored = backPanels.placements[map];
+  const selected = signage[map].placements.filter(backPanelApplies);
+  assert.equal(
+    authored.length,
+    EXPECTED_BACK_PANELS[map],
+    `${map} authors ${authored.length} back panels; the delivery counts `
+      + `${EXPECTED_BACK_PANELS[map]}.`,
+  );
+  assert.deepEqual(
+    [...authored].map((entry) => `${entry.slot}@${entry.distance}`).sort(),
+    selected.map((placement) => `${placement.slot}@${placement.distance}`).sort(),
+    `${map}'s authored back-panel table and the apply/exclude rule disagree. A `
+      + "board the rule selects and the table forgot ships with no back; a "
+      + "table entry the rule rejects puts a panel behind a pit wall.",
+  );
+  const counts = backPanels.counts[map];
+  assert.equal(
+    authored.filter((entry) => entry.region === "SIGN_BACK_TAGGED").length,
+    counts.tagged,
+    `${map} tagged back-panel count disagrees with its own table.`,
+  );
+  assert.equal(
+    authored.filter((entry) => entry.region === "SIGN_BACK_BLANK").length,
+    counts.blank,
+    `${map} blank back-panel count disagrees with its own table.`,
+  );
+  for (const entry of authored) {
+    assert.ok(
+      trimRegions[entry.region],
+      `${map} back panel ${entry.slot}@${entry.distance} names ${entry.region}, `
+        + "which is not a region on futurisma_trim_512.",
+    );
+    // No back panel resolves for a wall plaque. The thirteen Hangar Six plaques
+    // come off the course furniture resolver, never out of the board table, so
+    // this asserts the two systems have stayed disjoint.
+    assert.ok(
+      !/PLAQUE/i.test(entry.slot),
+      `${map} back panel ${entry.slot} resolves as a wall plaque; those thirteen `
+        + "already carry the Pass 02 backing panel, and a wall has no back.",
+    );
+  }
+  backPanelTotal += authored.length;
+}
+assert.equal(backPanelTotal, backPanels.counts.total, "26 back panels across both maps.");
+assert.equal(backPanelTotal, 26);
+
+// --- Deliverable 4: the Bitterpan road edge band. --------------------------
+
+assert.equal(edgeBand.sheet.texture, "futurisma_trim_512");
+for (const variant of edgeBand.variants) {
+  assert.ok(
+    trimRegions[variant.region],
+    `Edge band variant ${variant.region} is not a region on futurisma_trim_512.`,
+  );
+}
+assert.ok(trimRegions[edgeBand.ticks.region], "EDGE_TICK_SET is not on the trim sheet.");
+assert.equal(edgeBand.ticks.cells.length, 4, "EDGE_TICK_SET holds four 1.5 m cells.");
+// Nothing here is furniture. Every entry is zero-height painted road under the
+// flat threshold, which is what lets the corridor sweep report zero intrusions
+// for a layer drawn inside the drivable corridor on purpose.
+assert.ok(
+  edgeBand.geometry.liftMetres < FLAT_FURNITURE_MAX_HEIGHT_METRES,
+  `The edge band lifts ${edgeBand.geometry.liftMetres} m, at or above the `
+    + `${FLAT_FURNITURE_MAX_HEIGHT_METRES} m flat-furniture threshold; it would `
+    + "become an obstacle rather than paint.",
+);
+const plan = edgeBand.placementPlan;
+assert.equal(plan.stripsPerSide * plan.sides, plan.totalStrips, "254 strips is 127 a side.");
+assert.equal(plan.totalStrips, 254);
+// 127 strips of 24 m cover 3,048 m of a 3,050 m lap. The 2 m that are left are
+// the authored trim at the lap seam: every strip stays a whole six cycles, so
+// the phase never stutters, and the seam falls inside a gap rather than inside
+// a dash. Both halves of that are asserted, because a strip count that covered
+// the lap exactly would have had to shorten one strip and break the phase.
+const covered = plan.stripsPerSide * edgeBand.geometry.stripLengthMetres;
+assert.equal(covered, 3048, `${plan.stripsPerSide} strips cover ${covered} m.`);
+const seamGap = plan.lapLengthMetres - covered;
+assert.ok(
+  seamGap > 0 && seamGap < edgeBand.geometry.stripLengthMetres,
+  `The lap seam leaves a ${seamGap} m gap; one more strip would be a whole one.`,
+);
+assert.ok(
+  seamGap <= 2,
+  `The delivery trims 2 m at the seam; the accepted lap leaves ${seamGap} m.`,
+);
+// The dash rhythm has to divide the strip exactly, or the repeat lands mid-dash
+// and the paint stutters at every seam.
+const cycles = edgeBand.geometry.stripLengthMetres
+  / edgeBand.geometry.dashRhythmMetres.cycle;
+assert.equal(cycles, 6, "A strip is exactly six 4.0 m dash cycles.");
+assert.equal(
+  edgeBand.geometry.dashRhythmMetres.on + edgeBand.geometry.dashRhythmMetres.off,
+  edgeBand.geometry.dashRhythmMetres.cycle,
+);
+assert.equal(
+  edgeBand.geometry.dashRhythmMetresOpenPan.on
+    + edgeBand.geometry.dashRhythmMetresOpenPan.off,
+  edgeBand.geometry.dashRhythmMetresOpenPan.cycle,
+);
+// Same phase at 2400 m and 2424 m: both are strip origins, 24 m apart.
+assert.equal(2400 % edgeBand.geometry.stripLengthMetres, 0);
+assert.equal(2424 % edgeBand.geometry.stripLengthMetres, 0);
+
+// The edge spans the band paints and the edge spans the map actually authors
+// must be the same three spans. A band that draws a berm where the course has
+// open pan is telling the player the surface is walled when it is not.
+assert.deepEqual(
+  edgeBand.spanMapping.spans.map((span) => `${span.id}:${span.fromDistance}-${span.toDistance}`),
+  bitterpanProduction.edges.spans.map(
+    (span) => `${span.id}:${span.fromDistance}-${span.toDistance}`,
+  ),
+  "The edge band's spans and BITTERPAN_PRODUCTION's edge table disagree.",
+);
+for (const span of edgeBand.spanMapping.spans) {
+  const authored = bitterpanProduction.edges.spans.find(
+    (candidate) => candidate.id === span.id,
+  );
+  assert.equal(span.left.edge, authored.edgeLeft, `${span.id} left edge type drifted.`);
+  assert.equal(span.right.edge, authored.edgeRight, `${span.id} right edge type drifted.`);
+  assert.equal(
+    span.entryTick,
+    true,
+    `${span.id} authors no entry tick; the cyan exception is exactly the three `
+      + "span entries, both sides.",
+  );
+}
+// Six cyan ticks a lap: three authored spans, two sides, and no more. Cyan is
+// route language and is RESERVED — this is the pinned exception.
+assert.equal(
+  edgeBand.spanMapping.spans.filter((span) => span.entryTick).length * 2,
+  6,
+  "The cyan span-entry tick is authorised six times a lap and no more.",
+);
+// The lip threshold is measured against the ribbon the map actually authors.
+const ribbonY = bitterpanStations.stations.map((station) => station.y);
+const lipLow = Math.min(...ribbonY) - (-1.95);
+const lipHigh = Math.max(...ribbonY) - (-1.95);
+assert.ok(
+  Math.abs(lipLow - 0.078) < 0.002 && Math.abs(lipHigh - 3.822) < 0.002,
+  `The delivery derives a 0.078-3.822 m lip from the accepted ribbon; the `
+    + `station table gives ${lipLow.toFixed(3)}-${lipHigh.toFixed(3)} m.`,
+);
+assert.ok(
+  lipLow < 0.35 && lipHigh > 0.35,
+  "The 0.35 m lip threshold must actually split the lap, or one of the two "
+    + "band variants is dead art.",
+);
+
+// --- Negative tests. -------------------------------------------------------
+//
+// Each rule above is only worth its line if it FAILS on the thing it is
+// supposed to catch. These construct that thing and assert the throw.
+
+assert.throws(
+  () => {
+    // A facade family whose lattice face moved to a second sheet: the exact
+    // failure the "one sheet, one material per family" rule exists to stop.
+    const family = { ...facades.families[0], faces: { ...facades.families[0].faces } };
+    family.faces.sides = "LATTICE_RIG_ON_ANOTHER_SHEET";
+    for (const region of Object.values(family.faces)) {
+      assert.ok(facadeRegions[region], `${family.id} maps a face off the sheet.`);
+    }
+  },
+  /maps a face off the sheet/,
+  "The facade single-sheet rule does not fail on a face that leaves the sheet.",
+);
+
+assert.throws(
+  () => {
+    // A back panel authored for a pit-wall totem: excluded by the delivery's
+    // own rule, and the kind of entry that would put a ribbed steel panel on
+    // the inside of the pit wall.
+    const totem = signage.greenwater.placements.find(
+      (placement) => placement.slot.startsWith("TOTEM_"),
+    );
+    assert.equal(backPanelApplies(totem), true, "totem back panel rejected");
+  },
+  /totem back panel rejected/,
+  "The back-panel exclude rule does not reject a pit-wall totem panel.",
+);
+
+assert.throws(
+  () => {
+    // A cyan mark outside an authored edge span. Cyan is route language and is
+    // reserved; the six span entries are the whole exception.
+    const stray = { id: "EDGE_STRAY_CYAN", fromDistance: 1400, toDistance: 1440 };
+    assert.ok(
+      bitterpanProduction.edges.spans.some(
+        (span) => stray.fromDistance >= span.fromDistance
+          && stray.fromDistance < span.toDistance,
+      ),
+      "cyan tick outside an authored edge span",
+    );
+  },
+  /cyan tick outside an authored edge span/,
+  "The cyan-exception rule does not reject a tick outside an authored span.",
+);
+
 console.log(
-  `Art pass PASS: 7 sheets hash-matched to their regions (36/17/16 + 1/18/4/14 `
+  `Art pass PASS: 10 sheets hash-matched to their regions (36/17/16 + 1/18/4/14 `
+    + `+ 15/16/6 `
     + `slots); ${decals.decalCount} opening decals / ${decals.triangles} tris, `
     + `${beyondDeck.length} past halfWidth on the apron profile; signage `
     + `greenwater ${EXPECTED_SIGNAGE.greenwater.boards} boards / `
@@ -1149,5 +1562,16 @@ console.log(
     + `${liveryWear.intensity}/100, 4 liveries, ${placements.length} library slots `
     + `APPLIED at ${decalCells.cellCount} measured decal cells `
     + `(${decalCells.quadCount} quads, GLB sha pinned) — P15 shipped these `
-    + "resolved-and-not-applied and the history is kept at the assertion.",
+    + "resolved-and-not-applied and the history is kept at the assertion. "
+    + `Pass 03: ${facades.families.length} facade families over `
+    + `${facadePlacements} placements on ONE sheet (+0 draw calls, alpha only on `
+    + `${latticeFamilies.length} lattice families, BASE_SKIRT on every family); `
+    + `${horizon.counts.greenwater.cards} + ${horizon.counts.bitterpan.cards} `
+    + "horizon cards over 1 + 2 batches, every silhouette bottom-anchored and "
+    + "exactly one fog exemption; "
+    + `${backPanelTotal} board backs, the authored table and the apply/exclude `
+    + "rule agreeing placement for placement and no wall plaque among them; "
+    + `${plan.totalStrips} edge strips of ${edgeBand.geometry.stripLengthMetres} m `
+    + `at ${edgeBand.geometry.liftMetres} m lift (${cycles} dash cycles a strip, `
+    + "spans matched to the accepted edge table, cyan pinned to 6 a lap).",
 );

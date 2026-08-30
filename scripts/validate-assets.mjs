@@ -51,9 +51,14 @@ const expectedHashes = {
  * against the sha256 recorded beside its regions in ATLAS_REGIONS.json, so a
  * sheet and its UV rectangles can never drift apart.
  *
- * The first three are P12 (art pass 01); the last four are P15 (art pass 02) —
+ * The first three are P12 (art pass 01); the next four are P15 (art pass 02) —
  * the Bitterpan pan crust tile and its decal sheet, the Hangar Six fixture
- * panels, and the TOTEM livery wear overlay.
+ * panels, and the TOTEM livery wear overlay. The last three are P18 (art pass
+ * 03) — the world past the barriers.
+ *
+ * Regenerating: the builder's `--out` defaults to `scripts/`, not the repo
+ * root, so it must be run as `--out .` from the repo root or it writes a stray
+ * `scripts/public/` tree and leaves the served sheets untouched.
  */
 const expectedArtPassHashes = {
   "greenwater/textures/greenwater_runway_1024.png":
@@ -70,6 +75,15 @@ const expectedArtPassHashes = {
     "296531d9bb2c80b979b2390c28fc097fb3dd2090e887207ca5b7d9baacb6629a",
   "totem/textures/totem_wear_1024.png":
     "093033d86282e20eb0e26dbb638ef9c528fd3942fed5d54559043d84e60fe123",
+  // P18 (art pass 03): Bitterpan structure facades, the shared distant
+  // silhouette card sheet, and the trim sheet that carries both the signage
+  // back panels and the Bitterpan road edge band.
+  "map02/textures/bitterpan_facades_1024.png":
+    "12883ac673abb34060f3be8c9f224f2e45a0a73689b8d19eb1d3fe560b1be0b8",
+  "greenwater/textures/futurisma_horizon_1024.png":
+    "0ad6d3efe0511ea0872e7582e0b00f8f146d0cbf2ebd585eee70329079e63ca5",
+  "greenwater/textures/futurisma_trim_512.png":
+    "b27bcae3f44bd1203c6e935bcacd598af2409526832fa7791bf40013842a9318",
 };
 
 for (const [relativePath, expectedHash] of Object.entries(expectedArtPassHashes)) {
