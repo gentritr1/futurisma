@@ -1,0 +1,77 @@
+{
+  "format": "FUTURISMA_PASS03_BITTERPAN_ROAD_EDGE_BAND",
+  "version": "v0.3.0",
+  "units": "metres",
+  "note": "Pass 03 deliverable 4. Replacement for the orange edge banding that arrives with the legacy BLOCKOUT_barrier material, drawn on the ribbon itself as zero-height painted road. Every entry is under FLAT_FURNITURE_MAX_HEIGHT_METRES, so nothing here is furniture, nothing needs a corridor exemption, and the corridor sweep should report zero intrusions.",
+  "sheet": {
+    "texture": "futurisma_trim_512",
+    "strip": { "pixels": [512, 64], "metres": [24, 3], "scale": "21.333 px/m in both axes" },
+    "filtering": "nearest, no mips — magnified onto ground quads, same as the Pass 02 decal sheets",
+    "vConvention": "v = 0 is the deck lip; v = 64 px is 3.00 m inboard. The band lives in the outboard half of the strip and the inboard half is transparent, which is what lets one strip serve a 9 m deck and a 12 m one without re-authoring."
+  },
+  "geometry": {
+    "warningBandWidthMetres": 0.55,
+    "warningBandWidthMetresOpenPan": 0.45,
+    "hairlineWidthMetres": 0.10,
+    "hairlineOffsetMetres": 0.65,
+    "dashRhythmMetres": { "on": 2.4, "off": 1.6, "cycle": 4.0 },
+    "dashRhythmMetresOpenPan": { "on": 1.6, "off": 2.4, "cycle": 4.0 },
+    "hatchPitchMetres": 0.6,
+    "hatchAngleDegrees": 45,
+    "stripLengthMetres": 24,
+    "phaseRule": "Dash phase is 0 at each strip origin and the strip is exactly six 4.0 m cycles long, so a repeat lands on a dash boundary. The rhythm never stutters at a seam, which is the failure mode that makes painted road look like a texture.",
+    "liftMetres": 0.012
+  },
+  "hierarchy": {
+    "statement": "Orange is physical. Cyan is route. They never mean the same thing and they never share a mark.",
+    "orange": "#f06a32 — the surface ends here, or something on it will hit you. All three band variants, the chevron tick, the wear cap.",
+    "cyan": "#77dce3 — the line, the direction, the sequence. RESERVED, and pinned as an exception: the only new cyan in Pass 03 is the 1.5 m span-entry tick in EDGE_TICK_SET, used six times a lap (three authored edge spans, two sides). ROUTE_EDGE_CYAN and the rest of the route language on bitterpan_crust_1024 are untouched.",
+    "why": "The pan's whole subject is glare, so it can carry exactly two saturated colours. If the physical edge and the racing line share one, the map stops telling you which one you are about to cross."
+  },
+  "variants": [
+    { "region": "EDGE_BAND_DECK", "appliesTo": "a real deck lip: edge type C where the ribbon stands >= 0.35 m above the pan floor", "band": 0.55, "dash": "2.4 / 1.6", "hairline": true, "hatch": false, "note": "The full statement. Hairline at 0.65 m inboard defines the lip; the band warns about it." },
+    { "region": "EDGE_BAND_PAN", "appliesTo": "edge type C where the ribbon stands < 0.35 m above the pan floor — the open spans where the deck edge is a painted lip onto salt", "band": 0.45, "dash": "1.6 / 2.4", "hairline": false, "hatch": false, "note": "THE DEGRADE, and the one that matters: 86% of stations are open pan. Less paint, more crust, no hairline — because there is no lip to define. Crust encroaches over the outer edge of every dash and the alpha drops to 0.62, so the band tells you the truth: leaving here costs time, not the race." },
+    { "region": "EDGE_BAND_BERM", "appliesTo": "edge types A (SALT_BERM) and B (WORKS_STAND) — every station where the edge table says wall: true", "band": 0.55, "dash": "2.4 / 1.6", "hairline": true, "hatch": true, "note": "Hatch means walled. It appears nowhere else, so the hatch alone is a reliable read that overrunning here has a mechanical consequence." }
+  ],
+  "spanMapping": {
+    "default": { "edgeLeft": "C", "edgeRight": "C", "region": "EDGE_BAND_DECK or EDGE_BAND_PAN by lip height", "note": "524 of 610 stations. The sector identity, stated as a number, and now painted." },
+    "spans": [
+      { "id": "EDGE_HARVESTER_CHICANE", "fromDistance": 2405, "toDistance": 2548, "left": { "edge": "B", "region": "EDGE_BAND_BERM" }, "right": { "edge": "A", "region": "EDGE_BAND_BERM" }, "entryTick": true },
+      { "id": "EDGE_BRINE_CUT", "fromDistance": 2722, "toDistance": 2960, "left": { "edge": "A", "region": "EDGE_BAND_BERM" }, "right": { "edge": "A", "region": "EDGE_BAND_BERM" }, "entryTick": true },
+      { "id": "EDGE_CONVEYOR_UNDERPASS", "fromDistance": 3005, "toDistance": 3050, "left": { "edge": "B", "region": "EDGE_BAND_BERM" }, "right": { "edge": "B", "region": "EDGE_BAND_BERM" }, "entryTick": true, "note": "The only place on the lap where both hands are walled, and the last thing read before the line. Both entry ticks land at 3005 m." }
+    ]
+  },
+  "lipHeightDerivation": "lip = ribbonY(station) - GROUND_Y_METRES(-1.95). The authored ribbon runs -1.872 to +1.872 m, so the lip is 0.078 m at the ribbon's low point and 3.822 m at its high point. The 0.35 m threshold is measured, not chosen for looks: below it the deck edge and the pan are the same surface to the eye at 300 km/h, and a hairline drawn there would be describing an edge the player cannot see.",
+  "ticks": {
+    "region": "EDGE_TICK_SET",
+    "cells": [
+      { "index": 0, "id": "SPAN_ENTRY_CYAN", "metres": 1.5, "placement": "first 1.5 m of each authored edge span, both sides — 6 per lap", "note": "The pinned cyan exception. Three bars reading inboard: the route language telling you the sequence has changed." },
+      { "index": 1, "id": "CHEVRON_ORANGE", "metres": 1.5, "placement": "12 m before each braking reference on the four BP_* sequences — 8 per lap", "note": "Physical warning, paired with the existing ROUTE_ARROW_ORANGE chevrons on the crust sheet so the two agree in direction." },
+      { "index": 2, "id": "WEAR_CAP", "metres": 1.5, "placement": "the last strip of any band run that ends on open pan — 14 per lap", "note": "A band that stops dead reads as a texture ending. This is how paint actually ends: worn to nothing." },
+      { "index": 3, "id": "BLANK_CRUST", "metres": 1.5, "placement": "stations where the band is deliberately absent, e.g. across the HZ_SALT_DRIFT patches", "note": "Salt drift buries paint. Painting over a drift patch would tell the player the surface is grippy where the hazard says it is not." }
+    ]
+  },
+  "placementPlan": {
+    "stripLengthMetres": 24,
+    "stripsPerSide": 127,
+    "sides": 2,
+    "totalStrips": 254,
+    "totalTicks": 28,
+    "lapLengthMetres": 3050,
+    "note": "127 strips of 24 m covers 3048 m; the last strip is trimmed 2 m at the lap seam and its dash phase is preserved, so the seam falls inside a gap rather than inside a dash.",
+    "driftExclusions": "Strips whose midpoint falls inside an HZ_SALT_DRIFT patch resolve BLANK_CRUST instead of a band. On the accepted hazard set that is 11 strips per side."
+  },
+  "budget": {
+    "drawCallsAdded": { "bitterpan": 1, "greenwater": 0 },
+    "trianglesAdded": { "bitterpan": 564 },
+    "reason": "One merged decal mesh, one material, one draw call — 282 quads. It cannot ride BP_SURFACE_CRUST: that material samples bitterpan_crust_1024, which is hash-pinned as of Pass 02.",
+    "legacyRemoval": "When BLOCKOUT_barrier goes, its orange banding goes with it. This deliverable is the replacement and is authored to be applied in the same change, not before it — two orange edge languages in one frame is worse than either alone."
+  },
+  "verification": [
+    "Corridor sweep: zero intrusions. Every strip is 0.012 m of painted road, well under the 0.3 m flat threshold.",
+    "Runtime counter: edge strips == 254, ticks == 28, cyan ticks == 6 and all six inside an authored edge span.",
+    "Dash phase check: sample the band at 2400 m and 2424 m — the two strips must show the same phase.",
+    "Screenshot review at 2405 m (chicane entry, both hands changing), 1400 m (open pan degrade) and 3005 m (both walled).",
+    "Transcription note (build side): this file was hand-staged from the Pass 03 delivery via model context; before integration, diff it against the delivery copy in the Claude Design project (data/BITTERPAN_ROAD_EDGE_BAND.json) if any count fails."
+  ]
+}

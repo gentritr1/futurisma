@@ -1,0 +1,95 @@
+{
+  "format": "FUTURISMA_PASS03_HORIZON_SILHOUETTE_LAYERS",
+  "version": "v0.3.0",
+  "units": "metres",
+  "note": "Pass 03 deliverable 2. A distant-card layer for both maps, authored in the living-world card idiom so no new runtime path is needed: batches are LivingBatchSpec entries, zones are LivingZone entries, and the card authors are mechanical from the numeric ranges below. The precedent is GREENWATER_ZONES_B.OPENING_WRECK_LINE, which already stands ground-anchored silhouettes on shear at 34-78 m; this is the same idiom pushed out to 180-1400 m.",
+  "sheet": {
+    "texture": "futurisma_horizon_1024",
+    "cells": "atlasRect(1024, 4, slot) — 16 cells of 256 px, addressed exactly like greenwater_motion_b_512",
+    "filtering": "sRGB, NearestFilter both filters, no mipmaps (living-world.ts card contract, unchanged)",
+    "authoringRules": [
+      "Bottom-anchored: cards are placed with base 0, so every cell draws its grade contact at y 248-256. A silhouette that does not touch the cell's bottom edge floats.",
+      "Alpha is either >= 0.6 or 0. Nothing between 0.1 and 0.5 anywhere on the silhouette cells, because the batch alpha-tests at 0.5 and a feathered edge does not survive it — it just gets a jagged one.",
+      "Softness is delivered by the per-band TINT below, never by feathering pixels.",
+      "The two band cells (SHIMMER_BAND, HAZE_BAND) are the exception: they are additive and authored as tone."
+    ]
+  },
+  "streamRule": "Both zone sets are appended AFTER the existing zones of their map, so the shared seeded stream reaches every legacy zone with exactly the draws it saw before. Greenwater's 155 accepted cards and the P9/P12 additions stay bit-exact. Declaration order below is the authoring order.",
+  "batches": {
+    "greenwater": [
+      {
+        "id": "horizon",
+        "meshName": "GW_LIVING_HORIZON",
+        "texture": "horizon",
+        "blending": "normal",
+        "depthWrite": false,
+        "fog": true,
+        "alphaTest": 0.5,
+        "lamps": false,
+        "note": "depthWrite false, unlike the silhouette batch: at 180 m and beyond nothing needs to occlude anything, and writing depth from a card that far out only risks fighting the sky dome. alphaTest 0.5 keeps the silhouette edge hard."
+      }
+    ],
+    "bitterpan": [
+      {
+        "id": "horizon",
+        "meshName": "BP_LIVING_HORIZON",
+        "texture": "horizon",
+        "blending": "normal",
+        "depthWrite": false,
+        "fog": true,
+        "alphaTest": 0.5,
+        "lamps": false
+      },
+      {
+        "id": "horizonAir",
+        "meshName": "BP_LIVING_HORIZON_AIR",
+        "texture": "horizon",
+        "blending": "additive",
+        "depthWrite": false,
+        "fog": false,
+        "alphaTest": 0,
+        "lamps": false,
+        "note": "fog false is deliberate and is the only fog exemption in Pass 03: this batch IS the far-field air. Fogging an additive haze band multiplies the effect by itself and the horizon goes milky. Greenwater does not get this batch — its far plane is 650 m and its own fog already does the job."
+      }
+    ]
+  },
+  "parallaxBands": {
+    "greenwater": [
+      { "id": "GW_NEAR", "distanceMetres": [180, 240], "tint": "#74827a", "note": "Reads as a treeline you could walk to. Darkest tint in the set." },
+      { "id": "GW_MID", "distanceMetres": [300, 380], "tint": "#8b968c" },
+      { "id": "GW_FAR", "distanceMetres": [480, 600], "tint": "#a1aa9f", "note": "Inside camera.far 650 with 50 m of margin, so a card never clips through the far plane on a camera that has swung wide." }
+    ],
+    "bitterpan": [
+      { "id": "BP_NEAR", "distanceMetres": [260, 340], "tint": "#8c8474" },
+      { "id": "BP_MID", "distanceMetres": [460, 600], "tint": "#a79f8c" },
+      { "id": "BP_FAR", "distanceMetres": [760, 900], "tint": "#bdb5a1" },
+      { "id": "BP_HORIZON", "distanceMetres": [1200, 1400], "tint": "#c9c1ae", "note": "Only the mesa cells go out here. camera.far is 1800 on Bitterpan, and the pan floor is a 6,048 m square, so there is real ground under these cards." }
+    ]
+  },
+  "tintRule": "Tint darkens with proximity, never with size. The value is the sector fog colour pulled toward the map's silhouette base (#4d564e Greenwater, #6d6a5f Bitterpan) by 0.55 in the near band, 0.35 in the mid, 0.18 in the far and 0.10 at the horizon band. Those four numbers are the whole atmospheric perspective; fog density is NOT touched, because it is signed off on both maps.",
+  "zones": {
+    "greenwater": [
+      { "id": "HORIZON_TREELINE_FAR", "batch": "horizon", "from": 60, "to": 2440, "cards": 14, "kind": "shear", "band": "GW_FAR", "sides": "both", "rects": ["TREELINE_DENSE", "TREELINE_BROKEN", "TREELINE_SNAG"], "lateralMetres": [480, 600], "baseMetres": 0, "widthMetres": [78, 104], "heightMetres": [16, 22], "amplitudeDegrees": 0.25, "speedPeriodSeconds": 11.5, "note": "The base layer. Fourteen cards over 2.4 km is one card every 170 m, which is enough to close the horizon without ever putting two in the same frame at the same size." },
+      { "id": "HORIZON_TREELINE_MID", "batch": "horizon", "from": 120, "to": 2360, "cards": 9, "kind": "shear", "band": "GW_MID", "sides": "both", "rects": ["TREELINE_BROKEN", "TREELINE_SNAG"], "lateralMetres": [300, 380], "baseMetres": 0, "widthMetres": [54, 72], "heightMetres": [13, 18], "amplitudeDegrees": 0.4, "speedPeriodSeconds": 9.4, "note": "The parallax. Two bands moving at different rates is what makes the far one read as far; one band alone reads as wallpaper." },
+      { "id": "HORIZON_PYLON_LINE", "batch": "horizon", "from": 300, "to": 1900, "cards": 5, "kind": "shear", "band": "GW_MID", "sides": "left", "rects": ["PYLON_RUN"], "lateralMetres": [320, 360], "baseMetres": 0, "widthMetres": [38, 44], "heightMetres": [30, 36], "amplitudeDegrees": 0.15, "speedPeriodSeconds": 13, "note": "One side only, spaced so consecutive pylons imply a line running away from the course rather than a fence beside it. The catenary is drawn into the cell, so two cards 300 m apart do not need to connect." },
+      { "id": "HORIZON_FAR_INDUSTRY", "batch": "horizon", "from": 420, "to": 2300, "cards": 6, "kind": "shear", "band": "GW_FAR", "sides": "both", "rects": ["GANTRY_FAR", "HANGAR_MASS", "SILO_PAIR", "TANK_FARM_FAR"], "lateralMetres": [500, 590], "baseMetres": 0, "widthMetres": [46, 88], "heightMetres": [20, 34], "amplitudeDegrees": 0.2, "speedPeriodSeconds": 12.2, "note": "Greenwater is a facility, so its horizon is a facility. These four cells are the far-field answer to the same question the wreck line answers up close: this field is a place where airframes are taken apart." }
+    ],
+    "bitterpan": [
+      { "id": "PAN_MESA_LINE", "batch": "horizon", "from": 0, "to": 3050, "cards": 10, "kind": "shear", "band": "BP_HORIZON", "sides": "both", "rects": ["MESA_LONG", "MESA_BLUFF"], "lateralMetres": [1200, 1400], "baseMetres": 0, "widthMetres": [240, 320], "heightMetres": [44, 62], "amplitudeDegrees": 0.1, "speedPeriodSeconds": 15, "note": "The pan's edge. Eight MESA_LONG to two MESA_BLUFF: the bluff is the one vertical out there and it should be rare enough to be a landmark. This layer alone changes Bitterpan from a white plane into a basin." },
+      { "id": "PAN_REFINERY_FAR", "batch": "horizon", "from": 180, "to": 2900, "cards": 8, "kind": "shear", "band": "BP_FAR", "sides": "both", "rects": ["STACK_CLUSTER", "STACK_SINGLE", "PLANT_MASS"], "lateralMetres": [760, 900], "baseMetres": 0, "widthMetres": [54, 92], "heightMetres": [42, 66], "amplitudeDegrees": 0.15, "speedPeriodSeconds": 12.6, "note": "Where the salt goes. The works on this map currently start and end at the loadout; putting a refinery on the horizon is what makes the harvest look like it has a customer." },
+      { "id": "PAN_RIG_FIELD_FAR", "batch": "horizon", "from": 240, "to": 2620, "cards": 8, "kind": "shear", "band": "BP_MID", "sides": "both", "rects": ["RIG_FAR"], "lateralMetres": [460, 600], "baseMetres": 0, "widthMetres": [30, 42], "heightMetres": [18, 26], "amplitudeDegrees": 0.3, "speedPeriodSeconds": 10.4, "note": "RIG_FAR is the same stance as LATTICE_RIG on the facade sheet, so the 36 textured rigs beside the deck and the field of them on the horizon read as one operation at two distances. This is the cheapest continuity in the pass." },
+      { "id": "PAN_HAZE_BAND", "batch": "horizonAir", "from": 0, "to": 3050, "cards": 7, "kind": "mist", "band": "BP_FAR", "rects": ["HAZE_BAND"], "sides": "both", "lateralMetres": [700, 820], "baseMetres": [2, 6], "widthMetres": [180, 240], "heightMetres": [18, 26], "speed": 0.24, "tint": "#d9cfb4", "alphaKind": "shimmer", "note": "Sits behind and under the silhouettes: the band that makes 800 m look like 800 m without touching fog density. Additive and unfogged." },
+      { "id": "PAN_HEAT_SHIMMER_FAR", "batch": "horizonAir", "from": 180, "to": 2400, "cards": 5, "kind": "mist", "band": "BP_MID", "rects": ["SHIMMER_BAND"], "sides": "both", "lateralMetres": [420, 560], "baseMetres": [0, 1.5], "widthMetres": [120, 170], "heightMetres": [10, 15], "speed": 0.3, "tint": "#f0e9d8", "alphaKind": "shimmer", "note": "Bottom-weighted heat off the pan, at the base of the mid-band silhouettes so the rig feet dissolve rather than sitting on a hard line. Tint matches PAN_CRUST_SCUD so the two are one atmosphere at two heights. ALPHA_ENVELOPES.shimmer [0.05, 0.17] — the quietest envelope in the set, and it stays that way." }
+    ]
+  },
+  "counts": {
+    "greenwater": { "cards": 34, "batches": 1, "drawCallsAdded": 1, "trianglesAdded": 68 },
+    "bitterpan": { "cards": 38, "batches": 2, "drawCallsAdded": 2, "trianglesAdded": 76 }
+  },
+  "fogRule": "No fog distance, density or colour changes. The layer is authored INSIDE the existing fog: Greenwater's far band stops at 600 m against camera.far 650; Bitterpan's horizon band stops at 1400 m against camera.far 1800 and sits on the 6,048 m pan floor. If a band reads too strong at review, the fix is its tint, not the fog.",
+  "verification": [
+    "Runtime counter: horizon cards == 34 Greenwater, 38 Bitterpan; batches == 1 and 2.",
+    "Every horizon card resolves base 0 (silhouette zones) — a non-zero base on a silhouette zone means the grade contact is floating.",
+    "Screenshot review from the deck at GW 900 m (open wetland) and BP 1200 m (the Long Basin, where the map currently ends in gradient), stops 0 and 4."
+  ]
+}

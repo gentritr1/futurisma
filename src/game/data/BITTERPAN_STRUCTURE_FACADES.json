@@ -1,0 +1,75 @@
+{
+  "format": "FUTURISMA_PASS03_BITTERPAN_STRUCTURE_FACADES",
+  "version": "v0.3.0",
+  "units": "metres",
+  "note": "Pass 03 deliverable 1. A facade treatment for the 226 untextured blockout placements in MASSING_PLACEMENTS.json, delivered as region assignments over ONE sheet so every massing family keeps the single merged material it already has. No geometry is authored, no accepted placement is touched, no new draw call is introduced. Region rects are the truth in data/PASS03_ATLAS_REGIONS.json; this file only assigns them and states the mapping scale.",
+  "sheet": {
+    "texture": "bitterpan_facades_1024",
+    "width": 1024,
+    "height": 1024,
+    "filtering": "mips on, LinearFilter, anisotropy 4, sRGB",
+    "filteringReason": "These faces are read from 8 m to 900 m in the same frame. NearestFilter on a 0.25 m rib pitch at 1280x720 with MSAA is a moire generator; the Pass 02 crust tile argument applies unchanged.",
+    "authoringScale": {
+      "skins": "64 px/m (256 px region = 4.00 m)",
+      "concrete": "64 px/m (512 px region = 8.00 m)",
+      "lattice_tank_roof": "42.67 px/m (256 px region = 6.00 m)",
+      "strips": "64 px/m (512 x 128 px = 8.00 x 2.00 m)"
+    }
+  },
+  "palette": {
+    "note": "Every value sits between the pan it stands on and the fog in front of it, because that is the only way a facade reads as mass at 400 m. Anchored to the PAN ramp (Pass 02) and the three sector fog colours in BITTERPAN_PRODUCTION.json.",
+    "fogAnchors": { "S1": "#c7b997", "S2": "#d5cfb9", "S3": "#aeb8b2" },
+    "materials": {
+      "MASS_galvanised_sheet": { "lit": "#98a29f", "mid": "#768180", "dark": "#525c5c", "reads": "cool against the warm pan; the S3 signature" },
+      "MASS_corroded_plant_steel": { "lit": "#8d6c52", "mid": "#684f3d", "dark": "#43362e", "reads": "warm mass; the S1 silhouette" },
+      "MASS_weathered_canvas": { "lit": "#b5a88c", "dark": "#756b58", "reads": "the only soft material on the pan" },
+      "MASS_bleached_fibreglass": { "lit": "#d6d2c2", "dark": "#a3a092", "reads": "near salt in value, so silhouette carries it" },
+      "concrete": { "lit": "#a8a394", "dark": "#716d62", "reads": "plinths and tank bunds" },
+      "interior": { "lamp": "#ffb154", "deep": "#c46c2a", "reads": "HANGAR_LAMP_COLOR; the dusk read" }
+    }
+  },
+  "sizeClasses": [
+    { "id": "SMALL", "heightMetres": [0, 4.5], "kinds": ["screen", "marker", "hood", "drift"], "treatment": "one skin, base skirt, no trim, no window. At this height the whole object is 2-3 texels tall at 300 m; a second region would never be seen.", "tag": "WS-04" },
+    { "id": "MID", "heightMetres": [4.5, 9.0], "kinds": ["shed", "cone", "stand"], "treatment": "skin + one trim face + roof + base skirt + window strip. This is the class that carries the dusk read, because it is the only class with an interior.", "tag": "SH-11" },
+    { "id": "TALL", "heightMetres": [9.0, 16.0], "kinds": ["rig", "trestle", "mast", "dustmast"], "treatment": "lattice or skin + vertical trim + base skirt. Verticality is the read; nothing horizontal is assigned to this class.", "tag": "RIG-06" },
+    { "id": "TANK", "heightMetres": [0, 16.0], "kinds": ["tank"], "treatment": "tank skin + base skirt. Assigned by kind, not by height: a brine tank is a tank at any size.", "tag": "BT-02" },
+    { "id": "HERO", "heightMetres": [16.0, 60.0], "kinds": ["tower", "span"], "treatment": "concrete plinth + galvanised skin + lattice + window strip + roof. The one class allowed all five.", "tag": "LT-01" }
+  ],
+  "families": [
+    { "id": "S1_harvester_rigs", "placements": 36, "sizeClass": "TALL", "faces": { "sides": "LATTICE_RIG", "ends": "SKIN_PLANT_STEEL", "top": "ROOF_SHEET", "trim": "TRIM_DUCT_STACK", "base": "BASE_SKIRT" }, "alphaTest": 0.5, "uvMetresPerTile": [6, 6], "note": "The alpha lattice is the whole point of this deliverable. 36 open frames currently read as shipping containers; skinning them opaque would keep that read at higher fidelity." },
+    { "id": "S1_hoppers_and_sheds", "placements": 15, "sizeClass": "MID", "faces": { "sides": "SKIN_GALV_RIB", "ends": "SKIN_PATCHED", "top": "ROOF_SHEET", "trim": "TRIM_VENT", "base": "BASE_SKIRT", "window": "WINDOW_STRIP_DUSK" }, "alphaTest": 0, "uvMetresPerTile": [4, 4], "note": "SKIN_PATCHED on the ends only, so the mismatch is a discovery from one approach and not a texture everybody sees twice a lap." },
+    { "id": "S1_wind_screens", "placements": 27, "sizeClass": "SMALL", "faces": { "sides": "SKIN_CANVAS", "base": "BASE_SKIRT" }, "alphaTest": 0, "uvMetresPerTile": [4, 4], "note": "Closest ordinary massing to the deck, so it is also the most likely to be seen at 10 m. The torn corner is authored at one corner of the region only; UV it to the downwind end (292 deg wind)." },
+    { "id": "S1_brine_tanks", "placements": 13, "sizeClass": "TANK", "faces": { "sides": "SKIN_TANK", "top": "ROOF_SHEET", "base": "BASE_SKIRT" }, "alphaTest": 0, "uvMetresPerTile": [6, 6], "note": "Tide rings are the read: every level this tank has been emptied to. Align the region's lowest ring to the tank's own base so the rings stack upward." },
+    { "id": "S1_hazard_markers", "placements": 23, "sizeClass": "SMALL", "faces": { "sides": "FACADE_TAGS", "base": "BASE_SKIRT" }, "alphaTest": 0, "uvMetresPerTile": [2, 2], "note": "One 2.0 m tag block per marker. MASS_sun_killed_paint: chalky, never glossy — the lettering is drawn at 0.5-0.8 alpha for that reason." },
+    { "id": "S2_cone_stacks", "placements": 6, "sizeClass": "MID", "faces": { "sides": "SKIN_CANVAS", "base": "BASE_SKIRT" }, "alphaTest": 0, "uvMetresPerTile": [4, 4], "note": "The Cone Row names the sweep and is seen only at distance. Canvas rather than sheet, because a covered salt cone is what it is." },
+    { "id": "S2_pump_stands", "placements": 5, "sizeClass": "TALL", "faces": { "sides": "SKIN_PLANT_STEEL", "trim": "TRIM_PIPE_RUN", "top": "ROOF_SHEET", "base": "BASE_SKIRT" }, "alphaTest": 0, "uvMetresPerTile": [4, 4], "note": "TRIM_PIPE_RUN is the only horizontal assignment in a TALL family, and it is allowed because a pump stand IS its pipework." },
+    { "id": "S2_horizon_markers", "placements": 3, "sizeClass": "TALL", "faces": { "sides": "SKIN_PLANT_STEEL", "base": "BASE_SKIRT" }, "alphaTest": 0, "uvMetresPerTile": [4, 4], "note": "Far orientation only. One skin; anything more is invisible at their placement distances." },
+    { "id": "S3_conveyor_trestles", "placements": 17, "sizeClass": "TALL", "faces": { "sides": "LATTICE_RIG", "ends": "SKIN_GALV_RIB", "trim": "TRIM_DUCT_STACK", "base": "BASE_SKIRT" }, "alphaTest": 0.5, "uvMetresPerTile": [6, 6], "note": "The sector's repeated rhythm. Lattice keeps the repetition legible as structure rather than as a fence." },
+    { "id": "S3_loadout_tower", "placements": 1, "sizeClass": "HERO", "faces": { "sides": "SKIN_GALV_RIB", "ends": "LATTICE_RIG", "plinth": "SKIN_CONCRETE", "top": "ROOF_SHEET", "trim": "TRIM_VENT", "base": "BASE_SKIRT", "window": "WINDOW_STRIP_DUSK" }, "alphaTest": 0.5, "uvMetresPerTile": [4, 4], "note": "Visible from most of the lap, so it is the one asset that gets the full vocabulary: concrete at grade, sheet above, lattice on the ends, a lit control level at the top." },
+    { "id": "S3_sheds_and_plant", "placements": 9, "sizeClass": "MID", "faces": { "sides": "SKIN_GALV_RIB", "ends": "SKIN_PATCHED", "top": "ROOF_SHEET", "trim": "TRIM_VENT", "base": "BASE_SKIRT", "window": "WINDOW_STRIP_DUSK" }, "alphaTest": 0, "uvMetresPerTile": [4, 4], "note": "Stacked plant, shadowed galvanised sheet. Same assignment as the S1 sheds on purpose: one shed vocabulary across the lap, differentiated by the sector light, not by the texture." },
+    { "id": "S3_hood_covers", "placements": 2, "sizeClass": "SMALL", "faces": { "sides": "SKIN_CANVAS", "base": "BASE_SKIRT" }, "alphaTest": 0, "uvMetresPerTile": [4, 4], "note": "Wind indicator family 4. Canvas, pulled to the windward side." },
+    { "id": "WIND_salt_drift", "placements": 57, "sizeClass": "SMALL", "faces": { "sides": "BASE_SKIRT" }, "alphaTest": 0, "uvMetresPerTile": [8, 2], "note": "Drifts are salt, not structure: they take the skirt region alone, which is already a salt bank with a lit crest. This is the family that ties the facade sheet to the crust floor." },
+    { "id": "OCC2_conveyor_span", "placements": 1, "sizeClass": "HERO", "faces": { "sides": "SKIN_GALV_RIB", "soffit": "TRIM_PIPE_RUN", "ends": "LATTICE_RIG", "top": "ROOF_SHEET", "base": "BASE_SKIRT" }, "alphaTest": 0.5, "uvMetresPerTile": [4, 4], "note": "The only element over the drivable corridor and therefore the only one whose SOFFIT is a hero surface — it is read from directly underneath at speed. TRIM_PIPE_RUN there gives the underpass a direction of travel that matches the belt above it." },
+    { "id": "WIND_dust_masts", "placements": 11, "sizeClass": "TALL", "faces": { "sides": "SKIN_PLANT_STEEL", "base": "BASE_SKIRT" }, "alphaTest": 0, "uvMetresPerTile": [4, 4], "note": "Wind indicator family 3. Skin only." }
+  ],
+  "rules": [
+    "One sheet, one material per family. If any face assignment moves to a second sheet, the family splits into two draw calls and the deliverable is over budget.",
+    "BASE_SKIRT is applied to all 226 placements without exception. It is the region that stops a structure looking pasted onto the ground plane, and it is the cheapest thing in the pass.",
+    "WINDOW_STRIP_DUSK and WINDOW_STRIP_DEAD are the same eight bays at the same pitch. Cross-fade the two regions on the time-of-day stop rather than tinting one: an amber-tinted dead window is a dead window, not a lit one.",
+    "Two of the eight bays in WINDOW_STRIP_DUSK are authored dark. A shed with every bay lit is a hotel.",
+    "Trim regions are FACE assignments, not decals. They are box-mapped onto one face of a blockout primitive; nothing here requires a decal pass or a second UV set.",
+    "Only LATTICE_RIG uses alpha. Families that take it set alphaTest 0.5 on their existing material, which costs nothing; families that do not must stay opaque so the pan's sorting is unchanged.",
+    "No region assumes a sector. The sector read comes from the lighting and fog already authored in BITTERPAN_PRODUCTION.json; if a facade needs a per-sector variant later, it is a tint on the material, not a new region."
+  ],
+  "budget": {
+    "drawCallsAdded": { "greenwater": 0, "bitterpan": 0 },
+    "trianglesAdded": 0,
+    "texturesAdded": 1,
+    "reason": "Texturing a merged blockout family is a material swap. The sheet is one 1024 x 1024 RGBA; at DXT5 or mips-on RGBA it is inside the graphics-resources budget already allowed for a single art sheet."
+  },
+  "verification": [
+    "Runtime counter: facade material assignments == 226, and distinct materials per family == 1.",
+    "No family's material samples more than one texture.",
+    "Screenshot review at S1 2410-2500 m (the harvester chicane, 16 rigs against the deck) and S3 3005-3050 m (the underpass soffit) at time-of-day stops 0 and 4."
+  ]
+}

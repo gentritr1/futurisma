@@ -1,0 +1,78 @@
+{
+  "format": "FUTURISMA_PASS03_SIGNAGE_BACK_PANELS",
+  "version": "v0.3.0",
+  "units": "metres",
+  "note": "Pass 03 deliverable 3. Board backs currently show the front art mirrored, which is the one thing on either map that reads as a mistake rather than as an era. The back of a board is a panel, a frame, four bolt heads and a service tag. Two regions on futurisma_trim_512, assigned by mount type.",
+  "sheet": {
+    "texture": "futurisma_trim_512",
+    "regions": {
+      "SIGN_BACK_BLANK": { "metres": [2.5, 2.5], "note": "ribbed weathered panel, welded frame, four through-bolts. No lettering." },
+      "SIGN_BACK_TAGGED": { "metres": [2.5, 2.5], "note": "same panel plus a 1.30 x 0.45 m stencilled service tag block." }
+    },
+    "filtering": "nearest, no mips — same contract as the signage sheet it sits behind",
+    "mapping": "Box-mapped to the board's back face at the board's own footprint. The region is authored square at 2.5 m; a wider board repeats the ribs along U rather than stretching them, so the 0.34 m rib pitch stays 0.34 m on every board."
+  },
+  "designNotes": [
+    "Ribs run HORIZONTALLY. Stiffeners are welded across the sheet, and the change of direction against the front art's vertical layout is the cue that says you are looking at the wrong side.",
+    "The four bolts are the fixings that hold the FRONT art on, seen from behind, with oxide weeping below each one. That is the only detail on the panel that has to be there.",
+    "Value sits at galvanised mid (#768180) — darker than every sky either map has, so a board back never becomes the brightest thing in the frame when you pass it.",
+    "The tag block reads BP-S3 / 041 and DO NOT PAINT. It is authored once; per-board codes are a text swap on the same region if the build side ever wants them, but nothing depends on them being unique — at the distance a back is seen, it is a value block, not a label."
+  ],
+  "rule": {
+    "statement": "Apply a back panel to every free-standing board whose back face is drawn. Do not apply it where a back face does not exist or is already art.",
+    "applyWhen": [
+      "mount contains 'post' or 'hoarding' — the board stands in the open, so its back is visible for the whole time you are past it.",
+      "facing is 'inward' or 'reverse'."
+    ],
+    "excludeWhen": [
+      "mount states 'both faces' (CRADLE_BANNER at distance 0) — the art IS double-sided by design and the reverse-facing entry already covers it.",
+      "The placement resolves as a WALL PLAQUE in a barrier span. Those thirteen already have the Pass 02 backing panel (HANGAR_SIX_PLAQUE_BACKING), which is a better answer than a back face: there is no back, there is a wall.",
+      "Capping and tape strips (SPONSOR_TAPE) and pennant rows (PENNANT_ROW) — no back face is drawn.",
+      "Totem panels (TOTEM_*) — they are pit-wall mounted."
+    ],
+    "variantRule": "SIGN_BACK_TAGGED where the board's own width >= 2.00 m, so the 1.30 m tag block fits inside the frame with margin. SIGN_BACK_BLANK below that — a tag squeezed onto a marshal plate would be a texture, not a tag."
+  },
+  "placements": {
+    "greenwater": [
+      { "slot": "BOARD_KAIRO", "distance": 62, "region": "SIGN_BACK_TAGGED" },
+      { "slot": "BOARD_GREENWATER_AUTH", "distance": 108, "region": "SIGN_BACK_TAGGED" },
+      { "slot": "BOARD_AEROLIFT", "distance": 178, "region": "SIGN_BACK_TAGGED" },
+      { "slot": "BOARD_TECH_PLATE", "distance": 214, "region": "SIGN_BACK_TAGGED" },
+      { "slot": "BOARD_AEROLIFT", "distance": 648, "region": "SIGN_BACK_TAGGED" },
+      { "slot": "BOARD_KAIRO", "distance": 806, "region": "SIGN_BACK_TAGGED" },
+      { "slot": "BOARD_SODIUM_ROW", "distance": 1712, "region": "SIGN_BACK_TAGGED" },
+      { "slot": "BOARD_SODIUM_ROW", "distance": 1968, "region": "SIGN_BACK_TAGGED" },
+      { "slot": "BOARD_GREENWATER_AUTH", "distance": 2364, "region": "SIGN_BACK_TAGGED" },
+      { "slot": "BOARD_KAIRO", "distance": 2452, "region": "SIGN_BACK_TAGGED" },
+      { "slot": "MARSHAL_PLATE", "distance": 212, "region": "SIGN_BACK_BLANK" },
+      { "slot": "MARSHAL_PLATE", "distance": 640, "region": "SIGN_BACK_BLANK" },
+      { "slot": "MARSHAL_PLATE", "distance": 1520, "region": "SIGN_BACK_BLANK" },
+      { "slot": "MARSHAL_PLATE", "distance": 2140, "region": "SIGN_BACK_BLANK" }
+    ],
+    "bitterpan": [
+      { "slot": "BOARD_BITTERPAN_WORKS", "distance": 64, "region": "SIGN_BACK_TAGGED", "note": "four-post hoarding on the pan; the largest back face on either map" },
+      { "slot": "BOARD_PALE_HARVEST", "distance": 420, "region": "SIGN_BACK_TAGGED" },
+      { "slot": "BOARD_HEAT_DEAD", "distance": 760, "region": "SIGN_BACK_TAGGED", "note": "leaning 4-9 deg, so the back catches the key from underneath — the one place the drip lip on the frame will read" },
+      { "slot": "BOARD_PALE_HARVEST", "distance": 1180, "region": "SIGN_BACK_TAGGED" },
+      { "slot": "BOARD_HEAT_DEAD", "distance": 1520, "region": "SIGN_BACK_TAGGED" },
+      { "slot": "BOARD_KAIRO", "distance": 1740, "region": "SIGN_BACK_TAGGED" },
+      { "slot": "BOARD_HEAT_DEAD", "distance": 2060, "region": "SIGN_BACK_TAGGED" },
+      { "slot": "BOARD_PALE_HARVEST", "distance": 2260, "region": "SIGN_BACK_TAGGED" },
+      { "slot": "BOARD_TECH_PLATE", "distance": 2880, "region": "SIGN_BACK_TAGGED" },
+      { "slot": "MARSHAL_PLATE", "distance": 640, "region": "SIGN_BACK_BLANK" },
+      { "slot": "MARSHAL_PLATE", "distance": 2620, "region": "SIGN_BACK_BLANK" },
+      { "slot": "MARSHAL_PLATE", "distance": 2996, "region": "SIGN_BACK_BLANK" }
+    ]
+  },
+  "counts": { "greenwater": { "tagged": 10, "blank": 4 }, "bitterpan": { "tagged": 9, "blank": 3 }, "total": 26 },
+  "budget": {
+    "drawCallsAdded": { "greenwater": 1, "bitterpan": 1 },
+    "trianglesAdded": { "greenwater": 28, "bitterpan": 24 },
+    "reason": "A back face cannot ride the signage material because it does not sample the signage sheet. One merged back-face mesh per map, one material, one draw call. If the build side would rather pay zero, the alternative is to copy the two regions onto a free corner of a signage sheet at its next rebuild — but that sheet is hash-pinned, so this pass does not assume it."
+  },
+  "verification": [
+    "Runtime counter: back panels == 14 Greenwater, 12 Bitterpan, and no back panel is resolved for a wall plaque.",
+    "No mirrored front art remains on any drawn back face.",
+    "Screenshot review looking back from just past GW 108 m and BP 760 m (the leaning board)."
+  ]
+}

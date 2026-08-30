@@ -32,6 +32,11 @@ import {
   buildHangarFixtures,
   buildLiveryWearAtlas,
 } from "./atlas-draw-pass02.mjs";
+import {
+  buildBitterpanFacades,
+  buildHorizonCards,
+  buildTrimSheet,
+} from "./atlas-draw-pass03.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 
@@ -45,6 +50,12 @@ const TARGETS = {
   bitterpan_crust_1024: "public/assets/map02/textures/bitterpan_crust_1024.png",
   hangar_fixtures_512: "public/assets/greenwater/textures/hangar_fixtures_512.png",
   totem_wear_1024: "public/assets/totem/textures/totem_wear_1024.png",
+  // Pass 03. The horizon sheet and the trim sheet are shared by both maps, the
+  // same way greenwater_motion_512 already is, so they are served from the
+  // shared greenwater texture directory rather than duplicated per map.
+  bitterpan_facades_1024: "public/assets/map02/textures/bitterpan_facades_1024.png",
+  futurisma_horizon_1024: "public/assets/greenwater/textures/futurisma_horizon_1024.png",
+  futurisma_trim_512: "public/assets/greenwater/textures/futurisma_trim_512.png",
 };
 
 const REGIONS_TARGET = "src/game/data/ATLAS_REGIONS.json";
@@ -117,6 +128,9 @@ const sheets = [
   buildBitterpanCrustAtlas(),
   buildHangarFixtures(),
   buildLiveryWearAtlas(),
+  buildBitterpanFacades(),
+  buildHorizonCards(),
+  buildTrimSheet(),
 ];
 const regions = {};
 let failed = false;
