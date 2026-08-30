@@ -257,22 +257,57 @@ export const HORIZON_RECTS = Object.freeze({
 });
 
 /**
- * The four parallax bands of FUTURISMA_HORIZON_LAYERS.json, as authored.
+ * The parallax bands of FUTURISMA_HORIZON_LAYERS.json.
  *
- * `tintRule` in that file explains how the values were derived (each map's fog
- * colour pulled toward its silhouette base by 0.55 / 0.35 / 0.18 / 0.10); the
- * hex values below are the delivery's own output of that rule and are used
- * verbatim rather than re-derived, because fog colour is per-sector at runtime
- * and re-deriving would make a signed-off tint move with the sector.
+ * GW_* are the delivery's own output of that file's `tintRule` (each map's fog
+ * colour pulled toward the silhouette base by 0.55 / 0.35 / 0.18 / 0.10).
+ * Greenwater has ONE fog colour for the whole lap, so a hex frozen there freezes
+ * a relationship to fog as well as a value.
+ *
+ * BP_* are NOT that. P18.2 re-authored them as ABSOLUTE Rec.709 luminance
+ * targets, because Bitterpan's fog is per-sector and the pull rule, frozen to a
+ * single hex, silently freezes the wrong half of the relationship: it pins the
+ * band's luminance while the fog it has to contrast against keeps moving, so the
+ * SIGN of the contrast flips from sector to sector and the silhouette dissolves
+ * wherever the two cross. PAN_MESA_LINE spans 0-3050 m — the whole lap — so all
+ * three sectors are load-bearing for one tint.
+ *
+ *   BP_NEAR    0x8c8474  luma 132.6
+ *   BP_MID     0x9a9381  luma 147.1
+ *   BP_FAR     0xa59e8d  luma 158.3
+ *   BP_HORIZON 0xb1aa99  luma 170.3
+ *
+ * The invariant those four exist to hold: every one sits BELOW the darkest
+ * sector fog on the map, so a silhouette reads darker than the air behind it
+ * everywhere on the lap. The three sector fog luminances (measured off
+ * BITTERPAN_PRODUCTION.json lighting.profiles) are S1 HARVEST BASIN #c7b997
+ * 185.5, S2 THE LONG BASIN #d5cfb9 206.7, S3 LOADOUT BASIN #aeb8b2 181.4. The
+ * ceiling is S3's 181.4, and BP_HORIZON clears it by 11.1. Hue is unchanged from
+ * the delivery — each new value is a uniform RGB scale of the old one, so only
+ * value moved, not the grade. Re-tint a band and you re-check it against 181.4;
+ * validate-living-world.mjs asserts that bound on every built card, so this is a
+ * rule with teeth rather than a note. FUTURISMA_HORIZON_LAYERS.json still lists
+ * the delivered BP hexes and is left alone on purpose — it is the record of what
+ * was delivered, and THIS table is what the runtime draws.
+ *
+ * The structural fix — derive each card's tint from the LIVE fog colour rather
+ * than a constant — is rejected for now, not unconsidered. It would need
+ * per-frame vertex-colour rewrites across all 38 Bitterpan horizon cards,
+ * because atmosphere.ts does not step fog per sector: it lerps `fog.color`
+ * toward `course.fogAt(progress)` every tick and multiplies that by the
+ * time-of-day tint, so there is no frame on which the fog colour is a constant
+ * to derive from. If this band ever goes invisible again — a re-graded sector, a
+ * fourth sector, a darker time-of-day ramp — the live derivation is the real
+ * answer and this table is the workaround that ran out.
  */
 const HORIZON_BANDS = Object.freeze({
   GW_NEAR: 0x74827a,
   GW_MID: 0x8b968c,
   GW_FAR: 0xa1aa9f,
   BP_NEAR: 0x8c8474,
-  BP_MID: 0xa79f8c,
-  BP_FAR: 0xbdb5a1,
-  BP_HORIZON: 0xc9c1ae,
+  BP_MID: 0x9a9381,
+  BP_FAR: 0xa59e8d,
+  BP_HORIZON: 0xb1aa99,
 });
 
 const TAU = Math.PI * 2;
