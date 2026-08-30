@@ -141,13 +141,24 @@ for (const sheet of sheets) {
   const target = TARGETS[sheet.name];
   if (!target) throw new Error(`No served path registered for ${sheet.name}.`);
   const path = join(root, target);
+  // P18: `note` is stripped on the way out. ATLAS_REGIONS.json is IMPORTED by
+  // `totem.ts`, which is in the initial bundle, so every byte of it is shipped
+  // to every player on first load — and the ten sheets' notes are 6.5 KB raw /
+  // 2.8 KiB gzip of prose that no runtime and no validator reads. They are not
+  // lost: the authoring layouts in `atlas-draw*.mjs` are where they are
+  // written and are the only place they were ever edited. This registry is a
+  // UV table.
+  const rects = {};
+  for (const [id, rect] of Object.entries(sheet.regions)) {
+    rects[id] = { x: rect.x, y: rect.y, w: rect.w, h: rect.h };
+  }
   regions[sheet.name] = {
     texture: `/${target.replace(/^public\//, "")}`,
     width: sheet.width,
     height: sheet.height,
     bytes: png.length,
     sha256: hash,
-    regions: sheet.regions,
+    regions: rects,
   };
 
   if (check) {

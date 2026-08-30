@@ -14,6 +14,7 @@ import {
   ps2ColorGradeChunk,
   PS2_TONE_MAPPING_ANCHOR,
 } from "./render-mode.js";
+import { publishTimeOfDayDrift } from "./time-of-day";
 
 /** The exposure the AgX path has run at since the renderer was set up. */
 // P11: 1.05 -> 1.10. A half-stop of headroom under AgX; the markers that now
@@ -295,6 +296,9 @@ export class RaceAtmosphere {
     // --- Time-of-day drift. Sampled once and applied as a multiplier over
     // whatever the sector palette just returned, so sector identity survives.
     this.timeOfDayDrift = resolveTimeOfDayDrift(lapProgress, reducedMotion);
+    // P18: published, not threaded. The Bitterpan facade window strips
+    // cross-fade DEAD -> DUSK on this exact number; see time-of-day.ts.
+    publishTimeOfDayDrift(this.timeOfDayDrift);
     const stops = this.course.timeOfDayStops;
     const tint = this.tintScratch;
     if (stops && stops.length > 0) {

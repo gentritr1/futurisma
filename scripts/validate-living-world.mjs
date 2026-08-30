@@ -50,8 +50,12 @@ const BUDGETS = {
   // atlas-B batches, 215 accepted cards + the 31 opening-straight cards;
   // Bitterpan 3 + 1 batches, 98 + 18 cards. A new zone now has to be argued for
   // against a real ceiling rather than slipped into slack.
-  greenwater: { drawCalls: 6, cards: 246, triangles: 492 },
-  bitterpan: { drawCalls: 4, cards: 116, triangles: 232 },
+  //
+  // P18 art pass 03 re-baselines both maps by exactly the horizon layer and no
+  // more: Greenwater +1 batch / +34 cards, Bitterpan +2 batches / +38 cards.
+  // Same rule as P12 — these are measured post-integration costs, not headroom.
+  greenwater: { drawCalls: 7, cards: 280, triangles: 560 },
+  bitterpan: { drawCalls: 6, cards: 154, triangles: 308 },
 };
 
 /**
@@ -123,6 +127,36 @@ const P12_ZONES = [
   { id: "OPENING_DECK_SCUD", map: "greenwater", batch: "airB", from: 6, to: 218, cards: 8, digest: "aeb28d1007059468" },
   { id: "SALT_DEVIL_CORE", map: "bitterpan", batch: "airB", from: 340, to: 2290, cards: 8, digest: "979fe240083dc19d" },
   { id: "PAN_CRUST_SCUD", map: "bitterpan", batch: "airB", from: 180, to: 2100, cards: 10, digest: "25baa6f85792d865" },
+];
+
+/**
+ * P18 art pass 03. The horizon batches, appended after P12's. Greenwater takes
+ * one; Bitterpan takes two, and the second is the ONLY batch on either map that
+ * is both additive and unfogged — that is the deliberate, single fog exemption
+ * of Pass 03 (`horizonAir` IS the far-field air, and fogging an additive haze
+ * band multiplies the effect by itself).
+ */
+const P18_BATCHES = {
+  greenwater: [
+    { id: "horizon", meshName: "GW_LIVING_HORIZON", texture: "horizon", blending: "normal", depthWrite: false, fog: true, alphaTest: 0.5, lamps: false },
+  ],
+  bitterpan: [
+    { id: "horizon", meshName: "BP_LIVING_HORIZON", texture: "horizon", blending: "normal", depthWrite: false, fog: true, alphaTest: 0.5, lamps: false },
+    { id: "horizonAir", meshName: "BP_LIVING_HORIZON_AIR", texture: "horizon", blending: "additive", depthWrite: false, fog: false, alphaTest: 0, lamps: false },
+  ],
+};
+
+/** P18 art pass 03 zones, pinned the way P9's and P12's are. */
+const P18_ZONES = [
+  { id: "HORIZON_TREELINE_FAR", map: "greenwater", batch: "horizon", from: 60, to: 2440, cards: 14, digest: "d6a8548e2008fc56" },
+  { id: "HORIZON_TREELINE_MID", map: "greenwater", batch: "horizon", from: 120, to: 2360, cards: 9, digest: "9c1ece39fce89145" },
+  { id: "HORIZON_PYLON_LINE", map: "greenwater", batch: "horizon", from: 300, to: 1900, cards: 5, digest: "99dc098226fd514a" },
+  { id: "HORIZON_FAR_INDUSTRY", map: "greenwater", batch: "horizon", from: 420, to: 2300, cards: 6, digest: "c87873ffddfd2af1" },
+  { id: "PAN_MESA_LINE", map: "bitterpan", batch: "horizon", from: 0, to: 3050, cards: 10, digest: "47f0a65fa1df8335" },
+  { id: "PAN_REFINERY_FAR", map: "bitterpan", batch: "horizon", from: 180, to: 2900, cards: 8, digest: "c11a9f235ecf3769" },
+  { id: "PAN_RIG_FIELD_FAR", map: "bitterpan", batch: "horizon", from: 240, to: 2620, cards: 8, digest: "58bd17b3021d3947" },
+  { id: "PAN_HAZE_BAND", map: "bitterpan", batch: "horizonAir", from: 0, to: 3050, cards: 7, digest: "441b6a162eabed89" },
+  { id: "PAN_HEAT_SHIMMER_FAR", map: "bitterpan", batch: "horizonAir", from: 180, to: 2400, cards: 5, digest: "05283e34b081cd49" },
 ];
 
 const NUMERIC_FIELDS = [
@@ -417,18 +451,41 @@ for (const authored of P9_ZONES) {
 for (const [map, appended] of Object.entries(P12_BATCHES)) {
   const spec = LIVING_WORLD_SPECS[map];
   const accepted = map === "greenwater" ? ACCEPTED_GREENWATER_BATCHES.length : 3;
+  const later = P18_BATCHES[map] ?? [];
   assert.equal(
     spec.batches.length,
-    accepted + appended.length,
+    accepted + appended.length + later.length,
     `${spec.id} declares ${spec.batches.length} batches; P12 authors `
-      + `${accepted} accepted plus ${appended.length} appended.`,
+      + `${accepted} accepted plus ${appended.length} appended, and P18 appends `
+      + `${later.length} more.`,
   );
   assert.deepEqual(
-    spec.batches.slice(accepted).map((batch) => ({ ...batch })),
+    spec.batches.slice(accepted, accepted + appended.length).map((batch) => ({ ...batch })),
     appended,
     `${spec.id} atlas-B batches changed. Each one is a draw call and a render `
       + "state, and they must stay AFTER the accepted batches.",
   );
+  assert.deepEqual(
+    spec.batches.slice(accepted + appended.length).map((batch) => ({ ...batch })),
+    later,
+    `${spec.id} horizon batches changed. They are appended LAST so nothing `
+      + "above them moves, and each is a draw call and a render state.",
+  );
+}
+
+// The additive-and-unfogged combination is a single deliberate exemption. Any
+// other batch that turns fog off must either be a lamp batch (whose colour is
+// driven per frame anyway) or be argued for here.
+for (const [map, spec] of Object.entries(LIVING_WORLD_SPECS)) {
+  for (const batch of spec.batches) {
+    if (batch.fog) continue;
+    assert.ok(
+      batch.lamps || batch.id === "horizonAir",
+      `${spec.id} batch ${batch.id} is unfogged. Pass 03 allows exactly one `
+        + `non-lamp fog exemption (${map} horizonAir) and it is authored as the `
+        + "far-field air itself.",
+    );
+  }
 }
 
 // Only the appended batches may name the second sheet, and every batch that
@@ -459,14 +516,82 @@ for (const authored of P12_ZONES) {
   );
 }
 
-// The P12 zones append: they must be the LAST zones of their spec, or the
-// shared seeded stream reaches the accepted zones with different draws.
+// ---------------------------------------------------------------------------
+// The P18 art-pass-03 additions.
+// ---------------------------------------------------------------------------
+
+for (const authored of P18_ZONES) {
+  const spec = LIVING_WORLD_SPECS[authored.map];
+  const zone = spec.zones.find((candidate) => candidate.id === authored.id);
+  assert.ok(zone, `The P18 zone ${authored.id} is missing from ${authored.map}.`);
+  assert.equal(zone.batch, authored.batch, `${authored.id} changed batch.`);
+  assert.equal(zone.from, authored.from, `${authored.id} changed its start.`);
+  assert.equal(zone.to, authored.to, `${authored.id} changed its end.`);
+  assert.equal(zone.cards, authored.cards, `${authored.id} changed its card count.`);
+  assert.equal(
+    zoneDigests.get(`${authored.map}/${authored.id}`),
+    authored.digest,
+    `${authored.id} no longer authors the cards this validator pinned.`,
+  );
+}
+
+// Every silhouette card of the horizon layer resolves base 0. The cells are
+// authored bottom-anchored, so a non-zero base floats the grade contact — this
+// is the one geometric mistake the layer can make that still looks like art.
+for (const authored of P18_ZONES) {
+  if (authored.batch !== "horizon") continue;
+  const cards = built[authored.map].batches
+    .flatMap((batch) => batch.cards)
+    .filter((card) => card.motionId === authored.id);
+  for (const card of cards) {
+    assert.equal(
+      card.base,
+      0,
+      `${authored.id} places a silhouette card at base ${card.base} m; a `
+        + "bottom-anchored cell above 0 floats off the grade.",
+    );
+  }
+}
+
+// The append order is the whole determinism argument: P12's zones sit after the
+// accepted and P9 ones, P18's sit after P12's, and P18's are last. Any other
+// order reaches the accepted zones with different draws off the shared stream.
 for (const [map, spec] of Object.entries(LIVING_WORLD_SPECS)) {
-  const appended = P12_ZONES.filter((zone) => zone.map === map).map((zone) => zone.id);
+  const p12 = P12_ZONES.filter((zone) => zone.map === map).map((zone) => zone.id);
+  const p18 = P18_ZONES.filter((zone) => zone.map === map).map((zone) => zone.id);
+  const ids = spec.zones.map((zone) => zone.id);
   assert.deepEqual(
-    spec.zones.slice(spec.zones.length - appended.length).map((zone) => zone.id),
-    appended,
-    `${spec.id} must keep its P12 zones last and in order.`,
+    ids.slice(ids.length - p18.length),
+    p18,
+    `${spec.id} must keep its P18 horizon zones last and in order.`,
+  );
+  assert.deepEqual(
+    ids.slice(ids.length - p18.length - p12.length, ids.length - p18.length),
+    p12,
+    `${spec.id} must keep its P12 zones immediately before the P18 zones.`,
+  );
+}
+
+// The horizon layer exists to close the far field. Assert the reach, not just
+// that the zones parse: Greenwater's far band must clear 480 m (inside the
+// 650 m far plane) and Bitterpan's must clear 1,200 m (inside 1,800 m).
+for (const [map, minimum, ceiling] of [["greenwater", 480, 650], ["bitterpan", 1200, 1800]]) {
+  const laterals = built[map].batches
+    .flatMap((batch) => batch.cards)
+    .filter((card) => card.motionId.startsWith("HORIZON_") || card.motionId.startsWith("PAN_MESA")
+      || card.motionId.startsWith("PAN_REFINERY") || card.motionId.startsWith("PAN_RIG")
+      || card.motionId.startsWith("PAN_HAZE") || card.motionId.startsWith("PAN_HEAT_SHIMMER_FAR"))
+    .map((card) => card.lateral);
+  assert.ok(laterals.length > 0, `${map} authors no horizon cards.`);
+  assert.ok(
+    Math.max(...laterals) >= minimum,
+    `${map}'s horizon reaches only ${Math.max(...laterals).toFixed(0)} m; the `
+      + `layer is authored to stand out at ${minimum} m or beyond.`,
+  );
+  assert.ok(
+    Math.max(...laterals) < ceiling,
+    `${map}'s horizon stands at ${Math.max(...laterals).toFixed(0)} m, at or `
+      + `past camera.far ${ceiling} m, so a card can clip through the far plane.`,
   );
 }
 
@@ -578,6 +703,9 @@ const summary = Object.entries(built)
   .join(", ");
 console.log(
   `Living world PASS: ${summary}; 11 accepted Greenwater zones pinned byte-exact, `
-    + `${P9_ZONES.length} P9 zones pinned, ${CARD_KINDS.length} motions and `
+    + `${P9_ZONES.length} P9 zones pinned, ${P12_ZONES.length} P12 zones, `
+    + `${P18_ZONES.length} P18 horizon zones (34 GW / 38 BP cards, 1 / 2 batches, `
+    + "every silhouette at base 0, one fog exemption), "
+    + `${CARD_KINDS.length} motions and `
     + `${alphaKinds.size} envelopes wired in the runtime.`,
 );

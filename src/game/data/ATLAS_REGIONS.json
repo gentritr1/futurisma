@@ -10,253 +10,217 @@
     "x": 0,
     "y": 0,
     "w": 1024,
-    "h": 96,
-    "note": "runway threshold, 8 bars along U"
+    "h": 96
    },
    "CENTRELINE_DASH": {
     "x": 0,
     "y": 96,
     "w": 256,
-    "h": 32,
-    "note": "runway centreline dash"
+    "h": 32
    },
    "EDGE_LINE": {
     "x": 256,
     "y": 96,
     "w": 256,
-    "h": 32,
-    "note": "continuous runway edge line"
+    "h": 32
    },
    "HOLD_LADDER": {
     "x": 512,
     "y": 96,
     "w": 256,
-    "h": 32,
-    "note": "holding position: 2 solid, 2 dashed"
+    "h": 32
    },
    "TAXI_DASH": {
     "x": 768,
     "y": 96,
     "w": 256,
-    "h": 32,
-    "note": "taxi route dash, service yellow"
+    "h": 32
    },
    "DESIGNATOR_07": {
     "x": 0,
     "y": 128,
     "w": 192,
-    "h": 128,
-    "note": "runway designator 07"
+    "h": 128
    },
    "DESIGNATOR_25": {
     "x": 192,
     "y": 128,
     "w": 192,
-    "h": 128,
-    "note": "reciprocal designator 25"
+    "h": 128
    },
    "WORD_NO_ENTRY": {
     "x": 384,
     "y": 128,
     "w": 320,
-    "h": 64,
-    "note": "deck stencil"
+    "h": 64
    },
    "WORD_KEEP_CLEAR": {
     "x": 384,
     "y": 192,
     "w": 320,
-    "h": 64,
-    "note": "deck stencil"
+    "h": 64
    },
    "WORD_HOLD_SHORT": {
     "x": 704,
     "y": 128,
     "w": 320,
-    "h": 64,
-    "note": "deck stencil"
+    "h": 64
    },
    "WORD_FUEL_POINT": {
     "x": 704,
     "y": 192,
     "w": 320,
-    "h": 64,
-    "note": "deck stencil"
+    "h": 64
    },
    "AIM_BLOCK": {
     "x": 0,
     "y": 256,
     "w": 128,
-    "h": 256,
-    "note": "aiming point block pair"
+    "h": 256
    },
    "TDZ_3BAR": {
     "x": 128,
     "y": 256,
     "w": 96,
-    "h": 256,
-    "note": "touchdown zone, 3 bar"
+    "h": 256
    },
    "TDZ_2BAR": {
     "x": 224,
     "y": 256,
     "w": 96,
-    "h": 256,
-    "note": "touchdown zone, 2 bar"
+    "h": 256
    },
    "TDZ_1BAR": {
     "x": 320,
     "y": 256,
     "w": 96,
-    "h": 256,
-    "note": "touchdown zone, 1 bar"
+    "h": 256
    },
    "GRID_BOX": {
     "x": 416,
     "y": 256,
     "w": 192,
-    "h": 192,
-    "note": "start grid box outline"
+    "h": 192
    },
    "GRID_NUM_1": {
     "x": 416,
     "y": 448,
     "w": 48,
-    "h": 64,
-    "note": "grid slot numeral 1"
+    "h": 64
    },
    "GRID_NUM_2": {
     "x": 464,
     "y": 448,
     "w": 48,
-    "h": 64,
-    "note": "grid slot numeral 2"
+    "h": 64
    },
    "GRID_NUM_3": {
     "x": 512,
     "y": 448,
     "w": 48,
-    "h": 64,
-    "note": "grid slot numeral 3"
+    "h": 64
    },
    "GRID_NUM_4": {
     "x": 560,
     "y": 448,
     "w": 48,
-    "h": 64,
-    "note": "grid slot numeral 4"
+    "h": 64
    },
    "CHEVRON_SHOULDER": {
     "x": 608,
     "y": 256,
     "w": 416,
-    "h": 128,
-    "note": "shoulder chevrons, orange"
+    "h": 128
    },
    "HAZARD_BAND": {
     "x": 608,
     "y": 384,
     "w": 416,
-    "h": 128,
-    "note": "run-off hazard banding"
+    "h": 128
    },
    "SCRUB_HEAVY": {
     "x": 0,
     "y": 512,
     "w": 256,
-    "h": 128,
-    "note": "rubber deposit, heavy"
+    "h": 128
    },
    "SCRUB_LIGHT": {
     "x": 256,
     "y": 512,
     "w": 256,
-    "h": 128,
-    "note": "rubber deposit, light"
+    "h": 128
    },
    "PATCH_ASPHALT": {
     "x": 512,
     "y": 512,
     "w": 256,
-    "h": 128,
-    "note": "resurfacing patch with seam"
+    "h": 128
    },
    "PATCH_PLATE": {
     "x": 768,
     "y": 512,
     "w": 256,
-    "h": 128,
-    "note": "bolted steel repair plate"
+    "h": 128
    },
    "CRACK_NET": {
     "x": 0,
     "y": 640,
     "w": 256,
-    "h": 128,
-    "note": "surface crack network"
+    "h": 128
    },
    "STAIN_PUDDLE": {
     "x": 256,
     "y": 640,
     "w": 256,
-    "h": 128,
-    "note": "standing water stain"
+    "h": 128
    },
    "STAIN_OIL": {
     "x": 512,
     "y": 640,
     "w": 256,
-    "h": 128,
-    "note": "service spill"
+    "h": 128
    },
    "DRAIN_GRATE": {
     "x": 768,
     "y": 640,
     "w": 256,
-    "h": 128,
-    "note": "deck drain grate"
+    "h": 128
    },
    "CANCEL_X": {
     "x": 0,
     "y": 768,
     "w": 256,
-    "h": 256,
-    "note": "cancelled marking"
+    "h": 256
    },
    "FADED_ARROW": {
     "x": 256,
     "y": 768,
     "w": 256,
-    "h": 256,
-    "note": "faded direction arrow"
+    "h": 256
    },
    "TIEDOWN_RING": {
     "x": 512,
     "y": 768,
     "w": 128,
-    "h": 128,
-    "note": "deck tie-down ring"
+    "h": 128
    },
    "BOLT_CLUSTER": {
     "x": 640,
     "y": 768,
     "w": 128,
-    "h": 128,
-    "note": "panel fixings"
+    "h": 128
    },
    "SEAM_JOINT": {
     "x": 512,
     "y": 896,
     "w": 256,
-    "h": 128,
-    "note": "slab expansion joint"
+    "h": 128
    },
    "WARN_PLATE": {
     "x": 768,
     "y": 768,
     "w": 256,
-    "h": 256,
-    "note": "deck warning plate"
+    "h": 256
    }
   }
  },
@@ -271,120 +235,103 @@
     "x": 0,
     "y": 0,
     "w": 512,
-    "h": 128,
-    "note": "prime constructor, both maps"
+    "h": 128
    },
    "BOARD_PALE_HARVEST": {
     "x": 512,
     "y": 0,
     "w": 512,
-    "h": 128,
-    "note": "Bitterpan: the salt works that leases the pan"
+    "h": 128
    },
    "BOARD_SODIUM_ROW": {
     "x": 0,
     "y": 128,
     "w": 512,
-    "h": 128,
-    "note": "Greenwater: the fuel contractor Fuel Row is named for"
+    "h": 128
    },
    "BOARD_AEROLIFT": {
     "x": 512,
     "y": 128,
     "w": 512,
-    "h": 128,
-    "note": "Greenwater: airframe repair, the trade Hangar Six houses"
+    "h": 128
    },
    "BOARD_GREENWATER_AUTH": {
     "x": 0,
     "y": 256,
     "w": 512,
-    "h": 128,
-    "note": "the site operator; the only board that carries a civic tone"
+    "h": 128
    },
    "BOARD_BITTERPAN_WORKS": {
     "x": 512,
     "y": 256,
     "w": 512,
-    "h": 128,
-    "note": "Bitterpan site board"
+    "h": 128
    },
    "BOARD_TECH_PLATE": {
     "x": 0,
     "y": 384,
     "w": 512,
-    "h": 128,
-    "note": "technical plate, reads as facility signage not sponsorship"
+    "h": 128
    },
    "BOARD_HEAT_DEAD": {
     "x": 512,
     "y": 384,
     "w": 512,
-    "h": 128,
-    "note": "sun-killed board: the Bitterpan brief's heat-dead signage"
+    "h": 128
    },
    "TOTEM_WORKS": {
     "x": 0,
     "y": 512,
     "w": 256,
-    "h": 256,
-    "note": "factory entry — acid, works sheet chip 6"
+    "h": 256
    },
    "TOTEM_PRIVATEER": {
     "x": 256,
     "y": 512,
     "w": 256,
-    "h": 256,
-    "note": "customer car — orange, privateer sheet chip 6"
+    "h": 256
    },
    "TOTEM_NIGHTFORM": {
     "x": 512,
     "y": 512,
     "w": 256,
-    "h": 256,
-    "note": "night trials shell — cyan, nightform sheet chip 6"
+    "h": 256
    },
    "TOTEM_NEEDLE": {
     "x": 768,
     "y": 512,
     "w": 256,
-    "h": 256,
-    "note": "lightweight spec — teal, needle sheet chip 6"
+    "h": 256
    },
    "PENNANT_ROW": {
     "x": 0,
     "y": 768,
     "w": 256,
-    "h": 128,
-    "note": "tileable pennant line"
+    "h": 128
    },
    "SPONSOR_TAPE": {
     "x": 256,
     "y": 768,
     "w": 256,
-    "h": 128,
-    "note": "tileable sponsor tape, 256 px repeat"
+    "h": 128
    },
    "MARSHAL_PLATE": {
     "x": 512,
     "y": 768,
     "w": 256,
-    "h": 128,
-    "note": "marshal post plate"
+    "h": 128
    },
    "DISTANCE_BLANK": {
     "x": 768,
     "y": 768,
     "w": 256,
-    "h": 128,
-    "note": "blank distance board for runtime numerals"
+    "h": 128
    },
    "CRADLE_BANNER": {
     "x": 0,
     "y": 896,
     "w": 1024,
-    "h": 128,
-    "note": "start/finish gantry fascia, 38 m wide"
+    "h": 128
    }
   }
  },
@@ -399,113 +346,97 @@
     "x": 0,
     "y": 0,
     "w": 128,
-    "h": 128,
-    "note": "flock frame 1 of 3"
+    "h": 128
    },
    "BIRDS_B": {
     "x": 128,
     "y": 0,
     "w": 128,
-    "h": 128,
-    "note": "flock frame 2 of 3"
+    "h": 128
    },
    "BIRDS_C": {
     "x": 256,
     "y": 0,
     "w": 128,
-    "h": 128,
-    "note": "flock frame 3 of 3"
+    "h": 128
    },
    "GULL_SINGLE": {
     "x": 384,
     "y": 0,
     "w": 128,
-    "h": 128,
-    "note": "single near bird, larger read"
+    "h": 128
    },
    "DEVIL_WISP_A": {
     "x": 0,
     "y": 128,
     "w": 128,
-    "h": 128,
-    "note": "salt devil column"
+    "h": 128
    },
    "DEVIL_WISP_B": {
     "x": 128,
     "y": 128,
     "w": 128,
-    "h": 128,
-    "note": "salt devil column"
+    "h": 128
    },
    "FLICKER_FULL": {
     "x": 256,
     "y": 128,
     "w": 128,
-    "h": 128,
-    "note": "lamp lit"
+    "h": 128
    },
    "FLICKER_HALF": {
     "x": 384,
     "y": 128,
     "w": 128,
-    "h": 128,
-    "note": "lamp browning out"
+    "h": 128
    },
    "FLICKER_DEAD": {
     "x": 0,
     "y": 256,
     "w": 128,
-    "h": 128,
-    "note": "lamp out, fixture only"
+    "h": 128
    },
    "WRECK_FUSELAGE": {
     "x": 128,
     "y": 256,
     "w": 128,
-    "h": 128,
-    "note": "airframe hull on its side, ~18 m"
+    "h": 128
    },
    "WRECK_TAILFIN": {
     "x": 256,
     "y": 256,
     "w": 128,
-    "h": 128,
-    "note": "empennage upright in the grass, ~11 m"
+    "h": 128
    },
    "WRECK_NACELLE_STACK": {
     "x": 384,
     "y": 256,
     "w": 128,
-    "h": 128,
-    "note": "engine cans on pallets, ~6 m"
+    "h": 128
    },
    "WRECK_GANTRY": {
     "x": 0,
     "y": 384,
     "w": 128,
-    "h": 128,
-    "note": "service gantry frame, ~14 m"
+    "h": 128
    },
    "DUST_SCUD": {
     "x": 128,
     "y": 384,
     "w": 128,
-    "h": 128,
-    "note": "low ground scud"
+    "h": 128
    },
    "VAPOR_THIN": {
     "x": 256,
     "y": 384,
     "w": 128,
-    "h": 128,
-    "note": "thin vapour, quietest card on the sheet"
+    "h": 128
    },
    "CRATE_STACK": {
     "x": 384,
     "y": 384,
     "w": 128,
-    "h": 128,
-    "note": "served stores, near-field silhouette"
+    "h": 128
    }
   }
  },
@@ -520,8 +451,7 @@
     "x": 0,
     "y": 0,
     "w": 256,
-    "h": 256,
-    "note": "seamless pan crust, 12 m across, repeat wrapped"
+    "h": 256
    }
   }
  },
@@ -536,127 +466,109 @@
     "x": 0,
     "y": 0,
     "w": 256,
-    "h": 256,
-    "note": "crack overlay, 6x6 plates, tileable"
+    "h": 256
    },
    "CRACK_MID": {
     "x": 256,
     "y": 0,
     "w": 256,
-    "h": 256,
-    "note": "crack overlay, 9x9 plates, tileable"
+    "h": 256
    },
    "CRACK_FINE": {
     "x": 512,
     "y": 0,
     "w": 256,
-    "h": 256,
-    "note": "crack overlay, 13x13 plates, tileable"
+    "h": 256
    },
    "CRACK_SHATTER": {
     "x": 768,
     "y": 0,
     "w": 256,
-    "h": 256,
-    "note": "crack overlay, 19x19 plates, tileable"
+    "h": 256
    },
    "SPILL_FAN_HEAVY": {
     "x": 0,
     "y": 256,
     "w": 256,
-    "h": 256,
-    "note": "loadout drop, running chute"
+    "h": 256
    },
    "SPILL_FAN_LIGHT": {
     "x": 256,
     "y": 256,
     "w": 256,
-    "h": 256,
-    "note": "loadout drop, trailing off"
+    "h": 256
    },
    "SPILL_FAN_SPLIT": {
     "x": 512,
     "y": 256,
     "w": 256,
-    "h": 256,
-    "note": "twin chute, overlapping toes"
+    "h": 256
    },
    "HARVESTER_TURN": {
     "x": 768,
     "y": 256,
     "w": 256,
-    "h": 256,
-    "note": "scraped turning arc at a windrow head"
+    "h": 256
    },
    "SCRAPE_BUNDLE_A": {
     "x": 0,
     "y": 512,
     "w": 512,
-    "h": 128,
-    "note": "harvester corduroy, 9 passes, U-tileable"
+    "h": 128
    },
    "SCRAPE_BUNDLE_B": {
     "x": 512,
     "y": 512,
     "w": 512,
-    "h": 128,
-    "note": "harvester corduroy, 6 passes, worn"
+    "h": 128
    },
    "WINDROW_LONG": {
     "x": 0,
     "y": 640,
     "w": 512,
-    "h": 128,
-    "note": "continuous salt windrow, U-tileable"
+    "h": 128
    },
    "WINDROW_BROKEN": {
     "x": 512,
     "y": 640,
     "w": 256,
-    "h": 128,
-    "note": "worked windrow, gapped"
+    "h": 128
    },
    "WINDROW_END": {
     "x": 768,
     "y": 640,
     "w": 256,
-    "h": 128,
-    "note": "windrow head, tapered"
+    "h": 128
    },
    "CONVEYOR_SHADOW": {
     "x": 0,
     "y": 768,
     "w": 1024,
-    "h": 128,
-    "note": "span shadow band across the deck, U-tileable"
+    "h": 128
    },
    "BRINE_STAIN": {
     "x": 0,
     "y": 896,
     "w": 256,
-    "h": 128,
-    "note": "standing brine, crystallised rim"
+    "h": 128
    },
    "BRINE_SHEEN": {
     "x": 256,
     "y": 896,
     "w": 256,
-    "h": 128,
-    "note": "wet pan sheen, the HZ_SALT_DRIFT telegraph"
+    "h": 128
    },
    "ROUTE_EDGE_CYAN": {
     "x": 512,
     "y": 896,
     "w": 256,
-    "h": 128,
-    "note": "route edge line, U-tileable"
+    "h": 128
    },
    "ROUTE_ARROW_ORANGE": {
     "x": 768,
     "y": 896,
     "w": 256,
-    "h": 128,
-    "note": "direction chevron pair, warning orange"
+    "h": 128
    }
   }
  },
@@ -671,29 +583,25 @@
     "x": 0,
     "y": 0,
     "w": 512,
-    "h": 256,
-    "note": "backing for the 3.00 x 1.45 m chevron plaque; 3.90 x 1.95 m"
+    "h": 256
    },
    "PANEL_BOARD": {
     "x": 0,
     "y": 256,
     "w": 448,
-    "h": 256,
-    "note": "backing for the 2.465 x 1.28 m braking board; 3.15 x 1.80 m"
+    "h": 256
    },
    "BOLT_PAIR": {
     "x": 448,
     "y": 256,
     "w": 64,
-    "h": 128,
-    "note": "spare fixing detail for a wider panel"
+    "h": 128
    },
    "MOUNT_STRAP": {
     "x": 448,
     "y": 384,
     "w": 64,
-    "h": 128,
-    "note": "vertical strap, ties a panel to a pillar"
+    "h": 128
    }
   }
  },
@@ -708,99 +616,334 @@
     "x": 0,
     "y": 0,
     "w": 256,
-    "h": 256,
-    "note": "broad settled grime, multiply"
+    "h": 256
    },
    "GRIME_STREAK": {
     "x": 256,
     "y": 0,
     "w": 256,
-    "h": 256,
-    "note": "wash streaking, hangs from the top edge"
+    "h": 256
    },
    "SOOT_FAN": {
     "x": 512,
     "y": 0,
     "w": 256,
-    "h": 256,
-    "note": "exhaust soot, aft of the nozzle exits"
+    "h": 256
    },
    "REPAIR_PATCH_A": {
     "x": 768,
     "y": 0,
     "w": 256,
-    "h": 256,
-    "note": "bolted repair plate, oversprayed edge"
+    "h": 256
    },
    "REPAIR_PATCH_B": {
     "x": 0,
     "y": 256,
     "w": 256,
-    "h": 256,
-    "note": "welded strap, ground back and left bare"
+    "h": 256
    },
    "MISMATCH_PANEL": {
     "x": 256,
     "y": 256,
     "w": 512,
-    "h": 256,
-    "note": "unpainted replacement panel, primer grey"
+    "h": 256
    },
    "GRIME_CORNER": {
     "x": 768,
     "y": 256,
     "w": 256,
-    "h": 256,
-    "note": "corner accumulation, for cell edges"
+    "h": 256
    },
    "SCUFF_EDGE": {
     "x": 0,
     "y": 512,
     "w": 512,
-    "h": 128,
-    "note": "abraded leading edge, paint worn to metal"
+    "h": 128
    },
    "RIVET_ROW": {
     "x": 512,
     "y": 512,
     "w": 512,
-    "h": 64,
-    "note": "tileable fixing line, 64 px pitch"
+    "h": 64
    },
    "STENCIL_REPAIR": {
     "x": 512,
     "y": 576,
     "w": 512,
-    "h": 64,
-    "note": "service stencil applied over the livery"
+    "h": 64
    },
    "DUST_FILM": {
     "x": 0,
     "y": 640,
     "w": 1024,
-    "h": 128,
-    "note": "even settled dust, whole-cell multiply"
+    "h": 128
    },
    "OVERSPRAY": {
     "x": 0,
     "y": 768,
     "w": 1024,
-    "h": 128,
-    "note": "masking bleed and touch-up haze"
+    "h": 128
    },
    "CHIP_WEAR_STRIP": {
     "x": 8,
     "y": 900,
     "w": 896,
-    "h": 96,
-    "note": "in register with livery paint-chip strip; one multiply per material"
+    "h": 96
    },
    "WEAR_KEY": {
     "x": 8,
     "y": 1000,
     "w": 896,
-    "h": 20,
-    "note": "authoring key, never sampled at runtime"
+    "h": 20
+   }
+  }
+ },
+ "bitterpan_facades_1024": {
+  "texture": "/assets/map02/textures/bitterpan_facades_1024.png",
+  "width": 1024,
+  "height": 1024,
+  "bytes": 164565,
+  "sha256": "12883ac673abb34060f3be8c9f224f2e45a0a73689b8d19eb1d3fe560b1be0b8",
+  "regions": {
+   "SKIN_GALV_RIB": {
+    "x": 0,
+    "y": 0,
+    "w": 256,
+    "h": 256
+   },
+   "SKIN_PLANT_STEEL": {
+    "x": 256,
+    "y": 0,
+    "w": 256,
+    "h": 256
+   },
+   "SKIN_PATCHED": {
+    "x": 512,
+    "y": 0,
+    "w": 256,
+    "h": 256
+   },
+   "SKIN_CANVAS": {
+    "x": 768,
+    "y": 0,
+    "w": 256,
+    "h": 256
+   },
+   "SKIN_CONCRETE": {
+    "x": 0,
+    "y": 256,
+    "w": 512,
+    "h": 256
+   },
+   "LATTICE_RIG": {
+    "x": 512,
+    "y": 256,
+    "w": 256,
+    "h": 256
+   },
+   "SKIN_TANK": {
+    "x": 768,
+    "y": 256,
+    "w": 256,
+    "h": 256
+   },
+   "TRIM_VENT": {
+    "x": 0,
+    "y": 512,
+    "w": 256,
+    "h": 256
+   },
+   "TRIM_PIPE_RUN": {
+    "x": 256,
+    "y": 512,
+    "w": 256,
+    "h": 256
+   },
+   "TRIM_DUCT_STACK": {
+    "x": 512,
+    "y": 512,
+    "w": 256,
+    "h": 256
+   },
+   "ROOF_SHEET": {
+    "x": 768,
+    "y": 512,
+    "w": 256,
+    "h": 256
+   },
+   "WINDOW_STRIP_DUSK": {
+    "x": 0,
+    "y": 768,
+    "w": 512,
+    "h": 128
+   },
+   "WINDOW_STRIP_DEAD": {
+    "x": 512,
+    "y": 768,
+    "w": 512,
+    "h": 128
+   },
+   "BASE_SKIRT": {
+    "x": 0,
+    "y": 896,
+    "w": 512,
+    "h": 128
+   },
+   "FACADE_TAGS": {
+    "x": 512,
+    "y": 896,
+    "w": 512,
+    "h": 128
+   }
+  }
+ },
+ "futurisma_horizon_1024": {
+  "texture": "/assets/greenwater/textures/futurisma_horizon_1024.png",
+  "width": 1024,
+  "height": 1024,
+  "bytes": 49017,
+  "sha256": "0ad6d3efe0511ea0872e7582e0b00f8f146d0cbf2ebd585eee70329079e63ca5",
+  "regions": {
+   "TREELINE_DENSE": {
+    "x": 0,
+    "y": 0,
+    "w": 256,
+    "h": 256
+   },
+   "TREELINE_BROKEN": {
+    "x": 256,
+    "y": 0,
+    "w": 256,
+    "h": 256
+   },
+   "TREELINE_SNAG": {
+    "x": 512,
+    "y": 0,
+    "w": 256,
+    "h": 256
+   },
+   "PYLON_RUN": {
+    "x": 768,
+    "y": 0,
+    "w": 256,
+    "h": 256
+   },
+   "GANTRY_FAR": {
+    "x": 0,
+    "y": 256,
+    "w": 256,
+    "h": 256
+   },
+   "HANGAR_MASS": {
+    "x": 256,
+    "y": 256,
+    "w": 256,
+    "h": 256
+   },
+   "SILO_PAIR": {
+    "x": 512,
+    "y": 256,
+    "w": 256,
+    "h": 256
+   },
+   "TANK_FARM_FAR": {
+    "x": 768,
+    "y": 256,
+    "w": 256,
+    "h": 256
+   },
+   "STACK_CLUSTER": {
+    "x": 0,
+    "y": 512,
+    "w": 256,
+    "h": 256
+   },
+   "STACK_SINGLE": {
+    "x": 256,
+    "y": 512,
+    "w": 256,
+    "h": 256
+   },
+   "PLANT_MASS": {
+    "x": 512,
+    "y": 512,
+    "w": 256,
+    "h": 256
+   },
+   "RIG_FAR": {
+    "x": 768,
+    "y": 512,
+    "w": 256,
+    "h": 256
+   },
+   "MESA_LONG": {
+    "x": 0,
+    "y": 768,
+    "w": 256,
+    "h": 256
+   },
+   "MESA_BLUFF": {
+    "x": 256,
+    "y": 768,
+    "w": 256,
+    "h": 256
+   },
+   "SHIMMER_BAND": {
+    "x": 512,
+    "y": 768,
+    "w": 256,
+    "h": 256
+   },
+   "HAZE_BAND": {
+    "x": 768,
+    "y": 768,
+    "w": 256,
+    "h": 256
+   }
+  }
+ },
+ "futurisma_trim_512": {
+  "texture": "/assets/greenwater/textures/futurisma_trim_512.png",
+  "width": 512,
+  "height": 512,
+  "bytes": 34266,
+  "sha256": "b27bcae3f44bd1203c6e935bcacd598af2409526832fa7791bf40013842a9318",
+  "regions": {
+   "SIGN_BACK_BLANK": {
+    "x": 0,
+    "y": 0,
+    "w": 256,
+    "h": 256
+   },
+   "SIGN_BACK_TAGGED": {
+    "x": 256,
+    "y": 0,
+    "w": 256,
+    "h": 256
+   },
+   "EDGE_BAND_DECK": {
+    "x": 0,
+    "y": 256,
+    "w": 512,
+    "h": 64
+   },
+   "EDGE_BAND_PAN": {
+    "x": 0,
+    "y": 320,
+    "w": 512,
+    "h": 64
+   },
+   "EDGE_BAND_BERM": {
+    "x": 0,
+    "y": 384,
+    "w": 512,
+    "h": 64
+   },
+   "EDGE_TICK_SET": {
+    "x": 0,
+    "y": 448,
+    "w": 512,
+    "h": 64
    }
   }
  }

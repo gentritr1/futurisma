@@ -74,7 +74,7 @@ const DECAL_LIFT_METRES = 0.012;
  * spec's own placement rule ("honouring the ribbon"), and it reads as the road
  * running on a raised shelf over the pan.
  */
-const GROUND_Y_METRES = -1.95;
+export const GROUND_Y_METRES = -1.95;
 
 /**
  * Half-extent of the pan floor, in metres, and where it is centred.

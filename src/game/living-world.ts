@@ -33,6 +33,19 @@ export interface LivingWorldTextures {
   emissive?: THREE.Texture;
 }
 
+/**
+ * The card sheets this module loads for itself, on both maps.
+ *
+ * `motion` and `motionB` are the two shared motion atlases; P18 adds `horizon`,
+ * the distant-silhouette sheet, on the same terms — generic cells, both maps,
+ * one more 1024 rather than one more draw call per map.
+ */
+interface LivingWorldSheets {
+  motion: THREE.Texture;
+  motionB: THREE.Texture;
+  horizon: THREE.Texture;
+}
+
 interface LivingCard extends AuthoredCard {
   anchorX: number;
   anchorY: number;
@@ -132,17 +145,18 @@ function makeBatch(
 
 function makeMaterial(
   spec: LivingBatchSpec,
-  motionTexture: THREE.Texture,
-  motionBTexture: THREE.Texture,
+  sheets: LivingWorldSheets,
   textures: LivingWorldTextures,
 ): THREE.MeshBasicMaterial {
   const map = spec.texture === "motion"
-    ? motionTexture
+    ? sheets.motion
     : spec.texture === "motionB"
-      ? motionBTexture
-      : spec.texture === "jungle"
-        ? textures.jungle
-        : textures.emissive;
+      ? sheets.motionB
+      : spec.texture === "horizon"
+        ? sheets.horizon
+        : spec.texture === "jungle"
+          ? textures.jungle
+          : textures.emissive;
   if (!map) {
     throw new Error(
       `Living-world batch ${spec.meshName} needs the ${spec.texture} texture, `
@@ -241,8 +255,7 @@ export class LivingWorld {
   private constructor(
     private readonly course: RaceCourse,
     spec: LivingWorldSpec,
-    motionTexture: THREE.Texture,
-    motionBTexture: THREE.Texture,
+    sheets: LivingWorldSheets,
     textures: LivingWorldTextures,
   ) {
     this.root.name = spec.rootName;
@@ -265,7 +278,7 @@ export class LivingWorld {
         hangY: 0,
         flowSample: null,
       })),
-      makeMaterial(batch.spec, motionTexture, motionBTexture, textures),
+      makeMaterial(batch.spec, sheets, textures),
     ));
     for (const batch of this.batches) this.root.add(batch.mesh);
 
@@ -308,20 +321,25 @@ export class LivingWorld {
     textures: LivingWorldTextures,
     motionTextureUrl: string,
     motionBTextureUrl: string,
+    horizonTextureUrl: string,
   ): Promise<LivingWorld> {
     const spec = LIVING_WORLD_SPECS[course.kind];
     if (!spec) {
       throw new Error(`No living-world zone set is authored for ${course.kind}.`);
     }
-    const [motionTexture, motionBTexture] = await Promise.all([
+    // P18: the horizon sheet takes the identical card contract — sRGB, nearest
+    // on both filters, no mip chain. It is a card sheet, not a facade sheet.
+    const [motion, motionB, horizon] = await Promise.all([
       LivingWorld.loadMotionAtlas(motionTextureUrl, "living_world_motion_512"),
       LivingWorld.loadMotionAtlas(motionBTextureUrl, "living_world_motion_b_512"),
+      LivingWorld.loadMotionAtlas(horizonTextureUrl, "futurisma_horizon_1024"),
     ]);
     try {
-      return new LivingWorld(course, spec, motionTexture, motionBTexture, textures);
+      return new LivingWorld(course, spec, { motion, motionB, horizon }, textures);
     } catch (error) {
-      motionTexture.dispose();
-      motionBTexture.dispose();
+      motion.dispose();
+      motionB.dispose();
+      horizon.dispose();
       throw error;
     }
   }
