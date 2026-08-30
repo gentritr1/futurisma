@@ -470,7 +470,15 @@ export class LivingWorld {
             batch.positions,
             cardIndex,
             x,
-            y,
+            // P18.1 — bottom anchoring. `writeCameraFacingCard` centres the
+            // quad on this Y, which is right for drifting atmosphere and wrong
+            // for a ground-standing silhouette: at base 0 a 50 m mesa card
+            // spanned -25..+25 m and showed half its authored height. Lifting
+            // by the CURRENT half-height (after the motion switch has scaled
+            // it) keeps the bottom edge on `base` even for a kind that grows,
+            // so a bottom-anchored card grows upward out of the ground rather
+            // than sinking into it.
+            batch.spec.anchor === "bottom" ? y + halfHeight : y,
             z,
             halfWidth,
             halfHeight,

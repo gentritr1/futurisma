@@ -77,6 +77,24 @@
  * @property {boolean} fog
  * @property {number} alphaTest 0 disables the alpha test
  * @property {boolean} lamps emissive batch: colour is driven per frame
+ * @property {"bottom"} [anchor] P18.1. Where `base` puts the card.
+ *
+ *   The card system has always CENTRED a quad on `sample.position.y + base`,
+ *   which is right for drifting atmosphere — mist, steam, rain, glint all want
+ *   a centre. It is wrong for a ground-standing silhouette: a 50 m mesa card at
+ *   base 0 spans -25 m to +25 m and shows half its authored height, which is
+ *   how P18 shipped and why the Long Basin still read as gradient.
+ *
+ *   `anchor: "bottom"` moves the card up by its own half-height so its BOTTOM
+ *   edge sits at `base`. The cells are authored bottom-anchored — their grade
+ *   contact is drawn at the cell's own bottom edge — so this is what makes
+ *   `base: 0` mean "on the ground" instead of "half buried", and it keeps
+ *   base 0 the verifiable convention the delivery asks for.
+ *
+ *   A BATCH property, not a card one: it is a property of what the cells on a
+ *   sheet mean, every card in a batch shares it, and putting it here keeps it
+ *   out of `canonicalCard` — so the 155 accepted Greenwater cards and every
+ *   P9/P12 digest are untouched by definition rather than by inspection.
  *
  * @typedef {object} LivingWorldSpec
  * @property {string} id
@@ -1175,6 +1193,7 @@ export const GREENWATER_BATCHES_C = Object.freeze([
     fog: true,
     alphaTest: 0.5,
     lamps: false,
+    anchor: "bottom",
   },
 ]);
 
@@ -1292,12 +1311,19 @@ export const BITTERPAN_BATCHES_C = Object.freeze([
     fog: true,
     alphaTest: 0.5,
     lamps: false,
+    anchor: "bottom",
   },
   {
     // `fog: false` is deliberate and is the ONLY fog exemption in Pass 03: this
     // batch IS the far-field air. Fogging an additive haze band multiplies the
     // effect by itself and the horizon goes milky. Greenwater does not get this
     // batch — its far plane is 650 m and its own fog already does the job.
+    //
+    // No `anchor` either, and that is the delivery's own carve-out: the two
+    // band cells are "the exception: they are additive and authored as tone",
+    // not as silhouettes with a grade contact. They keep the centred card
+    // convention every other drifting-atmosphere batch uses, and they are the
+    // two zones that author a non-zero base for exactly that reason.
     id: "horizonAir",
     meshName: "BP_LIVING_HORIZON_AIR",
     texture: "horizon",

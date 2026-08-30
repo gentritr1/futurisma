@@ -138,10 +138,10 @@ const P12_ZONES = [
  */
 const P18_BATCHES = {
   greenwater: [
-    { id: "horizon", meshName: "GW_LIVING_HORIZON", texture: "horizon", blending: "normal", depthWrite: false, fog: true, alphaTest: 0.5, lamps: false },
+    { id: "horizon", meshName: "GW_LIVING_HORIZON", texture: "horizon", blending: "normal", depthWrite: false, fog: true, alphaTest: 0.5, lamps: false, anchor: "bottom" },
   ],
   bitterpan: [
-    { id: "horizon", meshName: "BP_LIVING_HORIZON", texture: "horizon", blending: "normal", depthWrite: false, fog: true, alphaTest: 0.5, lamps: false },
+    { id: "horizon", meshName: "BP_LIVING_HORIZON", texture: "horizon", blending: "normal", depthWrite: false, fog: true, alphaTest: 0.5, lamps: false, anchor: "bottom" },
     { id: "horizonAir", meshName: "BP_LIVING_HORIZON_AIR", texture: "horizon", blending: "additive", depthWrite: false, fog: false, alphaTest: 0, lamps: false },
   ],
 };
@@ -553,6 +553,96 @@ for (const authored of P18_ZONES) {
   }
 }
 
+// ---------------------------------------------------------------------------
+// P18.1 — the anchoring rule.
+//
+// `base` used to mean one thing (the card's CENTRE) because every card in the
+// layer was drifting atmosphere. P18 added ground-standing silhouettes, where
+// base 0 centred a 44-62 m mesa on the deck and buried half of it. The rule
+// below is what keeps the two meanings from being confused again.
+// ---------------------------------------------------------------------------
+
+/**
+ * Whether a batch stands its cards on the ground.
+ *
+ * A batch that alpha-tests and does not drive lamps is drawing SILHOUETTES —
+ * shapes with a hard edge and a grade contact — and every one of them must
+ * anchor at the bottom. A batch that blends is drawing tone, and tone centres.
+ */
+const anchorsAtBottom = (batch) => batch.alphaTest > 0 && !batch.lamps
+  && batch.texture === "horizon";
+
+for (const [map, spec] of Object.entries(LIVING_WORLD_SPECS)) {
+  for (const batch of spec.batches) {
+    if (anchorsAtBottom(batch)) {
+      assert.equal(
+        batch.anchor,
+        "bottom",
+        `${spec.id} batch ${batch.id} draws bottom-anchored silhouette cells `
+          + "but centres them on `base`. At base 0 that buries half of every "
+          + "card, which is exactly the P18 defect this rule exists to catch.",
+      );
+      continue;
+    }
+    assert.equal(
+      batch.anchor,
+      undefined,
+      `${spec.id} batch ${batch.id} declares anchor "${batch.anchor}". Only the `
+        + "silhouette batches anchor; every accepted batch above them centres "
+        + "its cards, and moving one would move accepted art.",
+    );
+  }
+  // The two additive band batches are the delivery's own carve-out — "authored
+  // as tone", not as silhouettes — and they are the only horizon zones allowed
+  // a non-zero base. Assert the pairing, so a band can never quietly become a
+  // silhouette or a silhouette a band.
+  for (const zone of P18_ZONES.filter((entry) => entry.map === map)) {
+    const batch = spec.batches.find((candidate) => candidate.id === zone.batch);
+    const cards = built[map].batches
+      .flatMap((entry) => entry.cards)
+      .filter((card) => card.motionId === zone.id);
+    const anchored = batch.anchor === "bottom";
+    const bases = cards.map((card) => card.base);
+    assert.equal(
+      anchored,
+      bases.every((base) => base === 0),
+      `${zone.id} is on a ${anchored ? "bottom-anchored" : "centred"} batch but `
+        + `authors bases ${[...new Set(bases)].join(", ")}. A bottom-anchored `
+        + "zone bases at 0; a centred band is the only thing allowed to lift.",
+    );
+  }
+}
+
+// The rule is only worth its lines if it fails on the thing it exists to catch:
+// a silhouette batch that forgot to anchor, which renders as half-buried art
+// and throws no error anywhere else in the system.
+assert.throws(
+  () => {
+    const unanchored = { ...P18_BATCHES.bitterpan[0] };
+    delete unanchored.anchor;
+    assert.ok(anchorsAtBottom(unanchored), "not a silhouette batch");
+    assert.equal(
+      unanchored.anchor,
+      "bottom",
+      "silhouette batch centres its cards",
+    );
+  },
+  /silhouette batch centres its cards/,
+  "The anchoring rule does not fail on a silhouette batch with no anchor.",
+);
+
+// ... and the runtime has to actually implement it, or the data says one thing
+// while every frame does another.
+const anchorRuntime = readFileSync(
+  new URL("../src/game/living-world.ts", import.meta.url),
+  "utf8",
+);
+assert.ok(
+  anchorRuntime.includes('batch.spec.anchor === "bottom" ? y + halfHeight : y'),
+  "living-world.ts never lifts a bottom-anchored card by its half-height, so "
+    + "the `anchor` flag would be data nothing reads.",
+);
+
 // The append order is the whole determinism argument: P12's zones sit after the
 // accepted and P9 ones, P18's sit after P12's, and P18's are last. Any other
 // order reaches the accepted zones with different draws off the shared stream.
@@ -705,7 +795,8 @@ console.log(
   `Living world PASS: ${summary}; 11 accepted Greenwater zones pinned byte-exact, `
     + `${P9_ZONES.length} P9 zones pinned, ${P12_ZONES.length} P12 zones, `
     + `${P18_ZONES.length} P18 horizon zones (34 GW / 38 BP cards, 1 / 2 batches, `
-    + "every silhouette at base 0, one fog exemption), "
+    + "every silhouette bottom-anchored at base 0, the two tone bands centred, "
+    + "one fog exemption), "
     + `${CARD_KINDS.length} motions and `
     + `${alphaKinds.size} envelopes wired in the runtime.`,
 );
