@@ -146,18 +146,57 @@ const P18_BATCHES = {
   ],
 };
 
-/** P18 art pass 03 zones, pinned the way P9's and P12's are. */
+/**
+ * P18 art pass 03 zones, pinned the way P9's and P12's are.
+ *
+ * The three Bitterpan `horizon` digests were re-baselined once, in P18.2, and
+ * the history is kept here rather than dropped because the reason matters more
+ * than the hash. `canonicalCard` folds `card.tint` in, so re-tinting a band
+ * moves its zone digest and nothing else — which is exactly the containment
+ * check the re-baseline rests on:
+ *
+ *   PAN_MESA_LINE      47f0a65fa1df8335 -> 0dc645008d33810e  (BP_HORIZON)
+ *   PAN_REFINERY_FAR   c11a9f235ecf3769 -> 7c1baca536fd8c79  (BP_FAR)
+ *   PAN_RIG_FIELD_FAR  58bd17b3021d3947 -> 9e6b64e2c684bcaa  (BP_MID)
+ *
+ * Why: the P18 tints were the frozen output of a fog-pull rule, and BP_HORIZON
+ * landed at luma 193.3 — ABOVE two of Bitterpan's three sector fogs (185.5 /
+ * 206.7 / 181.4). The mesa line was therefore lighter than the air behind it in
+ * S1 and S3 and read as near-invisible. P18.2 re-authored the four BP bands as
+ * absolute luminance targets that all sit under the darkest sector fog; see the
+ * HORIZON_BANDS comment in living-world-zones.js. Nothing else about these
+ * zones moved: the six other P18 digests, all six geometry fields per zone, and
+ * both Greenwater/Bitterpan card counts are unchanged from the P18 baseline, so
+ * a digest drift on any zone but these three is still a real regression.
+ */
 const P18_ZONES = [
   { id: "HORIZON_TREELINE_FAR", map: "greenwater", batch: "horizon", from: 60, to: 2440, cards: 14, digest: "d6a8548e2008fc56" },
   { id: "HORIZON_TREELINE_MID", map: "greenwater", batch: "horizon", from: 120, to: 2360, cards: 9, digest: "9c1ece39fce89145" },
   { id: "HORIZON_PYLON_LINE", map: "greenwater", batch: "horizon", from: 300, to: 1900, cards: 5, digest: "99dc098226fd514a" },
   { id: "HORIZON_FAR_INDUSTRY", map: "greenwater", batch: "horizon", from: 420, to: 2300, cards: 6, digest: "c87873ffddfd2af1" },
-  { id: "PAN_MESA_LINE", map: "bitterpan", batch: "horizon", from: 0, to: 3050, cards: 10, digest: "47f0a65fa1df8335" },
-  { id: "PAN_REFINERY_FAR", map: "bitterpan", batch: "horizon", from: 180, to: 2900, cards: 8, digest: "c11a9f235ecf3769" },
-  { id: "PAN_RIG_FIELD_FAR", map: "bitterpan", batch: "horizon", from: 240, to: 2620, cards: 8, digest: "58bd17b3021d3947" },
+  { id: "PAN_MESA_LINE", map: "bitterpan", batch: "horizon", from: 0, to: 3050, cards: 10, digest: "0dc645008d33810e" },
+  { id: "PAN_REFINERY_FAR", map: "bitterpan", batch: "horizon", from: 180, to: 2900, cards: 8, digest: "7c1baca536fd8c79" },
+  { id: "PAN_RIG_FIELD_FAR", map: "bitterpan", batch: "horizon", from: 240, to: 2620, cards: 8, digest: "9e6b64e2c684bcaa" },
   { id: "PAN_HAZE_BAND", map: "bitterpan", batch: "horizonAir", from: 0, to: 3050, cards: 7, digest: "441b6a162eabed89" },
   { id: "PAN_HEAT_SHIMMER_FAR", map: "bitterpan", batch: "horizonAir", from: 180, to: 2400, cards: 5, digest: "05283e34b081cd49" },
 ];
+
+/**
+ * The invariant the P18.2 re-baseline actually protects, asserted rather than
+ * described: every Bitterpan horizon band must be DARKER than the darkest
+ * sector fog on the map, or the silhouette's contrast changes sign somewhere on
+ * a lap and the layer dissolves there. Pinning the digests alone would let a
+ * future re-tint sail through with the same failure the digests were rebaselined
+ * for. Luminance is Rec.709 on the raw 8-bit channels, which is what the eye
+ * sorts these two surfaces by.
+ */
+const BP_SECTOR_FOG_HEXES = ["#c7b997", "#d5cfb9", "#aeb8b2"];
+const rec709 = (hex) => {
+  const value = typeof hex === "number" ? hex : Number.parseInt(hex.slice(1), 16);
+  return 0.2126 * ((value >> 16) & 0xff)
+    + 0.7152 * ((value >> 8) & 0xff)
+    + 0.0722 * (value & 0xff);
+};
 
 const NUMERIC_FIELDS = [
   "distance",
@@ -549,6 +588,31 @@ for (const authored of P18_ZONES) {
       0,
       `${authored.id} places a silhouette card at base ${card.base} m; a `
         + "bottom-anchored cell above 0 floats off the grade.",
+    );
+  }
+}
+
+// P18.2 — the contrast rule. Every Bitterpan silhouette card must be darker
+// than the DARKEST sector fog, not merely darker than some sector's fog: the
+// card is one constant and the fog is three, so anything above the floor reads
+// as a silhouette in one basin and dissolves in another. This is the assertion
+// the P18 digests could not make; they pinned a value, and the failure was in a
+// relationship.
+const darkestSectorFog = Math.min(...BP_SECTOR_FOG_HEXES.map(rec709));
+for (const authored of P18_ZONES) {
+  if (authored.map !== "bitterpan" || authored.batch !== "horizon") continue;
+  const cards = built.bitterpan.batches
+    .flatMap((batch) => batch.cards)
+    .filter((card) => card.motionId === authored.id);
+  assert.ok(cards.length > 0, `${authored.id} built no cards to check tint on.`);
+  for (const card of cards) {
+    assert.ok(
+      rec709(card.tint) < darkestSectorFog,
+      `${authored.id} tints its silhouettes 0x${card.tint.toString(16)} `
+        + `(luma ${rec709(card.tint).toFixed(1)}), at or above the darkest `
+        + `Bitterpan sector fog (luma ${darkestSectorFog.toFixed(1)}). The `
+        + "band inverts against that sector's air and the layer disappears "
+        + "there — see the HORIZON_BANDS comment in living-world-zones.js.",
     );
   }
 }
