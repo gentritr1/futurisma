@@ -55,6 +55,12 @@ const dressing = readJson("src/game/data/BITTERPAN_SET_DRESSING.json");
 const plaqueBacking = readJson("src/game/data/HANGAR_SIX_PLAQUE_BACKING.json");
 const liveryWear = readJson("src/game/data/TOTEM_LIVERY_WEAR.json");
 const totemManifest = readJson("public/assets/totem/MANIFEST.json");
+// P17 — the measured decal cells, the art call about what lands on each, and the
+// generated table the runtime actually imports. All three are written or checked
+// by scripts/derive-decal-cells.mjs.
+const decalCells = readJson("src/game/data/TOTEM_DECAL_CELLS.json");
+const wearPlacement = readJson("src/game/data/TOTEM_WEAR_PLACEMENT.json");
+const wearCells = readJson("src/game/data/TOTEM_WEAR_CELLS.json");
 
 // ---------------------------------------------------------------------------
 // 1 + 2. The sheets, their regions, and that the two agree.
@@ -716,14 +722,340 @@ for (const entry of liveryWear.chipStrip.perMaterial) {
 for (const slot of liveryWear.librarySlots.slots) {
   assert.ok(wearRegions[slot.slot], `Wear library slot ${slot.slot} has no region.`);
 }
-// The library slots are addressed by name and are NOT applied this phase: the
-// 12 decal-cell rects are unpublished, so a runtime that placed them would be
-// guessing. The chip strip is the whole of the shipped read, and the open
-// dependency is recorded so a future phase picks it up rather than rediscovers it.
+
+// --- The wear library, placed on the measured decal cells -------------------
+//
+// HISTORY OF THIS ASSERTION. P15 asserted the opposite of what follows:
+//
+//     "The library slots are addressed by name and are NOT applied this phase:
+//      the 12 decal-cell rects are unpublished, so a runtime that placed them
+//      would be guessing. The chip strip is the whole of the shipped read, and
+//      the open dependency is recorded so a future phase picks it up rather
+//      than rediscovers it."
+//
+// It checked only that `openDependency` stayed recorded — a deliberate hold,
+// not an oversight. P17 closed the dependency the only way it could be closed
+// honestly: the rects were never published by totem.js, so they were MEASURED
+// out of the runtime GLB by scripts/derive-decal-cells.mjs and committed as
+// TOTEM_DECAL_CELLS.json with per-cell provenance and the GLB's sha256.
+//
+// The P15 assertion is not deleted, it is INVERTED, and the inversion carries
+// the condition that made the hold correct in the first place: a slot may only
+// be applied at a rect somebody measured. Everything below exists to make
+// "applied without measurement" a failure rather than a silent regression to
+// guessing.
 assert.ok(
   liveryWear.librarySlots.openDependency.length > 0,
-  "The unpublished decal-cell dependency must stay recorded.",
+  "The decal-cell dependency's ORIGINAL wording must stay recorded even now that "
+    + "it is closed. It is the record of why the library shipped unapplied for a "
+    + "phase, and deleting it would make the hold look like an oversight.",
 );
+assert.ok(
+  liveryWear.librarySlots.openDependencyClosedBy?.pass === "P17",
+  "The open dependency is closed by P17 and the closure must say so.",
+);
+
+// The measurement itself: shape, provenance, and that it still describes the GLB
+// that ships. `node scripts/derive-decal-cells.mjs --check` is the deeper gate
+// (it re-derives from the binary); these are the invariants the runtime relies on.
+assert.equal(decalCells.cellCount, 12, "The GLB must yield exactly 12 decal cells.");
+assert.equal(
+  decalCells.cells.length,
+  decalCells.cellCount,
+  "The decal-cell list disagrees with its own count.",
+);
+assert.equal(
+  decalCells.source.glb,
+  "public/assets/totem/models/totem_runtime.glb",
+  "The decal cells must be measured from the GLB the runtime actually loads.",
+);
+assert.equal(
+  decalCells.source.sha256,
+  createHash("sha256")
+    .update(readFileSync(new URL(decalCells.source.glb, root)))
+    .digest("hex"),
+  "The runtime GLB has changed since the decal cells were measured. Re-run "
+    + "scripts/derive-decal-cells.mjs and review the diff BEFORE shipping: the wear "
+    + "library would otherwise be painted at UV rects that no longer exist, which "
+    + "is exactly the guessing P15 refused to do.",
+);
+// The convention is the trap this measurement lives inside — the served sheets
+// are the vertical flip of the GLB-embedded one. Pin the proof, not the note.
+assert.equal(
+  decalCells.chipRowV,
+  1 - (totemManifest.texture_assignments.paint_chip_strip.region_px[1]
+    + totemManifest.texture_assignments.paint_chip_strip.chip_size_px / 2) / 1024,
+  "The hull's collapsed UV row must land on the paint-chip strip's centre row in "
+    + "the SERVED (flipY = true) convention. If this fails the whole pixel/UV "
+    + "mapping in TOTEM_DECAL_CELLS.json is mirrored and every rect is wrong.",
+);
+
+const measuredCellIds = new Set();
+const cellById = new Map(decalCells.cells.map((cell) => [cell.id, cell]));
+for (const cell of decalCells.cells) {
+  const where = `decal cell ${cell.id}`;
+  assert.ok(!measuredCellIds.has(cell.id), `${where} is listed twice.`);
+  measuredCellIds.add(cell.id);
+  const [x, y, w, h] = cell.rectPx;
+  assert.ok(w > 0 && h > 0, `${where} has no extent.`);
+  assert.ok(
+    x >= 0 && y >= 0 && x + w <= 1024 && y + h <= 1024,
+    `${where} leaves the 1024 sheet.`,
+  );
+  const [u0, v0, u1, v1] = cell.uvRect;
+  assert.ok(
+    Math.abs(u0 * 1024 - x) < 1e-3 && Math.abs((1 - v1) * 1024 - y) < 1e-3
+      && Math.abs((u1 - u0) * 1024 - w) < 1e-3 && Math.abs((v1 - v0) * 1024 - h) < 1e-3,
+    `${where}'s UV rect and pixel rect disagree; one of them was hand-edited.`,
+  );
+  // Provenance is how a GLB re-export becomes visible as more than a hash change.
+  assert.ok(cell.quads > 0, `${where} has no quads.`);
+  assert.equal(
+    cell.provenance.length,
+    cell.quads,
+    `${where} claims ${cell.quads} quads but carries ${cell.provenance.length} `
+      + "provenance entries.",
+  );
+  assert.equal(
+    cell.provenance.reduce((sum, entry) => sum + entry.vertices, 0),
+    cell.vertices,
+    `${where}'s per-quad vertex counts do not add up to its own total.`,
+  );
+  for (const entry of cell.provenance) {
+    assert.equal(
+      entry.material,
+      "TOTEM_body",
+      `${where} names material ${entry.material}; the wear overlay only reaches `
+        + "TOTEM_body.",
+    );
+    assert.ok(entry.node.length > 0, `${where} has a provenance entry with no node.`);
+  }
+}
+
+// Disjointness is load-bearing: the runtime picks a cell per fragment by summing
+// rect tests, and the chip strip's multiply is applied unconditionally alongside.
+// Overlapping rects would double-multiply and move the chip read off its spec.
+const chipUv = [
+  wearRegions.CHIP_WEAR_STRIP.x / 1024,
+  1 - (wearRegions.CHIP_WEAR_STRIP.y + wearRegions.CHIP_WEAR_STRIP.h) / 1024,
+  (wearRegions.CHIP_WEAR_STRIP.x + wearRegions.CHIP_WEAR_STRIP.w) / 1024,
+  1 - wearRegions.CHIP_WEAR_STRIP.y / 1024,
+];
+const uvOverlaps = (a, b) => a[0] < b[2] && b[0] < a[2] && a[1] < b[3] && b[1] < a[3];
+for (const [index, cell] of decalCells.cells.entries()) {
+  assert.ok(
+    !uvOverlaps(cell.uvRect, chipUv),
+    `${cell.id} overlaps the paint-chip strip. The chip multiply and a library `
+      + "slot would stack on the same texel and the chip read would stop being the "
+      + "spec's effective number.",
+  );
+  for (const other of decalCells.cells.slice(index + 1)) {
+    assert.ok(
+      !uvOverlaps(cell.uvRect, other.uvRect),
+      `${cell.id} and ${other.id} overlap.`,
+    );
+  }
+}
+
+// --- Every applied slot must reference a measured rect ----------------------
+const placements = wearPlacement.placements;
+assert.ok(Array.isArray(placements), "The wear library must publish its placements.");
+const slotNames = liveryWear.librarySlots.slots.map((entry) => entry.slot);
+assert.equal(
+  placements.length,
+  slotNames.length,
+  `The library authors ${slotNames.length} slots and places ${placements.length}. `
+    + "P15 shipped 12 resolved and 0 applied; P17 ships 12 resolved and 12 applied. "
+    + "A slot that is authored but unplaced is a slot nobody will ever see.",
+);
+/**
+ * THE assertion this phase adds: apply-without-measurement fails.
+ *
+ * A function rather than an inline `assert.ok` so the negative test below can
+ * drive the SAME predicate over a synthetic placement — twelve placements that
+ * all pass prove only that the loop runs, not that the rule binds.
+ */
+function assertPlacementIsMeasured(placement) {
+  assert.ok(
+    measuredCellIds.has(placement.cell),
+    `wear placement ${placement.slot} is applied at cell ${placement.cell}, which no `
+      + "measurement produced. A slot may only be applied at a rect that came out of "
+      + "scripts/derive-decal-cells.mjs; anything else is the guess P15 refused. "
+      + `Measured cells: ${[...measuredCellIds].join(", ")}.`,
+  );
+}
+
+const placedCells = new Set();
+const placedSlots = new Set();
+for (const placement of placements) {
+  const where = `wear placement ${placement.slot}`;
+  assertPlacementIsMeasured(placement);
+  assert.ok(
+    wearRegions[placement.slot],
+    `${where} names a slot with no region on the wear sheet.`,
+  );
+  assert.ok(!placedSlots.has(placement.slot), `${where} is placed twice.`);
+  assert.ok(
+    !placedCells.has(placement.cell),
+    `${where} lands on cell ${placement.cell}, which already carries a slot. The `
+      + "runtime takes the first containing cell per fragment, so the second slot "
+      + "would silently never render.",
+  );
+  placedSlots.add(placement.slot);
+  placedCells.add(placement.cell);
+  // `scale` is the hold-back mechanism. It may only ever pull a slot BACK.
+  assert.ok(
+    Number.isFinite(placement.scale) && placement.scale > 0 && placement.scale <= 1,
+    `${where} asks for scale ${placement.scale}; the sheet is authored at its full `
+      + "strength and a per-slot scale can only hold it back.",
+  );
+  assert.ok(
+    typeof placement.reason === "string" && placement.reason.length > 0,
+    `${where} has no recorded reason. Which slot lands on which cell is an art `
+      + "call; an unargued one is indistinguishable from a guess.",
+  );
+}
+assert.deepEqual(
+  [...placedSlots].sort(),
+  [...slotNames].sort(),
+  "Every authored library slot must be placed, and only authored slots may be.",
+);
+
+// The three placements that are not taste but measurement. Each is derived from
+// the cell AABBs, so a GLB re-export that moves the geometry fails here with the
+// reason attached rather than quietly putting soot on the nose.
+const cellOf = (slot) => cellById.get(
+  placements.find((placement) => placement.slot === slot).cell,
+);
+const forwardMost = decalCells.cells.reduce(
+  (best, cell) => (cell.aabb[2] < best.aabb[2] ? cell : best),
+);
+assert.equal(
+  cellOf("SCUFF_EDGE").id,
+  forwardMost.id,
+  `SCUFF_EDGE is "abrasion along a leading edge", so it belongs on the cell with `
+    + `the minimum zMin. That is ${forwardMost.id} (${forwardMost.aabb[2]} m), not `
+    + `${cellOf("SCUFF_EDGE").id}.`,
+);
+const sootCell = cellOf("SOOT_FAN");
+assert.ok(
+  sootCell.aabb[5] > 2.2,
+  `SOOT_FAN pairs with the vertex-colour heat staining the spec places at z > 2.2, `
+    + `but ${sootCell.id} reaches only z = ${sootCell.aabb[5]} m.`,
+);
+const aftCells = decalCells.cells.filter((cell) => cell.aabb[5] > 2.2);
+assert.equal(
+  sootCell.id,
+  aftCells.reduce((best, cell) => {
+    const area = (c) => c.rectPx[2] * c.rectPx[3];
+    return area(cell) > area(best) ? cell : best;
+  }).id,
+  "SOOT_FAN must take the largest of the aft cells; a fan on a small one reads as "
+    + "a stain rather than as exhaust.",
+);
+assert.equal(
+  cellOf("MISMATCH_PANEL").quads,
+  2,
+  "The privateer entry says it carries BOTH MISMATCH_PANEL placements, so the cell "
+    + "MISMATCH_PANEL lands on must be a two-quad cell. One quad cannot be both.",
+);
+
+// --- The generated runtime table --------------------------------------------
+//
+// src/game/totem.ts imports TOTEM_WEAR_CELLS.json, not the two files above: the
+// reasoning and the provenance are for people, and the initial bundle is capped
+// at 225 KiB gzip. That split is only safe while the generated table says the
+// same thing its sources do, so check it here as well as in --check.
+assert.equal(
+  wearCells.cells.length,
+  placements.length,
+  `The runtime table carries ${wearCells.cells.length} placements and the art `
+    + `direction authors ${placements.length}. Re-run scripts/derive-decal-cells.mjs.`,
+);
+for (const [index, entry] of wearCells.cells.entries()) {
+  const authored = placements[index];
+  const where = `runtime wear cell ${index} (${entry.slot})`;
+  assert.equal(entry.slot, authored.slot, `${where} is not the authored slot.`);
+  assert.equal(entry.cell, authored.cell, `${where} names a different cell.`);
+  assert.equal(entry.scale, authored.scale, `${where} carries a different scale.`);
+  assert.deepEqual(
+    entry.dst,
+    cellById.get(entry.cell).uvRect,
+    `${where}'s destination rect is not the measured cell's UV rect, so the runtime `
+      + "would wear a rectangle nobody measured.",
+  );
+  const region = wearRegions[entry.slot];
+  assert.deepEqual(
+    entry.src,
+    [
+      region.x / 1024,
+      1 - (region.y + region.h) / 1024,
+      (region.x + region.w) / 1024,
+      1 - region.y / 1024,
+    ],
+    `${where}'s source rect is not ${entry.slot}'s region on the wear sheet.`,
+  );
+  // Both rects must be non-degenerate: the shader divides by the destination's
+  // size, and a zero-width source would collapse the slot to a single texel.
+  assert.ok(
+    entry.dst[2] > entry.dst[0] && entry.dst[3] > entry.dst[1],
+    `${where} has a degenerate destination; the shader divides by its size.`,
+  );
+  assert.ok(
+    entry.src[2] > entry.src[0] && entry.src[3] > entry.src[1],
+    `${where} has a degenerate source.`,
+  );
+}
+
+// ---------------------------------------------------------------------------
+// NEGATIVE TEST — apply-without-measurement must FAIL.
+//
+// The twelve shipped placements all name measured cells, so running the rule
+// over them proves only that the loop executes. The whole point of P17's
+// re-baseline is that the P15 hold ("do not place a slot at a rect nobody
+// published") survives the inversion as a condition rather than being dropped
+// with it. So drive the SAME predicate over a placement pointing at a cell id
+// no measurement produced, and assert it throws with the reason attached.
+//
+// The real JSON is never touched: the synthetic record is a copy of a real
+// placement with its cell id moved off the measured set, and thrown away.
+// ---------------------------------------------------------------------------
+
+{
+  const unmeasuredCell = "decal_99__SYNTHETIC_UNMEASURED";
+  assert.ok(
+    !measuredCellIds.has(unmeasuredCell),
+    "The synthetic cell id is one the measurement produced, so the negative test "
+      + "is not testing anything.",
+  );
+  const guessed = { ...placements[0], cell: unmeasuredCell };
+  assert.throws(
+    () => assertPlacementIsMeasured(guessed),
+    (error) => {
+      assert.ok(
+        error instanceof assert.AssertionError,
+        "The measurement rule threw the wrong error type.",
+      );
+      const message = String(error.message);
+      for (const fragment of [
+        guessed.slot,
+        unmeasuredCell,
+        "scripts/derive-decal-cells.mjs",
+      ]) {
+        assert.ok(
+          message.includes(fragment),
+          `The apply-without-measurement failure does not name "${fragment}". A `
+            + `failure nobody can read is a failure nobody acts on. Got: ${message}`,
+        );
+      }
+      return true;
+    },
+    "A wear slot applied at an UNMEASURED cell did not fail. The rule cannot fail, "
+      + "so it has never proved anything about the twelve that pass — and the "
+      + "guessing P15 refused would ship silently.",
+  );
+}
+
 const liveryCodes = liveryWear.perLivery.map((entry) => entry.livery);
 assert.deepEqual(
   [...liveryCodes].sort(),
@@ -814,6 +1146,8 @@ console.log(
     + `${plaqueBacking.placement.BACKING_INSET_METRES} m inside a `
     + `${WALL_PLAQUE_INSET_METRES} m plaque; wear overlay in register with the `
     + "livery chip strip at intensity "
-    + `${liveryWear.intensity}/100, 4 liveries, 12 library slots resolved and not `
-    + "applied.",
+    + `${liveryWear.intensity}/100, 4 liveries, ${placements.length} library slots `
+    + `APPLIED at ${decalCells.cellCount} measured decal cells `
+    + `(${decalCells.quadCount} quads, GLB sha pinned) — P15 shipped these `
+    + "resolved-and-not-applied and the history is kept at the assertion.",
 );

@@ -1,0 +1,627 @@
+{
+ "id": "TOTEM_DECAL_CELLS_v1",
+ "pass": "P17 — decal-cell UV rects, measured",
+ "producedBy": "scripts/derive-decal-cells.mjs",
+ "source": {
+  "glb": "public/assets/totem/models/totem_runtime.glb",
+  "sha256": "4bec092f1c85c78b00a4974532b0dda5f1f89f756d9741535820368e3cfd35ec",
+  "material": "TOTEM_body",
+  "note": "The sha256 is the detection mechanism for a GLB re-export: if the hull's UV layout moves, this hash moves with it and validate-art-pass fails before the wear overlay is painted at rects that no longer exist."
+ },
+ "convention": {
+  "sheet": "1024x1024 SERVED PNG, origin top-left, +Y down",
+  "flipY": true,
+  "flipYSource": "SERVED_LIVERY_FLIP_Y in src/game/totem.ts",
+  "rectPx": "[x, y, w, h] in served-sheet pixels",
+  "uvRect": "[uMin, vMin, uMax, vMax]; u = x/1024, vMin = 1 - (y+h)/1024",
+  "proof": "The paint-chip strip is declared at image rows 900-996 (centre 948) and every hull vertex in the GLB reads v = 0.07421875 = 1 - 948/1024. The convention lands on the texel, so it is measured rather than assumed."
+ },
+ "chipRowV": 0.07421875,
+ "sheetSize": 1024,
+ "cellCount": 12,
+ "quadCount": 19,
+ "cells": [
+  {
+   "id": "decal_01",
+   "rectPx": [
+    0,
+    0,
+    256,
+    256
+   ],
+   "uvRect": [
+    0,
+    0.75,
+    0.25,
+    1
+   ],
+   "quads": 3,
+   "triangles": 6,
+   "vertices": 18,
+   "aabb": [
+    -0.4352,
+    -0.2493,
+    -0.2236,
+    0.4348,
+    0.4017,
+    0.5814
+   ],
+   "provenance": [
+    {
+     "node": "body_static",
+     "material": "TOTEM_body",
+     "primitive": "0/0",
+     "vertices": 6,
+     "aabb": [
+      -0.4352,
+      -0.2493,
+      -0.2236,
+      -0.4352,
+      0.0807,
+      0.1064
+     ]
+    },
+    {
+     "node": "body_static",
+     "material": "TOTEM_body",
+     "primitive": "0/0",
+     "vertices": 6,
+     "aabb": [
+      -0.2202,
+      0.4017,
+      0.1414,
+      0.2198,
+      0.4017,
+      0.5814
+     ]
+    },
+    {
+     "node": "body_static",
+     "material": "TOTEM_body",
+     "primitive": "0/0",
+     "vertices": 6,
+     "aabb": [
+      0.4348,
+      -0.2493,
+      -0.2236,
+      0.4348,
+      0.0807,
+      0.1064
+     ]
+    }
+   ]
+  },
+  {
+   "id": "decal_02",
+   "rectPx": [
+    256,
+    0,
+    256,
+    256
+   ],
+   "uvRect": [
+    0.25,
+    0.75,
+    0.5,
+    1
+   ],
+   "quads": 2,
+   "triangles": 4,
+   "vertices": 12,
+   "aabb": [
+    -0.3452,
+    -0.2293,
+    -1.5036,
+    0.3448,
+    0.0607,
+    -1.2136
+   ],
+   "provenance": [
+    {
+     "node": "body_static",
+     "material": "TOTEM_body",
+     "primitive": "0/0",
+     "vertices": 6,
+     "aabb": [
+      -0.3452,
+      -0.2293,
+      -1.5036,
+      -0.3452,
+      0.0607,
+      -1.2136
+     ]
+    },
+    {
+     "node": "body_static",
+     "material": "TOTEM_body",
+     "primitive": "0/0",
+     "vertices": 6,
+     "aabb": [
+      0.3448,
+      -0.2293,
+      -1.5036,
+      0.3448,
+      0.0607,
+      -1.2136
+     ]
+    }
+   ]
+  },
+  {
+   "id": "decal_03",
+   "rectPx": [
+    512,
+    0,
+    512,
+    256
+   ],
+   "uvRect": [
+    0.5,
+    0.75,
+    1,
+    1
+   ],
+   "quads": 1,
+   "triangles": 2,
+   "vertices": 6,
+   "aabb": [
+    -0.6802,
+    0.1237,
+    1.9164,
+    0.6798,
+    0.1237,
+    2.2464
+   ],
+   "provenance": [
+    {
+     "node": "body_static",
+     "material": "TOTEM_body",
+     "primitive": "0/0",
+     "vertices": 6,
+     "aabb": [
+      -0.6802,
+      0.1237,
+      1.9164,
+      0.6798,
+      0.1237,
+      2.2464
+     ]
+    }
+   ]
+  },
+  {
+   "id": "decal_04",
+   "rectPx": [
+    0,
+    256,
+    512,
+    128
+   ],
+   "uvRect": [
+    0,
+    0.625,
+    0.5,
+    0.75
+   ],
+   "quads": 2,
+   "triangles": 4,
+   "vertices": 12,
+   "aabb": [
+    -1.4302,
+    0.1237,
+    1.5964,
+    1.4298,
+    0.1237,
+    1.7864
+   ],
+   "provenance": [
+    {
+     "node": "body_static",
+     "material": "TOTEM_body",
+     "primitive": "0/0",
+     "vertices": 6,
+     "aabb": [
+      -1.4302,
+      0.1237,
+      1.5964,
+      -0.5702,
+      0.1237,
+      1.7864
+     ]
+    },
+    {
+     "node": "body_static",
+     "material": "TOTEM_body",
+     "primitive": "0/0",
+     "vertices": 6,
+     "aabb": [
+      0.5698,
+      0.1237,
+      1.5964,
+      1.4298,
+      0.1237,
+      1.7864
+     ]
+    }
+   ]
+  },
+  {
+   "id": "decal_05",
+   "rectPx": [
+    512,
+    256,
+    256,
+    128
+   ],
+   "uvRect": [
+    0.5,
+    0.625,
+    0.75,
+    0.75
+   ],
+   "quads": 2,
+   "triangles": 4,
+   "vertices": 12,
+   "aabb": [
+    -1.2402,
+    0.1237,
+    0.9464,
+    1.2398,
+    0.1237,
+    1.0964
+   ],
+   "provenance": [
+    {
+     "node": "body_static",
+     "material": "TOTEM_body",
+     "primitive": "0/0",
+     "vertices": 6,
+     "aabb": [
+      -1.2402,
+      0.1237,
+      0.9464,
+      -0.8402,
+      0.1237,
+      1.0964
+     ]
+    },
+    {
+     "node": "body_static",
+     "material": "TOTEM_body",
+     "primitive": "0/0",
+     "vertices": 6,
+     "aabb": [
+      0.8398,
+      0.1237,
+      0.9464,
+      1.2398,
+      0.1237,
+      1.0964
+     ]
+    }
+   ]
+  },
+  {
+   "id": "decal_06",
+   "rectPx": [
+    768,
+    256,
+    256,
+    128
+   ],
+   "uvRect": [
+    0.75,
+    0.625,
+    1,
+    0.75
+   ],
+   "quads": 1,
+   "triangles": 2,
+   "vertices": 6,
+   "aabb": [
+    0.3698,
+    0.1237,
+    2.0614,
+    0.8298,
+    0.1237,
+    2.2214
+   ],
+   "provenance": [
+    {
+     "node": "body_static",
+     "material": "TOTEM_body",
+     "primitive": "0/0",
+     "vertices": 6,
+     "aabb": [
+      0.3698,
+      0.1237,
+      2.0614,
+      0.8298,
+      0.1237,
+      2.2214
+     ]
+    }
+   ]
+  },
+  {
+   "id": "decal_07",
+   "rectPx": [
+    0,
+    384,
+    384,
+    128
+   ],
+   "uvRect": [
+    0,
+    0.5,
+    0.375,
+    0.625
+   ],
+   "quads": 1,
+   "triangles": 2,
+   "vertices": 6,
+   "aabb": [
+    -0.8902,
+    0.1237,
+    2.0564,
+    -0.3102,
+    0.1237,
+    2.2264
+   ],
+   "provenance": [
+    {
+     "node": "body_static",
+     "material": "TOTEM_body",
+     "primitive": "0/0",
+     "vertices": 6,
+     "aabb": [
+      -0.8902,
+      0.1237,
+      2.0564,
+      -0.3102,
+      0.1237,
+      2.2264
+     ]
+    }
+   ]
+  },
+  {
+   "id": "decal_08",
+   "rectPx": [
+    384,
+    384,
+    384,
+    128
+   ],
+   "uvRect": [
+    0.375,
+    0.5,
+    0.75,
+    0.625
+   ],
+   "quads": 1,
+   "triangles": 2,
+   "vertices": 6,
+   "aabb": [
+    -1.3102,
+    0.1237,
+    1.2764,
+    -0.7302,
+    0.1237,
+    1.4464
+   ],
+   "provenance": [
+    {
+     "node": "body_static",
+     "material": "TOTEM_body",
+     "primitive": "0/0",
+     "vertices": 6,
+     "aabb": [
+      -1.3102,
+      0.1237,
+      1.2764,
+      -0.7302,
+      0.1237,
+      1.4464
+     ]
+    }
+   ]
+  },
+  {
+   "id": "decal_09",
+   "rectPx": [
+    0,
+    512,
+    1024,
+    128
+   ],
+   "uvRect": [
+    0,
+    0.375,
+    1,
+    0.5
+   ],
+   "quads": 1,
+   "triangles": 2,
+   "vertices": 6,
+   "aabb": [
+    -1.7002,
+    0.4027,
+    -0.7736,
+    1.6998,
+    0.4027,
+    -0.5836
+   ],
+   "provenance": [
+    {
+     "node": "body_static",
+     "material": "TOTEM_body",
+     "primitive": "0/0",
+     "vertices": 6,
+     "aabb": [
+      -1.7002,
+      0.4027,
+      -0.7736,
+      1.6998,
+      0.4027,
+      -0.5836
+     ]
+    }
+   ]
+  },
+  {
+   "id": "decal_10",
+   "rectPx": [
+    0,
+    640,
+    512,
+    128
+   ],
+   "uvRect": [
+    0,
+    0.25,
+    0.5,
+    0.375
+   ],
+   "quads": 2,
+   "triangles": 4,
+   "vertices": 12,
+   "aabb": [
+    -1.6102,
+    0.1237,
+    1.7164,
+    1.6098,
+    0.1237,
+    1.8864
+   ],
+   "provenance": [
+    {
+     "node": "body_static",
+     "material": "TOTEM_body",
+     "primitive": "0/0",
+     "vertices": 6,
+     "aabb": [
+      -1.6102,
+      0.1237,
+      1.7164,
+      -0.9502,
+      0.1237,
+      1.8864
+     ]
+    },
+    {
+     "node": "body_static",
+     "material": "TOTEM_body",
+     "primitive": "0/0",
+     "vertices": 6,
+     "aabb": [
+      0.9498,
+      0.1237,
+      1.7164,
+      1.6098,
+      0.1237,
+      1.8864
+     ]
+    }
+   ]
+  },
+  {
+   "id": "decal_11",
+   "rectPx": [
+    512,
+    640,
+    256,
+    256
+   ],
+   "uvRect": [
+    0.5,
+    0.125,
+    0.75,
+    0.375
+   ],
+   "quads": 2,
+   "triangles": 4,
+   "vertices": 12,
+   "aabb": [
+    -0.9902,
+    -0.2393,
+    0.5864,
+    0.9898,
+    0.0707,
+    0.8964
+   ],
+   "provenance": [
+    {
+     "node": "body_static",
+     "material": "TOTEM_body",
+     "primitive": "0/0",
+     "vertices": 6,
+     "aabb": [
+      -0.9902,
+      -0.2393,
+      0.5864,
+      -0.9902,
+      0.0707,
+      0.8964
+     ]
+    },
+    {
+     "node": "body_static",
+     "material": "TOTEM_body",
+     "primitive": "0/0",
+     "vertices": 6,
+     "aabb": [
+      0.9898,
+      -0.2393,
+      0.5864,
+      0.9898,
+      0.0707,
+      0.8964
+     ]
+    }
+   ]
+  },
+  {
+   "id": "decal_12",
+   "rectPx": [
+    768,
+    640,
+    256,
+    128
+   ],
+   "uvRect": [
+    0.75,
+    0.25,
+    1,
+    0.375
+   ],
+   "quads": 1,
+   "triangles": 2,
+   "vertices": 6,
+   "aabb": [
+    0.1198,
+    -0.1793,
+    2.4514,
+    0.5598,
+    -0.0293,
+    2.4514
+   ],
+   "provenance": [
+    {
+     "node": "body_static",
+     "material": "TOTEM_body",
+     "primitive": "0/0",
+     "vertices": 6,
+     "aabb": [
+      0.1198,
+      -0.1793,
+      2.4514,
+      0.5598,
+      -0.0293,
+      2.4514
+     ]
+    }
+   ]
+  }
+ ]
+}

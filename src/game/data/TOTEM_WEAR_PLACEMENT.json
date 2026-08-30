@@ -1,0 +1,96 @@
+{
+ "id": "TOTEM_WEAR_PLACEMENT_v1",
+ "pass": "P17 — which library slot lands on which measured decal cell, and why",
+ "slotsFrom": "src/game/data/TOTEM_LIVERY_WEAR.json#librarySlots.slots",
+ "regionsFrom": "src/game/data/ATLAS_REGIONS.json#totem_wear_1024",
+ "cellsFrom": "src/game/data/TOTEM_DECAL_CELLS.json",
+ "runtimeTable": "src/game/data/TOTEM_WEAR_CELLS.json, generated from this file by scripts/derive-decal-cells.mjs",
+ "whyItsOwnFile": "this file is ART DIRECTION and is mostly prose: twelve reasons a person has to be able to argue with. It is read by scripts/validate-art-pass.mjs and by people, never by the runtime — src/game/totem.ts imports the generated TOTEM_WEAR_CELLS.json instead, which carries the same twelve placements as eight floats each and nothing else. The initial JS bundle is budgeted at 225 KiB gzip in scripts/validate-build.mjs and reasoning does not belong on the wire.",
+ "openDependencyClosedBy": {
+  "pass": "P17",
+  "how": "the rects were never published by totem.js, so they were MEASURED out of the runtime GLB instead. scripts/derive-decal-cells.mjs parses every TOTEM_body primitive in totem_runtime.glb, splits the triangles that are NOT on the collapsed chip row, groups them into geometric islands and buckets the islands by their exact UV rect. Twelve rects came back, carrying nineteen quads. The result is src/game/data/TOTEM_DECAL_CELLS.json, keyed to the GLB's sha256 so a re-export is detectable.",
+  "why not guessed": "the P15 note is still the reason the library was withheld - a guessed rect leaks grime and a NEEDLE REPAIR stencil onto whatever those cells actually hold. Nothing here is guessed; every rect in the placement table below is a cell id that the derivation produced, and derive-decal-cells.mjs fails if a placement names a cell it did not measure."
+ },
+ "placementModel": {
+  "sampling": "raw uv attribute, NOT vMapUv - the rivals remap vMapUv into their atlas quadrant in the vertex stage and the wear sheet is not quadranted. Same rule the chip strip already follows.",
+  "mapping": "a slot is PLACED on a cell, not sampled in register with it. The cell rect is the destination on the hull's UV; the slot rect is the source on the wear sheet. wearUv = slotRect.min + (uv - cellRect.min) / cellSize * slotSize. The chip strip stays in register (source rect == destination rect) and its code path is untouched.",
+  "whatItCanReach": "TOTEM_body is alphaTest 0.5 MASK, so a decal cell only draws where the LIVERY sheet is opaque. The library therefore wears the DECAL GRAPHICS - numbers, stripes, sponsor marks, hazard blocks - and not the paint around them. The paint is the chip strip's job and always was. MISMATCH_PANEL is the one slot this bites: its opaque primer can only replace the decal it lands on, never the hull panel behind it, so it reads as an oversprayed graphic rather than as a swapped panel.",
+  "disjointness": "the twelve cell rects do not overlap each other and none of them overlaps the chip strip (lowest cell v = 0.125, chip strip tops out at v = 0.12109). The runtime picks a cell by summing disjoint rect tests, so exactly one - or none - can ever be inside. Asserted in derive-decal-cells.mjs and again in validate-art-pass.mjs.",
+  "edgeInset": "the runtime insets each destination rect by half a texel before testing, so a fragment landing exactly on a shared cell boundary is inside neither and takes the identity factor. Without it a boundary fragment would sum two cells and sample a UV that is the average of two unrelated places on the sheet."
+ },
+ "placementNote": "One slot per cell, twelve of each, a bijection. 'scale' is a per-slot hold-back multiplying uWearScale for that cell only; 1 means the slot ships at the sheet's authored strength. It exists so a slot that reads as mud at racing distance can be pulled back without re-authoring the PNG, which is hash-pinned.",
+ "placements": [
+  {
+   "slot": "GRIME_SOFT",
+   "cell": "decal_01",
+   "scale": 1,
+   "reason": "three quads - the widest spread of any cell, cockpit flanks plus the deck square between them - and an exact 1:1 aspect match to the slot. 'Any large cell' is this one."
+  },
+  {
+   "slot": "SCUFF_EDGE",
+   "cell": "decal_02",
+   "scale": 1,
+   "reason": "MEASURED RULE: the cell with the minimum zMin (-1.504), i.e. the forward-most decals on the craft. Nose flanks are the leading edge the slot names. The slot's 4:1 band stretches to 1:1 here, which thickens the abrasion but keeps it hugging the same edge; it is a gradient, not text, so it survives the stretch."
+  },
+  {
+   "slot": "SOOT_FAN",
+   "cell": "decal_03",
+   "scale": 1,
+   "reason": "MEASURED RULE: the largest-area cell whose zMax clears the 2.2 m the spec names for the vertex-colour heat staining (2.246). The widest aft deck panel on the craft, so the fan spreads laterally behind the nozzles."
+  },
+  {
+   "slot": "RIVET_ROW",
+   "cell": "decal_04",
+   "scale": 1,
+   "reason": "the wing-root deck strips, one per side. 4:1 cell against an 8:1 tileable fixing line, so the rivets sit at twice their authored width; at racing distance the read is the line, not the individual fixing."
+  },
+  {
+   "slot": "MISMATCH_PANEL",
+   "cell": "decal_05",
+   "scale": 1,
+   "reason": "MEASURED RULE: exact 2:1 aspect match AND two quads, one per side - which is what 'the privateer carries both MISMATCH_PANEL placements' asks for. A 0.4 x 0.15 m outboard deck panel each side is the part a customer team buys from stock."
+  },
+  {
+   "slot": "REPAIR_PATCH_A",
+   "cell": "decal_06",
+   "scale": 1,
+   "reason": "single quad, starboard only, aft deck at z 2.06-2.22. A bolted plate is an asymmetric repair; it belongs on one side, not on a mirrored pair."
+  },
+  {
+   "slot": "REPAIR_PATCH_B",
+   "cell": "decal_07",
+   "scale": 1,
+   "reason": "the port counterpart of decal_06 at the same z. One bolted plate to starboard, one welded strap to port - the two repair reads on opposite shoulders, which is how a car that has been hit twice looks."
+  },
+  {
+   "slot": "GRIME_CORNER",
+   "cell": "decal_08",
+   "scale": 1,
+   "reason": "port mid deck, single quad, tucked inboard of the wing root - a corner that collects rather than a face that sheds."
+  },
+  {
+   "slot": "STENCIL_REPAIR",
+   "cell": "decal_09",
+   "scale": 1,
+   "reason": "EXACT 8:1 aspect match, the only one on the craft. STENCIL_REPAIR is the only slot carrying readable text (REWORK 0714) and text is the one thing that must not be stretched. decal_09 is also the full-span 3.4 m forward band, so 'applied over the livery' is literal."
+  },
+  {
+   "slot": "OVERSPRAY",
+   "cell": "decal_10",
+   "scale": 1,
+   "reason": "the outboard hazard strips, warning-orange on all four sheets and 50% coverage - the highest of any cell. Hazard blocks are masked and sprayed, so masking bleed belongs exactly here."
+  },
+  {
+   "slot": "GRIME_STREAK",
+   "cell": "decal_11",
+   "scale": 1,
+   "reason": "MEASURED RULE: the only VERTICAL cell of the three 1:1 cells - flank panels at x = +/-0.99, one per side. Streaking hangs downward from a top edge, which is a statement about a vertical surface, and the aspect matches exactly."
+  },
+  {
+   "slot": "DUST_FILM",
+   "cell": "decal_12",
+   "scale": 1,
+   "reason": "the aft transom plate at z = 2.451, the aft-most decal on the craft. DUST_FILM is a featureless even multiply, so the 8:1-onto-2:1 squash costs nothing - there is no feature in it to distort."
+  }
+ ]
+}

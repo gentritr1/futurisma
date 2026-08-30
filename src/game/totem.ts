@@ -3,6 +3,7 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import atlasRegionsJson from "./data/ATLAS_REGIONS.json";
 import liveryWearJson from "./data/TOTEM_LIVERY_WEAR.json";
+import wearCellsJson from "./data/TOTEM_WEAR_CELLS.json";
 import { disposeObject3DResources } from "./graphics-resources";
 import {
   TotemRacePresence,
@@ -103,6 +104,14 @@ export interface Ps2TreatmentDiagnostics {
   wearMaterials: number;
   /** 1.0 at the authored 45/100; nightform holds it back to 34/45. */
   wearScale: number;
+  /**
+   * P17 — library slots actually placed on a measured decal cell. 0 is the P15
+   * behaviour (chip strip only); 12 is the whole authored library. A slot held
+   * back to `scale: 0` in the spec still counts as applied, because it is armed
+   * and one number away from visible; a slot that failed to RESOLVE never gets
+   * here at all, and the shortfall is what this counter exists to surface.
+   */
+  appliedWearSlots: number;
 }
 
 export type TotemRivalMaterialRole =
@@ -273,6 +282,7 @@ export function ps2TreatmentDiagnostics(): Ps2TreatmentDiagnostics {
     wearActive: liveryWearMaterialCount > 0 && liveryWearMapUniform.value !== null,
     wearMaterials: liveryWearMaterialCount,
     wearScale: Number(liveryWearScaleUniform.value.toFixed(4)),
+    appliedWearSlots: LIVERY_WEAR_CELLS.length,
   };
 }
 
@@ -378,14 +388,18 @@ export function composeShaderInjection(
  *   is sampled at the hull's own UV. It is sampled from the RAW `uv` attribute
  *   rather than from `vMapUv`, because the rivals remap `vMapUv` into their
  *   atlas quadrant in the vertex stage and the wear sheet is not quadranted.
- * - **Chip strip only.** The hull's UVs collapse to the centre of one of the
- *   eight paint chips — the centre texel is the only one ever sampled, and the
- *   authored wear detail lives in the chip margins for review. Outside that
- *   strip the factor is exactly 1.0, because the 12 decal-cell rects that would
- *   place the library slots are unpublished; guessing them would leak grime,
+ * - **Chip strip, in register.** The hull's UVs collapse to the centre of one of
+ *   the eight paint chips — the centre texel is the only one ever sampled, and
+ *   the authored wear detail lives in the chip margins for review.
+ * - **Decal cells, placed** — P17. P15 shipped with the factor pinned to exactly
+ *   1.0 outside the chip strip, because the 12 decal-cell rects that would place
+ *   the library slots were unpublished and guessing them would leak grime,
  *   repair plates and a NEEDLE REPAIR stencil onto whatever those cells hold.
- *   That open dependency is recorded in the spec and asserted by
- *   `validate-art-pass.mjs`; the library slots are NOT applied this phase.
+ *   They are no longer guessed: `scripts/derive-decal-cells.mjs` measures them
+ *   out of the runtime GLB, `TOTEM_DECAL_CELLS.json` publishes them with
+ *   per-cell provenance, and the twelve library slots are placed one per cell.
+ *   See `resolveLiveryWearCells` for the placement model and for why the chip
+ *   read is unaffected.
  * - **One intensity.** The sheet is authored at 45/100 with the 0.45 already
  *   baked into every alpha, so a straight `mix(1, wearRGB, alpha)` reproduces
  *   the spec's `effective` column. `uWearScale` only ever scales that back
@@ -419,6 +433,33 @@ const LIVERY_WEAR = liveryWearJson as unknown as {
 const LIVERY_WEAR_SHEET_KEY = "totem_wear_1024";
 const LIVERY_WEAR_STRIP_SLOT = "CHIP_WEAR_STRIP";
 
+interface AtlasSheet {
+  width: number;
+  height: number;
+  regions: Record<string, { x: number; y: number; w: number; h: number }>;
+}
+
+/** The one place a pixel rect becomes a UV rect. See `resolveWearChipRect`. */
+function pixelRectToUv(
+  sheet: { width: number; height: number },
+  rect: { x: number; y: number; w: number; h: number },
+): THREE.Vector4 {
+  return new THREE.Vector4(
+    rect.x / sheet.width,
+    1 - (rect.y + rect.h) / sheet.height,
+    (rect.x + rect.w) / sheet.width,
+    1 - rect.y / sheet.height,
+  );
+}
+
+function wearSheet(): AtlasSheet {
+  const sheet = (atlasRegionsJson as unknown as Record<string, AtlasSheet>)[
+    LIVERY_WEAR_SHEET_KEY
+  ];
+  if (!sheet) throw new Error(`ATLAS_REGIONS.json has no ${LIVERY_WEAR_SHEET_KEY} sheet.`);
+  return sheet;
+}
+
 /**
  * The chip strip in UV space.
  *
@@ -431,28 +472,139 @@ const LIVERY_WEAR_STRIP_SLOT = "CHIP_WEAR_STRIP";
  * `v = 0.07422` chip row. Measured against the shipped sheets, not assumed.
  */
 function resolveWearChipRect(): THREE.Vector4 {
-  const sheet = (atlasRegionsJson as unknown as Record<string, {
-    width: number;
-    height: number;
-    regions: Record<string, { x: number; y: number; w: number; h: number }>;
-  }>)[LIVERY_WEAR_SHEET_KEY];
-  const region = sheet?.regions[LIVERY_WEAR_STRIP_SLOT];
-  if (!sheet || !region) {
+  const sheet = wearSheet();
+  const region = sheet.regions[LIVERY_WEAR_STRIP_SLOT];
+  if (!region) {
     throw new Error(`The wear sheet is missing its ${LIVERY_WEAR_STRIP_SLOT} region.`);
   }
-  return new THREE.Vector4(
-    region.x / sheet.width,
-    1 - (region.y + region.h) / sheet.height,
-    (region.x + region.w) / sheet.width,
-    1 - region.y / sheet.height,
-  );
+  return pixelRectToUv(sheet, region);
 }
+
+/**
+ * P17 — the wear LIBRARY, placed on the measured decal cells.
+ *
+ * P15 shipped the twelve library slots authored on the sheet and deliberately
+ * unapplied: the decal-cell rects they had to land on were never published, and
+ * a guessed rect leaks a NEEDLE REPAIR stencil onto whatever the cell really
+ * holds. `scripts/derive-decal-cells.mjs` closed that by MEASURING the rects out
+ * of `totem_runtime.glb` — every `TOTEM_body` triangle that is not on the
+ * collapsed chip row, grouped into islands, bucketed by exact UV rect. Twelve
+ * came back. `TOTEM_DECAL_CELLS.json` is that measurement, keyed to the GLB's
+ * sha256 so a re-export is caught before the overlay paints at rects that moved.
+ *
+ * A slot is PLACED on a cell rather than sampled in register with it: the cell
+ * rect is the destination on the hull's UV, the slot rect is the source on the
+ * wear sheet, and the shader maps one onto the other. Only the chip strip is in
+ * register, and its code path below is untouched — the two UV regions are
+ * disjoint (cells bottom out at v = 0.125, the strip tops out at v = 0.12109),
+ * so the library factor is exactly 1.0 at every chip texel and the chip read is
+ * bit-identical to P15's.
+ *
+ * WHY THE TABLE IS PRE-RESOLVED. `TOTEM_WEAR_CELLS.json` is generated: it holds
+ * the twelve placements as eight floats and a scale each, and nothing else. The
+ * argument for which slot lands where is in `TOTEM_WEAR_PLACEMENT.json` and the
+ * measurement with its provenance is in `TOTEM_DECAL_CELLS.json`; the runtime
+ * imports neither, because this module lands in the initial bundle and
+ * `validate-build.mjs` caps that at 225 KiB gzip.
+ *
+ * Resolution is all-or-nothing per slot and never throws: a malformed entry is
+ * dropped, and `appliedWearSlots` in the soak diagnostics is what reports the
+ * shortfall. `validate-art-pass.mjs` asserts the full twelve, so a silent drop
+ * cannot ship.
+ */
+interface LiveryWearCell {
+  slot: string;
+  cell: string;
+  /** Destination rect on the hull's UV: the measured decal cell. */
+  destination: THREE.Vector4;
+  /** Source rect on the wear sheet: the authored library slot. */
+  source: THREE.Vector4;
+  /** Per-slot hold-back, multiplying `uWearScale` for this cell only. */
+  scale: number;
+}
+
+function resolveLiveryWearCells(): LiveryWearCell[] {
+  const table = wearCellsJson as unknown as {
+    cells: readonly {
+      slot: string;
+      cell: string;
+      dst: readonly number[];
+      src: readonly number[];
+      scale: number;
+    }[];
+  };
+  const resolved: LiveryWearCell[] = [];
+  for (const entry of table.cells) {
+    if (entry.dst.length !== 4 || entry.src.length !== 4) continue;
+    if (!(entry.scale > 0)) continue;
+    resolved.push({
+      slot: entry.slot,
+      cell: entry.cell,
+      destination: new THREE.Vector4(entry.dst[0], entry.dst[1], entry.dst[2], entry.dst[3]),
+      source: new THREE.Vector4(entry.src[0], entry.src[1], entry.src[2], entry.src[3]),
+      scale: Math.min(entry.scale, 1),
+    });
+  }
+  return resolved;
+}
+
+const LIVERY_WEAR_CELLS = resolveLiveryWearCells();
 
 const liveryWearMapUniform: { value: THREE.Texture | null } = { value: null };
 const liveryWearScaleUniform = { value: 1 };
 const liveryWearRectUniform = { value: resolveWearChipRect() };
+const liveryWearCellDestinationUniform = {
+  value: LIVERY_WEAR_CELLS.map((cell) => cell.destination),
+};
+const liveryWearCellSourceUniform = {
+  value: LIVERY_WEAR_CELLS.map((cell) => cell.source),
+};
+const liveryWearCellScaleUniform = {
+  value: LIVERY_WEAR_CELLS.map((cell) => cell.scale),
+};
 let liveryWearMaterialCount = 0;
 const liveryWearPatchedMaterials = new WeakSet<THREE.Material>();
+
+/**
+ * The library half of the wear injection, as GLSL.
+ *
+ * Kept out of `applyLiveryWearTreatment` so the chip-strip block there stays
+ * character-for-character what P15 shipped — the acceptance for this phase is
+ * that the chip centres read back bit-identical, and the cheapest way to hold
+ * that is to not retype the code that produces them.
+ *
+ * FIRST HIT WINS. The twelve destination rects are disjoint (asserted in
+ * `derive-decal-cells.mjs`), but `step` is inclusive at both ends, so a fragment
+ * landing exactly on a shared cell boundary would satisfy two rect tests, sum
+ * two scales and sample the average of two unrelated places on the sheet. The
+ * `1.0 - taken` factor makes the first containing cell the only one that
+ * contributes, branchlessly. A fragment inside no cell keeps `wearCellAmount`
+ * at 0, and `mix(vec3(1.0), x, 0.0)` is exactly `vec3(1.0)` — so the hull, and
+ * the chip strip with it, is multiplied by exactly one.
+ */
+function liveryWearLibraryChunk(count: number): string {
+  return (
+    `\tvec2 wearCellUv = vec2( 0.0 );\n`
+    + `\tfloat wearCellAmount = 0.0;\n`
+    + `\tfloat wearCellTaken = 0.0;\n`
+    + `\tfor ( int i = 0; i < ${count}; i ++ ) {\n`
+    + `\t\tvec4 wearDst = uWearCellDst[ i ];\n`
+    + `\t\tvec2 wearHitAxes = step( wearDst.xy, vWearUv ) * step( vWearUv, wearDst.zw );\n`
+    + `\t\tfloat wearHit = wearHitAxes.x * wearHitAxes.y * ( 1.0 - wearCellTaken );\n`
+    + `\t\twearCellTaken = min( 1.0, wearCellTaken + wearHitAxes.x * wearHitAxes.y );\n`
+    + `\t\tvec4 wearSrc = uWearCellSrc[ i ];\n`
+    + `\t\twearCellUv += wearHit * ( wearSrc.xy\n`
+    + `\t\t\t+ ( vWearUv - wearDst.xy ) / ( wearDst.zw - wearDst.xy )\n`
+    + `\t\t\t* ( wearSrc.zw - wearSrc.xy ) );\n`
+    + `\t\twearCellAmount += wearHit * uWearCellScale[ i ];\n`
+    + `\t}\n`
+    + `\tvec4 wearCellTexel = texture2D( uWearMap, wearCellUv );\n`
+    + `\tdiffuseColor.rgb *= mix(\n`
+    + `\t\tvec3( 1.0 ),\n`
+    + `\t\tmix( vec3( 1.0 ), wearCellTexel.rgb, wearCellTexel.a ),\n`
+    + `\t\twearCellAmount * uWearScale );\n`
+  );
+}
 
 /** Loads the overlay sheet once. Resolves to null when it is unavailable. */
 export async function loadLiveryWearMap(): Promise<THREE.Texture | null> {
@@ -504,7 +656,11 @@ export function applyLiveryWearTreatment(material: THREE.Material): boolean {
   if (!liveryWearMapUniform.value) return false;
   if (liveryWearPatchedMaterials.has(material)) return false;
   liveryWearPatchedMaterials.add(material);
-  composeShaderInjection(material, "wear", (shader) => {
+  const cellCount = LIVERY_WEAR_CELLS.length;
+  // The cell count is a compile-time constant baked into the loop bound, so it
+  // has to reach the program cache key: a build that resolved a different number
+  // of cells must not reuse a program compiled for the old count.
+  composeShaderInjection(material, `wear|cells${cellCount}`, (shader) => {
     shader.uniforms.uWearMap = liveryWearMapUniform;
     shader.uniforms.uWearScale = liveryWearScaleUniform;
     shader.uniforms.uWearChipRect = liveryWearRectUniform;
@@ -512,10 +668,20 @@ export function applyLiveryWearTreatment(material: THREE.Material): boolean {
       "#include <uv_vertex>",
       "#include <uv_vertex>\n\tvWearUv = uv;",
     );
+    if (cellCount > 0) {
+      shader.uniforms.uWearCellDst = liveryWearCellDestinationUniform;
+      shader.uniforms.uWearCellSrc = liveryWearCellSourceUniform;
+      shader.uniforms.uWearCellScale = liveryWearCellScaleUniform;
+    }
     shader.fragmentShader = (
       "uniform sampler2D uWearMap;\n"
       + "uniform float uWearScale;\n"
       + "uniform vec4 uWearChipRect;\n"
+      + (cellCount > 0
+        ? `uniform vec4 uWearCellDst[ ${cellCount} ];\n`
+          + `uniform vec4 uWearCellSrc[ ${cellCount} ];\n`
+          + `uniform float uWearCellScale[ ${cellCount} ];\n`
+        : "")
       + "varying vec2 vWearUv;\n"
       + shader.fragmentShader
     ).replace(
@@ -528,7 +694,8 @@ export function applyLiveryWearTreatment(material: THREE.Material): boolean {
         + "\tdiffuseColor.rgb *= mix(\n"
         + "\t\tvec3( 1.0 ),\n"
         + "\t\tmix( vec3( 1.0 ), wearTexel.rgb, wearTexel.a ),\n"
-        + "\t\twearAmount );\n",
+        + "\t\twearAmount );\n"
+        + (cellCount > 0 ? liveryWearLibraryChunk(cellCount) : ""),
     );
   });
   liveryWearMaterialCount += 1;

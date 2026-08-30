@@ -1,0 +1,216 @@
+{
+ "id": "TOTEM_WEAR_CELLS_v1",
+ "from": [
+  "src/game/data/TOTEM_DECAL_CELLS.json",
+  "src/game/data/TOTEM_WEAR_PLACEMENT.json",
+  "src/game/data/ATLAS_REGIONS.json#totem_wear_1024"
+ ],
+ "producedBy": "scripts/derive-decal-cells.mjs",
+ "uv": "dst = measured decal cell on the hull UV; src = library slot on the wear sheet; both [uMin, vMin, uMax, vMax], flipY = true",
+ "cells": [
+  {
+   "slot": "GRIME_SOFT",
+   "cell": "decal_01",
+   "dst": [
+    0,
+    0.75,
+    0.25,
+    1
+   ],
+   "src": [
+    0,
+    0.75,
+    0.25,
+    1
+   ],
+   "scale": 1
+  },
+  {
+   "slot": "SCUFF_EDGE",
+   "cell": "decal_02",
+   "dst": [
+    0.25,
+    0.75,
+    0.5,
+    1
+   ],
+   "src": [
+    0,
+    0.375,
+    0.5,
+    0.5
+   ],
+   "scale": 1
+  },
+  {
+   "slot": "SOOT_FAN",
+   "cell": "decal_03",
+   "dst": [
+    0.5,
+    0.75,
+    1,
+    1
+   ],
+   "src": [
+    0.5,
+    0.75,
+    0.75,
+    1
+   ],
+   "scale": 1
+  },
+  {
+   "slot": "RIVET_ROW",
+   "cell": "decal_04",
+   "dst": [
+    0,
+    0.625,
+    0.5,
+    0.75
+   ],
+   "src": [
+    0.5,
+    0.4375,
+    1,
+    0.5
+   ],
+   "scale": 1
+  },
+  {
+   "slot": "MISMATCH_PANEL",
+   "cell": "decal_05",
+   "dst": [
+    0.5,
+    0.625,
+    0.75,
+    0.75
+   ],
+   "src": [
+    0.25,
+    0.5,
+    0.75,
+    0.75
+   ],
+   "scale": 1
+  },
+  {
+   "slot": "REPAIR_PATCH_A",
+   "cell": "decal_06",
+   "dst": [
+    0.75,
+    0.625,
+    1,
+    0.75
+   ],
+   "src": [
+    0.75,
+    0.75,
+    1,
+    1
+   ],
+   "scale": 1
+  },
+  {
+   "slot": "REPAIR_PATCH_B",
+   "cell": "decal_07",
+   "dst": [
+    0,
+    0.5,
+    0.375,
+    0.625
+   ],
+   "src": [
+    0,
+    0.5,
+    0.25,
+    0.75
+   ],
+   "scale": 1
+  },
+  {
+   "slot": "GRIME_CORNER",
+   "cell": "decal_08",
+   "dst": [
+    0.375,
+    0.5,
+    0.75,
+    0.625
+   ],
+   "src": [
+    0.75,
+    0.5,
+    1,
+    0.75
+   ],
+   "scale": 1
+  },
+  {
+   "slot": "STENCIL_REPAIR",
+   "cell": "decal_09",
+   "dst": [
+    0,
+    0.375,
+    1,
+    0.5
+   ],
+   "src": [
+    0.5,
+    0.375,
+    1,
+    0.4375
+   ],
+   "scale": 1
+  },
+  {
+   "slot": "OVERSPRAY",
+   "cell": "decal_10",
+   "dst": [
+    0,
+    0.25,
+    0.5,
+    0.375
+   ],
+   "src": [
+    0,
+    0.125,
+    1,
+    0.25
+   ],
+   "scale": 1
+  },
+  {
+   "slot": "GRIME_STREAK",
+   "cell": "decal_11",
+   "dst": [
+    0.5,
+    0.125,
+    0.75,
+    0.375
+   ],
+   "src": [
+    0.25,
+    0.75,
+    0.5,
+    1
+   ],
+   "scale": 1
+  },
+  {
+   "slot": "DUST_FILM",
+   "cell": "decal_12",
+   "dst": [
+    0.75,
+    0.25,
+    1,
+    0.375
+   ],
+   "src": [
+    0,
+    0.25,
+    1,
+    0.375
+   ],
+   "scale": 1
+  }
+ ]
+}
