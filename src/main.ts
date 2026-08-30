@@ -2,6 +2,7 @@ import { FuturismaGame } from "./game/game";
 import type { RaceCourse } from "./game/course";
 import { InputController } from "./game/input";
 import { resolveMapSelection } from "./game/map-selection";
+import { restoreStoredLivery } from "./game/meta-runtime";
 import { MetaUi } from "./game/meta-ui";
 import { save } from "./game/persistence";
 import { configureRenderMode } from "./game/render-mode.js";
@@ -78,8 +79,15 @@ ui.restartButton.addEventListener("click", handleRestartClick);
 
 game
   .initialize()
-  .then((initialized) => {
+  .then(async (initialized) => {
     if (!initialized) return;
+    // P17.1 — the stored livery goes ON THE CRAFT, not just in the chip row.
+    // Here rather than in `MetaUi.syncFromSave` because the panel is built
+    // before this promise resolves, so at sync time there is no loaded model to
+    // swap a decal sheet on; and awaited before the grid is shown or the demo
+    // starts, so the field is never issued against paint the player can see is
+    // wrong. Returns null and keeps the works sheet if it cannot be applied.
+    await restoreStoredLivery((code) => game.applyLivery(code));
     const parameters = new URLSearchParams(window.location.search);
     const manualDemoStart = parameters.has("diagnostics")
       && parameters.has("demo")

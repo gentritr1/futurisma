@@ -7,6 +7,11 @@ import {
   MAX_GHOST_FRAMES,
 } from "../src/game/ghost.js";
 import {
+  BAKED_LIVERY_CODE,
+  bootLiveryToApply,
+  liveryFor,
+} from "../src/game/liveries.js";
+import {
   DEFAULT_LIVERY,
   DEFAULT_TRACK,
   LIVERY_CODES,
@@ -827,11 +832,189 @@ for (const [label, ghost] of hostileGhosts) {
   }
 }
 
+// ---------------------------------------------------------------------------
+// P17.1 — a stored livery has to reach the CRAFT, not just the chip row.
+//
+// THE BUG. Everything above proves the save file survives anything and hands
+// the game a usable livery code. None of it proved the code was ever put on the
+// vehicle. `MetaUi.syncFromSave` restores the choice with `ChipGroup.setValue`,
+// which deliberately does not fire `onCommit`, and nothing else applied it — so
+// after a reload the HUD read `NIGHTFORM 24` over a craft still wearing the
+// works sheet baked into the GLB. A stored value that never reaches the runtime
+// is a persistence failure even though the file was perfect, which is why the
+// assertion lives here.
+//
+// Two halves, because the bug had two halves: a decision nobody could test, and
+// a call nobody made.
+// ---------------------------------------------------------------------------
+
+const BAKED_LIVERY_FLIP_MATCH = {
+  works: 100,
+  privateer: 91.859,
+  nightform: 91.253,
+  needle: 77.852,
+};
+
+assert.equal(
+  BAKED_LIVERY_CODE,
+  DEFAULT_LIVERY,
+  "The livery baked into totem_runtime.glb and the save file's default must be "
+    + "the same sheet, or a fresh save boots wearing paint it does not claim.",
+);
+assert.ok(
+  LIVERY_CODES.includes(BAKED_LIVERY_CODE),
+  `BAKED_LIVERY_CODE is ${BAKED_LIVERY_CODE}, which is not a shipped livery.`,
+);
+// The constant is a MEASURED fact, recorded in liveries.js: the GLB's embedded
+// TOTEM_body.map was extracted and compared pixel-for-pixel against all four
+// served sheets under the vertical flip the glTF/served flipY conventions imply.
+// Exactly one matched, and not marginally. Re-measuring here would mean decoding
+// two 1024x1024 PNGs on every run; the guard against the constant going stale is
+// that a re-exported GLB moves its sha256, which validate-art-pass.mjs pins
+// through TOTEM_DECAL_CELLS.json.
+assert.equal(
+  Object.entries(BAKED_LIVERY_FLIP_MATCH)
+    .filter(([, percent]) => percent === 100)
+    .map(([code]) => code)
+    .join(),
+  BAKED_LIVERY_CODE,
+  "The recorded GLB pixel measurement names a different sheet than "
+    + "BAKED_LIVERY_CODE. One of the two was edited without the other.",
+);
+
+// --- Half one: the decision, driven with real inputs ------------------------
+assert.equal(
+  bootLiveryToApply("nightform"),
+  "nightform",
+  "A stored non-default livery must be applied at boot. This is the bug: it was "
+    + "restored into the chip row and never put on the craft.",
+);
+for (const code of LIVERY_CODES) {
+  assert.equal(
+    bootLiveryToApply(code),
+    code === BAKED_LIVERY_CODE ? null : code,
+    `bootLiveryToApply(${code}) must apply every livery except the one already `
+      + "baked into the GLB.",
+  );
+}
+assert.equal(
+  bootLiveryToApply(BAKED_LIVERY_CODE),
+  null,
+  "The boot path must do NOTHING for the baked livery. Swapping in pixels that "
+    + "are already on the model would put a fetch and a texture replacement on "
+    + "the default no-save path, which this fix is required to leave unchanged.",
+);
+// A save file is hostile input everywhere else in this suite; it is here too.
+for (const rubbish of ["", "WORKS", "nightform ", "__proto__", "../works", "0"]) {
+  assert.equal(
+    bootLiveryToApply(rubbish),
+    null,
+    `A stored token of ${JSON.stringify(rubbish)} must collapse to the baked `
+      + "livery and fetch nothing. A boot path that trusted it would request a "
+      + "decal sheet that does not exist.",
+  );
+}
+
+// --- Half two: the call, which is what was actually missing -----------------
+//
+// The decision function can be perfect and the bug still ship, because the bug
+// WAS that nothing called it. So pin the wiring: main.ts must await the restore
+// after initialize() resolves and before the grid is shown or the demo starts.
+const mainSource = await readFile(new URL("../src/main.ts", import.meta.url), "utf8");
+assert.match(
+  mainSource,
+  /await\s+restoreStoredLivery\s*\(/,
+  "src/main.ts must AWAIT restoreStoredLivery on the boot path. Without the "
+    + "await the grid can be shown, or the demo started, against the works sheet "
+    + "while the real livery is still being fetched.",
+);
+const restoreAt = mainSource.indexOf("await restoreStoredLivery");
+for (const [what, needle] of [
+  ["the ready screen", "ui.showReady()"],
+  ["the demo start", "game.startTrial()"],
+]) {
+  const at = mainSource.indexOf(needle, restoreAt);
+  assert.ok(
+    at > restoreAt,
+    `src/main.ts reaches ${what} before restoring the stored livery, so the boot `
+      + "path can present a craft wearing the wrong paint.",
+  );
+}
+// The restore has to go through the SAME entry point the chip click uses, or the
+// P17 wear treatment and the per-livery uWearScale stop being guaranteed to
+// compose the same way on both paths.
+const metaRuntimeSource = await readFile(
+  new URL("../src/game/meta-runtime.ts", import.meta.url),
+  "utf8",
+);
+assert.match(
+  metaRuntimeSource,
+  /export async function restoreStoredLivery/,
+  "restoreStoredLivery must live in meta-runtime.ts, beside applyRaceLivery.",
+);
+assert.match(
+  mainSource,
+  /restoreStoredLivery\(\s*\(code\)\s*=>\s*game\.applyLivery\(code\)\s*\)/,
+  "The boot restore must call game.applyLivery — the same hook MetaUi's livery "
+    + "chip commits to. A second swap path would be a second place for the wear "
+    + "treatment to compose differently.",
+);
+
+// --- NEGATIVE TEST ----------------------------------------------------------
+//
+// Every assertion above passes against the shipped code, which proves only that
+// the shipped code is self-consistent. The rule that matters is "a stored
+// non-default livery is applied at boot", and the way it broke was silent. So
+// re-run the SAME predicate over the two implementations that would reintroduce
+// it, and require both to fail.
+{
+  // (a) The pre-fix behaviour: nothing is ever applied.
+  const neverApplies = () => null;
+  assert.throws(
+    () => assert.equal(
+      neverApplies("nightform"),
+      "nightform",
+      "A stored non-default livery must be applied at boot.",
+    ),
+    assert.AssertionError,
+    "A boot path that applies NOTHING passed the stored-livery rule. The rule "
+      + "cannot fail, so it never proved anything about the fix.",
+  );
+  // (b) The over-correction: applying the baked livery too, which puts a fetch
+  //     and a texture swap on the default path this fix must not touch.
+  const alwaysApplies = (code) => liveryFor(code).code;
+  assert.throws(
+    () => assert.equal(
+      alwaysApplies(BAKED_LIVERY_CODE),
+      null,
+      "The boot path must do NOTHING for the baked livery.",
+    ),
+    assert.AssertionError,
+    "A boot path that swaps the baked livery in over itself passed the "
+      + "default-path rule, so the rule does not protect the default path.",
+  );
+  // And the wiring half: a main.ts that calls without awaiting must fail.
+  const unawaited = mainSource.replace(
+    "await restoreStoredLivery",
+    "void restoreStoredLivery",
+  );
+  assert.throws(
+    () => assert.match(unawaited, /await\s+restoreStoredLivery\s*\(/),
+    assert.AssertionError,
+    "A fire-and-forget restore passed the await check, so the check would not "
+      + "catch the grid being shown against an unfinished livery swap.",
+  );
+}
+
 console.log(
   `Persistence PASS: v2 round trip with a stored ghost, ${hostile.length} hostile payloads `
     + `absorbed to defaults, v1 -> v2 migrated field by field with nothing lost, `
     + `${hostileGhosts.length} corrupt ghosts dropped while their course records survived, `
     + "ghost follows bestLapMs, write budget inside the 64 KB read ceiling, volume grid "
     + "stable across JSON, record folding correct, quota-exceeded and absent ports "
-    + "degrade to memory without throwing.",
+    + "degrade to memory without throwing; the stored livery reaches the CRAFT — "
+    + `${LIVERY_CODES.length - 1} of ${LIVERY_CODES.length} applied at boot, `
+    + `${BAKED_LIVERY_CODE} skipped as already baked into the GLB, 6 hostile tokens `
+    + "collapsed to it, main.ts awaits the restore ahead of the grid and the demo, "
+    + "3 negative fixtures rejected.",
 );
