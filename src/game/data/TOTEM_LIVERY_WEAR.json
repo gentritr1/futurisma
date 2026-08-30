@@ -1,6 +1,6 @@
 {
- "id": "TOTEM_LIVERY_WEAR_v0.2",
- "pass": "P02 art direction",
+ "id": "TOTEM_LIVERY_WEAR_v0.3",
+ "pass": "P02 art direction; library placed in P17",
  "intensity": 45,
  "intensityScale": 0.45,
  "sentence": "At 45 of 100 this is a machine that is serviced, not one that is abandoned.",
@@ -43,6 +43,12 @@
  "librarySlots": {
   "note": "Everything outside the chip strip is a LIBRARY, addressed by name, to be placed on the 12 decal cells by whoever owns that UV layout. The cell rects are not published in totem/MANIFEST.json and are deliberately not guessed here.",
   "openDependency": "the 12 decal_* cell rects from totem.js. Until those land, the wear pass is applied at the chip strip only, which is already the majority of the visible read.",
+  "openDependencyClosedBy": {
+   "pass": "P17",
+   "how": "the rects were never published by totem.js, so they were MEASURED out of the runtime GLB instead - see scripts/derive-decal-cells.mjs and src/game/data/TOTEM_DECAL_CELLS.json.",
+   "placements": "src/game/data/TOTEM_WEAR_PLACEMENT.json - which slot lands on which cell, and the argument for each. Kept out of this file, and out of the runtime, because it is prose: totem.ts imports the generated TOTEM_WEAR_CELLS.json instead.",
+   "whyNotGuessed": "the P15 note above is still the reason the library was withheld - a guessed rect leaks grime and a NEEDLE REPAIR stencil onto whatever those cells really hold. Nothing is guessed now: derive-decal-cells.mjs fails if a placement names a cell it did not measure, and validate-art-pass.mjs has a negative test proving that rule binds."
+  },
   "slots": [
    { "slot": "GRIME_SOFT", "use": "broad settled grime, any large cell" },
    { "slot": "GRIME_STREAK", "use": "wash streaking hanging from a cell's top edge" },
