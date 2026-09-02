@@ -1412,7 +1412,10 @@ export class GreenwaterCourse implements RaceCourse {
   }
 
   vehicleHoverHeight(speedMetersPerSecond: number, boostActive: boolean): number {
-    const dynamicHeight = boostActive ? 0.6 : speedMetersPerSecond < 11 ? 0.18 : 0.45;
+    // P19 hover clearance: the TOTEM stabiliser ring bottoms out 0.892 m below
+    // the model origin, so anything under ~0.95 m of total hover puts the ring
+    // IN the deck. Rest keeps a small skim; cruise and boost carry real air.
+    const dynamicHeight = boostActive ? 0.74 : speedMetersPerSecond < 11 ? 0.3 : 0.58;
     return dynamicHeight + 0.71;
   }
 
@@ -2531,8 +2534,10 @@ export class GreenwaterCourse implements RaceCourse {
     }
 
     const boostMaterial = new THREE.MeshBasicMaterial({
-      color: 0xc8ff2e,
-      toneMapped: false,
+      // P19: tone-mapped now. The pad was tone-mapping-exempt and read as a
+      // glowing slab parked on the road rather than a painted strip on it.
+      color: 0xb9e62e,
+      toneMapped: true,
     });
     const boostPads = new THREE.InstancedMesh(
       new THREE.BoxGeometry(1, 1, 1),

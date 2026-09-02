@@ -144,9 +144,9 @@
     ]
   },
   "boostPads": {
-    "note": "Four pads, all on the two authored straights - Q1 THE LONG PAN and L1 RETURN LEG. Bitterpan rewards commitment on the long stuff, so nothing is offered in a bend. Sides alternate so a pad is a line choice rather than a lane to sit in. Every pad clears its nearest checkpoint by at least 105 m and its nearest neighbour by at least 240 m.",
-    "halfLengthMetres": 10,
-    "lateralHalfFraction": 0.28,
+    "note": "Four pads, all on the two authored straights - Q1 THE LONG PAN and L1 RETURN LEG. Bitterpan rewards commitment on the long stuff, so nothing is offered in a bend. Sides alternate so a pad is a line choice rather than a lane to sit in. Every pad clears its nearest checkpoint by at least 105 m and its nearest neighbour by at least 240 m. P19 narrowed the footprint 0.28 -> 0.18 and shortened 10 -> 8 m: at the authored size the slab spanned the edge band and, tone-mapping-exempt, read as a glowing obstacle parked on the road instead of a painted strip in the lane.",
+    "halfLengthMetres": 8,
+    "lateralHalfFraction": 0.18,
     "minimumSpacingMetres": 40,
     "minimumCheckpointClearanceMetres": 60,
     "pads": [
@@ -341,15 +341,15 @@
     }
   },
   "lighting": {
-    "note": "Three sector profiles, one per accepted sector. The accepted post-readability-repair palettes are carried over unchanged - P8 adds the authored key direction and the lap ramp, it does not re-grade a look that was already accepted. The sun is high and hard because a salt pan at noon has no soft light in it: elevation falls 74 -> 69 -> 63 degrees and the azimuth swings 20 -> 38 -> 56 degrees around the lap, so the shadow direction turns visibly across the three basins and wraps back over the start line.",
+    "note": "Three sector profiles, one per accepted sector. P19 re-graded the pan for pigment: the fogs deepened (S1 #c7b997 -> #c4ad84, S2 #d5cfb9 -> #cec2a2) and thickened (0.00072 -> 0.0009, 0.00048 -> 0.00066, 0.00082 -> 0.00095) so distance has air in it, and S2's hemisphere fell 1.35 -> 1.15 while its key rose 1.45 -> 1.6, because the pale flat basin was the paleness complaint. The fog floor still clears every P18.2 horizon band luminance target. The sun stays high and hard because a salt pan at noon has no soft light in it: elevation falls 74 -> 69 -> 63 degrees and the azimuth swings 20 -> 38 -> 56 degrees around the lap, so the shadow direction turns visibly across the three basins and wraps back over the start line.",
     "crossfadeMetres": 90,
     "profiles": [
       {
         "sector": "S1",
         "name": "HARVEST BASIN",
         "distance": 60,
-        "sky": "#c9b994",
-        "ground": "#665c48",
+        "sky": "#c0a87f",
+        "ground": "#5f5340",
         "key": "#ffe0a8",
         "rim": "#d9904d",
         "hemisphereIntensity": 1.25,
@@ -363,20 +363,20 @@
           "z": -0.094273
         },
         "fog": {
-          "density": 0.00072,
-          "color": "#c7b997"
+          "density": 0.0009,
+          "color": "#c4ad84"
         }
       },
       {
         "sector": "S2",
         "name": "THE LONG BASIN",
         "distance": 1610,
-        "sky": "#d7d2bf",
-        "ground": "#6f6b60",
+        "sky": "#cbbfa6",
+        "ground": "#676052",
         "key": "#ffedc7",
         "rim": "#b6c3be",
-        "hemisphereIntensity": 1.35,
-        "keyIntensity": 1.45,
+        "hemisphereIntensity": 1.15,
+        "keyIntensity": 1.6,
         "rimIntensity": 0.55,
         "keyElevationDegrees": 69,
         "keyAzimuthDegrees": 38,
@@ -386,8 +386,8 @@
           "z": -0.220633
         },
         "fog": {
-          "density": 0.00048,
-          "color": "#d5cfb9"
+          "density": 0.00066,
+          "color": "#cec2a2"
         }
       },
       {
@@ -409,7 +409,7 @@
           "z": -0.376372
         },
         "fog": {
-          "density": 0.00082,
+          "density": 0.00095,
           "color": "#aeb8b2"
         }
       }

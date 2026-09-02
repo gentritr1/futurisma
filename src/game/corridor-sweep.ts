@@ -447,6 +447,10 @@ export const TALL_GEOMETRY_SPAN_METRES = 10;
  * An invisible boundary at a hazard you can visibly fly over is the exact feel
  * this phase exists to kill — and skimming a coil by 0.11 m is a near miss,
  * which is what the trip hazards are for.
+ *
+ * P19 raised the hover floor (the stabiliser ring needs ~0.9 m; see
+ * `vehicleHoverHeight`), so the minimum hover is now 1.01 m and the coil
+ * clearance is 0.23 m. The threshold stays 0.85 m — still under the floor.
  */
 export const TALL_GEOMETRY_MIN_HEIGHT_METRES = 0.85;
 

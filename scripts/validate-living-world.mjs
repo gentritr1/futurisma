@@ -190,7 +190,11 @@ const P18_ZONES = [
  * for. Luminance is Rec.709 on the raw 8-bit channels, which is what the eye
  * sorts these two surfaces by.
  */
-const BP_SECTOR_FOG_HEXES = ["#c7b997", "#d5cfb9", "#aeb8b2"];
+// P19: mirrors the P19 fog re-grade in BITTERPAN_PRODUCTION.json (S1
+// #c7b997 -> #c4ad84, S2 #d5cfb9 -> #cec2a2; S3 unchanged). The relational
+// assertion below is unchanged and still the point: every horizon band stays
+// darker than the darkest sector fog, now luma 174.9 (S1).
+const BP_SECTOR_FOG_HEXES = ["#c4ad84", "#cec2a2", "#aeb8b2"];
 const rec709 = (hex) => {
   const value = typeof hex === "number" ? hex : Number.parseInt(hex.slice(1), 16);
   return 0.2126 * ((value >> 16) & 0xff)

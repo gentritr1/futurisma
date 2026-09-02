@@ -272,7 +272,10 @@ const SECTOR_LABELS: Record<string, string> = {
   S2: "THE LONG BASIN",
   S3: "LOADOUT BASIN",
 };
-const BOOST_PAD_COLOR = new THREE.Color(0x77dce3);
+// P19: 0x77dce3 -> deeper. Under AgX tone mapping the old value still read as
+// a pale ice slab against the dark deck; this keeps the cyan identity at a
+// luminance the road can sit under.
+const BOOST_PAD_COLOR = new THREE.Color(0x49a9bd);
 const CABLE_COIL_COLOR = new THREE.Color(0xf06a32);
 const SALT_DRIFT_COLOR = new THREE.Color(0xe8e2cf);
 
@@ -860,7 +863,10 @@ export class BitterpanCourse implements RaceCourse {
   }
 
   vehicleHoverHeight(_speedMetersPerSecond: number, boostActive: boolean): number {
-    return boostActive ? 1.1 : 0.95;
+    // P19 hover clearance: the stabiliser ring bottoms out 0.892 m below the
+    // model origin, so the old 0.95/1.1 left the ring 0.06 m off the deck —
+    // touching it on any bank. These carry 0.29/0.45 m of ring clearance.
+    return boostActive ? 1.34 : 1.18;
   }
 
   setCheckpointProgress(nextCheckpointIndex: number): void {
@@ -1200,7 +1206,9 @@ export class BitterpanCourse implements RaceCourse {
       new THREE.MeshBasicMaterial({
         color: BOOST_PAD_COLOR,
         fog: true,
-        toneMapped: false,
+        // P19: tone-mapped now. Unmapped, the pad was a flat cyan slab glowing
+        // over the deck; mapped, it reads as paint under the same sun.
+        toneMapped: true,
       }),
       pads.pads.length,
     );

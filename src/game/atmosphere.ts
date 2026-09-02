@@ -19,7 +19,10 @@ import { publishTimeOfDayDrift } from "./time-of-day";
 /** The exposure the AgX path has run at since the renderer was set up. */
 // P11: 1.05 -> 1.10. A half-stop of headroom under AgX; the markers that now
 // opt out of tone mapping clip to glow rather than being rolled grey.
-const AGX_TONE_MAPPING_EXPOSURE = 1.1;
+// P19: 1.10 -> 1.04. The extra headroom was reading as milk — both maps graded
+// pale against their own assets. A touch under P11 keeps the glow markers
+// legible while the decks and pans keep their pigment.
+const AGX_TONE_MAPPING_EXPOSURE = 1.04;
 
 /**
  * P4b. `agx` keeps the 2023 filmic curve the project shipped with; `ps2`
@@ -222,10 +225,14 @@ export class RaceAtmosphere {
         varying vec3 vDirection;
         void main() {
           float h = normalize(vDirection).y;
-          vec3 color = mix(horizonColor, topColor, smoothstep(0.0, 0.42, h));
-          color = mix(color * 0.82, color, smoothstep(-0.12, 0.0, h));
+          // P19: the gradient used to reach the zenith only at h=0.42, which a
+          // chase camera never frames — the whole visible dome sat on the flat
+          // horizon fog colour and the sky read as one pale wash. The ramp now
+          // resolves inside the framed band, so there is real air overhead.
+          vec3 color = mix(horizonColor, topColor, smoothstep(-0.03, 0.26, h));
+          color = mix(color * 0.78, color, smoothstep(-0.12, 0.0, h));
           float band = exp(-pow((h - 0.035) * 16.0, 2.0));
-          color += bandColor * band * 0.52;
+          color += bandColor * band * 0.42;
           gl_FragColor = vec4(color, 1.0);
           #include <tonemapping_fragment>
           #include <colorspace_fragment>
@@ -365,7 +372,10 @@ export class RaceAtmosphere {
     // the sector rim hue so each sector gets a contrasting sky accent. The
     // horizon and zenith inherit the drift through the tinted fog colour; the
     // band takes it at reduced strength so the navigation accent stays legible.
-    this.skyTopTarget.copy(this.tintedFog).multiplyScalar(0.3).lerp(SKY_ZENITH_TINT, 0.45);
+    // P19: the zenith drop was 0.3/0.45 — barely darker than the horizon under
+    // a pale pan fog, which is why the sky read flat. A deeper multiplier and a
+    // harder pull toward the zenith tint restore the dome's vertical read.
+    this.skyTopTarget.copy(this.tintedFog).multiplyScalar(0.22).lerp(SKY_ZENITH_TINT, 0.55);
     this.skyBandTarget.setRGB(
       lighting.rim.r * (1 + (tint.keyR - 1) * 0.45),
       lighting.rim.g * (1 + (tint.keyG - 1) * 0.45),
