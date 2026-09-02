@@ -10,6 +10,21 @@ const HANGAR_ROUTE_HINT_PROGRESS = 0.28;
 const HANGAR_BARRIER_OUTWARD_SHIFT_METERS = 4;
 const EXPECTED_RELOCATED_HANGAR_COMPONENTS = 76;
 const EXPECTED_RELOCATED_HANGAR_VERTICES = 2_400;
+/**
+ * P20.1 — authored material families that must NOT cast.
+ *
+ * `GW_MAT_water` is the standing-water sheet: a body of water reading as an
+ * opaque occluder is worse than no shadow at all. `GW_MAT_emissive` is the lamp
+ * and glow geometry, which is the light in the fiction, sits coplanar with the
+ * walls it is mounted on (an acne source), and is the single largest family in
+ * GREENWATER_SWEEP and CANOPY_PASSAGE.
+ *
+ * Excluding them takes Greenwater's shadow pass from 41.5 to 37.5 draws a
+ * frame (43 -> 39 distinct casters), measured with
+ * scripts/visual/shadow-caster-probe.mjs on a demo lap.
+ */
+const NON_CASTING_MATERIALS = new Set(["GW_MAT_water", "GW_MAT_emissive"]);
+
 const REPLACED_PROCEDURAL_OBJECTS = [
   "greenwater_surface",
   "greenwater_understructure",
@@ -364,7 +379,13 @@ export class GreenwaterEnvironment {
           triangles: meshTriangles,
         });
         triangles += meshTriangles;
-        object.castShadow = false;
+        // P20.1. The sector meshes are the Greenwater deck AND the structures
+        // beside it, in one family per material, so this arms both the casters
+        // and the deck's own self-shadowing in a single flag — except for the
+        // two families in NON_CASTING_MATERIALS below.
+        object.castShadow = !NON_CASTING_MATERIALS.has(
+          (Array.isArray(object.material) ? object.material[0] : object.material)?.name,
+        );
         object.receiveShadow = true;
       });
       if (cullGroups.length !== EXPECTED_RUNTIME_MESHES) {

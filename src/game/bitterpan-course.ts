@@ -1067,6 +1067,14 @@ export class BitterpanCourse implements RaceCourse {
     });
     const mesh = new THREE.Mesh(geometry, material);
     mesh.name = "map02_route_deck_read_surface";
+    // P20.1. This overlay IS Bitterpan's drivable deck: the accepted blockout
+    // road under it is hidden, so it is the only surface the craft's contact
+    // shadow can land on. An unlit material cannot take a shadow, so when
+    // shadows are on `promoteUnlitShadowReceivers` in shadows.ts swaps this
+    // material for a shadow-only stand-in by mesh name — done there rather than
+    // here so the whole shadow decision lives in one module and this map's
+    // chunk carries no shadow code.
+    mesh.receiveShadow = true;
     return mesh;
   }
 
@@ -1251,6 +1259,9 @@ export class BitterpanCourse implements RaceCourse {
       CABLE_HAZARDS.length,
     );
     mesh.name = "map02_cable_coils";
+    // P20.1. A trip hazard the player is meant to see and avoid; a coil with no
+    // shadow reads as painted onto the deck rather than lying on it.
+    mesh.castShadow = true;
     const transform = new THREE.Object3D();
     const basis = new THREE.Matrix4();
     for (let index = 0; index < CABLE_HAZARDS.length; index += 1) {

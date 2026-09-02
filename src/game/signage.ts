@@ -357,7 +357,10 @@ export class TracksideSignage {
     });
     const boardMesh = new THREE.Mesh(boardGeometry, boardMaterial);
     boardMesh.name = course.kind === "bitterpan" ? "BP_SIGNAGE_BOARDS" : "GW_SIGNAGE_BOARDS";
-    boardMesh.castShadow = false;
+    // P20.1. The board is alpha-tested, and three's depth material carries
+    // `map` + `alphaTest` through to the shadow pass, so the shadow is the
+    // board's silhouette rather than its bounding rectangle.
+    boardMesh.castShadow = true;
     boardMesh.receiveShadow = false;
     root.add(boardMesh);
 
@@ -379,7 +382,7 @@ export class TracksideSignage {
       });
       const postMesh = new THREE.Mesh(postGeometry, postMaterial);
       postMesh.name = course.kind === "bitterpan" ? "BP_SIGNAGE_POSTS" : "GW_SIGNAGE_POSTS";
-      postMesh.castShadow = false;
+      postMesh.castShadow = true;
       postMesh.receiveShadow = false;
       root.add(postMesh);
       postTriangles = posts.indices.length / 3;

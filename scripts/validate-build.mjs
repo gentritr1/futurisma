@@ -40,9 +40,17 @@ assert.ok(
   javascript.rawBytes <= 950 * 1024,
   `Initial JavaScript exceeds 950 KiB raw (${(javascript.rawBytes / 1024).toFixed(1)} KiB).`,
 );
+// Re-baselined 2026-09-03 by P20.1 (directional shadow mapping): 224.2 -> 225.3
+// KiB gzip measured on this build, 8 initial chunks in both. The +1.1 KiB is
+// src/game/shadows.ts — the shadow settings, the texel-snapping maths and the
+// shadow-receiving stand-in material for Bitterpan's unlit deck overlay. An
+// earlier arrangement of the same code cost +2.0 KiB because seven lazy modules
+// imported it and Rollup promoted it to a shared chunk; the import surface was
+// cut to three call sites to buy that back, so this ceiling is 226 rather than
+// 227. Raise only with a fresh measurement and rationale.
 assert.ok(
-  javascriptGzip <= 225 * 1024,
-  `JavaScript bundle exceeds 225 KiB gzip (${(javascriptGzip / 1024).toFixed(1)} KiB).`,
+  javascriptGzip <= 226 * 1024,
+  `JavaScript bundle exceeds 226 KiB gzip (${(javascriptGzip / 1024).toFixed(1)} KiB).`,
 );
 // Re-baselined 2026-08-28 from a measured 4.35 KiB gzip (the 4 KiB ceiling predated
 // the HUD turn-cue and hazard styling) plus headroom for the planned minimap and
