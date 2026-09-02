@@ -939,6 +939,10 @@ export class SceneAssets {
       livingWorldError: this.livingWorldError,
       livingWorldDrawCalls: stats?.drawCalls ?? 0,
       livingWorldCards: stats?.cards ?? 0,
+      // P20.4. Authored cards say what exists; visible cards say what the
+      // driver can see. Bitterpan shipped 154 of the first and none of the
+      // second, and only this number would have caught it.
+      livingWorldVisibleCards: stats?.visibleCards ?? 0,
       livingWorldTriangles: stats?.triangles ?? 0,
       livingWorldUpdateHz: stats?.updateHz ?? 0,
       livingWorldUpdateSteps: stats?.updateSteps ?? 0,
