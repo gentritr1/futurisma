@@ -445,10 +445,19 @@ for (const pad of production.boostPads.pads) {
   });
 }
 
+// P20.2: the dash is a zero-thickness quad, not a box.
+//
+// It was `BoxGeometry(0.34, 0.055, 7.5)` centred at 0.075 m of lift, so it
+// occupied 0.0475..0.1025 m and showed a lit 5.5 cm wall edge-on to the chase
+// camera — a cream plank in the lane. It is now a flat plane at 0.055 m of
+// lift, which has no vertical extent at all: bottom and top are the same
+// number, and that number is the lift. The footprint half-width is unchanged
+// (the dash is still 0.34 m across); only the length and the height moved, and
+// the length is not modelled here.
 for (let distance = 12.5; distance < stations.total_length_m; distance += 25) {
   add({
     map: "bitterpan", class: "flat", id: "BP_CENTRE_DASH", distance, sample: bitterpanAt(distance),
-    lateral: 0, footprintHalfWidth: 0.17, bottomHeight: 0.0475, topHeight: 0.1025,
+    lateral: 0, footprintHalfWidth: 0.17, bottomHeight: 0.055, topHeight: 0.055,
   });
 }
 
