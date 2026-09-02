@@ -70,7 +70,7 @@ def analyse(path):
                 n += 1
         return total / n
 
-    best_row, best_step = 340, -1e9
+    best_row, best_step = 340, 0.0  # P20.4 review: was -1e9, which made the search dead code
     for y in range(260, 420, 4):
         step = band_mean(y - BAND) - band_mean(y)
         if abs(step) > abs(best_step):
