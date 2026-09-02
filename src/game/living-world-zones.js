@@ -23,10 +23,11 @@
 
 /**
  * @typedef {"mist" | "rise" | "puff" | "rain" | "ripple" | "flow" | "pendulum"
- *   | "shear" | "sequence" | "pulse" | "blink" | "devil" | "strobe"} CardKind
+ *   | "shear" | "sequence" | "pulse" | "blink" | "devil" | "strobe"
+ *   | "cross"} CardKind
  *
  * @typedef {"mist" | "rise" | "puff" | "rain" | "ripple" | "flow" | "devil"
- *   | "shimmer"} AlphaKind
+ *   | "shimmer" | "cross"} AlphaKind
  *
  * @typedef {object} AtlasRect
  * @property {number} x
@@ -48,11 +49,41 @@
  * @property {number} tint
  * @property {number} seed
  * @property {number} [amplitude] radians for `shear`/`pendulum`, orbit metres
- *   for `devil`
+ *   for `devil`, half the lateral traverse in metres for `cross`
  * @property {number} [hang] vertical reach: the pendulum anchor, or the climb
  *   height of a dust devil
  * @property {AlphaKind} [alphaKind]
  * @property {number} [alphaInitial]
+ * @property {boolean} [upright] P20.4. Whether this card samples the atlas cell
+ *   it NAMES.
+ *
+ *   It does not, by default, and that is a defect rather than a convention.
+ *   `atlasRect` measures `rect.y` in PNG rows from the TOP of the sheet, and
+ *   `living-world.ts` builds V straight off it (`v0 = rect.y / sheetSize`). But
+ *   the sheets are uploaded through `THREE.TextureLoader` with `flipY` left at
+ *   its default `true`, so V counts from the BOTTOM — and a cell in row `r` of
+ *   an N-row grid therefore resolves to row `N - 1 - r`, same column. On the
+ *   4x4 horizon sheet HAZE_BAND (slot 15) draws PYLON_RUN (slot 3) and
+ *   MESA_LONG (12) draws TREELINE_DENSE (0); on the 4x4 motion-B sheet
+ *   DUST_SCUD (13) draws BIRDS_B (1) and DEVIL_WISP_A (4) draws FLICKER_DEAD
+ *   (8); on the 2x2 motion sheet MIST (0) draws RAIN (2).
+ *
+ *   MEASURED, not deduced. Two independent reads, both in shots/p20.4/:
+ *   the horizon band renders visible lattice pylon masts with catenary wires
+ *   that vanish at `?living=0`, and its rendered alpha profile matches
+ *   PYLON_RUN's cell row for row while contradicting HAZE_BAND's. It is also
+ *   the reason the P9/P12 near-field set reads as nothing: a "dust scud" card
+ *   drawing a sparse bird cell has almost no coverage to show.
+ *
+ *   The fix is one line in `makeBatch`, and applying it globally would re-point
+ *   EVERY card on both maps — the 155 accepted Greenwater cards included —
+ *   which is out of scope for this phase and needs its own art review. So it is
+ *   opt-in per CARD: the five P20.4 zones set it, get the cells they name, and
+ *   every accepted card renders byte-identically to before. Per card rather
+ *   than per batch because the new zones ride the accepted `air` and `airB`
+ *   batches, and a batch of their own would cost a draw call.
+ *
+ *   A phase that fixes this properly deletes the flag and re-reviews both maps.
  *
  * @typedef {LivingCardSeed & { motionId: string, batch: string }} AuthoredCard
  *
@@ -137,6 +168,11 @@ export const CARD_KINDS = Object.freeze([
   "blink",
   "devil",
   "strobe",
+  // P20.4. Salt scud walking ACROSS the deck with the 292 deg wind. `flow`
+  // travels ALONG the centreline and lies flat; nothing in the set could move a
+  // camera-facing card sideways over the road, which is the one motion the
+  // driver's seat actually catches.
+  "cross",
 ]);
 
 /** Kinds whose colour is driven by `updateLampColors`, not by an envelope. */
@@ -155,6 +191,12 @@ export const ALPHA_ENVELOPES = Object.freeze({
   // P9. Heat off the pan is barely there — this is the quietest envelope in the
   // set on purpose, because the shimmer sits over the whole Bitterpan straight.
   shimmer: [0.05, 0.17],
+  // P20.4. A crossing scud is born at one shoulder and gone at the other, so it
+  // shares the traverse clock exactly (`sin(pi * progress)` on the SAME
+  // `t * speed + phase` sawtooth the motion uses) and the sawtooth reset lands
+  // on alpha 0. The ceiling is 0.32: a card that crosses the racing line below
+  // 6 m has to stay under the 0.35 corridor cap by construction, not by review.
+  cross: [0, 0.32],
 });
 
 /**
@@ -1502,6 +1544,337 @@ export const BITTERPAN_ZONES_C = Object.freeze([
   },
 ]);
 
+// ===========================================================================
+// P20.4 — the air crosses the road. APPEND ONLY, same rule as P12 and P18.
+//
+// The P9/P12 Bitterpan set was authored "deliberately sparse, far off the deck
+// and large in scale": nothing it draws is closer than 24 m outboard, so at
+// 300 km/h from the chase camera NONE of it crosses the frame. Thirteen station
+// screenshots of the P19 build show no living-world card at all. Greenwater
+// reads because its mist, rain, glints and fronds are at the kerb (0-12 m).
+//
+// This block brings four things INSIDE the near field and adds one far one:
+//   PAN_SCUD_NEAR      2-14 m outboard, the motion the eye catches at speed
+//   PAN_SCUD_CROSSING  walks over the racing line on the new `cross` motion
+//   SALT_DEVIL_ROAD    one devil whose orbit reaches the deck, once a lap
+//   BRINE_HAZE_LOW     the wet basin breathing, 6-30 m outboard
+//   PAN_SKY_HAZE       the band that separates sky from ground at the horizon
+//
+// The corridor rule these are authored against, asserted card by card in
+// validate-living-world.mjs: `lateral` is measured OUTBOARD OF `halfWidth`
+// (living-world.ts: `offset = sample.halfWidth + card.lateral`), and the
+// drivable corridor on open pan is `halfWidth + 5.8` — so half-width cancels
+// and "inside the corridor" is exactly `lateral <= 5.8`, at every station, with
+// no course data needed. A card that reaches inside it below 6 m of deck height
+// must peak at alpha <= 0.35. Every zone below satisfies that through its
+// ENVELOPE (rise 0.34, devil 0.26, cross 0.32) rather than through a per-card
+// number a later edit could drift.
+// ===========================================================================
+
+/**
+ * The three windows PAN_SCUD_NEAR fills: the long pan, the sweep pair, and the
+ * return leg. A LivingZone carries one span, so the zone advertises 160-2120 m
+ * and each card picks its window off `index` — the SALT_DUST_DEVILS precedent
+ * for a zone whose stations are structural rather than evenly spread.
+ */
+const SCUD_NEAR_WINDOWS = Object.freeze([
+  [160, 630],
+  [1000, 1600],
+  [1640, 2120],
+]);
+
+/** THE LONG PAN and RETURN LEG, the two places a scud has room to cross. */
+const SCUD_CROSS_WINDOWS = Object.freeze([
+  [200, 600],
+  [1700, 2100],
+]);
+
+/**
+ * P20.4 sky haze tint, computed here rather than picked.
+ *
+ * The three Bitterpan sector fogs (BITTERPAN_PRODUCTION.json lighting.profiles,
+ * as re-graded in P19) are S1 #c4ad84, S2 #cec2a2, S3 #aeb8b2 — Rec.709 luma
+ * 174.9 / 194.3 / 181.4, mean colour (192.0, 183.7, 157.3) at luma 183.5.
+ *
+ * The band has to sit under the DARKEST of the three or its contrast changes
+ * sign from sector to sector, which is the exact failure P18.2 re-authored the
+ * HORIZON_BANDS table for. Target = 174.9 - 15 = 159.9; scaling the mean fog
+ * colour by 159.9 / 183.5 = 0.8712 gives (167.3, 160.0, 137.1), and cooling it
+ * (red down, blue up, ~5 counts each way, hue only) lands on
+ *
+ *   0xa2a091 = (162, 160, 145), luma 159.3
+ *
+ * which is 15.6 under S1, 34.9 under S2 and 22.1 under S3 — inside the 12-18
+ * band against the darkest fog, and under all three. validate-living-world.mjs
+ * asserts the "under the darkest sector fog" half of that.
+ */
+const BP_SKY_HAZE_TINT = 0xa2a091;
+
+/** @type {readonly LivingBatchSpec[]} */
+export const BITTERPAN_BATCHES_D = Object.freeze([
+  {
+    // The second fog exemption on the map, and it is the same argument
+    // `horizonAir` already carries: this batch IS the far-field air, so fogging
+    // it multiplies the effect by itself and the horizon goes milky.
+    //
+    // It is a SEPARATE batch from `horizonAir` for two reasons that are both
+    // render state, not taste. `horizonAir` is ADDITIVE, and an additive card
+    // can only ever add light — it cannot put a value BELOW the sky behind it,
+    // which is the whole job here. And `horizon` alpha-tests at 0.5, which
+    // erases a soft band whose own cell peaks at alpha 0.53. Normal blending,
+    // no alpha test, no fog: +1 draw call, and the only one this phase spends.
+    id: "skyHaze",
+    meshName: "BP_LIVING_SKY_HAZE",
+    texture: "horizon",
+    blending: "normal",
+    depthWrite: false,
+    fog: false,
+    alphaTest: 0,
+    lamps: false,
+  },
+]);
+
+/** @type {readonly LivingZone[]} */
+export const BITTERPAN_ZONES_D = Object.freeze([
+  {
+    /**
+     * Near-field salt scud, 2-14 m outboard of the deck edge — the first cards
+     * on this map inside the distance the chase camera actually resolves at
+     * 300 km/h. `shear` rather than `flow`, because `flow` writes a FLAT
+     * ground-plane quad (writeFlatCard) that is edge-on to a camera looking
+     * down the road and therefore invisible; `shear` is camera-facing and leans
+     * with the 292 deg wind, which is the read the blockout authored.
+     *
+     * CELLS, MEASURED. The brief named DUST_SCUD / VAPOR_THIN and those cells
+     * cannot carry a near-field read: sampled off greenwater_motion_b_512,
+     * DUST_SCUD is 12.8% covered with a 0.029 MEAN alpha and VAPOR_THIN 56.3%
+     * at 0.042, against MIST 53.4% at 0.167 and STEAM 64.6% at 0.226 on the
+     * first motion sheet. At the 0.34 envelope ceiling below, a DUST_SCUD card
+     * averages 1% opacity — and a diagnostic pass that forced these cards to
+     * flat magenta at vertex alpha 1.0 still rendered a barely-visible smudge
+     * (shots/p20.4/garish). MIST and STEAM are six to eight times denser, are
+     * the cells SALT_DUST_DEVILS already uses for dry lifted crust, and put the
+     * zone on the `air` batch, which costs no draw call either way.
+     *
+     * Alpha rides the `rise` envelope (peak 0.34) rather than `mist` (0.46):
+     * the inner cards sit at lateral 2-5.8 m, inside the drivable corridor and
+     * below 6 m, so 0.35 is a hard ceiling and the envelope is what holds it.
+     * The envelope's birth-and-dissolve shape also gives the scud a life rather
+     * than a loop, which is what separates it from PAN_CRUST_SCUD above.
+     */
+    id: "PAN_SCUD_NEAR",
+    batch: "air",
+    from: 160,
+    to: 2120,
+    cards: 34,
+    card: (_distance, side, index, next) => {
+      const window = SCUD_NEAR_WINDOWS[index % 3];
+      const slot = Math.floor(index / 3);
+      return {
+        kind: "shear",
+        distance: window[0] + (window[1] - window[0]) * (slot + 0.5) / 12,
+        side,
+        lateral: 2 + next() * 12,
+        base: 0.2 + next() * 1.2,
+        width: 6 + next() * 8,
+        height: 1.2 + next() * 1.4,
+        phase: next() * TAU,
+        speed: 0.09 + next() * 0.05,
+        amplitude: degToRad(6.5),
+        rect: index % 3 === 2 ? MOTION_RECTS.steam : MOTION_RECTS.mist,
+        upright: true,
+        tint: 0xe6dcc4,
+        seed: next(),
+        alphaKind: "rise",
+        alphaInitial: ALPHA_ENVELOPES.rise[0],
+      };
+    },
+  },
+  {
+    /**
+     * Scud that crosses the racing line. This is the one card in the set the
+     * driver cannot miss, so it is also the one held hardest: the `cross`
+     * envelope peaks at 0.32, under the 0.35 corridor cap, and both ends of the
+     * traverse are alpha 0 so the sawtooth reset is never seen.
+     *
+     * `amplitude` is half the traverse. The anchor sits at `halfWidth + lateral`
+     * outboard, so an amplitude of 34 m carries the card from ~34 m beyond its
+     * own shoulder to ~9 m past the far edge of the deck, over 1 / speed = 9 s.
+     */
+    id: "PAN_SCUD_CROSSING",
+    batch: "air",
+    from: 200,
+    to: 2100,
+    cards: 10,
+    card: (_distance, side, index, next) => {
+      const window = SCUD_CROSS_WINDOWS[index % 2];
+      const slot = Math.floor(index / 2);
+      return {
+        kind: "cross",
+        distance: window[0] + (window[1] - window[0]) * (slot + 0.5) / 5,
+        side,
+        lateral: 8 + next() * 6,
+        base: 0.3 + next() * 0.6,
+        width: 10 + next() * 8,
+        height: 2.2 + next() * 1.4,
+        phase: next(),
+        speed: 1 / 9,
+        amplitude: 34,
+        rect: MOTION_RECTS.mist,
+        upright: true,
+        tint: 0xe2d8bf,
+        seed: next(),
+        alphaKind: "cross",
+        alphaInitial: ALPHA_ENVELOPES.cross[0],
+      };
+    },
+  },
+  {
+    /**
+     * The devil that walks onto the road, at the CONE ROW SWEEP entry. The four
+     * at 58 m outboard stay where they are; this is one column on the SAME
+     * SALT_DEVIL_CORE idiom whose orbit centre is the deck edge (lateral 0) and
+     * whose orbit radius reaches 16 m, so the column crosses the deck rather
+     * than standing beside it.
+     *
+     * The corridor rule is answered on the ALPHA side, not the height side: the
+     * lowest card bases at 1.4 m, well under 6 m, and the `devil` envelope
+     * peaks at 0.26 — the quietest ceiling in the set and comfortably under
+     * 0.35. Lifting it above 6.5 m instead was the alternative and it is the
+     * wrong one here: a dust devil that starts above head height is not a dust
+     * devil, it is a cloud.
+     */
+    id: "SALT_DEVIL_ROAD",
+    batch: "air",
+    from: 1198,
+    to: 1240,
+    cards: 4,
+    card: (_distance, _side, index, next) => ({
+      kind: "devil",
+      distance: 1210 + index * 5,
+      side: -1,
+      lateral: 0,
+      base: 1.4 + index * 5.2,
+      width: 6 + index * 2.2,
+      height: 11 + index * 3.5,
+      phase: index * 1.05,
+      speed: TAU / 8.5,
+      amplitude: 16,
+      hang: 12,
+      rect: index % 2 === 0 ? MOTION_RECTS.steam : MOTION_RECTS.mist,
+      upright: true,
+      tint: 0xded5bd,
+      seed: next(),
+      alphaKind: "devil",
+      alphaInitial: ALPHA_ENVELOPES.devil[0],
+    }),
+  },
+  {
+    /**
+     * WET PAN BEND into BRINE CUT is the only wet ground on the map, and it is
+     * the one sector allowed to look humid. Wide, low, slow: 28-44 m of card
+     * 2-4 m tall lying 6-30 m outboard, so the basin breathes without any of it
+     * reaching the corridor (lateral floor 6 m clears the 5.8 m edge).
+     *
+     * `mist` drift for the motion and the `rise` envelope for the alpha, whose
+     * 0.34 peak is under the 0.4 the sector can carry before the pan stops
+     * reading as open. The two clocks are deliberately the same `card.speed`,
+     * so a card is brightest in the middle of its own drift.
+     */
+    id: "BRINE_HAZE_LOW",
+    batch: "air",
+    from: 2600,
+    to: 2960,
+    cards: 16,
+    card: (distance, side, _index, next) => ({
+      kind: "mist",
+      distance,
+      side,
+      lateral: 6 + next() * 24,
+      base: 0.1 + next() * 0.5,
+      width: 28 + next() * 16,
+      height: 2 + next() * 2,
+      phase: next() * TAU,
+      speed: 0.1 + next() * 0.04,
+      rect: MOTION_RECTS.mist,
+      upright: true,
+      tint: 0xd9e0dc,
+      seed: next(),
+      alphaKind: "rise",
+      alphaInitial: ALPHA_ENVELOPES.rise[0],
+    }),
+  },
+  {
+    /**
+     * The horizon band. PAN_HAZE_BAND (P18, `horizonAir`) is EXTENDED rather
+     * than replaced — it stays exactly as authored, seven additive cards at
+     * 700-820 m that tint the far field — because retiring it would move the
+     * seeded stream. What it cannot do is separate sky from ground: it is
+     * additive, so it can only add light to both, and at 700-820 m with an 18-26
+     * m card it lands well under the horizon line from most stations.
+     *
+     * This zone is the continuous ring: 30 cards at 1320-1500 m, each 300-480 m
+     * wide (>= 260 m), standing from ~8 m to ~168 m above the deck. That is
+     * roughly 0.2-6.8 deg of elevation at 1400 m and still covers 0.4-5.2 deg at
+     * the 1800 m far plane, so the band brackets the horizon row from every
+     * station rather than only from the ones a card happens to face. The bottom
+     * edge stays ABOVE eye level at every distance, which is the property that
+     * keeps it out of the ground band it is supposed to contrast against.
+     *
+     * `shear` at 0.06 deg is a stand-still: this is tone, and tone that drifts
+     * reads as cloud. No alphaKind, so the vertex alpha below is the constant
+     * the material draws with; the cell's own alpha peaks at 0.53, so the band
+     * lands at ~0.40 effective at its densest and fades to nothing upward.
+     *
+     * SEVENTY-TWO IS A MEASURED NUMBER, NOT A ROUND ONE. The card count was
+     * swept against frame-metrics.py's sky band (rows 308-331) on matched race
+     * poses, shots/p20.4/timed-live vs timed-nolive at clock 21299 ms:
+     *
+     *   30 cards @ alpha 0.66   sky band -2.3 luma
+     *   72 cards @ alpha 0.75   sky band -7.0 luma
+     *  150 cards @ alpha 0.75   sky band -7.5 luma   <- saturated
+     *
+     * The ceiling is COVERAGE, not opacity: the band's dense rows only fill
+     * about a third of that 24-row window, so past ~72 cards more ring buys
+     * fill rate and nothing else. 72 is the knee — 93% of the saturated effect
+     * for half the overdraw of 150.
+     */
+    id: "PAN_SKY_HAZE",
+    batch: "skyHaze",
+    from: 0,
+    to: 3050,
+    cards: 72,
+    card: (distance, side, _index, next) => {
+      // Authored as BOTTOM EDGE + height, then converted, because `base` on a
+      // centred batch is the card's middle and the thing that has to hold is
+      // where the band's bottom lands: above the chase camera's eye, or the
+      // band drops under the horizon line and darkens the ground it exists to
+      // separate from. Drawing base and height independently let the bottom
+      // wander to -2 m, which is how this was first authored and what
+      // validate-living-world.mjs now refuses.
+      const bottom = 10 + next() * 4;
+      const height = 140 + next() * 40;
+      return {
+        kind: "shear",
+        distance,
+        side,
+        lateral: 1320 + next() * 180,
+        base: bottom + height / 2,
+        width: 300 + next() * 180,
+        height,
+        phase: next() * TAU,
+        speed: TAU / 22,
+        amplitude: degToRad(0.06),
+        rect: HORIZON_RECTS.hazeBand,
+        upright: true,
+        tint: BP_SKY_HAZE_TINT,
+        seed: next(),
+        alphaInitial: 0.75,
+      };
+    },
+  },
+]);
+
 /**
  * @type {LivingWorldSpec}
  *
@@ -1534,9 +1907,11 @@ export const BITTERPAN_LIVING_WORLD = Object.freeze({
   courseLength: 3050,
   batches: Object.freeze([
     ...BITTERPAN_BATCHES, ...BITTERPAN_BATCHES_B, ...BITTERPAN_BATCHES_C,
+    ...BITTERPAN_BATCHES_D,
   ]),
   zones: Object.freeze([
     ...BITTERPAN_ZONES, ...BITTERPAN_ZONES_B, ...BITTERPAN_ZONES_C,
+    ...BITTERPAN_ZONES_D,
   ]),
 });
 
