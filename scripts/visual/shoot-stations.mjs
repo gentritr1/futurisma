@@ -1,9 +1,10 @@
 // Visual review harness (not part of the shipped game).
 //
 // Drives a demo lap and screenshots at FIXED course distances, so two builds
-// can be compared station by station. Polls #futurisma-diagnostics at 40 ms
-// (~3.5 m of travel at top speed) and fires when distanceMeters crosses the
-// next station. Requires `demo=1&diagnostics=1&autostart=1` on the URL.
+// can be compared station by station. Polls #futurisma-diagnostics, which the
+// game refreshes at ~1 Hz (up to ~90 m of travel), and fires when
+// distanceMeters lands inside [station, station + 110 m). Space stations at
+// least 150 m apart; compare frames by station, not by exact metre. Requires `demo=1&diagnostics=1&autostart=1` on the URL.
 //
 // Usage: node scripts/visual/shoot-stations.mjs <url> <outDir> [stations]
 //   stations: comma list of metres, default per map (read from the URL).
@@ -58,7 +59,7 @@ while (next < stations.length && Date.now() < deadline) {
       console.log(`lap wrap at ${lastD} -> ${diag.d}, ${stations.length - next} stations left`);
     }
     lastD = diag.d;
-    if (diag.d >= stations[next] && diag.d < stations[next] + 60) {
+    if (diag.d >= stations[next] && diag.d < stations[next] + 110) {
       const file = `${outDir}/st-${String(stations[next]).padStart(4, "0")}.png`;
       await page.screenshot({ path: file });
       results.push({ station: stations[next], ...diag, file });
@@ -67,7 +68,7 @@ while (next < stations.length && Date.now() < deadline) {
       continue;
     }
     // Overshot (e.g. spawn past the station): skip it rather than wait a lap.
-    while (next < stations.length && diag.d >= stations[next] + 60 && diag.d - stations[next] < 500) {
+    while (next < stations.length && diag.d >= stations[next] + 110 && diag.d - stations[next] < 500) {
       console.log(`skip station ${stations[next]} (already at ${diag.d})`);
       next += 1;
     }

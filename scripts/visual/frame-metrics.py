@@ -43,7 +43,7 @@ def analyse(path):
     w, h = im.size
     world = im.crop(WORLD)
     ww, wh = world.size
-    data = list(world.getdata())
+    data = list(world.getdata())  # noqa
 
     # --- flat%: modal colour at 4-level quantisation, then radius-10 census.
     hist = {}
