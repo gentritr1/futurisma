@@ -3,6 +3,7 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { ASSET_KIT_PROP_PLACEMENTS } from "./asset-kit-layout";
 import type { BitterpanSurface } from "./bitterpan-surface";
+import type { BitterpanMidground } from "./bitterpan-midground";
 import type { CorridorSweepResult } from "./corridor-sweep";
 import type {
   CourseRelocationStats,
@@ -70,6 +71,33 @@ const CORRIDOR_SWEEP_EXCLUDED_NAMES: ReadonlySet<string> = new Set([
   // once cannot say anything useful about geometry that moves every frame, and
   // a transparent scud card is not something the craft drives into.
   "GW_LIVING_RUNTIME",
+  // P20.3 — the SAME class, on the map the original entry forgot.
+  //
+  // Only the Greenwater root was listed, so Bitterpan's identical card layer
+  // stayed in the sweep and its drift landed in the DERIVED PHYSICS TABLE.
+  // Measured, not inferred: re-deriving `map02/DRIVABLE_LIMITS.json` from a
+  // fresh capture on the committed tip produced FIVE limited spans against the
+  // committed three, the two extra ones set by `BP_LIVING_AIR_B` at 1610 m and
+  // `BP_LIVING_HORIZON` at 2960 m — a drifting scud card and a horizon card,
+  // neither of which is anything the craft can drive into. With this line the
+  // derivation reproduces the committed table byte-for-byte.
+  //
+  // That is a pre-existing bug, not one this phase introduced; it is fixed here
+  // because P20.3's acceptance is "the limit table is byte-identical after a
+  // re-derivation with the new layer present", and a table that is not
+  // reproducible from its own inputs cannot answer that question either way.
+  "BP_LIVING_RUNTIME",
+  // P20.3 — the Bitterpan mid-ground dressing layer.
+  //
+  // 569 instanced props in the 3-120 m band outboard of the deck. Every one is
+  // authored outside `halfWidth + apronWidth + 1.5 m` and the generator asserts
+  // it, so nothing here is inside the sweep's reach in the first place. The
+  // exclusion is the SECOND guarantee, not the only one: a fence post is 2.2 m
+  // tall, the sweep promotes anything over 0.85 m to a physics boundary, and a
+  // single bad regeneration would otherwise put an invisible wall over open
+  // salt pan. Two independent locks, because either alone is one rename or one
+  // re-run away from the P16 bug.
+  "BP_MIDGROUND",
 ]);
 
 /**
@@ -276,6 +304,9 @@ export class SceneAssets {
   signage: TracksideSignage | null = null;
   /** P15: the Bitterpan pan crust + set dressing, and the Hangar Six backings. */
   bitterpanSurface: BitterpanSurface | null = null;
+
+  /** P20.3: the Bitterpan mid-ground dressing layer. Bitterpan only. */
+  bitterpanMidground: BitterpanMidground | null = null;
   plaqueBacking: HangarPlaqueBacking | null = null;
   /** P18: the two layers that sample futurisma_trim_512. */
   signageBacks: SignageBackPanels | null = null;
@@ -286,6 +317,10 @@ export class SceneAssets {
   private bitterpanSurfaceLoadMs: number | null = null;
   private bitterpanSurfaceReady = false;
   private bitterpanSurfaceError: string | null = null;
+
+  private midgroundLoadMs: number | null = null;
+  private midgroundReady = false;
+  private midgroundError: string | null = null;
   private plaqueBackingLoadMs: number | null = null;
   private plaqueBackingReady = false;
   private plaqueBackingError: string | null = null;
@@ -345,6 +380,7 @@ export class SceneAssets {
           this.loadLivingWorld({}),
           this.loadSignage(),
           this.loadBitterpanSurface(),
+          this.loadBitterpanMidground(),
           this.loadTrimLayers(),
         ]);
         return;
@@ -548,6 +584,42 @@ export class SceneAssets {
       console.warn("Bitterpan pan-surface layer failed to load.", error);
     } finally {
       this.bitterpanSurfaceLoadMs = performance.now() - loadStartedAt;
+    }
+  }
+
+  /**
+   * P20.3. The mid-ground dressing in the 3-120 m band outboard of the deck —
+   * post-and-cable runs, salt windrows, lifted crust plates, brine-line
+   * trestles and drum clusters. Bitterpan only; Greenwater's equivalent band is
+   * already dense with kerbs, fences, lamp posts and vegetation cards.
+   *
+   * Loaded alongside the surface layer rather than after it: the two share no
+   * state beyond `GROUND_Y_METRES`, which is a module constant and not a load
+   * result, so serialising them would only cost a round trip.
+   */
+  private async loadBitterpanMidground(): Promise<void> {
+    const loadStartedAt = performance.now();
+    try {
+      const { BitterpanMidground } = await import("./bitterpan-midground");
+      const midground = await BitterpanMidground.load(
+        this.course,
+        BITTERPAN_FACADES_TEXTURE_URL,
+      );
+      if (this.isDisposed()) {
+        midground.dispose();
+        return;
+      }
+      this.bitterpanMidground = midground;
+      this.scene.add(midground.root);
+      this.midgroundReady = true;
+      this.requestRender();
+    } catch (error) {
+      this.midgroundError = error instanceof Error
+        ? error.message
+        : "Unknown Bitterpan midground load error";
+      console.warn("Bitterpan mid-ground layer failed to load.", error);
+    } finally {
+      this.midgroundLoadMs = performance.now() - loadStartedAt;
     }
   }
 
@@ -840,7 +912,26 @@ export class SceneAssets {
     const band = this.roadEdgeBand?.stats;
     const facades = (this.authoredEnvironment as { facades?: { stats: FacadeStats } | null })
       ?.facades?.stats;
+    // P20.3. The frustum count is taken HERE rather than on a race-loop tick:
+    // the layer is static, `game.ts` is at its seam budget, and this line
+    // refreshes at ~1 Hz, which is inside the phase's <= 4 Hz sampling rule.
+    this.bitterpanMidground?.refreshVisibility(this.camera);
+    const midground = this.bitterpanMidground;
     return {
+      // P20.3 art pass 04 — the mid-ground band. Nested rather than flattened
+      // because the acceptance reads `midground.visibleInstances` directly, and
+      // because every other counter here would have to grow a `midground`
+      // prefix to say the same thing. Same reasoning as every art-pass counter
+      // below: none of it is interactive, so the ONLY automated evidence that
+      // the layer is in the scene is these numbers reading nonzero.
+      midgroundLoadMs: this.midgroundLoadMs === null
+        ? null
+        : Number(this.midgroundLoadMs.toFixed(1)),
+      midgroundReady: this.midgroundReady,
+      midgroundError: this.midgroundError,
+      midground: midground
+        ? midground.diagnostics()
+        : { drawCalls: 0, instances: 0, triangles: 0, families: 0, visibleInstances: 0 },
       // P18 art pass 03. Same reasoning as every art-pass counter above: none
       // of this is interactive, so a soak whose layer silently failed has
       // identical lap times, faults and frame timing to one where it rendered.
