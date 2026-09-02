@@ -54,6 +54,36 @@
  *   height of a dust devil
  * @property {AlphaKind} [alphaKind]
  * @property {number} [alphaInitial]
+ * @property {boolean} [upright] P20.4. Whether this card samples the atlas cell
+ *   it NAMES.
+ *
+ *   It does not, by default, and that is a defect rather than a convention.
+ *   `atlasRect` measures `rect.y` in PNG rows from the TOP of the sheet, and
+ *   `living-world.ts` builds V straight off it (`v0 = rect.y / sheetSize`). But
+ *   the sheets are uploaded through `THREE.TextureLoader` with `flipY` left at
+ *   its default `true`, so V counts from the BOTTOM — and a cell in row `r` of
+ *   an N-row grid therefore resolves to row `N - 1 - r`, same column. On the
+ *   4x4 horizon sheet HAZE_BAND (slot 15) draws PYLON_RUN (slot 3) and
+ *   MESA_LONG (12) draws TREELINE_DENSE (0); on the 4x4 motion-B sheet
+ *   DUST_SCUD (13) draws BIRDS_B (1) and DEVIL_WISP_A (4) draws FLICKER_DEAD
+ *   (8); on the 2x2 motion sheet MIST (0) draws RAIN (2).
+ *
+ *   MEASURED, not deduced. Two independent reads, both in shots/p20.4/:
+ *   the horizon band renders visible lattice pylon masts with catenary wires
+ *   that vanish at `?living=0`, and its rendered alpha profile matches
+ *   PYLON_RUN's cell row for row while contradicting HAZE_BAND's. It is also
+ *   the reason the P9/P12 near-field set reads as nothing: a "dust scud" card
+ *   drawing a sparse bird cell has almost no coverage to show.
+ *
+ *   The fix is one line in `makeBatch`, and applying it globally would re-point
+ *   EVERY card on both maps — the 155 accepted Greenwater cards included —
+ *   which is out of scope for this phase and needs its own art review. So it is
+ *   opt-in per CARD: the five P20.4 zones set it, get the cells they name, and
+ *   every accepted card renders byte-identically to before. Per card rather
+ *   than per batch because the new zones ride the accepted `air` and `airB`
+ *   batches, and a batch of their own would cost a draw call.
+ *
+ *   A phase that fixes this properly deletes the flag and re-reviews both maps.
  *
  * @typedef {LivingCardSeed & { motionId: string, batch: string }} AuthoredCard
  *
@@ -78,30 +108,6 @@
  * @property {boolean} fog
  * @property {number} alphaTest 0 disables the alpha test
  * @property {boolean} lamps emissive batch: colour is driven per frame
- * @property {boolean} [cellsUpright] P20.4. Whether this batch's cards sample
- *   the atlas row they NAME.
- *
- *   They do not, by default, and that is a defect rather than a convention.
- *   `atlasRect` measures `rect.y` in PNG rows from the TOP of the sheet, and
- *   `living-world.ts` builds V straight off it (`v0 = rect.y / sheetSize`). But
- *   the sheets are uploaded through `THREE.TextureLoader` with `flipY` left at
- *   its default `true`, so V counts from the BOTTOM — and a slot in row `r` of
- *   an N-row grid therefore resolves to row `N - 1 - r`. Slot 15 (HAZE_BAND)
- *   draws slot 3 (PYLON_RUN); slot 12 (MESA_LONG) draws slot 0
- *   (TREELINE_DENSE), which is a treeline on a salt pan.
- *
- *   MEASURED, not deduced: with this zone set at `?living=1` the horizon band
- *   renders visible lattice pylon masts with catenary wires, and the alpha
- *   profile of the rendered band matches PYLON_RUN's cell row for row while
- *   contradicting HAZE_BAND's. See shots/p20.4/.
- *
- *   The fix is one line in `makeBatch`, and applying it globally would re-point
- *   EVERY card on both maps — the 155 accepted Greenwater cards included — which
- *   is out of scope for this phase and needs its own art review. So it is opt-in
- *   per batch: `skyHaze` (P20.4) is the only batch that sets it, gets the cell
- *   it names, and every accepted batch renders byte-identically to before.
- *   A phase that fixes this properly deletes the flag and re-reviews both maps.
- *
  * @property {"bottom"} [anchor] P18.1. Where `base` puts the card.
  *
  *   The card system has always CENTRED a quad on `sample.position.y + base`,
@@ -1617,12 +1623,6 @@ export const BITTERPAN_BATCHES_D = Object.freeze([
     // which is the whole job here. And `horizon` alpha-tests at 0.5, which
     // erases a soft band whose own cell peaks at alpha 0.53. Normal blending,
     // no alpha test, no fog: +1 draw call, and the only one this phase spends.
-    //
-    // `cellsUpright` because this batch has to draw HAZE_BAND and, without it,
-    // slot 15 resolves to slot 3 and the "haze band" renders as a row of
-    // lattice pylons — see the LivingBatchSpec doc for the measurement. The
-    // only batch on either map that sets it, on purpose: every other batch
-    // keeps the cell it has been drawing since it was accepted.
     id: "skyHaze",
     meshName: "BP_LIVING_SKY_HAZE",
     texture: "horizon",
@@ -1631,7 +1631,6 @@ export const BITTERPAN_BATCHES_D = Object.freeze([
     fog: false,
     alphaTest: 0,
     lamps: false,
-    cellsUpright: true,
   },
 ]);
 
@@ -1646,6 +1645,17 @@ export const BITTERPAN_ZONES_D = Object.freeze([
      * down the road and therefore invisible; `shear` is camera-facing and leans
      * with the 292 deg wind, which is the read the blockout authored.
      *
+     * CELLS, MEASURED. The brief named DUST_SCUD / VAPOR_THIN and those cells
+     * cannot carry a near-field read: sampled off greenwater_motion_b_512,
+     * DUST_SCUD is 12.8% covered with a 0.029 MEAN alpha and VAPOR_THIN 56.3%
+     * at 0.042, against MIST 53.4% at 0.167 and STEAM 64.6% at 0.226 on the
+     * first motion sheet. At the 0.34 envelope ceiling below, a DUST_SCUD card
+     * averages 1% opacity — and a diagnostic pass that forced these cards to
+     * flat magenta at vertex alpha 1.0 still rendered a barely-visible smudge
+     * (shots/p20.4/garish). MIST and STEAM are six to eight times denser, are
+     * the cells SALT_DUST_DEVILS already uses for dry lifted crust, and put the
+     * zone on the `air` batch, which costs no draw call either way.
+     *
      * Alpha rides the `rise` envelope (peak 0.34) rather than `mist` (0.46):
      * the inner cards sit at lateral 2-5.8 m, inside the drivable corridor and
      * below 6 m, so 0.35 is a hard ceiling and the envelope is what holds it.
@@ -1653,7 +1663,7 @@ export const BITTERPAN_ZONES_D = Object.freeze([
      * than a loop, which is what separates it from PAN_CRUST_SCUD above.
      */
     id: "PAN_SCUD_NEAR",
-    batch: "airB",
+    batch: "air",
     from: 160,
     to: 2120,
     cards: 34,
@@ -1671,7 +1681,8 @@ export const BITTERPAN_ZONES_D = Object.freeze([
         phase: next() * TAU,
         speed: 0.09 + next() * 0.05,
         amplitude: degToRad(6.5),
-        rect: index % 3 === 2 ? MOTION_B_RECTS.vaporThin : MOTION_B_RECTS.dustScud,
+        rect: index % 3 === 2 ? MOTION_RECTS.steam : MOTION_RECTS.mist,
+        upright: true,
         tint: 0xe6dcc4,
         seed: next(),
         alphaKind: "rise",
@@ -1691,7 +1702,7 @@ export const BITTERPAN_ZONES_D = Object.freeze([
      * own shoulder to ~9 m past the far edge of the deck, over 1 / speed = 9 s.
      */
     id: "PAN_SCUD_CROSSING",
-    batch: "airB",
+    batch: "air",
     from: 200,
     to: 2100,
     cards: 10,
@@ -1709,7 +1720,8 @@ export const BITTERPAN_ZONES_D = Object.freeze([
         phase: next(),
         speed: 1 / 9,
         amplitude: 34,
-        rect: MOTION_B_RECTS.dustScud,
+        rect: MOTION_RECTS.mist,
+        upright: true,
         tint: 0xe2d8bf,
         seed: next(),
         alphaKind: "cross",
@@ -1733,7 +1745,7 @@ export const BITTERPAN_ZONES_D = Object.freeze([
      * devil, it is a cloud.
      */
     id: "SALT_DEVIL_ROAD",
-    batch: "airB",
+    batch: "air",
     from: 1198,
     to: 1240,
     cards: 4,
@@ -1749,7 +1761,8 @@ export const BITTERPAN_ZONES_D = Object.freeze([
       speed: TAU / 8.5,
       amplitude: 16,
       hang: 12,
-      rect: index % 2 === 0 ? MOTION_B_RECTS.devilWispA : MOTION_B_RECTS.devilWispB,
+      rect: index % 2 === 0 ? MOTION_RECTS.steam : MOTION_RECTS.mist,
+      upright: true,
       tint: 0xded5bd,
       seed: next(),
       alphaKind: "devil",
@@ -1784,6 +1797,7 @@ export const BITTERPAN_ZONES_D = Object.freeze([
       phase: next() * TAU,
       speed: 0.1 + next() * 0.04,
       rect: MOTION_RECTS.mist,
+      upright: true,
       tint: 0xd9e0dc,
       seed: next(),
       alphaKind: "rise",
@@ -1852,6 +1866,7 @@ export const BITTERPAN_ZONES_D = Object.freeze([
         speed: TAU / 22,
         amplitude: degToRad(0.06),
         rect: HORIZON_RECTS.hazeBand,
+        upright: true,
         tint: BP_SKY_HAZE_TINT,
         seed: next(),
         alphaInitial: 0.75,

@@ -198,37 +198,9 @@ const P18_ZONES = [
 const P20_BATCHES = {
   greenwater: [],
   bitterpan: [
-    { id: "skyHaze", meshName: "BP_LIVING_SKY_HAZE", texture: "horizon", blending: "normal", depthWrite: false, fog: false, alphaTest: 0, lamps: false, cellsUpright: true },
+    { id: "skyHaze", meshName: "BP_LIVING_SKY_HAZE", texture: "horizon", blending: "normal", depthWrite: false, fog: false, alphaTest: 0, lamps: false },
   ],
 };
-
-/**
- * P20.4 - `cellsUpright` is opt-in and stays opt-in.
- *
- * `atlasRect` counts `rect.y` in PNG rows from the TOP; the sheets upload with
- * three.js `flipY` at its default `true`, so V counts from the BOTTOM and a
- * slot in grid row `r` resolves to row `N - 1 - r`. HAZE_BAND (slot 15) draws
- * PYLON_RUN (slot 3); MESA_LONG (slot 12) draws TREELINE_DENSE (slot 0), which
- * is a treeline on a salt pan. That is a real defect, measured rather than
- * deduced, and it is written up in living-world-zones.js.
- *
- * It is NOT fixed globally here, and the assertion below is what says so out
- * loud: fixing it re-points every card on both maps, the 155 accepted Greenwater
- * ones included, and that needs its own art review rather than a quiet
- * ride-along in a Bitterpan phase. Exactly one batch opts in - the one P20.4
- * adds - so the accepted layer renders byte-identically and the defect stays
- * visible to the next phase instead of being half-fixed.
- */
-for (const [map, spec] of Object.entries(LIVING_WORLD_SPECS)) {
-  const upright = spec.batches.filter((batch) => batch.cellsUpright);
-  assert.deepEqual(
-    upright.map((batch) => batch.id),
-    map === "bitterpan" ? ["skyHaze"] : [],
-    `${spec.id} changed which batches sample the atlas row they name. Turning `
-      + "this on for an existing batch re-points accepted art; turning it off "
-      + "for skyHaze puts lattice pylons back in the horizon haze.",
-  );
-}
 
 /**
  * P20.4 zones, pinned the way P9's, P12's and P18's are, plus `kind` — because
@@ -238,9 +210,9 @@ for (const [map, spec] of Object.entries(LIVING_WORLD_SPECS)) {
  * which is the exact class of mistake the P9 Bitterpan set shipped.
  */
 const P20_ZONES = [
-  { id: "PAN_SCUD_NEAR", map: "bitterpan", batch: "airB", from: 160, to: 2120, cards: 34, kind: "shear", digest: "c3350d6fdc44fdbe" },
-  { id: "PAN_SCUD_CROSSING", map: "bitterpan", batch: "airB", from: 200, to: 2100, cards: 10, kind: "cross", digest: "f612bd02840dece7" },
-  { id: "SALT_DEVIL_ROAD", map: "bitterpan", batch: "airB", from: 1198, to: 1240, cards: 4, kind: "devil", digest: "7022596fe0fc97b5" },
+  { id: "PAN_SCUD_NEAR", map: "bitterpan", batch: "air", from: 160, to: 2120, cards: 34, kind: "shear", digest: "0b6ec69406d3f2f7" },
+  { id: "PAN_SCUD_CROSSING", map: "bitterpan", batch: "air", from: 200, to: 2100, cards: 10, kind: "cross", digest: "2b6527873de789cb" },
+  { id: "SALT_DEVIL_ROAD", map: "bitterpan", batch: "air", from: 1198, to: 1240, cards: 4, kind: "devil", digest: "2b43c2d58b760d98" },
   { id: "BRINE_HAZE_LOW", map: "bitterpan", batch: "air", from: 2600, to: 2960, cards: 16, kind: "mist", digest: "42cadeead47e65dc" },
   { id: "PAN_SKY_HAZE", map: "bitterpan", batch: "skyHaze", from: 0, to: 3050, cards: 72, kind: "shear", digest: "2f1081bb5769ae93" },
 ];
@@ -957,6 +929,65 @@ for (const authored of P20_ZONES) {
     `${authored.id} no longer authors the cards this validator pinned.`,
   );
 }
+
+/**
+ * P20.4 - `upright` is opt-in and stays opt-in.
+ *
+ * `atlasRect` counts `rect.y` in PNG rows from the TOP; the sheets upload with
+ * three.js `flipY` at its default `true`, so V counts from the BOTTOM and a
+ * slot in grid row `r` resolves to row `N - 1 - r`. HAZE_BAND (slot 15) draws
+ * PYLON_RUN (slot 3); MESA_LONG (slot 12) draws TREELINE_DENSE (slot 0), which
+ * is a treeline on a salt pan. That is a real defect, measured rather than
+ * deduced, and it is written up in living-world-zones.js.
+ *
+ * It is NOT fixed globally here, and the assertion below is what says so out
+ * loud: fixing it re-points every card on both maps, the 155 accepted Greenwater
+ * ones included, and that needs its own art review rather than a quiet
+ * ride-along in a Bitterpan phase. Exactly one batch opts in - the one P20.4
+ * adds - so the accepted layer renders byte-identically and the defect stays
+ * visible to the next phase instead of being half-fixed.
+ */
+for (const [map, world] of Object.entries(built)) {
+  const uprightZones = [...new Set(world.batches
+    .flatMap((batch) => batch.cards)
+    .filter((card) => card.upright)
+    .map((card) => card.motionId))].sort();
+  const expected = P20_ZONES
+    .filter((zone) => zone.map === map)
+    .map((zone) => zone.id)
+    .sort();
+  assert.deepEqual(
+    uprightZones,
+    expected,
+    `${map} changed which zones sample the atlas cell they name. Turning this `
+      + "on for an existing zone re-points accepted art; turning it off for a "
+      + "P20.4 zone puts birds back in the salt scud and lattice pylons back in "
+      + "the horizon haze.",
+  );
+  // Every card of an opted-in zone, not just some of them: a zone whose author
+  // sets the flag on one branch of a ternary and not the other renders half its
+  // cards from a different cell and looks like a deliberate mix.
+  for (const zone of expected) {
+    const cards = world.batches
+      .flatMap((batch) => batch.cards)
+      .filter((card) => card.motionId === zone);
+    assert.ok(
+      cards.every((card) => card.upright === true),
+      `${zone} authors ${cards.filter((card) => !card.upright).length} cards `
+        + "without `upright`, so the zone draws from two different atlas cells.",
+    );
+  }
+}
+
+// ... and the runtime has to implement it, or the flag is data nothing reads.
+assert.ok(
+  readFileSync(
+    new URL("../src/game/living-world.ts", import.meta.url),
+    "utf8",
+  ).includes("card.upright"),
+  "living-world.ts never reads `upright`, so the P20.4 zones would silently "
+    + "render the mirrored atlas cell the accepted zones render.",
+);
 
 // The corridor rule, asserted over every Bitterpan card rather than only the
 // new ones — the failure it prevents is not "the P20.4 zones are wrong", it is

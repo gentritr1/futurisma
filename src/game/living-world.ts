@@ -118,16 +118,21 @@ function makeBatch(
     const u0 = (rect.x + padding) / rect.sheetSize;
     const v0 = (rect.y + padding) / rect.sheetSize;
     const size = (rect.size - padding * 2) / rect.sheetSize;
-    // P20.4 — `cellsUpright`. See the LivingBatchSpec docs: `rect.y` counts PNG
-    // rows from the TOP, three.js uploads these sheets with `flipY` (the
-    // default), and V therefore counts from the BOTTOM, so `v0 = rect.y / size`
-    // resolves the vertically MIRRORED row of the atlas grid. A batch that opts
-    // in gets the row it named; every batch that does not is left exactly as it
+    // P20.4 — `upright`. See the LivingCardSeed docs: `rect.y` counts PNG rows
+    // from the TOP, three.js uploads these sheets with `flipY` (the default),
+    // and V therefore counts from the BOTTOM, so `v0 = rect.y / sheetSize`
+    // resolves the vertically MIRRORED row of the atlas grid. A card that opts
+    // in gets the cell it named; every card that does not is left exactly as it
     // renders today, because those cards are accepted art.
-    const vBottom = spec.cellsUpright
+    //
+    // Per CARD rather than per batch on purpose: the new zones ride the
+    // accepted `air` and `airB` batches, so a batch-wide flag would have
+    // re-pointed PAN_CRUST_SCUD and SALT_DEVIL_CORE along with them, and a
+    // batch of their own would have cost a draw call this phase does not have.
+    const vBottom = card.upright
       ? 1 - (rect.y + rect.size - padding) / rect.sheetSize
       : v0 + size;
-    const vTop = spec.cellsUpright
+    const vTop = card.upright
       ? 1 - (rect.y + padding) / rect.sheetSize
       : v0;
     const uvQuad = [
