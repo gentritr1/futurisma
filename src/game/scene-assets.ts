@@ -191,6 +191,13 @@ function mergeStaticSceneByMaterial(source: THREE.Object3D): THREE.Group {
     mergedRoot.add(new THREE.Mesh(geometry, bucket.material));
   }
   if (fallbackMeshes.length > 0) mergedRoot.add(...fallbackMeshes);
+  // P20.1. The asset-kit dressing is trackside furniture; it casts for the same
+  // reason the authored massing does. Set on the merged root's own meshes,
+  // because the source objects these were baked from are discarded above.
+  for (const child of mergedRoot.children) {
+    child.castShadow = true;
+    child.receiveShadow = true;
+  }
   return mergedRoot;
 }
 

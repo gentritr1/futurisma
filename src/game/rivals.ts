@@ -426,7 +426,11 @@ export class RivalFleet {
       );
       mesh.name = `rival_${batch.role.toLowerCase()}_${batch.group}`;
       mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-      mesh.castShadow = false;
+      // P20.1. An InstancedMesh casts every instance from one depth draw, so
+      // the whole field costs one extra call in the shadow pass. Receiving is
+      // still off: the rivals carry their own emissive read and a shadow across
+      // a rival hull at 300 km/h is noise, not information.
+      mesh.castShadow = true;
       mesh.receiveShadow = false;
       mesh.frustumCulled = false;
       if (batch.role === "TOTEM_body") {

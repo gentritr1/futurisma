@@ -194,7 +194,13 @@ function countVisibleMeshes(root: THREE.Object3D): {
       object.geometry.index?.count
       ?? object.geometry.getAttribute("position").count
     ) / 3;
-    object.castShadow = false;
+    // P20.1: the massing families are the site. Self-shadowing on them is
+    // wanted — a brine tank with no shadow side reads as a decal. Gated on
+    // `visible` like the counts above, which is what keeps the hidden blockout
+    // road out of the shadow pass: this runs once at load, after the blockout
+    // has been hidden and before `updateVisibility` has culled anything, so
+    // every mesh that will ever be drawn is armed here.
+    object.castShadow = true;
     object.receiveShadow = true;
   });
   return { meshes, triangles };

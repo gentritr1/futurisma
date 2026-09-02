@@ -74,6 +74,7 @@ import {
   preferredPixelRatioFor,
   reconcilePixelRatioAfterResize,
 } from "./render-quality";
+import { configureShadowMap } from "./shadows";
 import { applyRaceLivery, recordFinishedRace } from "./meta-runtime";
 import { save } from "./persistence";
 import { playerRaceDistanceMeters as calculatePlayerRaceDistance } from "./rival-race.js";
@@ -316,7 +317,7 @@ export class FuturismaGame {
     });
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     configureToneMapping(this.renderer);
-    this.renderer.shadowMap.enabled = false;
+    configureShadowMap(this.renderer); // P20.1. See shadows.ts for the kill switch.
     this.ui.setRaceFormat(
       this.totalLaps,
       this.course.length,

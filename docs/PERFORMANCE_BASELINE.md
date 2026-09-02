@@ -658,3 +658,46 @@ satisfies the roadmap's `1.80 s ± 0.02 s` criterion, but only on the exact
 `validate-physics.mjs` therefore measures the crossing from the slope the
 integrator itself produces, and separately asserts that slope is constant. If
 exactly 1.800 s is wanted, the rate is `0.5556 /s`.
+
+## P20.1 — directional shadow mapping: the draw-call ceiling amended
+
+The 120-call complete-scene ceiling quoted above was set when the renderer ran
+`shadowMap.enabled = false`. P20.1 turns on one orthographic shadow camera on
+the key light, which re-renders every caster into a depth-only pass before the
+main pass. That pass is invisible to the number the ceiling was written against:
+in three r184 `WebGLShadowMap.render()` runs **before** `this.info.reset()`
+inside `WebGLRenderer.render`, so `renderer.info.render.calls` — the source of
+every `calls` figure in this document and in the diagnostics line — excludes the
+shadow pass entirely. A reviewer comparing `calls` before and after this phase
+will see no change, and that is an instrument limitation, not an absence of cost.
+
+Measured on the 1280 × 720 headless demo lap (`scripts/visual/diag.mjs`), with
+the shadow-pass draws counted separately by hooking `Object3D.onBeforeShadow`
+(`scripts/visual/shadow-caster-probe.mjs`):
+
+| | Bitterpan | Greenwater |
+| --- | --- | --- |
+| Peak `calls` (main pass, as reported) | 71 | 99 |
+| Shadow-pass draws per frame (mean over 181 frames) | 32.0 | 37.5 |
+| **True peak draw calls** | **103** | **~137** |
+| p95 frame time, shadows off | 8.2 ms | 8.0 ms |
+| p95 frame time, shadows on, 2048 map | 8.0 ms | 8.1 ms |
+| p95 frame time, shadows on, 1024 map | 8.0 ms | 8.3 ms |
+| Lap time, shadows off / on | 38.775 s / 38.775 s | 34.483 s / 34.483 s |
+
+**The complete-scene ceiling is therefore amended to 145 draw calls**, from 120,
+for the shadow-enabled path only. The reason it is a defensible raise rather
+than a budget breach: the added calls are depth-only, share a single depth
+material, bind no textures except on the four alpha-tested facade families, and
+write no colour. The instrument that the ceiling is a proxy for — frame time —
+does not move: p95 is within 0.3 ms of the shadows-off figure on both maps at
+either map size, and the 1024/2048 difference is inside run-to-run noise, so the
+2048 map is kept for its 6.8 cm texel. `?shadows=0` returns the render and the
+call count to the pre-phase figures exactly (71 peak on Bitterpan, 100 on
+Greenwater), so the pre-amendment ceiling still governs that path.
+
+Two families are deliberately excluded from casting on Greenwater,
+`GW_MAT_water` and `GW_MAT_emissive` — a water sheet reading as an opaque
+occluder is worse than no shadow, and the emissive strips are the light in the
+fiction and sit coplanar with the walls they are mounted on. That exclusion is
+what takes Greenwater's shadow pass from 41.5 to 37.5 draws a frame.
