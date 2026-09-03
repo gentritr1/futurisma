@@ -8,6 +8,14 @@ import {
 } from "./hud-presentation.js";
 import { DRIFT_REWARD_MINIMUM_CHARGE, SLIPSTREAM_LOCK_THRESHOLD } from "./physics";
 import { resolveReducedMotion } from "./query-probes";
+import {
+  RACE_MODE_LABELS,
+  RIVAL_TIER_LABELS,
+  SECTOR_DELTA_HOLD_MS,
+  deltaTone,
+  formatDeltaSeconds,
+} from "./race-modes-rules.js";
+import type { RaceResultSummary } from "./race-modes";
 
 /**
  * G2 round 2 - where the contact glow steps from a brush to a firm lean.
@@ -202,6 +210,12 @@ export class GameUi {
   private readonly cleanChain = requiredElement<HTMLElement>("clean-chain");
   private lastCushionState = "";
   private lastCleanChainLabel = "";
+  /** G4 - the per-gate delta flash, the live chip and the result stats. */
+  private readonly sectorDelta = requiredElement<HTMLElement>("sector-delta");
+  private readonly deltaChip = requiredElement<HTMLElement>("delta-chip");
+  private readonly deltaChipValue = requiredElement<HTMLElement>("delta-chip-value");
+  private readonly resultStats = requiredElement<HTMLElement>("result-stats");
+  private sectorDeltaUntil = 0;
   private readonly errorPanel = requiredElement<HTMLElement>("error-panel");
   private readonly errorMessage = requiredElement<HTMLElement>("error-message");
   private lastLapLabel = "";
@@ -232,6 +246,22 @@ export class GameUi {
   /** The course half of the intro footer, kept so a livery swap can rebuild it
    * without re-running `setRaceFormat`. */
   private courseFooterLabel = "GREENWATER FIELD RACE";
+  /** The course half on its own, so the format half can be swapped without
+   * having to parse it back out of the joined string. */
+  private courseFooterName = "GREENWATER";
+  /**
+   * G4 — the format half of that footer, which used to be the literal string
+   * `FIELD RACE` baked into the line above.
+   *
+   * That was true while there was only one format and became a lie the moment
+   * there were three: the paddock screenshot showed `SPRINT` selected in the
+   * chip row with `GREENWATER STRIP FIELD RACE` printed underneath it. Held as
+   * its own field rather than passed into `setRaceFormat` because the two are
+   * set from opposite directions — `MetaUi` knows the format and the race loop
+   * knows the course — and `setRaceFormat` rebuilds the line from both, so
+   * whichever arrives second does not clobber the first.
+   */
+  private raceFormatLabel = "FIELD RACE";
   private readonly reducedMotion = window.matchMedia(
     "(prefers-reduced-motion: reduce)",
   ).matches;
@@ -265,7 +295,8 @@ export class GameUi {
       ? `Four ships. ${lapLabel} through Greenwater Strip. Follow the amber turn markers, clear all eight gates, and bring TOTEM home through The Cradle.`
       : `Four ships. ${lapLabel} through ${course.mapName}. Follow the amber turn markers, clear all ${course.checkpointCount} sector gates, and bring TOTEM home through ${course.finishName}.`;
     this.courseName.textContent = `${course.mapName.toUpperCase()} / ${course.mapCode}`;
-    this.courseFooterLabel = `${course.mapName.toUpperCase()} FIELD RACE`;
+    this.courseFooterName = course.mapName.toUpperCase();
+    this.courseFooterLabel = `${this.courseFooterName} ${this.raceFormatLabel}`;
     this.introFooter.textContent = `${this.playerLiveryLabel} · ${this.courseFooterLabel}`;
     document.title = `FUTURISMA · ${course.mapName}`;
     this.checkpointValue.textContent = `NEXT GATE 01 / ${course.checkpointCount
@@ -287,6 +318,16 @@ export class GameUi {
    * starting-grid list and the classification line so the whole panel follows
    * the chosen issue instead of naming a works car that is no longer on track.
    */
+  /**
+   * G4 — the format the paddock footer names. Called by `MetaUi`, which is the
+   * only thing that knows which format was dispatched.
+   */
+  setRaceModeLabel(label: string): void {
+    this.raceFormatLabel = label;
+    this.courseFooterLabel = `${this.courseFooterName} ${label}`;
+    this.introFooter.textContent = `${this.playerLiveryLabel} · ${this.courseFooterLabel}`;
+  }
+
   setPlayerLivery(label: string, grid: readonly RaceGridEntry[]): void {
     this.playerLiveryLabel = label;
     this.introFooter.textContent = `${label} · ${this.courseFooterLabel}`;
@@ -366,12 +407,20 @@ export class GameUi {
     position = 1,
     racerCount = 1,
     standings: readonly RaceStandingEntry[] = [],
-    newBestLap = false,
+    summary: RaceResultSummary | null = null,
   ): void {
+    const newBestLap = summary?.newBestLap ?? false;
     this.resultTime.textContent = formatRaceTime(elapsedMs);
-    this.resultDetail.textContent = `${formatRacePosition(position, racerCount)} · TOTEM / ${
-      this.playerLiveryLabel
-    } · ${totalLaps} ${
+    // G4 — the format and the field the time was set against, ahead of the
+    // classification. A 2-lap sprint time and a 5-lap race time are different
+    // numbers about different things, and a screen that printed them the same
+    // way would be inviting the player to compare them.
+    const format = summary
+      ? `${RACE_MODE_LABELS[summary.mode]} · ${RIVAL_TIER_LABELS[summary.tier]} · `
+      : "";
+    this.resultDetail.textContent = `${format}${
+      formatRacePosition(position, racerCount)
+    } · TOTEM / ${this.playerLiveryLabel} · ${totalLaps} ${
       totalLaps === 1 ? "LAP" : "LAPS"
     } LOGGED · BEST ${formatRaceTime(bestLapMs)}`;
     // P7 — the flash and the file are decided by one comparison in the save
@@ -379,6 +428,7 @@ export class GameUi {
     this.resultBest.hidden = !newBestLap;
     this.resultBest.dataset.active = newBestLap ? "true" : "false";
     this.updateResultClassification(standings, lapTimesMs, bestLapMs);
+    this.updateResultStats(summary);
     this.resultScreen.hidden = false;
     this.countdown.textContent = "";
     this.countdown.dataset.paused = "false";
@@ -525,6 +575,38 @@ export class GameUi {
     this.hazardUntil = performance.now() + durationMs;
   }
 
+  /**
+   * G4 — a gate's delta against the stored best lap.
+   *
+   * Held for {@link SECTOR_DELTA_HOLD_MS} and cleared by `update`, which is the
+   * same discipline the gate-clear flash beside it uses rather than a second
+   * timer of its own. `tone` rather than the raw sign, because the runtime has
+   * already applied the dead band and the text and the colour must be decided
+   * once: a chip reading `0.00` in orange would be saying two different things.
+   */
+  flashSectorDelta(label: string, tone: "none" | "level" | "up" | "down"): void {
+    this.sectorDeltaUntil = performance.now() + SECTOR_DELTA_HOLD_MS;
+    this.sectorDelta.textContent = label;
+    this.sectorDelta.dataset.tone = tone;
+    this.sectorDelta.hidden = false;
+    this.sectorDelta.setAttribute("aria-hidden", "false");
+  }
+
+  /**
+   * G4 — the time-attack live delta, or `null` to take the chip off the HUD.
+   *
+   * Written only when the runtime says the value moved, so this does not need
+   * its own change guard: `RaceModes.updateLiveDelta` holds the call to 4 Hz
+   * AND drops a repeat of the same label, which is the pair of conditions the
+   * slipstream chip and the boost meter apply to themselves.
+   */
+  setLiveDelta(label: string | null, tone: "none" | "level" | "up" | "down"): void {
+    this.deltaChip.hidden = label === null;
+    if (label === null) return;
+    this.deltaChipValue.textContent = label;
+    this.deltaChip.dataset.tone = tone;
+  }
+
   announcePosition(position: number, gained: boolean): void {
     this.setSystemStatus(`${gained ? "POSITION GAINED" : "POSITION LOST"} · P${position}`);
   }
@@ -541,6 +623,13 @@ export class GameUi {
       && performance.now() >= this.impactFlashUntil
     ) {
       this.impactFlash.dataset.active = "false";
+    }
+    // G4 — the gate delta expires on the HUD's own clock, like the gate-clear
+    // flash above it, rather than owning a timer that would keep running while
+    // the race is paused.
+    if (!this.sectorDelta.hidden && performance.now() >= this.sectorDeltaUntil) {
+      this.sectorDelta.hidden = true;
+      this.sectorDelta.setAttribute("aria-hidden", "true");
     }
     this.speedValue.textContent = Math.round(frame.speedKph).toString().padStart(3, "0");
     this.timeValue.textContent = formatRaceTime(frame.elapsedMs);
@@ -838,6 +927,13 @@ export class GameUi {
     this.cleanChain.hidden = true;
     this.cleanChain.setAttribute("aria-hidden", "true");
     this.lastCleanChainLabel = "";
+    // G4 — a gate delta in flight is race state too, and the result screen is
+    // not a race. The live chip is NOT cleared here: it is owned by the format
+    // rather than by the race, and `RaceModes.reset` is what puts it back to
+    // `—` for the next run.
+    this.sectorDelta.hidden = true;
+    this.sectorDelta.setAttribute("aria-hidden", "true");
+    this.sectorDeltaUntil = 0;
   }
 
   private hideLapEvent(): void {
@@ -862,6 +958,68 @@ export class GameUi {
       fragment.append(row);
     }
     this.gridOrder.replaceChildren(fragment);
+  }
+
+  /**
+   * G4 — the six figures under the classification.
+   *
+   * All six were already being measured and then dropped at the finish line:
+   * near misses and the clean chain are G2's, slipstream seconds are G1's, top
+   * speed is the race loop's own. The screen does not compute anything — it is
+   * handed a summary the runtime composed from those contributors, which is why
+   * `game.ts` did not have to grow to feed it.
+   *
+   * The time-attack delta is appended rather than always present, because in a
+   * field race there is no previous best of this format to be up or down on
+   * until one exists, and a permanent `—` is a row that never says anything.
+   */
+  private updateResultStats(summary: RaceResultSummary | null): void {
+    this.resultStats.hidden = summary === null;
+    if (!summary) return;
+    const rows: [string, string, Record<string, string>][] = [
+      [
+        "BEST LAP",
+        summary.bestLapMs === null ? "—" : formatRaceTime(summary.bestLapMs),
+        summary.newBestLap ? { earned: "true" } : {},
+      ],
+      [
+        "NEAR MISSES",
+        summary.nearMisses.toString().padStart(2, "0"),
+        summary.nearMisses > 0 ? { earned: "true" } : {},
+      ],
+      [
+        "CLEAN CHAIN",
+        `×${summary.cleanGateChain}`,
+        summary.cleanGateChain > 1 ? { earned: "true" } : {},
+      ],
+      ["SLIPSTREAM", `${summary.slipstreamSeconds.toFixed(2)} S`, {}],
+      ["TOP SPEED", `${Math.round(summary.topSpeedKph)} KM/H`, {}],
+    ];
+    if (summary.mode === "timeattack") {
+      // Against the record as it stood BEFORE this race, which is the only
+      // comparison that means anything once the file has already been updated:
+      // measuring against the new best would print 0.00 on every personal best.
+      const delta = summary.previousBestLapMs !== null && summary.bestLapMs !== null
+        ? summary.bestLapMs - summary.previousBestLapMs
+        : null;
+      rows.push([
+        "VS PREVIOUS BEST",
+        formatDeltaSeconds(delta),
+        { tone: deltaTone(delta) },
+      ]);
+    }
+    const fragment = document.createDocumentFragment();
+    for (const [label, value, flags] of rows) {
+      const group = document.createElement("div");
+      const term = document.createElement("dt");
+      const detail = document.createElement("dd");
+      term.textContent = label;
+      detail.textContent = value;
+      for (const [key, flag] of Object.entries(flags)) detail.dataset[key] = flag;
+      group.append(term, detail);
+      fragment.append(group);
+    }
+    this.resultStats.replaceChildren(fragment);
   }
 
   private updateResultClassification(

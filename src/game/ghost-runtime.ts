@@ -25,7 +25,8 @@ import {
   type GhostRecording,
 } from "./ghost.js";
 import { save } from "./persistence";
-import { probeSelected, searchFlag } from "./query-probes";
+import { probeSelected } from "./query-probes";
+import { raceModes } from "./race-modes";
 import type { TotemRivalVisualBatch } from "./totem";
 
 /** Mirrors `game.ts`'s own constant. The recorder's rate is derived from it. */
@@ -142,9 +143,29 @@ class GhostRuntime {
 
   /**
    * Builds the mesh and returns it for the caller to add to the scene. Returns
-   * an empty group — no mesh, no draw call, no recording — under `?demo` or any
-   * `?probe=`, because a showcase reel and a headless probe are not races and
-   * must not be able to write a personal best.
+   * an empty group — no mesh, no draw call, no recording — under any `?probe=`,
+   * because a headless probe is not a race and must not be able to write a
+   * personal best.
+   *
+   * G4 DROPPED `?demo` FROM THAT GATE, and the reason is that it was only ever
+   * half applied. A demo run already writes a personal best: `recordFinishedRace`
+   * has never been demo-gated, so the showcase reel has always been able to put
+   * a lap time on file — the gate stopped the REPLAY of that lap from being
+   * stored beside it. The result was a save holding a `bestLapMs` whose ghost
+   * was either missing or belonged to some earlier lap, which is precisely the
+   * "a ghost that outlived the time it belongs to" failure `save-schema.js`
+   * warns about, arrived at from the other direction.
+   *
+   * The two now agree: a run that may set a best lap may store the ghost of
+   * that lap, and a probe may do neither. It also makes `timeattack` a mode
+   * that works at all under the autopilot, which is the only way it can be
+   * soaked headlessly.
+   *
+   * The cost is bounded and was measured rather than argued: on a fresh profile
+   * the first demo race finds no stored ghost, so `player` stays null, the mesh
+   * stays invisible and `ghostDrawCalls` is 0 — the `race` soak's draw calls
+   * and lap times are unchanged. Only a second run in the same browser profile
+   * pays the +1 draw call, and it pays it for a ghost the player earned.
    */
   attach(course: RaceCourse, vehicle: GhostGeometrySource): THREE.Object3D {
     this.root.clear();
@@ -157,7 +178,7 @@ class GhostRuntime {
     this.bestOfRaceMs = null;
     this.triangles = 0;
     this.recorder.reset();
-    this.enabled = !searchFlag("demo") && !isProbeRun();
+    this.enabled = !isProbeRun();
     if (!this.enabled) return this.root;
     const batches = vehicle.createRivalVisualBatches();
     try {
@@ -192,8 +213,12 @@ class GhostRuntime {
     this.bestOfRaceMs = null;
     this.lap = 1;
     this.lapSteps = 0;
+    // G4 — keyed by format as well as course. A time attack replays the fastest
+    // time-attack lap; a sprint replays a sprint lap. Sharing one ghost across
+    // formats would put a 5-lap race line on screen as the target for a 2-lap
+    // defence, which is a different race.
     this.player = this.enabled && this.course
-      ? createGhostPlayer(save.ghostFor(this.course.mapCode))
+      ? createGhostPlayer(save.ghostFor(this.course.mapCode, raceModes.ghostKey))
       : null;
     if (this.mesh) this.mesh.visible = this.player !== null;
   }

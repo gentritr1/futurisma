@@ -63,6 +63,17 @@
           <span class="telemetry__sub">
             <span id="position-value">P1 / 4</span> · <span id="gap-value">FIELD LEAD</span>
           </span>
+          <!--
+            G4 live delta. Time attack only, and it takes the slot the position
+            ladder occupies in a field race - which is the point: alone against
+            the clock, the stored best lap IS the field, so the readout that
+            says where you are against it belongs where "where you are against
+            them" already lives.
+          -->
+          <span id="delta-chip" class="delta-chip" data-tone="none" hidden>
+            <span class="delta-chip__label">VS BEST</span>
+            <strong id="delta-chip-value">—</strong>
+          </span>
         </section>
 
         <section class="race-progress" aria-label="Course progress">
@@ -74,6 +85,15 @@
               chain, so a normal lap never carries a "x1" that means nothing.
             -->
             <span id="clean-chain" class="clean-chain" aria-hidden="true" hidden></span>
+            <!--
+              G4 sector delta. Sits beside the clean-gate chain because both are
+              gate verdicts and both are earned by the same crossing; it speaks
+              the same register, one line of mono, hidden until there is a
+              record to measure against. Orange is slower and cyan is faster,
+              and the sign carries it too so the pair never depends on colour
+              alone.
+            -->
+            <span id="sector-delta" class="sector-delta" aria-hidden="true" hidden></span>
             <span id="finish-value">12.6 KM TO FINISH</span>
           </div>
           <span id="sector-value" class="sector-value">RUNWAY 09</span>
@@ -171,6 +191,24 @@
               ></div>
             </div>
             <div class="dispatch__row">
+              <span class="dispatch__key" id="format-select-label">FORMAT</span>
+              <div
+                id="format-select"
+                class="chip-row"
+                role="radiogroup"
+                aria-labelledby="format-select-label"
+              ></div>
+            </div>
+            <div class="dispatch__row">
+              <span class="dispatch__key" id="tier-select-label">FIELD</span>
+              <div
+                id="tier-select"
+                class="chip-row"
+                role="radiogroup"
+                aria-labelledby="tier-select-label"
+              ></div>
+            </div>
+            <div class="dispatch__row">
               <span class="dispatch__key" id="livery-select-label">LIVERY</span>
               <div
                 id="livery-select"
@@ -224,6 +262,16 @@
             NEW BEST LAP · ENTERED ON FILE
           </p>
           <ol id="result-laps" class="result-laps" aria-label="Race classification" hidden></ol>
+          <!--
+            G4 race stats. Under the classification rather than beside it: the
+            classification is the answer and these are how it was arrived at,
+            so they read in that order. Every figure here was already being
+            measured by an earlier phase and thrown away at the finish line -
+            near misses and the clean chain by G2, slipstream by G1, top speed
+            by the race loop - which is the whole reason the screen is worth
+            coming back to.
+          -->
+          <dl id="result-stats" class="result-stats" aria-label="Race statistics" hidden></dl>
           <button id="restart-button" class="launch-button" type="button">
             <span>RACE AGAIN</span>
             <kbd>ENTER</kbd>

@@ -650,6 +650,119 @@
           }
         ]
       }
+    },
+    "tiersNote": "G4 rival tiers. The block above IS the `works` tier - it is not copied here, so the calibrated G1 pace and the tier the game loads for `works` cannot drift apart. `rookie` and `feral` author only what they change: a cruise speed and the boost windows, per profile. Everything else (cornerSpeedGain, cornerSpeedFloor, noBlockSide, driftCurvature, straightCurvature) is inherited, so a later pass at the shared model moves all three tiers together. There is no runtime multiplier on speed anywhere - `applyPaceTier` in src/game/race-modes-rules.js merges these fields and nothing else. WINDOWS FIRST, CRUISE SECOND, and in that order for a reason: the windows are the authored driving character (rookie commits to a boost 30 m later off a corner and lets the launch boost go at 80% length; feral opens 30 m earlier and holds it 15 m longer), and the cruise is then SOLVED against those windows by `node scripts/rival-pace-calibration.mjs --tier=<tier> --solve` until the best rival lands in the phase's window. Solving cruise against a different set of windows than the race loads is how a calibrated number stops meaning anything. Measured on this tree, PRIVATEER 13 versus the demo player over five laps: rookie +3.24 s (greenwater) / +3.25 s (bitterpan), works -0.39 / -0.41, feral -3.24 / -3.26. scripts/validate-rivals.mjs pins all three.",
+    "tiers": {
+      "rookie": {
+        "profiles": {
+          "rival-privateer": {
+            "cruiseSpeedMetersPerSecond": 84.94,
+            "boostWindows": [
+              {
+                "fromMeters": 0,
+                "toMeters": 112
+              },
+              {
+                "fromMeters": 450,
+                "toMeters": 570
+              },
+              {
+                "fromMeters": 1680,
+                "toMeters": 1800
+              }
+            ]
+          },
+          "rival-nightform": {
+            "cruiseSpeedMetersPerSecond": 85.01,
+            "boostWindows": [
+              {
+                "fromMeters": 0,
+                "toMeters": 132
+              },
+              {
+                "fromMeters": 510,
+                "toMeters": 630
+              },
+              {
+                "fromMeters": 1750,
+                "toMeters": 1870
+              }
+            ]
+          },
+          "rival-needle": {
+            "cruiseSpeedMetersPerSecond": 83.18,
+            "boostWindows": [
+              {
+                "fromMeters": 0,
+                "toMeters": 152
+              },
+              {
+                "fromMeters": 390,
+                "toMeters": 510
+              },
+              {
+                "fromMeters": 1910,
+                "toMeters": 2030
+              }
+            ]
+          }
+        }
+      },
+      "feral": {
+        "profiles": {
+          "rival-privateer": {
+            "cruiseSpeedMetersPerSecond": 86.84,
+            "boostWindows": [
+              {
+                "fromMeters": 0,
+                "toMeters": 140
+              },
+              {
+                "fromMeters": 390,
+                "toMeters": 585
+              },
+              {
+                "fromMeters": 1620,
+                "toMeters": 1815
+              }
+            ]
+          },
+          "rival-nightform": {
+            "cruiseSpeedMetersPerSecond": 87.18,
+            "boostWindows": [
+              {
+                "fromMeters": 0,
+                "toMeters": 165
+              },
+              {
+                "fromMeters": 450,
+                "toMeters": 645
+              },
+              {
+                "fromMeters": 1690,
+                "toMeters": 1885
+              }
+            ]
+          },
+          "rival-needle": {
+            "cruiseSpeedMetersPerSecond": 84.76,
+            "boostWindows": [
+              {
+                "fromMeters": 0,
+                "toMeters": 190
+              },
+              {
+                "fromMeters": 330,
+                "toMeters": 525
+              },
+              {
+                "fromMeters": 1850,
+                "toMeters": 2045
+              }
+            ]
+          }
+        }
+      }
     }
   }
 }

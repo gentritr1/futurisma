@@ -1,5 +1,12 @@
 import type { InputFrame } from "./input";
 import { save } from "./persistence";
+import {
+  normalizeRaceMode,
+  normalizeRivalTier,
+  resolveModeLapCount,
+  type RaceMode,
+  type RivalTier,
+} from "./race-modes-rules.js";
 import { resolveQualityMode } from "./render-quality";
 import type { RenderQualityMode } from "./render-quality";
 
@@ -118,19 +125,48 @@ export function searchFlag(name: string): boolean {
 }
 
 /**
- * `?laps=`, clamped to what the course itself allows.
+ * G4 — `?mode=` and `?tier=`, composed with the stored dispatch exactly the way
+ * `resolveMapSelection` composes `?map=`.
+ *
+ * The QA override always wins, present-but-unknown included: a soak command or
+ * a share link must land on the format it names whatever this browser last
+ * chose, and an unknown value is still an override that resolves to the
+ * default rather than silently falling through to the save file. Both are read
+ * once, here, because both are load-time decisions — the lap count, whether a
+ * fleet is spawned and which pace table it drives are all fixed before the
+ * first frame, so a mid-race change is not a thing that can exist.
+ */
+export function resolveRaceMode(): RaceMode {
+  const requested = SEARCH.get("mode");
+  return normalizeRaceMode(requested ?? save.raceMode);
+}
+
+export function resolveRivalTier(): RivalTier {
+  const requested = SEARCH.get("tier");
+  return normalizeRivalTier(requested ?? save.tier);
+}
+
+/**
+ * `?laps=`, clamped to what the course itself allows — and, since G4, arbitrated
+ * against the race format.
  *
  * A query-string decision, so it lives with the other query-string decisions
- * rather than in the race loop - see the note on `resolveProbeSpawn`.
+ * rather than in the race loop - see the note on `resolveProbeSpawn`. The
+ * format's own claim on the lap count is resolved in
+ * `resolveModeLapCount`, which is where the one asymmetry lives: the sprint's
+ * two laps are the format rather than a preference inside it, so `?laps=` does
+ * not move them. `race` and `timeattack` honour the override as before.
  */
 export function resolveLapCount(course: {
   defaultLapCount: number;
   minimumLapCount: number;
   maximumLapCount: number;
 }): number {
-  const requested = Number.parseInt(SEARCH.get("laps") ?? "", 10);
-  if (!Number.isFinite(requested)) return course.defaultLapCount;
-  return Math.min(course.maximumLapCount, Math.max(course.minimumLapCount, requested));
+  return resolveModeLapCount(
+    resolveRaceMode(),
+    course,
+    Number.parseInt(SEARCH.get("laps") ?? "", 10),
+  );
 }
 
 export function readProbeNumber(parameter: string, fallback: number): number {

@@ -59,7 +59,51 @@ import { readFileSync } from "node:fs";
  * inside `updateRace`, ~70 lines of world-contact handling that belongs with
  * the rest of contact) is still the honest one and is still unclaimed.
  */
-const GAME_LINE_BUDGET = 1_998;
+/**
+ * G4 — 1975 -> 1992, and like G2's note above this is a WEAKENED assertion that
+ * should be read as one.
+ *
+ * What G4 did with it. The phase adds three race formats, three rival tiers,
+ * per-gate deltas against a stored best lap, a live delta chip and a result
+ * screen with six statistics. All of the deciding is in two new modules:
+ * `src/game/race-modes-rules.js` (~300 lines, pure, runs under Node) and
+ * `src/game/race-modes.ts` (~230 lines, the DOM/save/course adapter). The
+ * authored tier pace lives in the two maps' own JSON.
+ *
+ * What is left in the race loop is 17 net lines, and every one of them is a
+ * call or a comment: one import, one `attach`, one `reset`, one `closeLap`, one
+ * `crossGate`, one `updateLiveDelta`, the `recordFinishedRace` argument list,
+ * and the branch that lets `initialize` accept a fleet that was never spawned.
+ * Three regions that were ALREADY in `game.ts` got smaller rather than larger
+ * on the way: `resolveLapCount` now arbitrates the format inside
+ * `query-probes.ts`, the live delta's arithmetic moved into `RaceModes` so the
+ * call site carries none, and `RivalFleet.create` answers the "does this format
+ * have a field" question itself instead of the race loop wrapping it.
+ *
+ * WHY NOT EXTRACT INSTEAD. G2's note nominates the apron/boundary block inside
+ * `updateRace` as the next candidate, and that is still the right one — but it
+ * is ~70 lines of world-contact code that reads and writes the simulation's
+ * lateral, speed and grip inside the fixed step. Moving it in the same phase
+ * that changes the save schema and the rival pace would put a determinism-
+ * critical refactor behind two other risky changes, and the phase's own
+ * acceptance is that `race` comes back bit-identical. That extraction wants a
+ * phase where it is the only thing happening.
+ *
+ * The compensating half is below: five assertions that the G4 logic is NOT in
+ * `game.ts`, which is what the budget is a proxy for.
+ */
+/**
+ * G3 + G4 merge — 1998 and 1992 became 2_012.
+ *
+ * Neither phase saw the other's wiring, so the two notes above are each honest
+ * about their own 20 and 17 lines and neither is the number this tree has. The
+ * merged count is what it is: both sets of call sites are present, none of them
+ * overlap, and nothing was removed to make room. Kept as a merge line rather
+ * than by editing either rationale, because a future phase deciding whether to
+ * spend more needs to see that the budget moved twice for two different reasons
+ * and not once for a big one.
+ */
+const GAME_LINE_BUDGET = 2_012;
 
 function read(path) {
   return readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
@@ -146,6 +190,34 @@ assert.ok(
     + "object for the audio phase to read; it does not drive audio itself.",
 );
 
+// G4 — the race-modes seam, which is what the budget bump above is a proxy for.
+// The race loop may CALL the format; it may not contain any of its decisions.
+// Each of these names being absent from game.ts is the difference between a
+// feature that was extracted and one that was merely given a helper method.
+for (const owned of [
+  "sectorDeltaMs",
+  "liveDeltaMs",
+  "formatDeltaSeconds",
+  "applyPaceTier",
+  "bestRecordKey",
+]) {
+  assert.ok(
+    !game.includes(owned),
+    `src/game/game.ts references ${owned}. The G4 format model lives in `
+      + "src/game/race-modes-rules.js; the race loop calls raceModes instead.",
+  );
+}
+
+// The race loop must not learn the vocabulary either: a `mode === "sprint"` in
+// game.ts is the same failure as inlining the arithmetic, one branch at a time.
+for (const token of ['"sprint"', '"timeattack"', '"feral"', '"rookie"']) {
+  assert.ok(
+    !game.includes(token),
+    `src/game/game.ts names the race format ${token} directly. Formats are `
+      + "resolved in race-modes.ts; the race loop asks it questions.",
+  );
+}
+
 // Authored asset loading belongs to src/game/scene-assets.ts.
 assert.ok(
   !game.includes("GLTFLoader"),
@@ -165,6 +237,13 @@ const modules = {
   "src/game/track-events-rules.js": [
     "export function buildTrackEventSchedule",
     "export function gustEnvelope",
+  ],
+  "src/game/race-modes.ts": ["export const raceModes"],
+  "src/game/race-modes-rules.js": [
+    "export function resolveModeLapCount",
+    "export function applyPaceTier",
+    "export function liveDeltaMs",
+    "export function reverseGridOrder",
   ],
   "src/game/scene-assets.ts": ["export class SceneAssets"],
   "src/game/diagnostics.ts": [

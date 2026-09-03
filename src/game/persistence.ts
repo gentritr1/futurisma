@@ -31,8 +31,18 @@ import {
  * `save-schema.js` carries a ladder of one-version steps, and v2 is the first
  * rung. P10 added an optional best-lap ghost to each course record, so v1 → v2
  * is purely additive and a v1 file arrives with every field intact.
+ *
+ * G4 added v3: race modes and rival tiers. A course record gained a best lap
+ * per `"<mode>:<tier>"` with the gate splits that lap was set with, the single
+ * per-course ghost became a per-mode map, and the file itself gained the last
+ * dispatched mode and tier. The ghost is the only RELOCATED field on the
+ * ladder, so it is the one the migration is written around: a v2 ghost was
+ * necessarily a `race` lap and lands at `ghosts.race` rather than being
+ * dropped. The step's own note in `save-schema.js` carries the full reasoning,
+ * and `scripts/validate-persistence.mjs` proves the whole v1 → v3 walk field by
+ * field.
  */
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3;
 
 /**
  * The single storage key. Every key this game writes is prefixed `futurisma.`
@@ -88,12 +98,19 @@ export function persistenceDiagnostics(): {
   schemaVersion: number;
   storedLivery: string;
   storedTrack: string;
+  storedFormat: string;
+  storedTier: string;
 } {
   return {
+    // `save.mode` is the STORAGE mode (storage vs memory) and `save.format`
+    // would be the race one; the store spells the second `mode` too, so the
+    // emitted keys keep them apart rather than the accessors doing it.
     persistenceMode: save.mode,
     schemaVersion: SCHEMA_VERSION,
     storedLivery: save.livery,
     storedTrack: save.track,
+    storedFormat: save.raceMode,
+    storedTier: save.tier,
   };
 }
 

@@ -9,6 +9,8 @@
 import { ghostRuntime } from "./ghost-runtime";
 import { bootLiveryToApply, liveryFor } from "./liveries.js";
 import { save } from "./persistence";
+import { raceModes } from "./race-modes";
+import type { RaceResultInputs, RaceResultSummary } from "./race-modes";
 import type { RivalFleet } from "./rivals";
 import type { TotemVehicle } from "./totem";
 import type { GameUi } from "./ui";
@@ -103,8 +105,8 @@ export async function restoreStoredLivery(
 }
 
 /**
- * Folds a finished race into the course's stored record and reports whether the
- * lap that was just set is the fastest this browser has ever seen on it.
+ * Folds a finished race into the course's stored record and composes what the
+ * result screen prints.
  *
  * The return value is what drives the result screen's `NEW BEST` flash, so the
  * flash and the file can never disagree: the same comparison decides both.
@@ -118,22 +120,39 @@ export async function restoreStoredLivery(
  * `lapTimesMs` arrives whole rather than as a count because the ghost needs the
  * final lap's time: the race ends on the crossing that closes it, so that lap
  * is still open in the recorder when this runs.
+ *
+ * G4 turned the boolean into a summary and moved the write itself into
+ * `RaceModes`, which owns the record slot, the gate splits and the ghost key.
+ * This stays as the seam `game.ts` calls, unchanged in shape at that call site,
+ * so the race loop still knows nothing about modes — the same reason it was
+ * extracted in P7.
  */
 export function recordFinishedRace(
-  mapCode: string,
   bestLapMs: number | null,
   raceMs: number,
   lapTimesMs: readonly number[],
-): boolean {
-  return save.recordRace(mapCode, {
+  inputs: RaceResultInputs,
+): RaceResultSummary {
+  return raceModes.recordFinish(
     bestLapMs,
     raceMs,
-    laps: lapTimesMs.length,
-    ghost: ghostRuntime.bestLapRecording(lapTimesMs[lapTimesMs.length - 1] ?? null),
-  }).newBestLap;
+    lapTimesMs,
+    ghostRuntime.bestLapRecording(lapTimesMs[lapTimesMs.length - 1] ?? null),
+    inputs,
+  );
 }
 
-/** The stored best lap for a course, or null when nothing is on file yet. */
+/**
+ * The stored best lap the paddock line prints, for the format that is about to
+ * be raced.
+ *
+ * G4 — the FORMAT's record rather than the course's outright one. The line sits
+ * directly under the format and field chips and is the bar the next race has to
+ * clear, so it has to be the bar that race is actually measured against;
+ * printing an outright best set in a different mode would advertise a target
+ * `NEW BEST` would never fire on. The outright record still exists on the
+ * course record and is what a v2 file arrives holding.
+ */
 export function storedBestLapMs(mapCode: string): number | null {
-  return save.recordFor(mapCode).bestLapMs;
+  return save.bestFor(mapCode, raceModes.recordKey).bestLapMs;
 }
