@@ -208,6 +208,8 @@ export class RaceAtmosphere {
     cloudShape: { value: new THREE.Vector4() },
     /** x low deg, y high deg, z drift phase, w shadow-side cool mix */
     cloudBand: { value: new THREE.Vector4() },
+    /** Cell aspect ratio, wide to tall. 6 = cirrus streaks; 1 = round blobs. */
+    cloudStretch: { value: 1 },
     /** x cos(inner), y cos(outer), z intensity */
     sunShape: { value: new THREE.Vector3(SUN_COS_INNER, SUN_COS_OUTER, SUN_INTENSITY) },
   };
@@ -301,6 +303,7 @@ export class RaceAtmosphere {
       this.cloudPhase,
       this.cloudProfile.shadowCool,
     );
+    this.skyUniforms.cloudStretch.value = this.cloudProfile.stretch;
     this.installLighting(progress);
     this.skyDome = this.createSkyBackdrop();
     this.scene.add(this.skyDome);
@@ -459,10 +462,22 @@ export class RaceAtmosphere {
        *   two standard deviations out and produce almost no cloud. The stretch
        *   before `puff` spreads that hump over [0,1] so `coverage` means what it
        *   says.
-       * - Cloud shade MULTIPLIES and cloud light ADDS. A symmetric additive term
-       *   was the first attempt and it punched black holes in Greenwater's
-       *   zenith, which is ~0.02 linear against a coverage of 0.52. Proportional
-       *   darkening cannot reach black however thick the cloud is.
+       * - `cloudStretch` is the cell ASPECT RATIO, wide to tall, and the
+       *   vertical frequency is derived from it rather than authored: one cell
+       *   spans `360 / azimuthPeriod` degrees of azimuth, so a 6:1 streak needs
+       *   `stretch / 360 * azimuthPeriod` cells per degree of elevation. P20.5
+       *   round 1 shipped the two frequencies independently at roughly 1:1 and
+       *   the band read as soft round blobs — smoke, not cirrus. The ratio is
+       *   the authored number now, which is the thing an art note is actually
+       *   about.
+       * - The cloud ADDS light and never removes it, and the add is capped at
+       *   `hazeColor`. Round 1 had a symmetric term that also darkened: it
+       *   punched black holes in Greenwater's zenith (~0.02 linear against a
+       *   coverage of 0.52), and even after that was made proportional the dark
+       *   half is what read as storm cloud. A cloud that can only lift the sky
+       *   toward — never past — the haze it sits under is brighter than the
+       *   zenith and never darker than the horizon, by construction rather than
+       *   by tuning.
        * - The whole cloud block sits behind an elevation gate, so the noise is
        *   only evaluated on the ~20% of the screen the band can occupy.
        */
@@ -477,6 +492,7 @@ export class RaceAtmosphere {
         uniform vec4 skyRamp;
         uniform vec4 cloudShape;
         uniform vec4 cloudBand;
+        uniform float cloudStretch;
         varying vec3 vDirection;
 
         float skyHash(vec2 p) {
@@ -510,14 +526,17 @@ export class RaceAtmosphere {
           color += bandColor * band * skyRamp.w;
           color += sunColor
             * (smoothstep(sunShape.y, sunShape.x, dot(dir, sunDirection)) * sunShape.z);
-          float cloudMask = smoothstep(cloudBand.x, cloudBand.x + 6.0, elevation)
+          float cloudMask = smoothstep(cloudBand.x, cloudBand.x + 3.0, elevation)
             * (1.0 - smoothstep(cloudBand.y - 8.0, cloudBand.y, elevation));
           if (cloudMask > 0.002) {
             float azimuth = atan(dir.z, dir.x) * 0.15915494;
-            vec2 uv = vec2((azimuth + cloudBand.z) * cloudShape.w, elevation * 0.06);
-            float n = skyNoise(uv, cloudShape.w) * 0.5
-              + skyNoise(uv * 2.0, cloudShape.w * 2.0) * 0.3
-              + skyNoise(uv * 4.0, cloudShape.w * 4.0) * 0.2;
+            vec2 uv = vec2(
+              (azimuth + cloudBand.z) * cloudShape.w,
+              elevation * cloudShape.w * cloudStretch / 360.0
+            );
+            float n = skyNoise(uv, cloudShape.w) * 0.4
+              + skyNoise(uv * 2.0, cloudShape.w * 2.0) * 0.34
+              + skyNoise(uv * 4.0, cloudShape.w * 4.0) * 0.26;
             n = clamp((n - 0.5) * 2.6 + 0.5, 0.0, 1.0);
             float puff = smoothstep(
               1.0 - cloudShape.x - cloudShape.y,
@@ -528,9 +547,8 @@ export class RaceAtmosphere {
             vec2 sunFlat = normalize(vec2(sunDirection.x, sunDirection.z) + vec2(1e-5));
             vec3 warm = mix(hazeColor, sunColor, 0.75);
             vec3 lit = mix(hazeColor * cloudBand.w, warm, dot(flat2, sunFlat) * 0.5 + 0.5);
-            float shade = (puff - cloudShape.x) * cloudMask;
-            color *= 1.0 - max(-shade, 0.0) * 0.55;
-            color += lit * (max(shade, 0.0) * cloudShape.z);
+            vec3 add = lit * (min(puff, 0.8) * cloudMask * cloudShape.z);
+            color += min(add, max(hazeColor - color, vec3(0.0)));
           }
           gl_FragColor = vec4(max(color, vec3(0.0)), 1.0);
           #include <tonemapping_fragment>

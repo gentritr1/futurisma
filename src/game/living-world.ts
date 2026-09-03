@@ -118,23 +118,30 @@ function makeBatch(
     const u0 = (rect.x + padding) / rect.sheetSize;
     const v0 = (rect.y + padding) / rect.sheetSize;
     const size = (rect.size - padding * 2) / rect.sheetSize;
-    // P20.4 — `upright`. See the LivingCardSeed docs: `rect.y` counts PNG rows
-    // from the TOP, three.js uploads these sheets with `flipY` (the default),
-    // and V therefore counts from the BOTTOM, so `v0 = rect.y / sheetSize`
-    // resolves the vertically MIRRORED row of the atlas grid. A card that opts
-    // in gets the cell it named; every card that does not is left exactly as it
-    // renders today, because those cards are accepted art.
+    // P20.8 — ONE UV CONVENTION FOR EVERY SHEET THIS MODULE SAMPLES.
     //
-    // Per CARD rather than per batch on purpose: the new zones ride the
-    // accepted `air` and `airB` batches, so a batch-wide flag would have
-    // re-pointed PAN_CRUST_SCUD and SALT_DEVIL_CORE along with them, and a
-    // batch of their own would have cost a draw call this phase does not have.
-    const vBottom = card.upright
-      ? 1 - (rect.y + rect.size - padding) / rect.sheetSize
-      : v0 + size;
-    const vTop = card.upright
-      ? 1 - (rect.y + padding) / rect.sheetSize
-      : v0;
+    // `atlasRect` measures `rect.y` in PNG rows from the TOP of the sheet, so
+    // the quad's TOP edge takes `v0` and its BOTTOM edge `v0 + size`. That is
+    // correct if and only if the texture's own V origin is also at the top,
+    // i.e. `flipY === false`.
+    //
+    // Two of the five sources this module draws from already are: `jungle` and
+    // `emissive` are material maps lifted out of the Greenwater GLB, and
+    // `GLTFLoader` sets `flipY = false` because glTF puts UV (0,0) at the top
+    // of the image. The three card sheets are NOT — they were loaded through
+    // `TextureLoader` with `flipY` at its default `true`, which put V's origin
+    // at the bottom and resolved every card to the vertically MIRRORED row of
+    // its atlas grid (a cell in row r of an N-row grid drew row N-1-r, upside
+    // down). P20.4 measured that and worked around it per card with `upright`.
+    //
+    // The fix is on the TEXTURE, not here: `loadMotionAtlas` now sets
+    // `flipY = false` on all three card sheets, so all five sources share the
+    // GLB's top-origin convention and this one expression is right for every
+    // card. Fixing it here instead — computing V from the bottom for every
+    // card — would have mirrored the foliage and lamp cards, which were the
+    // only ones on this layer that were already correct.
+    const vTop = v0;
+    const vBottom = v0 + size;
     const uvQuad = [
       [u0, vBottom],
       [u0 + size, vBottom],
@@ -391,6 +398,28 @@ export class LivingWorld {
    * Loads a motion atlas the way every card sheet wants to be sampled: sRGB,
    * nearest on both filters, no mipmaps. A card is a handful of pixels blown up
    * to metres, so a mip chain only smears the authored dither.
+   *
+   * P20.8 — `flipY = false` IS THE LOAD-BEARING LINE HERE, not the filtering.
+   *
+   * `atlasRect` addresses a cell by its PNG row from the TOP of the sheet, and
+   * `makeBatch` builds V straight off that number. `TextureLoader` defaults to
+   * `flipY = true`, which puts V's origin at the BOTTOM, and the two
+   * conventions do not cancel: every card resolved to the mirrored grid row,
+   * upside down, on both maps. Bitterpan's mesa line drew Greenwater's
+   * treeline; its additive haze band drew a run of pylons; its heat shimmer
+   * drew rain. Setting the sampler's origin at the top instead makes these
+   * three sheets agree with the two GLB-sourced ones (`jungle`, `emissive`),
+   * which `GLTFLoader` already loads `flipY = false`, so ONE UV expression in
+   * `makeBatch` is correct for every card on the layer.
+   *
+   * These are this module's own `THREE.Texture` instances, loaded from these
+   * URLs here and nowhere else. `race-presence.ts` and `rivals.ts` build their
+   * own atlas textures (and already set `flipY = false` for their own reasons);
+   * nothing outside this file samples the objects created below.
+   *
+   * `scripts/validate-living-world.mjs` pins the pairing — the cell a named
+   * rect resolves to in UV space against that cell's rows in the PNG itself —
+   * so a future edit cannot silently take one half of it back.
    */
   private static async loadMotionAtlas(
     url: string,
@@ -399,6 +428,7 @@ export class LivingWorld {
     const texture = await new THREE.TextureLoader().loadAsync(url);
     texture.name = name;
     texture.colorSpace = THREE.SRGBColorSpace;
+    texture.flipY = false;
     texture.magFilter = THREE.NearestFilter;
     texture.minFilter = THREE.NearestFilter;
     texture.generateMipmaps = false;

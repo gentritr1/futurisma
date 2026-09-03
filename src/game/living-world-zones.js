@@ -54,36 +54,27 @@
  *   height of a dust devil
  * @property {AlphaKind} [alphaKind]
  * @property {number} [alphaInitial]
- * @property {boolean} [upright] P20.4. Whether this card samples the atlas cell
- *   it NAMES.
  *
- *   It does not, by default, and that is a defect rather than a convention.
- *   `atlasRect` measures `rect.y` in PNG rows from the TOP of the sheet, and
- *   `living-world.ts` builds V straight off it (`v0 = rect.y / sheetSize`). But
- *   the sheets are uploaded through `THREE.TextureLoader` with `flipY` left at
- *   its default `true`, so V counts from the BOTTOM — and a cell in row `r` of
- *   an N-row grid therefore resolves to row `N - 1 - r`, same column. On the
- *   4x4 horizon sheet HAZE_BAND (slot 15) draws PYLON_RUN (slot 3) and
- *   MESA_LONG (12) draws TREELINE_DENSE (0); on the 4x4 motion-B sheet
- *   DUST_SCUD (13) draws BIRDS_B (1) and DEVIL_WISP_A (4) draws FLICKER_DEAD
- *   (8); on the 2x2 motion sheet MIST (0) draws RAIN (2).
+ * P20.8 RETIRED `upright`. Every card samples the cell it names, so the flag
+ * that used to say so per card no longer distinguishes anything.
  *
- *   MEASURED, not deduced. Two independent reads, both in shots/p20.4/:
- *   the horizon band renders visible lattice pylon masts with catenary wires
- *   that vanish at `?living=0`, and its rendered alpha profile matches
- *   PYLON_RUN's cell row for row while contradicting HAZE_BAND's. It is also
- *   the reason the P9/P12 near-field set reads as nothing: a "dust scud" card
- *   drawing a sparse bird cell has almost no coverage to show.
+ * The defect it worked around: `atlasRect` measures `rect.y` in PNG rows from
+ * the TOP of the sheet and `living-world.ts` builds V straight off it, but the
+ * three card sheets were uploaded through `THREE.TextureLoader` with `flipY`
+ * at its default `true`, which puts V's origin at the BOTTOM. A cell in row
+ * `r` of an N-row grid therefore drew row `N - 1 - r`, same column, upside
+ * down. On the horizon sheet MESA_LONG (12) drew TREELINE_DENSE (0) and
+ * HAZE_BAND (15) drew PYLON_RUN (3); on motion-B DEVIL_WISP_A (4) drew
+ * FLICKER_DEAD (8); on the 2x2 motion sheet MIST (0) drew RAIN (2) and STEAM
+ * (1) drew GLINT (3) — and RAIN and GLINT are 4.3% and 2.1% covered, so every
+ * mist and steam zone on both maps was drawing an almost empty cell.
  *
- *   The fix is one line in `makeBatch`, and applying it globally would re-point
- *   EVERY card on both maps — the 155 accepted Greenwater cards included —
- *   which is out of scope for this phase and needs its own art review. So it is
- *   opt-in per CARD: the five P20.4 zones set it, get the cells they name, and
- *   every accepted card renders byte-identically to before. Per card rather
- *   than per batch because the new zones ride the accepted `air` and `airB`
- *   batches, and a batch of their own would cost a draw call.
- *
- *   A phase that fixes this properly deletes the flag and re-reviews both maps.
+ * The fix is on the TEXTURE (`loadMotionAtlas` sets `flipY = false`) rather
+ * than in the UV expression, because `jungle` and `emissive` come out of the
+ * Greenwater GLB with `flipY = false` already and were the only cards on the
+ * layer that were NOT mirrored. See the note there, and
+ * `scripts/validate-living-world.mjs`, which pins each named rect against the
+ * cell's own rows in the PNG so the pairing cannot come apart again.
  *
  * @typedef {LivingCardSeed & { motionId: string, batch: string }} AuthoredCard
  *
@@ -828,6 +819,21 @@ export const GREENWATER_BATCHES_B = Object.freeze([
     fog: true,
     alphaTest: 0.5,
     lamps: false,
+    // P20.8. The P18.1 anchor, applied here for the first time — and only now,
+    // because until this phase the batch was not drawing what it names.
+    //
+    // OPENING_WRECK_LINE authors `base: 0` for fourteen 9-13 m silhouettes, and
+    // the motion-B wreck cells are bottom-anchored art exactly like the horizon
+    // sheet's: WRECK_FUSELAGE, WRECK_GANTRY and CRATE_STACK all draw their
+    // ground contact at the cell's own bottom edge. Centred on `base`, a 13 m
+    // wreck spans -6.5..+6.5 m and half of it is under the wetland — verified
+    // in shots/p20.8/ab-gw-wreck.png, where the fuselage and the tailfin are
+    // both cut off at the water line.
+    //
+    // It did not show before because the mirrored cells this batch was actually
+    // drawing (DEVIL_WISP_B, FLICKER_FULL, FLICKER_HALF, GULL, BIRDS_A) are all
+    // centre-weighted, so burying the bottom half buried nothing.
+    anchor: "bottom",
   },
 ]);
 
@@ -1754,14 +1760,42 @@ export const BITTERPAN_ZONES_D = Object.freeze([
     cards: 34,
     card: (distance, side, index, next) => {
       const shoulder = Math.floor(index / 2) % 2 === 0;
+      // P20.8 — HEIGHT AND ANCHOR, the P20.4 carry-over.
+      //
+      // Round 2 authored `base` 0.1-1.0 m with `height` 1.6-3.4 m on a CENTRED
+      // batch, so the card's centre sat 0.1-1.0 m over the crust and its bottom
+      // half — up to 1.7 m of a 3.4 m card — was under the pan. Half the layer
+      // was buried, which is half the density thrown away for nothing.
+      //
+      // So `bottom` is now what the number means, and the centre is derived:
+      // `base = bottom + height / 2`, the PAN_SKY_HAZE idiom, on the same batch
+      // and with the same `anchor`-free convention. Height goes to 4-9 m, which
+      // is scud standing on the crust rather than lying in it.
+      //
+      // THE DRAW COUNT AND THE DRAW ORDER ARE UNCHANGED — seven `next()` calls,
+      // lateral / bottom / width / height / phase / speed / seed, in that order.
+      // That is what keeps `lateral`, `width`, `phase`, `speed` and `seed`
+      // bit-identical to round 2 (the lateral tier split and therefore the
+      // corridor and alpha pins are untouched), and what leaves every zone
+      // AFTER this one — PAN_SCUD_CROSSING, SALT_DEVIL_ROAD, BRINE_HAZE_LOW,
+      // PAN_SKY_HAZE — reading exactly the stream they read before.
+      //
+      // The corridor rule still holds by construction: the inner tier stays on
+      // `rise` (0.34, under the 0.35 cap), and it is the ALPHA that answers the
+      // rule, not the height — a taller card inside the corridor is still a
+      // card the craft flies through at 0.34.
+      const lateral = shoulder ? 6.2 + next() * 1.8 : 2 + next() * 3.6;
+      const bottom = 0.1 + next() * 0.9;
+      const width = 8 + next() * 10;
+      const height = 4 + next() * 5;
       return {
         kind: "shear",
         distance,
         side,
-        lateral: shoulder ? 6.2 + next() * 1.8 : 2 + next() * 3.6,
-        base: 0.1 + next() * 0.9,
-        width: 8 + next() * 10,
-        height: 1.6 + next() * 1.8,
+        lateral,
+        base: bottom + height / 2,
+        width,
+        height,
         phase: next() * TAU,
         speed: 0.09 + next() * 0.05,
         amplitude: degToRad(6.5),
@@ -1773,7 +1807,6 @@ export const BITTERPAN_ZONES_D = Object.freeze([
         // one goes where the ceiling is 0.35 and density would only be thrown
         // away.
         rect: shoulder ? MOTION_RECTS.steam : MOTION_RECTS.mist,
-        upright: true,
         tint: 0x4a4136,
         seed: next(),
         alphaKind: shoulder ? "scudShoulder" : "rise",
@@ -1812,7 +1845,6 @@ export const BITTERPAN_ZONES_D = Object.freeze([
         speed: 1 / 9,
         amplitude: 34,
         rect: MOTION_RECTS.mist,
-        upright: true,
         // Round 2: the crossing scud cannot buy alpha — it flies through the
         // corridor, so 0.32 is where it stays — and the tint is therefore ALL
         // of its contrast. Two counts darker than PAN_SCUD_NEAR's for exactly
@@ -1857,7 +1889,6 @@ export const BITTERPAN_ZONES_D = Object.freeze([
       amplitude: 16,
       hang: 12,
       rect: index % 2 === 0 ? MOTION_RECTS.steam : MOTION_RECTS.mist,
-      upright: true,
       // Round 2: same argument as the crossing scud. The lowest card of the
       // column reaches lateral -16 m at base 1.4 m, so the whole column is held
       // to the `devil` envelope's 0.26 and the tint is the only lever left.
@@ -1910,7 +1941,6 @@ export const BITTERPAN_ZONES_D = Object.freeze([
       phase: next() * TAU,
       speed: 0.1 + next() * 0.04,
       rect: MOTION_RECTS.mist,
-      upright: true,
       tint: 0xb9c1bd,
       seed: next(),
       alphaKind: "brineSwell",
@@ -1979,7 +2009,6 @@ export const BITTERPAN_ZONES_D = Object.freeze([
         speed: TAU / 22,
         amplitude: degToRad(0.06),
         rect: HORIZON_RECTS.hazeBand,
-        upright: true,
         tint: BP_SKY_HAZE_TINT,
         seed: next(),
         alphaInitial: 0.75,
