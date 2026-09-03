@@ -3,8 +3,46 @@ import atlasRegionsJson from "./data/ATLAS_REGIONS.json";
 import setDressingJson from "./data/BITTERPAN_SET_DRESSING.json";
 import surfaceCrustJson from "./data/BITTERPAN_SURFACE_CRUST.json";
 import { type CourseSample, type RaceCourse, surfaceHeightAtLateral } from "./course";
+import {
+  PAN_FLOOR_BRINE_DEEP_FAR_METRES,
+  PAN_FLOOR_BRINE_DEEP_LUMA,
+  PAN_FLOOR_BRINE_DEEP_NEAR_METRES,
+  PAN_FLOOR_BRINE_LUMA,
+  PAN_FLOOR_BRINE_SCALE_METRES,
+  PAN_FLOOR_BRINE_THRESHOLD_DRY,
+  PAN_FLOOR_BRINE_THRESHOLD_WET,
+  PAN_FLOOR_BRINE_TINT,
+  PAN_FLOOR_DETAIL_FADE_FAR,
+  PAN_FLOOR_DETAIL_FADE_NEAR,
+  PAN_FLOOR_FEATURE_FADE_FAR,
+  PAN_FLOOR_FEATURE_FADE_NEAR,
+  PAN_FLOOR_FEATURE_TRIM,
+  PAN_FLOOR_MACRO_FADE_FAR,
+  PAN_FLOOR_MACRO_FADE_NEAR,
+  PAN_FLOOR_MACRO_RAMP_FAR,
+  PAN_FLOOR_MACRO_RAMP_NEAR,
+  PAN_FLOOR_MACRO_SEED,
+  PAN_FLOOR_RIM_LIFT,
+  PAN_FLOOR_RIM_METRES,
+  PAN_FLOOR_ROTATED_SCALE,
+  PAN_FLOOR_SCOUR_STEP,
+  PAN_FLOOR_SCOUR_STRETCH,
+  PAN_FLOOR_SCOUR_THRESHOLD,
+  PAN_FLOOR_SECONDARY_BLEND,
+  PAN_FLOOR_SECONDARY_SCALE,
+  PAN_FLOOR_SEGMENTS,
+  PAN_FLOOR_SHORE_METRES,
+  PAN_FLOOR_STREAK_BANDS,
+  PAN_FLOOR_STREAK_LENGTH_METRES,
+  PAN_FLOOR_STREAK_OCTAVE_SCALE,
+  PAN_FLOOR_STREAK_WIDTH_METRES,
+  PAN_FLOOR_WIND_DEGREES,
+  PAN_FLOOR_TILE_MEAN_LINEAR,
+  PAN_FLOOR_WIND_VECTOR,
+  generatePanFloorColours,
+} from "./pan-floor-colour.js";
 import { activeRenderMode } from "./render-mode.js";
-import { applyPs2MaterialTreatment } from "./totem";
+import { applyPs2MaterialTreatment, composeShaderInjection } from "./totem";
 
 /**
  * P15 art pass 02 — the Bitterpan pan, given a ground and what was left on it.
@@ -141,6 +179,33 @@ export interface BitterpanSurfaceStats {
   groundMetresPerTile: number;
   groundAnisotropy: number;
   shaderModel: "unlit+lambert";
+  /**
+   * P20.6 — the pan floor's macro field, as the numbers a soak can see.
+   *
+   * The floor is not interactive, so nothing else in the diagnostics moves if
+   * this pass silently fails to run: `segments` reading 1 or `meanLuma`
+   * drifting off 1.0 is the only automated evidence that the field is on the
+   * mesh and that it is a variation pass rather than a re-grade.
+   */
+  panFloor: {
+    segments: number;
+    macroSeed: number;
+    secondaryScale: number;
+    vertices: number;
+    /** Mean of the generated vertex colours, as a luma multiplier. 1.0 = the
+     *  flat white the floor shipped with. */
+    meanLuma: number;
+    peakBrightness: number;
+    peakHue: number;
+    /** The wind the streaks lie along, and how many terrace bands cut them. */
+    windDegrees: number;
+    streakBands: number;
+    /** Mean brine-flat weight over the plane: 0 means no pool will ever be
+     *  drawn, which is the one silent failure this layer can have. */
+    brineWeightMean: number;
+    /** True only under `?floorprobe=1`, the review-only view. */
+    probe: boolean;
+  };
 }
 
 /** Corner order and winding, identical to `opening-surface.ts`. */
@@ -160,10 +225,18 @@ export class BitterpanSurface {
     this.stats = stats;
   }
 
+  /**
+   * @param probeMode the review-only `?floorprobe` mode, PASSED IN rather than
+   *   read here. `floor-probe.js` lives in the initial chunk (`scene-assets.ts`
+   *   reads it to hide the other layers); importing it from this lazily loaded
+   *   module would make Rollup hoist it to a shared chunk and push the initial
+   *   JS over its 226 KiB gzip budget. Threading one number costs nothing.
+   */
   static build(
     course: RaceCourse,
     groundTexture: THREE.Texture,
     decalTexture: THREE.Texture,
+    probeMode: 0 | 1 | 2 = 0,
   ): BitterpanSurface {
     const sheetKey = "bitterpan_crust_1024";
     const sheet = ATLAS_SHEETS[sheetKey];
@@ -280,9 +353,17 @@ export class BitterpanSurface {
     decalMesh.receiveShadow = false;
     decalMesh.renderOrder = 1;
 
+    const panFloor = buildPanFloor(course, groundTexture, probeMode);
+    const [meanR, meanG, meanB] = panFloor.colours.mean;
+    // `?floorprobe=1` — see `panFloorProbeActive`. The decals and the set
+    // dressing are what make the acceptance metric unable to see the floor, so
+    // the probe view drops them; `scene-assets.ts` drops the mid-ground and the
+    // living world the same way.
+    if (probeMode !== 0) decalMesh.visible = false;
+
     const root = new THREE.Group();
     root.name = "bitterpan_surface_layer";
-    root.add(buildPanFloor(groundTexture), decalMesh);
+    root.add(panFloor.mesh, decalMesh);
 
     return new BitterpanSurface(root, {
       drawCalls: 2,
@@ -295,6 +376,19 @@ export class BitterpanSurface {
       groundMetresPerTile: SURFACE_CRUST.ground.metresPerTile,
       groundAnisotropy: groundTexture.anisotropy,
       shaderModel: "unlit+lambert",
+      panFloor: {
+        segments: PAN_FLOOR_SEGMENTS,
+        macroSeed: PAN_FLOOR_MACRO_SEED,
+        secondaryScale: PAN_FLOOR_SECONDARY_SCALE,
+        vertices: panFloor.colours.vertices,
+        meanLuma: 0.2126 * meanR + 0.7152 * meanG + 0.0722 * meanB,
+        peakBrightness: panFloor.colours.extremes.brightness,
+        peakHue: panFloor.colours.extremes.hue,
+        windDegrees: PAN_FLOOR_WIND_DEGREES,
+        streakBands: PAN_FLOOR_STREAK_BANDS.length + 1,
+        brineWeightMean: panFloor.colours.brineWeightMean,
+        probe: probeMode !== 0,
+      },
     });
   }
 
@@ -302,6 +396,7 @@ export class BitterpanSurface {
     course: RaceCourse,
     groundTextureUrl: string,
     decalTextureUrl: string,
+    probeMode: 0 | 1 | 2 = 0,
   ): Promise<BitterpanSurface> {
     const loader = new THREE.TextureLoader();
     const [groundTexture, decalTexture] = await Promise.all([
@@ -326,7 +421,7 @@ export class BitterpanSurface {
     decalTexture.needsUpdate = true;
 
     try {
-      return BitterpanSurface.build(course, groundTexture, decalTexture);
+      return BitterpanSurface.build(course, groundTexture, decalTexture, probeMode);
     } catch (error) {
       groundTexture.dispose();
       decalTexture.dispose();
@@ -335,22 +430,274 @@ export class BitterpanSurface {
   }
 }
 
+/** A GLSL float literal, so a JS constant cannot land in a shader as `16`. */
+const glsl = (value: number): string => value.toFixed(6);
+
 /**
- * The ground the pan never had. A single quad the size of the visible world,
- * lit like the rest of the site rather than unlit like the decals over it.
+ * The varyings the feature stage needs and Lambert does not provide.
+ *
+ * `vFogDepth` carries the same number as `vPanDepth`, but only while `USE_FOG`
+ * is defined — one switch away from a shader that will not link. `vPanWorld` is
+ * the ground position in metres, which is what lets a shoreline be 2 m wide
+ * instead of 2 somethings.
  */
-function buildPanFloor(texture: THREE.Texture): THREE.Mesh {
-  const geometry = new THREE.PlaneGeometry(GROUND_SIZE_METRES, GROUND_SIZE_METRES, 1, 1);
+const PAN_VARYINGS = [
+  "varying float vPanDepth;",
+  "varying vec2 vPanWorld;",
+  "varying float vPanBrine;",
+  "",
+].join("\n");
+
+/**
+ * Value noise, and the ridge transform the wind streaks are cut from.
+ *
+ * The hash is Dave Hoskins' `hash12` — no `sin`, no integer ops, so it behaves
+ * the same on every driver this ships to. It is NOT the same hash as the
+ * generator's `hash2` in `pan-floor-colour.js`, and it does not need to be: the
+ * two fields live at different scales and are never compared, only summed.
+ */
+const PAN_NOISE_GLSL = /* glsl */ `
+float panHash( vec2 p ) {
+	vec3 p3 = fract( vec3( p.xyx ) * 0.1031 );
+	p3 += dot( p3, p3.yzx + 33.33 );
+	return fract( ( p3.x + p3.y ) * p3.z );
+}
+float panNoise( vec2 p ) {
+	vec2 i = floor( p );
+	vec2 f = fract( p );
+	vec2 u = f * f * ( 3.0 - 2.0 * f );
+	return mix(
+		mix( panHash( i ), panHash( i + vec2( 1.0, 0.0 ) ), u.x ),
+		mix( panHash( i + vec2( 0.0, 1.0 ) ), panHash( i + vec2( 1.0, 1.0 ) ), u.x ),
+		u.y );
+}
+/** A ridge crest: 1 where the field passes through its own middle. */
+float panRidge( vec2 p ) {
+	return 1.0 - abs( 2.0 * panNoise( p ) - 1.0 );
+}
+/**
+ * A terrace step whose edge is as wide as one pixel of this field — measured
+ * ANISOTROPICALLY.
+ *
+ * This is the whole aliasing strategy, and the anisotropy is not a detail. A
+ * chase camera 1.5 m above a plain sees the ground at a grazing angle: one
+ * pixel row can span 30 m of DEPTH while the same pixel spans 0.4 m ACROSS the
+ * view. \`fwidth\` (|ddx| + |ddy|) takes the worst of the two, so it reports a
+ * 30 m footprint and dissolves a feature that is still perfectly resolvable
+ * horizontally — measured, that is what made the first cut of this pass
+ * invisible: cranking every feature step by 3.7x moved the pan band's stdev
+ * from 23.55 to 26.47, because the edges were being averaged away before they
+ * reached the frame.
+ *
+ * Taking the SMALLER of the two derivatives is what anisotropic filtering does
+ * for a texture, for the same reason. A streak running toward the horizon keeps
+ * its edge; one running across the view still softens, because there its
+ * smaller derivative is the large one.
+ */
+float panBand( float threshold, float value ) {
+	float w = max( min( abs( dFdx( value ) ), abs( dFdy( value ) ) ) * 0.5, 1e-4 );
+	return smoothstep( threshold - w, threshold + w, value );
+}
+
+/** The ground footprint of one pixel, in metres, on the same anisotropic
+ *  reading. Clamped so a near-horizon pixel cannot ask for a 400 m shoreline. */
+float panFootprint( vec2 world ) {
+	return clamp( min( length( dFdx( world ) ), length( dFdy( world ) ) ), 0.25, 24.0 );
+}
+`;
+
+/**
+ * P20.6 round 2 — the pan's surface features, in the fragment stage.
+ *
+ * Round 1 put a smooth field in vertex colours and it was invisible. A plain
+ * reads as a plain because of EDGES, and an edge cannot exist between two
+ * vertices 47 m apart. So:
+ *
+ * 1. **Wind streaks.** Ridged noise stretched 25:1 along the authored 292
+ *    degree wind, terraced into two bright bands and one sparser dark one.
+ *    Because they are anisotropic and the ground is flat, the streaks converge
+ *    toward the horizon under perspective, which is the strongest depth cue a
+ *    plain has.
+ * 2. **Brine flats.** A thresholded region field, cool and darker, whose
+ *    shoreline is measured in METRES: the signed distance to the threshold is
+ *    recovered by dividing the field by its own world-space gradient, so the
+ *    2 m shoreline and the 3 m dried-salt rim are 2 m and 3 m at any distance
+ *    rather than a fixed fraction of a noise cell. The gradient costs two
+ *    extra noise taps and is the reason a pool has a shore instead of a blur.
+ *    How common pools are is `vPanBrine`, one float per vertex from the
+ *    generator — the wet sectors and the low side of the ribbon.
+ * 3. The tile break and the crust-detail fade, unchanged from round 1.
+ *
+ * Everything ramps in between 16 m and 52 m so the near-field crack pattern is
+ * untouched, and out again near `camera.far`.
+ *
+ * Composed through `composeShaderInjection` rather than assigned: in
+ * `?render=ps2` this material already carries the snap/grade/dither injection,
+ * and `material.onBeforeCompile = fn` would delete it while leaving its program
+ * cache key in place.
+ */
+function injectPanFloorMacro(shader: THREE.WebGLProgramParametersWithUniforms): void {
+  const [meanR, meanG, meanB] = PAN_FLOOR_TILE_MEAN_LINEAR;
+  const [windX, windZ] = PAN_FLOOR_WIND_VECTOR;
+  const [tintR, tintG, tintB] = PAN_FLOOR_BRINE_TINT;
+  // In at 16-52 m so the near field is untouched, out again at 500-1,400 m for
+  // the smooth vertex field and only at 1,150-1,800 m for the features, which
+  // antialias themselves.
+  const nearRamp = `smoothstep( ${glsl(PAN_FLOOR_MACRO_RAMP_NEAR)}, `
+    + `${glsl(PAN_FLOOR_MACRO_RAMP_FAR)}, vPanDepth )`;
+  const vertexRamp = `( ${nearRamp} * ( 1.0 - smoothstep( `
+    + `${glsl(PAN_FLOOR_MACRO_FADE_NEAR)}, ${glsl(PAN_FLOOR_MACRO_FADE_FAR)}, vPanDepth ) ) )`;
+  const featureRamp = `( ${nearRamp} * ( 1.0 - smoothstep( `
+    + `${glsl(PAN_FLOOR_FEATURE_FADE_NEAR)}, ${glsl(PAN_FLOOR_FEATURE_FADE_FAR)}, `
+    + "vPanDepth ) ) )";
+
+  shader.vertexShader = `attribute float panBrine;\n${PAN_VARYINGS}`
+    + shader.vertexShader.replace(
+      "#include <project_vertex>",
+      "#include <project_vertex>\n"
+        + "\tvPanDepth = - mvPosition.z;\n"
+        + "\tvPanWorld = ( modelMatrix * vec4( position, 1.0 ) ).xz;\n"
+        + "\tvPanBrine = panBrine;",
+    );
+
+  shader.fragmentShader = PAN_VARYINGS + PAN_NOISE_GLSL + shader.fragmentShader
+    .replace(
+      "#include <map_fragment>",
+      /* glsl */ `
+	vec3 panTileMean = vec3( ${glsl(meanR)}, ${glsl(meanG)}, ${glsl(meanB)} );
+	vec3 panCrust = texture2D( map, vMapUv ).rgb;
+	float panDetail = 1.0 - smoothstep( ${glsl(PAN_FLOOR_DETAIL_FADE_NEAR)}, ${glsl(PAN_FLOOR_DETAIL_FADE_FAR)}, vPanDepth );
+	panCrust = mix( panTileMean, panCrust, panDetail );
+
+	// --- the 12 m tile stops repeating -------------------------------------
+	vec3 panWide = texture2D( map, vMapUv * ${glsl(PAN_FLOOR_SECONDARY_SCALE)} + vec2( 0.317, 0.611 ) ).rgb;
+	vec2 panTurnedUv = vec2( vMapUv.y, - vMapUv.x ) * ${glsl(PAN_FLOOR_ROTATED_SCALE)} + vec2( 0.083, 0.457 );
+	vec3 panCross = texture2D( map, panTurnedUv ).rgb;
+	vec3 panMacro = 0.5 * ( panWide + panCross ) / panTileMean;
+	panCrust *= mix( vec3( 1.0 ), panMacro, ${glsl(PAN_FLOOR_SECONDARY_BLEND)} * ${vertexRamp} * panDetail );
+
+	// --- wind streaks -------------------------------------------------------
+	vec2 panAlong = vec2( ${glsl(windX)}, ${glsl(windZ)} );
+	vec2 panAcross = vec2( - panAlong.y, panAlong.x );
+	vec2 panStreakUv = vec2(
+		dot( vPanWorld, panAlong ) / ${glsl(PAN_FLOOR_STREAK_LENGTH_METRES)},
+		dot( vPanWorld, panAcross ) / ${glsl(PAN_FLOOR_STREAK_WIDTH_METRES)} );
+	// Two octaves along the same wind. The fine one is the authored 6-14 m
+	// streak and reads from 20 m to about 120 m; past that it is sub-pixel from
+	// this camera whatever the filtering does. The coarse one is the same
+	// pattern at ${glsl(PAN_FLOOR_STREAK_OCTAVE_SCALE)}x, so its bands are tens
+	// of metres across and carry the read all the way to the horizon. Same
+	// bearing, so they never read as two patterns.
+	float panStreak = panRidge( panStreakUv );
+	float panStreakWide = panRidge( panStreakUv / ${glsl(PAN_FLOOR_STREAK_OCTAVE_SCALE)} + 11.37 );
+	float panBloom = ${glsl(PAN_FLOOR_STREAK_BANDS[0].step)} * panBand( ${glsl(PAN_FLOOR_STREAK_BANDS[0].threshold)}, panStreak )
+		+ ${glsl(PAN_FLOOR_STREAK_BANDS[1].step)} * panBand( ${glsl(PAN_FLOOR_STREAK_BANDS[1].threshold)}, panStreak )
+		+ ${glsl(PAN_FLOOR_STREAK_BANDS[0].step)} * panBand( ${glsl(PAN_FLOOR_STREAK_BANDS[0].threshold)}, panStreakWide )
+		+ ${glsl(PAN_FLOOR_STREAK_BANDS[1].step)} * panBand( ${glsl(PAN_FLOOR_STREAK_BANDS[1].threshold)}, panStreakWide );
+	float panScour = panRidge( panStreakUv * vec2( ${glsl(PAN_FLOOR_SCOUR_STRETCH[0])}, ${glsl(PAN_FLOOR_SCOUR_STRETCH[1])} ) + 37.19 );
+	float panScourWide = panRidge( panStreakUv * vec2( ${glsl(PAN_FLOOR_SCOUR_STRETCH[0])}, ${glsl(PAN_FLOOR_SCOUR_STRETCH[1])} ) / ${glsl(PAN_FLOOR_STREAK_OCTAVE_SCALE)} + 5.51 );
+	float panScourBand = ${glsl(PAN_FLOOR_SCOUR_STEP)} * panBand( ${glsl(PAN_FLOOR_SCOUR_THRESHOLD)}, panScour )
+		+ ${glsl(PAN_FLOOR_SCOUR_STEP)} * panBand( ${glsl(PAN_FLOOR_SCOUR_THRESHOLD)}, panScourWide );
+	// Clamped to ONE octave's worth, so the accepted contrast ratios are the
+	// ratios that ship: a bloom core is 1.22:1 against the crust and a scour
+	// streak 0.85:1, whether one octave fires there or both.
+	panBloom = min( panBloom, ${glsl(PAN_FLOOR_STREAK_BANDS[0].step + PAN_FLOOR_STREAK_BANDS[1].step)} );
+	panScourBand = min( panScourBand, ${glsl(PAN_FLOOR_SCOUR_STEP)} );
+
+	// --- brine flats, with a shoreline measured in metres --------------------
+	vec2 panPoolUv = vPanWorld / ${glsl(PAN_FLOOR_BRINE_SCALE_METRES)};
+	float panPoolField = panNoise( panPoolUv );
+	float panPoolStep = 2.0 / ${glsl(PAN_FLOOR_BRINE_SCALE_METRES)};
+	vec2 panPoolGradient = vec2(
+		panNoise( panPoolUv + vec2( panPoolStep, 0.0 ) ) - panPoolField,
+		panNoise( panPoolUv + vec2( 0.0, panPoolStep ) ) - panPoolField ) * 0.5;
+	float panPoolSlope = max( length( panPoolGradient ), 1e-5 );
+	float panPoolThreshold = mix( ${glsl(PAN_FLOOR_BRINE_THRESHOLD_DRY)}, ${glsl(PAN_FLOOR_BRINE_THRESHOLD_WET)}, clamp( vPanBrine, 0.0, 1.0 ) );
+	// Signed distance to the shoreline, in metres on the ground.
+	float panShoreMetres = ( panPoolField - panPoolThreshold ) / panPoolSlope;
+	float panEdge = max( ${glsl(PAN_FLOOR_SHORE_METRES)}, panFootprint( vPanWorld ) );
+	float panPool = smoothstep( - panEdge, panEdge, panShoreMetres );
+	float panRimBand = panPool * ( 1.0 - smoothstep( ${glsl(PAN_FLOOR_RIM_METRES)} - panEdge, ${glsl(PAN_FLOOR_RIM_METRES)} + panEdge, panShoreMetres ) );
+
+	// --- one product, trimmed so the features do not darken the pan ---------
+	vec3 panFeature = vec3( ${glsl(PAN_FLOOR_FEATURE_TRIM)} );
+	panFeature *= 1.0 + panBloom - panScourBand;
+	// A flat is damp crust at the rim and standing brine in the middle, so the
+	// depth ramps with distance inside the shoreline rather than being one step.
+	float panPoolDeep = smoothstep( ${glsl(PAN_FLOOR_BRINE_DEEP_NEAR_METRES)}, ${glsl(PAN_FLOOR_BRINE_DEEP_FAR_METRES)}, panShoreMetres );
+	float panPoolLuma = mix( ${glsl(PAN_FLOOR_BRINE_LUMA)}, ${glsl(PAN_FLOOR_BRINE_DEEP_LUMA)}, panPoolDeep );
+	panFeature *= mix( vec3( 1.0 ), vec3( ${glsl(tintR)}, ${glsl(tintG)}, ${glsl(tintB)} ) * panPoolLuma, panPool );
+	panFeature *= 1.0 + ${glsl(PAN_FLOOR_RIM_LIFT)} * panRimBand;
+	panCrust *= mix( vec3( 1.0 ), panFeature, ${featureRamp} );
+
+	diffuseColor.rgb *= panCrust;
+`,
+    )
+    .replace(
+      "#include <color_fragment>",
+      /* glsl */ `
+#if defined( USE_COLOR ) || defined( USE_COLOR_ALPHA )
+	diffuseColor.rgb *= mix( vec3( 1.0 ), vColor.rgb, ${vertexRamp} );
+#endif
+`,
+    );
+}
+
+/**
+ * The ground the pan never had — and, since P20.6, a ground with a distance
+ * cue on it.
+ *
+ * Still ONE mesh, ONE material, ONE draw call and ONE texture. What changed is
+ * that the quad is subdivided and carries a per-vertex colour field (see
+ * `pan-floor-colour.js` for the field and for why 128 segments rather than the
+ * 96 the phase brief suggested), and that the material's fragment stage samples
+ * the crust tile twice more at macro scales. 32,768 triangles is the whole cost;
+ * they are static, in one buffer, and never re-uploaded.
+ */
+function buildPanFloor(course: RaceCourse, texture: THREE.Texture, probeMode: 0 | 1 | 2): {
+  mesh: THREE.Mesh;
+  colours: ReturnType<typeof generatePanFloorColours>;
+} {
+  const geometry = new THREE.PlaneGeometry(
+    GROUND_SIZE_METRES,
+    GROUND_SIZE_METRES,
+    PAN_FLOOR_SEGMENTS,
+    PAN_FLOOR_SEGMENTS,
+  );
+  // `?floorprobe=2` — the controlled baseline. Everything this phase adds is
+  // skipped and the floor renders as the flat Lambert quad it was before it,
+  // in the SAME binary as the treated build. See `panFloorProbeMode`.
+  const bypass = probeMode === 2;
+  const colours = generatePanFloorColours({
+    segments: PAN_FLOOR_SEGMENTS,
+    sizeMetres: GROUND_SIZE_METRES,
+    centreXMetres: GROUND_CENTRE_X_METRES,
+    centreZMetres: GROUND_CENTRE_Z_METRES,
+    seed: PAN_FLOOR_MACRO_SEED,
+    lapLengthMetres: course.length,
+    ribbon: buildPanRibbon(course),
+  });
+  if (!bypass) {
+    geometry.setAttribute("color", new THREE.BufferAttribute(colours.colors, 3));
+    // One float per vertex: how common brine flats are here. The SHAPE of a
+    // pool is procedural and per-pixel — a shoreline authored on a 47 m grid is
+    // not a shoreline — so all the geometry carries is where they belong.
+    geometry.setAttribute("panBrine", new THREE.BufferAttribute(colours.brineWeights, 1));
+  }
+
   const material = new THREE.MeshLambertMaterial({
     name: GROUND_MATERIAL_NAME,
     map: texture,
     fog: true,
+    vertexColors: !bypass,
   });
   const mesh = new THREE.Mesh(geometry, material);
   mesh.name = GROUND_MESH_NAME;
   mesh.rotation.x = -Math.PI / 2;
   mesh.position.set(GROUND_CENTRE_X_METRES, GROUND_Y_METRES, GROUND_CENTRE_Z_METRES);
   mesh.castShadow = false;
+  // P20.1 owns this line: the pan floor is where the craft's contact shadow
+  // lands, and subdividing the plane does not change that.
   mesh.receiveShadow = true;
   // Always under the camera, never worth a bounding-sphere test.
   mesh.frustumCulled = false;
@@ -368,7 +715,43 @@ function buildPanFloor(texture: THREE.Texture): THREE.Mesh {
     texture.anisotropy = 4;
     texture.needsUpdate = true;
   }
-  return mesh;
+  // AFTER the PS2 treatment, so the composition wraps that injection rather
+  // than being wrapped by it — and so a ps2 run keeps both.
+  if (!bypass) composeShaderInjection(material, "bpPanFloorMacro", injectPanFloorMacro);
+  return { mesh, colours };
+}
+
+/**
+ * The centreline as a flat polyline, for the pan floor's sector biases.
+ *
+ * Sampled at the same 5 m as `CENTRELINE_STATIONS.json` so the validator's
+ * re-run of the generator — which reads that file, because it cannot build a
+ * `RaceCourse` under Node — walks a ribbon of the same shape and spacing.
+ */
+function buildPanRibbon(course: RaceCourse): Array<{
+  x: number;
+  z: number;
+  rightX: number;
+  rightZ: number;
+  distance: number;
+  curvature: number;
+}> {
+  const scratch = course.createSampleScratch();
+  const count = Math.max(2, Math.round(course.length / 5));
+  const nodes = [];
+  for (let index = 0; index < count; index += 1) {
+    const distance = (index * course.length) / count;
+    const sample = course.sample(distance / course.length, scratch);
+    nodes.push({
+      x: sample.position.x,
+      z: sample.position.z,
+      rightX: sample.right.x,
+      rightZ: sample.right.z,
+      distance,
+      curvature: sample.curvature,
+    });
+  }
+  return nodes;
 }
 
 /** Keeps a decal corner on the lap when it straddles the start line. */
