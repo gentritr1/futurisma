@@ -54,8 +54,21 @@ const BUDGETS = {
   // P18 art pass 03 re-baselines both maps by exactly the horizon layer and no
   // more: Greenwater +1 batch / +34 cards, Bitterpan +2 batches / +38 cards.
   // Same rule as P12 — these are measured post-integration costs, not headroom.
+  //
+  // P20.4 re-baselines Bitterpan and only Bitterpan: +1 batch (`skyHaze`, the
+  // single draw call the phase was allowed) and +136 cards. Same rule again —
+  // these are the measured post-integration costs of the five zones the phase
+  // adds, not headroom. Greenwater is untouched by P20.4 and does not move.
+  //
+  // P20.4 ROUND 2 adds ten more cards and no batch: PAN_SCUD_CROSSING goes
+  // 10 -> 20. That is the zone that puts air over the racing line, and at ten
+  // cards over 2360 m it was one every 236 m — measured on the review station
+  // table (shots/p20.4r2/station-coverage.mjs), six of the thirteen stations
+  // had no crossing card anywhere in the 15-150 m window where a card is both
+  // in frame and big enough to read. Twenty is one every 118 m and every
+  // station has one. Draw calls do not move; the cost is 20 triangles.
   greenwater: { drawCalls: 7, cards: 280, triangles: 560 },
-  bitterpan: { drawCalls: 6, cards: 154, triangles: 308 },
+  bitterpan: { drawCalls: 7, cards: 300, triangles: 600 },
 };
 
 /**
@@ -180,6 +193,98 @@ const P18_ZONES = [
   { id: "PAN_HAZE_BAND", map: "bitterpan", batch: "horizonAir", from: 0, to: 3050, cards: 7, digest: "441b6a162eabed89" },
   { id: "PAN_HEAT_SHIMMER_FAR", map: "bitterpan", batch: "horizonAir", from: 180, to: 2400, cards: 5, digest: "05283e34b081cd49" },
 ];
+
+/**
+ * P20.4 — the air crosses the road. One batch, appended after P18's.
+ *
+ * `skyHaze` is the second non-lamp fog exemption on the map and the first new
+ * batch since P18. It could not ride either horizon batch: `horizonAir` is
+ * ADDITIVE (it can only add light to the sky, never put a value below it) and
+ * `horizon` alpha-tests at 0.5, which erases a band whose own cell peaks at
+ * 0.53. Normal blending, no alpha test, no fog.
+ */
+const P20_BATCHES = {
+  greenwater: [],
+  bitterpan: [
+    { id: "skyHaze", meshName: "BP_LIVING_SKY_HAZE", texture: "horizon", blending: "normal", depthWrite: false, fog: false, alphaTest: 0, lamps: false },
+  ],
+};
+
+/**
+ * P20.4 zones, pinned the way P9's, P12's and P18's are, plus `kind` — because
+ * for this phase the MOTION is the deliverable. `PAN_SCUD_CROSSING` authored as
+ * anything but `cross` does not cross; `PAN_SCUD_NEAR` authored as `flow`
+ * renders a flat ground quad that is edge-on to the chase camera and invisible,
+ * which is the exact class of mistake the P9 Bitterpan set shipped.
+ */
+// ROUND 2 re-pins all five. What moved and why, zone by zone:
+//   PAN_SCUD_NEAR      span 2120 -> 2560 and the three authored windows dropped
+//                      for the even spread; two lateral tiers (inner 2.0-5.6 m
+//                      on `rise`, shoulder 6.2-8.0 m on `scudShoulder`); tint
+//                      0xe6dcc4 -> 0x4a4136; STEAM on the shoulder tier.
+//   PAN_SCUD_CROSSING  10 -> 20 cards, span 2100 -> 2560, windows dropped,
+//                      tint 0xe2d8bf -> 0x453d33.
+//   SALT_DEVIL_ROAD    tint 0xded5bd -> 0x3f382e. Nothing else.
+//   BRINE_HAZE_LOW     lateral floor 6 -> 7.5 m (which is what buys it the
+//                      `brineSwell` envelope), tint 0xd9e0dc -> 0xb9c1bd.
+//   PAN_SKY_HAZE       NOT re-authored. Its digest moves because it is the last
+//                      zone on a single seeded stream and the ten extra
+//                      crossing cards ahead of it shift that stream. Same 72
+//                      cards, same BP_SKY_HAZE_TINT, same bottom-above-eye
+//                      construction, all still asserted below; the ring is a
+//                      re-roll of the same distribution, not a re-author.
+const P20_ZONES = [
+  { id: "PAN_SCUD_NEAR", map: "bitterpan", batch: "air", from: 160, to: 2560, cards: 34, kind: "shear", digest: "ab3f4ec74c7398b7" },
+  { id: "PAN_SCUD_CROSSING", map: "bitterpan", batch: "air", from: 200, to: 2560, cards: 20, kind: "cross", digest: "31c527cecfc96d37" },
+  { id: "SALT_DEVIL_ROAD", map: "bitterpan", batch: "air", from: 1198, to: 1240, cards: 4, kind: "devil", digest: "e27b47f8ced41c7b" },
+  { id: "BRINE_HAZE_LOW", map: "bitterpan", batch: "air", from: 2600, to: 2960, cards: 16, kind: "mist", digest: "a969ac97c2c2b2ac" },
+  { id: "PAN_SKY_HAZE", map: "bitterpan", batch: "skyHaze", from: 0, to: 3050, cards: 72, kind: "shear", digest: "b1aa89e52e9cc2c8" },
+];
+
+/**
+ * P20.4 — THE CORRIDOR RULE.
+ *
+ * `lateral` is measured OUTBOARD of the deck half-width: living-world.ts places
+ * a card at `sample.halfWidth + card.lateral` along the course right vector. The
+ * drivable corridor on Bitterpan's open pan is `halfWidth + 5.8` (edge C of
+ * BITTERPAN_PRODUCTION.json authors 5.8 m of run-off), so half-width cancels out
+ * of both sides and "this card reaches inside the corridor" is exactly
+ * `reachableLateral <= 5.8` — true at every station, with no course sampling and
+ * no half-width table to drift.
+ *
+ * A card that gets inside it below 6 m of deck height has to peak at alpha 0.35
+ * or under, or it is a whiteout on the racing line. Bitterpan only: 5.8 m is
+ * Bitterpan's own run-off width, and Greenwater's aprons are authored per
+ * sector, so the same constant would be a different rule over there.
+ */
+const CORRIDOR_LATERAL_METRES = 5.8;
+const CORRIDOR_HEIGHT_METRES = 6;
+const CORRIDOR_ALPHA_CEILING = 0.35;
+
+/**
+ * The smallest `lateral` a card's own MOTION can carry it to.
+ *
+ * The default is the authored lateral, and every kind that moves a card
+ * sideways is named — because a rule that reads the anchor and not the motion
+ * would wave `cross` and `devil` straight through, and those are the two kinds
+ * this phase put on the deck on purpose.
+ */
+function reachableLateral(card) {
+  // `cross` walks `amplitude` metres either side of its anchor; `devil` orbits
+  // out to `amplitude`; `mist` drifts `speed * 9` along the camera right vector
+  // (living-world.ts, case "mist").
+  if (card.kind === "cross" || card.kind === "devil") {
+    return card.lateral - (card.amplitude ?? 0);
+  }
+  if (card.kind === "mist") return card.lateral - card.speed * 9;
+  return card.lateral;
+}
+
+/** The highest alpha a card can ever draw at. */
+function peakAlpha(card) {
+  if (card.alphaKind) return ALPHA_ENVELOPES[card.alphaKind][1];
+  return card.alphaInitial ?? 1;
+}
 
 /**
  * The invariant the P18.2 re-baseline actually protects, asserted rather than
@@ -495,12 +600,13 @@ for (const [map, appended] of Object.entries(P12_BATCHES)) {
   const spec = LIVING_WORLD_SPECS[map];
   const accepted = map === "greenwater" ? ACCEPTED_GREENWATER_BATCHES.length : 3;
   const later = P18_BATCHES[map] ?? [];
+  const latest = P20_BATCHES[map] ?? [];
   assert.equal(
     spec.batches.length,
-    accepted + appended.length + later.length,
+    accepted + appended.length + later.length + latest.length,
     `${spec.id} declares ${spec.batches.length} batches; P12 authors `
-      + `${accepted} accepted plus ${appended.length} appended, and P18 appends `
-      + `${later.length} more.`,
+      + `${accepted} accepted plus ${appended.length} appended, P18 appends `
+      + `${later.length} more and P20.4 appends ${latest.length}.`,
   );
   assert.deepEqual(
     spec.batches.slice(accepted, accepted + appended.length).map((batch) => ({ ...batch })),
@@ -509,24 +615,37 @@ for (const [map, appended] of Object.entries(P12_BATCHES)) {
       + "state, and they must stay AFTER the accepted batches.",
   );
   assert.deepEqual(
-    spec.batches.slice(accepted + appended.length).map((batch) => ({ ...batch })),
+    spec.batches
+      .slice(accepted + appended.length, accepted + appended.length + later.length)
+      .map((batch) => ({ ...batch })),
     later,
-    `${spec.id} horizon batches changed. They are appended LAST so nothing `
-      + "above them moves, and each is a draw call and a render state.",
+    `${spec.id} horizon batches changed. They are appended after P12's so `
+      + "nothing above them moves, and each is a draw call and a render state.",
+  );
+  assert.deepEqual(
+    spec.batches
+      .slice(accepted + appended.length + later.length)
+      .map((batch) => ({ ...batch })),
+    latest,
+    `${spec.id} P20.4 batches changed. They are appended LAST, and the one `
+      + "there is the single extra draw call the phase was allowed to spend.",
   );
 }
 
-// The additive-and-unfogged combination is a single deliberate exemption. Any
-// other batch that turns fog off must either be a lamp batch (whose colour is
-// driven per frame anyway) or be argued for here.
+// Turning fog off is an exemption, and the list of them is closed. Both
+// non-lamp exemptions are batches that ARE the far-field air, so fogging them
+// multiplies the effect by itself and the horizon goes milky. P18 opened the
+// list with `horizonAir`; P20.4 adds `skyHaze` and nothing else may join
+// without being argued for by name, right here.
+const UNFOGGED_NON_LAMP_BATCHES = new Set(["horizonAir", "skyHaze"]);
 for (const [map, spec] of Object.entries(LIVING_WORLD_SPECS)) {
   for (const batch of spec.batches) {
     if (batch.fog) continue;
     assert.ok(
-      batch.lamps || batch.id === "horizonAir",
-      `${spec.id} batch ${batch.id} is unfogged. Pass 03 allows exactly one `
-        + `non-lamp fog exemption (${map} horizonAir) and it is authored as the `
-        + "far-field air itself.",
+      batch.lamps || UNFOGGED_NON_LAMP_BATCHES.has(batch.id),
+      `${spec.id} batch ${batch.id} is unfogged. The only non-lamp fog `
+        + `exemptions are ${[...UNFOGGED_NON_LAMP_BATCHES].join(", ")} (${map}), `
+        + "both authored as the far-field air itself.",
     );
   }
 }
@@ -717,14 +836,24 @@ assert.ok(
 for (const [map, spec] of Object.entries(LIVING_WORLD_SPECS)) {
   const p12 = P12_ZONES.filter((zone) => zone.map === map).map((zone) => zone.id);
   const p18 = P18_ZONES.filter((zone) => zone.map === map).map((zone) => zone.id);
+  const p20 = P20_ZONES.filter((zone) => zone.map === map).map((zone) => zone.id);
   const ids = spec.zones.map((zone) => zone.id);
+  const end = ids.length;
   assert.deepEqual(
-    ids.slice(ids.length - p18.length),
-    p18,
-    `${spec.id} must keep its P18 horizon zones last and in order.`,
+    ids.slice(end - p20.length),
+    p20,
+    `${spec.id} must keep its P20.4 zones last and in order.`,
   );
   assert.deepEqual(
-    ids.slice(ids.length - p18.length - p12.length, ids.length - p18.length),
+    ids.slice(end - p20.length - p18.length, end - p20.length),
+    p18,
+    `${spec.id} must keep its P18 horizon zones immediately before P20.4's.`,
+  );
+  assert.deepEqual(
+    ids.slice(
+      end - p20.length - p18.length - p12.length,
+      end - p20.length - p18.length,
+    ),
     p12,
     `${spec.id} must keep its P12 zones immediately before the P18 zones.`,
   );
@@ -792,6 +921,478 @@ assert.deepEqual(
   [...bitterpanSectorCoverage].sort(),
   ["S1", "S2", "S3"],
   "Bitterpan's zone set must reach all three sectors.",
+);
+
+// ---------------------------------------------------------------------------
+// The P20.4 additions — the air crosses the road.
+// ---------------------------------------------------------------------------
+
+for (const authored of P20_ZONES) {
+  const spec = LIVING_WORLD_SPECS[authored.map];
+  const zone = spec.zones.find((candidate) => candidate.id === authored.id);
+  assert.ok(zone, `The P20.4 zone ${authored.id} is missing from ${authored.map}.`);
+  assert.equal(zone.batch, authored.batch, `${authored.id} changed batch.`);
+  assert.equal(zone.from, authored.from, `${authored.id} changed its start.`);
+  assert.equal(zone.to, authored.to, `${authored.id} changed its end.`);
+  assert.equal(zone.cards, authored.cards, `${authored.id} changed its card count.`);
+  const cards = built[authored.map].batches
+    .flatMap((batch) => batch.cards)
+    .filter((card) => card.motionId === authored.id);
+  assert.ok(cards.length > 0, `${authored.id} built no cards.`);
+  for (const card of cards) {
+    assert.equal(
+      card.kind,
+      authored.kind,
+      `${authored.id} authors a "${card.kind}" card; the zone is pinned to `
+        + `"${authored.kind}", and for this phase the motion IS the deliverable.`,
+    );
+  }
+  assert.equal(
+    zoneDigests.get(`${authored.map}/${authored.id}`),
+    authored.digest,
+    `${authored.id} no longer authors the cards this validator pinned.`,
+  );
+}
+
+/**
+ * P20.4 ROUND 2 — THE NEAR CARDS READ AS DUST, NOT AS CRUST.
+ *
+ * Round 1 shipped these four zones tinted at the crust's own colour
+ * (PAN_SCUD_NEAR 0xe6dcc4, PAN_SCUD_CROSSING 0xe2d8bf, SALT_DEVIL_ROAD
+ * 0xded5bd, BRINE_HAZE_LOW 0xd9e0dc, Rec.709 luma 220 / 216 / 213 / 223) and
+ * its own honest read was that the cards are placed and moving correctly and
+ * are INVISIBLE in a still frame. A card tinted at the colour it is drawn over
+ * has no luminance to contribute in either direction, whatever its alpha.
+ *
+ * Vertex colour is a LINEAR multiplier applied before AgX and before the alpha
+ * blend (living-world.ts writes `(tint >> 16 & 255) / 255` straight into the
+ * colour attribute with no sRGB decode), so the tint is not a colour the card
+ * is drawn IN — it is a gain on the cell. The near crust renders at 78-102
+ * display luma over the four pan stations, and the three DUST zones have to
+ * land under that: the round-2 taste call, in the reviewer's words, is that
+ * near cards read as dust — darker and warmer than the crust, never lighter.
+ *
+ * Asserted here rather than left to the digests, because a digest tells the
+ * next phase that something moved and this tells it what may not:
+ *   - the three dust zones stay at or under DUST_TINT_LUMA_CEILING;
+ *   - the three dust zones stay WARM, red over green over blue, which is the
+ *     crust's own hue and the thing that stops "darker" from becoming "grey";
+ *   - BRINE_HAZE_LOW is the one zone allowed to be cool (blue at or over red),
+ *     because it is the wet basin rather than lifted crust, and it still has to
+ *     sit under the round-1 value it replaced.
+ */
+const DUST_TINT_LUMA_CEILING = 80;
+const BRINE_TINT_LUMA_CEILING = 200;
+const P20_DUST_ZONES = ["PAN_SCUD_NEAR", "PAN_SCUD_CROSSING", "SALT_DEVIL_ROAD"];
+const P20_ROUND_ONE_TINTS = {
+  PAN_SCUD_NEAR: 0xe6dcc4,
+  PAN_SCUD_CROSSING: 0xe2d8bf,
+  SALT_DEVIL_ROAD: 0xded5bd,
+  BRINE_HAZE_LOW: 0xd9e0dc,
+};
+for (const [zoneId, roundOne] of Object.entries(P20_ROUND_ONE_TINTS)) {
+  const cards = built.bitterpan.batches
+    .flatMap((batch) => batch.cards)
+    .filter((card) => card.motionId === zoneId);
+  assert.ok(cards.length > 0, `${zoneId} authored no cards to tint.`);
+  for (const card of cards) {
+    const luma = rec709(card.tint);
+    const red = (card.tint >> 16) & 0xff;
+    const green = (card.tint >> 8) & 0xff;
+    const blue = card.tint & 0xff;
+    assert.ok(
+      luma < rec709(roundOne),
+      `${zoneId} is tinted at luma ${luma.toFixed(1)}; round 1 shipped `
+        + `${rec709(roundOne).toFixed(1)} and was rejected for having no `
+        + "luminance contrast against the crust. It may not go back up.",
+    );
+    if (P20_DUST_ZONES.includes(zoneId)) {
+      assert.ok(
+        luma <= DUST_TINT_LUMA_CEILING,
+        `${zoneId} is tinted at luma ${luma.toFixed(1)}, over the `
+          + `${DUST_TINT_LUMA_CEILING} ceiling. The near crust renders at `
+          + "78-102 display luma and this is a linear gain on the cell, so a "
+          + "dust card tinted above the ceiling reads as haze on the crust "
+          + "rather than as dust in front of it.",
+      );
+      assert.ok(
+        red > green && green > blue,
+        `${zoneId} is tinted (${red}, ${green}, ${blue}); lifted salt crust is `
+          + "warm — red over green over blue — and a neutral dark card reads as "
+          + "a smudge on the lens rather than as air.",
+      );
+    } else {
+      assert.ok(
+        blue >= red && luma <= BRINE_TINT_LUMA_CEILING,
+        `${zoneId} is tinted (${red}, ${green}, ${blue}) at luma `
+          + `${luma.toFixed(1)}; the wet basin is the one zone allowed to be `
+          + "cooler than the crust, and it still has to sit under "
+          + `${BRINE_TINT_LUMA_CEILING}.`,
+      );
+    }
+  }
+}
+
+// The tint rule is only worth its lines if it fails on the thing it exists to
+// catch. Asserted against synthetic cards so the fixtures cannot drift with the
+// real zones — and needed as fixtures at all because a real re-tint trips the
+// zone DIGEST first, which says only that something moved.
+assert.throws(
+  () => {
+    const offender = { motionId: "FAKE_PALE_SCUD", tint: 0xe6dcc4 };
+    assert.ok(
+      rec709(offender.tint) <= DUST_TINT_LUMA_CEILING,
+      "dust tint is under the ceiling",
+    );
+  },
+  /dust tint is under the ceiling/,
+  "The dust-tint rule does not fail on round 1's crust-coloured tint, which is "
+    + "the exact value it exists to keep out.",
+);
+assert.throws(
+  () => {
+    const offender = { tint: 0x33383f };
+    const red = (offender.tint >> 16) & 0xff;
+    const green = (offender.tint >> 8) & 0xff;
+    const blue = offender.tint & 0xff;
+    assert.ok(red > green && green > blue, "dust tint is warm");
+  },
+  /dust tint is warm/,
+  "The dust-tint rule passes a cold grey-blue card, which reads as a smudge on "
+    + "the lens rather than as lifted salt crust.",
+);
+
+/**
+ * P20.4 ROUND 2 — THE TWO-TIER ALPHA, AND THE PLACEMENT IT DEPENDS ON.
+ *
+ * The 0.35 corridor cap is a rule about cards the craft flies THROUGH. Round 1
+ * applied it to the whole near zone, which cost the outboard cards a factor of
+ * two in density for nothing: measured on greenwater_motion_512, the MIST cell
+ * averages 0.167 alpha, so a card at 0.34 vertex alpha averages 5.7% opacity —
+ * under the 10-luma census threshold at every station.
+ *
+ * So PAN_SCUD_NEAR is two tiers, split on the same number the corridor rule
+ * reads: inner cards at lateral 2.0-5.6 m stay on `rise` (0.34), shoulder cards
+ * at 6.2-8.0 m ride `scudShoulder` (0.62). This asserts both halves — the
+ * placement envelope the round-2 brief specifies, and that no card outside the
+ * corridor exceeds 0.62 while no card inside it exceeds 0.35.
+ */
+const NEAR_ALPHA_CEILING_OUTSIDE = 0.62;
+const P20_NEAR_ZONES = [...P20_DUST_ZONES, "BRINE_HAZE_LOW"];
+const scudNear = built.bitterpan.batches
+  .flatMap((batch) => batch.cards)
+  .filter((card) => card.motionId === "PAN_SCUD_NEAR");
+assert.equal(scudNear.length, 34, "PAN_SCUD_NEAR is 34 cards.");
+for (const card of scudNear) {
+  assert.ok(
+    card.width >= 8 && card.width <= 18,
+    `PAN_SCUD_NEAR authors a ${card.width.toFixed(1)} m card; the near band is `
+      + "8-18 m wide.",
+  );
+  assert.ok(
+    card.height >= 1.6 && card.height <= 3.4,
+    `PAN_SCUD_NEAR authors a ${card.height.toFixed(1)} m card; the near band is `
+      + "1.6-3.4 m tall.",
+  );
+  assert.ok(
+    card.base >= 0.1 && card.base <= 1.0,
+    `PAN_SCUD_NEAR bases a card at ${card.base.toFixed(2)} m; the near band `
+      + "sits at 0.1-1.0 m.",
+  );
+}
+const scudNearInBand = scudNear.filter(
+  (card) => card.lateral >= 2 && card.lateral <= 8,
+);
+assert.ok(
+  scudNearInBand.length >= 25,
+  `Only ${scudNearInBand.length} of PAN_SCUD_NEAR's ${scudNear.length} cards sit `
+    + "2-8 m outboard of the deck edge; at least 25 have to. Further out and the "
+    + "zone is PAN_CRUST_SCUD again, which is the layer the driver never saw.",
+);
+const shoulderTier = scudNear.filter((card) => card.alphaKind === "scudShoulder");
+assert.ok(
+  shoulderTier.length >= 12,
+  `PAN_SCUD_NEAR has ${shoulderTier.length} shoulder-tier cards; the tier that `
+    + "carries the density is what makes the zone visible and it may not be "
+    + "emptied by a re-author.",
+);
+assert.deepEqual(
+  [...new Set(shoulderTier.map((card) => card.side))].sort(),
+  [-1, 1],
+  "PAN_SCUD_NEAR puts its whole shoulder tier on one side of the road. `side` "
+    + "is `index % 2`, so a tier keyed off the same parity lands entirely on "
+    + "one shoulder — the tier key has to be a different parity.",
+);
+for (const card of built.bitterpan.batches
+  .filter((batch) => !batch.spec.lamps)
+  .flatMap((batch) => batch.cards)) {
+  if (!P20_NEAR_ZONES.includes(card.motionId)) continue;
+  const reach = reachableLateral(card);
+  if (reach <= CORRIDOR_LATERAL_METRES && card.base < CORRIDOR_HEIGHT_METRES) {
+    continue; // covered by the corridor rule below, at the tighter 0.35.
+  }
+  assert.ok(
+    peakAlpha(card) <= NEAR_ALPHA_CEILING_OUTSIDE,
+    `BITTERPAN/${card.motionId} peaks at alpha ${peakAlpha(card).toFixed(2)} at `
+      + `lateral reach ${reach.toFixed(2)} m. Outboard of the corridor a near `
+      + `card may go to ${NEAR_ALPHA_CEILING_OUTSIDE}; past that it stops being `
+      + "air over the pan and becomes weather over the track.",
+  );
+}
+
+/**
+ * P20.4 ROUND 2 — `forceSinglePass` on every living-world material.
+ *
+ * A transparent DoubleSide material is drawn twice by three.js, back faces then
+ * front, so that a folded transparent surface sorts against itself. Measured on
+ * the pinned station set, the seven Bitterpan batches cost 14 of
+ * `renderer.info.render.calls` at every one of the thirteen stations (64 live
+ * minus 50 with `?living=0` at station 150), and 7 after this flag.
+ *
+ * Every card is a flat quad with `depthWrite: false`; it has no self-sorting to
+ * do. DoubleSide stays — the ring and the crossing scud are both seen from
+ * behind — and only the duplicate pass goes. Asserted in the source because
+ * there is no other place it can be caught: dropping it costs seven draw calls
+ * a frame and changes not one pixel.
+ */
+const livingWorldSource = readFileSync(
+  new URL("../src/game/living-world.ts", import.meta.url),
+  "utf8",
+);
+assert.ok(
+  /forceSinglePass:\s*true/.test(livingWorldSource),
+  "living-world.ts no longer sets `forceSinglePass: true`, so every one of the "
+    + "seven transparent DoubleSide batches is drawn in two passes again — 14 "
+    + "draw calls for 7 batches, with no visible difference to show for it.",
+);
+assert.ok(
+  /side:\s*THREE\.DoubleSide/.test(livingWorldSource),
+  "living-world.ts no longer sets DoubleSide. `forceSinglePass` is not a "
+    + "substitute for it: cards are seen from behind at every station.",
+);
+
+/**
+ * P20.4 - `upright` is opt-in and stays opt-in.
+ *
+ * `atlasRect` counts `rect.y` in PNG rows from the TOP; the sheets upload with
+ * three.js `flipY` at its default `true`, so V counts from the BOTTOM and a
+ * slot in grid row `r` resolves to row `N - 1 - r`. HAZE_BAND (slot 15) draws
+ * PYLON_RUN (slot 3); MESA_LONG (slot 12) draws TREELINE_DENSE (slot 0), which
+ * is a treeline on a salt pan. That is a real defect, measured rather than
+ * deduced, and it is written up in living-world-zones.js.
+ *
+ * It is NOT fixed globally here, and the assertion below is what says so out
+ * loud: fixing it re-points every card on both maps, the 155 accepted Greenwater
+ * ones included, and that needs its own art review rather than a quiet
+ * ride-along in a Bitterpan phase. Exactly one batch opts in - the one P20.4
+ * adds - so the accepted layer renders byte-identically and the defect stays
+ * visible to the next phase instead of being half-fixed.
+ */
+for (const [map, world] of Object.entries(built)) {
+  const uprightZones = [...new Set(world.batches
+    .flatMap((batch) => batch.cards)
+    .filter((card) => card.upright)
+    .map((card) => card.motionId))].sort();
+  const expected = P20_ZONES
+    .filter((zone) => zone.map === map)
+    .map((zone) => zone.id)
+    .sort();
+  assert.deepEqual(
+    uprightZones,
+    expected,
+    `${map} changed which zones sample the atlas cell they name. Turning this `
+      + "on for an existing zone re-points accepted art; turning it off for a "
+      + "P20.4 zone puts birds back in the salt scud and lattice pylons back in "
+      + "the horizon haze.",
+  );
+  // Every card of an opted-in zone, not just some of them: a zone whose author
+  // sets the flag on one branch of a ternary and not the other renders half its
+  // cards from a different cell and looks like a deliberate mix.
+  for (const zone of expected) {
+    const cards = world.batches
+      .flatMap((batch) => batch.cards)
+      .filter((card) => card.motionId === zone);
+    assert.ok(
+      cards.every((card) => card.upright === true),
+      `${zone} authors ${cards.filter((card) => !card.upright).length} cards `
+        + "without `upright`, so the zone draws from two different atlas cells.",
+    );
+  }
+}
+
+// ... and the runtime has to implement it, or the flag is data nothing reads.
+assert.ok(
+  readFileSync(
+    new URL("../src/game/living-world.ts", import.meta.url),
+    "utf8",
+  ).includes("card.upright"),
+  "living-world.ts never reads `upright`, so the P20.4 zones would silently "
+    + "render the mirrored atlas cell the accepted zones render.",
+);
+
+// The corridor rule, asserted over every Bitterpan card rather than only the
+// new ones — the failure it prevents is not "the P20.4 zones are wrong", it is
+// "some later zone is". Lamp batches are excluded: `updateLampColors` overwrites
+// vertex alpha every frame, so an envelope on one is dead data anyway, and a
+// 1.35 m beacon is a point of light rather than a screen-filling card.
+let corridorCards = 0;
+for (const batch of built.bitterpan.batches) {
+  if (batch.spec.lamps) continue;
+  for (const card of batch.cards) {
+    const reach = reachableLateral(card);
+    if (reach > CORRIDOR_LATERAL_METRES) continue;
+    if (card.base >= CORRIDOR_HEIGHT_METRES) continue;
+    corridorCards += 1;
+    assert.ok(
+      peakAlpha(card) <= CORRIDOR_ALPHA_CEILING,
+      `BITTERPAN/${card.motionId} reaches lateral ${reach.toFixed(2)} m — inside `
+        + `the halfWidth + ${CORRIDOR_LATERAL_METRES} m corridor — at base `
+        + `${card.base.toFixed(2)} m, and peaks at alpha `
+        + `${peakAlpha(card).toFixed(2)}. A card the craft flies through below `
+        + `${CORRIDOR_HEIGHT_METRES} m has to stay at or under `
+        + `${CORRIDOR_ALPHA_CEILING} or it is a whiteout on the racing line.`,
+    );
+  }
+}
+assert.ok(
+  corridorCards >= 15,
+  `Only ${corridorCards} Bitterpan cards reach inside the drivable corridor `
+    + "below 6 m. P20.4 exists because that number was 0 and the map read as "
+    + "empty from the driver's seat; a rule with nothing to check is not a rule. "
+    + "P20.4 authors 17 of them: the ten crossing scud, the lowest road devil, "
+    + "and the inner tail of PAN_SCUD_NEAR / BRINE_HAZE_LOW.",
+);
+
+// The rule is only worth its lines if it fails on the thing it exists to catch:
+// a low, opaque card sitting on the racing line, which renders as a whiteout at
+// 300 km/h and throws no error anywhere else in the system.
+assert.throws(
+  () => {
+    const offender = {
+      motionId: "FAKE_LOW_SCUD",
+      kind: "shear",
+      lateral: 3,
+      base: 1,
+      alphaKind: "mist",
+    };
+    assert.ok(
+      reachableLateral(offender) > CORRIDOR_LATERAL_METRES,
+      "card is outboard of the corridor",
+    );
+    assert.ok(
+      peakAlpha(offender) <= CORRIDOR_ALPHA_CEILING,
+      "card is under the corridor alpha ceiling",
+    );
+  },
+  /card is outboard of the corridor/,
+  "The corridor rule does not fail on a low, opaque card on the racing line.",
+);
+
+// The point of P20.4 is that the layer arrives in the NEAR field. Assert the
+// reach the phase exists to add: the P9/P12 Bitterpan set bottomed out at 24 m
+// outboard, which is why thirteen station screenshots of it showed nothing.
+const p20Ids = new Set(P20_ZONES.map((zone) => zone.id));
+const nearFieldCards = built.bitterpan.batches
+  .flatMap((batch) => batch.cards)
+  .filter((card) => p20Ids.has(card.motionId)
+    && reachableLateral(card) <= 14 && card.base < 12);
+assert.ok(
+  nearFieldCards.length >= 48,
+  `P20.4 puts ${nearFieldCards.length} cards within 14 m of the deck edge and `
+    + "under 12 m up; the phase is authored to put at least 48 there.",
+);
+
+// The crossing scud has to actually cross. `amplitude` is half the traverse and
+// the anchor sits at halfWidth + lateral, so the card only reaches the far side
+// of the deck if the amplitude clears BOTH the authored lateral and the widest
+// half-width on the map — 11.5 m, the widest Bitterpan deck (validate-map02.mjs
+// carries the station table this is read off).
+const BITTERPAN_MAX_HALF_WIDTH_METRES = 11.5;
+let crossingCards = 0;
+for (const card of built.bitterpan.batches.flatMap((batch) => batch.cards)) {
+  if (card.kind !== "cross") continue;
+  crossingCards += 1;
+  assert.ok(
+    (card.amplitude ?? 0) >= card.lateral + BITTERPAN_MAX_HALF_WIDTH_METRES,
+    `${card.motionId} traverses ${card.amplitude} m from lateral ${card.lateral}; `
+      + `it needs ${(card.lateral + BITTERPAN_MAX_HALF_WIDTH_METRES).toFixed(1)} m `
+      + "to reach the centreline, so as authored it never crosses the road and "
+      + "the zone is a lateral drift with a grand name.",
+  );
+}
+// ROUND 2: twenty, not ten. Ten over the zone's span was one crossing card
+// every 236 m, and six of the thirteen review stations then had none inside the
+// 15-150 m window where a card is both in frame and large enough to read — the
+// zone that names the phase was absent from half of it. Twenty is one every
+// 118 m. Pinned as an equality rather than a floor because "more air over the
+// racing line" is a corridor-rule question, not a free knob.
+assert.equal(crossingCards, 20, "PAN_SCUD_CROSSING is twenty crossing cards.");
+
+// The sky haze ring exists to separate sky from ground at the horizon, and
+// every half of that is geometry. Stand it far enough out to read as horizon,
+// keep it inside camera.far, keep every card wide enough to be a band rather
+// than a cloud, and — the load-bearing one — keep its BOTTOM edge above the
+// chase camera's eye height, because a band whose bottom dips below eye level
+// lands under the horizon line and darkens the ground it exists to separate
+// from. That is not a taste call; it is the sign of the metric.
+const BP_CHASE_EYE_HEIGHT_METRES = 8;
+const skyHazeCards = built.bitterpan.batches
+  .flatMap((batch) => batch.cards)
+  .filter((card) => card.motionId === "PAN_SKY_HAZE");
+assert.equal(skyHazeCards.length, 72, "PAN_SKY_HAZE is a 72-card ring.");
+for (const card of skyHazeCards) {
+  assert.ok(
+    card.lateral >= 1200 && card.lateral < 1800,
+    `PAN_SKY_HAZE stands at ${card.lateral.toFixed(0)} m; the ring is authored `
+      + "at 1,200 m or beyond and inside the 1,800 m far plane.",
+  );
+  assert.ok(
+    card.width >= 260,
+    `PAN_SKY_HAZE authors a ${card.width.toFixed(0)} m card; under 260 m the `
+      + "ring reads as cloud rather than as a continuous band.",
+  );
+  assert.ok(
+    card.base - card.height / 2 > BP_CHASE_EYE_HEIGHT_METRES,
+    `PAN_SKY_HAZE bottoms at ${(card.base - card.height / 2).toFixed(1)} m, at `
+      + `or below the ${BP_CHASE_EYE_HEIGHT_METRES} m chase eye height.`,
+  );
+  assert.ok(
+    peakAlpha(card) >= 0.55 && peakAlpha(card) <= 0.75,
+    `PAN_SKY_HAZE draws at alpha ${peakAlpha(card)}; the band is authored at `
+      + "0.55-0.75 and the cell's own alpha peaks at 0.53 on top of that.",
+  );
+}
+
+// ... and it stays darker than the darkest sector fog, for exactly the reason
+// the P18.2 horizon bands do: one constant against three fogs, so anything above
+// the floor inverts in one basin and the band dissolves there.
+for (const card of skyHazeCards) {
+  assert.ok(
+    rec709(card.tint) < darkestSectorFog,
+    `PAN_SKY_HAZE tints 0x${card.tint.toString(16)} (luma `
+      + `${rec709(card.tint).toFixed(1)}), at or above the darkest Bitterpan `
+      + `sector fog (luma ${darkestSectorFog.toFixed(1)}).`,
+  );
+}
+
+// The visibility census is a diagnostics number, and a diagnostics number that
+// silently stops being computed is worse than none. It is the only evidence in
+// the build that the layer is on screen at all.
+assert.ok(
+  readFileSync(
+    new URL("../src/game/living-world.ts", import.meta.url),
+    "utf8",
+  ).includes("this.stats.visibleCards = this.countVisibleCards(camera)"),
+  "living-world.ts never samples visibleCards, so the diagnostics field would "
+    + "report 0 for a layer that is fully on screen.",
+);
+assert.ok(
+  readFileSync(
+    new URL("../src/game/scene-assets.ts", import.meta.url),
+    "utf8",
+  ).includes("livingWorldVisibleCards"),
+  "scene-assets.ts never reports visibleCards, so nothing outside the class "
+    + "can see it.",
 );
 
 // ---------------------------------------------------------------------------
@@ -863,8 +1464,14 @@ console.log(
   `Living world PASS: ${summary}; 11 accepted Greenwater zones pinned byte-exact, `
     + `${P9_ZONES.length} P9 zones pinned, ${P12_ZONES.length} P12 zones, `
     + `${P18_ZONES.length} P18 horizon zones (34 GW / 38 BP cards, 1 / 2 batches, `
-    + "every silhouette bottom-anchored at base 0, the two tone bands centred, "
-    + "one fog exemption), "
+    + "every silhouette bottom-anchored at base 0, the two tone bands centred), "
+    + `${P20_ZONES.length} P20.4 zones (`
+    + `${P20_ZONES.reduce((total, zone) => total + zone.cards, 0)} BP cards, `
+    + `+1 batch, ${shoulderTier.length} shoulder-tier cards at alpha `
+    + `${NEAR_ALPHA_CEILING_OUTSIDE} and ${corridorCards} cards inside the `
+    + `drivable corridor all under alpha ${CORRIDOR_ALPHA_CEILING}, every dust `
+    + `tint under luma ${DUST_TINT_LUMA_CEILING}, single-pass materials), `
+    + "two fog exemptions, "
     + `${CARD_KINDS.length} motions and `
     + `${alphaKinds.size} envelopes wired in the runtime.`,
 );

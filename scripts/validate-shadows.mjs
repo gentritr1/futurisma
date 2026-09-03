@@ -9,9 +9,12 @@ import {
   SHADOW_LIGHT_DISTANCE_METRES,
   SHADOW_LOOKAHEAD_METRES,
   SHADOW_MAP_SIZE,
+  SHADOW_MAP_TYPE,
+  SHADOW_MAP_TYPES,
   SHADOW_NORMAL_BIAS,
   SHADOW_UNLIT_FLOOR,
   resolveShadowMapSize,
+  resolveShadowMapType,
   resolveShadowsEnabled,
   shadowBasis,
   shadowTexelMetres,
@@ -58,6 +61,87 @@ assert.equal(resolveShadowMapSize("512"), 512);
 // a share link must not break the game.
 for (const bad of ["1023", "0", "-2048", "huge", ""]) {
   assert.equal(resolveShadowMapSize(bad), SHADOW_MAP_SIZE);
+}
+
+// ---------------------------------------------------------------------------
+// The shadow filter. P20.7 item 3.
+// ---------------------------------------------------------------------------
+//
+// THE PIN IS `"pcf"`, AND IT IS A RENAME, NOT A CHANGE. P20.1 asked for
+// `THREE.PCFSoftShadowMap` and argued in a comment that it beat VSM. three r184
+// deprecated that constant: `WebGLShadowMap.render` logs
+// "PCFSoftShadowMap has been deprecated. Using PCFShadowMap instead." and
+// reassigns `this.type` before it rasterises a single shadow — verified against
+// node_modules/three/src/renderers/webgl/WebGLShadowMap.js:99-104 in the
+// installed r184. So the game has been rendering PCF since the phase shipped,
+// every P20.1 acceptance number was measured on PCF, and naming PCF here moves
+// no pixel. It only stops the code claiming a filter it never had, and stops
+// the warning firing on every load.
+//
+// VSM WAS MEASURED RATHER THAN RE-ARGUED. Bitterpan, 1280x720, Chromium/Metal,
+// via the `?shadowType=` lever this pin guards:
+//
+//   headless soak, one full lap each, interleaved pcf/vsm/pcf/vsm
+//     pcf   p95 8.0 / 8.8 ms   5171 / 5170 frames   lap 38775 ms
+//     vsm   p95 8.1 / 8.1 ms   5178 / 5158 frames   lap 38775 ms
+//   Sample reconciliation: 38.775 s at ~133 Hz is ~5160 frames, which is what
+//   every run reported, so these p95s are over the whole lap and not over a
+//   truncated sample. The two ranges OVERLAP, so the honest reading is "no
+//   measurable difference", not "vsm is faster" — a single-run ordering between
+//   two configs whose true gap is ~0 is a coin toss.
+//
+//   craft contact shadow, station 574: the deck's shadowed samples land at
+//     luma 45 against a lit deck at 69 under BOTH filters — a 24 luma drop,
+//     against P20.1's >= 22.
+//   acne, open deck at station 310: 0.00% of deck samples below luma 55 under
+//     both filters AND under `?shadows=0`, i.e. the shadow floor appears zero
+//     times where nothing is casting. No acne, and the same under either.
+//
+// So VSM buys nothing measurable and still costs the blur pass and the light
+// leak P20.1 named — visible at BRINE CUT (station 2900), where VSM's pan loses
+// the shadows the conveyor spans cast onto it. PCF stays.
+assert.equal(
+  SHADOW_MAP_TYPE,
+  "pcf",
+  "The shipped shadow filter is PCF. See the note above before changing it.",
+);
+assert.ok(
+  SHADOW_MAP_TYPES.includes("pcf") && SHADOW_MAP_TYPES.includes("vsm"),
+  "The ?shadowType= lever must keep both A/B arms reachable.",
+);
+assert.equal(resolveShadowMapType(null), SHADOW_MAP_TYPE);
+assert.equal(resolveShadowMapType("vsm"), "vsm");
+assert.equal(resolveShadowMapType(" VSM "), "vsm");
+assert.equal(resolveShadowMapType("basic"), "basic");
+for (const bad of ["pcfsoft", "soft", "2", "", "nonsense"]) {
+  assert.equal(
+    resolveShadowMapType(bad),
+    SHADOW_MAP_TYPE,
+    `?shadowType=${bad} must fall back rather than throw.`,
+  );
+}
+// The deprecated constant must not come back by name anywhere in the runtime.
+const shadowsSource = readFileSync(
+  new URL("../src/game/shadows.ts", import.meta.url),
+  "utf8",
+);
+// `THREE.PCFSoftShadowMap` specifically: the prose above the function is
+// allowed to name the deprecated constant, because explaining what the filter
+// used to claim to be is the whole point of that note. What must not come back
+// is a REFERENCE to it.
+assert.ok(
+  !/THREE\.PCFSoftShadowMap/.test(shadowsSource),
+  "shadows.ts references THREE.PCFSoftShadowMap, which three r184 deprecates "
+    + "and silently replaces with PCFShadowMap. Name the filter the renderer "
+    + "actually runs.",
+);
+// And the mapping must cover every advertised lever value, or `?shadowType=`
+// would set `renderer.shadowMap.type = undefined` for one of them.
+for (const type of SHADOW_MAP_TYPES) {
+  assert.ok(
+    new RegExp(`\\b${type}:\\s*THREE\\.\\w+ShadowMap`).test(shadowsSource),
+    `shadows.ts does not map ?shadowType=${type} to a three constant.`,
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -229,7 +313,8 @@ for (const family of ["GW_MAT_water", "GW_MAT_emissive"]) {
 }
 
 console.log(
-  "Shadows PASS: kill switches (?shadows=0, ?render=ps2) and map-size parsing; "
+  "Shadows PASS: kill switches (?shadows=0, ?render=ps2), map-size and "
+    + "filter parsing with the shipped filter pinned to PCF (?shadowType= A/B); "
     + `${SHADOW_BOX_METRES} m box / ${SHADOW_MAP_SIZE} map = `
     + `${(shadowTexelMetres(2048) * 100).toFixed(1)} cm texel with the frustum `
     + "clearing a 70 m caster at a 56 degree key; snapping matches "

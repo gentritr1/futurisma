@@ -6,9 +6,8 @@ import {
   calculateSpeedStreakLength,
   calculateSpeedStreakOpacity,
 } from "./presentation";
+import { resolveSpeedLineProfile } from "./speed-line-profile.js";
 
-const SPEED_LINE_COLOR = new THREE.Color(0x94bdb7);
-const BOOST_LINE_COLOR = new THREE.Color(0x78d6de);
 const IMPACT_SPARK_COUNT = 48;
 
 /**
@@ -22,14 +21,33 @@ export class RaceEffects {
   private readonly sparkVelocities = new Float32Array(IMPACT_SPARK_COUNT * 3);
   private readonly sparkLife = new Float32Array(IMPACT_SPARK_COUNT);
   private sparkCursor = 0;
+  /**
+   * P20.5 — per-map streak palette. Held as fields rather than read per frame so
+   * the update path stays allocation-free and the colours are two `THREE.Color`
+   * objects for the life of the race, exactly as the two module constants were.
+   */
+  private readonly profile: ReturnType<typeof resolveSpeedLineProfile>;
+  private readonly lineColor: THREE.Color;
+  private readonly boostColor: THREE.Color;
 
-  constructor(private readonly reducedMotion: boolean) {
+  /**
+   * @param courseKind decides the streak palette; see speed-line-profile.js.
+   * Defaults to Greenwater so a caller that has no course yet gets the shipped
+   * look rather than an empty profile.
+   */
+  constructor(
+    private readonly reducedMotion: boolean,
+    courseKind: string = "greenwater",
+  ) {
+    this.profile = resolveSpeedLineProfile(courseKind);
+    this.lineColor = new THREE.Color(this.profile.color);
+    this.boostColor = new THREE.Color(this.profile.boostColor);
     this.speedLines = this.createSpeedLines();
     this.sparkPoints = this.createImpactSparks();
   }
 
   private createSpeedLines(): THREE.LineSegments {
-    const count = 96;
+    const count = this.profile.count;
     const positions = new Float32Array(count * 6);
     for (let index = 0; index < count; index += 1) {
       const offset = index * 6;
@@ -46,11 +64,13 @@ export class RaceEffects {
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
     const material = new THREE.LineBasicMaterial({
-      color: 0xc5f4ff,
+      color: this.profile.color,
       transparent: true,
       opacity: 0,
       depthWrite: false,
-      blending: THREE.AdditiveBlending,
+      blending: this.profile.additive
+        ? THREE.AdditiveBlending
+        : THREE.NormalBlending,
     });
     const lines = new THREE.LineSegments(geometry, material);
     lines.frustumCulled = false;
@@ -96,15 +116,17 @@ export class RaceEffects {
     const speedRatio = speed / BOOST_MAX_SPEED;
     const material = this.speedLines.material as THREE.LineBasicMaterial;
     material.color.lerpColors(
-      SPEED_LINE_COLOR,
-      BOOST_LINE_COLOR,
+      this.lineColor,
+      this.boostColor,
       boostActive ? 1 : 0,
     );
+    // The ramp is untouched; the map's scale rides over its output, so the
+    // drift and boost shoulders keep exactly the shape the validator pins.
     material.opacity = calculateSpeedStreakOpacity(
       speedRatio,
       driftIntensity,
       this.reducedMotion,
-    );
+    ) * this.profile.opacityScale;
     this.speedLines.visible = material.opacity > 0.005;
     const speedLineRoll = this.reducedMotion
       ? 0
@@ -120,7 +142,7 @@ export class RaceEffects {
       speedRatio,
       boostActive,
       this.reducedMotion,
-    );
+    ) * this.profile.lengthScale;
     const travel = delta * (10 + speed * 0.85);
     for (let offset = 0; offset < values.length; offset += 6) {
       let z = values[offset + 2] + travel;

@@ -5,6 +5,11 @@ import {
   createHangarFlicker,
   createTimeOfDayTint,
   evaluateTimeOfDay,
+  // Both maps author a 90 m sector crossfade — Greenwater in course.ts, which
+  // this constant mirrors, and Bitterpan in `lighting.crossfadeMetres` in its
+  // own JSON. One window for both is what keeps the sky and the light changing
+  // sector on the same metre; validate-lighting.mjs pins the JSON to it.
+  LIGHTING_CROSSFADE_METRES,
   resolveHangarLampLevel,
   resolveLapProgress,
   resolveTimeOfDayDrift,
@@ -14,6 +19,14 @@ import {
   ps2ColorGradeChunk,
   PS2_TONE_MAPPING_ANCHOR,
 } from "./render-mode.js";
+import {
+  bandStrengthFor,
+  cloudProfileFor,
+  resolveSkyBlend,
+  skyZonesFor,
+  SKY_FOG_FADE_DEGREES,
+  SKY_HAZE_TOP_DEGREES,
+} from "./sky-profile.js";
 import {
   SHADOW_LIGHT_DISTANCE_METRES,
   SHADOW_LOOKAHEAD_METRES,
@@ -51,7 +64,6 @@ export function configureToneMapping(renderer: THREE.WebGLRenderer): void {
   renderer.toneMappingExposure = ps2 ? 1 : AGX_TONE_MAPPING_EXPOSURE;
 }
 
-const SKY_ZENITH_TINT = new THREE.Color(0x0a1216);
 const WHITE = new THREE.Color(0xffffff);
 // P11: 1.85 -> 1.35. The rim was doing the work the key should: pulling it back
 // and pushing key intensity up per sector is what gives the deck form again.
@@ -62,7 +74,30 @@ const HEMISPHERE_TRIM = 0.88;
 // and the two numbers must move together. A DirectionalLight reads only the
 // direction, so neither number changes the lighting.
 const KEY_LIGHT_DISTANCE = SHADOW_LIGHT_DISTANCE_METRES;
+/**
+ * Where the sun sits, as a fraction of `camera.far`, and how wide it is.
+ *
+ * P20.5 moved the sun out of its own additive `MeshBasicMaterial` circle and
+ * into the dome's fragment shader. The mesh could not be occluded correctly:
+ * `transparent: true` put it in the transparent queue at `renderOrder -999`,
+ * i.e. before every other transparent surface, and a transparent surface writes
+ * no depth — so any geometry drawn with `depthWrite: false` (Greenwater's water
+ * plane, for one) could not stop it. Measured on the merged base with the disc
+ * forced to screen centre inside HANGAR_SIX: 472 of its 15,652 pixels drew over
+ * geometry that should have hidden it (see scripts/visual/sun-disc-occlusion.mjs).
+ * Painted inside the dome the sun is drawn first, before anything else in the
+ * frame, so every surface in the scene covers it — opaque or not — and the
+ * scene loses one object rather than gaining a sorting rule.
+ *
+ * The angular radius is preserved exactly: `atan(0.055 / 0.72)` = 4.37 degrees,
+ * the half-angle the old `CircleGeometry(far * 0.055)` at `far * 0.72` subtended.
+ */
 const SUN_DISC_DISTANCE_RATIO = 0.72;
+const SUN_ANGULAR_RADIUS_RADIANS = Math.atan(0.055 / SUN_DISC_DISTANCE_RATIO);
+/** Inner/outer cosines of the soft edge, and the linear-space add at centre. */
+const SUN_COS_INNER = Math.cos(SUN_ANGULAR_RADIUS_RADIANS);
+const SUN_COS_OUTER = Math.cos(SUN_ANGULAR_RADIUS_RADIANS * 1.55);
+const SUN_INTENSITY = 0.55;
 
 /**
  * Sodium vapour, matching the `sodiumMaterial` lamp strips in
@@ -123,6 +158,20 @@ export interface AtmosphereDiagnostics {
    */
   hangarLampIntensity: number;
   timeOfDayDrift: number;
+  /**
+   * P20.5 — the sky as numbers, so a soak can prove the dome stopped being the
+   * fog without anyone opening a screenshot. `horizonHex` is the authored haze
+   * currently in the uniform (NOT the fog, which now only owns the bottom 1.5
+   * degrees) and `zenithHex` the authored top; a build that regressed to the
+   * old derivation would report the fog's own khaki in both.
+   */
+  sky: {
+    horizonHex: string;
+    zenithHex: string;
+    cloudCoverage: number;
+    /** False only while the sun is framed AND nothing stands in front of it. */
+    sunOccluded: boolean;
+  };
 }
 
 /**
@@ -139,15 +188,52 @@ export class RaceAtmosphere {
   private readonly hemisphereLight = new THREE.HemisphereLight();
   private readonly keyLight = new THREE.DirectionalLight();
   private readonly rimLight = new THREE.DirectionalLight();
+  /**
+   * P20.5. `horizonColor` is still the sector fog, but it now only owns the
+   * bottom {@link SKY_FOG_FADE_DEGREES}; `hazeColor` and `topColor` are the
+   * authored sky above it. `skyRamp`/`cloudShape`/`cloudBand`/`sunShape` are
+   * packed into vec4s rather than kept as eight separate uniforms so the
+   * per-frame write is four `set` calls instead of a dozen.
+   */
   private readonly skyUniforms = {
     topColor: { value: new THREE.Color(0x1a2226) },
     horizonColor: { value: new THREE.Color(0xa9bbb0) },
+    hazeColor: { value: new THREE.Color(0xa9bbb0) },
     bandColor: { value: new THREE.Color(0xc8ff2e) },
+    sunColor: { value: new THREE.Color(0xffffff) },
+    sunDirection: { value: new THREE.Vector3(0, 1, 0) },
+    /** x fog-fade deg, y haze-top deg, z zenith-resolved deg, w band strength */
+    skyRamp: { value: new THREE.Vector4() },
+    /** x coverage, y edge softness, z contrast, w azimuth period (integer) */
+    cloudShape: { value: new THREE.Vector4() },
+    /** x low deg, y high deg, z drift phase, w shadow-side cool mix */
+    cloudBand: { value: new THREE.Vector4() },
+    /** x cos(inner), y cos(outer), z intensity */
+    sunShape: { value: new THREE.Vector3(SUN_COS_INNER, SUN_COS_OUTER, SUN_INTENSITY) },
   };
   private readonly skyDome: THREE.Mesh;
-  private readonly sunDisc: THREE.Mesh;
-  private readonly skyTopTarget = new THREE.Color();
   private readonly skyBandTarget = new THREE.Color();
+  /**
+   * Authored per-sector sky, built once from the map's own table. Assigned in
+   * the constructor rather than as a field initializer: `course` is a parameter
+   * property, and under ES class-field semantics initializers run before the
+   * constructor body has assigned it.
+   */
+  private readonly skyZones: {
+    distance: number;
+    horizon: THREE.Color;
+    zenith: THREE.Color;
+    blendDegrees: number;
+  }[];
+  private readonly cloudProfile: ReturnType<typeof cloudProfileFor>;
+  private readonly skyBlend = { index: 0, next: 0, amount: 0 };
+  private readonly skyHazeTarget = new THREE.Color();
+  private readonly skyZenithTarget = new THREE.Color();
+  private skyBlendDegrees = SKY_HAZE_TOP_DEGREES + 20;
+  private cloudPhase = 0;
+  private readonly sunWorldPosition = new THREE.Vector3();
+  private readonly sunRaycaster = new THREE.Raycaster();
+  private readonly sunNdc = new THREE.Vector3();
   private readonly presenceLight = new THREE.PointLight(0xffffff, 0, 26, 1.8);
 
   // --- P4a scratch. Every one of these exists so the per-frame path allocates
@@ -184,10 +270,40 @@ export class RaceAtmosphere {
     vehicleRoot: THREE.Object3D,
     private readonly reducedMotion = false,
   ) {
+    this.skyZones = skyZonesFor(course.kind).map((zone) => ({
+      distance: zone.distance,
+      horizon: new THREE.Color(zone.horizon),
+      zenith: new THREE.Color(zone.zenith),
+      blendDegrees: zone.blendDegrees,
+    }));
+    this.cloudProfile = cloudProfileFor(course.kind);
+    // Static half of the sky uniforms: the ramp geometry, the cloud shape and
+    // the elevation gate never change after construction, so they are written
+    // once here and the per-frame path only touches colours and the drift phase.
+    this.skyUniforms.skyRamp.value.set(
+      SKY_FOG_FADE_DEGREES,
+      SKY_HAZE_TOP_DEGREES,
+      this.skyBlendDegrees,
+      bandStrengthFor(course.kind),
+    );
+    this.skyUniforms.cloudShape.value.set(
+      this.cloudProfile.coverage,
+      this.cloudProfile.softness,
+      this.cloudProfile.strength,
+      this.cloudProfile.azimuthPeriod,
+    );
+    // The seed is the drift phase's starting offset: one number, so the two maps
+    // never show the same cloud arrangement, and a soak replays the same sky.
+    this.cloudPhase = this.cloudProfile.seed;
+    this.skyUniforms.cloudBand.value.set(
+      this.cloudProfile.lowDegrees,
+      this.cloudProfile.highDegrees,
+      this.cloudPhase,
+      this.cloudProfile.shadowCool,
+    );
     this.installLighting(progress);
     this.skyDome = this.createSkyBackdrop();
-    this.sunDisc = this.createSunDisc();
-    this.scene.add(this.skyDome, this.sunDisc);
+    this.scene.add(this.skyDome);
     this.presenceLight.position.set(0, 2.3, 0.9);
     vehicleRoot.add(this.presenceLight);
     this.installHangarLamps();
@@ -288,9 +404,22 @@ export class RaceAtmosphere {
   }
 
   /**
-   * Graded sky dome + horizon accent band. The horizon matches the sector fog
-   * colour so geometry melts into it, while the zenith drops toward a cool
-   * near-black and a restrained sector-accent band glows at the horizon line.
+   * The whole sky, in one material and one draw call: fog hand-off, authored
+   * haze, zenith ramp, sector accent band, sun and cloud band.
+   *
+   * P20.5 rewrote it. Before this phase the dome's horizon WAS the sector fog
+   * colour all the way up, so the framed sky (a chase camera sees ~0-25 degrees)
+   * was a wash of the ground's own hue — measured on Bitterpan at 20% saturation
+   * in the same khaki as the pan. Now the fog only survives for
+   * `skyRamp.x` = {@link SKY_FOG_FADE_DEGREES} degrees above the horizon line,
+   * which is all distance needs to melt into it; above that the authored haze
+   * takes over and ramps to the authored zenith by `skyRamp.z`.
+   *
+   * The cloud band and the sun are evaluated here rather than as geometry:
+   * clouds because a dome that already shades every sky pixel can afford three
+   * octaves of value noise inside a 4-30 degree elevation gate and cannot afford
+   * another draw call; the sun because painting it first is the only way to have
+   * every surface in the scene occlude it (see {@link SUN_DISC_DISTANCE_RATIO}).
    */
   private createSkyBackdrop(): THREE.Mesh {
     const radius = this.camera.far * 0.8;
@@ -306,22 +435,104 @@ export class RaceAtmosphere {
           gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
         }
       `,
+      /**
+       * Sky fragment, in the order the eye reads it: fog hand-off, haze, zenith
+       * ramp, accent band, sun, cloud band. Every explanation lives out here
+       * rather than inside the template literal, because GLSL comments are
+       * string content that survives minification and ships to every player.
+       *
+       * - The haze-to-zenith ramp mixes in GAMMA space (`sqrt` in, square out),
+       *   not linear light. Measured: with a linear mix and the ramp resolving
+       *   at 22 degrees the framed upper sky came out at 140 luma against a
+       *   60-105 target, because a pale haze at ~0.19 linear dominates a ~0.02
+       *   zenith and half way up the ramp is still three quarters as bright as
+       *   the horizon. Two hardware sqrts are the cheapest honest fix and put
+       *   the midpoint where a colourist drawing the gradient would put it.
+       * - `skyNoise` wraps its x lattice at `period` so the cloud band closes on
+       *   itself around the horizon instead of seaming at due east; `period`
+       *   doubles per octave for the same reason.
+       * - The drift phase is in TURNS OF AZIMUTH, so the layer rotates. At the
+       *   authored 0.0022-0.0035/s the band swings 0.8-1.3 degrees of sky per
+       *   second: weather moving, never a texture scrolling.
+       * - Three octaves of value noise land in a narrow hump around 0.5
+       *   (measured sd ~0.12), so a raw threshold at `1 - coverage` would sit
+       *   two standard deviations out and produce almost no cloud. The stretch
+       *   before `puff` spreads that hump over [0,1] so `coverage` means what it
+       *   says.
+       * - Cloud shade MULTIPLIES and cloud light ADDS. A symmetric additive term
+       *   was the first attempt and it punched black holes in Greenwater's
+       *   zenith, which is ~0.02 linear against a coverage of 0.52. Proportional
+       *   darkening cannot reach black however thick the cloud is.
+       * - The whole cloud block sits behind an elevation gate, so the noise is
+       *   only evaluated on the ~20% of the screen the band can occupy.
+       */
       fragmentShader: `
         uniform vec3 topColor;
         uniform vec3 horizonColor;
+        uniform vec3 hazeColor;
         uniform vec3 bandColor;
+        uniform vec3 sunColor;
+        uniform vec3 sunDirection;
+        uniform vec3 sunShape;
+        uniform vec4 skyRamp;
+        uniform vec4 cloudShape;
+        uniform vec4 cloudBand;
         varying vec3 vDirection;
+
+        float skyHash(vec2 p) {
+          p = fract(p * vec2(127.1, 311.7));
+          p += dot(p, p + 34.56);
+          return fract(p.x * p.y);
+        }
+
+        float skyNoise(vec2 p, float period) {
+          vec2 i = floor(p);
+          vec2 f = fract(p);
+          f = f * f * (3.0 - 2.0 * f);
+          vec2 i0 = vec2(mod(i.x, period), i.y);
+          vec2 i1 = vec2(mod(i.x + 1.0, period), i.y);
+          float a = skyHash(i0);
+          float b = skyHash(i1);
+          float c = skyHash(i0 + vec2(0.0, 1.0));
+          float d = skyHash(i1 + vec2(0.0, 1.0));
+          return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+        }
+
         void main() {
-          float h = normalize(vDirection).y;
-          // P19: the gradient used to reach the zenith only at h=0.42, which a
-          // chase camera never frames — the whole visible dome sat on the flat
-          // horizon fog colour and the sky read as one pale wash. The ramp now
-          // resolves inside the framed band, so there is real air overhead.
-          vec3 color = mix(horizonColor, topColor, smoothstep(-0.03, 0.26, h));
-          color = mix(color * 0.78, color, smoothstep(-0.12, 0.0, h));
-          float band = exp(-pow((h - 0.035) * 16.0, 2.0));
-          color += bandColor * band * 0.42;
-          gl_FragColor = vec4(color, 1.0);
+          vec3 dir = normalize(vDirection);
+          float elevation = degrees(asin(clamp(dir.y, -1.0, 1.0)));
+          vec3 sky = mix(sqrt(hazeColor), sqrt(topColor),
+            smoothstep(skyRamp.y, skyRamp.z, elevation));
+          sky *= sky;
+          vec3 color = mix(horizonColor, sky, smoothstep(0.0, skyRamp.x, elevation));
+          color = mix(color * 0.78, color, smoothstep(-7.0, 0.0, elevation));
+          float band = exp(-pow((elevation - 2.0) * 0.33, 2.0));
+          color += bandColor * band * skyRamp.w;
+          color += sunColor
+            * (smoothstep(sunShape.y, sunShape.x, dot(dir, sunDirection)) * sunShape.z);
+          float cloudMask = smoothstep(cloudBand.x, cloudBand.x + 6.0, elevation)
+            * (1.0 - smoothstep(cloudBand.y - 8.0, cloudBand.y, elevation));
+          if (cloudMask > 0.002) {
+            float azimuth = atan(dir.z, dir.x) * 0.15915494;
+            vec2 uv = vec2((azimuth + cloudBand.z) * cloudShape.w, elevation * 0.06);
+            float n = skyNoise(uv, cloudShape.w) * 0.5
+              + skyNoise(uv * 2.0, cloudShape.w * 2.0) * 0.3
+              + skyNoise(uv * 4.0, cloudShape.w * 4.0) * 0.2;
+            n = clamp((n - 0.5) * 2.6 + 0.5, 0.0, 1.0);
+            float puff = smoothstep(
+              1.0 - cloudShape.x - cloudShape.y,
+              1.0 - cloudShape.x + cloudShape.y,
+              n
+            );
+            vec2 flat2 = normalize(vec2(dir.x, dir.z) + vec2(1e-5));
+            vec2 sunFlat = normalize(vec2(sunDirection.x, sunDirection.z) + vec2(1e-5));
+            vec3 warm = mix(hazeColor, sunColor, 0.75);
+            vec3 lit = mix(hazeColor * cloudBand.w, warm, dot(flat2, sunFlat) * 0.5 + 0.5);
+            float shade = (puff - cloudShape.x) * cloudMask;
+            color *= 1.0 - max(-shade, 0.0) * 0.55;
+            color += lit * (max(shade, 0.0) * cloudShape.z);
+          }
+          gl_FragColor = vec4(max(color, vec3(0.0)), 1.0);
           #include <tonemapping_fragment>
           #include <colorspace_fragment>
         }
@@ -344,22 +555,72 @@ export class RaceAtmosphere {
     return dome;
   }
 
-  /** Small additive key-light disc that anchors the sky composition. */
-  private createSunDisc(): THREE.Mesh {
-    const geometry = new THREE.CircleGeometry(this.camera.far * 0.055, 20);
-    const material = new THREE.MeshBasicMaterial({
-      color: this.keyLight.color.clone(),
-      transparent: true,
-      // P11: 0.5 -> 0.62.
-      opacity: 0.62,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-      fog: false,
-    });
-    const disc = new THREE.Mesh(geometry, material);
-    disc.name = "sun_disc";
-    disc.renderOrder = -999;
-    return disc;
+  /**
+   * Crossfades the authored sky between the two sectors the lap is between and
+   * writes it into the dome, tinted by the time-of-day drift.
+   *
+   * The `blendDegrees` of the zone the lap is *leaving* wins outright rather
+   * than being interpolated: it moves the elevation at which the zenith has
+   * resolved by a degree or two between sectors, and a lerped ramp edge is a
+   * moving target the eye reads as the sky breathing. Colours crossfade;
+   * geometry of the ramp steps once, inside a 90 m window, under a colour
+   * change that hides it.
+   */
+  private updateSkyPalette(
+    distanceMetres: number,
+    tint: ReturnType<typeof createTimeOfDayTint>,
+    response: number,
+  ): void {
+    resolveSkyBlend(
+      this.skyZones,
+      distanceMetres,
+      this.course.length,
+      LIGHTING_CROSSFADE_METRES,
+      this.skyBlend,
+    );
+    const zone = this.skyZones[this.skyBlend.index];
+    const next = this.skyZones[this.skyBlend.next];
+    this.skyHazeTarget.lerpColors(zone.horizon, next.horizon, this.skyBlend.amount);
+    this.skyZenithTarget.lerpColors(zone.zenith, next.zenith, this.skyBlend.amount);
+    this.skyHazeTarget.setRGB(
+      this.skyHazeTarget.r * tint.fogR,
+      this.skyHazeTarget.g * tint.fogG,
+      this.skyHazeTarget.b * tint.fogB,
+    );
+    this.skyZenithTarget.setRGB(
+      this.skyZenithTarget.r * tint.fogR,
+      this.skyZenithTarget.g * tint.fogG,
+      this.skyZenithTarget.b * tint.fogB,
+    );
+    this.skyUniforms.hazeColor.value.lerp(this.skyHazeTarget, response);
+    this.skyUniforms.topColor.value.lerp(this.skyZenithTarget, response);
+    this.skyBlendDegrees = SKY_HAZE_TOP_DEGREES + zone.blendDegrees;
+    this.skyUniforms.skyRamp.value.z = this.skyBlendDegrees;
+  }
+
+  /**
+   * Is the sun drawing into the frame right now, and is anything covering it?
+   *
+   * Only ever called from `diagnostics()`, i.e. at the ~1 Hz the sampler runs
+   * and only under `?diagnostics=1`. The raycast is gated behind the frustum
+   * test on purpose: on both shipped maps the key sits 56-74 degrees up and the
+   * sun is never framed (measured: 588 Bitterpan and 586 Greenwater samples over
+   * three laps each, zero on screen — scripts/visual/sun-disc-sweep.mjs), so the
+   * expensive branch costs nothing today and still tells the truth on the day a
+   * sector drops its sun toward the horizon.
+   */
+  private isSunOccluded(): boolean {
+    this.sunWorldPosition
+      .copy(this.camera.position)
+      .addScaledVector(this.keyDirection, this.camera.far * SUN_DISC_DISTANCE_RATIO);
+    this.sunNdc.copy(this.sunWorldPosition).project(this.camera);
+    const framed = Math.abs(this.sunNdc.x) <= 1
+      && Math.abs(this.sunNdc.y) <= 1
+      && this.sunNdc.z <= 1;
+    if (!framed) return true;
+    this.sunRaycaster.set(this.camera.position, this.keyDirection);
+    this.sunRaycaster.far = this.camera.far * SUN_DISC_DISTANCE_RATIO;
+    return this.sunRaycaster.intersectObject(this.course.group, true).length > 0;
   }
 
   /**
@@ -387,6 +648,7 @@ export class RaceAtmosphere {
     const reducedMotion = this.reducedMotion;
     const target = this.course.fogAt(progress);
     const lighting = this.course.lightingAt(progress);
+    const distanceMetres = THREE.MathUtils.euclideanModulo(progress, 1) * this.course.length;
 
     // --- Time-of-day drift. Sampled once and applied as a multiplier over
     // whatever the sector palette just returned, so sector identity survives.
@@ -459,32 +721,37 @@ export class RaceAtmosphere {
       lightingResponse,
     );
 
-    // Sky gradient follows the sector palette: the horizon stays glued to the
-    // fog colour, the zenith drops cool and dark, and the accent band picks up
-    // the sector rim hue so each sector gets a contrasting sky accent. The
-    // horizon and zenith inherit the drift through the tinted fog colour; the
-    // band takes it at reduced strength so the navigation accent stays legible.
-    // P19: the zenith drop was 0.3/0.45 — barely darker than the horizon under
-    // a pale pan fog, which is why the sky read flat. A deeper multiplier and a
-    // harder pull toward the zenith tint restore the dome's vertical read.
-    this.skyTopTarget.copy(this.tintedFog).multiplyScalar(0.22).lerp(SKY_ZENITH_TINT, 0.55);
+    // P20.5 — the sky is authored, not derived. `horizonColor` is still the
+    // sector fog, but the shader only lets it own the bottom 1.5 degrees; the
+    // haze and the zenith come from the map's own sky table, crossfaded on the
+    // same sector window the palette uses so the sky and the light change
+    // sector on the same metre. Both still take the time-of-day drift, as a
+    // multiplier over the authored colour rather than as its source — a dusk
+    // that reddens the fog reddens the sky with it, and reduced motion (drift
+    // pinned to stop 0) leaves the authored noon look untouched.
+    this.updateSkyPalette(distanceMetres, tint, response);
     this.skyBandTarget.setRGB(
       lighting.rim.r * (1 + (tint.keyR - 1) * 0.45),
       lighting.rim.g * (1 + (tint.keyG - 1) * 0.45),
       lighting.rim.b * (1 + (tint.keyB - 1) * 0.45),
     );
     this.skyUniforms.horizonColor.value.lerp(this.tintedFog, response);
-    this.skyUniforms.topColor.value.lerp(this.skyTopTarget, response);
     this.skyUniforms.bandColor.value.lerp(this.skyBandTarget, response);
     this.skyDome.position.set(this.camera.position.x, 0, this.camera.position.z);
-    const sunMaterial = this.sunDisc.material as THREE.MeshBasicMaterial;
-    sunMaterial.color.lerp(this.tintedKey, lightingResponse);
-    // The disc rides the same swinging direction, so the sun in the sky and the
-    // sun lighting the deck can never disagree.
-    this.sunDisc.position
-      .copy(this.camera.position)
-      .addScaledVector(this.keyDirection, this.camera.far * SUN_DISC_DISTANCE_RATIO);
-    this.sunDisc.lookAt(this.camera.position);
+    // The sun rides the same swinging direction the key light does, so the sun
+    // in the sky and the sun lighting the deck can never disagree.
+    this.skyUniforms.sunColor.value.lerp(this.tintedKey, lightingResponse);
+    this.skyUniforms.sunDirection.value.copy(this.keyDirection);
+    // Cloud drift. `driftPerSecond` is an azimuth-lattice rate, not a wind
+    // speed: at the authored 0.0022-0.0035 it takes four to seven minutes for
+    // the band to move one noise cell, which is the difference between "the sky
+    // is alive" and "the sky is a screensaver". Reduced motion stops it dead —
+    // the phase is simply never advanced, so two frames any distance apart are
+    // identical from the same pose.
+    if (!reducedMotion) {
+      this.cloudPhase += delta * this.cloudProfile.driftPerSecond;
+      this.skyUniforms.cloudBand.value.z = this.cloudPhase;
+    }
 
     // A restrained craft-following light lifts TOTEM off the bright deck and
     // pools a sector-tinted glow beneath it as a grounding cue.
@@ -555,6 +822,12 @@ export class RaceAtmosphere {
       hangarFlickerActive: this.hangarLampLevel > 0,
       hangarLampIntensity: Number(this.hangarLampLevel.toFixed(4)),
       timeOfDayDrift: Number(this.timeOfDayDrift.toFixed(4)),
+      sky: {
+        horizonHex: `#${this.skyUniforms.hazeColor.value.getHexString()}`,
+        zenithHex: `#${this.skyUniforms.topColor.value.getHexString()}`,
+        cloudCoverage: this.cloudProfile.coverage,
+        sunOccluded: this.isSunOccluded(),
+      },
     };
   }
 }

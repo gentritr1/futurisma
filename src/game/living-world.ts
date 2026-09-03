@@ -3,6 +3,7 @@ import {
   type RaceCourse,
   type CourseSample,
 } from "./course";
+import { searchParam } from "./query-probes";
 import {
   ALPHA_ENVELOPES,
   buildLivingWorld,
@@ -22,6 +23,16 @@ const CARD_VERTICES = 4;
 const DEVIL_CLIMB_HZ = 0.11;
 /** Heat shimmer breathes on its own slow cycle rather than on the card speed. */
 const SHIMMER_PERIOD_SECONDS = 6.5;
+/**
+ * P20.4. Frustum census rate for `stats.visibleCards`.
+ *
+ * A diagnostics number, not a render one: it walks every card and builds a
+ * bounding sphere per card, so it runs four times a second rather than thirty.
+ * Nothing in the frame depends on it — `mesh.frustumCulled` is false on every
+ * batch and stays false, because a batch is one buffer and culling it would
+ * cull the whole lap.
+ */
+const VISIBILITY_SAMPLE_HZ = 4;
 
 /**
  * Textures a zone set may ask for by name. `motion` is loaded by `load` from
@@ -51,6 +62,16 @@ interface LivingCard extends AuthoredCard {
   anchorY: number;
   anchorZ: number;
   hangY: number;
+  /**
+   * P20.4. The course `right` vector at the card's own station, frozen at load.
+   *
+   * `cross` walks a card sideways over the deck, which needs the lateral axis
+   * of the road under it. `flow` gets that by re-sampling the centreline every
+   * tick; a crossing scud does not move ALONG the course at all, so re-sampling
+   * would buy nothing and cost a curve evaluation per card per tick.
+   */
+  rightX: number;
+  rightZ: number;
   flowSample: CourseSample | null;
 }
 
@@ -71,6 +92,13 @@ export interface LivingWorldStats {
   triangles: number;
   updateHz: number;
   updateSteps: number;
+  /**
+   * P20.4. How many cards were inside the camera frustum at the last visibility
+   * sample. `cards` says what was authored; this says what the driver can
+   * actually see, which is the number the "Bitterpan reads as empty" verdict
+   * was really about. Sampled at VISIBILITY_SAMPLE_HZ, not every tick.
+   */
+  visibleCards: number;
 }
 
 function makeBatch(
@@ -90,11 +118,28 @@ function makeBatch(
     const u0 = (rect.x + padding) / rect.sheetSize;
     const v0 = (rect.y + padding) / rect.sheetSize;
     const size = (rect.size - padding * 2) / rect.sheetSize;
+    // P20.4 — `upright`. See the LivingCardSeed docs: `rect.y` counts PNG rows
+    // from the TOP, three.js uploads these sheets with `flipY` (the default),
+    // and V therefore counts from the BOTTOM, so `v0 = rect.y / sheetSize`
+    // resolves the vertically MIRRORED row of the atlas grid. A card that opts
+    // in gets the cell it named; every card that does not is left exactly as it
+    // renders today, because those cards are accepted art.
+    //
+    // Per CARD rather than per batch on purpose: the new zones ride the
+    // accepted `air` and `airB` batches, so a batch-wide flag would have
+    // re-pointed PAN_CRUST_SCUD and SALT_DEVIL_CORE along with them, and a
+    // batch of their own would have cost a draw call this phase does not have.
+    const vBottom = card.upright
+      ? 1 - (rect.y + rect.size - padding) / rect.sheetSize
+      : v0 + size;
+    const vTop = card.upright
+      ? 1 - (rect.y + padding) / rect.sheetSize
+      : v0;
     const uvQuad = [
-      [u0, v0 + size],
-      [u0 + size, v0 + size],
-      [u0 + size, v0],
-      [u0, v0],
+      [u0, vBottom],
+      [u0 + size, vBottom],
+      [u0 + size, vTop],
+      [u0, vTop],
     ];
     for (let vertex = 0; vertex < CARD_VERTICES; vertex += 1) {
       const uvOffset = (cardIndex * CARD_VERTICES + vertex) * 2;
@@ -172,6 +217,34 @@ function makeMaterial(
       : THREE.NormalBlending,
     vertexColors: true,
     side: THREE.DoubleSide,
+    // P20.4 round 2. A transparent DoubleSide material is drawn TWICE by
+    // three.js — back faces, then front faces — so that a curved or folded
+    // transparent surface sorts against itself. Measured on the pinned station
+    // set: 7 living-world batches cost 14 of `renderer.info.render.calls`
+    // (64 - 50 at station 150 with `?living=0` as the B side), at every one of
+    // the 13 stations.
+    //
+    // Nothing here needs that sort. Every card is a FLAT quad with
+    // `depthWrite: false`; its own back face never occludes its own front face,
+    // and cards in a batch already blend in buffer order rather than in depth
+    // order. `forceSinglePass` keeps DoubleSide — the quad is still lit and
+    // still drawn from behind, which the sky-haze ring and the crossing scud
+    // both rely on — and drops the duplicate pass.
+    //
+    // AND IT IS FREE, WHICH IS NOT OBVIOUS. The two-pass path sets BackSide
+    // then FrontSide, and each of those culls the orientation the other draws,
+    // so a flat quad was never blended twice — the second pass drew zero
+    // triangles for every card facing the camera and the first drew zero for
+    // every card facing away. Verified rather than reasoned: the same four
+    // Greenwater poses shot before and after this flag differ by 906 / 611 /
+    // 6347 / 1305 changed pixels, and TWO RUNS OF THE BUILD WITH THE FLAG ON
+    // differ by 659 / 1157 / 6551 / 1460 at the same poses — the change is
+    // inside the harness's own noise. Greenwater is the map that can prove it:
+    // `flow` and `ripple` write the only living-world quads with a fixed
+    // world-space normal (writeFlatCard), 44 of them in GLINT_WATER_TABLE and
+    // GLINT_SWEEP_DRAINAGE, and stations 340 and 910 look straight down at
+    // them. A lost back face would show there first.
+    forceSinglePass: true,
     opacity: 1,
     fog: spec.fog,
   });
@@ -251,6 +324,10 @@ export class LivingWorld {
   private readonly cameraRight = new THREE.Vector3(1, 0, 0);
   private accumulatorSeconds = 0;
   private elapsedSeconds = 0;
+  private visibilityAccumulatorSeconds = 0;
+  private readonly visibilityFrustum = new THREE.Frustum();
+  private readonly visibilityMatrix = new THREE.Matrix4();
+  private readonly visibilitySphere = new THREE.Sphere();
 
   private constructor(
     private readonly course: RaceCourse,
@@ -266,7 +343,16 @@ export class LivingWorld {
       triangles: authored.triangles,
       updateHz: LIVING_WORLD_UPDATE_HZ,
       updateSteps: 0,
+      visibleCards: 0,
     };
+    // P20.4. `?living=0` draws the frame with the card layer switched off and
+    // nothing else changed, so a station screenshot can be differenced against
+    // the same station with the layer on. That diff is the only honest answer to
+    // "is any of this visible from the driver's seat" — the question this phase
+    // exists to answer, and the one the P9/P12 Bitterpan set silently failed.
+    // The cards are still authored and still stepped, so every diagnostics
+    // number stays comparable; only the meshes stop being drawn.
+    this.root.visible = searchParam("living") !== "0";
 
     this.batches = authored.batches.map((batch) => makeBatch(
       batch.spec,
@@ -276,6 +362,8 @@ export class LivingWorld {
         anchorY: 0,
         anchorZ: 0,
         hangY: 0,
+        rightX: 1,
+        rightZ: 0,
         flowSample: null,
       })),
       makeMaterial(batch.spec, sheets, textures),
@@ -290,6 +378,8 @@ export class LivingWorld {
         card.anchorY = sample.position.y + card.base;
         card.anchorZ = sample.position.z + sample.right.z * offset * card.side;
         card.hangY = sample.position.y + (card.hang ?? 0);
+        card.rightX = sample.right.x;
+        card.rightZ = sample.right.z;
         if (card.kind === "flow") card.flowSample = this.course.createSampleScratch();
       }
     }
@@ -431,6 +521,22 @@ export class LivingWorld {
             y = card.hangY - card.height / 2 * Math.cos(angle);
             break;
           }
+          case "cross": {
+            // P20.4. The card walks ACROSS the road on the course's own lateral
+            // axis, not the camera's: `cameraRight` would make the traverse
+            // depend on where the driver is looking, and a scud has to keep
+            // crossing the same way while the camera swings through a bend.
+            //
+            // One traverse per `1 / speed` seconds, `amplitude` metres either
+            // side of the anchor. The sawtooth wraps hard, which is invisible
+            // because the `cross` alpha envelope reads the SAME sawtooth and is
+            // zero at both ends of it.
+            const amount = (this.elapsedSeconds * card.speed + card.phase) % 1;
+            const travel = (amount * 2 - 1) * (card.amplitude ?? 0);
+            x += card.rightX * travel * card.side;
+            z += card.rightZ * travel * card.side;
+            break;
+          }
           case "shear":
             shear = Math.sin(
               this.elapsedSeconds * card.speed + card.phase,
@@ -494,7 +600,55 @@ export class LivingWorld {
     for (const batch of this.batches) {
       if (batch.spec.lamps) this.updateLampColors(batch);
     }
+    this.visibilityAccumulatorSeconds += deltaSeconds;
+    if (
+      camera
+      && this.visibilityAccumulatorSeconds >= 1 / VISIBILITY_SAMPLE_HZ
+    ) {
+      this.visibilityAccumulatorSeconds = 0;
+      this.stats.visibleCards = this.countVisibleCards(camera);
+    }
     return true;
+  }
+
+  /**
+   * P20.4. How many cards the camera can actually see, right now.
+   *
+   * Read off the position buffer that was just written rather than off the
+   * authored anchors, because half the motions in the set move a card metres
+   * from its anchor and two of them (`devil`, `cross`) move it across the road.
+   * The test is the card's own bounding sphere, not its centre: a 480 m haze
+   * card fills the frame long after its centre has left it, and counting
+   * centres would report the horizon ring as invisible exactly when it is
+   * covering the sky.
+   */
+  private countVisibleCards(camera: THREE.Camera): number {
+    camera.updateMatrixWorld();
+    const projection = (camera as THREE.PerspectiveCamera).projectionMatrix;
+    this.visibilityMatrix.multiplyMatrices(projection, camera.matrixWorldInverse);
+    this.visibilityFrustum.setFromProjectionMatrix(this.visibilityMatrix);
+    let visible = 0;
+    for (const batch of this.batches) {
+      for (let cardIndex = 0; cardIndex < batch.cards.length; cardIndex += 1) {
+        const offset = cardIndex * 12;
+        // Vertex 0 is the card's bottom-left corner and vertex 2 its top-right,
+        // so their midpoint is the centre and half their separation the radius,
+        // for both the camera-facing and the flat writer.
+        const x0 = batch.positions[offset];
+        const y0 = batch.positions[offset + 1];
+        const z0 = batch.positions[offset + 2];
+        const x2 = batch.positions[offset + 6];
+        const y2 = batch.positions[offset + 7];
+        const z2 = batch.positions[offset + 8];
+        this.visibilitySphere.center.set((x0 + x2) / 2, (y0 + y2) / 2, (z0 + z2) / 2);
+        const dx = (x2 - x0) / 2;
+        const dy = (y2 - y0) / 2;
+        const dz = (z2 - z0) / 2;
+        this.visibilitySphere.radius = Math.sqrt(dx * dx + dy * dy + dz * dz);
+        if (this.visibilityFrustum.intersectsSphere(this.visibilitySphere)) visible += 1;
+      }
+    }
+    return visible;
   }
 
   private updateCardAlpha(
@@ -511,7 +665,14 @@ export class LivingWorld {
           this.elapsedSeconds * (Math.PI * 2 / 9) + card.phase,
         );
         break;
-      case "rise": {
+      // P20.4 round 2. `scudShoulder` and `brineSwell` are the SAME birth-and-
+      // dissolve shape as `rise`; only the envelope's ceiling differs, because
+      // the thing that separates them is the corridor rule and not the motion.
+      // Sharing the case rather than copying it is deliberate: three copies of
+      // this curve would drift apart the first time one of them was tuned.
+      case "rise":
+      case "scudShoulder":
+      case "brineSwell": {
         const progress = (this.elapsedSeconds * card.speed + card.seed) % 1;
         amount = Math.min(1, progress * 4)
           * (1 - Math.max(0, (progress - 0.62) / 0.38));
@@ -551,6 +712,14 @@ export class LivingWorld {
           this.elapsedSeconds * (Math.PI * 2 / SHIMMER_PERIOD_SECONDS) + card.phase,
         );
         break;
+      case "cross": {
+        // The SAME sawtooth the `cross` motion advances on, so the card is
+        // invisible at both ends of its traverse and the wrap is never seen.
+        // Any other clock here puts a hard pop in the middle of the road.
+        const progress = (this.elapsedSeconds * card.speed + card.phase) % 1;
+        amount = Math.sin(Math.PI * progress);
+        break;
+      }
     }
     const envelope = ALPHA_ENVELOPES[alphaKind];
     const alpha = envelope[0]

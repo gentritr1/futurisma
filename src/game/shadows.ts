@@ -7,6 +7,7 @@ import {
   SHADOW_NORMAL_BIAS,
   SHADOW_UNLIT_FLOOR,
   shadowMapSize,
+  shadowMapType,
   shadowsEnabled,
 } from "./shadow-settings.js";
 
@@ -21,18 +22,26 @@ import {
  * that file for why the import surface is kept that small.
  */
 
+/** The `?shadowType=` value, resolved to the constant three actually wants. */
+const SHADOW_MAP_TYPES: Record<string, THREE.ShadowMapType> = {
+  basic: THREE.BasicShadowMap,
+  pcf: THREE.PCFShadowMap,
+  vsm: THREE.VSMShadowMap,
+};
+
 /**
  * Arms the renderer. Called from `game.ts` in place of the `shadowMap.enabled =
  * false` this phase replaced, so the race loop keeps its one line.
  *
- * `PCFSoftShadowMap` over `VSMShadowMap`: VSM needs a blur pass over the map
- * every frame and leaks light through the thin conveyor spans that BRINE CUT is
- * built from, which is exactly the shadow this phase exists to show.
+ * P20.7: the filter is named by {@link shadowMapType}, and the default is
+ * `PCFShadowMap` — see the note on `SHADOW_MAP_TYPE` in shadow-settings.js for
+ * why the `PCFSoftShadowMap` this line used to carry was never the filter the
+ * renderer ran, and for where the VSM comparison lives.
  */
 export function configureShadowMap(renderer: THREE.WebGLRenderer): void {
   const enabled = shadowsEnabled();
   renderer.shadowMap.enabled = enabled;
-  if (enabled) renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  if (enabled) renderer.shadowMap.type = SHADOW_MAP_TYPES[shadowMapType()];
 }
 
 /**

@@ -1,0 +1,184 @@
+[
+  {
+    "file": "px-0150.png",
+    "changed": 224,
+    "nearEdge": 224,
+    "tight": 97,
+    "signedLuma": -3.14,
+    "edgeRows": 259,
+    "bbox": [
+      13,
+      244,
+      1092,
+      557
+    ]
+  },
+  {
+    "file": "px-0310.png",
+    "changed": 52,
+    "nearEdge": 50,
+    "tight": 35,
+    "signedLuma": -6.43,
+    "edgeRows": 260,
+    "bbox": [
+      6,
+      190,
+      1030,
+      541
+    ]
+  },
+  {
+    "file": "px-0574.png",
+    "changed": 414,
+    "nearEdge": 384,
+    "tight": 221,
+    "signedLuma": 1.89,
+    "edgeRows": 260,
+    "bbox": [
+      4,
+      258,
+      1090,
+      558
+    ]
+  },
+  {
+    "file": "px-0830.png",
+    "changed": 356,
+    "nearEdge": 355,
+    "tight": 275,
+    "signedLuma": -2.08,
+    "edgeRows": 260,
+    "bbox": [
+      0,
+      216,
+      1070,
+      559
+    ]
+  },
+  {
+    "file": "px-1080.png",
+    "changed": 2119,
+    "nearEdge": 2109,
+    "tight": 782,
+    "signedLuma": 59.58,
+    "edgeRows": 221,
+    "bbox": [
+      0,
+      249,
+      1090,
+      559
+    ]
+  },
+  {
+    "file": "px-1343.png",
+    "changed": 828,
+    "nearEdge": 825,
+    "tight": 620,
+    "signedLuma": 0.48,
+    "edgeRows": 260,
+    "bbox": [
+      5,
+      248,
+      1095,
+      559
+    ]
+  },
+  {
+    "file": "px-1600.png",
+    "changed": 565,
+    "nearEdge": 532,
+    "tight": 472,
+    "signedLuma": 1.72,
+    "edgeRows": 260,
+    "bbox": [
+      5,
+      134,
+      1094,
+      558
+    ]
+  },
+  {
+    "file": "px-1784.png",
+    "changed": 628,
+    "nearEdge": 628,
+    "tight": 459,
+    "signedLuma": 2.85,
+    "edgeRows": 260,
+    "bbox": [
+      4,
+      293,
+      1099,
+      559
+    ]
+  },
+  {
+    "file": "px-2050.png",
+    "changed": 272,
+    "nearEdge": 272,
+    "tight": 236,
+    "signedLuma": 1.94,
+    "edgeRows": 260,
+    "bbox": [
+      6,
+      293,
+      1088,
+      559
+    ]
+  },
+  {
+    "file": "px-2300.png",
+    "changed": 978,
+    "nearEdge": 978,
+    "tight": 845,
+    "signedLuma": -1.83,
+    "edgeRows": 260,
+    "bbox": [
+      0,
+      247,
+      1093,
+      559
+    ]
+  },
+  {
+    "file": "px-2512.png",
+    "changed": 1603,
+    "nearEdge": 1313,
+    "tight": 622,
+    "signedLuma": -1.36,
+    "edgeRows": 260,
+    "bbox": [
+      0,
+      210,
+      1089,
+      559
+    ]
+  },
+  {
+    "file": "px-2660.png",
+    "changed": 383,
+    "nearEdge": 382,
+    "tight": 322,
+    "signedLuma": -1.65,
+    "edgeRows": 260,
+    "bbox": [
+      1,
+      168,
+      1098,
+      558
+    ]
+  },
+  {
+    "file": "px-2900.png",
+    "changed": 208,
+    "nearEdge": 197,
+    "tight": 145,
+    "signedLuma": -2.17,
+    "edgeRows": 260,
+    "bbox": [
+      10,
+      187,
+      1055,
+      557
+    ]
+  }
+]

@@ -40,45 +40,70 @@ assert.ok(
   javascript.rawBytes <= 950 * 1024,
   `Initial JavaScript exceeds 950 KiB raw (${(javascript.rawBytes / 1024).toFixed(1)} KiB).`,
 );
-// Re-baselined twice on 2026-09-03, from 224.2 KiB gzip before either phase:
+// The JavaScript ceiling, re-baselined four times on 2026-09-03 from 224.2 KiB
+// gzip. Every rationale is kept, because each one names what its bytes bought
+// and a later phase deciding whether to spend more needs all of them:
 //
-//   P20.1 directional shadow mapping  +1.1 KiB - src/game/shadows.ts, the
+//   P20.1 directional shadow mapping  +1.1 KiB - src/game/shadows.ts: the
 //     shadow settings, the texel-snapping maths and the shadow-receiving
 //     stand-in material for Bitterpan's unlit deck overlay. An earlier
-//     arrangement cost +2.0 KiB because seven lazy modules imported it and
-//     Rollup promoted it to a shared chunk; the import surface was cut to
-//     three call sites to buy that back.
+//     arrangement of the same code cost +2.0 KiB because seven lazy modules
+//     imported it and Rollup promoted it to a shared chunk; the import surface
+//     was cut to three call sites to buy that back.
+//   P20.6 pan-floor macro field  +0.8 KiB - the vertex colour generator and its
+//     shader injection, measured at 226.1 KiB on a tree with P20.3/P20.4/P20.7.
+//   P20.5 sky decoupled from fog  +2.2 KiB - src/game/sky-profile.js (two
+//     authored sky tables and the cloud profiles), src/game/speed-line-profile.js
+//     and the rewritten dome fragment shader. GLSL is string content that
+//     survives minification, so the shader is the expensive half; its
+//     explanatory comments were moved OUT of the template literal into
+//     TypeScript above it, which bought back 1.2 KiB of the 3.4 KiB the first
+//     arrangement cost. What was NOT done, and why the ceiling had to move
+//     instead: the Bitterpan sky is authored in BITTERPAN_PRODUCTION.json and
+//     the Greenwater sector distances in course.ts, and importing either from
+//     atmosphere.ts - which is in the initial shell - would have pulled a 12 KiB
+//     or a 253 KiB lazy map chunk into first paint. The tables are mirrored in
+//     sky-profile.js instead and validate-lighting.mjs fails if a mirror drifts.
 //   G1 rivals that race + slipstream  +6.3 KiB - the per-map rival pace model
 //     with its boost-reserve, pad and drift economies, the lane constraint
 //     solver that keeps the field off the player and off each other,
-//     `calculateSlipstream` and its two integrator terms, the HUD chip, and
-//     the rival/slipstream telemetry the soaks read. The pace data itself is
-//     ~0.6 KiB of that. G1 round two added the last 2.5 KiB: the launch model
-//     (a one-off grid fan plus a lateral rate limit over the opening 260 m),
-//     the player/rival race-distance origin correction, and the two telemetry
+//     `calculateSlipstream` and its two integrator terms, the HUD chip, and the
+//     rival/slipstream telemetry the soaks read. The pace data itself is
+//     ~0.6 KiB. Round two added 2.5 KiB of that total: the launch model (a
+//     one-off grid fan plus a lateral rate limit over the opening 260 m), the
+//     player/rival race-distance origin correction, and the two telemetry
 //     channels that found it - the tow's own inputs measured against the
 //     world-space separation the same frame drew, and a record of where the
 //     field's closest approach actually happened.
 //
-// Measured with `npx vite build && node scripts/validate-build.mjs`; raise only
-// with a fresh measurement and a note saying what the bytes bought.
+// Measured on the merged tree with `npx vite build && node
+// scripts/validate-build.mjs`: 232.8 KiB gzip over 10 initial chunks, against
+// the 224.2 KiB all four phases started from. The individual figures above were
+// each taken on their own branch and do not sum exactly to it - Rollup splits
+// differently once four phases share a tree, and this build has 10 initial
+// chunks where the pre-phase one had 8. The merged number is the real one and
+// the one this ceiling is set from. The validator prints it live every run.
+// Raise only with a fresh measurement and a note saying what the bytes bought.
 assert.ok(
-  javascriptGzip <= 232 * 1024,
-  `JavaScript bundle exceeds 232 KiB gzip (${(javascriptGzip / 1024).toFixed(1)} KiB).`,
+  javascriptGzip <= 234 * 1024,
+  `JavaScript bundle exceeds 234 KiB gzip (${(javascriptGzip / 1024).toFixed(1)} KiB).`,
 );
-// Re-baselined 2026-08-28 from a measured 4.35 KiB gzip (the 4 KiB ceiling predated
-// the HUD turn-cue and hazard styling) plus headroom for the planned minimap and
-// meta-layer UI. Raise only with a fresh measurement and rationale.
+// Re-baselined 2026-08-28 from a measured 4.35 KiB gzip (the 4 KiB ceiling
+// predated the HUD turn-cue and hazard styling) plus headroom for the planned
+// minimap and meta-layer UI, and still comfortable at 5.10 KiB with G1's
+// SLIPSTREAM chip in. Raise only with a fresh measurement and rationale.
 assert.ok(
   stylesheetGzip <= 8 * 1024,
   `Stylesheet exceeds 8 KiB gzip (${(stylesheetGzip / 1024).toFixed(1)} KiB).`,
 );
-// Re-baselined alongside the JavaScript ceiling above, from a measured
-// 238.3 KiB gzip (HTML 3.1 + JS 230.0 + CSS 5.1). The stylesheet grew 0.75 KiB
-// for G1's SLIPSTREAM chip and still sits well under its own 8 KiB ceiling.
+// Shell = HTML + initial JS + CSS. It moves with the JS ceiling above and for
+// the same reason. The only shell-specific cost this round is G1's SLIPSTREAM
+// chip, 0.75 KiB of stylesheet, which still leaves CSS well under its own 8 KiB
+// ceiling; HTML is untouched by every phase above. Measured on the merged tree
+// at 241.0 KiB (HTML 3.1 + JS 232.8 + CSS 5.1).
 assert.ok(
-  shellGzip <= 243 * 1024,
-  `Initial app shell exceeds 243 KiB gzip (${(shellGzip / 1024).toFixed(1)} KiB).`,
+  shellGzip <= 245 * 1024,
+  `Initial app shell exceeds 245 KiB gzip (${(shellGzip / 1024).toFixed(1)} KiB).`,
 );
 assert.ok(
   html.includes('rel="preload"')

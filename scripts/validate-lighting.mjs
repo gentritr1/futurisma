@@ -870,6 +870,280 @@ assert.equal(
     + "stand for, or the fixture reads as unlit metal under a lit pool.",
 );
 
+/* ------------------------------------------------------------------ */
+/* 8. P20.5 — the sky dome is authored, and is not the fog              */
+/* ------------------------------------------------------------------ */
+
+// The point of P20.5 is that the framed sky stopped being a wash of the
+// ground's own hue. That is a claim about NUMBERS — a haze cooler than the fog
+// under it, a zenith darker than the haze, a hue that is not the pan's — so it
+// is pinned here rather than left to a screenshot nobody re-takes.
+
+const sky = await import("../src/game/sky-profile.js");
+
+function channels(hex) {
+  return [(hex >> 16) & 255, (hex >> 8) & 255, hex & 255];
+}
+/** Rec.709 luma of an sRGB hex, 0-255. Used for ordering, never as a target. */
+function hexLuma(hex) {
+  const [r, g, b] = channels(hex);
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+/** HSV hue in degrees. */
+function hexHue(hex) {
+  const [r, g, b] = channels(hex).map((value) => value / 255);
+  const max = Math.max(r, g, b);
+  const delta = max - Math.min(r, g, b);
+  if (delta < 1e-6) return 0;
+  let hue;
+  if (max === r) hue = ((g - b) / delta) % 6;
+  else if (max === g) hue = (b - r) / delta + 2;
+  else hue = (r - g) / delta + 4;
+  return (((hue * 60) % 360) + 360) % 360;
+}
+/** How blue a colour is over how red it is, in 0-255 sRGB. */
+function coolness(hex) {
+  const [r, , b] = channels(hex);
+  return b - r;
+}
+const hexString = (value) => `#${value.toString(16).padStart(6, "0")}`;
+
+// --- The Bitterpan table in sky-profile.js MIRRORS the map JSON. atmosphere.ts
+// cannot import the map (a 12 KiB lazy chunk) without dragging it into the
+// initial shell, which validate-build holds to 226 KiB gzip. The mirror is
+// allowed; the drift is not. The JSON is the authoring surface and this is what
+// makes that true.
+assert.equal(
+  sky.BITTERPAN_SKY_ZONES.length,
+  bitterpanProfiles.length,
+  "sky-profile.js and BITTERPAN_PRODUCTION.json disagree on how many sectors "
+    + "Bitterpan has.",
+);
+for (let index = 0; index < bitterpanProfiles.length; index += 1) {
+  const authoredSky = bitterpanProfiles[index];
+  const mirrored = sky.BITTERPAN_SKY_ZONES[index];
+  assert.equal(
+    mirrored.sector,
+    authoredSky.sector,
+    `sky-profile.js zone ${index} is ${mirrored.sector}; the map says `
+      + `${authoredSky.sector}.`,
+  );
+  assert.equal(
+    mirrored.distance,
+    authoredSky.distance,
+    `${authoredSky.sector} sky zone starts at ${mirrored.distance} m in `
+      + `sky-profile.js and ${authoredSky.distance} m in the map.`,
+  );
+  for (const [field, jsonKey] of [["horizon", "skyHorizon"], ["zenith", "skyZenith"]]) {
+    assert.ok(
+      typeof authoredSky[jsonKey] === "string",
+      `Bitterpan ${authoredSky.sector} authors no ${jsonKey}. P20.5 requires one `
+        + "per sector.",
+    );
+    assert.equal(
+      hexString(mirrored[field]),
+      authoredSky[jsonKey].toLowerCase(),
+      `Bitterpan ${authoredSky.sector} ${jsonKey} is ${authoredSky[jsonKey]} in the `
+        + `map and ${hexString(mirrored[field])} in sky-profile.js. The mirror has `
+        + "drifted; the map is the authoring surface.",
+    );
+  }
+  assert.equal(
+    mirrored.blendDegrees,
+    authoredSky.skyHorizonBlendDegrees,
+    `Bitterpan ${authoredSky.sector} sky blend disagrees between map and mirror.`,
+  );
+}
+
+// --- Greenwater's sky zones mirror the sector distances in course.ts, so the
+// sky changes sector on the same metre the palette and the fog do. A sector
+// added to one table and not the other is the failure this catches.
+assert.deepEqual(
+  sky.GREENWATER_SKY_ZONES.map((zone) => zone.sector),
+  authored.map((zone) => zone.sector),
+  "GREENWATER_SKY_ZONES and SECTOR_PALETTE_DEFINITIONS disagree on the sectors "
+    + "or their order around the lap.",
+);
+for (let index = 0; index < authored.length; index += 1) {
+  assert.equal(
+    sky.GREENWATER_SKY_ZONES[index].distance,
+    authored[index].distance,
+    `${authored[index].sector} starts at ${authored[index].distance} m in course.ts `
+      + "but somewhere else in sky-profile.js; the sky would change sector on a "
+      + "different metre from the light.",
+  );
+}
+
+// --- The relations the phase is actually about, per sector, on both maps.
+const fogByBitterpanSector = new Map(
+  bitterpanProfiles.map((profile) => [
+    profile.sector,
+    Number.parseInt(profile.fog.color.slice(1), 16),
+  ]),
+);
+const greenwaterFogHex = [...paletteBlock.matchAll(/\n\s*fog: (0x[0-9a-f]+),/g)]
+  .map((match) => Number.parseInt(match[1], 16));
+assert.equal(
+  greenwaterFogHex.length,
+  12,
+  "Expected 12 Greenwater sector fogs to compare the sky against, found "
+    + `${greenwaterFogHex.length}.`,
+);
+
+for (const [label, zones, fogs] of [
+  [
+    "Bitterpan",
+    sky.BITTERPAN_SKY_ZONES,
+    sky.BITTERPAN_SKY_ZONES.map((zone) => fogByBitterpanSector.get(zone.sector)),
+  ],
+  ["Greenwater", sky.GREENWATER_SKY_ZONES, greenwaterFogHex],
+]) {
+  for (let index = 0; index < zones.length; index += 1) {
+    const zone = zones[index];
+    const fog = fogs[index];
+    assert.ok(
+      hexLuma(zone.zenith) < hexLuma(zone.horizon) - 20,
+      `${label} ${zone.sector}: the zenith (${hexLuma(zone.zenith).toFixed(0)}) is not `
+        + `clearly darker than the haze (${hexLuma(zone.horizon).toFixed(0)}). Without `
+        + "that drop the dome is a flat wash again.",
+    );
+    assert.ok(
+      coolness(zone.horizon) > coolness(fog),
+      `${label} ${zone.sector}: the haze is not cooler than the sector fog `
+        + `(${coolness(zone.horizon)} vs ${coolness(fog)}). A haze at the fog's own `
+        + "temperature is the coupling P20.5 exists to break.",
+    );
+    // Where the sector fog is WARM — the khaki that made Bitterpan's sky read
+    // as more pan — the haze has to leave that hue entirely. 60 degrees is a
+    // whole sextant of the wheel and still allows a green-grey sky.
+    //
+    // Greenwater's fogs are already cool greys and greens (RUNWAY_START is
+    // hue 197), so a hue-separation rule there would only force the sky away
+    // from a temperature it is supposed to share. `coolness` above is the
+    // assertion that carries those sectors.
+    const fogHue = hexHue(fog);
+    const fogIsWarm = fogHue < 90 || fogHue > 300;
+    if (fogIsWarm) {
+      const separation = Math.abs(((hexHue(zone.horizon) - fogHue + 540) % 360) - 180);
+      assert.ok(
+        separation > 60,
+        `${label} ${zone.sector}: haze hue ${hexHue(zone.horizon).toFixed(0)} deg is `
+          + `only ${separation.toFixed(0)} deg from the warm fog's `
+          + `${fogHue.toFixed(0)} deg. That is the sky wearing the ground's pigment.`,
+      );
+    }
+    assert.ok(
+      zone.blendDegrees >= 12 && zone.blendDegrees <= 26,
+      `${label} ${zone.sector}: sky blend ${zone.blendDegrees} deg is outside the `
+        + "12-26 deg band the chase camera frames.",
+    );
+  }
+}
+
+// Bitterpan is a salt pan at noon: its sky is blue-grey, not the green-grey
+// Greenwater's humidity earns. Measured over 13 stations at 1280x720, the framed
+// upper sky reads 195-204 degrees with these values.
+for (const zone of sky.BITTERPAN_SKY_ZONES) {
+  for (const field of ["horizon", "zenith"]) {
+    const hue = hexHue(zone[field]);
+    assert.ok(
+      hue >= 185 && hue <= 235,
+      `Bitterpan ${zone.sector} ${field} hue ${hue.toFixed(0)} deg is outside the `
+        + "185-235 deg blue-grey band the pan's sky is authored to.",
+    );
+  }
+}
+for (const zone of sky.GREENWATER_SKY_ZONES) {
+  for (const field of ["horizon", "zenith"]) {
+    const hue = hexHue(zone[field]);
+    assert.ok(
+      hue >= 140 && hue <= 235,
+      `Greenwater ${zone.sector} ${field} hue ${hue.toFixed(0)} deg is outside the `
+        + "140-235 deg green-grey to blue-grey band.",
+    );
+  }
+}
+
+// --- The cloud band. The coverage bands are the brief's; the drift ceiling is
+// what keeps a sky from reading as a scrolling texture.
+assert.ok(
+  sky.CLOUD_PROFILES.greenwater.coverage >= 0.45
+    && sky.CLOUD_PROFILES.greenwater.coverage <= 0.6,
+  `Greenwater cloud coverage ${sky.CLOUD_PROFILES.greenwater.coverage} is outside `
+    + "the authored 0.45-0.6 overcast band.",
+);
+assert.ok(
+  sky.CLOUD_PROFILES.bitterpan.coverage >= 0.15
+    && sky.CLOUD_PROFILES.bitterpan.coverage <= 0.3,
+  `Bitterpan cloud coverage ${sky.CLOUD_PROFILES.bitterpan.coverage} is outside the `
+    + "authored 0.15-0.3 sparse-dust band.",
+);
+for (const [map, profile] of Object.entries(sky.CLOUD_PROFILES)) {
+  assert.ok(
+    profile.driftPerSecond > 0
+      && profile.driftPerSecond <= sky.CLOUD_MAX_DRIFT_PER_SECOND,
+    `${map} cloud drift ${profile.driftPerSecond}/s is not inside `
+      + `(0, ${sky.CLOUD_MAX_DRIFT_PER_SECOND}] turns per second.`,
+  );
+  assert.ok(
+    Number.isInteger(profile.azimuthPeriod),
+    `${map} cloud azimuthPeriod ${profile.azimuthPeriod} is not an integer; the `
+      + "value-noise lattice would not wrap and the sky would seam at due east.",
+  );
+  assert.ok(
+    profile.seed % 1 !== 0,
+    `${map} cloud seed ${profile.seed} is a whole turn, which multiplies into a `
+      + "whole number of lattice cells and therefore seeds nothing.",
+  );
+  assert.ok(
+    profile.lowDegrees >= 3 && profile.highDegrees <= 32,
+    `${map} cloud band ${profile.lowDegrees}-${profile.highDegrees} deg escapes the `
+      + "4-30 deg window the brief confines it to.",
+  );
+}
+assert.notEqual(
+  sky.CLOUD_PROFILES.greenwater.azimuthPeriod,
+  sky.CLOUD_PROFILES.bitterpan.azimuthPeriod,
+  "Both maps sample the cloud lattice at the same period, so they would show the "
+    + "same sky rotated. Give them different periods.",
+);
+
+// --- ...and the sky reaches the dome. Data nothing reads is not a feature.
+for (const needle of [
+  "skyZonesFor(course.kind)",
+  "this.updateSkyPalette(distanceMetres, tint, response)",
+  "uniform vec3 hazeColor;",
+  "mix(sqrt(hazeColor), sqrt(topColor)",
+  "skyRamp.x",
+]) {
+  assert.ok(
+    atmosphereSource.includes(needle),
+    `atmosphere.ts no longer contains \`${needle}\`; the authored sky is not `
+      + "reaching the dome.",
+  );
+}
+// The sun is part of the dome now rather than a mesh in the transparent queue.
+// That is the fix for the occlusion leak — measured inside HANGAR_SIX with the
+// sun forced to screen centre, 262 of its pixels drew over opaque geometry
+// before and 8 after — and a build that puts the mesh back reintroduces it.
+assert.ok(
+  !atmosphereSource.includes("createSunDisc"),
+  "atmosphere.ts is building a separate sun-disc mesh again. A transparent mesh "
+    + "at renderOrder -999 is drawn before every other transparent surface and "
+    + "cannot be occluded by anything that does not write depth.",
+);
+assert.ok(
+  atmosphereSource.includes("dot(dir, sunDirection)"),
+  "The sun must be painted inside the dome's fragment shader, where every "
+    + "surface in the scene covers it.",
+);
+// Reduced motion must be able to stop the sky, not merely slow it.
+assert.ok(
+  /if \(!reducedMotion\) \{\s*\n\s*this\.cloudPhase \+= delta \* this\.cloudProfile\.driftPerSecond;/
+    .test(atmosphereSource),
+  "The cloud drift phase must only advance when reduced motion is off.",
+);
+
 console.log(
   "Lighting motion PASS: 12 normalized sector key directions, max "
     + `${maxDelta.toFixed(3)}°/m over ${samples} samples (budget `
@@ -883,5 +1157,11 @@ console.log(
     + `2 authored, rim boost ${rimBoost}), ${lampDistances.length} hangar lamps `
     + `at ${lampDistances.join("/")} m over a ${lampRange} m range `
     + `(darkest deck point ${(darkestFraction * 100).toFixed(0)}% of range, `
-    + `spill ${spillBefore.toFixed(1)}/${spillAfter.toFixed(1)} m past the mouths).`,
+    + `spill ${spillBefore.toFixed(1)}/${spillAfter.toFixed(1)} m past the mouths); `
+    + `P20.5 sky authored on ${sky.BITTERPAN_SKY_ZONES.length} Bitterpan and `
+    + `${sky.GREENWATER_SKY_ZONES.length} Greenwater sectors, every haze cooler than `
+    + "its own fog and every zenith 20+ luma under its haze; cloud coverage "
+    + `${sky.CLOUD_PROFILES.bitterpan.coverage}/${sky.CLOUD_PROFILES.greenwater.coverage} `
+    + `drifting ${sky.CLOUD_PROFILES.bitterpan.driftPerSecond}/`
+    + `${sky.CLOUD_PROFILES.greenwater.driftPerSecond} turns per second.`,
 );

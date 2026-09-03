@@ -339,7 +339,7 @@ export class FuturismaGame {
     this.scene.fog = new THREE.FogExp2(initialFog.color, initialFog.density);
 
     this.scene.add(this.course.group, this.vehicle.root);
-    this.effects = new RaceEffects(this.reducedMotion);
+    this.effects = new RaceEffects(this.reducedMotion, this.course.kind);
     this.camera.add(this.effects.speedLines);
     this.scene.add(this.camera, this.effects.sparkPoints);
     this.atmosphere = new RaceAtmosphere(

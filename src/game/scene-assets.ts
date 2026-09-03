@@ -3,6 +3,23 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { ASSET_KIT_PROP_PLACEMENTS } from "./asset-kit-layout";
 import type { BitterpanSurface } from "./bitterpan-surface";
+import { panFloorProbeActive, panFloorProbeMode } from "./floor-probe.js";
+
+/**
+ * P20.6 `?floorprobe=1|2` — the review-only view.
+ *
+ * Everything that is not the road, the pan floor or the sky is hidden, so the
+ * floor's own variation can be measured instead of the decals, rigs, facades
+ * and signage that otherwise dominate any number taken off the pan band. The
+ * layer still LOADS — its diagnostics stay honest and its load errors still
+ * surface — it simply does not draw.
+ *
+ * Returns its argument so it can wrap a `scene.add` without moving a line.
+ */
+function hiddenUnderFloorProbe<T extends THREE.Object3D>(root: T): T {
+  if (panFloorProbeActive()) root.visible = false;
+  return root;
+}
 import type { BitterpanMidground } from "./bitterpan-midground";
 import type { CorridorSweepResult } from "./corridor-sweep";
 import type {
@@ -370,7 +387,7 @@ export class SceneAssets {
         }
         this.authoredEnvironment = environment;
         await this.clearCorridorObstacles(environment.root);
-        this.scene.add(environment.root);
+        this.scene.add(hiddenUnderFloorProbe(environment.root));
         this.environmentReady = true;
         this.requestRender();
         // Bitterpan's zone set names only the shared motion atlases, so it needs
@@ -403,7 +420,7 @@ export class SceneAssets {
       await this.clearCorridorObstacles(environment.root);
       setProceduralEnvironmentVisible(this.course.group, false);
       environment.updateVisibility(this.camera);
-      this.scene.add(environment.root);
+      this.scene.add(hiddenUnderFloorProbe(environment.root));
       this.environmentReady = true;
       this.requestRender();
       await Promise.all([
@@ -446,7 +463,7 @@ export class SceneAssets {
         return;
       }
       this.livingWorld = livingWorld;
-      this.scene.add(livingWorld.root);
+      this.scene.add(hiddenUnderFloorProbe(livingWorld.root));
       this.livingWorldReady = true;
       this.requestRender();
     } catch (error) {
@@ -512,7 +529,7 @@ export class SceneAssets {
         this.course,
       );
       this.surfaceCharacter = surfaceCharacter;
-      this.scene.add(surfaceCharacter.root);
+      this.scene.add(hiddenUnderFloorProbe(surfaceCharacter.root));
       this.surfaceCharacterReady = true;
       this.requestRender();
     } catch (error) {
@@ -542,7 +559,7 @@ export class SceneAssets {
         return;
       }
       this.openingSurface = openingSurface;
-      this.scene.add(openingSurface.root);
+      this.scene.add(hiddenUnderFloorProbe(openingSurface.root));
       this.openingSurfaceReady = true;
       this.requestRender();
     } catch (error) {
@@ -568,6 +585,7 @@ export class SceneAssets {
         this.course,
         BITTERPAN_CRUST_TILE_URL,
         BITTERPAN_CRUST_DECAL_URL,
+        panFloorProbeMode(),
       );
       if (this.isDisposed()) {
         disposeObject3DResources(surface.root);
@@ -610,7 +628,7 @@ export class SceneAssets {
         return;
       }
       this.bitterpanMidground = midground;
-      this.scene.add(midground.root);
+      this.scene.add(hiddenUnderFloorProbe(midground.root));
       this.midgroundReady = true;
       this.requestRender();
     } catch (error) {
@@ -641,7 +659,7 @@ export class SceneAssets {
         return;
       }
       this.plaqueBacking = backing;
-      this.scene.add(backing.root);
+      this.scene.add(hiddenUnderFloorProbe(backing.root));
       this.plaqueBackingReady = true;
       this.requestRender();
     } catch (error) {
@@ -675,7 +693,7 @@ export class SceneAssets {
         return;
       }
       this.signageBacks = backs;
-      this.scene.add(backs.root);
+      this.scene.add(hiddenUnderFloorProbe(backs.root));
 
       if (this.course.kind === "bitterpan") {
         const material = (backs.root.children[0] as THREE.Mesh).material;
@@ -687,7 +705,7 @@ export class SceneAssets {
           return;
         }
         this.roadEdgeBand = band;
-        this.scene.add(band.root);
+        this.scene.add(hiddenUnderFloorProbe(band.root));
       }
       this.trimLayersReady = true;
       this.requestRender();
@@ -712,7 +730,7 @@ export class SceneAssets {
         return;
       }
       this.signage = signage;
-      this.scene.add(signage.root);
+      this.scene.add(hiddenUnderFloorProbe(signage.root));
       this.signageReady = true;
       this.requestRender();
     } catch (error) {
@@ -742,7 +760,7 @@ export class SceneAssets {
         disposeObject3DResources(dressingDisplay);
         return;
       }
-      this.scene.add(dressingDisplay);
+      this.scene.add(hiddenUnderFloorProbe(dressingDisplay));
       const proceduralCables = this.course.group.getObjectByName("cable_trip_hazards");
       if (proceduralCables) proceduralCables.visible = false;
       this.assetKitReady = true;
@@ -995,6 +1013,29 @@ export class SceneAssets {
       bpCrustTriangles: bitterpanSurface?.triangles ?? 0,
       bpGroundMetresPerTile: bitterpanSurface?.groundMetresPerTile ?? 0,
       bpGroundAnisotropy: bitterpanSurface?.groundAnisotropy ?? 0,
+      // P20.6 — the pan floor's macro colour field. Nested, like `midground`
+      // above, because the acceptance reads `panFloor.segments` directly. The
+      // floor is not interactive, so these are the only automated evidence
+      // that the field is on the mesh: `segments` collapsing to 1 means the
+      // subdivision never happened, and `meanLuma` off 1.0 means this stopped
+      // being a variation pass and became a re-grade.
+      panFloor: bitterpanSurface?.panFloor
+        ? {
+          segments: bitterpanSurface.panFloor.segments,
+          macroSeed: bitterpanSurface.panFloor.macroSeed,
+          secondaryScale: Number(bitterpanSurface.panFloor.secondaryScale.toFixed(6)),
+          vertices: bitterpanSurface.panFloor.vertices,
+          meanLuma: Number(bitterpanSurface.panFloor.meanLuma.toFixed(5)),
+          peakBrightness: Number(bitterpanSurface.panFloor.peakBrightness.toFixed(4)),
+          peakHue: Number(bitterpanSurface.panFloor.peakHue.toFixed(4)),
+          windDegrees: bitterpanSurface.panFloor.windDegrees,
+          streakBands: bitterpanSurface.panFloor.streakBands,
+          brineWeightMean: Number(bitterpanSurface.panFloor.brineWeightMean.toFixed(5)),
+          probe: bitterpanSurface.panFloor.probe,
+        }
+        : { segments: 0, macroSeed: 0, secondaryScale: 0, vertices: 0, meanLuma: 0,
+          peakBrightness: 0, peakHue: 0, windDegrees: 0, streakBands: 0,
+          brineWeightMean: 0, probe: false },
       plaqueBackingLoadMs: this.plaqueBackingLoadMs === null
         ? null
         : Number(this.plaqueBackingLoadMs.toFixed(1)),
@@ -1037,6 +1078,10 @@ export class SceneAssets {
       livingWorldError: this.livingWorldError,
       livingWorldDrawCalls: stats?.drawCalls ?? 0,
       livingWorldCards: stats?.cards ?? 0,
+      // P20.4. Authored cards say what exists; visible cards say what the
+      // driver can see. Bitterpan shipped 154 of the first and none of the
+      // second, and only this number would have caught it.
+      livingWorldVisibleCards: stats?.visibleCards ?? 0,
       livingWorldTriangles: stats?.triangles ?? 0,
       livingWorldUpdateHz: stats?.updateHz ?? 0,
       livingWorldUpdateSteps: stats?.updateSteps ?? 0,
