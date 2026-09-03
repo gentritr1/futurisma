@@ -590,6 +590,7 @@ assert.equal(crust.ground.runtime.wrapT, "RepeatWrapping");
 // ---------------------------------------------------------------------------
 
 const panFloor = await import("../src/game/pan-floor-colour.js");
+const floorProbe = await import("../src/game/floor-probe.js");
 
 assert.equal(panFloor.PAN_FLOOR_SEGMENTS, 128, "The pan floor is subdivided 128 x 128.");
 assert.equal(panFloor.PAN_FLOOR_MACRO_SEED, 206_101, "The pan floor macro seed is pinned.");
@@ -608,10 +609,9 @@ for (const [label, cell] of [
       + `multiple of the ${panVertexSpacing} m vertex spacing.`,
   );
 }
-// Amplitude bounds. The upper bound is the phase's own ceiling, NOT the brief's
-// +/-9%: that number was measured to be below the eye's threshold on this pan
-// (see src/game/pan-floor-colour.js for the three-amplitude measurement), so the
-// shipped value is 0.18 and the guard is set where a re-grade would start.
+// Amplitude bounds on the SMOOTH vertex field. It is no longer what carries the
+// read — the streaks and brine flats below are — so the guard is only there to
+// stop a future pass turning a variation field into a grade.
 assert.ok(
   panFloor.PAN_FLOOR_BRIGHTNESS_AMPLITUDE > 0.05
     && panFloor.PAN_FLOOR_BRIGHTNESS_AMPLITUDE <= 0.2,
@@ -656,6 +656,115 @@ assert.ok(
   `The pan floor hue axis sums to ${panHueSum}, so swinging along it changes `
     + "brightness as well as colour.",
 );
+
+// --- The fragment-stage features -------------------------------------------
+//
+// Round 1 of this phase put a smooth field in vertex colours; it measured 4.8
+// luma against a 1.1 luma noise floor and it was invisible, because a smooth
+// gradient multiplied into a bright texture under AgX flattens to nothing. What
+// reads on a plain is FEATURES WITH EDGES. These pins are on the numbers that
+// make an edge an edge.
+
+assert.equal(panFloor.PAN_FLOOR_WIND_DEGREES, 292, "The streaks lie along the authored wind.");
+{
+  const [windX, windZ] = panFloor.PAN_FLOOR_WIND_VECTOR;
+  assert.ok(
+    Math.abs(Math.hypot(windX, windZ) - 1) < 1e-9,
+    "The wind vector is not a unit vector.",
+  );
+  const bearing = (Math.atan2(windX, windZ) * 180) / Math.PI;
+  assert.ok(
+    Math.abs(((bearing % 360) + 360) % 360 - panFloor.PAN_FLOOR_WIND_DEGREES) < 1e-6,
+    `The wind vector points at ${bearing} degrees, not ${panFloor.PAN_FLOOR_WIND_DEGREES}.`,
+  );
+}
+// 25:1, which is what makes a streak a streak rather than a blob.
+{
+  const stretch = panFloor.PAN_FLOOR_STREAK_LENGTH_METRES
+    / panFloor.PAN_FLOOR_STREAK_WIDTH_METRES;
+  assert.ok(
+    stretch >= 20 && stretch <= 30,
+    `The streak cell is stretched ${stretch}:1; the accepted band is 20:1 to 30:1.`,
+  );
+}
+// Terraced, and strictly ordered: a wide weak band with a narrow bright core
+// INSIDE it. Two thresholds that crossed would put the bright band outside the
+// weak one and the streak would lose its edge.
+assert.equal(panFloor.PAN_FLOOR_STREAK_BANDS.length, 2, "Two bright terrace bands.");
+assert.ok(
+  panFloor.PAN_FLOOR_STREAK_BANDS[0].threshold < panFloor.PAN_FLOOR_STREAK_BANDS[1].threshold,
+  "The bright streak core must sit inside the weak band, not beside it.",
+);
+for (const band of panFloor.PAN_FLOOR_STREAK_BANDS) {
+  assert.ok(
+    band.threshold > 0.5 && band.threshold < 1,
+    `A streak terrace threshold is ${band.threshold}; the ridge field runs 0 to 1 and `
+      + "piles up near 1, so a threshold below 0.5 fires almost everywhere.",
+  );
+}
+assert.ok(
+  panFloor.PAN_FLOOR_SCOUR_THRESHOLD > panFloor.PAN_FLOOR_STREAK_BANDS[0].threshold,
+  "The dark scour band must be sparser than the weak bloom band.",
+);
+assert.ok(
+  panFloor.PAN_FLOOR_STREAK_OCTAVE_SCALE > 1,
+  "The coarse streak octave has to be coarser than the fine one.",
+);
+
+// Brine flats. The shoreline and the rim are in METRES on the ground, which is
+// the whole reason a pool has a shore instead of a blur; if either were a noise
+// fraction it would scale with distance and stop reading.
+assert.ok(
+  panFloor.PAN_FLOOR_SHORE_METRES > 0 && panFloor.PAN_FLOOR_SHORE_METRES <= 4,
+  `The brine shoreline is ${panFloor.PAN_FLOOR_SHORE_METRES} m.`,
+);
+assert.ok(
+  panFloor.PAN_FLOOR_RIM_METRES > panFloor.PAN_FLOOR_SHORE_METRES,
+  "The dried-salt rim has to be wider than the shoreline it sits inside.",
+);
+assert.ok(
+  panFloor.PAN_FLOOR_BRINE_SCALE_METRES >= 60 && panFloor.PAN_FLOOR_BRINE_SCALE_METRES <= 200,
+  `Brine flats are authored 40-200 m; the region scale is `
+    + `${panFloor.PAN_FLOOR_BRINE_SCALE_METRES} m.`,
+);
+assert.ok(
+  panFloor.PAN_FLOOR_BRINE_THRESHOLD_WET < panFloor.PAN_FLOOR_BRINE_THRESHOLD_DRY,
+  "Pools must be MORE common in the wet sectors, not less.",
+);
+assert.ok(
+  panFloor.PAN_FLOOR_BRINE_DEEP_LUMA < panFloor.PAN_FLOOR_BRINE_LUMA
+    && panFloor.PAN_FLOOR_BRINE_LUMA < 1,
+  "A brine flat is darker than the crust, and its middle darker than its rim.",
+);
+assert.ok(
+  panFloor.PAN_FLOOR_RIM_LIFT > 0,
+  "The dried-salt rim is a LIFT; a negative one would be a second shoreline.",
+);
+// The tint carries colour only. Same rule as the vertex hue axis: a tint whose
+// channels do not average 1 would move brightness as well, and the brightness
+// is already set by BRINE_LUMA against a measured tone curve.
+{
+  const tint = panFloor.PAN_FLOOR_BRINE_TINT;
+  const mean = (tint[0] + tint[1] + tint[2]) / 3;
+  assert.ok(
+    Math.abs(mean - 1) < 1e-9,
+    `The brine tint averages ${mean}, so it darkens as well as cools.`,
+  );
+  assert.ok(tint[2] > tint[0], "The brine tint must be COOLER than neutral, not warmer.");
+}
+// The trim is a correction, not a grade. Anything past +/-15% would mean the
+// features are being used to re-light the pan.
+assert.ok(
+  panFloor.PAN_FLOOR_FEATURE_TRIM > 0.85 && panFloor.PAN_FLOOR_FEATURE_TRIM < 1.15,
+  `The feature trim is ${panFloor.PAN_FLOOR_FEATURE_TRIM}; past +/-15% it is a grade.`,
+);
+// The review-only probe must be OFF under Node, where there is no `window`.
+assert.equal(floorProbe.panFloorProbeMode(), 0, "The floor probe defaults on.");
+assert.equal(floorProbe.panFloorProbeActive(), false, "The floor probe defaults on.");
+
+// Every vertex carries a brine weight, and some of them are nonzero — a weight
+// field that came back all-zero would draw no pool anywhere and no other
+// counter in the diagnostics would move.
 
 // The tile mean, recomputed from the asset the shader divides by.
 const panTileMeasured = meanLinearRgb(
@@ -721,6 +830,21 @@ for (const [label, extra] of [
     generated.extremes.brightness <= panFloor.PAN_FLOOR_BRIGHTNESS_LIMIT + 1e-9,
     "The pan floor brightness clamp did not hold.",
   );
+  assert.equal(
+    generated.brineWeights.length,
+    generated.vertices,
+    "The brine weight field does not cover the subdivided plane.",
+  );
+  const weighted = generated.brineWeights.filter((weight) => weight > 0.01).length;
+  if (extra.ribbon) {
+    assert.ok(
+      weighted > 200,
+      `Only ${weighted} vertices carry a brine weight ${label}; no pool would draw in `
+        + "the wet sectors and nothing else in the diagnostics would move.",
+    );
+  } else {
+    assert.equal(weighted, 0, "A run with no ribbon must place no brine weight at all.");
+  }
 }
 
 assert.equal(crust.decalCount, 297, "Art pass 02 authors 297 pan crust decals.");
@@ -1841,5 +1965,10 @@ console.log(
     + `${panFloor.PAN_FLOOR_FINE_METRES} m, both whole multiples of the 47.25 m vertex `
     + `spacing), re-run under Node to a mean within 2/255 of flat; tile-break at 1/37 `
     + `and 1/23 blended ${panFloor.PAN_FLOOR_SECONDARY_BLEND} toward a tile mean `
-    + `recomputed from the PNG.`,
+    + `recomputed from the PNG; wind streaks along `
+    + `${panFloor.PAN_FLOOR_WIND_DEGREES} degrees terraced into `
+    + `${panFloor.PAN_FLOOR_STREAK_BANDS.length + 1} bands over two octaves, and brine `
+    + `flats at ${panFloor.PAN_FLOOR_BRINE_SCALE_METRES} m with a `
+    + `${panFloor.PAN_FLOOR_SHORE_METRES} m shoreline and a `
+    + `${panFloor.PAN_FLOOR_RIM_METRES} m dried-salt rim, both measured in metres.`,
 );
