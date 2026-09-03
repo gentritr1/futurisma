@@ -255,11 +255,69 @@ assert.ok(
     + "measurement, and re-derive when the hover changes.",
 );
 
+// ---------------------------------------------------------------------------
+// 7. The Bitterpan pan plane may not be drawn over the ribbon AT ALL.
+//
+// The last pinned residual was never an object standing in the corridor - it was
+// the pan floor drawn OVER the road. `GROUND_Y_METRES` is a flat -1.95 m, picked
+// as 0.078 m below the ribbon's CENTRELINE low point; the ribbon banks 2.5 deg,
+// so its lowest DRAWN surface is the run-off lip at -2.7446 m, three quarters of
+// a metre below the plane meant to sit under everything. Same shape of error as
+// the bounding floor in section 6: a clearance computed against the wrong
+// reference. `pan-floor-relief.js` now carves the grid down under the stations
+// that need it.
+//
+// ASSERTED FROM A MEASUREMENT, NOT A MODEL. An earlier pass computed the overlap
+// here analytically from the centreline, and it was both approximate and wrong
+// in the reassuring direction: it modelled the deck only, and it read the plane
+// height off a swept vertex rather than the source constant. What the census
+// carries now is the runtime's own check, taken on the geometry that was built -
+// the displaced grid sampled BILINEARLY at both deck edges and both run-off lips
+// of all 610 stations, which is the surface the GPU actually rasterises and not
+// the continuous function that displaced it.
+//
+// `reliefVertices` is asserted alongside, because `coveredSides: 0` on its own
+// is exactly what a floor layer that never loaded would report.
+// ---------------------------------------------------------------------------
+const bitterpan = byMap.get("bitterpan");
+const panFloor = bitterpan.panFloor;
+assert.ok(
+  panFloor,
+  "The Bitterpan census carries no panFloor block, so the pan-plane fix is "
+    + "unmeasured. Re-capture the baseline against a dev server.",
+);
+assert.equal(
+  panFloor.coveredSides,
+  0,
+  `The Bitterpan pan plane is drawn over the ribbon on ${panFloor.coveredSides} `
+    + `station-side(s), worst ${panFloor.coveredWorstMetres} m. The floor must sit `
+    + "under every drawn surface of the road, at every station, on both sides. "
+    + "See pan-floor-relief.js.",
+);
+assert.ok(
+  panFloor.reliefVertices > 0 && panFloor.reliefMaxDropMetres > 0,
+  `The pan relief displaced ${panFloor.reliefVertices} vertices by at most `
+    + `${panFloor.reliefMaxDropMetres} m. Zero of either means the relief never `
+    + 'ran, and "0 covered sides" from a floor that was never built is not a '
+    + "clean reading - it is no reading.",
+);
+assert.equal(
+  panFloor.fix,
+  "b",
+  `The census was recorded with pan fix "${panFloor.fix}". "b" is the shipped `
+    + 'design; "a" (dropping GROUND_Y_METRES globally) is a review preview whose '
+    + "mid-ground props and road-edge lips are NOT re-derived, so a baseline "
+    + "taken under it does not describe anything shippable.",
+);
+
 const obstacles = CENSUS.maps.reduce((sum, map) => sum + map.obstacles.length, 0);
 console.log(
   `Corridor PASS: ${obstacles} obstacle group(s) inside the drivable corridor `
     + `across both maps — ${allowedSeen.size} collidable hazard mesh(es) and `
     + `${pinnedSeen.size} pinned residual(s), nothing unaccounted for. Bounding `
     + `floor ${tallFloor} m clears the ${hullBottom.toFixed(3)} m hull bottom; both `
-    + "DRIVABLE_LIMITS.json tables re-derive byte-identical from their captures.",
+    + "DRIVABLE_LIMITS.json tables re-derive byte-identical from their captures. "
+    + `Bitterpan pan plane covers the ribbon on ${panFloor.coveredSides} `
+    + `station-side(s), with ${panFloor.reliefVertices} grid vertices carved down `
+    + `by up to ${panFloor.reliefMaxDropMetres} m.`,
 );

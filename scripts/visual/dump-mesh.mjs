@@ -2,10 +2,10 @@
 // Usage: node scripts/visual/dump-mesh.mjs <base> <map> <meshName> <from> <to>
 import { chromium } from "playwright";
 
-const [base, map, mesh, from, to] = process.argv.slice(2);
+const [base, map, mesh, from, to, extraQuery = ""] = process.argv.slice(2);
 const url = `${base}/?diagnostics=1&probe=corridor-sweep&census=1`
   + `&dumpMesh=${encodeURIComponent(mesh)}&dumpFrom=${from}&dumpTo=${to}`
-  + (map === "bitterpan" ? "&map=bitterpan" : "");
+  + (map === "bitterpan" ? "&map=bitterpan" : "") + extraQuery;
 const browser = await chromium.launch({
   args: ["--use-angle=metal", "--enable-gpu", "--ignore-gpu-blocklist"],
 });

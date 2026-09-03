@@ -6,9 +6,9 @@
   "hullMarginMetres": 1.6,
   "rule": "limit = max(halfWidth, min(clampMax, tallGeometryLateral - hullMargin)); geometry at or below TALL_GEOMETRY_MIN_HEIGHT_METRES (0.6 m, the measured hull-bottom clearance) above the local deck plane does not bound, and neither does a collidable hazard.",
   "summary": {
-    "spans": 231,
-    "trimmedSides": 457,
-    "flooredToDeckEdge": 316,
+    "spans": 232,
+    "trimmedSides": 460,
+    "flooredToDeckEdge": 319,
     "maxTrimMetres": 7.012
   },
   "entries": [
@@ -313,7 +313,7 @@
       "right": {
         "limit": 12,
         "setBy": "GW_SECTOR_RUNWAY_START_metal",
-        "tall": 12.735
+        "tall": 12.73
       }
     },
     {
@@ -329,7 +329,7 @@
       "right": {
         "limit": 11.666,
         "setBy": "GW_SECTOR_RUNWAY_START_metal",
-        "tall": 12.488
+        "tall": 12.472
       }
     },
     {
@@ -343,9 +343,9 @@
         "tall": 11.804
       },
       "right": {
-        "limit": 14.733,
-        "setBy": "barrier_A_right",
-        "tall": 16.333
+        "limit": 11.333,
+        "setBy": "GW_SECTOR_RUNWAY_START_metal",
+        "tall": 11.979
       }
     },
     {
@@ -656,7 +656,7 @@
       "distance": 400,
       "halfWidth": 10.589,
       "clamp": 15.589,
-      "clampMax": 15.689,
+      "clampMax": 15.709,
       "left": {
         "limit": 10.589,
         "setBy": "GW_SECTOR_WATER_TABLE_metal",
@@ -665,7 +665,7 @@
       "right": {
         "limit": 10.589,
         "setBy": "GW_SECTOR_WATER_TABLE_metal",
-        "tall": 11.428
+        "tall": 11.416
       }
     },
     {
@@ -1511,9 +1511,9 @@
         "tall": 11.839
       },
       "right": {
-        "limit": 14.724,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
-        "tall": 16.324
+        "limit": 11.294,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_emissive",
+        "tall": 12.894
       }
     },
     {
@@ -1527,9 +1527,9 @@
         "tall": 11.681
       },
       "right": {
-        "limit": 14.109,
-        "setBy": "greenwater_open_edge_markers/<unnamed>",
-        "tall": 15.709
+        "limit": 13.789,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 15.389
       }
     },
     {
@@ -1568,11 +1568,11 @@
       "distance": 1190,
       "halfWidth": 9.941,
       "clamp": 15.741,
-      "clampMax": 15.742,
+      "clampMax": 15.757,
       "left": {
-        "limit": 10.258,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_emissive",
-        "tall": 11.858
+        "limit": 10.229,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 11.829
       },
       "right": {
         "limit": 9.941,
@@ -1586,9 +1586,9 @@
       "clamp": 15.732,
       "clampMax": 15.741,
       "left": {
-        "limit": 10.141,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_emissive",
-        "tall": 11.741
+        "limit": 10.101,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 11.701
       },
       "right": {
         "limit": 9.932,
@@ -1602,14 +1602,14 @@
       "clamp": 15.706,
       "clampMax": 15.713,
       "left": {
-        "limit": 13.687,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_jungle",
-        "tall": 15.287
+        "limit": 13.613,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 15.213
       },
       "right": {
-        "limit": 13.97,
-        "setBy": "greenwater_open_edge_markers/<unnamed>",
-        "tall": 15.57
+        "limit": 13.771,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 15.371
       }
     },
     {
@@ -1630,13 +1630,13 @@
     },
     {
       "distance": 1230,
-      "halfWidth": 9.873,
-      "clamp": 15.673,
+      "halfWidth": 9.865,
+      "clamp": 15.665,
       "clampMax": 15.68,
       "left": {
-        "limit": 13.904,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_jungle",
-        "tall": 15.504
+        "limit": 13.564,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 15.164
       },
       "right": {
         "limit": 13.94,
@@ -1648,11 +1648,11 @@
       "distance": 1240,
       "halfWidth": 9.848,
       "clamp": 15.648,
-      "clampMax": 15.65,
+      "clampMax": 15.664,
       "left": {
-        "limit": 10.049,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_emissive",
-        "tall": 11.649
+        "limit": 10.009,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 11.609
       },
       "right": {
         "limit": 9.848,
@@ -1682,14 +1682,14 @@
       "clamp": 15.618,
       "clampMax": 15.619,
       "left": {
-        "limit": 13.878,
-        "setBy": "greenwater_open_edge_markers/<unnamed>",
-        "tall": 15.478
+        "limit": 13.519,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 15.119
       },
       "right": {
-        "limit": 13.879,
-        "setBy": "greenwater_open_edge_markers/<unnamed>",
-        "tall": 15.479
+        "limit": 13.681,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 15.281
       }
     },
     {
@@ -1710,18 +1710,18 @@
     },
     {
       "distance": 1280,
-      "halfWidth": 9.788,
-      "clamp": 15.588,
+      "halfWidth": 9.772,
+      "clamp": 15.572,
       "clampMax": 15.588,
       "left": {
-        "limit": 13.848,
-        "setBy": "greenwater_open_edge_markers/<unnamed>",
-        "tall": 15.448
+        "limit": 13.472,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 15.072
       },
       "right": {
-        "limit": 13.848,
-        "setBy": "greenwater_open_edge_markers/<unnamed>",
-        "tall": 15.448
+        "limit": 13.636,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 15.236
       }
     },
     {
@@ -1730,9 +1730,9 @@
       "clamp": 15.55,
       "clampMax": 15.558,
       "left": {
-        "limit": 9.958,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_emissive",
-        "tall": 11.558
+        "limit": 9.917,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 11.517
       },
       "right": {
         "limit": 9.75,
@@ -1758,18 +1758,18 @@
     },
     {
       "distance": 1310,
-      "halfWidth": 9.727,
-      "clamp": 15.527,
-      "clampMax": 15.527,
+      "halfWidth": 9.726,
+      "clamp": 15.526,
+      "clampMax": 15.528,
       "left": {
-        "limit": 13.787,
-        "setBy": "greenwater_open_edge_markers/<unnamed>",
-        "tall": 15.387
+        "limit": 13.589,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 15.189
       },
       "right": {
-        "limit": 13.787,
-        "setBy": "greenwater_open_edge_markers/<unnamed>",
-        "tall": 15.387
+        "limit": 13.429,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 15.029
       }
     },
     {
@@ -1789,14 +1789,30 @@
       }
     },
     {
+      "distance": 1330,
+      "halfWidth": 9.68,
+      "clamp": 15.48,
+      "clampMax": 15.482,
+      "left": {
+        "limit": 13.542,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 15.142
+      },
+      "right": {
+        "limit": 13.383,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 14.983
+      }
+    },
+    {
       "distance": 1340,
       "halfWidth": 9.657,
       "clamp": 15.457,
       "clampMax": 15.468,
       "left": {
-        "limit": 9.866,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_emissive",
-        "tall": 11.466
+        "limit": 9.825,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 11.425
       },
       "right": {
         "limit": 9.657,
@@ -1808,16 +1824,16 @@
       "distance": 1350,
       "halfWidth": 9.635,
       "clamp": 15.435,
-      "clampMax": 15.435,
+      "clampMax": 15.436,
       "left": {
         "limit": 13.695,
         "setBy": "greenwater_open_edge_markers/<unnamed>",
         "tall": 15.295
       },
       "right": {
-        "limit": 13.695,
-        "setBy": "greenwater_open_edge_markers/<unnamed>",
-        "tall": 15.295
+        "limit": 13.335,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 14.935
       }
     },
     {
@@ -1856,7 +1872,12 @@
       "distance": 1380,
       "halfWidth": 9.58,
       "clamp": 15.38,
-      "clampMax": 15.38,
+      "clampMax": 15.39,
+      "left": {
+        "limit": 13.451,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 15.051
+      },
       "right": {
         "limit": 13.173,
         "setBy": "GW_SECTOR_CANOPY_PASSAGE_jungle",
@@ -1869,9 +1890,9 @@
       "clamp": 15.366,
       "clampMax": 15.375,
       "left": {
-        "limit": 9.775,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_emissive",
-        "tall": 11.375
+        "limit": 9.734,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 11.334
       },
       "right": {
         "limit": 9.566,
@@ -1890,9 +1911,9 @@
         "tall": 13.619
       },
       "right": {
-        "limit": 13.603,
-        "setBy": "greenwater_open_edge_markers/<unnamed>",
-        "tall": 15.203
+        "limit": 13.243,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 14.843
       }
     },
     {
@@ -1933,9 +1954,9 @@
       "clamp": 15.313,
       "clampMax": 15.392,
       "left": {
-        "limit": 9.793,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_emissive",
-        "tall": 11.393
+        "limit": 9.752,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 11.352
       },
       "right": {
         "limit": 9.513,
@@ -1949,9 +1970,9 @@
       "clamp": 15.393,
       "clampMax": 15.396,
       "left": {
-        "limit": 9.91,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_emissive",
-        "tall": 11.51
+        "limit": 9.881,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
+        "tall": 11.481
       },
       "right": {
         "limit": 9.593,
@@ -2013,9 +2034,9 @@
       "clamp": 15.102,
       "clampMax": 16.067,
       "left": {
-        "limit": 10.426,
-        "setBy": "GW_SECTOR_THE_ELBOW_emissive",
-        "tall": 12.026
+        "limit": 10.386,
+        "setBy": "GW_SECTOR_THE_ELBOW_metal",
+        "tall": 11.986
       },
       "right": {
         "limit": 10.01,
@@ -2093,9 +2114,9 @@
       "clamp": 16.238,
       "clampMax": 17.161,
       "left": {
-        "limit": 11.509,
-        "setBy": "GW_SECTOR_THE_ELBOW_emissive",
-        "tall": 13.109
+        "limit": 11.468,
+        "setBy": "GW_SECTOR_THE_ELBOW_metal",
+        "tall": 13.068
       },
       "right": {
         "limit": 11.238,
@@ -2980,7 +3001,7 @@
       "right": {
         "limit": 11.5,
         "setBy": "GW_SECTOR_FUEL_ROW_metal",
-        "tall": 12.3
+        "tall": 12.294
       }
     },
     {
@@ -2996,7 +3017,7 @@
       "right": {
         "limit": 11.5,
         "setBy": "GW_SECTOR_FUEL_ROW_metal",
-        "tall": 12.31
+        "tall": 12.303
       }
     },
     {
@@ -3012,7 +3033,7 @@
       "right": {
         "limit": 11.5,
         "setBy": "GW_SECTOR_FUEL_ROW_metal",
-        "tall": 12.326
+        "tall": 12.318
       }
     },
     {
@@ -3026,9 +3047,9 @@
         "tall": 12.185
       },
       "right": {
-        "limit": 14.9,
-        "setBy": "barrier_A_right",
-        "tall": 16.5
+        "limit": 11.5,
+        "setBy": "GW_SECTOR_FUEL_ROW_metal",
+        "tall": 12.325
       }
     },
     {
@@ -3266,9 +3287,9 @@
         "tall": 11.86
       },
       "right": {
-        "limit": 14.516,
-        "setBy": "barrier_A_right",
-        "tall": 16.116
+        "limit": 11.086,
+        "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
+        "tall": 11.985
       }
     },
     {
@@ -3300,7 +3321,7 @@
       "right": {
         "limit": 11.45,
         "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
-        "tall": 12.353
+        "tall": 12.347
       }
     },
     {

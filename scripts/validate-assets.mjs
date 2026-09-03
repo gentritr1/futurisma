@@ -84,8 +84,51 @@ const expectedArtPassHashes = {
     "0ad6d3efe0511ea0872e7582e0b00f8f146d0cbf2ebd585eee70329079e63ca5",
   "greenwater/textures/futurisma_trim_512.png":
     "b27bcae3f44bd1203c6e935bcacd598af2409526832fa7791bf40013842a9318",
+  // H2a. The generated horizon sheet, which is the DEFAULT sheet — the P18 one
+  // above stays served as `?art=base`. Its provenance is NOT
+  // build-futurisma-atlases.mjs but `python3
+  // scripts/prepare-higgsfield-textures.py`, which is deterministic, ships in
+  // the repo and takes `--check` to re-derive without writing. The inputs it
+  // reads are 5-7 MB Higgsfield generations under `assets-in/higgsfield/batch1/`
+  // and are gitignored: they are raw generations, not source art, and this
+  // sheet is the artefact.
+  "greenwater/textures/futurisma_horizon_hf_1024.png":
+    "169c30729904ec20edaa44c33298704bb76ce5c387ba39e8f7f9d6256653c967",
 };
 
+/**
+ * H2a. The served weight of the art pack, asserted rather than described.
+ *
+ * The phase was given a 2.5 MB raw ceiling for everything it adds under
+ * `public/`. It spends 193.3 KiB of it, on one file:
+ *
+ *   futurisma_horizon_hf_1024.png   197,939 bytes  (+148,922 over the 49,017
+ *                                                   the P18 sheet weighs)
+ *
+ * The "added" column is the honest one: the P18 sheet stays served as the
+ * `?art=base` way back, so this costs its own full weight and not a difference.
+ *
+ * THREE OTHER CANDIDATES WERE PREPARED AND ARE NOT HERE. A generated pan crust
+ * tile (428,926 bytes) and facade sheet (664,721) were built, wired, shot at
+ * five Bitterpan stations and rejected on the crops — the crust's macro
+ * polygons came out about twice the shipping tile's, which makes the 12 m
+ * repeat visible, and the facade skins were tone-matched into their sheet
+ * closely enough to be hard to tell apart at 2300 m. A brine tile (441,696) had
+ * no texture slot to go into. Together they would have been 1,535,343 bytes,
+ * roughly eight times what shipped, for changes the review could not see. They
+ * are still emitted by the preparation script into `shots/higgsfield/`, which
+ * .gitignore covers, so the rejects stay reproducible without being served.
+ *
+ * This is a TEXTURE, not shell bytes: it is not in the initial JS/CSS that
+ * validate-build.mjs weighs, and it is fetched only when a session loads the
+ * living-world layer.
+ */
+const ART_PACK_BYTES = {
+  "greenwater/textures/futurisma_horizon_hf_1024.png": 197939,
+};
+const ART_PACK_RAW_CEILING = 2.5 * 1000 * 1000;
+
+let artPackRawBytes = 0;
 for (const [relativePath, expectedHash] of Object.entries(expectedArtPassHashes)) {
   const bytes = await readFile(
     new URL(`../public/assets/${relativePath}`, import.meta.url),
@@ -96,7 +139,29 @@ for (const [relativePath, expectedHash] of Object.entries(expectedArtPassHashes)
     expectedHash,
     `${relativePath} is not the sheet the atlas builder emitted.`,
   );
+  const expectedBytes = ART_PACK_BYTES[relativePath];
+  if (expectedBytes === undefined) continue;
+  assert.equal(
+    bytes.byteLength,
+    expectedBytes,
+    `${relativePath} is ${bytes.byteLength} bytes against a pinned `
+      + `${expectedBytes}. Re-run \`python3 scripts/prepare-higgsfield-textures.py\` `
+      + "and move the pin WITH the measurement, not ahead of it.",
+  );
+  artPackRawBytes += bytes.byteLength;
 }
+assert.equal(
+  Object.keys(ART_PACK_BYTES).length,
+  1,
+  "The art pack is ONE sheet. Round 2 of the review cut it from three; a "
+    + "second needs its own budget line and its own crop, not a quiet addition "
+    + "to a total.",
+);
+assert.ok(
+  artPackRawBytes <= ART_PACK_RAW_CEILING,
+  `The H2a art pack adds ${(artPackRawBytes / 1024).toFixed(1)} KiB raw under `
+    + `public/, over its ${(ART_PACK_RAW_CEILING / 1024).toFixed(1)} KiB ceiling.`,
+);
 
 let assetKitBytes;
 for (const [relativePath, expectedHash] of Object.entries(expectedHashes)) {

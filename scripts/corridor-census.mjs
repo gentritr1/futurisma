@@ -95,52 +95,22 @@ export const CENSUS_ALLOWED_MESHES = Object.freeze([
 ]);
 
 /**
- * Solid geometry that is STILL standing in the drivable corridor after P21, one
- * row per object, with the measured depth and the reason it survived.
+ * Solid geometry still standing in the drivable corridor, one row per object.
  *
- * This table is a debt, not a rule, and it is written down instead of being
- * absorbed by a category so that it stays countable. The P21 brief's own
- * instruction was to re-pin `RUN_OFF_INTRUSIONS` to EMPTY, and this is not that:
- * `scripts/validate-corridor.mjs` asserts the census is exactly the allowed
- * hazards plus exactly these rows, so a new intrusion fails the build and a row
- * that stops intruding must be deleted — but the rows themselves are unfixed.
+ * EMPTY, and `scripts/validate-corridor.mjs` asserts it stays that way in both
+ * directions: an intrusion that is not a collidable hazard fails the build, and
+ * a row here that no longer intrudes fails it too. The P21 brief asked for the
+ * P12 exception table to be re-pinned to EMPTY and for this one never to grow
+ * into its replacement; three rounds later there is nothing in it.
  *
- * Five of the six are vertices INSIDE `greenwater_environment_runtime.glb`,
- * which arrives merged one mesh per sector per material. There is no placement
- * record to move and no sub-object to relocate: the fix is either an edit to a
- * frozen art asset or a further narrowing of the derived corridor, and the
- * corridor narrowing was measured and rejected (see the note on
- * `TALL_GEOMETRY_MIN_HEIGHT_METRES` and the gap-fill experiment in the P21
- * report). The sixth is Bitterpan's own pan floor: a single vertex of the ground
- * the craft drives ON, not an object standing in the corridor.
+ * Round 1 closed the boards and gate posts (they were never in the corridor -
+ * the derived limits already excluded them). Round 2 closed five Greenwater
+ * environment-GLB rows with a mesh-class derivation floor. Round 3 closed the
+ * last one, Bitterpan's pan floor, which was never an object at all: the pan
+ * plane was drawn OVER the ribbon, and `pan-floor-relief.js` now carves it down
+ * under the stations where the road dips below the datum.
  */
-export const CENSUS_PINNED_RESIDUALS = Object.freeze({
-  "greenwater_authored_environment|GW_SECTOR_CANOPY_PASSAGE_emissive":
-    "Canopy Passage light strip. Its in-band vertices top out at 0.42 m; the "
-    + "group also carries an overhead element at 3.51 m, which is why the band "
-    + "spans 0.07-3.51. Inside the environment GLB.",
-  "greenwater_authored_environment|GW_SECTOR_RUNWAY_START_metal":
-    "Trackside barrier at Runway Start. The same barrier bounds the LEFT side "
-    + "(floored to the deck edge at 190 m); on the right it measures 0.57 m "
-    + "over 200-220 m, under the 0.60 m hull-bottom floor. Inside the GLB.",
-  "greenwater_authored_environment|GW_SECTOR_FUEL_ROW_metal":
-    "The same barrier at Fuel Row, 0.31-0.51 m over 2110-2120 m, between two "
-    + "spans where it floors the limit to the deck edge. Inside the GLB.",
-  "greenwater_authored_environment|GW_SECTOR_RUNWAY_HOME_metal":
-    "The same barrier at Runway Home, 0.38-0.55 m over 2260-2270 m, likewise "
-    + "between two floored spans. Inside the GLB.",
-  "greenwater_authored_environment|GW_SECTOR_CANOPY_PASSAGE_metal":
-    "Canopy Passage wall, inner face at 14.94 m against a 15.47 m limit. The "
-    + "spans either side trim it to 13.3-13.4 m; 1330 m and 1380 m have no row "
-    + "of their own. Inside the GLB.",
-  "bitterpan_surface_layer|BP_PAN_FLOOR":
-    "One vertex of the pan floor, 0.58 m proud of the deck plane 18.7 m out. "
-    + "This is the surface the craft drives ON — the corridor's floor, not an "
-    + "object in it — and the apron cross-section does not model the pan's own "
-    + "macro relief.",
-});
-
-export const CENSUS_MAPS = Object.freeze([
+export const CENSUS_PINNED_RESIDUALS = Object.freeze({});export const CENSUS_MAPS = Object.freeze([
   { map: "greenwater", query: "" },
   { map: "bitterpan", query: "&map=bitterpan" },
 ]);
@@ -338,6 +308,17 @@ export function baselineOf(map, report) {
     meshesSwept: report.corridorSweepMeshes,
     verticesSwept: report.corridorSweepVertices,
     groups: (report.corridorIntrusionList ?? []).length,
+    // P21.3 - the pan-plane fix, measured on the geometry that was built.
+    // Bitterpan only; `null` on Greenwater, which has no pan floor.
+    panFloor: report.panFloor?.segments
+      ? {
+        fix: report.panFloor.fix,
+        coveredSides: report.panFloor.coveredSides,
+        coveredWorstMetres: report.panFloor.coveredWorstMetres,
+        reliefVertices: report.panFloor.reliefVertices,
+        reliefMaxDropMetres: report.panFloor.reliefMaxDropMetres,
+      }
+      : null,
     bands: {
       obstacle: report.corridorIntrusions,
       flush: report.corridorFlush,
