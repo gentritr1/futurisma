@@ -217,6 +217,34 @@ function makeMaterial(
       : THREE.NormalBlending,
     vertexColors: true,
     side: THREE.DoubleSide,
+    // P20.4 round 2. A transparent DoubleSide material is drawn TWICE by
+    // three.js — back faces, then front faces — so that a curved or folded
+    // transparent surface sorts against itself. Measured on the pinned station
+    // set: 7 living-world batches cost 14 of `renderer.info.render.calls`
+    // (64 - 50 at station 150 with `?living=0` as the B side), at every one of
+    // the 13 stations.
+    //
+    // Nothing here needs that sort. Every card is a FLAT quad with
+    // `depthWrite: false`; its own back face never occludes its own front face,
+    // and cards in a batch already blend in buffer order rather than in depth
+    // order. `forceSinglePass` keeps DoubleSide — the quad is still lit and
+    // still drawn from behind, which the sky-haze ring and the crossing scud
+    // both rely on — and drops the duplicate pass.
+    //
+    // AND IT IS FREE, WHICH IS NOT OBVIOUS. The two-pass path sets BackSide
+    // then FrontSide, and each of those culls the orientation the other draws,
+    // so a flat quad was never blended twice — the second pass drew zero
+    // triangles for every card facing the camera and the first drew zero for
+    // every card facing away. Verified rather than reasoned: the same four
+    // Greenwater poses shot before and after this flag differ by 906 / 611 /
+    // 6347 / 1305 changed pixels, and TWO RUNS OF THE BUILD WITH THE FLAG ON
+    // differ by 659 / 1157 / 6551 / 1460 at the same poses — the change is
+    // inside the harness's own noise. Greenwater is the map that can prove it:
+    // `flow` and `ripple` write the only living-world quads with a fixed
+    // world-space normal (writeFlatCard), 44 of them in GLINT_WATER_TABLE and
+    // GLINT_SWEEP_DRAINAGE, and stations 340 and 910 look straight down at
+    // them. A lost back face would show there first.
+    forceSinglePass: true,
     opacity: 1,
     fog: spec.fog,
   });
@@ -637,7 +665,14 @@ export class LivingWorld {
           this.elapsedSeconds * (Math.PI * 2 / 9) + card.phase,
         );
         break;
-      case "rise": {
+      // P20.4 round 2. `scudShoulder` and `brineSwell` are the SAME birth-and-
+      // dissolve shape as `rise`; only the envelope's ceiling differs, because
+      // the thing that separates them is the corridor rule and not the motion.
+      // Sharing the case rather than copying it is deliberate: three copies of
+      // this curve would drift apart the first time one of them was tuned.
+      case "rise":
+      case "scudShoulder":
+      case "brineSwell": {
         const progress = (this.elapsedSeconds * card.speed + card.seed) % 1;
         amount = Math.min(1, progress * 4)
           * (1 - Math.max(0, (progress - 0.62) / 0.38));

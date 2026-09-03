@@ -59,8 +59,16 @@ const BUDGETS = {
   // single draw call the phase was allowed) and +136 cards. Same rule again —
   // these are the measured post-integration costs of the five zones the phase
   // adds, not headroom. Greenwater is untouched by P20.4 and does not move.
+  //
+  // P20.4 ROUND 2 adds ten more cards and no batch: PAN_SCUD_CROSSING goes
+  // 10 -> 20. That is the zone that puts air over the racing line, and at ten
+  // cards over 2360 m it was one every 236 m — measured on the review station
+  // table (shots/p20.4r2/station-coverage.mjs), six of the thirteen stations
+  // had no crossing card anywhere in the 15-150 m window where a card is both
+  // in frame and big enough to read. Twenty is one every 118 m and every
+  // station has one. Draw calls do not move; the cost is 20 triangles.
   greenwater: { drawCalls: 7, cards: 280, triangles: 560 },
-  bitterpan: { drawCalls: 7, cards: 290, triangles: 580 },
+  bitterpan: { drawCalls: 7, cards: 300, triangles: 600 },
 };
 
 /**
@@ -209,12 +217,28 @@ const P20_BATCHES = {
  * renders a flat ground quad that is edge-on to the chase camera and invisible,
  * which is the exact class of mistake the P9 Bitterpan set shipped.
  */
+// ROUND 2 re-pins all five. What moved and why, zone by zone:
+//   PAN_SCUD_NEAR      span 2120 -> 2560 and the three authored windows dropped
+//                      for the even spread; two lateral tiers (inner 2.0-5.6 m
+//                      on `rise`, shoulder 6.2-8.0 m on `scudShoulder`); tint
+//                      0xe6dcc4 -> 0x4a4136; STEAM on the shoulder tier.
+//   PAN_SCUD_CROSSING  10 -> 20 cards, span 2100 -> 2560, windows dropped,
+//                      tint 0xe2d8bf -> 0x453d33.
+//   SALT_DEVIL_ROAD    tint 0xded5bd -> 0x3f382e. Nothing else.
+//   BRINE_HAZE_LOW     lateral floor 6 -> 7.5 m (which is what buys it the
+//                      `brineSwell` envelope), tint 0xd9e0dc -> 0xb9c1bd.
+//   PAN_SKY_HAZE       NOT re-authored. Its digest moves because it is the last
+//                      zone on a single seeded stream and the ten extra
+//                      crossing cards ahead of it shift that stream. Same 72
+//                      cards, same BP_SKY_HAZE_TINT, same bottom-above-eye
+//                      construction, all still asserted below; the ring is a
+//                      re-roll of the same distribution, not a re-author.
 const P20_ZONES = [
-  { id: "PAN_SCUD_NEAR", map: "bitterpan", batch: "air", from: 160, to: 2120, cards: 34, kind: "shear", digest: "0b6ec69406d3f2f7" },
-  { id: "PAN_SCUD_CROSSING", map: "bitterpan", batch: "air", from: 200, to: 2100, cards: 10, kind: "cross", digest: "2b6527873de789cb" },
-  { id: "SALT_DEVIL_ROAD", map: "bitterpan", batch: "air", from: 1198, to: 1240, cards: 4, kind: "devil", digest: "2b43c2d58b760d98" },
-  { id: "BRINE_HAZE_LOW", map: "bitterpan", batch: "air", from: 2600, to: 2960, cards: 16, kind: "mist", digest: "42cadeead47e65dc" },
-  { id: "PAN_SKY_HAZE", map: "bitterpan", batch: "skyHaze", from: 0, to: 3050, cards: 72, kind: "shear", digest: "2f1081bb5769ae93" },
+  { id: "PAN_SCUD_NEAR", map: "bitterpan", batch: "air", from: 160, to: 2560, cards: 34, kind: "shear", digest: "ab3f4ec74c7398b7" },
+  { id: "PAN_SCUD_CROSSING", map: "bitterpan", batch: "air", from: 200, to: 2560, cards: 20, kind: "cross", digest: "31c527cecfc96d37" },
+  { id: "SALT_DEVIL_ROAD", map: "bitterpan", batch: "air", from: 1198, to: 1240, cards: 4, kind: "devil", digest: "e27b47f8ced41c7b" },
+  { id: "BRINE_HAZE_LOW", map: "bitterpan", batch: "air", from: 2600, to: 2960, cards: 16, kind: "mist", digest: "a969ac97c2c2b2ac" },
+  { id: "PAN_SKY_HAZE", map: "bitterpan", batch: "skyHaze", from: 0, to: 3050, cards: 72, kind: "shear", digest: "b1aa89e52e9cc2c8" },
 ];
 
 /**
@@ -931,6 +955,223 @@ for (const authored of P20_ZONES) {
 }
 
 /**
+ * P20.4 ROUND 2 — THE NEAR CARDS READ AS DUST, NOT AS CRUST.
+ *
+ * Round 1 shipped these four zones tinted at the crust's own colour
+ * (PAN_SCUD_NEAR 0xe6dcc4, PAN_SCUD_CROSSING 0xe2d8bf, SALT_DEVIL_ROAD
+ * 0xded5bd, BRINE_HAZE_LOW 0xd9e0dc, Rec.709 luma 220 / 216 / 213 / 223) and
+ * its own honest read was that the cards are placed and moving correctly and
+ * are INVISIBLE in a still frame. A card tinted at the colour it is drawn over
+ * has no luminance to contribute in either direction, whatever its alpha.
+ *
+ * Vertex colour is a LINEAR multiplier applied before AgX and before the alpha
+ * blend (living-world.ts writes `(tint >> 16 & 255) / 255` straight into the
+ * colour attribute with no sRGB decode), so the tint is not a colour the card
+ * is drawn IN — it is a gain on the cell. The near crust renders at 78-102
+ * display luma over the four pan stations, and the three DUST zones have to
+ * land under that: the round-2 taste call, in the reviewer's words, is that
+ * near cards read as dust — darker and warmer than the crust, never lighter.
+ *
+ * Asserted here rather than left to the digests, because a digest tells the
+ * next phase that something moved and this tells it what may not:
+ *   - the three dust zones stay at or under DUST_TINT_LUMA_CEILING;
+ *   - the three dust zones stay WARM, red over green over blue, which is the
+ *     crust's own hue and the thing that stops "darker" from becoming "grey";
+ *   - BRINE_HAZE_LOW is the one zone allowed to be cool (blue at or over red),
+ *     because it is the wet basin rather than lifted crust, and it still has to
+ *     sit under the round-1 value it replaced.
+ */
+const DUST_TINT_LUMA_CEILING = 80;
+const BRINE_TINT_LUMA_CEILING = 200;
+const P20_DUST_ZONES = ["PAN_SCUD_NEAR", "PAN_SCUD_CROSSING", "SALT_DEVIL_ROAD"];
+const P20_ROUND_ONE_TINTS = {
+  PAN_SCUD_NEAR: 0xe6dcc4,
+  PAN_SCUD_CROSSING: 0xe2d8bf,
+  SALT_DEVIL_ROAD: 0xded5bd,
+  BRINE_HAZE_LOW: 0xd9e0dc,
+};
+for (const [zoneId, roundOne] of Object.entries(P20_ROUND_ONE_TINTS)) {
+  const cards = built.bitterpan.batches
+    .flatMap((batch) => batch.cards)
+    .filter((card) => card.motionId === zoneId);
+  assert.ok(cards.length > 0, `${zoneId} authored no cards to tint.`);
+  for (const card of cards) {
+    const luma = rec709(card.tint);
+    const red = (card.tint >> 16) & 0xff;
+    const green = (card.tint >> 8) & 0xff;
+    const blue = card.tint & 0xff;
+    assert.ok(
+      luma < rec709(roundOne),
+      `${zoneId} is tinted at luma ${luma.toFixed(1)}; round 1 shipped `
+        + `${rec709(roundOne).toFixed(1)} and was rejected for having no `
+        + "luminance contrast against the crust. It may not go back up.",
+    );
+    if (P20_DUST_ZONES.includes(zoneId)) {
+      assert.ok(
+        luma <= DUST_TINT_LUMA_CEILING,
+        `${zoneId} is tinted at luma ${luma.toFixed(1)}, over the `
+          + `${DUST_TINT_LUMA_CEILING} ceiling. The near crust renders at `
+          + "78-102 display luma and this is a linear gain on the cell, so a "
+          + "dust card tinted above the ceiling reads as haze on the crust "
+          + "rather than as dust in front of it.",
+      );
+      assert.ok(
+        red > green && green > blue,
+        `${zoneId} is tinted (${red}, ${green}, ${blue}); lifted salt crust is `
+          + "warm — red over green over blue — and a neutral dark card reads as "
+          + "a smudge on the lens rather than as air.",
+      );
+    } else {
+      assert.ok(
+        blue >= red && luma <= BRINE_TINT_LUMA_CEILING,
+        `${zoneId} is tinted (${red}, ${green}, ${blue}) at luma `
+          + `${luma.toFixed(1)}; the wet basin is the one zone allowed to be `
+          + "cooler than the crust, and it still has to sit under "
+          + `${BRINE_TINT_LUMA_CEILING}.`,
+      );
+    }
+  }
+}
+
+// The tint rule is only worth its lines if it fails on the thing it exists to
+// catch. Asserted against synthetic cards so the fixtures cannot drift with the
+// real zones — and needed as fixtures at all because a real re-tint trips the
+// zone DIGEST first, which says only that something moved.
+assert.throws(
+  () => {
+    const offender = { motionId: "FAKE_PALE_SCUD", tint: 0xe6dcc4 };
+    assert.ok(
+      rec709(offender.tint) <= DUST_TINT_LUMA_CEILING,
+      "dust tint is under the ceiling",
+    );
+  },
+  /dust tint is under the ceiling/,
+  "The dust-tint rule does not fail on round 1's crust-coloured tint, which is "
+    + "the exact value it exists to keep out.",
+);
+assert.throws(
+  () => {
+    const offender = { tint: 0x33383f };
+    const red = (offender.tint >> 16) & 0xff;
+    const green = (offender.tint >> 8) & 0xff;
+    const blue = offender.tint & 0xff;
+    assert.ok(red > green && green > blue, "dust tint is warm");
+  },
+  /dust tint is warm/,
+  "The dust-tint rule passes a cold grey-blue card, which reads as a smudge on "
+    + "the lens rather than as lifted salt crust.",
+);
+
+/**
+ * P20.4 ROUND 2 — THE TWO-TIER ALPHA, AND THE PLACEMENT IT DEPENDS ON.
+ *
+ * The 0.35 corridor cap is a rule about cards the craft flies THROUGH. Round 1
+ * applied it to the whole near zone, which cost the outboard cards a factor of
+ * two in density for nothing: measured on greenwater_motion_512, the MIST cell
+ * averages 0.167 alpha, so a card at 0.34 vertex alpha averages 5.7% opacity —
+ * under the 10-luma census threshold at every station.
+ *
+ * So PAN_SCUD_NEAR is two tiers, split on the same number the corridor rule
+ * reads: inner cards at lateral 2.0-5.6 m stay on `rise` (0.34), shoulder cards
+ * at 6.2-8.0 m ride `scudShoulder` (0.62). This asserts both halves — the
+ * placement envelope the round-2 brief specifies, and that no card outside the
+ * corridor exceeds 0.62 while no card inside it exceeds 0.35.
+ */
+const NEAR_ALPHA_CEILING_OUTSIDE = 0.62;
+const P20_NEAR_ZONES = [...P20_DUST_ZONES, "BRINE_HAZE_LOW"];
+const scudNear = built.bitterpan.batches
+  .flatMap((batch) => batch.cards)
+  .filter((card) => card.motionId === "PAN_SCUD_NEAR");
+assert.equal(scudNear.length, 34, "PAN_SCUD_NEAR is 34 cards.");
+for (const card of scudNear) {
+  assert.ok(
+    card.width >= 8 && card.width <= 18,
+    `PAN_SCUD_NEAR authors a ${card.width.toFixed(1)} m card; the near band is `
+      + "8-18 m wide.",
+  );
+  assert.ok(
+    card.height >= 1.6 && card.height <= 3.4,
+    `PAN_SCUD_NEAR authors a ${card.height.toFixed(1)} m card; the near band is `
+      + "1.6-3.4 m tall.",
+  );
+  assert.ok(
+    card.base >= 0.1 && card.base <= 1.0,
+    `PAN_SCUD_NEAR bases a card at ${card.base.toFixed(2)} m; the near band `
+      + "sits at 0.1-1.0 m.",
+  );
+}
+const scudNearInBand = scudNear.filter(
+  (card) => card.lateral >= 2 && card.lateral <= 8,
+);
+assert.ok(
+  scudNearInBand.length >= 25,
+  `Only ${scudNearInBand.length} of PAN_SCUD_NEAR's ${scudNear.length} cards sit `
+    + "2-8 m outboard of the deck edge; at least 25 have to. Further out and the "
+    + "zone is PAN_CRUST_SCUD again, which is the layer the driver never saw.",
+);
+const shoulderTier = scudNear.filter((card) => card.alphaKind === "scudShoulder");
+assert.ok(
+  shoulderTier.length >= 12,
+  `PAN_SCUD_NEAR has ${shoulderTier.length} shoulder-tier cards; the tier that `
+    + "carries the density is what makes the zone visible and it may not be "
+    + "emptied by a re-author.",
+);
+assert.deepEqual(
+  [...new Set(shoulderTier.map((card) => card.side))].sort(),
+  [-1, 1],
+  "PAN_SCUD_NEAR puts its whole shoulder tier on one side of the road. `side` "
+    + "is `index % 2`, so a tier keyed off the same parity lands entirely on "
+    + "one shoulder — the tier key has to be a different parity.",
+);
+for (const card of built.bitterpan.batches
+  .filter((batch) => !batch.spec.lamps)
+  .flatMap((batch) => batch.cards)) {
+  if (!P20_NEAR_ZONES.includes(card.motionId)) continue;
+  const reach = reachableLateral(card);
+  if (reach <= CORRIDOR_LATERAL_METRES && card.base < CORRIDOR_HEIGHT_METRES) {
+    continue; // covered by the corridor rule below, at the tighter 0.35.
+  }
+  assert.ok(
+    peakAlpha(card) <= NEAR_ALPHA_CEILING_OUTSIDE,
+    `BITTERPAN/${card.motionId} peaks at alpha ${peakAlpha(card).toFixed(2)} at `
+      + `lateral reach ${reach.toFixed(2)} m. Outboard of the corridor a near `
+      + `card may go to ${NEAR_ALPHA_CEILING_OUTSIDE}; past that it stops being `
+      + "air over the pan and becomes weather over the track.",
+  );
+}
+
+/**
+ * P20.4 ROUND 2 — `forceSinglePass` on every living-world material.
+ *
+ * A transparent DoubleSide material is drawn twice by three.js, back faces then
+ * front, so that a folded transparent surface sorts against itself. Measured on
+ * the pinned station set, the seven Bitterpan batches cost 14 of
+ * `renderer.info.render.calls` at every one of the thirteen stations (64 live
+ * minus 50 with `?living=0` at station 150), and 7 after this flag.
+ *
+ * Every card is a flat quad with `depthWrite: false`; it has no self-sorting to
+ * do. DoubleSide stays — the ring and the crossing scud are both seen from
+ * behind — and only the duplicate pass goes. Asserted in the source because
+ * there is no other place it can be caught: dropping it costs seven draw calls
+ * a frame and changes not one pixel.
+ */
+const livingWorldSource = readFileSync(
+  new URL("../src/game/living-world.ts", import.meta.url),
+  "utf8",
+);
+assert.ok(
+  /forceSinglePass:\s*true/.test(livingWorldSource),
+  "living-world.ts no longer sets `forceSinglePass: true`, so every one of the "
+    + "seven transparent DoubleSide batches is drawn in two passes again — 14 "
+    + "draw calls for 7 batches, with no visible difference to show for it.",
+);
+assert.ok(
+  /side:\s*THREE\.DoubleSide/.test(livingWorldSource),
+  "living-world.ts no longer sets DoubleSide. `forceSinglePass` is not a "
+    + "substitute for it: cards are seen from behind at every station.",
+);
+
+/**
  * P20.4 - `upright` is opt-in and stays opt-in.
  *
  * `atlasRect` counts `rect.y` in PNG rows from the TOP; the sheets upload with
@@ -1079,7 +1320,13 @@ for (const card of built.bitterpan.batches.flatMap((batch) => batch.cards)) {
       + "the zone is a lateral drift with a grand name.",
   );
 }
-assert.equal(crossingCards, 10, "PAN_SCUD_CROSSING is ten crossing cards.");
+// ROUND 2: twenty, not ten. Ten over the zone's span was one crossing card
+// every 236 m, and six of the thirteen review stations then had none inside the
+// 15-150 m window where a card is both in frame and large enough to read — the
+// zone that names the phase was absent from half of it. Twenty is one every
+// 118 m. Pinned as an equality rather than a floor because "more air over the
+// racing line" is a corridor-rule question, not a free knob.
+assert.equal(crossingCards, 20, "PAN_SCUD_CROSSING is twenty crossing cards.");
 
 // The sky haze ring exists to separate sky from ground at the horizon, and
 // every half of that is geometry. Stand it far enough out to read as horizon,
@@ -1218,9 +1465,13 @@ console.log(
     + `${P9_ZONES.length} P9 zones pinned, ${P12_ZONES.length} P12 zones, `
     + `${P18_ZONES.length} P18 horizon zones (34 GW / 38 BP cards, 1 / 2 batches, `
     + "every silhouette bottom-anchored at base 0, the two tone bands centred), "
-    + `${P20_ZONES.length} P20.4 zones (136 BP cards, +1 batch, `
-    + `${corridorCards} cards inside the drivable corridor all under alpha `
-    + `${CORRIDOR_ALPHA_CEILING}), two fog exemptions, `
+    + `${P20_ZONES.length} P20.4 zones (`
+    + `${P20_ZONES.reduce((total, zone) => total + zone.cards, 0)} BP cards, `
+    + `+1 batch, ${shoulderTier.length} shoulder-tier cards at alpha `
+    + `${NEAR_ALPHA_CEILING_OUTSIDE} and ${corridorCards} cards inside the `
+    + `drivable corridor all under alpha ${CORRIDOR_ALPHA_CEILING}, every dust `
+    + `tint under luma ${DUST_TINT_LUMA_CEILING}, single-pass materials), `
+    + "two fog exemptions, "
     + `${CARD_KINDS.length} motions and `
     + `${alphaKinds.size} envelopes wired in the runtime.`,
 );

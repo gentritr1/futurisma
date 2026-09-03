@@ -27,7 +27,7 @@
  *   | "cross"} CardKind
  *
  * @typedef {"mist" | "rise" | "puff" | "rain" | "ripple" | "flow" | "devil"
- *   | "shimmer" | "cross"} AlphaKind
+ *   | "shimmer" | "cross" | "scudShoulder" | "brineSwell"} AlphaKind
  *
  * @typedef {object} AtlasRect
  * @property {number} x
@@ -197,6 +197,25 @@ export const ALPHA_ENVELOPES = Object.freeze({
   // on alpha 0. The ceiling is 0.32: a card that crosses the racing line below
   // 6 m has to stay under the 0.35 corridor cap by construction, not by review.
   cross: [0, 0.32],
+  // P20.4 round 2 — THE SHOULDER TIER.
+  //
+  // Round 1 put every near card on `rise` (0.34) because the inner ones sit in
+  // the drivable corridor and 0.35 is a hard cap there. That cap is a corridor
+  // rule, not an air rule: a card OUTBOARD of halfWidth + 5.8 m is never flown
+  // through, so it is free to be dust rather than a rumour. Measured on the
+  // MIST cell (53.4% coverage, 0.167 mean alpha), 0.34 vertex alpha leaves a
+  // card averaging 5.7% opacity over the crust — under the 10-luma census
+  // threshold at every station, which is exactly why round 1 read as empty.
+  //
+  // 0.62 is the phase ceiling for a card the craft cannot reach, and the shape
+  // is `rise`'s: a birth and a dissolve on the card's own clock, so the
+  // shoulder tier still has a life rather than a loop.
+  scudShoulder: [0.14, 0.62],
+  // P20.4 round 2. The wet basin, moved outboard of the corridor (lateral floor
+  // 7.5 m against a 1.26 m mist drift = 6.24 m reach) so it can carry the same
+  // ceiling. Held two counts under the scud because these cards are 28-44 m
+  // wide and one of them fills more frame than four scud put together.
+  brineSwell: [0.18, 0.6],
 });
 
 /**
@@ -1554,10 +1573,10 @@ export const BITTERPAN_ZONES_C = Object.freeze([
 // reads because its mist, rain, glints and fronds are at the kerb (0-12 m).
 //
 // This block brings four things INSIDE the near field and adds one far one:
-//   PAN_SCUD_NEAR      2-14 m outboard, the motion the eye catches at speed
+//   PAN_SCUD_NEAR      2-8 m outboard in two tiers, the motion the eye catches
 //   PAN_SCUD_CROSSING  walks over the racing line on the new `cross` motion
 //   SALT_DEVIL_ROAD    one devil whose orbit reaches the deck, once a lap
-//   BRINE_HAZE_LOW     the wet basin breathing, 6-30 m outboard
+//   BRINE_HAZE_LOW     the wet basin breathing, 7.5-30 m outboard
 //   PAN_SKY_HAZE       the band that separates sky from ground at the horizon
 //
 // The corridor rule these are authored against, asserted card by card in
@@ -1569,25 +1588,47 @@ export const BITTERPAN_ZONES_C = Object.freeze([
 // must peak at alpha <= 0.35. Every zone below satisfies that through its
 // ENVELOPE (rise 0.34, devil 0.26, cross 0.32) rather than through a per-card
 // number a later edit could drift.
+//
+// ROUND 2 reads the same number the other way as well. A card that does NOT
+// reach inside the corridor is never flown through, and round 1 held those to
+// 0.35 anyway — which cost the whole near set a factor of two in density for
+// nothing. So the outboard tiers ride `scudShoulder` (0.62) and `brineSwell`
+// (0.6), and the split is made on `reachableLateral`, the same predicate the
+// validator asserts with.
 // ===========================================================================
 
 /**
- * The three windows PAN_SCUD_NEAR fills: the long pan, the sweep pair, and the
- * return leg. A LivingZone carries one span, so the zone advertises 160-2120 m
- * and each card picks its window off `index` — the SALT_DUST_DEVILS precedent
- * for a zone whose stations are structural rather than evenly spread.
+ * ROUND 2 — THE WINDOWS ARE GONE, AND WHY.
+ *
+ * Round 1 packed PAN_SCUD_NEAR into three windows ([160, 630], [1000, 1600],
+ * [1640, 2120]) and PAN_SCUD_CROSSING into two ([200, 600], [1700, 2100]), on
+ * the SALT_DUST_DEVILS precedent for structural stations. Measured, that is the
+ * wrong shape for a near-field zone, for two reasons that only show up in a
+ * frame:
+ *
+ *   THE GAPS ARE VISIBLE. 630-1000 m and 1600-1640 m carried no near card at
+ *   all, so the layer simply did not exist at station 830 — the one station of
+ *   thirteen that failed the round-1 pixel census (3987 changed px against a
+ *   6000 floor, and 34 of ~44,000 px on the shoulder band).
+ *
+ *   PACKING DOES NOT HELP. A card is only ON SCREEN in a narrow depth window.
+ *   `side` alternates with `index`, so a same-side card comes every second
+ *   station; at 40 m ahead a card at lateral 2-8 m sits 11-19.5 m off the
+ *   centreline, which is 15-26 deg off axis and inside a ~35 deg half-frame,
+ *   and by 25 m ahead it is 35-38 deg off axis and OUT of frame. Bunching the
+ *   stations does not put more cards in that window; it puts more of them
+ *   behind the camera at once.
+ *
+ * So both zones now take the even spread `buildLivingWorld` hands them, over a
+ * span extended to 2560 m so the 2120-2600 m dead ground before the wet sector
+ * closes: PAN_SCUD_NEAR is 34 cards at 70.6 m, PAN_SCUD_CROSSING 20 at 118 m.
+ * Checked against the review station table rather than asserted — every one of
+ * the thirteen stations now has two to seven near cards in the 15-150 m window
+ * where a card is both in frame and large enough to read
+ * (shots/p20.4r2/station-coverage.mjs), where round 1 left three stations with
+ * none. The windows are kept here as a comment rather than as a table because
+ * the next phase should not rediscover them.
  */
-const SCUD_NEAR_WINDOWS = Object.freeze([
-  [160, 630],
-  [1000, 1600],
-  [1640, 2120],
-]);
-
-/** THE LONG PAN and RETURN LEG, the two places a scud has room to cross. */
-const SCUD_CROSS_WINDOWS = Object.freeze([
-  [200, 600],
-  [1700, 2100],
-]);
 
 /**
  * P20.4 sky haze tint, computed here rather than picked.
@@ -1656,37 +1697,89 @@ export const BITTERPAN_ZONES_D = Object.freeze([
      * the cells SALT_DUST_DEVILS already uses for dry lifted crust, and put the
      * zone on the `air` batch, which costs no draw call either way.
      *
-     * Alpha rides the `rise` envelope (peak 0.34) rather than `mist` (0.46):
-     * the inner cards sit at lateral 2-5.8 m, inside the drivable corridor and
-     * below 6 m, so 0.35 is a hard ceiling and the envelope is what holds it.
-     * The envelope's birth-and-dissolve shape also gives the scud a life rather
-     * than a loop, which is what separates it from PAN_CRUST_SCUD above.
+     * ROUND 2 — WHY THIS IS TWO TIERS AND WHY IT IS DARK.
+     *
+     * Round 1 authored one tier at lateral 2-14 m, tint 0xe6dcc4 and the `rise`
+     * envelope (0.34), and its own measurement is the reason this block was
+     * re-authored: the cards are placed and moving correctly and are INVISIBLE
+     * in a still frame. Two compounding reasons, both measurable:
+     *
+     *   ALPHA. The MIST cell is 53.4% covered at a 0.167 mean alpha, so a card
+     *   at 0.34 vertex alpha averages 5.7% opacity. Nothing at 5.7% opacity
+     *   moves a pixel by the 10 luma a diff can tell from dither.
+     *
+     *   SIGN. 0xe6dcc4 is the crust's own colour. A card tinted at the colour
+     *   it is drawn over has no luminance to contribute in either direction,
+     *   however dense it gets.
+     *
+     * So the tier split. `lateral` is measured outboard of halfWidth, and the
+     * drivable corridor is halfWidth + 5.8 m, so the number that decides which
+     * tier a card is in is the same number the corridor rule reads:
+     *
+     *   INNER, lateral 2.0-5.6 m — inside the corridor. The craft flies through
+     *   these, so they stay on `rise` (0.34, under the 0.35 cap) and the tint
+     *   is the whole of their contribution.
+     *   SHOULDER, lateral 6.2-8.0 m — outboard of it, never flown through, so
+     *   `scudShoulder` (0.62). Measured: this tier is what puts the layer over
+     *   the census floor in the near band.
+     *
+     * The tiers alternate on `Math.floor(index / 2) % 2` rather than on
+     * `index % 2`, because `side` is already `index % 2` — keying the tier off
+     * the same parity would have put every shoulder card on the right of the
+     * road and every inner card on the left.
+     *
+     * TINT 0x4a4136, MEASURED NOT PICKED. The near crust renders at 78-102
+     * display luma across the four pan stations (rows 460-520 of the
+     * `?living=0` frames at 310 / 574 / 1080 / 1784). Vertex colour is a LINEAR
+     * multiplier on the sRGB-decoded cell — living-world.ts writes
+     * `(tint >> 16 & 255) / 255` straight into the colour attribute with no
+     * decode — so the tint is a gain on radiance BEFORE AgX and before the
+     * blend, and what the card puts on screen is not something the hex can be
+     * read off.
+     *
+     * So it was swept, four candidates at the same pinned poses
+     * (shots/p20.4r2/tint-sweep.sh, signed near-band delta from
+     * near-field.py): 0xa8987a — the brief's starting point — and 0x8d7f68
+     * both still measured LIGHTER than the crust on the shoulder at half the
+     * stations; 0x6e6252 was borderline; 0x3c352c was clearly darker
+     * everywhere. 0x4a4136 sits at the dark end of that bracket, warm
+     * (R > G > B, the crust's own hue), and the whole-frame A/B census comes
+     * back negative at all thirteen stations (-8.4 to -57.8 luma,
+     * shots/p20.4r2/final-ab.json). The SIGN is the acceptance, not the size.
      */
     id: "PAN_SCUD_NEAR",
     batch: "air",
     from: 160,
-    to: 2120,
+    to: 2560,
     cards: 34,
-    card: (_distance, side, index, next) => {
-      const window = SCUD_NEAR_WINDOWS[index % 3];
-      const slot = Math.floor(index / 3);
+    card: (distance, side, index, next) => {
+      const shoulder = Math.floor(index / 2) % 2 === 0;
       return {
         kind: "shear",
-        distance: window[0] + (window[1] - window[0]) * (slot + 0.5) / 12,
+        distance,
         side,
-        lateral: 2 + next() * 12,
-        base: 0.2 + next() * 1.2,
-        width: 6 + next() * 8,
-        height: 1.2 + next() * 1.4,
+        lateral: shoulder ? 6.2 + next() * 1.8 : 2 + next() * 3.6,
+        base: 0.1 + next() * 0.9,
+        width: 8 + next() * 10,
+        height: 1.6 + next() * 1.8,
         phase: next() * TAU,
         speed: 0.09 + next() * 0.05,
         amplitude: degToRad(6.5),
-        rect: index % 3 === 2 ? MOTION_RECTS.steam : MOTION_RECTS.mist,
+        // STEAM on the shoulder, MIST inside the corridor. Measured on
+        // greenwater_motion_512 (shots/p20.4r2/cell-density.py): STEAM is 64.6%
+        // covered with a 0.226 mean alpha and 19.8% of the cell over alpha 0.5;
+        // MIST is 53.4% / 0.167 / 13.0%. The denser cell goes where the alpha
+        // ceiling is 0.62, because that is where density compounds; the thinner
+        // one goes where the ceiling is 0.35 and density would only be thrown
+        // away.
+        rect: shoulder ? MOTION_RECTS.steam : MOTION_RECTS.mist,
         upright: true,
-        tint: 0xe6dcc4,
+        tint: 0x4a4136,
         seed: next(),
-        alphaKind: "rise",
-        alphaInitial: ALPHA_ENVELOPES.rise[0],
+        alphaKind: shoulder ? "scudShoulder" : "rise",
+        alphaInitial: shoulder
+          ? ALPHA_ENVELOPES.scudShoulder[0]
+          : ALPHA_ENVELOPES.rise[0],
       };
     },
   },
@@ -1704,14 +1797,12 @@ export const BITTERPAN_ZONES_D = Object.freeze([
     id: "PAN_SCUD_CROSSING",
     batch: "air",
     from: 200,
-    to: 2100,
-    cards: 10,
-    card: (_distance, side, index, next) => {
-      const window = SCUD_CROSS_WINDOWS[index % 2];
-      const slot = Math.floor(index / 2);
+    to: 2560,
+    cards: 20,
+    card: (distance, side, _index, next) => {
       return {
         kind: "cross",
-        distance: window[0] + (window[1] - window[0]) * (slot + 0.5) / 5,
+        distance,
         side,
         lateral: 8 + next() * 6,
         base: 0.3 + next() * 0.6,
@@ -1722,7 +1813,11 @@ export const BITTERPAN_ZONES_D = Object.freeze([
         amplitude: 34,
         rect: MOTION_RECTS.mist,
         upright: true,
-        tint: 0xe2d8bf,
+        // Round 2: the crossing scud cannot buy alpha — it flies through the
+        // corridor, so 0.32 is where it stays — and the tint is therefore ALL
+        // of its contrast. Two counts darker than PAN_SCUD_NEAR's for exactly
+        // that reason.
+        tint: 0x453d33,
         seed: next(),
         alphaKind: "cross",
         alphaInitial: ALPHA_ENVELOPES.cross[0],
@@ -1763,7 +1858,12 @@ export const BITTERPAN_ZONES_D = Object.freeze([
       hang: 12,
       rect: index % 2 === 0 ? MOTION_RECTS.steam : MOTION_RECTS.mist,
       upright: true,
-      tint: 0xded5bd,
+      // Round 2: same argument as the crossing scud. The lowest card of the
+      // column reaches lateral -16 m at base 1.4 m, so the whole column is held
+      // to the `devil` envelope's 0.26 and the tint is the only lever left.
+      // Lifted crust is the DARKEST thing in the set on purpose — a devil is a
+      // column of ground in the air, not vapour.
+      tint: 0x3f382e,
       seed: next(),
       alphaKind: "devil",
       alphaInitial: ALPHA_ENVELOPES.devil[0],
@@ -1773,13 +1873,26 @@ export const BITTERPAN_ZONES_D = Object.freeze([
     /**
      * WET PAN BEND into BRINE CUT is the only wet ground on the map, and it is
      * the one sector allowed to look humid. Wide, low, slow: 28-44 m of card
-     * 2-4 m tall lying 6-30 m outboard, so the basin breathes without any of it
-     * reaching the corridor (lateral floor 6 m clears the 5.8 m edge).
+     * 2-4 m tall lying 7.5-30 m outboard, so the basin breathes without any of
+     * it reaching the corridor.
      *
-     * `mist` drift for the motion and the `rise` envelope for the alpha, whose
-     * 0.34 peak is under the 0.4 the sector can carry before the pan stops
-     * reading as open. The two clocks are deliberately the same `card.speed`,
-     * so a card is brightest in the middle of its own drift.
+     * `mist` drift for the motion and a birth-and-dissolve envelope for the
+     * alpha. The two clocks are deliberately the same `card.speed`, so a card
+     * is brightest in the middle of its own drift.
+     *
+     * ROUND 2. The lateral floor moved 6 m -> 7.5 m and the envelope moved
+     * `rise` (0.34) -> `brineSwell` (0.6). Those two are ONE change, not two:
+     * `mist` drifts a card `speed * 9` metres along the camera right vector, so
+     * at the round-1 floor the innermost card reached lateral 4.74 m — INSIDE
+     * the halfWidth + 5.8 m corridor, which is what pinned the whole zone to
+     * 0.35. At 7.5 m the worst reach is 7.5 - 0.14 * 9 = 6.24 m, outboard of
+     * the corridor by 0.44 m, and the zone is free to carry the density the wet
+     * sector was authored for.
+     *
+     * Tint 0xb9c1bd rather than round 1's 0xd9e0dc: brine haze is the one place
+     * on the map the air is allowed to be COOLER than the crust rather than
+     * warmer, but it still has to sit under it. 0xd9e0dc is (217, 224, 220) —
+     * lighter than anything the wet pan renders.
      */
     id: "BRINE_HAZE_LOW",
     batch: "air",
@@ -1790,7 +1903,7 @@ export const BITTERPAN_ZONES_D = Object.freeze([
       kind: "mist",
       distance,
       side,
-      lateral: 6 + next() * 24,
+      lateral: 7.5 + next() * 22.5,
       base: 0.1 + next() * 0.5,
       width: 28 + next() * 16,
       height: 2 + next() * 2,
@@ -1798,10 +1911,10 @@ export const BITTERPAN_ZONES_D = Object.freeze([
       speed: 0.1 + next() * 0.04,
       rect: MOTION_RECTS.mist,
       upright: true,
-      tint: 0xd9e0dc,
+      tint: 0xb9c1bd,
       seed: next(),
-      alphaKind: "rise",
-      alphaInitial: ALPHA_ENVELOPES.rise[0],
+      alphaKind: "brineSwell",
+      alphaInitial: ALPHA_ENVELOPES.brineSwell[0],
     }),
   },
   {

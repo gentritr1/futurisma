@@ -1,0 +1,58 @@
+[
+  {
+    "file": "px-0280.png",
+    "changed": 906,
+    "nearEdge": 0,
+    "tight": 0,
+    "signedLuma": 0.0,
+    "edgeRows": 0,
+    "bbox": [
+      0,
+      136,
+      1094,
+      559
+    ]
+  },
+  {
+    "file": "px-0340.png",
+    "changed": 611,
+    "nearEdge": 0,
+    "tight": 0,
+    "signedLuma": 0.0,
+    "edgeRows": 0,
+    "bbox": [
+      4,
+      137,
+      1095,
+      559
+    ]
+  },
+  {
+    "file": "px-0850.png",
+    "changed": 6347,
+    "nearEdge": 0,
+    "tight": 0,
+    "signedLuma": 0.0,
+    "edgeRows": 0,
+    "bbox": [
+      0,
+      130,
+      1099,
+      559
+    ]
+  },
+  {
+    "file": "px-0910.png",
+    "changed": 1305,
+    "nearEdge": 0,
+    "tight": 0,
+    "signedLuma": 0.0,
+    "edgeRows": 0,
+    "bbox": [
+      37,
+      137,
+      1083,
+      559
+    ]
+  }
+]
