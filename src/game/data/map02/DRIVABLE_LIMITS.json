@@ -6,7 +6,11 @@
   "hullMarginMetres": 1.6,
   "rule": "limit = max(halfWidth, min(clampMax, tallGeometryLateral - hullMargin)); geometry at or below TALL_GEOMETRY_MIN_HEIGHT_METRES (0.6 m, the measured hull-bottom clearance) above the local deck plane does not bound, and neither does a collidable hazard.",
   "summary": {
-    "spans": 1,
+    "spans": 305,
+    "supportUsable": false,
+    "supportNullSides": 193,
+    "supportCappedSides": 0,
+    "maxSupportTrimMetres": 0,
     "trimmedSides": 1,
     "flooredToDeckEdge": 1,
     "maxTrimMetres": 5.8

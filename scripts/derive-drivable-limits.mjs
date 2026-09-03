@@ -117,6 +117,34 @@ function derive(report, map) {
   let flooredToDeck = 0;
   let maxTrim = 0;
 
+  // P21.4 - the surface-support rule.
+  //
+  // A drivable limit may not extend past the last lateral at which DRAWN
+  // geometry supports the craft. Measured by the sweep (see the note on
+  // SUPPORT_STEP_METRES in corridor-sweep.ts) and applied here as a second cap,
+  // alongside the tall-geometry one.
+  //
+  // REFUSED WHOLESALE WHEN THE CAPTURE COULD NOT SEE THE ROAD. `leftSupport` is
+  // null where the sweep found no drawn surface even at the deck edge, which on
+  // a map with a road is a failed measurement and not a missing surface -
+  // Bitterpan's drawn deck is the blockout GLB, which `CORRIDOR_SWEEP_EXCLUDED_NAMES`
+  // removes from the traversal by name, so its capture reports null on 193 of
+  // 610 span-sides. Clamping to a support limit derived from that capture would
+  // carve invisible walls over road the player can see, which is precisely the
+  // P16 failure this table exists to prevent. So the rule is all-or-nothing per
+  // map: any null, and the support cap is not applied at all and says so.
+  const supportNulls = spans.reduce(
+    (count, span) => count
+      + (span.leftSupport === null ? 1 : 0)
+      + (span.rightSupport === null ? 1 : 0),
+    0,
+  );
+  const supportUsable = spans.length > 0
+    && spans.every((span) => span.leftSupport !== undefined)
+    && supportNulls === 0;
+  let supportCapped = 0;
+  let maxSupportTrim = 0;
+
   for (const span of spans) {
     const sides = {};
     for (const side of ["left", "right"]) {
@@ -142,6 +170,26 @@ function derive(report, map) {
         };
       }
     }
+    // The support cap is independent of whether anything tall was found: a span
+    // with an open horizon and no run-off surface still may not let the craft
+    // out past the last drawn triangle.
+    if (supportUsable) {
+      for (const side of ["left", "right"]) {
+        const support = span[`${side}Support`];
+        if (support === null || support === undefined) continue;
+        const cap = span.clampMax ?? span.clamp;
+        const capped = Math.max(span.halfWidth, Math.min(cap, support));
+        const already = sides[side]?.limit ?? cap;
+        if (capped >= already - 1e-6) continue;
+        supportCapped += 1;
+        maxSupportTrim = Math.max(maxSupportTrim, already - capped);
+        sides[side] = {
+          limit: Number(capped.toFixed(3)),
+          setBy: `surface-support(${sides[side]?.setBy ?? "unbounded"})`,
+          tall: Number((capped + HULL_MARGIN_METRES).toFixed(3)),
+        };
+      }
+    }
     if (Object.keys(sides).length > 0) {
       entries.push({
         distance: span.distance,
@@ -160,6 +208,10 @@ function derive(report, map) {
     entries,
     summary: {
       spans: spans.length,
+      supportUsable,
+      supportNullSides: supportNulls,
+      supportCappedSides: supportCapped,
+      maxSupportTrimMetres: Number(maxSupportTrim.toFixed(3)),
       trimmedSides: trimmed,
       flooredToDeckEdge: flooredToDeck,
       maxTrimMetres: Number(maxTrim.toFixed(3)),

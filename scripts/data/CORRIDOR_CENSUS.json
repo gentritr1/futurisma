@@ -8,31 +8,16 @@
       "ran": true,
       "meshesSwept": 137,
       "verticesSwept": 182280,
-      "groups": 1045,
+      "groups": 998,
       "panFloor": null,
       "bands": {
-        "obstacle": 1,
-        "flush": 761,
-        "overhead": 15,
+        "obstacle": 0,
+        "flush": 758,
+        "overhead": 0,
         "boundary": 0,
-        "vfx": 82
+        "vfx": 81
       },
-      "obstacles": [
-        {
-          "root": "map01_greenwater_strip",
-          "mesh": "cable_trip_hazards",
-          "distance": 1280.12,
-          "lateral": 11.596,
-          "depth": 2.04,
-          "heightMin": 0.314,
-          "heightMax": 0.374,
-          "limit": 13.636,
-          "innerExtent": 11.596,
-          "vertices": 8,
-          "visible": true,
-          "sector": "CANOPY_PASSAGE"
-        }
-      ]
+      "obstacles": []
     },
     {
       "map": "bitterpan",

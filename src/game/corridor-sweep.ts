@@ -511,6 +511,83 @@ export interface TallGeometrySpan {
   /** Height above the local deck plane at the bounding vertex, per side. */
   readonly leftHeight: number | null;
   readonly rightHeight: number | null;
+  /**
+   * P21.4 - the last lateral, per side, out to which DRAWN geometry supports
+   * the craft, measured outward from the deck edge in
+   * `SUPPORT_STEP_METRES` and stopping at the first unsupported step.
+   *
+   * `null` where the sweep saw no support even at the deck edge, which means
+   * the measurement failed rather than that the road is not there - the
+   * derivation ignores a null instead of clamping to it, because a limit table
+   * that narrows on a bad capture is the P16 failure with extra steps.
+   */
+  readonly leftSupport: number | null;
+  readonly rightSupport: number | null;
+}
+
+/**
+ * P21.4 - the surface-support sweep.
+ *
+ * WHAT IT ANSWERS. "A drivable limit may not extend past the last lateral at
+ * which DRAWN geometry supports the craft." The tall-geometry rule above asks
+ * what the craft would drive INTO; this asks what it would be standing ON, and
+ * on the Greenwater Sweep the answer was nothing.
+ *
+ * THE MEASURED FAILURE IT EXISTS FOR. At d 1083, craft lateral -11.31, camera
+ * lateral -3.62, `scripts/visual/vehicle-pixels.mjs` counts 40 pixels of craft
+ * in the frame; hiding `GW_SECTOR_GREENWATER_SWEEP` makes it 41,403. The
+ * authored deck has no A-edge run-off surface there, the derived limit let the
+ * craft 3.4 m past the drawn edge, and from a camera still over the deck the
+ * craft sits behind the deck's own edge ridge. The physics was happy and the
+ * picture was wrong - which is the whole P21 complaint, one layer down: this
+ * time the craft is the thing you cannot see.
+ *
+ * WHAT COUNTS AS SUPPORT. Drawn, opaque, roughly at deck level:
+ *
+ *  - not a `depthWrite: false` transparent overlay. That is the same
+ *    `isNonOccludingOverlay` test the census uses for `vfx`, so cards, decals,
+ *    spray and scud cannot hold the craft up.
+ *  - not `apron_*`. Those are the PROCEDURAL run-off decks, and on Greenwater
+ *    `setProceduralEnvironmentVisible(course.group, false)` replaces the ribbon
+ *    with the GLB - H1's ray found `apron_A_gravel` 1.34 m under the craft, and
+ *    a surface nobody draws cannot be the reason a limit is allowed to stand.
+ *  - not `*_water`. The water table is a surface you fall into, not one you
+ *    drive on, and it is authored transparent in places besides.
+ *
+ * TRIANGLES, NOT VERTICES. A 5.8 m gravel shoulder can be two triangles whose
+ * only vertices are at its edges; asking "is there a vertex in this 0.25 m
+ * bucket" would report the middle of a perfectly good surface as a hole and
+ * carve an invisible wall down the centre of it. So the fill walks the index
+ * buffer and marks the lateral RANGE each triangle covers. The bounding range
+ * over-estimates a diagonal triangle's footprint, and that is the deliberate
+ * direction of error: over-estimating support leaves a limit where it was, and
+ * only under-estimating it invents a boundary over ground the player can see.
+ */
+export const SUPPORT_STEP_METRES = 0.25;
+
+/** Height band around the deck surface a mesh must reach to count as support. */
+export const SUPPORT_BELOW_METRES = 1.6;
+export const SUPPORT_ABOVE_METRES = 0.3;
+
+/** Widest lateral the support grid tracks, metres. Past any authored clamp. */
+const SUPPORT_MAX_LATERAL_METRES = 24;
+const SUPPORT_BUCKETS = Math.ceil(SUPPORT_MAX_LATERAL_METRES / SUPPORT_STEP_METRES);
+
+/**
+ * A triangle spanning more lap distance than this is not describing one span's
+ * surface - it is a projection artefact, or a horizon-scale plane whose corners
+ * happen to resolve to opposite ends of the course. Filling every span between
+ * them would report support everywhere.
+ */
+const SUPPORT_MAX_TRIANGLE_SPAN_METRES = 100;
+
+/** True for geometry that can hold the craft up. See the note above. */
+function isSupportSurface(mesh: THREE.Mesh, nonOccluding: boolean): boolean {
+  if (nonOccluding) return false;
+  const name = mesh.name;
+  if (name.startsWith("apron_")) return false;
+  if (name.endsWith("_water")) return false;
+  return true;
 }
 
 /** Lap resolution of the derived limit table. */
@@ -843,14 +920,48 @@ export function sweepCorridor(
     clampMax: number;
   }
   const spanBuckets = new Map<number, SpanBucket>();
-  const recordTallGeometry = (
+  // P21.4 - one 0.25 m occupancy row per span per side. Allocated lazily: most
+  // of a 6 km plane never comes near a station.
+  const supportBuckets = new Map<number, { left: Uint8Array; right: Uint8Array }>();
+  const supportRowFor = (index: number) => {
+    let row = supportBuckets.get(index);
+    if (!row) {
+      row = {
+        left: new Uint8Array(SUPPORT_BUCKETS),
+        right: new Uint8Array(SUPPORT_BUCKETS),
+      };
+      supportBuckets.set(index, row);
+    }
+    return row;
+  };
+  /** Marks |lateral| from `fromAbs` to `toAbs` on one side of one span. */
+  const markSupport = (
+    spanIndex: number,
+    side: -1 | 1,
+    fromAbs: number,
+    toAbs: number,
+  ): void => {
+    const row = supportRowFor(spanIndex);
+    const cells = side < 0 ? row.left : row.right;
+    const first = Math.max(0, Math.floor(fromAbs / SUPPORT_STEP_METRES));
+    const last = Math.min(SUPPORT_BUCKETS - 1, Math.floor(toAbs / SUPPORT_STEP_METRES));
+    for (let cell = first; cell <= last; cell += 1) cells[cell] = 1;
+  };
+  /**
+   * P21.4 - the span's own geometry, recorded for EVERY station the sweep sees.
+   *
+   * This used to happen only when tall geometry was found, which was fine while
+   * the table's only job was "what bounds the craft": a span with nothing tall
+   * in it needed no row. The support rule changes that. Bitterpan has tall
+   * geometry at exactly ONE span and drawn run-off at all 305, so a table keyed
+   * on tall geometry could not carry a support limit for any of them - the first
+   * capture after the support sweep landed reported one span for the whole map.
+   */
+  const touchSpan = (
     distance: number,
-    lateral: number,
     halfWidth: number,
     clamp: number,
-    height: number,
-    mesh: string,
-  ): void => {
+  ): SpanBucket => {
     const index = Math.floor(distance / TALL_GEOMETRY_SPAN_METRES);
     let bucket = spanBuckets.get(index);
     if (!bucket) {
@@ -859,11 +970,23 @@ export function sweepCorridor(
       };
       spanBuckets.set(index, bucket);
     }
-    // Narrowest half-width and clamp across the span: the limit has to hold
-    // everywhere in it, so the span takes its tightest station.
     bucket.halfWidth = Math.min(bucket.halfWidth, halfWidth);
     bucket.clamp = Math.min(bucket.clamp, clamp);
     bucket.clampMax = Math.max(bucket.clampMax, clamp);
+    return bucket;
+  };
+  const recordTallGeometry = (
+    distance: number,
+    lateral: number,
+    halfWidth: number,
+    clamp: number,
+    height: number,
+    mesh: string,
+  ): void => {
+    const bucket = touchSpan(distance, halfWidth, clamp);
+    // Narrowest half-width and clamp across the span (done in `touchSpan`): the
+    // limit has to hold everywhere in it, so the span takes its tightest
+    // station. `clampMax` is the widest, and is what the derivation caps against.
     const magnitude = Math.abs(lateral);
     const side: SpanSide = {
       lateral: magnitude, at: distance, halfWidth, height, mesh,
@@ -882,6 +1005,21 @@ export function sweepCorridor(
   let verticesTested = 0;
   let skippedMeshes = 0;
 
+  // P21.4 - the current mesh's vertices in course-local coordinates, so the
+  // triangle fill can read three of them at once. Grown, never reallocated per
+  // mesh: a 182k-vertex sweep would otherwise churn four arrays per mesh.
+  let cacheDistance = new Float32Array(0);
+  let cacheLateral = new Float32Array(0);
+  let cacheHeight = new Float32Array(0);
+  let cacheValid = new Uint8Array(0);
+  const growCache = (count: number): void => {
+    if (cacheValid.length >= count) return;
+    cacheDistance = new Float32Array(count);
+    cacheLateral = new Float32Array(count);
+    cacheHeight = new Float32Array(count);
+    cacheValid = new Uint8Array(count);
+  };
+
   const sweepBatch = (
     mesh: THREE.Mesh,
     matrix: THREE.Matrix4,
@@ -890,6 +1028,12 @@ export function sweepCorridor(
     visible: boolean,
   ): void => {
     const meshKey = `${mesh.id}#${instance ?? ""}`;
+    const nonOccludingMesh = isNonOccludingOverlay(mesh);
+    const wantSupport = collectSpans && isSupportSurface(mesh, nonOccludingMesh);
+    if (wantSupport) {
+      growCache(positions.count);
+      cacheValid.fill(0, 0, positions.count);
+    }
     for (let i = 0; i < positions.count; i += 1) {
       verticesSwept += 1;
       vertex.fromBufferAttribute(positions, i).applyMatrix4(matrix);
@@ -937,6 +1081,12 @@ export function sweepCorridor(
       const surface = surfaceHeightAtLateral(projection, lateral);
       const height = offset.subVectors(vertex, projection.position)
         .dot(projection.up) - surface;
+      if (wantSupport) {
+        cacheDistance[i] = distance;
+        cacheLateral[i] = lateral;
+        cacheHeight[i] = height;
+        cacheValid[i] = 1;
+      }
       // Tall geometry anywhere inside the clamp bounds the craft, whichever
       // side of the deck edge it stands on. Recorded before the gate test,
       // because most of it is legitimately outside the deck.
@@ -945,6 +1095,9 @@ export function sweepCorridor(
       // crosses the track at 3.5 m and would otherwise collapse the derived
       // limit to lateral 0 on the start line, which is exactly what the first
       // span table did (`d=0 left 0`).
+      if (collectSpans && Math.abs(lateral) <= clamp) {
+        touchSpan(distance, projection.halfWidth, clamp);
+      }
       if (
         height >= (BARRIER_CLASS_MESHES.has(mesh.name)
           ? BARRIER_CLASS_TALL_MIN_METRES
@@ -1048,6 +1201,43 @@ export function sweepCorridor(
         accumulator.limit = apron.lateralLimit;
       }
     }
+    if (!wantSupport) return;
+    // Walk the triangles and mark the lateral range each one covers.
+    const index = mesh.geometry.getIndex();
+    const triangles = index ? index.count / 3 : positions.count / 3;
+    for (let triangle = 0; triangle < triangles; triangle += 1) {
+      const a = index ? index.getX(triangle * 3) : triangle * 3;
+      const b = index ? index.getX(triangle * 3 + 1) : triangle * 3 + 1;
+      const c = index ? index.getX(triangle * 3 + 2) : triangle * 3 + 2;
+      if (!cacheValid[a] || !cacheValid[b] || !cacheValid[c]) continue;
+      const hMin = Math.min(cacheHeight[a], cacheHeight[b], cacheHeight[c]);
+      const hMax = Math.max(cacheHeight[a], cacheHeight[b], cacheHeight[c]);
+      // The triangle has to reach the band; it does not have to sit inside it,
+      // because a ramp crossing deck level supports the craft where it crosses.
+      if (hMax < -SUPPORT_BELOW_METRES || hMin > SUPPORT_ABOVE_METRES) continue;
+      const dMin = Math.min(cacheDistance[a], cacheDistance[b], cacheDistance[c]);
+      const dMax = Math.max(cacheDistance[a], cacheDistance[b], cacheDistance[c]);
+      if (dMax - dMin > SUPPORT_MAX_TRIANGLE_SPAN_METRES) continue;
+      const lMin = Math.min(cacheLateral[a], cacheLateral[b], cacheLateral[c]);
+      const lMax = Math.max(cacheLateral[a], cacheLateral[b], cacheLateral[c]);
+      // A WALL IS NOT A FLOOR. Without this the first pass reported 12.75 m of
+      // support on the Greenwater Sweep's A edge, where the authored concrete
+      // draws no surface at all below lateral 12.5 - what it was measuring was
+      // the vertical face of the deck's own edge ridge, whose vertices span the
+      // height band because they run through it. Anything steeper than 45
+      // degrees across its own footprint is a face, not a surface; the 0.3 m
+      // floor keeps a small near-flat triangle from failing on rounding.
+      const footprint = Math.max(lMax - lMin, dMax - dMin);
+      if (hMax - hMin > Math.max(SUPPORT_ABOVE_METRES, footprint)) continue;
+      const firstSpan = Math.floor(dMin / TALL_GEOMETRY_SPAN_METRES);
+      const lastSpan = Math.floor(dMax / TALL_GEOMETRY_SPAN_METRES);
+      for (let span = firstSpan; span <= lastSpan; span += 1) {
+        // A triangle straddling the centreline supports both sides, each from
+        // the centreline out to its own extreme.
+        if (lMin < 0) markSupport(span, -1, lMax < 0 ? Math.abs(lMax) : 0, Math.abs(lMin));
+        if (lMax > 0) markSupport(span, 1, lMin > 0 ? lMin : 0, lMax);
+      }
+    }
   };
 
   scene.traverse((object) => {
@@ -1079,6 +1269,33 @@ export function sweepCorridor(
     meshesSwept += 1;
     sweepBatch(object, object.matrixWorld, null, positions, visible);
   });
+
+  /**
+   * How far out drawn geometry supports the craft on one side of one span.
+   *
+   * Walks outward from the deck edge in `SUPPORT_STEP_METRES` and stops at the
+   * first unsupported step, so a surface with a hole in it limits at the hole
+   * rather than past it. Returns `null` when even the deck edge reads
+   * unsupported: that is a failed measurement, not a road that is not there,
+   * and the derivation must ignore it rather than clamp to it.
+   */
+  const supportLimitFor = (
+    index: number,
+    side: -1 | 1,
+    halfWidth: number,
+  ): number | null => {
+    const row = supportBuckets.get(index);
+    if (!row) return null;
+    const cells = side < 0 ? row.left : row.right;
+    // Start one step INSIDE the deck edge: the edge itself is the seam between
+    // the deck mesh and whatever surfaces the run-off, and a seam that lands on
+    // a bucket boundary would otherwise read as a hole.
+    const start = Math.max(0, Math.floor(halfWidth / SUPPORT_STEP_METRES) - 1);
+    if (!cells[start]) return null;
+    let cell = start;
+    while (cell + 1 < SUPPORT_BUCKETS && cells[cell + 1]) cell += 1;
+    return Number(((cell + 1) * SUPPORT_STEP_METRES).toFixed(3));
+  };
 
   const ordered = [...accumulators.values()]
     .map((entry): CorridorIntrusion => ({
@@ -1164,6 +1381,8 @@ export function sweepCorridor(
         clampMax: Number(bucket.clampMax.toFixed(3)),
         leftMesh: bucket.left?.mesh ?? null,
         rightMesh: bucket.right?.mesh ?? null,
+        leftSupport: supportLimitFor(index, -1, bucket.halfWidth),
+        rightSupport: supportLimitFor(index, 1, bucket.halfWidth),
         leftHeight: bucket.left === null
           ? null
           : Number(bucket.left.height.toFixed(3)),

@@ -6,10 +6,14 @@
   "hullMarginMetres": 1.6,
   "rule": "limit = max(halfWidth, min(clampMax, tallGeometryLateral - hullMargin)); geometry at or below TALL_GEOMETRY_MIN_HEIGHT_METRES (0.6 m, the measured hull-bottom clearance) above the local deck plane does not bound, and neither does a collidable hazard.",
   "summary": {
-    "spans": 232,
+    "spans": 251,
+    "supportUsable": true,
+    "supportNullSides": 0,
+    "supportCappedSides": 82,
+    "maxSupportTrimMetres": 3.469,
     "trimmedSides": 460,
-    "flooredToDeckEdge": 319,
-    "maxTrimMetres": 7.012
+    "flooredToDeckEdge": 359,
+    "maxTrimMetres": 7.109
   },
   "entries": [
     {
@@ -335,7 +339,7 @@
     {
       "distance": 200,
       "halfWidth": 11.333,
-      "clamp": 16.334,
+      "clamp": 16.333,
       "clampMax": 16.666,
       "left": {
         "limit": 11.333,
@@ -350,18 +354,18 @@
     },
     {
       "distance": 210,
-      "halfWidth": 11.003,
-      "clamp": 16.003,
+      "halfWidth": 11,
+      "clamp": 16,
       "clampMax": 16.333,
       "left": {
-        "limit": 11.003,
+        "limit": 11,
         "setBy": "GW_SECTOR_T1_CRADLE_BEND_metal",
         "tall": 11.38
       },
       "right": {
-        "limit": 14.466,
-        "setBy": "barrier_A_right",
-        "tall": 16.066
+        "limit": 13,
+        "setBy": "surface-support(barrier_A_right)",
+        "tall": 14.6
       }
     },
     {
@@ -375,9 +379,9 @@
         "tall": 11.235
       },
       "right": {
-        "limit": 14.4,
-        "setBy": "barrier_A_right",
-        "tall": 16
+        "limit": 12.75,
+        "setBy": "surface-support(barrier_A_right)",
+        "tall": 14.35
       }
     },
     {
@@ -391,9 +395,9 @@
         "tall": 11.234
       },
       "right": {
-        "limit": 14.4,
-        "setBy": "barrier_A_right",
-        "tall": 16
+        "limit": 12.135,
+        "setBy": "GW_SECTOR_T1_CRADLE_BEND_metal",
+        "tall": 13.735
       }
     },
     {
@@ -407,9 +411,9 @@
         "tall": 11.235
       },
       "right": {
-        "limit": 14.4,
-        "setBy": "barrier_A_right",
-        "tall": 16
+        "limit": 12.5,
+        "setBy": "surface-support(barrier_A_right)",
+        "tall": 14.1
       }
     },
     {
@@ -423,9 +427,9 @@
         "tall": 11.234
       },
       "right": {
-        "limit": 14.4,
-        "setBy": "barrier_A_right",
-        "tall": 16
+        "limit": 12.146,
+        "setBy": "GW_SECTOR_T1_CRADLE_BEND_metal",
+        "tall": 13.746
       }
     },
     {
@@ -439,9 +443,9 @@
         "tall": 11.236
       },
       "right": {
-        "limit": 14.4,
-        "setBy": "barrier_A_right",
-        "tall": 16
+        "limit": 12.135,
+        "setBy": "GW_SECTOR_T1_CRADLE_BEND_metal",
+        "tall": 13.735
       }
     },
     {
@@ -455,9 +459,9 @@
         "tall": 11.235
       },
       "right": {
-        "limit": 14.4,
-        "setBy": "barrier_A_right",
-        "tall": 16
+        "limit": 12.5,
+        "setBy": "surface-support(barrier_A_right)",
+        "tall": 14.1
       }
     },
     {
@@ -471,9 +475,9 @@
         "tall": 11.235
       },
       "right": {
-        "limit": 14.4,
-        "setBy": "barrier_A_right",
-        "tall": 16
+        "limit": 12.135,
+        "setBy": "GW_SECTOR_T1_CRADLE_BEND_metal",
+        "tall": 13.735
       }
     },
     {
@@ -487,9 +491,9 @@
         "tall": 11.234
       },
       "right": {
-        "limit": 14.4,
-        "setBy": "barrier_A_right",
-        "tall": 16
+        "limit": 12.5,
+        "setBy": "surface-support(barrier_A_right)",
+        "tall": 14.1
       }
     },
     {
@@ -503,9 +507,9 @@
         "tall": 11.237
       },
       "right": {
-        "limit": 14.4,
-        "setBy": "barrier_A_right",
-        "tall": 16
+        "limit": 12.5,
+        "setBy": "surface-support(barrier_A_right)",
+        "tall": 14.1
       }
     },
     {
@@ -519,9 +523,9 @@
         "tall": 11.237
       },
       "right": {
-        "limit": 14.4,
-        "setBy": "barrier_A_right",
-        "tall": 16
+        "limit": 12.135,
+        "setBy": "GW_SECTOR_T1_CRADLE_BEND_metal",
+        "tall": 13.735
       }
     },
     {
@@ -535,9 +539,9 @@
         "tall": 11.237
       },
       "right": {
-        "limit": 14.4,
-        "setBy": "barrier_A_right",
-        "tall": 16
+        "limit": 12.5,
+        "setBy": "surface-support(barrier_A_right)",
+        "tall": 14.1
       }
     },
     {
@@ -551,9 +555,9 @@
         "tall": 11.234
       },
       "right": {
-        "limit": 14.4,
-        "setBy": "barrier_A_right",
-        "tall": 16
+        "limit": 12.135,
+        "setBy": "GW_SECTOR_T1_CRADLE_BEND_metal",
+        "tall": 13.735
       }
     },
     {
@@ -567,9 +571,9 @@
         "tall": 11.236
       },
       "right": {
-        "limit": 14.4,
-        "setBy": "barrier_A_right",
-        "tall": 16
+        "limit": 12.5,
+        "setBy": "surface-support(barrier_A_right)",
+        "tall": 14.1
       }
     },
     {
@@ -583,9 +587,9 @@
         "tall": 11.233
       },
       "right": {
-        "limit": 14.4,
-        "setBy": "barrier_A_right",
-        "tall": 16
+        "limit": 12.5,
+        "setBy": "surface-support(barrier_A_right)",
+        "tall": 14.1
       }
     },
     {
@@ -599,9 +603,9 @@
         "tall": 11.24
       },
       "right": {
-        "limit": 14.4,
-        "setBy": "barrier_A_right",
-        "tall": 16
+        "limit": 12.135,
+        "setBy": "GW_SECTOR_T1_CRADLE_BEND_metal",
+        "tall": 13.735
       }
     },
     {
@@ -615,32 +619,32 @@
         "tall": 11.373
       },
       "right": {
-        "limit": 14.004,
-        "setBy": "GW_SECTOR_T1_CRADLE_BEND_jungle",
-        "tall": 15.604
+        "limit": 12.5,
+        "setBy": "surface-support(GW_SECTOR_T1_CRADLE_BEND_jungle)",
+        "tall": 14.1
       }
     },
     {
       "distance": 380,
-      "halfWidth": 10.839,
-      "clamp": 15.839,
-      "clampMax": 15.962,
+      "halfWidth": 10.838,
+      "clamp": 15.838,
+      "clampMax": 15.963,
       "left": {
-        "limit": 10.839,
+        "limit": 10.838,
         "setBy": "GW_SECTOR_WATER_TABLE_metal",
         "tall": 11.323
       },
       "right": {
-        "limit": 14.288,
-        "setBy": "barrier_A_right",
-        "tall": 15.888
+        "limit": 11.833,
+        "setBy": "GW_SECTOR_WATER_TABLE_metal",
+        "tall": 13.433
       }
     },
     {
       "distance": 390,
       "halfWidth": 10.714,
       "clamp": 15.714,
-      "clampMax": 15.82,
+      "clampMax": 15.838,
       "left": {
         "limit": 10.714,
         "setBy": "GW_SECTOR_WATER_TABLE_concrete",
@@ -656,7 +660,7 @@
       "distance": 400,
       "halfWidth": 10.589,
       "clamp": 15.589,
-      "clampMax": 15.709,
+      "clampMax": 15.713,
       "left": {
         "limit": 10.589,
         "setBy": "GW_SECTOR_WATER_TABLE_metal",
@@ -672,7 +676,7 @@
       "distance": 410,
       "halfWidth": 10.5,
       "clamp": 15.5,
-      "clampMax": 15.566,
+      "clampMax": 15.588,
       "left": {
         "limit": 10.5,
         "setBy": "GW_SECTOR_WATER_TABLE_metal",
@@ -942,27 +946,27 @@
     },
     {
       "distance": 580,
-      "halfWidth": 9.993,
-      "clamp": 14.993,
+      "halfWidth": 9.975,
+      "clamp": 7.925,
       "clampMax": 15.5,
       "left": {
-        "limit": 9.993,
+        "limit": 9.975,
         "setBy": "GW_SECTOR_LINK_APRON_concrete",
         "tall": 10.428
       },
       "right": {
-        "limit": 9.993,
+        "limit": 9.975,
         "setBy": "GW_SECTOR_LINK_APRON_concrete",
         "tall": 10.491
       }
     },
     {
       "distance": 810,
-      "halfWidth": 9.588,
-      "clamp": 11.588,
-      "clampMax": 14.588,
+      "halfWidth": 9.5,
+      "clamp": 7.45,
+      "clampMax": 14.688,
       "left": {
-        "limit": 9.588,
+        "limit": 9.5,
         "setBy": "GW_SECTOR_HANGAR_SIX_concrete",
         "tall": 9.862
       },
@@ -974,45 +978,45 @@
     },
     {
       "distance": 820,
-      "halfWidth": 9.787,
+      "halfWidth": 9.689,
       "clamp": 11.787,
       "clampMax": 15.188,
       "left": {
-        "limit": 9.787,
+        "limit": 9.689,
         "setBy": "GW_SECTOR_HANGAR_SIX_concrete",
-        "tall": 10.007
+        "tall": 9.785
       },
       "right": {
-        "limit": 9.787,
+        "limit": 9.689,
         "setBy": "GW_SECTOR_HANGAR_EXIT_concrete",
         "tall": 10.515
       }
     },
     {
       "distance": 830,
-      "halfWidth": 10.284,
+      "halfWidth": 10.19,
       "clamp": 12.286,
       "clampMax": 15.688,
       "left": {
-        "limit": 10.284,
+        "limit": 10.19,
         "setBy": "GW_SECTOR_HANGAR_EXIT_metal",
         "tall": 10.823
       },
       "right": {
-        "limit": 10.284,
+        "limit": 10.19,
         "setBy": "GW_SECTOR_HANGAR_EXIT_concrete",
         "tall": 10.963
       }
     },
     {
       "distance": 840,
-      "halfWidth": 10.788,
-      "clamp": 12.882,
+      "halfWidth": 10.691,
+      "clamp": 12.733,
       "clampMax": 17.8,
       "left": {
-        "limit": 10.788,
+        "limit": 10.691,
         "setBy": "GW_SECTOR_HANGAR_EXIT_metal",
-        "tall": 11.625
+        "tall": 11.409
       },
       "right": {
         "limit": 11.235,
@@ -1026,14 +1030,14 @@
       "clamp": 17,
       "clampMax": 17.8,
       "left": {
-        "limit": 15.353,
-        "setBy": "GW_SECTOR_GREENWATER_SWEEP_metal",
-        "tall": 16.953
+        "limit": 12,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_concrete",
+        "tall": 12.851
       },
       "right": {
-        "limit": 13.434,
-        "setBy": "GW_SECTOR_GREENWATER_SWEEP_metal",
-        "tall": 15.034
+        "limit": 12,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_water",
+        "tall": 12.85
       }
     },
     {
@@ -1042,14 +1046,14 @@
       "clamp": 17,
       "clampMax": 17.8,
       "left": {
-        "limit": 15.399,
-        "setBy": "barrier_A_left",
-        "tall": 16.999
+        "limit": 12,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_concrete",
+        "tall": 12.851
       },
       "right": {
-        "limit": 16.06,
-        "setBy": "greenwater_open_edge_markers/<unnamed>",
-        "tall": 17.66
+        "limit": 13.25,
+        "setBy": "surface-support(greenwater_open_edge_markers/<unnamed>)",
+        "tall": 14.85
       }
     },
     {
@@ -1058,14 +1062,14 @@
       "clamp": 17,
       "clampMax": 17.8,
       "left": {
-        "limit": 15.352,
-        "setBy": "GW_SECTOR_GREENWATER_SWEEP_metal",
-        "tall": 16.952
+        "limit": 12,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_concrete",
+        "tall": 12.851
       },
       "right": {
-        "limit": 16.06,
-        "setBy": "greenwater_open_edge_markers/<unnamed>",
-        "tall": 17.66
+        "limit": 13.25,
+        "setBy": "surface-support(greenwater_open_edge_markers/<unnamed>)",
+        "tall": 14.85
       }
     },
     {
@@ -1074,14 +1078,14 @@
       "clamp": 17,
       "clampMax": 17.8,
       "left": {
-        "limit": 15.399,
-        "setBy": "barrier_A_left",
-        "tall": 16.999
+        "limit": 12,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_concrete",
+        "tall": 12.851
       },
       "right": {
-        "limit": 13.434,
-        "setBy": "GW_SECTOR_GREENWATER_SWEEP_metal",
-        "tall": 15.034
+        "limit": 13.25,
+        "setBy": "surface-support(GW_SECTOR_GREENWATER_SWEEP_metal)",
+        "tall": 14.85
       }
     },
     {
@@ -1091,13 +1095,13 @@
       "clampMax": 17.8,
       "left": {
         "limit": 12,
-        "setBy": "GW_SECTOR_GREENWATER_SWEEP_metal",
-        "tall": 12.86
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_concrete",
+        "tall": 12.851
       },
       "right": {
-        "limit": 16.06,
-        "setBy": "greenwater_open_edge_markers/<unnamed>",
-        "tall": 17.66
+        "limit": 12,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_water",
+        "tall": 12.85
       }
     },
     {
@@ -1111,9 +1115,9 @@
         "tall": 12.85
       },
       "right": {
-        "limit": 13.434,
-        "setBy": "GW_SECTOR_GREENWATER_SWEEP_metal",
-        "tall": 15.034
+        "limit": 12,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_signage",
+        "tall": 12.857
       }
     },
     {
@@ -1122,14 +1126,14 @@
       "clamp": 17,
       "clampMax": 17.8,
       "left": {
-        "limit": 15.399,
-        "setBy": "barrier_A_left",
-        "tall": 16.999
+        "limit": 12,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_concrete",
+        "tall": 12.851
       },
       "right": {
-        "limit": 16.06,
-        "setBy": "greenwater_open_edge_markers/<unnamed>",
-        "tall": 17.66
+        "limit": 13.25,
+        "setBy": "surface-support(greenwater_open_edge_markers/<unnamed>)",
+        "tall": 14.85
       }
     },
     {
@@ -1138,14 +1142,14 @@
       "clamp": 17,
       "clampMax": 17.8,
       "left": {
-        "limit": 15.399,
-        "setBy": "barrier_A_left",
-        "tall": 16.999
+        "limit": 12,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_concrete",
+        "tall": 12.851
       },
       "right": {
-        "limit": 16.06,
-        "setBy": "greenwater_open_edge_markers/<unnamed>",
-        "tall": 17.66
+        "limit": 12,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_water",
+        "tall": 12.85
       }
     },
     {
@@ -1154,14 +1158,14 @@
       "clamp": 17,
       "clampMax": 17.8,
       "left": {
-        "limit": 15.399,
-        "setBy": "barrier_A_left",
-        "tall": 16.999
+        "limit": 12,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_concrete",
+        "tall": 12.85
       },
       "right": {
-        "limit": 13.447,
-        "setBy": "GW_SECTOR_GREENWATER_SWEEP_metal",
-        "tall": 15.047
+        "limit": 13.25,
+        "setBy": "surface-support(GW_SECTOR_GREENWATER_SWEEP_metal)",
+        "tall": 14.85
       }
     },
     {
@@ -1170,14 +1174,14 @@
       "clamp": 17,
       "clampMax": 17.8,
       "left": {
-        "limit": 15.399,
-        "setBy": "barrier_A_left",
-        "tall": 16.999
+        "limit": 12,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_concrete",
+        "tall": 12.85
       },
       "right": {
-        "limit": 16.06,
-        "setBy": "greenwater_open_edge_markers/<unnamed>",
-        "tall": 17.66
+        "limit": 13.25,
+        "setBy": "surface-support(greenwater_open_edge_markers/<unnamed>)",
+        "tall": 14.85
       }
     },
     {
@@ -1186,14 +1190,14 @@
       "clamp": 17,
       "clampMax": 17.8,
       "left": {
-        "limit": 15.399,
-        "setBy": "barrier_A_left",
-        "tall": 16.999
+        "limit": 12,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_concrete",
+        "tall": 12.85
       },
       "right": {
-        "limit": 16.06,
-        "setBy": "greenwater_open_edge_markers/<unnamed>",
-        "tall": 17.66
+        "limit": 12,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_water",
+        "tall": 12.85
       }
     },
     {
@@ -1202,14 +1206,14 @@
       "clamp": 17,
       "clampMax": 17.8,
       "left": {
-        "limit": 15.4,
-        "setBy": "barrier_A_left",
-        "tall": 17
+        "limit": 12,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_concrete",
+        "tall": 12.85
       },
       "right": {
-        "limit": 13.447,
-        "setBy": "GW_SECTOR_GREENWATER_SWEEP_metal",
-        "tall": 15.047
+        "limit": 13.25,
+        "setBy": "surface-support(GW_SECTOR_GREENWATER_SWEEP_metal)",
+        "tall": 14.85
       }
     },
     {
@@ -1218,14 +1222,14 @@
       "clamp": 17,
       "clampMax": 17.8,
       "left": {
-        "limit": 15.4,
-        "setBy": "barrier_A_left",
-        "tall": 17
+        "limit": 12,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_concrete",
+        "tall": 12.85
       },
       "right": {
-        "limit": 16.06,
-        "setBy": "greenwater_open_edge_markers/<unnamed>",
-        "tall": 17.66
+        "limit": 13.25,
+        "setBy": "surface-support(greenwater_open_edge_markers/<unnamed>)",
+        "tall": 14.85
       }
     },
     {
@@ -1234,14 +1238,14 @@
       "clamp": 17,
       "clampMax": 17.8,
       "left": {
-        "limit": 15.4,
-        "setBy": "barrier_A_left",
-        "tall": 17
+        "limit": 12,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_concrete",
+        "tall": 12.85
       },
       "right": {
-        "limit": 13.447,
-        "setBy": "GW_SECTOR_GREENWATER_SWEEP_metal",
-        "tall": 15.047
+        "limit": 12,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_water",
+        "tall": 12.85
       }
     },
     {
@@ -1250,14 +1254,14 @@
       "clamp": 17,
       "clampMax": 17.8,
       "left": {
-        "limit": 15.399,
-        "setBy": "barrier_A_left",
-        "tall": 16.999
+        "limit": 12,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_concrete",
+        "tall": 12.85
       },
       "right": {
-        "limit": 16.06,
-        "setBy": "greenwater_open_edge_markers/<unnamed>",
-        "tall": 17.66
+        "limit": 13.25,
+        "setBy": "surface-support(greenwater_open_edge_markers/<unnamed>)",
+        "tall": 14.85
       }
     },
     {
@@ -1266,14 +1270,14 @@
       "clamp": 17,
       "clampMax": 17.8,
       "left": {
-        "limit": 15.4,
-        "setBy": "barrier_A_left",
-        "tall": 17
+        "limit": 12,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_concrete",
+        "tall": 12.85
       },
       "right": {
-        "limit": 16.06,
-        "setBy": "greenwater_open_edge_markers/<unnamed>",
-        "tall": 17.66
+        "limit": 13.25,
+        "setBy": "surface-support(greenwater_open_edge_markers/<unnamed>)",
+        "tall": 14.85
       }
     },
     {
@@ -1282,14 +1286,14 @@
       "clamp": 17,
       "clampMax": 17.8,
       "left": {
-        "limit": 15.399,
-        "setBy": "barrier_A_left",
-        "tall": 16.999
+        "limit": 12,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_concrete",
+        "tall": 12.85
       },
       "right": {
-        "limit": 13.447,
-        "setBy": "GW_SECTOR_GREENWATER_SWEEP_metal",
-        "tall": 15.047
+        "limit": 12,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_water",
+        "tall": 12.85
       }
     },
     {
@@ -1298,14 +1302,14 @@
       "clamp": 17,
       "clampMax": 17.8,
       "left": {
-        "limit": 15.4,
-        "setBy": "barrier_A_left",
-        "tall": 17
+        "limit": 12,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_concrete",
+        "tall": 12.85
       },
       "right": {
-        "limit": 16.06,
-        "setBy": "greenwater_open_edge_markers/<unnamed>",
-        "tall": 17.66
+        "limit": 13.25,
+        "setBy": "surface-support(greenwater_open_edge_markers/<unnamed>)",
+        "tall": 14.85
       }
     },
     {
@@ -1314,14 +1318,14 @@
       "clamp": 17,
       "clampMax": 17.8,
       "left": {
-        "limit": 15.399,
-        "setBy": "barrier_A_left",
-        "tall": 16.999
+        "limit": 12,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_concrete",
+        "tall": 12.85
       },
       "right": {
-        "limit": 13.451,
-        "setBy": "GW_SECTOR_GREENWATER_SWEEP_metal",
-        "tall": 15.051
+        "limit": 13.25,
+        "setBy": "surface-support(GW_SECTOR_GREENWATER_SWEEP_metal)",
+        "tall": 14.85
       }
     },
     {
@@ -1330,14 +1334,14 @@
       "clamp": 17,
       "clampMax": 17.8,
       "left": {
-        "limit": 15.399,
-        "setBy": "barrier_A_left",
-        "tall": 16.999
+        "limit": 12,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_concrete",
+        "tall": 12.85
       },
       "right": {
-        "limit": 13.447,
-        "setBy": "GW_SECTOR_GREENWATER_SWEEP_metal",
-        "tall": 15.047
+        "limit": 13.25,
+        "setBy": "surface-support(GW_SECTOR_GREENWATER_SWEEP_metal)",
+        "tall": 14.85
       }
     },
     {
@@ -1346,14 +1350,14 @@
       "clamp": 17,
       "clampMax": 17.8,
       "left": {
-        "limit": 15.399,
-        "setBy": "barrier_A_left",
-        "tall": 16.999
+        "limit": 12,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_concrete",
+        "tall": 12.85
       },
       "right": {
-        "limit": 16.06,
-        "setBy": "greenwater_open_edge_markers/<unnamed>",
-        "tall": 17.66
+        "limit": 12,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_water",
+        "tall": 12.85
       }
     },
     {
@@ -1362,14 +1366,14 @@
       "clamp": 17,
       "clampMax": 17.8,
       "left": {
-        "limit": 15.399,
-        "setBy": "barrier_A_left",
-        "tall": 16.999
+        "limit": 12,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_concrete",
+        "tall": 12.85
       },
       "right": {
-        "limit": 13.447,
-        "setBy": "GW_SECTOR_GREENWATER_SWEEP_metal",
-        "tall": 15.047
+        "limit": 13.25,
+        "setBy": "surface-support(GW_SECTOR_GREENWATER_SWEEP_metal)",
+        "tall": 14.85
       }
     },
     {
@@ -1378,14 +1382,14 @@
       "clamp": 17,
       "clampMax": 17.8,
       "left": {
-        "limit": 15.4,
-        "setBy": "barrier_A_left",
-        "tall": 17
+        "limit": 12,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_concrete",
+        "tall": 12.85
       },
       "right": {
-        "limit": 16.06,
-        "setBy": "greenwater_open_edge_markers/<unnamed>",
-        "tall": 17.66
+        "limit": 13.25,
+        "setBy": "surface-support(greenwater_open_edge_markers/<unnamed>)",
+        "tall": 14.85
       }
     },
     {
@@ -1394,14 +1398,14 @@
       "clamp": 17,
       "clampMax": 17.8,
       "left": {
-        "limit": 15.399,
-        "setBy": "barrier_A_left",
-        "tall": 16.999
+        "limit": 12,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_concrete",
+        "tall": 12.85
       },
       "right": {
-        "limit": 16.06,
-        "setBy": "greenwater_open_edge_markers/<unnamed>",
-        "tall": 17.66
+        "limit": 12,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_water",
+        "tall": 12.85
       }
     },
     {
@@ -1410,14 +1414,14 @@
       "clamp": 17,
       "clampMax": 17.8,
       "left": {
-        "limit": 15.399,
-        "setBy": "barrier_A_left",
-        "tall": 16.999
+        "limit": 12,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_concrete",
+        "tall": 12.85
       },
       "right": {
-        "limit": 13.447,
-        "setBy": "GW_SECTOR_GREENWATER_SWEEP_metal",
-        "tall": 15.047
+        "limit": 13.25,
+        "setBy": "surface-support(GW_SECTOR_GREENWATER_SWEEP_metal)",
+        "tall": 14.85
       }
     },
     {
@@ -1426,14 +1430,14 @@
       "clamp": 17,
       "clampMax": 17.8,
       "left": {
-        "limit": 15.399,
-        "setBy": "barrier_A_left",
-        "tall": 16.999
+        "limit": 12,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_concrete",
+        "tall": 12.85
       },
       "right": {
-        "limit": 16.06,
-        "setBy": "greenwater_open_edge_markers/<unnamed>",
-        "tall": 17.66
+        "limit": 13.25,
+        "setBy": "surface-support(greenwater_open_edge_markers/<unnamed>)",
+        "tall": 14.85
       }
     },
     {
@@ -1442,73 +1446,73 @@
       "clamp": 17,
       "clampMax": 17.8,
       "left": {
-        "limit": 15.399,
-        "setBy": "barrier_A_left",
-        "tall": 16.999
+        "limit": 12,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_concrete",
+        "tall": 12.85
       },
       "right": {
-        "limit": 13.447,
-        "setBy": "GW_SECTOR_GREENWATER_SWEEP_metal",
-        "tall": 15.047
+        "limit": 12,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_water",
+        "tall": 12.85
       }
     },
     {
       "distance": 1120,
-      "halfWidth": 11.95,
+      "halfWidth": 11.949,
       "clamp": 16.95,
       "clampMax": 17.8,
       "left": {
-        "limit": 15.349,
-        "setBy": "barrier_A_left",
-        "tall": 16.949
+        "limit": 11.949,
+        "setBy": "GW_SECTOR_GREENWATER_SWEEP_concrete",
+        "tall": 12.85
       },
       "right": {
-        "limit": 16.06,
-        "setBy": "greenwater_open_edge_markers/<unnamed>",
-        "tall": 17.66
+        "limit": 13.25,
+        "setBy": "surface-support(greenwater_open_edge_markers/<unnamed>)",
+        "tall": 14.85
       }
     },
     {
       "distance": 1130,
-      "halfWidth": 11.546,
-      "clamp": 17.346,
-      "clampMax": 17.712,
+      "halfWidth": 11.449,
+      "clamp": 17.249,
+      "clampMax": 17.749,
       "left": {
-        "limit": 11.546,
+        "limit": 11.449,
         "setBy": "GW_SECTOR_CANOPY_PASSAGE_concrete",
-        "tall": 12.396
+        "tall": 12.667
       },
       "right": {
-        "limit": 15.708,
-        "setBy": "greenwater_open_edge_markers/<unnamed>",
-        "tall": 17.308
+        "limit": 11.449,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_signage",
+        "tall": 12.728
       }
     },
     {
       "distance": 1140,
-      "halfWidth": 11.034,
-      "clamp": 16.834,
+      "halfWidth": 10.949,
+      "clamp": 16.749,
       "clampMax": 17.246,
       "left": {
-        "limit": 11.034,
+        "limit": 10.949,
         "setBy": "GW_SECTOR_CANOPY_PASSAGE_concrete",
-        "tall": 12.143
+        "tall": 12.502
       },
       "right": {
-        "limit": 14.846,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
-        "tall": 16.446
+        "limit": 10.949,
+        "setBy": "GW_SECTOR_CANOPY_PASSAGE_water",
+        "tall": 11.886
       }
     },
     {
       "distance": 1150,
-      "halfWidth": 10.548,
-      "clamp": 16.348,
+      "halfWidth": 10.449,
+      "clamp": 16.249,
       "clampMax": 16.748,
       "left": {
-        "limit": 10.548,
+        "limit": 10.598,
         "setBy": "GW_SECTOR_CANOPY_PASSAGE_concrete",
-        "tall": 11.839
+        "tall": 12.198
       },
       "right": {
         "limit": 11.294,
@@ -1518,57 +1522,57 @@
     },
     {
       "distance": 1160,
-      "halfWidth": 10.046,
-      "clamp": 15.846,
+      "halfWidth": 9.998,
+      "clamp": 15.798,
       "clampMax": 16.248,
       "left": {
-        "limit": 10.081,
+        "limit": 10.44,
         "setBy": "GW_SECTOR_CANOPY_PASSAGE_concrete",
-        "tall": 11.681
+        "tall": 12.04
       },
       "right": {
-        "limit": 13.789,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
-        "tall": 15.389
+        "limit": 11,
+        "setBy": "surface-support(GW_SECTOR_CANOPY_PASSAGE_jungle)",
+        "tall": 12.6
       }
     },
     {
       "distance": 1170,
-      "halfWidth": 9.986,
-      "clamp": 15.786,
-      "clampMax": 15.786,
+      "halfWidth": 9.979,
+      "clamp": 15.779,
+      "clampMax": 15.798,
       "left": {
-        "limit": 13.787,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
-        "tall": 15.387
+        "limit": 11.75,
+        "setBy": "surface-support(GW_SECTOR_CANOPY_PASSAGE_jungle)",
+        "tall": 13.35
       },
       "right": {
-        "limit": 13.786,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
-        "tall": 15.386
+        "limit": 10.5,
+        "setBy": "surface-support(GW_SECTOR_CANOPY_PASSAGE_metal)",
+        "tall": 12.1
       }
     },
     {
       "distance": 1180,
-      "halfWidth": 9.965,
-      "clamp": 15.765,
+      "halfWidth": 9.96,
+      "clamp": 15.76,
       "clampMax": 15.779,
       "left": {
-        "limit": 13.124,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_jungle",
-        "tall": 14.724
+        "limit": 11.75,
+        "setBy": "surface-support(GW_SECTOR_CANOPY_PASSAGE_jungle)",
+        "tall": 13.35
       },
       "right": {
-        "limit": 12.917,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_jungle",
-        "tall": 14.517
+        "limit": 10.5,
+        "setBy": "surface-support(GW_SECTOR_CANOPY_PASSAGE_jungle)",
+        "tall": 12.1
       }
     },
     {
       "distance": 1190,
       "halfWidth": 9.941,
       "clamp": 15.741,
-      "clampMax": 15.757,
+      "clampMax": 15.76,
       "left": {
         "limit": 10.229,
         "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
@@ -1582,8 +1586,8 @@
     },
     {
       "distance": 1200,
-      "halfWidth": 9.932,
-      "clamp": 15.732,
+      "halfWidth": 9.921,
+      "clamp": 15.721,
       "clampMax": 15.741,
       "left": {
         "limit": 10.101,
@@ -1591,63 +1595,63 @@
         "tall": 11.701
       },
       "right": {
-        "limit": 9.932,
+        "limit": 9.921,
         "setBy": "GW_SECTOR_CANOPY_PASSAGE_emissive",
         "tall": 10.475
       }
     },
     {
       "distance": 1210,
-      "halfWidth": 9.906,
-      "clamp": 15.706,
-      "clampMax": 15.713,
+      "halfWidth": 9.902,
+      "clamp": 15.703,
+      "clampMax": 15.721,
       "left": {
-        "limit": 13.613,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
-        "tall": 15.213
+        "limit": 11.75,
+        "setBy": "surface-support(GW_SECTOR_CANOPY_PASSAGE_metal)",
+        "tall": 13.35
       },
       "right": {
-        "limit": 13.771,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
-        "tall": 15.371
+        "limit": 10.5,
+        "setBy": "surface-support(GW_SECTOR_CANOPY_PASSAGE_jungle)",
+        "tall": 12.1
       }
     },
     {
       "distance": 1220,
-      "halfWidth": 9.887,
-      "clamp": 15.687,
-      "clampMax": 15.695,
+      "halfWidth": 9.883,
+      "clamp": 15.683,
+      "clampMax": 15.702,
       "left": {
-        "limit": 13.571,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
-        "tall": 15.171
+        "limit": 11.75,
+        "setBy": "surface-support(GW_SECTOR_CANOPY_PASSAGE_metal)",
+        "tall": 13.35
       },
       "right": {
-        "limit": 13.614,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
-        "tall": 15.214
+        "limit": 10.5,
+        "setBy": "surface-support(GW_SECTOR_CANOPY_PASSAGE_metal)",
+        "tall": 12.1
       }
     },
     {
       "distance": 1230,
       "halfWidth": 9.865,
       "clamp": 15.665,
-      "clampMax": 15.68,
+      "clampMax": 15.683,
       "left": {
-        "limit": 13.564,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
-        "tall": 15.164
+        "limit": 11.75,
+        "setBy": "surface-support(GW_SECTOR_CANOPY_PASSAGE_metal)",
+        "tall": 13.35
       },
       "right": {
-        "limit": 13.94,
-        "setBy": "greenwater_open_edge_markers/<unnamed>",
-        "tall": 15.54
+        "limit": 10.5,
+        "setBy": "surface-support(GW_SECTOR_CANOPY_PASSAGE_jungle)",
+        "tall": 12.1
       }
     },
     {
       "distance": 1240,
-      "halfWidth": 9.848,
-      "clamp": 15.648,
+      "halfWidth": 9.845,
+      "clamp": 15.645,
       "clampMax": 15.664,
       "left": {
         "limit": 10.009,
@@ -1655,52 +1659,52 @@
         "tall": 11.609
       },
       "right": {
-        "limit": 9.848,
+        "limit": 9.845,
         "setBy": "GW_SECTOR_CANOPY_PASSAGE_emissive",
         "tall": 10.383
       }
     },
     {
       "distance": 1250,
-      "halfWidth": 9.841,
-      "clamp": 15.641,
-      "clampMax": 15.642,
+      "halfWidth": 9.826,
+      "clamp": 15.626,
+      "clampMax": 15.645,
       "left": {
-        "limit": 13.526,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
-        "tall": 15.126
+        "limit": 11.75,
+        "setBy": "surface-support(GW_SECTOR_CANOPY_PASSAGE_metal)",
+        "tall": 13.35
       },
       "right": {
-        "limit": 13.568,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
-        "tall": 15.168
+        "limit": 10.25,
+        "setBy": "surface-support(GW_SECTOR_CANOPY_PASSAGE_metal)",
+        "tall": 11.85
       }
     },
     {
       "distance": 1260,
-      "halfWidth": 9.818,
-      "clamp": 15.618,
-      "clampMax": 15.619,
+      "halfWidth": 9.807,
+      "clamp": 15.607,
+      "clampMax": 15.626,
       "left": {
-        "limit": 13.519,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
-        "tall": 15.119
+        "limit": 11.75,
+        "setBy": "surface-support(GW_SECTOR_CANOPY_PASSAGE_metal)",
+        "tall": 13.35
       },
       "right": {
-        "limit": 13.681,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
-        "tall": 15.281
+        "limit": 10.25,
+        "setBy": "surface-support(GW_SECTOR_CANOPY_PASSAGE_metal)",
+        "tall": 11.85
       }
     },
     {
       "distance": 1270,
       "halfWidth": 9.788,
       "clamp": 15.588,
-      "clampMax": 15.606,
+      "clampMax": 15.607,
       "left": {
-        "limit": 13.48,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
-        "tall": 15.08
+        "limit": 11.75,
+        "setBy": "surface-support(GW_SECTOR_CANOPY_PASSAGE_jungle)",
+        "tall": 13.35
       },
       "right": {
         "limit": 9.82,
@@ -1710,112 +1714,112 @@
     },
     {
       "distance": 1280,
-      "halfWidth": 9.772,
-      "clamp": 15.572,
+      "halfWidth": 9.769,
+      "clamp": 15.569,
       "clampMax": 15.588,
       "left": {
-        "limit": 13.472,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
-        "tall": 15.072
+        "limit": 11.75,
+        "setBy": "surface-support(GW_SECTOR_CANOPY_PASSAGE_metal)",
+        "tall": 13.35
       },
       "right": {
-        "limit": 13.636,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
-        "tall": 15.236
+        "limit": 10.25,
+        "setBy": "surface-support(GW_SECTOR_CANOPY_PASSAGE_jungle)",
+        "tall": 11.85
       }
     },
     {
       "distance": 1290,
-      "halfWidth": 9.75,
-      "clamp": 15.55,
-      "clampMax": 15.558,
+      "halfWidth": 9.749,
+      "clamp": 15.549,
+      "clampMax": 15.569,
       "left": {
         "limit": 9.917,
         "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
         "tall": 11.517
       },
       "right": {
-        "limit": 9.75,
+        "limit": 9.749,
         "setBy": "GW_SECTOR_CANOPY_PASSAGE_emissive",
         "tall": 10.291
       }
     },
     {
       "distance": 1300,
-      "halfWidth": 9.749,
-      "clamp": 15.549,
+      "halfWidth": 9.73,
+      "clamp": 15.53,
       "clampMax": 15.549,
       "left": {
-        "limit": 13.435,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
-        "tall": 15.035
+        "limit": 11.5,
+        "setBy": "surface-support(GW_SECTOR_CANOPY_PASSAGE_metal)",
+        "tall": 13.1
       },
       "right": {
-        "limit": 13.478,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
-        "tall": 15.078
+        "limit": 10.25,
+        "setBy": "surface-support(GW_SECTOR_CANOPY_PASSAGE_metal)",
+        "tall": 11.85
       }
     },
     {
       "distance": 1310,
-      "halfWidth": 9.726,
-      "clamp": 15.526,
-      "clampMax": 15.528,
+      "halfWidth": 9.711,
+      "clamp": 15.511,
+      "clampMax": 15.53,
       "left": {
-        "limit": 13.589,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
-        "tall": 15.189
+        "limit": 11.5,
+        "setBy": "surface-support(GW_SECTOR_CANOPY_PASSAGE_jungle)",
+        "tall": 13.1
       },
       "right": {
-        "limit": 13.429,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
-        "tall": 15.029
+        "limit": 10.25,
+        "setBy": "surface-support(GW_SECTOR_CANOPY_PASSAGE_metal)",
+        "tall": 11.85
       }
     },
     {
       "distance": 1320,
-      "halfWidth": 9.696,
-      "clamp": 15.496,
+      "halfWidth": 9.693,
+      "clamp": 15.492,
       "clampMax": 15.511,
       "left": {
-        "limit": 13.43,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
-        "tall": 15.03
+        "limit": 11.5,
+        "setBy": "surface-support(GW_SECTOR_CANOPY_PASSAGE_metal)",
+        "tall": 13.1
       },
       "right": {
-        "limit": 13.388,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
-        "tall": 14.988
+        "limit": 10.25,
+        "setBy": "surface-support(GW_SECTOR_CANOPY_PASSAGE_metal)",
+        "tall": 11.85
       }
     },
     {
       "distance": 1330,
-      "halfWidth": 9.68,
-      "clamp": 15.48,
-      "clampMax": 15.482,
+      "halfWidth": 9.674,
+      "clamp": 15.474,
+      "clampMax": 15.492,
       "left": {
-        "limit": 13.542,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
-        "tall": 15.142
+        "limit": 11.5,
+        "setBy": "surface-support(GW_SECTOR_CANOPY_PASSAGE_metal)",
+        "tall": 13.1
       },
       "right": {
-        "limit": 13.383,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
-        "tall": 14.983
+        "limit": 10.25,
+        "setBy": "surface-support(GW_SECTOR_CANOPY_PASSAGE_metal)",
+        "tall": 11.85
       }
     },
     {
       "distance": 1340,
-      "halfWidth": 9.657,
-      "clamp": 15.457,
-      "clampMax": 15.468,
+      "halfWidth": 9.654,
+      "clamp": 15.454,
+      "clampMax": 15.473,
       "left": {
         "limit": 9.825,
         "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
         "tall": 11.425
       },
       "right": {
-        "limit": 9.657,
+        "limit": 9.654,
         "setBy": "GW_SECTOR_CANOPY_PASSAGE_emissive",
         "tall": 10.199
       }
@@ -1824,134 +1828,134 @@
       "distance": 1350,
       "halfWidth": 9.635,
       "clamp": 15.435,
-      "clampMax": 15.436,
+      "clampMax": 15.452,
       "left": {
-        "limit": 13.695,
-        "setBy": "greenwater_open_edge_markers/<unnamed>",
-        "tall": 15.295
+        "limit": 11.5,
+        "setBy": "surface-support(greenwater_open_edge_markers/<unnamed>)",
+        "tall": 13.1
       },
       "right": {
-        "limit": 13.335,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
-        "tall": 14.935
+        "limit": 10.25,
+        "setBy": "surface-support(GW_SECTOR_CANOPY_PASSAGE_jungle)",
+        "tall": 11.85
       }
     },
     {
       "distance": 1360,
-      "halfWidth": 9.62,
-      "clamp": 15.42,
+      "halfWidth": 9.616,
+      "clamp": 15.416,
       "clampMax": 15.435,
       "left": {
-        "limit": 13.28,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_jungle",
-        "tall": 14.88
+        "limit": 11.5,
+        "setBy": "surface-support(GW_SECTOR_CANOPY_PASSAGE_jungle)",
+        "tall": 13.1
       },
       "right": {
-        "limit": 13.42,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
-        "tall": 15.02
+        "limit": 10.25,
+        "setBy": "surface-support(GW_SECTOR_CANOPY_PASSAGE_metal)",
+        "tall": 11.85
       }
     },
     {
       "distance": 1370,
-      "halfWidth": 9.604,
-      "clamp": 15.404,
-      "clampMax": 15.412,
+      "halfWidth": 9.597,
+      "clamp": 15.397,
+      "clampMax": 15.416,
       "left": {
-        "limit": 13.338,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
-        "tall": 14.938
+        "limit": 11.5,
+        "setBy": "surface-support(GW_SECTOR_CANOPY_PASSAGE_metal)",
+        "tall": 13.1
       },
       "right": {
-        "limit": 13.298,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
-        "tall": 14.898
+        "limit": 10.25,
+        "setBy": "surface-support(GW_SECTOR_CANOPY_PASSAGE_jungle)",
+        "tall": 11.85
       }
     },
     {
       "distance": 1380,
-      "halfWidth": 9.58,
-      "clamp": 15.38,
-      "clampMax": 15.39,
+      "halfWidth": 9.578,
+      "clamp": 15.378,
+      "clampMax": 15.397,
       "left": {
-        "limit": 13.451,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
-        "tall": 15.051
+        "limit": 11.5,
+        "setBy": "surface-support(GW_SECTOR_CANOPY_PASSAGE_metal)",
+        "tall": 13.1
       },
       "right": {
-        "limit": 13.173,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_jungle",
-        "tall": 14.773
+        "limit": 10,
+        "setBy": "surface-support(GW_SECTOR_CANOPY_PASSAGE_jungle)",
+        "tall": 11.6
       }
     },
     {
       "distance": 1390,
-      "halfWidth": 9.566,
-      "clamp": 15.366,
-      "clampMax": 15.375,
+      "halfWidth": 9.559,
+      "clamp": 15.358,
+      "clampMax": 15.378,
       "left": {
         "limit": 9.734,
         "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
         "tall": 11.334
       },
       "right": {
-        "limit": 9.566,
+        "limit": 9.559,
         "setBy": "GW_SECTOR_CANOPY_PASSAGE_emissive",
         "tall": 10.107
       }
     },
     {
       "distance": 1400,
-      "halfWidth": 9.543,
-      "clamp": 15.343,
+      "halfWidth": 9.54,
+      "clamp": 15.34,
       "clampMax": 15.357,
       "left": {
-        "limit": 12.019,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_jungle",
-        "tall": 13.619
+        "limit": 11.5,
+        "setBy": "surface-support(GW_SECTOR_CANOPY_PASSAGE_jungle)",
+        "tall": 13.1
       },
       "right": {
-        "limit": 13.243,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
-        "tall": 14.843
+        "limit": 10,
+        "setBy": "surface-support(GW_SECTOR_CANOPY_PASSAGE_metal)",
+        "tall": 11.6
       }
     },
     {
       "distance": 1410,
       "halfWidth": 9.521,
-      "clamp": 15.321,
-      "clampMax": 15.328,
+      "clamp": 15.32,
+      "clampMax": 15.339,
       "left": {
-        "limit": 13.246,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
-        "tall": 14.846
+        "limit": 11.5,
+        "setBy": "surface-support(GW_SECTOR_CANOPY_PASSAGE_jungle)",
+        "tall": 13.1
       },
       "right": {
-        "limit": 13.327,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
-        "tall": 14.927
+        "limit": 10,
+        "setBy": "surface-support(GW_SECTOR_CANOPY_PASSAGE_metal)",
+        "tall": 11.6
       }
     },
     {
       "distance": 1420,
-      "halfWidth": 9.512,
-      "clamp": 15.312,
+      "halfWidth": 9.502,
+      "clamp": 15.302,
       "clampMax": 15.32,
       "left": {
-        "limit": 13.249,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
-        "tall": 14.849
+        "limit": 11.25,
+        "setBy": "surface-support(GW_SECTOR_CANOPY_PASSAGE_metal)",
+        "tall": 12.85
       },
       "right": {
-        "limit": 13.04,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_jungle",
-        "tall": 14.64
+        "limit": 10,
+        "setBy": "surface-support(GW_SECTOR_CANOPY_PASSAGE_jungle)",
+        "tall": 11.6
       }
     },
     {
       "distance": 1430,
-      "halfWidth": 9.513,
-      "clamp": 15.313,
+      "halfWidth": 9.502,
+      "clamp": 15.302,
       "clampMax": 15.392,
       "left": {
         "limit": 9.752,
@@ -1959,7 +1963,7 @@
         "tall": 11.352
       },
       "right": {
-        "limit": 9.513,
+        "limit": 9.502,
         "setBy": "GW_SECTOR_CANOPY_PASSAGE_emissive",
         "tall": 10.126
       }
@@ -1968,7 +1972,7 @@
       "distance": 1440,
       "halfWidth": 9.593,
       "clamp": 15.393,
-      "clampMax": 15.396,
+      "clampMax": 15.491,
       "left": {
         "limit": 9.881,
         "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
@@ -1982,128 +1986,128 @@
     },
     {
       "distance": 1450,
-      "halfWidth": 9.749,
-      "clamp": 15.549,
-      "clampMax": 15.552,
+      "halfWidth": 9.692,
+      "clamp": 15.492,
+      "clampMax": 15.59,
       "left": {
-        "limit": 13.63,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
-        "tall": 15.23
+        "limit": 11.75,
+        "setBy": "surface-support(GW_SECTOR_CANOPY_PASSAGE_metal)",
+        "tall": 13.35
       },
       "right": {
-        "limit": 13.63,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
-        "tall": 15.23
+        "limit": 10.25,
+        "setBy": "surface-support(GW_SECTOR_CANOPY_PASSAGE_metal)",
+        "tall": 11.85
       }
     },
     {
       "distance": 1460,
-      "halfWidth": 9.83,
-      "clamp": 15.63,
-      "clampMax": 15.63,
+      "halfWidth": 9.791,
+      "clamp": 15.591,
+      "clampMax": 15.69,
       "left": {
-        "limit": 13.63,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
-        "tall": 15.23
+        "limit": 11.75,
+        "setBy": "surface-support(GW_SECTOR_CANOPY_PASSAGE_metal)",
+        "tall": 13.35
       },
       "right": {
-        "limit": 13.63,
-        "setBy": "GW_SECTOR_CANOPY_PASSAGE_metal",
-        "tall": 15.23
+        "limit": 10.5,
+        "setBy": "surface-support(GW_SECTOR_CANOPY_PASSAGE_metal)",
+        "tall": 12.1
       }
     },
     {
       "distance": 1470,
       "halfWidth": 9.908,
       "clamp": 15.708,
-      "clampMax": 15.773,
+      "clampMax": 15.789,
       "left": {
-        "limit": 13.507,
-        "setBy": "GW_SECTOR_THE_ELBOW_metal",
-        "tall": 15.107
+        "limit": 11.75,
+        "setBy": "surface-support(GW_SECTOR_THE_ELBOW_metal)",
+        "tall": 13.35
       },
       "right": {
-        "limit": 13.969,
-        "setBy": "greenwater_open_edge_markers/<unnamed>",
-        "tall": 15.569
+        "limit": 10.5,
+        "setBy": "surface-support(greenwater_open_edge_markers/<unnamed>)",
+        "tall": 12.1
       }
     },
     {
       "distance": 1480,
-      "halfWidth": 10.01,
-      "clamp": 15.102,
-      "clampMax": 16.067,
+      "halfWidth": 9.989,
+      "clamp": 15.032,
+      "clampMax": 16.095,
       "left": {
         "limit": 10.386,
         "setBy": "GW_SECTOR_THE_ELBOW_metal",
         "tall": 11.986
       },
       "right": {
-        "limit": 10.01,
+        "limit": 9.989,
         "setBy": "GW_SECTOR_THE_ELBOW_metal",
         "tall": 11.018
       }
     },
     {
       "distance": 1490,
-      "halfWidth": 10.361,
-      "clamp": 15.369,
+      "halfWidth": 10.3,
+      "clamp": 15.3,
       "clampMax": 16.428,
       "left": {
-        "limit": 13.759,
-        "setBy": "barrier_A_left",
-        "tall": 15.359
+        "limit": 11.25,
+        "setBy": "surface-support(barrier_A_left)",
+        "tall": 12.85
       },
       "right": {
-        "limit": 10.361,
+        "limit": 10.3,
         "setBy": "GW_SECTOR_THE_ELBOW_metal",
         "tall": 11.284
       }
     },
     {
       "distance": 1500,
-      "halfWidth": 10.635,
-      "clamp": 15.635,
-      "clampMax": 16.695,
+      "halfWidth": 10.633,
+      "clamp": 15.633,
+      "clampMax": 16.762,
       "left": {
-        "limit": 14.025,
-        "setBy": "barrier_A_left",
-        "tall": 15.625
+        "limit": 11.5,
+        "setBy": "surface-support(barrier_A_left)",
+        "tall": 13.1
       },
       "right": {
-        "limit": 10.635,
+        "limit": 10.633,
         "setBy": "GW_SECTOR_THE_ELBOW_metal",
         "tall": 11.551
       }
     },
     {
       "distance": 1510,
-      "halfWidth": 11.011,
-      "clamp": 16.063,
+      "halfWidth": 10.963,
+      "clamp": 15.965,
       "clampMax": 16.91,
       "left": {
-        "limit": 14.458,
-        "setBy": "barrier_A_left",
-        "tall": 16.058
+        "limit": 11.75,
+        "setBy": "surface-support(barrier_A_left)",
+        "tall": 13.35
       },
       "right": {
-        "limit": 11.011,
+        "limit": 10.963,
         "setBy": "GW_SECTOR_THE_ELBOW_metal",
         "tall": 11.801
       }
     },
     {
       "distance": 1520,
-      "halfWidth": 11.113,
-      "clamp": 16.113,
-      "clampMax": 17.026,
+      "halfWidth": 11.112,
+      "clamp": 16.112,
+      "clampMax": 17.035,
       "left": {
-        "limit": 14.508,
-        "setBy": "barrier_A_left",
-        "tall": 16.108
+        "limit": 11.75,
+        "setBy": "surface-support(GW_SECTOR_THE_ELBOW_metal)",
+        "tall": 13.35
       },
       "right": {
-        "limit": 11.113,
+        "limit": 11.112,
         "setBy": "GW_SECTOR_THE_ELBOW_metal",
         "tall": 12.001
       }
@@ -2128,11 +2132,11 @@
       "distance": 1540,
       "halfWidth": 11.363,
       "clamp": 16.363,
-      "clampMax": 17.267,
+      "clampMax": 17.285,
       "left": {
-        "limit": 14.758,
-        "setBy": "barrier_A_left",
-        "tall": 16.358
+        "limit": 12,
+        "setBy": "surface-support(barrier_A_left)",
+        "tall": 13.6
       },
       "right": {
         "limit": 11.363,
@@ -2142,64 +2146,64 @@
     },
     {
       "distance": 1550,
-      "halfWidth": 11.488,
+      "halfWidth": 11.486,
       "clamp": 16.488,
       "clampMax": 17.411,
       "left": {
-        "limit": 14.883,
-        "setBy": "barrier_A_left",
-        "tall": 16.483
+        "limit": 12.25,
+        "setBy": "surface-support(barrier_A_left)",
+        "tall": 13.85
       },
       "right": {
-        "limit": 11.488,
+        "limit": 11.486,
         "setBy": "GW_SECTOR_THE_ELBOW_metal",
         "tall": 12.301
       }
     },
     {
       "distance": 1560,
-      "halfWidth": 11.614,
-      "clamp": 16.614,
-      "clampMax": 17.527,
+      "halfWidth": 11.613,
+      "clamp": 16.613,
+      "clampMax": 17.536,
       "left": {
-        "limit": 15.008,
-        "setBy": "barrier_A_left",
-        "tall": 16.608
+        "limit": 12.25,
+        "setBy": "surface-support(barrier_A_left)",
+        "tall": 13.85
       },
       "right": {
-        "limit": 11.614,
+        "limit": 11.613,
         "setBy": "GW_SECTOR_THE_ELBOW_metal",
         "tall": 12.501
       }
     },
     {
       "distance": 1570,
-      "halfWidth": 11.761,
-      "clamp": 16.764,
+      "halfWidth": 11.738,
+      "clamp": 16.738,
       "clampMax": 17.661,
       "left": {
-        "limit": 15.158,
-        "setBy": "barrier_A_left",
-        "tall": 16.758
+        "limit": 12.5,
+        "setBy": "surface-support(GW_SECTOR_THE_ELBOW_metal)",
+        "tall": 14.1
       },
       "right": {
-        "limit": 11.761,
+        "limit": 11.738,
         "setBy": "GW_SECTOR_THE_ELBOW_metal",
         "tall": 12.601
       }
     },
     {
       "distance": 1580,
-      "halfWidth": 11.889,
-      "clamp": 16.889,
-      "clampMax": 17.761,
+      "halfWidth": 11.863,
+      "clamp": 16.863,
+      "clampMax": 17.786,
       "left": {
-        "limit": 11.889,
+        "limit": 11.863,
         "setBy": "GW_SECTOR_FUEL_ROW_metal",
         "tall": 12.357
       },
       "right": {
-        "limit": 11.889,
+        "limit": 11.863,
         "setBy": "GW_SECTOR_THE_ELBOW_metal",
         "tall": 12.701
       }
@@ -2238,32 +2242,32 @@
     },
     {
       "distance": 1610,
-      "halfWidth": 11.761,
-      "clamp": 16.761,
-      "clampMax": 16.827,
+      "halfWidth": 11.759,
+      "clamp": 16.759,
+      "clampMax": 16.835,
       "left": {
-        "limit": 11.761,
+        "limit": 11.759,
         "setBy": "GW_SECTOR_FUEL_ROW_metal",
         "tall": 12.516
       },
       "right": {
-        "limit": 11.761,
+        "limit": 11.759,
         "setBy": "GW_SECTOR_FUEL_ROW_metal",
         "tall": 12.516
       }
     },
     {
       "distance": 1620,
-      "halfWidth": 11.691,
-      "clamp": 16.691,
+      "halfWidth": 11.676,
+      "clamp": 16.676,
       "clampMax": 16.758,
       "left": {
-        "limit": 11.691,
+        "limit": 11.676,
         "setBy": "GW_SECTOR_FUEL_ROW_metal",
         "tall": 12.45
       },
       "right": {
-        "limit": 11.691,
+        "limit": 11.676,
         "setBy": "GW_SECTOR_FUEL_ROW_metal",
         "tall": 12.45
       }
@@ -2272,7 +2276,7 @@
       "distance": 1630,
       "halfWidth": 11.593,
       "clamp": 16.593,
-      "clampMax": 16.66,
+      "clampMax": 16.67,
       "left": {
         "limit": 11.593,
         "setBy": "GW_SECTOR_FUEL_ROW_metal",
@@ -2286,16 +2290,16 @@
     },
     {
       "distance": 1640,
-      "halfWidth": 11.526,
-      "clamp": 16.526,
+      "halfWidth": 11.51,
+      "clamp": 16.51,
       "clampMax": 16.576,
       "left": {
-        "limit": 11.526,
+        "limit": 11.51,
         "setBy": "GW_SECTOR_FUEL_ROW_metal",
         "tall": 12.29
       },
       "right": {
-        "limit": 11.526,
+        "limit": 11.51,
         "setBy": "GW_SECTOR_FUEL_ROW_metal",
         "tall": 12.29
       }
@@ -3038,16 +3042,16 @@
     },
     {
       "distance": 2110,
-      "halfWidth": 11.5,
-      "clamp": 16.5,
+      "halfWidth": 11.496,
+      "clamp": 16.496,
       "clampMax": 16.5,
       "left": {
-        "limit": 11.5,
+        "limit": 11.496,
         "setBy": "GW_SECTOR_FUEL_ROW_metal",
         "tall": 12.185
       },
       "right": {
-        "limit": 11.5,
+        "limit": 11.496,
         "setBy": "GW_SECTOR_FUEL_ROW_metal",
         "tall": 12.325
       }
@@ -3056,7 +3060,7 @@
       "distance": 2120,
       "halfWidth": 11,
       "clamp": 13,
-      "clampMax": 16.291,
+      "clampMax": 16.494,
       "left": {
         "limit": 11,
         "setBy": "GW_SECTOR_T10_TOTEM_TURN_metal",
@@ -3310,32 +3314,32 @@
     },
     {
       "distance": 2280,
-      "halfWidth": 11.45,
-      "clamp": 16.45,
+      "halfWidth": 11.432,
+      "clamp": 16.432,
       "clampMax": 16.584,
       "left": {
-        "limit": 11.45,
+        "limit": 11.432,
         "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
         "tall": 12.325
       },
       "right": {
-        "limit": 11.45,
+        "limit": 11.432,
         "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
         "tall": 12.347
       }
     },
     {
       "distance": 2290,
-      "halfWidth": 11.614,
-      "clamp": 16.614,
+      "halfWidth": 11.602,
+      "clamp": 16.602,
       "clampMax": 16.75,
       "left": {
-        "limit": 11.614,
+        "limit": 11.602,
         "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
         "tall": 12.473
       },
       "right": {
-        "limit": 11.614,
+        "limit": 11.602,
         "setBy": "GW_SECTOR_RUNWAY_HOME_metal",
         "tall": 12.473
       }
