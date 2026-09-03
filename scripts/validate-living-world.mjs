@@ -1580,6 +1580,69 @@ assert.throws(
   "The corridor rule does not fail on a low, opaque card on the racing line.",
 );
 
+// G3 — THE RE-PHASED CROSSING SCUD, against the same corridor rule.
+//
+// The gust schedule takes over PAN_SCUD_CROSSING's clock and re-centres its
+// traverse on the deck CENTRELINE instead of on the card's own anchor, so the
+// card is over the racing line at progress 0.5 where the `cross` alpha envelope
+// peaks. Under the free sawtooth it crossed at whatever progress its own
+// half-width happened to put it at — as early as progress 0 on the widest
+// stations, where the envelope is still 0 and the telegraph was therefore
+// invisible. That is the change, and it moves the card DEEPER inside the
+// corridor, not shallower: it now reaches `amplitude` metres past the
+// centreline on both sides rather than `amplitude - (halfWidth + lateral)`.
+//
+// So the rule has to be checked against the re-centred reach, which is what
+// this does. `reachableLateral` already returns `lateral - amplitude` for
+// `cross`, which is more negative than the re-centred `-amplitude - halfWidth`
+// expressed in the same outboard coordinate for every authored card here — the
+// existing corridor sweep above therefore already covers the new geometry, and
+// this asserts that containment rather than assuming it.
+{
+  const crossing = built.bitterpan.batches
+    .flatMap((batch) => batch.cards)
+    .filter((card) => card.motionId === "PAN_SCUD_CROSSING");
+  assert.ok(crossing.length > 0, "PAN_SCUD_CROSSING authored no cards.");
+  // The widest Bitterpan deck is 11.5 m half-width (validate-map02.mjs), so a
+  // re-centred traverse of `amplitude` either side of the centreline reaches
+  // `-amplitude - 11.5` in the outboard coordinate the corridor rule uses.
+  const widestHalfWidth = 11.5;
+  for (const card of crossing) {
+    const recentred = -(card.amplitude ?? 0) - widestHalfWidth;
+    assert.ok(
+      recentred <= reachableLateral(card),
+      `PAN_SCUD_CROSSING re-centred reach ${recentred.toFixed(2)} m is shallower `
+        + `than the free-sawtooth reach ${reachableLateral(card).toFixed(2)} m the `
+        + "corridor rule was checked against. The G3 re-phase must only ever "
+        + "take the card FURTHER inside the corridor, never out of the swept set.",
+    );
+    assert.ok(
+      reachableLateral(card) <= CORRIDOR_LATERAL_METRES
+        && card.base < CORRIDOR_HEIGHT_METRES,
+      `PAN_SCUD_CROSSING card at ${card.distance.toFixed(0)} m is no longer inside `
+        + "the corridor sweep, so the 0.35 alpha ceiling above stopped applying "
+        + "to the one zone that flies through the racing line.",
+    );
+    assert.ok(
+      peakAlpha(card) <= CORRIDOR_ALPHA_CEILING,
+      `PAN_SCUD_CROSSING peaks at alpha ${peakAlpha(card).toFixed(2)} — over the `
+        + `${CORRIDOR_ALPHA_CEILING} corridor ceiling. G3 drives this zone over `
+        + "the racing line on a schedule now, so it is flown through MORE often "
+        + "than it was, not less.",
+    );
+    // The re-centred traverse is symmetric, so the card is on the centreline at
+    // exactly progress 0.5 — the peak of the `cross` envelope. That is the
+    // telegraph: a card that crossed at progress 0.1 would be at 31% of its
+    // peak alpha when it mattered.
+    assert.equal(
+      card.alphaKind,
+      "cross",
+      "A gust-driven crossing card must ride the `cross` envelope, whose peak "
+        + "coincides with the re-centred centreline crossing at progress 0.5.",
+    );
+  }
+}
+
 // The point of P20.4 is that the layer arrives in the NEAR field. Assert the
 // reach the phase exists to add: the P9/P12 Bitterpan set bottomed out at 24 m
 // outboard, which is why thirteen station screenshots of it showed nothing.
@@ -1717,6 +1780,54 @@ assert.ok(
   "living-world.ts must gate its clock on `advanceMotion` so reduced motion "
     + "freezes the layer.",
 );
+// G3 added two more sources of motion to this module, and both had to come in
+// UNDER the same gate or reduced motion would have stopped meaning what it
+// says. The squall's rain runs on a second clock (so a 1.5x speed change does
+// not jump every streak's phase), and the crossing scud runs on a clock
+// published by the gust schedule. Assert both are inside `advanceMotion`, and
+// assert the event samples are LATCHED once a tick rather than read per card —
+// a per-card read of module state is exactly how the gate would be bypassed
+// without touching either line above.
+assert.ok(
+  runtime.includes("this.squallClockSeconds += UPDATE_STEP_SECONDS * squallRainSpeedGain()"),
+  "living-world.ts must advance the G3 squall clock from UPDATE_STEP_SECONDS.",
+);
+{
+  const update = runtime.slice(
+    runtime.indexOf("  update(\n    deltaSeconds: number,"),
+  );
+  const gate = update.indexOf("if (advanceMotion) {");
+  const squallClock = update.indexOf("this.squallClockSeconds +=");
+  assert.ok(
+    gate >= 0 && squallClock > gate && squallClock - gate < 200,
+    "living-world.ts must advance the squall clock inside the `advanceMotion` "
+      + "gate, or reduced motion leaves the rain falling.",
+  );
+  for (const sample of [
+    "this.scudClockSeconds = gustScudClockSeconds();",
+    "this.squallAlphaGain = squallRainAlphaGain();",
+    "this.lampsSolid = saltLampsSolid();",
+  ]) {
+    assert.ok(
+      update.includes(sample),
+      `living-world.ts must latch \`${sample}\` once per tick under `
+        + "`advanceMotion`, not read it per card.",
+    );
+  }
+}
+for (const perCardRead of [
+  "gustScudClockSeconds()",
+  "squallRainAlphaGain()",
+  "saltLampsSolid()",
+]) {
+  assert.equal(
+    runtime.split(perCardRead).length - 1,
+    1,
+    `living-world.ts calls ${perCardRead} more than once. There is exactly one `
+      + "legal call site - the per-tick latch inside the `advanceMotion` gate - "
+      + "and a second one is how a track-event level escapes reduced motion.",
+  );
+}
 for (const clock of ["performance.now(", "Date.now(", "Math.random("]) {
   assert.ok(
     !runtime.includes(clock),

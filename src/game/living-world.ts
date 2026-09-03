@@ -5,6 +5,15 @@ import {
 } from "./course";
 import { searchParam } from "./query-probes";
 import {
+  gustScudAlphaScale,
+  gustScudClockSeconds,
+  gustScudProgressAt,
+  noteScudRoadCrossing,
+  saltLampsSolid,
+  squallRainAlphaGain,
+  squallRainSpeedGain,
+} from "./track-events";
+import {
   ALPHA_ENVELOPES,
   buildLivingWorld,
   CARD_TRIANGLES,
@@ -33,6 +42,22 @@ const SHIMMER_PERIOD_SECONDS = 6.5;
  * cull the whole lap.
  */
 const VISIBILITY_SAMPLE_HZ = 4;
+
+/**
+ * G3 — the three authored zones a live track event drives.
+ *
+ * Matched on `motionId`, which `buildLivingWorld` already stamps on every card,
+ * rather than on a new authored field: `canonicalCard` in
+ * `scripts/validate-living-world.mjs` hashes the authored card, so a new field
+ * would move three pinned zone digests for no change to what is drawn.
+ *
+ * Each id is map-exclusive, so the map gating is structural — PAN_SCUD_CROSSING
+ * and UNDERPASS_HAZARD_LAMPS exist only on Bitterpan and RAIN_SWEEP only on
+ * Greenwater, and neither map can pick up the other's weather by accident.
+ */
+const GUST_SCUD_ZONE = "PAN_SCUD_CROSSING";
+const SALT_LAMP_ZONE = "UNDERPASS_HAZARD_LAMPS";
+const SQUALL_RAIN_ZONE = "RAIN_SWEEP";
 
 /**
  * Textures a zone set may ask for by name. `motion` is loaded by `load` from
@@ -73,6 +98,24 @@ interface LivingCard extends AuthoredCard {
   rightX: number;
   rightZ: number;
   flowSample: CourseSample | null;
+  /**
+   * G3. How far outboard of the CENTRELINE this card's anchor sits, metres.
+   *
+   * `cross` walks the card `amplitude` metres either side of its own anchor,
+   * and the anchor is at `halfWidth + lateral` — so where on the deck the
+   * traverse actually crosses depends on a half-width the card never stored,
+   * and on the widest Bitterpan stations the crossing lands at the very start
+   * of the sawtooth where the alpha envelope is still 0. A gust-driven traverse
+   * subtracts this and walks symmetrically about the centreline instead, so the
+   * card is over the racing line at progress 0.5 — where `cross` alpha peaks.
+   */
+  crossOffsetMeters: number;
+  /** Which side of the centreline the card was on last tick: -1, 0 or 1. */
+  crossSide: number;
+  /** The traverse progress the motion resolved, for the alpha to reuse. */
+  crossProgress: number;
+  /** Set once at load: this card is driven by a live track event. */
+  eventZone: "" | "gust" | "lamp" | "rain";
 }
 
 interface LivingBatch {
@@ -331,6 +374,33 @@ export class LivingWorld {
   private readonly cameraRight = new THREE.Vector3(1, 0, 0);
   private accumulatorSeconds = 0;
   private elapsedSeconds = 0;
+  /**
+   * G3. A SECOND clock, for the Greenwater squall's rain only.
+   *
+   * The squall asks for rain that falls 1.5x faster. Multiplying `card.speed`
+   * where the sawtooth reads `elapsedSeconds * speed` would jump every streak's
+   * phase the instant the multiplier moved - 22 rain cards teleporting mid-fall
+   * at both ends of the squall. Advancing a clock of its own at the scaled rate
+   * keeps the sawtooth continuous through the ramp: the rain speeds up, it does
+   * not restart.
+   */
+  private squallClockSeconds = 0;
+  /**
+   * G3. The three live-event samples, latched ONCE per tick and only while the
+   * layer is advancing.
+   *
+   * Every motion in this module is a pure function of `elapsedSeconds`, which
+   * is what makes `advanceMotion = false` freeze the whole layer for a driver
+   * who asked for reduced motion. A track-event level read per card, straight
+   * off module state, would have been the one exception - the crossing scud
+   * would keep walking over the road and the rain would keep swelling while
+   * everything around them stood still. Latching here puts the three back under
+   * the same gate, and costs three reads a tick instead of three per card.
+   */
+  private scudClockSeconds = Number.NaN;
+  private scudAlphaScale = 1;
+  private squallAlphaGain = 1;
+  private lampsSolid = false;
   private visibilityAccumulatorSeconds = 0;
   private readonly visibilityFrustum = new THREE.Frustum();
   private readonly visibilityMatrix = new THREE.Matrix4();
@@ -372,6 +442,16 @@ export class LivingWorld {
         rightX: 1,
         rightZ: 0,
         flowSample: null,
+        crossOffsetMeters: 0,
+        crossSide: 0,
+        crossProgress: 0,
+        eventZone: card.motionId === GUST_SCUD_ZONE
+          ? "gust"
+          : card.motionId === SALT_LAMP_ZONE
+            ? "lamp"
+            : card.motionId === SQUALL_RAIN_ZONE
+              ? "rain"
+              : "",
       })),
       makeMaterial(batch.spec, sheets, textures),
     ));
@@ -387,6 +467,7 @@ export class LivingWorld {
         card.hangY = sample.position.y + (card.hang ?? 0);
         card.rightX = sample.right.x;
         card.rightZ = sample.right.z;
+        card.crossOffsetMeters = offset;
         if (card.kind === "flow") card.flowSample = this.course.createSampleScratch();
       }
     }
@@ -474,7 +555,16 @@ export class LivingWorld {
     while (this.accumulatorSeconds >= UPDATE_STEP_SECONDS) {
       this.accumulatorSeconds -= UPDATE_STEP_SECONDS;
       if (advanceMotion) this.elapsedSeconds += UPDATE_STEP_SECONDS;
+      if (advanceMotion) {
+        this.squallClockSeconds += UPDATE_STEP_SECONDS * squallRainSpeedGain();
+      }
       this.stats.updateSteps += 1;
+    }
+    if (advanceMotion) {
+      this.scudClockSeconds = gustScudClockSeconds();
+      this.scudAlphaScale = gustScudAlphaScale();
+      this.squallAlphaGain = squallRainAlphaGain();
+      this.lampsSolid = saltLampsSolid();
     }
     if (camera) {
       camera.updateMatrixWorld();
@@ -519,7 +609,13 @@ export class LivingWorld {
             break;
           }
           case "rain": {
-            const amount = (this.elapsedSeconds * card.speed / 26 + card.phase) % 1;
+            // G3: RAIN_SWEEP falls on the squall clock, everything else on the
+            // shared one. Outside a squall the two advance at the same rate, so
+            // this is the identity it has always been.
+            const clock = card.eventZone === "rain"
+              ? this.squallClockSeconds
+              : this.elapsedSeconds;
+            const amount = (clock * card.speed / 26 + card.phase) % 1;
             y = card.anchorY + 16 - amount * 26;
             shear = 0.105;
             break;
@@ -561,10 +657,37 @@ export class LivingWorld {
             // side of the anchor. The sawtooth wraps hard, which is invisible
             // because the `cross` alpha envelope reads the SAME sawtooth and is
             // zero at both ends of it.
-            const amount = (this.elapsedSeconds * card.speed + card.phase) % 1;
-            const travel = (amount * 2 - 1) * (card.amplitude ?? 0);
+            //
+            // G3. When a gust schedule owns the clock, the traverse is re-timed
+            // AND re-centred: `gustScudProgress` returns the schedule's own
+            // sawtooth, and the card walks symmetrically about the CENTRELINE
+            // rather than about its own anchor, so it is over the racing line
+            // at progress 0.5 - which is exactly where the `cross` alpha
+            // envelope peaks. `-1` means no schedule owns it (Greenwater,
+            // `?events=0`, standby) and the free sawtooth below is unchanged.
+            const driven = card.eventZone === "gust"
+              ? gustScudProgressAt(this.scudClockSeconds, card.phase)
+              : -1;
+            const amount = driven >= 0
+              ? driven
+              : (this.elapsedSeconds * card.speed + card.phase) % 1;
+            card.crossProgress = amount;
+            const amplitude = card.amplitude ?? 0;
+            const travel = driven >= 0
+              ? (amount * 2 - 1) * amplitude - card.crossOffsetMeters
+              : (amount * 2 - 1) * amplitude;
             x += card.rightX * travel * card.side;
             z += card.rightZ * travel * card.side;
+            if (driven > 0 && driven < 1) {
+              // The telegraph, MEASURED. A parked card sits at exactly 0 or 1
+              // and is excluded above, so only a card genuinely mid-traverse
+              // can report a crossing.
+              const side = Math.sign((amount * 2 - 1) * amplitude) || card.crossSide;
+              if (card.crossSide !== 0 && side !== card.crossSide) {
+                noteScudRoadCrossing(this.scudClockSeconds);
+              }
+              card.crossSide = side;
+            }
             break;
           }
           case "shear":
@@ -746,14 +869,26 @@ export class LivingWorld {
         // The SAME sawtooth the `cross` motion advances on, so the card is
         // invisible at both ends of its traverse and the wrap is never seen.
         // Any other clock here puts a hard pop in the middle of the road.
-        const progress = (this.elapsedSeconds * card.speed + card.phase) % 1;
-        amount = Math.sin(Math.PI * progress);
+        //
+        // G3 reads the progress the motion just resolved rather than
+        // recomputing it, because under a gust schedule the motion's clock is
+        // no longer a function of `elapsedSeconds` and a second copy of the
+        // expression would drift the alpha off the traverse it belongs to.
+        amount = Math.sin(Math.PI * card.crossProgress);
         break;
       }
     }
     const envelope = ALPHA_ENVELOPES[alphaKind];
-    const alpha = envelope[0]
-      + (envelope[1] - envelope[0]) * THREE.MathUtils.clamp(amount, 0, 1);
+    // G3: the squall gain multiplies the RESOLVED alpha rather than the
+    // authored envelope, so the pinned `ALPHA_ENVELOPES` table stays the
+    // authored ceiling and the gain is a runtime, ramped, reversible term.
+    const gain = card.eventZone === "rain"
+      ? this.squallAlphaGain
+      : card.eventZone === "gust"
+        ? this.scudAlphaScale
+        : 1;
+    const alpha = Math.min(1, gain * (envelope[0]
+      + (envelope[1] - envelope[0]) * THREE.MathUtils.clamp(amount, 0, 1)));
     for (let vertex = 0; vertex < CARD_VERTICES; vertex += 1) {
       batch.colors[(cardIndex * CARD_VERTICES + vertex) * 4 + 3] = alpha;
     }
@@ -763,7 +898,14 @@ export class LivingWorld {
     for (let cardIndex = 0; cardIndex < batch.cards.length; cardIndex += 1) {
       const card = batch.cards[cardIndex];
       let brightness = 1;
-      if (card.kind === "sequence") {
+      if (card.eventZone === "lamp" && this.lampsSolid) {
+        // G3 - the salt drop's telegraph, and it takes precedence over every
+        // motion below. The underpass chase is the map's ambient hazard
+        // signature, so it cannot also mean "something is about to happen";
+        // dropping the chase and holding every lamp SOLID is the one state the
+        // driver has never seen there before.
+        brightness = 1;
+      } else if (card.kind === "sequence") {
         brightness = (Math.floor(this.elapsedSeconds / 1.1) % 3) / 3 === card.phase
           ? 1
           : 0.12;

@@ -1074,6 +1074,7 @@ export function nearestAllowedLane(desired, low, high, forbidden) {
  *   cushionYieldMeters?: number;
  *   cushionYieldSign?: number;
  *   evasiveSideMeters?: number;
+ *   gustLaneBiasMeters?: number;
  * }} input
  */
 export function rivalContestLaneMeters(paceLaneMeters, input) {
@@ -1126,6 +1127,24 @@ export function rivalContestLaneMeters(paceLaneMeters, input) {
   // be clamped by constraints that were already there, so the yield is strictly
   // gentler and the corridor is left alone.
   desired += cushionSign * cushionYield;
+  // G3 - the wind's half of a Bitterpan gust: while the gust HOLDS, every craft
+  // on the deck is asked to sit up to GUST_RIVAL_LANE_BIAS_METERS downwind.
+  //
+  // It joins the desired lane on exactly the same terms as the cushion yield
+  // above, and for the same reason: shifting a target can only ever be clamped
+  // by constraints that were already there, so the corridor rule and the
+  // player's room both still outrank it. Widening a forbidden span instead
+  // would make the solve infeasible more often, which is the failure G2
+  // measured twice.
+  //
+  // AND IT IS LATERAL, FULL STOP. `driveTargetSpeed` reads the profile, the
+  // course speed factor and the boost state and never a lateral; `onBoostPad`
+  // is resolved against `paceLateralMeters`, the player-free lane this bias
+  // does not touch. That is what keeps rival lap and finish times bit-identical
+  // between a race with gusts and the same race with `?events=0` - asserted in
+  // scripts/validate-rivals.mjs rather than argued for here.
+  const gustBiasRaw = input.gustLaneBiasMeters ?? 0;
+  if (Number.isFinite(gustBiasRaw) && gustBiasRaw !== 0) desired += gustBiasRaw;
   desired = clamp(desired, -laneHalfWidth, laneHalfWidth);
 
   /** @type {number[][]} */
