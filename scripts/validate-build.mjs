@@ -48,9 +48,14 @@ assert.ok(
 // imported it and Rollup promoted it to a shared chunk; the import surface was
 // cut to three call sites to buy that back, so this ceiling is 226 rather than
 // 227. Raise only with a fresh measurement and rationale.
+// Re-baselined 2026-09-03 by the P20.6 merge (pan-floor macro field: vertex
+// colour generator + shader injection, measured 226.1 KiB gzip on the merged
+// tree with P20.3/P20.4/P20.7 in). Ceiling 228 leaves one small phase of
+// headroom; G1 (rival pace + slipstream, +3.8 KiB) re-baselines again when it
+// lands.
 assert.ok(
-  javascriptGzip <= 226 * 1024,
-  `JavaScript bundle exceeds 226 KiB gzip (${(javascriptGzip / 1024).toFixed(1)} KiB).`,
+  javascriptGzip <= 228 * 1024,
+  `JavaScript bundle exceeds 228 KiB gzip (${(javascriptGzip / 1024).toFixed(1)} KiB).`,
 );
 // Re-baselined 2026-08-28 from a measured 4.35 KiB gzip (the 4 KiB ceiling predated
 // the HUD turn-cue and hazard styling) plus headroom for the planned minimap and
