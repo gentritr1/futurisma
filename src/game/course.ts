@@ -2565,6 +2565,8 @@ export class GreenwaterCourse implements RaceCourse {
       cableWarnings.setMatrixAt(index, cableObject.matrix);
     }
     cableCoils.name = "cable_trip_hazards";
+    // P20.1. Greenwater's equivalent of the Bitterpan coils; same reason.
+    cableCoils.castShadow = true;
     cableWarnings.name = "cable_trip_warning_posts";
     cableCoils.instanceMatrix.needsUpdate = true;
     cableWarnings.instanceMatrix.needsUpdate = true;

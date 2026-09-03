@@ -283,6 +283,182 @@ const CABLE_COIL_COLOR = new THREE.Color(0xf06a32);
 const SALT_DRIFT_COLOR = new THREE.Color(0xe8e2cf);
 
 /**
+ * P20.2 centre-line paint. See `createCentreDashes`.
+ *
+ * 7.5 -> 4.5 m on the same 25 m rhythm: at 88 m/s a 7.5 m dash covers the lane
+ * for 85 ms, which is long enough for the eye to track it as an object rather
+ * than as a rhythm. The lift drops 0.075 -> 0.055 m, one centimetre over the
+ * deck read surface (0.045) and one centimetre under the edge band (0.065), so
+ * the paint layer keeps its slot in the stack without standing off the road.
+ */
+const CENTRE_DASH_WIDTH_METRES = 0.34;
+const CENTRE_DASH_LENGTH_METRES = 4.5;
+const CENTRE_DASH_LIFT_METRES = 0.055;
+/**
+ * Measured, not picked.
+ *
+ * `shots/p20.2/calibrate-dash.mjs` freezes a frame, masks the dash's exact
+ * pixels, and re-renders that same frame once per candidate colour, so the
+ * only thing that changes between readings is the colour. The transfer it
+ * measured through AgX at 1280x720, against the deck taken from the pixels
+ * immediately beside the dash:
+ *
+ *   colour     d 586 (S1, deck 70.4)   d 2084 (S3, deck 68.8)
+ *   0x6b6f63   +41.0                   +47.8
+ *   0x7d8175   +55.0                   +62.5
+ *   0x9aa08f   +74.6  (over)           +82.9  (over)
+ *   0xdce6d4  +105.8  (the old value)  +115.8
+ *
+ * 0x74786c is interpolated between the two passing rungs to sit near the middle
+ * of the [deck + 30, deck + 70] window on both decks, so neither end of the
+ * window is one grade change away. The old 0xdce6d4 is on the table because it
+ * is the value that shipped, and it missed by 36..46.
+ */
+const CENTRE_DASH_COLOR = new THREE.Color(0x74786c);
+
+/**
+ * P20.2 salt-drift falloff, metres.
+ *
+ * The drift is a grip telegraph, so its EXTENT is not negotiable — it is the
+ * exact band `surfaceGripAt` tests and nothing here moves it. What changes is
+ * that the paint no longer stops dead at that band's edge. A hard-edged
+ * near-white ribbon over the inside third is the silhouette of a poured slab;
+ * crust that thins into the road is the silhouette of crust.
+ *
+ * 1.8 m across the inner edge and 6 m at each end are the acceptance floors for
+ * this phase, and the code takes the smaller of the floor and a fraction of the
+ * band so a narrow station cannot invert the ramp.
+ */
+const DRIFT_INNER_FADE_METRES = 2;
+const DRIFT_OUTER_FADE_METRES = 0.9;
+const DRIFT_END_FADE_METRES = 6.5;
+/**
+ * The most opaque the crust ever gets. Under 1 the deck reads THROUGH the
+ * drift everywhere, which is what stops the patch reading as a separate
+ * surface laid on top of the road.
+ *
+ * 0.68 is measured, not chosen. Two readings bound it from opposite sides and
+ * both were taken through a pixel-exact mask of the patch:
+ *
+ *   * the patch's OPAQUE CORE must land under the 135 luma cap. At 0.86 it
+ *     measured 136.8 at d 324 and 143.4 at d 1358 -- over on both;
+ *   * the patch AS A WHOLE, fades included, must stay at least 35 over the
+ *     deck or it stops telegraphing the grip loss.
+ *
+ * Those pull against each other: alpha moves the core and the whole patch in
+ * the same direction. 0.68 with these fade widths is the value that clears
+ * both with room, and the fades were tightened from 2.4 / 8 m to the phase's
+ * own floors of 2 / 6.5 m for the same reason -- a narrower ramp puts more of
+ * the patch at full crust, which buys back telegraph without buying back glare.
+ */
+const DRIFT_PEAK_ALPHA = 0.68;
+
+/** Hermite ramp; 0 below `edge0`, 1 above `edge1`. */
+function smoothstep(edge0: number, edge1: number, value: number): number {
+  const t = THREE.MathUtils.clamp((value - edge0) / (edge1 - edge0), 0, 1);
+  return t * t * (3 - 2 * t);
+}
+
+/**
+ * The boost pad's paint, generated rather than authored.
+ *
+ * 64 x 256 greyscale-modulated, drawn once and shared by all four instances, so
+ * it costs one 64 KB texture and NO draw call — the pads stay a single
+ * instanced draw. The canvas maps u across the road and v along it (the pad's
+ * local X is `right` and its local Z is the tangent), and the pad is about
+ * 4.1 m x 16 m, so a 64 x 256 sheet is very close to square texels.
+ *
+ * Values are a MULTIPLIER on `BOOST_PAD_COLOR`: 1.0 is exactly the P19 cyan, so
+ * nothing here can push the pad brighter than the value that was already
+ * accepted. Everything else is darker, which is where the interior structure
+ * comes from.
+ */
+function createBoostPadTexture(): THREE.CanvasTexture {
+  const width = 64;
+  const height = 256;
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const context = canvas.getContext("2d");
+  if (!context) throw new Error("Could not create the Bitterpan boost pad paint.");
+
+  // The field the chevrons sit on. Measured: at "#6a6a6a" the pad came back at
+  // mean luma 55.2 against a 66.6 deck -- DARKER than the road it is painted
+  // on, which trades a glowing plate for a hole. The field has to sit above the
+  // deck; the structure comes from the chevrons and the rim, not from sinking
+  // the whole marking.
+  context.fillStyle = "#909090";
+  context.fillRect(0, 0, width, height);
+
+  // Chevrons pointing the way the craft is going. Local +Z is -tangent, so
+  // travel runs from high v to low v and the apex points at the top of the
+  // canvas as drawn.
+  const border = 6; // ~0.35 m on both axes at this pad size.
+  const chevrons = 5;
+  const pitch = (height - border * 2) / chevrons;
+  context.strokeStyle = "#ffffff";
+  context.lineWidth = pitch * 0.3;
+  context.lineCap = "butt";
+  context.lineJoin = "miter";
+  for (let index = 0; index < chevrons; index += 1) {
+    const base = height - border - index * pitch - pitch * 0.25;
+    context.beginPath();
+    context.moveTo(border + 2, base);
+    context.lineTo(width / 2, base - pitch * 0.45);
+    context.lineTo(width - border - 2, base);
+    context.stroke();
+  }
+
+  // The border last, over everything, so no chevron leaks into it. A marking
+  // with a darker rim reads as painted onto the surface; a marking that runs
+  // to its own silhouette reads as a plate resting on it.
+  context.fillStyle = "#565656";
+  context.fillRect(0, 0, width, border);
+  context.fillRect(0, height - border, width, border);
+  context.fillRect(0, 0, border, height);
+  context.fillRect(width - border, 0, border, height);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.name = "map02_boost_pad_paint";
+  texture.colorSpace = THREE.SRGBColorSpace;
+  // The pad is read from 2 m to 300 m. Point-sampling a 5-chevron ladder at
+  // that range is the sparkle the pan floor's own note warns about, so this
+  // takes the same stated exception: mipped and linear.
+  texture.magFilter = THREE.LinearFilter;
+  texture.minFilter = THREE.LinearMipmapLinearFilter;
+  texture.generateMipmaps = true;
+  texture.anisotropy = 4;
+  texture.wrapS = THREE.ClampToEdgeWrapping;
+  texture.wrapT = THREE.ClampToEdgeWrapping;
+  texture.needsUpdate = true;
+  return texture;
+}
+
+/** Deterministic 0..1 from one number. Same crust grain on every load. */
+function hashUnit(seed: number): number {
+  const x = Math.sin(seed * 12.9898) * 43758.5453;
+  return x - Math.floor(x);
+}
+
+/**
+ * Where to put a ring of vertices along one drift.
+ *
+ * A uniform 5 m step cannot carry an 8 m end ramp — two segments for the whole
+ * fade, which is a visible facet, not a fade. This keeps the 5 m body step and
+ * adds explicit nodes across both ramps, so the gradient is smooth where it is
+ * measured and costs vertices only where it is needed.
+ */
+function driftNodeDistances(from: number, to: number): number[] {
+  const nodes = new Set<number>([from, to]);
+  for (const offset of [1, 2, 3.5, 5, 6.5, 8]) {
+    if (from + offset < to) nodes.add(from + offset);
+    if (to - offset > from) nodes.add(to - offset);
+  }
+  for (let distance = from + 5; distance < to; distance += 5) nodes.add(distance);
+  return [...nodes].sort((a, b) => a - b);
+}
+
+/**
  * Per-station edge types, resolved once from the authored span table. `sample`
  * runs several times per frame, so this has to be a table read rather than a
  * span scan: 610 stations x 2 sides, built at module scope alongside the
@@ -1095,6 +1271,14 @@ export class BitterpanCourse implements RaceCourse {
     });
     const mesh = new THREE.Mesh(geometry, material);
     mesh.name = "map02_route_deck_read_surface";
+    // P20.1. This overlay IS Bitterpan's drivable deck: the accepted blockout
+    // road under it is hidden, so it is the only surface the craft's contact
+    // shadow can land on. An unlit material cannot take a shadow, so when
+    // shadows are on `promoteUnlitShadowReceivers` in shadows.ts swaps this
+    // material for a shadow-only stand-in by mesh name — done there rather than
+    // here so the whole shadow decision lives in one module and this map's
+    // chunk carries no shadow code.
+    mesh.receiveShadow = true;
     return mesh;
   }
 
@@ -1163,21 +1347,16 @@ export class BitterpanCourse implements RaceCourse {
     const colors: number[] = [];
     const indices: number[] = [];
     const surfaceLift = 0.055;
-    const stepMetres = 5;
     for (const hazard of GRIP_HAZARDS) {
       const firstVertex = positions.length / 3;
-      const steps = Math.max(
-        1,
-        Math.round((hazard.toDistance - hazard.fromDistance) / stepMetres),
-      );
+      const nodes = driftNodeDistances(hazard.fromDistance, hazard.toDistance);
       // Darker crust where the grip loss is worst, so the three patches read as
       // three different costs rather than one repeated decal.
       const shade = SALT_DRIFT_COLOR.clone().multiplyScalar(
         0.72 + hazard.gripMultiplier * 0.28,
       );
-      for (let step = 0; step <= steps; step += 1) {
-        const distance = hazard.fromDistance
-          + ((hazard.toDistance - hazard.fromDistance) * step) / steps;
+      for (let node = 0; node < nodes.length; node += 1) {
+        const distance = nodes[node];
         const sample = this.sampleAtDistance(distance);
         // The authored band is clamped into the deck so the drift never floats
         // over the run-off it is not authored to cover.
@@ -1191,26 +1370,63 @@ export class BitterpanCourse implements RaceCourse {
           -sample.halfWidth + 0.35,
           sample.halfWidth - 0.35,
         );
-        for (const offset of [inner, outer]) {
+        // Along the road: the crust arrives and leaves, it does not start.
+        const along = Math.min(
+          smoothstep(0, DRIFT_END_FADE_METRES, distance - hazard.fromDistance),
+          smoothstep(0, DRIFT_END_FADE_METRES, hazard.toDistance - distance),
+        );
+        // Across the road: full where the grip band is worst, gone by the time
+        // it reaches the racing line, so the driver sees crust thinning rather
+        // than a slab edge. The FULL band is still the band `surfaceGripAt`
+        // tests — only the paint's opacity falls off, never its extent.
+        const width = inner - outer;
+        const towardInner = Math.sign(width) || 1;
+        const innerFadeMetres = Math.min(
+          DRIFT_INNER_FADE_METRES,
+          Math.abs(width) * 0.45,
+        );
+        const outerFadeMetres = Math.min(
+          DRIFT_OUTER_FADE_METRES,
+          Math.abs(width) * 0.2,
+        );
+        const columns: [number, number][] = [
+          [outer, 0],
+          [outer + towardInner * outerFadeMetres, 1],
+          [inner - towardInner * innerFadeMetres, 1],
+          [inner, 0],
+        ];
+        for (const [offset, across] of columns) {
           const point = sample.position.clone()
             .addScaledVector(sample.right, offset)
             .addScaledVector(sample.up, surfaceLift);
           positions.push(point.x, point.y, point.z);
-          colors.push(shade.r, shade.g, shade.b);
+          // A little deterministic mottle so the patch has crust grain rather
+          // than one flat fill. Cheap: it rides the vertex colour that is
+          // already there instead of a second texture and a second draw call.
+          const grain = 0.94 + 0.12 * hashUnit(distance * 3.1 + offset * 7.7);
+          colors.push(
+            shade.r * grain,
+            shade.g * grain,
+            shade.b * grain,
+            across * along * DRIFT_PEAK_ALPHA,
+          );
         }
       }
-      for (let step = 0; step < steps; step += 1) {
-        const a = firstVertex + step * 2;
-        const b = a + 1;
-        const c = firstVertex + (step + 1) * 2;
-        const d = c + 1;
-        indices.push(a, b, d, a, d, c);
+      for (let node = 0; node < nodes.length - 1; node += 1) {
+        const a = firstVertex + node * 4;
+        const b = firstVertex + (node + 1) * 4;
+        for (let column = 0; column < 3; column += 1) {
+          indices.push(
+            a + column, a + column + 1, b + column + 1,
+            a + column, b + column + 1, b + column,
+          );
+        }
       }
     }
 
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
-    geometry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
+    geometry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 4));
     geometry.setIndex(indices);
     geometry.computeBoundingSphere();
     const mesh = new THREE.Mesh(
@@ -1218,21 +1434,56 @@ export class BitterpanCourse implements RaceCourse {
       new THREE.MeshBasicMaterial({
         vertexColors: true,
         fog: true,
-        toneMapped: false,
+        // P20.2: was `toneMapped: false`, which put the patch at 179.5 against
+        // a 69.7 deck — 2.5x the road and brighter than the sky, which is what
+        // made a grip telegraph read as a concrete ramp. Graded with everything
+        // else it still brightens well before entry; it just stops being the
+        // brightest thing in the frame.
+        toneMapped: true,
+        transparent: true,
+        depthWrite: false,
         side: THREE.DoubleSide,
+        // MEASURED, not assumed: a transparent DoubleSide material is drawn in
+        // TWO passes by WebGLRenderer (back faces, then front), so turning this
+        // mesh transparent silently doubled it from 1 draw call to 2 and put
+        // the phase over its whole budget on one material flag. The patch lies
+        // flat on the deck and is read from above; there is no back face to
+        // sort against a front face, so one pass is not an approximation of
+        // two, it is the same picture. `shots/p20.2/probe-calls.mjs` reads the
+        // per-mesh cost by hiding it and diffing renderer.info.
+        forceSinglePass: true,
       }),
     );
     mesh.name = "map02_salt_drift_patches";
+    // Blended paint over an opaque deck: it must not write depth over the edge
+    // band that sits a centimetre above it, and it must draw after the deck.
+    mesh.renderOrder = 1;
     return mesh;
   }
 
-  /** The four authored pads, one instanced draw, sized from the live half-width. */
+  /**
+   * The four authored pads, one instanced draw, sized from the live half-width.
+   *
+   * P20.2: the pad is painted rather than plated. P19 tone-mapped it and
+   * narrowed it, which fixed the glow, but it was still ONE flat cyan value
+   * across its whole footprint, and a uniform rectangle on a road reads as an
+   * object lying on the road whatever its brightness. It now carries a
+   * procedural chevron ladder — a dark border, a mid field, bright chevrons —
+   * so the eye gets interior structure and resolves it as a marking.
+   *
+   * Geometry, transform, footprint and trigger are BYTE-IDENTICAL to P19. The
+   * painted extent is the trigger extent; only the material changed. That is
+   * deliberate: the brief allows the paint to overhang the trigger by up to
+   * 0.6 m, and taking that option would have desynchronised the mesh from the
+   * footprint `validate-furniture.mjs` models from the same JSON.
+   */
   private createBoostPads(): THREE.InstancedMesh {
     const pads = PRODUCTION.boostPads;
     const mesh = new THREE.InstancedMesh(
       new THREE.BoxGeometry(1, 0.07, 1),
       new THREE.MeshBasicMaterial({
         color: BOOST_PAD_COLOR,
+        map: createBoostPadTexture(),
         fog: true,
         // P19: tone-mapped now. Unmapped, the pad was a flat cyan slab glowing
         // over the deck; mapped, it reads as paint under the same sun.
@@ -1279,6 +1530,9 @@ export class BitterpanCourse implements RaceCourse {
       CABLE_HAZARDS.length,
     );
     mesh.name = "map02_cable_coils";
+    // P20.1. A trip hazard the player is meant to see and avoid; a coil with no
+    // shadow reads as painted onto the deck rather than lying on it.
+    mesh.castShadow = true;
     const transform = new THREE.Object3D();
     const basis = new THREE.Matrix4();
     for (let index = 0; index < CABLE_HAZARDS.length; index += 1) {
@@ -1342,14 +1596,53 @@ export class BitterpanCourse implements RaceCourse {
     return mesh;
   }
 
+  /**
+   * P20.2 — the centre line is paint, not a plank.
+   *
+   * It used to be a `BoxGeometry(0.34, 0.055, 7.5)` in an unlit,
+   * tone-mapping-exempt `MeshBasicMaterial` at 0.075 m of lift. Three separate
+   * things made that read as an obstacle from the chase camera: the box has
+   * SIDES, so the nearest dash showed a lit 5.5 cm wall edge-on; 7.5 m is long
+   * enough at 317 km/h to fill the lane ahead of the craft; and exempting it
+   * from the grade let it sit at 2x the deck's luma, brighter than anything
+   * else on the road.
+   *
+   * It is now a zero-thickness quad — no side to catch the light — 4.5 m long
+   * on the same 25 m rhythm, lit and tone-mapped like the world rather than
+   * punched through it. The colour is the value that lands the nearest dash
+   * inside [deck + 30, deck + 70] measured at 1280x720 across the S1/S2/S3
+   * deck keys; see `shots/p20.2/measure.py`.
+   *
+   * Still ONE draw call: same InstancedMesh, 2 triangles an instance instead of
+   * 12.
+   */
   private createCentreDashes(): THREE.InstancedMesh {
     const spacing = 25;
     const count = Math.floor(this.length / spacing);
-    const geometry = new THREE.BoxGeometry(0.34, 0.055, 7.5);
+    // A plane lies in local XY with its normal on local +Z, so the basis below
+    // puts local +Z on the surface up and the quad lies flat on the deck.
+    const geometry = new THREE.PlaneGeometry(
+      CENTRE_DASH_WIDTH_METRES,
+      CENTRE_DASH_LENGTH_METRES,
+    );
+    // Unlit, like the deck read surface it is painted on, but NOT
+    // tone-mapping-exempt the way that surface still is. Matching the deck's
+    // shading model is what makes the dash/deck contrast a constant the phase
+    // can pin: a Lambert dash re-lights per sector against an unlit road, so
+    // the same colour measured deck+52 in S1 and deck+9 in S3 and no single
+    // value satisfies the window. Unlit + graded is one number everywhere.
     const material = new THREE.MeshBasicMaterial({
-      color: 0xdce6d4,
+      color: CENTRE_DASH_COLOR,
       fog: true,
-      toneMapped: false,
+      // P20.2: was `toneMapped: false`. Paint takes the same grade as the road
+      // it is painted on; exempting it is what made it glow.
+      toneMapped: true,
+      // The dash sits 1 cm over the deck read surface, which is enough at 4 m
+      // and not enough at 400 m. The offset keeps the far dashes off the deck's
+      // own z without lifting the near ones into the air.
+      polygonOffset: true,
+      polygonOffsetFactor: -3,
+      polygonOffsetUnits: -3,
     });
     const dashes = new THREE.InstancedMesh(geometry, material, count);
     dashes.name = "map02_route_centre_dashes";
@@ -1357,12 +1650,9 @@ export class BitterpanCourse implements RaceCourse {
     const basis = new THREE.Matrix4();
     for (let index = 0; index < count; index += 1) {
       const sample = this.sampleAtDistance(index * spacing + spacing / 2);
-      transform.position.copy(sample.position).addScaledVector(sample.up, 0.075);
-      basis.makeBasis(
-        sample.right,
-        sample.up,
-        sample.tangent.clone().multiplyScalar(-1),
-      );
+      transform.position.copy(sample.position)
+        .addScaledVector(sample.up, CENTRE_DASH_LIFT_METRES);
+      basis.makeBasis(sample.right, sample.tangent, sample.up);
       transform.quaternion.setFromRotationMatrix(basis);
       transform.scale.set(1, 1, 1);
       transform.updateMatrix();

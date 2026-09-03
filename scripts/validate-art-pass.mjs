@@ -1193,15 +1193,28 @@ for (const family of facades.families) {
         + "region on bitterpan_facades_1024.",
     );
   }
-  // BASE_SKIRT is applied to all 226 placements without exception — it is the
-  // region that stops a structure looking pasted onto the ground plane, and it
-  // is the cheapest thing in the pass. WIND_salt_drift carries it on `sides`
-  // rather than `base`, because a drift IS the skirt, so this looks for the
-  // region anywhere in the family's face map rather than for a `base` key.
+  // Every family resolves a GRADE BAND — the region that stops a structure
+  // looking pasted onto the ground plane, and the cheapest thing in the pass.
+  //
+  // P20.2 loosened this from "names BASE_SKIRT" to "names a grade band", and
+  // the reason is a real defect rather than a convenience. BASE_SKIRT is the
+  // dark grounding band authored for steel standing on the pan: measured off
+  // bitterpan_facades_1024 it is mean luma 56.8 with a minimum of 0, the
+  // darkest region on the sheet. WIND_salt_drift used to name it as its ONLY
+  // face, and because a 0.31 m drift box never reaches the 2 m skirt plane the
+  // whole box wore it — so the 57 salt drifts rendered as the darkest flat
+  // quads on the map, which is the opposite of salt, and players read them as
+  // obstacles beside the deck. That family now takes SKIN_CONCRETE at grade.
+  //
+  // What is still asserted, and is the thing that actually matters, is that
+  // every family resolves SOMETHING at grade: `bitterpan-facades.ts` warns per
+  // placement when it cannot, and a family with no `base` and no BASE_SKIRT
+  // would emit one warning per placement and ground nothing.
   assert.ok(
-    Object.values(family.faces).includes("BASE_SKIRT"),
-    `Facade family ${family.id} names no BASE_SKIRT face. The skirt is applied `
-      + "to all 226 placements without exception.",
+    family.faces.base || Object.values(family.faces).includes("BASE_SKIRT"),
+    `Facade family ${family.id} resolves no grade band: it names neither a `
+      + "`base` face nor BASE_SKIRT anywhere. Every one of the 226 placements "
+      + "is banded at grade without exception.",
   );
   // Only LATTICE_RIG uses alpha. A family that alpha-tests without it pays for
   // a discard on an opaque surface; a lattice family that does not is a solid
@@ -1565,7 +1578,7 @@ console.log(
     + "resolved-and-not-applied and the history is kept at the assertion. "
     + `Pass 03: ${facades.families.length} facade families over `
     + `${facadePlacements} placements on ONE sheet (+0 draw calls, alpha only on `
-    + `${latticeFamilies.length} lattice families, BASE_SKIRT on every family); `
+    + `${latticeFamilies.length} lattice families, a grade band on every family); `
     + `${horizon.counts.greenwater.cards} + ${horizon.counts.bitterpan.cards} `
     + "horizon cards over 1 + 2 batches, every silhouette bottom-anchored and "
     + "exactly one fog exemption; "

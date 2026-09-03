@@ -387,6 +387,14 @@ export function buildDiagnosticsReport(
     ...contributors.atmosphere,
     ...contributors.ghost,
     ...contributors.ps2,
+    // P20.1. The shadow block is atmosphere.ts's (it owns the key light), but
+    // the frame cost belongs to the race loop, so the two are joined here
+    // rather than threading p95 through the contributor. Re-stating the key
+    // overrides the spread above, which is why it has to come after it.
+    shadows: {
+      ...contributors.atmosphere.shadows,
+      p95FrameMs: Number(core.p95FrameMs.toFixed(2)),
+    },
     pixelRatio: Number(core.pixelRatio.toFixed(2)),
     preferredPixelRatio: Number(core.preferredPixelRatio.toFixed(2)),
     minimumPixelRatio: Number(core.minimumPixelRatio.toFixed(2)),

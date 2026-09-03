@@ -118,7 +118,9 @@ export class HangarPlaqueBacking {
       mesh.name = MESH_NAMES[klass];
       forClass.forEach((placement, index) => mesh.setMatrixAt(index, placement.matrix));
       mesh.instanceMatrix.needsUpdate = true;
-      mesh.castShadow = false;
+      // P20.1. A backing plate proud of the wall it hangs on is exactly the
+      // kind of small caster that makes an interior read as built.
+      mesh.castShadow = true;
       mesh.receiveShadow = true;
       mesh.renderOrder = BACKING_RENDER_ORDER;
       triangles += forClass.length * 2;

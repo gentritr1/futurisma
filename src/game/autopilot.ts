@@ -108,16 +108,22 @@ export class DemoAutopilot {
    * G1 - the traffic picture, pushed in by the race loop before `read`.
    *
    * The showcase controller has to exercise the slipstream, or a headless soak
-   * would never prove the tow works at all. `distanceMeters` is positive when
-   * the rival is ahead; `strength` is the fleet's own measurement, so the
-   * autopilot and the physics can never disagree about when the tow is locked.
+   * would never prove the tow works at all. `traffic` is the rival fleet, taken
+   * structurally so this module stays independent of it; its draft distance is
+   * positive when the rival is ahead. `strength` is the fleet's own tow
+   * measurement, so the autopilot and the physics can never disagree about when
+   * the tow is locked.
    */
   setDraft(
-    distanceMeters: number,
-    lateralGapMeters: number,
+    traffic: {
+      readonly draftDistanceMeters: number;
+      readonly draftLateralMeters: number;
+    } | null | undefined,
     strength: number,
     deltaSeconds = 0,
   ): void {
+    const distanceMeters = traffic?.draftDistanceMeters ?? Infinity;
+    const lateralGapMeters = traffic?.draftLateralMeters ?? Infinity;
     this.draftDistanceMeters = Number.isFinite(distanceMeters) ? distanceMeters : Infinity;
     this.draftLateralGapMeters = Number.isFinite(lateralGapMeters)
       ? lateralGapMeters

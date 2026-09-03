@@ -14,6 +14,15 @@ import {
   ps2ColorGradeChunk,
   PS2_TONE_MAPPING_ANCHOR,
 } from "./render-mode.js";
+import {
+  SHADOW_LIGHT_DISTANCE_METRES,
+  SHADOW_LOOKAHEAD_METRES,
+  shadowMapSize,
+  shadowTexelMetres,
+  shadowsEnabled,
+  snapShadowCentre,
+} from "./shadow-settings.js";
+import { armKeyLightShadow, promoteUnlitShadowReceivers } from "./shadows";
 import { publishTimeOfDayDrift } from "./time-of-day";
 
 /** The exposure the AgX path has run at since the renderer was set up. */
@@ -48,7 +57,11 @@ const WHITE = new THREE.Color(0xffffff);
 // and pushing key intensity up per sector is what gives the deck form again.
 const RIM_PRESENCE_BOOST = 1.35;
 const HEMISPHERE_TRIM = 0.88;
-const KEY_LIGHT_DISTANCE = 160;
+// Equal to SHADOW_LIGHT_DISTANCE_METRES by construction: the shadow camera's
+// near/far were derived from where the light sits relative to the box centre,
+// and the two numbers must move together. A DirectionalLight reads only the
+// direction, so neither number changes the lighting.
+const KEY_LIGHT_DISTANCE = SHADOW_LIGHT_DISTANCE_METRES;
 const SUN_DISC_DISTANCE_RATIO = 0.72;
 
 /**
@@ -85,6 +98,22 @@ const HANGAR_LAMP_PEAK_INTENSITY = 150;
 export interface AtmosphereDiagnostics {
   /** Current crossfaded key direction, normalized world space. */
   keyDirection: readonly [number, number, number];
+  /**
+   * P20.1 — proof a soak can read that the shadow pass is actually running.
+   * `casters` is the live count of `castShadow` meshes in the scene graph, not
+   * an authored expectation, so a family that quietly lost its flag shows up
+   * here rather than only in a screenshot.
+   */
+  shadows: {
+    enabled: boolean;
+    mapSize: number;
+    casters: number;
+    /**
+     * Authored unlit overlays swapped for a shadow-receiving stand-in. Exactly
+     * 1 on Bitterpan (its drivable deck), 0 on Greenwater, 0 with shadows off.
+     */
+    promotedReceivers: number;
+  };
   hangarFlickerActive: boolean;
   /**
    * Normalized lamp level: exactly `0` when the lamps are off, otherwise the
@@ -130,6 +159,16 @@ export class RaceAtmosphere {
   private readonly tintedKey = new THREE.Color();
   private readonly tintedFog = new THREE.Color();
 
+  // --- P20.1 shadow scratch. Same rule as the P4a block above: the shadow
+  // frustum is repositioned every frame and must allocate nothing to do it.
+  private readonly shadowActive = shadowsEnabled();
+  private shadowReceiversPromoted = 0;
+  private readonly shadowForward = new THREE.Vector3();
+  private readonly shadowCentre = new THREE.Vector3();
+  private readonly shadowSnapped = new THREE.Vector3();
+  private readonly shadowRight = new THREE.Vector3();
+  private readonly shadowUp = new THREE.Vector3();
+
   private readonly hangarLamps: THREE.PointLight[] = [];
   private readonly hangarFlicker = createHangarFlicker();
   private hangarFlickerClock = 0;
@@ -169,6 +208,55 @@ export class RaceAtmosphere {
     this.rimLight.intensity = lighting.rimIntensity * RIM_PRESENCE_BOOST;
     this.rimLight.position.set(-100, 25, -80);
     this.scene.add(this.hemisphereLight, this.keyLight, this.rimLight);
+    // The key is the only shadow caster in the game. Its target has to be in
+    // the scene graph for three to read a world matrix off it; without shadows
+    // the target is never moved and the light behaves exactly as it did before
+    // this phase, so adding it is unconditional and free.
+    this.scene.add(this.keyLight.target);
+    armKeyLightShadow(this.keyLight);
+    this.shadowReceiversPromoted = promoteUnlitShadowReceivers(this.course.group);
+  }
+
+  /**
+   * Walks the shadow box to a texel-snapped point ~45 m ahead of the chase
+   * camera, once per frame.
+   *
+   * The direction is whatever the sector crossfade last set — this phase moves
+   * the frustum, never the sun. Snapping happens in the same basis
+   * `Object3D.lookAt` will rebuild inside `LightShadow.updateMatrices`, which is
+   * the only reason it removes shimmer rather than adding a different one.
+   */
+  private updateShadowCamera(): void {
+    if (!this.shadowActive) return;
+    this.camera.getWorldDirection(this.shadowForward);
+    this.shadowCentre
+      .copy(this.camera.position)
+      .addScaledVector(this.shadowForward, SHADOW_LOOKAHEAD_METRES);
+    snapShadowCentre(
+      this.shadowCentre,
+      this.keyDirection,
+      shadowTexelMetres(),
+      this.shadowRight,
+      this.shadowUp,
+      this.shadowSnapped,
+    );
+    this.keyLight.target.position.copy(this.shadowSnapped);
+    this.keyLight.target.updateMatrixWorld();
+    this.keyLight.position
+      .copy(this.shadowSnapped)
+      .addScaledVector(this.keyDirection, KEY_LIGHT_DISTANCE);
+  }
+
+  /**
+   * Live caster census. Only ever called from `diagnostics()`, i.e. at the ~1 Hz
+   * the diagnostics sampler runs and only under `?diagnostics=1`.
+   */
+  private countShadowCasters(): number {
+    let casters = 0;
+    this.scene.traverse((object) => {
+      if (object.castShadow && (object as THREE.Mesh).isMesh) casters += 1;
+    });
+    return casters;
   }
 
   /**
@@ -360,6 +448,10 @@ export class RaceAtmosphere {
     this.keyLight.position
       .copy(this.keyDirection)
       .multiplyScalar(KEY_LIGHT_DISTANCE);
+    // P20.1 overwrites that position with the same direction taken from the
+    // shadow box centre instead of from the world origin. The direction — the
+    // only thing the light contributes to shading — is identical either way.
+    this.updateShadowCamera();
     this.rimLight.color.lerp(lighting.rim, lightingResponse);
     this.rimLight.intensity = THREE.MathUtils.lerp(
       this.rimLight.intensity,
@@ -451,6 +543,15 @@ export class RaceAtmosphere {
         Number(this.keyDirection.y.toFixed(4)),
         Number(this.keyDirection.z.toFixed(4)),
       ],
+      shadows: {
+        enabled: this.shadowActive,
+        mapSize: this.shadowActive ? shadowMapSize() : 0,
+        // Reported whether or not the pass runs: the flags are armed
+        // unconditionally (see shadows.ts) and a family that lost one is worth
+        // catching under the kill switch too.
+        casters: this.countShadowCasters(),
+        promotedReceivers: this.shadowReceiversPromoted,
+      },
       hangarFlickerActive: this.hangarLampLevel > 0,
       hangarLampIntensity: Number(this.hangarLampLevel.toFixed(4)),
       timeOfDayDrift: Number(this.timeOfDayDrift.toFixed(4)),
