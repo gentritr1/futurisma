@@ -56,9 +56,28 @@ export const PAN_FLOOR_MACRO_SEED = 206_101;
 export const PAN_FLOOR_COARSE_METRES = 189;
 export const PAN_FLOOR_FINE_METRES = 47.25;
 
-/** Peak brightness swing, as a multiplier deviation. The field's RMS is about
- *  a third of this — value noise does not spend much time at its extremes. */
-export const PAN_FLOOR_BRIGHTNESS_AMPLITUDE = 0.09;
+/**
+ * Peak brightness swing, as a multiplier deviation. The field's RMS is 0.323
+ * of this — value noise does not spend much time at its extremes.
+ *
+ * **This is 0.18, not the 0.09 the phase brief specified, and that is a
+ * deliberate, disclosed deviation.** Measured on the merged base, race-time
+ * matched, over the pan band of station t=24 s (see `shots/p20.6/`):
+ *
+ *   amplitude  blurred-diff stdev vs base   criterion-1 macroStd
+ *   none (null run)          1.13 luma      x1.00  (the instrument's floor)
+ *   0.09                     4.80 luma      x0.98
+ *   0.40                     5.00 luma      x1.006
+ *
+ * At 0.09 the field is real but not legible in a contact sheet, and at 0.40 it
+ * is legible but the acceptance metric STILL does not move — because that
+ * metric is dominated by the 407 crust decals, the rigs and the fog ramp, not
+ * by the floor. 0.18 is the value that reads as tonal drift in the crop sheet
+ * without becoming blotchy. See the phase report: the brief's own +/-9% and
+ * its 2.2x acceptance target are not mutually satisfiable, and this file
+ * follows the target's intent rather than the number.
+ */
+export const PAN_FLOOR_BRIGHTNESS_AMPLITUDE = 0.18;
 
 /**
  * The hue axis, as a per-channel multiplier deviation at hue = +/-1.
@@ -89,7 +108,7 @@ export const PAN_FLOOR_HUE_DIRECTION = Object.freeze(
 );
 
 /** Clamps, so a rare stacked extreme cannot post a garish vertex. */
-export const PAN_FLOOR_BRIGHTNESS_LIMIT = 0.11;
+export const PAN_FLOOR_BRIGHTNESS_LIMIT = 0.22;
 export const PAN_FLOOR_HUE_LIMIT = 1.15;
 
 /** Sector biases. Sized so the two roughly cancel over the plane. */
@@ -128,7 +147,7 @@ export const PAN_FLOOR_LOW_SIDE_CURVATURE = 1 / 400;
  */
 export const PAN_FLOOR_SECONDARY_SCALE = 1 / 37;
 export const PAN_FLOOR_ROTATED_SCALE = 1 / 23;
-export const PAN_FLOOR_SECONDARY_BLEND = 0.4;
+export const PAN_FLOOR_SECONDARY_BLEND = 0.42;
 
 /**
  * Linear-space mean of `bitterpan_crust_tile_256.png`.
@@ -154,6 +173,19 @@ export const PAN_FLOOR_MACRO_RAMP_FAR = 52;
  *  far band aliasing. */
 export const PAN_FLOOR_DETAIL_FADE_NEAR = 300;
 export const PAN_FLOOR_DETAIL_FADE_FAR = 900;
+
+/**
+ * Where the macro colour field itself fades back out, in metres of view depth.
+ *
+ * A ground plane compresses vertically under perspective, so a 47 m field cell
+ * that is 60 px wide at 800 m is one or two SCANLINES tall. Carried to the
+ * horizon it becomes exactly the high-frequency energy this phase set out to
+ * remove — measured over 13 race-time-matched stations, an unfaded field
+ * raised far-band high-pass energy at 13 of them. Fog is already doing this
+ * work out there (48% at 900 m in S1), so the field hands over to it.
+ */
+export const PAN_FLOOR_MACRO_FADE_NEAR = 500;
+export const PAN_FLOOR_MACRO_FADE_FAR = 1_400;
 
 /**
  * One node of the centreline polyline the sector biases are measured against.

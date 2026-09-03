@@ -6,6 +6,8 @@ import { type CourseSample, type RaceCourse, surfaceHeightAtLateral } from "./co
 import {
   PAN_FLOOR_DETAIL_FADE_FAR,
   PAN_FLOOR_DETAIL_FADE_NEAR,
+  PAN_FLOOR_MACRO_FADE_FAR,
+  PAN_FLOOR_MACRO_FADE_NEAR,
   PAN_FLOOR_MACRO_RAMP_FAR,
   PAN_FLOOR_MACRO_RAMP_NEAR,
   PAN_FLOOR_MACRO_SEED,
@@ -408,8 +410,14 @@ const PAN_DEPTH_VARYING = "varying float vPanDepth;\n";
  *    the craft is bit-for-bit what it was before. That pattern was never the
  *    complaint.
  * 3. **The far field stops sparkling.** Past 300 m the crust sample fades to
- *    the tile mean, so the far pan carries macro colour and fog only. Mips and
- *    aniso 4 already fight the aliasing; this removes the signal instead.
+ *    the tile mean, so the far pan carries the vertex-colour macro field and
+ *    fog only. Mips and aniso 4 already fight the aliasing; this removes the
+ *    signal instead. The SAME fade is applied to the two macro samples, and
+ *    that is not decoration: measured over 13 race-time-matched stations, a
+ *    macro blend that ran all the way out raised far-band high-pass energy at
+ *    13/13 of them. Magnifying a 256 px crack tile 37x still leaves ~1.7 m
+ *    texels, which is sub-pixel past 600 m and aliases exactly like the tile it
+ *    was added to disguise.
  *
  * Composed through `composeShaderInjection` rather than assigned: in
  * `?render=ps2` this material already carries the snap/grade/dither injection,
@@ -418,8 +426,11 @@ const PAN_DEPTH_VARYING = "varying float vPanDepth;\n";
  */
 function injectPanFloorMacro(shader: THREE.WebGLProgramParametersWithUniforms): void {
   const [meanR, meanG, meanB] = PAN_FLOOR_TILE_MEAN_LINEAR;
-  const ramp = `smoothstep( ${glsl(PAN_FLOOR_MACRO_RAMP_NEAR)}, `
-    + `${glsl(PAN_FLOOR_MACRO_RAMP_FAR)}, vPanDepth )`;
+  // In at 16-52 m so the near field is untouched, out again at 500-1,400 m so
+  // the field never survives to where a cell is a scanline tall.
+  const ramp = `( smoothstep( ${glsl(PAN_FLOOR_MACRO_RAMP_NEAR)}, `
+    + `${glsl(PAN_FLOOR_MACRO_RAMP_FAR)}, vPanDepth ) * ( 1.0 - smoothstep( `
+    + `${glsl(PAN_FLOOR_MACRO_FADE_NEAR)}, ${glsl(PAN_FLOOR_MACRO_FADE_FAR)}, vPanDepth ) ) )`;
 
   shader.vertexShader = PAN_DEPTH_VARYING + shader.vertexShader.replace(
     "#include <project_vertex>",
@@ -438,7 +449,7 @@ function injectPanFloorMacro(shader: THREE.WebGLProgramParametersWithUniforms): 
 	vec2 panTurnedUv = vec2( vMapUv.y, - vMapUv.x ) * ${glsl(PAN_FLOOR_ROTATED_SCALE)} + vec2( 0.083, 0.457 );
 	vec3 panCross = texture2D( map, panTurnedUv ).rgb;
 	vec3 panMacro = 0.5 * ( panWide + panCross ) / panTileMean;
-	panCrust *= mix( vec3( 1.0 ), panMacro, ${glsl(PAN_FLOOR_SECONDARY_BLEND)} * ${ramp} );
+	panCrust *= mix( vec3( 1.0 ), panMacro, ${glsl(PAN_FLOOR_SECONDARY_BLEND)} * ${ramp} * panDetail );
 	diffuseColor.rgb *= panCrust;
 `,
     )

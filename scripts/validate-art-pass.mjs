@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
+import { inflateSync } from "node:zlib";
 import { resolveApronProfile } from "../src/game/apron.js";
 import {
   FLAT_FURNITURE_MAX_HEIGHT_METRES,
@@ -44,6 +45,98 @@ import { HORIZON_RECTS } from "../src/game/living-world-zones.js";
 
 const root = new URL("../", import.meta.url);
 const readJson = (path) => JSON.parse(readFileSync(new URL(path, root), "utf8"));
+
+/** @returns {boolean} whether `value` is prime; used on the macro sample scales. */
+function isPrime(value) {
+  if (!Number.isInteger(value) || value < 2) return false;
+  for (let divisor = 2; divisor * divisor <= value; divisor += 1) {
+    if (value % divisor === 0) return false;
+  }
+  return true;
+}
+
+/**
+ * The smallest PNG decoder that can answer "what colour is this tile, on
+ * average" - 8-bit non-interlaced RGB/RGBA only, which is every sheet in this
+ * project. Written out rather than pulled in: the alternative is a dependency
+ * in the validator path for one number.
+ */
+function decodePng(buffer) {
+  let offset = 8;
+  let header = null;
+  const idat = [];
+  while (offset < buffer.length) {
+    const length = buffer.readUInt32BE(offset);
+    const type = buffer.toString("ascii", offset + 4, offset + 8);
+    const body = buffer.subarray(offset + 8, offset + 8 + length);
+    if (type === "IHDR") {
+      header = {
+        width: body.readUInt32BE(0),
+        height: body.readUInt32BE(4),
+        depth: body[8],
+        colourType: body[9],
+        interlace: body[12],
+      };
+    } else if (type === "IDAT") {
+      idat.push(body);
+    }
+    offset += 12 + length;
+  }
+  assert.ok(header, "PNG has no IHDR.");
+  assert.equal(header.depth, 8, "Only 8-bit PNGs are decoded here.");
+  assert.equal(header.interlace, 0, "Only non-interlaced PNGs are decoded here.");
+  assert.ok(
+    header.colourType === 2 || header.colourType === 6,
+    "Only RGB/RGBA PNGs are decoded here.",
+  );
+  const channels = header.colourType === 6 ? 4 : 3;
+  const raw = inflateSync(Buffer.concat(idat));
+  const stride = header.width * channels;
+  const pixels = Buffer.alloc(header.height * stride);
+  for (let row = 0; row < header.height; row += 1) {
+    const filter = raw[row * (stride + 1)];
+    const source = raw.subarray(row * (stride + 1) + 1, row * (stride + 1) + 1 + stride);
+    const target = pixels.subarray(row * stride, row * stride + stride);
+    for (let index = 0; index < stride; index += 1) {
+      const left = index >= channels ? target[index - channels] : 0;
+      const up = row > 0 ? pixels[(row - 1) * stride + index] : 0;
+      const upLeft = row > 0 && index >= channels
+        ? pixels[(row - 1) * stride + index - channels]
+        : 0;
+      let value = source[index];
+      if (filter === 1) value += left;
+      else if (filter === 2) value += up;
+      else if (filter === 3) value += (left + up) >> 1;
+      else if (filter === 4) {
+        const predictor = left + up - upLeft;
+        const dLeft = Math.abs(predictor - left);
+        const dUp = Math.abs(predictor - up);
+        const dUpLeft = Math.abs(predictor - upLeft);
+        if (dLeft <= dUp && dLeft <= dUpLeft) value += left;
+        else if (dUp <= dUpLeft) value += up;
+        else value += upLeft;
+      }
+      target[index] = value & 0xff;
+    }
+  }
+  return { ...header, channels, pixels };
+}
+
+/** Mean colour of a decoded PNG, in LINEAR light - the space `texture2D`
+ *  returns for an sRGB-uploaded texture. */
+function meanLinearRgb(image) {
+  const totals = [0, 0, 0];
+  const count = image.width * image.height;
+  for (let index = 0; index < count; index += 1) {
+    for (let channel = 0; channel < 3; channel += 1) {
+      const value = image.pixels[index * image.channels + channel] / 255;
+      totals[channel] += value <= 0.040_45
+        ? value / 12.92
+        : ((value + 0.055) / 1.055) ** 2.4;
+    }
+  }
+  return totals.map((total) => total / count);
+}
 
 const atlas = readJson("src/game/data/ATLAS_REGIONS.json");
 const decals = readJson("src/game/data/GREENWATER_OPENING_SURFACE_DECALS.json");
@@ -475,6 +568,160 @@ assert.equal(crust.ground.runtime.generateMipmaps, true);
 assert.equal(crust.ground.runtime.anisotropy, 4);
 assert.equal(crust.ground.runtime.wrapS, "RepeatWrapping");
 assert.equal(crust.ground.runtime.wrapT, "RepeatWrapping");
+
+// ---------------------------------------------------------------------------
+// P20.6 — the pan floor's macro colour field.
+//
+// The floor is a single mesh with no interactive behaviour, so a soak whose
+// macro field silently failed to generate has identical lap times, faults and
+// frame timing to one where it rendered. Four things are pinned here, and the
+// last one is the load-bearing one:
+//
+// 1. The seed and the segment count. Changing either re-rolls the whole pan,
+//    which is an art decision that has to be argued for rather than absorbed.
+// 2. The amplitude bounds, so a future "make it pop" pass cannot quietly turn a
+//    variation field into a re-grade.
+// 3. The tile mean the shader divides the macro samples by, RECOMPUTED from the
+//    PNG rather than trusted. If the crust tile is ever regenerated, a stale
+//    mean would make the blend a systematic darken or lift.
+// 4. Mean preservation: the generator is RE-RUN here under Node and its mean
+//    must land within 2/255 of flat white. That is the claim "this is a
+//    variation phase, not a re-grade" as a number.
+// ---------------------------------------------------------------------------
+
+const panFloor = await import("../src/game/pan-floor-colour.js");
+
+assert.equal(panFloor.PAN_FLOOR_SEGMENTS, 128, "The pan floor is subdivided 128 x 128.");
+assert.equal(panFloor.PAN_FLOOR_MACRO_SEED, 206_101, "The pan floor macro seed is pinned.");
+// The two authored scales must stay representable on the vertex grid. A cell
+// smaller than the 47.25 m spacing is sampled under Nyquist and lands on screen
+// as grid-frequency noise rather than as the field that was authored.
+const panVertexSpacing = 6_048 / panFloor.PAN_FLOOR_SEGMENTS;
+assert.equal(panVertexSpacing, 47.25);
+for (const [label, cell] of [
+  ["coarse", panFloor.PAN_FLOOR_COARSE_METRES],
+  ["fine", panFloor.PAN_FLOOR_FINE_METRES],
+]) {
+  assert.ok(
+    cell >= panVertexSpacing && Number.isInteger(cell / panVertexSpacing),
+    `The pan floor's ${label} noise cell is ${cell} m, which is not a whole `
+      + `multiple of the ${panVertexSpacing} m vertex spacing.`,
+  );
+}
+// Amplitude bounds. The upper bound is the phase's own ceiling, NOT the brief's
+// +/-9%: that number was measured to be below the eye's threshold on this pan
+// (see src/game/pan-floor-colour.js for the three-amplitude measurement), so the
+// shipped value is 0.18 and the guard is set where a re-grade would start.
+assert.ok(
+  panFloor.PAN_FLOOR_BRIGHTNESS_AMPLITUDE > 0.05
+    && panFloor.PAN_FLOOR_BRIGHTNESS_AMPLITUDE <= 0.2,
+  `The pan floor brightness amplitude is ${panFloor.PAN_FLOOR_BRIGHTNESS_AMPLITUDE}; `
+    + "past 0.2 this stops being variation and becomes a grade.",
+);
+assert.ok(
+  panFloor.PAN_FLOOR_BRIGHTNESS_LIMIT >= panFloor.PAN_FLOOR_BRIGHTNESS_AMPLITUDE
+    && panFloor.PAN_FLOOR_BRIGHTNESS_LIMIT <= 0.25,
+  "The pan floor brightness clamp must sit above the amplitude and below a grade.",
+);
+assert.ok(
+  panFloor.PAN_FLOOR_SECONDARY_BLEND >= 0.35 && panFloor.PAN_FLOOR_SECONDARY_BLEND <= 0.45,
+  `The tile-break blend is ${panFloor.PAN_FLOOR_SECONDARY_BLEND}; the accepted band is `
+    + "0.35 to 0.45.",
+);
+// Prime, and different: the beat between the two extra samples and the 12 m
+// tile has to be longer than the 6,048 m plane or the repeat comes back.
+for (const scale of [panFloor.PAN_FLOOR_SECONDARY_SCALE, panFloor.PAN_FLOOR_ROTATED_SCALE]) {
+  const divisor = Math.round(1 / scale);
+  assert.ok(
+    Math.abs(1 / scale - divisor) < 1e-9 && isPrime(divisor),
+    `A pan floor macro sample is taken at 1/${1 / scale}, which is not 1 over a prime.`,
+  );
+}
+assert.ok(
+  Math.round(1 / panFloor.PAN_FLOOR_SECONDARY_SCALE)
+    !== Math.round(1 / panFloor.PAN_FLOOR_ROTATED_SCALE),
+  "The two macro samples share a scale, so they beat together instead of apart.",
+);
+assert.ok(
+  crust.ground.metresPerTile
+    * Math.round(1 / panFloor.PAN_FLOOR_SECONDARY_SCALE)
+    * Math.round(1 / panFloor.PAN_FLOOR_ROTATED_SCALE) > 6_048,
+  "The macro samples come back into phase inside the plane, so the tile repeats.",
+);
+// The hue axis carries colour, not brightness: its three components sum to ~0,
+// which is what lets the brine/crust swing move without moving luma.
+const panHueSum = panFloor.PAN_FLOOR_HUE_DIRECTION.reduce((a, b) => a + b, 0);
+assert.ok(
+  Math.abs(panHueSum) < 0.005,
+  `The pan floor hue axis sums to ${panHueSum}, so swinging along it changes `
+    + "brightness as well as colour.",
+);
+
+// The tile mean, recomputed from the asset the shader divides by.
+const panTileMeasured = meanLinearRgb(
+  decodePng(readFileSync(new URL(`public${crust.ground.texture}`, root))),
+);
+panFloor.PAN_FLOOR_TILE_MEAN_LINEAR.forEach((pinned, channel) => {
+  assert.ok(
+    Math.abs(pinned - panTileMeasured[channel]) < 5e-4,
+    `The pinned crust tile linear mean channel ${channel} is ${pinned}, but the PNG `
+      + `measures ${panTileMeasured[channel].toFixed(6)}. The macro blend would darken `
+      + "or lift the whole pan by that difference.",
+  );
+});
+
+// Mean preservation, re-run. Two runs bracket the runtime value: the runtime
+// walks a ribbon sampled off `RaceCourse` (which cannot be built under Node),
+// this one walks the authored centreline, and the second has no ribbon at all.
+// The sector biases move the whole-plane mean by well under the tolerance
+// either way, so both runs standing inside +/- 2/255 covers the runtime.
+const panRibbon = bitterpanStations.stations.map((station, index, all) => {
+  const next = all[Math.min(index + 1, all.length - 1)];
+  const previous = all[Math.max(index - 1, 0)];
+  // Lateral = tangent x up, matching `RaceCourse.sample`'s `right`.
+  const dx = next.x - previous.x;
+  const dz = next.z - previous.z;
+  const length = Math.hypot(dx, dz) || 1;
+  return {
+    x: station.x,
+    z: station.z,
+    rightX: -dz / length,
+    rightZ: dx / length,
+    distance: station.s,
+    curvature: station.curvature,
+  };
+});
+for (const [label, extra] of [
+  ["with the authored centreline",
+    { ribbon: panRibbon, lapLengthMetres: bitterpanStations.total_length_m }],
+  ["with no sector bias", {}],
+]) {
+  const generated = panFloor.generatePanFloorColours({
+    segments: panFloor.PAN_FLOOR_SEGMENTS,
+    sizeMetres: 6_048,
+    centreXMetres: 281,
+    centreZMetres: 271,
+    seed: panFloor.PAN_FLOOR_MACRO_SEED,
+    ...extra,
+  });
+  assert.equal(
+    generated.vertices,
+    (panFloor.PAN_FLOOR_SEGMENTS + 1) ** 2,
+    "The pan floor colour buffer does not cover the subdivided plane.",
+  );
+  for (const [channel, mean] of generated.mean.entries()) {
+    assert.ok(
+      Math.abs(mean - 1) <= 2 / 255,
+      `The pan floor macro field ${label} has a channel ${channel} mean of `
+        + `${mean.toFixed(6)} (${((mean - 1) * 255).toFixed(2)}/255 off flat). This is a `
+        + "variation pass, not a re-grade.",
+    );
+  }
+  assert.ok(
+    generated.extremes.brightness <= panFloor.PAN_FLOOR_BRIGHTNESS_LIMIT + 1e-9,
+    "The pan floor brightness clamp did not hold.",
+  );
+}
 
 assert.equal(crust.decalCount, 297, "Art pass 02 authors 297 pan crust decals.");
 assert.equal(crust.decals.length, 297, "The crust decal list disagrees with its own count.");
@@ -1586,5 +1833,13 @@ console.log(
     + "rule agreeing placement for placement and no wall plaque among them; "
     + `${plan.totalStrips} edge strips of ${edgeBand.geometry.stripLengthMetres} m `
     + `at ${edgeBand.geometry.liftMetres} m lift (${cycles} dash cycles a strip, `
-    + "spans matched to the accepted edge table, cyan pinned to 6 a lap).",
+    + "spans matched to the accepted edge table, cyan pinned to 6 a lap). "
+    + `P20.6: pan floor macro field on ${panFloor.PAN_FLOOR_SEGMENTS} x `
+    + `${panFloor.PAN_FLOOR_SEGMENTS} segments (seed `
+    + `${panFloor.PAN_FLOOR_MACRO_SEED}, +/-${panFloor.PAN_FLOOR_BRIGHTNESS_AMPLITUDE} `
+    + `brightness at ${panFloor.PAN_FLOOR_COARSE_METRES} m and `
+    + `${panFloor.PAN_FLOOR_FINE_METRES} m, both whole multiples of the 47.25 m vertex `
+    + `spacing), re-run under Node to a mean within 2/255 of flat; tile-break at 1/37 `
+    + `and 1/23 blended ${panFloor.PAN_FLOOR_SECONDARY_BLEND} toward a tile mean `
+    + `recomputed from the PNG.`,
 );
