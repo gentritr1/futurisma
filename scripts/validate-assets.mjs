@@ -84,8 +84,60 @@ const expectedArtPassHashes = {
     "0ad6d3efe0511ea0872e7582e0b00f8f146d0cbf2ebd585eee70329079e63ca5",
   "greenwater/textures/futurisma_trim_512.png":
     "b27bcae3f44bd1203c6e935bcacd598af2409526832fa7791bf40013842a9318",
+  // H2a (the generated art pack, behind `?art=hf`). These three are NOT emitted
+  // by build-futurisma-atlases.mjs — their provenance is
+  // `python3 scripts/prepare-higgsfield-textures.py`, which is deterministic,
+  // ships in the repo and takes `--check` to re-derive without writing. The
+  // inputs it reads are 5-7 MB Higgsfield generations under
+  // `assets-in/higgsfield/batch1/`, which are gitignored: they are raw
+  // generations, not source art, and these three sheets are the artefact.
+  //
+  // Each stands in for a sheet above at the SAME rects, and the base sheet
+  // stays served — `src/game/art-pack.js` defaults to `base`, so both editions
+  // ship until the eyeball gate picks one.
+  "map02/textures/bitterpan_crust_tile_hf_512.png":
+    "e1fdd16f56f426bcddd0cf6f631b0da949b53ba8dd685589f446b316453c4b98",
+  "map02/textures/bitterpan_facades_hf_1024.png":
+    "472c11931d78abe5376bcd49594f85d3a538dce3c3786e4f2c35a7503ec53555",
+  "greenwater/textures/futurisma_horizon_hf_1024.png":
+    "169c30729904ec20edaa44c33298704bb76ce5c387ba39e8f7f9d6256653c967",
 };
 
+/**
+ * H2a. The served weight of the art pack, asserted rather than described.
+ *
+ * The phase was given a 2.5 MB raw ceiling for everything it adds under
+ * `public/`. Measured, per file:
+ *
+ *   bitterpan_crust_tile_hf_512.png    428,926 bytes  (+353,498 over the 256
+ *                                      tile it stands in for, which is 75,428)
+ *   bitterpan_facades_hf_1024.png      664,721 bytes  (+500,156 over 164,565)
+ *   futurisma_horizon_hf_1024.png      197,939 bytes  (+148,922 over  49,017)
+ *                                    -------------
+ *   total added                      1,291,586 bytes  = 1261.3 KiB = 1.23 MiB
+ *
+ * The "added" column is the honest one: the base sheets stay served, so the
+ * pack costs its own full weight on top of them, not a difference. 1.23 MiB
+ * against 2.5 MB, i.e. roughly half the allowance, and the headroom is
+ * deliberate — a second batch of generations would come through the same door.
+ *
+ * The crust tile is where the allowance actually got spent, and it is why it is
+ * served at 512: the same tile encodes to 1475.3 KiB at 1024, which alone would
+ * have been more than the whole pack costs now. That measurement is in the
+ * preparation script's docstring beside the code that took it.
+ *
+ * These are TEXTURES, not shell bytes: none of them is in the initial JS/CSS
+ * that validate-build.mjs weighs, and none is fetched at all unless a Bitterpan
+ * (or, for the horizon sheet, any) session actually loads that layer.
+ */
+const ART_PACK_BYTES = {
+  "map02/textures/bitterpan_crust_tile_hf_512.png": 428926,
+  "map02/textures/bitterpan_facades_hf_1024.png": 664721,
+  "greenwater/textures/futurisma_horizon_hf_1024.png": 197939,
+};
+const ART_PACK_RAW_CEILING = 2.5 * 1000 * 1000;
+
+let artPackRawBytes = 0;
 for (const [relativePath, expectedHash] of Object.entries(expectedArtPassHashes)) {
   const bytes = await readFile(
     new URL(`../public/assets/${relativePath}`, import.meta.url),
@@ -96,7 +148,28 @@ for (const [relativePath, expectedHash] of Object.entries(expectedArtPassHashes)
     expectedHash,
     `${relativePath} is not the sheet the atlas builder emitted.`,
   );
+  const expectedBytes = ART_PACK_BYTES[relativePath];
+  if (expectedBytes === undefined) continue;
+  assert.equal(
+    bytes.byteLength,
+    expectedBytes,
+    `${relativePath} is ${bytes.byteLength} bytes against a pinned `
+      + `${expectedBytes}. Re-run \`python3 scripts/prepare-higgsfield-textures.py\` `
+      + "and move the pin WITH the measurement, not ahead of it.",
+  );
+  artPackRawBytes += bytes.byteLength;
 }
+assert.equal(
+  Object.keys(ART_PACK_BYTES).length,
+  3,
+  "The art pack is three sheets. A fourth needs its own budget line, not a "
+    + "quiet addition to a total.",
+);
+assert.ok(
+  artPackRawBytes <= ART_PACK_RAW_CEILING,
+  `The H2a art pack adds ${(artPackRawBytes / 1024).toFixed(1)} KiB raw under `
+    + `public/, over its ${(ART_PACK_RAW_CEILING / 1024).toFixed(1)} KiB ceiling.`,
+);
 
 let assetKitBytes;
 for (const [relativePath, expectedHash] of Object.entries(expectedHashes)) {

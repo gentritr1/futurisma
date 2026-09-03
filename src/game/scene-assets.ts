@@ -3,6 +3,7 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { ASSET_KIT_PROP_PLACEMENTS } from "./asset-kit-layout";
 import type { BitterpanSurface } from "./bitterpan-surface";
+import { artPackSheet } from "./art-pack.js";
 import { panFloorProbeActive, panFloorProbeMode } from "./floor-probe.js";
 
 /**
@@ -163,11 +164,17 @@ const OPENING_SURFACE_TEXTURE_URL = "/assets/greenwater/textures/greenwater_runw
 /** P12. Trackside board atlas, both maps. */
 const SIGNAGE_TEXTURE_URL = "/assets/greenwater/textures/futurisma_signage_1024.png";
 /**
- * P15 art pass 02. The pan crust: a 256 seamless tile for the ground itself and
- * a 1024 decal sheet for the 407 cracks, brine patches, windrows, scrape
- * bundles, spill fans and conveyor shadows drawn over it. Bitterpan only.
+ * P15 art pass 02. The pan crust: a seamless tile for the ground itself and a
+ * 1024 decal sheet for the 407 cracks, brine patches, windrows, scrape bundles,
+ * spill fans and conveyor shadows drawn over it. Bitterpan only.
+ *
+ * H2a: the GROUND TILE moved into `art-pack.js`, along with the facade sheet
+ * and the horizon sheet, because each has a second edition behind `?art=hf` and
+ * they are resolved at the load site rather than frozen here. The decal sheet
+ * did not: `bitterpan_crust_1024` carries the authored route language
+ * (ROUTE_EDGE_CYAN, the windrows, the conveyor shadows) that Pass 02 pinned,
+ * and no generation was ordered for it.
  */
-const BITTERPAN_CRUST_TILE_URL = "/assets/map02/textures/bitterpan_crust_tile_256.png";
 const BITTERPAN_CRUST_DECAL_URL = "/assets/map02/textures/bitterpan_crust_1024.png";
 /** P15. Hangar Six fixture panels — the plaque backings. Greenwater only. */
 const HANGAR_FIXTURES_TEXTURE_URL = "/assets/greenwater/textures/hangar_fixtures_512.png";
@@ -180,10 +187,11 @@ const HANGAR_FIXTURES_TEXTURE_URL = "/assets/greenwater/textures/hangar_fixtures
  * directory rather than duplicated per map. The trim sheet carries BOTH the
  * signage back panels and the Bitterpan road edge band, which is why it is
  * loaded once here and handed to whichever layers a map has.
+ *
+ * H2a: two of the three are behind `?art=hf` and live in `art-pack.js`. The
+ * trim sheet is not — no generation in batch 1 covers it.
  */
-const BITTERPAN_FACADES_TEXTURE_URL = "/assets/map02/textures/bitterpan_facades_1024.png";
 const BITTERPAN_MASSING_PLACEMENTS_URL = "/data/map02/MASSING_PLACEMENTS.json";
-const HORIZON_TEXTURE_URL = "/assets/greenwater/textures/futurisma_horizon_1024.png";
 const TRIM_TEXTURE_URL = "/assets/greenwater/textures/futurisma_trim_512.png";
 const SURFACE_CHARACTER_MODEL_URL = "/assets/greenwater/models/greenwater_surface_character_runtime.glb";
 const BITTERPAN_TRACK_MODEL_URL = "/assets/map02/models/bitterpan_blockout.glb";
@@ -377,7 +385,7 @@ export class SceneAssets {
         const environment = await BitterpanEnvironment.load(
           BITTERPAN_TRACK_MODEL_URL,
           BITTERPAN_MASSING_MODEL_URL,
-          BITTERPAN_FACADES_TEXTURE_URL,
+          artPackSheet("bitterpanFacades"),
           BITTERPAN_MASSING_PLACEMENTS_URL,
         );
         this.environmentLoadMs = performance.now() - environmentLoadStartedAt;
@@ -456,7 +464,7 @@ export class SceneAssets {
         textures,
         LIVING_WORLD_MOTION_URL,
         LIVING_WORLD_MOTION_B_URL,
-        HORIZON_TEXTURE_URL,
+        artPackSheet("horizonCards"),
       );
       if (this.isDisposed()) {
         disposeObject3DResources(livingWorld.root);
@@ -583,7 +591,7 @@ export class SceneAssets {
       const { BitterpanSurface } = await import("./bitterpan-surface");
       const surface = await BitterpanSurface.load(
         this.course,
-        BITTERPAN_CRUST_TILE_URL,
+        artPackSheet("panCrustTile"),
         BITTERPAN_CRUST_DECAL_URL,
         panFloorProbeMode(),
       );
@@ -621,7 +629,7 @@ export class SceneAssets {
       const { BitterpanMidground } = await import("./bitterpan-midground");
       const midground = await BitterpanMidground.load(
         this.course,
-        BITTERPAN_FACADES_TEXTURE_URL,
+        artPackSheet("bitterpanFacades"),
       );
       if (this.isDisposed()) {
         midground.dispose();

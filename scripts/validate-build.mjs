@@ -229,6 +229,64 @@ assert.ok(
   "The production build must include the hardened response-header policy.",
 );
 
+// ---------------------------------------------------------------------------
+// H2a. The generated art pack, on the served side of the build.
+//
+// The three alternates behind `?art=hf` cost the SHELL almost nothing: the only
+// code they add is src/game/art-pack.js, measured at +0.2 KiB gzip against the
+// 246.2 KiB this phase started from (246.4 after), which is why neither ceiling
+// above moved. What they cost is SERVED TEXTURE BYTES, and that is a different
+// axis from the one the ceilings above police, so it is weighed separately
+// rather than folded into a number that would then mean two things:
+//
+//   bitterpan_crust_tile_hf_512.png    428,926 raw   (gzip is not the axis: PNG
+//   bitterpan_facades_hf_1024.png      664,721 raw    is already deflate, and
+//   futurisma_horizon_hf_1024.png      197,939 raw    the _headers policy does
+//                                    -----------      not re-compress images)
+//                                    1,291,586 raw = 1261.3 KiB = 1.23 MiB
+//
+// against a 2.5 MB allowance for the phase. The base sheets stay served, so
+// this is a full addition and not a delta — art-pack.js defaults to `base` and
+// both editions ship until the eyeball gate picks one. If it picks `hf`, the
+// three base sheets can be retired and the pack's net cost drops to +1,002,576
+// bytes; if it picks `base`, these three files come back out entirely. Either
+// resolution SHRINKS this number, which is the reason it was acceptable to
+// spend it before the gate closed.
+//
+// This block asserts the bytes reach `dist/` at all. The hashes live in
+// validate-art-pass.mjs (which also pins that every base rect still lands
+// inside its alternate) and in validate-assets.mjs; what is checked here, and
+// only here, is that Vite actually copied them out of public/ — a texture that
+// validates in the source tree and 404s in production is the failure this file
+// exists to catch.
+// ---------------------------------------------------------------------------
+const artPackServed = {
+  "map02/textures/bitterpan_crust_tile_hf_512.png": 428926,
+  "map02/textures/bitterpan_facades_hf_1024.png": 664721,
+  "greenwater/textures/futurisma_horizon_hf_1024.png": 197939,
+};
+let artPackServedBytes = 0;
+for (const [name, expected] of Object.entries(artPackServed)) {
+  const bytes = await readFile(new URL(name, assetsDirectory));
+  assert.equal(
+    bytes.byteLength,
+    expected,
+    `dist/assets/${name} is ${bytes.byteLength} bytes, not the ${expected} the `
+      + "art pack pins. The build copied a different file than the one the "
+      + "validators hashed.",
+  );
+  artPackServedBytes += bytes.byteLength;
+}
+assert.ok(
+  artPackServedBytes <= 2.5 * 1000 * 1000,
+  `The H2a art pack serves ${(artPackServedBytes / 1024).toFixed(1)} KiB, over `
+    + "its 2.5 MB allowance.",
+);
+
+console.log(
+  `Art pack: ${(artPackServedBytes / 1024).toFixed(1)} KiB of served texture `
+    + "across 3 alternate sheets, behind ?art=hf.",
+);
 console.log(
   `Build PASS: ${(shellGzip / 1024).toFixed(1)} KiB gzip shell; ${(
     javascript.rawBytes / 1024

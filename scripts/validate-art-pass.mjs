@@ -238,6 +238,117 @@ for (const [key, expected] of Object.entries(EXPECTED_SHEETS)) {
 }
 
 // ---------------------------------------------------------------------------
+// 2b. H2a — the generated art pack, behind `?art=hf`.
+//
+// Three sheets have an alternate edition prepared by
+// `scripts/prepare-higgsfield-textures.py`. They are NOT ATLAS_REGIONS entries:
+// that manifest is asserted above to describe exactly the ten art-pass sheets,
+// and an alternate edition is not an eleventh sheet — it is the SAME rects over
+// different pixels, which is the only thing that makes it a drop-in.
+//
+// So what is pinned here is (a) each alternate's bytes and dimensions, and
+// (b) the invariant that makes the swap safe: every region rect of the base
+// sheet still lands inside the alternate at the same coordinates and the same
+// size. The rects live in ATLAS_REGIONS.json against the BASE sheet and are
+// never duplicated, so there is nothing for the two to drift apart on — (b) is
+// therefore a dimension check, and it is written out rather than assumed
+// because a re-render of the pack at a different resolution would silently
+// re-scale every UV on the sheet.
+//
+// The base sheets stay served and stay pinned above. `?art=hf` is opt-in and
+// `src/game/art-pack.js` defaults to `base`, so a build in which one of these
+// files is wrong is still a build whose default path is correct — which is
+// exactly why the default is a review gate and not a hedge.
+// ---------------------------------------------------------------------------
+
+const ART_PACK_SHEETS = {
+  // 428,926 bytes. Served at 512, not 1024: a truecolour PNG of this crust
+  // measures 1475.3 KiB at 1024 against a 700 KB item budget, and 512 is still
+  // four times the texel density of the 256 tile it stands in for.
+  bitterpan_crust_tile_hf_512: {
+    base: "bitterpan_crust_tile_256",
+    texture: "/assets/map02/textures/bitterpan_crust_tile_hf_512.png",
+    width: 512,
+    height: 512,
+    bytes: 428926,
+    sha256: "e1fdd16f56f426bcddd0cf6f631b0da949b53ba8dd685589f446b316453c4b98",
+    // The ground tile wraps and is never addressed by region; CRUST_FIELD is
+    // the whole sheet. So this one is deliberately NOT rect-checked against its
+    // base — a 512 tile and a 256 tile cannot share a rect and do not need to.
+    rectsMustMatch: false,
+  },
+  // 664,721 bytes. Three of fifteen regions repainted (SKIN_GALV_RIB,
+  // SKIN_PATCHED, SKIN_CONCRETE); the other twelve are the base sheet's own
+  // pixels, copied through. SKIN_CANVAS is NOT among them on purpose: the
+  // generation for it is a hanging tarp object with grommets and a wall behind
+  // it, not a canvas material, and it cannot tile.
+  bitterpan_facades_hf_1024: {
+    base: "bitterpan_facades_1024",
+    texture: "/assets/map02/textures/bitterpan_facades_hf_1024.png",
+    width: 1024,
+    height: 1024,
+    bytes: 664721,
+    sha256: "472c11931d78abe5376bcd49594f85d3a538dce3c3786e4f2c35a7503ec53555",
+    rectsMustMatch: true,
+  },
+  // 197,939 bytes. Thirteen of sixteen cells redrawn. RIG_FAR keeps its
+  // original pixels because the 4x4 generation carries no second lattice rig,
+  // and SHIMMER_BAND and HAZE_BAND keep theirs because the generated band cells
+  // are PALE gradients: a luminance-to-alpha pass would turn the two cells
+  // whose whole job is to lift the far field into dark ones.
+  futurisma_horizon_hf_1024: {
+    base: "futurisma_horizon_1024",
+    texture: "/assets/greenwater/textures/futurisma_horizon_hf_1024.png",
+    width: 1024,
+    height: 1024,
+    bytes: 197939,
+    sha256: "169c30729904ec20edaa44c33298704bb76ce5c387ba39e8f7f9d6256653c967",
+    rectsMustMatch: true,
+  },
+};
+
+for (const [key, pack] of Object.entries(ART_PACK_SHEETS)) {
+  const bytes = readFileSync(new URL(`public${pack.texture}`, root));
+  assert.equal(
+    bytes.byteLength,
+    pack.bytes,
+    `${key} is ${bytes.byteLength} bytes; the pin says ${pack.bytes}. Re-run `
+      + "`python3 scripts/prepare-higgsfield-textures.py --check` rather than "
+      + "editing the pin: that script is the provenance for these sheets.",
+  );
+  assert.equal(
+    createHash("sha256").update(bytes).digest("hex"),
+    pack.sha256,
+    `${key} on disk is not the sheet prepare-higgsfield-textures.py emits.`,
+  );
+  assert.equal(
+    bytes.subarray(0, 8).toString("hex"),
+    "89504e470d0a1a0a",
+    `${key} is not a PNG.`,
+  );
+  // IHDR width/height, read out of the header rather than trusted to the pin.
+  assert.equal(bytes.readUInt32BE(16), pack.width, `${key} changed width.`);
+  assert.equal(bytes.readUInt32BE(20), pack.height, `${key} changed height.`);
+
+  const base = atlas[pack.base];
+  assert.ok(base, `${key} names ${pack.base}, which ATLAS_REGIONS does not.`);
+  if (!pack.rectsMustMatch) continue;
+  assert.equal(
+    pack.width, base.width,
+    `${key} is ${pack.width} wide against ${pack.base}'s ${base.width}. The `
+      + "alternate has to be the same size as the sheet it stands in for, or "
+      + "every UV rect on it addresses different pixels.",
+  );
+  assert.equal(pack.height, base.height, `${key} changed height against its base.`);
+  for (const [name, region] of Object.entries(base.regions)) {
+    assert.ok(
+      region.x + region.w <= pack.width && region.y + region.h <= pack.height,
+      `${pack.base}/${name} runs off ${key}.`,
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
 // 3. The opening-surface decals.
 // ---------------------------------------------------------------------------
 

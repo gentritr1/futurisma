@@ -1394,6 +1394,34 @@ const SHEET_PROBES = [
     probe: { x: 152, y: 165 },
     zone: "PAN_MESA_LINE",
   },
+  // H2a. The `?art=hf` edition of the horizon sheet, at the SAME probe as the
+  // base edition above — deliberately the same, so the two rows are directly
+  // comparable and the assertion reads as "the alternate sheet answers the
+  // orientation probe the same way the sheet it stands in for does".
+  //
+  // The P20.8 defect this pins is a property of the SHEET, not of the loader:
+  // `atlasRect` counts rows from the top of the PNG, the sampler reaches them
+  // through `flipY = false`, and a sheet whose cells were composed bottom-up
+  // would draw every card mirrored with no code change anywhere. An alternate
+  // edition is exactly the kind of thing that reintroduces it, because the
+  // temptation when writing one is to compose in image-natural order and let
+  // the loader sort it out. So the alternate is probed, not trusted.
+  //
+  // Measured at (152, 165) of MESA_LONG: drawn alpha 255 with a 11x11
+  // neighbourhood minimum of 255, mirrored alpha 0 across the same
+  // neighbourhood. The base sheet passes the same probe at 204 with an edge
+  // inside its neighbourhood, which is worth recording: the base probe is
+  // marginal where this one is not, and if the base one ever has to move, this
+  // row does not have to move with it.
+  {
+    sheet: "futurisma_horizon_hf_1024",
+    sheetSize: 1024,
+    columns: 4,
+    cell: { slot: 12, name: "MESA_LONG" },
+    mirror: { slot: 0, name: "TREELINE_DENSE" },
+    probe: { x: 152, y: 165 },
+    zone: "PAN_MESA_LINE",
+  },
 ];
 
 // (1) The runtime's two halves of the convention. Neither is inferable from the
