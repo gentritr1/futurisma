@@ -439,6 +439,18 @@ export class EngineAudio {
   }
 
   /**
+   * G1 - the slipstream locking on. Deliberately the quiet inverse of
+   * `playBoost`: boost is a low sawtooth shove with a bright spike on top, this
+   * is a soft rising sine pair at half the level, because catching a tow is a
+   * thing that happens TO the craft rather than something the driver fires. One
+   * cue, fired on the lock edge only, so a lap spent drafting does not chatter.
+   */
+  playSlipstreamLock(): void {
+    this.playTone(228, 0.17, 0.018, "sine", 0, 1.42);
+    this.playTone(342, 0.22, 0.013, "triangle", 0.05, 1.34);
+  }
+
+  /**
    * One cue serves both drift edges. Entry keeps the original 210 Hz square
    * blip (`releaseCharge` 0); a rewarded release replays the same one-shot
    * pitched and opened up by the bank it paid out, so a big drift cashes in an

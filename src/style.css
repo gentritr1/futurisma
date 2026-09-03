@@ -409,6 +409,69 @@ body[data-graphics-context="lost"] .system-state__lamp {
   pointer-events: none;
 }
 
+/*
+ * G1 slipstream chip. Sits directly above the plasma reserve, because the two
+ * are one economy: the tow is what refills the bar under it. Same uppercase
+ * mono the rest of the HUD speaks, same cyan the route reads in, and it only
+ * exists on screen while a tow is actually being had - PRODUCT.md's HUD
+ * anti-reference is chrome that competes with the racing line, so a chip that
+ * is lit whenever you are behind anyone would be exactly that.
+ *
+ * State is carried twice over, never by colour alone: the label brightens and
+ * gains a `LOCK` suffix at the lock threshold, and the bar under it fills.
+ */
+.slipstream {
+  position: absolute;
+  left: 50%;
+  bottom: calc(clamp(22px, 4vh, 44px) + 34px);
+  width: min(320px, 40vw);
+  transform: translateX(-50%);
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  color: var(--dim);
+  opacity: 0;
+  transition: opacity 160ms var(--ease-out);
+  pointer-events: none;
+}
+
+.slipstream[data-active="true"] {
+  opacity: 1;
+  color: var(--muted);
+}
+
+.slipstream[data-locked="true"] {
+  color: var(--cyan);
+  text-shadow: 0 0 7px oklch(0.86 0.13 210 / 0.5);
+}
+
+.slipstream__track {
+  display: block;
+  height: 2px;
+  margin-top: 5px;
+  background: oklch(0.8 0.02 210 / 0.16);
+  overflow: hidden;
+}
+
+.slipstream__track span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform: scaleX(0);
+  transform-origin: left center;
+  background: var(--cyan);
+}
+
+.slipstream[data-locked="true"] .slipstream__track span {
+  box-shadow: 0 0 6px oklch(0.86 0.13 210 / 0.7);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slipstream {
+    transition: none;
+  }
+}
+
 .boost__track span[data-active="true"] {
   background: var(--cyan);
   box-shadow: 0 0 7px oklch(0.86 0.13 210 / 0.62);
@@ -1248,6 +1311,11 @@ body[data-options="true"] .hud {
 
   .boost {
     bottom: 24px;
+    width: 52vw;
+  }
+
+  .slipstream {
+    bottom: 58px;
     width: 52vw;
   }
 

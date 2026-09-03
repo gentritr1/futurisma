@@ -158,7 +158,43 @@ function rivalFields(
     rivalMinimumSeparationMeters: Number(
       (rivals?.minimumSeparationMeters ?? 0).toFixed(2),
     ),
+    // G1 - split out because the player half of the pair depends on how the
+    // player drives, while the rival-versus-rival half is entirely the fleet's
+    // to hold. A soak that regresses one and not the other says which.
+    rivalMinimumRivalSeparationMeters: Number(
+      (rivals?.minimumRivalSeparationMeters ?? 0).toFixed(2),
+    ),
+    rivalClosestApproach: rivals?.closestApproach
+      ? {
+        id: rivals.closestApproach.id,
+        longitudinalMeters: Number(rivals.closestApproach.longitudinalMeters.toFixed(2)),
+        lateralMeters: Number(rivals.closestApproach.lateralMeters.toFixed(2)),
+        courseDistanceMeters: Math.round(rivals.closestApproach.courseDistanceMeters),
+        lap: rivals.closestApproach.lap,
+      }
+      : null,
     rivalCatchUpMultiplier: rivals?.catchUpMultiplier ?? 1,
+    // G1 - PRODUCT.md principle 5, measured. `minimumFreeDeckTargetFraction` is
+    // the geometric ceiling on the narrowest deck the sample visited: on a deck
+    // under 22 m a single craft cannot leave 40% clear whatever lane it takes.
+    rivalMinimumFreeDeckFraction: Number(
+      (rivals?.minimumFreeDeckFraction ?? 1).toFixed(4),
+    ),
+    rivalMinimumClearFreeDeckFraction: Number(
+      (rivals?.minimumClearFreeDeckFraction ?? 1).toFixed(4),
+    ),
+    rivalMinimumFreeDeckTargetFraction: Number(
+      (rivals?.minimumFreeDeckTargetFraction ?? 1).toFixed(4),
+    ),
+    rivalFreeDeckSamples: rivals?.freeDeckSamples ?? 0,
+    rivalFreeDeckAlongsideSamples: rivals?.freeDeckAlongsideSamples ?? 0,
+    rivalLeadChanges: rivals?.leadChanges ?? 0,
+    // G1 slipstream telemetry. Owned by the fleet, because the fleet is what
+    // supplies the tow.
+    slipstream: Number((rivals?.slipstream ?? 0).toFixed(3)),
+    slipstreamSeconds: Number((rivals?.slipstreamSeconds ?? 0).toFixed(2)),
+    slipstreamPeak: Number((rivals?.slipstreamPeak ?? 0).toFixed(3)),
+    slipstreamLocks: rivals?.slipstreamLocks ?? 0,
     rivalArticulatedGroups: rivals?.articulatedGroups ?? [],
     // Peak fin deflection seen since the last reset. A soak that leaves this at
     // zero has rivals whose control surfaces never moved, whatever the frame
@@ -170,6 +206,7 @@ function rivalFields(
       id: entry.id,
       steerRadians: Number(entry.steerRadians.toFixed(4)),
       brakeRadians: Number(entry.brakeRadians.toFixed(4)),
+      driftSignal: Number(entry.driftSignal.toFixed(3)),
     })),
     rivals: (rivals?.states ?? []).map((state) => ({
       ...state,
@@ -179,6 +216,14 @@ function rivalFields(
       finishTimeMs: state.finishTimeMs === null
         ? null
         : Math.round(state.finishTimeMs),
+      // G1 - a rival's own lap times and tool use, so a soak can prove the
+      // calibration and the pads/boost/drift counts without a second harness.
+      lapTimesMs: state.lapTimesMs.map((lap) => Math.round(lap)),
+      boostSeconds: Number(state.boostSeconds.toFixed(2)),
+      boostReserve: Number(state.boostReserve.toFixed(3)),
+      padHits: state.padHits,
+      driftEntries: state.driftEntries,
+      driftSeconds: Number(state.driftSeconds.toFixed(2)),
     })),
   };
 }

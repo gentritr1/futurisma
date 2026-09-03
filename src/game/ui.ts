@@ -6,7 +6,7 @@ import {
   resolveInitialRacePresentation,
   resolveRaceStage,
 } from "./hud-presentation.js";
-import { DRIFT_REWARD_MINIMUM_CHARGE } from "./physics";
+import { DRIFT_REWARD_MINIMUM_CHARGE, SLIPSTREAM_LOCK_THRESHOLD } from "./physics";
 
 export interface HudFrame {
   speedKph: number;
@@ -31,6 +31,8 @@ export interface HudFrame {
   boostActive: boolean;
   boostLocked: boolean;
   driftCharge: number;
+  /** G1 - tow strength from the craft ahead, 0..1. */
+  slipstream: number;
   braking: boolean;
   drifting: boolean;
   skidsDown: boolean;
@@ -127,6 +129,11 @@ export class GameUi {
   private readonly boostValue = requiredElement<HTMLElement>("boost-value");
   private readonly boostFill = requiredElement<HTMLElement>("boost-fill");
   private readonly driftChargeFill = requiredElement<HTMLElement>("drift-charge");
+  private readonly slipstreamChip = requiredElement<HTMLElement>("slipstream-chip");
+  private readonly slipstreamLabel = requiredElement<HTMLElement>(
+    "slipstream-chip",
+  ).querySelector<HTMLElement>(".slipstream__label")!;
+  private readonly slipstreamFill = requiredElement<HTMLElement>("slipstream-fill");
   private readonly edgeWarning = requiredElement<HTMLElement>("edge-warning");
   private readonly edgeWarningLabel = requiredElement<HTMLElement>("edge-warning-label");
   private readonly edgeWarningFill = requiredElement<HTMLElement>("edge-warning-fill");
@@ -150,6 +157,7 @@ export class GameUi {
   private lastDriveState = "";
   private lastBoostState = "";
   private lastDriftArmed: boolean | null = null;
+  private lastSlipstreamState = "";
   private lastEdgeState = "";
   private lastEdgeLabel = "";
   private lastTurnState = "";
@@ -522,6 +530,27 @@ export class GameUi {
     if (driftArmed !== this.lastDriftArmed) {
       this.boostMeter.dataset.charge = driftArmed ? "armed" : "idle";
       this.lastDriftArmed = driftArmed;
+    }
+    // The chip's fill tracks every frame; its state words only touch the DOM on
+    // a threshold crossing, the same discipline the boost meter uses.
+    const slipstream = Math.min(1, Math.max(0, frame.slipstream));
+    this.slipstreamFill.style.transform = `scaleX(${slipstream})`;
+    const slipstreamState = slipstream <= 0
+      ? "idle"
+      : slipstream >= SLIPSTREAM_LOCK_THRESHOLD
+        ? "locked"
+        : "active";
+    if (slipstreamState !== this.lastSlipstreamState) {
+      this.slipstreamChip.dataset.active = slipstreamState === "idle" ? "false" : "true";
+      this.slipstreamChip.dataset.locked = slipstreamState === "locked" ? "true" : "false";
+      this.slipstreamChip.setAttribute(
+        "aria-hidden",
+        slipstreamState === "idle" ? "true" : "false",
+      );
+      this.slipstreamLabel.textContent = slipstreamState === "locked"
+        ? "SLIPSTREAM · LOCK"
+        : "SLIPSTREAM";
+      this.lastSlipstreamState = slipstreamState;
     }
     const boostPresentation = resolveBoostPresentation(frame.boostActive, frame.boostLocked);
     const boostState = boostPresentation.state;

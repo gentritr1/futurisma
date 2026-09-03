@@ -9,6 +9,7 @@ function simulateSpeed({
   boostActive,
   steer = 0,
   startingSpeed = 0,
+  slipstream = 0,
 }) {
   let speed = startingSpeed;
   const iterations = Math.round(seconds / step);
@@ -25,6 +26,7 @@ function simulateSpeed({
       boostActive,
       drift,
       step,
+      slipstream,
     );
   }
   return speed;
@@ -946,6 +948,188 @@ assert.equal(
   farmedCommitments,
   200,
   "A drift held past the minimum must pay every time, not intermittently.",
+);
+
+// ---------------------------------------------------------------------------
+// G1 slipstream
+// ---------------------------------------------------------------------------
+
+// Shape, at the four corners of the authored window.
+assert.equal(
+  physics.calculateSlipstream(10, 0.5, 0.9),
+  1,
+  "Squarely in the wake and on the line must be a full tow.",
+);
+assert.equal(
+  physics.calculateSlipstream(30, 0, 0.9),
+  0,
+  "Past SLIPSTREAM_FADE_METERS there is no tow at all.",
+);
+assert.equal(
+  physics.calculateSlipstream(10, 3, 0.9),
+  0,
+  "Past SLIPSTREAM_LATERAL_FADE_METERS off the line there is no tow at all.",
+);
+assert.equal(
+  physics.calculateSlipstream(10, 0, 0.3),
+  0,
+  "Below SLIPSTREAM_MINIMUM_SPEED_RATIO a crawling craft gets no tow.",
+);
+
+// Boundaries and monotonicity: the window has to be continuous, or the HUD chip
+// and the drag term would both flicker on the edge of it.
+assert.equal(physics.calculateSlipstream(0, 0, 0.9), 0);
+assert.equal(physics.calculateSlipstream(physics.SLIPSTREAM_NEAR_METERS, 0, 0.9), 1);
+assert.equal(physics.calculateSlipstream(physics.SLIPSTREAM_FULL_METERS, 0, 0.9), 1);
+assert.equal(physics.calculateSlipstream(physics.SLIPSTREAM_FADE_METERS, 0, 0.9), 0);
+assert.equal(
+  physics.calculateSlipstream(10, physics.SLIPSTREAM_LATERAL_FULL_METERS, 0.9),
+  1,
+);
+assert.equal(
+  physics.calculateSlipstream(10, physics.SLIPSTREAM_LATERAL_FADE_METERS, 0.9),
+  0,
+);
+assert.equal(
+  physics.calculateSlipstream(10, -0.5, 0.9),
+  physics.calculateSlipstream(10, 0.5, 0.9),
+  "The lateral window must be symmetric about the rival's line.",
+);
+assert.equal(
+  physics.calculateSlipstream(physics.SLIPSTREAM_MINIMUM_SPEED_RATIO * 0 + 10, 0, physics.SLIPSTREAM_MINIMUM_SPEED_RATIO),
+  0,
+  "The speed gate opens AT the minimum ratio, not below it.",
+);
+// Never NaN, never out of range, whatever it is handed.
+for (const [distance, lateral, ratio] of [
+  [Number.NaN, 0, 0.9],
+  [10, Number.NaN, 0.9],
+  [10, 0, Number.NaN],
+  [-10, 0, 0.9],
+  [Infinity, 0, 0.9],
+]) {
+  const value = physics.calculateSlipstream(distance, lateral, ratio);
+  assert.ok(
+    Number.isFinite(value) && value >= 0 && value <= 1,
+    `calculateSlipstream(${distance}, ${lateral}, ${ratio}) returned ${value}.`,
+  );
+}
+let previousTow = 1;
+for (let distance = physics.SLIPSTREAM_FULL_METERS; distance <= physics.SLIPSTREAM_FADE_METERS; distance += 0.5) {
+  const tow = physics.calculateSlipstream(distance, 0, 0.9);
+  assert.ok(tow <= previousTow + 1e-12, "The tow must fall off monotonically.");
+  previousTow = tow;
+}
+
+/**
+ * What the tow is worth, measured rather than asserted from the constant.
+ *
+ * `SLIPSTREAM_CRUISE_BONUS` lifts the cruise CAP by 6% - the knee where
+ * overspeed drag starts, 86 -> 91.16 m/s - which is not the same thing as a 6%
+ * higher top speed. Both numbers are pinned so a later edit to the drag model
+ * cannot quietly change what a draft is worth while the constant still reads
+ * 0.06. CRUISE_MAX_SPEED and BOOST_MAX_SPEED themselves are untouched: the tow
+ * is a bonus over the authored cruise, never a change to it.
+ */
+const towedCruise120 = simulateSpeed({
+  seconds: 60,
+  step: 1 / 120,
+  throttle: 1,
+  brake: 0,
+  boostActive: false,
+  slipstream: 1,
+});
+const towedCruise60 = simulateSpeed({
+  seconds: 60,
+  step: 1 / 60,
+  throttle: 1,
+  brake: 0,
+  boostActive: false,
+  slipstream: 1,
+});
+const plainCruise60s = simulateSpeed({
+  seconds: 60,
+  step: 1 / 120,
+  throttle: 1,
+  brake: 0,
+  boostActive: false,
+});
+assert.equal(physics.CRUISE_MAX_SPEED, 86, "The authored cruise cap must not move.");
+assert.equal(physics.BOOST_MAX_SPEED, 112, "The authored boost cap must not move.");
+assert.equal(
+  Number((physics.CRUISE_MAX_SPEED * (1 + physics.SLIPSTREAM_CRUISE_BONUS)).toFixed(2)),
+  91.16,
+  "Full tow must lift the effective cruise cap 86 -> 91.16 m/s.",
+);
+assert.equal(
+  Number(plainCruise60s.toFixed(2)),
+  91.79,
+  "Terminal cruise with no tow moved; re-pin only with a deliberate drag change.",
+);
+assert.equal(
+  Number(towedCruise120.toFixed(2)),
+  95.85,
+  "Terminal cruise at full tow moved; re-pin only with a deliberate drag change.",
+);
+assert.ok(
+  towedCruise120 > plainCruise60s,
+  "A full tow must be worth speed.",
+);
+assert.ok(
+  Math.abs(towedCruise120 - towedCruise60) < 0.001,
+  `Towed cruise drifts ${Math.abs(towedCruise120 - towedCruise60).toFixed(5)} m/s `
+    + "between 60 Hz and 120 Hz.",
+);
+assert.equal(
+  simulateSpeed({
+    seconds: 60,
+    step: 1 / 120,
+    throttle: 1,
+    brake: 0,
+    boostActive: false,
+    slipstream: 0,
+  }),
+  plainCruise60s,
+  "Zero tow must be byte-identical to the pre-G1 integrator.",
+);
+
+// The reserve half of the tow: regen doubles, drain is untouched.
+const regenNoTow = physics.integrateBoostReserve(0, false, 1, 0, 0);
+const regenFullTow = physics.integrateBoostReserve(0, false, 1, 0, 1);
+assert.equal(regenNoTow, physics.BOOST_RESERVE_REGEN_RATE);
+assert.equal(
+  Number(regenFullTow.toFixed(6)),
+  Number((physics.BOOST_RESERVE_REGEN_RATE * 2).toFixed(6)),
+  "A full tow must double reserve regen.",
+);
+assert.equal(
+  physics.integrateBoostReserve(1, true, 1, 0, 1),
+  physics.integrateBoostReserve(1, true, 1, 0, 0),
+  "A tow must not change the drain rate; drafting is not free boost.",
+);
+let towedReserve120 = 0;
+let towedReserve60 = 0;
+for (let index = 0; index < 120 * 6; index += 1) {
+  towedReserve120 = physics.integrateBoostReserve(towedReserve120, false, 1 / 120, 0, 0.6);
+}
+for (let index = 0; index < 60 * 6; index += 1) {
+  towedReserve60 = physics.integrateBoostReserve(towedReserve60, false, 1 / 60, 0, 0.6);
+}
+assert.ok(
+  Math.abs(towedReserve120 - towedReserve60) < 0.001,
+  `Towed reserve drifts ${Math.abs(towedReserve120 - towedReserve60).toFixed(6)} `
+    + "between 60 Hz and 120 Hz.",
+);
+
+console.log(
+  `Slipstream PASS: full tow inside ${physics.SLIPSTREAM_NEAR_METERS}-`
+    + `${physics.SLIPSTREAM_FULL_METERS} m and ${physics.SLIPSTREAM_LATERAL_FULL_METERS} m `
+    + `of the line, gone by ${physics.SLIPSTREAM_FADE_METERS} m / `
+    + `${physics.SLIPSTREAM_LATERAL_FADE_METERS} m; cruise cap 86 -> 91.16 m/s, `
+    + `terminal cruise ${plainCruise60s.toFixed(2)} -> ${towedCruise120.toFixed(2)} m/s `
+    + `(+${((towedCruise120 / plainCruise60s - 1) * 100).toFixed(2)}%), regen `
+    + `${physics.BOOST_RESERVE_REGEN_RATE} -> ${regenFullTow.toFixed(3)} per second; `
+    + `60/120 Hz drift ${Math.abs(towedCruise120 - towedCruise60).toFixed(5)} m/s.`,
 );
 
 console.log(

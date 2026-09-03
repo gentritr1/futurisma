@@ -218,6 +218,8 @@ export class FuturismaGame {
   private recoveryImmunity = 0;
   private hazardTripCooldown = 0;
   private padBoostTime = 0;
+  /** G1 - the tow the fleet measured on the last fixed step, 0..1. */
+  private slipstream = 0;
   private impactShake = 0;
   private physicsAccumulator = 0;
   private adaptiveQualityDebt = 0;
@@ -505,6 +507,8 @@ export class FuturismaGame {
   };
 
   private readDemoInput(): InputFrame {
+    const fleet = this.rivalFleet;
+    this.autopilot.setDraft(fleet?.draftDistanceMeters ?? Infinity, fleet?.draftLateralMeters ?? Infinity, this.slipstream, FIXED_STEP);
     return this.autopilot.read(
       this.position,
       this.forward,
@@ -532,18 +536,11 @@ export class FuturismaGame {
       if (this.phase === "countdown") this.updateCountdown(FIXED_STEP);
       if (this.phase === "resuming") this.updateResumeCountdown(FIXED_STEP);
       if (this.phase === "running") {
-        this.rivalFleet?.step(
-          FIXED_STEP,
-          this.playerRaceDistance(),
-          this.lateral,
-        );
+        // Fleet first: `updateRace` reads the tow it measured for this step.
+        this.rivalFleet?.step(FIXED_STEP, this.playerRaceDistance(), this.lateral, this.speed);
         this.updateRace(FIXED_STEP, this.resolveRaceInput(input));
       } else if (this.phase === "finished") {
-        this.rivalFleet?.step(
-          FIXED_STEP,
-          this.playerRaceDistance(),
-          this.lateral,
-        );
+        this.rivalFleet?.step(FIXED_STEP, this.playerRaceDistance(), this.lateral, this.speed);
         this.updateCoast(FIXED_STEP);
       }
       this.physicsAccumulator -= FIXED_STEP;
@@ -758,6 +755,9 @@ export class FuturismaGame {
       );
       this.input.pulse(0.24, 0.12, 90);
     }
+    const slipstream = this.rivalFleet?.slipstreamStrength ?? 0;
+    if (this.rivalFleet?.slipstreamLocked) this.audio.playSlipstreamLock();
+    this.slipstream = slipstream;
     this.speed = integrateSpeed(
       this.speed,
       input.throttle,
@@ -765,6 +765,7 @@ export class FuturismaGame {
       this.boostActive,
       driftIntent,
       delta,
+      slipstream,
     );
     if (this.diagnosticsMode) {
       this.diagnosticDistanceTravelled += this.speed * delta;
@@ -773,7 +774,7 @@ export class FuturismaGame {
       if (this.driftActive) this.diagnosticDriftSeconds += delta;
     }
 
-    this.boostReserve = integrateBoostReserve(this.boostReserve, reserveBoost, delta, driftReward);
+    this.boostReserve = integrateBoostReserve(this.boostReserve, reserveBoost, delta, driftReward, slipstream);
 
     this.steerAmount = integrateSteering(
       this.steerAmount,
@@ -1400,6 +1401,7 @@ export class FuturismaGame {
       boostActive: this.boostActive,
       boostLocked: this.boostLockedUntilRelease,
       driftCharge: this.driftBank.charge,
+      slipstream: this.slipstream,
       braking: input.brake > 0.1,
       drifting: this.driftActive,
       skidsDown: this.speed < 11,
@@ -1524,6 +1526,7 @@ export class FuturismaGame {
     this.driftIntensity = 0;
     this.surfaceGrip = 1;
     this.padBoostTime = 0;
+    this.slipstream = 0;
     this.autopilot.reset();
     this.lap = 1;
     this.elapsedMs = 0;

@@ -1,0 +1,69 @@
+{
+  "format": "FUTURISMA_GREENWATER_RIVAL_PACE",
+  "version": "1.0",
+  "map": "GREENWATER",
+  "note": "G1 rival pace. Solved, not guessed: node scripts/rival-pace-calibration.mjs greenwater prints the table, --solve-corner and --solve re-derive these numbers against a freshly measured demo lap. The script's header carries the full derivation; it does not ship, this file does.",
+  "rivals": {
+    "cornerSpeedGain": 0.7738,
+    "cornerSpeedFloor": 0.45,
+    "noBlockSide": -1,
+    "driftCurvature": 0.55,
+    "straightCurvature": 0.13,
+    "profiles": {
+      "rival-privateer": {
+        "cruiseSpeedMetersPerSecond": 88.0,
+        "padUse": true,
+        "boostWindows": [
+          {
+            "fromMeters": 0,
+            "toMeters": 150
+          },
+          {
+            "fromMeters": 1730,
+            "toMeters": 1960
+          },
+          {
+            "fromMeters": 2300,
+            "toMeters": 2480
+          }
+        ]
+      },
+      "rival-nightform": {
+        "cruiseSpeedMetersPerSecond": 83.52,
+        "padUse": true,
+        "boostWindows": [
+          {
+            "fromMeters": 0,
+            "toMeters": 175
+          },
+          {
+            "fromMeters": 1770,
+            "toMeters": 1990
+          },
+          {
+            "fromMeters": 2340,
+            "toMeters": 2495
+          }
+        ]
+      },
+      "rival-needle": {
+        "cruiseSpeedMetersPerSecond": 82.79,
+        "padUse": true,
+        "boostWindows": [
+          {
+            "fromMeters": 0,
+            "toMeters": 190
+          },
+          {
+            "fromMeters": 1710,
+            "toMeters": 1930
+          },
+          {
+            "fromMeters": 2280,
+            "toMeters": 2460
+          }
+        ]
+      }
+    }
+  }
+}

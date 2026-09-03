@@ -40,9 +40,18 @@ assert.ok(
   javascript.rawBytes <= 950 * 1024,
   `Initial JavaScript exceeds 950 KiB raw (${(javascript.rawBytes / 1024).toFixed(1)} KiB).`,
 );
+// Re-baselined for G1 (rivals that race + the player slipstream) from a
+// measured 227.6 KiB gzip, against 224.2 KiB on the commit before the phase.
+// The 3.4 KiB buys: the per-map rival pace model with its boost-reserve, pad
+// and drift economies, the lane constraint solver that keeps the field off the
+// player and off each other, `calculateSlipstream` and its two integrator
+// terms, the HUD chip, and the rival/slipstream telemetry the soaks read. The
+// pace data itself is ~0.6 KiB of that. Measured with
+// `npx vite build && node scripts/validate-build.mjs`; raise only with a fresh
+// measurement and a note saying what the bytes bought.
 assert.ok(
-  javascriptGzip <= 225 * 1024,
-  `JavaScript bundle exceeds 225 KiB gzip (${(javascriptGzip / 1024).toFixed(1)} KiB).`,
+  javascriptGzip <= 229 * 1024,
+  `JavaScript bundle exceeds 229 KiB gzip (${(javascriptGzip / 1024).toFixed(1)} KiB).`,
 );
 // Re-baselined 2026-08-28 from a measured 4.35 KiB gzip (the 4 KiB ceiling predated
 // the HUD turn-cue and hazard styling) plus headroom for the planned minimap and
@@ -51,9 +60,12 @@ assert.ok(
   stylesheetGzip <= 8 * 1024,
   `Stylesheet exceeds 8 KiB gzip (${(stylesheetGzip / 1024).toFixed(1)} KiB).`,
 );
+// Re-baselined alongside the JavaScript ceiling above, from a measured
+// 235.8 KiB gzip (HTML 3.1 + JS 227.6 + CSS 5.1). The stylesheet grew 0.75 KiB
+// for the SLIPSTREAM chip and still sits well under its own 8 KiB ceiling.
 assert.ok(
-  shellGzip <= 235 * 1024,
-  `Initial app shell exceeds 235 KiB gzip (${(shellGzip / 1024).toFixed(1)} KiB).`,
+  shellGzip <= 239 * 1024,
+  `Initial app shell exceeds 239 KiB gzip (${(shellGzip / 1024).toFixed(1)} KiB).`,
 );
 assert.ok(
   html.includes('rel="preload"')

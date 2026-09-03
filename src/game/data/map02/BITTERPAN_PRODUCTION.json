@@ -578,5 +578,69 @@
     "baseDistanceMetres": 900,
     "radiusMultiplier": 8,
     "maximumDistanceMetres": 1800
+  },
+  "rivals": {
+    "note": "G1 rival pace. Solved, not guessed: node scripts/rival-pace-calibration.mjs bitterpan prints the table, --solve-corner and --solve re-derive these numbers against a freshly measured demo lap. The script's header carries the full derivation; it does not ship, this file does.",
+    "cornerSpeedGain": 0.4537,
+    "cornerSpeedFloor": 0.45,
+    "noBlockSide": -1,
+    "driftCurvature": 0.72,
+    "straightCurvature": 0.13,
+    "profiles": {
+      "rival-privateer": {
+        "cruiseSpeedMetersPerSecond": 86.0,
+        "padUse": true,
+        "boostWindows": [
+          {
+            "fromMeters": 0,
+            "toMeters": 140
+          },
+          {
+            "fromMeters": 420,
+            "toMeters": 570
+          },
+          {
+            "fromMeters": 1650,
+            "toMeters": 1800
+          }
+        ]
+      },
+      "rival-nightform": {
+        "cruiseSpeedMetersPerSecond": 86.18,
+        "padUse": true,
+        "boostWindows": [
+          {
+            "fromMeters": 0,
+            "toMeters": 165
+          },
+          {
+            "fromMeters": 480,
+            "toMeters": 630
+          },
+          {
+            "fromMeters": 1720,
+            "toMeters": 1870
+          }
+        ]
+      },
+      "rival-needle": {
+        "cruiseSpeedMetersPerSecond": 84.72,
+        "padUse": true,
+        "boostWindows": [
+          {
+            "fromMeters": 0,
+            "toMeters": 190
+          },
+          {
+            "fromMeters": 360,
+            "toMeters": 510
+          },
+          {
+            "fromMeters": 1880,
+            "toMeters": 2030
+          }
+        ]
+      }
+    }
   }
 }

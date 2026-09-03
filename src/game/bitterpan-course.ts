@@ -20,6 +20,7 @@ import type {
   MusicProfile,
   RaceCourse,
   RivalGridStart,
+  RivalPaceTable,
   TimeOfDayStop,
   TurnCue,
 } from "./course";
@@ -207,6 +208,8 @@ interface BitterpanProductionData {
     lateralHalfFraction: number;
     pads: BitterpanBoostPad[];
   };
+  /** G1 rival pace, solved by scripts/rival-pace-calibration.mjs. */
+  rivals: RivalPaceTable;
   music: { triggers: BitterpanMusicTrigger[] };
   audio: {
     zones: { name: AudioZone; startDistance: number; endDistance: number }[];
@@ -416,6 +419,9 @@ export class BitterpanCourse implements RaceCourse {
   readonly recoveryImmunitySeconds = 1.2;
   readonly surfaceGripRecoverySeconds = PRODUCTION.hazards.gripRecoverySeconds;
   readonly timeOfDayStops: readonly TimeOfDayStop[] = PRODUCTION.timeOfDay.stops;
+  // G1 - the rival pace block, authored under the production sheet's `rivals`
+  // key so the map ships its own racing character with the rest of its data.
+  readonly rivalPace: RivalPaceTable = PRODUCTION.rivals;
 
   private readonly stations = CENTRELINE.stations;
   private readonly projectionPoints = this.stations.map(
@@ -810,6 +816,28 @@ export class BitterpanCourse implements RaceCourse {
       }
     }
     return 0;
+  }
+
+  boostPadLaneAt(
+    courseDistanceMeters: number,
+    halfWidth: number,
+    approachMeters: number,
+  ): number | null {
+    const distance = THREE.MathUtils.euclideanModulo(courseDistanceMeters, this.length);
+    const pads = PRODUCTION.boostPads;
+    let lane: number | null = null;
+    let nearest = Infinity;
+    for (const pad of pads.pads) {
+      const gap = THREE.MathUtils.euclideanModulo(
+        pad.distance - distance + this.length / 2,
+        this.length,
+      ) - this.length / 2;
+      if (gap > approachMeters || gap < -pads.halfLengthMetres) continue;
+      if (Math.abs(gap) >= nearest) continue;
+      nearest = Math.abs(gap);
+      lane = pad.lateralFraction * halfWidth;
+    }
+    return lane;
   }
 
   isOnBoostPad(progress: number, lateral: number, halfWidth: number): boolean {

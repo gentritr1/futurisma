@@ -21,6 +21,40 @@ export const DRIFT_REWARD_MINIMUM_CHARGE = 0.35;
 export const DRIFT_RELEASE_REWARD = 0.3;
 export const BOOST_RESERVE_DRAIN_RATE = 0.26;
 export const BOOST_RESERVE_REGEN_RATE = 0.045;
+
+/*
+ * G1 slipstream. Sitting in a rival's wake is the one tool the player has for
+ * fighting a car that is quicker in a straight line, so it pays in the two
+ * currencies the drive is made of: a higher effective cruise cap and a faster
+ * refill of the reserve that buys the pass.
+ *
+ * The shape is a distance window times a lateral window times a speed gate:
+ *   - full tow from SLIPSTREAM_NEAR to SLIPSTREAM_FULL metres behind, ramping
+ *     in from nothing at zero (past that you are alongside, not drafting) and
+ *     out to nothing at SLIPSTREAM_FADE;
+ *   - full inside SLIPSTREAM_LATERAL_FULL of the rival's line, out to nothing
+ *     at SLIPSTREAM_LATERAL_FADE;
+ *   - nothing at all below SLIPSTREAM_MINIMUM_SPEED_RATIO of BOOST_MAX_SPEED,
+ *     so a crawling player gets no tow.
+ */
+export const SLIPSTREAM_NEAR_METERS = 4;
+export const SLIPSTREAM_FULL_METERS = 16;
+export const SLIPSTREAM_FADE_METERS = 26;
+export const SLIPSTREAM_LATERAL_FULL_METERS = 1.5;
+export const SLIPSTREAM_LATERAL_FADE_METERS = 2.6;
+export const SLIPSTREAM_MINIMUM_SPEED_RATIO = 0.45;
+export const SLIPSTREAM_SPEED_RATIO_RAMP = 0.55;
+/**
+ * Share the effective cruise cap is lifted by at full tow: 86 -> 91.16 m/s.
+ * The cap is the knee where overspeed drag starts biting, not a hard limit, so
+ * the measured terminal cruise moves 91.79 -> 95.85 m/s (+4.4%) - see
+ * `scripts/validate-physics.mjs`, which pins both numbers.
+ */
+export const SLIPSTREAM_CRUISE_BONUS = 0.06;
+/** Reserve regen multiplier at full tow: +100%, i.e. 0.045 -> 0.09 per second. */
+export const SLIPSTREAM_REGEN_BONUS = 1;
+/** Where the HUD chip reads as locked and the audio cue fires. */
+export const SLIPSTREAM_LOCK_THRESHOLD = 0.8;
 const OVERSPEED_DRAG_RATE = 0.45;
 const COAST_BASE_DECELERATION = 10;
 const COAST_SPEED_DRAG_RATE = 0.55;
@@ -63,12 +97,48 @@ export function resolveDriftActive(previousActive, driftIntent) {
 }
 
 /**
+ * Tow strength behind the craft ahead, 0..1.
+ *
+ * Pure and allocation free: `updateRace` calls it three times a step, once per
+ * rival, from race-distance fields it already has.
+ *
+ * @param {number} distanceBehindMeters positive when the other craft is ahead
+ * @param {number} lateralGapMeters signed offset between the two lines
+ * @param {number} speedRatio player speed over {@link BOOST_MAX_SPEED}
+ * @returns {number} clamped to [0, 1]
+ */
+export function calculateSlipstream(distanceBehindMeters, lateralGapMeters, speedRatio) {
+  const distance = Number.isFinite(distanceBehindMeters) ? distanceBehindMeters : 0;
+  const lateral = Number.isFinite(lateralGapMeters) ? Math.abs(lateralGapMeters) : Infinity;
+  const ratio = Number.isFinite(speedRatio) ? speedRatio : 0;
+  if (distance <= 0 || distance >= SLIPSTREAM_FADE_METERS) return 0;
+  if (lateral >= SLIPSTREAM_LATERAL_FADE_METERS) return 0;
+  const longitudinal = distance < SLIPSTREAM_NEAR_METERS
+    ? distance / SLIPSTREAM_NEAR_METERS
+    : distance <= SLIPSTREAM_FULL_METERS
+      ? 1
+      : 1 - (distance - SLIPSTREAM_FULL_METERS)
+        / (SLIPSTREAM_FADE_METERS - SLIPSTREAM_FULL_METERS);
+  const across = lateral <= SLIPSTREAM_LATERAL_FULL_METERS
+    ? 1
+    : 1 - (lateral - SLIPSTREAM_LATERAL_FULL_METERS)
+      / (SLIPSTREAM_LATERAL_FADE_METERS - SLIPSTREAM_LATERAL_FULL_METERS);
+  const gate = smoothstep(
+    ratio,
+    SLIPSTREAM_MINIMUM_SPEED_RATIO,
+    SLIPSTREAM_SPEED_RATIO_RAMP,
+  );
+  return clamp(longitudinal * across * gate, 0, 1);
+}
+
+/**
  * @param {number} speed
  * @param {number} throttle
  * @param {number} brake
  * @param {boolean} boostActive
  * @param {number} driftIntent
  * @param {number} delta
+ * @param {number} [slipstream] 0..1 tow from the craft ahead
  */
 export function integrateSpeed(
   speed,
@@ -77,15 +147,22 @@ export function integrateSpeed(
   boostActive,
   driftIntent,
   delta,
+  slipstream = 0,
 ) {
-  const maxSpeed = boostActive ? BOOST_MAX_SPEED : CRUISE_MAX_SPEED;
+  const tow = Number.isFinite(slipstream) ? clamp(slipstream, 0, 1) : 0;
+  // The tow is a drag reduction expressed as a lift of the cruise cap: it moves
+  // the knee where overspeed drag starts and, with it, the engine's own falloff
+  // curve. It is deliberately NOT a change to CRUISE_MAX_SPEED itself - the
+  // constant stays the authored cruise and the tow is a bonus over it.
+  const cruiseCap = CRUISE_MAX_SPEED * (1 + SLIPSTREAM_CRUISE_BONUS * tow);
+  const maxSpeed = boostActive ? BOOST_MAX_SPEED : cruiseCap;
   const engineForce = throttle * (26 - (speed / maxSpeed) * 12);
   const boostForce = boostActive ? 34 : 0;
   const brakeForce = brake * lerp(46, 25, driftIntent);
   const drag = 1.2 + speed * 0.038 + speed * speed * 0.0007;
   const overspeedDrag = boostActive
     ? 0
-    : Math.max(0, speed - CRUISE_MAX_SPEED) * OVERSPEED_DRAG_RATE;
+    : Math.max(0, speed - cruiseCap) * OVERSPEED_DRAG_RATE;
   const nextSpeed = speed + (
     engineForce
     + boostForce
@@ -168,14 +245,22 @@ export function resolveDriftRelease(charge, wasDrifting, isDrifting) {
  * @param {boolean} reserveBoostActive
  * @param {number} delta
  * @param {number} [reward] drift-release payout applied this step
+ * @param {number} [slipstream] 0..1 tow, which speeds the refill but never the drain
  */
-export function integrateBoostReserve(reserve, reserveBoostActive, delta, reward = 0) {
+export function integrateBoostReserve(
+  reserve,
+  reserveBoostActive,
+  delta,
+  reward = 0,
+  slipstream = 0,
+) {
   const current = Number.isFinite(reserve) ? clamp(reserve, 0, 1) : 0;
   const payout = Number.isFinite(reward) ? Math.max(0, reward) : 0;
   const step = Number.isFinite(delta) ? Math.max(0, delta) : 0;
+  const tow = Number.isFinite(slipstream) ? clamp(slipstream, 0, 1) : 0;
   const rate = reserveBoostActive
     ? -BOOST_RESERVE_DRAIN_RATE
-    : BOOST_RESERVE_REGEN_RATE;
+    : BOOST_RESERVE_REGEN_RATE * (1 + SLIPSTREAM_REGEN_BONUS * tow);
   return clamp(current + payout + rate * step, 0, 1);
 }
 

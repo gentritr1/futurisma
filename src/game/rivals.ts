@@ -1,22 +1,43 @@
 import * as THREE from "three";
 import type { RaceCourse } from "./course";
 import {
+  RIVAL_DEFENCE_LOOKAHEAD_METERS,
+  RIVAL_DRIFT_AIRBRAKE_GAIN,
   RIVAL_FIXED_STEP_SECONDS,
   RIVAL_FINISH_RUN_OUT_SECONDS,
+  RIVAL_FREE_DECK_FRACTION,
+  RIVAL_LANE_CLEARANCE_METERS,
+  RIVAL_LANE_CONTEST_GAP_METERS,
+  RIVAL_NO_BLOCK_MARGIN_FRACTION,
+  RIVAL_NO_BLOCK_WINDOW_METERS,
+  RIVAL_PAD_APPROACH_METERS,
   RIVAL_PROFILES,
+  VEHICLE_CLEARANCE_METERS,
   calculateRivalBankRadians,
   calculateRaceGaps,
-  chooseOvertakeOffset,
   createRivalState,
+  freeDeckTargetFraction,
+  isInsideBoostWindow,
+  measureFreeDeckFraction,
   rankRaceEntries,
   resetRivalState,
+  resolveRivalPace,
   rivalBrakeSignal,
+  rivalContestLaneMeters,
+  rivalCourseSpeedFactor,
+  rivalDriftSignal,
   rivalFinishRunOutDistanceMeters,
   rivalGlowSignal,
+  rivalPaceLaneMeters,
   rivalSteerSignal,
   rivalThrottleSignal,
-  stepRivalState,
+  stepRivalField,
 } from "./rival-race.js";
+import {
+  BOOST_MAX_SPEED,
+  SLIPSTREAM_LOCK_THRESHOLD,
+  calculateSlipstream,
+} from "./physics.js";
 import {
   LIVERY_ATLAS_ORDER,
   fieldLiveries,
@@ -32,7 +53,6 @@ import type {
 import type { FieldOrderEntry, RaceGridEntry, RaceStandingEntry } from "./ui";
 
 const PLAYER_ID = "player";
-const VEHICLE_CLEARANCE_METERS = 2.2;
 const RIVAL_COUNT = RIVAL_PROFILES.length;
 const RIVAL_ROLL_AXIS = new THREE.Vector3(0, 0, 1);
 const DEG = Math.PI / 180;
@@ -257,13 +277,34 @@ export interface RivalFleetDiagnostics {
   triangles: number;
   updateSteps: number;
   minimumSeparationMeters: number;
+  minimumRivalSeparationMeters: number;
+  closestApproach: {
+    id: string;
+    longitudinalMeters: number;
+    lateralMeters: number;
+    courseDistanceMeters: number;
+    lap: number;
+  };
   catchUpMultiplier: number;
   articulatedGroups: string[];
   maximumSteerRadians: number;
+  /** G1 - the free-deck rule (PRODUCT.md principle 5), measured live. */
+  minimumFreeDeckFraction: number;
+  minimumClearFreeDeckFraction: number;
+  minimumFreeDeckTargetFraction: number;
+  freeDeckSamples: number;
+  freeDeckAlongsideSamples: number;
+  leadChanges: number;
+  /** G1 - the player's tow, accumulated by the fleet that supplies it. */
+  slipstream: number;
+  slipstreamSeconds: number;
+  slipstreamPeak: number;
+  slipstreamLocks: number;
   articulation: Array<{
     id: string;
     steerRadians: number;
     brakeRadians: number;
+    driftSignal: number;
   }>;
   states: Array<{
     id: string;
@@ -274,6 +315,12 @@ export interface RivalFleetDiagnostics {
     lateralMeters: number;
     finishTimeMs: number | null;
     recoveries: number;
+    lapTimesMs: number[];
+    boostSeconds: number;
+    boostReserve: number;
+    padHits: number;
+    driftEntries: number;
+    driftSeconds: number;
   }>;
 }
 
@@ -305,10 +352,32 @@ export class RivalFleet {
   private readonly brakeSignals = new Float32Array(RIVAL_COUNT);
   private readonly throttleSignals = new Float32Array(RIVAL_COUNT);
   private readonly glowSignals = new Float32Array(RIVAL_COUNT);
+  private readonly driftSignals = new Float32Array(RIVAL_COUNT);
+  /** G1 - the authored pace for this map, resolved once per rival at assembly. */
+  private readonly paces: ReturnType<typeof resolveRivalPace>[];
+  private readonly noBlockSide: number;
+  private readonly driftCurvature: number;
+  /**
+   * One drive-input scratch per rival. `stepRivalField` writes `deltaSeconds`
+   * straight into whatever the resolver returns, so a whole race allocates
+   * nothing in the rival loop.
+   */
+  private readonly driveScratch: Record<string, unknown>[];
+  private readonly freeDeckScratch: number[] = [];
+  private readonly neighbourScratch: number[] = [];
+  private readonly closestApproach = {
+    id: "",
+    longitudinalMeters: 0,
+    lateralMeters: 0,
+    courseDistanceMeters: 0,
+    lap: 0,
+  };
+  private fieldRemainderSeconds = 0;
   private readonly visuals: RivalVisual[] = [];
   private readonly engineGlow: THREE.InstancedMesh;
   private readonly shadowBlobs: THREE.InstancedMesh;
   private readonly sample;
+  private readonly lookAheadSample;
   private readonly poseMatrix = new THREE.Matrix4();
   private readonly slotMatrix = new THREE.Matrix4();
   private readonly articulationMatrix = new THREE.Matrix4();
@@ -336,7 +405,28 @@ export class RivalFleet {
   private readonly articulatedGroups: string[] = [];
   private updateSteps = 0;
   private minimumSeparationMeters = Infinity;
+  private minimumRivalSeparationMeters = Infinity;
   private maximumSteerRadians = 0;
+  private minimumFreeDeckFraction = 1;
+  private minimumClearFreeDeckFraction = 1;
+  private minimumFreeDeckTargetFraction = 1;
+  private freeDeckSamples = 0;
+  private freeDeckAlongsideSamples = 0;
+  private leadChanges = 0;
+  private previousLeader = -1;
+  /**
+   * G1 - the player's tow. The fleet owns it because the fleet already has the
+   * three race distances and laterals it is computed from; `game.ts` reads
+   * `slipstreamStrength` back on the same fixed step.
+   */
+  private slipstream = 0;
+  /** Nearest rival ahead of the player, and how far off its line the player is. */
+  private draftDistance = Number.POSITIVE_INFINITY;
+  private draftLateral = Number.POSITIVE_INFINITY;
+  private slipstreamSeconds = 0;
+  private slipstreamPeak = 0;
+  private slipstreamLocks = 0;
+  private slipstreamLockedThisStep = false;
 
   readonly stats: {
     drawCalls: number;
@@ -410,6 +500,16 @@ export class RivalFleet {
       createRivalState(profile.id, course.length, totalLaps)
     ));
     this.sample = course.createSampleScratch();
+    this.lookAheadSample = course.createSampleScratch();
+    const pace = course.rivalPace;
+    this.paces = RIVAL_PROFILES.map((profile) => resolveRivalPace(pace, profile.id));
+    this.noBlockSide = pace && Number.isFinite(pace.noBlockSide) ? pace.noBlockSide : -1;
+    this.driftCurvature = pace && Number.isFinite(pace.driftCurvature)
+      ? pace.driftCurvature
+      : Number.POSITIVE_INFINITY;
+    this.driveScratch = RIVAL_PROFILES.map(() => ({
+      deltaSeconds: RIVAL_FIXED_STEP_SECONDS,
+    }));
     this.worldPositions = RIVAL_PROFILES.map(() => new THREE.Vector3());
     this.worldVelocities = RIVAL_PROFILES.map(() => new THREE.Vector3());
     this.glowTints = RIVAL_PROFILES.map(
@@ -581,6 +681,9 @@ export class RivalFleet {
         state.raceDistanceMeters = gridStart.raceDistanceMeters;
         state.courseDistanceMeters = gridStart.courseDistanceMeters;
         state.lateralMeters = gridStart.lateralMeters;
+        // The player-free lane starts on the grid slot too, or the first pad
+        // lookup would be resolved against the profile's nominal lane instead.
+        state.paceLateralMeters = gridStart.lateralMeters;
         state.lastSafeDistanceMeters = gridStart.raceDistanceMeters;
         state.lastSafeLateralMeters = gridStart.lateralMeters;
       }
@@ -592,105 +695,319 @@ export class RivalFleet {
       this.brakeSignals[index] = 0;
       this.throttleSignals[index] = 0;
       this.glowSignals[index] = 0;
+      this.driftSignals[index] = 0;
     });
     this.updateSteps = 0;
+    this.fieldRemainderSeconds = 0;
     this.minimumSeparationMeters = Infinity;
+    this.minimumRivalSeparationMeters = Infinity;
+    this.closestApproach.id = "";
+    this.closestApproach.longitudinalMeters = 0;
+    this.closestApproach.lateralMeters = 0;
+    this.closestApproach.courseDistanceMeters = 0;
+    this.closestApproach.lap = 0;
     this.maximumSteerRadians = 0;
+    this.minimumFreeDeckFraction = 1;
+    this.minimumClearFreeDeckFraction = 1;
+    this.minimumFreeDeckTargetFraction = 1;
+    this.freeDeckSamples = 0;
+    this.freeDeckAlongsideSamples = 0;
+    this.leadChanges = 0;
+    this.previousLeader = -1;
+    this.slipstream = 0;
+    this.draftDistance = Number.POSITIVE_INFINITY;
+    this.draftLateral = Number.POSITIVE_INFINITY;
+    this.slipstreamSeconds = 0;
+    this.slipstreamPeak = 0;
+    this.slipstreamLocks = 0;
+    this.slipstreamLockedThisStep = false;
     this.updatePresentation(1, 0);
+  }
+
+  /**
+   * G1 - the player's tow, 0..1, refreshed on the fixed step this fleet was
+   * last advanced on. Read by `game.ts` in the same step.
+   */
+  get slipstreamStrength(): number {
+    return this.slipstream;
+  }
+
+  /** True only on the step the tow crossed {@link SLIPSTREAM_LOCK_THRESHOLD}. */
+  get slipstreamLocked(): boolean {
+    return this.slipstreamLockedThisStep;
+  }
+
+  /** Metres to the nearest rival ahead of the player, Infinity when there is none. */
+  get draftDistanceMeters(): number {
+    return this.draftDistance;
+  }
+
+  /** Signed lateral offset from that rival's line. */
+  get draftLateralMeters(): number {
+    return this.draftLateral;
+  }
+
+  /**
+   * The drive input for one rival for one sub-step.
+   *
+   * Everything longitudinal here reads only the rival's own state and the
+   * course: pace lane, pad coverage, boost window, corner scrub and drift are
+   * all resolved before the player is considered. The player enters exactly
+   * once, in `rivalContestLaneMeters`, and only as a lateral target. That
+   * separation is what `scripts/validate-rivals.mjs` proves end to end by
+   * racing the same field twice - once against a moving player and once
+   * against a player left on the grid - and comparing lap times bit for bit.
+   */
+  private resolveDrive(
+    state: RivalState,
+    field: readonly RivalState[],
+    playerRaceDistanceMeters: number,
+    playerLateralMeters: number,
+    sample = this.sample,
+    lookAhead = this.lookAheadSample,
+    scratch = this.driveScratch,
+  ): Record<string, unknown> {
+    const index = field.indexOf(state);
+    const entry = this.paces[index];
+    this.course.sample(state.courseDistanceMeters / this.course.length, sample);
+    const halfWidthMeters = sample.halfWidth;
+    const laneHalfWidthMeters = Math.max(0, halfWidthMeters - VEHICLE_CLEARANCE_METERS);
+    const padLaneMeters = entry.padUse
+      ? this.course.boostPadLaneAt(
+        state.courseDistanceMeters,
+        halfWidthMeters,
+        RIVAL_PAD_APPROACH_METERS,
+      )
+      : null;
+    const paceLane = rivalPaceLaneMeters(state, {
+      curvature: sample.curvature,
+      laneHalfWidthMeters,
+      padLaneMeters,
+      padUse: entry.padUse,
+      startSpreadSideSign: this.noBlockSide,
+    });
+    const neighbourLaterals = this.neighbourScratch;
+    neighbourLaterals.length = 0;
+    for (const other of field) {
+      if (other === state || other.finished) continue;
+      if (
+        Math.abs(state.raceDistanceMeters - other.raceDistanceMeters)
+          < RIVAL_LANE_CONTEST_GAP_METERS
+      ) neighbourLaterals.push(other.lateralMeters);
+    }
+    this.course.sample(
+      (state.courseDistanceMeters + RIVAL_DEFENCE_LOOKAHEAD_METERS) / this.course.length,
+      lookAhead,
+    );
+    const insideSign = Math.abs(lookAhead.curvature) >= this.driftCurvature
+      ? Math.sign(lookAhead.curvature)
+      : 0;
+    const drive = scratch[index];
+    drive.deltaSeconds = RIVAL_FIXED_STEP_SECONDS;
+    const playerGap = state.raceDistanceMeters - playerRaceDistanceMeters;
+    drive.targetLateralMeters = rivalContestLaneMeters(paceLane, {
+      lateralMeters: state.lateralMeters,
+      playerGapMeters: playerGap,
+      playerLateralMeters,
+      rivalId: state.id,
+      neighbourLaterals,
+      insideSign,
+      sideSign: this.noBlockSide,
+      halfWidthMeters,
+      laneHalfWidthMeters,
+    });
+    drive.paceLateralMeters = paceLane;
+    drive.laneHalfWidthMeters = laneHalfWidthMeters;
+    drive.courseSpeedFactor = rivalCourseSpeedFactor(
+      this.course.rivalPace,
+      sample.curvature,
+    );
+    drive.cruiseSpeedMetersPerSecond = entry.cruiseSpeedMetersPerSecond;
+    drive.boostWindowActive = isInsideBoostWindow(
+      entry.boostWindows,
+      state.courseDistanceMeters,
+    );
+    // Pad coverage is resolved against the PLAYER-FREE lane, so no amount of
+    // tailgating can deny a rival a pad it had committed to. The craft yields
+    // laterally while still banking that pad; the alternative is a longitudinal
+    // reaction to the player, which is exactly what principle 5 forbids.
+    drive.onBoostPad = entry.padUse
+      && this.course.isOnBoostPad(
+        state.courseDistanceMeters / this.course.length,
+        state.paceLateralMeters,
+        halfWidthMeters,
+      );
+    drive.curvatureMagnitude = Math.abs(sample.curvature);
+    drive.driftCurvature = this.driftCurvature;
+    return drive;
   }
 
   step(
     deltaSeconds: number,
     playerRaceDistanceMeters: number,
     playerLateralMeters: number,
+    playerSpeedMetersPerSecond = 0,
   ): void {
     for (let index = 0; index < this.states.length; index += 1) {
-      const state = this.states[index];
-      const profile = RIVAL_PROFILES[index];
-      this.previousDistances[index] = state.raceDistanceMeters;
-      this.previousLaterals[index] = state.lateralMeters;
-      const wasFinished = state.finished;
-      const crossingSpeed = state.speedMetersPerSecond;
-      if (wasFinished) {
+      this.previousDistances[index] = this.states[index].raceDistanceMeters;
+      this.previousLaterals[index] = this.states[index].lateralMeters;
+      if (this.states[index].finished) {
         this.finishVisualAges[index] += Math.max(0, deltaSeconds);
-        // A finished rival coasts with its control surfaces neutral.
+      }
+    }
+    const crossingSpeeds = this.states.map((state) => state.speedMetersPerSecond);
+    const wasFinished = this.states.map((state) => state.finished);
+
+    this.fieldRemainderSeconds = stepRivalField(this.states, {
+      deltaSeconds,
+      remainderSeconds: this.fieldRemainderSeconds,
+      resolveSubStepInput: (state, field) => this.resolveDrive(
+        state,
+        field,
+        playerRaceDistanceMeters,
+        playerLateralMeters,
+      ) as never,
+    });
+
+    for (let index = 0; index < this.states.length; index += 1) {
+      const state = this.states[index];
+      if (state.finished) {
+        if (!wasFinished[index]) {
+          this.finishVisualAges[index] = 0;
+          this.finishRunOutSpeeds[index] = crossingSpeeds[index];
+        }
         this.steerSignals[index] = 0;
         this.brakeSignals[index] = 0;
         this.throttleSignals[index] = 0;
         this.glowSignals[index] = 0;
+        this.driftSignals[index] = 0;
         continue;
       }
-      this.course.sample(state.courseDistanceMeters / this.course.length, this.sample);
-      const laneHalfWidth = Math.max(
-        0,
-        this.sample.halfWidth - VEHICLE_CLEARANCE_METERS,
-      );
-      let targetLateral = profile.startingLateralMeters
-        + Math.sin(
-          state.raceDistanceMeters / 210 + profile.pacePhaseRadians,
-        ) * 0.75
-        - this.sample.curvature * 1.4;
-      if (
-        Math.abs(state.raceDistanceMeters - playerRaceDistanceMeters) < 12
-        && Math.abs(state.lateralMeters - playerLateralMeters) < 2.8
-      ) {
-        targetLateral = chooseOvertakeOffset(
-          state.id,
-          PLAYER_ID,
-          profile.startingLateralMeters,
-        );
-      }
-      for (let otherIndex = 0; otherIndex < this.states.length; otherIndex += 1) {
-        if (otherIndex === index) continue;
-        const other = this.states[otherIndex];
-        if (
-          Math.abs(state.raceDistanceMeters - other.raceDistanceMeters) < 10
-          && Math.abs(state.lateralMeters - other.lateralMeters) < 2.6
-        ) {
-          targetLateral = chooseOvertakeOffset(
-            state.id,
-            other.id,
-            profile.startingLateralMeters,
-          );
-          break;
-        }
-      }
-      const courseSpeedFactor = THREE.MathUtils.clamp(
-        1 - Math.abs(this.sample.curvature) * 0.2,
-        0.79,
-        1,
-      );
-      const poseInput = {
-        targetLateralMeters: targetLateral,
-        laneHalfWidthMeters: laneHalfWidth,
-        courseSpeedFactor,
-        curvature: this.sample.curvature,
-      };
-      // Read the pose before stepping: the signals describe what the rival is
-      // about to do with the state the step is about to consume, and they are
-      // derived from that state alone rather than from any frame delta.
+      // The pose is read AFTER the step from the state the step produced, and
+      // is a pure function of that state, so it stays rate independent.
+      const poseInput = this.resolveDrive(
+        state,
+        this.states,
+        playerRaceDistanceMeters,
+        playerLateralMeters,
+      ) as never;
       const steer = rivalSteerSignal(state, poseInput);
       this.steerSignals[index] = steer;
       this.brakeSignals[index] = rivalBrakeSignal(state, poseInput);
       this.throttleSignals[index] = rivalThrottleSignal(state, poseInput);
       this.glowSignals[index] = rivalGlowSignal(state, poseInput);
+      this.driftSignals[index] = rivalDriftSignal(state);
       this.maximumSteerRadians = Math.max(
         this.maximumSteerRadians,
         Math.abs(steer) * ARTICULATION_TRAVEL_RADIANS.steering_fins,
       );
-      stepRivalState(state, {
-        deltaSeconds,
-        targetLateralMeters: targetLateral,
-        laneHalfWidthMeters: laneHalfWidth,
-        courseSpeedFactor,
-      });
-      if (state.finished) {
-        this.finishVisualAges[index] = 0;
-        this.finishRunOutSpeeds[index] = crossingSpeed;
-      }
     }
     this.updateSteps += 1;
     this.measureSeparation(playerRaceDistanceMeters, playerLateralMeters);
+    this.measureFreeDeck(playerRaceDistanceMeters, playerLateralMeters);
+    this.measureLeadChanges();
+    this.measureSlipstream(
+      playerRaceDistanceMeters,
+      playerLateralMeters,
+      playerSpeedMetersPerSecond,
+      deltaSeconds,
+    );
+  }
+
+  /**
+   * Strongest tow over the three rivals. No allocation: it walks the states
+   * already held and the race-distance fields already tracked.
+   */
+  private measureSlipstream(
+    playerRaceDistanceMeters: number,
+    playerLateralMeters: number,
+    playerSpeedMetersPerSecond: number,
+    deltaSeconds: number,
+  ): void {
+    const speedRatio = playerSpeedMetersPerSecond / BOOST_MAX_SPEED;
+    let strongest = 0;
+    let nearestAhead = Number.POSITIVE_INFINITY;
+    let nearestLateral = Number.POSITIVE_INFINITY;
+    for (const state of this.states) {
+      if (state.finished) continue;
+      const ahead = state.raceDistanceMeters - playerRaceDistanceMeters;
+      const lateralGap = state.lateralMeters - playerLateralMeters;
+      const tow = calculateSlipstream(ahead, lateralGap, speedRatio);
+      if (tow > strongest) strongest = tow;
+      if (ahead > 0 && ahead < nearestAhead) {
+        nearestAhead = ahead;
+        nearestLateral = lateralGap;
+      }
+    }
+    this.draftDistance = nearestAhead;
+    this.draftLateral = nearestLateral;
+    this.slipstreamLockedThisStep = strongest >= SLIPSTREAM_LOCK_THRESHOLD
+      && this.slipstream < SLIPSTREAM_LOCK_THRESHOLD;
+    if (this.slipstreamLockedThisStep) this.slipstreamLocks += 1;
+    if (strongest > 0) this.slipstreamSeconds += Math.max(0, deltaSeconds);
+    if (strongest > this.slipstreamPeak) this.slipstreamPeak = strongest;
+    this.slipstream = strongest;
+  }
+
+  /**
+   * PRODUCT.md principle 5, measured rather than assumed: the widest strip of
+   * deck left clear by every rival sitting within
+   * {@link RIVAL_NO_BLOCK_WINDOW_METERS} ahead of the player.
+   */
+  private measureFreeDeck(
+    playerRaceDistanceMeters: number,
+    playerLateralMeters: number,
+  ): void {
+    this.freeDeckScratch.length = 0;
+    let narrowestHalfWidth = Infinity;
+    // A sample only answers the question "does the player have a route past"
+    // when the player is somewhere the question means something: outside the
+    // strip reserved for it to pass through, and not sitting on a rival's own
+    // line, where the craft is already sliding out of the way. Both cases are
+    // counted and reported rather than dropped.
+    let conclusive = true;
+    const reserved = RIVAL_FREE_DECK_FRACTION + RIVAL_NO_BLOCK_MARGIN_FRACTION;
+    for (const state of this.states) {
+      if (state.finished) continue;
+      const gap = state.raceDistanceMeters - playerRaceDistanceMeters;
+      if (gap < 0 || gap > RIVAL_NO_BLOCK_WINDOW_METERS) continue;
+      this.freeDeckScratch.push(state.lateralMeters);
+      this.course.sample(state.courseDistanceMeters / this.course.length, this.sample);
+      const halfWidth = this.sample.halfWidth;
+      narrowestHalfWidth = Math.min(narrowestHalfWidth, halfWidth);
+      const inner = halfWidth * (2 * reserved - 1) + VEHICLE_CLEARANCE_METERS;
+      if (this.noBlockSide * playerLateralMeters >= inner) conclusive = false;
+      if (
+        Math.abs(state.lateralMeters - playerLateralMeters) < RIVAL_LANE_CLEARANCE_METERS
+      ) conclusive = false;
+    }
+    if (this.freeDeckScratch.length === 0) return;
+    this.freeDeckSamples += 1;
+    const fraction = measureFreeDeckFraction(this.freeDeckScratch, narrowestHalfWidth);
+    this.minimumFreeDeckFraction = Math.min(this.minimumFreeDeckFraction, fraction);
+    this.minimumFreeDeckTargetFraction = Math.min(
+      this.minimumFreeDeckTargetFraction,
+      freeDeckTargetFraction(narrowestHalfWidth),
+    );
+    if (!conclusive) this.freeDeckAlongsideSamples += 1;
+    else {
+      this.minimumClearFreeDeckFraction = Math.min(
+        this.minimumClearFreeDeckFraction,
+        fraction,
+      );
+    }
+  }
+
+  /** How often the rivals swap the lead among themselves over a race. */
+  private measureLeadChanges(): void {
+    let leader = 0;
+    for (let index = 1; index < this.states.length; index += 1) {
+      if (
+        this.states[index].raceDistanceMeters > this.states[leader].raceDistanceMeters
+      ) leader = index;
+    }
+    if (this.previousLeader >= 0 && leader !== this.previousLeader) this.leadChanges += 1;
+    this.previousLeader = leader;
   }
 
   updatePresentation(alpha: number, elapsedSeconds: number): void {
@@ -728,6 +1045,7 @@ export class RivalFleet {
         this.previousLaterals[index],
         state.lateralMeters,
         this.sample.curvature,
+        this.driftSignals[index],
       );
       this.bankQuaternion.setFromAxisAngle(RIVAL_ROLL_AXIS, bank);
       this.poseQuaternion.multiply(this.bankQuaternion);
@@ -748,7 +1066,15 @@ export class RivalFleet {
         const angle = visual.group === "steering_fins"
           ? this.steerSignals[index] * travel
           : visual.group === "airbrakes"
-            ? this.brakeSignals[index] * travel
+            // G1 - a committed drift flares the airbrakes past what the pace
+            // model alone asks for. It rides the batches that already exist, so
+            // the drift costs zero extra draw calls: no spark emitter, no new
+            // instanced mesh, nothing added to the fleet's seven calls.
+            ? Math.min(
+              1,
+              this.brakeSignals[index]
+                + this.driftSignals[index] * RIVAL_DRIFT_AIRBRAKE_GAIN,
+            ) * travel
             : 0;
         for (let slot = 0; slot < visual.slots.length; slot += 1) {
           const instance = index * visual.slots.length + slot;
@@ -918,7 +1244,9 @@ export class RivalFleet {
     }));
   }
 
-  classification(playerFinishTimeSeconds: number): RaceStandingEntry[] {    const totalDistance = this.course.length * this.totalLaps;
+  classification(playerFinishTimeSeconds: number): RaceStandingEntry[] {
+    const totalDistance = this.course.length * this.totalLaps;
+    const projectedFinishes = this.projectFinishTimes();
     const entries = [
       {
         id: PLAYER_ID,
@@ -929,18 +1257,15 @@ export class RivalFleet {
         finished: true,
         finishTimeSeconds: playerFinishTimeSeconds,
       },
-      ...this.states.map((state, index) => {
-        const projectedFinish = this.projectFinishTime(state, index);
-        return {
-          id: state.id,
-          name: this.liveryLabels[index],
-          team: "FIELD TOTEM",
-          player: false,
-          raceDistanceMeters: totalDistance,
-          finished: true,
-          finishTimeSeconds: projectedFinish,
-        };
-      }),
+      ...this.states.map((state, index) => ({
+        id: state.id,
+        name: this.liveryLabels[index],
+        team: "FIELD TOTEM",
+        player: false,
+        raceDistanceMeters: totalDistance,
+        finished: true,
+        finishTimeSeconds: projectedFinishes[index],
+      })),
     ];
     const ordered = rankRaceEntries(entries);
     const winnerTime = ordered[0].finishTimeSeconds ?? playerFinishTimeSeconds;
@@ -1003,15 +1328,30 @@ export class RivalFleet {
       minimumSeparationMeters: Number.isFinite(this.minimumSeparationMeters)
         ? this.minimumSeparationMeters
         : 0,
+      minimumRivalSeparationMeters: Number.isFinite(this.minimumRivalSeparationMeters)
+        ? this.minimumRivalSeparationMeters
+        : 0,
+      closestApproach: { ...this.closestApproach },
       catchUpMultiplier: 1,
       articulatedGroups: [...this.articulatedGroups],
       maximumSteerRadians: this.maximumSteerRadians,
+      minimumFreeDeckFraction: this.minimumFreeDeckFraction,
+      minimumClearFreeDeckFraction: this.minimumClearFreeDeckFraction,
+      minimumFreeDeckTargetFraction: this.minimumFreeDeckTargetFraction,
+      freeDeckSamples: this.freeDeckSamples,
+      freeDeckAlongsideSamples: this.freeDeckAlongsideSamples,
+      leadChanges: this.leadChanges,
+      slipstream: this.slipstream,
+      slipstreamSeconds: this.slipstreamSeconds,
+      slipstreamPeak: this.slipstreamPeak,
+      slipstreamLocks: this.slipstreamLocks,
       articulation: this.states.map((state, index) => ({
         id: state.id,
         steerRadians: this.steerSignals[index]
           * ARTICULATION_TRAVEL_RADIANS.steering_fins,
         brakeRadians: this.brakeSignals[index]
           * ARTICULATION_TRAVEL_RADIANS.airbrakes,
+        driftSignal: this.driftSignals[index],
       })),
       states: this.states.map((state, index) => ({
         id: state.id,
@@ -1024,6 +1364,12 @@ export class RivalFleet {
           ? null
           : state.finishTimeSeconds * 1000,
         recoveries: state.recoveryCount,
+        lapTimesMs: state.lapTimesSeconds.map((lap) => lap * 1000),
+        boostSeconds: state.boostSeconds,
+        boostReserve: state.boostReserve,
+        padHits: state.padHits,
+        driftEntries: state.driftEntries,
+        driftSeconds: state.driftSeconds,
       })),
     };
   }
@@ -1065,66 +1411,111 @@ export class RivalFleet {
     );
   }
 
-  private projectFinishTime(state: RivalState, profileIndex: number): number {
-    if (state.finishTimeSeconds !== null) return state.finishTimeSeconds;
-    const projected: RivalState = {
+  /**
+   * Finish times for a field that has not finished yet, so the classification
+   * can be shown the moment the player crosses.
+   *
+   * It runs the REAL model forward - the same pace block, pads, boost windows,
+   * drift and lane contest the race itself used - with no player in the world.
+   * That is exactly legitimate here, because nothing longitudinal in the model
+   * reads the player: a rival's remaining lap time is the same whether the
+   * player is alongside or already in the pits.
+   */
+  private projectFinishTimes(): number[] {
+    const projected: RivalState[] = this.states.map((state) => ({
       ...state,
       lapTimesSeconds: [...state.lapTimesSeconds],
-    };
-    const profile = RIVAL_PROFILES[profileIndex];
+    }));
     const sample = this.course.createSampleScratch();
-    const maximumSteps = Math.ceil(this.totalLaps * this.course.length / 20
-      / RIVAL_FIXED_STEP_SECONDS);
-    for (let step = 0; step < maximumSteps && !projected.finished; step += 1) {
-      this.course.sample(projected.courseDistanceMeters / this.course.length, sample);
-      const laneHalfWidth = Math.max(0, sample.halfWidth - VEHICLE_CLEARANCE_METERS);
-      const targetLateral = THREE.MathUtils.clamp(
-        profile.startingLateralMeters
-          + Math.sin(
-            projected.raceDistanceMeters / 210 + profile.pacePhaseRadians,
-          ) * 0.75
-          - sample.curvature * 1.4,
-        -laneHalfWidth,
-        laneHalfWidth,
-      );
-      stepRivalState(projected, {
+    const lookAhead = this.course.createSampleScratch();
+    const scratch: Record<string, unknown>[] = projected.map(() => ({
+      deltaSeconds: RIVAL_FIXED_STEP_SECONDS,
+    }));
+    // No player in the world: an infinite gap disarms the corridor and the
+    // player's lateral room, and leaves everything longitudinal untouched -
+    // which is the whole reason projecting a rival's remaining laps is legal.
+    const resolve = (state: RivalState, field: readonly RivalState[]) => this.resolveDrive(
+      state,
+      field,
+      Number.NEGATIVE_INFINITY,
+      0,
+      sample,
+      lookAhead,
+      scratch,
+    );
+    const maximumSteps = Math.ceil(
+      this.totalLaps * this.course.length / 20 / RIVAL_FIXED_STEP_SECONDS,
+    );
+    let remainder = 0;
+    for (
+      let step = 0;
+      step < maximumSteps && projected.some((state) => !state.finished);
+      step += 1
+    ) {
+      remainder = stepRivalField(projected, {
         deltaSeconds: RIVAL_FIXED_STEP_SECONDS,
-        targetLateralMeters: targetLateral,
-        laneHalfWidthMeters: laneHalfWidth,
-        courseSpeedFactor: THREE.MathUtils.clamp(
-          1 - Math.abs(sample.curvature) * 0.2,
-          0.79,
-          1,
-        ),
+        remainderSeconds: remainder,
+        resolveSubStepInput: resolve as never,
       });
     }
-    if (projected.finishTimeSeconds === null) {
-      throw new Error(`Rival ${state.id} did not reach its projected finish.`);
-    }
-    return projected.finishTimeSeconds;
+    return projected.map((state, index) => {
+      if (state.finishTimeSeconds === null) {
+        throw new Error(
+          `Rival ${this.states[index].id} did not reach its projected finish.`,
+        );
+      }
+      return state.finishTimeSeconds;
+    });
   }
 
   private measureSeparation(
     playerRaceDistanceMeters: number,
     playerLateralMeters: number,
   ): void {
+    // Once the PLAYER has crossed, its race distance is frozen on the finish
+    // line while the rest of the field drives through it to take the flag. That
+    // is not a near miss - the result overlay is up and the craft is coasting
+    // into the run-off - but it is the smallest number this metric will ever
+    // see, and it was reading 0.09 m on a race the field never came near the
+    // player in.
+    const raceDistance = this.course.length * this.totalLaps;
+    const playerFinished = playerRaceDistanceMeters >= raceDistance - 1e-6;
     for (let index = 0; index < this.states.length; index += 1) {
       const state = this.states[index];
-      this.minimumSeparationMeters = Math.min(
-        this.minimumSeparationMeters,
-        Math.hypot(
-          state.raceDistanceMeters - playerRaceDistanceMeters,
-          state.lateralMeters - playerLateralMeters,
-        ),
-      );
+      // A finished rival is parked on the line and its visual is retired, so it
+      // is not a separation hazard - counting it would report the whole field
+      // stacked on the finish as a near miss.
+      if (state.finished) continue;
+      if (!playerFinished) {
+        const longitudinal = state.raceDistanceMeters - playerRaceDistanceMeters;
+        const lateral = state.lateralMeters - playerLateralMeters;
+        const separation = Math.hypot(longitudinal, lateral);
+        if (separation < this.minimumSeparationMeters) {
+          this.minimumSeparationMeters = separation;
+          // Where it happened, not just how close. A bare minimum says nothing
+          // about whether the field crowded the player or the player drove into
+          // the field, and those want opposite fixes.
+          this.closestApproach.id = state.id;
+          this.closestApproach.longitudinalMeters = longitudinal;
+          this.closestApproach.lateralMeters = lateral;
+          this.closestApproach.courseDistanceMeters = state.courseDistanceMeters;
+          this.closestApproach.lap = state.lap;
+        }
+      }
       for (let otherIndex = index + 1; otherIndex < this.states.length; otherIndex += 1) {
         const other = this.states[otherIndex];
+        if (other.finished) continue;
+        const separation = Math.hypot(
+          state.raceDistanceMeters - other.raceDistanceMeters,
+          state.lateralMeters - other.lateralMeters,
+        );
         this.minimumSeparationMeters = Math.min(
           this.minimumSeparationMeters,
-          Math.hypot(
-            state.raceDistanceMeters - other.raceDistanceMeters,
-            state.lateralMeters - other.lateralMeters,
-          ),
+          separation,
+        );
+        this.minimumRivalSeparationMeters = Math.min(
+          this.minimumRivalSeparationMeters,
+          separation,
         );
       }
     }

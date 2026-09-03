@@ -4,37 +4,60 @@ import {
   RIVAL_FIXED_STEP_SECONDS,
   RIVAL_FINISH_RUN_OUT_SECONDS,
   RIVAL_GLOW_SPEED_SHARE,
+  RIVAL_LANE_CLEARANCE_METERS,
+  RIVAL_FREE_DECK_FRACTION,
+  RIVAL_NO_BLOCK_MARGIN_FRACTION,
   RIVAL_PROFILES,
   RIVAL_STEER_CURVATURE_GAIN,
+  VEHICLE_CLEARANCE_METERS,
   calculateRivalBankRadians,
   calculateRaceGaps,
-  chooseOvertakeOffset,
   createRivalState,
+  freeDeckTargetFraction,
+  isInsideBoostWindow,
+  measureFreeDeckFraction,
   playerRaceDistanceMeters,
   recoverInvalidRivalState,
+  resolveRivalPace,
   rivalBrakeSignal,
   rivalFinishRunOutDistanceMeters,
   rivalGlowSignal,
+  nearestAllowedLane,
+  rivalContestLaneMeters,
   rivalPoseSignals,
   rivalSteerSignal,
   rivalThrottleSignal,
   resetRivalState,
   stepRivalState,
 } from "../src/game/rival-race.js";
+import { loadCourseModel, loadRivalPace } from "./lib/rival-course-model.mjs";
+import {
+  measuredPacePlayer,
+  parkedPlayer,
+  simulateRivalField,
+} from "./lib/rival-field-sim.mjs";
 
 const courseLengthMeters = 2516;
 const totalLaps = 5;
 
 /**
- * Finish times captured from this harness on the commit BEFORE the P2 rival
- * aliveness work, so the phase can prove it left the race itself untouched.
- * Recorded by running the same open-loop simulation against the pre-phase
- * `rival-race.js`. Any edit to the pacing model breaks these on purpose.
+ * Open-loop five-lap finish times, re-pinned for G1.
+ *
+ * These were 211.30391519203832 / 216.25351195486905 / 220.25874561555503 from
+ * P2 until G1. They move because the rival model itself changed: a rival now
+ * carries a boost reserve it spends in authored windows, collects pads, and
+ * drives an authored per-map cruise instead of the profile constant. The pin is
+ * still doing its job - it fails on any unintended edit to the pacing model -
+ * it is just anchored to the model the field actually races now.
+ *
+ * The open-loop inputs below are held CONSTANT on purpose: that is what makes
+ * the 60 Hz / 120 Hz comparison meaningful, because the only thing left that
+ * could make the two disagree is a rate-dependent term inside the model.
  */
-const PRE_PHASE_OPEN_LOOP_FINISH_SECONDS = Object.freeze({
-  "rival-privateer": 211.30391519203832,
-  "rival-nightform": 216.25351195486905,
-  "rival-needle": 220.25874561555503,
+const OPEN_LOOP_FINISH_SECONDS = Object.freeze({
+  "rival-privateer": 164.5406638542678,
+  "rival-nightform": 130.50419689883486,
+  "rival-needle": 171.10130492467295,
 });
 
 /** The authored travel the pose signals drive, mirroring `rivals.ts`. */
@@ -57,9 +80,19 @@ const MINIMUM_PEAK_STEER_RADIANS = 0.10;
 function openLoopInput(index) {
   return {
     targetLateralMeters: RIVAL_PROFILES[index].startingLateralMeters + 5,
+    paceLateralMeters: RIVAL_PROFILES[index].startingLateralMeters + 5,
     laneHalfWidthMeters: 8,
     courseSpeedFactor: 0.91,
     curvature: 0.4,
+    // G1 - the new drive terms, held constant like the rest. Every rival is
+    // given a live boost window, a pad under its wheels and a corner over the
+    // drift threshold, so the determinism comparison actually walks the boost,
+    // pad and drift branches rather than skipping past them.
+    cruiseSpeedMetersPerSecond: 84 - index * 1.5,
+    boostWindowActive: index !== 1,
+    onBoostPad: index === 1,
+    curvatureMagnitude: 0.8,
+    driftCurvature: 0.55,
   };
 }
 
@@ -76,7 +109,7 @@ function simulate(renderDeltaSeconds) {
       const state = states[index];
       const input = openLoopInput(index);
       const pose = rivalPoseSignals(state, input);
-      poses[index].push(pose.steer, pose.brake, pose.throttle, pose.glow);
+      poses[index].push(pose.steer, pose.brake, pose.throttle, pose.glow, pose.drift);
       stepRivalState(state, { deltaSeconds: renderDeltaSeconds, ...input });
       assert.ok(state.raceDistanceMeters >= previousDistances[index]);
       assert.ok(Math.abs(state.lateralMeters) <= 8 + 1e-9);
@@ -99,6 +132,10 @@ const stableSnapshot = (states) => states.map((state) => ({
   laps: state.lapTimesSeconds,
   finish: state.finishTimeSeconds,
   recoveries: state.recoveryCount,
+  boostSeconds: state.boostSeconds,
+  padHits: state.padHits,
+  driftEntries: state.driftEntries,
+  reserve: state.boostReserve,
 }));
 assert.deepEqual(stableSnapshot(at60Hz), stableSnapshot(at120Hz));
 
@@ -106,7 +143,7 @@ assert.deepEqual(stableSnapshot(at60Hz), stableSnapshot(at120Hz));
 // pose sequence must land bit-for-bit on every second 120 Hz sample. A signal
 // derived from `(current - previous) / deltaSeconds` would fail here, which is
 // the whole point of deriving them from state instead.
-const SIGNALS_PER_SAMPLE = 4;
+const SIGNALS_PER_SAMPLE = 5;
 for (let index = 0; index < RIVAL_PROFILES.length; index += 1) {
   const dense = run120Hz.poses[index];
   const sparse = run60Hz.poses[index];
@@ -144,24 +181,51 @@ for (let index = 0; index < RIVAL_PROFILES.length; index += 1) {
 }
 
 for (const state of at120Hz) {
-  const expected = PRE_PHASE_OPEN_LOOP_FINISH_SECONDS[state.id];
+  const expected = OPEN_LOOP_FINISH_SECONDS[state.id];
   assert.equal(
     typeof expected,
     "number",
-    `No pre-phase finish time recorded for ${state.id}.`,
+    `No open-loop finish time recorded for ${state.id}.`,
   );
   assert.equal(
     state.finishTimeSeconds,
     expected,
-    `${state.id} finish time moved from the pre-phase capture: `
-      + `${state.finishTimeSeconds} vs ${expected}. The rival race must be `
-      + "untouched by presentation work.",
+    `${state.id} open-loop finish time moved from the pin: `
+      + `${state.finishTimeSeconds} vs ${expected}. Re-pin ONLY together with a `
+      + "deliberate change to the pacing model, never to make a diff pass.",
   );
 }
 
+// G1 - the boost, pad and drift branches must actually have run, or the
+// determinism comparison above is comparing two runs of dead code.
+for (const state of at120Hz) {
+  assert.ok(
+    state.boostSeconds > 0,
+    `${state.id} never lit boost in the open-loop run.`,
+  );
+  assert.ok(
+    state.driftEntries > 0,
+    `${state.id} never entered a drift in the open-loop run.`,
+  );
+  assert.deepEqual(
+    at60Hz.map((entry) => [entry.boostSeconds, entry.padHits, entry.driftEntries]),
+    at120Hz.map((entry) => [entry.boostSeconds, entry.padHits, entry.driftEntries]),
+    "Boost, pad and drift accumulators must be rate independent.",
+  );
+}
+assert.ok(
+  at120Hz.some((state) => state.padHits > 0),
+  "No rival collected a pad in the open-loop run.",
+);
+
 const finishTimes = at120Hz.map((state) => state.finishTimeSeconds);
 assert.equal(new Set(finishTimes).size, RIVAL_PROFILES.length);
-assert.ok(Math.max(...finishTimes) - Math.min(...finishTimes) < 12);
+// The "field spread under 12 s" check that used to live here has MOVED to the
+// course-faithful runs below, where it is a statement about the race. It was
+// never one here: the open-loop inputs are constant and deliberately unequal
+// between rivals - one of them is handed a boost pad for the entire run so the
+// pad branch is walked - so the open-loop spread measures the harness's own
+// asymmetry, not the field's.
 
 const playerDistance = playerRaceDistanceMeters({
   progress: 0.5,
@@ -298,150 +362,447 @@ for (const [name, value] of Object.entries(corruptPose)) {
   assert.ok(Number.isFinite(value), `${name} signal is not finite for corrupt state.`);
 }
 
-// --- course-faithful five-lap run -----------------------------------------
+// --- the lane solver, as a property ---------------------------------------
+//
+// This replaces the P2 pin on `chooseOvertakeOffset`, which is gone. That rule
+// sent each rival to a FIXED lane chosen by id order, so two rivals whose
+// authored lanes were already on the "wrong" sides swapped ACROSS each other
+// and passed through zero separation. What matters is not which lane a rival
+// picks, it is that the lane it picks is clear of everything it has to be clear
+// of - and that clamping three interacting constraints in sequence cannot
+// deliver, which is what `nearestAllowedLane` exists to fix.
 
-// The game steps the fleet at a fixed 1/120 out of its physics accumulator
-// whatever the renderer is doing (game.ts), so this run reproduces the shape of
-// a real race: the target line and speed factor come from the Greenwater
-// centreline and are recomputed at every sub-step.
-const blockout = JSON.parse(readFileSync(
-  new URL("../src/game/data/greenwater-blockout.json", import.meta.url),
-  "utf8",
-));
-const centreline = blockout.centreline.samples;
-const lapLength = blockout.centreline.lapLength;
-const sampleCount = centreline.length;
-const wrapIndex = (value) => ((value % sampleCount) + sampleCount) % sampleCount;
-const clamp = (value, low, high) => Math.min(high, Math.max(low, value));
-const normalise = (vector) => {
-  const length = Math.hypot(vector[0], vector[1], vector[2]) || 1;
-  return [vector[0] / length, vector[1] / length, vector[2] / length];
-};
-// Mirrors GreenwaterCourse's tangent/curvature derivation closely enough to
-// shape a representative run. It is not a second source of truth for the
-// course — the finish times below are anchored to this harness alone.
-const tangents = centreline.map((_, index) => {
-  const before = centreline[wrapIndex(index - 1)];
-  const after = centreline[wrapIndex(index + 1)];
-  return normalise([after.x - before.x, after.y - before.y, after.z - before.z]);
-});
-const curvatureOffset = Math.max(1, Math.round(8 / (lapLength / sampleCount)));
-const curvatures = tangents.map((_, index) => {
-  const before = tangents[wrapIndex(index - curvatureOffset)];
-  const after = tangents[wrapIndex(index + curvatureOffset)];
-  return clamp((before[2] * after[0] - before[0] * after[2]) * 4, -1, 1);
-});
-const sampleCourse = (progress) => {
-  const scaled = (((progress % 1) + 1) % 1) * sampleCount;
-  const index = Math.floor(scaled) % sampleCount;
-  const next = (index + 1) % sampleCount;
-  const alpha = scaled - Math.floor(scaled);
-  const mix = (a, b) => a + (b - a) * alpha;
-  return {
-    curvature: mix(curvatures[index], curvatures[next]),
-    halfWidth: mix(centreline[index].w, centreline[next].w) / 2,
-  };
-};
-
-const VEHICLE_CLEARANCE_METERS = 2.2;
-
-function raceOnCourse() {
-  const states = RIVAL_PROFILES.map((profile) => (
-    createRivalState(profile.id, lapLength, totalLaps)
-  ));
-  const steerRadians = [];
-  const brakeRadians = [];
-  let peakSteerRadians = 0;
-  const stepLimit = Math.ceil(300 / RIVAL_FIXED_STEP_SECONDS);
-  for (let step = 0; step < stepLimit && states.some((s) => !s.finished); step += 1) {
-    for (let index = 0; index < states.length; index += 1) {
-      const state = states[index];
-      if (state.finished) continue;
-      const profile = RIVAL_PROFILES[index];
-      const sample = sampleCourse(state.courseDistanceMeters / lapLength);
-      const laneHalfWidth = Math.max(0, sample.halfWidth - VEHICLE_CLEARANCE_METERS);
-      let targetLateral = profile.startingLateralMeters
-        + Math.sin(state.raceDistanceMeters / 210 + profile.pacePhaseRadians) * 0.75
-        - sample.curvature * 1.4;
-      for (let other = 0; other < states.length; other += 1) {
-        if (other === index) continue;
-        const rival = states[other];
-        if (
-          Math.abs(state.raceDistanceMeters - rival.raceDistanceMeters) < 10
-          && Math.abs(state.lateralMeters - rival.lateralMeters) < 2.6
-        ) {
-          targetLateral = chooseOvertakeOffset(
-            state.id,
-            rival.id,
-            profile.startingLateralMeters,
-          );
-          break;
-        }
-      }
-      const input = {
-        targetLateralMeters: targetLateral,
-        laneHalfWidthMeters: laneHalfWidth,
-        courseSpeedFactor: clamp(1 - Math.abs(sample.curvature) * 0.2, 0.79, 1),
-        curvature: sample.curvature,
-      };
-      const pose = rivalPoseSignals(state, input);
-      const steer = Math.abs(pose.steer) * STEERING_FIN_TRAVEL_RADIANS;
-      steerRadians.push(steer);
-      brakeRadians.push(pose.brake * AIRBRAKE_TRAVEL_RADIANS);
-      if (steer > peakSteerRadians) peakSteerRadians = steer;
-      stepRivalState(state, { deltaSeconds: RIVAL_FIXED_STEP_SECONDS, ...input });
-    }
-  }
-  return { states, steerRadians, brakeRadians, peakSteerRadians };
-}
+assert.equal(nearestAllowedLane(0, -10, 10, []), 0, "No constraint, no movement.");
+assert.equal(nearestAllowedLane(20, -10, 10, []), 10, "Must clamp to the range.");
+assert.equal(
+  nearestAllowedLane(0, -10, 10, [[-3, 3]]),
+  -3,
+  "An exact tie resolves to the first equally close boundary considered, and "
+    + "resolves the same way every time - determinism matters more than which "
+    + "side a dead-centre craft picks.",
+);
+assert.equal(nearestAllowedLane(-1, -10, 10, [[-3, 3]]), -3, "Nearest side wins.");
+assert.equal(nearestAllowedLane(2.9, -10, 10, [[-3, 3]]), 3);
+assert.equal(
+  nearestAllowedLane(0, -2, 2, [[-3, 3]]),
+  null,
+  "A range entirely inside a forbidden span has no solution.",
+);
+// Two forbidden spans with a gap between them: the gap is reachable.
+assert.equal(nearestAllowedLane(0, -20, 20, [[-12, -4], [4, 12]]), 0);
+assert.equal(nearestAllowedLane(-6, -20, 20, [[-12, -4], [4, 12]]), -4);
 
 /**
- * Finish times for the course-faithful run, captured on the same pre-phase
- * commit as the open-loop constants above.
+ * The two properties that matter for the race, over a grid of situations on a
+ * 26 m deck:
+ *
+ *   1. the lane a rival is given clears the PLAYER by the full clearance -
+ *      the player does not cooperate, so the rival owes it the whole gap;
+ *   2. a PAIR of rivals, each solving from its own point of view, ends up at
+ *      least a clearance apart - neither is asked to clear the other outright,
+ *      because both are moving; each is held to its own side of the midpoint,
+ *      which is a value they agree on.
  */
-const PRE_PHASE_COURSE_FINISH_SECONDS = Object.freeze({
-  "rival-privateer": 204.08746742796023,
-  "rival-nightform": 208.60184334230098,
-  "rival-needle": 212.6753891283855,
-});
-
-const courseRace = raceOnCourse();
-assert.ok(
-  courseRace.states.every((state) => state.finished),
-  "Every rival must finish the course-faithful five-lap run.",
+const contestProbe = (paceLane, own, playerLateral, neighbourLateral, gap) => (
+  rivalContestLaneMeters(paceLane, {
+    lateralMeters: own,
+    playerGapMeters: gap,
+    playerLateralMeters: playerLateral,
+    rivalId: "rival-privateer",
+    neighbourLaterals: neighbourLateral === null ? null : [neighbourLateral],
+    insideSign: 0,
+    sideSign: -1,
+    halfWidthMeters: 13,
+    laneHalfWidthMeters: 13 - VEHICLE_CLEARANCE_METERS,
+  })
 );
-for (const state of courseRace.states) {
+for (const paceLane of [-8, -4, -1, 0, 2, 6]) {
+  for (const playerLateral of [-9, -4, 0, 4, 9]) {
+    for (const own of [-9, -3, 0, 3, 9]) {
+      for (const gap of [0, 5, 12, 30, 44]) {
+        const lane = contestProbe(paceLane, own, playerLateral, null, gap);
+        assert.ok(
+          Number.isFinite(lane) && Math.abs(lane) <= 13 - VEHICLE_CLEARANCE_METERS + 1e-9,
+          `Contest lane ${lane} left the deck.`,
+        );
+        assert.ok(
+          Math.abs(lane - playerLateral) >= RIVAL_LANE_CLEARANCE_METERS - 1e-9,
+          `Contest lane ${lane.toFixed(2)} sits `
+            + `${Math.abs(lane - playerLateral).toFixed(2)} m from a player at `
+            + `${playerLateral} (pace ${paceLane}, own ${own}, gap ${gap}).`,
+        );
+      }
+    }
+  }
+}
+for (const first of [-9, -5, -2, 0, 2, 5, 9]) {
+  for (const second of [-9, -5, -2, 0, 2, 5, 9]) {
+    if (first === second) continue;
+    const laneA = contestProbe(first, first, 0, second, Number.POSITIVE_INFINITY);
+    const laneB = contestProbe(second, second, 0, first, Number.POSITIVE_INFINITY);
+    assert.ok(
+      Math.abs(laneA - laneB) >= RIVAL_LANE_CLEARANCE_METERS - 1e-9,
+      `A pair at ${first} / ${second} solved to lanes ${laneA.toFixed(2)} / `
+        + `${laneB.toFixed(2)}, only ${Math.abs(laneA - laneB).toFixed(2)} m apart.`,
+    );
+    assert.ok(
+      (laneA - laneB) * (first - second) > 0,
+      `A pair at ${first} / ${second} solved to lanes that cross each other.`,
+    );
+  }
+}
+// Two craft on exactly the same line have to be separated by the id tie-break,
+// or they would sit on top of one another for ever.
+const stackedA = contestProbe(0, 0, 0, 0, Number.POSITIVE_INFINITY);
+assert.ok(
+  Math.abs(stackedA) >= RIVAL_LANE_CLEARANCE_METERS / 2 - 1e-9,
+  `Two rivals on the same line left one of them at ${stackedA.toFixed(2)}.`,
+);
+
+// Beyond the avoid window the player is simply not in the picture any more.
+assert.equal(
+  rivalContestLaneMeters(-8, {
+    playerGapMeters: 60,
+    playerLateralMeters: -9,
+    insideSign: 0,
+    sideSign: -1,
+    halfWidthMeters: 13,
+    laneHalfWidthMeters: 10.8,
+  }),
+  -8,
+);
+
+// With nobody around, the pace lane must come back untouched: the contest is a
+// constraint, not a second opinion about the racing line.
+assert.equal(
+  rivalContestLaneMeters(-3.2, {
+    playerGapMeters: Number.POSITIVE_INFINITY,
+    playerLateralMeters: 0,
+    insideSign: 0,
+    sideSign: -1,
+    halfWidthMeters: 12,
+    laneHalfWidthMeters: 9.8,
+  }),
+  -3.2,
+);
+// The corridor: armed, and with the deck otherwise clear, a rival must sit
+// inside the (1 - RIVAL_FREE_DECK_FRACTION - margin) share of the deck that
+// hugs its authored yield side.
+const reservedShare = RIVAL_FREE_DECK_FRACTION + RIVAL_NO_BLOCK_MARGIN_FRACTION;
+const corridorLane = rivalContestLaneMeters(6, {
+  playerGapMeters: 40,
+  playerLateralMeters: Number.NaN,
+  insideSign: 0,
+  sideSign: -1,
+  halfWidthMeters: 12,
+  laneHalfWidthMeters: 9.8,
+});
+assert.ok(
+  corridorLane + VEHICLE_CLEARANCE_METERS <= 12 - reservedShare * 24 + 1e-9,
+  `A yielding rival reached ${corridorLane.toFixed(2)}, inside the reserved `
+    + `${(reservedShare * 100).toFixed(0)}% of the deck.`,
+);
+
+// --- the free-deck rule, as a property ------------------------------------
+
+assert.equal(measureFreeDeckFraction([], 12), 1);
+assert.equal(measureFreeDeckFraction([0], 12), (12 - VEHICLE_CLEARANCE_METERS) / 24);
+// Three abreast and evenly spread IS a wall: this is the case the field-level
+// reading of principle 5 exists to catch, and the per-craft reading misses.
+assert.ok(
+  measureFreeDeckFraction([-7.5, 0, 7.5], 12) < 0.4,
+  "Three rivals spread across a 24 m deck must read as blocking it.",
+);
+// Geometry ceiling: on a deck under 22 m no single craft can leave 40% clear.
+assert.equal(freeDeckTargetFraction(12), 0.4);
+assert.equal(freeDeckTargetFraction(11), 0.4);
+assert.ok(freeDeckTargetFraction(9.5) < 0.4);
+assert.equal(
+  freeDeckTargetFraction(9.5),
+  (9.5 - VEHICLE_CLEARANCE_METERS) / 19,
+);
+
+// --- boost windows sit on straights ---------------------------------------
+
+const MAPS = ["greenwater", "bitterpan"];
+for (const kind of MAPS) {
+  const course = loadCourseModel(kind);
+  const pace = loadRivalPace(kind);
+  assert.ok(
+    Number.isFinite(pace.straightCurvature) && pace.straightCurvature > 0,
+    `${kind} authors no straightCurvature.`,
+  );
+  assert.ok(
+    Number.isFinite(pace.driftCurvature) && pace.driftCurvature > pace.straightCurvature,
+    `${kind} drift threshold must sit above its straight ceiling.`,
+  );
+  for (const profile of RIVAL_PROFILES) {
+    const entry = resolveRivalPace(pace, profile.id);
+    assert.equal(
+      entry.boostWindows.length,
+      3,
+      `${kind}/${profile.id} must author exactly three reserve windows per lap.`,
+    );
+    assert.ok(
+      entry.cruiseSpeedMetersPerSecond >= 82 && entry.cruiseSpeedMetersPerSecond <= 88,
+      `${kind}/${profile.id} cruise ${entry.cruiseSpeedMetersPerSecond} is outside `
+        + "the player's own 82-88 m/s cruise band; a rival that cannot reach it on "
+        + "a straight is a pace car with a boost button.",
+    );
+    for (const window of entry.boostWindows) {
+      assert.ok(
+        window.toMeters > window.fromMeters,
+        `${kind}/${profile.id} has an empty boost window.`,
+      );
+      assert.ok(
+        window.toMeters <= course.length,
+        `${kind}/${profile.id} has a boost window past the finish line.`,
+      );
+      let peak = 0;
+      for (let d = window.fromMeters; d <= window.toMeters; d += 1) {
+        peak = Math.max(peak, Math.abs(course.sample(d / course.length).curvature));
+      }
+      assert.ok(
+        peak <= pace.straightCurvature,
+        `${kind}/${profile.id} boost window ${window.fromMeters}-${window.toMeters} `
+          + `peaks at |curvature| ${peak.toFixed(3)}, above the authored straight `
+          + `ceiling ${pace.straightCurvature}. A rival must not commit reserve `
+          + "into a bend.",
+      );
+      // The window must be inside a pad's reach or a real straight, not a
+      // one-metre sliver that would never light the boost.
+      assert.ok(
+        window.toMeters - window.fromMeters >= 100,
+        `${kind}/${profile.id} boost window is only `
+          + `${(window.toMeters - window.fromMeters).toFixed(0)} m long.`,
+      );
+    }
+    // Every rival's set differs from every other's, so the field fans out on
+    // the straights rather than holding station.
+    for (const other of RIVAL_PROFILES) {
+      if (other.id === profile.id) continue;
+      const otherEntry = resolveRivalPace(pace, other.id);
+      assert.notDeepEqual(
+        entry.boostWindows,
+        otherEntry.boostWindows,
+        `${kind}: ${profile.id} and ${other.id} share a boost-window set.`,
+      );
+    }
+  }
+  assert.ok(
+    isInsideBoostWindow(resolveRivalPace(pace, "rival-privateer").boostWindows, 0),
+    `${kind}/rival-privateer must be able to launch on boost from the line.`,
+  );
+}
+
+// --- course-faithful five-lap races, both maps ----------------------------
+//
+// `simulateRivalField` runs the SAME decision sequence `RivalFleet.step` runs,
+// against the same authored course data, so what is asserted here is the race
+// the game actually holds rather than a second model of it.
+
+/**
+ * Five-lap totals for the course-faithful run, per map. These replace the P2
+ * Greenwater-only pins (204.08746742796023 / 208.60184334230098 /
+ * 212.6753891283855) and move for the same reason as the open-loop pins above:
+ * the rival model itself changed in G1. Re-derive with
+ * `node scripts/rival-pace-calibration.mjs` and re-pin deliberately.
+ */
+const COURSE_FINISH_SECONDS = {
+  greenwater: {
+    "rival-privateer": 165.03942677996986,
+    "rival-nightform": 167.69980259174025,
+    "rival-needle": 169.33301012827604,
+  },
+  bitterpan: {
+    "rival-privateer": 183.5309377998621,
+    "rival-nightform": 185.63749668195837,
+    "rival-needle": 185.82389155322403,
+  },
+};
+
+/**
+ * Demo-autopilot five-lap totals the pace was calibrated against, measured by
+ * `node scripts/visual/diag-long.mjs "...&laps=5&demo=1&diagnostics=1&headless=1"`.
+ * Both tables above are re-derived from these by
+ * `node scripts/visual/print-rival-pins.mjs`; re-measure before re-pinning either.
+ */
+const PLAYER_TOTAL_SECONDS = { greenwater: 165.442, bitterpan: 183.933 };
+
+let peakSteerRadians = 0;
+const steerRadians = [];
+const brakeRadians = [];
+
+for (const kind of MAPS) {
+  const course = loadCourseModel(kind);
+  const pace = loadRivalPace(kind);
+  const player = () => measuredPacePlayer(course.length, PLAYER_TOTAL_SECONDS[kind] / 5);
+
+  const at120 = simulateRivalField({
+    course,
+    pace,
+    totalLaps,
+    renderDeltaSeconds: RIVAL_FIXED_STEP_SECONDS,
+    player: player(),
+  });
+  const at60 = simulateRivalField({
+    course,
+    pace,
+    totalLaps,
+    renderDeltaSeconds: 1 / 60,
+    player: player(),
+  });
+  const idle = simulateRivalField({
+    course,
+    pace,
+    totalLaps,
+    renderDeltaSeconds: RIVAL_FIXED_STEP_SECONDS,
+    player: parkedPlayer(),
+  });
+
+  const timing = (run) => run.states.map((state) => ({
+    id: state.id,
+    laps: state.lapTimesSeconds,
+    finish: state.finishTimeSeconds,
+    boostSeconds: state.boostSeconds,
+    padHits: state.padHits,
+    driftEntries: state.driftEntries,
+  }));
+
+  assert.ok(
+    at120.states.every((state) => state.finished),
+    `${kind}: every rival must finish the five-lap run.`,
+  );
+
+  // 1. Render rate cannot move a rival. `stepRivalField` owns the accumulator
+  //    and hands every rival exactly one fixed sub-step, in lockstep, so a
+  //    1/60 frame is two of the identical sub-steps a 1/120 frame takes one of.
+  assert.deepEqual(
+    timing(at60),
+    timing(at120),
+    `${kind}: rival lap and finish times differ between 60 Hz and 120 Hz.`,
+  );
+
+  // 2. The player cannot move a rival either. Same field, same course, raced
+  //    once against a moving player and once against a player left on the grid.
+  //    Anything that let the player's position reach a rival's SPEED - a
+  //    catch-up term, a pad resolved against the player-reactive lane, a corner
+  //    factor that read the contested lane - shows up here as a timing diff.
+  assert.deepEqual(
+    timing(idle),
+    timing(at120),
+    `${kind}: rival timing changed with the player's position. That is `
+      + "rubber-banding, however it got in.",
+  );
+
+  const finishes = at120.states.map((state) => state.finishTimeSeconds);
   assert.equal(
-    state.finishTimeSeconds,
-    PRE_PHASE_COURSE_FINISH_SECONDS[state.id],
-    `${state.id} course finish time moved from the pre-phase capture.`,
+    new Set(finishes).size,
+    RIVAL_PROFILES.length,
+    `${kind}: two rivals finished at exactly the same time.`,
+  );
+  assert.ok(
+    Math.max(...finishes) - Math.min(...finishes) < 12,
+    `${kind}: the field is spread over `
+      + `${(Math.max(...finishes) - Math.min(...finishes)).toFixed(2)} s; that is a `
+      + "procession, not a race.",
+  );
+
+  for (const state of at120.states) {
+    const expected = COURSE_FINISH_SECONDS[kind][state.id];
+    assert.equal(
+      state.finishTimeSeconds,
+      expected,
+      `${kind}/${state.id} course finish time moved from the pin: `
+        + `${state.finishTimeSeconds} vs ${expected}.`,
+    );
+  }
+
+  // 3. Separation, rival versus rival. This half is entirely the fleet's to
+  //    hold: both craft resolve the same constraint from the same two
+  //    positions, so nothing outside the fleet can push them together.
+  assert.ok(
+    at120.minimumRivalSeparationMeters >= VEHICLE_CLEARANCE_METERS,
+    `${kind}: rivals closed to ${at120.minimumRivalSeparationMeters.toFixed(2)} m, `
+      + `inside the ${VEHICLE_CLEARANCE_METERS} m clearance.`,
+  );
+  //    The player half is NOT asserted here, deliberately. The stand-in player
+  //    above weaves across the deck with no regard for traffic and can steer
+  //    straight into a craft that is already sliding away from it as fast as it
+  //    can; what that measures is the harness's aggression, not the fleet's
+  //    behaviour. The two things the fleet can actually promise are asserted
+  //    instead - the lane solver's output is always at least
+  //    RIVAL_LANE_CLEARANCE_METERS from the player (the property grid above),
+  //    and the real demo soak's `rivalMinimumSeparationMeters` is the
+  //    acceptance measurement for the number itself. It is printed below so a
+  //    regression is still visible in the log.
+
+  // 4. The free-deck rule. Asserted on every sample where a rival sits within
+  //    the no-block window ahead of the player and is not literally alongside
+  //    it: alongside, the lateral clearance is allowed to pull a craft out of
+  //    the yield corridor, which is the documented trade in
+  //    `rivalContestLaneMeters` - a player parked in the corridor is not being
+  //    blocked, and assertion 3 covers that case instead.
+  assert.ok(
+    at120.noBlockSamples > 200,
+    `${kind}: only ${at120.noBlockSamples} no-block samples; the free-deck `
+      + "assertion would be near vacuous.",
+  );
+  assert.ok(
+    at120.minimumClearFreeDeckFraction >= at120.minimumFreeDeckTarget - 1e-9,
+    `${kind}: the field left only `
+      + `${(at120.minimumClearFreeDeckFraction * 100).toFixed(1)}% of the deck free `
+      + `where ${(at120.minimumFreeDeckTarget * 100).toFixed(1)}% was reachable.`,
+  );
+
+  // 5. The tools are actually used, per rival, per five laps.
+  for (const state of at120.states) {
+    assert.ok(
+      state.boostSeconds >= 4,
+      `${kind}/${state.id} spent only ${state.boostSeconds.toFixed(2)} s on boost.`,
+    );
+    assert.ok(
+      state.padHits >= 3 || kind === "greenwater",
+      `${kind}/${state.id} collected only ${state.padHits} pads.`,
+    );
+  }
+  if (kind === "greenwater") {
+    for (const state of at120.states) {
+      assert.ok(
+        state.driftEntries >= 3,
+        `${kind}/${state.id} drifted only ${state.driftEntries} corners; `
+          + "Greenwater is the map with the hard corners.",
+      );
+    }
+  }
+
+  if (kind === "greenwater") {
+    peakSteerRadians = at120.peakSteerRadians;
+    for (const state of at120.states) {
+      steerRadians.push(Math.abs(state.lateralMeters));
+    }
+  }
+
+  console.log(
+    `${kind}: `
+      + at120.states.map((state) => (
+        `${state.id.replace("rival-", "")} ${state.finishTimeSeconds.toFixed(3)}s `
+          + `(lap1 ${state.lapTimesSeconds[0].toFixed(3)}, boost `
+          + `${state.boostSeconds.toFixed(1)}s, pads ${state.padHits}, drifts `
+          + `${state.driftEntries})`
+      )).join("  ")
+      + ` | rival-rival ${at120.minimumRivalSeparationMeters.toFixed(2)} m, `
+      + `player-rival ${at120.minimumSeparationMeters.toFixed(2)} m, `
+      + `free deck ${(at120.minimumClearFreeDeckFraction * 100).toFixed(1)}% of `
+      + `${(at120.minimumFreeDeckTarget * 100).toFixed(1)}% reachable over `
+      + `${at120.noBlockSamples} samples, lead changes ${at120.leadChanges}`,
   );
 }
 
 assert.ok(
-  courseRace.peakSteerRadians >= MINIMUM_PEAK_STEER_RADIANS,
-  `Peak fin deflection over five laps was ${courseRace.peakSteerRadians.toFixed(4)} rad, `
+  peakSteerRadians >= MINIMUM_PEAK_STEER_RADIANS,
+  `Peak fin deflection over five laps was ${peakSteerRadians.toFixed(4)} rad, `
     + `below the ${MINIMUM_PEAK_STEER_RADIANS} rad floor: the fins would read as welded.`,
-);
-
-const quantile = (values, fraction) => {
-  const sorted = [...values].sort((a, b) => a - b);
-  return sorted[Math.min(sorted.length - 1, Math.floor(fraction * sorted.length))];
-};
-const steerAtOrAboveFloor = courseRace.steerRadians
-  .filter((value) => value >= MINIMUM_PEAK_STEER_RADIANS).length;
-// The gain in `rival-race.js` was chosen from exactly this distribution; the
-// numbers are printed so a later change to it is visible in the log, not just
-// in a pass/fail.
-console.log(
-  `Rival articulation over ${courseRace.steerRadians.length} sampled sub-steps: `
-    + `|steer| p50=${quantile(courseRace.steerRadians, 0.5).toFixed(4)} rad, `
-    + `p75=${quantile(courseRace.steerRadians, 0.75).toFixed(4)} rad, `
-    + `p90=${quantile(courseRace.steerRadians, 0.9).toFixed(4)} rad, `
-    + `peak=${courseRace.peakSteerRadians.toFixed(4)} rad, `
-    + `${(steerAtOrAboveFloor / courseRace.steerRadians.length * 100).toFixed(1)}% at or `
-    + `above ${MINIMUM_PEAK_STEER_RADIANS} rad; `
-    + `airbrake peak=${quantile(courseRace.brakeRadians, 1).toFixed(4)} rad.`,
 );
 
 // ---------------------------------------------------------------------------
@@ -498,5 +859,14 @@ assert.match(
 );
 
 console.log(
-  "Rival race PASS: deterministic 120 Hz pacing, five-lap timing, bounded lanes, stable ranking/gaps, finish spread, safe-state recovery, bounded visual banking, rate-independent pose signals and unchanged pre/post-phase finish times; livery sheet orientation pinned in both consumers (player swap sets flipY = true, rival atlas mirrors per quadrant at flipY = false).",
+  "Rival race PASS: deterministic 120 Hz pacing, five-lap timing, bounded lanes, "
+    + "stable ranking/gaps, finish spread, safe-state recovery, bounded visual "
+    + "banking, rate-independent pose signals and pinned open-loop finish times; "
+    + "G1 - boost/pad/drift accumulators rate independent, every reserve window "
+    + "on an authored straight with each rival's set distinct, rival lap and "
+    + "finish times bit-identical at 60 Hz and 120 Hz AND between a moving player "
+    + "and a player left on the grid on both maps, lane solver always clear of "
+    + "player and neighbour, field-level free-deck rule held; livery sheet "
+    + "orientation pinned in both consumers (player swap sets flipY = true, rival "
+    + "atlas mirrors per quadrant at flipY = false).",
 );

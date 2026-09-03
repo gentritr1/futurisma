@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import greenwaterJson from "./data/greenwater-blockout.json";
+import greenwaterRivalPaceJson from "./data/greenwater-rival-pace.json";
 import plaqueBackingJson from "./data/HANGAR_SIX_PLAQUE_BACKING.json";
 import {
   createApronResolution,
@@ -275,6 +276,28 @@ export interface RivalGridStart {
   lateralMeters: number;
 }
 
+/** One rival's authored pace on this map. See `rival-race.js` for the model. */
+export interface RivalPaceEntry {
+  cruiseSpeedMetersPerSecond: number;
+  padUse: boolean;
+  boostWindows: readonly { fromMeters: number; toMeters: number }[];
+}
+
+/**
+ * G1 - the per-map rival pace block. Greenwater authors it in
+ * `data/greenwater-rival-pace.json`, Bitterpan under the `rivals` key of
+ * `BITTERPAN_PRODUCTION.json`. Both were solved by
+ * `scripts/rival-pace-calibration.mjs` against a measured demo soak.
+ */
+export interface RivalPaceTable {
+  cornerSpeedGain: number;
+  cornerSpeedFloor: number;
+  noBlockSide: number;
+  driftCurvature: number;
+  straightCurvature: number;
+  profiles: Record<string, RivalPaceEntry>;
+}
+
 export interface RaceCourse {
   readonly kind: CourseKind;
   readonly group: THREE.Group;
@@ -345,6 +368,19 @@ export interface RaceCourse {
   setLapBoard(current: number, total: number): void;
   recoveryProgressFor(progress: number, previousCheckpointIndex: number): number;
   rivalGridStart(identity: string): RivalGridStart | null;
+  /** The authored rival pace for this map, or null if it authors none. */
+  readonly rivalPace: RivalPaceTable | null;
+  /**
+   * The lateral line of the authored boost pad this course distance is running
+   * up to, or null when there is none inside `approachMeters`. Rivals use it to
+   * line up for a pad the way the player does; it is a pure function of the
+   * course, so which pad a rival takes can never depend on the player.
+   */
+  boostPadLaneAt(
+    courseDistanceMeters: number,
+    halfWidth: number,
+    approachMeters: number,
+  ): number | null;
 }
 
 const WORLD_UP = new THREE.Vector3(0, 1, 0);
@@ -367,6 +403,10 @@ const APRON_SURFACE_LABELS: Record<string, string> = {
 /** P11: turn guide lights hug the inside deck edge instead of the apex. */
 const TURN_GUIDE_EDGE_INSET_METRES = 0.9;
 const BOOST_PAD_DISTANCES = [1705, 1815, 1925, 2035] as const;
+const BOOST_PAD_HALF_LENGTH_METRES = 10;
+/** Middle of the authored 0.12..0.78 half-width strip `isOnBoostPad` accepts. */
+const BOOST_PAD_LANE_FRACTION = 0.45;
+const GREENWATER_RIVAL_PACE = greenwaterRivalPaceJson.rivals as unknown as RivalPaceTable;
 const SECTOR_LABELS: Record<string, string> = {
   RUNWAY_START: "RUNWAY 09",
   T1_CRADLE_BEND: "CRADLE BEND",
@@ -793,6 +833,7 @@ export class GreenwaterCourse implements RaceCourse {
   readonly mapCode = "MAP 01";
   readonly finishName = "The Cradle";
   readonly startLabel = "RUNWAY 09";
+  readonly rivalPace = GREENWATER_RIVAL_PACE;
   readonly startProgress = 0.002;
   readonly startLateral = 0;
   readonly recoveryHoldSeconds = MAP.recovery.holdSeconds;
@@ -1307,8 +1348,31 @@ export class GreenwaterCourse implements RaceCourse {
     if (lateral < halfWidth * 0.12 || lateral > halfWidth * 0.78) return false;
     const distance = THREE.MathUtils.euclideanModulo(progress, 1) * this.length;
     return BOOST_PAD_DISTANCES.some(
-      (padDistance) => Math.abs(distance - padDistance) <= 10,
+      (padDistance) => Math.abs(distance - padDistance) <= BOOST_PAD_HALF_LENGTH_METRES,
     );
+  }
+
+  boostPadLaneAt(
+    courseDistanceMeters: number,
+    halfWidth: number,
+    approachMeters: number,
+  ): number | null {
+    const distance = THREE.MathUtils.euclideanModulo(courseDistanceMeters, this.length);
+    let lane: number | null = null;
+    let nearest = Infinity;
+    for (const padDistance of BOOST_PAD_DISTANCES) {
+      const gap = THREE.MathUtils.euclideanModulo(
+        padDistance - distance + this.length / 2,
+        this.length,
+      ) - this.length / 2;
+      if (gap > approachMeters || gap < -BOOST_PAD_HALF_LENGTH_METRES) continue;
+      if (Math.abs(gap) >= nearest) continue;
+      nearest = Math.abs(gap);
+      // Middle of the authored strip: `isOnBoostPad` accepts 0.12..0.78 of the
+      // half width, so 0.45 is the line that collects it with the most margin.
+      lane = BOOST_PAD_LANE_FRACTION * halfWidth;
+    }
+    return lane;
   }
 
   sectorLabelAt(progress: number): string {
