@@ -581,7 +581,7 @@
   },
   "rivals": {
     "note": "G1 rival pace. Solved, not guessed: node scripts/rival-pace-calibration.mjs bitterpan prints the table, --solve-corner and --solve re-derive these numbers against a freshly measured demo lap. The script's header carries the full derivation; it does not ship, this file does.",
-    "cornerSpeedGain": 0.4537,
+    "cornerSpeedGain": 0.4312,
     "cornerSpeedFloor": 0.45,
     "noBlockSide": -1,
     "driftCurvature": 0.72,
@@ -606,7 +606,7 @@
         ]
       },
       "rival-nightform": {
-        "cruiseSpeedMetersPerSecond": 86.18,
+        "cruiseSpeedMetersPerSecond": 86.31,
         "padUse": true,
         "boostWindows": [
           {
@@ -624,7 +624,7 @@
         ]
       },
       "rival-needle": {
-        "cruiseSpeedMetersPerSecond": 84.72,
+        "cruiseSpeedMetersPerSecond": 84.29,
         "padUse": true,
         "boostWindows": [
           {

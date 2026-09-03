@@ -13,7 +13,7 @@ import { measuredPacePlayer, simulateRivalField } from "../lib/rival-field-sim.m
 
 const courseLengthMeters = 2516;
 const totalLaps = 5;
-const PLAYER_TOTAL_SECONDS = { greenwater: 165.449, bitterpan: 183.117 };
+const PLAYER_TOTAL_SECONDS = { greenwater: 165.425, bitterpan: 183.075 };
 
 function openLoopInput(index) {
   return {
