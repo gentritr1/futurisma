@@ -108,13 +108,15 @@ assert.ok(
   `Stylesheet exceeds 8 KiB gzip (${(stylesheetGzip / 1024).toFixed(1)} KiB).`,
 );
 // Shell = HTML + initial JS + CSS. It moves with the JS ceiling above and for
-// the same reason. The only shell-specific cost this round is G1's SLIPSTREAM
-// chip, 0.75 KiB of stylesheet, which still leaves CSS well under its own 8 KiB
-// ceiling; HTML is untouched by every phase above. Measured on the merged tree
-// at 241.0 KiB (HTML 3.1 + JS 232.8 + CSS 5.1).
+// the same reason. The only shell-specific cost of G1 was its SLIPSTREAM chip,
+// 0.75 KiB of stylesheet; G2 adds the contact glow, the clean-gate counter and
+// their two HTML nodes, about 0.4 KiB of CSS and 0.2 of HTML, which still
+// leaves CSS well under its own 8 KiB ceiling. Measured on the merged tree at
+// 245.1 KiB (HTML 3.3 + JS 236.3 + CSS 5.5), against 241.0 before G2. The
+// ceiling moves with the JS one it is dominated by; re-measure both together.
 assert.ok(
-  shellGzip <= 245 * 1024,
-  `Initial app shell exceeds 245 KiB gzip (${(shellGzip / 1024).toFixed(1)} KiB).`,
+  shellGzip <= 248 * 1024,
+  `Initial app shell exceeds 248 KiB gzip (${(shellGzip / 1024).toFixed(1)} KiB).`,
 );
 assert.ok(
   html.includes('rel="preload"')

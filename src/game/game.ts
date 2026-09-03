@@ -857,6 +857,7 @@ export class FuturismaGame {
     if (this.contact.stepCushion(
       this.rivalFleet, this.contactPose, this.playerRaceDistance(),
       delta, this.elapsedMs, afterMove, this.position,
+      this.course.apronAt(afterMove, this.lateral, this.afterMoveApron).lateralLimit,
     )) {
       this.lateral = this.contactPose.lateralMeters;
       this.position.copy(afterMove.position).addScaledVector(afterMove.right, this.lateral);
@@ -1444,6 +1445,7 @@ export class FuturismaGame {
       driftCharge: this.driftBank.charge,
       slipstream: this.slipstream,
       cushionSide: this.contact.glowAt(this.elapsedMs),
+      cushionPush: Math.abs(this.rivalFleet?.cushionPushMetersPerSecondSquared ?? 0),
       cleanGateChain: this.contact.cleanGateChain,
       cleanGateMultiplier: this.contact.regenMultiplier,
       braking: input.brake > 0.1,

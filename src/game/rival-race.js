@@ -171,20 +171,31 @@ export const RIVAL_NO_BLOCK_YIELD_OVERRIDE_METERS = 7;
  * G2 — extra lateral room a rival gives up while the player is leaning on it
  * through the air cushion.
  *
- * The cushion moves the PLAYER; this is the rival's half of the same moment,
- * and it is deliberately small. A rival that bailed out of a contact entirely
- * would be a rival that can be shoved off any line the player wants, which is
- * the opposite of the pressure principle 5 asks for. 0.6 m is about a seventh
- * of a hull: enough that a lean actually opens a gap over a second or two,
- * nowhere near enough to make leaning a substitute for a pass.
+ * The cushion moves the PLAYER; this is the rival's half of the same moment, so
+ * the pair separates from both sides rather than the player doing all the work.
+ * Round 1 shipped 0.6 m and it was measurably nothing; 1.4 m is the same order
+ * as the cushion's own authority, which is what it has to be for the two halves
+ * to add up to a hull's width of clearance.
  *
- * It is LATERAL ONLY, and it reaches the rival exactly the way the existing
- * player-avoidance does — by widening the span the lane solver refuses to aim
- * at. Nothing here can touch a rival's speed, which is what keeps
- * `validate-rivals.mjs`'s longitudinal-independence proof true with the cushion
- * armed.
+ * It is LATERAL ONLY, and it reaches the rival by shifting the lane it AIMS at,
+ * never by widening the forbidden span around the player - see the note in
+ * `rivalContestLaneMeters` for why that distinction cost 0.9 points of free
+ * deck when it was done the other way. Nothing here can touch a rival's speed,
+ * which is what keeps the longitudinal-independence proof in
+ * `validate-rivals.mjs` true with the cushion armed.
  */
-export const RIVAL_CUSHION_YIELD_METERS = 0.6;
+export const RIVAL_CUSHION_YIELD_METERS = 1.4;
+/**
+ * ... and what it becomes when the PLAYER cannot move.
+ *
+ * At the deck edge the apron clamp wins: the cushion asks to push the player
+ * outward, the clamp refuses, and the lean has nowhere to go. Without this the
+ * pair would simply stay fouled for as long as the player was pinned there,
+ * which is the one place a contact is most likely and least escapable. So the
+ * rival takes the whole separation instead - enough on its own to clear two
+ * hulls, rather than the half it takes on open deck.
+ */
+export const RIVAL_CUSHION_YIELD_BLOCKED_METERS = 2.8;
 
 /** A rival defends the inside line while the player sits in this gap band. */
 export const RIVAL_DEFENCE_MINIMUM_GAP_METERS = 8;

@@ -93,36 +93,82 @@ export const SLIPSTREAM_LOCK_THRESHOLD = 0.8;
  * push is always AWAY from the rival, so it can never drive the two together;
  * `scripts/validate-physics.mjs` asserts that over the whole envelope.
  */
-export const CUSHION_LATERAL_RANGE_METERS = 2.4;
-export const CUSHION_LATERAL_PEAK_METERS = 0.8;
-export const CUSHION_LONGITUDINAL_FULL_METERS = 3;
-export const CUSHION_LONGITUDINAL_RANGE_METERS = 5.5;
+/*
+ * ROUND 2 envelope. Round 1 shipped 2.4 m / 5.5 m at a 6 m/s^2 peak through a
+ * 0.5 s integrator, and the soak telemetry said exactly what that was worth:
+ * 0.489 m of lateral travel over five laps, a longest contact of 0.208 s, and
+ * a Greenwater minimum separation of 0.15 m - two hulls drawn through one
+ * another. The arithmetic was the finding: a lean that only arms at 2.4 m has
+ * to arrest all closure inside 0.4 m to leave 2.0 m, which is a wall.
+ *
+ * So the envelope arms earlier and pushes harder. It is still not a wall - it
+ * is a lane's worth of lean, bounded by CUSHION_VELOCITY_CAP_MPS rather than by
+ * being too weak to matter.
+ */
+export const CUSHION_LATERAL_RANGE_METERS = 3.4;
+/**
+ * Full push at or inside this hull-centre gap. A TOTEM is ~2.2 m across, so
+ * 2.2 m centre to centre is hulls touching and 1.4 m is deep overlap: the peak
+ * is reached before the craft intersect, not after.
+ */
+export const CUSHION_LATERAL_PEAK_METERS = 1.4;
+/**
+ * Longitudinal profile: full while within FULL of level, fading to nothing at
+ * RANGE. 4 m of level keeps the whole side-by-side band at full strength; the
+ * fade out to 7 m is what stops a craft two lengths up the road from shoving.
+ */
+export const CUSHION_LONGITUDINAL_FULL_METERS = 4;
+export const CUSHION_LONGITUDINAL_RANGE_METERS = 7;
 /** Peak lateral acceleration on the player, m/s^2, at or inside the peak gap. */
-export const CUSHION_PEAK_PUSH_MPS2 = 6;
-/** Ceiling on the scrub, as a share of current speed per second. */
+export const CUSHION_PEAK_PUSH_MPS2 = 14;
+/** Ceiling on the scrub, as a share of current speed per second. Unchanged. */
 export const CUSHION_MAX_SCRUB_PER_SECOND = 0.02;
 /** Closing speed at which the closing term is fully spent, m/s. */
 export const CUSHION_CLOSING_REFERENCE_MPS = 3;
 /** How much earlier a fast closing reaches the peak: `across` * up to 1.6. */
 export const CUSHION_CLOSING_GAIN = 0.6;
 /**
- * How fast the cushion's own lateral velocity bleeds off, per second.
+ * The hard ceiling on how fast the cushion alone can move the craft sideways.
  *
- * The cushion is an acceleration, so without this a two-second contact would
- * fling the craft sideways at 12 m/s. With it, a sustained push settles at
- * CUSHION_PEAK_PUSH_MPS2 / CUSHION_VELOCITY_DAMPING metres per second of
- * lateral drift, and that ratio is the whole feel of the feature: it is how
- * fast a lean can open a gap, and equally how fast a driver can close one back.
+ * This, not the peak acceleration, is what keeps the cushion a lean. 14 m/s^2
+ * is a firm shove for the fraction of a second it takes to get clear, but the
+ * craft never leaves at more than a lane-change speed, and the moment the
+ * contact ends the whole thing bleeds off in about a third of a second.
  *
- * MEASURED, not chosen. It began at 4 (a 1.5 m/s lean) and that was too weak to
- * do the job the phase exists for: on the Greenwater demo soak the cushion was
- * armed for 1.1 s over five laps and the player-rival minimum came out at
- * 0.14 m - no better than the 1.19 m the cushion-off control managed, because a
- * demo driver steering back onto its racing line simply out-pushed it. 2 gives
- * a 3 m/s lean, which is the same order as the craft's own lateral authority at
- * race speed, so the two can actually argue.
+ * Note it sits BELOW the undamped terminal velocity
+ * (CUSHION_PEAK_PUSH_MPS2 * CUSHION_VELOCITY_TIME_CONSTANT_SECONDS = 4.9 m/s),
+ * so a sustained peak contact reaches the cap at about 0.59 s and holds there.
  */
-export const CUSHION_VELOCITY_DAMPING = 2;
+export const CUSHION_VELOCITY_CAP_MPS = 4;
+/**
+ * How long the cushion's own lateral velocity takes to bleed off once the
+ * contact ends, in seconds - and, on the way in, the time constant of the ramp.
+ *
+ * 0.35 s is short enough that the craft is back on the driver's line almost
+ * immediately after a brush, and long enough that the push does not read as a
+ * kick. Round 1 ran 0.5 s at a fifth of the acceleration and the two together
+ * were what made the feature invisible.
+ */
+export const CUSHION_VELOCITY_TIME_CONSTANT_SECONDS = 0.35;
+/** Expressed as a rate for the integrator: 1 / time constant. */
+export const CUSHION_VELOCITY_DAMPING = 1 / CUSHION_VELOCITY_TIME_CONSTANT_SECONDS;
+/**
+ * Separation under which a "tow" is really a contact.
+ *
+ * The cushion exempts a craft the player is properly drafting, because a locked
+ * tow is the game working rather than two hulls fouling. That exemption has to
+ * stop somewhere, and this is where.
+ *
+ * INTERPRETED, and the interpretation is worth stating. The round 2 brief asks
+ * for "a tow that closes under 2.0 m LATERAL" to drop the lock. Read literally
+ * that disarms every draft in the game: SLIPSTREAM_LATERAL_FULL_METERS is
+ * 1.5 m, so a full tow is BY DEFINITION under 2.0 m of lateral - the rule would
+ * mean no lock could ever exist. Taken as SEPARATION it says the intended
+ * thing: a tow sits 4-16 m back, so hypot is 4 m or more and the exemption
+ * survives, while a craft that has closed to within 2 m of the one ahead is
+ * touching it and gets the cushion.
+ */
+export const CUSHION_TOW_CONTACT_SEPARATION_METERS = 2;
 
 /**
  * The soft contact between the player and one rival, for one step.
@@ -181,14 +227,27 @@ export function calculateCushion(
 }
 
 /**
- * Integrates the cushion's own lateral velocity, damped so a long contact
- * settles at a bounded lean instead of accelerating without limit.
+ * Integrates the cushion's own lateral velocity.
  *
- * This is the exact solution of `v' = push - k v` over the step rather than an
- * Euler step of it, so 60 Hz and 120 Hz reach the same velocity over the same
- * wall-clock contact to floating point, not merely to integrator accuracy.
+ * TWO REGIMES, because a pressure field and a release are not the same thing.
+ *
+ *   PUSHING - the field accelerates the craft, full stop. `v += push * delta`,
+ *     bounded by CUSHION_VELOCITY_CAP_MPS. There is no drag term here on
+ *     purpose: a damping that fought the push while the hulls were still
+ *     fouling is exactly what made round 1 useless, and it is also wrong -
+ *     nothing is resisting the separation while the two craft are inside one
+ *     another's air.
+ *   CLEAR - the craft coasts back onto the driver's line, decaying with
+ *     CUSHION_VELOCITY_TIME_CONSTANT_SECONDS. This is the regime the brief's
+ *     0.35 s describes, and it is what stops a brush handing the player a
+ *     permanent sideways drift.
+ *
+ * Both halves are exact over the step rather than Euler approximations of
+ * something else - a constant acceleration integrates exactly, and the decay
+ * uses the closed form - so 60 Hz and 120 Hz agree to floating point.
+ *
  * @param {number} velocity
- * @param {number} pushMetersPerSecondSquared
+ * @param {number} pushMetersPerSecondSquared signed; zero means clear
  * @param {number} delta
  */
 export function integrateCushionVelocity(velocity, pushMetersPerSecondSquared, delta) {
@@ -197,8 +256,10 @@ export function integrateCushionVelocity(velocity, pushMetersPerSecondSquared, d
     ? pushMetersPerSecondSquared
     : 0;
   const step = Number.isFinite(delta) ? clamp(delta, 0, 0.1) : 0;
-  const settled = push / CUSHION_VELOCITY_DAMPING;
-  return settled + (current - settled) * Math.exp(-step * CUSHION_VELOCITY_DAMPING);
+  const next = push === 0
+    ? current * Math.exp(-step * CUSHION_VELOCITY_DAMPING)
+    : current + push * step;
+  return clamp(next, -CUSHION_VELOCITY_CAP_MPS, CUSHION_VELOCITY_CAP_MPS);
 }
 
 const OVERSPEED_DRAG_RATE = 0.45;

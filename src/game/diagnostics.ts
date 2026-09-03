@@ -184,6 +184,28 @@ function rivalFields(
       (rivals?.playerRivalMinimumSeparationMeters ?? 0).toFixed(2),
     ),
     cushionSeconds: Number((rivals?.cushionSeconds ?? 0).toFixed(2)),
+    // G2 round 2 - LIVE this-frame contact state, for the state-triggered
+    // screenshot harness. A soak total cannot tell a reviewer what the frame in
+    // front of them is showing; these four can.
+    cushionPushNow: Number((rivals?.cushionPushNow ?? 0).toFixed(2)),
+    cushionGapNow: Number((rivals?.cushionGapNow ?? 0).toFixed(2)),
+    cushionSeparationNow: Number((rivals?.cushionSeparationNow ?? 0).toFixed(2)),
+    cushionYieldNow: Number((rivals?.cushionYieldNow ?? 0).toFixed(2)),
+    // The honest "how hard does it push while the hulls are clear" pair, from
+    // the physics step rather than from this once-a-second report.
+    cushionPeakClearPush: Number((rivals?.cushionPeakClearPush ?? 0).toFixed(2)),
+    cushionSeparationAtPeakClearPush: Number(
+      (rivals?.cushionSeparationAtPeakClearPush ?? 0).toFixed(2),
+    ),
+    closestPlayerContact: rivals?.closestPlayerContact
+      ? {
+        ...rivals.closestPlayerContact,
+        longitudinalMeters: Number(rivals.closestPlayerContact.longitudinalMeters.toFixed(2)),
+        lateralMeters: Number(rivals.closestPlayerContact.lateralMeters.toFixed(2)),
+        courseDistanceMeters: Math.round(rivals.closestPlayerContact.courseDistanceMeters),
+        cushionPush: Number(rivals.closestPlayerContact.cushionPush.toFixed(2)),
+      }
+      : null,
     cushionPeakPush: Number((rivals?.cushionPeakPush ?? 0).toFixed(2)),
     cushionContacts: rivals?.cushionContacts ?? 0,
     rivalClosestApproach: rivals?.closestApproach

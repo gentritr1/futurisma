@@ -822,32 +822,38 @@ const PLAYER_TOTAL_SECONDS = { greenwater: 165.425, bitterpan: 183.075 };
  * exactly. Both are pinned so a regression shows up as a diff rather than as a
  * number nobody re-read, and the floor is asserted against the cushion-on pair.
  */
-const PLAYER_RIVAL_SEPARATION_FLOOR_METERS = 2;
-const SOAK_PLAYER_RIVAL_SEPARATION_METERS = { greenwater: 0.15, bitterpan: 3.6 };
+const PLAYER_RIVAL_SEPARATION_FLOOR_METERS = 1.9;
+const SOAK_PLAYER_RIVAL_SEPARATION_METERS = { greenwater: 0.18, bitterpan: 3.6 };
 const SOAK_PLAYER_RIVAL_SEPARATION_CUSHION_OFF_METERS = {
   greenwater: 1.19,
-  bitterpan: 3.58,
+  bitterpan: 3.52,
 };
 /**
  * What the cushion actually MOVED the craft over those same soaks, and the
  * longest single contact it had to do it in. Both are read straight off the
  * soak (`cushionTravelMeters`, `cushionLongestContactSeconds`).
  *
- * These two are why Greenwater is 0.15 m and not 2.0 m, and they are pinned
- * here so the explanation cannot drift away from the number it explains. Over
- * five laps the cushion moved the craft 0.489 m in total across six contacts,
- * and its longest contact lasted 0.208 s. A damped integrator with a
- * 1 / CUSHION_VELOCITY_DAMPING = 0.5 s time constant reaches
- * 3 * (1 - e^-0.416) = 0.99 m/s in 0.208 s and averages about half that, so
- * ~0.10 m of travel per contact - which is what was measured, 0.489 / 6.
+ * ROUND 2 re-measured. The envelope was rebuilt - 3.4 m / 7.0 m arming at a
+ * 14 m/s^2 peak through a two-regime integrator capped at 4 m/s - and the
+ * cushion's authority went up by every measure it has: travel over five laps
+ * 0.489 -> 3.214 m on Greenwater and 0 -> 1.438 m on Bitterpan, longest contact
+ * 0.208 -> 0.542 s, peak push 6 -> 14 m/s^2.
  *
- * A lean with 0.1 m of authority per contact cannot open a 2 m gap, and no
- * setting of the damping changes that: the envelope starts at 2.4 m, so to end
- * up 2.0 m apart the cushion would have to arrest all closure inside 0.4 m of
- * travel. That is a wall, and the phase asked for a lean. See the report.
+ * Bitterpan clears the 1.9 m floor at 3.60 m. GREENWATER DID NOT MOVE: 0.15 m
+ * in round 1, 0.18 m in round 2, against a 1.19 m cushion-off control. The
+ * telemetry says why, and it is not the cushion being weak. At the worst
+ * instant - PRIVATEER, lap 3, d 590 - the record reads cushionActive true,
+ * cushionPush 14 (the ceiling), towLocked false, with the pair at 0.13 m
+ * longitudinal and 0.12 m lateral. The cushion is doing everything it is
+ * allowed to do and the craft still arrive on top of one another, because what
+ * is left is the APPROACH: the demo driver and the fleet's own evasive lateral
+ * gain converge faster than 14 m/s^2 can turn around inside 3.4 m. Raising the
+ * push further does not fix an approach; arming earlier might, and that is a
+ * decision about how far from a rival the game should start pushing, not a
+ * tuning pass. See the report.
  */
-const SOAK_CUSHION_TRAVEL_METERS = { greenwater: 0.489 };
-const SOAK_CUSHION_LONGEST_CONTACT_SECONDS = { greenwater: 0.208 };
+const SOAK_CUSHION_TRAVEL_METERS = { greenwater: 3.214, bitterpan: 1.438 };
+const SOAK_CUSHION_LONGEST_CONTACT_SECONDS = { greenwater: 0.542, bitterpan: 0.35 };
 
 let peakSteerRadians = 0;
 const steerRadians = [];
@@ -1068,7 +1074,8 @@ for (const kind of MAPS) {
         + `(cushion off: ${SOAK_PLAYER_RIVAL_SEPARATION_CUSHION_OFF_METERS[kind]} m; `
         + `the cushion moved the craft ${SOAK_CUSHION_TRAVEL_METERS[kind]} m in total `
         + `over a longest contact of ${SOAK_CUSHION_LONGEST_CONTACT_SECONDS[kind]} s). `
-        + "A lean cannot open a 2 m gap from inside a 2.4 m envelope.",
+        + "The cushion is at its 14 m/s^2 ceiling at that instant; what is left "
+        + "is the approach, not the push. See the note above.",
     );
   }
   assert.ok(

@@ -8,6 +8,13 @@ import {
 } from "./hud-presentation.js";
 import { DRIFT_REWARD_MINIMUM_CHARGE, SLIPSTREAM_LOCK_THRESHOLD } from "./physics";
 
+/**
+ * G2 round 2 - where the contact glow steps from a brush to a firm lean.
+ * Roughly 40% of CUSHION_PEAK_PUSH_MPS2: below it the cushion is grazing, above
+ * it the craft is genuinely being moved.
+ */
+const CUSHION_FIRM_PUSH_MPS2 = 6;
+
 export interface HudFrame {
   speedKph: number;
   boost: number;
@@ -35,6 +42,8 @@ export interface HudFrame {
   slipstream: number;
   /** G2 - which edge the air cushion is pushing from, null when clear. */
   cushionSide: "LEFT" | "RIGHT" | null;
+  /** G2 round 2 - how hard, m/s^2, so the glow can read as a lean or a shove. */
+  cushionPush: number;
   /** G2 - consecutive gates taken clean. */
   cleanGateChain: number;
   /** G2 - the passive-regen multiplier that chain is currently paying. */
@@ -592,11 +601,18 @@ export class GameUi {
     // on a state change, the same discipline the slipstream chip and the boost
     // meter above are held to; the cushion in particular can be armed for
     // several seconds at a time and must not write a style every frame.
-    const cushionState = frame.cushionSide ?? "none";
+    // Two strengths, not a continuous fade: a firm lean and a brush look
+    // different at a glance, and a value that changed every frame would write
+    // an inline style 30 times a second for a cue that is on for a third of one.
+    const cushionStrength = frame.cushionPush >= CUSHION_FIRM_PUSH_MPS2
+      ? "firm"
+      : "soft";
+    const cushionState = `${frame.cushionSide ?? "none"}:${cushionStrength}`;
     if (cushionState !== this.lastCushionState) {
       this.cushionGlow.dataset.active = frame.cushionSide ? "true" : "false";
       if (frame.cushionSide) {
         this.cushionGlow.dataset.side = frame.cushionSide.toLowerCase();
+        this.cushionGlow.dataset.strength = cushionStrength;
       }
       this.lastCushionState = cushionState;
     }

@@ -118,6 +118,25 @@ const DRAFT_SETTLE_SECONDS = 1;
  *   ... plus an edge fade to kill those impacts, which zeroed the yield exactly
  *       where the crossings happen and put separation back to 0.07 m
  *
+ * G2 round 2 added two more measurements to that list, both rejected, and they
+ * are the reason the controller still has NO traffic term at all:
+ *
+ *   contact yield: 0.22 steer away + 0.55 throttle, gated to the frames the
+ *                  air cushion reports contact (about 2 s in a five-lap race)
+ *                  Greenwater 0.18 -> 0.67 m separation, but BITTERPAN 3.60 ->
+ *                  0.03 m. The lift is what did it: a driver that slows down
+ *                  inside traffic stays in traffic. Contacts went 6 -> 27, the
+ *                  craft ended up parked on NEEDLE at d737, and the five-lap
+ *                  total grew 0.43 s. It also took Bitterpan from 2 slipstream
+ *                  locks to 13, which is the one thing it was good at.
+ *   draft-steer suppression only: cancel the tuck/acquire steer while touching,
+ *                  no yield, no lift
+ *                  bit-identical to no rule at all on both maps - separation,
+ *                  cushion travel, contact count and longest contact all
+ *                  matched to the last digit. The controller is not tucking
+ *                  during those contacts, so the rule never fires. Removed
+ *                  rather than shipped as an untested guard.
+ *
  * The pattern is consistent: a driver steering away from traffic is a driver
  * steering away from the racing line and out of the slipstream, and near the
  * deck edge it is a driver steering into the wall. The launch - which is where

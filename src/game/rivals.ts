@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import type { RaceCourse } from "./course";
 import {
+  RIVAL_CUSHION_YIELD_BLOCKED_METERS,
   RIVAL_CUSHION_YIELD_METERS,
   RIVAL_DEFENCE_LOOKAHEAD_METERS,
   RIVAL_DRIFT_AIRBRAKE_GAIN,
@@ -40,6 +41,7 @@ import {
 } from "./rival-race.js";
 import {
   BOOST_MAX_SPEED,
+  CUSHION_TOW_CONTACT_SEPARATION_METERS,
   SLIPSTREAM_LOCK_THRESHOLD,
   calculateCushion,
   calculateSlipstream,
@@ -71,6 +73,13 @@ const PLAYER_ID = "player";
  * player a lane for the rest of the straight.
  */
 const CUSHION_YIELD_HOLD_SECONDS = 0.6;
+
+/**
+ * Hull-centre separation at which two TOTEMs stop overlapping. A craft is
+ * ~2.2 m across, so this is the line between "leaning" and "intersecting", and
+ * it is what `cushionPeakClearPush` is measured against.
+ */
+const CUSHION_HULL_CLEAR_SEPARATION_METERS = 2.2;
 const RIVAL_COUNT = RIVAL_PROFILES.length;
 const RIVAL_ROLL_AXIS = new THREE.Vector3(0, 0, 1);
 const DEG = Math.PI / 180;
@@ -301,6 +310,22 @@ export interface RivalFleetDiagnostics {
   cushionSeconds: number;
   cushionPeakPush: number;
   cushionContacts: number;
+  cushionPushNow: number;
+  cushionGapNow: number;
+  cushionSeparationNow: number;
+  cushionYieldNow: number;
+  cushionPeakClearPush: number;
+  cushionSeparationAtPeakClearPush: number;
+  closestPlayerContact: {
+    id: string;
+    longitudinalMeters: number;
+    lateralMeters: number;
+    lap: number;
+    courseDistanceMeters: number;
+    cushionActive: boolean;
+    cushionPush: number;
+    towLocked: boolean;
+  };
   closestApproach: {
     id: string;
     longitudinalMeters: number;
@@ -500,6 +525,23 @@ export class RivalFleet {
   private cushionYieldHold = 0;
   private heldCushionRivalIndex = -1;
   private heldCushionYieldSign = 0;
+  /**
+   * Set by the race loop when the apron clamp refused the cushion's push. The
+   * player is pinned against the deck edge, so the rival takes the whole
+   * separation instead of half of it.
+   */
+  private cushionPlayerBlocked = false;
+  /**
+   * Live, this-step contact telemetry, for the state-triggered screenshot
+   * harness. A soak total says a contact happened somewhere; these say what the
+   * frame on screen is actually showing, which is what a screenshot has to be
+   * argued from.
+   */
+  private cushionPushNow = 0;
+  private cushionPeakClearPush = 0;
+  private cushionSeparationAtPeakClearPush = 0;
+  private cushionGapNow = 0;
+  private cushionSeparationNow = 0;
   private cushionSeconds = 0;
   private cushionPeakPush = 0;
   private cushionContacts = 0;
@@ -513,6 +555,16 @@ export class RivalFleet {
    * own 3.5 m floor and cannot show what the cushion did.
    */
   private playerRivalMinimumSeparationMeters = Infinity;
+  private readonly closestPlayerContact = {
+    id: "",
+    longitudinalMeters: 0,
+    lateralMeters: 0,
+    lap: 0,
+    courseDistanceMeters: 0,
+    cushionActive: false,
+    cushionPush: 0,
+    towLocked: false,
+  };
   /**
    * G2 pass detection. The player's race distance last step, so a crossing
    * from behind to ahead can be spotted without the race loop keeping a second
@@ -855,12 +907,22 @@ export class RivalFleet {
     this.cushionYieldHold = 0;
     this.heldCushionRivalIndex = -1;
     this.heldCushionYieldSign = 0;
+    this.cushionPlayerBlocked = false;
+    this.cushionPushNow = 0;
+    this.cushionPeakClearPush = 0;
+    this.cushionSeparationAtPeakClearPush = 0;
+    this.cushionGapNow = 0;
+    this.cushionSeparationNow = 0;
     this.cushionSeconds = 0;
     this.cushionPeakPush = 0;
     this.cushionContacts = 0;
     this.cushionContactSide = 0;
     this.cushionActiveLastStep = false;
     this.playerRivalMinimumSeparationMeters = Infinity;
+    this.closestPlayerContact.id = "";
+    this.closestPlayerContact.cushionActive = false;
+    this.closestPlayerContact.cushionPush = 0;
+    this.closestPlayerContact.towLocked = false;
     this.previousPlayerRaceDistance = 0;
     this.hasPreviousPlayerRaceDistance = false;
     this.passCount = 0;
@@ -947,6 +1009,8 @@ export class RivalFleet {
     let strongestScrub = 0;
     let strongestIndex = -1;
     let strongestSign = 0;
+    let strongestGap = 0;
+    let strongestSeparation = 0;
     for (let index = 0; index < this.states.length; index += 1) {
       const state = this.states[index];
       if (state.finished) continue;
@@ -960,11 +1024,17 @@ export class RivalFleet {
       // cushion was armed, because the push was shoving the driver sideways out
       // of its own tow. A locked tow is the one case where being that close is
       // the game working, so it is excluded.
-      if (index === this.slipstreamRivalIndex && this.slipstream >= SLIPSTREAM_LOCK_THRESHOLD) {
-        continue;
-      }
       const lateralGap = state.lateralMeters - playerLateralMeters;
       const longitudinalGap = state.raceDistanceMeters - playerRaceDistanceMeters;
+      // ... but a tow that has closed to within CUSHION_TOW_CONTACT_SEPARATION_
+      // METERS is not a tow any more, it is a rear-end, so the lock is dropped
+      // in `measureSlipstream` and the cushion re-arms here.
+      if (
+        index === this.slipstreamRivalIndex
+        && this.slipstream >= SLIPSTREAM_LOCK_THRESHOLD
+        && Math.hypot(longitudinalGap, lateralGap)
+          >= CUSHION_TOW_CONTACT_SEPARATION_METERS
+      ) continue;
       // Positive when the gap is shrinking. The rival's own lateral rate is
       // taken from the step it just ran, so a craft already sliding away is not
       // treated as diving in.
@@ -984,11 +1054,28 @@ export class RivalFleet {
         strongestScrub = cushion.speedScrub;
         strongestIndex = index;
         strongestSign = lateralGap >= 0 ? 1 : -1;
+        strongestGap = lateralGap;
+        strongestSeparation = Math.hypot(longitudinalGap, lateralGap);
       }
     }
     this.cushionResult.lateralPush = strongestPush;
     this.cushionResult.speedScrub = strongestScrub;
     const active = strongest > 0;
+    this.cushionPushNow = strongestPush;
+    // Latched over the whole race, on the PHYSICS step rather than on the
+    // diagnostics report. The report writes its DOM node once a second and a
+    // contact lasts about a third of one, so anything polled from outside the
+    // page samples this at roughly one frame in sixty - a screenshot harness
+    // reading `cushionPushNow` measured a 0.22 m/s^2 "peak" on a race whose
+    // real peak was 13.4. These two are the honest answer to "how hard does the
+    // cushion push while the hulls are still clear of each other".
+    if (active && strongestSeparation >= CUSHION_HULL_CLEAR_SEPARATION_METERS
+      && strongest > this.cushionPeakClearPush) {
+      this.cushionPeakClearPush = strongest;
+      this.cushionSeparationAtPeakClearPush = strongestSeparation;
+    }
+    this.cushionGapNow = active ? strongestGap : 0;
+    this.cushionSeparationNow = active ? strongestSeparation : 0;
     // The YIELD outlives the contact by CUSHION_YIELD_HOLD_SECONDS, and the
     // push does not.
     //
@@ -1025,6 +1112,37 @@ export class RivalFleet {
   /** True while the player is inside a rival's cushion. Drives the HUD glow. */
   get cushionActive(): boolean {
     return this.cushionActiveLastStep;
+  }
+
+  /**
+   * The race loop reports back whether the apron clamp ate the push. When it
+   * did, the rival is asked for the whole separation rather than its half.
+   */
+  setCushionPlayerBlocked(blocked: boolean): void {
+    this.cushionPlayerBlocked = blocked;
+  }
+
+  private cushionYieldMeters(): number {
+    return this.cushionPlayerBlocked
+      ? RIVAL_CUSHION_YIELD_BLOCKED_METERS
+      : RIVAL_CUSHION_YIELD_METERS;
+  }
+
+  /** Live contact telemetry for the screenshot harness. See the fields. */
+  get cushionPushMetersPerSecondSquared(): number {
+    return this.cushionPushNow;
+  }
+
+  get cushionLateralGapMeters(): number {
+    return this.cushionGapNow;
+  }
+
+  get cushionSeparationMeters(): number {
+    return this.cushionSeparationNow;
+  }
+
+  get cushionYieldRequestMeters(): number {
+    return this.cushionRivalIndex >= 0 ? this.cushionYieldMeters() : 0;
   }
 
   /** Which side the contact is on: +1 when the rival sits at higher lateral. */
@@ -1065,13 +1183,23 @@ export class RivalFleet {
     if (playerRaceDistanceMeters >= raceDistance - 1e-6) return;
     for (const state of this.states) {
       if (state.finished) continue;
-      this.playerRivalMinimumSeparationMeters = Math.min(
-        this.playerRivalMinimumSeparationMeters,
-        Math.hypot(
-          state.raceDistanceMeters - playerRaceDistanceMeters,
-          state.lateralMeters - playerLateralMeters,
-        ),
-      );
+      const longitudinal = state.raceDistanceMeters - playerRaceDistanceMeters;
+      const lateral = state.lateralMeters - playerLateralMeters;
+      const separation = Math.hypot(longitudinal, lateral);
+      if (separation >= this.playerRivalMinimumSeparationMeters) continue;
+      this.playerRivalMinimumSeparationMeters = separation;
+      // WHERE the worst moment was, and whether the cushion was even awake for
+      // it. A bare minimum cannot distinguish "the cushion pushed as hard as it
+      // could and lost" from "the cushion was not armed at all", and those want
+      // opposite fixes - round 2 spent a soak finding that out the slow way.
+      this.closestPlayerContact.id = state.id;
+      this.closestPlayerContact.longitudinalMeters = longitudinal;
+      this.closestPlayerContact.lateralMeters = lateral;
+      this.closestPlayerContact.lap = state.lap;
+      this.closestPlayerContact.courseDistanceMeters = state.courseDistanceMeters;
+      this.closestPlayerContact.cushionActive = this.cushionActiveLastStep;
+      this.closestPlayerContact.cushionPush = this.cushionPushNow;
+      this.closestPlayerContact.towLocked = this.slipstream >= SLIPSTREAM_LOCK_THRESHOLD;
     }
   }
 
@@ -1147,7 +1275,7 @@ export class RivalFleet {
       // and only laterally. A rival two lanes away is untouched by a contact it
       // is not part of.
       cushionYieldMeters: index === this.cushionRivalIndex
-        ? RIVAL_CUSHION_YIELD_METERS
+        ? this.cushionYieldMeters()
         : 0,
       cushionYieldSign: index === this.cushionRivalIndex ? this.cushionYieldSign : 0,
     });
@@ -1310,7 +1438,17 @@ export class RivalFleet {
       if (state.finished) continue;
       const ahead = state.raceDistanceMeters - playerRaceDistanceMeters;
       const lateralGap = state.lateralMeters - playerLateralMeters;
-      const tow = calculateSlipstream(ahead, lateralGap, speedRatio);
+      // G2 round 2 - a "tow" that has closed inside
+      // CUSHION_TOW_CONTACT_SEPARATION_METERS is a contact, and a contact does
+      // not lock. Capping it just under the threshold rather than zeroing it
+      // keeps the chip's fill continuous as the player closes in - the bar
+      // stops short of LOCK instead of vanishing - and re-arms the cushion,
+      // which reads that same threshold.
+      const separation = Math.hypot(ahead, lateralGap);
+      const rawTow = calculateSlipstream(ahead, lateralGap, speedRatio);
+      const tow = separation < CUSHION_TOW_CONTACT_SEPARATION_METERS
+        ? Math.min(rawTow, SLIPSTREAM_LOCK_THRESHOLD - 1e-6)
+        : rawTow;
       if (tow > strongest) {
         strongest = tow;
         this.slipstreamRivalIndex = index;
@@ -1740,6 +1878,13 @@ export class RivalFleet {
       cushionSeconds: this.cushionSeconds,
       cushionPeakPush: this.cushionPeakPush,
       cushionContacts: this.cushionContacts,
+      cushionPushNow: this.cushionPushNow,
+      cushionGapNow: this.cushionGapNow,
+      cushionSeparationNow: this.cushionSeparationNow,
+      cushionYieldNow: this.cushionYieldRequestMeters,
+      cushionPeakClearPush: this.cushionPeakClearPush,
+      cushionSeparationAtPeakClearPush: this.cushionSeparationAtPeakClearPush,
+      closestPlayerContact: { ...this.closestPlayerContact },
       closestApproach: { ...this.closestApproach },
       catchUpMultiplier: 1,
       articulatedGroups: [...this.articulatedGroups],

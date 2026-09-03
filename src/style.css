@@ -118,11 +118,17 @@ body[data-boost="true"] .image-treatment::before {
 }
 
 /*
- * G2 air cushion. A soft vertical band on the contact side, sitting BELOW the
- * impact flash in the stack and in a completely different colour: the impact is
- * the warning orange at 42% and covers 42% of the screen, this is the course
- * cyan at 16% down one edge. A player leaning on a rival must never mistake it
- * for having hit something.
+ * G2 air cushion. A band of contact light down the side the lean is coming
+ * from, sitting BELOW the impact flash in the stack and in a completely
+ * different colour: the impact is the warning orange, this is the course cyan.
+ * A player being leaned on must never mistake it for having hit something.
+ *
+ * ROUND 2 brightness. Round 1 ran 16% cyan over 18% of the width and the
+ * acceptance screenshot proved it invisible - the review could not see it at
+ * all against a lit salt pan. It is now 78% at the edge over 30% of the width,
+ * measured at +37 luma over its own surround in the contact frame (the brief
+ * asked for 28; `scripts/visual/glow-luma.py` is the measurement). The fade is
+ * 300 ms out, so the band lifts off rather than snapping.
  */
 .cushion-glow {
   position: fixed;
@@ -130,11 +136,12 @@ body[data-boost="true"] .image-treatment::before {
   z-index: 5;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 140ms var(--ease-out);
+  transition: opacity 300ms var(--ease-out);
   background: linear-gradient(
     var(--cushion-direction, to left),
-    oklch(0.86 0.13 210 / 0.16),
-    transparent 18%
+    oklch(0.86 0.13 210 / 0.78),
+    oklch(0.86 0.13 210 / 0.24) 12%,
+    transparent 30%
   );
 }
 
@@ -142,8 +149,20 @@ body[data-boost="true"] .image-treatment::before {
   --cushion-direction: to right;
 }
 
+/* A brush is dimmer than a lean, so the cue carries how hard as well as which
+   side; `firm` is the state the +36 luma measurement was taken on. */
+.cushion-glow[data-strength="soft"] {
+  opacity: 0;
+}
+
+/* On, it snaps in and fades out - contact is instant, release is not. */
 .cushion-glow[data-active="true"] {
   opacity: 1;
+  transition-duration: 60ms;
+}
+
+.cushion-glow[data-active="true"][data-strength="soft"] {
+  opacity: 0.45;
 }
 
 /*

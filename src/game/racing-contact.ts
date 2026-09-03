@@ -187,6 +187,7 @@ export class RacingContact {
     elapsedMs: number,
     projection: ReturnType<RaceCourse["project"]>,
     position: THREE.Vector3,
+    lateralLimitMeters: number,
   ): boolean {
     const lateralSpeed = deltaSeconds > 0
       ? (pose.lateralMeters - this.previousLateral) / deltaSeconds
@@ -221,6 +222,14 @@ export class RacingContact {
     }
     const active = fleet?.cushionActive ?? false;
     const side = (fleet?.cushionSide ?? 1) >= 0 ? 1 : -1;
+    // G2 round 2 — the apron clamp runs immediately after this and will refuse
+    // a push that leaves the deck. Tested against the lateral the cushion ASKED
+    // for, because the clamp has not run yet: if the ask is already outside the
+    // limit, the player is pinned and the rival has to take the whole
+    // separation instead of half of it.
+    fleet?.setCushionPlayerBlocked(
+      active && Math.abs(pose.lateralMeters) >= lateralLimitMeters,
+    );
     if (active && !this.contactActive) {
       // First contact only, and deliberately NOT through `impactBurst` below:
       // a lean is not an impact, so it must not fire the vehicle's impact flash

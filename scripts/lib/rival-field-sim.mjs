@@ -316,6 +316,8 @@ export function simulateRivalField(options) {
       laneHalfWidthMeters,
       // G2 — mirrors `RivalFleet.resolveDrive`: only the craft being leaned on
       // gives up the extra road, and only on the side it is actually on.
+      // The harness never models the deck edge, so it never uses the blocked
+      // variant - see RIVAL_CUSHION_YIELD_BLOCKED_METERS.
       cushionYieldMeters: index === cushionRivalIndex ? RIVAL_CUSHION_YIELD_METERS : 0,
       cushionYieldSign: index === cushionRivalIndex ? cushionYieldSign : 0,
     });
