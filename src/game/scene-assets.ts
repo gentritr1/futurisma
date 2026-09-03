@@ -33,7 +33,9 @@ import type { LivingWorld, LivingWorldTextures } from "./living-world";
 import type { GreenwaterOpeningSurface } from "./opening-surface";
 import type { FacadeStats } from "./bitterpan-facades";
 import type { HangarPlaqueBacking } from "./plaque-backing";
-import { probeSelected, searchFlag } from "./query-probes";
+import {
+  probeSelected, readProbeNumber, searchFlag, searchParam,
+} from "./query-probes";
 import type { BitterpanRoadEdgeBand } from "./road-edge-band";
 import type { TracksideSignage } from "./signage";
 import type { SignageBackPanels } from "./signage-backs";
@@ -122,6 +124,8 @@ const CORRIDOR_SWEEP_EXCLUDED_NAMES: ReadonlySet<string> = new Set([
  * `corridor-sweep.ts` stays entirely out of the initial bundle. `ran: false` is
  * the load-bearing field: every zero below means "no measurement", never "clean".
  */
+const CENSUS_LIST_CAP = 5000;
+
 const CORRIDOR_SWEEP_NOT_RUN: CorridorSweepResult = Object.freeze({
   ran: false,
   map: "",
@@ -139,6 +143,7 @@ const CORRIDOR_SWEEP_NOT_RUN: CorridorSweepResult = Object.freeze({
   hiddenByBand: Object.freeze({ flush: 0, obstacle: 0, overhead: 0, boundary: 0, vfx: 0 }),
   list: Object.freeze([]) as CorridorSweepResult["list"],
   spans: Object.freeze([]) as CorridorSweepResult["spans"],
+  dump: Object.freeze([]) as CorridorSweepResult["dump"],
   elapsedMs: 0,
 });
 
@@ -842,6 +847,20 @@ export class SceneAssets {
         // `scripts/derive-drivable-limits.mjs` asks for it — it is ~250 rows a
         // map, which does not belong in a once-a-second diagnostics line.
         collectSpans: searchFlag("spans"),
+        // P21 — `?census=1` widens the gate from the deck edge to the craft's
+        // own lateral clamp, and lifts the list cap so the census can tell
+        // "nothing more" from "no more room". Off by default: the committed
+        // `corridorIntrusions` counter, the soak gates that read it and
+        // `derive-drivable-limits.mjs` all mean the DECK gate, and silently
+        // widening it here would have redefined every one of them at once.
+        gate: searchFlag("census") ? "drivable" : "deck",
+        listCap: searchFlag("census") ? CENSUS_LIST_CAP : undefined,
+        // `?dumpMesh=NAME&dumpFrom=&dumpTo=` — the point cloud behind one census
+        // row. See `CorridorSweepOptions.dumpMesh`.
+        tallMin: readProbeNumber("tallMin", Number.NaN),
+        dumpMesh: searchParam("dumpMesh") ?? undefined,
+        dumpFrom: readProbeNumber("dumpFrom", Number.NEGATIVE_INFINITY),
+        dumpTo: readProbeNumber("dumpTo", Number.POSITIVE_INFINITY),
       },
     );
   }
@@ -878,7 +897,12 @@ export class SceneAssets {
       corridorSweepVertices: sweep.verticesSwept,
       corridorSweepVerticesTested: sweep.verticesTested,
       corridorSweepMs: sweep.elapsedMs,
+      // P21 — which corridor the numbers above were measured against. A census
+      // reading "0 obstacles" is worthless without it: the deck gate and the
+      // drivable gate answer different questions and both emit `corridorIntrusions`.
+      corridorGate: searchFlag("census") ? "drivable" : "deck",
       corridorIntrusionList: sweep.list,
+      corridorDump: sweep.dump,
       corridorSpans: sweep.spans,
       corridorRelocated: this.corridorRelocation?.relocated ?? 0,
       corridorRelocationMaxShift: this.corridorRelocation?.maxShiftMetres ?? 0,

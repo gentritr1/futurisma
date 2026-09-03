@@ -175,6 +175,55 @@ export function classifyCorridorBand(
   return "obstacle";
 }
 
+/**
+ * P21 — the same three height bands, judged against the DRIVABLE corridor.
+ *
+ * The P16 gate above asks "is this standing on the deck". The user's P21 ruling
+ * is wider and it is about a different thing: "check that we don't have
+ * obstacles in the road even though they don't block and we can go inside them".
+ * The run-off is road. The craft's own clamp (`apron.lateralLimit`) says so — it
+ * is free to drive out across 5 m of Greenwater gravel, 2.1 m of works stand and
+ * 5.8 m of Bitterpan pan, and nothing out there has collision. So a board bolted
+ * 3.4 m into a 5 m shoulder is geometry the player drives THROUGH, which is the
+ * defect, whether or not it also blocks.
+ *
+ * Three differences from `classifyCorridorBand`, each deliberate:
+ *
+ *  - There is no `boundary` escape by MARGIN. The deck gate needed one because
+ *    its corridor reached 0.5 m past the deck and swallowed the track's own
+ *    kerbs and walls. This gate stops exactly at the clamp, and the clamp is
+ *    already derived to sit a 1.6 m hull margin inside the nearest tall thing,
+ *    so an honest wall falls outside the corridor by construction rather than by
+ *    exemption. What survives is a SEAM tolerance: the apron and kerb meshes are
+ *    authored to overlap their own seam by 0.045-0.06 m, and wherever the
+ *    derived limit floors to the deck edge that overlap would otherwise read as
+ *    an intrusion 45 mm deep. `BOUNDARY_SEAM_TOLERANCE_METRES`, reused unchanged.
+ *  - `flush` and `overhead` are kept, unchanged, for the reasons P13 gave:
+ *    painted road under 0.3 m is not something you drive into, and the plaque
+ *    band at 3.2 m is where P13 deliberately put the boards that had nowhere
+ *    else to go. The P21 brief's own prescribed remedy is "convert to wall
+ *    plaques >= 3.2 m", so geometry entirely in that band cannot also be the
+ *    defect it prescribes a cure for.
+ *  - Everything else is an `obstacle`, INCLUDING geometry standing past the deck
+ *    edge. That is the whole point of the wider gate.
+ */
+export function classifyDrivableBand(
+  heightMin: number,
+  heightMax: number,
+  depth: number,
+  nonOccluding = false,
+): CorridorBand {
+  if (nonOccluding) return "vfx";
+  if (heightMax <= FLAT_FURNITURE_MAX_HEIGHT_METRES + BAND_EPSILON_METRES) {
+    return "flush";
+  }
+  if (heightMin >= PLAQUE_BAND_BOTTOM_METRES - BAND_EPSILON_METRES) {
+    return "overhead";
+  }
+  if (depth <= BOUNDARY_SEAM_TOLERANCE_METRES) return "boundary";
+  return "obstacle";
+}
+
 /** Cell size of the station lookup grid, metres. */
 const GRID_CELL_METRES = 24;
 
@@ -227,6 +276,17 @@ export interface CorridorIntrusion {
   readonly reach: number;
   /** |lateral| of this group's innermost vertex — its inner face. */
   readonly innerExtent: number;
+  /**
+   * P21 — the craft's own lateral clamp at the deepest vertex, metres.
+   *
+   * `apron.lateralLimit`: the DERIVED drivable limit where
+   * `DRIVABLE_LIMITS.json` has one for this span and side, and the authored
+   * `halfWidth + apronWidth` where it does not. Reported on every entry in BOTH
+   * gate modes, so a census table can be read without re-deriving the corridor
+   * from a half-width and an apron table. Under `gate: "drivable"` this is the
+   * number `depth` is measured against.
+   */
+  readonly limit: number;
 }
 
 export interface CorridorSweepResult {
@@ -265,6 +325,12 @@ export interface CorridorSweepResult {
    * diagnostics line.
    */
   readonly spans: readonly TallGeometrySpan[];
+  /**
+   * P21 — raw course-local vertices for `dumpMesh`, `[distance, lateral, height]`
+   * each. Empty unless asked for. Unfiltered by the gate: the point of the dump
+   * is to see the whole cross-section, including the part that is outside.
+   */
+  readonly dump: readonly (readonly [number, number, number])[];
   readonly elapsedMs: number;
 }
 
@@ -287,6 +353,7 @@ export const EMPTY_CORRIDOR_SWEEP: CorridorSweepResult = Object.freeze({
   }),
   list: Object.freeze([]) as readonly CorridorIntrusion[],
   spans: Object.freeze([]) as readonly TallGeometrySpan[],
+  dump: Object.freeze([]) as CorridorSweepResult["dump"],
   elapsedMs: 0,
 });
 
@@ -399,8 +466,25 @@ export interface TallGeometrySpan {
   /** Innermost tall lateral to the right (positive side), or null. */
   readonly right: number | null;
   readonly halfWidth: number;
-  /** `resolveApron`'s current clamp for this span. */
+  /** `resolveApron`'s current clamp for this span — its NARROWEST station. */
   readonly clamp: number;
+  /**
+   * P21 — the same clamp at this span's WIDEST station.
+   *
+   * `derive-drivable-limits.mjs` emits an entry only when the derived limit is
+   * tighter than the span's clamp, and it was reading the narrow one. Where the
+   * edge type changes inside a bucket that suppresses the trim entirely: at
+   * Greenwater 840-850 the works stand ends and the open pan begins, so the
+   * clamp runs 12.88 m at one end and 17.80 m at the other. The barrier at
+   * 15.79 m gives a limit of 14.19 m, which is not tighter than 12.88, so no
+   * entry was written — and the runtime clamp at 848 m stayed 17.80 m, with a
+   * 1.4 m edge marker standing at 17.66 m. That is census row 9.
+   *
+   * Emitting against the widest clamp cannot over-narrow anything: `resolveApron`
+   * takes `min(authoredLimit, derived)` per station, so at the narrow end of the
+   * same span the station's own 12.88 m still wins.
+   */
+  readonly clampMax: number;
   /**
    * Distance and half-width AT THE BOUNDING VERTEX ITSELF, per side.
    *
@@ -433,26 +517,81 @@ export interface TallGeometrySpan {
 export const TALL_GEOMETRY_SPAN_METRES = 10;
 
 /**
+ * P21 — the ONE class of solid geometry that is allowed to stand in the
+ * drivable corridor, and the one class that must never derive a limit from it.
+ *
+ * Both maps' cable coils are COLLIDABLE. `game.ts` asks
+ * `course.cableTripSideAt(progress, lateral)` every step and `racing-contact.ts`
+ * scores the near miss, so a coil is not geometry the craft passes through — it
+ * is a hazard with its own physics, authored to be aimed at and missed. P16 put
+ * that in writing when it raised the derivation floor: "An invisible boundary at
+ * a hazard you can visibly fly over is the exact feel this phase exists to
+ * kill." Lowering the floor to the measured hull bottom (below) would have
+ * turned every coil into exactly that wall — five Bitterpan span-sides, measured
+ * — so the class is excluded from the DERIVATION by name and reason.
+ *
+ * It is excluded from the derivation ONLY. A coil still sweeps, still classifies
+ * as an obstacle and still appears in the census, where
+ * `scripts/validate-corridor.mjs` asserts the census is exactly this class and
+ * nothing else. An exemption you can still see is an exemption you can audit;
+ * the deck-hazard whitelist drifted because nothing counted what it hid.
+ *
+ * Both entries are mesh names, matched exactly. `map01_greenwater_strip` builds
+ * `cable_trip_hazards` from the same authored hazard table Bitterpan builds
+ * `map02_cable_coils` from, and `course.ts` says so in its own comment: "P20.1.
+ * Greenwater's equivalent of the Bitterpan coils; same reason."
+ */
+export const COLLIDABLE_HAZARD_MESHES: ReadonlySet<string> = new Set([
+  "map02_cable_coils",
+  "cable_trip_hazards",
+]);
+
+/**
  * Below this, geometry does not BOUND the craft — it is something the craft
  * goes over rather than into.
  *
- * 0.85 m, just under the 0.89 m minimum hover height, and this is the
- * DERIVATION threshold only: the sweep's own obstacle classification still
- * starts at `FLAT_FURNITURE_MAX_HEIGHT_METRES` (0.3 m), so a 0.78 m cable coil
- * standing on the racing surface is still an obstacle and still has to move.
- * What it no longer does is generate an invisible wall.
+ * P21 measured it against the hull instead of the origin, and the number moved
+ * 0.85 -> 0.60.
  *
- * It was 0.5 m, and that put a derived limit at five Bitterpan spans where the
- * only tall thing was a 0.78 m coil the craft physically clears by 0.11 m.
- * An invisible boundary at a hazard you can visibly fly over is the exact feel
- * this phase exists to kill — and skimming a coil by 0.11 m is a near miss,
- * which is what the trip hazards are for.
+ * THE OLD NUMBER WAS MEASURED AGAINST THE WRONG PART OF THE CRAFT. P16 set 0.85
+ * as "just under the 0.89 m minimum hover height" and P19 restated it as "the
+ * minimum hover is now 1.01 m and the coil clearance is 0.23 m". Both are the
+ * MODEL ORIGIN. `course.ts` and `bitterpan-course.ts` both say, in the same
+ * functions that produce those numbers, that "the TOTEM stabiliser ring bottoms
+ * out 0.892 m below the model origin". The craft's lowest geometry is therefore
  *
- * P19 raised the hover floor (the stabiliser ring needs ~0.9 m; see
- * `vehicleHoverHeight`), so the minimum hover is now 1.01 m and the coil
- * clearance is 0.23 m. The threshold stays 0.85 m — still under the floor.
+ *   Greenwater  rest   0.30 + 0.71 - 0.892 = 0.118 m above the deck
+ *               cruise 0.58 + 0.71 - 0.892 = 0.398 m
+ *               boost  0.74 + 0.71 - 0.892 = 0.558 m
+ *   Bitterpan   cruise 1.18 - 0.892        = 0.288 m
+ *               boost  1.34 - 0.892        = 0.448 m
+ *
+ * The highest the hull bottom ever gets is 0.558 m, on Greenwater under boost.
+ * So 0.558 m is the tallest thing the craft can pass OVER, and every one of the
+ * eight readings above is far below 0.85. A 0.72 m barrier is not flown over at
+ * any speed on either map; it is driven through, which is precisely the report
+ * this phase answers. 0.60 m sits just above the measured maximum: high enough
+ * that nothing the craft genuinely clears can bound it, low enough that the
+ * trackside barrier the census found does.
+ *
+ * WHAT THE CHANGE COSTS, MEASURED, NOT ESTIMATED. Re-deriving both tables at
+ * 0.60 against the same captures moves SEVEN Greenwater span-sides (~156 m2 of
+ * run-off, largest trim 3.53 m) and, once the collidable hazards above are
+ * excluded, ZERO Bitterpan sides. Every one of those seven is a mesh the P21
+ * census independently flagged as solid geometry standing inside the corridor.
+ * Nothing else in either table moves.
+ *
+ * The floor was NOT taken to `FLAT_FURNITURE_MAX_HEIGHT_METRES` (0.3), which
+ * would have made the sweep's obstacle band and its bounding band the same
+ * number. That was measured too, and it is wrong: 46 Greenwater sides, ~700 m2
+ * of run-off, and the meshes setting the new limits include
+ * `GW_SECTOR_GREENWATER_SWEEP_water`, `GW_SECTOR_RUNWAY_START_concrete` and
+ * `GW_SECTOR_CANOPY_PASSAGE_concrete` — the water surface and the ground. The
+ * authored GLB terrain rises a few decimetres above the course model's deck
+ * plane across the shoulders, so a 0.3 m floor turns undulating ground into an
+ * invisible wall. That is the P16 failure, reproduced.
  */
-export const TALL_GEOMETRY_MIN_HEIGHT_METRES = 0.85;
+export const TALL_GEOMETRY_MIN_HEIGHT_METRES = 0.6;
 
 interface MeshAccumulator {
   mesh: string;
@@ -471,6 +610,7 @@ interface MeshAccumulator {
   sector: string;
   reach: number;
   innerExtent: number;
+  limit: number;
 }
 
 function displayName(object: THREE.Object3D): string {
@@ -525,6 +665,57 @@ export interface CorridorSweepOptions {
   readonly heightMax?: number;
   /** Emit the per-span tall-geometry table. Off by default; see `spans`. */
   readonly collectSpans?: boolean;
+  /**
+   * P21 — which corridor the gate measures against.
+   *
+   * `"deck"` (the default, and what P16 ships) gates on
+   * `halfWidth + lateralMargin`: the racing surface plus half a metre. Every
+   * existing caller, every committed counter and the derivation in
+   * `scripts/derive-drivable-limits.mjs` depend on that number, so it is left
+   * exactly as it was.
+   *
+   * `"drivable"` gates on `apron.lateralLimit` — the craft's own lateral clamp,
+   * deck plus authored run-off, trimmed by `DRIVABLE_LIMITS.json` wherever the
+   * art stands closer. That is the corridor the P21 census is about: everywhere
+   * the player can actually put the craft, not just the deck.
+   *
+   * The mode changes ONLY the gate and the band classifier. The projection, the
+   * height measurement, the grouping and the span table are shared, so the two
+   * modes cannot disagree about where a thing is — only about whether being
+   * there is a defect.
+   */
+  readonly gate?: "deck" | "drivable";
+  /**
+   * P21 — dump every swept vertex of one mesh, in course-local coordinates.
+   *
+   * A census row says "solid geometry at 848 m, lateral +12.85, 0.78 m tall".
+   * It does NOT say whether that is a rail bolted to the shoulder or the ground
+   * rising under it, and on Greenwater the environment GLB is BOTH: it replaces
+   * the procedural ribbon, and it arrives merged one mesh per sector per
+   * material, so `GW_SECTOR_RUNWAY_START_metal` is every metal thing in that
+   * sector at once. Guessing which from a name is exactly the move this repo
+   * keeps paying for.
+   *
+   * So the instrument can be asked to hand back the point cloud instead: filter
+   * by mesh name and a lap window, and the shape answers the question. A prop is
+   * a few dozen vertices in a metre or two of lateral with a flat top; ground is
+   * a sheet that runs the length of the window and rises continuously outward.
+   */
+  /**
+   * P21 measurement override for `TALL_GEOMETRY_MIN_HEIGHT_METRES`, so the cost
+   * of moving that floor can be MEASURED before the number is changed rather
+   * than argued about. Generation-time only; nothing runtime reads it.
+   */
+  readonly tallMin?: number;
+  readonly dumpMesh?: string;
+  readonly dumpFrom?: number;
+  readonly dumpTo?: number;
+  /**
+   * Cap on the emitted list. Defaults to `MAX_REPORTED_INTRUSIONS` (120), which
+   * is right for a once-a-second diagnostics line and wrong for a census: a
+   * capped census cannot tell "no more entries" from "no more room".
+   */
+  readonly listCap?: number;
 }
 
 /**
@@ -548,6 +739,15 @@ export function sweepCorridor(
   const heightMax = options.heightMax ?? CORRIDOR_HEIGHT_MAX_METRES;
   const excluded = new Set(options.exclude ?? []);
   const collectSpans = options.collectSpans === true;
+  const drivableGate = options.gate === "drivable";
+  const tallMin = Number.isFinite(options.tallMin)
+    ? (options.tallMin as number)
+    : TALL_GEOMETRY_MIN_HEIGHT_METRES;
+  const dumpMesh = options.dumpMesh ?? "";
+  const dumpFrom = options.dumpFrom ?? -Infinity;
+  const dumpTo = options.dumpTo ?? Infinity;
+  const dump: [number, number, number][] = [];
+  const listCap = Math.max(1, Math.trunc(options.listCap ?? MAX_REPORTED_INTRUSIONS));
 
   // Station spacing tracks the authored tables: ~2 m on Greenwater, ~5 m on
   // Bitterpan. One station per 4 m of lap is finer than the grid cell either way.
@@ -576,6 +776,7 @@ export function sweepCorridor(
     right: SpanSide | null;
     halfWidth: number;
     clamp: number;
+    clampMax: number;
   }
   const spanBuckets = new Map<number, SpanBucket>();
   const recordTallGeometry = (
@@ -589,13 +790,16 @@ export function sweepCorridor(
     const index = Math.floor(distance / TALL_GEOMETRY_SPAN_METRES);
     let bucket = spanBuckets.get(index);
     if (!bucket) {
-      bucket = { left: null, right: null, halfWidth, clamp };
+      bucket = {
+        left: null, right: null, halfWidth, clamp, clampMax: clamp,
+      };
       spanBuckets.set(index, bucket);
     }
     // Narrowest half-width and clamp across the span: the limit has to hold
     // everywhere in it, so the span takes its tightest station.
     bucket.halfWidth = Math.min(bucket.halfWidth, halfWidth);
     bucket.clamp = Math.min(bucket.clamp, clamp);
+    bucket.clampMax = Math.max(bucket.clampMax, clamp);
     const magnitude = Math.abs(lateral);
     const side: SpanSide = {
       lateral: magnitude, at: distance, halfWidth, height, mesh,
@@ -644,7 +848,14 @@ export function sweepCorridor(
       // derive the limit from it. `apronAt` resolves this span's edge type from
       // course data, so nothing here hardcodes which spans are open run-off.
       course.apronAt(projection, lateral, apron);
-      const gate = projection.halfWidth + lateralMargin;
+      // P21 — the drivable gate is the craft's OWN clamp, read from the same
+      // resolution the physics step reads. Not `halfWidth + apronWidth`
+      // recomputed here: that would miss every span where
+      // `DRIVABLE_LIMITS.json` pulled the clamp in, and would then report a
+      // board as an intrusion at a lateral the craft is forbidden to reach.
+      const gate = drivableGate
+        ? apron.lateralLimit
+        : projection.halfWidth + lateralMargin;
       // The AUTHORED reach, rebuilt from the apron width — deliberately NOT
       // `apron.lateralLimit`, which now returns the DERIVED limit.
       //
@@ -671,9 +882,12 @@ export function sweepCorridor(
       // limit to lateral 0 on the start line, which is exactly what the first
       // span table did (`d=0 left 0`).
       if (
-        height >= TALL_GEOMETRY_MIN_HEIGHT_METRES
+        height >= tallMin
         && height < PLAQUE_BAND_BOTTOM_METRES
         && Math.abs(lateral) <= clamp
+        // P21 — a collidable hazard has its own physics and must never become a
+        // derived wall. See `COLLIDABLE_HAZARD_MESHES`.
+        && !COLLIDABLE_HAZARD_MESHES.has(mesh.name)
       ) {
         if (collectSpans) {
           recordTallGeometry(
@@ -685,6 +899,19 @@ export function sweepCorridor(
             displayName(mesh),
           );
         }
+      }
+      if (
+        dumpMesh !== ""
+        && displayName(mesh) === dumpMesh
+        && distance >= dumpFrom
+        && distance <= dumpTo
+        && dump.length < 20000
+      ) {
+        dump.push([
+          Number(distance.toFixed(2)),
+          Number(lateral.toFixed(3)),
+          Number(height.toFixed(3)),
+        ]);
       }
       const depth = gate - Math.abs(lateral);
       if (depth <= 0) continue;
@@ -709,6 +936,7 @@ export function sweepCorridor(
           sector: projection.sector,
           reach: clamp,
           innerExtent: Infinity,
+          limit: apron.lateralLimit,
         };
         accumulators.set(key, accumulator);
       }
@@ -726,6 +954,7 @@ export function sweepCorridor(
         accumulator.lateral = lateral;
         accumulator.height = height;
         accumulator.sector = projection.sector;
+        accumulator.limit = apron.lateralLimit;
       }
     }
   };
@@ -777,7 +1006,8 @@ export function sweepCorridor(
       sector: entry.sector,
       reach: Number(entry.reach.toFixed(3)),
       innerExtent: Number(entry.innerExtent.toFixed(3)),
-      band: classifyCorridorBand(
+      limit: Number(entry.limit.toFixed(3)),
+      band: (drivableGate ? classifyDrivableBand : classifyCorridorBand)(
         entry.heightMin,
         entry.heightMax,
         entry.depth,
@@ -845,6 +1075,7 @@ export function sweepCorridor(
           : Number(bucket.right.halfWidth.toFixed(3)),
         halfWidth: Number(bucket.halfWidth.toFixed(3)),
         clamp: Number(bucket.clamp.toFixed(3)),
+        clampMax: Number(bucket.clampMax.toFixed(3)),
         leftMesh: bucket.left?.mesh ?? null,
         rightMesh: bucket.right?.mesh ?? null,
         leftHeight: bucket.left === null
@@ -861,7 +1092,8 @@ export function sweepCorridor(
       ...obstacles,
       ...visibleList.filter((entry) => entry.band !== "obstacle"),
       ...hiddenList.filter((entry) => entry.band !== "obstacle"),
-    ].slice(0, MAX_REPORTED_INTRUSIONS),
+    ].slice(0, listCap),
+    dump,
     elapsedMs: Number((performance.now() - startedAt).toFixed(1)),
   };
 }

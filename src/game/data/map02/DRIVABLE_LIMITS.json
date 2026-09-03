@@ -4,38 +4,19 @@
   "map": "bitterpan",
   "spanMetres": 10,
   "hullMarginMetres": 1.6,
-  "rule": "limit = max(halfWidth, min(clamp, tallGeometryLateral - hullMargin)); geometry at or below 0.5 m above the local deck plane does not bound.",
+  "rule": "limit = max(halfWidth, min(clampMax, tallGeometryLateral - hullMargin)); geometry at or below TALL_GEOMETRY_MIN_HEIGHT_METRES (0.6 m, the measured hull-bottom clearance) above the local deck plane does not bound, and neither does a collidable hazard.",
   "summary": {
-    "spans": 3,
-    "trimmedSides": 3,
+    "spans": 1,
+    "trimmedSides": 1,
     "flooredToDeckEdge": 1,
     "maxTrimMetres": 5.8
   },
   "entries": [
     {
-      "distance": 2850,
-      "halfWidth": 12.029,
-      "clamp": 16.629,
-      "right": {
-        "limit": 13.94,
-        "setBy": "map02_cable_coils",
-        "tall": 15.54
-      }
-    },
-    {
-      "distance": 2860,
-      "halfWidth": 12.033,
-      "clamp": 16.633,
-      "right": {
-        "limit": 13.94,
-        "setBy": "map02_cable_coils",
-        "tall": 15.54
-      }
-    },
-    {
       "distance": 2990,
       "halfWidth": 13,
       "clamp": 18.8,
+      "clampMax": 18.8,
       "left": {
         "limit": 13,
         "setBy": "BP_SIGNAGE_POSTS",
