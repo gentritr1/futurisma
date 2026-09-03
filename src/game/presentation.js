@@ -175,3 +175,51 @@ export function hullClearance(vehicleY, centreY, rightY, upY, lateral, surfaceHe
   ) return 0;
   return vehicleY - (centreY + rightY * lateral + upY * surfaceHeight);
 }
+
+/**
+ * H1.2 — how far the chase camera has to be pushed back to keep the craft in
+ * frame, in metres along the craft's own forward.
+ *
+ * `desired` is a steady 7.26 m behind the hull on Greenwater and 8.76 m on
+ * Bitterpan (measured, `wantBack` in the H1 camera survey). The DAMPED camera
+ * is not: when the craft slams the run-off and decelerates or spins, the
+ * camera keeps closing and `back` collapsed to 2.86 m, which put the hull at
+ * NDC y -1.216 — off the bottom of the screen with the deck edge across it.
+ * The craft's own screen position is what this protects, so the floor is
+ * applied to the damped camera, not to `desired`, which was never wrong.
+ *
+ * Returns 0 whenever the camera is already far enough back, so the guard is
+ * inert on every frame that was not already broken.
+ *
+ * @param {number} backAlongForward `(camera - hull) . forward`; negative
+ *   behind the craft, which is where a chase camera lives.
+ * @param {number} minimumChase metres.
+ */
+export function chaseDistanceCorrection(backAlongForward, minimumChase) {
+  if (!Number.isFinite(backAlongForward) || !Number.isFinite(minimumChase)) return 0;
+  const behind = -backAlongForward;
+  if (behind >= minimumChase) return 0;
+  return minimumChase - behind;
+}
+
+/**
+ * H1.2 — the camera's height above the DRAWN surface beneath it, at the
+ * camera's own lateral.
+ *
+ * The pre-existing guard measured `(desired - centreline) . up`, which is the
+ * height above the banked deck PLANE. That is right on the deck and incomplete
+ * over the run-off, where `createApronDecks` displaces the surface along `up`
+ * by the edge's cross-section — and the run-off is exactly where the camera
+ * ends up when the craft is pinned against the boundary.
+ *
+ * The lateral is not needed here because `right . up === 0`: the bank term
+ * cancels out of the `up` component on its own. What the caller must supply is
+ * `surfaceHeightAtLateral` evaluated at the CAMERA's lateral, not the craft's.
+ *
+ * @param {number} offsetAlongUp `(camera - sample.position) . sample.up`.
+ * @param {number} surfaceHeight `surfaceHeightAtLateral(sample, cameraLateral)`.
+ */
+export function cameraSurfaceClearance(offsetAlongUp, surfaceHeight) {
+  if (!Number.isFinite(offsetAlongUp) || !Number.isFinite(surfaceHeight)) return 0;
+  return offsetAlongUp - surfaceHeight;
+}

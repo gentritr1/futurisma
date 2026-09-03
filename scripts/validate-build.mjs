@@ -176,9 +176,26 @@ assert.ok(
 //     the other, and Rollup resplits when both land, so measured 246.0 KiB gzip / 255.9 KiB shell on
 //     the merged tree, ceilings 247 and 257. Taken with `npx vite build && node
 //     scripts/validate-build.mjs` after the merge.
+//
+//   H1 + H1.2 pose and camera fix  246.6 -> 247.3 KiB gzip, measured on the
+//     tree merged with P21, with `npx vite build && node
+//     scripts/validate-build.mjs`. Ceiling 247 -> 248.
+//
+//     IN the shell, all of it, and none of it optional: the presentation lift
+//     and the two chase-camera guards run every frame of every race, so
+//     `presentation.js` (`lateralFromHorizontalOffset`, `hullClearance`,
+//     `chaseDistanceCorrection`, `cameraSurfaceClearance`) and their call sites
+//     in `game.ts` are first-paint code by definition. The diagnostics fields
+//     that pin them are behind `diagnosticsMode` at runtime but their keys are
+//     in `diagnostics.ts`, which is already in the shell.
+//
+//     OUT of the shell: the proof. `scripts/validate-pose.mjs` is 435 lines of
+//     invariant and negative fixtures and ships nothing, which is the whole
+//     reason the arithmetic went into a leaf module rather than into the race
+//     loop where it could not be tested without a browser.
 assert.ok(
-  javascriptGzip <= 247 * 1024,
-  `JavaScript bundle exceeds 247 KiB gzip (${(javascriptGzip / 1024).toFixed(1)} KiB).`,
+  javascriptGzip <= 248 * 1024,
+  `JavaScript bundle exceeds 248 KiB gzip (${(javascriptGzip / 1024).toFixed(1)} KiB).`,
 );
 // Re-baselined 2026-08-28 from a measured 4.35 KiB gzip (the 4 KiB ceiling
 // predated the HUD turn-cue and hazard styling) plus headroom for the planned
@@ -213,9 +230,16 @@ assert.ok(
 // at the JS ceiling of 243 the shell is already ~252, so a 251 shell ceiling
 // would fail builds the JS ceiling explicitly allows.
 // G3 + G4 merge: re-measured, for the same reason the JS ceiling above was.
+// H1 + H1.2: 257.3 KiB (HTML 3.4 + JS 247.3 + CSS 5.6), measured on the tree
+// merged with P21. The phase adds no HTML and no CSS - it is the race loop's
+// pose and camera - so the whole move is the JS above, which went 246.6 ->
+// 247.3 for its own documented reasons. The ceiling goes 257 -> 258, the same
+// +1 the JS ceiling took, on the coherence argument A1 and G4 both used: at a
+// JS ceiling of 248 the shell is already ~258, so a 257 shell ceiling would
+// fail builds the JS ceiling explicitly allows.
 assert.ok(
-  shellGzip <= 257 * 1024,
-  `Initial app shell exceeds 257 KiB gzip (${(shellGzip / 1024).toFixed(1)} KiB).`,
+  shellGzip <= 258 * 1024,
+  `Initial app shell exceeds 258 KiB gzip (${(shellGzip / 1024).toFixed(1)} KiB).`,
 );
 assert.ok(
   html.includes('rel="preload"')

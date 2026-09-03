@@ -1,5 +1,5 @@
 {
- "id": "HANGAR_SIX_PLAQUE_BACKING_v0.2",
+ "id": "HANGAR_SIX_PLAQUE_BACKING_v0.3",
  "pass": "P02 art direction",
  "course": "greenwater",
  "sentence": "Thirteen plaques inside Hangar Six are pinned to an open pillar frame with nothing behind them. This is the thing they are bolted to.",
@@ -7,7 +7,7 @@
  "regionsFrom": "src/game/data/ATLAS_REGIONS.json#hangar_fixtures_512",
  "derivation": {
   "note": "Not a position list. Positions for these 13 already exist and are resolved at runtime; duplicating them here is exactly the class of second source of truth that furniture-placement.js was written to remove. Instead: one backing panel per furniture group whose resolved placement.mode === 'wall', emitted from the same resolver call that placed the plaque.",
-  "rule": "for each edge-furniture group in course.ts createTurnMarkers(): const placement = resolveFurniturePlacement(...); if (placement.mode === 'wall') emit a backing panel with the class table below, at the same sample, at backingLateral, with bottomHeight = PLAQUE_BAND_BOTTOM_METRES.",
+  "rule": "for each edge-furniture group in course.ts createTurnMarkers(): const placement = resolveFurniturePlacement(...); if (placement.mode === 'wall') emit a backing panel with the class table below, at the same sample, at backingLateral, with bottomHeight = PLAQUE_BAND_BOTTOM_METRES. H1 raised that constant from 3.2 m to 4.6 m because the chase camera rides a measured 4.09-4.20 m above the deck, so every panel and every plaque moved up 1.4 m with it; the band itself still lives only in furniture-placement.js.",
   "expected": { "panels": 13, "chevronPanels": 7, "boardPanels": 6 }
  },
  "classes": [
@@ -17,8 +17,8 @@
    "backs": "turn chevron plaque, 3.00 x 1.45 m (course.ts chevronBoardWidth / chevronBoardHeight)",
    "widthMetres": 3.9, "heightMetres": 1.95,
    "sideMarginMetres": 0.45, "topMarginMetres": 0.5, "bottomMarginMetres": 0,
-   "bottomHeightMetres": 3.2, "centreHeightMetres": 4.175,
-   "expectedPlaqueCentreHeightMetres": 3.925
+   "bottomHeightMetres": 4.6, "centreHeightMetres": 5.575,
+   "expectedPlaqueCentreHeightMetres": 5.325
   },
   {
    "id": "PLAQUE_BACK_BOARD",
@@ -26,8 +26,8 @@
    "backs": "braking distance board, 2.465 x 1.28 m (course.ts distanceBoardWidth = 1.7 * 1.45)",
    "widthMetres": 3.15, "heightMetres": 1.8,
    "sideMarginMetres": 0.3425, "topMarginMetres": 0.52, "bottomMarginMetres": 0,
-   "bottomHeightMetres": 3.2, "centreHeightMetres": 4.1,
-   "expectedPlaqueCentreHeightMetres": 3.84
+   "bottomHeightMetres": 4.6, "centreHeightMetres": 5.5,
+   "expectedPlaqueCentreHeightMetres": 5.24
   }
  ],
  "placement": {
@@ -39,9 +39,9 @@
  },
  "deckSafety": {
   "note": "The panel grows upward only and its bottom edge is flush with the plaque's at exactly PLAQUE_BAND_BOTTOM_METRES; a symmetric margin would hang structure over the deck under the band, the precise P13 failure.",
-  "clearsDeck": "true, via the overhead-structure branch (bottomHeight >= PLAQUE_BAND_BOTTOM_METRES)",
+  "clearsDeck": "true, via the overhead-structure branch (bottomHeight >= PLAQUE_BAND_BOTTOM_METRES, 4.6 m since H1)",
   "innerFaceInsideDeckEdgeMetres": 0.29,
-  "validatorAction": "add the two classes to the enumeration in validate-furniture.mjs as an EDGE class with bottomHeight 3.2 - they must be measured, not exempted."
+  "validatorAction": "add the two classes to the enumeration in validate-furniture.mjs as an EDGE class with bottomHeight 4.6 - they must be measured, not exempted."
  },
  "runtime": {
   "meshes": [

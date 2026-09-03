@@ -59,6 +59,8 @@ import {
 } from "./apron.js";
 import {
   calculatePresentationAlpha,
+  cameraSurfaceClearance,
+  chaseDistanceCorrection,
   hullClearance,
   lateralFromHorizontalOffset,
   presentationSurfaceLift,
@@ -109,6 +111,18 @@ type RacePhase = "standby" | "countdown" | "running" | "paused" | "resuming" | "
 
 const FIXED_STEP = 1 / 120;
 const MAX_PHYSICS_BACKLOG = 0.1;
+/**
+ * H1.2 - floors for the two chase-camera guards, both metres.
+ *
+ * MINIMUM_CHASE_METRES sits below the DESIRED chase distance on both maps, so
+ * the guard is inert on an unbroken frame and only catches the collapse.
+ * MINIMUM_CAMERA_SURFACE_CLEARANCE_METRES is a backstop under the existing
+ * 2.1 m guard on `desired`: that one runs before damping and the impact shake,
+ * this one runs after both.
+ */
+const MINIMUM_CHASE_METRES = 5.5;
+const MINIMUM_CAMERA_SURFACE_CLEARANCE_METRES = 1.6;
+
 const RESUME_COUNTDOWN_SECONDS = 2.7;
 
 export class FuturismaGame {
@@ -178,6 +192,14 @@ export class FuturismaGame {
    * offset where a unit basis vector was intended.
    */
   private readonly cameraScratch = new THREE.Vector3();
+  /**
+   * H1.2 kill switch, in the style of `?cushion=0` and `?shadows=0`: turns both
+   * chase-camera guards off so the collapse they exist for can be measured
+   * again. Every number `validate-pose.mjs` pins them against - the 7.26 m and
+   * 8.76 m desired chase distances and the 4.93 m collapse - was read from a
+   * `?camguards=0` run, and stays reproducible because of this line.
+   */
+  private readonly cameraGuardsEnabled = searchParam("camguards") !== "0";
   private readonly vehicleVisualState: TotemVisualState = {
     steer: 0,
     throttle: 0,
@@ -271,6 +293,19 @@ export class FuturismaGame {
   private diagnosticHullClearance = 0;
   private diagnosticMinimumHullClearance = Number.POSITIVE_INFINITY;
   private diagnosticMaximumHullClearance = Number.NEGATIVE_INFINITY;
+  // H1.2 - the chase camera's own two numbers. `hullNdcY` is where the craft
+  // actually lands on screen; `cameraSurfaceClearance` is how far the camera
+  // sits above the drawn surface AT ITS OWN LATERAL.
+  private diagnosticCameraSurfaceClearance = 0;
+  private diagnosticMinimumCameraSurfaceClearance = Number.POSITIVE_INFINITY;
+  private diagnosticChaseMeters = 0;
+  private diagnosticMinimumChaseMeters = Number.POSITIVE_INFINITY;
+  private diagnosticDesiredChaseMeters = 0;
+  private diagnosticCameraLateral = 0;
+  private diagnosticHullNdcX = 0;
+  private diagnosticHullNdcY = 0;
+  private diagnosticMinimumHullNdcY = Number.POSITIVE_INFINITY;
+  private diagnosticMaximumHullNdcY = Number.NEGATIVE_INFINITY;
   private diagnosticEdgeSeconds = 0;
   private diagnosticWrongWaySeconds = 0;
   private diagnosticWrongWayEntries = 0;
@@ -1347,6 +1382,89 @@ export class FuturismaGame {
     );
   }
 
+  /**
+   * H1.2 (a) - the chase camera may not close inside `MINIMUM_CHASE_METRES` of
+   * the hull along the craft's own forward. See `chaseDistanceCorrection`.
+   */
+  private holdChaseDistance(): void {
+    const back = this.cameraScratch
+      .copy(this.cameraTarget)
+      .sub(this.vehicle.root.position)
+      .dot(this.presentationForward);
+    const correction = chaseDistanceCorrection(back, MINIMUM_CHASE_METRES);
+    if (correction > 0) {
+      this.cameraTarget.addScaledVector(this.presentationForward, -correction);
+    }
+  }
+
+  /**
+   * H1.2 (b) - the camera may not sink into the surface it is looking across.
+   * Measured at the CAMERA's lateral, so the run-off cross-section counts, and
+   * applied to the final position so the impact shake cannot undo it.
+   */
+  private holdCameraOverSurface(progress: number): void {
+    const surface = this.course.project(
+      this.camera.position,
+      progress,
+      this.cameraSurfaceProjection,
+    );
+    const offsetAlongUp = this.cameraScratch
+      .copy(this.camera.position)
+      .sub(surface.position)
+      .dot(surface.up);
+    const clearance = cameraSurfaceClearance(
+      offsetAlongUp,
+      surfaceHeightAtLateral(surface, surface.lateral),
+    );
+    if (this.cameraGuardsEnabled
+      && clearance < MINIMUM_CAMERA_SURFACE_CLEARANCE_METRES) {
+      const lift = MINIMUM_CAMERA_SURFACE_CLEARANCE_METRES - clearance;
+      this.camera.position.addScaledVector(surface.up, lift);
+      this.cameraTarget.addScaledVector(surface.up, lift);
+    }
+    if (!this.diagnosticsMode) return;
+    this.diagnosticCameraLateral = surface.lateral;
+    this.diagnosticCameraSurfaceClearance = this.cameraGuardsEnabled
+      ? Math.max(clearance, MINIMUM_CAMERA_SURFACE_CLEARANCE_METRES)
+      : clearance;
+    this.diagnosticChaseMeters = -this.cameraScratch
+      .copy(this.camera.position)
+      .sub(this.vehicle.root.position)
+      .dot(this.presentationForward);
+    if (this.phase !== "running") return;
+    this.diagnosticMinimumCameraSurfaceClearance = Math.min(
+      this.diagnosticMinimumCameraSurfaceClearance,
+      this.diagnosticCameraSurfaceClearance,
+    );
+    this.diagnosticMinimumChaseMeters = Math.min(
+      this.diagnosticMinimumChaseMeters,
+      this.diagnosticChaseMeters,
+    );
+  }
+
+  /**
+   * H1.2 - where the hull actually lands on screen, in normalised device
+   * coordinates. The whole point of the two guards above, measured directly
+   * rather than argued from the offsets that produce it.
+   */
+  private recordHullNdc(): void {
+    this.camera.updateMatrixWorld();
+    const ndc = this.cameraScratch
+      .copy(this.vehicle.root.position)
+      .project(this.camera);
+    this.diagnosticHullNdcX = ndc.x;
+    this.diagnosticHullNdcY = ndc.y;
+    if (this.phase !== "running") return;
+    this.diagnosticMinimumHullNdcY = Math.min(
+      this.diagnosticMinimumHullNdcY,
+      this.diagnosticHullNdcY,
+    );
+    this.diagnosticMaximumHullNdcY = Math.max(
+      this.diagnosticMaximumHullNdcY,
+      this.diagnosticHullNdcY,
+    );
+  }
+
   private updateCamera(
     delta: number,
     steer: number,
@@ -1409,7 +1527,17 @@ export class FuturismaGame {
     const speedRatio = this.speed / BOOST_MAX_SPEED;
     const positionDamping = 1 - Math.exp(-delta * (12 + speedRatio * 8));
     const lookDamping = 1 - Math.exp(-delta * (11 + speedRatio * 5));
+    if (this.diagnosticsMode) {
+      this.diagnosticDesiredChaseMeters = -this.cameraScratch
+        .copy(desired)
+        .sub(this.vehicle.root.position)
+        .dot(this.presentationForward);
+    }
     this.cameraTarget.lerp(desired, positionDamping);
+    // H1.2 (a) - the damped camera, not `desired`, is what loses the craft.
+    // Written back into `cameraTarget` so the next frame's lerp starts from the
+    // corrected point instead of fighting the guard every frame.
+    if (this.cameraGuardsEnabled) this.holdChaseDistance();
     this.cameraLook.lerp(target, lookDamping);
     this.camera.position.copy(this.cameraTarget);
     const desiredCameraUp = this.scratchB.copy(sample.up);
@@ -1437,6 +1565,10 @@ export class FuturismaGame {
         );
     }
 
+    // H1.2 (b) - the last thing that touches the camera position. After the
+    // damping AND after the impact shake, because both can put it under the
+    // run-off, and at the camera's own lateral rather than the craft's.
+    this.holdCameraOverSurface(sample.progress);
     this.camera.lookAt(this.cameraLook);
     const desiredFov = calculateDesiredCameraFov(
       this.speed / BOOST_MAX_SPEED,
@@ -1455,6 +1587,9 @@ export class FuturismaGame {
       this.camera.updateProjectionMatrix();
     }
     if (this.diagnosticsMode) {
+      // After the FOV settles: the projection the player is looking through is
+      // the one the hull has to be inside of.
+      this.recordHullNdc();
       const freeCameraFov = calculateDesiredCameraFov(
         this.speed / BOOST_MAX_SPEED,
         this.boostActive,
@@ -1922,6 +2057,16 @@ export class FuturismaGame {
         minimumHullClearance: this.diagnosticMinimumHullClearance,
         maximumHullClearance: this.diagnosticMaximumHullClearance,
         hoverHeight: this.course.vehicleHoverHeight(this.speed, this.boostActive),
+        cameraSurfaceClearance: this.diagnosticCameraSurfaceClearance,
+        minimumCameraSurfaceClearance: this.diagnosticMinimumCameraSurfaceClearance,
+        chaseMeters: this.diagnosticChaseMeters,
+        minimumChaseMeters: this.diagnosticMinimumChaseMeters,
+        desiredChaseMeters: this.diagnosticDesiredChaseMeters,
+        cameraLateral: this.diagnosticCameraLateral,
+        hullNdcX: this.diagnosticHullNdcX,
+        hullNdcY: this.diagnosticHullNdcY,
+        minimumHullNdcY: this.diagnosticMinimumHullNdcY,
+        maximumHullNdcY: this.diagnosticMaximumHullNdcY,
         edgeSeconds: this.diagnosticEdgeSeconds,
         wrongWaySeconds: this.diagnosticWrongWaySeconds,
         wrongWayEntries: this.diagnosticWrongWayEntries,
