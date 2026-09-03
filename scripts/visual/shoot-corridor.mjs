@@ -13,7 +13,10 @@ import { chromium } from "playwright";
 import { mkdirSync, writeFileSync } from "node:fs";
 
 const [base, outDir, map] = [process.argv[2], process.argv[3], process.argv[4]];
-const specs = process.argv.slice(5).map((raw) => {
+// Any argument beginning with "&" is extra query string (e.g. "&panfix=a").
+const rest = process.argv.slice(5);
+const extraQuery = rest.filter((raw) => raw.startsWith("&")).join("");
+const specs = rest.filter((raw) => !raw.startsWith("&")).map((raw) => {
   const [distance, lateral, label] = raw.split(":");
   return { distance: Number(distance), lateral: Number(lateral), label: label || raw };
 });
@@ -32,7 +35,8 @@ for (const spec of specs) {
   const url = `${base}/?diagnostics=1&autostart=1&probe=boundary-hold`
     + `&probeDistance=${Math.max(0, spec.distance - LEAD_METRES)}`
     + `&probeLateral=${spec.lateral}`
-    + (map === "bitterpan" ? "&map=bitterpan" : "");
+    + (map === "bitterpan" ? "&map=bitterpan" : "")
+    + extraQuery;
   await page.goto(url, { waitUntil: "networkidle" });
   await page.waitForTimeout(1500);
   await page.click("#start-button").catch(() => page.evaluate(

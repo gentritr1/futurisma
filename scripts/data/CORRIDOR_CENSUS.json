@@ -9,6 +9,7 @@
       "meshesSwept": 137,
       "verticesSwept": 182280,
       "groups": 1045,
+      "panFloor": null,
       "bands": {
         "obstacle": 1,
         "flush": 761,
@@ -39,29 +40,22 @@
       "ran": true,
       "meshesSwept": 31,
       "verticesSwept": 56736,
-      "groups": 325,
+      "groups": 321,
+      "panFloor": {
+        "fix": "b",
+        "coveredSides": 0,
+        "coveredWorstMetres": 0,
+        "reliefVertices": 82,
+        "reliefMaxDropMetres": 0.8726
+      },
       "bands": {
-        "obstacle": 6,
-        "flush": 294,
+        "obstacle": 5,
+        "flush": 291,
         "overhead": 0,
         "boundary": 0,
         "vfx": 23
       },
       "obstacles": [
-        {
-          "root": "bitterpan_surface_layer",
-          "mesh": "BP_PAN_FLOOR",
-          "distance": 1028.01,
-          "lateral": -18.702,
-          "depth": 0.697,
-          "heightMin": 0.584,
-          "heightMax": 0.584,
-          "limit": 19.399,
-          "innerExtent": 18.702,
-          "vertices": 1,
-          "visible": true,
-          "sector": "S1"
-        },
         {
           "root": "map02_bitterpan_runtime_markers",
           "mesh": "map02_cable_coils",

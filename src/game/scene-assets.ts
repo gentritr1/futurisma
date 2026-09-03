@@ -1066,11 +1066,22 @@ export class SceneAssets {
           windDegrees: bitterpanSurface.panFloor.windDegrees,
           streakBands: bitterpanSurface.panFloor.streakBands,
           brineWeightMean: Number(bitterpanSurface.panFloor.brineWeightMean.toFixed(5)),
+          // P21.3 - `coveredSides` must be 0. See BitterpanSurfaceStats.
+          fix: bitterpanSurface.panFloor.fix,
+          coveredSides: bitterpanSurface.panFloor.coveredSides,
+          coveredWorstMetres: bitterpanSurface.panFloor.coveredWorstMetres,
+          reliefVertices: bitterpanSurface.panFloor.reliefVertices,
+          reliefMaxDropMetres: bitterpanSurface.panFloor.reliefMaxDropMetres,
           probe: bitterpanSurface.panFloor.probe,
         }
+        // Every zero here means "the surface layer did not load", never "clean" -
+        // which is why `coveredSides` is paired with `reliefVertices`: a real
+        // measurement of a fixed floor has 0 covered sides AND a non-zero relief.
         : { segments: 0, macroSeed: 0, secondaryScale: 0, vertices: 0, meanLuma: 0,
           peakBrightness: 0, peakHue: 0, windDegrees: 0, streakBands: 0,
-          brineWeightMean: 0, probe: false },
+          brineWeightMean: 0, fix: "off" as const, coveredSides: 0,
+          coveredWorstMetres: 0, reliefVertices: 0, reliefMaxDropMetres: 0,
+          probe: false },
       plaqueBackingLoadMs: this.plaqueBackingLoadMs === null
         ? null
         : Number(this.plaqueBackingLoadMs.toFixed(1)),
