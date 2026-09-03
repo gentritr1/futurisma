@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
+import { inflateSync } from "node:zlib";
 import {
   ALPHA_ENVELOPES,
   buildLivingWorld,
@@ -126,7 +127,7 @@ const P9_ZONES = [
 const P12_BATCHES = {
   greenwater: [
     { id: "airB", meshName: "GW_LIVING_AIR_B", texture: "motionB", blending: "normal", depthWrite: false, fog: true, alphaTest: 0, lamps: false },
-    { id: "silhouette", meshName: "GW_LIVING_SILHOUETTE", texture: "motionB", blending: "normal", depthWrite: true, fog: true, alphaTest: 0.5, lamps: false },
+    { id: "silhouette", meshName: "GW_LIVING_SILHOUETTE", texture: "motionB", blending: "normal", depthWrite: true, fog: true, alphaTest: 0.5, lamps: false, anchor: "bottom" },
   ],
   bitterpan: [
     { id: "airB", meshName: "BP_LIVING_AIR_B", texture: "motionB", blending: "normal", depthWrite: false, fog: true, alphaTest: 0, lamps: false },
@@ -234,7 +235,12 @@ const P20_BATCHES = {
 //                      construction, all still asserted below; the ring is a
 //                      re-roll of the same distribution, not a re-author.
 const P20_ZONES = [
-  { id: "PAN_SCUD_NEAR", map: "bitterpan", batch: "air", from: 160, to: 2560, cards: 34, kind: "shear", digest: "ab3f4ec74c7398b7" },
+  // P20.8 re-baselined this ONE digest, and nothing else on either map moved —
+  // which is the evidence that the near-band re-author kept its seven `next()`
+  // draws in their original order. `lateral`, `width`, `phase`, `speed`, `seed`,
+  // `side` and `distance` are bit-identical to round 2 across all 34 cards;
+  // `base` and `height` are the only fields that changed.
+  { id: "PAN_SCUD_NEAR", map: "bitterpan", batch: "air", from: 160, to: 2560, cards: 34, kind: "shear", digest: "f1a77995bac49cf2" },
   { id: "PAN_SCUD_CROSSING", map: "bitterpan", batch: "air", from: 200, to: 2560, cards: 20, kind: "cross", digest: "31c527cecfc96d37" },
   { id: "SALT_DEVIL_ROAD", map: "bitterpan", batch: "air", from: 1198, to: 1240, cards: 4, kind: "devil", digest: "e27b47f8ced41c7b" },
   { id: "BRINE_HAZE_LOW", map: "bitterpan", batch: "air", from: 2600, to: 2960, cards: 16, kind: "mist", digest: "a969ac97c2c2b2ac" },
@@ -756,8 +762,23 @@ for (const authored of P18_ZONES) {
  * shapes with a hard edge and a grade contact — and every one of them must
  * anchor at the bottom. A batch that blends is drawing tone, and tone centres.
  */
+// P20.8 widened this from `texture === "horizon"` to the SHEETS whose silhouette
+// cells are authored with their ground contact at the cell's own bottom edge.
+//
+// The horizon sheet always was one. The motion-B wreck cells always were too —
+// WRECK_FUSELAGE, WRECK_GANTRY and CRATE_STACK all stand on the cell floor —
+// but the `silhouette` batch that names them was not drawing them: it drew the
+// mirrored grid row (devil wisps, flicker panels, a gull), and centre-weighted
+// cells do not care where they are anchored, so the missing anchor was
+// invisible. It is visible now, and this is the rule that would have caught it.
+//
+// `jungle` is deliberately NOT in the set even though `foliage` alpha-tests. A
+// vine hangs from its anchor (VINE_SWAY_CANOPY bases at 11 m and hangs to
+// 17.4 m) and a frond leans from its stem; those cells are centre-authored, and
+// bottom-anchoring them would lift accepted art off its own attachment point.
+const BOTTOM_ANCHORED_SHEETS = new Set(["horizon", "motionB"]);
 const anchorsAtBottom = (batch) => batch.alphaTest > 0 && !batch.lamps
-  && batch.texture === "horizon";
+  && BOTTOM_ANCHORED_SHEETS.has(batch.texture);
 
 for (const [map, spec] of Object.entries(LIVING_WORLD_SPECS)) {
   for (const batch of spec.batches) {
@@ -1090,14 +1111,22 @@ for (const card of scudNear) {
       + "8-18 m wide.",
   );
   assert.ok(
-    card.height >= 1.6 && card.height <= 3.4,
+    card.height >= 4 && card.height <= 9,
     `PAN_SCUD_NEAR authors a ${card.height.toFixed(1)} m card; the near band is `
-      + "1.6-3.4 m tall.",
+      + "4-9 m tall.",
   );
+  // P20.8. `base` on this batch is the card's CENTRE, and the number that has
+  // to hold is where the card's BOTTOM lands: the zone authors bottom + height
+  // / 2 so the bottom sits on the crust at 0.1-1.0 m instead of the centre
+  // sitting there and half the card being under the pan. Assert the derived
+  // quantity, not the field, or the idiom can be dropped without a failure.
+  const bottom = card.base - card.height / 2;
   assert.ok(
-    card.base >= 0.1 && card.base <= 1.0,
-    `PAN_SCUD_NEAR bases a card at ${card.base.toFixed(2)} m; the near band `
-      + "sits at 0.1-1.0 m.",
+    bottom >= 0.1 && bottom <= 1.0,
+    `PAN_SCUD_NEAR puts a card's bottom edge at ${bottom.toFixed(2)} m; the `
+      + "near band stands on the crust at 0.1-1.0 m. `base` is the centre on "
+      + "this batch, so a bottom under 0 is a card buried in the pan — which is "
+      + "how round 2 shipped and what the P20.8 carry-over fixed.",
   );
 }
 const scudNearInBand = scudNear.filter(
@@ -1172,62 +1201,325 @@ assert.ok(
 );
 
 /**
- * P20.4 - `upright` is opt-in and stays opt-in.
+ * P20.8 — SHEET ORIENTATION. Replaces the P20.4 `upright` opt-in list.
  *
- * `atlasRect` counts `rect.y` in PNG rows from the TOP; the sheets upload with
- * three.js `flipY` at its default `true`, so V counts from the BOTTOM and a
- * slot in grid row `r` resolves to row `N - 1 - r`. HAZE_BAND (slot 15) draws
- * PYLON_RUN (slot 3); MESA_LONG (slot 12) draws TREELINE_DENSE (slot 0), which
- * is a treeline on a salt pan. That is a real defect, measured rather than
- * deduced, and it is written up in living-world-zones.js.
+ * THE DEFECT THIS PINS. `atlasRect` counts `rect.y` in PNG rows from the TOP of
+ * the sheet and `makeBatch` builds V straight off that number, which is correct
+ * only if the texture's V origin is also at the top. Through P20.7 it was not:
+ * the three card sheets loaded through `TextureLoader` with `flipY` at its
+ * default `true`, so a cell in grid row `r` of an N-row grid drew row
+ * `N - 1 - r`, upside down. MESA_LONG drew TREELINE_DENSE — a treeline on a salt
+ * pan — HAZE_BAND drew PYLON_RUN, and MIST drew RAIN, a cell 4.3% covered
+ * against MIST's 53.4%, which is why every mist and steam zone on both maps read
+ * as nothing.
  *
- * It is NOT fixed globally here, and the assertion below is what says so out
- * loud: fixing it re-points every card on both maps, the 155 accepted Greenwater
- * ones included, and that needs its own art review rather than a quiet
- * ride-along in a Bitterpan phase. Exactly one batch opts in - the one P20.4
- * adds - so the accepted layer renders byte-identically and the defect stays
- * visible to the next phase instead of being half-fixed.
+ * WHY A LIST OF OPTED-IN ZONES IS THE WRONG PIN NOW. P20.4 could only name the
+ * five zones it had re-pointed. The invariant underneath was never about which
+ * zones opt in; it is that the RECT and the SAMPLER agree about where row zero
+ * is. So this asserts that, on the sheets themselves:
+ *
+ *   1. the runtime's two halves of the convention are both present in the
+ *      source — `flipY = false` on the card sheets, top-origin V in makeBatch;
+ *   2. under that convention, the UV quad `makeBatch` builds for a named cell
+ *      lands on that cell's own rows and columns in the PNG; and
+ *   3. a probe pixel that is OPAQUE in the named cell and TRANSPARENT in what
+ *      the old convention would have sampled reads opaque — so the assertion
+ *      can tell the two conventions apart rather than passing under either.
+ *
+ * Point 3 is the one with teeth, and its own margin is asserted below: if a
+ * probe ever stops discriminating, the test says so instead of going quietly
+ * green.
  */
-for (const [map, world] of Object.entries(built)) {
-  const uprightZones = [...new Set(world.batches
-    .flatMap((batch) => batch.cards)
-    .filter((card) => card.upright)
-    .map((card) => card.motionId))].sort();
-  const expected = P20_ZONES
-    .filter((zone) => zone.map === map)
-    .map((zone) => zone.id)
-    .sort();
-  assert.deepEqual(
-    uprightZones,
-    expected,
-    `${map} changed which zones sample the atlas cell they name. Turning this `
-      + "on for an existing zone re-points accepted art; turning it off for a "
-      + "P20.4 zone puts birds back in the salt scud and lattice pylons back in "
-      + "the horizon haze.",
+
+/**
+ * The smallest PNG reader that can answer "what is the alpha at (x, y)".
+ *
+ * Eight-bit RGBA, non-interlaced, which is what all three card sheets are (the
+ * IHDR fields are asserted, so a re-export in another format fails loudly
+ * rather than being misread). No dependency: nothing in node_modules decodes
+ * PNG pixels, and forty lines here is cheaper than a new one.
+ */
+function decodePng(url) {
+  const bytes = readFileSync(url);
+  assert.ok(
+    bytes.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10])),
+    `${url} is not a PNG.`,
   );
-  // Every card of an opted-in zone, not just some of them: a zone whose author
-  // sets the flag on one branch of a ternary and not the other renders half its
-  // cards from a different cell and looks like a deliberate mix.
-  for (const zone of expected) {
-    const cards = world.batches
-      .flatMap((batch) => batch.cards)
-      .filter((card) => card.motionId === zone);
-    assert.ok(
-      cards.every((card) => card.upright === true),
-      `${zone} authors ${cards.filter((card) => !card.upright).length} cards `
-        + "without `upright`, so the zone draws from two different atlas cells.",
-    );
+  const width = bytes.readUInt32BE(16);
+  const height = bytes.readUInt32BE(20);
+  assert.equal(bytes[24], 8, `${url} is not 8 bits per channel.`);
+  assert.equal(bytes[25], 6, `${url} is not RGBA (colour type 6).`);
+  assert.equal(bytes[28], 0, `${url} is interlaced; this reader is not.`);
+
+  const chunks = [];
+  let offset = 8;
+  while (offset + 8 <= bytes.length) {
+    const length = bytes.readUInt32BE(offset);
+    const type = bytes.toString("ascii", offset + 4, offset + 8);
+    if (type === "IDAT") {
+      chunks.push(bytes.subarray(offset + 8, offset + 8 + length));
+    }
+    if (type === "IEND") break;
+    offset += 12 + length;
   }
+  const raw = inflateSync(Buffer.concat(chunks));
+
+  // PNG filtering: each scanline is prefixed with a filter byte and predicted
+  // from the pixel to its left (a) and the scanline above (b).
+  const stride = width * 4;
+  const out = Buffer.alloc(height * stride);
+  for (let row = 0; row < height; row += 1) {
+    const filter = raw[row * (stride + 1)];
+    const source = row * (stride + 1) + 1;
+    const target = row * stride;
+    for (let index = 0; index < stride; index += 1) {
+      const x = raw[source + index];
+      const a = index >= 4 ? out[target + index - 4] : 0;
+      const b = row > 0 ? out[target + index - stride] : 0;
+      const c = index >= 4 && row > 0 ? out[target + index - stride - 4] : 0;
+      let value;
+      if (filter === 0) value = x;
+      else if (filter === 1) value = x + a;
+      else if (filter === 2) value = x + b;
+      else if (filter === 3) value = x + ((a + b) >> 1);
+      else if (filter === 4) {
+        const p = a + b - c;
+        const pa = Math.abs(p - a);
+        const pb = Math.abs(p - b);
+        const pc = Math.abs(p - c);
+        value = x + (pa <= pb && pa <= pc ? a : pb <= pc ? b : c);
+      } else assert.fail(`${url} row ${row} uses PNG filter ${filter}.`);
+      out[target + index] = value & 255;
+    }
+  }
+  return {
+    width,
+    height,
+    alphaAt: (x, y) => out[y * stride + x * 4 + 3],
+  };
 }
 
-// ... and the runtime has to implement it, or the flag is data nothing reads.
+/**
+ * One probe per card sheet.
+ *
+ * `cell` is a cell a zone actually names; `mirror` is the cell the pre-P20.8
+ * convention drew in its place. The probe is in intra-cell pixels of `cell`,
+ * chosen to be far from every cell edge so the 1.5 px UV inset cannot reach it.
+ */
+const SHEET_PROBES = [
+  {
+    sheet: "greenwater_motion_512",
+    sheetSize: 512,
+    columns: 2,
+    cell: { slot: 0, name: "MIST" },
+    mirror: { slot: 2, name: "RAIN" },
+    probe: { x: 127, y: 127 },
+    zone: "HEAT_SHIMMER_LONG_PAN",
+  },
+  {
+    sheet: "greenwater_motion_b_512",
+    sheetSize: 512,
+    columns: 4,
+    cell: { slot: 15, name: "CRATE_STACK" },
+    mirror: { slot: 3, name: "GULL_SINGLE" },
+    probe: { x: 59, y: 68 },
+    zone: "OPENING_WRECK_LINE",
+  },
+  {
+    sheet: "futurisma_horizon_1024",
+    sheetSize: 1024,
+    columns: 4,
+    cell: { slot: 12, name: "MESA_LONG" },
+    mirror: { slot: 0, name: "TREELINE_DENSE" },
+    probe: { x: 152, y: 165 },
+    zone: "PAN_MESA_LINE",
+  },
+];
+
+// (1) The runtime's two halves of the convention. Neither is inferable from the
+// data, and either one alone is the bug.
 assert.ok(
-  readFileSync(
-    new URL("../src/game/living-world.ts", import.meta.url),
-    "utf8",
-  ).includes("card.upright"),
-  "living-world.ts never reads `upright`, so the P20.4 zones would silently "
-    + "render the mirrored atlas cell the accepted zones render.",
+  /texture\.flipY = false;/.test(livingWorldSource),
+  "living-world.ts no longer sets `flipY = false` in loadMotionAtlas, so the "
+    + "three card sheets sample with V's origin at the BOTTOM while atlasRect "
+    + "addresses cells from the TOP. That is the P20.8 defect exactly: every "
+    + "card draws the mirrored grid row, upside down.",
+);
+assert.ok(
+  /const vTop = v0;\s*\n\s*const vBottom = v0 \+ size;/.test(livingWorldSource),
+  "makeBatch no longer builds V top-origin off `rect.y`. The rect and the "
+    + "sampler have to agree about where row zero is; this is the half that "
+    + "lives in the UVs.",
+);
+// `card.upright`, not the word — the retirement is written up in prose in both
+// modules on purpose, and a rule that fails on its own explanation teaches the
+// next phase to delete the explanation.
+assert.ok(
+  !/card\.upright/.test(livingWorldSource),
+  "living-world.ts reads `card.upright` again. P20.8 retired the per-card "
+    + "opt-in by making every card correct; a card-level orientation flag can "
+    + "now only put one zone back on the mirrored cell.",
+);
+for (const [map, world] of Object.entries(built)) {
+  const flagged = world.batches
+    .flatMap((batch) => batch.cards)
+    .filter((card) => card.upright !== undefined);
+  assert.equal(
+    flagged.length,
+    0,
+    `${map} authors ${flagged.length} cards with an \`upright\` field. The flag `
+      + "is retired: every card samples the cell it names, so the field can "
+      + "only be data nothing reads or a request to re-mirror one zone.",
+  );
+}
+
+// (2) and (3). The UV quad makeBatch builds, resolved back to PNG pixels under
+// the convention above, has to land inside the cell the rect names — and the
+// probe has to be able to tell that convention from the old one.
+const UV_PADDING = 1.5;
+for (const entry of SHEET_PROBES) {
+  const image = decodePng(
+    new URL(`../public/assets/greenwater/textures/${entry.sheet}.png`,
+      import.meta.url),
+  );
+  assert.equal(image.width, entry.sheetSize, `${entry.sheet} changed size.`);
+  assert.equal(image.height, entry.sheetSize, `${entry.sheet} is not square.`);
+
+  const size = entry.sheetSize / entry.columns;
+  const rectX = (entry.cell.slot % entry.columns) * size;
+  const rectY = Math.floor(entry.cell.slot / entry.columns) * size;
+
+  // The zone that names this cell has to still name it, or the probe is
+  // pinning a cell nothing draws.
+  const card = built[
+    entry.zone.startsWith("PAN_") || entry.zone.startsWith("HEAT_")
+      ? "bitterpan"
+      : "greenwater"
+  ].batches
+    .flatMap((batch) => batch.cards)
+    .find((candidate) => candidate.motionId === entry.zone
+      && candidate.rect.x === rectX && candidate.rect.y === rectY);
+  assert.ok(
+    card,
+    `${entry.zone} no longer authors a card at ${entry.cell.name} `
+      + `(${rectX}, ${rectY}) on ${entry.sheet}, so this orientation probe is `
+      + "pinning a cell the runtime never draws. Re-point the probe at a cell "
+      + "the zone table still uses.",
+  );
+
+  // makeBatch's own expression, restated. The source assertion above is what
+  // keeps this restatement honest.
+  const u0 = (rectX + UV_PADDING) / entry.sheetSize;
+  const vTop = (rectY + UV_PADDING) / entry.sheetSize;
+  const span = (size - UV_PADDING * 2) / entry.sheetSize;
+  const vBottom = vTop + span;
+
+  // flipY = false, so V's origin is the top row and a V maps straight to a PNG
+  // row. Both edges of the quad must land inside the named cell.
+  assert.ok(
+    vTop * entry.sheetSize >= rectY
+      && vBottom * entry.sheetSize <= rectY + size,
+    `${entry.sheet} ${entry.cell.name}: the card's UV quad spans PNG rows `
+      + `${(vTop * entry.sheetSize).toFixed(1)}-`
+      + `${(vBottom * entry.sheetSize).toFixed(1)}, outside the cell's own rows `
+      + `${rectY}-${rectY + size}.`,
+  );
+
+  // The probe, reached THROUGH the quad rather than looked up directly: the
+  // fraction of the way down the card that lands on the probe row.
+  const across = (entry.probe.x - UV_PADDING) / (size - UV_PADDING * 2);
+  const down = (entry.probe.y - UV_PADDING) / (size - UV_PADDING * 2);
+  const sampledColumn = Math.round((u0 + across * span) * entry.sheetSize);
+  const sampledRow = Math.round((vTop + down * span) * entry.sheetSize);
+  assert.equal(
+    sampledColumn, rectX + entry.probe.x,
+    `${entry.sheet}: the card's U interpolation does not reach the probe column.`,
+  );
+  assert.equal(
+    sampledRow, rectY + entry.probe.y,
+    `${entry.sheet}: the card's V interpolation does not reach the probe row.`,
+  );
+
+  const drawn = image.alphaAt(sampledColumn, sampledRow);
+  // What `flipY = true` would have sampled at the same point on the card: the
+  // mirrored grid row, upside down.
+  const mirroredRow = entry.sheetSize - 1 - sampledRow;
+  const wouldHaveDrawn = image.alphaAt(sampledColumn, mirroredRow);
+
+  assert.ok(
+    drawn > 200,
+    `${entry.sheet} ${entry.cell.name}: the probe pixel the card samples is `
+      + `alpha ${drawn}, not opaque. Either the sheet was re-authored or the `
+      + "rect no longer lands on this cell.",
+  );
+  assert.ok(
+    wouldHaveDrawn < 20,
+    `${entry.sheet}: the probe cannot tell the two conventions apart — the `
+      + `mirrored reading is alpha ${wouldHaveDrawn}, not transparent. This `
+      + "assertion would pass with the flipY defect back in place, so it is "
+      + "worth nothing until the probe is moved to a discriminating pixel.",
+  );
+}
+
+/**
+ * P20.8. Every card rect resolves to a NAMED region of ATLAS_REGIONS.json.
+ *
+ * The orientation probes above pin three cells. This pins the rest of the
+ * addressing: a rect that lands between cells, or on a cell the atlas manifest
+ * does not name, is a card drawing a seam or someone else's art — and
+ * `atlasRect` will produce one happily from an off-by-one slot index.
+ *
+ * Only the two sheets the manifest carries are checked. `greenwater_motion_512`
+ * has no ATLAS_REGIONS entry (it predates the manifest), so its four cells are
+ * covered by the grid-alignment assertion alone, and that gap is recorded here
+ * rather than papered over.
+ */
+const atlasRegions = JSON.parse(readFileSync(
+  new URL("../src/game/data/ATLAS_REGIONS.json", import.meta.url), "utf8"));
+const SHEET_MANIFESTS = {
+  motionB: atlasRegions.greenwater_motion_b_512,
+  horizon: atlasRegions.futurisma_horizon_1024,
+};
+let namedRects = 0;
+let unmanifestedRects = 0;
+for (const [map, world] of Object.entries(built)) {
+  for (const batch of world.batches) {
+    for (const card of batch.cards) {
+      const { x, y, size, sheetSize } = card.rect;
+      assert.ok(
+        Number.isInteger(x / size) && Number.isInteger(y / size)
+          && x + size <= sheetSize && y + size <= sheetSize,
+        `${map}/${card.motionId} authors rect (${x}, ${y}, ${size}) on a `
+          + `${sheetSize} sheet, which is not a whole cell of that grid.`,
+      );
+      const manifest = SHEET_MANIFESTS[batch.spec.texture];
+      if (!manifest) {
+        unmanifestedRects += 1;
+        continue;
+      }
+      const named = Object.entries(manifest.regions).find(
+        ([, region]) => region.x === x && region.y === y
+          && region.w === size && region.h === size,
+      );
+      assert.ok(
+        named,
+        `${map}/${card.motionId} draws rect (${x}, ${y}, ${size}) on `
+          + `${manifest.texture}, which names no region there. Either the slot `
+          + "index is off by one or the sheet was re-laid-out without the zone "
+          + "table following.",
+      );
+      namedRects += 1;
+    }
+  }
+}
+assert.ok(
+  namedRects > 0,
+  "No card rect was checked against ATLAS_REGIONS.json, so this rule is inert.",
+);
+assert.ok(
+  unmanifestedRects > 0,
+  "Every card sheet now has an ATLAS_REGIONS entry. Fold `motion`, `jungle` "
+    + "and `emissive` into SHEET_MANIFESTS and delete this note.",
 );
 
 // The corridor rule, asserted over every Bitterpan card rather than only the
