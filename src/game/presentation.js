@@ -125,3 +125,53 @@ export function calculateSpeedStreakLength(
 export function presentationSurfaceLift(rightY, lateral, upY, surfaceHeight) {
   return bankedSurfaceLift(rightY, lateral) + apronSurfaceLift(upY, surfaceHeight);
 }
+
+/**
+ * H1 - the lateral a presentation point is REALLY at, recovered from its
+ * horizontal offset alone.
+ *
+ * The simulation stores `position.y` at the centreline height, so the stored
+ * point sits below the banked deck plane and `course.project()` hands back
+ * `lateral * cos^2(bank)` for it. The horizontal offset, though, is untouched
+ * by both the flattening and by any height lift, so dividing it by the
+ * horizontal length of `right` recovers the true lateral exactly. That is what
+ * makes the clearance below a real measurement rather than a restatement of the
+ * lift: nothing that writes `y` can move this number.
+ *
+ * @param {number} offsetX `point.x - sample.position.x`.
+ * @param {number} offsetZ `point.z - sample.position.z`.
+ * @param {number} rightX `sample.right.x`.
+ * @param {number} rightZ `sample.right.z`.
+ */
+export function lateralFromHorizontalOffset(offsetX, offsetZ, rightX, rightZ) {
+  const horizontalSq = rightX * rightX + rightZ * rightZ;
+  if (!Number.isFinite(horizontalSq) || horizontalSq <= 1e-9) return 0;
+  const projected = offsetX * rightX + offsetZ * rightZ;
+  if (!Number.isFinite(projected)) return 0;
+  return projected / horizontalSq;
+}
+
+/**
+ * H1 - the vertical gap between the craft and the DRAWN surface under it.
+ *
+ * Deliberately independent of `presentationSurfaceLift`: the lateral it is
+ * evaluated at comes from `lateralFromHorizontalOffset`, which no height write
+ * can influence, so a lift applied twice, once too little, or not at all all
+ * show up here. Equals `hoverHeight * upY` exactly when the lift is applied
+ * once and only once.
+ *
+ * @param {number} vehicleY world Y of the placed hull.
+ * @param {number} centreY `sample.position.y`.
+ * @param {number} rightY `sample.right.y`, i.e. sin(bank).
+ * @param {number} upY `sample.up.y`, i.e. cos(bank).
+ * @param {number} lateral from `lateralFromHorizontalOffset`.
+ * @param {number} surfaceHeight `surfaceHeightAtLateral(sample, lateral)`.
+ */
+export function hullClearance(vehicleY, centreY, rightY, upY, lateral, surfaceHeight) {
+  if (
+    !Number.isFinite(vehicleY) || !Number.isFinite(centreY)
+    || !Number.isFinite(rightY) || !Number.isFinite(upY)
+    || !Number.isFinite(lateral) || !Number.isFinite(surfaceHeight)
+  ) return 0;
+  return vehicleY - (centreY + rightY * lateral + upY * surfaceHeight);
+}

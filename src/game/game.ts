@@ -57,7 +57,12 @@ import {
   createApronResolution,
   createApronTelemetry,
 } from "./apron.js";
-import { calculatePresentationAlpha, presentationSurfaceLift } from "./presentation";
+import {
+  calculatePresentationAlpha,
+  hullClearance,
+  lateralFromHorizontalOffset,
+  presentationSurfaceLift,
+} from "./presentation";
 import {
   calculateFinishDistanceMeters,
   calculateRecoveryTelemetry,
@@ -147,6 +152,18 @@ export class FuturismaGame {
   private readonly previousPosition = new THREE.Vector3();
   private readonly previousForward = new THREE.Vector3(0, 0, -1);
   private readonly previousTravelDirection = new THREE.Vector3(0, 0, -1);
+  /**
+   * H1 - the lateral that goes with `previousPosition` / `presentationPosition`.
+   *
+   * The simulation's convention is that `position.y` is ALWAYS the centreline
+   * height: every writer that offsets by the banked `right` puts the y back.
+   * That makes the stored point sit BELOW the banked deck plane by
+   * `lateral * tan(bank)`, and re-projecting it returns `lateral * cos^2(bank)`,
+   * not `lateral` - so the presentation lift must be driven by the lateral the
+   * race loop actually holds, never by a projection of the flattened point.
+   */
+  private previousLateral = 0;
+  private presentationLateral = 0;
   private readonly presentationPosition = new THREE.Vector3();
   private readonly presentationForward = new THREE.Vector3(0, 0, -1);
   private readonly presentationTravelDirection = new THREE.Vector3(0, 0, -1);
@@ -154,6 +171,13 @@ export class FuturismaGame {
   private readonly scratchB = new THREE.Vector3();
   private readonly scratchC = new THREE.Vector3();
   private readonly scratchD = new THREE.Vector3();
+  /**
+   * H1 - the chase camera's own scratch. `updateCamera` used to borrow
+   * `scratchA` for the ground-clearance vector AFTER deriving `vehicleRight`
+   * into it, so the impact shake read a vector as long as the craft's lateral
+   * offset where a unit basis vector was intended.
+   */
+  private readonly cameraScratch = new THREE.Vector3();
   private readonly vehicleVisualState: TotemVisualState = {
     steer: 0,
     throttle: 0,
@@ -242,6 +266,11 @@ export class FuturismaGame {
   private diagnosticBoostSeconds = 0;
   private diagnosticDriftSeconds = 0;
   private diagnosticMinimumSurfaceGrip = 1;
+  // H1 - the drawn deck under the craft vs the craft, from the SIM's own
+  // (progress, lateral). See `hullClearance` in presentation.js.
+  private diagnosticHullClearance = 0;
+  private diagnosticMinimumHullClearance = Number.POSITIVE_INFINITY;
+  private diagnosticMaximumHullClearance = Number.NEGATIVE_INFINITY;
   private diagnosticEdgeSeconds = 0;
   private diagnosticWrongWaySeconds = 0;
   private diagnosticWrongWayEntries = 0;
@@ -690,6 +719,7 @@ export class FuturismaGame {
   }
 
   private capturePreviousSimulationPose(): void {
+    this.previousLateral = this.lateral;
     this.previousPosition.copy(this.position);
     this.previousForward.copy(this.forward);
     this.previousTravelDirection.copy(this.travelDirection);
@@ -697,12 +727,18 @@ export class FuturismaGame {
 
   private syncPresentationPose(): void {
     this.capturePreviousSimulationPose();
+    this.presentationLateral = this.lateral;
     this.presentationPosition.copy(this.position);
     this.presentationForward.copy(this.forward);
     this.presentationTravelDirection.copy(this.travelDirection);
   }
 
   private interpolatePresentationPose(alpha: number): void {
+    this.presentationLateral = THREE.MathUtils.lerp(
+      this.previousLateral,
+      this.lateral,
+      alpha,
+    );
     this.presentationPosition.lerpVectors(
       this.previousPosition,
       this.position,
@@ -1063,6 +1099,10 @@ export class FuturismaGame {
       projection.halfWidth - 2.05,
     );
     this.position.copy(projection.position).addScaledVector(projection.right, this.lateral);
+    // H1 - same convention as every other writer in `updateRace`: the banked
+    // `right` just added sin(bank) * lateral, which the presentation lift
+    // applies itself. Leaving it in double-applies it on a banked coast.
+    this.position.y = projection.position.y;
     this.boostActive = false;
     if (previousSpeed > 0 && this.speed === 0) this.diagnostics.requestImmediateReport();
   }
@@ -1209,11 +1249,14 @@ export class FuturismaGame {
     // P11 bank plane + P16 apron cross-section; see `presentationSurfaceLift`.
     // `sample` is projected from the un-lifted point on purpose, and this never
     // accumulates: `presentationPosition` is rewritten from the sim each frame.
+    // H1 - the lateral is the race loop's own, NOT `sample.lateral`: projecting
+    // the centreline-flattened point returns `lateral * cos^2(bank)`, which
+    // under-lifts the craft by `lateral * sin(bank) * sin^2(bank)`.
     this.presentationPosition.y += presentationSurfaceLift(
       sample.right.y,
-      sample.lateral,
+      this.presentationLateral,
       sample.up.y,
-      surfaceHeightAtLateral(sample, sample.lateral),
+      surfaceHeightAtLateral(sample, this.presentationLateral),
     );
     const speedRatio = this.speed / BOOST_MAX_SPEED;
     const vehiclePosition = this.scratchA
@@ -1264,8 +1307,44 @@ export class FuturismaGame {
       this.vehicle.hoverHeightMeters(this.vehicleVisualState),
     );
 
+    if (this.diagnosticsMode) this.recordHullClearance(vehiclePosition.y, sample);
     if (delta > 0) this.impactShake = Math.max(0, this.impactShake - delta * 3.6);
     return sample;
+  }
+
+  /**
+   * H1 - proof that the presentation lift is applied exactly once, per frame.
+   *
+   * `sample` is the projection taken BEFORE the lift and the lateral is
+   * recovered from the presentation point's horizontal offset, so neither input
+   * can be moved by a height write. The answer is `hoverHeight * up.y` when the
+   * lift is right, and off by `sin(bank) * lateral` for each extra or missing
+   * application of it.
+   */
+  private recordHullClearance(vehicleY: number, sample: CourseProjection): void {
+    const lateral = lateralFromHorizontalOffset(
+      this.presentationPosition.x - sample.position.x,
+      this.presentationPosition.z - sample.position.z,
+      sample.right.x,
+      sample.right.z,
+    );
+    this.diagnosticHullClearance = hullClearance(
+      vehicleY,
+      sample.position.y,
+      sample.right.y,
+      sample.up.y,
+      lateral,
+      surfaceHeightAtLateral(sample, lateral),
+    );
+    if (this.phase !== "running") return;
+    this.diagnosticMinimumHullClearance = Math.min(
+      this.diagnosticMinimumHullClearance,
+      this.diagnosticHullClearance,
+    );
+    this.diagnosticMaximumHullClearance = Math.max(
+      this.diagnosticMaximumHullClearance,
+      this.diagnosticHullClearance,
+    );
   }
 
   private updateCamera(
@@ -1314,7 +1393,13 @@ export class FuturismaGame {
       sample.progress,
       this.cameraSurfaceProjection,
     );
-    const cameraClearance = this.scratchA.copy(desired)
+    // H1 - `cameraScratch`, not `scratchA`: `vehicleRight` still lives in
+    // `scratchA` and the impact shake below reads it. Borrowing it here left
+    // the shake multiplying (desired - centreline) - a vector whose length is
+    // the craft's lateral offset, up to 17 m on the apron - where a unit
+    // right-vector was meant, so the shake scaled with how far off-line the
+    // craft was instead of with the impact.
+    const cameraClearance = this.cameraScratch.copy(desired)
       .sub(cameraSurface.position)
       .dot(cameraSurface.up);
     if (cameraClearance < 2.1) {
@@ -1651,6 +1736,11 @@ export class FuturismaGame {
     const start = this.course.sample(this.progress, this.poseProjection);
     this.lateral = probeSpawnLateral(spawn, start.halfWidth);
     this.position.copy(start.position).addScaledVector(start.right, this.lateral);
+    // H1 - the writer that broke the convention. A `?probe=` spawn with a
+    // non-zero lateral on a banked sample kept sin(bank) * lateral in the sim
+    // position AND got it again from the presentation lift, burying the craft
+    // 3.33 m under GREENWATER SWEEP's 12 degree deck at lateral -16.
+    this.position.y = start.position.y;
     this.forward.copy(start.tangent);
     this.travelDirection.copy(start.tangent);
     if (spawn.reversed) {
@@ -1828,6 +1918,10 @@ export class FuturismaGame {
         driftSeconds: this.diagnosticDriftSeconds,
         ...this.driftBank.diagnostics(),
         minimumSurfaceGrip: this.diagnosticMinimumSurfaceGrip,
+        hullClearance: this.diagnosticHullClearance,
+        minimumHullClearance: this.diagnosticMinimumHullClearance,
+        maximumHullClearance: this.diagnosticMaximumHullClearance,
+        hoverHeight: this.course.vehicleHoverHeight(this.speed, this.boostActive),
         edgeSeconds: this.diagnosticEdgeSeconds,
         wrongWaySeconds: this.diagnosticWrongWaySeconds,
         wrongWayEntries: this.diagnosticWrongWayEntries,

@@ -102,8 +102,19 @@ import { readFileSync } from "node:fs";
  * than by editing either rationale, because a future phase deciding whether to
  * spend more needs to see that the budget moved twice for two different reasons
  * and not once for a big one.
+ *
+ * H1 raises it a third time, by 94 lines, for a bug fix rather than a feature:
+ * the presentation lift needed the race loop's own lateral carried alongside
+ * `presentationPosition` (two fields plus their interpolation), and the fix
+ * only closes if something measures it, so `recordHullClearance` and its three
+ * counters live here too. The arithmetic itself did NOT come into game.ts --
+ * `hullClearance` and `lateralFromHorizontalOffset` are in presentation.js with
+ * the rest of the lift, and the assertions are in validate-pose.mjs. What is
+ * here is the wiring that can only be here, plus the comments that say why the
+ * convention exists, which is the thing that was missing when two writers
+ * broke it.
  */
-const GAME_LINE_BUDGET = 2_012;
+const GAME_LINE_BUDGET = 2_106;
 
 function read(path) {
   return readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
