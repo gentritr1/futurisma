@@ -99,6 +99,11 @@ export const SKY_BAND_STRENGTH = Object.freeze({
  *   integer so the value-noise lattice wraps and there is no seam at due east.
  *   The two maps use different periods, which is what makes their cloud
  *   arrangements genuinely different rather than the same sky rotated.
+ * - `stretch` the cell aspect ratio, wide to tall. The vertical frequency is
+ *   DERIVED from it in the shader, not authored separately: round 1 set the two
+ *   independently at roughly 1:1 and the band read as round blobs — smoke, not
+ *   the high cirrus and blown dust the maps are about. 6:1 is the shape of a
+ *   streak; the ratio is the number an art note is actually about.
  * - `seed` the starting phase, in turns. Fractional on purpose: an integer
  *   would multiply by `azimuthPeriod` into a whole number of lattice cells and
  *   land back on the unseeded pattern.
@@ -108,22 +113,24 @@ export const SKY_BAND_STRENGTH = Object.freeze({
  */
 export const CLOUD_PROFILES = Object.freeze({
   greenwater: Object.freeze({
-    coverage: 0.52,
-    softness: 0.3,
-    strength: 0.3,
+    coverage: 0.5,
+    softness: 0.5,
+    strength: 0.135,
     driftPerSecond: 0.0035,
-    azimuthPeriod: 16,
+    azimuthPeriod: 26,
+    stretch: 6,
     lowDegrees: 4,
     highDegrees: 30,
     shadowCool: 0.55,
     seed: 0.37,
   }),
   bitterpan: Object.freeze({
-    coverage: 0.28,
-    softness: 0.16,
-    strength: 0.075,
+    coverage: 0.22,
+    softness: 0.45,
+    strength: 0.074,
     driftPerSecond: 0.0022,
-    azimuthPeriod: 23,
+    azimuthPeriod: 56,
+    stretch: 6,
     lowDegrees: 4,
     highDegrees: 30,
     shadowCool: 0.7,

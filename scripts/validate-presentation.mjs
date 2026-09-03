@@ -233,26 +233,33 @@ assert.ok(
     + "authored a 20% reduction, i.e. 0.8.",
 );
 
-assert.equal(
-  bitterpanStreaks.count,
-  60,
-  `Bitterpan authors ${bitterpanStreaks.count} streaks; P20.5 authored 60.`,
+// P20.5 round 2 replaced round 1's pale-and-sparse Bitterpan streaks with dark
+// dust: the pale tint rendered within ten luma of the pan sky and the speed cue
+// vanished entirely (a measured ZERO streak pixels at three stations). What is
+// pinned here is the DIRECTION — darker than the sky, never additive, never
+// near-white — and the density that keeps it legible at that low contrast.
+assert.ok(
+  bitterpanStreaks.count >= 96 && bitterpanStreaks.count <= 160,
+  `Bitterpan authors ${bitterpanStreaks.count} streaks; a dark streak carries `
+    + "less signal per line, so the density has to sit in 96-160 to keep the "
+    + "speed cue. Round 1 shipped 60 and the cue disappeared.",
 );
 assert.ok(
-  Math.abs(bitterpanStreaks.lengthScale - 0.7) < 1e-9,
-  `Bitterpan streak length scale is ${bitterpanStreaks.lengthScale}, not 0.7.`,
+  bitterpanStreaks.lengthScale >= 0.9 && bitterpanStreaks.lengthScale <= 1,
+  `Bitterpan streak length scale is ${bitterpanStreaks.lengthScale}; 0.9-1.0. `
+    + "Round 1's 0.7 cut length on top of an already quiet blend.",
 );
 assert.ok(
-  bitterpanStreaks.opacityScale <= 0.55,
+  bitterpanStreaks.opacityScale <= 0.8,
   `Bitterpan streak opacity scale ${bitterpanStreaks.opacityScale} is over the `
-    + "0.55 ceiling; over a pale pan sky that is what reads as scratches.",
+    + "0.8 ceiling.",
 );
 assert.ok(
   !bitterpanStreaks.additive,
   "Bitterpan streaks must not blend additively: additive white over a pale sky "
     + "is exactly the near-white scratch the phase removed.",
 );
-// Warm dust, not cold light: red over green over blue.
+// Warm dust, not cold light: red over green over blue...
 const [dustR, dustG, dustB] = [16, 8, 0].map(
   (shift) => (bitterpanStreaks.color >> shift) & 255,
 );
@@ -260,6 +267,26 @@ assert.ok(
   dustR > dustG && dustG > dustB,
   `Bitterpan streak colour #${bitterpanStreaks.color.toString(16)} is not a warm `
     + "dust tint (needs red > green > blue).",
+);
+// ...and DARK, which is the half that cannot be eyeballed off a swatch. Under
+// AgX a mid dust tint renders near the pan sky's own value and disappears; the
+// streak has to start far below it. Rec.709 luma of the authored sRGB, out of
+// 255 — 60 is already well under a sky that measures 95-145 in frame.
+const dustLuma = 0.2126 * dustR + 0.7152 * dustG + 0.0722 * dustB;
+assert.ok(
+  dustLuma <= 60,
+  `Bitterpan streak colour #${bitterpanStreaks.color.toString(16)} has luma `
+    + `${dustLuma.toFixed(0)}; over 60 it renders within a few luma of the pan `
+    + "sky under AgX and the streaks stop reading at all.",
+);
+assert.ok(
+  dustLuma
+    < 0.2126 * ((greenwaterStreaks.color >> 16) & 255)
+      + 0.7152 * ((greenwaterStreaks.color >> 8) & 255)
+      + 0.0722 * (greenwaterStreaks.color & 255),
+  "Bitterpan's streaks must be darker than Greenwater's: one map reads its "
+    + "speed as light added to a dark sky, the other as dust taken out of a "
+    + "bright one.",
 );
 
 // The ramps themselves are untouched, and the scales ride OVER their output.
