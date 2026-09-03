@@ -6,6 +6,6 @@ page.on("pageerror", (e) => console.log("[pageerror]", String(e).slice(0, 200)))
 await page.goto(url, { waitUntil: "networkidle" });
 await page.waitForTimeout(waitMs);
 await page.screenshot({ path: out });
-const d = await page.evaluate(() => { try { const c = JSON.parse(document.getElementById("futurisma-diagnostics")?.textContent || "{}").current || {}; return { d: c.distanceMeters, lat: c.lateralMeters, v: c.speedKph, sector: c.sector, phase: c.phase, probe: c.probe, apron: c.onApron, edge: c.edgeSeconds }; } catch { return null; } });
+const d = await page.evaluate(() => { try { const c = JSON.parse(document.getElementById("futurisma-diagnostics")?.textContent || "{}").current || {}; return { d: c.distanceMeters, lat: c.lateralMeters, v: c.speedKph, sector: c.sector, phase: c.phase, probe: c.probe, apron: c.onApron, edge: c.edgeSeconds, hull: c.hullClearanceMeters, hover: c.hoverHeightMeters }; } catch { return null; } });
 console.log(JSON.stringify(d));
 await browser.close();
