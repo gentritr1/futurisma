@@ -179,6 +179,29 @@ assert.ok(
 //     the merged tree, ceilings 247 and 257. Taken with `npx vite build && node
 //     scripts/validate-build.mjs` after the merge.
 //
+//   H2a  247 -> 250, and this one is NOT a re-baseline for what H2a spent.
+//     H2a's own code is `src/game/art-pack.js` — two string constants, a query
+//     parse and a memo. MEASURED by building the merged tree twice, once with
+//     that module and its one import removed and once with it: 246.8 -> 246.9
+//     KiB gzip, i.e. +0.1 KiB, and 256.7 -> 256.9 KiB shell. A phase that costs
+//     a tenth of a kilobyte does not move a ceiling.
+//
+//     The ceiling moves because MAIN is at 246.8 of 247 on its own. The 247 was
+//     set at the G3+G4 merge from a measured 246.0 with a kilobyte of headroom,
+//     and the corridor and pose work that landed since has eaten it: what is
+//     left is 0.2 KiB, which is smaller than the resplit noise this file has
+//     already recorded twice (P20.1 saw 0.9 KiB move on import surface alone,
+//     G3 saw 0.7 KiB). At that margin the next landing fails on Rollup's chunk
+//     boundaries rather than on anything its author wrote, and the honest
+//     failure mode of a ceiling is "you spent too much", not "you were
+//     unlucky". 250 restores roughly the 1 KiB of working room the 247 was
+//     chosen to have, and H1 round 2 and P21 round 3 are both in flight.
+//
+//     What was NOT done: nothing was trimmed to avoid the move, because there
+//     was nothing to trim — the phase's whole shell cost is 0.1 KiB and the
+//     three sheets it prepared but rejected were TEXTURE bytes, which this
+//     ceiling does not weigh (see the art-pack block below). Raising a ceiling
+//     to cover someone else's spend is worth naming as exactly that.
 //   H2b pit radio  +2.4 KiB - measured 246.8 -> 249.2 KiB gzip on this tree with
 //     `npx vite build && node scripts/validate-build.mjs`, the baseline taken by
 //     stashing the phase and rebuilding rather than by trusting the 246.0 the
@@ -202,9 +225,19 @@ assert.ok(
 //     in the graph at all, they are never touched by anyone who does not press
 //     start, and a driver with the VOICE row off never downloads them. Their own
 //     ceiling is asserted separately below.
+//
+//   H2a + H2b merge  re-measured on the merged tree rather than summed, the
+//     rule this file has applied at every merge since G3 + G4. H2a raised the
+//     ceiling to 250 to restore main's own headroom (its code costs 0.1 KiB);
+//     H2b measured 249.2 against a 246.8 baseline it took by stashing itself.
+//     Neither had seen the other. MEASURED on the merged tree with `npx vite
+//     build && node scripts/validate-build.mjs`: 249.5 KiB gzip JS / 259.5 KiB
+//     shell. The ceilings go to 252 and 262, which keeps roughly the 2.5 KiB of
+//     working room H2a's note argues main needs and that neither branch's own
+//     number would have left.
 assert.ok(
-  javascriptGzip <= 251 * 1024,
-  `JavaScript bundle exceeds 251 KiB gzip (${(javascriptGzip / 1024).toFixed(1)} KiB).`,
+  javascriptGzip <= 252 * 1024,
+  `JavaScript bundle exceeds 252 KiB gzip (${(javascriptGzip / 1024).toFixed(1)} KiB).`,
 );
 // Re-baselined 2026-08-28 from a measured 4.35 KiB gzip (the 4 KiB ceiling
 // predated the HUD turn-cue and hazard styling) plus headroom for the planned
@@ -311,6 +344,69 @@ assert.ok(
   "The production build must include the hardened response-header policy.",
 );
 
+// ---------------------------------------------------------------------------
+// H2a. The generated horizon sheet, on the served side of the build.
+//
+// It costs the SHELL 0.1 KiB gzip (see the ceiling note above). What it costs
+// is SERVED TEXTURE BYTES, a different axis from the one the ceilings above
+// police, so it is weighed separately rather than folded into a number that
+// would then mean two things:
+//
+//   futurisma_horizon_hf_1024.png   197,939 raw   (gzip is not the axis: PNG is
+//                                                  already deflate, and the
+//                                                  _headers policy does not
+//                                                  re-compress images)
+//
+// against a 2.5 MB allowance for the phase. The P18 sheet stays served as the
+// `?art=base` way back, so this is a full addition and not a delta. Three other
+// candidates — a pan crust tile, a facade sheet and a brine tile, 1,535,343
+// bytes together — were prepared, wired, shot and REJECTED on the crops; they
+// are emitted into the gitignored `shots/higgsfield/` instead of served.
+//
+// This block asserts the bytes reach `dist/` at all. The hash lives in
+// validate-art-pass.mjs (which also pins that every base rect still lands
+// inside the alternate, and that art-pack.js actually defaults to it) and in
+// validate-assets.mjs; the pixel properties — P20.8 row orientation and the
+// P18.1 bottom anchor — live in validate-living-world.mjs. What is checked
+// here, and only here, is that Vite actually copied it out of public/: a
+// texture that validates in the source tree and 404s in production is the
+// failure this file exists to catch, and it is the DEFAULT sheet now, so that
+// 404 would be every player's horizon.
+// ---------------------------------------------------------------------------
+const artPackServed = {
+  "greenwater/textures/futurisma_horizon_hf_1024.png": 197939,
+};
+let artPackServedBytes = 0;
+for (const [name, expected] of Object.entries(artPackServed)) {
+  const bytes = await readFile(new URL(name, assetsDirectory));
+  assert.equal(
+    bytes.byteLength,
+    expected,
+    `dist/assets/${name} is ${bytes.byteLength} bytes, not the ${expected} the `
+      + "art pack pins. The build copied a different file than the one the "
+      + "validators hashed.",
+  );
+  artPackServedBytes += bytes.byteLength;
+}
+assert.ok(
+  artPackServedBytes <= 2.5 * 1000 * 1000,
+  `The H2a art pack serves ${(artPackServedBytes / 1024).toFixed(1)} KiB, over `
+    + "its 2.5 MB allowance.",
+);
+// The P18 sheet has to survive too: it is `?art=base`, and a comparison that
+// needs a checkout to reproduce stops being reproduced.
+assert.ok(
+  (await readFile(new URL(
+    "greenwater/textures/futurisma_horizon_1024.png", assetsDirectory,
+  ))).byteLength === 49017,
+  "The P18 horizon sheet is missing or resized in dist/. It is the `?art=base` "
+    + "way back to the sheet the generated one replaced.",
+);
+
+console.log(
+  `Art pack: ${(artPackServedBytes / 1024).toFixed(1)} KiB of served texture — `
+    + "the generated horizon sheet, now the default, with ?art=base kept.",
+);
 console.log(
   `Build PASS: ${(radioBytes / 1024).toFixed(1)} KiB of pit radio across ${
     radioNames.length} served files; ${(shellGzip / 1024).toFixed(1)} KiB gzip shell; ${(

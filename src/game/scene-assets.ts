@@ -3,6 +3,7 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { ASSET_KIT_PROP_PLACEMENTS } from "./asset-kit-layout";
 import type { BitterpanSurface } from "./bitterpan-surface";
+import { horizonSheetUrl } from "./art-pack.js";
 import { panFloorProbeActive, panFloorProbeMode } from "./floor-probe.js";
 
 /**
@@ -171,6 +172,11 @@ const SIGNAGE_TEXTURE_URL = "/assets/greenwater/textures/futurisma_signage_1024.
  * P15 art pass 02. The pan crust: a 256 seamless tile for the ground itself and
  * a 1024 decal sheet for the 407 cracks, brine patches, windrows, scrape
  * bundles, spill fans and conveyor shadows drawn over it. Bitterpan only.
+ *
+ * H2a prepared a generated replacement for the ground tile and did NOT ship it:
+ * its macro polygons measured about twice these, which makes the 12 m repeat
+ * visible on the pan. `scripts/prepare-higgsfield-textures.py` still emits it
+ * into `shots/higgsfield/` with the measurements that rejected it.
  */
 const BITTERPAN_CRUST_TILE_URL = "/assets/map02/textures/bitterpan_crust_tile_256.png";
 const BITTERPAN_CRUST_DECAL_URL = "/assets/map02/textures/bitterpan_crust_1024.png";
@@ -185,10 +191,15 @@ const HANGAR_FIXTURES_TEXTURE_URL = "/assets/greenwater/textures/hangar_fixtures
  * directory rather than duplicated per map. The trim sheet carries BOTH the
  * signage back panels and the Bitterpan road edge band, which is why it is
  * loaded once here and handed to whichever layers a map has.
+ *
+ * H2a: the HORIZON sheet has a generated edition, which is now the default and
+ * is resolved through `art-pack.js` at the load site rather than frozen here.
+ * `?art=base` returns this P18 one. The facade and trim sheets are unchanged —
+ * a generated facade sheet was prepared and rejected on the crops, and no
+ * generation in batch 1 covers the trim.
  */
 const BITTERPAN_FACADES_TEXTURE_URL = "/assets/map02/textures/bitterpan_facades_1024.png";
 const BITTERPAN_MASSING_PLACEMENTS_URL = "/data/map02/MASSING_PLACEMENTS.json";
-const HORIZON_TEXTURE_URL = "/assets/greenwater/textures/futurisma_horizon_1024.png";
 const TRIM_TEXTURE_URL = "/assets/greenwater/textures/futurisma_trim_512.png";
 const SURFACE_CHARACTER_MODEL_URL = "/assets/greenwater/models/greenwater_surface_character_runtime.glb";
 const BITTERPAN_TRACK_MODEL_URL = "/assets/map02/models/bitterpan_blockout.glb";
@@ -461,7 +472,7 @@ export class SceneAssets {
         textures,
         LIVING_WORLD_MOTION_URL,
         LIVING_WORLD_MOTION_B_URL,
-        HORIZON_TEXTURE_URL,
+        horizonSheetUrl(),
       );
       if (this.isDisposed()) {
         disposeObject3DResources(livingWorld.root);
@@ -1055,11 +1066,22 @@ export class SceneAssets {
           windDegrees: bitterpanSurface.panFloor.windDegrees,
           streakBands: bitterpanSurface.panFloor.streakBands,
           brineWeightMean: Number(bitterpanSurface.panFloor.brineWeightMean.toFixed(5)),
+          // P21.3 - `coveredSides` must be 0. See BitterpanSurfaceStats.
+          fix: bitterpanSurface.panFloor.fix,
+          coveredSides: bitterpanSurface.panFloor.coveredSides,
+          coveredWorstMetres: bitterpanSurface.panFloor.coveredWorstMetres,
+          reliefVertices: bitterpanSurface.panFloor.reliefVertices,
+          reliefMaxDropMetres: bitterpanSurface.panFloor.reliefMaxDropMetres,
           probe: bitterpanSurface.panFloor.probe,
         }
+        // Every zero here means "the surface layer did not load", never "clean" -
+        // which is why `coveredSides` is paired with `reliefVertices`: a real
+        // measurement of a fixed floor has 0 covered sides AND a non-zero relief.
         : { segments: 0, macroSeed: 0, secondaryScale: 0, vertices: 0, meanLuma: 0,
           peakBrightness: 0, peakHue: 0, windDegrees: 0, streakBands: 0,
-          brineWeightMean: 0, probe: false },
+          brineWeightMean: 0, fix: "off" as const, coveredSides: 0,
+          coveredWorstMetres: 0, reliefVertices: 0, reliefMaxDropMetres: 0,
+          probe: false },
       plaqueBackingLoadMs: this.plaqueBackingLoadMs === null
         ? null
         : Number(this.plaqueBackingLoadMs.toFixed(1)),

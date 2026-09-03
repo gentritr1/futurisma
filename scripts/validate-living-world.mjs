@@ -1394,7 +1394,60 @@ const SHEET_PROBES = [
     probe: { x: 152, y: 165 },
     zone: "PAN_MESA_LINE",
   },
+  // H2a. The generated edition, which since round 2 of the art review is the
+  // DEFAULT sheet — `art-pack.js` loads this one and `?art=base` returns the
+  // P18 one above. Probed at the SAME (152, 165) as the P18 row, deliberately,
+  // so the two are directly comparable and the pair reads as "both editions
+  // answer the orientation probe the same way".
+  //
+  // The P20.8 defect this pins is a property of the SHEET, not of the loader:
+  // `atlasRect` counts rows from the top of the PNG, the sampler reaches them
+  // through `flipY = false`, and a sheet whose cells were composed bottom-up
+  // would draw every card mirrored with no code change anywhere. A re-authored
+  // sheet is exactly the kind of thing that reintroduces it, because the
+  // temptation when composing one is to work in image-natural order and let the
+  // loader sort it out. So the new default is probed, not trusted — and it is
+  // probed FIRST here, because it is the one players get.
+  //
+  // Measured at (152, 165) of MESA_LONG: drawn alpha 255 with an 11x11
+  // neighbourhood minimum of 255, mirrored alpha 0 across the same
+  // neighbourhood. The P18 sheet passes the same probe at 204 with an edge
+  // inside its neighbourhood, which is worth recording: that probe is marginal
+  // where this one is not, so if the P18 row ever has to move, this row does
+  // not have to move with it.
+  {
+    sheet: "futurisma_horizon_hf_1024",
+    sheetSize: 1024,
+    columns: 4,
+    cell: { slot: 12, name: "MESA_LONG" },
+    mirror: { slot: 0, name: "TREELINE_DENSE" },
+    probe: { x: 152, y: 165 },
+    zone: "PAN_MESA_LINE",
+    isDefault: true,
+  },
 ];
+
+/**
+ * H2a. The sheet `art-pack.js` actually loads has to be one of the probed ones.
+ *
+ * Without this, every assertion below still passes on a build whose default
+ * points at a sheet no probe has ever read — which is the shape of a default
+ * that got changed by an editor rather than by a decision.
+ */
+{
+  const artPack = readFileSync(
+    new URL("../src/game/art-pack.js", import.meta.url), "utf8");
+  const defaultProbe = SHEET_PROBES.find((entry) => entry.isDefault);
+  assert.ok(
+    defaultProbe && artPack.includes(`${defaultProbe.sheet}.png`),
+    "art-pack.js does not default to the horizon sheet this file marks "
+      + "`isDefault`. Move the marker with the default, not after it.",
+  );
+  assert.ok(
+    /DEFAULT_ART_PACK = \/\*\* @type \{ArtPack\} \*\/ \("hf"\)/.test(artPack),
+    "art-pack.js no longer defaults to the generated horizon sheet.",
+  );
+}
 
 // (1) The runtime's two halves of the convention. Neither is inferable from the
 // data, and either one alone is the bug.
@@ -1518,6 +1571,109 @@ for (const entry of SHEET_PROBES) {
       + `mirrored reading is alpha ${wouldHaveDrawn}, not transparent. This `
       + "assertion would pass with the flipY defect back in place, so it is "
       + "worth nothing until the probe is moved to a discriminating pixel.",
+  );
+}
+
+/**
+ * P18.1, re-asserted in PIXELS against the sheet that is actually served.
+ *
+ * The horizon batch draws its cards at `base 0` — the bottom edge of the quad
+ * sits on the ground plane — and the assertion above that every silhouette is
+ * "bottom-anchored" is about that GEOMETRY. It says nothing about the artwork:
+ * a cell whose silhouette stops forty rows short of the cell's bottom edge
+ * draws a structure hovering forty rows above the pan, on a card whose geometry
+ * is anchored perfectly.
+ *
+ * That gap did not matter while the sheet was authored by the pass that wrote
+ * the rule. It matters now: H2a redrew thirteen of the sixteen cells from a
+ * generation and made that sheet the default, and "did the new artwork keep the
+ * anchor" is a question about pixels that only pixels can answer.
+ *
+ * WHICH CELLS THE RULE COVERS, and why it is derived rather than listed. Only
+ * cells drawn by a BOTTOM-ANCHORED batch can float — the two additive band
+ * batches centre their cards and are the delivery's own "authored as tone"
+ * carve-out, asserted as such above. They also draw at `alphaTest: 0`, where
+ * the silhouette batch draws at 0.5, so they are allowed to be faint at their
+ * bottom edge in a way a silhouette is not. Hard-coding "all but SHIMMER_BAND
+ * and HAZE_BAND" would restate that pairing in a second place and let the two
+ * drift; walking the built world for batches whose `anchor` is "bottom" reads
+ * it from the one place that owns it. (Writing this rule the hard-coded way
+ * first is how the distinction got noticed: it failed on SHIMMER_BAND, which is
+ * a cell the rule was never about.)
+ *
+ * The tolerance is 4 rows and it is not slack for new art — it is the P18
+ * sheet's own margin, measured: its cells stop at rows 253-255 of 256, because
+ * several were authored with a one-to-two row transparent guard at the bottom.
+ * A tolerance tighter than the incumbent would fail the sheet this one
+ * replaces, which pins a preference rather than a property.
+ */
+const BOTTOM_ANCHOR_TOLERANCE_ROWS = 4;
+{
+  const defaultProbe = SHEET_PROBES.find((entry) => entry.isDefault);
+  const image = decodePng(new URL(
+    `../public/assets/greenwater/textures/${defaultProbe.sheet}.png`,
+    import.meta.url));
+  const manifest = JSON.parse(readFileSync(
+    new URL("../src/game/data/ATLAS_REGIONS.json", import.meta.url), "utf8"),
+  ).futurisma_horizon_1024;
+
+  // Every rect any bottom-anchored horizon batch actually draws, on either map.
+  const anchoredRects = new Set();
+  for (const world of Object.values(built)) {
+    for (const batch of world.batches) {
+      if (batch.spec.texture !== "horizon" || batch.spec.anchor !== "bottom") continue;
+      for (const card of batch.cards) anchoredRects.add(`${card.rect.x},${card.rect.y}`);
+    }
+  }
+  assert.ok(
+    anchoredRects.size > 0,
+    "No bottom-anchored horizon batch draws any card, so this rule is checking "
+      + "nothing. Either the batches were retextured or `anchor` was dropped.",
+  );
+
+  const floated = [];
+  let checked = 0;
+  for (const [name, rect] of Object.entries(manifest.regions)) {
+    if (!anchoredRects.has(`${rect.x},${rect.y}`)) continue;
+    let lowestCovered = -1;
+    for (let row = rect.h - 1; row >= 0 && lowestCovered < 0; row -= 1) {
+      for (let column = 0; column < rect.w; column += 1) {
+        // 127 is the silhouette batch's own alphaTest of 0.5 in 8-bit alpha: a
+        // pixel that batch would discard is not coverage.
+        if (image.alphaAt(rect.x + column, rect.y + row) > 127) {
+          lowestCovered = row;
+          break;
+        }
+      }
+    }
+    assert.ok(
+      lowestCovered >= 0,
+      `${defaultProbe.sheet}/${name} is entirely transparent above the batch's `
+        + "alphaTest, so its cards draw nothing at all.",
+    );
+    if (lowestCovered < rect.h - 1 - BOTTOM_ANCHOR_TOLERANCE_ROWS) {
+      floated.push(`${name} stops at row ${lowestCovered} of ${rect.h}`);
+    }
+    checked += 1;
+  }
+  assert.deepEqual(
+    floated, [],
+    `On ${defaultProbe.sheet}, ${floated.length} bottom-anchored cell(s) float `
+      + `inside their own cell: ${floated.join("; ")}. The cards' geometry is `
+      + "anchored at base 0, so artwork that floats draws a silhouette hovering "
+      + "over the pan.",
+  );
+  // A count, so a rule that quietly stops covering anything is visible.
+  // MEASURED: 14 of the 16 cells are drawn by a bottom-anchored batch; the two
+  // that are not are SHIMMER_BAND and HAZE_BAND, the tone bands. Of the 14, all
+  // but RIG_FAR carry coverage on row 255 — flush with the cell floor, no
+  // margin at all — and RIG_FAR, the one cell here still carrying its P18
+  // pixels, stops at 253. That spread is where the 4-row tolerance comes from.
+  assert.equal(
+    checked, 14,
+    `Bottom-anchor checked ${checked} cells of ${defaultProbe.sheet}; the `
+      + "bottom-anchored batches draw 14. A different count means the rect "
+      + "match is wrong, or a zone changed which cells it names.",
   );
 }
 

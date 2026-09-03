@@ -238,6 +238,103 @@ for (const [key, expected] of Object.entries(EXPECTED_SHEETS)) {
 }
 
 // ---------------------------------------------------------------------------
+// 2b. H2a — the generated horizon sheet, which is now the DEFAULT.
+//
+// `futurisma_horizon_hf_1024.png` redraws thirteen of the sixteen silhouette
+// cells of the P18 sheet and `src/game/art-pack.js` loads it unless `?art=base`
+// asks for the old one. It is NOT an ATLAS_REGIONS entry: that manifest is
+// asserted above to describe exactly the ten art-pass sheets, and this is not
+// an eleventh sheet — it is the SAME rects over different pixels, which is the
+// only thing that makes it a drop-in.
+//
+// So what is pinned here is (a) its bytes and dimensions, (b) that every region
+// rect of the P18 sheet still lands inside it at the same coordinates and size,
+// and (c) that art-pack.js actually defaults to it. (c) matters more than it
+// looks: the rest of this block would pass unchanged on a build that shipped
+// the file and never loaded it, which is exactly the shape of a default that
+// got reverted by an editor and not by a decision.
+//
+// Both editions stay served. `?art=base` is the review-only way back, and a
+// before/after that can only be reproduced by checking out an old commit stops
+// being reproduced.
+//
+// The pixel-level properties — the P20.8 row orientation and the P18.1 bottom
+// anchor — are asserted in validate-living-world.mjs, which already carries a
+// PNG decoder. This file weighs the sheet; that one reads it.
+// ---------------------------------------------------------------------------
+
+const HORIZON_HF = {
+  base: "futurisma_horizon_1024",
+  texture: "/assets/greenwater/textures/futurisma_horizon_hf_1024.png",
+  width: 1024,
+  height: 1024,
+  bytes: 197939,
+  sha256: "169c30729904ec20edaa44c33298704bb76ce5c387ba39e8f7f9d6256653c967",
+};
+
+{
+  const bytes = readFileSync(new URL(`public${HORIZON_HF.texture}`, root));
+  assert.equal(
+    bytes.byteLength,
+    HORIZON_HF.bytes,
+    `futurisma_horizon_hf_1024 is ${bytes.byteLength} bytes; the pin says `
+      + `${HORIZON_HF.bytes}. Re-run \`python3 `
+      + "scripts/prepare-higgsfield-textures.py --check` rather than editing the "
+      + "pin: that script is the provenance for this sheet.",
+  );
+  assert.equal(
+    createHash("sha256").update(bytes).digest("hex"),
+    HORIZON_HF.sha256,
+    "futurisma_horizon_hf_1024 on disk is not the sheet "
+      + "prepare-higgsfield-textures.py emits.",
+  );
+  assert.equal(
+    bytes.subarray(0, 8).toString("hex"),
+    "89504e470d0a1a0a",
+    "futurisma_horizon_hf_1024 is not a PNG.",
+  );
+  // IHDR width/height, read out of the header rather than trusted to the pin.
+  assert.equal(bytes.readUInt32BE(16), HORIZON_HF.width, "horizon hf changed width.");
+  assert.equal(bytes.readUInt32BE(20), HORIZON_HF.height, "horizon hf changed height.");
+
+  const base = atlas[HORIZON_HF.base];
+  assert.equal(
+    HORIZON_HF.width, base.width,
+    `futurisma_horizon_hf_1024 is ${HORIZON_HF.width} wide against `
+      + `${HORIZON_HF.base}'s ${base.width}. The alternate has to be the same `
+      + "size as the sheet it stands in for, or every UV rect on it addresses "
+      + "different pixels.",
+  );
+  assert.equal(HORIZON_HF.height, base.height, "horizon hf changed height against its base.");
+  for (const [name, region] of Object.entries(base.regions)) {
+    assert.ok(
+      region.x + region.w <= HORIZON_HF.width
+        && region.y + region.h <= HORIZON_HF.height,
+      `${HORIZON_HF.base}/${name} runs off futurisma_horizon_hf_1024.`,
+    );
+  }
+
+  // (c). The default is the decision this phase actually made, so it is pinned
+  // as data rather than left to the module's prose.
+  const artPack = readFileSync(
+    new URL("src/game/art-pack.js", root), "utf8");
+  assert.ok(
+    /DEFAULT_ART_PACK = \/\*\* @type \{ArtPack\} \*\/ \("hf"\)/.test(artPack),
+    "art-pack.js no longer defaults to the generated horizon sheet. Shipping "
+      + "the file and not loading it is the failure this asserts against: every "
+      + "other check in this block passes on a build that serves a sheet nobody "
+      + "sees.",
+  );
+  assert.ok(
+    artPack.includes(HORIZON_HF.texture)
+      && artPack.includes(atlas[HORIZON_HF.base].texture),
+    "art-pack.js must name BOTH horizon editions. `?art=base` is the only way "
+      + "back to the P18 sheet, and a comparison that needs a checkout to "
+      + "reproduce stops being reproduced.",
+  );
+}
+
+// ---------------------------------------------------------------------------
 // 3. The opening-surface decals.
 // ---------------------------------------------------------------------------
 
