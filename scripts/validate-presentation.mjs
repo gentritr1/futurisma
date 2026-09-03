@@ -197,6 +197,110 @@ assert.ok(
   "Impact sparks must leave the banked surface, not the centreline plane.",
 );
 
+/* ------------------------------------------------------------------ */
+/* P20.5 — speed lines are per map, and the ramp underneath is not      */
+/* ------------------------------------------------------------------ */
+
+// The 96 additive white-cyan streaks were drawn for Greenwater's dark sky. On
+// Bitterpan's pale one they read as scratches on the lens — measured on the
+// merged base they were the busiest thing in most frames. The palette is now
+// per map; what must NOT be per map is the shape of the speed and drift ramps,
+// because that is game feel and both maps drive the same craft.
+const { SPEED_LINE_PROFILES, resolveSpeedLineProfile } = await import(
+  "../src/game/speed-line-profile.js"
+);
+const effectsSource = read("src/game/effects.ts");
+
+const bitterpanStreaks = SPEED_LINE_PROFILES.bitterpan;
+const greenwaterStreaks = SPEED_LINE_PROFILES.greenwater;
+
+assert.equal(
+  resolveSpeedLineProfile("nonexistent-map"),
+  greenwaterStreaks,
+  "An unknown course kind must fall back to the shipped Greenwater streaks "
+    + "rather than to an empty profile.",
+);
+
+assert.equal(greenwaterStreaks.count, 96, "Greenwater keeps its 96 streaks.");
+assert.equal(greenwaterStreaks.lengthScale, 1, "Greenwater keeps its streak length.");
+assert.ok(
+  greenwaterStreaks.additive,
+  "Greenwater's dark sky is what additive streaks were drawn for; keep them.",
+);
+assert.ok(
+  Math.abs(greenwaterStreaks.opacityScale - 0.8) < 1e-9,
+  `Greenwater streak opacity scale is ${greenwaterStreaks.opacityScale}; P20.5 `
+    + "authored a 20% reduction, i.e. 0.8.",
+);
+
+assert.equal(
+  bitterpanStreaks.count,
+  60,
+  `Bitterpan authors ${bitterpanStreaks.count} streaks; P20.5 authored 60.`,
+);
+assert.ok(
+  Math.abs(bitterpanStreaks.lengthScale - 0.7) < 1e-9,
+  `Bitterpan streak length scale is ${bitterpanStreaks.lengthScale}, not 0.7.`,
+);
+assert.ok(
+  bitterpanStreaks.opacityScale <= 0.55,
+  `Bitterpan streak opacity scale ${bitterpanStreaks.opacityScale} is over the `
+    + "0.55 ceiling; over a pale pan sky that is what reads as scratches.",
+);
+assert.ok(
+  !bitterpanStreaks.additive,
+  "Bitterpan streaks must not blend additively: additive white over a pale sky "
+    + "is exactly the near-white scratch the phase removed.",
+);
+// Warm dust, not cold light: red over green over blue.
+const [dustR, dustG, dustB] = [16, 8, 0].map(
+  (shift) => (bitterpanStreaks.color >> shift) & 255,
+);
+assert.ok(
+  dustR > dustG && dustG > dustB,
+  `Bitterpan streak colour #${bitterpanStreaks.color.toString(16)} is not a warm `
+    + "dust tint (needs red > green > blue).",
+);
+
+// The ramps themselves are untouched, and the scales ride OVER their output.
+// If a future change folds the map scale into the ramp, these two fail: the
+// ramp is what the rest of this file pins, and it must stay map-agnostic.
+assert.ok(
+  effectsSource.includes(") * this.profile.opacityScale;"),
+  "effects.ts must apply the map's opacity scale over calculateSpeedStreakOpacity's "
+    + "result, not inside it, or the drift and boost shoulders change shape.",
+);
+assert.ok(
+  effectsSource.includes(") * this.profile.lengthScale;"),
+  "effects.ts must apply the map's length scale over calculateSpeedStreakLength's "
+    + "result.",
+);
+// Same ramp, two maps: the ONLY difference at a given input is the scale.
+for (const speed of [0.5, 0.7, 0.9, 1]) {
+  for (const drift of [0, 0.5, 1]) {
+    const base = calculateSpeedStreakOpacity(speed, drift, false);
+    assert.ok(
+      Math.abs(base * bitterpanStreaks.opacityScale
+        - base * greenwaterStreaks.opacityScale * (bitterpanStreaks.opacityScale
+          / greenwaterStreaks.opacityScale)) < 1e-12,
+      "The per-map scale must be a pure multiplier over one shared ramp.",
+    );
+    assert.ok(
+      base * bitterpanStreaks.opacityScale <= base * greenwaterStreaks.opacityScale,
+      `At speed ${speed}/drift ${drift} Bitterpan's streaks are not quieter than `
+        + "Greenwater's, which is the whole point of the per-map profile.",
+    );
+  }
+}
+// Reduced motion is still the more restrictive path on both maps.
+for (const profile of [bitterpanStreaks, greenwaterStreaks]) {
+  assert.ok(
+    calculateSpeedStreakOpacity(0.9, 0.5, true) * profile.opacityScale
+      < calculateSpeedStreakOpacity(0.9, 0.5, false) * profile.opacityScale,
+    "Reduced motion must stay quieter than full motion under every profile.",
+  );
+}
+
 const summaries = [];
 for (const refreshRate of [144, 165, 240]) {
   const stepped = simulatePresentation(refreshRate, false);
@@ -223,5 +327,10 @@ console.log(
   `Presentation PASS: ${summaries.join(", ")}; bounded directional speed streaks; `
     + `banked-deck lift ${worstCaseError.toFixed(2)} m at the ${steepest.bank}° `
     + `station (d=${steepest.d} m), applied on the presentation pose and the `
-    + "spark origin and kept off the simulation's own position.",
+    + "spark origin and kept off the simulation's own position; P20.5 streak "
+    + `profiles Bitterpan ${bitterpanStreaks.count} lines x${bitterpanStreaks.lengthScale} `
+    + `length x${bitterpanStreaks.opacityScale} opacity `
+    + `(#${bitterpanStreaks.color.toString(16)}, normal blend) and Greenwater `
+    + `${greenwaterStreaks.count} x${greenwaterStreaks.opacityScale} additive, over one `
+    + "shared ramp.",
 );

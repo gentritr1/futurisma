@@ -48,9 +48,27 @@ assert.ok(
 // imported it and Rollup promoted it to a shared chunk; the import surface was
 // cut to three call sites to buy that back, so this ceiling is 226 rather than
 // 227. Raise only with a fresh measurement and rationale.
+//
+// Re-baselined 2026-09-03 by P20.5 (sky decoupled from fog, cloud band, per-map
+// speed lines): 225.6 -> 227.8 KiB gzip measured on this build, 8 initial chunks
+// in both. The +2.2 KiB is src/game/sky-profile.js (two authored sky tables and
+// the cloud profiles), src/game/speed-line-profile.js, and the rewritten dome
+// fragment shader — GLSL is string content that survives minification, so it is
+// the expensive half. That shader's explanatory comments were moved OUT of the
+// template literal into TypeScript above it for exactly this reason, which
+// bought back 1.2 KiB of the 3.4 KiB the first arrangement cost.
+//
+// What was NOT done, and why the ceiling had to move instead: the Bitterpan sky
+// is authored in BITTERPAN_PRODUCTION.json and the Greenwater sector distances
+// in course.ts, and importing either from atmosphere.ts — which is in the
+// initial shell — would have pulled a 12 KiB or a 253 KiB lazy map chunk into
+// first paint. The tables are mirrored in sky-profile.js instead and
+// validate-lighting.mjs fails if a mirror drifts from its source.
+//
+// Raise only with a fresh measurement and rationale.
 assert.ok(
-  javascriptGzip <= 226 * 1024,
-  `JavaScript bundle exceeds 226 KiB gzip (${(javascriptGzip / 1024).toFixed(1)} KiB).`,
+  javascriptGzip <= 228 * 1024,
+  `JavaScript bundle exceeds 228 KiB gzip (${(javascriptGzip / 1024).toFixed(1)} KiB).`,
 );
 // Re-baselined 2026-08-28 from a measured 4.35 KiB gzip (the 4 KiB ceiling predated
 // the HUD turn-cue and hazard styling) plus headroom for the planned minimap and
@@ -59,9 +77,13 @@ assert.ok(
   stylesheetGzip <= 8 * 1024,
   `Stylesheet exceeds 8 KiB gzip (${(stylesheetGzip / 1024).toFixed(1)} KiB).`,
 );
+// Shell = HTML + initial JS + CSS. It moves with the JS ceiling above and for
+// the same reason; re-baselined 2026-09-03 by P20.5 from a measured 233.6 ->
+// 235.9 KiB gzip, which is the +2.2 KiB of sky tables and dome shader and
+// nothing else (HTML and CSS are untouched by this phase).
 assert.ok(
-  shellGzip <= 235 * 1024,
-  `Initial app shell exceeds 235 KiB gzip (${(shellGzip / 1024).toFixed(1)} KiB).`,
+  shellGzip <= 237 * 1024,
+  `Initial app shell exceeds 237 KiB gzip (${(shellGzip / 1024).toFixed(1)} KiB).`,
 );
 assert.ok(
   html.includes('rel="preload"')

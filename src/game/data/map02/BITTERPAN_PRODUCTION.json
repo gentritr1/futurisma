@@ -341,7 +341,7 @@
     }
   },
   "lighting": {
-    "note": "Three sector profiles, one per accepted sector. P19 re-graded the pan for pigment: the fogs deepened (S1 #c7b997 -> #c4ad84, S2 #d5cfb9 -> #cec2a2) and thickened (0.00072 -> 0.0009, 0.00048 -> 0.00066, 0.00082 -> 0.00095) so distance has air in it, and S2's hemisphere fell 1.35 -> 1.15 while its key rose 1.45 -> 1.6, because the pale flat basin was the paleness complaint. The fog floor still clears every P18.2 horizon band luminance target. The sun stays high and hard because a salt pan at noon has no soft light in it: elevation falls 74 -> 69 -> 63 degrees and the azimuth swings 20 -> 38 -> 56 degrees around the lap, so the shadow direction turns visibly across the three basins and wraps back over the start line.",
+    "note": "Three sector profiles, one per accepted sector. P19 re-graded the pan for pigment: the fogs deepened (S1 #c7b997 -> #c4ad84, S2 #d5cfb9 -> #cec2a2) and thickened (0.00072 -> 0.0009, 0.00048 -> 0.00066, 0.00082 -> 0.00095) so distance has air in it, and S2's hemisphere fell 1.35 -> 1.15 while its key rose 1.45 -> 1.6, because the pale flat basin was the paleness complaint. The fog floor still clears every P18.2 horizon band luminance target. The sun stays high and hard because a salt pan at noon has no soft light in it: elevation falls 74 -> 69 -> 63 degrees and the azimuth swings 20 -> 38 -> 56 degrees around the lap, so the shadow direction turns visibly across the three basins and wraps back over the start line. P20.5 decoupled the sky dome from the fog: each profile authors skyHorizon (a pale haze band ABOVE the fog and cooler than it), skyZenith (deep desaturated blue-grey) and skyHorizonBlendDegrees (the elevation at which the haze has fully resolved into the zenith). The fog colour now survives only in the bottom 1.5 degrees, so distance still melts into it while the framed sky stops sharing the pan's khaki. These three pairs are mirrored in src/game/sky-profile.js because atmosphere.ts cannot import this file without dragging the map chunk into the initial shell; scripts/validate-lighting.mjs fails if the mirror drifts.",
     "crossfadeMetres": 90,
     "profiles": [
       {
@@ -352,6 +352,9 @@
         "ground": "#5f5340",
         "key": "#ffe0a8",
         "rim": "#d9904d",
+        "skyHorizon": "#6e8492",
+        "skyZenith": "#1a2835",
+        "skyHorizonBlendDegrees": 20,
         "hemisphereIntensity": 1.25,
         "keyIntensity": 1.55,
         "rimIntensity": 0.7,
@@ -375,6 +378,9 @@
         "ground": "#676052",
         "key": "#ffedc7",
         "rim": "#b6c3be",
+        "skyHorizon": "#728896",
+        "skyZenith": "#1c2b38",
+        "skyHorizonBlendDegrees": 20,
         "hemisphereIntensity": 1.15,
         "keyIntensity": 1.6,
         "rimIntensity": 0.55,
@@ -398,6 +404,9 @@
         "ground": "#555e5a",
         "key": "#e4eadc",
         "rim": "#86aaa7",
+        "skyHorizon": "#6b8294",
+        "skyZenith": "#182634",
+        "skyHorizonBlendDegrees": 20,
         "hemisphereIntensity": 1.2,
         "keyIntensity": 1.3,
         "rimIntensity": 0.8,
