@@ -232,7 +232,8 @@ assert.ok(
 //     H2b measured 249.2 against a 246.8 baseline it took by stashing itself.
 //     Neither had seen the other. MEASURED on the merged tree with `npx vite
 //     build && node scripts/validate-build.mjs`: 249.5 KiB gzip JS / 259.5 KiB
-//     shell. The ceilings go to 252 and 262, which keeps roughly the 2.5 KiB of
+//     shell, and 249.7 / 259.7 once H2b's rejected `?deck=hf` probe went in
+//     (+0.2 KiB, kept so its crop stays re-takeable). The ceilings go to 252 and 262, which keeps roughly the 2.5 KiB of
 //     working room H2a's note argues main needs and that neither branch's own
 //     number would have left.
 assert.ok(

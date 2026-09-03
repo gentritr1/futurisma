@@ -82,6 +82,36 @@ H2b added a fifth and it is REJECTED too, on a mismatch rather than on quality:
 
       Not shipped, still emitted, on the same terms as the three above.
 
+  greenwater_deck_hf_512          REJECTED, and the PREMISE was wrong before the
+      crop was. The item was written as "a material change on those meshes, like
+      P18's facade swap". It is not. Every `GW_SECTOR_*_concrete` mesh in the
+      accepted GLB carries ATLAS UVs spanning 0..1 (most of them 0.5..1 in v)
+      across its whole extent into ONE shared `GW_MAT_concrete` image, and that
+      image is not a concrete tile: it is a sixteen-cell sheet whose cells are
+      the runway thresholds, the chequer array, the chevrons, the A9 numerals,
+      the wear patches and the KD 114 datum plate. THE PAINT IS THE DECK
+      TEXTURE. P18's facades were swappable because that layer is procedurally
+      UV'd into a region sheet; this one is baked, and the bake is accepted art.
+
+      Built anyway, as fairly as the geometry allows — one cloned material per
+      sector so each gets its own `repeat` and `offset` and the tile lands at
+      27 m everywhere rather than at the average sector's scale. 27 m is the
+      measurement, not a preference: the tile carries 4-5 expansion-joint lines
+      per edge and the target was joints about 6 m apart.
+
+      The crop at Greenwater 60 settles it. The accepted deck is a humid
+      green-grey with soft mottling and darker service panels, sitting inside
+      the palette the whole circuit is authored in. The swap is a cool light
+      grey broken by a regular slab checker that reads as a tiled floor rather
+      than a runway, has lost the green cast entirely, and carries the
+      generation's tyre-mark arcs into a bright repeating streak up the middle
+      of the deck. Every service panel and wear patch is gone with the atlas.
+
+      `?deck=hf` stays in the source, at a measured +0.2 KiB gzip, so the crop
+      can be re-taken; the tile is not served, so the switch is inert until the
+      copy line above is run. That is the same trade H2a made to keep
+      `?art=base` runnable after its own review closed.
+
 The three rejects are still emitted, into `shots/higgsfield/`, which .gitignore
 covers. A rejected candidate whose numbers can only be reproduced by reverting a
 commit stops being a reject and becomes a rumour.
@@ -317,6 +347,23 @@ OUT_CRUST_1024 = "shots/higgsfield/bitterpan_crust_tile_hf_1024.png"
 OUT_FACADES = "shots/higgsfield/bitterpan_facades_hf_1024.png"
 OUT_BRINE_512 = "shots/higgsfield/bitterpan_brine_hf_512.png"
 OUT_SIGNAGE = "shots/higgsfield/futurisma_signage_hf_1024.png"
+
+#: H2b — the Greenwater deck tile. PREPARED AND REJECTED; see the entry in the
+#: module docstring. Emitted under shots/ like the other rejects, so `?deck=hf`
+#: is inert until somebody copies it into public/ to re-take the crop:
+#:
+#:   cp shots/higgsfield/greenwater_deck_hf_512.png \
+#:      public/assets/greenwater/textures/
+OUT_DECK = "shots/higgsfield/greenwater_deck_hf_512.png"
+#: The row of `09-runway-deck-ortho.png` the plate is taken from. Chosen the
+#: same way CRUST_KEEP_FROM_ROW was, on the printed aspect series: over
+#: keep = 0 / 512 / 768 / 1024 the residual perspective slope per band runs
+#: -0.028 / +0.044 / -0.013 / +0.003 and the seam ratio 1.067 / 1.075 / 0.926 /
+#: 1.127. 768 is the only crop that is both the flattest trend and the cleanest
+#: wrap, and it keeps 4-5 expansion-joint lines per edge, which is what
+#: DECK_TILE_METRES is derived from.
+DECK_KEEP_FROM_ROW = 768
+DECK_SERVED_SIZE = 512
 
 # --------------------------------------------------------------------------
 # Small image maths. numpy + PIL only — scipy is not a dependency of this repo.
@@ -922,7 +969,7 @@ def main() -> int:
     atlas = json.loads((ROOT / "src/game/data/ATLAS_REGIONS.json").read_text())
     results = {}
 
-    print("[1/5] pan crust tile <- 01-salt-crust.png")
+    print("[1/6] pan crust tile <- 01-salt-crust.png")
     crust1024 = prepare_ground_tile(
         inputs / "01-salt-crust.png", 1024, CRUST_KEEP_FROM_ROW,
         tone_target=Path("public/assets/map02/textures/bitterpan_crust_tile_256.png"),
@@ -933,26 +980,32 @@ def main() -> int:
     # Emitted for the size comparison the served resolution turns on, not served.
     results[OUT_CRUST_1024] = write_png(Path(OUT_CRUST_1024), crust1024, args.check)
 
-    print("[2/5] brine tile <- 02-brine-crust.png  (PREPARED, NOT SERVED)")
+    print("[2/6] brine tile <- 02-brine-crust.png  (PREPARED, NOT SERVED)")
     brine = prepare_ground_tile(
         inputs / "02-brine-crust.png", 512, CRUST_KEEP_FROM_ROW)
     results[OUT_BRINE_512] = write_png(Path(OUT_BRINE_512), brine, args.check)
 
-    print("[3/5] facade sheet <- 04-facade-atlas.png + the base sheet")
+    print("[3/6] facade sheet <- 04-facade-atlas.png + the base sheet")
     facades = prepare_facade_sheet(
         inputs / "04-facade-atlas.png", atlas["bitterpan_facades_1024"]["regions"])
     results[OUT_FACADES] = write_png(Path(OUT_FACADES), facades, args.check)
 
-    print("[4/5] horizon sheet <- 05-horizon-sheet.png + the base sheet")
+    print("[4/6] horizon sheet <- 05-horizon-sheet.png + the base sheet")
     horizon = prepare_horizon_sheet(
         inputs / "05-horizon-sheet.png", atlas["futurisma_horizon_1024"]["regions"])
     results[OUT_HORIZON] = write_png(Path(OUT_HORIZON), horizon, args.check)
 
-    print("[5/5] signage sheet <- 06-sponsor-boards.png + the base sheet"
+    print("[5/6] signage sheet <- 06-sponsor-boards.png + the base sheet"
           "  (PREPARED, NOT SERVED)")
     signage, signage_report = prepare_signage_sheet(
         inputs / "06-sponsor-boards.png", atlas["futurisma_signage_1024"]["regions"])
     results[OUT_SIGNAGE] = write_png(Path(OUT_SIGNAGE), signage, args.check)
+
+    print("[6/6] Greenwater deck tile <- 09-runway-deck-ortho.png"
+          "  (PREPARED, NOT SERVED)")
+    deck = prepare_ground_tile(
+        inputs / "09-runway-deck-ortho.png", DECK_SERVED_SIZE, DECK_KEEP_FROM_ROW)
+    results[OUT_DECK] = write_png(Path(OUT_DECK), deck, args.check)
 
     print("\nSERVED (the numbers the validators pin):")
     digest, size = results[OUT_HORIZON]
@@ -960,7 +1013,8 @@ def main() -> int:
     print(f"  total added to public/: {size:,} bytes ({size / 1024:.1f} KiB)")
     print("\nPREPARED BUT NOT SERVED (rejected on the crops, kept reproducible):")
     rejected = 0
-    for path in (OUT_CRUST, OUT_CRUST_1024, OUT_FACADES, OUT_BRINE_512, OUT_SIGNAGE):
+    for path in (OUT_CRUST, OUT_CRUST_1024, OUT_FACADES, OUT_BRINE_512,
+                 OUT_SIGNAGE, OUT_DECK):
         _, rejected_size = results[path]
         rejected += rejected_size
         print(f"  {path}  {rejected_size:,} bytes")

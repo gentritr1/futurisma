@@ -56,7 +56,6 @@ export const HORIZON_SHEETS = {
   hf: "/assets/greenwater/textures/futurisma_horizon_hf_1024.png",
 };
 
-
 /**
  * Parses `?art=`. Anything that is not `base` falls back to the default rather
  * than throwing, for the same reason `resolveRenderMode` does: a typo in a
@@ -89,6 +88,46 @@ export function activeArtPack() {
   }
   return cachedPack;
 }
+
+/**
+ * H2b — `?deck=hf`, the Greenwater deck-tile experiment.
+ *
+ * A SEPARATE switch from `?art=`, and OFF by default, which is the opposite of
+ * the choice made for the horizon sheet below. The reason is that this one is
+ * not an edition of anything. It does not swap a sheet for a redrawn sheet with
+ * the same regions: it takes the deck's baked atlas — which carries the runway
+ * thresholds, the chequer, the chevrons and the A9 numerals as well as the
+ * concrete — and replaces it with a repeating tile that has none of them. It
+ * exists so the crop that says so stays re-takeable, not because anybody should
+ * race with it.
+ *
+ * @returns {boolean}
+ */
+export function deckTileEnabled() {
+  return typeof window !== "undefined"
+    && new URLSearchParams(window.location.search).get("deck") === "hf";
+}
+
+/**
+ * The tile `?deck=hf` loads — and DELIBERATELY not a served file.
+ *
+ * The experiment was rejected, so 358 KiB of texture for it would be the trade
+ * H2a refused for the facade sheet. `scripts/prepare-higgsfield-textures.py`
+ * emits the tile into `shots/higgsfield/` and prints the one line that copies
+ * it here; until somebody runs that, this URL 404s and `environment.ts` leaves
+ * the accepted deck exactly as it is and says so on the console. The switch
+ * costs +0.2 KiB gzip and exists so the crop stays re-takeable.
+ */
+export const DECK_TILE_URL = "/assets/greenwater/textures/greenwater_deck_hf_512.png";
+
+/**
+ * How many metres of deck one repeat of that tile covers.
+ *
+ * MEASURED, not chosen: the prepared tile carries 4-5 expansion-joint lines per
+ * edge (`scripts/prepare-higgsfield-textures.py` prints the count), and the
+ * brief's target is joints about 6 m apart, so 4.5 x 6 = 27 m.
+ */
+export const DECK_TILE_METRES = 27;
 
 /**
  * The served URL of the horizon card sheet for this page load.

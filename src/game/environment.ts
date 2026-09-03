@@ -3,6 +3,7 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import type { RaceCourse } from "./course";
 import { disposeObject3DResources } from "./graphics-resources";
 import { applyPs2MaterialTreatment } from "./totem";
+import { DECK_TILE_METRES, DECK_TILE_URL, deckTileEnabled } from "./art-pack.js";
 
 const EXPECTED_RUNTIME_MESHES = 60;
 const HANGAR_BARRIER_MESH = "GW_SECTOR_HANGAR_SIX_concrete";
@@ -284,6 +285,94 @@ function replaceEnvironmentMaterials(root: THREE.Object3D): void {
   }
 }
 
+/**
+ * H2b — the `?deck=hf` experiment, and the reason it is shaped like a probe
+ * rather than like P18's facade swap.
+ *
+ * THE PREMISE THAT DID NOT HOLD. The brief for this called a deck-tile swap "a
+ * material change on those meshes, like P18's facade swap". Measured off the
+ * accepted GLB, it is not. Every `GW_SECTOR_*_concrete` mesh carries ATLAS UVs
+ * spanning 0..1 (or 0.5..1) across its whole extent into ONE shared
+ * `GW_MAT_concrete` image, and that image is not a concrete tile — it is a
+ * sixteen-cell sheet whose cells are the runway thresholds, the chequer, the
+ * chevron array, the A9 numerals, the wear patches and the KD 114 datum plate.
+ * The paint IS the deck texture. P18's facades worked because the facade layer
+ * is procedurally UV'd into a region sheet; this layer is baked, and the bake
+ * is the accepted art.
+ *
+ * So a "tile swap" here does two things at once: it retiles, and it DELETES
+ * every runway marking on the circuit. That is the finding, and this function
+ * exists so it can be photographed rather than argued.
+ *
+ * What it does, as fairly as the geometry allows. One cloned material per
+ * sector, because the twelve sectors share one material and their atlas UV
+ * ranges differ, so a single `repeat` could not give them a common
+ * metres-per-tile — which is itself part of the finding. Each clone's `repeat`
+ * and `offset` are derived from that mesh's own world extent and UV range, so
+ * the tile lands at {@link DECK_TILE_METRES} on every sector rather than on the
+ * average one. `receiveShadow` is untouched (it lives on the mesh, not the
+ * material) and the clone carries the colour, fog and side settings over, so
+ * the only thing that changes is the map.
+ *
+ * The cloning costs draw calls — twelve materials where there was one — and
+ * that cost is measured and reported rather than hidden. It is one of the
+ * reasons this is review-only.
+ */
+function applyDeckTileExperiment(root: THREE.Object3D, tile: THREE.Texture): number {
+  let swapped = 0;
+  const box = new THREE.Box3();
+  root.traverse((object) => {
+    if (!(object instanceof THREE.Mesh)) return;
+    if (!object.name.endsWith("_concrete")) return;
+    const material = Array.isArray(object.material) ? object.material[0] : object.material;
+    if (!(material instanceof THREE.MeshLambertMaterial)) return;
+    const uv = object.geometry.getAttribute("uv");
+    if (!uv) return;
+    let uMin = Infinity;
+    let uMax = -Infinity;
+    let vMin = Infinity;
+    let vMax = -Infinity;
+    for (let index = 0; index < uv.count; index += 1) {
+      const u = uv.getX(index);
+      const v = uv.getY(index);
+      if (u < uMin) uMin = u;
+      if (u > uMax) uMax = u;
+      if (v < vMin) vMin = v;
+      if (v > vMax) vMax = v;
+    }
+    object.geometry.computeBoundingBox();
+    box.copy(object.geometry.boundingBox as THREE.Box3).applyMatrix4(object.matrixWorld);
+    const width = Math.max(1, box.max.x - box.min.x);
+    const depth = Math.max(1, box.max.z - box.min.z);
+    // The UV axes are the ribbon's own along/across, not world XZ, so the two
+    // world extents are assigned to the two UV spans by SIZE rather than by
+    // axis: the longer world extent belongs to the wider UV span.
+    const uSpan = Math.max(1e-3, uMax - uMin);
+    const vSpan = Math.max(1e-3, vMax - vMin);
+    const longer = Math.max(width, depth);
+    const shorter = Math.min(width, depth);
+    const uMetres = uSpan >= vSpan ? longer : shorter;
+    const vMetres = uSpan >= vSpan ? shorter : longer;
+    const swap = material.clone();
+    swap.name = `${material.name}_deck_hf`;
+    const map = tile.clone();
+    map.wrapS = THREE.RepeatWrapping;
+    map.wrapT = THREE.RepeatWrapping;
+    map.colorSpace = THREE.SRGBColorSpace;
+    map.repeat.set(
+      uMetres / DECK_TILE_METRES / uSpan,
+      vMetres / DECK_TILE_METRES / vSpan,
+    );
+    map.offset.set(-uMin * map.repeat.x, -vMin * map.repeat.y);
+    map.needsUpdate = true;
+    swap.map = map;
+    swap.needsUpdate = true;
+    object.material = swap;
+    swapped += 1;
+  });
+  return swapped;
+}
+
 function findLivingTextures(root: THREE.Object3D): GreenwaterLivingTextures {
   let jungle: THREE.Texture | null = null;
   let emissive: THREE.Texture | null = null;
@@ -394,12 +483,28 @@ export class GreenwaterEnvironment {
         console.warn(`Greenwater authored-asset contract drift: ${drift}.`);
       }
       scene.name = "greenwater_authored_environment";
-      return new GreenwaterEnvironment(
+      const environment = new GreenwaterEnvironment(
         scene,
         cullGroups,
         triangles,
         contractDrift,
       );
+      // H2b — review only, after the constructor so the swap lands on the
+      // Lambert materials `replaceEnvironmentMaterials` produced rather than on
+      // the GLB's originals. A failed fetch leaves the accepted deck exactly as
+      // it was, which is the correct failure for a probe.
+      if (deckTileEnabled()) {
+        try {
+          const tile = await new THREE.TextureLoader().loadAsync(DECK_TILE_URL);
+          const swapped = applyDeckTileExperiment(scene, tile);
+          tile.dispose();
+          console.info(`[FUTURISMA_DECK_TILE] ${swapped} sector deck material(s) swapped `
+            + `at ${DECK_TILE_METRES} m per tile.`);
+        } catch {
+          console.warn("[FUTURISMA_DECK_TILE] tile unavailable; the accepted deck stands.");
+        }
+      }
+      return environment;
     } catch (error) {
       disposeObject3DResources(scene);
       throw error;
