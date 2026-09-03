@@ -1,0 +1,138 @@
+{
+  "$generatedBy": "scripts/corridor-census.mjs --write-baseline",
+  "$doNotEditByHand": "Measured from the rendered scene with ?probe=corridor-sweep&census=1. Re-run the census against a dev server after any change to trackside geometry or to DRIVABLE_LIMITS.json; do not hand-edit a row to make scripts/validate-corridor.mjs pass.",
+  "maps": [
+    {
+      "map": "greenwater",
+      "gate": "drivable",
+      "ran": true,
+      "meshesSwept": 137,
+      "verticesSwept": 182280,
+      "groups": 1045,
+      "bands": {
+        "obstacle": 1,
+        "flush": 761,
+        "overhead": 15,
+        "boundary": 0,
+        "vfx": 82
+      },
+      "obstacles": [
+        {
+          "root": "map01_greenwater_strip",
+          "mesh": "cable_trip_hazards",
+          "distance": 1280.12,
+          "lateral": 11.596,
+          "depth": 2.04,
+          "heightMin": 0.314,
+          "heightMax": 0.374,
+          "limit": 13.636,
+          "innerExtent": 11.596,
+          "vertices": 8,
+          "visible": true,
+          "sector": "CANOPY_PASSAGE"
+        }
+      ]
+    },
+    {
+      "map": "bitterpan",
+      "gate": "drivable",
+      "ran": true,
+      "meshesSwept": 31,
+      "verticesSwept": 56736,
+      "groups": 325,
+      "bands": {
+        "obstacle": 6,
+        "flush": 294,
+        "overhead": 0,
+        "boundary": 0,
+        "vfx": 23
+      },
+      "obstacles": [
+        {
+          "root": "bitterpan_surface_layer",
+          "mesh": "BP_PAN_FLOOR",
+          "distance": 1028.01,
+          "lateral": -18.702,
+          "depth": 0.697,
+          "heightMin": 0.584,
+          "heightMax": 0.584,
+          "limit": 19.399,
+          "innerExtent": 18.702,
+          "vertices": 1,
+          "visible": true,
+          "sector": "S1"
+        },
+        {
+          "root": "map02_bitterpan_runtime_markers",
+          "mesh": "map02_cable_coils",
+          "distance": 2464.77,
+          "lateral": -11.846,
+          "depth": 1.339,
+          "heightMin": 0.322,
+          "heightMax": 0.711,
+          "limit": 13.185,
+          "innerExtent": 11.846,
+          "vertices": 16,
+          "visible": true,
+          "sector": "S2"
+        },
+        {
+          "root": "map02_bitterpan_runtime_markers",
+          "mesh": "map02_cable_coils",
+          "distance": 2859.57,
+          "lateral": 12.762,
+          "depth": 3.868,
+          "heightMin": 0.419,
+          "heightMax": 0.881,
+          "limit": 16.63,
+          "innerExtent": 12.762,
+          "vertices": 24,
+          "visible": true,
+          "sector": "S3"
+        },
+        {
+          "root": "map02_bitterpan_runtime_markers",
+          "mesh": "map02_cable_coils",
+          "distance": 2860.43,
+          "lateral": 12.762,
+          "depth": 3.871,
+          "heightMin": 0.419,
+          "heightMax": 0.872,
+          "limit": 16.632,
+          "innerExtent": 12.762,
+          "vertices": 16,
+          "visible": true,
+          "sector": "S3"
+        },
+        {
+          "root": "map02_bitterpan_runtime_markers",
+          "mesh": "map02_cable_coils",
+          "distance": 3020,
+          "lateral": -13.75,
+          "depth": 1.35,
+          "heightMin": 0.323,
+          "heightMax": 0.712,
+          "limit": 15.1,
+          "innerExtent": 13.75,
+          "vertices": 12,
+          "visible": true,
+          "sector": "S3"
+        },
+        {
+          "root": "map02_bitterpan_runtime_markers",
+          "mesh": "map02_cable_coils",
+          "distance": 3021.12,
+          "lateral": -14.159,
+          "depth": 0.941,
+          "heightMin": 0.323,
+          "heightMax": 0.689,
+          "limit": 15.1,
+          "innerExtent": 14.159,
+          "vertices": 4,
+          "visible": true,
+          "sector": "S3"
+        }
+      ]
+    }
+  ]
+}

@@ -71,10 +71,28 @@ for (const table of [greenwater, bitterpan]) {
           + `inside the ${entry.halfWidth} m deck edge. The racing surface must `
           + "stay fully drivable; the table may only ever trim run-off.",
       );
+      // P21 — compared against `clampMax`, the clamp at the span's WIDEST
+      // station, not `clamp`, its narrowest.
+      //
+      // A 10 m bucket can straddle an edge-type change: at Greenwater 840-850 m
+      // the works stand ends and the open pan begins, so the authored clamp runs
+      // 12.88 m at one end and 17.80 m at the other. Capping the derived limit
+      // at the NARROW end suppressed the entry entirely — 14.19 m is not tighter
+      // than 12.88 m — and left the runtime clamp at 848 m running the full
+      // 17.80 m with a 1.4 m edge marker standing at 17.66 m, which the P21
+      // census caught the craft driving through.
+      //
+      // Emitting against the wide end cannot widen anything: `resolveApron`
+      // evaluates `min(authoredLimit, derived)` at every station from that
+      // station's own apron, so at the narrow end of the same span the 12.88 m
+      // still wins. The invariant that matters — a derived limit never exceeds
+      // what the craft was already allowed — is unchanged; it is just now
+      // stated against the clamp the derivation actually used.
+      const cap = entry.clampMax ?? entry.clamp;
       assert.ok(
-        measured.limit <= entry.clamp + EPSILON,
+        measured.limit <= cap + EPSILON,
         `${table.map} @${entry.distance} m ${side}: limit ${measured.limit} m is `
-          + `wider than the authored clamp ${entry.clamp} m. The table may only `
+          + `wider than the authored clamp ${cap} m. The table may only `
           + "narrow.",
       );
       assert.ok(

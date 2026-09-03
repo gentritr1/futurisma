@@ -6,6 +6,7 @@ import {
   EDGE_FURNITURE_CLEARANCE_METRES,
   FLAT_FURNITURE_MAX_HEIGHT_METRES,
   GATE_POST_DECK_CLEARANCE_METRES,
+  PLACEMENT_EPSILON_METRES,
   PLAQUE_BAND_BOTTOM_METRES,
   WALL_PLAQUE_INSET_METRES,
   TURN_CHEVRON_CLEARANCE_METRES,
@@ -806,6 +807,110 @@ for (const item of backingItems) {
 }
 
 // ---------------------------------------------------------------------------
+// H1 — the wall-span rule, asserted DIRECTLY instead of only as a side effect.
+//
+// Honest scope first. A hangar plaque that lost its height ALREADY fails the
+// sweep above, because `clearsDeck` passes an item either for being far enough
+// outboard or for clearing the plaque band, and a plaque pinned 0.35 m inside
+// the wall line can never satisfy the first. Verified by re-pinning the
+// resolver to the authored 2.05 m centre: the sweep fails on
+// `T4_CHEVRON_0_BOARD`. So the loop below is not the thing that catches a
+// regression — it is the thing that NAMES it. What it adds on top:
+//
+//   - the failure message says "barrier span, below the plaque band" instead of
+//     "inside the deck", which is the difference between a reader reaching for
+//     the lateral and reaching for the height;
+//   - a wall plaque must also be INSIDE its wall line, which nothing checked;
+//   - the count guard, so the rule cannot quietly sweep zero items if a future
+//     edit stops authoring `widthMetres: 0`;
+//   - the 50M board's lower edge is pinned to the band EXACTLY, at the station
+//     the H1 report names, rather than only "somewhere at or above it".
+// ---------------------------------------------------------------------------
+
+const wallItems = items.filter((item) => item.mode === "wall");
+assert.ok(
+  wallItems.length >= 26,
+  `only ${wallItems.length} placements resolved as wall plaques, so this rule `
+    + "swept almost nothing. LINK_APRON and HANGAR_SIX author widthMetres: 0 "
+    + "for 13 plaques and their 13 backing panels.",
+);
+for (const item of wallItems) {
+  assert.ok(
+    item.bottomHeight >= PLAQUE_BAND_BOTTOM_METRES - PLACEMENT_EPSILON_METRES,
+    `${item.map}/${item.id} stands in a BARRIER span (apronWidth 0) at lateral `
+      + `${item.lateral.toFixed(2)} m against a ${item.halfWidth.toFixed(2)} m `
+      + `half-width, with its lower edge at ${item.bottomHeight.toFixed(2)} m — `
+      + `below the ${PLAQUE_BAND_BOTTOM_METRES} m plaque band. There is no verge `
+      + "to stand on inside a wall span, so a board that keeps its open-air "
+      + "height is an obstacle at the chase camera's eye line, in the road, for "
+      + "a player pinned against that wall.",
+  );
+  assert.ok(
+    Math.abs(item.lateral) <= item.halfWidth + PLACEMENT_EPSILON_METRES,
+    `${item.map}/${item.id} is a wall plaque at lateral `
+      + `${item.lateral.toFixed(2)} m, OUTSIDE the ${item.halfWidth.toFixed(2)} m `
+      + "wall line it is supposed to be bolted to.",
+  );
+}
+
+// The negative fixture. This is the placement P11 shipped and P13 fixed: the
+// hangar clamp pulled the board inside the wall line and left its authored
+// open-air centre height alone. If the loop above cannot fail on it, it is not
+// testing anything.
+const hangarSample = greenwaterAt(664.1);
+assert.equal(
+  apronOn(hangarSample, -1),
+  0,
+  "HANGAR_SIX no longer authors a zero-width apron on the left, so the fixture "
+    + "below is not standing in a barrier span any more.",
+);
+const brokenBoard = {
+  map: "greenwater",
+  id: "H1_FIXTURE_HANGAR_BOARD_AT_VERGE_HEIGHT",
+  mode: "wall",
+  lateral: -Math.max(0, hangarSample.halfWidth - WALL_PLAQUE_INSET_METRES),
+  halfWidth: hangarSample.halfWidth,
+  apronWidth: 0,
+  footprintHalfWidth: DISTANCE_BOARD_WIDTH / 2,
+  // The authored open-air geometry: centre 2.05 m, 1.28 m tall.
+  bottomHeight: 2.05 - DISTANCE_BOARD_HEIGHT / 2,
+  topHeight: 2.05 + DISTANCE_BOARD_HEIGHT / 2,
+};
+assert.ok(
+  brokenBoard.bottomHeight < PLAQUE_BAND_BOTTOM_METRES - PLACEMENT_EPSILON_METRES,
+  "the fixture's lower edge is no longer below the plaque band, so it has "
+    + "stopped reproducing the P11 failure.",
+);
+assert.ok(
+  !clearsDeck(brokenBoard),
+  "the fixture also has to fail the older deck predicate; if it passes both, "
+    + "the two rules disagree about the same geometry.",
+);
+// And the shipped resolver must never produce it: same corridor, same authored
+// geometry, in through the front door.
+const hangarPlacement = resolveFurniturePlacement({
+  halfWidth: hangarSample.halfWidth,
+  apronWidth: apronOn(hangarSample, -1),
+  side: -1,
+  clearance: EDGE_FURNITURE_CLEARANCE_METRES,
+  footprintHalfWidth: DISTANCE_BOARD_WIDTH / 2,
+  centreHeight: 2.05,
+  extentHeight: DISTANCE_BOARD_HEIGHT,
+});
+assert.equal(hangarPlacement.mode, "wall");
+assert.equal(
+  Number((hangarPlacement.centreHeight - DISTANCE_BOARD_HEIGHT / 2).toFixed(6)),
+  PLAQUE_BAND_BOTTOM_METRES,
+  "the HANGAR_SIX 50M board's lower edge must land exactly on the plaque band.",
+);
+assert.equal(
+  hangarPlacement.groundMounted,
+  false,
+  "a wall plaque must not keep the post and approach arrow that would stand on "
+    + "the racing surface under it.",
+);
+
+// ---------------------------------------------------------------------------
 // P12's trackside signage answers to the same deck rule.
 //
 // Its 13 pinned run-off intrusions stay pinned — validate-art-pass.mjs owns
@@ -857,7 +962,12 @@ console.log(
     + `the deck with no exemption list (tightest ${tightestHazard.toFixed(3)} m `
     + `spare), the rule proved failable by a synthetic re-pin at lateral 0; `
     + `${signageChecked} P12 boards re-checked against `
-    + `the same deck predicate. P15: ${backingPanels} plaque backings `
+    + `the same deck predicate. H1: ${wallItems.length} barrier-span `
+    + `placements asserted directly against the `
+    + `${PLAQUE_BAND_BOTTOM_METRES} m plaque band and inside their wall `
+    + "line, the rule proved failable by a board re-pinned at its authored "
+    + "1.41 m open-air height in HANGAR_SIX. "
+    + `P15: ${backingPanels} plaque backings `
     + `(${backingCounts.chevron} chevron + ${backingCounts.board} board) derived `
     + `from those same wall placements, measured not exempted — every lower edge `
     + `flush at ${PLAQUE_BAND_BOTTOM_METRES} m and every panel `

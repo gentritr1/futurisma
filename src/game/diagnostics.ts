@@ -59,6 +59,15 @@ export interface DiagnosticsCore {
   driftRewardTotal: number;
   maxDriftIntensity: number;
   minimumSurfaceGrip: number;
+  /**
+   * H1 — the vertical gap between the hull and the drawn deck beneath it, and
+   * the authored hover it should equal (times cos(bank)). A run whose minimum
+   * goes negative had the craft under the deck.
+   */
+  hullClearance: number;
+  minimumHullClearance: number;
+  maximumHullClearance: number;
+  hoverHeight: number;
   edgeSeconds: number;
   wrongWaySeconds: number;
   wrongWayEntries: number;
@@ -445,6 +454,14 @@ export function buildDiagnosticsReport(
     driftRewardTotal: Number(core.driftRewardTotal.toFixed(2)),
     maxDriftIntensity: Number(core.maxDriftIntensity.toFixed(2)),
     minimumSurfaceGrip: Number(core.minimumSurfaceGrip.toFixed(3)),
+    hullClearanceMeters: Number(core.hullClearance.toFixed(3)),
+    minimumHullClearanceMeters: Number.isFinite(core.minimumHullClearance)
+      ? Number(core.minimumHullClearance.toFixed(3))
+      : null,
+    maximumHullClearanceMeters: Number.isFinite(core.maximumHullClearance)
+      ? Number(core.maximumHullClearance.toFixed(3))
+      : null,
+    hoverHeightMeters: Number(core.hoverHeight.toFixed(3)),
     edgeSeconds: Number(core.edgeSeconds.toFixed(2)),
     wrongWaySeconds: Number(core.wrongWaySeconds.toFixed(2)),
     wrongWayEntries: core.wrongWayEntries,

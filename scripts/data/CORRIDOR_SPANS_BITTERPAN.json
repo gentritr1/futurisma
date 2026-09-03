@@ -1,0 +1,27 @@
+{
+  "$generatedBy": "scripts/visual/capture-corridor-spans.mjs (?probe=corridor-sweep&spans=1)",
+  "$doNotEditByHand": "The rendered-scene measurement DRIVABLE_LIMITS.json is derived from. Re-capture against a dev server after any change to trackside geometry.",
+  "map": "bitterpan",
+  "corridorSweepRan": true,
+  "corridorIntrusions": 0,
+  "corridorSweepMeshes": 31,
+  "corridorSweepVertices": 56736,
+  "corridorSpans": [
+    {
+      "distance": 2990,
+      "left": 13.83,
+      "right": null,
+      "leftAt": 2996.16,
+      "rightAt": null,
+      "leftHalfWidth": 13,
+      "rightHalfWidth": null,
+      "halfWidth": 13,
+      "clamp": 18.8,
+      "clampMax": 18.8,
+      "leftMesh": "BP_SIGNAGE_POSTS",
+      "rightMesh": null,
+      "leftHeight": 2.25,
+      "rightHeight": null
+    }
+  ]
+}
