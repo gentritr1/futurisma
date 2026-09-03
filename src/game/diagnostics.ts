@@ -81,6 +81,8 @@ export interface DiagnosticsCore {
   minimumChaseMeters: number;
   desiredChaseMeters: number;
   cameraLateral: number;
+  cameraLateralLag: number;
+  maximumCameraLateralLag: number;
   hullNdcX: number;
   hullNdcY: number;
   minimumHullNdcY: number;
@@ -503,6 +505,8 @@ export function buildDiagnosticsReport(
       : null,
     desiredChaseMeters: Number(core.desiredChaseMeters.toFixed(2)),
     cameraLateralMeters: Number(core.cameraLateral.toFixed(2)),
+    cameraLateralLagMeters: Number(core.cameraLateralLag.toFixed(2)),
+    maximumCameraLateralLagMeters: Number(core.maximumCameraLateralLag.toFixed(2)),
     hullNdcX: Number(core.hullNdcX.toFixed(3)),
     hullNdcY: Number(core.hullNdcY.toFixed(3)),
     minimumHullNdcY: Number.isFinite(core.minimumHullNdcY)

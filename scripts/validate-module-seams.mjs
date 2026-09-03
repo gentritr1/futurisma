@@ -128,8 +128,13 @@ import { readFileSync } from "node:fs";
  * `scripts/visual/vehicle-pixels.mjs`. It is here rather than in a module
  * because it needs `this.scene`, and it is a runtime call rather than a URL
  * flag because the measurement needs two renders of the SAME paused frame.
+ *
+ * H1.4 adds 85 for `holdHullInFrame`, the third chase-camera guard. Same
+ * split as the other two: the arithmetic is `angleExcess` in presentation.js
+ * and the window is asserted in validate-pose.mjs; what is here is the camera
+ * basis and the one write to `cameraLook`, which cannot leave the race loop.
  */
-const GAME_LINE_BUDGET = 2_284;
+const GAME_LINE_BUDGET = 2_369;
 
 function read(path) {
   return readFileSync(new URL(`../${path}`, import.meta.url), "utf8");

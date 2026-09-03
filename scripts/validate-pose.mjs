@@ -33,6 +33,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import {
+  angleExcess,
   cameraSurfaceClearance,
   chaseDistanceCorrection,
   hullClearance,
@@ -574,6 +575,86 @@ assert.ok(
     + "The shake moves the camera position, so a guard that runs before it can "
     + "be undone by it.",
 );
+// ---------------------------------------------------------------------------
+// H1.4 — the frame-follow window.
+//
+// The H1 review's acceptance window for the projected hull is
+// y in [-0.85, 0.65] and |x| <= 0.8. The guard aims INSIDE that, because it
+// corrects the damped look target once per frame and a guard that aimed at the
+// acceptance edge would leave the measured value sitting on it. Both facts are
+// pinned here: the aim window must be inside the ruled one, and it must not
+// collapse to nothing.
+// ---------------------------------------------------------------------------
+
+const RULED_NDC_Y_MIN = -0.85;
+const RULED_NDC_Y_MAX = 0.65;
+const RULED_NDC_X_LIMIT = 0.8;
+
+const frameWindow = Object.fromEntries(
+  ["HULL_FRAME_NDC_Y_MIN", "HULL_FRAME_NDC_Y_MAX", "HULL_FRAME_NDC_X_LIMIT"]
+    .map((name) => [
+      name,
+      Number(new RegExp(`const ${name} = (-?[\\d.]+);`).exec(gameCameraSource)?.[1]),
+    ]),
+);
+for (const [name, value] of Object.entries(frameWindow)) {
+  assert.ok(
+    Number.isFinite(value),
+    `game.ts no longer declares ${name} as a plain constant.`,
+  );
+}
+assert.ok(
+  frameWindow.HULL_FRAME_NDC_Y_MIN > RULED_NDC_Y_MIN
+    && frameWindow.HULL_FRAME_NDC_Y_MAX < RULED_NDC_Y_MAX
+    && frameWindow.HULL_FRAME_NDC_X_LIMIT < RULED_NDC_X_LIMIT,
+  `the frame guard aims at y [${frameWindow.HULL_FRAME_NDC_Y_MIN}, `
+    + `${frameWindow.HULL_FRAME_NDC_Y_MAX}] / |x| <= `
+    + `${frameWindow.HULL_FRAME_NDC_X_LIMIT}, which is not strictly inside the `
+    + `reviewed window y [${RULED_NDC_Y_MIN}, ${RULED_NDC_Y_MAX}] / |x| <= `
+    + `${RULED_NDC_X_LIMIT}. Aiming AT the acceptance edge leaves the measured `
+    + "value on it, and one frame of lag then puts it outside.",
+);
+assert.ok(
+  frameWindow.HULL_FRAME_NDC_Y_MAX - frameWindow.HULL_FRAME_NDC_Y_MIN > 0.8
+    && frameWindow.HULL_FRAME_NDC_X_LIMIT > 0.4,
+  "the frame guard's aim window has collapsed. A window this tight would hold "
+    + "the hull pinned to the middle of the screen and take the chase camera's "
+    + "framing away from it entirely.",
+);
+
+// `angleExcess` is the whole correction: zero inside the window, and exactly
+// the overshoot outside it, on both sides.
+assert.equal(angleExcess(0.1, -0.5, 0.5), 0);
+assert.equal(angleExcess(-0.5, -0.5, 0.5), 0);
+assert.equal(angleExcess(0.5, -0.5, 0.5), 0);
+assert.equal(Number(angleExcess(0.9, -0.5, 0.5).toFixed(6)), 0.4);
+assert.equal(Number(angleExcess(-0.9, -0.5, 0.5).toFixed(6)), -0.4);
+// Continuous at the edge: the correction has to grow from zero, not step.
+assert.ok(Math.abs(angleExcess(0.5 + 1e-9, -0.5, 0.5)) < 1e-8);
+// A hull BEHIND the camera is past 90 degrees, and the excess must say so --
+// this is what a clamped forward component destroys.
+assert.ok(angleExcess(2.6, -0.5, 0.5) > 2);
+assert.equal(angleExcess(Number.NaN, -0.5, 0.5), 0);
+assert.equal(angleExcess(0.9, Number.NaN, 0.5), 0);
+
+// The call site: after the FOV settles, because the window is defined against
+// the projection the player looks through, and behind the kill switch so the
+// before/after stays measurable.
+assert.ok(
+  /this\.camera\.updateProjectionMatrix\(\);[\s\S]{0,400}?if \(this\.cameraGuardsEnabled\) this\.holdHullInFrame\(\);/
+    .test(gameCameraSource),
+  "`holdHullInFrame` must run after the FOV update and under the "
+    + "`?camguards=0` kill switch. The window is an angle measured through the "
+    + "current projection; correcting before the FOV settles measures it "
+    + "through the previous frame's.",
+);
+assert.ok(
+  gameCameraSource.includes("const alongAxis = toHull.dot(forward);"),
+  "the frame guard must take the RAW forward component. Clamping it caps a "
+    + "behind-the-camera hull at a 90 degree excess, which leaves a spun-out "
+    + "frame still aimed away from the craft.",
+);
+
 // The numbers above were read with `?camguards=0`. If that switch goes, so does
 // the ability to reproduce them, and these assertions become folklore.
 assert.ok(
@@ -601,5 +682,9 @@ console.log(
     + `maps' desired chase (${DESIRED_CHASE_GREENWATER_METRES} / `
     + `${DESIRED_CHASE_BITTERPAN_METRES} m); surface floor ${surfaceFloor} m sits `
     + "under the 2.1 m `desired` guard; both guards pinned to the damped camera "
-    + "and to the post-shake position by call-site assertions.",
+    + "and to the post-shake position by call-site assertions. H1.4 frame "
+    + `window y [${frameWindow.HULL_FRAME_NDC_Y_MIN}, `
+    + `${frameWindow.HULL_FRAME_NDC_Y_MAX}] / |x| <= `
+    + `${frameWindow.HULL_FRAME_NDC_X_LIMIT}, strictly inside the reviewed `
+    + `y [${RULED_NDC_Y_MIN}, ${RULED_NDC_Y_MAX}] / |x| <= ${RULED_NDC_X_LIMIT}.`,
 );

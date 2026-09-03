@@ -58,6 +58,7 @@ import {
   createApronTelemetry,
 } from "./apron.js";
 import {
+  angleExcess,
   calculatePresentationAlpha,
   cameraSurfaceClearance,
   chaseDistanceCorrection,
@@ -121,6 +122,18 @@ const MAX_PHYSICS_BACKLOG = 0.1;
  * this one runs after both.
  */
 const MINIMUM_CHASE_METRES = 5.5;
+/**
+ * H1.4 - the window the hull is held inside, in normalised device coordinates.
+ *
+ * The review's acceptance window is y in [-0.85, 0.65] and |x| <= 0.8. The
+ * guard AIMS at 0.05 inside that on every edge, because it corrects the damped
+ * look target once per frame: a guard that aimed exactly at the acceptance edge
+ * would leave the measured value sitting on it, and one frame of lag would put
+ * it outside. `validate-pose.mjs` asserts these stay inside the ruled window.
+ */
+const HULL_FRAME_NDC_Y_MIN = -0.8;
+const HULL_FRAME_NDC_Y_MAX = 0.6;
+const HULL_FRAME_NDC_X_LIMIT = 0.75;
 const MINIMUM_CAMERA_SURFACE_CLEARANCE_METRES = 1.6;
 
 const RESUME_COUNTDOWN_SECONDS = 2.7;
@@ -302,6 +315,8 @@ export class FuturismaGame {
   private diagnosticMinimumChaseMeters = Number.POSITIVE_INFINITY;
   private diagnosticDesiredChaseMeters = 0;
   private diagnosticCameraLateral = 0;
+  private diagnosticCameraLateralLag = 0;
+  private diagnosticMaximumCameraLateralLag = 0;
   private diagnosticHullNdcX = 0;
   private diagnosticHullNdcY = 0;
   private diagnosticMinimumHullNdcY = Number.POSITIVE_INFINITY;
@@ -1498,6 +1513,63 @@ export class FuturismaGame {
     );
   }
 
+  /**
+   * H1.4 - the hull stays inside the frame.
+   *
+   * The two H1.2 floors bound how far behind and how high the camera sits.
+   * Neither bounds where the craft LANDS on screen, and on Bitterpan's A-edge
+   * run-off the measured hull went to NDC y +1.36 with the camera 5.5 m back,
+   * 4.55 m over its own surface and its lateral within 0.02 m of the craft's --
+   * every other guard healthy, the craft off the top of the frame.
+   *
+   * So this one is written in the space the acceptance is written in. It
+   * measures the hull's angle from the view axis, and when that angle is
+   * outside the window it rotates the LOOK TARGET by exactly the excess. The
+   * correction is zero inside the window and grows continuously from zero at
+   * its edge, so it is a corrective term rather than a snap, and it is applied
+   * to `cameraLook` -- the damped state -- so the next frame's lerp starts from
+   * the corrected aim instead of fighting it.
+   */
+  private holdHullInFrame(): void {
+    const position = this.camera.position;
+    const toLook = this.cameraScratch.copy(this.cameraLook).sub(position);
+    const lookDistance = toLook.length();
+    if (lookDistance < 0.05) return;
+    const forward = this.scratchA.copy(toLook).divideScalar(lookDistance);
+    const right = this.scratchB.crossVectors(forward, this.camera.up);
+    if (right.lengthSq() < 1e-8) return;
+    right.normalize();
+    const up = this.scratchC.crossVectors(right, forward).normalize();
+    const toHull = this.scratchD
+      .copy(this.vehicle.root.position)
+      .sub(position);
+    if (toHull.lengthSq() < 0.0025) return;
+    // `atan2` on the RAW forward component, not a clamped one. A hull behind
+    // the camera is at an angle past 90 degrees, and that is the number the
+    // correction needs: clamping the denominator caps the measured excess at
+    // 90 and leaves a spun-out frame still aimed away from the craft.
+    const alongAxis = toHull.dot(forward);
+    const tanHalfVertical = Math.tan(THREE.MathUtils.degToRad(this.camera.fov) / 2);
+    const tanHalfHorizontal = tanHalfVertical * this.camera.aspect;
+    const pitch = Math.atan2(toHull.dot(up), alongAxis);
+    const yaw = Math.atan2(toHull.dot(right), alongAxis);
+    const pitchExcess = angleExcess(
+      pitch,
+      Math.atan(HULL_FRAME_NDC_Y_MIN * tanHalfVertical),
+      Math.atan(HULL_FRAME_NDC_Y_MAX * tanHalfVertical),
+    );
+    const yawLimit = Math.atan(HULL_FRAME_NDC_X_LIMIT * tanHalfHorizontal);
+    const yawExcess = angleExcess(yaw, -yawLimit, yawLimit);
+    if (pitchExcess === 0 && yawExcess === 0) return;
+    // Rotating `forward` about `right` by +a tilts it toward `up`; about `up`
+    // by +b tilts it toward `right`. Both move the axis TOWARDS the hull by
+    // exactly the amount it overshot, which lands it on the window edge.
+    if (pitchExcess !== 0) forward.applyAxisAngle(right, pitchExcess);
+    if (yawExcess !== 0) forward.applyAxisAngle(up, yawExcess);
+    this.cameraLook.copy(position).addScaledVector(forward, lookDistance);
+    this.camera.lookAt(this.cameraLook);
+  }
+
   private updateCamera(
     delta: number,
     steer: number,
@@ -1619,10 +1691,21 @@ export class FuturismaGame {
       this.camera.fov = nextFov;
       this.camera.updateProjectionMatrix();
     }
+    // H1.4 - after the FOV settles, because the window is defined against the
+    // projection the player is actually looking through.
+    if (this.cameraGuardsEnabled) this.holdHullInFrame();
     if (this.diagnosticsMode) {
-      // After the FOV settles: the projection the player is looking through is
-      // the one the hull has to be inside of.
       this.recordHullNdc();
+      this.diagnosticCameraLateralLag = this.cameraScratch
+        .copy(this.camera.position)
+        .sub(this.vehicle.root.position)
+        .dot(sample.right);
+      if (this.phase === "running") {
+        this.diagnosticMaximumCameraLateralLag = Math.max(
+          this.diagnosticMaximumCameraLateralLag,
+          Math.abs(this.diagnosticCameraLateralLag),
+        );
+      }
       const freeCameraFov = calculateDesiredCameraFov(
         this.speed / BOOST_MAX_SPEED,
         this.boostActive,
@@ -2096,6 +2179,8 @@ export class FuturismaGame {
         minimumChaseMeters: this.diagnosticMinimumChaseMeters,
         desiredChaseMeters: this.diagnosticDesiredChaseMeters,
         cameraLateral: this.diagnosticCameraLateral,
+        cameraLateralLag: this.diagnosticCameraLateralLag,
+        maximumCameraLateralLag: this.diagnosticMaximumCameraLateralLag,
         hullNdcX: this.diagnosticHullNdcX,
         hullNdcY: this.diagnosticHullNdcY,
         minimumHullNdcY: this.diagnosticMinimumHullNdcY,
