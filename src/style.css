@@ -507,27 +507,157 @@ body[data-graphics-context="lost"] .system-state__lamp {
 }
 
 /*
- * G3 track-event chip. Borrows the slipstream chip wholesale - same width,
- * same mono, same fade - and sits one line above it, so the HUD gains a word
- * rather than a widget. It has no bar of its own: a gust either is coming or is
- * not, and a fill would invite the driver to watch a meter instead of the road.
+ * G3 track-event chip, as re-cut by P20.10. Borrows the slipstream chip
+ * wholesale - same width, same mono, same uppercase, same tracking, same place
+ * in the stack - and sits one line above it, so the HUD gains a word rather
+ * than a widget. It has no bar of its own: a gust either is coming or is not,
+ * and a fill would invite the driver to watch a meter instead of the road.
  *
- * Amber rather than the route's cyan. Cyan on this HUD means "you are being
- * rewarded" (slipstream, clean chain, cleared gate); a gust, a salt patch and a
- * squall are all costs, and the one thing the colour must not do is read as an
- * opportunity. The state is still carried twice over - the chip only exists
- * while the event does, and the word itself names it.
+ * P20.10 - WHY THIS RENDERED AS SMALL GREY TEXT, which is a cascade bug and not
+ * a taste call. `ui.ts` sets BOTH `data-active` and `data-event` on this chip,
+ * and `.slipstream[data-active="true"] { color: var(--muted) }` above is an
+ * attribute selector, i.e. specificity (0,2,0). The G3 rule that was supposed
+ * to colour it was a bare `.track-event { color: ... }`, (0,1,0), so the
+ * slipstream's grey won every time the chip was lit - the one state in which
+ * anybody sees it. The three rules below carry the colour on the SAME
+ * specificity as the rule they have to beat and come after it, which is what
+ * makes them win rather than tie.
+ *
+ * ONE COLOUR PER EVENT, and P20.10 overrules G3's single amber. G3's argument
+ * was that cyan on this HUD means "you are being rewarded", so no cost should
+ * wear it. That holds for the slipstream's cyan; it does not hold for weather.
+ * A squall is rain, cyan is what rain is, and the chip is on screen for 25 s
+ * with the deck grip down - nothing about it reads as an opportunity, and the
+ * word SQUALL names it besides. So:
+ *
+ *   GUST    amber, and the arrow is the actionable half - `track-events.ts`
+ *           resolves it from the gust's own sign, which is the sign of the
+ *           lateral acceleration applied to the craft, so the arrow points
+ *           WHERE YOU WILL BE PUSHED rather than where the wind is from.
+ *   SALT    the HUD's hazard orange, the same `--warning` the locked boost
+ *           meter and the impact flash speak, because a salt patch is the one
+ *           of the three that takes grip away under the craft.
+ *   SQUALL  cyan.
+ *
+ * State is still carried twice over: the chip only exists while the event does,
+ * the word itself names it, and the arrow carries the direction.
+ *
+ * SIZE. The chip element measures >= 14 px tall at 1280x720 through
+ * `line-height`, not through a larger font: the slipstream chip's own block is
+ * label plus a 2 px track and a 5 px margin, and this chip has no track, so at
+ * the shared 0.62rem it was a 12 px line on its own. Same font, same weight,
+ * same tracking - only the line box is opened up to the height the chip beside
+ * it already occupies.
  */
 .track-event {
-  bottom: calc(clamp(22px, 4vh, 44px) + 56px);
-  color: var(--amber, oklch(0.82 0.14 74));
+  /*
+   * 42 px rather than G3's 56 px because the 14 px of bottom padding below
+   * puts the WORD back where it was; the chip's box grew downward, the text
+   * did not move.
+   */
+  bottom: calc(clamp(22px, 4vh, 44px) + 42px);
+  line-height: 1.5;
+  /*
+   * THE SCRIM, and it is sized from the measurement rather than by eye.
+   *
+   * Colour alone cannot carry 4.5:1 here and the arithmetic says so. The chip
+   * sits over whatever the craft is driving past: the squall chip landed on a
+   * 12 px surround of rgb(117,89,58) — bright Greenwater sand, measured — and
+   * the HUD's cyan is relative luminance 0.665, which is 4.05:1 and no lighter
+   * cyan closes it with any margin. A dark halo does not either: three stacked
+   * text-shadows moved that surround from rgb(120,91,60) to rgb(117,89,58),
+   * about 2.5%, because a 12 px ring is mostly the world and a blur off a 10 px
+   * mono glyph is thin by the time it gets there.
+   *
+   * So the chip carries its own ground, which is the language the HUD already
+   * speaks for a cue that must be read against terrain — `.turn-cue` and
+   * `.lap-event` both sit on a panel. This one is a gradient rather than a
+   * plate so it has no edge to notice: opaque under the word, gone by the
+   * middle of the chip. The geometry is chosen so the ACCEPTANCE's own 12 px
+   * surround lands on it — the label box is 43 x 10 px at x 480, so the ring
+   * spans x 468-535 and y 610-644, and the padded box below spans x 464-784
+   * and y 608-651 with the scrim at full strength out to x 547.
+   */
+  padding: 14px 0 14px 16px;
+  margin-left: -16px;
+  background: linear-gradient(
+    90deg,
+    oklch(0.09 0.012 205 / 0.55) 0%,
+    oklch(0.09 0.012 205 / 0.55) 26%,
+    oklch(0.09 0.012 205 / 0) 46%
+  );
+  /*
+   * P20.10 - the fade is authored on the OUT direction and overridden on the
+   * IN, because the two are not the same cue. A gust chip leads its hold by
+   * GUST_CHIP_LEAD_SECONDS; a 1.0 s rise inside that lead is the telegraph
+   * arriving, and a 0.6 s fall is it getting out of the way.
+   */
+  transition: opacity 600ms var(--ease-out);
 }
 
-.track-event[data-event="salt"],
-.track-event[data-event="squall"],
+.track-event[data-active="true"] {
+  transition-duration: 1000ms;
+}
+
+/*
+ * CONTRAST IS CARRIED BY THE HALO, NOT ONLY BY THE HUE, and the numbers are why.
+ * The acceptance is 4.5:1 measured as the glyph body against the 12 px surround
+ * of the frame behind it. Colour alone does not reach it: `--warning` at
+ * oklch(0.7 0.2 38) resolves to rgb(255,101,49), relative luminance 0.31, and
+ * over the 12 px surround the salt chip actually landed on — rgb(57,69,69),
+ * measured, `shots/p20.10/chips-bitterpan` — that is 3.07:1. The dark ring
+ * below is what closes it, by darkening the surround the chip is measured
+ * against rather than by making the text shout: it is three stacked shadows
+ * rather than one, so the falloff covers the first ~11 px out from the glyph,
+ * which is the band the measurement weights most heavily. The coloured glow
+ * stays, one stop wider, so the chip still reads as lit rather than as stencil.
+ *
+ * `--warning` itself is NOT re-tuned: the locked boost meter and the impact
+ * flash speak it, and moving it to satisfy a chip would re-grade two cues this
+ * phase has no business touching. The salt chip takes a lighter step of the
+ * same hazard hue instead.
+ */
 .track-event[data-event="gust"] {
   opacity: 1;
-  text-shadow: 0 0 7px oklch(0.82 0.14 74 / 0.45);
+  color: oklch(0.88 0.15 78);
+  text-shadow:
+    0 0 2px oklch(0.09 0.012 205 / 0.95),
+    0 0 5px oklch(0.09 0.012 205 / 0.85),
+    0 0 11px oklch(0.09 0.012 205 / 0.7),
+    0 0 14px oklch(0.88 0.15 78 / 0.35);
+}
+
+.track-event[data-event="salt"] {
+  opacity: 1;
+  color: oklch(0.82 0.16 46);
+  text-shadow:
+    0 0 2px oklch(0.09 0.012 205 / 0.95),
+    0 0 5px oklch(0.09 0.012 205 / 0.85),
+    0 0 11px oklch(0.09 0.012 205 / 0.7),
+    0 0 14px oklch(0.7 0.2 38 / 0.4);
+}
+
+.track-event[data-event="squall"] {
+  opacity: 1;
+  color: var(--cyan);
+  text-shadow:
+    0 0 2px oklch(0.09 0.012 205 / 0.95),
+    0 0 5px oklch(0.09 0.012 205 / 0.85),
+    0 0 11px oklch(0.09 0.012 205 / 0.7),
+    0 0 14px oklch(0.86 0.13 210 / 0.35);
+}
+
+/*
+ * P20.10 - reduced motion, from ALL THREE of its sources rather than only the
+ * operating system's. `resolveReducedMotion()` composes `?motion=reduce`, the
+ * stored setting and `prefers-reduced-motion`, and `ui.ts` stamps the answer
+ * here; the media query at the bottom of this file only ever saw the third.
+ * A chip that is a warning is exactly the wrong thing to fade in for a driver
+ * who asked for calm - it should simply be there.
+ */
+.track-event[data-reduced-motion="true"],
+.track-event[data-reduced-motion="true"][data-active="true"] {
+  transition: none;
 }
 
 .slipstream__track {
@@ -552,7 +682,9 @@ body[data-graphics-context="lost"] .system-state__lamp {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .slipstream {
+  .slipstream,
+  .track-event,
+  .track-event[data-active="true"] {
     transition: none;
   }
 }

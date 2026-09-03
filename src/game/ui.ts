@@ -7,6 +7,7 @@ import {
   resolveRaceStage,
 } from "./hud-presentation.js";
 import { DRIFT_REWARD_MINIMUM_CHARGE, SLIPSTREAM_LOCK_THRESHOLD } from "./physics";
+import { resolveReducedMotion } from "./query-probes";
 
 /**
  * G2 round 2 - where the contact glow steps from a brush to a firm lean.
@@ -14,6 +15,25 @@ import { DRIFT_REWARD_MINIMUM_CHARGE, SLIPSTREAM_LOCK_THRESHOLD } from "./physic
  * it the craft is genuinely being moved.
  */
 const CUSHION_FIRM_PUSH_MPS2 = 6;
+
+/**
+ * P20.10 — puts the COMPOSED reduced-motion answer where CSS can read it.
+ *
+ * `@media (prefers-reduced-motion: reduce)` sees only the operating system.
+ * `resolveReducedMotion()` composes that with `?motion=reduce` and with the
+ * stored setting, and the composition rule is "the most restrictive input
+ * wins" — so a driver who ticked the box in the options panel was still being
+ * shown a chip that faded in. Stamping the answer on the element is what lets
+ * one selector honour all three.
+ *
+ * Read once, at element resolution, which is the same moment `game.ts` reads
+ * it for the world; a mid-session change of the stored setting needs a relink
+ * either way.
+ */
+function markReducedMotion<T extends HTMLElement>(element: T): T {
+  element.dataset.reducedMotion = resolveReducedMotion() ? "true" : "false";
+  return element;
+}
 
 export interface HudFrame {
   speedKph: number;
@@ -174,7 +194,9 @@ export class GameUi {
   /** G2 - the air cushion's edge glow and the clean-gate counter. */
   private readonly cushionGlow = requiredElement<HTMLElement>("cushion-glow");
   /** G3 - the live track event chip. */
-  private readonly trackEventChip = requiredElement<HTMLElement>("track-event-chip");
+  private readonly trackEventChip = markReducedMotion(
+    requiredElement<HTMLElement>("track-event-chip"),
+  );
   private readonly trackEventLabel = requiredElement<HTMLElement>("track-event-label");
   private lastTrackEvent = "";
   private readonly cleanChain = requiredElement<HTMLElement>("clean-chain");

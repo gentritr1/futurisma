@@ -1201,6 +1201,66 @@ assert.ok(
 );
 
 /**
+ * P20.10 — THE CAMERA FADE, pinned as four separate things that all had to be
+ * true at once and none of which a comment can hold.
+ *
+ * THE DEFECT. A living-world card is a quad in world space with no idea where
+ * the driver is, and several zones put one through the chase camera every lap.
+ * Measured on a Bitterpan demo lap before the fix: 91.3% of the world crop
+ * (rows 130-560, cols 0-1100 at 1280x720) darkened by 25 luma or more against
+ * the same race instant with `?living=0`, against a 15.2% self-difference noise
+ * floor — `scripts/visual/slab-census.mjs`, race 7516 ms, pair drift 8 ms. The
+ * frame is a wall. The card at that instant is PAN_REFINERY_FAR, a 59 x 56 m
+ * HORIZON silhouette, 1.3 m from the camera: it is authored at station 2390 m,
+ * side -1, lateral 871 m, and on a 3050 m CLOSED LOOP a few hundred metres
+ * across that offset crosses the basin and lands on the deck at station ~500.
+ *
+ * WHY THE ASSERTIONS ARE SHAPED LIKE THIS. Each one is a way the fix was
+ * actually got wrong on the way to working, measured each time:
+ *
+ *   1. NEAREST POINT, NOT CENTRE. A wide card's centre is metres away when its
+ *      edge is in the camera's lap. G3's own attempt at a proximity fade was
+ *      reverted for measuring nothing.
+ *   2. EVERY NON-LAMP BATCH, not the two near ones. Scoped to `air`/`airB` the
+ *      census only fell 91.3% -> 64.5%, because the wall is on `horizon`.
+ *   3. A BAND THAT SCALES WITH THE CARD. A 280 m mesa still fills the frame at
+ *      70 m, four times outside a flat 18 m band. With the scaling the census
+ *      maximum is 20.6% and no frame of a lap exceeds 25%.
+ *   4. LAMPS EXCLUDED. UNDERPASS_HAZARD_LAMPS passes 13 m from the camera and
+ *      holding it solid is G3's salt telegraph; fading a hazard lamp because
+ *      the driver got close to it is the one thing this must never do.
+ *
+ * The fade multiplies the RESOLVED alpha, after the clamp, so it can only lower
+ * one — every envelope ceiling and every corridor assertion in this file still
+ * holds by construction, which is why none of them needed changing.
+ */
+assert.ok(
+  /function nearestQuadDistance\(/.test(livingWorldSource),
+  "living-world.ts no longer measures the camera distance to the nearest point "
+    + "of a card's quad. A centre-distance fade is the version that was tried, "
+    + "measured no change, and was reverted: a 10-18 m card's centre is still "
+    + "metres away when its edge is through the lens.",
+);
+assert.ok(
+  /nearFade:\s*!spec\.lamps/.test(livingWorldSource),
+  "The camera fade must cover every non-lamp batch. Scoped to the two near "
+    + "batches it left the horizon silhouettes in the frame and the census "
+    + "maximum at 64.5% against a 25% ceiling.",
+);
+assert.ok(
+  /Math\.max\(NEAR_FADE_FULL_METERS, reachMeters \* NEAR_FADE_FULL_SPAN_SHARE\)/
+    .test(livingWorldSource),
+  "The fade band must scale with the card's own half-extent. A flat 18 m band "
+    + "leaves a 240-320 m mesa filling the frame from 70 m away.",
+);
+assert.ok(
+  /card\.nearFadeScale \* Math\.min\(1, gain \* \(envelope\[0\]/.test(livingWorldSource),
+  "The camera fade must multiply the RESOLVED alpha, outside the clamp. "
+    + "Folding it into an envelope would move the ALPHA_ENVELOPES ceilings this "
+    + "file pins and the corridor rule asserted against them.",
+);
+
+/**
  * P20.8 — SHEET ORIENTATION. Replaces the P20.4 `upright` opt-in list.
  *
  * THE DEFECT THIS PINS. `atlasRect` counts `rect.y` in PNG rows from the TOP of

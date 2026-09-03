@@ -3,6 +3,9 @@ import {
   BITTERPAN_WIND_BEARING_DEGREES,
   GUST_BASE_PEAK_MPS2,
   GUST_CHIP_LEAD_SECONDS,
+  gustChipLabel,
+  SALT_CHIP_LABEL,
+  SQUALL_CHIP_LABEL,
   GUST_END_SECONDS,
   GUST_HOLD_END_SECONDS,
   GUST_HOLD_SECONDS,
@@ -52,6 +55,9 @@ import {
   integrateGustVelocity,
   resolveTargetSurfaceGrip,
 } from "../src/game/physics.js";
+
+/** P20.10: [arrow, metres the same gust carries the craft], for the summary. */
+const gustPushReport = [];
 
 /**
  * G3 — live track events.
@@ -264,6 +270,61 @@ assert.ok(
   `The underpass lamps go solid ${SALT_WARNING_SECONDS} s before the salt; the `
     + "acceptance floor is 1.8 s.",
 );
+
+// ---------------------------------------------------------------------------
+// P20.10 — THE ARROW POINTS WHERE THE CRAFT WILL BE PUSHED.
+//
+// The chip says `GUST →` or `GUST ←` and the driver leans on it, so "which way
+// does that arrow mean" is a load-bearing claim with two ends that used to live
+// in different files and could not be checked against each other: the glyph was
+// picked inside a private method of `track-events.ts`, and the push is
+// `integrateGustVelocity` in `physics.js`. `gustChipLabel` moved into the rules
+// module so this can run BOTH ends and compare them.
+//
+// The chain, and every link is exercised below rather than asserted about:
+//   `stepGustLateral` drives the integrator with
+//   `published.gust * GUST_PEAK_CEILING_MPS2 * published.gustSign`,
+//   adds `velocity * dt` onto `pose.lateralMeters`, and `lateralMeters` is
+//   positive to STARBOARD — `game.ts` flashes "LEFT" on impact exactly when it
+//   is negative. So a positive sign must produce positive travel and a
+//   right-pointing arrow.
+for (const sign of [1, -1]) {
+  let velocity = 0;
+  let lateral = 0;
+  const step = 1 / 120;
+  // Straight through the authored envelope, at the ceiling, with the same
+  // integrator the race loop uses.
+  for (let t = 0; t < GUST_END_SECONDS; t += step) {
+    const push = gustEnvelope(t) * GUST_PEAK_CEILING_MPS2 * sign;
+    velocity = integrateGustVelocity(velocity, push, step);
+    lateral += velocity * step;
+  }
+  const arrow = gustChipLabel(sign);
+  assert.ok(
+    Math.abs(lateral) > 0.5,
+    `A full gust at sign ${sign} moved the craft ${lateral.toFixed(3)} m; that is `
+      + "not a push anybody would need a chip for.",
+  );
+  assert.equal(
+    Math.sign(lateral),
+    sign,
+    `A gust at sign ${sign} moved the craft ${lateral.toFixed(3)} m: the push `
+      + "does not follow the sign the chip is resolved from.",
+  );
+  assert.equal(
+    arrow,
+    sign > 0 ? "GUST →" : "GUST ←",
+    `The chip reads "${arrow}" for a gust that carries the craft `
+      + `${lateral.toFixed(2)} m to ${lateral > 0 ? "starboard" : "port"}; the `
+      + "arrow must point where the driver is going to be pushed.",
+  );
+  gustPushReport.push([arrow, Number(lateral.toFixed(2))]);
+}
+// The other two labels are pinned so a rename cannot silently break the CSS
+// that colours them — `ui.ts` maps the label text onto `data-event`, and
+// `style.css` colours off that attribute.
+assert.equal(SALT_CHIP_LABEL, "SALT");
+assert.equal(SQUALL_CHIP_LABEL, "SQUALL");
 
 // --- 3. schedule determinism ----------------------------------------------
 
@@ -818,6 +879,12 @@ assert.ok(
       + "squall to the last lap, or the replay stopped modelling the runtime.",
   );
 }
+
+console.log(
+  "Gust chip direction PASS: "
+    + gustPushReport.map((row) => `${row[0]} carries the craft ${row[1] > 0 ? "+" : ""}${row[1]} m`).join("; ")
+    + " (lateral positive to starboard).",
+);
 
 console.log(
   `Track events PASS: ${first.gusts.length} Bitterpan gusts over ${TOTAL_LAPS} laps `

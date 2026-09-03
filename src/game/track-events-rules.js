@@ -53,6 +53,35 @@ export const GUST_END_SECONDS = GUST_HOLD_END_SECONDS + GUST_RAMP_OUT_SECONDS;
 export const GUST_TELEGRAPH_SECONDS = 1.2;
 /** How far ahead of the hold the `GUST` chip lights. */
 export const GUST_CHIP_LEAD_SECONDS = 1;
+
+/**
+ * P20.10 — the three HUD chip labels, and the one that carries a direction.
+ *
+ * Here rather than in `track-events.ts` because "the arrow points where the
+ * craft will be pushed" is an invariant with two ends, and only one of them was
+ * ever testable from a private method. The other end is `integrateGustVelocity`
+ * in `physics.js`, which the race loop drives with
+ * `published.gust * GUST_PEAK_CEILING_MPS2 * published.gustSign` and adds
+ * straight onto `pose.lateralMeters`; `lateralMeters` is positive to starboard
+ * — `game.ts` flashes "LEFT" on impact exactly when it is negative. So a
+ * positive sign is a push to the driver's right, and the glyph has to be the
+ * right-pointing one.
+ *
+ * `scripts/validate-track-events.mjs` now asserts the two ends against each
+ * other by running a signed push through the real integrator and comparing the
+ * displacement with the arrow this returns, so the pair cannot drift apart in
+ * a later edit — which is the failure mode a comment alone does not stop.
+ *
+ * @param {number} sign -1 or +1, the gust's signed lateral acceleration
+ */
+export function gustChipLabel(sign) {
+  return sign > 0 ? "GUST →" : "GUST ←";
+}
+
+/** The label the salt drop's warning shows. */
+export const SALT_CHIP_LABEL = "SALT";
+/** ...and the squall's. */
+export const SQUALL_CHIP_LABEL = "SQUALL";
 /** One crossing-scud traverse, arm-relative, centred on the telegraph instant. */
 export const GUST_SCUD_TRAVERSE_SECONDS = 2.6;
 /**
@@ -96,13 +125,26 @@ export const GUST_SCUD_SPREAD_FRACTION = 0.08;
  * sawtooth - `?events=0`, Greenwater, standby - draws exactly what it did.
  *
  * NOT WHAT THIS FIXES, and the distinction cost a wrong commit message to
- * establish: a crossing card whose station is at the craft's own passes THROUGH
- * the chase camera and its quad covers the whole frame, which reads as a
- * rendering fault. That is real, it is visible in this build, and it is NOT
- * G3's - it reproduces frame for frame with `?events=0` at the same race time
- * (shots/g3-bitterpan/gust-*.png against a `?events=0` burst at 7.4-7.7 s), so
- * the free sawtooth has always done it. A proximity fade was written for it,
- * measured to change nothing, and reverted.
+ * establish: a card passing THROUGH the chase camera covers the whole frame,
+ * which reads as a rendering fault. That is real, it is visible in this build,
+ * and it is NOT G3's - it reproduces frame for frame with `?events=0` at the
+ * same race time (shots/g3-bitterpan/gust-*.png against a `?events=0` burst at
+ * 7.4-7.7 s). A proximity fade was written for it, measured to change nothing,
+ * and reverted.
+ *
+ * P20.10 FOUND OUT WHY THAT FADE MEASURED NOTHING, and it is worth recording
+ * here because the wrong half of the diagnosis is written above: the fade was
+ * aimed at the CROSSING SCUD, and the crossing scud is not the card that fills
+ * the frame. At the 7.4-7.7 s window this comment names, the wall is
+ * PAN_REFINERY_FAR - a 59 x 56 m HORIZON silhouette - 1.3 m from the camera,
+ * because the far-field zones author `lateral` at 460-1500 m on a 3050 m closed
+ * loop only a few hundred metres across, so those offsets cross the basin and
+ * land on the deck. The crossing scud does fly through the camera too, at
+ * 2.18 m, but it is 13 x 3 m at a 0.32 ceiling and it is fourth on the list.
+ * Reproduced by scoping P20.10's fade to PAN_SCUD_CROSSING alone and
+ * re-running the census: 94.6% of the world crop darkened, i.e. the baseline.
+ * See the P20.10 block at the top of `living-world.ts` for the fix and the
+ * numbers.
  */
 export const GUST_SCUD_ALPHA_SCALE = 0.625;
 

@@ -44,6 +44,169 @@ const SHIMMER_PERIOD_SECONDS = 6.5;
 const VISIBILITY_SAMPLE_HZ = 4;
 
 /**
+ * P20.10 — THE CARD THAT WENT THROUGH THE LENS.
+ *
+ * THE DEFECT, MEASURED. On a Bitterpan demo lap, 91.3% of the world crop
+ * (rows 130-560, cols 0-1100 of 1280x720) came back darkened by 25 luma or more
+ * against the same race instant with `?living=0`, against a self-difference
+ * noise floor of 15.2% — `scripts/visual/slab-census.mjs`, race 7516 ms, pair
+ * drift 8 ms. The frame is a dark wall: sky, pan, rigs and rivals all gone.
+ *
+ * WHERE IT COMES FROM, and it is not where the phase brief assumed. The card
+ * responsible at that instant is PAN_REFINERY_FAR — a 59 x 56 m HORIZON
+ * silhouette — 1.3 m from the camera. `living-world-zones.js` places a card at
+ * `sample.right * (halfWidth + lateral)` from its own station, and the far-field
+ * zones author `lateral` at 460-1500 m. Bitterpan is a 3050 m CLOSED LOOP whose
+ * footprint is a few hundred metres across, so those offsets do not go to the
+ * horizon: they cross the basin and land on the far side of the track. The
+ * offender above is authored at station 2390 m, side -1, lateral 871 m, and
+ * resolves to world (1.2, 510.9) — on the deck at station ~500, where the craft
+ * drives through it once a lap.
+ *
+ * Five zones on four batches were measured passing inside 6 m of the chase
+ * camera on one lap (closest approach, card size at that tick):
+ *
+ *   PAN_HAZE_BAND         0.09 m   204 x 20 m   horizonAir
+ *   PAN_HEAT_SHIMMER_FAR  0.59 m   128 x 10 m   horizonAir
+ *   PAN_REFINERY_FAR      0.94 m    59 x 56 m   horizon
+ *   PAN_RIG_FIELD_FAR     1.13 m    38 x 19 m   horizon
+ *   PAN_SCUD_CROSSING     2.18 m    13 x  3 m   air
+ *   BRINE_HAZE_LOW        2.99 m    35 x  3 m   air
+ *   PAN_SCUD_NEAR         4.62 m    15 x  8 m   air
+ *
+ * WHY THE EARLIER FADE MEASURED NOTHING. G3 tried a camera-proximity fade on
+ * the crossing scud, saw no change and reverted it. Reproduced here by gating
+ * the fade below to PAN_SCUD_CROSSING alone and re-running the census: 94.6%,
+ * i.e. the baseline. The crossing card is real and does fly through the camera
+ * — it is fourth on that list — but it is 13 x 3 m at an envelope ceiling of
+ * 0.32, and the frame-filler beside it is a 59 x 56 m silhouette at alpha 1.
+ * A fade scoped to one zone, or to the two near batches, cannot answer this;
+ * the rule has to be the layer's.
+ *
+ * THE RULE. Every camera-facing card on every non-lamp batch fades out as the
+ * camera reaches it: alpha x 0 at 6 m and closer, x 1 at 18 m and beyond,
+ * smoothstep between. Three things about its shape are load-bearing.
+ *
+ *   IT IS MEASURED TO THE NEAREST POINT OF THE QUAD, NOT TO ITS CENTRE. A
+ *   PAN_SCUD_NEAR card sits 2-8 m outboard of the deck edge and is 8-18 m wide,
+ *   so when its near edge is in the camera's lap its centre is still 6-13 m
+ *   away — outside any centre-based cutoff that does not also fade cards the
+ *   driver is supposed to see. `nearestQuadDistance` clamps the camera offset
+ *   onto the quad's own span first, so a wide card starts fading when its EDGE
+ *   arrives. This is the other half of why a first attempt can measure nothing.
+ *
+ *   IT IS APPLIED TO THE RESOLVED ALPHA, alongside the G3 event gains, rather
+ *   than to an envelope or an authored ceiling. `ALPHA_ENVELOPES` is pinned by
+ *   `validate-living-world.mjs` and the corridor rule is asserted against it; a
+ *   fade that moved those numbers would have changed what is authored instead
+ *   of what is drawn. Multiplying at the end can only ever LOWER an alpha, so
+ *   every corridor and envelope assertion still holds by construction.
+ *
+ *   THE LAMP BATCHES ARE EXCLUDED. `updateLampColors` rewrites their alpha to 1
+ *   after this runs, so a fade there would be dead code — and it must stay dead
+ *   code: UNDERPASS_HAZARD_LAMPS passes 13 m from the camera and holding it
+ *   SOLID is G3's salt-drop telegraph. Dimming a hazard lamp because the driver
+ *   got close to it is the one thing this rule must not do.
+ *
+ * 18 m keeps every telegraph that matters: PAN_SCUD_CROSSING has to be readable
+ * on the road 40-120 m ahead, where the scale is 1, and the horizon silhouettes
+ * this removes are only ever removed at ranges no horizon is authored for.
+ */
+const NEAR_FADE_ZERO_METERS = 6;
+const NEAR_FADE_FULL_METERS = 18;
+
+/**
+ * ...AND THE HALF OF THE RULE A FIXED 6/18 m BAND CANNOT EXPRESS.
+ *
+ * 6 m and 18 m are the right numbers for a card the size of a scud - 8-18 m
+ * wide, so at 18 m it is a shape on the road rather than a wall. They are the
+ * wrong numbers for the far field, and that is arithmetic rather than taste: a
+ * PAN_MESA_LINE card is 240-320 m wide, and the horizontal cross-section of a
+ * 1280x720 frustum at distance d is about 1.9 d, so a 280 m card STILL FILLS
+ * THE FRAME at 70 m - four times outside a fixed 18 m band. Measured: with the
+ * flat band applied to every non-lamp batch, the census maximum fell from 91.3%
+ * to 64.5%, and hiding `BP_LIVING_HORIZON` at that same frame took the same
+ * statistic to 3.2% (shots/p20.10/probe, race 7458 ms). The horizon layer was
+ * still the wall.
+ *
+ * So the band scales with the card: a quad stops covering the frame at roughly
+ * its own half-extent, so that is where it comes back to full alpha, and it
+ * reaches zero at a quarter of it. The absolute 6/18 m stays as the floor,
+ * which is what keeps every near-field card on exactly the band the phase asked
+ * for - a scud's half-extent is 4-9 m, under both floors, so nothing about
+ * PAN_SCUD_NEAR, PAN_SCUD_CROSSING or BRINE_HAZE_LOW is changed by this line.
+ *
+ * It only ever removes a card the camera is INSIDE relative to that card's own
+ * size. A mesa authored at 1200-1400 m lateral reads at scale 1 wherever it is
+ * actually on the horizon; the ones this takes out are the ones the 3050 m
+ * closed loop folded back onto the deck.
+ */
+const NEAR_FADE_ZERO_SPAN_SHARE = 0.25;
+const NEAR_FADE_FULL_SPAN_SHARE = 2;
+
+/**
+ * Distance from a point to the nearest point of a camera-facing quad, in metres.
+ *
+ * The quad spans `cameraRight` horizontally and world Y vertically, so in the
+ * orthonormal frame {right, n, up} the offset from the centre splits into
+ * (along, perpendicular, up) and the nearest point clamps `along` and `up` onto
+ * the card's own half-extents while `perpendicular` — the quad has no thickness
+ * — is carried whole.
+ *
+ * `shear` leans the top edge along `right` by `shear * halfHeight`
+ * (writeCameraFacingCard), so the horizontal span is widened by that much
+ * rather than the parallelogram being solved exactly. That is deliberately the
+ * conservative direction: it can only make a sheared card start fading slightly
+ * early, never late.
+ */
+function nearestQuadDistance(
+  cameraX: number,
+  cameraY: number,
+  cameraZ: number,
+  centerX: number,
+  centerY: number,
+  centerZ: number,
+  halfWidth: number,
+  halfHeight: number,
+  rightX: number,
+  rightZ: number,
+  shear: number,
+): number {
+  const dx = cameraX - centerX;
+  const dy = cameraY - centerY;
+  const dz = cameraZ - centerZ;
+  const along = dx * rightX + dz * rightZ;
+  const perpendicular = dz * rightX - dx * rightZ;
+  const halfSpan = halfWidth + Math.abs(shear) * halfHeight;
+  const overAlong = along > halfSpan
+    ? along - halfSpan
+    : along < -halfSpan ? along + halfSpan : 0;
+  const overUp = dy > halfHeight
+    ? dy - halfHeight
+    : dy < -halfHeight ? dy + halfHeight : 0;
+  return Math.sqrt(
+    overAlong * overAlong + perpendicular * perpendicular + overUp * overUp,
+  );
+}
+
+/**
+ * 0 where the camera is inside the card, 1 where the card is a shape in the
+ * world again, smoothstep between. `reachMeters` is the card's own largest
+ * half-extent this tick, which is what makes the band mean the same thing to a
+ * 13 m scud and to a 300 m mesa.
+ */
+function nearFadeScale(distanceMeters: number, reachMeters: number): number {
+  const full = Math.max(NEAR_FADE_FULL_METERS, reachMeters * NEAR_FADE_FULL_SPAN_SHARE);
+  // Written as "not less than" so a card with no camera this tick — the
+  // constructor's first update passes none — reads NaN and stays at 1.
+  if (!(distanceMeters < full)) return 1;
+  const zero = Math.max(NEAR_FADE_ZERO_METERS, reachMeters * NEAR_FADE_ZERO_SPAN_SHARE);
+  if (distanceMeters <= zero) return 0;
+  const t = (distanceMeters - zero) / (full - zero);
+  return t * t * (3 - 2 * t);
+}
+
+/**
  * G3 — the three authored zones a live track event drives.
  *
  * Matched on `motionId`, which `buildLivingWorld` already stamps on every card,
@@ -116,6 +279,18 @@ interface LivingCard extends AuthoredCard {
   crossProgress: number;
   /** Set once at load: this card is driven by a live track event. */
   eventZone: "" | "gust" | "lamp" | "rain";
+  /**
+   * P20.10. The camera-proximity multiplier resolved for this tick, 0..1.
+   *
+   * Written where the quad is written, because that is the only place the
+   * card's CURRENT centre, half-extents and shear all exist at once — every
+   * motion in the switch above moves or scales at least one of them, and a
+   * fade computed from the authored anchor would test a card that is metres
+   * from where it is drawn. `updateCardAlpha` then reads it rather than
+   * recomputing it, for the same reason the `cross` alpha reads
+   * `crossProgress`.
+   */
+  nearFadeScale: number;
 }
 
 interface LivingBatch {
@@ -127,6 +302,8 @@ interface LivingBatch {
   positionAttribute: THREE.BufferAttribute;
   colorAttribute: THREE.BufferAttribute;
   hasAnimatedAlpha: boolean;
+  /** P20.10. This batch's cards fade out as the camera reaches them. */
+  nearFade: boolean;
 }
 
 export interface LivingWorldStats {
@@ -234,7 +411,14 @@ function makeBatch(
     colors,
     positionAttribute,
     colorAttribute,
-    hasAnimatedAlpha: cards.some((card) => card.alphaKind !== undefined),
+    // P20.10 — a fading batch always rewrites its colours, because the fade is
+    // itself an animation even for a card whose authored alpha is a constant
+    // (every horizon silhouette, OPENING_BIRD_FLOCK, SALT_DEVIL_CORE). The
+    // lamp batches are the exception on both counts: `updateLampColors`
+    // already rewrites their whole colour buffer every tick.
+    hasAnimatedAlpha: cards.some((card) => card.alphaKind !== undefined)
+      || !spec.lamps,
+    nearFade: !spec.lamps,
   };
 }
 
@@ -372,6 +556,19 @@ export class LivingWorld {
 
   private readonly batches: LivingBatch[];
   private readonly cameraRight = new THREE.Vector3(1, 0, 0);
+  /**
+   * P20.10. The camera's own world position, latched once a tick.
+   *
+   * `cameraRight` was already read off `camera.matrixWorld` here; the near fade
+   * needs the translation column of the same matrix, so it costs one more read
+   * a tick rather than one per card. Left at NaN when the caller passes no
+   * camera, which `nearFadeScale` resolves to "no fade" rather than "invisible".
+   */
+  private readonly cameraPosition = new THREE.Vector3(
+    Number.NaN,
+    Number.NaN,
+    Number.NaN,
+  );
   private accumulatorSeconds = 0;
   private elapsedSeconds = 0;
   /**
@@ -445,6 +642,7 @@ export class LivingWorld {
         crossOffsetMeters: 0,
         crossSide: 0,
         crossProgress: 0,
+        nearFadeScale: 1,
         eventZone: card.motionId === GUST_SCUD_ZONE
           ? "gust"
           : card.motionId === SALT_LAMP_ZONE
@@ -569,8 +767,10 @@ export class LivingWorld {
     if (camera) {
       camera.updateMatrixWorld();
       this.cameraRight.setFromMatrixColumn(camera.matrixWorld, 0).setY(0).normalize();
+      this.cameraPosition.setFromMatrixPosition(camera.matrixWorld);
     } else {
       this.cameraRight.set(1, 0, 0);
+      this.cameraPosition.set(Number.NaN, Number.NaN, Number.NaN);
     }
 
     for (const batch of this.batches) {
@@ -724,7 +924,32 @@ export class LivingWorld {
             halfWidth * 1.6,
             halfWidth * 0.42,
           );
+          card.nearFadeScale = 1;
         } else {
+          // P20.10 — the fade, on the CURRENT quad. `centerY` is the same
+          // expression the writer below uses, so the card that is tested and
+          // the card that is drawn are the same rectangle. Computed here rather
+          // than in `updateCardAlpha` because this is the only place a card's
+          // post-motion centre, half-extents and shear all exist at once.
+          if (batch.nearFade) {
+            const centerY = batch.spec.anchor === "bottom" ? y + halfHeight : y;
+            card.nearFadeScale = nearFadeScale(
+              nearestQuadDistance(
+                this.cameraPosition.x,
+                this.cameraPosition.y,
+                this.cameraPosition.z,
+                x,
+                centerY,
+                z,
+                halfWidth,
+                halfHeight,
+                this.cameraRight.x,
+                this.cameraRight.z,
+                shear,
+              ),
+              Math.max(halfWidth + Math.abs(shear) * halfHeight, halfHeight),
+            );
+          }
           writeCameraFacingCard(
             batch.positions,
             cardIndex,
@@ -745,7 +970,12 @@ export class LivingWorld {
             shear,
           );
         }
-        if (card.alphaKind) this.updateCardAlpha(batch, cardIndex, card);
+        // P20.10 — a fading card is written even without an alpha envelope,
+        // because the fade is the animation. On a lamp batch this is the
+        // condition it has always been, and `updateLampColors` owns the alpha.
+        if (card.alphaKind || batch.nearFade) {
+          this.updateCardAlpha(batch, cardIndex, card);
+        }
       }
       batch.positionAttribute.needsUpdate = true;
       if (batch.hasAnimatedAlpha) batch.colorAttribute.needsUpdate = true;
@@ -810,7 +1040,18 @@ export class LivingWorld {
     card: LivingCard,
   ): void {
     const alphaKind: AlphaKind | undefined = card.alphaKind;
-    if (!alphaKind) return;
+    if (!alphaKind) {
+      // P20.10 — a card with no envelope still has to answer the camera. Every
+      // horizon silhouette is one of these, and they are the zones that put the
+      // 59 x 56 m wall in the frame, so this branch is the load-bearing half of
+      // the fix rather than a tidy-up: their authored constant is written
+      // through the fade instead of being left in the buffer from `makeBatch`.
+      const flat = (card.alphaInitial ?? 1) * card.nearFadeScale;
+      for (let vertex = 0; vertex < CARD_VERTICES; vertex += 1) {
+        batch.colors[(cardIndex * CARD_VERTICES + vertex) * 4 + 3] = flat;
+      }
+      return;
+    }
     let amount = 0;
     switch (alphaKind) {
       case "mist":
@@ -887,7 +1128,10 @@ export class LivingWorld {
       : card.eventZone === "gust"
         ? this.scudAlphaScale
         : 1;
-    const alpha = Math.min(1, gain * (envelope[0]
+    // P20.10: the camera fade multiplies LAST, after the clamp, so it can only
+    // ever lower a resolved alpha — the authored envelope and the corridor cap
+    // `validate-living-world.mjs` pins are both still the ceiling.
+    const alpha = card.nearFadeScale * Math.min(1, gain * (envelope[0]
       + (envelope[1] - envelope[0]) * THREE.MathUtils.clamp(amount, 0, 1)));
     for (let vertex = 0; vertex < CARD_VERTICES; vertex += 1) {
       batch.colors[(cardIndex * CARD_VERTICES + vertex) * 4 + 3] = alpha;

@@ -256,6 +256,136 @@ assert.equal(
 );
 
 // ---------------------------------------------------------------------------
+// P20.10 — THE TRACK EVENTS ARE AUDIBLE, which until this phase they were not.
+//
+// A1 authored `dry_wind.event`, `wetland.event`, `salt_patter.event` and
+// `rain_patter.event` against `setEventLevels`; G3 published `trackEventState()`
+// and, because `audio.ts` was owned by a phase running beside it, deliberately
+// called nothing. So the latch every assertion above exercises was never
+// written by a race: a gust changed the picture and not the sound, and every
+// check in this file still passed, because they all drive `bedTargetGain` with
+// events this file makes up.
+//
+// The three blocks below are what a re-break would now have to get past.
+// ---------------------------------------------------------------------------
+
+// 1. THE SEAM EXISTS. A source read rather than a call, because `track-events.ts`
+// is TypeScript and node cannot import it — the same reason this file's header
+// gives for measuring the graph in a browser. It is the cheapest assertion here
+// and it is the one that would have caught the gap.
+const trackEventsSource = readFileSync(
+  new URL("../src/game/track-events.ts", import.meta.url),
+  "utf8",
+);
+assert.match(
+  trackEventsSource,
+  /setEventLevels\s*\(/,
+  "track-events.ts must hand its published levels to the ambience latch; "
+    + "without that call every event bed below is authored and unreachable.",
+);
+assert.match(
+  trackEventsSource,
+  /from "\.\/ambience-cue\.js"/,
+  "The ambience latch must be imported from ambience-cue.js, not from audio.ts: "
+    + "audio.ts carries the whole engine graph and would pull it into the "
+    + "track-event chunk.",
+);
+// ...and it must not allocate to do it. A fresh object literal inside the
+// argument list is 120 allocations a second for the length of a race.
+assert.doesNotMatch(
+  trackEventsSource,
+  /setEventLevels\(\s*\{/,
+  "setEventLevels must be handed a reused object, not a literal built per step.",
+);
+
+// 2. EVERY EVENT-DRIVEN BED ACTUALLY SWELLS, in decibels rather than in
+// "eventGain is greater than zero". The rise is what a listener notices, and a
+// 0.02 eventGain on a 0.30 bed is a change of 0.6 dB that nobody would hear.
+const EVENT_SWELL_FLOOR_DB = 3;
+const eventBeds = Object.values(AMBIENCE_BEDS)
+  .flat()
+  .filter((bed) => bed.event && bed.eventGain > 0);
+assert.ok(eventBeds.length >= 4, "Both maps must carry event-driven beds.");
+const eventSwell = [];
+for (const bed of eventBeds) {
+  const at = (level) => bedTargetGain(bed, {
+    distanceMeters: bed.window ? (bed.window.startDistance + bed.window.endDistance) / 2 : 500,
+    lapLengthMeters: bed.window ? 3_050 : 3_050,
+    zone: "open",
+    events: { ...noEvents, [bed.event]: level },
+  });
+  const rest = at(0);
+  const loud = at(1);
+  assert.ok(loud > rest, `${bed.id} does not rise with ${bed.event}.`);
+  if (rest === 0) {
+    // An event-only bed. Its whole existence is the event, so the assertion is
+    // that it is silent without one — `AMBIENCE_RMS_BANDS` already describes
+    // what it renders at event 1.
+    eventSwell.push([bed.id, bed.event, "silent", loud.toFixed(3)]);
+    continue;
+  }
+  const swellDb = 20 * Math.log10(loud / rest);
+  assert.ok(
+    swellDb >= EVENT_SWELL_FLOOR_DB,
+    `${bed.id} swells ${swellDb.toFixed(2)} dB on a full ${bed.event}; under `
+      + `${EVENT_SWELL_FLOOR_DB} dB that is a change nobody hears.`,
+  );
+  eventSwell.push([bed.id, bed.event, `${rest.toFixed(3)}`, `+${swellDb.toFixed(2)} dB`]);
+}
+
+// 3. THE TWO EVENT-ONLY LOOPS FIRE, at a level this file can compute for itself.
+//
+// A looping buffer into a gain is exactly `loop x gain`, and both halves are
+// pure JS, so `salt_patter` on a salt drop and `rain_patter` in a squall can be
+// put in decibels here rather than only in a browser.
+//
+// AND THE NUMBER IS AN UPPER BOUND, NOT THE RENDERED LEVEL, which is the whole
+// reason this block does not simply assert against `AMBIENCE_RMS_BANDS`. The
+// bands were measured through the real graph, and the real graph plays a 24 kHz
+// buffer into a 48 kHz context: the resample costs broadband content real
+// energy. Measured on 2026-09-03 with `node scripts/visual/audio-probe.mjs`,
+// against this same arithmetic — salt_patter node -24.69 vs rendered -26.69
+// (2.00 dB), rain_patter node -23.80 vs rendered -25.66 (1.86 dB). So the
+// assertion is one-sided: the computed level must not fall BELOW the band (an
+// event bed that has gone quiet), and it must sit inside the resample
+// allowance ABOVE it rather than being silently accepted anywhere in range.
+// The rendered figure remains the browser probe's to own.
+const RESAMPLE_ALLOWANCE_DB = 3;
+for (const [map, id, event] of [
+  ["bitterpan", "salt_patter", "saltDrop"],
+  ["greenwater", "rain_patter", "squall"],
+]) {
+  const bed = AMBIENCE_BEDS[map].find((entry) => entry.id === id);
+  const state = {
+    distanceMeters: 500,
+    lapLengthMeters: lapLength[map],
+    zone: "open",
+    events: { ...noEvents, [event]: 1 },
+  };
+  assert.equal(
+    bedTargetGain(bed, { ...state, events: noEvents }),
+    0,
+    `${id} must be silent with no ${event}.`,
+  );
+  const gain = bedTargetGain(bed, state);
+  const loop = renderAmbienceLoop(id, AMBIENCE_LOOP_SAMPLE_RATE);
+  const bound = channelRmsDbfs(loop) + 20 * Math.log10(gain);
+  const [low, high] = AMBIENCE_RMS_BANDS[id];
+  assert.ok(
+    bound >= low,
+    `${id} at ${event} 1 computes ${bound.toFixed(2)} dBFS, under its authored `
+      + `floor of ${low} dBFS before the resample has taken anything: the bed `
+      + "has gone quiet.",
+  );
+  assert.ok(
+    bound <= high + RESAMPLE_ALLOWANCE_DB,
+    `${id} at ${event} 1 computes ${bound.toFixed(2)} dBFS, more than `
+      + `${RESAMPLE_ALLOWANCE_DB} dB over its authored ceiling of ${high} dBFS.`,
+  );
+  eventSwell.push([id, event, "silent", `${bound.toFixed(2)} dBFS pre-resample`]);
+}
+
+// ---------------------------------------------------------------------------
 // The crossfade, simulated rather than asserted on the constant.
 //
 // This is the "beds crossfade within 2.5 s of a sector boundary" criterion. It
@@ -501,6 +631,12 @@ for (const [map, beds] of Object.entries(AMBIENCE_BEDS)) {
       + "hitch before the countdown.",
   );
 }
+
+console.log(
+  "Track events -> ambience PASS: "
+    + eventSwell.map((row) => `${row[0]} on ${row[1]} ${row[2]} -> ${row[3]}`).join("; ")
+    + ".",
+);
 
 console.log(
   "Audio ambience PASS: "

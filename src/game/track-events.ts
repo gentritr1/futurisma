@@ -2,12 +2,16 @@ import * as THREE from "three";
 import type { RaceCourse } from "./course";
 import { integrateGustVelocity } from "./physics";
 import { searchParam } from "./query-probes";
+import { setEventLevels } from "./ambience-cue.js";
 import {
   BITTERPAN_WIND_BEARING_DEGREES,
   GUST_END_SECONDS,
   GUST_HOLD_END_SECONDS,
   GUST_HOLD_START_SECONDS,
   GUST_CHIP_LEAD_SECONDS,
+  gustChipLabel,
+  SALT_CHIP_LABEL,
+  SQUALL_CHIP_LABEL,
   GUST_PEAK_CEILING_MPS2,
   GUST_RIVAL_LANE_BIAS_METERS,
   SALT_PATCH_FROM_METERS,
@@ -116,6 +120,17 @@ const published: PublishedTrackEvents = {
   chip: "",
   lastEvent: "",
 };
+
+/**
+ * P20.10 — the object handed to `setEventLevels`, reused forever.
+ *
+ * `publish()` runs on every physics step; a fresh literal there would be 120
+ * allocations a second for the length of a race. `ambience-cue.ts` clamps and
+ * copies the three fields out of whatever it is given and keeps no reference,
+ * so one object is enough — the same discipline `AmbienceField.update` already
+ * follows with its own solver input.
+ */
+const eventLevels = { windGust: 0, squall: 0, saltDrop: 0 };
 
 /** The read-only view an audio phase wires to. See the file header. */
 export function trackEventState(): {
@@ -648,6 +663,30 @@ export class TrackEvents {
       : 0;
 
     published.chip = this.resolveChip(gustSeconds);
+    // P20.10 — the audio seam, closed. G3 published `trackEventState()` and
+    // deliberately did not call into `audio.ts`, which was being built beside
+    // it; A1 authored `dry_wind.event`, `salt_patter.event` and
+    // `rain_patter.event` against `setEventLevels` and had nobody to call it.
+    // The two halves have been sitting a function call apart ever since, which
+    // is why a gust changed the picture and not the sound.
+    //
+    // HERE RATHER THAN IN THE AUDIO CONTROL TICK, for two reasons that are both
+    // mechanical. `trackEventState()` builds an object, so calling it 30 times
+    // a second from `audio.ts` would allocate 30 times a second for the life of
+    // a race; writing three numbers into a module-level scratch and handing THAT
+    // over allocates nothing, and `setEventLevels` copies the fields out, so
+    // reusing one object is safe by contract rather than by luck. And it costs
+    // `game.ts` zero lines against its seam budget, where the audio side would
+    // have cost an import and a call.
+    //
+    // `reset()` runs `publish()` too, so a restart zeroes the beds without a
+    // second seam; `?events=0` never reaches this line at all, because `step`
+    // returns before `publish` when the system is disabled, and the latch keeps
+    // the silence it was constructed with.
+    eventLevels.windGust = published.gust;
+    eventLevels.squall = published.squall;
+    eventLevels.saltDrop = published.saltPatch;
+    setEventLevels(eventLevels);
   }
 
   /**
@@ -660,13 +699,13 @@ export class TrackEvents {
    * which way to lean before it arrives.
    */
   private resolveChip(gustSeconds: number): string {
-    if (published.saltWarn > 0) return "SALT";
-    if (published.squall > 0) return "SQUALL";
+    if (published.saltWarn > 0) return SALT_CHIP_LABEL;
+    if (published.squall > 0) return SQUALL_CHIP_LABEL;
     if (
       this.activeGust
       && gustSeconds >= GUST_HOLD_START_SECONDS - GUST_CHIP_LEAD_SECONDS
       && gustSeconds <= GUST_END_SECONDS
-    ) return this.activeGust.sign > 0 ? "GUST →" : "GUST ←";
+    ) return gustChipLabel(this.activeGust.sign);
     return "";
   }
 
