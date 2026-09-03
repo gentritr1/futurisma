@@ -39,10 +39,18 @@ import {
  * ladder, so it is the one the migration is written around: a v2 ghost was
  * necessarily a `race` lap and lands at `ghosts.race` rather than being
  * dropped. The step's own note in `save-schema.js` carries the full reasoning,
- * and `scripts/validate-persistence.mjs` proves the whole v1 → v3 walk field by
+ * and `scripts/validate-persistence.mjs` proves the whole v1 → v4 walk field by
  * field.
+ *
+ * H2b added v4: one boolean, `settings.voice`, for the pit radio. It is the
+ * cheapest rung on the ladder — purely additive, nothing relocated, nothing
+ * renamed — and it is still a rung rather than a silent widening of v3, because
+ * a file this build writes has to be DISCARDED by an older build rather than
+ * half-understood. That is the rule the version number exists to carry and it
+ * does not bend for a small field. The cost of the rung is one identity step;
+ * the cost of skipping it would be a v3 build reading a v4 file as its own.
  */
-export const SCHEMA_VERSION = 3;
+export const SCHEMA_VERSION = 4;
 
 /**
  * The single storage key. Every key this game writes is prefixed `futurisma.`

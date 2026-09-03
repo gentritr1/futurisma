@@ -62,10 +62,10 @@ assert.ok(
 // migration and start exercising an identity — silently, which is the failure
 // mode worth an assertion.
 assert.ok(
-  SCHEMA_VERSION >= 3,
-  `SCHEMA_VERSION is ${SCHEMA_VERSION}; v2 introduced the best-lap ghost and v3 `
-    + "the per-mode ghost map and per-mode/tier best laps. This suite proves the "
-    + "whole v1 -> v3 walk is lossless.",
+  SCHEMA_VERSION >= 4,
+  `SCHEMA_VERSION is ${SCHEMA_VERSION}; v2 introduced the best-lap ghost, v3 the `
+    + "per-mode ghost map and per-mode/tier best laps, and v4 the pit radio's "
+    + "VOICE setting. This suite proves the whole v1 -> v4 walk is lossless.",
 );
 
 // The exemption is only defensible while the exempt file stays thin: one key,
@@ -264,6 +264,10 @@ const authored = {
     reducedMotion: true,
     quality: "low",
     renderMode: "ps2",
+    // H2b, v4. Deliberately the NON-default value: a fixture that round-trips
+    // `true` would pass identically against a normalizer that dropped the field
+    // and let the default fill it back in.
+    voice: false,
   },
   records: {
     // One course with a stored replay, one without — the mixed case is the one
@@ -858,6 +862,16 @@ for (const [key, expected] of Object.entries(v1Payload.records)) {
 // are the two a v1 build raced, so the upgrade lands the player where they left.
 assert.equal(migrated.mode, DEFAULT_RACE_MODE, "The migration invented a race format.");
 assert.equal(migrated.tier, DEFAULT_RIVAL_TIER, "The migration invented a rival tier.");
+// H2b — and the field v4 adds. A v1 file predates the pit radio entirely, so
+// the only honest answer is the default a fresh install gets. Asserted against
+// `defaultSettings()` rather than against a literal `true`, so flipping the
+// default later moves this with it instead of leaving a fixture that pins a
+// value the game no longer ships.
+assert.equal(
+  migrated.settings.voice,
+  defaultSettings().voice,
+  "The v1 -> v4 walk did not land settings.voice on the shipped default.",
+);
 
 // The migration is not a one-way door out of the game: what it produces must
 // itself round-trip, or the next reload would migrate a v2 file all over again.
@@ -1005,6 +1019,108 @@ for (const version of [0, -1, 1.5, SCHEMA_VERSION + 1, 99, "1", null, true]) {
     null,
     "A v2 race ghost was offered as a time-attack replay.",
   );
+}
+
+// ---------------------------------------------------------------------------
+// H2b — v3 → v4, the cheapest rung, tested anyway
+//
+// The step is an identity: v4 adds `settings.voice` and nothing moves. The
+// reason it still gets a fixture is that "purely additive" is exactly the claim
+// that goes wrong silently — a normalizer that rejects the whole settings
+// object when it meets an unknown shape, or a ladder entry wired to the wrong
+// `from`, produces a defaulted save that LOOKS fine and has quietly thrown away
+// a returning player's levels, their livery and their record line.
+//
+// So this asserts the boring thing loudly: every v3 field arrives with its own
+// value, and the one new field arrives with the shipped default.
+// ---------------------------------------------------------------------------
+
+{
+  const v3Ghost = recordedGhost(33_400);
+  const v3Payload = {
+    schemaVersion: 3,
+    settings: {
+      masterVolume: 0.45,
+      musicVolume: 0.15,
+      reducedMotion: true,
+      quality: "high",
+      renderMode: "ps2",
+    },
+    records: {
+      "MAP 01": {
+        bestLapMs: 33_400,
+        bestRaceMs: 169_100,
+        laps: 17,
+        ghosts: { timeattack: v3Ghost },
+        bests: {
+          "timeattack:feral": { bestLapMs: 33_400, gateSplitsMs: [4_000, 9_000, 14_000] },
+        },
+      },
+    },
+    livery: "needle",
+    track: "greenwater",
+    mode: "timeattack",
+    tier: "feral",
+  };
+  const upgraded = parseSave(JSON.stringify(v3Payload), SCHEMA_VERSION);
+  assertUsableSave(upgraded, "v3 migration");
+  assert.equal(upgraded.schemaVersion, SCHEMA_VERSION);
+
+  for (const [key, expected] of Object.entries(v3Payload.settings)) {
+    const want = VOLUME_KEYS.has(key) ? normalizeVolume(expected, -1) : expected;
+    assert.equal(
+      upgraded.settings[key],
+      want,
+      `The v3 -> v4 migration lost settings.${key}.`,
+    );
+  }
+  assert.equal(upgraded.livery, "needle", "The v3 -> v4 migration lost the livery.");
+  assert.equal(upgraded.track, "greenwater", "The v3 -> v4 migration lost the track.");
+  assert.equal(upgraded.mode, "timeattack", "The v3 -> v4 migration lost the format.");
+  assert.equal(upgraded.tier, "feral", "The v3 -> v4 migration lost the tier.");
+  assert.equal(
+    upgraded.settings.voice,
+    defaultSettings().voice,
+    "The v3 -> v4 migration did not default settings.voice.",
+  );
+  // The replay and the per-mode best are the two things a wipe would take, so
+  // they are compared rather than counted.
+  assert.deepEqual(
+    upgraded.records["MAP 01"].ghosts.timeattack,
+    v3Ghost,
+    "The v3 -> v4 migration lost the stored replay.",
+  );
+  assert.deepEqual(
+    upgraded.records["MAP 01"].bests["timeattack:feral"],
+    { bestLapMs: 33_400, gateSplitsMs: [4_000, 9_000, 14_000] },
+    "The v3 -> v4 migration lost a per-mode best lap or its splits.",
+  );
+  assert.deepEqual(
+    parseSave(serializeSave(upgraded), SCHEMA_VERSION),
+    upgraded,
+    "A migrated v3 save did not round-trip as v4.",
+  );
+
+  // A stored `voice: false` is a CHOICE and must survive the walk, which is the
+  // half an identity step could still get wrong if `normalizeSettings` gained
+  // its guard before the ladder gained its rung.
+  const quiet = parseSave(
+    JSON.stringify({ ...v3Payload, settings: { ...v3Payload.settings, voice: false } }),
+    SCHEMA_VERSION,
+  );
+  assert.equal(quiet.settings.voice, false, "A stored VOICE=OFF did not survive the walk.");
+  // ...and a hostile one is refused rather than coerced.
+  for (const hostile of ["false", 0, null, {}, []]) {
+    const poisoned = parseSave(
+      JSON.stringify({ ...v3Payload, settings: { ...v3Payload.settings, voice: hostile } }),
+      SCHEMA_VERSION,
+    );
+    assert.equal(
+      poisoned.settings.voice,
+      defaultSettings().voice,
+      `settings.voice accepted ${JSON.stringify(hostile)} instead of defaulting.`,
+    );
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -1561,12 +1677,13 @@ assert.match(
 }
 
 console.log(
-  `Persistence PASS: v3 round trip with per-mode ghosts and mode/tier best laps, `
-    + `v1 -> v3 and v2 -> v3 migrated field by field (the v2 ghost RELOCATED into `
+  `Persistence PASS: v4 round trip with per-mode ghosts and mode/tier best laps, `
+    + `v1 -> v4, v2 -> v4 and v3 -> v4 migrated field by field (the v2 ghost RELOCATED into `
     + `ghosts.race, not dropped), the global two-replay budget held across `
     + `${RACE_MODES.length} formats on one circuit with every lap time and split `
     + `surviving; ${hostile.length} hostile payloads `
     + `absorbed to defaults, v1 -> v2 migrated field by field with nothing lost, `
+    + `settings.voice defaulted on every rung and 5 hostile values refused, `
     + `${hostileGhosts.length} corrupt ghosts dropped while their course records survived, `
     + "ghost follows bestLapMs, write budget inside the 64 KB read ceiling, volume grid "
     + "stable across JSON, record folding correct, quota-exceeded and absent ports "

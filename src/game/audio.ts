@@ -39,6 +39,9 @@ import type {
   RivalVoiceLayers,
 } from "./audio-ambience.js";
 import { BOOST_MAX_SPEED } from "./physics.js";
+import { PitRadio, RADIO_DUCK_SECONDS } from "./pit-radio";
+import type { PitRadioDiagnostics } from "./pit-radio";
+import { resolveVoiceEnabled, voiceKilled } from "./query-probes";
 import {
   DEEP_DNB_BASS_EVENTS,
   GATE_CHIME_MIDI,
@@ -281,6 +284,28 @@ export class EngineAudio {
    * whole thing arrives on the same `await` the AudioContext already needs.
    */
   private ambienceModule: typeof import("./audio-ambience.js") | null = null;
+  /**
+   * H2b — the pit radio, and the one gain node its ambience duck needs.
+   *
+   * `ambienceBus` is a unity gain between the bed field / player air and the
+   * master bus. It exists only so the duck has something to move: `AmbienceField`
+   * owns its own bed levels and `PlayerAirField` its own air, and neither should
+   * have to know that something occasionally wants them 2 dB quieter. At unity
+   * it is transparent, so an `?voice=0` build and a pre-H2b build have
+   * bit-identical ambience paths.
+   *
+   * Null under `?voice=0`. The whole subsystem — the bus, the filters, the
+   * fetch and the control-tick poll — is never constructed in that case, which
+   * is what makes the switch a genuine kill rather than a mute. The STORED
+   * setting is a different thing and is re-read every control tick, so the
+   * VOICE row applies live like the two volume sliders rather than behind a
+   * relink; see `resolveVoiceEnabled`.
+   */
+  private radio: PitRadio | null = null;
+  private ambienceBus: GainNode | null = null;
+  /** The live music duck, so `setMusicVolume` composes with it rather than
+   * cancelling it mid-line. 1 whenever no line is playing. */
+  private radioMusicScale = 1;
 
   constructor() {
     const preparationStartedAt = performance.now();
@@ -372,10 +397,44 @@ export class EngineAudio {
     // frame loop has already published one by the time `start()` runs, which is
     // what keeps the ~60 ms of loop baking inside this one-off cost rather than
     // dropping it on the first control tick of the countdown.
-    this.playerAir = new this.ambienceModule.PlayerAirField(context, master);
-    this.ensureAmbience(context, master);
+    // H2b — everything ambient goes through one bus so the radio has a single
+    // thing to duck. See the field note; at unity this changes no level.
+    const ambienceBus = context.createGain();
+    ambienceBus.gain.value = 1;
+    ambienceBus.connect(master);
+    this.ambienceBus = ambienceBus;
+    this.playerAir = new this.ambienceModule.PlayerAirField(context, ambienceBus);
+    this.ensureAmbience(context, ambienceBus);
+    if (!voiceKilled()) {
+      this.radio = new PitRadio(context, master, this.applyRadioDuck);
+      this.radio.setEnabled(resolveVoiceEnabled());
+    }
     this.diagnosticInitializationMs = performance.now() - initializationStartedAt;
   }
+
+  /**
+   * The two ducks, applied together.
+   *
+   * The music scale multiplies the LISTENER's own music volume rather than
+   * replacing it, which is the P7 rule about the mix ceiling one level down: a
+   * driver who has pulled the music to 40 % still hears it duck by 3 dB under a
+   * radio call, and setting `musicVolume` while a line is playing composes
+   * rather than fights (`setMusicVolume` re-applies the same product).
+   */
+  private readonly applyRadioDuck = (
+    musicScale: number,
+    ambienceScale: number,
+  ): void => {
+    if (!this.context) return;
+    const now = this.context.currentTime;
+    this.radioMusicScale = musicScale;
+    this.musicBus?.gain.setTargetAtTime(
+      this.musicVolume * musicScale,
+      now,
+      RADIO_DUCK_SECONDS,
+    );
+    this.ambienceBus?.gain.setTargetAtTime(ambienceScale, now, RADIO_DUCK_SECONDS);
+  };
 
   /**
    * Builds (or rebuilds) the bed field for whatever map the cue names. Cheap
@@ -491,7 +550,11 @@ export class EngineAudio {
     this.updateRivals(now, racing);
     // A1. Same tick, same clock: the beds, the player's air and the pass-by
     // whoosh all move on the 30 Hz control update rather than adding a timer.
-    if (this.master) this.ensureAmbience(this.context, this.master);
+    if (this.ambienceBus) this.ensureAmbience(this.context, this.ambienceBus);
+    // H2b — the radio drains its queue on the same tick, after the beds, so a
+    // line and the duck it causes are scheduled against one `now`.
+    this.radio?.setEnabled(resolveVoiceEnabled());
+    this.radio?.tick(now);
     // The beds follow the zone IMMEDIATELY; only the convolver waits for a bar.
     // `bedZone` is recorded separately from `reverbZone` for that reason — they
     // legitimately disagree for up to one bar at every boundary.
@@ -561,6 +624,24 @@ export class EngineAudio {
     }
   }
 
+  /**
+   * H2b — the seven radio lines that hang off an existing cue, and why they
+   * hang off it rather than off a new call in the race loop.
+   *
+   * Each of `playGate`, `playMissedGate`, `playCountdown`, `playSlipstreamLock`,
+   * `playNearMiss`, `playFinalLap` and `playClassification` is ALREADY called
+   * at exactly the edge its line describes, from a race loop that sits on its
+   * seam budget with no headroom. A `this.radio?.cue(...)` beside the tone is
+   * therefore both the cheapest wiring available and the most honest one: the
+   * chime and the words are the same event by construction and cannot come
+   * apart in a later edit the way two separate call sites would.
+   *
+   * The other ten lines are edges the tones do not mark. Five are read off the
+   * HUD frame (`pit-radio.ts`), three off the track-event arm serial, and
+   * `position_gained` / `position_lost` deliberately do NOT hang off
+   * `playPositionChange`, because a position has to HOLD for 1.5 s before it is
+   * worth saying and the tone fires on the instant.
+   */
   playGate(index: number): void {
     const noteIndex = ((index - 1) % GATE_CHIME_MIDI.length
       + GATE_CHIME_MIDI.length) % GATE_CHIME_MIDI.length;
@@ -568,15 +649,18 @@ export class EngineAudio {
     const frequency = frequencyForMidiNote(note);
     this.playTone(frequency, 0.11, 0.038, "square", 0, 1.02);
     this.playTone(frequency * 1.5, 0.15, 0.022, "sine", 0.045, 1.01);
+    this.radio?.cue("gate_clear");
   }
 
   playMissedGate(): void {
     this.playTone(150, 0.2, 0.038, "square", 0, 0.58);
     this.playTone(94, 0.26, 0.03, "sawtooth", 0.08, 0.72);
+    this.radio?.cue("gate_missed");
   }
 
   playCountdown(go: boolean): void {
     this.playTone(go ? 520 : 260, go ? 0.16 : 0.09, go ? 0.045 : 0.028, "square");
+    if (go) this.radio?.cue("lights_out");
   }
 
   playBoost(): void {
@@ -594,6 +678,7 @@ export class EngineAudio {
   playSlipstreamLock(): void {
     this.playTone(228, 0.17, 0.018, "sine", 0, 1.42);
     this.playTone(342, 0.22, 0.013, "triangle", 0.05, 1.34);
+    this.radio?.cue("slipstream_locked");
   }
 
   /**
@@ -606,6 +691,7 @@ export class EngineAudio {
   playNearMiss(): void {
     this.playTone(630, 0.1, 0.02, "square", 0, 0.82);
     this.playTone(945, 0.16, 0.012, "sine", 0.045, 0.9);
+    this.radio?.cue("near_miss");
   }
 
   /**
@@ -669,6 +755,7 @@ export class EngineAudio {
       1.01,
     );
     this.diagnosticRaceEventCues += 1;
+    this.radio?.cue("final_lap");
   }
 
   playClassification(): void {
@@ -689,6 +776,7 @@ export class EngineAudio {
       1.01,
     );
     this.diagnosticRaceEventCues += 1;
+    this.radio?.cue("classification_locked");
   }
 
   playRecovery(): void {
@@ -716,8 +804,10 @@ export class EngineAudio {
   setMusicVolume(volume: number): void {
     this.musicVolume = clampVolume(volume, this.musicVolume);
     if (!this.context || !this.musicBus) return;
+    // H2b — the product, not the setting. Moving the slider while a radio line
+    // is playing would otherwise undo the duck for the rest of the sentence.
     this.musicBus.gain.setTargetAtTime(
-      this.musicVolume,
+      this.musicVolume * this.radioMusicScale,
       this.context.currentTime,
       0.045,
     );
@@ -739,6 +829,7 @@ export class EngineAudio {
     this.diagnosticSkippedOneShots = 0;
     this.diagnosticRaceEventCues = 0;
     this.diagnosticReverbTransitions = 0;
+    this.radio?.resetDiagnostics();
   }
 
   diagnostics(): {
@@ -785,6 +876,7 @@ export class EngineAudio {
         upX: number; upY: number; upZ: number;
       };
     };
+    pitRadio: PitRadioDiagnostics;
   } {
     const elapsed = this.context
       ? Math.max(0, this.context.currentTime - this.diagnosticControlStartedAt)
@@ -846,6 +938,11 @@ export class EngineAudio {
         panners: this.pannerReadouts.map((readout) => ({ ...readout })),
         listenerPose: { ...this.listenerPose },
       },
+      // H2b. Reported even with the voice off, so a soak line can tell "the
+      // driver turned it off" (loaded 0, linesPlayed 0) from "it is on and
+      // nothing fired" (loaded 17, linesPlayed 0), which are different bugs.
+      pitRadio: this.radio?.diagnostics()
+        ?? { linesPlayed: 0, linesDropped: 0, lastLine: "", queueDepth: 0, loaded: 0 },
     };
   }
 
@@ -874,6 +971,11 @@ export class EngineAudio {
     this.ambience = null;
     this.playerAir?.dispose();
     this.playerAir = null;
+    this.radio?.dispose();
+    this.radio = null;
+    this.ambienceBus?.disconnect();
+    this.ambienceBus = null;
+    this.radioMusicScale = 1;
     this.hasPreviousListener = false;
     this.previousSpatialTime = 0;
     this.listenerVelocity.set(0, 0, 0);

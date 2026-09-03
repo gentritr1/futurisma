@@ -7,6 +7,7 @@ import {
   resolveRaceStage,
 } from "./hud-presentation.js";
 import { DRIFT_REWARD_MINIMUM_CHARGE, SLIPSTREAM_LOCK_THRESHOLD } from "./physics";
+import { publishRadioFrame } from "./pit-radio";
 import { resolveReducedMotion } from "./query-probes";
 import {
   RACE_MODE_LABELS,
@@ -612,6 +613,12 @@ export class GameUi {
   }
 
   update(frame: HudFrame): void {
+    // H2b — the pit radio reads the HUD's own frame, which is what makes
+    // PRODUCT.md's "never communicate critical state by audio alone" a
+    // structural property rather than a review note: the voice physically
+    // cannot say something this object is not already showing. One line here
+    // and zero in `game.ts`, which sits on its seam budget; see `pit-radio.ts`.
+    publishRadioFrame(frame);
     if (
       this.lapEvent.dataset.active === "true"
       && performance.now() >= this.lapEventUntil

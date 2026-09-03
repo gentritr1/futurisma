@@ -15,3 +15,5 @@ artifacts/**
 .claude/worktrees/
 shots/
 assets-in/
+# Python bytecode from the tracked preparation scripts.
+__pycache__/
