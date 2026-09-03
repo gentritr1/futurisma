@@ -95,41 +95,22 @@ export const CENSUS_ALLOWED_MESHES = Object.freeze([
 ]);
 
 /**
- * Solid geometry that is STILL standing in the drivable corridor, one row per
- * object, with the measured depth and the reason it survived.
+ * Solid geometry still standing in the drivable corridor, one row per object.
  *
- * Round 2 emptied Greenwater. The five environment-GLB rows closed without
- * touching the frozen asset, by giving the trackside barrier family its own
- * derivation floor (`BARRIER_CLASS_MESHES` in `corridor-sweep.ts`). One row is
- * left, on Bitterpan, and it is not an object at all.
+ * EMPTY, and `scripts/validate-corridor.mjs` asserts it stays that way in both
+ * directions: an intrusion that is not a collidable hazard fails the build, and
+ * a row here that no longer intrudes fails it too. The P21 brief asked for the
+ * P12 exception table to be re-pinned to EMPTY and for this one never to grow
+ * into its replacement; three rounds later there is nothing in it.
  *
- * `scripts/validate-corridor.mjs` asserts the census is exactly the allowed
- * hazards plus exactly these rows, in both directions, so a new intrusion fails
- * the build and a row that stops intruding must be deleted.
+ * Round 1 closed the boards and gate posts (they were never in the corridor -
+ * the derived limits already excluded them). Round 2 closed five Greenwater
+ * environment-GLB rows with a mesh-class derivation floor. Round 3 closed the
+ * last one, Bitterpan's pan floor, which was never an object at all: the pan
+ * plane was drawn OVER the ribbon, and `pan-floor-relief.js` now carves it down
+ * under the stations where the road dips below the datum.
  */
-export const CENSUS_PINNED_RESIDUALS = Object.freeze({
-  "bitterpan_surface_layer|BP_PAN_FLOOR":
-    "NOT an object in the corridor — it is the pan plane drawn OVER the ribbon, "
-    + "and the census row is one symptom of a larger defect this instrument "
-    + "found. `GROUND_Y_METRES` is a flat -1.95 m, chosen (its own comment says "
-    + "so) as 0.078 m below the ribbon's CENTRELINE low point of -1.872 m. The "
-    + "ribbon banks 2.5 deg, so its lowest DRAWN surface is not the centreline: "
-    + "the deck edge reaches -2.4916 m and the C-edge run-off lip -2.7446 m, "
-    + "both at s=1100. Recomputed from CENTRELINE_STATIONS.json the correct "
-    + "value under the author's own rule is -2.8226 m. The consequence, measured "
-    + "over all 610 stations: on 53 of 1,220 station-sides the pan plane is "
-    + "drawn over part of the RACING SURFACE, up to 12.26 m of a 14 m half-width "
-    + "at s=1100, and over deck-or-run-off on 75. Screenshots at (1100, -3) and "
-    + "(1076, -8) show the craft sitting on salt three metres from the "
-    + "centreline with the road's left half gone. NOT FIXED HERE: "
-    + "`GROUND_Y_METRES` also anchors the 705-prop mid-ground layer and the "
-    + "254-strip road-edge band's 0.35 m lip threshold, both with pinned "
-    + "tables, so moving it is a map-wide art change and not something to slip "
-    + "into a corridor commit. `assertPanPlaneOverlapNoWorse` in "
-    + "scripts/validate-corridor.mjs pins the defect at its measured size so it "
-    + "cannot quietly grow while it waits for that decision.",
-});
-export const CENSUS_MAPS = Object.freeze([
+export const CENSUS_PINNED_RESIDUALS = Object.freeze({});export const CENSUS_MAPS = Object.freeze([
   { map: "greenwater", query: "" },
   { map: "bitterpan", query: "&map=bitterpan" },
 ]);
@@ -327,6 +308,17 @@ export function baselineOf(map, report) {
     meshesSwept: report.corridorSweepMeshes,
     verticesSwept: report.corridorSweepVertices,
     groups: (report.corridorIntrusionList ?? []).length,
+    // P21.3 - the pan-plane fix, measured on the geometry that was built.
+    // Bitterpan only; `null` on Greenwater, which has no pan floor.
+    panFloor: report.panFloor?.segments
+      ? {
+        fix: report.panFloor.fix,
+        coveredSides: report.panFloor.coveredSides,
+        coveredWorstMetres: report.panFloor.coveredWorstMetres,
+        reliefVertices: report.panFloor.reliefVertices,
+        reliefMaxDropMetres: report.panFloor.reliefMaxDropMetres,
+      }
+      : null,
     bands: {
       obstacle: report.corridorIntrusions,
       flush: report.corridorFlush,

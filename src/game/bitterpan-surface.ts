@@ -43,6 +43,8 @@ import {
   PAN_FLOOR_WIND_VECTOR,
   generatePanFloorColours,
 } from "./pan-floor-colour.js";
+import { panFloorDropAt, prepareReliefNodes } from "./pan-floor-relief.js";
+import { searchParam } from "./query-probes";
 import { activeRenderMode } from "./render-mode.js";
 import { applyPs2MaterialTreatment, composeShaderInjection } from "./totem";
 
@@ -115,6 +117,47 @@ const DECAL_LIFT_METRES = 0.012;
  * running on a raised shelf over the pan.
  */
 export const GROUND_Y_METRES = -1.95;
+
+/**
+ * P21.3 — where the ribbon's lowest DRAWN surface actually is, and the plane
+ * height that would clear it globally.
+ *
+ * Recomputed from `map02/CENTRELINE_STATIONS.json`, which is also where the
+ * -2.4916 m quoted above comes from: the deck edge at s=1100, once the
+ * 2.5-degree bank is applied to a 27.9 m width. One step further out is the
+ * C-edge run-off lip at -2.7446 m, and the author's own 0.078 m margin under
+ * THAT is -2.8226 m.
+ *
+ * Design A of this phase moved `GROUND_Y_METRES` here. Design B left the datum
+ * alone and depressed the grid locally instead. Both were built and looked at;
+ * see the P21.3 report and `?panfix=`.
+ */
+export const GROUND_Y_GLOBAL_CLEARING_METRES = -2.823;
+
+/**
+ * P21.3 review switch, `?panfix=off|a|b`.
+ *
+ *  - `off` - the pre-P21.3 floor, for before/after crops. A flat plane drawn
+ *    over the road on 53 station-sides.
+ *  - `a` - GLOBAL: the whole plane drops to `GROUND_Y_GLOBAL_CLEARING_METRES`.
+ *    PREVIEW ONLY under this flag: the mid-ground props and the road-edge band's
+ *    lip threshold are baked against `GROUND_Y_METRES` and are NOT re-derived
+ *    here, so judge the ground, not the dressing on it. Shipping A means moving
+ *    the constant and regenerating both.
+ *  - `b` - LOCAL: the datum stays and the grid is pulled down under the stations
+ *    whose ribbon dips below it. See `pan-floor-relief.js`.
+ *
+ * Read fresh, never memoized, and nothing but the floor geometry reads it.
+ */
+export type PanFixMode = "off" | "a" | "b";
+
+/** The design that ships. `?panfix=` overrides it for review. */
+export const PAN_FIX_SHIPPED: PanFixMode = "b";
+
+export function activePanFix(): PanFixMode {
+  const raw = searchParam("panfix");
+  return raw === "off" || raw === "a" || raw === "b" ? raw : PAN_FIX_SHIPPED;
+}
 
 /**
  * Half-extent of the pan floor, in metres, and where it is centred.
@@ -205,6 +248,21 @@ export interface BitterpanSurfaceStats {
     /** Mean brine-flat weight over the plane: 0 means no pool will ever be
      *  drawn, which is the one silent failure this layer can have. */
     brineWeightMean: number;
+    /**
+     * P21.3 - which pan-plane fix is live, and whether it worked.
+     *
+     * `coveredSides` is the count that must be zero: station-sides where the
+     * built floor is still drawn ABOVE the lowest drawn ribbon surface, sampled
+     * bilinearly off the grid rather than off the function that displaced it.
+     * `scripts/validate-corridor.mjs` asserts it from the census baseline, and
+     * nothing else in the game moves if the relief silently stops running -
+     * the floor is not interactive, so this is the only automated evidence.
+     */
+    fix: PanFixMode;
+    coveredSides: number;
+    coveredWorstMetres: number;
+    reliefVertices: number;
+    reliefMaxDropMetres: number;
     /** True only under `?floorprobe=1`, the review-only view. */
     probe: boolean;
   };
@@ -395,6 +453,11 @@ export class BitterpanSurface {
         windDegrees: PAN_FLOOR_WIND_DEGREES,
         streakBands: PAN_FLOOR_STREAK_BANDS.length + 1,
         brineWeightMean: panFloor.colours.brineWeightMean,
+        fix: activePanFix(),
+        coveredSides: panFloor.coverage.coveredSides,
+        coveredWorstMetres: panFloor.coverage.worstMetres,
+        reliefVertices: panFloor.reliefVertices,
+        reliefMaxDropMetres: Number(panFloor.reliefMaxDropMetres.toFixed(4)),
         probe: probeMode !== 0,
       },
     });
@@ -682,9 +745,66 @@ ${brineProbe}
  * the crust tile twice more at macro scales. 32,768 triangles is the whole cost;
  * they are static, in one buffer, and never re-uploaded.
  */
+/**
+ * How many station-sides the pan plane is still drawn over, and by how much.
+ *
+ * Samples the built grid bilinearly at four points per station - both deck edges
+ * and both run-off lips - because those are the extremes of the drawn
+ * cross-section and the bank makes the outer ones the low ones.
+ */
+function measurePanCoverage(
+  geometry: THREE.BufferGeometry,
+  ribbon: ReturnType<typeof buildPanRibbon>,
+  panFix: PanFixMode,
+): { coveredSides: number; worstMetres: number } {
+  const position = geometry.getAttribute("position") as THREE.BufferAttribute;
+  const step = GROUND_SIZE_METRES / PAN_FLOOR_SEGMENTS;
+  const origin = -GROUND_SIZE_METRES / 2;
+  const planeY = panFix === "a" ? GROUND_Y_GLOBAL_CLEARING_METRES : GROUND_Y_METRES;
+  // World Y of the displaced surface under one world point.
+  const surfaceAt = (worldX: number, worldZ: number): number => {
+    const localX = worldX - GROUND_CENTRE_X_METRES;
+    const localY = GROUND_CENTRE_Z_METRES - worldZ;
+    const cx = (localX - origin) / step;
+    const cy = (localY - origin) / step;
+    const ix = Math.min(PAN_FLOOR_SEGMENTS - 1, Math.max(0, Math.floor(cx)));
+    const iy = Math.min(PAN_FLOOR_SEGMENTS - 1, Math.max(0, Math.floor(cy)));
+    const fx = Math.min(1, Math.max(0, cx - ix));
+    const fy = Math.min(1, Math.max(0, cy - iy));
+    // PlaneGeometry rows run from +localY down, so row 0 is the LAST grid line.
+    const row = PAN_FLOOR_SEGMENTS - iy;
+    const at = (r: number, c: number): number => position.getZ(
+      Math.min(PAN_FLOOR_SEGMENTS, Math.max(0, r)) * (PAN_FLOOR_SEGMENTS + 1)
+      + Math.min(PAN_FLOOR_SEGMENTS, Math.max(0, c)),
+    );
+    const top = at(row, ix) * (1 - fx) + at(row, ix + 1) * fx;
+    const bottom = at(row - 1, ix) * (1 - fx) + at(row - 1, ix + 1) * fx;
+    return planeY + (top * (1 - fy) + bottom * fy);
+  };
+  let coveredSides = 0;
+  let worstMetres = 0;
+  for (const node of ribbon) {
+    for (const side of [-1, 1] as const) {
+      // The lowest drawn point on this side, and where it stands in world XZ.
+      const lateral = side * node.drawnHalfExtent;
+      const worldX = node.x + node.rightX * lateral;
+      const worldZ = node.z + node.rightZ * lateral;
+      const over = surfaceAt(worldX, worldZ) - node.lowestDrawnY;
+      if (over > 0) {
+        coveredSides += 1;
+        worstMetres = Math.max(worstMetres, over);
+      }
+    }
+  }
+  return { coveredSides, worstMetres: Number(worstMetres.toFixed(4)) };
+}
+
 function buildPanFloor(course: RaceCourse, texture: THREE.Texture, probeMode: PanFloorProbeMode): {
   mesh: THREE.Mesh;
   colours: ReturnType<typeof generatePanFloorColours>;
+  coverage: { coveredSides: number; worstMetres: number };
+  reliefVertices: number;
+  reliefMaxDropMetres: number;
 } {
   const geometry = new THREE.PlaneGeometry(
     GROUND_SIZE_METRES,
@@ -692,6 +812,43 @@ function buildPanFloor(course: RaceCourse, texture: THREE.Texture, probeMode: Pa
     PAN_FLOOR_SEGMENTS,
     PAN_FLOOR_SEGMENTS,
   );
+  const panFix = activePanFix();
+  const ribbon = buildPanRibbon(course);
+  const relief = prepareReliefNodes(ribbon, course.length / ribbon.length);
+  // P21.3 design B - pull the grid down under the stations whose ribbon dips
+  // below the datum. `PlaneGeometry` lies in local XY and the mesh is rotated
+  // -90 degrees about X, so world Y comes from the LOCAL Z attribute and world
+  // Z from -localY; the colour generator walks the same mapping a few lines
+  // down, and both are wrong together or right together.
+  let reliefVertices = 0;
+  let reliefMaxDropMetres = 0;
+  if (panFix === "b") {
+    const position = geometry.getAttribute("position") as THREE.BufferAttribute;
+    for (let index = 0; index < position.count; index += 1) {
+      const worldX = GROUND_CENTRE_X_METRES + position.getX(index);
+      const worldZ = GROUND_CENTRE_Z_METRES - position.getY(index);
+      const drop = panFloorDropAt(relief, worldX, worldZ, GROUND_Y_METRES);
+      if (drop <= 0) continue;
+      position.setZ(index, -drop);
+      reliefVertices += 1;
+      reliefMaxDropMetres = Math.max(reliefMaxDropMetres, drop);
+    }
+    position.needsUpdate = true;
+    // The plane ships with a flat normal per vertex; a 0.87 m dip over 47 m is
+    // a 1-degree slope, but Lambert shading reads it, so the normals follow.
+    geometry.computeVertexNormals();
+  }
+  // P21.3 - measure the thing the fix is for, on the geometry that was actually
+  // built, not on the function that built it.
+  //
+  // The displaced plane is the BILINEAR INTERPOLATION of a 47.25 m grid, and the
+  // continuous drop function is not that surface. So the check samples the grid
+  // the way the GPU will: for every station, at both deck edges and both run-off
+  // lips, interpolate the four surrounding vertices and compare against the
+  // drawn ribbon surface at that same point. `panCoveredSides` is the count that
+  // has to be zero, and `scripts/validate-corridor.mjs` asserts it off the
+  // committed census baseline.
+  const panCoverage = measurePanCoverage(geometry, ribbon, panFix);
   // `?floorprobe=2` — the controlled baseline. Everything this phase adds is
   // skipped and the floor renders as the flat Lambert quad it was before it,
   // in the SAME binary as the treated build. See `panFloorProbeMode`.
@@ -703,7 +860,7 @@ function buildPanFloor(course: RaceCourse, texture: THREE.Texture, probeMode: Pa
     centreZMetres: GROUND_CENTRE_Z_METRES,
     seed: PAN_FLOOR_MACRO_SEED,
     lapLengthMetres: course.length,
-    ribbon: buildPanRibbon(course),
+    ribbon,
   });
   if (!bypass) {
     geometry.setAttribute("color", new THREE.BufferAttribute(colours.colors, 3));
@@ -722,7 +879,11 @@ function buildPanFloor(course: RaceCourse, texture: THREE.Texture, probeMode: Pa
   const mesh = new THREE.Mesh(geometry, material);
   mesh.name = GROUND_MESH_NAME;
   mesh.rotation.x = -Math.PI / 2;
-  mesh.position.set(GROUND_CENTRE_X_METRES, GROUND_Y_METRES, GROUND_CENTRE_Z_METRES);
+  mesh.position.set(
+    GROUND_CENTRE_X_METRES,
+    panFix === "a" ? GROUND_Y_GLOBAL_CLEARING_METRES : GROUND_Y_METRES,
+    GROUND_CENTRE_Z_METRES,
+  );
   mesh.castShadow = false;
   // P20.1 owns this line: the pan floor is where the craft's contact shadow
   // lands, and subdividing the plane does not change that.
@@ -750,7 +911,7 @@ function buildPanFloor(course: RaceCourse, texture: THREE.Texture, probeMode: Pa
       injectPanFloorMacro(shader, probeMode);
     });
   }
-  return { mesh, colours };
+  return { mesh, colours, coverage: panCoverage, reliefVertices, reliefMaxDropMetres };
 }
 
 /**
@@ -767,6 +928,18 @@ function buildPanRibbon(course: RaceCourse): Array<{
   rightZ: number;
   distance: number;
   curvature: number;
+  /**
+   * P21.3 - world Y of the LOWEST surface actually drawn at this station.
+   *
+   * Four candidates per station, not one: both deck edges and both run-off
+   * lips, each taken through the sample's OWN `right` and `up` vectors rather
+   * than through a sin(bank) of our own. That is the whole point - the number
+   * this replaces was computed against the centreline, and the centreline is
+   * the one point on a banked cross-section that is never the lowest.
+   */
+  lowestDrawnY: number;
+  /** Half-width plus the wider of the two run-offs, metres. */
+  drawnHalfExtent: number;
 }> {
   const scratch = course.createSampleScratch();
   const count = Math.max(2, Math.round(course.length / 5));
@@ -774,6 +947,18 @@ function buildPanRibbon(course: RaceCourse): Array<{
   for (let index = 0; index < count; index += 1) {
     const distance = (index * course.length) / count;
     const sample = course.sample(distance / course.length, scratch);
+    // Deck edge and run-off lip, both sides, in the sample's own frame.
+    let lowestDrawnY = sample.position.y;
+    for (const side of [-1, 1] as const) {
+      const apron = side < 0 ? sample.apronLeft : sample.apronRight;
+      for (const lateral of [side * sample.halfWidth, side * (sample.halfWidth + apron)]) {
+        const rise = surfaceHeightAtLateral(sample, lateral);
+        lowestDrawnY = Math.min(
+          lowestDrawnY,
+          sample.position.y + sample.right.y * lateral + sample.up.y * rise,
+        );
+      }
+    }
     nodes.push({
       x: sample.position.x,
       z: sample.position.z,
@@ -781,6 +966,8 @@ function buildPanRibbon(course: RaceCourse): Array<{
       rightZ: sample.right.z,
       distance,
       curvature: sample.curvature,
+      lowestDrawnY,
+      drawnHalfExtent: sample.halfWidth + Math.max(sample.apronLeft, sample.apronRight),
     });
   }
   return nodes;
