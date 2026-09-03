@@ -280,6 +280,15 @@ assert.ok(
 // The ceiling goes 257 -> 262 on the coherence argument A1 and G4 both used: at
 // the JS ceiling of 251 the shell is already ~261, so a tighter shell ceiling
 // would fail builds the JS ceiling explicitly allows.
+// H1 r2 merge 2026-09-03: shell measured 257.3 KiB on that branch (camera guards,
+// plaque re-derivation, pose diagnostics); ceiling 258 with the merged measurement.
+// H1 r2 + H2b merge: re-measured together rather than either branch's number
+// taken, the rule this file has applied at every merge since G3 + G4. H1 r2 set
+// 258 from a measured 257.3 and H2b set 262 from a measured 259.2; neither had
+// seen the other. MEASURED on the merged tree: 250.3 KiB gzip JS / 260.3 KiB
+// shell, so 252 and 262 both stand with about 1.7 KiB of room each — which is
+// the working margin H2a's note above argues main needs and is why neither
+// number moves again here.
 assert.ok(
   shellGzip <= 262 * 1024,
   `Initial app shell exceeds 262 KiB gzip (${(shellGzip / 1024).toFixed(1)} KiB).`,

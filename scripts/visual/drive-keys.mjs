@@ -22,7 +22,7 @@ for (let attempt = 0; attempt < 40; attempt += 1) {
   await page.waitForTimeout(500);
 }
 await page.keyboard.down("KeyW");
-const read = () => page.evaluate(() => { try { const c = JSON.parse(document.getElementById("futurisma-diagnostics")?.textContent || "{}").current || {}; return { d: c.distanceMeters, lat: c.lateralMeters, v: c.speedKph, sector: c.sector, phase: c.phase, apron: c.onApron, grip: c.surfaceGrip, hull: c.hullClearanceMeters, hullMin: c.minimumHullClearanceMeters, hullMax: c.maximumHullClearanceMeters, hover: c.hoverHeightMeters }; } catch { return null; } });
+const read = () => page.evaluate(() => { try { const c = JSON.parse(document.getElementById("futurisma-diagnostics")?.textContent || "{}").current || {}; return { d: c.distanceMeters, lat: c.lateralMeters, v: c.speedKph, sector: c.sector, phase: c.phase, apron: c.onApron, grip: c.surfaceGrip, hull: c.hullClearanceMeters, hullMin: c.minimumHullClearanceMeters, hullMax: c.maximumHullClearanceMeters, hover: c.hoverHeightMeters, ndcX: c.hullNdcX, ndc: c.hullNdcY, camLat: c.cameraLateralMeters, ndcMin: c.minimumHullNdcY, ndcMax: c.maximumHullNdcY, camClear: c.cameraSurfaceClearanceMeters, camClearMin: c.minimumCameraSurfaceClearanceMeters, chase: c.chaseMeters, chaseMin: c.minimumChaseMeters, wantChase: c.desiredChaseMeters }; } catch { return null; } });
 // H1: Bitterpan's grid sits at progress ~1, so `distanceMeters` reads 3050 on
 // the first frames and both the steer trigger and the `d > shotTo` break fired
 // before the craft had moved. Arm only once the lap counter has come round.

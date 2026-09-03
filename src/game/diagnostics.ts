@@ -68,6 +68,23 @@ export interface DiagnosticsCore {
   minimumHullClearance: number;
   maximumHullClearance: number;
   hoverHeight: number;
+  /**
+   * H1.2 — the chase camera. `hullNdcY` is where the craft lands on screen
+   * (-1 is the bottom edge); `cameraSurfaceClearance` is the camera's height
+   * above the drawn surface at ITS OWN lateral; `chaseMeters` is how far
+   * behind the hull it actually sits against the `desiredChaseMeters` the
+   * offsets ask for.
+   */
+  cameraSurfaceClearance: number;
+  minimumCameraSurfaceClearance: number;
+  chaseMeters: number;
+  minimumChaseMeters: number;
+  desiredChaseMeters: number;
+  cameraLateral: number;
+  hullNdcX: number;
+  hullNdcY: number;
+  minimumHullNdcY: number;
+  maximumHullNdcY: number;
   edgeSeconds: number;
   wrongWaySeconds: number;
   wrongWayEntries: number;
@@ -474,6 +491,26 @@ export function buildDiagnosticsReport(
       ? Number(core.maximumHullClearance.toFixed(3))
       : null,
     hoverHeightMeters: Number(core.hoverHeight.toFixed(3)),
+    cameraSurfaceClearanceMeters: Number(core.cameraSurfaceClearance.toFixed(3)),
+    minimumCameraSurfaceClearanceMeters: Number.isFinite(
+      core.minimumCameraSurfaceClearance,
+    )
+      ? Number(core.minimumCameraSurfaceClearance.toFixed(3))
+      : null,
+    chaseMeters: Number(core.chaseMeters.toFixed(2)),
+    minimumChaseMeters: Number.isFinite(core.minimumChaseMeters)
+      ? Number(core.minimumChaseMeters.toFixed(2))
+      : null,
+    desiredChaseMeters: Number(core.desiredChaseMeters.toFixed(2)),
+    cameraLateralMeters: Number(core.cameraLateral.toFixed(2)),
+    hullNdcX: Number(core.hullNdcX.toFixed(3)),
+    hullNdcY: Number(core.hullNdcY.toFixed(3)),
+    minimumHullNdcY: Number.isFinite(core.minimumHullNdcY)
+      ? Number(core.minimumHullNdcY.toFixed(3))
+      : null,
+    maximumHullNdcY: Number.isFinite(core.maximumHullNdcY)
+      ? Number(core.maximumHullNdcY.toFixed(3))
+      : null,
     edgeSeconds: Number(core.edgeSeconds.toFixed(2)),
     wrongWaySeconds: Number(core.wrongWaySeconds.toFixed(2)),
     wrongWayEntries: core.wrongWayEntries,
