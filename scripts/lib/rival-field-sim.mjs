@@ -12,23 +12,28 @@
 import {
   RIVAL_DEFENCE_LOOKAHEAD_METERS,
   RIVAL_FIXED_STEP_SECONDS,
+  RIVAL_EVASIVE_LATERAL_GAIN,
+  RIVAL_GRID_HOLD_METERS,
   RIVAL_LANE_CLEARANCE_METERS,
   RIVAL_LANE_CONTEST_GAP_METERS,
   RIVAL_FREE_DECK_FRACTION,
   RIVAL_NO_BLOCK_MARGIN_FRACTION,
   RIVAL_NO_BLOCK_WINDOW_METERS,
   RIVAL_PAD_APPROACH_METERS,
+  RIVAL_PLAYER_AVOID_GAP_METERS,
   RIVAL_PROFILES,
   VEHICLE_CLEARANCE_METERS,
   createRivalState,
   isInsideBoostWindow,
   freeDeckTargetFraction,
   measureFreeDeckFraction,
+  playerRaceDistanceOffsetMeters,
   rivalContestLaneMeters,
   rivalCourseSpeedFactor,
   rivalPaceLaneMeters,
   rivalPoseSignals,
   resolveRivalPace,
+  spreadGridLaterals,
   stepRivalField,
 } from "../../src/game/rival-race.js";
 
@@ -70,19 +75,47 @@ export function simulateRivalField(options) {
     ? pace.driftCurvature
     : Infinity;
 
-  const states = profiles.map((profile) => {
+  // The same one-off grid fan `RivalFleet.reset` applies, from the same helper.
+  const gridSample = course.sample(course.startProgress);
+  const gridLaterals = spreadGridLaterals(
+    course.startLateral,
+    profiles.map((profile) => (
+      course.gridStart(profile.name)?.lateralMeters ?? profile.startingLateralMeters
+    )),
+    Math.max(0, gridSample.halfWidth - VEHICLE_CLEARANCE_METERS),
+  );
+  const states = profiles.map((profile, index) => {
     const state = createRivalState(profile.id, course.length, totalLaps);
     const grid = course.gridStart(profile.name);
     if (grid) {
       state.raceDistanceMeters = grid.raceDistanceMeters;
       state.courseDistanceMeters = grid.raceDistanceMeters;
-      state.lateralMeters = grid.lateralMeters;
-      state.paceLateralMeters = grid.lateralMeters;
       state.lastSafeDistanceMeters = grid.raceDistanceMeters;
-      state.lastSafeLateralMeters = grid.lateralMeters;
     }
+    state.lateralMeters = gridLaterals[index];
+    state.paceLateralMeters = gridLaterals[index];
+    state.lastSafeLateralMeters = gridLaterals[index];
     return state;
   });
+  const gridSlots = states.map((state) => state.lateralMeters);
+  let maximumGridDriftMeters = 0;
+
+  // The player's distance arrives measured from the start line and a rival's is
+  // measured from station zero; `RivalFleet.step` converts once on the way in
+  // and so does this. One scratch object, so a five-lap run still allocates
+  // nothing per sub-step.
+  const playerDistanceOffset = playerRaceDistanceOffsetMeters(
+    course.startProgress,
+    course.length,
+  );
+  const playerScratch = { raceDistanceMeters: 0, lateralMeters: 0 };
+  const readPlayer = (seconds) => {
+    if (!player) return null;
+    const raw = player(seconds);
+    playerScratch.raceDistanceMeters = raw.raceDistanceMeters + playerDistanceOffset;
+    playerScratch.lateralMeters = raw.lateralMeters;
+    return playerScratch;
+  };
 
   let elapsedSeconds = 0;
   let remainderSeconds = 0;
@@ -124,7 +157,6 @@ export function simulateRivalField(options) {
       laneHalfWidthMeters,
       padLaneMeters,
       padUse: entry.padUse,
-      startSpreadSideSign: noBlockSide,
     });
     const neighbourLaterals = [];
     if (contest) {
@@ -136,7 +168,7 @@ export function simulateRivalField(options) {
         ) neighbourLaterals.push(other.lateralMeters);
       }
     }
-    const playerState = player ? player(elapsedSeconds) : null;
+    const playerState = readPlayer(elapsedSeconds);
     const playerGapMeters = playerState
       ? state.raceDistanceMeters - playerState.raceDistanceMeters
       : Infinity;
@@ -176,11 +208,26 @@ export function simulateRivalField(options) {
         ),
       curvatureMagnitude: Math.abs(sample.curvature),
       driftCurvature,
+      lateralSpeedScale: playerState
+        && Math.abs(playerGapMeters) <= RIVAL_PLAYER_AVOID_GAP_METERS
+        && Math.abs(state.lateralMeters - playerState.lateralMeters)
+          < RIVAL_LANE_CLEARANCE_METERS
+        ? RIVAL_EVASIVE_LATERAL_GAIN
+        : 1,
     });
   };
 
   const onSubStep = (field) => {
-    const playerState = player ? player(elapsedSeconds) : null;
+    // The grid hold, measured rather than trusted: no rival may have moved a
+    // millimetre off the slot it was given before RIVAL_GRID_HOLD_METERS.
+    for (let index = 0; index < field.length; index += 1) {
+      if (field[index].raceDistanceMeters > RIVAL_GRID_HOLD_METERS) continue;
+      maximumGridDriftMeters = Math.max(
+        maximumGridDriftMeters,
+        Math.abs(field[index].lateralMeters - gridSlots[index]),
+      );
+    }
+    const playerState = readPlayer(elapsedSeconds);
     freeDeckScratch.length = 0;
     // A free-deck sample is CONCLUSIVE only when the player is on the free side
     // of the yield corridor. A player that has driven into the rivals' band has
@@ -303,6 +350,8 @@ export function simulateRivalField(options) {
 
   return {
     states,
+    gridSlots,
+    maximumGridDriftMeters,
     minimumSeparationMeters,
     minimumRivalSeparationMeters,
     worstRivalPair,
@@ -336,7 +385,12 @@ export function simulateRivalField(options) {
  * @param {number} [paceScale] >1 makes the player slower than the measurement,
  *   which is how the field is made to stream past it for the no-block rule.
  */
-export function measuredPacePlayer(courseLengthMeters, lapSeconds, paceScale = 1) {
+export function measuredPacePlayer(
+  courseLengthMeters,
+  lapSeconds,
+  gridLateralMeters = 0,
+  paceScale = 1,
+) {
   const RAMP_SECONDS = 3.4;
   const speed = courseLengthMeters / (lapSeconds * paceScale);
   const rampDistance = speed * RAMP_SECONDS / 2;
@@ -347,10 +401,20 @@ export function measuredPacePlayer(courseLengthMeters, lapSeconds, paceScale = 1
       : rampDistance + speed * (time - RAMP_SECONDS);
     return {
       raceDistanceMeters,
-      lateralMeters: Math.sin(time * 0.42) * 5.5,
+      // Holds its own grid lane over the launch, exactly as the demo driver
+      // does, then goes back to weaving across the deck without regard for
+      // traffic. Off the grid it is adversarial on purpose; on the grid it has
+      // to model the driver the acceptance soak actually runs, or the launch
+      // would be tested against a player the game never ships.
+      lateralMeters: raceDistanceMeters < GRID_LANE_HOLD_METERS
+        ? gridLateralMeters
+        : Math.sin(time * 0.42) * 5.5,
     };
   };
 }
+
+/** Mirrors `GRID_LANE_HOLD_METERS` in `src/game/autopilot.ts`. */
+export const GRID_LANE_HOLD_METERS = 200;
 
 /** A player who never leaves the grid: the longitudinal-independence control. */
 export function parkedPlayer() {

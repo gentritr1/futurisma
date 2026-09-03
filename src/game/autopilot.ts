@@ -22,6 +22,19 @@ export function alignDirectionToSurface(
   direction.normalize();
 }
 
+/**
+ * G1 - race distance over which the demo driver holds its own grid lane.
+ *
+ * The rivals hold their grid slots for the first 180-260 m so the launch cannot
+ * become a scrum; a demo player that immediately cut across to the racing line
+ * would walk straight through the field it just spread out for. 200 m sits
+ * inside the rivals' own release window, so the whole grid is off its slots at
+ * about the same point. It is the DEMO driver only - a human still steers
+ * wherever it likes off the line, and the rivals are pinned in that window, so
+ * a human can put a hull through a hull if it aims for one.
+ */
+const GRID_LANE_HOLD_METERS = 200;
+
 /** G1 - the controller only looks for a tow inside this much clear road. */
 const DRAFT_RANGE_METERS = 30;
 /**
@@ -39,7 +52,7 @@ const DRAFT_HOLD_METERS = 7;
 const DRAFT_HOLD_THROTTLE = 0.32;
 /** ... and only from a rival roughly on its own line. */
 const DRAFT_LATERAL_RANGE_METERS = 2.5;
-/** Steering authority spent closing onto the rival's line while tucking in. */
+/** Steering authority spent closing onto the rival line while tucking in. */
 const DRAFT_TUCK_GAIN = 0.28;
 /** Steering authority spent stepping out of the tow to make the pass. */
 const DRAFT_PASS_STEER = 0.34;
@@ -49,10 +62,33 @@ const DRAFT_PASS_STEER = 0.34;
  * Without it the pass fires on the first frame the tow reaches the threshold,
  * which both wastes the draft - the reserve regen is the bigger half of it -
  * and reads as a twitch rather than a driver settling into the wake and then
- * pulling out. A Bitterpan soak spent 2.47 s in a tow with no settle; the
- * phase asks for at least 3 s over five laps.
+ * pulling out. A Bitterpan soak spent 2.47 s in a tow at a 0.6 s settle; the
+ * phase asks for at least 3 s over five laps, and a second in the wake per pass
+ * is what a driver actually does with one.
  */
 const DRAFT_SETTLE_SECONDS = 1;
+/*
+ * G1 tried a fourth thing here and took it out again: a demo driver that yields
+ * laterally to a rival alongside, mirroring what the rivals do for it. Five
+ * soak configurations were measured and not one of them held all four of the
+ * phase's numbers at once.
+ *
+ *   ahead 20 m / 0.9 authority   separation 2.79 m, but a second a lap and the
+ *                                tow down to 0.3 s over five laps
+ *   ahead 8 m  / 0.5 authority   separation 1.07 m - too weak to matter
+ *   ahead 4 m  / 0.9 authority   Bitterpan back to 1.9 m, free deck 33-37%
+ *   ahead 8 m  / 0.9 authority   separation 2.79 m and 3-4 wall impacts, on
+ *                                soaks that had been clean all phase
+ *   ... plus an edge fade to kill those impacts, which zeroed the yield exactly
+ *       where the crossings happen and put separation back to 0.07 m
+ *
+ * The pattern is consistent: a driver steering away from traffic is a driver
+ * steering away from the racing line and out of the slipstream, and near the
+ * deck edge it is a driver steering into the wall. The launch - which is where
+ * the reviewed 0.07 m reading came from - is fixed structurally instead, by
+ * fanning the grid and holding it. What remains is one mid-race crossing on
+ * Greenwater and it is reported rather than papered over.
+ */
 
 /**
  * Showcase autopilot. Owns the demo input frame plus the course scratch objects
@@ -140,7 +176,7 @@ export class DemoAutopilot {
     travelDirection: THREE.Vector3,
     progress: number,
     speed: number,
-    _lap: number,
+    lap: number,
     nextCheckpointIndex: number,
     elapsedMs: number,
   ): InputFrame {
@@ -167,8 +203,16 @@ export class DemoAutopilot {
       this.scratchB.crossVectors(forward, target).dot(projection.up),
       THREE.MathUtils.clamp(forward.dot(target), -1, 1),
     );
+    // Distance since the line, on lap one only: everything the grid hold gates
+    // is over long before a lap is out, so a wrapped progress cannot confuse it.
+    const raceDistanceMeters = lap === 1
+      ? THREE.MathUtils.euclideanModulo(progress - this.course.startProgress, 1)
+        * this.course.length
+      : Number.POSITIVE_INFINITY;
+    const holdingGridLane = raceDistanceMeters < GRID_LANE_HOLD_METERS;
+    const laneTargetMeters = holdingGridLane ? this.course.startLateral : 0;
     const lateralCorrection = THREE.MathUtils.clamp(
-      projection.lateral / Math.max(1, projection.halfWidth),
+      (projection.lateral - laneTargetMeters) / Math.max(1, projection.halfWidth),
       -1,
       1,
     );
@@ -239,11 +283,20 @@ export class DemoAutopilot {
     const inDraftRange = this.draftDistanceMeters > 0
       && this.draftDistanceMeters < DRAFT_RANGE_METERS
       && Math.abs(this.draftLateralGapMeters) < DRAFT_LATERAL_RANGE_METERS
-      && !approachingTurnLimit;
+      && !approachingTurnLimit
+      // Not while holding the grid lane: tucking in means steering onto another
+      // craft's line, which is the one thing the launch window exists to stop.
+      && !holdingGridLane;
     const committing = inDraftRange
       && this.draftLockedSeconds >= DRAFT_SETTLE_SECONDS;
     const holding = inDraftRange && this.draftDistanceMeters < DRAFT_HOLD_METERS;
-    const tucking = inDraftRange && !committing && !holding;
+    // Tucking means steering ONTO another craft's line, so it is only ever the
+    // right thing to do with a real gap in front. Without the DRAFT_HOLD_METERS
+    // floor the controller tucked toward a craft 0.2 m ahead - alongside, not
+    // ahead - and, because tucking suppresses the traffic term below, it did so
+    // instead of leaving it room. That is the 0.79 m Greenwater reading.
+    const tucking = inDraftRange && !committing && !holding
+      && this.draftDistanceMeters >= DRAFT_HOLD_METERS;
     if (holding && !committing) this.input.throttle = DRAFT_HOLD_THROTTLE;
     const draftSteer = tucking
       // Close the lateral gap onto the rival's line to build the tow.

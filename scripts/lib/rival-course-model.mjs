@@ -60,6 +60,9 @@ function buildGreenwater() {
     kind: "greenwater",
     mapCode: "MAP 01",
     length,
+    // Mirrors GreenwaterCourse's authored start pose, which the grid fan needs.
+    startProgress: 0.002,
+    startLateral: 0,
     turns: blockout.turns,
     sample(progress) {
       const scaled = (((progress % 1) + 1) % 1) * count;
@@ -118,6 +121,9 @@ function buildBitterpan() {
     kind: "bitterpan",
     mapCode: "MAP 02",
     length,
+    // Mirrors BitterpanCourse: the WORKS 07 grid slot at station 3045.
+    startProgress: 3045 / length,
+    startLateral: 6.2,
     turns,
     sample(progress) {
       const scaled = (((progress % 1) + 1) % 1) * count;

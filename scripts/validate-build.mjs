@@ -48,18 +48,23 @@ assert.ok(
 //     arrangement cost +2.0 KiB because seven lazy modules imported it and
 //     Rollup promoted it to a shared chunk; the import surface was cut to
 //     three call sites to buy that back.
-//   G1 rivals that race + slipstream  +3.8 KiB - the per-map rival pace model
+//   G1 rivals that race + slipstream  +6.3 KiB - the per-map rival pace model
 //     with its boost-reserve, pad and drift economies, the lane constraint
 //     solver that keeps the field off the player and off each other,
 //     `calculateSlipstream` and its two integrator terms, the HUD chip, and
 //     the rival/slipstream telemetry the soaks read. The pace data itself is
-//     ~0.6 KiB of that.
+//     ~0.6 KiB of that. G1 round two added the last 2.5 KiB: the launch model
+//     (a one-off grid fan plus a lateral rate limit over the opening 260 m),
+//     the player/rival race-distance origin correction, and the two telemetry
+//     channels that found it - the tow's own inputs measured against the
+//     world-space separation the same frame drew, and a record of where the
+//     field's closest approach actually happened.
 //
 // Measured with `npx vite build && node scripts/validate-build.mjs`; raise only
 // with a fresh measurement and a note saying what the bytes bought.
 assert.ok(
-  javascriptGzip <= 230 * 1024,
-  `JavaScript bundle exceeds 230 KiB gzip (${(javascriptGzip / 1024).toFixed(1)} KiB).`,
+  javascriptGzip <= 232 * 1024,
+  `JavaScript bundle exceeds 232 KiB gzip (${(javascriptGzip / 1024).toFixed(1)} KiB).`,
 );
 // Re-baselined 2026-08-28 from a measured 4.35 KiB gzip (the 4 KiB ceiling predated
 // the HUD turn-cue and hazard styling) plus headroom for the planned minimap and
@@ -69,11 +74,11 @@ assert.ok(
   `Stylesheet exceeds 8 KiB gzip (${(stylesheetGzip / 1024).toFixed(1)} KiB).`,
 );
 // Re-baselined alongside the JavaScript ceiling above, from a measured
-// 237.6 KiB gzip (HTML 3.1 + JS 229.4 + CSS 5.1). The stylesheet grew 0.75 KiB
+// 238.3 KiB gzip (HTML 3.1 + JS 230.0 + CSS 5.1). The stylesheet grew 0.75 KiB
 // for G1's SLIPSTREAM chip and still sits well under its own 8 KiB ceiling.
 assert.ok(
-  shellGzip <= 241 * 1024,
-  `Initial app shell exceeds 241 KiB gzip (${(shellGzip / 1024).toFixed(1)} KiB).`,
+  shellGzip <= 243 * 1024,
+  `Initial app shell exceeds 243 KiB gzip (${(shellGzip / 1024).toFixed(1)} KiB).`,
 );
 assert.ok(
   html.includes('rel="preload"')

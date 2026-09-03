@@ -54,23 +54,31 @@ export const VEHICLE_CLEARANCE_METERS = 2.2;
 /** The id the player races under, shared by the fleet and the gap maths. */
 export const PLAYER_RACE_ID = "player";
 
-/** Metres of race distance over which the grid fans out instead of queueing. */
-export const RIVAL_START_SPREAD_METERS = 320;
-/**
- * Share of the usable lane the OUTERMOST rival takes off the line, with each
- * one inside it stepped in by {@link RIVAL_START_SPREAD_STEP}.
+/*
+ * The launch.
  *
- * All three fan to the map's authored yield side, not symmetrically about the
- * centre line. Fanning both ways put a rival straight across the player's own
- * launch line - a five-lap Greenwater soak measured the field and the player
- * 0.02 m apart laterally at 201 m, with everyone still sorting themselves out -
- * and it fought the no-block corridor, which wants the whole field on one side
- * while the player is close. Three lanes down one side is still a field
- * spreading across the deck; it just leaves the deck the player launches into.
+ * G1 first tried to solve the start by fanning the field out of its grid slots
+ * over the opening 320 m. That made it worse: three craft and the player all
+ * changing lane at once, off a grid whose own slots are as little as 0.4 m
+ * apart, put two hulls 0.07 m from each other at 165 m on Bitterpan and 0.09 m
+ * at 201 m on Greenwater. Nobody was misbehaving - the lane rules were all
+ * satisfied - there was simply no room and no time.
+ *
+ * So the launch does the opposite now. The grid is fanned ONCE, before anyone
+ * moves, to at least RIVAL_GRID_MINIMUM_SPACING_METERS between every slot
+ * including the player's; then every rival holds the slot it was given, with
+ * its lateral rate pinned at zero, until RIVAL_GRID_HOLD_METERS of race
+ * distance and ramped back to the authored rate by RIVAL_GRID_RELEASE_METERS.
+ * Nothing converges because nothing moves, and by the time the field is allowed
+ * to change lane it is strung out along the track instead of stacked across it.
  */
-export const RIVAL_START_SPREAD_FRACTION = 0.9;
-/** Step between consecutive grid slots' start lanes. */
-export const RIVAL_START_SPREAD_STEP = 0.35;
+
+/** Race distance up to which a rival holds its grid slot exactly. */
+export const RIVAL_GRID_HOLD_METERS = 180;
+/** ... and by which it has its full authored lateral rate back. */
+export const RIVAL_GRID_RELEASE_METERS = 260;
+/** Minimum gap between any two grid slots, the player's included. */
+export const RIVAL_GRID_MINIMUM_SPACING_METERS = 3.2;
 /** How far off its lane a rival will go to collect an authored pad. */
 export const RIVAL_PAD_LANE_REACH_METERS = 7;
 /**
@@ -127,17 +135,25 @@ export const RIVAL_LANE_CONTEST_GAP_METERS = 26;
  */
 export const RIVAL_PLAYER_AVOID_GAP_METERS = 46;
 /**
- * Ceiling on the per-sub-step lateral rate multiplier a caller may ask for.
+ * How much harder a rival slides while the player is inside its clearance.
  *
- * G1 tried spending this on an evasive reflex - slide harder while the player
- * is inside the clearance - to close the launch-scrum separation readings. It
- * did not help those (the crossing is over in a fraction of a second either
- * way) and it cost 6 points of free deck on Bitterpan, because a rival reaches
- * the player's clearance boundary sooner and leaves the yield corridor to do
- * it. The scale stays in the model, clamped to 1 by default; nothing asks for
- * more than 1 today.
+ * A craft getting out of the way moves decisively. At its authored ~4.6 m/s a
+ * rival needs 0.8 s to open the clearance, and a player changing line through
+ * a corner does not leave it 0.8 s; that is what left two craft 0.93 m apart at
+ * 468 m on Greenwater, on the exit of turn one, with the rival already aimed
+ * 3.6 m away. At this gain the same move takes 0.33 s.
+ *
+ * It is spent ONLY while the player is inside the bubble and only on the
+ * player-reactive lane - the player-free lane that pad coverage is resolved
+ * against keeps the authored rate - so it cannot reach a rival's speed, and it
+ * changes how fast a rival gets to its lane rather than which lane that is.
+ *
+ * G1 tried this once before against the LAUNCH scrum and reverted it: there it
+ * did not help (the crossing was over either way) and it cost free deck. This
+ * is the same lever aimed at the case it actually fits, with the launch now
+ * handled by holding the grid instead.
  */
-export const RIVAL_EVASIVE_LATERAL_GAIN = 2.4;
+export const RIVAL_EVASIVE_LATERAL_GAIN = 4;
 /**
  * Lateral room a rival keeps around anything else on the deck.
  *
@@ -673,12 +689,10 @@ export function recoverInvalidRivalState(state) {
  *   laneHalfWidthMeters?: number;
  *   padLaneMeters?: number | null;
  *   padUse?: boolean;
- *   startSpreadSideSign?: number;
  * }} input
  */
 export function rivalPaceLaneMeters(state, input) {
   const profile = profileForId(state.profileId);
-  const slot = RIVAL_PROFILES.findIndex((candidate) => candidate.id === state.profileId);
   const laneHalfWidth = typeof input.laneHalfWidthMeters === "number"
     && Number.isFinite(input.laneHalfWidthMeters)
     ? Math.max(0, input.laneHalfWidthMeters)
@@ -690,23 +704,12 @@ export function rivalPaceLaneMeters(state, input) {
   const distance = Number.isFinite(state.raceDistanceMeters)
     ? state.raceDistanceMeters
     : 0;
-  const authored = profile.startingLateralMeters
+  const lane = profile.startingLateralMeters
     + Math.sin(distance / 210 + profile.pacePhaseRadians) * 0.75
     - curvature * 1.4;
-  // The grid fans across the deck out of the start rather than queueing on the
-  // centre line, then eases back onto the authored lane. Squared so the release
-  // is gentle and the craft is not still sliding sideways at turn one.
-  const remaining = clamp(1 - distance / RIVAL_START_SPREAD_METERS, 0, 1);
-  const fanSide = typeof input.startSpreadSideSign === "number"
-    && Number.isFinite(input.startSpreadSideSign)
-    && input.startSpreadSideSign !== 0
-    ? Math.sign(input.startSpreadSideSign)
-    : Math.sign(profile.startingLateralMeters || 1);
-  const fan = fanSide * laneHalfWidth * Math.max(
-    0,
-    RIVAL_START_SPREAD_FRACTION - Math.max(0, slot) * RIVAL_START_SPREAD_STEP,
-  );
-  const lane = authored + (fan - authored) * remaining * remaining;
+  // No start fan here any more: the launch is handled by holding the grid slot
+  // (see `rivalGridHoldScale`), which is a rate limit rather than a lane, so a
+  // rival's authored line is the same expression from the line to the flag.
   const padLane = input.padLaneMeters;
   if (
     input.padUse
@@ -717,6 +720,124 @@ export function rivalPaceLaneMeters(state, input) {
     return clamp(padLane, -laneHalfWidth, laneHalfWidth);
   }
   return clamp(lane, -laneHalfWidth, laneHalfWidth);
+}
+
+/**
+ * The metres to add to a player race distance to compare it with a rival's.
+ *
+ * The two are measured from different origins, and G1 shipped a round without
+ * noticing. A rival's race distance is ribbon distance: `courseDistanceMeters`
+ * is `raceDistanceMeters` modulo the lap, so zero is station zero. The player's
+ * is measured from the START LINE, which is `startProgress` along that ribbon -
+ * 5.03 m into Greenwater's lap, and 3045 m into Bitterpan's 3050 m lap. So a
+ * rival and the player standing on the same line read race distances 5.03 m
+ * apart on Greenwater and 5 m apart the other way on Bitterpan.
+ *
+ * Every player-versus-rival comparison inherited that: the slipstream, whose
+ * full-tow band is only 4-16 m wide, so a 5 m error is a third of it; the
+ * separation telemetry; the no-block window; the defence band. It was found by
+ * comparing the tow's own inputs against the world-space separation the same
+ * frame drew - `slipstreamMaxPositionMismatchMeters` - after a LOCK screenshot
+ * showed no rival ahead of the craft.
+ *
+ * Wrapped to the half-lap nearest zero so the correction is the small signed
+ * number it physically is rather than a whole lap of it.
+ *
+ * @param {number} startProgress the course's authored start, 0..1
+ * @param {number} courseLengthMeters
+ */
+export function playerRaceDistanceOffsetMeters(startProgress, courseLengthMeters) {
+  const length = Number.isFinite(courseLengthMeters) ? Math.max(1, courseLengthMeters) : 1;
+  const progress = Number.isFinite(startProgress) ? startProgress : 0;
+  const raw = ((progress % 1) + 1) % 1 * length;
+  return raw > length / 2 ? raw - length : raw;
+}
+
+/**
+ * How much of its authored lateral rate a rival is allowed at this point in the
+ * race: none until {@link RIVAL_GRID_HOLD_METERS}, all of it from
+ * {@link RIVAL_GRID_RELEASE_METERS}, linear between.
+ *
+ * A rate limit rather than a lane, so it constrains nothing about WHERE a rival
+ * wants to be - only how fast it may get there. Pure in race distance, so it is
+ * as rate independent and as player independent as the rest of the model.
+ *
+ * @param {number} raceDistanceMeters
+ * @returns {number} 0..1
+ */
+export function rivalGridHoldScale(raceDistanceMeters) {
+  // A corrupted distance releases the lane rather than freezing it: a rival
+  // pinned on a grid slot for the rest of a race is a far worse failure than
+  // one that changes lane a little early. Infinities are meaningful and are
+  // left to the comparisons below.
+  if (typeof raceDistanceMeters !== "number" || Number.isNaN(raceDistanceMeters)) return 1;
+  const distance = raceDistanceMeters;
+  if (distance >= RIVAL_GRID_RELEASE_METERS) return 1;
+  if (distance <= RIVAL_GRID_HOLD_METERS) return 0;
+  return (distance - RIVAL_GRID_HOLD_METERS)
+    / (RIVAL_GRID_RELEASE_METERS - RIVAL_GRID_HOLD_METERS);
+}
+
+/**
+ * Fans the authored grid so no two slots on it are within
+ * {@link RIVAL_GRID_MINIMUM_SPACING_METERS}, the player's slot included.
+ *
+ * Greenwater authors no grid at all and the field launches from the profiles'
+ * own lanes, two of which sit 2.8 m apart with a third 0.4 m off the player's;
+ * Bitterpan's authored grid has a 3.1 m pair. Neither is enough room for four
+ * craft to hold station through the opening 180 m, so the slots are spread
+ * here, once, before anyone moves - rather than by editing accepted map data,
+ * which owns where the grid furniture is drawn.
+ *
+ * The player's slot is the anchor and never moves: it is where the course says
+ * the race starts from. Rivals keep their authored ORDER across the deck and
+ * are pushed outward from the anchor only as far as the spacing needs.
+ *
+ * @param {number} anchorLateralMeters the player's grid lateral
+ * @param {readonly number[]} lateralsMeters authored rival grid laterals
+ * @param {number} laneHalfWidthMeters usable half width at the grid
+ * @returns {number[]} spread laterals, in the order they were given
+ */
+export function spreadGridLaterals(anchorLateralMeters, lateralsMeters, laneHalfWidthMeters) {
+  const anchor = Number.isFinite(anchorLateralMeters) ? anchorLateralMeters : 0;
+  const laneHalfWidth = Number.isFinite(laneHalfWidthMeters)
+    ? Math.max(0, laneHalfWidthMeters)
+    : 8;
+  const entries = lateralsMeters.map((lateral, index) => ({
+    index,
+    lateral: Number.isFinite(lateral) ? lateral : 0,
+  }));
+  const ordered = [...entries].sort(
+    (a, b) => (a.lateral - b.lateral) || (a.index - b.index),
+  );
+  const spread = new Array(entries.length);
+  let cursor = anchor;
+  for (const entry of ordered.filter((candidate) => candidate.lateral >= anchor)) {
+    cursor = Math.max(entry.lateral, cursor + RIVAL_GRID_MINIMUM_SPACING_METERS);
+    spread[entry.index] = clamp(cursor, -laneHalfWidth, laneHalfWidth);
+  }
+  cursor = anchor;
+  const below = ordered.filter((candidate) => candidate.lateral < anchor).reverse();
+  for (const entry of below) {
+    cursor = Math.min(entry.lateral, cursor - RIVAL_GRID_MINIMUM_SPACING_METERS);
+    spread[entry.index] = clamp(cursor, -laneHalfWidth, laneHalfWidth);
+  }
+  return spread;
+}
+
+/**
+ * The smallest gap between any two of `laterals`, for asserting a grid is
+ * actually spread. Returns Infinity for fewer than two entries.
+ *
+ * @param {readonly number[]} laterals
+ */
+export function minimumLateralSpacingMeters(laterals) {
+  const sorted = [...laterals].filter(Number.isFinite).sort((a, b) => a - b);
+  let smallest = Infinity;
+  for (let index = 1; index < sorted.length; index += 1) {
+    smallest = Math.min(smallest, sorted[index] - sorted[index - 1]);
+  }
+  return smallest;
 }
 
 /**
@@ -928,6 +1049,14 @@ export function rivalContestLaneMeters(paceLaneMeters, input) {
   const neighbourOnly = hasNeighbours
     ? forbidden.slice(neighbourStart)
     : [];
+  // Relaxation order, when the three cannot all hold at once: the corridor is
+  // kept and the player's room is what yields. A player standing inside the
+  // strip reserved for it to pass through is not being denied a route, and the
+  // free-deck rule is asserted exactly on the samples where that is not
+  // happening. Dropping the corridor first instead was measured and reverted:
+  // it bought no separation at all on Greenwater (0.79 m either way, because
+  // the binding case there is a lateral transit rather than a constraint) and
+  // it cost Bitterpan 2.3 points of free deck.
   if (armed) {
     const inCorridor = nearestAllowedLane(desired, low, high, forbidden)
       ?? nearestAllowedLane(desired, low, high, neighbourOnly);
@@ -1163,10 +1292,14 @@ export function stepRivalState(state, input) {
     const targetLateral = authoredTargetLateral(profile, drive);
     const lateralScale = typeof drive.lateralSpeedScale === "number"
       && Number.isFinite(drive.lateralSpeedScale)
-      ? clamp(drive.lateralSpeedScale, 1, RIVAL_EVASIVE_LATERAL_GAIN)
+      ? clamp(drive.lateralSpeedScale, 0, RIVAL_EVASIVE_LATERAL_GAIN)
       : 1;
+    // The grid hold is applied HERE rather than left to the caller, because it
+    // has to bind both lanes below and a caller that forgot it would put the
+    // field back in the scrum it exists to prevent.
+    const gridHold = rivalGridHoldScale(state.raceDistanceMeters);
     const reach = profile.lateralSpeedMetersPerSecond
-      * lateralScale * RIVAL_FIXED_STEP_SECONDS;
+      * lateralScale * gridHold * RIVAL_FIXED_STEP_SECONDS;
     state.lateralMeters = clamp(
       moveToward(state.lateralMeters, targetLateral, reach),
       -laneHalfWidth,
@@ -1186,7 +1319,7 @@ export function stepRivalState(state, input) {
       moveToward(
         state.paceLateralMeters,
         paceLateral,
-        profile.lateralSpeedMetersPerSecond * RIVAL_FIXED_STEP_SECONDS,
+        profile.lateralSpeedMetersPerSecond * gridHold * RIVAL_FIXED_STEP_SECONDS,
       ),
       -laneHalfWidth,
       laneHalfWidth,

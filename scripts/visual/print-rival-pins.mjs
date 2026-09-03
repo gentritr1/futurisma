@@ -13,7 +13,7 @@ import { measuredPacePlayer, simulateRivalField } from "../lib/rival-field-sim.m
 
 const courseLengthMeters = 2516;
 const totalLaps = 5;
-const PLAYER_TOTAL_SECONDS = { greenwater: 165.442, bitterpan: 183.933 };
+const PLAYER_TOTAL_SECONDS = { greenwater: 165.449, bitterpan: 183.117 };
 
 function openLoopInput(index) {
   return {
@@ -53,7 +53,11 @@ for (const kind of ["greenwater", "bitterpan"]) {
     course,
     pace: loadRivalPace(kind),
     totalLaps,
-    player: measuredPacePlayer(course.length, PLAYER_TOTAL_SECONDS[kind] / 5),
+    player: measuredPacePlayer(
+      course.length,
+      PLAYER_TOTAL_SECONDS[kind] / 5,
+      course.startLateral,
+    ),
   });
   console.log(
     `  ${kind}: { `

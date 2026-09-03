@@ -28,8 +28,8 @@ import { RIVAL_PROFILES } from "../src/game/rival-race.js";
  * Re-measure and update both numbers whenever the player model moves.
  */
 const PLAYER_REFERENCE = {
-  greenwater: { lapOneSeconds: 34.483, totalSeconds: 165.442 },
-  bitterpan: { lapOneSeconds: 38.775, totalSeconds: 183.933 },
+  greenwater: { lapOneSeconds: 34.467, totalSeconds: 165.425 },
+  bitterpan: { lapOneSeconds: 37.917, totalSeconds: 183.075 },
 };
 
 /** Where each profile is meant to land relative to the player's five-lap total. */
@@ -53,7 +53,11 @@ function runOnce(kind, pace, player) {
     course,
     pace,
     totalLaps: 5,
-    player: measuredPacePlayer(course.length, player.totalSeconds / 5),
+    player: measuredPacePlayer(
+      course.length,
+      player.totalSeconds / 5,
+      course.startLateral,
+    ),
   });
 }
 
@@ -164,7 +168,11 @@ function solveCruise(kind) {
         course,
         pace: trial,
         totalLaps: 5,
-        player: measuredPacePlayer(course.length, player.totalSeconds / 5),
+        player: measuredPacePlayer(
+          course.length,
+          player.totalSeconds / 5,
+          course.startLateral,
+        ),
         onlyProfileIndex: RIVAL_PROFILES.indexOf(profile),
         contest: false,
       });

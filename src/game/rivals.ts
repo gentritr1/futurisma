@@ -8,8 +8,10 @@ import {
   RIVAL_FREE_DECK_FRACTION,
   RIVAL_LANE_CLEARANCE_METERS,
   RIVAL_LANE_CONTEST_GAP_METERS,
+  RIVAL_EVASIVE_LATERAL_GAIN,
   RIVAL_NO_BLOCK_MARGIN_FRACTION,
   RIVAL_NO_BLOCK_WINDOW_METERS,
+  RIVAL_PLAYER_AVOID_GAP_METERS,
   RIVAL_PAD_APPROACH_METERS,
   RIVAL_PROFILES,
   VEHICLE_CLEARANCE_METERS,
@@ -28,7 +30,9 @@ import {
   rivalDriftSignal,
   rivalFinishRunOutDistanceMeters,
   rivalGlowSignal,
+  playerRaceDistanceOffsetMeters,
   rivalPaceLaneMeters,
+  spreadGridLaterals,
   rivalSteerSignal,
   rivalThrottleSignal,
   stepRivalField,
@@ -284,6 +288,9 @@ export interface RivalFleetDiagnostics {
     lateralMeters: number;
     courseDistanceMeters: number;
     lap: number;
+    targetLateralMeters: number;
+    rivalLateralMeters: number;
+    playerLateralMeters: number;
   };
   catchUpMultiplier: number;
   articulatedGroups: string[];
@@ -297,6 +304,11 @@ export interface RivalFleetDiagnostics {
   leadChanges: number;
   /** G1 - the player's tow, accumulated by the fleet that supplies it. */
   slipstream: number;
+  slipstreamRival: string;
+  slipstreamAheadMeters: number;
+  slipstreamLateralMeters: number;
+  slipstreamWorldMeters: number;
+  slipstreamMaxPositionMismatchMeters: number;
   slipstreamSeconds: number;
   slipstreamPeak: number;
   slipstreamLocks: number;
@@ -356,6 +368,13 @@ export class RivalFleet {
   /** G1 - the authored pace for this map, resolved once per rival at assembly. */
   private readonly paces: ReturnType<typeof resolveRivalPace>[];
   private readonly noBlockSide: number;
+  /**
+   * Metres to add to an incoming player race distance to put it in the rivals'
+   * frame. See {@link playerRaceDistanceOffsetMeters}: the player's distance is
+   * measured from the start line and a rival's from station zero, and every
+   * comparison between them was out by this much until it was measured.
+   */
+  private readonly playerDistanceOffset: number;
   private readonly driftCurvature: number;
   /**
    * One drive-input scratch per rival. `stepRivalField` writes `deltaSeconds`
@@ -371,6 +390,9 @@ export class RivalFleet {
     lateralMeters: 0,
     courseDistanceMeters: 0,
     lap: 0,
+    targetLateralMeters: 0,
+    rivalLateralMeters: 0,
+    playerLateralMeters: 0,
   };
   private fieldRemainderSeconds = 0;
   private readonly visuals: RivalVisual[] = [];
@@ -420,6 +442,23 @@ export class RivalFleet {
    * `slipstreamStrength` back on the same fixed step.
    */
   private slipstream = 0;
+  /**
+   * Which rival is supplying the tow and the two numbers the physics read for
+   * it, plus the world-space separation the SAME frame actually rendered.
+   *
+   * The pair exists to answer one question that a screenshot cannot: when the
+   * chip says LOCK, is the craft it is drafting really where the race-distance
+   * model thinks it is? `slipstreamAhead`/`slipstreamLateralGap` are the model;
+   * `slipstreamWorld` is measured off the composed instance matrices against
+   * the player's own on-surface point. They should agree to within the hover
+   * offset (~0.8 m of height the flat model does not carry), and
+   * `slipstreamMaxPositionMismatch` is the worst disagreement over the race.
+   */
+  private slipstreamRivalIndex = -1;
+  private slipstreamAhead = 0;
+  private slipstreamLateralGap = 0;
+  private slipstreamWorld = 0;
+  private slipstreamMaxPositionMismatch = 0;
   /** Nearest rival ahead of the player, and how far off its line the player is. */
   private draftDistance = Number.POSITIVE_INFINITY;
   private draftLateral = Number.POSITIVE_INFINITY;
@@ -504,6 +543,10 @@ export class RivalFleet {
     const pace = course.rivalPace;
     this.paces = RIVAL_PROFILES.map((profile) => resolveRivalPace(pace, profile.id));
     this.noBlockSide = pace && Number.isFinite(pace.noBlockSide) ? pace.noBlockSide : -1;
+    this.playerDistanceOffset = playerRaceDistanceOffsetMeters(
+      course.startProgress,
+      course.length,
+    );
     this.driftCurvature = pace && Number.isFinite(pace.driftCurvature)
       ? pace.driftCurvature
       : Number.POSITIVE_INFINITY;
@@ -678,19 +721,31 @@ export class RivalFleet {
   }
 
   reset(): void {
+    // The grid is fanned once, here, before anyone moves: the authored slots on
+    // both maps put two craft closer than a field can hold station in, and the
+    // launch now depends on every craft keeping the slot it was given.
+    this.course.sample(this.course.startProgress, this.sample);
+    const gridLaterals = spreadGridLaterals(
+      this.course.startLateral,
+      RIVAL_PROFILES.map((profile) => (
+        this.course.rivalGridStart(profile.name)?.lateralMeters
+          ?? profile.startingLateralMeters
+      )),
+      Math.max(0, this.sample.halfWidth - VEHICLE_CLEARANCE_METERS),
+    );
     this.states.forEach((state, index) => {
       resetRivalState(state, this.course.length, this.totalLaps);
       const gridStart = this.course.rivalGridStart(RIVAL_PROFILES[index].name);
       if (gridStart) {
         state.raceDistanceMeters = gridStart.raceDistanceMeters;
         state.courseDistanceMeters = gridStart.courseDistanceMeters;
-        state.lateralMeters = gridStart.lateralMeters;
-        // The player-free lane starts on the grid slot too, or the first pad
-        // lookup would be resolved against the profile's nominal lane instead.
-        state.paceLateralMeters = gridStart.lateralMeters;
         state.lastSafeDistanceMeters = gridStart.raceDistanceMeters;
-        state.lastSafeLateralMeters = gridStart.lateralMeters;
       }
+      state.lateralMeters = gridLaterals[index];
+      // The player-free lane starts on the grid slot too, or the first pad
+      // lookup would be resolved against the profile's nominal lane instead.
+      state.paceLateralMeters = gridLaterals[index];
+      state.lastSafeLateralMeters = gridLaterals[index];
       this.previousDistances[index] = state.raceDistanceMeters;
       this.previousLaterals[index] = state.lateralMeters;
       this.finishVisualAges[index] = 0;
@@ -710,6 +765,9 @@ export class RivalFleet {
     this.closestApproach.lateralMeters = 0;
     this.closestApproach.courseDistanceMeters = 0;
     this.closestApproach.lap = 0;
+    this.closestApproach.targetLateralMeters = 0;
+    this.closestApproach.rivalLateralMeters = 0;
+    this.closestApproach.playerLateralMeters = 0;
     this.maximumSteerRadians = 0;
     this.minimumFreeDeckFraction = 1;
     this.minimumClearFreeDeckFraction = 1;
@@ -719,6 +777,11 @@ export class RivalFleet {
     this.leadChanges = 0;
     this.previousLeader = -1;
     this.slipstream = 0;
+    this.slipstreamRivalIndex = -1;
+    this.slipstreamAhead = 0;
+    this.slipstreamLateralGap = 0;
+    this.slipstreamWorld = 0;
+    this.slipstreamMaxPositionMismatch = 0;
     this.draftDistance = Number.POSITIVE_INFINITY;
     this.draftLateral = Number.POSITIVE_INFINITY;
     this.slipstreamSeconds = 0;
@@ -726,6 +789,15 @@ export class RivalFleet {
     this.slipstreamLocks = 0;
     this.slipstreamLockedThisStep = false;
     this.updatePresentation(1, 0);
+  }
+
+  /**
+   * Puts a player race distance - measured from the start line - into the frame
+   * a rival's race distance is measured in. Every comparison between the two
+   * goes through here; see {@link playerRaceDistanceOffsetMeters}.
+   */
+  private rivalFrameDistance(playerDistanceFromStart: number): number {
+    return playerDistanceFromStart + this.playerDistanceOffset;
   }
 
   /**
@@ -750,6 +822,7 @@ export class RivalFleet {
   get draftLateralMeters(): number {
     return this.draftLateral;
   }
+
 
   /**
    * The drive input for one rival for one sub-step.
@@ -788,7 +861,6 @@ export class RivalFleet {
       laneHalfWidthMeters,
       padLaneMeters,
       padUse: entry.padUse,
-      startSpreadSideSign: this.noBlockSide,
     });
     const neighbourLaterals = this.neighbourScratch;
     neighbourLaterals.length = 0;
@@ -843,15 +915,20 @@ export class RivalFleet {
       );
     drive.curvatureMagnitude = Math.abs(sample.curvature);
     drive.driftCurvature = this.driftCurvature;
+    drive.lateralSpeedScale = Math.abs(playerGap) <= RIVAL_PLAYER_AVOID_GAP_METERS
+      && Math.abs(state.lateralMeters - playerLateralMeters) < RIVAL_LANE_CLEARANCE_METERS
+      ? RIVAL_EVASIVE_LATERAL_GAIN
+      : 1;
     return drive;
   }
 
   step(
     deltaSeconds: number,
-    playerRaceDistanceMeters: number,
+    playerDistanceFromStart: number,
     playerLateralMeters: number,
     playerSpeedMetersPerSecond = 0,
   ): void {
+    const playerRaceDistanceMeters = this.rivalFrameDistance(playerDistanceFromStart);
     for (let index = 0; index < this.states.length; index += 1) {
       this.previousDistances[index] = this.states[index].raceDistanceMeters;
       this.previousLaterals[index] = this.states[index].lateralMeters;
@@ -932,12 +1009,19 @@ export class RivalFleet {
     let strongest = 0;
     let nearestAhead = Number.POSITIVE_INFINITY;
     let nearestLateral = Number.POSITIVE_INFINITY;
-    for (const state of this.states) {
+    this.slipstreamRivalIndex = -1;
+    for (let index = 0; index < this.states.length; index += 1) {
+      const state = this.states[index];
       if (state.finished) continue;
       const ahead = state.raceDistanceMeters - playerRaceDistanceMeters;
       const lateralGap = state.lateralMeters - playerLateralMeters;
       const tow = calculateSlipstream(ahead, lateralGap, speedRatio);
-      if (tow > strongest) strongest = tow;
+      if (tow > strongest) {
+        strongest = tow;
+        this.slipstreamRivalIndex = index;
+        this.slipstreamAhead = ahead;
+        this.slipstreamLateralGap = lateralGap;
+      }
       if (ahead > 0 && ahead < nearestAhead) {
         nearestAhead = ahead;
         nearestLateral = lateralGap;
@@ -1152,6 +1236,21 @@ export class RivalFleet {
     hoverMeters: number,
     visible = true,
   ): void {
+    // Same-frame check of the tow's geometry: the rival instances were composed
+    // by `updatePresentation` earlier this frame and the player's on-surface
+    // point has just been derived, so this compares the model the physics used
+    // with the positions this frame is about to draw.
+    if (this.slipstreamRivalIndex >= 0 && this.slipstream > 0) {
+      this.slipstreamWorld = this.worldPositions[this.slipstreamRivalIndex]
+        .distanceTo(surfacePosition);
+      this.slipstreamMaxPositionMismatch = Math.max(
+        this.slipstreamMaxPositionMismatch,
+        Math.abs(this.slipstreamWorld - Math.hypot(
+          this.slipstreamAhead,
+          this.slipstreamLateralGap,
+        )),
+      );
+    }
     this.composeShadowBlob(
       PLAYER_BLOB_INDEX,
       surfacePosition,
@@ -1184,15 +1283,17 @@ export class RivalFleet {
   }
 
   raceStatus(
-    playerRaceDistanceMeters: number,
+    playerDistanceFromStart: number,
     playerSpeedMetersPerSecond: number,
     playerFinished = false,
     playerFinishTimeSeconds: number | null = null,
   ): RivalRaceStatus {
+    // Position and gap are a comparison against the field, so they need the
+    // player's distance in the field's frame like everything else does.
     const gaps = calculateRaceGaps([
       {
         id: PLAYER_ID,
-        raceDistanceMeters: playerRaceDistanceMeters,
+        raceDistanceMeters: this.rivalFrameDistance(playerDistanceFromStart),
         speedMetersPerSecond: playerSpeedMetersPerSecond,
         finished: playerFinished,
         finishTimeSeconds: playerFinishTimeSeconds,
@@ -1226,13 +1327,13 @@ export class RivalFleet {
 
   /** Live field ranking for the HUD position ladder. */
   fieldOrder(
-    playerRaceDistanceMeters: number,
+    playerDistanceFromStart: number,
     playerSpeedMetersPerSecond: number,
   ): FieldOrderEntry[] {
     const { ordered } = calculateRaceGaps([
       {
         id: PLAYER_ID,
-        raceDistanceMeters: playerRaceDistanceMeters,
+        raceDistanceMeters: this.rivalFrameDistance(playerDistanceFromStart),
         speedMetersPerSecond: playerSpeedMetersPerSecond,
         finished: false,
         finishTimeSeconds: null,
@@ -1346,6 +1447,13 @@ export class RivalFleet {
       freeDeckAlongsideSamples: this.freeDeckAlongsideSamples,
       leadChanges: this.leadChanges,
       slipstream: this.slipstream,
+      slipstreamRival: this.slipstreamRivalIndex >= 0
+        ? this.states[this.slipstreamRivalIndex].id
+        : "",
+      slipstreamAheadMeters: this.slipstreamAhead,
+      slipstreamLateralMeters: this.slipstreamLateralGap,
+      slipstreamWorldMeters: this.slipstreamWorld,
+      slipstreamMaxPositionMismatchMeters: this.slipstreamMaxPositionMismatch,
       slipstreamSeconds: this.slipstreamSeconds,
       slipstreamPeak: this.slipstreamPeak,
       slipstreamLocks: this.slipstreamLocks,
@@ -1504,6 +1612,14 @@ export class RivalFleet {
           this.closestApproach.lateralMeters = lateral;
           this.closestApproach.courseDistanceMeters = state.courseDistanceMeters;
           this.closestApproach.lap = state.lap;
+          // The lane the craft was ASKING for at that instant. A target a full
+          // clearance away says the rules fired and the craft was in transit; a
+          // target on top of the player says they did not.
+          this.closestApproach.targetLateralMeters = Number(
+            this.driveScratch[index].targetLateralMeters ?? 0,
+          );
+          this.closestApproach.rivalLateralMeters = state.lateralMeters;
+          this.closestApproach.playerLateralMeters = playerLateralMeters;
         }
       }
       for (let otherIndex = index + 1; otherIndex < this.states.length; otherIndex += 1) {

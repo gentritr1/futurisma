@@ -171,6 +171,9 @@ function rivalFields(
         lateralMeters: Number(rivals.closestApproach.lateralMeters.toFixed(2)),
         courseDistanceMeters: Math.round(rivals.closestApproach.courseDistanceMeters),
         lap: rivals.closestApproach.lap,
+        targetLateralMeters: Number(rivals.closestApproach.targetLateralMeters.toFixed(2)),
+        rivalLateralMeters: Number(rivals.closestApproach.rivalLateralMeters.toFixed(2)),
+        playerLateralMeters: Number(rivals.closestApproach.playerLateralMeters.toFixed(2)),
       }
       : null,
     rivalCatchUpMultiplier: rivals?.catchUpMultiplier ?? 1,
@@ -192,6 +195,17 @@ function rivalFields(
     // G1 slipstream telemetry. Owned by the fleet, because the fleet is what
     // supplies the tow.
     slipstream: Number((rivals?.slipstream ?? 0).toFixed(3)),
+    // Which craft is towing, the two numbers the physics read, and the
+    // world-space separation the same frame drew. A model that disagreed with
+    // the render would show up as a growing mismatch rather than as a puzzling
+    // screenshot.
+    slipstreamRival: rivals?.slipstreamRival ?? "",
+    slipstreamAheadMeters: Number((rivals?.slipstreamAheadMeters ?? 0).toFixed(2)),
+    slipstreamLateralMeters: Number((rivals?.slipstreamLateralMeters ?? 0).toFixed(2)),
+    slipstreamWorldMeters: Number((rivals?.slipstreamWorldMeters ?? 0).toFixed(2)),
+    slipstreamMaxPositionMismatchMeters: Number(
+      (rivals?.slipstreamMaxPositionMismatchMeters ?? 0).toFixed(3),
+    ),
     slipstreamSeconds: Number((rivals?.slipstreamSeconds ?? 0).toFixed(2)),
     slipstreamPeak: Number((rivals?.slipstreamPeak ?? 0).toFixed(3)),
     slipstreamLocks: rivals?.slipstreamLocks ?? 0,

@@ -4,6 +4,9 @@ import {
   RIVAL_FIXED_STEP_SECONDS,
   RIVAL_FINISH_RUN_OUT_SECONDS,
   RIVAL_GLOW_SPEED_SHARE,
+  RIVAL_GRID_HOLD_METERS,
+  RIVAL_GRID_MINIMUM_SPACING_METERS,
+  RIVAL_GRID_RELEASE_METERS,
   RIVAL_LANE_CLEARANCE_METERS,
   RIVAL_FREE_DECK_FRACTION,
   RIVAL_NO_BLOCK_MARGIN_FRACTION,
@@ -22,7 +25,10 @@ import {
   rivalBrakeSignal,
   rivalFinishRunOutDistanceMeters,
   rivalGlowSignal,
+  minimumLateralSpacingMeters,
   nearestAllowedLane,
+  rivalGridHoldScale,
+  spreadGridLaterals,
   rivalContestLaneMeters,
   rivalPoseSignals,
   rivalSteerSignal,
@@ -503,6 +509,53 @@ assert.ok(
     + `${(reservedShare * 100).toFixed(0)}% of the deck.`,
 );
 
+// --- the launch: a fanned grid, held ---------------------------------------
+//
+// G1's first attempt fanned the field OUT of its grid slots over the opening
+// 320 m and measured two hulls 0.07 m apart at 165 m on Bitterpan. The rules
+// were all satisfied; there was no room and no time. The launch is a spread
+// grid plus a rate limit now, and both halves are asserted here.
+
+assert.equal(rivalGridHoldScale(Number.NEGATIVE_INFINITY), 0);
+assert.equal(rivalGridHoldScale(-36), 0, "A rival behind the line has not been released.");
+assert.equal(rivalGridHoldScale(0), 0);
+assert.equal(rivalGridHoldScale(RIVAL_GRID_HOLD_METERS), 0, "The hold is inclusive.");
+assert.equal(rivalGridHoldScale(RIVAL_GRID_RELEASE_METERS), 1, "The release is inclusive.");
+assert.equal(rivalGridHoldScale(10_000), 1);
+assert.equal(
+  rivalGridHoldScale((RIVAL_GRID_HOLD_METERS + RIVAL_GRID_RELEASE_METERS) / 2),
+  0.5,
+  "The ramp between hold and release is linear.",
+);
+assert.equal(rivalGridHoldScale(Number.NaN), 1, "Garbage in must not freeze a lane.");
+let previousHold = 0;
+for (let d = RIVAL_GRID_HOLD_METERS; d <= RIVAL_GRID_RELEASE_METERS; d += 1) {
+  const scale = rivalGridHoldScale(d);
+  assert.ok(scale >= previousHold - 1e-12 && scale <= 1, "The ramp must be monotonic.");
+  previousHold = scale;
+}
+
+assert.equal(minimumLateralSpacingMeters([]), Infinity);
+assert.equal(minimumLateralSpacingMeters([3]), Infinity);
+assert.equal(minimumLateralSpacingMeters([0, 5, 2]), 2);
+assert.equal(minimumLateralSpacingMeters([-6.4, 0, 3.2, -3.2]), 3.2);
+
+// The order across the deck is authored character and must survive the fan.
+const spreadProbe = spreadGridLaterals(0, [-3.2, 3.1, -0.4], 9.8);
+assert.deepEqual(spreadProbe, [-6.4, 3.2, -3.2]);
+assert.equal(
+  spreadGridLaterals(0, [1, 2, 3], 9.8).length,
+  3,
+  "Every slot must come back, in the order it was given.",
+);
+for (const laterals of [[0, 0, 0], [-1, -1.1, -1.2], [8, 8.1, 8.2], [-9, 9, 0]]) {
+  const spread = spreadGridLaterals(0, laterals, 9.8);
+  assert.ok(
+    spread.every((value) => Number.isFinite(value) && Math.abs(value) <= 9.8 + 1e-9),
+    `Spread grid ${JSON.stringify(spread)} left the deck.`,
+  );
+}
+
 // --- the free-deck rule, as a property ------------------------------------
 
 assert.equal(measureFreeDeckFraction([], 12), 1);
@@ -593,6 +646,39 @@ for (const kind of MAPS) {
     isInsideBoostWindow(resolveRivalPace(pace, "rival-privateer").boostWindows, 0),
     `${kind}/rival-privateer must be able to launch on boost from the line.`,
   );
+
+  // The authored grid, fanned. Both maps ship a grid that is too tight to hold
+  // station on: Greenwater launches the field off the profiles' own lanes, two
+  // of which are 2.8 m apart with a third 0.4 m off the player's, and
+  // Bitterpan's authored grid has a 3.1 m pair. The spacing is asserted over
+  // the WHOLE grid, the player's slot included, because the player is what the
+  // 0.07 m reading was measured against.
+  const gridSample = course.sample(course.startProgress);
+  const authored = RIVAL_PROFILES.map((profile) => (
+    course.gridStart(profile.name)?.lateralMeters ?? profile.startingLateralMeters
+  ));
+  const laneHalfWidth = Math.max(0, gridSample.halfWidth - VEHICLE_CLEARANCE_METERS);
+  const fanned = spreadGridLaterals(course.startLateral, authored, laneHalfWidth);
+  const authoredSpacing = minimumLateralSpacingMeters([course.startLateral, ...authored]);
+  const fannedSpacing = minimumLateralSpacingMeters([course.startLateral, ...fanned]);
+  assert.ok(
+    fannedSpacing >= RIVAL_GRID_MINIMUM_SPACING_METERS - 1e-9,
+    `${kind}: the fanned grid still has a ${fannedSpacing.toFixed(2)} m gap, under `
+      + `the ${RIVAL_GRID_MINIMUM_SPACING_METERS} m minimum. The deck at the start `
+      + `is ${(laneHalfWidth * 2).toFixed(1)} m of usable lane; four craft need `
+      + `${(RIVAL_GRID_MINIMUM_SPACING_METERS * 3).toFixed(1)} m of it.`,
+  );
+  assert.ok(
+    fanned.every((value) => Math.abs(value) <= laneHalfWidth + 1e-9),
+    `${kind}: the fanned grid put a rival off the deck.`,
+  );
+  console.log(
+    `${kind} grid: authored ${[course.startLateral, ...authored]
+      .map((value) => value.toFixed(2)).join(" / ")} (min gap `
+      + `${authoredSpacing.toFixed(2)} m) -> fanned ${[course.startLateral, ...fanned]
+        .map((value) => value.toFixed(2)).join(" / ")} (min gap `
+      + `${fannedSpacing.toFixed(2)} m)`,
+  );
 }
 
 // --- course-faithful five-lap races, both maps ----------------------------
@@ -627,7 +713,7 @@ const COURSE_FINISH_SECONDS = {
  * Both tables above are re-derived from these by
  * `node scripts/visual/print-rival-pins.mjs`; re-measure before re-pinning either.
  */
-const PLAYER_TOTAL_SECONDS = { greenwater: 165.442, bitterpan: 183.933 };
+const PLAYER_TOTAL_SECONDS = { greenwater: 165.449, bitterpan: 183.117 };
 
 let peakSteerRadians = 0;
 const steerRadians = [];
@@ -636,7 +722,11 @@ const brakeRadians = [];
 for (const kind of MAPS) {
   const course = loadCourseModel(kind);
   const pace = loadRivalPace(kind);
-  const player = () => measuredPacePlayer(course.length, PLAYER_TOTAL_SECONDS[kind] / 5);
+  const player = () => measuredPacePlayer(
+    course.length,
+    PLAYER_TOTAL_SECONDS[kind] / 5,
+    course.startLateral,
+  );
 
   const at120 = simulateRivalField({
     course,
@@ -672,6 +762,30 @@ for (const kind of MAPS) {
   assert.ok(
     at120.states.every((state) => state.finished),
     `${kind}: every rival must finish the five-lap run.`,
+  );
+
+  // 0. The launch. Not one rival may leave the slot it was given before
+  //    RIVAL_GRID_HOLD_METERS - not "barely move", zero - and the slots
+  //    themselves are the fanned ones asserted above.
+  assert.equal(
+    at120.maximumGridDriftMeters,
+    0,
+    `${kind}: a rival drifted ${at120.maximumGridDriftMeters.toFixed(4)} m off its `
+      + `grid slot inside the first ${RIVAL_GRID_HOLD_METERS} m.`,
+  );
+  assert.ok(
+    minimumLateralSpacingMeters(at120.gridSlots) >= RIVAL_GRID_MINIMUM_SPACING_METERS - 1e-9,
+    `${kind}: the field raced off a grid that was never spread.`,
+  );
+  assert.deepEqual(
+    at60.gridSlots,
+    at120.gridSlots,
+    `${kind}: the grid fan is not rate independent.`,
+  );
+  assert.deepEqual(
+    idle.gridSlots,
+    at120.gridSlots,
+    `${kind}: the grid fan moved with the player.`,
   );
 
   // 1. Render rate cannot move a rival. `stepRivalField` owns the accumulator
