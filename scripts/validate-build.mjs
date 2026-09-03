@@ -119,9 +119,30 @@ assert.ok(
 //     No audio ASSETS were added and none can be: the project ships zero audio
 //     files and every sound in it is synthesised at run time from a seeded LCG.
 //     The served file list below is unchanged by this phase.
+//
+//   G4 modes, tiers, sector deltas and the result stats  +3.1 KiB - measured
+//     238.9 -> 242.0 KiB gzip on the merged tree.
+//
+//     IN the shell, and each of these is load-bearing at first paint:
+//     `src/game/race-modes-rules.js` and `src/game/race-modes.ts` (the format
+//     vocabulary, the lap-count arbitration, the tier pace merge and the
+//     delta arithmetic) land in the `query-probes` chunk, which grew 3.71 ->
+//     5.14 KiB gzip. They cannot be lazy: `resolveLapCount` and the fleet
+//     decision run before the first frame, and `meta-ui.ts` builds the format
+//     and field chip rows on the start screen. `save-schema.js` grew by the
+//     v3 guards and the v2 -> v3 migration; `ui.ts` by the two delta elements
+//     and the result-stats renderer.
+//
+//     OUT of the shell: every byte of authored tier pace. The rookie and feral
+//     cruise/boost-window blocks are ~1.1 KiB raw each and live in
+//     `greenwater-rival-pace.json` and `BITTERPAN_PRODUCTION.json`, both of
+//     which are already inside the lazily-imported course chunks - so a player
+//     pays for the tier tables of the circuit they dispatched and neither of
+//     the other map's. The per-tier derivation notes in those files are the
+//     same: authored data, not shell.
 assert.ok(
-  javascriptGzip <= 240 * 1024,
-  `JavaScript bundle exceeds 240 KiB gzip (${(javascriptGzip / 1024).toFixed(1)} KiB).`,
+  javascriptGzip <= 243 * 1024,
+  `JavaScript bundle exceeds 243 KiB gzip (${(javascriptGzip / 1024).toFixed(1)} KiB).`,
 );
 // Re-baselined 2026-08-28 from a measured 4.35 KiB gzip (the 4 KiB ceiling
 // predated the HUD turn-cue and hazard styling) plus headroom for the planned
@@ -143,9 +164,16 @@ assert.ok(
 // ceiling goes 248 -> 251 for coherence rather than for headroom: at the JS
 // ceiling of 240 the shell is already ~248.8, so a 248 shell ceiling would fail
 // builds the JS ceiling explicitly allows.
+// G4 re-measure: 251.0 KiB (HTML 3.4 + JS 242.0 + CSS 5.6). Unlike A1 this
+// phase does touch both of the small halves - four HTML nodes (two chip rows,
+// the sector-delta span, the live chip and the result-stats list) and the CSS
+// for them, together about +0.3 KiB - but the move is still dominated by the
+// JS above. The ceiling goes 251 -> 254 on the same coherence argument A1 used:
+// at the JS ceiling of 243 the shell is already ~252, so a 251 shell ceiling
+// would fail builds the JS ceiling explicitly allows.
 assert.ok(
-  shellGzip <= 251 * 1024,
-  `Initial app shell exceeds 251 KiB gzip (${(shellGzip / 1024).toFixed(1)} KiB).`,
+  shellGzip <= 254 * 1024,
+  `Initial app shell exceeds 254 KiB gzip (${(shellGzip / 1024).toFixed(1)} KiB).`,
 );
 assert.ok(
   html.includes('rel="preload"')

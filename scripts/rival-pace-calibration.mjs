@@ -11,16 +11,23 @@
  *   node scripts/rival-pace-calibration.mjs                 both maps, report
  *   node scripts/rival-pace-calibration.mjs greenwater      one map, report
  *   node scripts/rival-pace-calibration.mjs bitterpan --solve --player=201.066
+ *   node scripts/rival-pace-calibration.mjs --tier=feral --solve
  *
  * `--solve` bisects each profile's `cruiseSpeedMetersPerSecond` until its
  * five-lap total lands on the authored offset from the player's total, then
  * prints the block to paste back. `--player=` is the demo-autopilot five-lap
  * total measured by `node scripts/visual/diag-long.mjs` on that map; pass the number
  * from the soak you are calibrating against, never a remembered one.
+ *
+ * G4 — `--tier=` selects which field strength is being reported or solved. It
+ * runs the tier through the same `applyPaceTier` the game does, so what the
+ * instrument measures is the table the race actually loads rather than a second
+ * arrangement of the same numbers. `--tier=all` walks all three.
  */
 import { loadCourseModel, loadRivalPace } from "./lib/rival-course-model.mjs";
 import { measuredPacePlayer, simulateRivalField } from "./lib/rival-field-sim.mjs";
 import { RIVAL_PROFILES } from "../src/game/rival-race.js";
+import { RIVAL_TIERS, applyPaceTier } from "../src/game/race-modes-rules.js";
 
 /**
  * Five-lap demo-autopilot totals and lap-1 times measured on the build this
@@ -39,6 +46,26 @@ const TARGET_TOTAL_OFFSET_SECONDS = {
   "rival-needle": 3.0,
 };
 
+/**
+ * G4 — how far each tier moves the whole field, in seconds over five laps.
+ *
+ * These are derived from the phase's acceptance windows rather than chosen, and
+ * the derivation is short enough to keep here. The window is stated on the BEST
+ * rival, which is PRIVATEER 13, and `works` already puts it at -0.4 s:
+ *
+ *   rookie  best rival 2.5-4.0 s BEHIND the demo player -> aim +3.25 s, the
+ *           window's midpoint, so the shift is +3.25 - (-0.4) = +3.65 s.
+ *   feral   best rival 2.5-4.0 s AHEAD -> aim -3.25 s, shift -2.85 s.
+ *
+ * The midpoint rather than an edge, because the solved cruise is then re-run
+ * against the live soak and has to survive the difference between the stand-in
+ * player curve and the actual demo lap; aiming at 2.5 would put half that
+ * difference outside the window. The whole field moves by the same offset, so
+ * the 3.4 s spread G1 authored between the three rivals is preserved and a tier
+ * changes how hard the race is rather than how bunched it is.
+ */
+const TIER_SHIFT_SECONDS = { rookie: 3.65, works: 0, feral: -2.85 };
+
 const argv = process.argv.slice(2);
 const solve = argv.includes("--solve");
 const kinds = argv.filter((value) => !value.startsWith("--"));
@@ -46,6 +73,22 @@ const maps = kinds.length > 0 ? kinds : ["greenwater", "bitterpan"];
 const playerOverride = argv
   .find((value) => value.startsWith("--player="))
   ?.slice("--player=".length);
+const tierArgument = argv
+  .find((value) => value.startsWith("--tier="))
+  ?.slice("--tier=".length) ?? "works";
+const tiers = tierArgument === "all" ? [...RIVAL_TIERS] : [tierArgument];
+
+/** The pace table a tier races, resolved exactly as the game resolves it. */
+function tierPace(kind, tier) {
+  return applyPaceTier(loadRivalPace(kind), tier);
+}
+
+/** The five-lap total this tier aims each profile at. */
+function tierTargetSeconds(playerTotalSeconds, profileId, tier) {
+  return playerTotalSeconds
+    + TARGET_TOTAL_OFFSET_SECONDS[profileId]
+    + (TIER_SHIFT_SECONDS[tier] ?? 0);
+}
 
 function runOnce(kind, pace, player) {
   const course = loadCourseModel(kind);
@@ -61,15 +104,18 @@ function runOnce(kind, pace, player) {
   });
 }
 
-function report(kind) {
-  const pace = loadRivalPace(kind);
+function report(kind, tier = "works") {
+  const pace = tierPace(kind, tier);
   const player = {
     ...PLAYER_REFERENCE[kind],
     ...(playerOverride ? { totalSeconds: Number(playerOverride) } : {}),
   };
   const run = runOnce(kind, pace, player);
   const course = loadCourseModel(kind);
-  console.log(`\n=== ${kind.toUpperCase()} (${course.length.toFixed(0)} m, 5 laps) ===`);
+  console.log(
+    `\n=== ${kind.toUpperCase()} · ${tier.toUpperCase()} `
+      + `(${course.length.toFixed(0)} m, 5 laps) ===`,
+  );
   console.log(
     `player   lap1 ${player.lapOneSeconds.toFixed(3)}   `
       + `total ${player.totalSeconds.toFixed(3)}`,
@@ -148,15 +194,15 @@ function solveCornerScrub(kind) {
   );
 }
 
-function solveCruise(kind) {
-  const pace = loadRivalPace(kind);
+function solveCruise(kind, tier = "works") {
+  const pace = tierPace(kind, tier);
   const player = {
     ...PLAYER_REFERENCE[kind],
     ...(playerOverride ? { totalSeconds: Number(playerOverride) } : {}),
   };
   const solved = {};
   for (const profile of RIVAL_PROFILES) {
-    const target = player.totalSeconds + TARGET_TOTAL_OFFSET_SECONDS[profile.id];
+    const target = tierTargetSeconds(player.totalSeconds, profile.id, tier);
     let low = 55;
     let high = 120;
     for (let iteration = 0; iteration < 34; iteration += 1) {
@@ -182,12 +228,26 @@ function solveCruise(kind) {
     }
     solved[profile.id] = Number(((low + high) / 2).toFixed(2));
   }
-  console.log(`\nsolved cruise for ${kind}:`, JSON.stringify(solved, null, 2));
+  console.log(`\nsolved cruise for ${kind} · ${tier}:`, JSON.stringify(solved, null, 2));
+  // The ratio against the works table this tier overlays, so a reviewer can see
+  // at a glance how far a tier actually moves the field rather than trusting
+  // that the solved numbers mean what the brief's headline scale said.
+  const works = loadRivalPace(kind).profiles;
+  console.log(
+    `  ratio vs works: ${Object.entries(solved)
+      .map(([id, cruise]) => (
+        `${id.replace("rival-", "")} ${
+          (cruise / works[id].cruiseSpeedMetersPerSecond).toFixed(4)}`
+      ))
+      .join("  ")}`,
+  );
   return solved;
 }
 
 for (const kind of maps) {
   if (argv.includes("--solve-corner")) solveCornerScrub(kind);
-  if (solve) solveCruise(kind);
-  report(kind);
+  for (const tier of tiers) {
+    if (solve) solveCruise(kind, tier);
+    report(kind, tier);
+  }
 }

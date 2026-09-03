@@ -41,7 +41,11 @@ import {
   stepRivalState,
 } from "../src/game/rival-race.js";
 import { CUSHION_PEAK_PUSH_MPS2 } from "../src/game/physics.js";
+import { RIVAL_TIERS, applyPaceTier } from "../src/game/race-modes-rules.js";
 import { loadCourseModel, loadRivalPace } from "./lib/rival-course-model.mjs";
+
+/** G4 — filled by the per-tier section at the end; declared here to stay flat. */
+const tierFinishTotals = { greenwater: {}, bitterpan: {} };
 import {
   measuredPacePlayer,
   parkedPlayer,
@@ -1438,6 +1442,149 @@ assert.match(
   "The rival atlas must mirror each served sheet into its quadrant, because it "
     + "cannot flip the sampler. Without this every rival body samples the "
     + "mirrored paint-chip row.",
+);
+
+// ---------------------------------------------------------------------------
+// G4 — the three rival tiers
+//
+// Everything above proves ONE field: the works pace, at 60 and 120 Hz, against
+// a moving player and a parked one. A tier is a different field driving the
+// same model, so it inherits none of that by assumption and all of it by
+// re-running — which is the only way to know that authoring a second pace table
+// did not, for instance, make a cruise speed depend on the player.
+//
+// Three properties per tier per map:
+//
+//   1. BIT-IDENTICAL at 60 and 120 Hz. Not "close": the same numbers.
+//   2. PLAYER-INDEPENDENT longitudinally. The lap and finish times a tier sets
+//      must be identical whether the player races or is left on the grid. This
+//      is the no-rubber-banding assertion, and it is the one a difficulty
+//      setting is most likely to break — "make the field harder" is exactly the
+//      shape of change that reaches for the player's position.
+//   3. INSIDE ITS WINDOW. The phase's acceptance, stated on the best rival.
+// ---------------------------------------------------------------------------
+
+/**
+ * Where each tier's best rival must land against the demo player's five-lap
+ * total, in seconds. Positive is behind.
+ *
+ * Measured, not chosen: `node scripts/rival-pace-calibration.mjs --tier=all`
+ * solved every cruise speed in the shipped JSON against these windows and the
+ * authored boost windows beside them. The bands are the brief's, 2.5-4.0 s
+ * either side, and `works` keeps G1's own -0.4 s with the tolerance G1 used.
+ */
+const TIER_BEST_RIVAL_WINDOW_SECONDS = {
+  rookie: [2.5, 4.0],
+  works: [-1.0, 0.2],
+  feral: [-4.0, -2.5],
+};
+
+for (const kind of MAPS) {
+  const course = loadCourseModel(kind);
+  const basePace = loadRivalPace(kind);
+  const player = () => measuredPacePlayer(
+    course.length,
+    PLAYER_TOTAL_SECONDS[kind] / 5,
+    course.startLateral,
+  );
+
+  for (const tier of RIVAL_TIERS) {
+    const pace = applyPaceTier(basePace, tier);
+    const runAt = (renderDeltaSeconds, playerModel) => simulateRivalField({
+      course,
+      pace,
+      totalLaps,
+      renderDeltaSeconds,
+      player: playerModel,
+    });
+    const at120 = runAt(RIVAL_FIXED_STEP_SECONDS, player());
+    const at60 = runAt(1 / 60, player());
+    const parked = runAt(RIVAL_FIXED_STEP_SECONDS, parkedPlayer());
+
+    const timing = (run) => run.states.map((state) => ({
+      id: state.id,
+      laps: state.lapTimesSeconds,
+      finish: state.finishTimeSeconds,
+      boostSeconds: state.boostSeconds,
+      padHits: state.padHits,
+      driftEntries: state.driftEntries,
+    }));
+
+    assert.ok(
+      at120.states.every((state) => state.finished),
+      `${kind}/${tier}: a rival did not finish the five-lap run.`,
+    );
+
+    // 1. Rate independence, bit for bit.
+    assert.deepEqual(
+      timing(at60),
+      timing(at120),
+      `${kind}/${tier}: the field is not bit-identical at 60 Hz and 120 Hz.`,
+    );
+
+    // 2. Longitudinal player independence. Lateral is deliberately excluded:
+    //    the lane solver yields to the player on purpose (that is the no-block
+    //    rule), so a lateral difference is the feature working. A LONGITUDINAL
+    //    difference would be rubber-banding.
+    assert.deepEqual(
+      timing(parked),
+      timing(at120),
+      `${kind}/${tier}: the field's lap times moved with the player. That is `
+        + "rubber-banding, and no tier is allowed it.",
+    );
+
+    // The grid the tier races off is the same one, too — a tier changes pace,
+    // never where the field starts.
+    assert.deepEqual(
+      at120.gridSlots,
+      parked.gridSlots,
+      `${kind}/${tier}: the grid fan moved with the player.`,
+    );
+
+    // 3. The window, on the best rival.
+    const best = Math.min(...at120.states.map((state) => state.finishTimeSeconds));
+    const offset = best - PLAYER_TOTAL_SECONDS[kind];
+    const [low, high] = TIER_BEST_RIVAL_WINDOW_SECONDS[tier];
+    assert.ok(
+      offset >= low && offset <= high,
+      `${kind}/${tier}: the best rival finished ${offset.toFixed(3)} s from the demo `
+        + `player, outside the ${low}..${high} s window. Re-solve with `
+        + `\`node scripts/rival-pace-calibration.mjs ${kind} --tier=${tier} --solve\` `
+        + "rather than moving this number.",
+    );
+
+    // The tiers have to be ORDERED, or two of them are the same difficulty
+    // wearing different names. Asserted on the field's whole five-lap total so
+    // one rival's boost window cannot carry the comparison.
+    tierFinishTotals[kind][tier] = at120.states
+      .reduce((sum, state) => sum + state.finishTimeSeconds, 0);
+  }
+
+  const { rookie, works, feral } = tierFinishTotals[kind];
+  assert.ok(
+    rookie > works && works > feral,
+    `${kind}: the tiers are not ordered by pace (rookie ${rookie.toFixed(2)} s, `
+      + `works ${works.toFixed(2)} s, feral ${feral.toFixed(2)} s over three rivals `
+      + "and five laps).",
+  );
+  // And separated by enough that a player can feel the step rather than measure
+  // it. One second per rival over five laps is the floor.
+  assert.ok(
+    rookie - works >= 3 && works - feral >= 3,
+    `${kind}: two tiers are within a second per rival (rookie-works `
+      + `${(rookie - works).toFixed(2)} s, works-feral ${(works - feral).toFixed(2)} s).`,
+  );
+}
+
+console.log(
+  `Rival tiers PASS: ${RIVAL_TIERS.length} tiers x ${MAPS.length} maps, each `
+    + "bit-identical at 60/120 Hz and longitudinally identical against a parked "
+    + "player (no rubber-banding in any tier), each best rival inside its window: "
+    + MAPS.map((kind) => `${kind} `
+      + RIVAL_TIERS.map((tier) => `${tier} ${(
+        tierFinishTotals[kind][tier] / 3 - PLAYER_TOTAL_SECONDS[kind]
+      ).toFixed(2)}s mean`).join(" / ")).join("; ")
+    + ".",
 );
 
 console.log(

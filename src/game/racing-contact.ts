@@ -294,8 +294,12 @@ export class RacingContact {
           `${id.replace("rival-", "").toUpperCase()} · ${Math.abs(gap).toFixed(1)} M`,
           0.2,
         );
+        // G4 - the COUNT leaves the diagnostics guard because the result screen
+        // prints NEAR MISSES in ordinary play; the location strings stay inside
+        // it, because an unbounded array of soak artifacts is not something a
+        // normal session should be accumulating.
+        this.nearMisses += 1;
         if (diagnosticsMode) {
-          this.nearMisses += 1;
           this.nearMissReward += scored.reward;
           this.locations.push(`${id}@${where}/${Math.abs(gap).toFixed(2)}m`);
         }
@@ -327,19 +331,23 @@ export class RacingContact {
    * Called on EVERY crossing of the armed gate, including the one that misses
    * it, and before any of the race loop's own gate branches return - a lap gate
    * has to score the same way a sector gate does.
+   *
+   * G4 dropped the `diagnosticsMode` argument: the only thing it gated was the
+   * peak-chain sample, which the result screen now prints in ordinary play.
    */
   crossGate(
     lateralMeters: number,
     gateHalfWidthMeters: number,
     missed: boolean,
-    diagnosticsMode: boolean,
   ): void {
     this.chain = resolveCleanGateChain(this.chain, {
       lateralMeters,
       gateHalfWidthMeters,
       missed,
     }).chain;
-    if (diagnosticsMode) this.peakChain = Math.max(this.peakChain, this.chain);
+    // G4 - unguarded, for the same reason `nearMisses` above is: CLEAN CHAIN is
+    // on the result screen now. One Math.max per gate crossing.
+    this.peakChain = Math.max(this.peakChain, this.chain);
   }
 
   /**

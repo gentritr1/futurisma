@@ -178,6 +178,79 @@ body[data-boost="true"] .image-treatment::before {
   opacity: 0.85;
 }
 
+/*
+ * G4 sector delta. Deliberately the same weight and rhythm as the clean-gate
+ * chain above - both are one gate's verdict, both appear only when they have
+ * something to say - so the progress block never grows a third typographic
+ * voice. What separates them is hue, and hue is never the only carrier: `+` and
+ * the U+2212 minus do the work for anyone who cannot tell the two apart.
+ */
+.sector-delta {
+  font-family: var(--mono);
+  font-size: 0.56rem;
+  letter-spacing: 0.12em;
+  font-variant-numeric: tabular-nums;
+  color: var(--dim);
+}
+
+.sector-delta[data-tone="up"] {
+  color: var(--warning);
+}
+
+.sector-delta[data-tone="down"] {
+  color: var(--cyan);
+}
+
+/*
+ * G4 live delta chip, time attack only. Lives inside the timing block, in the
+ * row the position ladder uses in a field race - see the note in index.html.
+ * Held at 4 Hz by the runtime, so this can afford a colour transition without
+ * it ever reading as a flicker.
+ */
+.delta-chip {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 2px;
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  font-variant-numeric: tabular-nums;
+  transition: color 160ms var(--ease-out);
+  color: var(--dim);
+}
+
+.delta-chip__label {
+  color: var(--dim);
+  font-size: 0.52rem;
+  letter-spacing: 0.16em;
+}
+
+.delta-chip strong {
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.delta-chip[data-tone="up"] {
+  color: var(--warning);
+}
+
+.delta-chip[data-tone="down"] {
+  color: var(--cyan);
+}
+
+.delta-chip[data-tone="level"] {
+  color: var(--muted);
+}
+
+/* Same rule the slipstream chip is held to: the colour still carries the
+   meaning, it just stops travelling to get there. */
+@media (prefers-reduced-motion: reduce) {
+  .delta-chip {
+    transition: none;
+  }
+}
+
 .race-header {
   position: fixed;
   z-index: 10;
@@ -1089,6 +1162,14 @@ body[data-options="true"] .hud {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+/* G4 — the two three-option rows get three columns rather than a 2 + 1 orphan.
+   Circuit and livery stay on two because they are two-across by content: their
+   chips carry a second line of deck copy that a third column cannot hold. */
+.dispatch #format-select,
+.dispatch #tier-select {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .chip {
   display: flex;
   flex-direction: column;
@@ -1253,6 +1334,64 @@ body[data-options="true"] .hud {
 
 .result-best[data-active="true"] {
   animation: result-best 900ms var(--ease-out) 2;
+}
+
+/*
+ * G4 race stats. A definition list because that is what it is - six labelled
+ * figures - and a two-column grid because six stacked rows would push the
+ * RACE AGAIN button off a laptop screen, which is the one thing the result
+ * panel must never do. Same mono, same rules, same acid-on-dim contrast as the
+ * dispatch sheet: this is the same terminal reporting back.
+ */
+.result-stats {
+  width: 100%;
+  margin: 14px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px 16px;
+  font-family: var(--mono);
+  text-align: left;
+}
+
+.result-stats div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.result-stats dt {
+  color: var(--dim);
+  font-size: 0.52rem;
+  letter-spacing: 0.16em;
+}
+
+.result-stats dd {
+  margin: 0;
+  color: var(--ink);
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The two the phase exists to surface read acid; the rest are context. */
+.result-stats dd[data-earned="true"] {
+  color: var(--acid);
+}
+
+.result-stats dd[data-tone="up"] {
+  color: var(--warning);
+}
+
+.result-stats dd[data-tone="down"] {
+  color: var(--cyan);
+}
+
+@media (max-width: 700px) {
+  .result-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 /* The dispatch sheet made the intro panel ~250px taller. Below a laptop's worth

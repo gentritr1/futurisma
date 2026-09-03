@@ -53,6 +53,8 @@ import {
   liveryFor,
 } from "./liveries.js";
 import type { MinimapContact } from "./minimap";
+import { raceModes } from "./race-modes";
+import { reverseGridOrder } from "./race-modes-rules.js";
 import { composeShaderInjection } from "./totem";
 import type {
   TotemRivalArticulationGroup,
@@ -297,7 +299,17 @@ export function openingRaceStatus(
   playerRaceDistanceMeters: number,
 ): RivalRaceStatus {
   return fleet?.raceStatus(playerRaceDistanceMeters, 0)
-    ?? { position: 1, racerCount: 4, gapToAheadMs: null, gapToBehindMs: null };
+    // G4 — the fallback now asks the format how many craft are classified.
+    // `race` and `sprint` still answer 4, exactly as the hard-coded number did;
+    // `timeattack` answers 1, and it is this line that makes `fieldSize` report
+    // a solo run honestly rather than claiming three rivals that were never
+    // spawned.
+    ?? {
+      position: 1,
+      racerCount: raceModes.fieldSize(RIVAL_PROFILES.length),
+      gapToAheadMs: null,
+      gapToBehindMs: null,
+    };
 }
 
 export interface RivalFleetDiagnostics {
@@ -598,6 +610,14 @@ export class RivalFleet {
    * Assemble a fleet from the loaded vehicle: builds the rival visual batches,
    * loads the livery atlas, and owns cleanup when the game is disposed while
    * the atlas is still in flight. Returns null when disposed mid-assembly.
+   *
+   * G4 — null now has a second meaning: the race format spawns no field. The
+   * check is FIRST, before the batches are built and before the livery atlas is
+   * fetched, so a time attack costs neither — "the fleet is absent" has to mean
+   * absent in the draw calls, the texture count and the network tab, not just
+   * in the scene graph. The caller tells the two nulls apart with
+   * `raceModes.hasField`, which is the same question asked before the work
+   * rather than after it.
    */
   static async create(
     course: RaceCourse,
@@ -609,6 +629,7 @@ export class RivalFleet {
     isDisposed: () => boolean,
     playerLivery = "works",
   ): Promise<RivalFleet | null> {
+    if (!raceModes.hasField) return null;
     const visualBatches = vehicle.createRivalVisualBatches();
     const disposeBatches = (): void => {
       for (const batch of visualBatches) {
@@ -662,7 +683,12 @@ export class RivalFleet {
     ));
     this.sample = course.createSampleScratch();
     this.lookAheadSample = course.createSampleScratch();
-    const pace = course.rivalPace;
+    // G4 — the tier's table, resolved from the map's authored block before
+    // anything reads a cruise speed. Resolved once here rather than per step,
+    // for the same reason the works table always was: the pace a rival drives
+    // is authored data, and a per-step lookup would be an invitation to make it
+    // depend on something.
+    const pace = raceModes.paceFor(course.rivalPace) as typeof course.rivalPace;
     this.paces = RIVAL_PROFILES.map((profile) => resolveRivalPace(pace, profile.id));
     this.noBlockSide = pace && Number.isFinite(pace.noBlockSide) ? pace.noBlockSide : -1;
     this.playerDistanceOffset = playerRaceDistanceOffsetMeters(
@@ -855,14 +881,28 @@ export class RivalFleet {
       )),
       Math.max(0, this.sample.halfWidth - VEHICLE_CLEARANCE_METERS),
     );
+    // G4 — the field's longitudinal slots, gathered before they are assigned so
+    // the sprint can hand them out back to front. `reverseGridOrder` permutes
+    // the slots the map authored rather than inventing new ones, so the spacing
+    // between them is whatever the circuit already said it should be, and the
+    // lateral fan above is untouched: it is computed from the profiles' lanes,
+    // which do not move. See `reverseGridOrder` for why this reverses the FIELD
+    // rather than the whole grid.
+    const authoredSlots = RIVAL_PROFILES.map((profile) => {
+      const gridStart = this.course.rivalGridStart(profile.name);
+      return gridStart ?? {
+        raceDistanceMeters: profile.gridOffsetMeters,
+        courseDistanceMeters: profile.gridOffsetMeters,
+      };
+    });
+    const slots = raceModes.reversesGrid
+      ? reverseGridOrder(authoredSlots)
+      : authoredSlots;
     this.states.forEach((state, index) => {
       resetRivalState(state, this.course.length, this.totalLaps);
-      const gridStart = this.course.rivalGridStart(RIVAL_PROFILES[index].name);
-      if (gridStart) {
-        state.raceDistanceMeters = gridStart.raceDistanceMeters;
-        state.courseDistanceMeters = gridStart.courseDistanceMeters;
-        state.lastSafeDistanceMeters = gridStart.raceDistanceMeters;
-      }
+      state.raceDistanceMeters = slots[index].raceDistanceMeters;
+      state.courseDistanceMeters = slots[index].courseDistanceMeters;
+      state.lastSafeDistanceMeters = slots[index].raceDistanceMeters;
       state.lateralMeters = gridLaterals[index];
       // The player-free lane starts on the grid slot too, or the first pad
       // lookup would be resolved against the profile's nominal lane instead.

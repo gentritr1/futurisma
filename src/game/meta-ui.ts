@@ -16,6 +16,15 @@ import type { MapSelection } from "./map-selection";
 import { TRACKS, trackFor } from "./map-selection";
 import { storedBestLapMs } from "./meta-runtime";
 import { save } from "./persistence";
+import {
+  RACE_MODES,
+  RACE_MODE_DECKS,
+  RACE_MODE_LABELS,
+  RIVAL_TIERS,
+  RIVAL_TIER_DECKS,
+  RIVAL_TIER_LABELS,
+} from "./race-modes-rules.js";
+import { raceModes } from "./race-modes";
 import type { GameUi } from "./ui";
 
 /** Everything the meta layer needs from the running game, and nothing more. */
@@ -169,6 +178,8 @@ export class MetaUi {
   private readonly musicSlider = requiredElement<HTMLInputElement>("option-music");
   private readonly musicValue = requiredElement<HTMLElement>("option-music-value");
   private readonly trackGroup: ChipGroup;
+  private readonly formatGroup: ChipGroup;
+  private readonly tierGroup: ChipGroup;
   private readonly liveryGroup: ChipGroup;
   private readonly motionGroup: ChipGroup;
   private readonly qualityGroup: ChipGroup;
@@ -192,6 +203,32 @@ export class MetaUi {
       })),
       "confirm",
       (value) => this.dispatchCircuit(value as MapSelection),
+    );
+    // G4 — the format and the field. Both commit with `"confirm"` and both
+    // dispatch by navigating, for exactly the reason the circuit row does: the
+    // lap count, whether a fleet is spawned at all and which pace table it
+    // drives are all read once at load, so changing one means relinking with
+    // the `?mode=` / `?tier=` a soak command already uses. An arrow key must
+    // never be able to reload the page by drifting across the row.
+    this.formatGroup = new ChipGroup(
+      requiredElement<HTMLElement>("format-select"),
+      RACE_MODES.map((mode) => ({
+        value: mode,
+        label: RACE_MODE_LABELS[mode],
+        note: RACE_MODE_DECKS[mode],
+      })),
+      "confirm",
+      (value) => this.dispatchFormat("mode", value),
+    );
+    this.tierGroup = new ChipGroup(
+      requiredElement<HTMLElement>("tier-select"),
+      RIVAL_TIERS.map((tier) => ({
+        value: tier,
+        label: RIVAL_TIER_LABELS[tier],
+        note: RIVAL_TIER_DECKS[tier],
+      })),
+      "confirm",
+      (value) => this.dispatchFormat("tier", value),
     );
     this.liveryGroup = new ChipGroup(
       requiredElement<HTMLElement>("livery-select"),
@@ -248,12 +285,27 @@ export class MetaUi {
   /** Repaints the start screen's record line for the dispatched circuit. */
   syncRecord(): void {
     const track = trackFor(this.selection);
-    this.ui.setStoredBest(storedBestLapMs(track.mapCode), track.label);
+    // G4 — the record line names the FORMAT it belongs to. `storedBestLapMs`
+    // now answers per map, mode and tier, so a line that said only
+    // "GREENWATER STRIP · BEST LAP 00:32.517" would be advertising a target
+    // without saying which race it was set in — and would appear to change on
+    // its own when the player moved the field chip.
+    this.ui.setStoredBest(
+      storedBestLapMs(track.mapCode),
+      `${track.label} · ${RACE_MODE_LABELS[raceModes.mode]} · ${
+        RIVAL_TIER_LABELS[raceModes.tier]}`,
+    );
   }
 
   private syncFromSave(): void {
     const settings = save.settings;
     this.trackGroup.setValue(this.selection);
+    // G4 — the RESOLVED format, not the stored one. `?mode=` and `?tier=` are
+    // overrides that win, so a soak launched with `&tier=feral` has to show the
+    // chip row saying FERAL; syncing from the save file would put the panel and
+    // the race it is sitting in front of into disagreement.
+    this.formatGroup.setValue(raceModes.mode);
+    this.tierGroup.setValue(raceModes.tier);
     this.liveryGroup.setValue(save.livery);
     this.motionGroup.setValue(settings.reducedMotion ? "on" : "off");
     this.qualityGroup.setValue(settings.quality);
@@ -283,6 +335,33 @@ export class MetaUi {
     }
     const parameters = new URLSearchParams(window.location.search);
     parameters.set("map", track);
+    window.location.search = parameters.toString();
+  }
+
+  /**
+   * G4 — commits a format or a field strength, which means relinking.
+   *
+   * Deliberately the same shape as {@link dispatchCircuit}, including the
+   * store-then-navigate order: the choice is written first so that a bare
+   * reload later — or a crash between the two — lands on what the player asked
+   * for rather than on what the URL happened to carry. Choosing the value this
+   * session already loaded re-checks the chip and does nothing else, because
+   * navigating to the page you are on to change nothing is a reload the player
+   * did not ask for.
+   *
+   * The URL keeps every OTHER parameter it had. A soak driving `?map=` and
+   * `?diagnostics=` through the panel must not lose them by picking a tier.
+   */
+  private dispatchFormat(parameter: "mode" | "tier", value: string): void {
+    const active = parameter === "mode" ? raceModes.mode : raceModes.tier;
+    if (parameter === "mode") save.setRaceMode(value);
+    else save.setTier(value);
+    if (value === active) {
+      (parameter === "mode" ? this.formatGroup : this.tierGroup).setValue(value);
+      return;
+    }
+    const parameters = new URLSearchParams(window.location.search);
+    parameters.set(parameter, value);
     window.location.search = parameters.toString();
   }
 
@@ -428,6 +507,8 @@ export class MetaUi {
     this.optionsClose.removeEventListener("click", this.handleCloseClick);
     this.optionsRelink.removeEventListener("click", this.handleRelinkClick);
     this.trackGroup.dispose();
+    this.formatGroup.dispose();
+    this.tierGroup.dispose();
     this.liveryGroup.dispose();
     this.motionGroup.dispose();
     this.qualityGroup.dispose();

@@ -77,6 +77,8 @@ import {
 } from "./render-quality";
 import { configureShadowMap } from "./shadows";
 import { applyRaceLivery, recordFinishedRace } from "./meta-runtime";
+// G4 - the race FORMAT. Every decision lives in race-modes.ts; six calls here.
+import { raceModes } from "./race-modes";
 import { save } from "./persistence";
 import { playerRaceDistanceMeters as calculatePlayerRaceDistance } from "./rival-race.js";
 import { RacingContact } from "./racing-contact";
@@ -367,6 +369,7 @@ export class FuturismaGame {
       },
     );
     this.diagnostics = new RaceDiagnostics(this.diagnosticsMode);
+    raceModes.attach(this.course, ui); // G4 - gate distances and the delta HUD.
     this.timer.connect(document);
     this.resize();
     window.addEventListener("resize", this.resize);
@@ -411,20 +414,25 @@ export class FuturismaGame {
       () => this.disposed,
       save.livery,
     );
-    if (!rivalFleet) {
+    // G4 - a null fleet is only a failure when the format wanted one; timeattack
+    // races solo, and `RivalFleet.create` says so by returning null too.
+    if (!rivalFleet && raceModes.hasField) {
       disposeObject3DResources(this.vehicle.root);
       this.vehicle.root.clear();
       return false;
     }
     this.rivalFleet = rivalFleet;
     // G2 kill switch: `?cushion=0` restores the G1 no-contact race exactly.
-    this.rivalFleet.setCushionEnabled(this.cushionEnabled);
-    this.scene.add(this.rivalFleet.root, ghostRuntime.attach(this.course, this.vehicle));
-    this.audio.attachSpatialScene(rivalFleet, this.camera, this.vehicle.root.position);
+    this.rivalFleet?.setCushionEnabled(this.cushionEnabled);
+    this.scene.add(ghostRuntime.attach(this.course, this.vehicle));
+    if (rivalFleet) {
+      this.scene.add(rivalFleet.root);
+      this.audio.attachSpatialScene(rivalFleet, this.camera, this.vehicle.root.position);
+    }
     this.ui.setRaceFormat(
       this.totalLaps,
       this.course.length,
-      this.rivalFleet.gridEntries,
+      this.rivalFleet?.gridEntries ?? [],
       {
         mapName: this.course.mapName,
         mapCode: this.course.mapCode,
@@ -776,9 +784,11 @@ export class FuturismaGame {
       delta,
       slipstream,
     );
+    // G4 - out of the guard below: the result screen prints TOP SPEED in
+    // ordinary play, and the value is identical, so `topSpeedKph` does not move.
+    this.diagnosticTopSpeed = Math.max(this.diagnosticTopSpeed, this.speed);
     if (this.diagnosticsMode) {
       this.diagnosticDistanceTravelled += this.speed * delta;
-      this.diagnosticTopSpeed = Math.max(this.diagnosticTopSpeed, this.speed);
       if (this.boostActive) this.diagnosticBoostSeconds += delta;
       if (this.driftActive) this.diagnosticDriftSeconds += delta;
     }
@@ -1054,7 +1064,7 @@ export class FuturismaGame {
     // of the four branches below can return. See racing-contact.ts.
     const gateHalfWidth = this.course.checkpointHalfWidth(this.nextCheckpointIndex);
     const missedGate = Math.abs(this.lateral) > gateHalfWidth;
-    this.contact.crossGate(this.lateral, gateHalfWidth, missedGate, this.diagnosticsMode);
+    this.contact.crossGate(this.lateral, gateHalfWidth, missedGate);
     if (missedGate) {
       if (this.missedGateIndex !== this.nextCheckpointIndex) {
         this.missedGateIndex = this.nextCheckpointIndex;
@@ -1079,6 +1089,7 @@ export class FuturismaGame {
       this.lastLapMs = completedLapMs;
       this.bestLapMs = Math.min(this.bestLapMs ?? completedLapMs, completedLapMs);
       this.lapTimesMs.push(completedLapMs);
+      raceModes.closeLap(completedLapMs); // G4 - before the finish check.
       this.lapStartElapsedMs = this.elapsedMs;
       this.lap += 1;
       if (this.lap > this.totalLaps) {
@@ -1105,6 +1116,8 @@ export class FuturismaGame {
       ? this.nextCheckpointIndex + 1
       : 0;
     this.course.setCheckpointProgress(this.nextCheckpointIndex);
+    // G4 - the split and its delta, on the same crossing the gate flashes on.
+    raceModes.crossGate(clearedCheckpoint, this.elapsedMs - this.lapStartElapsedMs);
     this.ui.flashGate(clearedCheckpoint);
     this.audio.playGate(clearedCheckpoint);
     this.input.pulse(0.08, 0.22, 70);
@@ -1416,6 +1429,8 @@ export class FuturismaGame {
       this.offCourseTime,
       this.course.recoveryHoldSeconds,
     );
+    // G4 - the time-attack live delta; held to 4 Hz inside `RaceModes`.
+    raceModes.updateLiveDelta(this.elapsedMs, this.lapStartElapsedMs, this.progress);
     this.ui.update({
       speedKph: this.speed * 3.6,
       boost: this.boostReserve,
@@ -1493,12 +1508,13 @@ export class FuturismaGame {
       this.raceStatus.position,
       this.raceStatus.racerCount,
       standings,
-      recordFinishedRace(
-        this.course.mapCode,
-        this.bestLapMs,
-        this.elapsedMs,
-        this.lapTimesMs,
-      ),
+      // G4 - the stats come from the contributors that already measure them,
+      // so nothing new is counted here. See `RaceResultInputs`.
+      recordFinishedRace(this.bestLapMs, this.elapsedMs, this.lapTimesMs, {
+        contact: this.contact.diagnostics(),
+        rivals: this.rivalFleet?.diagnostics(),
+        topSpeedMetersPerSecond: this.diagnosticTopSpeed,
+      }),
     );
   }
 
@@ -1583,6 +1599,7 @@ export class FuturismaGame {
     this.lapTimesMs.length = 0;
     this.rivalFleet?.reset();
     ghostRuntime.reset();
+    raceModes.reset(); // G4 - reloads the record this race is measured against.
     this.raceStatus = openingRaceStatus(
       this.rivalFleet,
       calculatePlayerRaceDistance({

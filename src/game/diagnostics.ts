@@ -6,6 +6,7 @@ import type { EngineAudio } from "./audio";
 import type { RaceCourse } from "./course";
 import type { MinimapDiagnostics } from "./minimap";
 import { persistenceDiagnostics } from "./persistence";
+import { raceModes } from "./race-modes";
 import type { RivalFleetDiagnostics } from "./rivals";
 import type { SceneAssets } from "./scene-assets";
 import type { Ps2TreatmentDiagnostics } from "./totem";
@@ -506,6 +507,11 @@ export function buildDiagnosticsReport(
     // P7: the save layer reports itself. `persistenceMode: "memory"` is the
     // signal that a write was refused and this session will forget on reload.
     ...persistenceDiagnostics(),
+    // G4: the race format reports itself, the same way and for the same reason.
+    // `raceMode`/`rivalTier` are what this page load RESOLVED; `storedFormat`/
+    // `storedTier` above are what the file holds, and a `?mode=` override is
+    // exactly the case where the two differ.
+    ...raceModes.diagnostics(),
     ps2CourseMaterials: core.ps2CourseMaterials,
     ps2CourseTextures: core.ps2CourseTextures,
     heapMb: core.heapMb === null ? null : Number(core.heapMb.toFixed(1)),
