@@ -1,65 +1,72 @@
 /**
- * H2a — the generated art pack, behind `?art=hf`.
+ * H2a — the horizon card sheet, in its generated edition.
  *
- * Three sheets have a second edition prepared by
- * `scripts/prepare-higgsfield-textures.py` out of the Higgsfield batch-1
- * generations: the Bitterpan pan crust tile, the Bitterpan facade sheet and the
- * shared horizon card sheet. This module is the ONLY place that decides which
- * edition a load reaches for, so the flag cannot be half-applied — a run with
- * the new horizon and the old facades is a combination nobody reviewed.
+ * `futurisma_horizon_hf_1024.png` is the DEFAULT sheet. It is prepared by
+ * `scripts/prepare-higgsfield-textures.py` out of a Higgsfield generation and
+ * redraws thirteen of the sixteen silhouette cells; the P18 sheet stays served
+ * and is reachable with `?art=base` for review only.
  *
- * The alternates are drop-in by construction. Every rect in ATLAS_REGIONS.json
- * is unmoved, the facade and horizon sheets keep the original pixels for every
- * region the pack does not replace, and nothing here touches a filter class:
- * `bitterpan-surface.ts` still puts linear + mipmaps + anisotropy 4 on the
- * floor and `living-world.ts` still puts the nearest, unmipped, `flipY = false`
- * card contract on the horizon sheet. The pack changes the pixels and nothing
- * else.
+ * Why this one and not the other two. The phase prepared three alternates and
+ * shot them against the shipping sheets at thirteen Bitterpan stations. The
+ * horizon was the only one that paid: a `STACK_CLUSTER` that was a dark
+ * rectangle with three sticks became seven chimneys over a plant block, and a
+ * featureless slab at 2900 m became a legible lattice gantry. That verdict
+ * rests on the CROPS and `frame-metrics.py` was NOT able to
+ * confirm it. That is recorded rather than dropped: on a five-station shoot the
+ * metric's edges% rose every time, which looked like support, and on a
+ * thirteen-station like-for-like re-shoot it rose at six of thirteen with most
+ * deltas inside +/-0.05. The two stations that moved more than noise moved for
+ * a reason the metric cannot see — `shoot-stations.mjs` fires anywhere inside
+ * its 45 m window, so the two builds were photographed from different poses,
+ * and its own header says so. A whole-frame structure metric is the wrong
+ * instrument for a change confined to a 60-row horizon band under fog. The
+ * crops are the evidence here, and they are qualitative on purpose.
  *
- * DEFAULT IS `base`, and that is a review gate rather than a hedge. The pan
- * crust in particular is a photoreal generation whose macro polygons land at
- * roughly 8 across a 12 m tile against the shipping tile's 14 finer ones, and
- * whether that reads as a salt pan or as a visible repeat is a taste call that
- * needs eyes on a station sheet, not a validator. Flipping the default is a
- * one-line change here once that call is made.
+ * The pan crust and the facade skins did not pay: the crust's
+ * macro polygons came out about twice the shipping tile's, which makes the 12 m
+ * repeat visible, and the facade skins were tone-matched into the sheet so
+ * carefully that at 2300 m they are hard to tell from the regions they replace.
+ * Neither was worth 1.09 MB of served texture, so neither ships; the
+ * preparation script still emits both into `shots/higgsfield/` so the work and
+ * its numbers survive.
+ *
+ * The swap is drop-in by construction. Every rect in ATLAS_REGIONS.json is
+ * unmoved, three cells (RIG_FAR, SHIMMER_BAND, HAZE_BAND — see the preparation
+ * script for why each has no honest source) keep the P18 sheet's own pixels,
+ * and nothing here touches a filter class: `living-world.ts` still puts the
+ * nearest, unmipped, `flipY = false` card contract on whichever edition loads.
+ * This module changes the pixels and nothing else.
+ *
+ * `?art=base` exists so the comparison stays runnable after the review closes —
+ * a before/after that can only be reproduced by checking out an old commit
+ * stops being reproduced. It is one string, not a feature.
  *
  * Shaped like `render-mode.js` on purpose: one parse, one memo, no `three`, so
  * a validator can import it under Node.
  *
  * @typedef {"base" | "hf"} ArtPack
- * @typedef {"panCrustTile" | "bitterpanFacades" | "horizonCards"} ArtPackSheet
  */
 
-/** @type {ArtPack} */
-export const DEFAULT_ART_PACK = "base";
+/** The generated sheet is the default; `?art=base` is the review-only way back. */
+export const DEFAULT_ART_PACK = /** @type {ArtPack} */ ("hf");
 
-/** @type {Record<ArtPackSheet, Record<ArtPack, string>>} */
-export const ART_PACK_SHEETS = {
-  panCrustTile: {
-    base: "/assets/map02/textures/bitterpan_crust_tile_256.png",
-    hf: "/assets/map02/textures/bitterpan_crust_tile_hf_512.png",
-  },
-  bitterpanFacades: {
-    base: "/assets/map02/textures/bitterpan_facades_1024.png",
-    hf: "/assets/map02/textures/bitterpan_facades_hf_1024.png",
-  },
-  horizonCards: {
-    base: "/assets/greenwater/textures/futurisma_horizon_1024.png",
-    hf: "/assets/greenwater/textures/futurisma_horizon_hf_1024.png",
-  },
+/** @type {Record<ArtPack, string>} */
+export const HORIZON_SHEETS = {
+  base: "/assets/greenwater/textures/futurisma_horizon_1024.png",
+  hf: "/assets/greenwater/textures/futurisma_horizon_hf_1024.png",
 };
 
 /**
- * Parses `?art=`. An unknown value falls back to the default rather than
- * throwing, for the same reason `resolveRenderMode` does: a typo in a shared
- * link must not break the game.
+ * Parses `?art=`. Anything that is not `base` falls back to the default rather
+ * than throwing, for the same reason `resolveRenderMode` does: a typo in a
+ * shared link must not break the game.
  *
  * @param {string | null | undefined} raw
  * @returns {ArtPack}
  */
 export function resolveArtPack(raw) {
-  return (typeof raw === "string" ? raw.trim().toLowerCase() : "") === "hf"
-    ? "hf"
+  return (typeof raw === "string" ? raw.trim().toLowerCase() : "") === "base"
+    ? "base"
     : DEFAULT_ART_PACK;
 }
 
@@ -67,7 +74,7 @@ export function resolveArtPack(raw) {
 let cachedPack = null;
 
 /**
- * The pack for this page load, memoized so the four load sites cannot disagree.
+ * The edition for this page load, memoized so a later read cannot disagree.
  *
  * @returns {ArtPack}
  */
@@ -83,11 +90,10 @@ export function activeArtPack() {
 }
 
 /**
- * The served URL for one sheet under the active pack.
+ * The served URL of the horizon card sheet for this page load.
  *
- * @param {ArtPackSheet} sheet
  * @returns {string}
  */
-export function artPackSheet(sheet) {
-  return ART_PACK_SHEETS[sheet][activeArtPack()];
+export function horizonSheetUrl() {
+  return HORIZON_SHEETS[activeArtPack()];
 }

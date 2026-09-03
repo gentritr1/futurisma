@@ -238,114 +238,100 @@ for (const [key, expected] of Object.entries(EXPECTED_SHEETS)) {
 }
 
 // ---------------------------------------------------------------------------
-// 2b. H2a — the generated art pack, behind `?art=hf`.
+// 2b. H2a — the generated horizon sheet, which is now the DEFAULT.
 //
-// Three sheets have an alternate edition prepared by
-// `scripts/prepare-higgsfield-textures.py`. They are NOT ATLAS_REGIONS entries:
-// that manifest is asserted above to describe exactly the ten art-pass sheets,
-// and an alternate edition is not an eleventh sheet — it is the SAME rects over
-// different pixels, which is the only thing that makes it a drop-in.
+// `futurisma_horizon_hf_1024.png` redraws thirteen of the sixteen silhouette
+// cells of the P18 sheet and `src/game/art-pack.js` loads it unless `?art=base`
+// asks for the old one. It is NOT an ATLAS_REGIONS entry: that manifest is
+// asserted above to describe exactly the ten art-pass sheets, and this is not
+// an eleventh sheet — it is the SAME rects over different pixels, which is the
+// only thing that makes it a drop-in.
 //
-// So what is pinned here is (a) each alternate's bytes and dimensions, and
-// (b) the invariant that makes the swap safe: every region rect of the base
-// sheet still lands inside the alternate at the same coordinates and the same
-// size. The rects live in ATLAS_REGIONS.json against the BASE sheet and are
-// never duplicated, so there is nothing for the two to drift apart on — (b) is
-// therefore a dimension check, and it is written out rather than assumed
-// because a re-render of the pack at a different resolution would silently
-// re-scale every UV on the sheet.
+// So what is pinned here is (a) its bytes and dimensions, (b) that every region
+// rect of the P18 sheet still lands inside it at the same coordinates and size,
+// and (c) that art-pack.js actually defaults to it. (c) matters more than it
+// looks: the rest of this block would pass unchanged on a build that shipped
+// the file and never loaded it, which is exactly the shape of a default that
+// got reverted by an editor and not by a decision.
 //
-// The base sheets stay served and stay pinned above. `?art=hf` is opt-in and
-// `src/game/art-pack.js` defaults to `base`, so a build in which one of these
-// files is wrong is still a build whose default path is correct — which is
-// exactly why the default is a review gate and not a hedge.
+// Both editions stay served. `?art=base` is the review-only way back, and a
+// before/after that can only be reproduced by checking out an old commit stops
+// being reproduced.
+//
+// The pixel-level properties — the P20.8 row orientation and the P18.1 bottom
+// anchor — are asserted in validate-living-world.mjs, which already carries a
+// PNG decoder. This file weighs the sheet; that one reads it.
 // ---------------------------------------------------------------------------
 
-const ART_PACK_SHEETS = {
-  // 428,926 bytes. Served at 512, not 1024: a truecolour PNG of this crust
-  // measures 1475.3 KiB at 1024 against a 700 KB item budget, and 512 is still
-  // four times the texel density of the 256 tile it stands in for.
-  bitterpan_crust_tile_hf_512: {
-    base: "bitterpan_crust_tile_256",
-    texture: "/assets/map02/textures/bitterpan_crust_tile_hf_512.png",
-    width: 512,
-    height: 512,
-    bytes: 428926,
-    sha256: "e1fdd16f56f426bcddd0cf6f631b0da949b53ba8dd685589f446b316453c4b98",
-    // The ground tile wraps and is never addressed by region; CRUST_FIELD is
-    // the whole sheet. So this one is deliberately NOT rect-checked against its
-    // base — a 512 tile and a 256 tile cannot share a rect and do not need to.
-    rectsMustMatch: false,
-  },
-  // 664,721 bytes. Three of fifteen regions repainted (SKIN_GALV_RIB,
-  // SKIN_PATCHED, SKIN_CONCRETE); the other twelve are the base sheet's own
-  // pixels, copied through. SKIN_CANVAS is NOT among them on purpose: the
-  // generation for it is a hanging tarp object with grommets and a wall behind
-  // it, not a canvas material, and it cannot tile.
-  bitterpan_facades_hf_1024: {
-    base: "bitterpan_facades_1024",
-    texture: "/assets/map02/textures/bitterpan_facades_hf_1024.png",
-    width: 1024,
-    height: 1024,
-    bytes: 664721,
-    sha256: "472c11931d78abe5376bcd49594f85d3a538dce3c3786e4f2c35a7503ec53555",
-    rectsMustMatch: true,
-  },
-  // 197,939 bytes. Thirteen of sixteen cells redrawn. RIG_FAR keeps its
-  // original pixels because the 4x4 generation carries no second lattice rig,
-  // and SHIMMER_BAND and HAZE_BAND keep theirs because the generated band cells
-  // are PALE gradients: a luminance-to-alpha pass would turn the two cells
-  // whose whole job is to lift the far field into dark ones.
-  futurisma_horizon_hf_1024: {
-    base: "futurisma_horizon_1024",
-    texture: "/assets/greenwater/textures/futurisma_horizon_hf_1024.png",
-    width: 1024,
-    height: 1024,
-    bytes: 197939,
-    sha256: "169c30729904ec20edaa44c33298704bb76ce5c387ba39e8f7f9d6256653c967",
-    rectsMustMatch: true,
-  },
+const HORIZON_HF = {
+  base: "futurisma_horizon_1024",
+  texture: "/assets/greenwater/textures/futurisma_horizon_hf_1024.png",
+  width: 1024,
+  height: 1024,
+  bytes: 197939,
+  sha256: "169c30729904ec20edaa44c33298704bb76ce5c387ba39e8f7f9d6256653c967",
 };
 
-for (const [key, pack] of Object.entries(ART_PACK_SHEETS)) {
-  const bytes = readFileSync(new URL(`public${pack.texture}`, root));
+{
+  const bytes = readFileSync(new URL(`public${HORIZON_HF.texture}`, root));
   assert.equal(
     bytes.byteLength,
-    pack.bytes,
-    `${key} is ${bytes.byteLength} bytes; the pin says ${pack.bytes}. Re-run `
-      + "`python3 scripts/prepare-higgsfield-textures.py --check` rather than "
-      + "editing the pin: that script is the provenance for these sheets.",
+    HORIZON_HF.bytes,
+    `futurisma_horizon_hf_1024 is ${bytes.byteLength} bytes; the pin says `
+      + `${HORIZON_HF.bytes}. Re-run \`python3 `
+      + "scripts/prepare-higgsfield-textures.py --check` rather than editing the "
+      + "pin: that script is the provenance for this sheet.",
   );
   assert.equal(
     createHash("sha256").update(bytes).digest("hex"),
-    pack.sha256,
-    `${key} on disk is not the sheet prepare-higgsfield-textures.py emits.`,
+    HORIZON_HF.sha256,
+    "futurisma_horizon_hf_1024 on disk is not the sheet "
+      + "prepare-higgsfield-textures.py emits.",
   );
   assert.equal(
     bytes.subarray(0, 8).toString("hex"),
     "89504e470d0a1a0a",
-    `${key} is not a PNG.`,
+    "futurisma_horizon_hf_1024 is not a PNG.",
   );
   // IHDR width/height, read out of the header rather than trusted to the pin.
-  assert.equal(bytes.readUInt32BE(16), pack.width, `${key} changed width.`);
-  assert.equal(bytes.readUInt32BE(20), pack.height, `${key} changed height.`);
+  assert.equal(bytes.readUInt32BE(16), HORIZON_HF.width, "horizon hf changed width.");
+  assert.equal(bytes.readUInt32BE(20), HORIZON_HF.height, "horizon hf changed height.");
 
-  const base = atlas[pack.base];
-  assert.ok(base, `${key} names ${pack.base}, which ATLAS_REGIONS does not.`);
-  if (!pack.rectsMustMatch) continue;
+  const base = atlas[HORIZON_HF.base];
   assert.equal(
-    pack.width, base.width,
-    `${key} is ${pack.width} wide against ${pack.base}'s ${base.width}. The `
-      + "alternate has to be the same size as the sheet it stands in for, or "
-      + "every UV rect on it addresses different pixels.",
+    HORIZON_HF.width, base.width,
+    `futurisma_horizon_hf_1024 is ${HORIZON_HF.width} wide against `
+      + `${HORIZON_HF.base}'s ${base.width}. The alternate has to be the same `
+      + "size as the sheet it stands in for, or every UV rect on it addresses "
+      + "different pixels.",
   );
-  assert.equal(pack.height, base.height, `${key} changed height against its base.`);
+  assert.equal(HORIZON_HF.height, base.height, "horizon hf changed height against its base.");
   for (const [name, region] of Object.entries(base.regions)) {
     assert.ok(
-      region.x + region.w <= pack.width && region.y + region.h <= pack.height,
-      `${pack.base}/${name} runs off ${key}.`,
+      region.x + region.w <= HORIZON_HF.width
+        && region.y + region.h <= HORIZON_HF.height,
+      `${HORIZON_HF.base}/${name} runs off futurisma_horizon_hf_1024.`,
     );
   }
+
+  // (c). The default is the decision this phase actually made, so it is pinned
+  // as data rather than left to the module's prose.
+  const artPack = readFileSync(
+    new URL("src/game/art-pack.js", root), "utf8");
+  assert.ok(
+    /DEFAULT_ART_PACK = \/\*\* @type \{ArtPack\} \*\/ \("hf"\)/.test(artPack),
+    "art-pack.js no longer defaults to the generated horizon sheet. Shipping "
+      + "the file and not loading it is the failure this asserts against: every "
+      + "other check in this block passes on a build that serves a sheet nobody "
+      + "sees.",
+  );
+  assert.ok(
+    artPack.includes(HORIZON_HF.texture)
+      && artPack.includes(atlas[HORIZON_HF.base].texture),
+    "art-pack.js must name BOTH horizon editions. `?art=base` is the only way "
+      + "back to the P18 sheet, and a comparison that needs a checkout to "
+      + "reproduce stops being reproduced.",
+  );
 }
 
 // ---------------------------------------------------------------------------

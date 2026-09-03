@@ -9,6 +9,47 @@ inputs writes byte-identical PNGs, which is what lets `validate-art-pass.mjs`
 and `validate-assets.mjs` pin their sha256. `--check` re-derives everything and
 fails if any served file would change, without writing.
 
+WHAT SHIPPED, AND WHAT DID NOT
+------------------------------
+Four candidates were prepared, shot against the sheets they would replace at
+five Bitterpan stations, and reviewed on the crops. ONE ships:
+
+  futurisma_horizon_hf_1024.png   SERVED, and the DEFAULT sheet. At station 150
+      the P18 STACK_CLUSTER is a dark rectangle with three sticks and this one
+      is seven chimneys over a plant block; at station 2900 a featureless dark
+      slab becomes a legible lattice gantry. 197,939 bytes.
+
+      The evidence for this is the CROPS, and `scripts/visual/frame-metrics.py`
+      could not corroborate it. Worth writing down, because the first reading
+      looked like corroboration: over five stations its edges% rose every time.
+      Re-shot like-for-like over thirteen, it rose at six of thirteen with most
+      deltas inside +/-0.05, and the two stations that moved further moved
+      because `shoot-stations.mjs` fires anywhere inside its 45 m window and the
+      two builds were photographed from different poses — its own header warns
+      about exactly that. A whole-frame structure metric cannot resolve a change
+      confined to a 60-row horizon band under fog. The five-station reading was
+      a small sample flattering a conclusion, not support for it.
+
+  bitterpan_crust_tile_hf_512     REJECTED. Measured 8.3 macro polygons across
+      the tile against the shipping tile's ~14, so at 12 m per tile the salt
+      polygons come out roughly twice the size and the repeat is visible on the
+      pan. The source's baked ridge shadows also survive de-lighting and fight
+      the game's own sun. 428,926 bytes not spent.
+
+  bitterpan_facades_hf_1024       REJECTED, and rejected BY its own success:
+      the three new skins are tone-matched into the sheet (see below) closely
+      enough that at 2300 m they are hard to tell from the regions they
+      replace. 664,721 bytes for a difference the crop cannot show is not a
+      trade. 664,721 bytes not spent.
+
+  bitterpan_brine_hf_512          NOT WIRED. There is no texture slot for it —
+      P20.6's brine flats are vertex colour, not a second ground material — and
+      adding one would add a draw call.
+
+The three rejects are still emitted, into `shots/higgsfield/`, which .gitignore
+covers. A rejected candidate whose numbers can only be reproduced by reverting a
+commit stops being a reject and becomes a rumour.
+
 Inputs live in `assets-in/higgsfield/batch1/` in the MAIN checkout and are
 gitignored — they are 5-7 MB hero renders, not source art. This script is the
 provenance for the sheets that ARE committed, the same way
@@ -208,14 +249,16 @@ FACADE_UNUSED_CELLS = [(1, 0)]
 BASE_FACADES = "public/assets/map02/textures/bitterpan_facades_1024.png"
 BASE_HORIZON = "public/assets/greenwater/textures/futurisma_horizon_1024.png"
 
-OUT_CRUST = "public/assets/map02/textures/bitterpan_crust_tile_hf_512.png"
-OUT_FACADES = "public/assets/map02/textures/bitterpan_facades_hf_1024.png"
+#: THE ONE SERVED OUTPUT. Round 2 of the review shipped the horizon sheet as the
+#: default and rejected the other two on the crops; see WHAT SHIPPED below.
 OUT_HORIZON = "public/assets/greenwater/textures/futurisma_horizon_hf_1024.png"
-#: Prepared but NOT served: there is no texture slot on the pan for a second
-#: ground material, and adding one would add a draw call, which this phase is
-#: not allowed to spend. Written under `shots/`, which .gitignore already
-#: covers as the bucket for local review artefacts.
+
+#: Prepared, measured, NOT served. `shots/` is already in .gitignore as the
+#: bucket for local review artefacts, so re-running this script reproduces every
+#: rejected candidate and its numbers without adding a byte to the build.
+OUT_CRUST = "shots/higgsfield/bitterpan_crust_tile_hf_512.png"
 OUT_CRUST_1024 = "shots/higgsfield/bitterpan_crust_tile_hf_1024.png"
+OUT_FACADES = "shots/higgsfield/bitterpan_facades_hf_1024.png"
 OUT_BRINE_512 = "shots/higgsfield/bitterpan_brine_hf_512.png"
 
 # --------------------------------------------------------------------------
@@ -682,13 +725,17 @@ def main() -> int:
         inputs / "05-horizon-sheet.png", atlas["futurisma_horizon_1024"]["regions"])
     results[OUT_HORIZON] = write_png(Path(OUT_HORIZON), horizon, args.check)
 
-    print("\nServed additions (the numbers the validators pin):")
-    added = 0
-    for path in (OUT_CRUST, OUT_FACADES, OUT_HORIZON):
-        digest, size = results[path]
-        added += size
-        print(f'  "{path.split("public/assets/")[1]}":\n    "{digest}",  // {size:,} bytes')
-    print(f"  total added to public/: {added:,} bytes ({added / 1024:.1f} KiB)")
+    print("\nSERVED (the numbers the validators pin):")
+    digest, size = results[OUT_HORIZON]
+    print(f'  "{OUT_HORIZON.split("public/assets/")[1]}":\n    "{digest}",  // {size:,} bytes')
+    print(f"  total added to public/: {size:,} bytes ({size / 1024:.1f} KiB)")
+    print("\nPREPARED BUT NOT SERVED (rejected on the crops, kept reproducible):")
+    rejected = 0
+    for path in (OUT_CRUST, OUT_CRUST_1024, OUT_FACADES, OUT_BRINE_512):
+        _, rejected_size = results[path]
+        rejected += rejected_size
+        print(f"  {path}  {rejected_size:,} bytes")
+    print(f"  total NOT added to public/: {rejected:,} bytes ({rejected / 1024:.1f} KiB)")
     return 0
 
 
