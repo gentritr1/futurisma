@@ -390,6 +390,18 @@ function audioFields(audio: ReturnType<EngineAudio["diagnostics"]>) {
       panners: audio.ambience.panners.map((p) => roundRecord(p, 4)),
       listenerPose: roundRecord(audio.ambience.listenerPose, 3),
     },
+    // H2b — the pit radio, appended AFTER the A1 block so no emitted key order
+    // moves. `loaded` is the one a soak has to read first: it separates "the
+    // driver turned the voice off" (0 loaded, 0 played) from "the voice is on
+    // and the clips are still arriving" (loaded < 17) from "everything is here
+    // and nothing fired", which are three different bugs with one symptom.
+    pitRadio: {
+      linesPlayed: audio.pitRadio.linesPlayed,
+      linesDropped: audio.pitRadio.linesDropped,
+      lastLine: audio.pitRadio.lastLine,
+      queueDepth: audio.pitRadio.queueDepth,
+      loaded: audio.pitRadio.loaded,
+    },
   };
 }
 

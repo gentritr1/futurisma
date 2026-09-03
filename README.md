@@ -70,7 +70,7 @@ Everything you set is remembered locally: livery, circuit, format, field, best l
 - **Sky.** A dome decoupled from the fog, with authored horizon and zenith per sector and a slow cirrus band.
 - **Ground.** Bitterpan's pan carries wind streaks and brine flats that converge to the horizon; Greenwater's decks carry runway paint and wear.
 - **Air.** Dust, heat, scud and haze cards near the road; mesas, rigs, treelines and pylons at the horizon; birds over Greenwater.
-- **Sound.** Everything is synthesised at start: a 174 BPM F-minor score cut by the route, per-sector ambience beds, wind that swells with the gusts, and rivals you can place by ear.
+- **Sound.** Almost everything is synthesised at start: a 174 BPM F-minor score cut by the route, per-sector ambience beds, wind that swells with the gusts, and rivals you can place by ear. The one exception is the pit radio — seventeen recorded lines in one voice that call the gates, the weather and the order, on their own ducked bus. Switch it off in the terminal or with `?voice=0`; nothing it says is anything the HUD is not already showing.
 
 ## URL switches
 
@@ -87,6 +87,7 @@ Useful while playing or testing. Combine with `&`.
 | `?quality=low` / `high` | Lock the render scale |
 | `?motion=reduce` | The reduced-motion path |
 | `?render=ps2` | Era-accurate raster look, no shadows |
+| `?voice=0` | Silences the pit radio and never downloads it |
 | `?events=0` `cushion=0` `shadows=0` `living=0` | Kill switches for track events, the air cushion, shadow maps, the card layer |
 
 QA probes (`?diagnostics=1&probe=recovery` and friends) are listed in [docs/PROVENANCE.md](docs/PROVENANCE.md).
@@ -111,6 +112,6 @@ Screenshot and soak harnesses live in `scripts/visual/`. They are not shipped.
 
 <div align="center">
 
-*Three.js · Vite · TypeScript · zero audio files · zero accounts*
+*Three.js · Vite · TypeScript · one voice on the radio, every other sound synthesised · zero accounts*
 
 </div>

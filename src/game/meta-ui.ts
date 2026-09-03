@@ -182,6 +182,7 @@ export class MetaUi {
   private readonly tierGroup: ChipGroup;
   private readonly liveryGroup: ChipGroup;
   private readonly motionGroup: ChipGroup;
+  private readonly voiceGroup: ChipGroup;
   private readonly qualityGroup: ChipGroup;
   private readonly renderGroup: ChipGroup;
   private open = false;
@@ -251,6 +252,22 @@ export class MetaUi {
       "select",
       (value) => this.storeSetting({ reducedMotion: value === "on" }),
     );
+    // H2b — the pit radio, and the only choice row on this panel that applies
+    // LIVE. Damping, resolution and pipeline are all read once at construction
+    // by the renderer and five motion consumers, so they honestly need a
+    // relink; the voice is re-read on every audio control tick, so it belongs
+    // with the two volume sliders rather than behind `refreshPending`. ON is
+    // first because it is the default, which is the ordering the OFF/ON motion
+    // row above deliberately inverts for the same reason.
+    this.voiceGroup = new ChipGroup(
+      requiredElement<HTMLElement>("option-voice"),
+      [
+        { value: "on", label: "ON" },
+        { value: "off", label: "OFF" },
+      ],
+      "select",
+      (value) => this.storeSetting({ voice: value === "on" }),
+    );
     this.qualityGroup = new ChipGroup(
       requiredElement<HTMLElement>("option-quality"),
       [
@@ -308,6 +325,7 @@ export class MetaUi {
     this.tierGroup.setValue(raceModes.tier);
     this.liveryGroup.setValue(save.livery);
     this.motionGroup.setValue(settings.reducedMotion ? "on" : "off");
+    this.voiceGroup.setValue(settings.voice ? "on" : "off");
     this.qualityGroup.setValue(settings.quality);
     this.renderGroup.setValue(settings.renderMode);
     this.masterSlider.value = String(settings.masterVolume);
@@ -384,7 +402,7 @@ export class MetaUi {
     this.optionsNote.dataset.pending = pending ? "true" : "false";
     this.optionsNote.textContent = pending
       ? "CONFIGURATION CHANGED · RELINK TO APPLY"
-      : "LEVELS APPLY LIVE · DAMPING, RESOLUTION AND PIPELINE ON NEXT RELINK";
+      : "LEVELS AND RADIO APPLY LIVE · DAMPING, RESOLUTION AND PIPELINE ON NEXT RELINK";
     this.optionsRelink.hidden = !pending;
   }
 
@@ -512,6 +530,7 @@ export class MetaUi {
     this.tierGroup.dispose();
     this.liveryGroup.dispose();
     this.motionGroup.dispose();
+    this.voiceGroup.dispose();
     this.qualityGroup.dispose();
     this.renderGroup.dispose();
   }

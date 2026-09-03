@@ -46,6 +46,72 @@ five Bitterpan stations, and reviewed on the crops. ONE ships:
       P20.6's brine flats are vertex colour, not a second ground material — and
       adding one would add a draw call.
 
+H2b added a fifth and it is REJECTED too, on a mismatch rather than on quality:
+
+  futurisma_signage_hf_1024       REJECTED. `06-sponsor-boards.png` composes
+      each of the four sponsor faces as a SQUARE plate carrying a square-ish
+      stack of type. Measured, the four type blocks are 2.13, 1.73, 1.72 and
+      2.18 to one. The cells are 512x128 and the quads that carry them are
+      9.6 x 2.4 m on Greenwater and 11 x 2.75 m on Bitterpan — 4:1 both. There
+      is no crop of a 1.7-2.2:1 block that is 4:1 and contains it, so the type
+      goes in at the cell's height and the plate is stretched either side of it,
+      and the lettering ends up filling 43.0 / 34.8 / 34.6 / 43.9 % of the cell
+      width against the pixel-authored cells' 99.8 %.
+
+      That alone is a composition change rather than a defeat, and per LETTER
+      the generation is arguably stronger: median stroke 6-9 px against the base
+      sheet's 4-5, and ink-to-paper contrast 76.5 against 32.3 on BOARD_AEROLIFT,
+      which is the lowest-contrast board the game ships. The 22 m crop at
+      Greenwater 648 shows that clearly and it is the strongest argument the
+      candidate has.
+
+      WHAT KILLS IT is BOARD_SODIUM_ROW. The generation gives it THREE lines
+      ("SODIUM / ROW - BULK / PROPELLANT") where the authored cell gives it one
+      headline and a sub-line: measured line heights 31 / 31 / 29 px against
+      72 / 10. At 55 m — the distance a 9.6 m board is actually read from at
+      270 km/h — the base still reads as a mark and a word and the candidate is
+      an illegible smear. The sheet is one texture and the switch is all or
+      nothing, so one unreadable board out of four is the verdict for all four.
+
+      Two things compound it rather than cause it. The plates are photographic
+      greys and teals that sit outside the oxide-and-timber palette the rest of
+      Greenwater is authored in, against PRODUCT.md's "photoreal materials"
+      anti-reference; and the sheet measures 386,351 bytes against the authored
+      sheet's 64,976, so it is +314 KiB of served texture for a set that
+      contains one board nobody can read.
+
+      Not shipped, still emitted, on the same terms as the three above.
+
+  greenwater_deck_hf_512          REJECTED, and the PREMISE was wrong before the
+      crop was. The item was written as "a material change on those meshes, like
+      P18's facade swap". It is not. Every `GW_SECTOR_*_concrete` mesh in the
+      accepted GLB carries ATLAS UVs spanning 0..1 (most of them 0.5..1 in v)
+      across its whole extent into ONE shared `GW_MAT_concrete` image, and that
+      image is not a concrete tile: it is a sixteen-cell sheet whose cells are
+      the runway thresholds, the chequer array, the chevrons, the A9 numerals,
+      the wear patches and the KD 114 datum plate. THE PAINT IS THE DECK
+      TEXTURE. P18's facades were swappable because that layer is procedurally
+      UV'd into a region sheet; this one is baked, and the bake is accepted art.
+
+      Built anyway, as fairly as the geometry allows — one cloned material per
+      sector so each gets its own `repeat` and `offset` and the tile lands at
+      27 m everywhere rather than at the average sector's scale. 27 m is the
+      measurement, not a preference: the tile carries 4-5 expansion-joint lines
+      per edge and the target was joints about 6 m apart.
+
+      The crop at Greenwater 60 settles it. The accepted deck is a humid
+      green-grey with soft mottling and darker service panels, sitting inside
+      the palette the whole circuit is authored in. The swap is a cool light
+      grey broken by a regular slab checker that reads as a tiled floor rather
+      than a runway, has lost the green cast entirely, and carries the
+      generation's tyre-mark arcs into a bright repeating streak up the middle
+      of the deck. Every service panel and wear patch is gone with the atlas.
+
+      `?deck=hf` stays in the source, at a measured +0.2 KiB gzip, so the crop
+      can be re-taken; the tile is not served, so the switch is inert until the
+      copy line above is run. That is the same trade H2a made to keep
+      `?art=base` runnable after its own review closed.
+
 The three rejects are still emitted, into `shots/higgsfield/`, which .gitignore
 covers. A rejected candidate whose numbers can only be reproduced by reverting a
 commit stops being a reject and becomes a rumour.
@@ -248,6 +314,26 @@ FACADE_UNUSED_CELLS = [(1, 0)]
 
 BASE_FACADES = "public/assets/map02/textures/bitterpan_facades_1024.png"
 BASE_HORIZON = "public/assets/greenwater/textures/futurisma_horizon_1024.png"
+BASE_SIGNAGE = "public/assets/greenwater/textures/futurisma_signage_1024.png"
+
+#: H2b — sponsor board cell (row, column) in the 2x2 generation -> region name.
+SIGNAGE_MAP = {
+    (0, 0): "BOARD_KAIRO",
+    (0, 1): "BOARD_PALE_HARVEST",
+    (1, 0): "BOARD_SODIUM_ROW",
+    (1, 1): "BOARD_AEROLIFT",
+}
+#: Luma below which a pixel of `06-sponsor-boards.png` is the gutter between
+#: the four plates rather than a plate.
+SIGNAGE_GUTTER_LUMA = 45.0
+#: Pixels inside the plate edge to ignore, so the rim and its bolts do not read
+#: as lettering. Measured off the generation: the rim band is ~55 px.
+SIGNAGE_RIM_INSET = 80
+#: How far off the plate's own median luma a pixel has to sit to be lettering.
+SIGNAGE_INK_DELTA = 55.0
+#: Vertical breathing room above and below the type block, as a fraction of its
+#: height, before it is scaled into the cell.
+SIGNAGE_TYPE_MARGIN = 0.12
 
 #: THE ONE SERVED OUTPUT. Round 2 of the review shipped the horizon sheet as the
 #: default and rejected the other two on the crops; see WHAT SHIPPED below.
@@ -260,6 +346,24 @@ OUT_CRUST = "shots/higgsfield/bitterpan_crust_tile_hf_512.png"
 OUT_CRUST_1024 = "shots/higgsfield/bitterpan_crust_tile_hf_1024.png"
 OUT_FACADES = "shots/higgsfield/bitterpan_facades_hf_1024.png"
 OUT_BRINE_512 = "shots/higgsfield/bitterpan_brine_hf_512.png"
+OUT_SIGNAGE = "shots/higgsfield/futurisma_signage_hf_1024.png"
+
+#: H2b — the Greenwater deck tile. PREPARED AND REJECTED; see the entry in the
+#: module docstring. Emitted under shots/ like the other rejects, so `?deck=hf`
+#: is inert until somebody copies it into public/ to re-take the crop:
+#:
+#:   cp shots/higgsfield/greenwater_deck_hf_512.png \
+#:      public/assets/greenwater/textures/
+OUT_DECK = "shots/higgsfield/greenwater_deck_hf_512.png"
+#: The row of `09-runway-deck-ortho.png` the plate is taken from. Chosen the
+#: same way CRUST_KEEP_FROM_ROW was, on the printed aspect series: over
+#: keep = 0 / 512 / 768 / 1024 the residual perspective slope per band runs
+#: -0.028 / +0.044 / -0.013 / +0.003 and the seam ratio 1.067 / 1.075 / 0.926 /
+#: 1.127. 768 is the only crop that is both the flattest trend and the cleanest
+#: wrap, and it keeps 4-5 expansion-joint lines per edge, which is what
+#: DECK_TILE_METRES is derived from.
+DECK_KEEP_FROM_ROW = 768
+DECK_SERVED_SIZE = 512
 
 # --------------------------------------------------------------------------
 # Small image maths. numpy + PIL only — scipy is not a dependency of this repo.
@@ -681,6 +785,172 @@ def prepare_horizon_sheet(source: Path, regions: dict) -> np.ndarray:
     return sheet
 
 
+def measure_board(quadrant: np.ndarray) -> dict:
+    """
+    Where the plate is and where the type is, inside one 1024x1024 quadrant.
+
+    Measured, never authored, because the whole verdict on this candidate turns
+    on ONE number — the aspect of the type block against the 4:1 aspect of the
+    cell it has to live in — and a hand-typed crop rectangle would make that
+    number an assumption instead of a reading.
+
+    The plate is whatever is not the near-black gutter between the four boards;
+    the type is whatever, inside the plate and clear of the rim, sits more than
+    SIGNAGE_INK_DELTA off the plate's own median luma. The row/column occupancy
+    threshold drops the bolt heads, which are small and round and never span
+    2% of an axis.
+    """
+    def luma(rgb):
+        return 0.2126 * rgb[..., 0] + 0.7152 * rgb[..., 1] + 0.0722 * rgb[..., 2]
+
+    plane = luma(quadrant)
+    gutter = plane < SIGNAGE_GUTTER_LUMA
+    rows = np.nonzero(~gutter.all(axis=1))[0]
+    columns = np.nonzero(~gutter.all(axis=0))[0]
+    top, bottom = int(rows.min()), int(rows.max())
+    left, right = int(columns.min()), int(columns.max())
+
+    inset = SIGNAGE_RIM_INSET
+    interior = plane[top + inset:bottom - inset, left + inset:right - inset]
+    ink = np.abs(interior - np.median(interior)) > SIGNAGE_INK_DELTA
+    ink_rows = np.nonzero(ink.sum(axis=1) > interior.shape[1] * 0.02)[0]
+    ink_columns = np.nonzero(ink.sum(axis=0) > interior.shape[0] * 0.02)[0]
+    return {
+        "plate": (left, top, right, bottom),
+        "type": (
+            left + inset + int(ink_columns.min()),
+            top + inset + int(ink_rows.min()),
+            left + inset + int(ink_columns.max()),
+            top + inset + int(ink_rows.max()),
+        ),
+    }
+
+
+def fit_board_cell(quadrant: np.ndarray, width: int, height: int) -> tuple[np.ndarray, dict]:
+    """
+    One square generated board face, fitted into a 4:1 cell.
+
+    THE PROBLEM, stated because it is the finding. The cells are 512x128 and the
+    quads that carry them are 9.6 x 2.4 m on Greenwater and 11 x 2.75 m on
+    Bitterpan — 4:1 both. The generation composes each board as a SQUARE plate
+    with a square-ish stack of type on it: measured, the four type blocks are
+    2.13, 1.73, 1.72 and 2.18 to one. There is no crop of a 1.7-2.2:1 block that
+    is 4:1 and still contains it.
+
+    So the type is placed at the largest size that fits the cell's height and
+    the PLATE is stretched horizontally either side of it — a piecewise-linear
+    horizontal map, 1:1 across the type and stretched across the plate-only
+    margins. Stretching rather than tiling or mirroring, because the margins are
+    120 and 113 px wide and a mirror-tile of a 120 px strip across 400 px puts a
+    visible repeat on a flat plate, while a stretch only smears vertical wear
+    streaks along an axis a metal plate is allowed to be smeared along.
+
+    What it costs is printed: the fraction of the cell's width the lettering
+    ends up occupying, against the ~85% the pixel-authored base cells carry.
+    That ratio is the acceptance number the crops are read against.
+    """
+    box = measure_board(quadrant)
+    left, top, right, bottom = box["plate"]
+    tx0, ty0, tx1, ty1 = box["type"]
+    type_height = ty1 - ty0
+    type_width = tx1 - tx0
+
+    # Vertical: the type plus a margin, scaled to the cell height.
+    crop_height = int(round(type_height * (1 + 2 * SIGNAGE_TYPE_MARGIN)))
+    centre = (ty0 + ty1) // 2
+    y0 = max(top, centre - crop_height // 2)
+    y1 = min(bottom, y0 + crop_height)
+    scale = height / max(1, y1 - y0)
+
+    # Horizontal: the type at that same scale, centred, with the plate-only
+    # margins stretched to fill what is left.
+    type_cell_width = int(round(type_width * scale))
+    type_cell_width = min(type_cell_width, width)
+    x_start = (width - type_cell_width) // 2
+    x_end = x_start + type_cell_width
+    source_x = np.empty(width, dtype=np.float64)
+    if x_start > 0:
+        source_x[:x_start] = np.linspace(left, tx0, x_start, endpoint=False)
+    source_x[x_start:x_end] = np.linspace(tx0, tx1, max(1, x_end - x_start))
+    if x_end < width:
+        source_x[x_end:] = np.linspace(tx1, right, width - x_end)
+    source_y = np.linspace(y0, y1 - 1, height)
+
+    # Bilinear, so the stretch does not stair-step the rivets.
+    xi = np.clip(source_x, 0, quadrant.shape[1] - 1.001)
+    yi = np.clip(source_y, 0, quadrant.shape[0] - 1.001)
+    x0i = np.floor(xi).astype(int)
+    y0i = np.floor(yi).astype(int)
+    fx = (xi - x0i)[None, :, None]
+    fy = (yi - y0i)[:, None, None]
+    a = quadrant[np.ix_(y0i, x0i)]
+    b = quadrant[np.ix_(y0i, x0i + 1)]
+    c = quadrant[np.ix_(y0i + 1, x0i)]
+    d = quadrant[np.ix_(y0i + 1, x0i + 1)]
+    cell = (a * (1 - fx) * (1 - fy) + b * fx * (1 - fy)
+            + c * (1 - fx) * fy + d * fx * fy)
+    return cell, {
+        "typeAspect": type_width / max(1, type_height),
+        "typeShare": type_cell_width / width,
+        "cropRows": (y0, y1),
+    }
+
+
+def prepare_signage_sheet(source: Path, regions: dict) -> tuple[np.ndarray, dict]:
+    """New sheet = the base signage sheet, with four sponsor cells redrawn."""
+    base = np.array(Image.open(ROOT / BASE_SIGNAGE).convert("RGBA")).astype(np.float64)
+    sheet = base.copy()
+    generation = np.array(Image.open(source).convert("RGB")).astype(np.float64)
+    report = {}
+
+    for (row, column), name in SIGNAGE_MAP.items():
+        rect = regions[name]
+        quadrant = generation[row * 1024:(row + 1) * 1024,
+                              column * 1024:(column + 1) * 1024]
+        cell, measured = fit_board_cell(quadrant, rect["w"], rect["h"])
+        base_rect = base[rect["y"]:rect["y"] + rect["h"],
+                         rect["x"]:rect["x"] + rect["w"]]
+        # What the pixel-authored cell it replaces spends on lettering, measured
+        # the same way, so the two shares below are the same measurement.
+        base_share = base_cell_type_share(base_rect)
+        report[name] = {**measured, "baseTypeShare": base_share}
+        print(
+            f"    {name:20s} cell({row},{column}) -> rect {rect['x']},{rect['y']} "
+            f"| type {measured['typeAspect']:.2f}:1 in a 4:1 cell "
+            f"| lettering fills {measured['typeShare'] * 100:4.1f}% of the cell "
+            f"(base cell: {base_share * 100:4.1f}%)"
+        )
+        sheet[rect["y"]:rect["y"] + rect["h"],
+              rect["x"]:rect["x"] + rect["w"], :3] = cell
+        sheet[rect["y"]:rect["y"] + rect["h"],
+              rect["x"]:rect["x"] + rect["w"], 3] = base_rect[..., 3]
+
+    kept = [n for n in regions if n not in SIGNAGE_MAP.values()]
+    print(f"    {len(SIGNAGE_MAP)} cells redrawn; {len(kept)} copied from the base "
+          f"sheet byte for byte.")
+    return sheet, report
+
+
+def base_cell_type_share(cell: np.ndarray) -> float:
+    """
+    The fraction of a base cell's width its lettering spans.
+
+    The base cells are flat two-colour prints, so "lettering" is simply anything
+    that is not the modal colour. Deliberately the crudest possible measure: it
+    only has to be comparable with `fit_board_cell`'s own number, and both are
+    column-occupancy over the same 512-wide rect.
+    """
+    def luma(rgb):
+        return 0.2126 * rgb[..., 0] + 0.7152 * rgb[..., 1] + 0.0722 * rgb[..., 2]
+
+    plane = luma(cell[..., :3])
+    ink = np.abs(plane - np.median(plane)) > SIGNAGE_INK_DELTA
+    columns = np.nonzero(ink.sum(axis=0) > cell.shape[0] * 0.02)[0]
+    if columns.size == 0:
+        return 0.0
+    return float(columns.max() - columns.min()) / cell.shape[1]
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -699,7 +969,7 @@ def main() -> int:
     atlas = json.loads((ROOT / "src/game/data/ATLAS_REGIONS.json").read_text())
     results = {}
 
-    print("[1/4] pan crust tile <- 01-salt-crust.png")
+    print("[1/6] pan crust tile <- 01-salt-crust.png")
     crust1024 = prepare_ground_tile(
         inputs / "01-salt-crust.png", 1024, CRUST_KEEP_FROM_ROW,
         tone_target=Path("public/assets/map02/textures/bitterpan_crust_tile_256.png"),
@@ -710,20 +980,32 @@ def main() -> int:
     # Emitted for the size comparison the served resolution turns on, not served.
     results[OUT_CRUST_1024] = write_png(Path(OUT_CRUST_1024), crust1024, args.check)
 
-    print("[2/4] brine tile <- 02-brine-crust.png  (PREPARED, NOT SERVED)")
+    print("[2/6] brine tile <- 02-brine-crust.png  (PREPARED, NOT SERVED)")
     brine = prepare_ground_tile(
         inputs / "02-brine-crust.png", 512, CRUST_KEEP_FROM_ROW)
     results[OUT_BRINE_512] = write_png(Path(OUT_BRINE_512), brine, args.check)
 
-    print("[3/4] facade sheet <- 04-facade-atlas.png + the base sheet")
+    print("[3/6] facade sheet <- 04-facade-atlas.png + the base sheet")
     facades = prepare_facade_sheet(
         inputs / "04-facade-atlas.png", atlas["bitterpan_facades_1024"]["regions"])
     results[OUT_FACADES] = write_png(Path(OUT_FACADES), facades, args.check)
 
-    print("[4/4] horizon sheet <- 05-horizon-sheet.png + the base sheet")
+    print("[4/6] horizon sheet <- 05-horizon-sheet.png + the base sheet")
     horizon = prepare_horizon_sheet(
         inputs / "05-horizon-sheet.png", atlas["futurisma_horizon_1024"]["regions"])
     results[OUT_HORIZON] = write_png(Path(OUT_HORIZON), horizon, args.check)
+
+    print("[5/6] signage sheet <- 06-sponsor-boards.png + the base sheet"
+          "  (PREPARED, NOT SERVED)")
+    signage, signage_report = prepare_signage_sheet(
+        inputs / "06-sponsor-boards.png", atlas["futurisma_signage_1024"]["regions"])
+    results[OUT_SIGNAGE] = write_png(Path(OUT_SIGNAGE), signage, args.check)
+
+    print("[6/6] Greenwater deck tile <- 09-runway-deck-ortho.png"
+          "  (PREPARED, NOT SERVED)")
+    deck = prepare_ground_tile(
+        inputs / "09-runway-deck-ortho.png", DECK_SERVED_SIZE, DECK_KEEP_FROM_ROW)
+    results[OUT_DECK] = write_png(Path(OUT_DECK), deck, args.check)
 
     print("\nSERVED (the numbers the validators pin):")
     digest, size = results[OUT_HORIZON]
@@ -731,7 +1013,8 @@ def main() -> int:
     print(f"  total added to public/: {size:,} bytes ({size / 1024:.1f} KiB)")
     print("\nPREPARED BUT NOT SERVED (rejected on the crops, kept reproducible):")
     rejected = 0
-    for path in (OUT_CRUST, OUT_CRUST_1024, OUT_FACADES, OUT_BRINE_512):
+    for path in (OUT_CRUST, OUT_CRUST_1024, OUT_FACADES, OUT_BRINE_512,
+                 OUT_SIGNAGE, OUT_DECK):
         _, rejected_size = results[path]
         rejected += rejected_size
         print(f"  {path}  {rejected_size:,} bytes")
