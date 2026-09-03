@@ -95,51 +95,40 @@ export const CENSUS_ALLOWED_MESHES = Object.freeze([
 ]);
 
 /**
- * Solid geometry that is STILL standing in the drivable corridor after P21, one
- * row per object, with the measured depth and the reason it survived.
+ * Solid geometry that is STILL standing in the drivable corridor, one row per
+ * object, with the measured depth and the reason it survived.
  *
- * This table is a debt, not a rule, and it is written down instead of being
- * absorbed by a category so that it stays countable. The P21 brief's own
- * instruction was to re-pin `RUN_OFF_INTRUSIONS` to EMPTY, and this is not that:
+ * Round 2 emptied Greenwater. The five environment-GLB rows closed without
+ * touching the frozen asset, by giving the trackside barrier family its own
+ * derivation floor (`BARRIER_CLASS_MESHES` in `corridor-sweep.ts`). One row is
+ * left, on Bitterpan, and it is not an object at all.
+ *
  * `scripts/validate-corridor.mjs` asserts the census is exactly the allowed
- * hazards plus exactly these rows, so a new intrusion fails the build and a row
- * that stops intruding must be deleted — but the rows themselves are unfixed.
- *
- * Five of the six are vertices INSIDE `greenwater_environment_runtime.glb`,
- * which arrives merged one mesh per sector per material. There is no placement
- * record to move and no sub-object to relocate: the fix is either an edit to a
- * frozen art asset or a further narrowing of the derived corridor, and the
- * corridor narrowing was measured and rejected (see the note on
- * `TALL_GEOMETRY_MIN_HEIGHT_METRES` and the gap-fill experiment in the P21
- * report). The sixth is Bitterpan's own pan floor: a single vertex of the ground
- * the craft drives ON, not an object standing in the corridor.
+ * hazards plus exactly these rows, in both directions, so a new intrusion fails
+ * the build and a row that stops intruding must be deleted.
  */
 export const CENSUS_PINNED_RESIDUALS = Object.freeze({
-  "greenwater_authored_environment|GW_SECTOR_CANOPY_PASSAGE_emissive":
-    "Canopy Passage light strip. Its in-band vertices top out at 0.42 m; the "
-    + "group also carries an overhead element at 3.51 m, which is why the band "
-    + "spans 0.07-3.51. Inside the environment GLB.",
-  "greenwater_authored_environment|GW_SECTOR_RUNWAY_START_metal":
-    "Trackside barrier at Runway Start. The same barrier bounds the LEFT side "
-    + "(floored to the deck edge at 190 m); on the right it measures 0.57 m "
-    + "over 200-220 m, under the 0.60 m hull-bottom floor. Inside the GLB.",
-  "greenwater_authored_environment|GW_SECTOR_FUEL_ROW_metal":
-    "The same barrier at Fuel Row, 0.31-0.51 m over 2110-2120 m, between two "
-    + "spans where it floors the limit to the deck edge. Inside the GLB.",
-  "greenwater_authored_environment|GW_SECTOR_RUNWAY_HOME_metal":
-    "The same barrier at Runway Home, 0.38-0.55 m over 2260-2270 m, likewise "
-    + "between two floored spans. Inside the GLB.",
-  "greenwater_authored_environment|GW_SECTOR_CANOPY_PASSAGE_metal":
-    "Canopy Passage wall, inner face at 14.94 m against a 15.47 m limit. The "
-    + "spans either side trim it to 13.3-13.4 m; 1330 m and 1380 m have no row "
-    + "of their own. Inside the GLB.",
   "bitterpan_surface_layer|BP_PAN_FLOOR":
-    "One vertex of the pan floor, 0.58 m proud of the deck plane 18.7 m out. "
-    + "This is the surface the craft drives ON — the corridor's floor, not an "
-    + "object in it — and the apron cross-section does not model the pan's own "
-    + "macro relief.",
+    "NOT an object in the corridor — it is the pan plane drawn OVER the ribbon, "
+    + "and the census row is one symptom of a larger defect this instrument "
+    + "found. `GROUND_Y_METRES` is a flat -1.95 m, chosen (its own comment says "
+    + "so) as 0.078 m below the ribbon's CENTRELINE low point of -1.872 m. The "
+    + "ribbon banks 2.5 deg, so its lowest DRAWN surface is not the centreline: "
+    + "the deck edge reaches -2.4916 m and the C-edge run-off lip -2.7446 m, "
+    + "both at s=1100. Recomputed from CENTRELINE_STATIONS.json the correct "
+    + "value under the author's own rule is -2.8226 m. The consequence, measured "
+    + "over all 610 stations: on 53 of 1,220 station-sides the pan plane is "
+    + "drawn over part of the RACING SURFACE, up to 12.26 m of a 14 m half-width "
+    + "at s=1100, and over deck-or-run-off on 75. Screenshots at (1100, -3) and "
+    + "(1076, -8) show the craft sitting on salt three metres from the "
+    + "centreline with the road's left half gone. NOT FIXED HERE: "
+    + "`GROUND_Y_METRES` also anchors the 705-prop mid-ground layer and the "
+    + "254-strip road-edge band's 0.35 m lip threshold, both with pinned "
+    + "tables, so moving it is a map-wide art change and not something to slip "
+    + "into a corridor commit. `assertPanPlaneOverlapNoWorse` in "
+    + "scripts/validate-corridor.mjs pins the defect at its measured size so it "
+    + "cannot quietly grow while it waits for that decision.",
 });
-
 export const CENSUS_MAPS = Object.freeze([
   { map: "greenwater", query: "" },
   { map: "bitterpan", query: "&map=bitterpan" },

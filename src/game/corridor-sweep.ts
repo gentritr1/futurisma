@@ -541,6 +541,69 @@ export const TALL_GEOMETRY_SPAN_METRES = 10;
  * `map02_cable_coils` from, and `course.ts` says so in its own comment: "P20.1.
  * Greenwater's equivalent of the Bitterpan coils; same reason."
  */
+/**
+ * P21 round 2 — the trackside barrier family, and the floor it derives at.
+ *
+ * THE PROBLEM A SINGLE FLOOR CANNOT SOLVE. Greenwater's barrier, kerbs and
+ * marker panels are authored symmetrically and measured asymmetrically: the same
+ * art reads 1.8-2.8 m above the deck plane on the inside of a bank and 0.3-0.6 m
+ * on the outside. So one global floor either sits high enough to miss the low
+ * half — which is what shipped, and what the P21 census caught the craft driving
+ * through at five places — or low enough to catch the ground with it. Both were
+ * measured: at 0.85 m five barrier rows survive; at 0.30 m the new limits are set
+ * by `GW_SECTOR_GREENWATER_SWEEP_water` and two `_concrete` sector meshes, i.e.
+ * the water surface and the terrain, which is the P16 "invisible wall over open
+ * ground" failure reproduced.
+ *
+ * The property that separates them is not height and not depth — it is WHAT THE
+ * MESH IS. The environment GLB arrives merged one mesh per sector per material,
+ * and the material is the classification: `_metal` is barrier, rail and kerb;
+ * `_emissive` is lit marker panels; `_concrete`, `_jungle` and `_water` are the
+ * ground, the foliage and the water table. So the floor is per class.
+ *
+ * ENUMERATED, NEVER MATCHED. Every name below is written out, and the two
+ * exceptions to the material rule are the whole reason why:
+ * `GW_SECTOR_HANGAR_EXIT_concrete` IS in the class (its census row is a 0.78 m
+ * kerb standing 0.85 m off the deck edge at 848 m), and no other `_concrete` is.
+ * A regex over `_metal|_concrete` would have taken the ground at Runway Start and
+ * Canopy Passage with it. A regex is also one new sector away from silently
+ * classifying something nobody looked at; a list fails closed instead.
+ *
+ * The floor for this class is `FLAT_FURNITURE_MAX_HEIGHT_METRES` — the same 0.3 m
+ * that separates painted road from an obstacle everywhere else in the repo. For
+ * geometry that is known to be a barrier there is no gap between "an obstacle"
+ * and "bounds the craft": that gap only exists because a merged mesh might be the
+ * floor you are standing on.
+ */
+export const BARRIER_CLASS_MESHES: ReadonlySet<string> = new Set([
+  // Barrier, rail and kerb, one per sector that has any.
+  "GW_SECTOR_CANOPY_PASSAGE_metal",
+  "GW_SECTOR_FUEL_ROW_metal",
+  "GW_SECTOR_GREENWATER_SWEEP_metal",
+  "GW_SECTOR_HANGAR_EXIT_metal",
+  "GW_SECTOR_RUNWAY_HOME_metal",
+  "GW_SECTOR_RUNWAY_START_metal",
+  "GW_SECTOR_T10_TOTEM_TURN_metal",
+  "GW_SECTOR_T1_CRADLE_BEND_metal",
+  "GW_SECTOR_THE_ELBOW_metal",
+  "GW_SECTOR_WATER_TABLE_metal",
+  // Lit marker panels. Measured, not assumed: the pair at 1152 m is 38/16/2/36/16
+  // vertices per lateral bin on the left and the SAME 38/16/2/36/16 on the right,
+  // one mirrored pair of panels, reading 1.90-2.82 m to port and 0.42-0.52 m to
+  // starboard across a banked station. Emissive geometry is never the ground.
+  "GW_SECTOR_CANOPY_PASSAGE_emissive",
+  "GW_SECTOR_GREENWATER_SWEEP_emissive",
+  "GW_SECTOR_THE_ELBOW_emissive",
+  "GW_SECTOR_T1_CRADLE_BEND_emissive",
+  // The one concrete member: the kerb at the Hangar Exit / Greenwater Sweep
+  // transition, six vertices at 0.773-0.789 m standing 0.85 m past a 12 m deck
+  // edge. Every other `_concrete` sector mesh is ground and is deliberately out.
+  "GW_SECTOR_HANGAR_EXIT_concrete",
+]);
+
+/** The derivation floor for {@link BARRIER_CLASS_MESHES}. */
+export const BARRIER_CLASS_TALL_MIN_METRES = FLAT_FURNITURE_MAX_HEIGHT_METRES;
+
 export const COLLIDABLE_HAZARD_MESHES: ReadonlySet<string> = new Set([
   "map02_cable_coils",
   "cable_trip_hazards",
@@ -611,6 +674,7 @@ interface MeshAccumulator {
   reach: number;
   innerExtent: number;
   limit: number;
+  band: CorridorBand;
 }
 
 function displayName(object: THREE.Object3D): string {
@@ -882,7 +946,9 @@ export function sweepCorridor(
       // limit to lateral 0 on the start line, which is exactly what the first
       // span table did (`d=0 left 0`).
       if (
-        height >= tallMin
+        height >= (BARRIER_CLASS_MESHES.has(mesh.name)
+          ? BARRIER_CLASS_TALL_MIN_METRES
+          : tallMin)
         && height < PLAQUE_BAND_BOTTOM_METRES
         && Math.abs(lateral) <= clamp
         // P21 — a collidable hazard has its own physics and must never become a
@@ -916,7 +982,31 @@ export function sweepCorridor(
       const depth = gate - Math.abs(lateral);
       if (depth <= 0) continue;
       if (height < heightMin || height > heightMax) continue;
-      const key = `${meshKey}@${Math.floor(distance / INTRUSION_GROUP_METRES)}`;
+      // P21 round 2 — the band is decided PER VERTEX, and it is part of the
+      // group key.
+      //
+      // It used to be decided from the GROUP's height span, and on a merged
+      // mesh that manufactures obstacles. `GW_SECTOR_CANOPY_PASSAGE_emissive`
+      // holds a floor strip and an overhead element in one THREE.Mesh; inside a
+      // single 20 m bucket their vertices pooled into one row spanning
+      // 0.07-3.51 m, which straddles both band edges and therefore classified
+      // `obstacle` — a reading no single piece of geometry there justified.
+      // Worse, a group whose vertices are ONLY below 0.3 m and above 3.2 m had
+      // no vertex in the driving volume at all and was still counted.
+      //
+      // Classifying the vertex and keying on the result splits that row into a
+      // `flush` row and an `overhead` row, each with an honest height range, and
+      // leaves an `obstacle` row only where a vertex is genuinely in the driving
+      // volume. The group's reported band is then the band of its members by
+      // construction rather than an inference over their envelope.
+      const nonOccluding = isNonOccludingOverlay(mesh);
+      const vertexBand = (drivableGate ? classifyDrivableBand : classifyCorridorBand)(
+        height,
+        height,
+        depth,
+        nonOccluding,
+      );
+      const key = `${meshKey}@${Math.floor(distance / INTRUSION_GROUP_METRES)}#${vertexBand}`;
       let accumulator = accumulators.get(key);
       if (!accumulator) {
         accumulator = {
@@ -925,7 +1015,8 @@ export function sweepCorridor(
           material: materialName(mesh),
           instance,
           visible,
-          nonOccluding: isNonOccludingOverlay(mesh),
+          nonOccluding,
+          band: vertexBand,
           vertices: 0,
           depth: -Infinity,
           distance: 0,
@@ -1007,12 +1098,7 @@ export function sweepCorridor(
       reach: Number(entry.reach.toFixed(3)),
       innerExtent: Number(entry.innerExtent.toFixed(3)),
       limit: Number(entry.limit.toFixed(3)),
-      band: (drivableGate ? classifyDrivableBand : classifyCorridorBand)(
-        entry.heightMin,
-        entry.heightMax,
-        entry.depth,
-        entry.nonOccluding,
-      ),
+      band: entry.band,
     }))
     .sort((a, b) => b.depth - a.depth);
 
