@@ -27,6 +27,7 @@ import {
   resetRivalState,
   resolveRivalPace,
   rivalBrakeSignal,
+  resolveEvasiveSide,
   rivalContestLaneMeters,
   rivalCourseSpeedFactor,
   rivalDriftSignal,
@@ -404,6 +405,15 @@ export class RivalFleet {
   private readonly states: RivalState[];
   private readonly previousDistances = new Float64Array(RIVAL_COUNT);
   private readonly previousLaterals = new Float32Array(RIVAL_COUNT);
+  /**
+   * G2 round 3 - the side of the player each rival has committed to avoiding
+   * on, and how long it has been committed. See `resolveEvasiveSide`; without
+   * this a rival re-picks its side every frame from the player's current
+   * lateral and sweeps through it when the player crosses its centreline.
+   */
+  private readonly evasiveSides = new Float32Array(RIVAL_COUNT);
+  private readonly evasiveHeldSeconds = new Float32Array(RIVAL_COUNT);
+  private readonly evasiveScratch = { side: 0, heldSeconds: 0 };
   private readonly steerSignals = new Float32Array(RIVAL_COUNT);
   private readonly brakeSignals = new Float32Array(RIVAL_COUNT);
   private readonly throttleSignals = new Float32Array(RIVAL_COUNT);
@@ -519,7 +529,7 @@ export class RivalFleet {
    * whole race allocates nothing here. `cushionRivalIndex` is the craft being
    * leaned on, and it is the only rival the extra yield reaches.
    */
-  private readonly cushionResult = { lateralPush: 0, speedScrub: 0 };
+  private readonly cushionResult = { lateralPush: 0, speedScrub: 0, contact: false };
   private cushionRivalIndex = -1;
   private cushionYieldSign = 0;
   private cushionYieldHold = 0;
@@ -902,12 +912,15 @@ export class RivalFleet {
     this.slipstreamLockedThisStep = false;
     this.cushionResult.lateralPush = 0;
     this.cushionResult.speedScrub = 0;
+    this.cushionResult.contact = false;
     this.cushionRivalIndex = -1;
     this.cushionYieldSign = 0;
     this.cushionYieldHold = 0;
     this.heldCushionRivalIndex = -1;
     this.heldCushionYieldSign = 0;
     this.cushionPlayerBlocked = false;
+    this.evasiveSides.fill(0);
+    this.evasiveHeldSeconds.fill(0);
     this.cushionPushNow = 0;
     this.cushionPeakClearPush = 0;
     this.cushionSeparationAtPeakClearPush = 0;
@@ -1011,6 +1024,7 @@ export class RivalFleet {
     let strongestSign = 0;
     let strongestGap = 0;
     let strongestSeparation = 0;
+    let strongestContact = false;
     for (let index = 0; index < this.states.length; index += 1) {
       const state = this.states[index];
       if (state.finished) continue;
@@ -1056,11 +1070,17 @@ export class RivalFleet {
         strongestSign = lateralGap >= 0 ? 1 : -1;
         strongestGap = lateralGap;
         strongestSeparation = Math.hypot(longitudinalGap, lateralGap);
+        strongestContact = cushion.contact;
       }
     }
     this.cushionResult.lateralPush = strongestPush;
     this.cushionResult.speedScrub = strongestScrub;
-    const active = strongest > 0;
+    // ACTIVE means contact, not merely "the pre-lean is bleeding closure off".
+    // The glow, the spark burst, the contact counters and the rival's extra
+    // yield all hang off this, and a craft 4 m away being nudged is not a craft
+    // the player is leaning on - counting it would redefine every number round
+    // 2 was accepted on.
+    const active = strongestContact;
     this.cushionPushNow = strongestPush;
     // Latched over the whole race, on the PHYSICS step rather than on the
     // diagnostics report. The report writes its DOM node once a second and a
@@ -1278,6 +1298,7 @@ export class RivalFleet {
         ? this.cushionYieldMeters()
         : 0,
       cushionYieldSign: index === this.cushionRivalIndex ? this.cushionYieldSign : 0,
+      evasiveSideMeters: this.evasiveSides[index],
     });
     drive.paceLateralMeters = paceLane;
     drive.laneHalfWidthMeters = laneHalfWidthMeters;
@@ -1323,6 +1344,7 @@ export class RivalFleet {
         this.finishVisualAges[index] += Math.max(0, deltaSeconds);
       }
     }
+    this.updateEvasiveSides(playerRaceDistanceMeters, playerLateralMeters, deltaSeconds);
     const crossingSpeeds = this.states.map((state) => state.speedMetersPerSecond);
     const wasFinished = this.states.map((state) => state.finished);
 
@@ -1381,6 +1403,38 @@ export class RivalFleet {
       playerSpeedMetersPerSecond,
       deltaSeconds,
     );
+  }
+
+  /**
+   * G2 round 3 — advances each rival's committed evasive side.
+   *
+   * Runs once per fleet step, before the field is advanced, from the player
+   * position the step was handed. The sub-steps inside `stepRivalField` all see
+   * the same committed side, which is what makes it deterministic: the latch
+   * is a function of the step's inputs and its own previous value, never of how
+   * many sub-steps happened to run.
+   */
+  private updateEvasiveSides(
+    playerRaceDistanceMeters: number,
+    playerLateralMeters: number,
+    deltaSeconds: number,
+  ): void {
+    for (let index = 0; index < this.states.length; index += 1) {
+      const state = this.states[index];
+      const longitudinal = state.raceDistanceMeters - playerRaceDistanceMeters;
+      const lateral = state.lateralMeters - playerLateralMeters;
+      this.evasiveScratch.side = this.evasiveSides[index];
+      this.evasiveScratch.heldSeconds = this.evasiveHeldSeconds[index];
+      const next = resolveEvasiveSide(this.evasiveScratch, {
+        engaged: !state.finished
+          && Math.abs(longitudinal) <= RIVAL_PLAYER_AVOID_GAP_METERS,
+        lateralGapMeters: lateral,
+        separationMeters: Math.hypot(longitudinal, lateral),
+        deltaSeconds,
+      });
+      this.evasiveSides[index] = next.side;
+      this.evasiveHeldSeconds[index] = next.heldSeconds;
+    }
   }
 
   /**

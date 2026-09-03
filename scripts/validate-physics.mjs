@@ -1135,7 +1135,7 @@ assert.ok(
 //    both signs, and zero on the boundary itself rather than one epsilon
 //    inside it.
 for (const longitudinal of [-8, -7, 0, 7, 8, 40]) {
-  for (const lateral of [-4, -3.4, 3.4, 4]) {
+  for (const lateral of [-5, -4.6, 4.6, 5]) {
     const outside = physics.calculateCushion(lateral, longitudinal, 0);
     assert.equal(
       outside.lateralPush,
@@ -1147,16 +1147,53 @@ for (const longitudinal of [-8, -7, 0, 7, 8, 40]) {
   }
 }
 assert.equal(
-  physics.calculateCushion(3.4, 0, 0).lateralPush,
+  physics.calculateCushion(physics.CUSHION_PRE_LEAN_RANGE_METERS, 0, 0).lateralPush,
   0,
-  "The lateral range is exclusive: exactly at CUSHION_LATERAL_RANGE_METERS the "
-    + "cushion must already be off, or the push jumps at the boundary.",
+  "The pre-lean range is exclusive: exactly at CUSHION_PRE_LEAN_RANGE_METERS "
+    + "the cushion must already be off, or the push jumps at the boundary.",
 );
 assert.equal(physics.calculateCushion(0, 7, 0).lateralPush, 0);
 assert.ok(
-  Math.abs(physics.calculateCushion(3.39, 0, 0).lateralPush) < 0.02,
+  Math.abs(physics.calculateCushion(4.59, 0, 0).lateralPush) < 0.02,
   "The cushion must arrive smoothly, not step on at the range boundary.",
 );
+
+// 1b. G2 round 3 — the pre-lean band, and the seam it joins the field at.
+//
+//     The whole value of the pre-lean is that it bleeds closure BEFORE the hard
+//     zone, so it has to be genuinely on out there, genuinely gentle, and
+//     continuous where it hands over - a step at the seam would read as the
+//     cushion snapping on.
+assert.ok(
+  Math.abs(physics.calculateCushion(4, 0, 0).lateralPush) > 0.5,
+  "The pre-lean must actually push at 4 m; a band that rounds to nothing is "
+    + "not bleeding any closure off.",
+);
+const seamOutside = Math.abs(
+  physics.calculateCushion(physics.CUSHION_LATERAL_RANGE_METERS, 0, 0).lateralPush,
+);
+const seamInside = Math.abs(physics.calculateCushion(3.399, 0, 0).lateralPush);
+assert.ok(
+  Math.abs(seamOutside - physics.CUSHION_PRE_LEAN_PUSH_MPS2) < 1e-9,
+  `The pre-lean reaches ${seamOutside} m/s^2 at the seam against a stated `
+    + `${physics.CUSHION_PRE_LEAN_PUSH_MPS2}.`,
+);
+assert.ok(
+  Math.abs(seamInside - seamOutside) < 0.01,
+  `The push steps ${Math.abs(seamInside - seamOutside).toFixed(3)} m/s^2 across `
+    + "the pre-lean seam. The two bands must join continuously.",
+);
+//     The pre-lean is a BLEED, not a contact: it must not scrub speed and must
+//     not read as contact, or every near miss the phase rewards would be taxed
+//     and lit up as a collision.
+assert.equal(
+  physics.calculateCushion(4, 0, 0).speedScrub,
+  0,
+  "The pre-lean must not scrub speed.",
+);
+assert.equal(physics.calculateCushion(4, 0, 0).contact, false);
+assert.equal(physics.calculateCushion(3.2, 0, 0).contact, true);
+assert.equal(physics.calculateCushion(5, 0, 0).contact, false);
 
 // 2. The peak. Full CUSHION_PEAK_PUSH_MPS2 first reached at
 //    CUSHION_LATERAL_PEAK_METERS and HELD from there down to zero gap - a
@@ -1177,7 +1214,7 @@ for (const lateral of [0, 0.2, 0.7, 1.39, 1.4]) {
 }
 // Monotone: closing the gap can never reduce the push.
 let previousPush = 0;
-for (let lateral = 3.4; lateral >= 0; lateral -= 0.05) {
+for (let lateral = 4.6; lateral >= 0; lateral -= 0.05) {
   const push = Math.abs(physics.calculateCushion(lateral, 0, 0).lateralPush);
   assert.ok(
     push >= previousPush - 1e-12,
@@ -1190,7 +1227,7 @@ for (let lateral = 3.4; lateral >= 0; lateral -= 0.05) {
 // 3. Direction. The push is ALWAYS away from the rival, over the whole
 //    envelope and at every closing speed. A cushion that pointed inward
 //    anywhere would be a magnet, and it would be invisible in a lap time.
-for (let lateral = -3.35; lateral <= 3.35; lateral += 0.05) {
+for (let lateral = -4.55; lateral <= 4.55; lateral += 0.05) {
   for (const longitudinal of [-6, -3, 0, 3, 6]) {
     for (const closing of [-4, 0, 1.5, 9]) {
       const { lateralPush } = physics.calculateCushion(lateral, longitudinal, closing);
@@ -1234,7 +1271,7 @@ assert.equal(
 // 5. The scrub ceiling. At most CUSHION_MAX_SCRUB_PER_SECOND of current speed
 //    per second, and never a function of the closing speed.
 let peakScrub = 0;
-for (let lateral = -3.4; lateral <= 3.4; lateral += 0.05) {
+for (let lateral = -4.6; lateral <= 4.6; lateral += 0.05) {
   for (const longitudinal of [-7, -4, 0, 4, 7]) {
     for (const closing of [0, 3, 20]) {
       const { speedScrub } = physics.calculateCushion(lateral, longitudinal, closing);
@@ -1443,7 +1480,9 @@ assert.equal(
 );
 
 console.log(
-  `Cushion PASS: zero outside ${physics.CUSHION_LATERAL_RANGE_METERS} m lateral / `
+  `Cushion PASS: pre-lean from ${physics.CUSHION_PRE_LEAN_RANGE_METERS} m at `
+    + `${physics.CUSHION_PRE_LEAN_PUSH_MPS2} m/s^2, field from `
+    + `${physics.CUSHION_LATERAL_RANGE_METERS} m lateral / `
     + `${physics.CUSHION_LONGITUDINAL_RANGE_METERS} m longitudinal, peak `
     + `${physics.CUSHION_PEAK_PUSH_MPS2} m/s^2 from `
     + `${physics.CUSHION_LATERAL_PEAK_METERS} m inward, monotone, never inward-`

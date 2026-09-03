@@ -33,6 +33,7 @@ import {
   freeDeckTargetFraction,
   measureFreeDeckFraction,
   playerRaceDistanceOffsetMeters,
+  resolveEvasiveSide,
   rivalContestLaneMeters,
   rivalCourseSpeedFactor,
   rivalPaceLaneMeters,
@@ -146,7 +147,11 @@ export function simulateRivalField(options) {
   let cushionContacts = 0;
   let cushionActive = false;
   let cushionYieldHold = 0;
-  const cushionScratch = { lateralPush: 0, speedScrub: 0 };
+  const cushionScratch = { lateralPush: 0, speedScrub: 0, contact: false };
+  // G2 round 3 - mirrors `RivalFleet.updateEvasiveSides`. One committed side
+  // and hold timer per rival, advanced once per sub-step from the same player
+  // position the drive resolver sees.
+  const evasiveSides = profiles.map(() => ({ side: 0, heldSeconds: 0 }));
   const readPlayer = (seconds) => {
     if (!player) return null;
     const raw = player(seconds);
@@ -171,6 +176,7 @@ export function simulateRivalField(options) {
     let push = 0;
     let index = -1;
     let sign = 0;
+    let contact = false;
     for (let slot = 0; slot < field.length; slot += 1) {
       const state = field[slot];
       if (state.finished) continue;
@@ -193,12 +199,13 @@ export function simulateRivalField(options) {
         push = result.lateralPush;
         index = slot;
         sign = lateralGap >= 0 ? 1 : -1;
+        contact = result.contact;
       }
     }
     // Mirrors `RivalFleet.resolveCushion`: the yield outlives the contact by
     // CUSHION_YIELD_HOLD_SECONDS so the lane solver has time to act on it,
     // while the push on the player stops the instant the contact does.
-    if (strongest > 0) {
+    if (contact) {
       cushionRivalIndex = index;
       cushionYieldSign = sign;
       cushionYieldHold = CUSHION_YIELD_HOLD_SECONDS;
@@ -218,7 +225,7 @@ export function simulateRivalField(options) {
       4,
       Math.max(-4, cushionOffsetMeters + cushionVelocity * step),
     );
-    const active = strongest > 0;
+    const active = contact;
     if (active) {
       cushionSeconds += step;
       cushionPeakPush = Math.max(cushionPeakPush, strongest);
@@ -320,6 +327,7 @@ export function simulateRivalField(options) {
       // variant - see RIVAL_CUSHION_YIELD_BLOCKED_METERS.
       cushionYieldMeters: index === cushionRivalIndex ? RIVAL_CUSHION_YIELD_METERS : 0,
       cushionYieldSign: index === cushionRivalIndex ? cushionYieldSign : 0,
+      evasiveSideMeters: evasiveSides[index].side,
     });
     const drive = driveScratch[index];
     return Object.assign(drive, {
@@ -359,6 +367,21 @@ export function simulateRivalField(options) {
         Math.abs(field[index].lateralMeters - gridSlots[index]),
       );
     }
+    const evasivePlayer = readPlayer(elapsedSeconds);
+    if (evasivePlayer) {
+      for (let index = 0; index < field.length; index += 1) {
+        const state = field[index];
+        const longitudinal = state.raceDistanceMeters - evasivePlayer.raceDistanceMeters;
+        const lateral = state.lateralMeters - evasivePlayer.lateralMeters;
+        evasiveSides[index] = resolveEvasiveSide(evasiveSides[index], {
+          engaged: !state.finished
+            && Math.abs(longitudinal) <= RIVAL_PLAYER_AVOID_GAP_METERS,
+          lateralGapMeters: lateral,
+          separationMeters: Math.hypot(longitudinal, lateral),
+          deltaSeconds: RIVAL_FIXED_STEP_SECONDS,
+        });
+      }
+    }
     stepCushion(field, readPlayer(elapsedSeconds));
     const playerState = readPlayer(elapsedSeconds);
     freeDeckScratch.length = 0;
@@ -395,7 +418,23 @@ export function simulateRivalField(options) {
           };
         }
         const gap = state.raceDistanceMeters - playerState.raceDistanceMeters;
-        if (gap >= 0 && gap <= RIVAL_NO_BLOCK_WINDOW_METERS && !state.finished) {
+        // G2 round 3 - the LAUNCH is not a free-deck question. Inside the grid
+        // hold the field is sitting on its authored slots by design, nobody is
+        // passing anybody, and the widest clear strip is a property of the grid
+        // fan rather than of anyone's racing behaviour. Assertion 0 covers that
+        // window on its own terms (zero drift off the slots, minimum spacing,
+        // rate and player independence).
+        //
+        // It has to be excluded because it is where the harness's crude cushion
+        // clamp bites: the stand-in has no driver and no apron, so its offset
+        // pins at +/-4 m during the launch and drags the sample from
+        // inconclusive to conclusive, reporting 27.5% for a grid formation that
+        // is identical in both runs. Applied to BOTH runs, so the comparison
+        // below stays honest.
+        const launching = playerState.raceDistanceMeters
+          < GRID_LANE_HOLD_METERS + playerDistanceOffset;
+        if (gap >= 0 && gap <= RIVAL_NO_BLOCK_WINDOW_METERS && !state.finished
+          && !launching) {
           freeDeckScratch.push(state.lateralMeters);
           const halfWidth = course.sample(
             state.courseDistanceMeters / course.length,

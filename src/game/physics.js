@@ -105,6 +105,20 @@ export const SLIPSTREAM_LOCK_THRESHOLD = 0.8;
  * is a lane's worth of lean, bounded by CUSHION_VELOCITY_CAP_MPS rather than by
  * being too weak to matter.
  */
+/**
+ * ROUND 3 pre-lean. The cushion now arms 1.2 m earlier than its own field, at a
+ * fixed gentle CUSHION_PRE_LEAN_PUSH_MPS2, and the point is not the push - it
+ * is the closure it takes off before the hard zone starts.
+ *
+ * Round 2's field was at its 14 m/s^2 ceiling at the worst Greenwater instant
+ * and still could not reverse the pair, because it only started arguing once
+ * they were 3.4 m apart and already converging fast. Three metres per second
+ * squared applied from 4.6 m is worth about a metre per second of closure by
+ * the time the field proper takes over, and a metre per second is most of the
+ * problem.
+ */
+export const CUSHION_PRE_LEAN_RANGE_METERS = 4.6;
+export const CUSHION_PRE_LEAN_PUSH_MPS2 = 3;
 export const CUSHION_LATERAL_RANGE_METERS = 3.4;
 /**
  * Full push at or inside this hull-centre gap. A TOTEM is ~2.2 m across, so
@@ -179,32 +193,29 @@ export const CUSHION_TOW_CONTACT_SEPARATION_METERS = 2;
  * @param {number} lateralGapMeters signed, rival lateral minus player lateral
  * @param {number} longitudinalGapMeters signed, rival distance minus player's
  * @param {number} closingLateralSpeed m/s, positive when the gap is shrinking
- * @param {{ lateralPush: number, speedScrub: number }} [target]
- * @returns {{ lateralPush: number, speedScrub: number }} `lateralPush` in
- *   m/s^2 on the player, `speedScrub` as a share of current speed per second
+ * @param {{ lateralPush: number, speedScrub: number, contact: boolean }} [target]
+ * @returns {{ lateralPush: number, speedScrub: number, contact: boolean }}
+ *   `lateralPush` in m/s^2 on the player, `speedScrub` as a share of current
+ *   speed per second, `contact` false while only the pre-lean is acting
  */
 export function calculateCushion(
   lateralGapMeters,
   longitudinalGapMeters,
   closingLateralSpeed,
-  target = { lateralPush: 0, speedScrub: 0 },
+  target = { lateralPush: 0, speedScrub: 0, contact: false },
 ) {
   target.lateralPush = 0;
   target.speedScrub = 0;
+  target.contact = false;
   if (!Number.isFinite(lateralGapMeters) || !Number.isFinite(longitudinalGapMeters)) {
     return target;
   }
   const lateral = Math.abs(lateralGapMeters);
   const longitudinal = Math.abs(longitudinalGapMeters);
   if (
-    lateral >= CUSHION_LATERAL_RANGE_METERS
+    lateral >= CUSHION_PRE_LEAN_RANGE_METERS
     || longitudinal >= CUSHION_LONGITUDINAL_RANGE_METERS
   ) return target;
-  const across = smoothstep(
-    CUSHION_LATERAL_RANGE_METERS - lateral,
-    0,
-    CUSHION_LATERAL_RANGE_METERS - CUSHION_LATERAL_PEAK_METERS,
-  );
   const along = 1 - smoothstep(
     longitudinal,
     CUSHION_LONGITUDINAL_FULL_METERS,
@@ -214,15 +225,43 @@ export function calculateCushion(
     ? clamp(closingLateralSpeed, 0, CUSHION_CLOSING_REFERENCE_MPS)
       / CUSHION_CLOSING_REFERENCE_MPS
     : 0;
+  // Two bands, joined so the magnitude is continuous at the seam: the pre-lean
+  // runs 0 -> CUSHION_PRE_LEAN_PUSH_MPS2 between 4.6 m and 3.4 m, and the field
+  // proper carries on from that same value up to the peak at 1.4 m. Approaching
+  // 3.4 m from either side gives CUSHION_PRE_LEAN_PUSH_MPS2, so nothing steps.
+  const contact = lateral < CUSHION_LATERAL_RANGE_METERS;
+  const across = contact
+    ? smoothstep(
+      CUSHION_LATERAL_RANGE_METERS - lateral,
+      0,
+      CUSHION_LATERAL_RANGE_METERS - CUSHION_LATERAL_PEAK_METERS,
+    )
+    : 0;
   const firmness = clamp(across * (1 + CUSHION_CLOSING_GAIN * closing), 0, 1);
+  const magnitude = contact
+    ? CUSHION_PRE_LEAN_PUSH_MPS2
+      + (CUSHION_PEAK_PUSH_MPS2 - CUSHION_PRE_LEAN_PUSH_MPS2) * firmness
+    : CUSHION_PRE_LEAN_PUSH_MPS2 * smoothstep(
+      CUSHION_PRE_LEAN_RANGE_METERS - lateral,
+      0,
+      CUSHION_PRE_LEAN_RANGE_METERS - CUSHION_LATERAL_RANGE_METERS,
+    );
   // Away from the rival. A gap of exactly zero resolves to a push toward
   // negative lateral rather than to no push at all, so two craft on identical
   // lines still separate instead of sitting inside one another.
   const away = lateralGapMeters >= 0 ? -1 : 1;
-  target.lateralPush = away * CUSHION_PEAK_PUSH_MPS2 * firmness * along;
+  target.lateralPush = away * magnitude * along;
   // The scrub reads the GEOMETRY only, never the closing term: leaning on a
   // rival costs the same whether the player arrived there fast or drifted in.
+  // It stays confined to the FIELD, not the pre-lean - the pre-lean is a bleed
+  // applied to craft that are merely near each other, and charging speed for
+  // that would tax every near miss the phase is trying to reward.
   target.speedScrub = CUSHION_MAX_SCRUB_PER_SECOND * across * along;
+  // Whether this is CONTACT, as against the pre-lean's gentle nudge. The glow,
+  // the spark burst and the contact counters all read this rather than "the
+  // push is non-zero", so their round 2 meaning is unchanged: a craft 4 m away
+  // being bled off is not a craft the player is leaning on.
+  target.contact = contact && target.lateralPush !== 0;
   return target;
 }
 

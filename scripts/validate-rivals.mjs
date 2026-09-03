@@ -7,6 +7,8 @@ import {
   RIVAL_GRID_HOLD_METERS,
   RIVAL_GRID_MINIMUM_SPACING_METERS,
   RIVAL_GRID_RELEASE_METERS,
+  RIVAL_EVASIVE_FLIP_SEPARATION_METERS,
+  RIVAL_EVASIVE_HOLD_SECONDS,
   RIVAL_LANE_CLEARANCE_METERS,
   RIVAL_FREE_DECK_FRACTION,
   RIVAL_NO_BLOCK_MARGIN_FRACTION,
@@ -30,6 +32,7 @@ import {
   playerRaceDistanceOffsetMeters,
   rivalGridHoldScale,
   spreadGridLaterals,
+  resolveEvasiveSide,
   rivalContestLaneMeters,
   rivalPoseSignals,
   rivalSteerSignal,
@@ -789,6 +792,11 @@ const COURSE_FINISH_SECONDS = {
  *
  * Greenwater keeps the geometric ceiling (38.4% at its narrowest, where the
  * deck is 19 m) and measures 45.0%.
+ *
+ * G2 round 3 re-measured after the launch window was excluded from the sampler
+ * (see `rival-field-sim.mjs`): Bitterpan 37.6%, Greenwater 45.0%. The floor
+ * stays at 37% rather than tightening onto 37.6 - a 0.1-point margin is a pin
+ * that fails on arithmetic noise rather than on a regression.
  */
 const FREE_DECK_FLOOR = { bitterpan: 0.37 };
 
@@ -823,37 +831,41 @@ const PLAYER_TOTAL_SECONDS = { greenwater: 165.425, bitterpan: 183.075 };
  * number nobody re-read, and the floor is asserted against the cushion-on pair.
  */
 const PLAYER_RIVAL_SEPARATION_FLOOR_METERS = 1.9;
-const SOAK_PLAYER_RIVAL_SEPARATION_METERS = { greenwater: 0.18, bitterpan: 3.6 };
+const SOAK_PLAYER_RIVAL_SEPARATION_METERS = { greenwater: 0.93, bitterpan: 3.6 };
 const SOAK_PLAYER_RIVAL_SEPARATION_CUSHION_OFF_METERS = {
-  greenwater: 1.19,
-  bitterpan: 3.52,
+  greenwater: 1.2,
+  bitterpan: 0.55,
 };
 /**
  * What the cushion actually MOVED the craft over those same soaks, and the
  * longest single contact it had to do it in. Both are read straight off the
  * soak (`cushionTravelMeters`, `cushionLongestContactSeconds`).
  *
- * ROUND 2 re-measured. The envelope was rebuilt - 3.4 m / 7.0 m arming at a
- * 14 m/s^2 peak through a two-regime integrator capped at 4 m/s - and the
- * cushion's authority went up by every measure it has: travel over five laps
- * 0.489 -> 3.214 m on Greenwater and 0 -> 1.438 m on Bitterpan, longest contact
- * 0.208 -> 0.542 s, peak push 6 -> 14 m/s^2.
+ * ROUND 3 re-measured, and the shape of the result changed.
  *
- * Bitterpan clears the 1.9 m floor at 3.60 m. GREENWATER DID NOT MOVE: 0.15 m
- * in round 1, 0.18 m in round 2, against a 1.19 m cushion-off control. The
- * telemetry says why, and it is not the cushion being weak. At the worst
- * instant - PRIVATEER, lap 3, d 590 - the record reads cushionActive true,
- * cushionPush 14 (the ceiling), towLocked false, with the pair at 0.13 m
- * longitudinal and 0.12 m lateral. The cushion is doing everything it is
- * allowed to do and the craft still arrive on top of one another, because what
- * is left is the APPROACH: the demo driver and the fleet's own evasive lateral
- * gain converge faster than 14 m/s^2 can turn around inside 3.4 m. Raising the
- * push further does not fix an approach; arming earlier might, and that is a
- * decision about how far from a rival the game should start pushing, not a
- * tuning pass. See the report.
+ * BITTERPAN is where the round 3 work shows. Its cushion-off control fell from
+ * 3.52 m to 0.55 m, because the evasive-side hysteresis applies to both runs
+ * and moved the field's behaviour, and the cushion carries it back to 3.60 m -
+ * a 6.5x separation over its own control, on a map where round 2's cushion had
+ * looked irrelevant because both runs happened to sit near 3.5 m.
+ *
+ * GREENWATER improved 0.15 -> 0.18 -> 0.93 m across the three rounds, measured
+ * at the same instant each time (PRIVATEER, lap 3, d 590): the pair went from
+ * 0.13/0.12 m longitudinal/lateral in round 2 to 0.81/0.46 m in round 3. It is
+ * still under the 1.9 m floor, and it is still under its own 1.20 m
+ * cushion-off control - the cushion perturbs the demo driver's closed loop, and
+ * a 24 m lateral budget spent over five laps moves where the driver's own
+ * conflicts land as much as it separates them.
+ *
+ * The cushion's authority is no longer in question: 23.789 m of lateral travel
+ * on Greenwater and 10.231 m on Bitterpan, peak push at the 14 m/s^2 ceiling
+ * with the hulls still clear (`cushionPeakClearPush` 14.00 at 2.52 m). What is
+ * left at Greenwater's worst instant is an approach the demo driver commits to,
+ * and round 3's brief ruled out both remaining levers - more push, and touching
+ * the driver. Reported, not tuned around.
  */
-const SOAK_CUSHION_TRAVEL_METERS = { greenwater: 3.214, bitterpan: 1.438 };
-const SOAK_CUSHION_LONGEST_CONTACT_SECONDS = { greenwater: 0.542, bitterpan: 0.35 };
+const SOAK_CUSHION_TRAVEL_METERS = { greenwater: 23.789, bitterpan: 10.231 };
+const SOAK_CUSHION_LONGEST_CONTACT_SECONDS = { greenwater: 0.433, bitterpan: 0.358 };
 
 let peakSteerRadians = 0;
 const steerRadians = [];
@@ -1134,6 +1146,171 @@ for (const kind of MAPS) {
     `${kind}: with the cushion armed the field left only `
       + `${(cushioned.minimumClearFreeDeckFraction * 100).toFixed(1)}% of the deck `
       + `free, under the ${(FREE_DECK_ABSOLUTE_FLOOR * 100).toFixed(0)}% route bar.`,
+  );
+
+  // 3c. G2 round 3 - THE EVASIVE-SIDE HYSTERESIS.
+  //
+  //     The bug: a rival picks its avoidance side from the player's CURRENT
+  //     lateral, so a player crossing the rival's centreline flips the chosen
+  //     side, and the craft - running at four times its normal lateral rate -
+  //     sweeps through the player to reach the new one. That is what put two
+  //     hulls on the same point with the cushion at its 14 m/s^2 ceiling.
+  //
+  //     (a) THE RULE ITSELF, as a pure property of `resolveEvasiveSide`: a
+  //         committed side NEVER changes while the pair is inside
+  //         RIVAL_EVASIVE_FLIP_SEPARATION_METERS, whatever the player does.
+  //         This is the assertion the brief actually asked for and it holds
+  //         unconditionally.
+  let sideState = { side: 0, heldSeconds: 0 };
+  let committed = 0;
+  let flipsInsideFlipRange = 0;
+  let sweepSteps = 0;
+  for (let time = 0; time <= 8; time += RIVAL_FIXED_STEP_SECONDS) {
+    // Player sweeps across the rival's line at exactly 1.0 m/s.
+    const lateralGapMeters = 3 - time;
+    const separationMeters = Math.abs(lateralGapMeters);
+    const previous = sideState.side;
+    sideState = resolveEvasiveSide(sideState, {
+      engaged: true,
+      lateralGapMeters,
+      separationMeters,
+      deltaSeconds: RIVAL_FIXED_STEP_SECONDS,
+    });
+    if (
+      previous !== 0
+      && sideState.side !== previous
+      && separationMeters <= RIVAL_EVASIVE_FLIP_SEPARATION_METERS
+    ) flipsInsideFlipRange += 1;
+    if (sideState.side !== 0) committed = sideState.side;
+    sweepSteps += 1;
+  }
+  assert.equal(
+    flipsInsideFlipRange,
+    0,
+    `${kind}: the committed evasive side flipped ${flipsInsideFlipRange} time(s) `
+      + `inside ${RIVAL_EVASIVE_FLIP_SEPARATION_METERS} m over a ${sweepSteps}-step `
+      + "1 m/s sweep across the rival's centreline. That flip IS the sweep-through.",
+  );
+  assert.notEqual(
+    committed,
+    0,
+    `${kind}: the latch never committed to a side, so the property above is `
+      + "vacuous.",
+  );
+  //     A flip needs the hold served AND the player clear AND real space; each
+  //     one missing on its own has to be enough to refuse it.
+  const held = { side: 1, heldSeconds: 99 };
+  assert.equal(
+    resolveEvasiveSide(held, {
+      engaged: true, lateralGapMeters: -9, separationMeters: 9, deltaSeconds: 0,
+    }).side,
+    -1,
+    "With the hold served, the player 9 m clear and 9 m of space, the side must "
+      + "be free to change.",
+  );
+  assert.equal(
+    resolveEvasiveSide({ side: 1, heldSeconds: 0 }, {
+      engaged: true, lateralGapMeters: -9, separationMeters: 9, deltaSeconds: 0,
+    }).side,
+    1,
+    `A flip inside ${RIVAL_EVASIVE_HOLD_SECONDS} s must be refused however clear `
+      + "the player is.",
+  );
+  assert.equal(
+    resolveEvasiveSide(held, {
+      engaged: true, lateralGapMeters: -2, separationMeters: 9, deltaSeconds: 0,
+    }).side,
+    1,
+    `A flip with the player only 2 m clear must be refused however long the side `
+      + "has been held.",
+  );
+  assert.equal(
+    resolveEvasiveSide(held, {
+      engaged: true, lateralGapMeters: -9, separationMeters: 2, deltaSeconds: 0,
+    }).side,
+    1,
+    `A flip inside ${RIVAL_EVASIVE_FLIP_SEPARATION_METERS} m of separation must `
+      + "be refused.",
+  );
+  //     Disengaging clears it, so the next encounter starts from where the craft
+  //     actually is rather than from a stale commitment.
+  assert.equal(
+    resolveEvasiveSide(held, {
+      engaged: false, lateralGapMeters: 1, separationMeters: 1, deltaSeconds: 0,
+    }).side,
+    0,
+  );
+  //     And it commits LATE - outside RIVAL_EVASIVE_RELEASE_METERS there is
+  //     nothing to commit to, or the frozen side can contradict where the craft
+  //     ends up by the time the two close.
+  assert.equal(
+    resolveEvasiveSide({ side: 0, heldSeconds: 0 }, {
+      engaged: true, lateralGapMeters: 9, separationMeters: 9, deltaSeconds: 0,
+    }).side,
+    0,
+  );
+
+  //     (b) WHAT IT BUYS THE LANE SOLVER, and honestly what it does not. Over a
+  //         sweep matrix of rival lanes and yield sides, the latched run must
+  //         remove target-lane crossings and must never ADD one.
+  //
+  //         It does NOT remove all of them, and that is a deliberate limit: the
+  //         yield corridor outranks the player's room (a G1 decision), so where
+  //         the committed side and the corridor disagree the corridor still
+  //         wins and the craft still crosses. Forcing the other order was
+  //         measured twice - 45.0% -> 27.5% free deck unconditionally, and new
+  //         crossings when restricted to close range - and reverted both times.
+  const sweepCrossings = (latched, sideSign, rivalLateral) => {
+    let state = { side: 0, heldSeconds: 0 };
+    let previousSide = 0;
+    let crossings = 0;
+    for (let step = 0; step <= 6 / RIVAL_FIXED_STEP_SECONDS; step += 1) {
+      const playerLateral = rivalLateral - 3 + step * RIVAL_FIXED_STEP_SECONDS;
+      const lateralGapMeters = rivalLateral - playerLateral;
+      state = resolveEvasiveSide(state, {
+        engaged: true,
+        lateralGapMeters,
+        separationMeters: Math.abs(lateralGapMeters),
+        deltaSeconds: RIVAL_FIXED_STEP_SECONDS,
+      });
+      const target = rivalContestLaneMeters(rivalLateral, {
+        lateralMeters: rivalLateral,
+        playerGapMeters: 0,
+        playerLateralMeters: playerLateral,
+        rivalId: "rival-privateer",
+        neighbourLaterals: [],
+        insideSign: 0,
+        sideSign,
+        halfWidthMeters: 12,
+        laneHalfWidthMeters: 9.8,
+        evasiveSideMeters: latched ? state.side : 0,
+      });
+      const side = Math.sign(target - playerLateral);
+      if (side !== 0) {
+        if (previousSide !== 0 && side !== previousSide) crossings += 1;
+        previousSide = side;
+      }
+    }
+    return crossings;
+  };
+  let sweepFixed = 0;
+  for (const yieldSide of [1, -1]) {
+    for (const rivalLateral of [0, 1.5, -1.5, 3, -3, 4.5, -4.5, 6, -6]) {
+      const bare = sweepCrossings(false, yieldSide, rivalLateral);
+      const latched = sweepCrossings(true, yieldSide, rivalLateral);
+      assert.ok(
+        latched <= bare,
+        `${kind}: the latch ADDED a target-lane crossing at yield side `
+          + `${yieldSide}, rival lane ${rivalLateral} m (${bare} -> ${latched}). `
+          + "It may only ever remove them.",
+      );
+      if (latched < bare) sweepFixed += 1;
+    }
+  }
+  assert.ok(
+    sweepFixed > 0,
+    `${kind}: the latch removed no crossings anywhere in the sweep matrix, so `
+      + "it is doing nothing the lane solver did not already do.",
   );
 
   // 4. The free-deck rule. Asserted on every sample where a rival sits within

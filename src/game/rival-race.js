@@ -197,6 +197,93 @@ export const RIVAL_CUSHION_YIELD_METERS = 1.4;
  */
 export const RIVAL_CUSHION_YIELD_BLOCKED_METERS = 2.8;
 
+/* ---------------------------------------------------------------------------
+ * G2 round 3 — evasive-side hysteresis.
+ *
+ * THE BUG THIS EXISTS FOR. A rival avoiding the player picks its side from the
+ * player's CURRENT lateral: the lane solver forbids a bubble around the player
+ * and takes the nearest allowed lane, which is whichever side the craft happens
+ * to be on this frame. When the player crosses the rival's centreline - a
+ * routine mid-corner move - that nearest side flips, and the rival, running at
+ * RIVAL_EVASIVE_LATERAL_GAIN (4x its normal lateral rate), sweeps straight
+ * THROUGH the player to reach its new lane.
+ *
+ * That is the closure the air cushion could not reverse. The round 2 record of
+ * the worst Greenwater instant reads cushionPush 14 - the ceiling - with the
+ * pair at 0.13 m longitudinal and 0.12 m lateral. A repulsion pointing the
+ * right way cannot put two hulls on the same point; something had to be driving
+ * them together, and this is it.
+ *
+ * THE FIX. Once a rival has committed to a side of the player it stays there:
+ * for at least RIVAL_EVASIVE_HOLD_SECONDS, and until the player is more than
+ * RIVAL_EVASIVE_RELEASE_METERS clear - whichever comes LATER - and a flip may
+ * only happen with the pair more than RIVAL_EVASIVE_FLIP_SEPARATION_METERS
+ * apart. A craft that has decided to go left of the player finishes going left.
+ *
+ * It is pure state, no randomness, and it is lateral: nothing here can reach a
+ * rival's speed, so lap and finish times stay bit-identical with the cushion on
+ * and off. `validate-rivals.mjs` proves that on both maps.
+ * ------------------------------------------------------------------------- */
+export const RIVAL_EVASIVE_HOLD_SECONDS = 1.2;
+export const RIVAL_EVASIVE_RELEASE_METERS = 4;
+export const RIVAL_EVASIVE_FLIP_SEPARATION_METERS = 3;
+
+/**
+ * Advances one rival's committed evasive side.
+ *
+ * Pure: the caller owns the two numbers of state and hands them back each step.
+ *
+ * @param {{ side: number, heldSeconds: number }} previous
+ * @param {{
+ *   engaged: boolean;
+ *   lateralGapMeters: number;
+ *   separationMeters: number;
+ *   deltaSeconds: number;
+ * }} input `lateralGapMeters` is rival minus player
+ * @returns {{ side: number, heldSeconds: number }}
+ */
+export function resolveEvasiveSide(previous, input) {
+  const side = Number.isFinite(previous?.side) ? Math.sign(previous.side) : 0;
+  const held = Number.isFinite(previous?.heldSeconds) ? Math.max(0, previous.heldSeconds) : 0;
+  const step = Number.isFinite(input?.deltaSeconds) ? Math.max(0, input.deltaSeconds) : 0;
+  // Disengaged: the player is nowhere near this craft longitudinally, so there
+  // is nothing to commit to and the next encounter starts clean.
+  if (!input?.engaged || !Number.isFinite(input.lateralGapMeters)) {
+    return { side: 0, heldSeconds: 0 };
+  }
+  const separation = Number.isFinite(input.separationMeters)
+    ? input.separationMeters
+    : Infinity;
+  const natural = input.lateralGapMeters >= 0 ? 1 : -1;
+  // COMMIT LATE, on purpose. The side is taken only once the pair is inside
+  // RIVAL_EVASIVE_RELEASE_METERS - the same distance the hold releases at - so
+  // the side committed to is the side the craft is genuinely on at the moment
+  // it matters.
+  //
+  // Committing at long range instead was tried and is worse than not
+  // committing at all: the lane solver's corridor decides the side out there,
+  // and freezing that choice meant the enforced side could contradict where the
+  // craft actually was by the time the two closed up, so the craft had to cross
+  // the player to obey it. A sweep test caught it - the latched run crossed on
+  // geometries the unlatched run did not.
+  if (side === 0) {
+    return separation <= RIVAL_EVASIVE_RELEASE_METERS
+      ? { side: natural, heldSeconds: 0 }
+      : { side: 0, heldSeconds: 0 };
+  }
+  const heldSeconds = held + step;
+  if (natural === side) return { side, heldSeconds };
+  // A flip needs ALL of it: the hold served, the player genuinely clear, and
+  // real space between the two craft. Any one of them missing and the craft
+  // finishes the move it started.
+  const releasable = heldSeconds >= RIVAL_EVASIVE_HOLD_SECONDS
+    && Math.abs(input.lateralGapMeters) > RIVAL_EVASIVE_RELEASE_METERS
+    && separation > RIVAL_EVASIVE_FLIP_SEPARATION_METERS;
+  return releasable
+    ? { side: natural, heldSeconds: 0 }
+    : { side, heldSeconds };
+}
+
 /** A rival defends the inside line while the player sits in this gap band. */
 export const RIVAL_DEFENCE_MINIMUM_GAP_METERS = 8;
 export const RIVAL_DEFENCE_MAXIMUM_GAP_METERS = 25;
@@ -986,6 +1073,7 @@ export function nearestAllowedLane(desired, low, high, forbidden) {
  *   laneHalfWidthMeters: number;
  *   cushionYieldMeters?: number;
  *   cushionYieldSign?: number;
+ *   evasiveSideMeters?: number;
  * }} input
  */
 export function rivalContestLaneMeters(paceLaneMeters, input) {
@@ -994,6 +1082,8 @@ export function rivalContestLaneMeters(paceLaneMeters, input) {
   const laneHalfWidth = Number.isFinite(input.laneHalfWidthMeters)
     ? Math.max(0, input.laneHalfWidthMeters)
     : 8;
+  const evasiveSideRaw = input.evasiveSideMeters ?? 0;
+  const evasiveSide = Number.isFinite(evasiveSideRaw) ? Math.sign(evasiveSideRaw) : 0;
   const cushionYieldRaw = input.cushionYieldMeters ?? 0;
   const cushionSignRaw = input.cushionYieldSign ?? 0;
   const cushionYield = Number.isFinite(cushionYieldRaw) ? Math.max(0, cushionYieldRaw) : 0;
@@ -1006,6 +1096,23 @@ export function rivalContestLaneMeters(paceLaneMeters, input) {
     && input.insideSign !== 0
   ) {
     desired += (input.insideSign > 0 ? 1 : -1) * RIVAL_DEFENCE_SHIFT_METERS;
+  }
+  // G2 round 3 - the committed evasive side (see `resolveEvasiveSide`), applied
+  // to the DESIRED lane rather than to the forbidden span around the player.
+  //
+  // The hard version was tried first and reverted: making the player's room a
+  // half-line the craft had to stay outside of took Greenwater's free deck from
+  // 45.0% to 27.5%, because three rivals each pinned to a chosen side of the
+  // player is an infeasible constraint set and the corridor is what gets
+  // dropped to satisfy it. Biasing the target instead leaves the feasible set
+  // exactly as it was - `nearestAllowedLane` still has both sides available if
+  // it needs them - while making the craft PREFER the side it committed to. The
+  // flip only ever happened because the desired lane jumped across the player;
+  // pinning the desired lane is enough to stop it.
+  if (evasiveSide !== 0 && Number.isFinite(input.playerLateralMeters)
+    && Math.abs(gap) <= RIVAL_PLAYER_AVOID_GAP_METERS) {
+    const bound = input.playerLateralMeters + evasiveSide * RIVAL_LANE_CLEARANCE_METERS;
+    desired = evasiveSide > 0 ? Math.max(desired, bound) : Math.min(desired, bound);
   }
   // G2 — the rival's half of an air-cushion contact: aim RIVAL_CUSHION_YIELD_
   // METERS further from the player, on the side this craft is already on.
@@ -1023,6 +1130,13 @@ export function rivalContestLaneMeters(paceLaneMeters, input) {
 
   /** @type {number[][]} */
   const forbidden = [];
+  // The player's room stays a symmetric bubble. Turning it into a half-line on
+  // the committed side was tried twice and reverted both times: unconditionally
+  // it took Greenwater's free deck from 45.0% to 27.5%, and restricted to close
+  // range it INTRODUCED target-lane crossings on geometries that had none,
+  // because a half-line that contradicts the yield corridor is infeasible and
+  // the relaxation drops the player's room entirely. The corridor outranking
+  // the player's room is a G1 decision this phase is not entitled to reverse.
   const playerRoom = Math.abs(gap) <= RIVAL_PLAYER_AVOID_GAP_METERS
     && Number.isFinite(input.playerLateralMeters)
     ? [
