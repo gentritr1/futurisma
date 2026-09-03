@@ -145,9 +145,13 @@ assert.ok(
 //     No audio ASSETS were added and none can be: the project ships zero audio
 //     files and every sound in it is synthesised at run time from a seeded LCG.
 //     The served file list below is unchanged by this phase.
+// Re-baselined 2026-09-03 at the G3 + A1 merge: 242.8 KiB measured on the
+// merged tree (A1's lazy ambience chunk split and G3's events landed on one
+// build; the per-branch numbers of 238.9 and 240.7 do not sum under Rollup's
+// resplit). Ceiling 244; G4 (modes/time attack) is the next known cost.
 assert.ok(
-  javascriptGzip <= 242 * 1024,
-  `JavaScript bundle exceeds 242 KiB gzip (${(javascriptGzip / 1024).toFixed(1)} KiB).`,
+  javascriptGzip <= 244 * 1024,
+  `JavaScript bundle exceeds 244 KiB gzip (${(javascriptGzip / 1024).toFixed(1)} KiB).`,
 );
 // Re-baselined 2026-08-28 from a measured 4.35 KiB gzip (the 4 KiB ceiling
 // predated the HUD turn-cue and hazard styling) plus headroom for the planned
