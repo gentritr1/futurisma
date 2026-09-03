@@ -332,7 +332,38 @@ function audioFields(audio: ReturnType<EngineAudio["diagnostics"]>) {
     // asserted from the diagnostics line rather than from the slider's own DOM.
     masterVolume: Number(audio.masterVolume.toFixed(2)),
     musicVolume: Number(audio.musicVolume.toFixed(2)),
+    // A1 — the sound field, nested rather than flattened. `panners[i]` is read
+    // back off the PannerNode AudioParams and `spatialSources[i]` is the rival
+    // seam on the same tick, both in listener space (x right, y up, z forward),
+    // which is what lets `scripts/visual/audio-probe.mjs` assert one against
+    // the other. Every number here is zero while the AudioContext is
+    // suspended, which is how the headless soaks run.
+    audio: {
+      map: audio.ambience.map,
+      bedZone: audio.ambience.bedZone,
+      beds: audio.ambience.beds,
+      bedLevels: roundRecord(audio.ambience.bedLevels, 4),
+      eventLevels: audio.ambience.eventLevels,
+      ambiencePreparationMs: Number(audio.ambience.preparationMs.toFixed(1)),
+      passByWhooshes: audio.ambience.passByWhooshes,
+      nearestRivalMeters: Number(audio.ambience.nearestRivalMeters.toFixed(2)),
+      spatialSources: audio.ambience.spatialSources.map((s) => roundRecord(s, 4)),
+      panners: audio.ambience.panners.map((p) => roundRecord(p, 4)),
+      listenerPose: roundRecord(audio.ambience.listenerPose, 3),
+    },
   };
+}
+
+/** Rounds every value of a flat numeric record, for the emitted JSON line. */
+function roundRecord<T extends Record<string, number>>(
+  source: T,
+  digits: number,
+): Record<string, number> {
+  const rounded: Record<string, number> = {};
+  for (const [key, value] of Object.entries(source)) {
+    rounded[key] = Number(value.toFixed(digits));
+  }
+  return rounded;
 }
 
 function readHeapMb(): number | null {

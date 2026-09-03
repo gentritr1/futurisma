@@ -25,6 +25,19 @@ import {
   seededRandom,
 } from "./audio-space.js";
 import type { AudioZone } from "./audio-space.js";
+import { ambienceCue, ambienceEventLevels } from "./ambience-cue.js";
+import {
+  dopplerRatio,
+  inverseDistanceGain,
+  RIVAL_PANNER,
+  SPATIAL_LEAD_CLAMP_METERS,
+  spatialLeadSeconds,
+} from "./audio-space.js";
+import type {
+  AmbienceField,
+  PlayerAirField,
+  RivalVoiceLayers,
+} from "./audio-ambience.js";
 import { BOOST_MAX_SPEED } from "./physics.js";
 import {
   DEEP_DNB_BASS_EVENTS,
@@ -37,6 +50,14 @@ import {
   TRANCE_PLUCK_MIDI,
   frequencyForMidiNote,
 } from "./music-plan";
+
+/**
+ * A1 — re-exported so the race loop's ONE existing `./audio` import line can
+ * carry them. `game.ts` sits exactly on its 1975-line seam budget, so the
+ * ambience wiring is two MODIFIED lines there and zero new ones; the reasoning
+ * is written out over `publishAmbienceCue` in `audio-ambience.ts`.
+ */
+export { publishAmbienceCue, setEventLevels } from "./ambience-cue.js";
 
 export interface MusicProfile {
   trance: number;
@@ -73,6 +94,11 @@ const BAR_SECONDS = BEAT_SECONDS * 4;
 const CONTROL_INTERVAL_SECONDS = 1 / 30;
 /** Roughly half a control tick: tracks a passing rival without zippering. */
 const SPATIAL_SMOOTHING_SECONDS = 0.018;
+/** A1 — what that smoother plus the tick costs in metres. See `ambience-beds`. */
+const SPATIAL_LEAD_SECONDS = spatialLeadSeconds(
+  SPATIAL_SMOOTHING_SECONDS,
+  CONTROL_INTERVAL_SECONDS,
+);
 const STEM_NAMES: StemName[] = ["trance", "jungle", "deep_dnb", "techstep"];
 const STEM_GAIN: Record<StemName, number> = {
   trance: 0.075,
@@ -185,6 +211,76 @@ export class EngineAudio {
   private readonly spatialPosition = new THREE.Vector3();
   private readonly spatialVelocity = new THREE.Vector3();
   private readonly spatialDelta = new THREE.Vector3();
+  /** Scratch for the lag-compensated position handed to an AudioParam. */
+  private readonly spatialLead = new THREE.Vector3();
+  /**
+   * A1 — the sound field. The beds, the player's air and the extra rival layers
+   * are all built and owned by `audio-ambience.ts`; this class only ticks them
+   * on the control clock it already runs.
+   */
+  private ambience: AmbienceField | null = null;
+  private playerAir: PlayerAirField | null = null;
+  private readonly rivalLayers: RivalVoiceLayers[] = [];
+  /**
+   * The listener's own velocity, finite-differenced off the live vehicle vector
+   * across control ticks. Needed for the Doppler closing speed and available
+   * without widening any seam, since the listener position is already bound.
+   */
+  private readonly listenerVelocity = new THREE.Vector3();
+  private readonly previousListener = new THREE.Vector3();
+  private hasPreviousListener = false;
+  private previousSpatialTime = 0;
+  private lastMusicProfile: MusicProfile = {
+    trance: 0,
+    jungle: 0,
+    deep_dnb: 0,
+    techstep: 0,
+  };
+  /**
+   * Diagnostics readouts, pre-allocated once. `panners` is read BACK off the
+   * `PannerNode` AudioParams and `sources` is sampled from the rival seam on the
+   * same tick, so the two are independent enough for the harness to assert one
+   * against the other rather than against itself.
+   */
+  private readonly pannerReadouts = RIVAL_DETUNE_RATIOS.map(() => ({
+    x: 0,
+    y: 0,
+    z: 0,
+    gain: 0,
+  }));
+  private readonly sourceReadouts = RIVAL_DETUNE_RATIOS.map(() => ({
+    x: 0,
+    y: 0,
+    z: 0,
+    speed: 0,
+    doppler: 1,
+    boost: 0,
+    brake: 0,
+  }));
+  private readonly listenerPose = {
+    x: 0,
+    y: 0,
+    z: 0,
+    forwardX: 0,
+    forwardY: 0,
+    forwardZ: -1,
+    upX: 0,
+    upY: 1,
+    upZ: 0,
+  };
+  private readonly bedLevelReadout: Record<string, number> = {};
+  /** Stand-in when a voice has no layer object; never mutated. */
+  private readonly idleRivalSignals = { boost: 0, brake: 0 };
+  private diagnosticAmbiencePrepareMs = 0;
+  private diagnosticBedZone: AudioZone = "open";
+  private diagnosticNearestRivalMeters = Number.POSITIVE_INFINITY;
+  private diagnosticNearestClosingMps = 0;
+  /**
+   * The lazily-loaded ambience module. `validate-build.mjs` caps the initial
+   * gzip shell and the bed plan plus its baked loops is 5.5 KiB of it, so the
+   * whole thing arrives on the same `await` the AudioContext already needs.
+   */
+  private ambienceModule: typeof import("./audio-ambience.js") | null = null;
 
   constructor() {
     const preparationStartedAt = performance.now();
@@ -199,6 +295,11 @@ export class EngineAudio {
       await this.context.resume();
       return;
     }
+
+    // A1 — the only `await` in the graph build, taken BEFORE the context is
+    // created so nothing between here and `this.context = context` can be
+    // re-entered. The chunk is small and this runs behind the start button.
+    this.ambienceModule = await import("./audio-ambience.js");
 
     const initializationStartedAt = performance.now();
     const context = new AudioContext();
@@ -266,7 +367,32 @@ export class EngineAudio {
     this.installReverb(context, master, filter);
     this.installRivalVoices(context, master);
     this.installMusic(context, master);
+    // A1. The player's air is map-independent so it is built here; the beds are
+    // not, so they wait for `publishAmbienceCue` to name a map. In practice the
+    // frame loop has already published one by the time `start()` runs, which is
+    // what keeps the ~60 ms of loop baking inside this one-off cost rather than
+    // dropping it on the first control tick of the countdown.
+    this.playerAir = new this.ambienceModule.PlayerAirField(context, master);
+    this.ensureAmbience(context, master);
     this.diagnosticInitializationMs = performance.now() - initializationStartedAt;
+  }
+
+  /**
+   * Builds (or rebuilds) the bed field for whatever map the cue names. Cheap
+   * and idempotent once the map is stable; a map change disposes the old field
+   * rather than leaving two maps' beds summing into the bus.
+   */
+  private ensureAmbience(context: AudioContext, master: GainNode): void {
+    const map = ambienceCue().map;
+    if (!map || !this.ambienceModule || this.ambience?.map === map) return;
+    this.ambience?.dispose();
+    this.ambience = new this.ambienceModule.AmbienceField(
+      context,
+      master,
+      this.reverbSend,
+      map,
+    );
+    this.diagnosticAmbiencePrepareMs = this.ambience.preparationMs;
   }
 
   /**
@@ -363,10 +489,30 @@ export class EngineAudio {
     );
     this.updateReverbZone(now, zone);
     this.updateRivals(now, racing);
+    // A1. Same tick, same clock: the beds, the player's air and the pass-by
+    // whoosh all move on the 30 Hz control update rather than adding a timer.
+    if (this.master) this.ensureAmbience(this.context, this.master);
+    // The beds follow the zone IMMEDIATELY; only the convolver waits for a bar.
+    // `bedZone` is recorded separately from `reverbZone` for that reason — they
+    // legitimately disagree for up to one bar at every boundary.
+    this.diagnosticBedZone = zone;
+    this.ambience?.update(now, zone, this.lastMusicProfile);
+    this.playerAir?.update(now, speedRatio, boost);
+    if (Number.isFinite(this.diagnosticNearestRivalMeters)) {
+      this.playerAir?.passBy(
+        now,
+        this.diagnosticNearestRivalMeters,
+        this.diagnosticNearestClosingMps,
+      );
+    }
     return true;
   }
 
   setMusicProfile(profile: MusicProfile): void {
+    // A1 — latched before the key gate below, because the ambience duck reads
+    // the LEVELS, not the transition. A profile that has not changed still has
+    // to be visible to the beds on the very first tick.
+    this.lastMusicProfile = profile;
     if (!this.context || !audioClockAdvances(this.context.state)) return;
     const key = encodeMusicProfileKey(
       profile.trance,
@@ -621,6 +767,24 @@ export class EngineAudio {
     reverbZoneTransitions: number;
     masterVolume: number;
     musicVolume: number;
+    ambience: {
+      map: string;
+      bedZone: AudioZone;
+      beds: number;
+      bedLevels: Record<string, number>;
+      eventLevels: { windGust: number; squall: number; saltDrop: number };
+      preparationMs: number;
+      passByWhooshes: number;
+      nearestRivalMeters: number;
+      spatialSources: { x: number; y: number; z: number; speed: number;
+        doppler: number; boost: number; brake: number }[];
+      panners: { x: number; y: number; z: number; gain: number }[];
+      listenerPose: {
+        x: number; y: number; z: number;
+        forwardX: number; forwardY: number; forwardZ: number;
+        upX: number; upY: number; upZ: number;
+      };
+    };
   } {
     const elapsed = this.context
       ? Math.max(0, this.context.currentTime - this.diagnosticControlStartedAt)
@@ -663,6 +827,25 @@ export class EngineAudio {
       reverbZoneTransitions: this.diagnosticReverbTransitions,
       masterVolume: this.masterVolume,
       musicVolume: this.musicVolume,
+      // A1. Copied out here rather than shared, because `diagnostics()` runs
+      // about once a second while the readouts below are mutated 30 times a
+      // second — handing the report a live reference would make every emitted
+      // line disagree with the tick it claims to describe.
+      ambience: {
+        map: this.ambience?.map ?? "",
+        bedZone: this.diagnosticBedZone,
+        beds: this.ambience?.bedCount ?? 0,
+        bedLevels: { ...this.ambience?.levels(this.bedLevelReadout) },
+        eventLevels: { ...ambienceEventLevels() },
+        preparationMs: this.diagnosticAmbiencePrepareMs,
+        passByWhooshes: this.playerAir?.passByCount ?? 0,
+        nearestRivalMeters: Number.isFinite(this.diagnosticNearestRivalMeters)
+          ? this.diagnosticNearestRivalMeters
+          : -1,
+        spatialSources: this.sourceReadouts.map((readout) => ({ ...readout })),
+        panners: this.pannerReadouts.map((readout) => ({ ...readout })),
+        listenerPose: { ...this.listenerPose },
+      },
     };
   }
 
@@ -682,6 +865,26 @@ export class EngineAudio {
       voice.panner.disconnect();
     }
     this.rivalVoices.length = 0;
+    // A1 — the ambience field owns the only large buffers this phase allocates
+    // (about 29 s of baked loops on Bitterpan), so dropping it here is what
+    // keeps a disposed race off the heap.
+    for (const layers of this.rivalLayers) layers.dispose();
+    this.rivalLayers.length = 0;
+    this.ambience?.dispose();
+    this.ambience = null;
+    this.playerAir?.dispose();
+    this.playerAir = null;
+    this.hasPreviousListener = false;
+    this.previousSpatialTime = 0;
+    this.listenerVelocity.set(0, 0, 0);
+    this.diagnosticAmbiencePrepareMs = 0;
+    this.diagnosticBedZone = "open";
+    this.diagnosticNearestRivalMeters = Number.POSITIVE_INFINITY;
+    this.diagnosticNearestClosingMps = 0;
+    this.ambienceModule = null;
+    for (const key of Object.keys(this.bedLevelReadout)) {
+      delete this.bedLevelReadout[key];
+    }
     this.rivalBus?.disconnect();
     this.rivalFilter?.disconnect();
     this.reverbSend?.disconnect();
@@ -821,12 +1024,15 @@ export class EngineAudio {
     this.rivalFilter = filter;
 
     for (let index = 0; index < RIVAL_AUDIO_VOICES; index += 1) {
+      // A1 — the distance model is authored in `ambience-beds.js` now, so the
+      // validator and the harness read the SAME numbers the graph is built
+      // from rather than a copy of them.
       const panner = context.createPanner();
-      panner.panningModel = "HRTF";
-      panner.distanceModel = "inverse";
-      panner.refDistance = 4;
-      panner.maxDistance = 90;
-      panner.rolloffFactor = 1.4;
+      panner.panningModel = RIVAL_PANNER.panningModel as PanningModelType;
+      panner.distanceModel = RIVAL_PANNER.distanceModel as DistanceModelType;
+      panner.refDistance = RIVAL_PANNER.refDistance;
+      panner.maxDistance = RIVAL_PANNER.maxDistance;
+      panner.rolloffFactor = RIVAL_PANNER.rolloffFactor;
       panner.connect(bus);
 
       const detune = RIVAL_DETUNE_RATIOS[index];
@@ -850,6 +1056,14 @@ export class EngineAudio {
 
       this.persistentSources.push(oscillator, harmonic);
       this.rivalVoices.push({ panner, oscillator, harmonic, gain, harmonicGain });
+      // A1 — the boost layer and the airbrake hiss go into the SAME panner, so
+      // a rival that lights its boost gets louder from where it already is
+      // rather than from the middle of the mix.
+      if (this.ambienceModule) {
+        this.rivalLayers.push(
+          new this.ambienceModule.RivalVoiceLayers(context, panner, detune),
+        );
+      }
     }
   }
 
@@ -924,27 +1138,161 @@ export class EngineAudio {
     this.spatialForward.set(-basis[8], -basis[9], -basis[10]).normalize();
     this.spatialUp.set(basis[4], basis[5], basis[6]).normalize();
     listenerRightVector(this.spatialForward, this.spatialUp, this.spatialRight);
-    this.applyListener(this.context.listener, listener, now);
+    // A1. The listener's own velocity, finite-differenced across control ticks.
+    // Nothing publishes it, and it is needed twice: for the Doppler term, which
+    // wants the RELATIVE closing speed rather than the rival's ground speed,
+    // and for the lag compensation below. One pole of smoothing on it, because
+    // a dropped frame otherwise turns into a velocity spike.
+    const step = Math.max(1e-3, now - this.previousSpatialTime);
+    if (this.hasPreviousListener) {
+      this.spatialDelta.subVectors(listener, this.previousListener)
+        .multiplyScalar(1 / step)
+        .sub(this.listenerVelocity)
+        .multiplyScalar(0.45);
+      this.listenerVelocity.add(this.spatialDelta);
+    } else {
+      this.listenerVelocity.set(0, 0, 0);
+    }
+    this.previousListener.copy(listener);
+    this.hasPreviousListener = true;
+    this.previousSpatialTime = now;
+    this.applyListener(
+      this.context.listener,
+      this.leadPosition(listener, this.listenerVelocity),
+      now,
+    );
+    this.diagnosticNearestRivalMeters = Number.POSITIVE_INFINITY;
+    this.diagnosticNearestClosingMps = 0;
+    this.readListenerPose(listener);
 
     for (let index = 0; index < this.rivalVoices.length; index += 1) {
       const voice = this.rivalVoices[index];
-      const position = index === 0 && this.rivalProbeOffset
-        ? this.spatialPosition.addVectors(listener, this.rivalProbeOffset)
+      const pinned = index === 0 && this.rivalProbeOffset !== null;
+      const position = pinned
+        ? this.spatialPosition.addVectors(listener, this.rivalProbeOffset!)
         : source.worldPosition(index, this.spatialPosition);
-      const speedRatio = source.worldVelocity(index, this.spatialVelocity).length()
-        / BOOST_MAX_SPEED;
-      const frequency = rivalEngineFrequency(speedRatio, RIVAL_DETUNE_RATIOS[index]);
+      // A pinned probe source rides the craft, so it is led by the CRAFT's
+      // velocity; otherwise the lag compensation would shove it forward at the
+      // rival's speed and the probe would stop being a fixed offset.
+      const speed = source.worldVelocity(index, this.spatialVelocity).length();
+      this.applyPanner(
+        voice.panner,
+        this.leadPosition(position, pinned ? this.listenerVelocity : this.spatialVelocity),
+        now,
+      );
+      const speedRatio = speed / BOOST_MAX_SPEED;
+      this.spatialDelta.subVectors(position, listener);
+      const distance = this.spatialDelta.length();
+      // Positive when the gap is shrinking. `spatialVelocity` still holds the
+      // rival's velocity from the call above, so this costs no extra vector.
+      const closing = distance > 1e-4
+        ? -(this.spatialVelocity.sub(this.listenerVelocity).dot(this.spatialDelta))
+          / distance
+        : 0;
+      const doppler = dopplerRatio(closing);
+      const frequency = rivalEngineFrequency(speedRatio, RIVAL_DETUNE_RATIOS[index])
+        * doppler;
       voice.oscillator.frequency.setTargetAtTime(frequency, now, 0.05);
       voice.harmonic.frequency.setTargetAtTime(frequency * 2.03, now, 0.05);
       const gains = rivalEngineGains(speedRatio, this.rivalGainPair);
       voice.gain.gain.setTargetAtTime(racing ? gains.oscillator : 0, now, 0.08);
       voice.harmonicGain.gain.setTargetAtTime(racing ? gains.harmonic : 0, now, 0.08);
-      this.applyPanner(voice.panner, position, now);
-      this.rivalPanValues[index] = listenerPanX(
-        this.spatialDelta.subVectors(position, listener),
-        this.spatialRight,
-      );
+      // Returns the layer's own reused signal object; nothing here allocates.
+      const layers = this.rivalLayers[index]?.update(now, speed, step, doppler, racing)
+        ?? this.idleRivalSignals;
+      this.rivalPanValues[index] = listenerPanX(this.spatialDelta, this.spatialRight);
+      if (distance < this.diagnosticNearestRivalMeters) {
+        this.diagnosticNearestRivalMeters = distance;
+        this.diagnosticNearestClosingMps = closing;
+      }
+      this.readSpatialDiagnostics(index, listener, speed, doppler, layers);
     }
+  }
+
+  /**
+   * The A1 readouts, taken on the same tick from two different places on
+   * purpose: `panners[i]` is read BACK off the `PannerNode`'s own AudioParams
+   * (so it carries the smoothing lag and would catch a mis-indexed or stale
+   * position), while `spatialSources[i]` is the rival seam sampled directly.
+   * The harness asserts one against the other; if they were both derived from
+   * the same vector the check would be proving itself.
+   *
+   * Both are expressed in LISTENER space — right, up, forward — because that is
+   * the frame the pan is actually heard in, and each is taken against ITS OWN
+   * origin: the panner readback against the AudioListener's smoothed position,
+   * the seam sample against the live craft. That distinction is the whole
+   * measurement. Both nodes ride the same 18 ms position smoother, and at 90 m/s
+   * a shared smoother puts BOTH about 3 m behind the world — but in the same
+   * direction, so what the ear actually receives is the difference, which is
+   * correct to well under a metre. Measuring a smoothed panner against an
+   * unsmoothed listener reports that shared 3 m lag as if it were error, and it
+   * is not: it is a 33 ms delay applied uniformly to the whole scene.
+   */
+  private readSpatialDiagnostics(
+    index: number,
+    listener: THREE.Vector3,
+    speed: number,
+    doppler: number,
+    layers: { boost: number; brake: number },
+  ): void {
+    const panner = this.rivalVoices[index].panner;
+    const readout = this.pannerReadouts[index];
+    const pose = this.listenerPose;
+    const x = panner.positionX ? panner.positionX.value : pose.x;
+    const y = panner.positionY ? panner.positionY.value : pose.y;
+    const z = panner.positionZ ? panner.positionZ.value : pose.z;
+    this.spatialDelta.set(x - pose.x, y - pose.y, z - pose.z);
+    readout.x = this.spatialDelta.dot(this.spatialRight);
+    readout.y = this.spatialDelta.dot(this.spatialUp);
+    readout.z = this.spatialDelta.dot(this.spatialForward);
+    readout.gain = inverseDistanceGain(this.spatialDelta.length());
+
+    const sourceReadout = this.sourceReadouts[index];
+    this.spatialDelta.subVectors(this.spatialPosition, listener);
+    sourceReadout.x = this.spatialDelta.dot(this.spatialRight);
+    sourceReadout.y = this.spatialDelta.dot(this.spatialUp);
+    sourceReadout.z = this.spatialDelta.dot(this.spatialForward);
+    sourceReadout.speed = speed;
+    sourceReadout.doppler = doppler;
+    sourceReadout.boost = layers.boost;
+    sourceReadout.brake = layers.brake;
+  }
+
+  /**
+   * `position + velocity * lead`, clamped. Both the listener and every panner
+   * go through this, so the compensation cancels for a pack running together
+   * and only shows up where two craft are genuinely diverging. Returns a shared
+   * scratch vector: the caller must consume it before the next call.
+   */
+  private leadPosition(
+    position: THREE.Vector3,
+    velocity: THREE.Vector3,
+  ): THREE.Vector3 {
+    this.spatialLead.copy(velocity).multiplyScalar(SPATIAL_LEAD_SECONDS);
+    const reach = this.spatialLead.length();
+    if (reach > SPATIAL_LEAD_CLAMP_METERS) {
+      this.spatialLead.multiplyScalar(SPATIAL_LEAD_CLAMP_METERS / reach);
+    }
+    return this.spatialLead.add(position);
+  }
+
+  /**
+   * The AudioListener's own state, read back off its AudioParams once per tick
+   * before the rivals are placed against it.
+   */
+  private readListenerPose(listener: THREE.Vector3): void {
+    const node = this.context?.listener;
+    if (!node) return;
+    const pose = this.listenerPose;
+    pose.x = node.positionX ? node.positionX.value : listener.x;
+    pose.y = node.positionY ? node.positionY.value : listener.y;
+    pose.z = node.positionZ ? node.positionZ.value : listener.z;
+    pose.forwardX = node.forwardX ? node.forwardX.value : this.spatialForward.x;
+    pose.forwardY = node.forwardY ? node.forwardY.value : this.spatialForward.y;
+    pose.forwardZ = node.forwardZ ? node.forwardZ.value : this.spatialForward.z;
+    pose.upX = node.upX ? node.upX.value : this.spatialUp.x;
+    pose.upY = node.upY ? node.upY.value : this.spatialUp.y;
+    pose.upZ = node.upZ ? node.upZ.value : this.spatialUp.z;
   }
 
   /**

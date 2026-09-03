@@ -283,9 +283,12 @@ for (const offset of [0, 0.001, 0.4, bar - 1e-4, bar, bar * 2.5, 37.9]) {
 }
 assert.equal(resolveZoneCrossfade(0, origin, bar).start, origin);
 
-// Gain staging. At the panner reference distance of 4 m the inverse distance
-// model is unity, so the pre-panner gains are directly comparable: three rivals
-// abeam must stay under 40 % of a boosting player engine.
+// Gain staging. Inside the panner reference distance the inverse distance model
+// is unity, so the pre-panner gains are directly comparable: three rivals abeam
+// must stay under 40 % of a boosting player engine. A1 moved that reference
+// distance to 6 m and added two gated layers per rival; the steady-state
+// ceiling below is unchanged and the distance model itself is asserted in
+// scripts/validate-audio-ambience.mjs.
 assert.equal(RIVAL_AUDIO_VOICES, 3);
 assert.equal(RIVAL_DETUNE_RATIOS.length, RIVAL_AUDIO_VOICES);
 assert.equal(new Set(RIVAL_DETUNE_RATIOS).size, RIVAL_AUDIO_VOICES);

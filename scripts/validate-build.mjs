@@ -95,9 +95,33 @@ assert.ok(
 // one and the one this ceiling is set from. The validator prints it live every
 // run. Raise only with a fresh measurement and a note saying what the bytes
 // bought.
+//
+//   A1 audio ambience  +2.0 KiB - measured 236.9 -> 238.9 KiB gzip on the
+//     merged tree with `npx vite build && node scripts/validate-build.mjs`.
+//     What the bytes bought, and what they deliberately did NOT:
+//
+//     IN the shell (the part that had to be): `src/game/ambience-cue.ts`, the
+//     synchronous cue the race loop publishes every frame (0.24 KiB gzip as its
+//     own chunk); the rival distance/Doppler/lag-compensation maths appended to
+//     `audio-space.js`, which the 30 Hz control tick calls; and the growth in
+//     `audio.ts` and `diagnostics.ts` - the lag-compensated listener and panner
+//     placement, the boost/brake/Doppler per rival, and the `audio` diagnostics
+//     block the harness asserts against.
+//
+//     OUT of the shell: `src/game/audio-ambience.ts` and `ambience-beds.js` -
+//     the whole bed plan, the wind/air/whoosh graph and about 29 s of baked
+//     loop synthesis - are behind a DYNAMIC import taken inside
+//     `EngineAudio.start()`, on the await the AudioContext already needed.
+//     That chunk is 4.60 KiB gzip and nobody who never presses start pays for
+//     it. The first cut of this phase put all of it in the shell and measured
+//     242.4 KiB; the split is what got it to 238.9.
+//
+//     No audio ASSETS were added and none can be: the project ships zero audio
+//     files and every sound in it is synthesised at run time from a seeded LCG.
+//     The served file list below is unchanged by this phase.
 assert.ok(
-  javascriptGzip <= 237 * 1024,
-  `JavaScript bundle exceeds 237 KiB gzip (${(javascriptGzip / 1024).toFixed(1)} KiB).`,
+  javascriptGzip <= 240 * 1024,
+  `JavaScript bundle exceeds 240 KiB gzip (${(javascriptGzip / 1024).toFixed(1)} KiB).`,
 );
 // Re-baselined 2026-08-28 from a measured 4.35 KiB gzip (the 4 KiB ceiling
 // predated the HUD turn-cue and hazard styling) plus headroom for the planned
@@ -114,9 +138,14 @@ assert.ok(
 // leaves CSS well under its own 8 KiB ceiling. Measured on the merged tree at
 // 245.1 KiB (HTML 3.3 + JS 236.3 + CSS 5.5), against 241.0 before G2. The
 // ceiling moves with the JS one it is dominated by; re-measure both together.
+// A1 re-measure: 247.6 KiB (HTML 3.3 + JS 238.9 + CSS 5.4). The phase adds no
+// HTML and no CSS at all - it is audio - so the whole move is the JS above. The
+// ceiling goes 248 -> 251 for coherence rather than for headroom: at the JS
+// ceiling of 240 the shell is already ~248.8, so a 248 shell ceiling would fail
+// builds the JS ceiling explicitly allows.
 assert.ok(
-  shellGzip <= 248 * 1024,
-  `Initial app shell exceeds 248 KiB gzip (${(shellGzip / 1024).toFixed(1)} KiB).`,
+  shellGzip <= 251 * 1024,
+  `Initial app shell exceeds 251 KiB gzip (${(shellGzip / 1024).toFixed(1)} KiB).`,
 );
 assert.ok(
   html.includes('rel="preload"')

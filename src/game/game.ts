@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { RaceAtmosphere, configureToneMapping } from "./atmosphere";
-import { EngineAudio } from "./audio";
+import { EngineAudio, publishAmbienceCue } from "./audio";
 import { DemoAutopilot, alignDirectionToSurface } from "./autopilot";
 import { DriftBank } from "./drift-charge";
 import {
@@ -598,7 +598,7 @@ export class FuturismaGame {
       this.boostActive,
       this.surfaceGrip,
       this.driftIntensity,
-      this.course.audioZoneAt(this.progress),
+      publishAmbienceCue(this.course, this.progress),
       this.phase === "running",
     );
     if (audioControlUpdated && this.phase !== "finished") {
