@@ -62,9 +62,9 @@ export const GREENWATER_SKY_ZONES = Object.freeze([
  * Mirrors `lighting.profiles[].sky*` in BITTERPAN_PRODUCTION.json.
  */
 export const BITTERPAN_SKY_ZONES = Object.freeze([
-  { sector: "S1", distance: 60, horizon: 0x6e8492, zenith: 0x1a2835, blendDegrees: 20 },
-  { sector: "S2", distance: 1610, horizon: 0x728896, zenith: 0x1c2b38, blendDegrees: 20 },
-  { sector: "S3", distance: 2550, horizon: 0x6b8294, zenith: 0x182634, blendDegrees: 20 },
+  { sector: "S1", distance: 60, horizon: 0x768d9c, zenith: 0x1a2835, blendDegrees: 20 },
+  { sector: "S2", distance: 1610, horizon: 0x7a92a1, zenith: 0x1c2b38, blendDegrees: 20 },
+  { sector: "S3", distance: 2550, horizon: 0x728b9e, zenith: 0x182634, blendDegrees: 20 },
 ]);
 
 /**
@@ -77,7 +77,7 @@ export const BITTERPAN_SKY_ZONES = Object.freeze([
  */
 export const SKY_BAND_STRENGTH = Object.freeze({
   greenwater: 0.34,
-  bitterpan: 0.14,
+  bitterpan: 0.19,
 });
 
 /**
@@ -110,7 +110,7 @@ export const CLOUD_PROFILES = Object.freeze({
   greenwater: Object.freeze({
     coverage: 0.52,
     softness: 0.3,
-    strength: 0.17,
+    strength: 0.3,
     driftPerSecond: 0.0035,
     azimuthPeriod: 16,
     lowDegrees: 4,
@@ -121,7 +121,7 @@ export const CLOUD_PROFILES = Object.freeze({
   bitterpan: Object.freeze({
     coverage: 0.28,
     softness: 0.16,
-    strength: 0.22,
+    strength: 0.075,
     driftPerSecond: 0.0022,
     azimuthPeriod: 23,
     lowDegrees: 4,
