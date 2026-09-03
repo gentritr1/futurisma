@@ -1369,7 +1369,11 @@ body[data-options="true"] .hud {
  */
 .result-stats {
   width: 100%;
-  margin: 14px 0 0;
+  /* The bottom margin matches `.result-laps`' 24px above it. Measured, not
+     guessed: without it the stats block's last row ends at exactly the
+     button's top edge (523 px on both, at 1280x720), which reads as a
+     collision in a screenshot even though nothing actually overlaps. */
+  margin: 14px 0 24px;
   padding-top: 12px;
   border-top: 1px solid var(--line);
   display: grid;
@@ -1468,8 +1472,17 @@ body[data-options="true"] .hud {
 /* Below this the key legend is the first thing to go — the dispatch sheet is
    what the screen is for, and the legend is reference rather than a decision.
    `.intro-footer` goes with it because it is absolutely positioned and would
-   otherwise sit on top of whatever ends up last. */
-@media (max-height: 680px) and (min-width: 701px) {
+   otherwise sit on top of whatever ends up last.
+
+   G4 — 680 -> 800, and the number was measured rather than nudged. The phase
+   adds two rows to the dispatch sheet (FORMAT and FIELD), each a `.chip` with
+   a deck line: 48 px of row plus the sheet's own 8 px gap, so ~112 px taller.
+   680 + 112 = 792, rounded to 800. The old threshold was ALREADY failing at
+   this repository's own harness viewport — the first G4 paddock screenshot at
+   1280x720 showed the absolutely-positioned footer sitting across the middle
+   of the key legend, which is exactly the collision this rule exists to
+   prevent and is why it had to move with the sheet that caused it. */
+@media (max-height: 800px) and (min-width: 701px) {
   .controls-list,
   .intro-footer {
     display: none;

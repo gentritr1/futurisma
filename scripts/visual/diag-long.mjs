@@ -31,9 +31,18 @@ for (let index = 0; index < 340; index += 1) {
   let done = false;
   try {
     const parsed = JSON.parse(last || "{}").current || {};
+    // G4 — a finished race, EITHER classified against a field or run solo.
+    //
+    // The classification check alone was the whole condition, which quietly
+    // meant "wait for a field race": `timeattack` spawns no rivals, so
+    // `finalClassification` stays empty for the rest of the run and this loop
+    // burned its full 340 s on every solo soak before printing the finished
+    // line it had been holding for minutes. `fieldSize === 1` is the honest
+    // second door — the same value the diagnostics line reports for a solo
+    // format — and it is checked alongside `phase`, never instead of it.
     done = parsed.phase === "finished"
       && Array.isArray(parsed.finalClassification)
-      && parsed.finalClassification.length > 0;
+      && (parsed.finalClassification.length > 0 || parsed.fieldSize === 1);
   } catch { /* the diagnostics line is not JSON yet */ }
   if (done) {
     console.log(last);

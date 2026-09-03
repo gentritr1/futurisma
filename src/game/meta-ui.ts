@@ -316,6 +316,7 @@ export class MetaUi {
     this.musicValue.textContent = formatLevel(settings.musicVolume);
     this.hooks.setMasterVolume(settings.masterVolume);
     this.hooks.setMusicVolume(settings.musicVolume);
+    this.ui.setRaceModeLabel(RACE_MODE_LABELS[raceModes.mode]);
     this.ui.setPlayerLivery(liveryFor(save.livery).label, []);
     this.syncRecord();
     this.refreshPending();

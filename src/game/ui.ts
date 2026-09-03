@@ -224,6 +224,22 @@ export class GameUi {
   /** The course half of the intro footer, kept so a livery swap can rebuild it
    * without re-running `setRaceFormat`. */
   private courseFooterLabel = "GREENWATER FIELD RACE";
+  /** The course half on its own, so the format half can be swapped without
+   * having to parse it back out of the joined string. */
+  private courseFooterName = "GREENWATER";
+  /**
+   * G4 — the format half of that footer, which used to be the literal string
+   * `FIELD RACE` baked into the line above.
+   *
+   * That was true while there was only one format and became a lie the moment
+   * there were three: the paddock screenshot showed `SPRINT` selected in the
+   * chip row with `GREENWATER STRIP FIELD RACE` printed underneath it. Held as
+   * its own field rather than passed into `setRaceFormat` because the two are
+   * set from opposite directions — `MetaUi` knows the format and the race loop
+   * knows the course — and `setRaceFormat` rebuilds the line from both, so
+   * whichever arrives second does not clobber the first.
+   */
+  private raceFormatLabel = "FIELD RACE";
   private readonly reducedMotion = window.matchMedia(
     "(prefers-reduced-motion: reduce)",
   ).matches;
@@ -257,7 +273,8 @@ export class GameUi {
       ? `Four ships. ${lapLabel} through Greenwater Strip. Follow the amber turn markers, clear all eight gates, and bring TOTEM home through The Cradle.`
       : `Four ships. ${lapLabel} through ${course.mapName}. Follow the amber turn markers, clear all ${course.checkpointCount} sector gates, and bring TOTEM home through ${course.finishName}.`;
     this.courseName.textContent = `${course.mapName.toUpperCase()} / ${course.mapCode}`;
-    this.courseFooterLabel = `${course.mapName.toUpperCase()} FIELD RACE`;
+    this.courseFooterName = course.mapName.toUpperCase();
+    this.courseFooterLabel = `${this.courseFooterName} ${this.raceFormatLabel}`;
     this.introFooter.textContent = `${this.playerLiveryLabel} · ${this.courseFooterLabel}`;
     document.title = `FUTURISMA · ${course.mapName}`;
     this.checkpointValue.textContent = `NEXT GATE 01 / ${course.checkpointCount
@@ -279,6 +296,16 @@ export class GameUi {
    * starting-grid list and the classification line so the whole panel follows
    * the chosen issue instead of naming a works car that is no longer on track.
    */
+  /**
+   * G4 — the format the paddock footer names. Called by `MetaUi`, which is the
+   * only thing that knows which format was dispatched.
+   */
+  setRaceModeLabel(label: string): void {
+    this.raceFormatLabel = label;
+    this.courseFooterLabel = `${this.courseFooterName} ${label}`;
+    this.introFooter.textContent = `${this.playerLiveryLabel} · ${this.courseFooterLabel}`;
+  }
+
   setPlayerLivery(label: string, grid: readonly RaceGridEntry[]): void {
     this.playerLiveryLabel = label;
     this.introFooter.textContent = `${label} · ${this.courseFooterLabel}`;

@@ -112,11 +112,16 @@ if (job === "shots") {
   await attack.goto(attackUrl, { waitUntil: "networkidle" });
   await until(attack, (d) => d.phase === "finished", 180, "the seeding time attack");
   await attack.goto(attackUrl, { waitUntil: "networkidle" });
+  // A NON-ZERO delta, at racing speed. The chip legitimately reads `0.00` on
+  // the grid — the lap has not started, so it is level with the record by
+  // definition — and a screenshot of that proves the element exists rather than
+  // that it works. Waiting for a real value is the difference.
   await until(
     attack,
-    (d) => d.liveDelta !== "—" && d.liveDelta !== "",
+    (d) => d.liveDelta !== "—" && d.liveDelta !== "" && d.liveDelta !== "0.00"
+      && d.speedKph > 150,
     180,
-    "the live delta chip to read a value",
+    "the live delta chip to read a non-zero value at racing speed",
   );
   const chip = await attack.evaluate(() => {
     const element = document.getElementById("delta-chip");
