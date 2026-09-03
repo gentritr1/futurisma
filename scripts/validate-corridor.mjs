@@ -255,11 +255,84 @@ assert.ok(
     + "measurement, and re-derive when the hover changes.",
 );
 
+// ---------------------------------------------------------------------------
+// 7. The Bitterpan pan plane may not swallow any more of the ribbon than it
+//    already does.
+//
+// The one pinned residual is not an object standing in the corridor — it is the
+// pan floor drawn OVER the road. `GROUND_Y_METRES` is flat at -1.95 m, picked as
+// 0.078 m below the ribbon's CENTRELINE low point; the ribbon banks 2.5 deg, so
+// its lowest DRAWN surface is the run-off lip at -2.7446 m, a quarter of a metre
+// below the plane meant to sit under everything. Same shape of error as the
+// bounding floor in section 6: a clearance computed against the wrong reference.
+//
+// Fixing it means moving `GROUND_Y_METRES`, which also anchors the mid-ground
+// layer and the road-edge band's lip threshold, so it is a map-wide art decision
+// and is deliberately not taken here. What IS taken here is the guarantee that
+// the defect cannot grow while it waits: the overlap is re-derived from the
+// authored centreline every run and compared with what was measured. Widen the
+// deck, deepen the bank or raise the plane, and this fails.
+// ---------------------------------------------------------------------------
+const CENTRELINE = readJson("src/game/data/map02/CENTRELINE_STATIONS.json");
+const SURFACE_SOURCE = readText("src/game/bitterpan-surface.ts");
+const groundY = number(
+  SURFACE_SOURCE,
+  /export const GROUND_Y_METRES = (-?[\d.]+);/,
+  "GROUND_Y_METRES",
+);
+/** Widest authored Bitterpan run-off (edge C, open pan), metres. */
+const BITTERPAN_WIDEST_APRON_METRES = 5.8;
+let deckSidesCovered = 0;
+let worstDeckCoverMetres = 0;
+let lowestDrawnRibbonY = Infinity;
+for (const station of CENTRELINE.stations) {
+  const halfWidth = station.width_m / 2;
+  const sinBank = Math.sin(Math.abs(station.bank_deg) * (Math.PI / 180));
+  lowestDrawnRibbonY = Math.min(
+    lowestDrawnRibbonY,
+    station.y - (halfWidth + BITTERPAN_WIDEST_APRON_METRES) * sinBank,
+  );
+  if (sinBank <= 0) continue;
+  // The lateral at which the banked deck plane drops through the pan plane.
+  const crossing = (groundY - station.y) / -sinBank;
+  const covered = halfWidth - Math.abs(crossing);
+  if (station.y - halfWidth * sinBank < groundY && covered > 0) {
+    deckSidesCovered += 1;
+    worstDeckCoverMetres = Math.max(worstDeckCoverMetres, covered);
+  }
+}
+// Computed by this block from the authored centreline and the GROUND_Y_METRES
+// literal in bitterpan-surface.ts — not transcribed from a scratch estimate. An
+// earlier pass pinned 12.26 m from a pan height inferred off a single swept
+// vertex (-1.9569 m); against the real -1.95 m the coverage is 12.42 m. The
+// crossing sits at 1/sin(2.5 deg) = 22.9 m of lateral per metre of height, so
+// 7 mm of error in the plane height moves the answer 16 cm. Read the constant.
+const MEASURED_DECK_SIDES_COVERED = 53;
+const MEASURED_WORST_DECK_COVER_METRES = 12.42;
+assert.ok(
+  deckSidesCovered <= MEASURED_DECK_SIDES_COVERED,
+  `The Bitterpan pan plane is now drawn over part of the racing surface on `
+    + `${deckSidesCovered} station-sides, up from the measured `
+    + `${MEASURED_DECK_SIDES_COVERED}. GROUND_Y_METRES is ${groundY} m and the `
+    + `lowest drawn ribbon surface is ${lowestDrawnRibbonY.toFixed(4)} m.`,
+);
+assert.ok(
+  worstDeckCoverMetres <= MEASURED_WORST_DECK_COVER_METRES + 0.01,
+  `The worst pan-over-deck coverage is now ${worstDeckCoverMetres.toFixed(2)} m, `
+    + `up from the measured ${MEASURED_WORST_DECK_COVER_METRES} m.`,
+);
+// And the fix, when it is taken, is this number.
+const requiredGroundY = lowestDrawnRibbonY - 0.078;
+
 const obstacles = CENSUS.maps.reduce((sum, map) => sum + map.obstacles.length, 0);
 console.log(
   `Corridor PASS: ${obstacles} obstacle group(s) inside the drivable corridor `
     + `across both maps — ${allowedSeen.size} collidable hazard mesh(es) and `
     + `${pinnedSeen.size} pinned residual(s), nothing unaccounted for. Bounding `
     + `floor ${tallFloor} m clears the ${hullBottom.toFixed(3)} m hull bottom; both `
-    + "DRIVABLE_LIMITS.json tables re-derive byte-identical from their captures.",
+    + "DRIVABLE_LIMITS.json tables re-derive byte-identical from their captures. "
+    + `Bitterpan pan plane at ${groundY} m still covers deck on ${deckSidesCovered} `
+    + `station-side(s), worst ${worstDeckCoverMetres.toFixed(2)} m (no worse than `
+    + `measured); clearing the ${lowestDrawnRibbonY.toFixed(3)} m run-off lip would `
+    + `need ${requiredGroundY.toFixed(3)} m.`,
 );

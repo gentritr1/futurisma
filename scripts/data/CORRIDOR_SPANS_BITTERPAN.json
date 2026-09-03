@@ -1,5 +1,5 @@
 {
-  "$generatedBy": "scripts/visual/_p21-capture.mjs (?probe=corridor-sweep&spans=1)",
+  "$generatedBy": "scripts/visual/capture-corridor-spans.mjs (?probe=corridor-sweep&spans=1)",
   "$doNotEditByHand": "The rendered-scene measurement DRIVABLE_LIMITS.json is derived from. Re-capture against a dev server after any change to trackside geometry.",
   "map": "bitterpan",
   "corridorSweepRan": true,
