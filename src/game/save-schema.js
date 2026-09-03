@@ -24,6 +24,8 @@
  * @property {boolean} reducedMotion Composes with the URL and OS signals.
  * @property {QualityMode} quality
  * @property {PresentationMode} renderMode
+ * @property {boolean} voice Schema v4. The pit radio. `?voice=0` overrides it
+ *   downward and nothing overrides it upward.
  *
  * @typedef {object} ModeBest
  * @property {number | null} bestLapMs Schema v3. The fastest lap set on this
@@ -136,6 +138,11 @@ export function defaultSettings() {
     reducedMotion: false,
     quality: "adaptive",
     renderMode: "agx",
+    // H2b — ON by default. The pit radio is the only voice in the game and a
+    // driver who never opens the service terminal should hear it; the two
+    // volume sliders and the mute key already govern it, and `?voice=0` is
+    // there for a soak that needs the mix without it.
+    voice: true,
   };
 }
 
@@ -216,6 +223,9 @@ export function normalizeSettings(raw) {
   if (PRESENTATION_MODES.includes(/** @type {PresentationMode} */ (source.renderMode))) {
     settings.renderMode = /** @type {PresentationMode} */ (source.renderMode);
   }
+  // H2b. A v3 file has no `voice` key at all and lands on the default, which is
+  // exactly what the v3 -> v4 migration relies on: see the ladder entry.
+  if (typeof source.voice === "boolean") settings.voice = source.voice;
   return settings;
 }
 
@@ -519,6 +529,31 @@ const MIGRATIONS = [
       }
       return { ...source, records: migrated };
     },
+  },
+  {
+    from: 3,
+    to: 4,
+    /**
+     * v3 → v4. H2b gave `settings` one boolean, `voice`, for the pit radio.
+     *
+     * PURELY ADDITIVE, and the step is deliberately an identity rather than a
+     * write. A v3 file has no `voice` key; `normalizeSettings` supplies `true`
+     * for a missing or non-boolean one, which is the default a fresh install
+     * gets, so a returning player arrives with the radio on and every other
+     * field byte-identical to what they left. Writing `voice: true` in here
+     * would produce the same result and would additionally be a lie about what
+     * the stored file said — the ladder's job is to reshape, and there is no
+     * shape to change.
+     *
+     * WIPE RISK: none. Nothing is relocated, nothing is renamed, and no field
+     * this build reads moves. The one relocation on the whole ladder is still
+     * v2's `ghost` and it happens a rung earlier, untouched by this.
+     * `scripts/validate-persistence.mjs` walks v1 -> v4 field by field.
+     *
+     * @param {Record<string, unknown>} source
+     * @returns {Record<string, unknown>}
+     */
+    step: (source) => source,
   },
 ];
 

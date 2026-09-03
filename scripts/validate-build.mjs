@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import { gzipSync } from "node:zlib";
-import { readFile } from "node:fs/promises";
+import { readFile, readdir } from "node:fs/promises";
+
+import { PIT_RADIO_IDS } from "../src/game/pit-radio-lines.js";
 
 const assetsDirectory = new URL("../dist/assets/", import.meta.url);
 const html = await readFile(new URL("../dist/index.html", import.meta.url));
@@ -176,9 +178,33 @@ assert.ok(
 //     the other, and Rollup resplits when both land, so measured 246.0 KiB gzip / 255.9 KiB shell on
 //     the merged tree, ceilings 247 and 257. Taken with `npx vite build && node
 //     scripts/validate-build.mjs` after the merge.
+//
+//   H2b pit radio  +2.4 KiB - measured 246.8 -> 249.2 KiB gzip on this tree with
+//     `npx vite build && node scripts/validate-build.mjs`, the baseline taken by
+//     stashing the phase and rebuilding rather than by trusting the 246.0 the
+//     G3+G4 merge note above records (that number was measured before P21.2 and
+//     H1 landed; this tree is 246.8, and quoting the stale one would have
+//     credited H2b with 3.2 KiB it did not spend).
+//
+//     IN the shell, and all of it has to be: `src/game/pit-radio-lines.js` (the
+//     17-line table with its scripts, the priorities, the cooldowns and the pure
+//     edge resolvers) and `src/game/pit-radio.ts` (the band-pass bus, the duck,
+//     the click envelope and the lazy fetch), plus the growth in `audio.ts` for
+//     the ambience bus and seven cue hooks, one line in `ui.ts`, the VOICE chip
+//     row in `meta-ui.ts`, `settings.voice` and the v3 -> v4 rung in
+//     `save-schema.js`, and `armSerial` / `armGustSign` in `track-events.ts`.
+//     The initial chunk count goes 12 -> 13; `pit-radio-lines.js` is a leaf that
+//     Rollup splits out on its own.
+//
+//     OUT of the shell: the 186 028 bytes of audio, which is the whole point of
+//     the arrangement. The clips are FETCHED, not imported, from
+//     `public/assets/audio/radio/` inside `EngineAudio.start()` — so they are not
+//     in the graph at all, they are never touched by anyone who does not press
+//     start, and a driver with the VOICE row off never downloads them. Their own
+//     ceiling is asserted separately below.
 assert.ok(
-  javascriptGzip <= 247 * 1024,
-  `JavaScript bundle exceeds 247 KiB gzip (${(javascriptGzip / 1024).toFixed(1)} KiB).`,
+  javascriptGzip <= 251 * 1024,
+  `JavaScript bundle exceeds 251 KiB gzip (${(javascriptGzip / 1024).toFixed(1)} KiB).`,
 );
 // Re-baselined 2026-08-28 from a measured 4.35 KiB gzip (the 4 KiB ceiling
 // predated the HUD turn-cue and hazard styling) plus headroom for the planned
@@ -213,9 +239,65 @@ assert.ok(
 // at the JS ceiling of 243 the shell is already ~252, so a 251 shell ceiling
 // would fail builds the JS ceiling explicitly allows.
 // G3 + G4 merge: re-measured, for the same reason the JS ceiling above was.
+// H2b re-measure: 259.2 KiB (HTML 4.4 + JS 249.2 + CSS 5.6), against 256.7 on
+// the same tree without the phase. The stylesheet does not move at all — the
+// VOICE row reuses the existing `.option--choice` / `.chip-row` rules — and the
+// HTML grows by the seven-line row plus nine characters of the options note.
+// The ceiling goes 257 -> 262 on the coherence argument A1 and G4 both used: at
+// the JS ceiling of 251 the shell is already ~261, so a tighter shell ceiling
+// would fail builds the JS ceiling explicitly allows.
 assert.ok(
-  shellGzip <= 257 * 1024,
-  `Initial app shell exceeds 257 KiB gzip (${(shellGzip / 1024).toFixed(1)} KiB).`,
+  shellGzip <= 262 * 1024,
+  `Initial app shell exceeds 262 KiB gzip (${(shellGzip / 1024).toFixed(1)} KiB).`,
+);
+
+// ---------------------------------------------------------------------------
+// H2b — the served audio, which is the first of it this project has ever had.
+//
+// Not part of the shell and deliberately measured apart from it: these bytes
+// are fetched from inside `EngineAudio.start()`, so nobody who does not press
+// start pays for them and nobody who turns the VOICE row off pays for them at
+// all. What they still are is bandwidth on every first race, so they get a
+// ceiling of their own rather than living unbudgeted because they missed the
+// one above.
+//
+// Measured 186 028 B (181.7 KiB) across 17 files by
+// `node scripts/prepare-pit-radio.mjs` at libmp3lame 48 kbps mono / 24 kHz —
+// 29.34 s of speech. The 192 KiB ceiling is that plus room to re-record a line
+// or two; a second voice would not fit, which is the point. 48 kbps rather than
+// 64 (which measured 240.9 KiB) because the runtime chain low-passes at 3.4 kHz
+// before the driver hears any of it, so the extra 59 KiB would buy bits in a
+// band the pit radio throws away.
+// ---------------------------------------------------------------------------
+const radioDirectory = new URL("../dist/assets/audio/radio/", import.meta.url);
+const radioNames = (await readdir(radioDirectory)).sort();
+assert.deepEqual(
+  radioNames.map((name) => name.replace(/\.mp3$/, "")),
+  [...PIT_RADIO_IDS].sort(),
+  "The served pit-radio files and the shipped line table disagree. Every id the "
+    + "queue can hold must have a file, and every served file must be reachable.",
+);
+let radioBytes = 0;
+for (const name of radioNames) {
+  const bytes = await readFile(new URL(name, radioDirectory));
+  assert.ok(
+    bytes.length > 2_000,
+    `dist/assets/audio/radio/${name} is ${bytes.length} B; that is not a spoken line.`,
+  );
+  // ID3v2 ("ID3") or a bare MPEG frame sync. A file that is not actually MP3
+  // fails `decodeAudioData` silently in the browser and is counted as a dropped
+  // line rather than an error, so it has to fail here instead.
+  assert.ok(
+    bytes.subarray(0, 3).toString("latin1") === "ID3"
+      || (bytes[0] === 0xff && (bytes[1] & 0xe0) === 0xe0),
+    `dist/assets/audio/radio/${name} does not begin with an MP3 frame or an ID3 tag.`,
+  );
+  radioBytes += bytes.length;
+}
+assert.ok(
+  radioBytes <= 192 * 1024,
+  `The served pit radio is ${(radioBytes / 1024).toFixed(1)} KiB; the ceiling is `
+    + "192 KiB. Re-run scripts/prepare-pit-radio.mjs and record the measurement.",
 );
 assert.ok(
   html.includes('rel="preload"')
@@ -230,7 +312,8 @@ assert.ok(
 );
 
 console.log(
-  `Build PASS: ${(shellGzip / 1024).toFixed(1)} KiB gzip shell; ${(
+  `Build PASS: ${(radioBytes / 1024).toFixed(1)} KiB of pit radio across ${
+    radioNames.length} served files; ${(shellGzip / 1024).toFixed(1)} KiB gzip shell; ${(
     javascript.rawBytes / 1024
   ).toFixed(1)} KiB raw / ${(javascriptGzip / 1024).toFixed(1)} KiB gzip initial JS across ${
     javascriptNames.length

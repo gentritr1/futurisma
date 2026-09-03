@@ -315,6 +315,42 @@ export function resolveQualityLock(): RenderQualityMode {
  * damping back *off* for someone whose OS asked for it — that would be the one
  * composition rule this must never get wrong.
  */
+/**
+ * H2b — `?voice=0`, the pit radio's kill switch.
+ *
+ * A LOAD-TIME decision, and separate from the stored setting below it, because
+ * the two answer different questions. This one decides whether the radio's
+ * graph and its 330 KB of clips exist at all, so it has to be answerable before
+ * the AudioContext is built and it must not be able to change afterwards.
+ *
+ * Only a literal `0` kills it. `?voice=1` is deliberately not a way to force the
+ * radio ON over a driver who switched it off in the terminal: the URL may take
+ * the voice away, never impose it.
+ */
+export function voiceKilled(): boolean {
+  return searchParam("voice") === "0";
+}
+
+/**
+ * ...and the composed answer, re-read on every audio control tick.
+ *
+ * Live rather than latched, which is what lets the VOICE row behave like the
+ * two volume sliders — applied on the spot — instead of joining damping,
+ * resolution and pipeline behind a relink. It can afford to: nothing about the
+ * radio is read at construction by anything else, so there is no half-applied
+ * state for a mid-race change to leave behind.
+ *
+ * Composed the way `resolveQualityLock` composes and NOT the way
+ * `resolveReducedMotion` does. Reduced motion has an OS signal that must never
+ * be overridden upward; the pit radio has no operating-system opinion and is
+ * not an accessibility surface — PRODUCT.md's rule is that the game stays
+ * playable without audio, so turning the voice off can never make anything
+ * less accessible.
+ */
+export function resolveVoiceEnabled(): boolean {
+  return !voiceKilled() && save.settings.voice;
+}
+
 export function resolveReducedMotion(): boolean {
   return searchParam("motion") === "reduce"
     || save.settings.reducedMotion

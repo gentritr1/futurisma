@@ -61,12 +61,23 @@ import {
  * Instead {@link trackEventState} publishes the four numbers an audio phase
  * needs and nothing else:
  *
- *     { windGust: 0..1, squall: 0..1, saltDrop: 0..1, lastEvent: string }
+ *     { windGust: 0..1, squall: 0..1, saltDrop: 0..1, lastEvent: string,
+ *       armSerial: number, gustSign: -1 | 0 | 1 }
  *
  * `windGust` is the gust's share of the 2.4 m/s^2 ceiling, so a wind bed can be
  * driven straight off it; `squall` and `saltDrop` are the same 0..1 shape.
  * `lastEvent` names the most recent event to arm ("gust", "salt", "squall", or
  * "" before the first one), for a one-shot cue. Read it, do not write it.
+ *
+ * H2b added the last two, and the reason they are not derivable from the four
+ * above is the whole point of the seam. A voice line has to land on the
+ * TELEGRAPH — 1.2 s before a gust's hold and 3 s before a salt patch costs
+ * grip — and a reader watching `windGust` rise necessarily fires at the hold,
+ * a second too late to be a warning. `armSerial` counts arming instants, so an
+ * edge is a comparison rather than a threshold, and two gusts back to back are
+ * two edges instead of one continuous level. `gustSign` is the same signed
+ * push `integrateGustVelocity` is about to apply, so a cue that names a
+ * direction and the shove that follows it cannot disagree.
  *
  * PUBLISHED STATE, same idiom as `time-of-day.ts` and `render-mode.js`: one
  * module-level snapshot, one writer (the single {@link TrackEvents} the race
@@ -105,6 +116,29 @@ interface PublishedTrackEvents {
   chip: string;
   /** "gust" | "salt" | "squall" | "" — the most recent event to arm. */
   lastEvent: string;
+  /**
+   * H2b — how many events have armed this race, counted from 0.
+   *
+   * The arming EDGE, published as a number rather than a flag, so a reader can
+   * tell "a gust armed" from "a gust is running" without holding a timer of its
+   * own and without a second gust of the same sign being invisible behind the
+   * first. Reset with the race; incremented in `armEvents` beside every write
+   * of `lastEvent`, so the two can never describe different instants.
+   */
+  armSerial: number;
+  /**
+   * H2b — the signed push of the gust that armed LAST, latched at the arm.
+   *
+   * Separate from `gustSign`, and the separation is the whole point. `gustSign`
+   * is gated on `gustLevel > 0` so that a bed reading it never hears a
+   * direction with no wind behind it — which means it is 0 at the arming
+   * instant, because `gustEnvelope(0)` is the bottom of the ramp. A cue that
+   * has to NAME the direction 1.2 s before the hold cannot wait for the
+   * envelope to leave zero, so it reads this instead. It is the same
+   * `gust.sign` the envelope will publish a frame later; nothing derives a
+   * force from it.
+   */
+  armGustSign: number;
 }
 
 const published: PublishedTrackEvents = {
@@ -119,6 +153,8 @@ const published: PublishedTrackEvents = {
   courseDistanceMeters: 0,
   chip: "",
   lastEvent: "",
+  armSerial: 0,
+  armGustSign: 0,
 };
 
 /**
@@ -132,19 +168,40 @@ const published: PublishedTrackEvents = {
  */
 const eventLevels = { windGust: 0, squall: 0, saltDrop: 0 };
 
+/**
+ * H2b — the reusable answer object.
+ *
+ * `trackEventState()` used to allocate a fresh literal per call, which was free
+ * while the only caller was a once-a-second diagnostics line. The pit radio
+ * asks on every 30 Hz control tick for the length of a race, so the literal
+ * became 1 800 objects a minute for a read that never keeps a reference. Same
+ * discipline as `eventLevels` above.
+ */
+const publishedState = {
+  windGust: 0,
+  squall: 0,
+  saltDrop: 0,
+  lastEvent: "",
+  armSerial: 0,
+  armGustSign: 0,
+};
+
 /** The read-only view an audio phase wires to. See the file header. */
 export function trackEventState(): {
   windGust: number;
   squall: number;
   saltDrop: number;
   lastEvent: string;
+  armSerial: number;
+  armGustSign: number;
 } {
-  return {
-    windGust: published.gust,
-    squall: published.squall,
-    saltDrop: published.saltPatch,
-    lastEvent: published.lastEvent,
-  };
+  publishedState.windGust = published.gust;
+  publishedState.squall = published.squall;
+  publishedState.saltDrop = published.saltPatch;
+  publishedState.lastEvent = published.lastEvent;
+  publishedState.armSerial = published.armSerial;
+  publishedState.armGustSign = published.armGustSign;
+  return publishedState;
 }
 
 /**
@@ -476,6 +533,11 @@ export class TrackEvents {
     scudCrossingSeconds = -1;
     published.scudDriven = false;
     published.lastEvent = "";
+    // H2b — the arm edge is race-scoped. A restart that carried the serial
+    // forward would leave the radio's `lastSerial` matching an event from the
+    // previous race and swallow the first gust of this one.
+    published.armSerial = 0;
+    published.armGustSign = 0;
     this.publish();
   }
 
@@ -580,6 +642,8 @@ export class TrackEvents {
       this.gustTelegraphLatched = false;
       scudCrossingSeconds = -1;
       published.lastEvent = "gust";
+      published.armSerial += 1;
+      published.armGustSign = gust.sign;
       if (diagnosticsMode) this.gustCount += 1;
     }
     while (
@@ -591,6 +655,7 @@ export class TrackEvents {
       this.activeSaltArmedAt = this.raceSeconds;
       this.nextSaltIndex += 1;
       published.lastEvent = "salt";
+      published.armSerial += 1;
       if (diagnosticsMode) {
         this.saltCount += 1;
         this.saltWarningLeads.push(SALT_WARNING_SECONDS);
@@ -605,6 +670,7 @@ export class TrackEvents {
       this.squallArmed = true;
       this.squallArmedAt = this.raceSeconds;
       published.lastEvent = "squall";
+      published.armSerial += 1;
       if (diagnosticsMode) {
         this.squallCount += 1;
         this.squallStartLap = lap;
