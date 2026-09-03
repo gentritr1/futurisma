@@ -9,10 +9,16 @@ import { persistenceDiagnostics } from "./persistence";
 import type { RivalFleetDiagnostics } from "./rivals";
 import type { SceneAssets } from "./scene-assets";
 import type { Ps2TreatmentDiagnostics } from "./totem";
+import type { TrackEventDiagnostics } from "./track-events";
 import type { RaceStandingEntry } from "./ui";
 
 const FRAME_SAMPLE_WINDOW = 720;
-const RACE_SEED = 714;
+/**
+ * The race seed. Exported since G3: the track-event schedule is a pure
+ * function of (map, THIS seed, lap count), and a schedule built off a second
+ * copy of the number would be deterministic against the wrong thing.
+ */
+export const RACE_SEED = 714;
 
 /**
  * Flat snapshot of the values the race loop itself owns. Every other field in
@@ -131,6 +137,12 @@ export interface DiagnosticsContributors {
   // P4b: `?render=` mode plus the PS2 shader-arming counts. Owned by the
   // material treatment in totem.ts, not by the race loop.
   ps2: Ps2TreatmentDiagnostics;
+  /**
+   * G3 — the live track events. Contributed by track-events.ts rather than
+   * grown into DiagnosticsCore, on the same terms as `atmosphere`: the module
+   * that owns the schedule owns its telemetry.
+   */
+  trackEvents: TrackEventDiagnostics;
 }
 
 function courseFields(course: RaceCourse) {
@@ -457,6 +469,7 @@ export function buildDiagnosticsReport(
     ...contributors.atmosphere,
     ...contributors.ghost,
     ...contributors.ps2,
+    ...contributors.trackEvents,
     // P20.1. The shadow block is atmosphere.ts's (it owns the key light), but
     // the frame cost belongs to the race loop, so the two are joined here
     // rather than threading p95 through the contributor. Re-stating the key

@@ -11,7 +11,7 @@ import {
 import { hasPlayerControlIntent } from "./control-mode";
 import { surfaceHeightAtLateral } from "./apron-profile";
 import { type CourseProjection, type RaceCourse, type TurnCue } from "./course";
-import { RaceDiagnostics } from "./diagnostics";
+import { RACE_SEED, RaceDiagnostics } from "./diagnostics";
 import { RaceEffects } from "./effects";
 import { ghostRuntime } from "./ghost-runtime";
 import { disposeObject3DResources } from "./graphics-resources";
@@ -80,6 +80,7 @@ import { applyRaceLivery, recordFinishedRace } from "./meta-runtime";
 import { save } from "./persistence";
 import { playerRaceDistanceMeters as calculatePlayerRaceDistance } from "./rival-race.js";
 import { RacingContact } from "./racing-contact";
+import { TrackEvents } from "./track-events";
 import {
   RivalFleet,
   openingRaceStatus,
@@ -225,6 +226,8 @@ export class FuturismaGame {
   private slipstream = 0;
   /** G2 - the cushion, the near miss and the chain, plus the pose they move. */
   private readonly contact: RacingContact;
+  /** G3 — the live track events: wind gusts, salt drops, the rain squall. */
+  private readonly trackEvents: TrackEvents;
   private readonly contactPose = { lateralMeters: 0, speedMetersPerSecond: 0 };
   private impactShake = 0;
   private physicsAccumulator = 0;
@@ -347,6 +350,8 @@ export class FuturismaGame {
     this.scene.add(this.course.group, this.vehicle.root);
     this.effects = new RaceEffects(this.reducedMotion, this.course.kind);
     this.contact = new RacingContact(ui, this.audio, input, this.effects);
+    this.trackEvents = new TrackEvents(this.course, this.totalLaps, RACE_SEED);
+    this.scene.add(this.trackEvents.group);
     this.camera.add(this.effects.speedLines);
     this.scene.add(this.camera, this.effects.sparkPoints);
     this.atmosphere = new RaceAtmosphere(
@@ -805,9 +810,14 @@ export class FuturismaGame {
 
     // The apron's grip cost enters the same integrator as standing water, so
     // leaving the deck reads as a surface change rather than a special case.
+    // G3 adds the live-event term on the same footing: the salt patch and the
+    // squall reach the craft exactly the way standing water and the apron
+    // already do, through one composed target and one integrator.
     const targetSurfaceGrip = resolveTargetSurfaceGrip(
       this.course.surfaceGripAt(this.progress, this.lateral, beforeMove.halfWidth),
       this.course.apronAt(beforeMove, this.lateral, this.beforeMoveApron).grip,
+      undefined,
+      this.trackEvents.surfaceGripMultiplier(this.progress * this.course.length),
     );
     const wasLowGrip = this.surfaceGrip < 0.95;
     this.surfaceGrip = integrateSurfaceGrip(
@@ -854,11 +864,17 @@ export class FuturismaGame {
     // apron clamp, for the reasons documented in racing-contact.ts.
     this.contactPose.lateralMeters = this.lateral;
     this.contactPose.speedMetersPerSecond = this.speed;
+    // G3 - the gust asks for its lateral here, immediately before the cushion
+    // and well before the apron clamp, so the deck edge still wins.
+    const gustMoved = this.trackEvents.step(
+      delta, this.playerRaceDistance(), this.progress * this.course.length,
+      this.lap, this.contactPose, this.diagnosticsMode,
+    );
     if (this.contact.stepCushion(
       this.rivalFleet, this.contactPose, this.playerRaceDistance(),
       delta, this.elapsedMs, afterMove, this.position,
       this.course.apronAt(afterMove, this.lateral, this.afterMoveApron).lateralLimit,
-    )) {
+    ) || gustMoved) {
       this.lateral = this.contactPose.lateralMeters;
       this.position.copy(afterMove.position).addScaledVector(afterMove.right, this.lateral);
       this.position.y = afterMove.position.y;
@@ -1446,6 +1462,7 @@ export class FuturismaGame {
       slipstream: this.slipstream,
       cushionSide: this.contact.glowAt(this.elapsedMs),
       cushionPush: Math.abs(this.rivalFleet?.cushionPushMetersPerSecondSquared ?? 0),
+      trackEvent: this.trackEvents.chipLabel,
       cleanGateChain: this.contact.cleanGateChain,
       cleanGateMultiplier: this.contact.regenMultiplier,
       braking: input.brake > 0.1,
@@ -1574,6 +1591,7 @@ export class FuturismaGame {
     this.padBoostTime = 0;
     this.slipstream = 0;
     this.contact.reset();
+    this.trackEvents.reset();
     this.autopilot.reset();
     this.lap = 1;
     this.elapsedMs = 0;
@@ -1843,6 +1861,7 @@ export class FuturismaGame {
         atmosphere: this.atmosphere.diagnostics(),
         ghost: ghostRuntime.diagnostics(),
         ps2: ps2TreatmentDiagnostics(),
+        trackEvents: this.trackEvents.diagnostics(),
       },
     );
   }
@@ -1867,6 +1886,7 @@ export class FuturismaGame {
     this.diagnosticImpacts = 0;
     this.diagnosticMissedGates = 0;
     this.contact.resetDiagnostics();
+    this.trackEvents.resetDiagnostics();
     this.diagnosticRecoveries = 0;
     this.diagnosticGateMissRecoveries = 0;
     this.diagnosticContextLosses = 0;

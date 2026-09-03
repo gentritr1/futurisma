@@ -64,6 +64,7 @@ const CUSHION_YIELD_HOLD_SECONDS = 0.6;
  *   player?: ((elapsedSeconds: number) => { raceDistanceMeters: number; lateralMeters: number }) | null;
  *   contest?: boolean;
  *   onlyProfileIndex?: number | null;
+ *   gusts?: ((elapsedSeconds: number) => number) | null;
  * }} options
  */
 export function simulateRivalField(options) {
@@ -77,6 +78,11 @@ export function simulateRivalField(options) {
     contest = true,
     onlyProfileIndex = null,
     cushion = false,
+    // G3 — a stand-in gust schedule, as a signed lane bias in metres at a given
+    // race time. `null` is the `?events=0` side of the comparison; anything
+    // else is the events-on side. It reaches the field the only way a gust is
+    // allowed to: through `rivalContestLaneMeters`, as a target-lane bias.
+    gusts = null,
   } = options;
 
   const profiles = onlyProfileIndex === null
@@ -328,6 +334,11 @@ export function simulateRivalField(options) {
       cushionYieldMeters: index === cushionRivalIndex ? RIVAL_CUSHION_YIELD_METERS : 0,
       cushionYieldSign: index === cushionRivalIndex ? cushionYieldSign : 0,
       evasiveSideMeters: evasiveSides[index].side,
+      // G3 — the gust's lane bias, mirroring `RivalFleet.resolveDrive`, which
+      // reads it from the published track-event state. Whatever this does to
+      // the lane, it must do NOTHING to the timing: that is the claim the
+      // events-on / events-off comparison in validate-rivals.mjs makes.
+      gustLaneBiasMeters: gusts ? gusts(elapsedSeconds) : 0,
     });
     const drive = driveScratch[index];
     return Object.assign(drive, {

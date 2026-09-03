@@ -36,6 +36,7 @@ import {
   snapShadowCentre,
 } from "./shadow-settings.js";
 import { armKeyLightShadow, promoteUnlitShadowReceivers } from "./shadows";
+import { trackEventFogMultiplier } from "./track-events";
 import { publishTimeOfDayDrift } from "./time-of-day";
 
 /** The exposure the AgX path has run at since the renderer was set up. */
@@ -701,7 +702,17 @@ export class RaceAtmosphere {
     );
 
     const response = 1 - Math.exp(-delta * 5.5);
-    fog.density = THREE.MathUtils.lerp(fog.density, target.density, response);
+    // G3 — the squall thickens the air over the two sectors it covers. A
+    // MULTIPLIER over whatever the sector palette just returned, on the same
+    // footing as the time-of-day tint above: the sector keeps its authored
+    // identity, it just gets denser, and outside a squall the term is exactly 1
+    // so nothing about the accepted fog grade moves. Published rather than
+    // threaded — see track-events.ts.
+    fog.density = THREE.MathUtils.lerp(
+      fog.density,
+      target.density * trackEventFogMultiplier(),
+      response,
+    );
     fog.color.lerp(this.tintedFog, response);
     if (this.scene.background instanceof THREE.Color) {
       this.scene.background.lerp(this.tintedFog, response);

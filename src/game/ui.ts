@@ -44,6 +44,16 @@ export interface HudFrame {
   cushionSide: "LEFT" | "RIGHT" | null;
   /** G2 round 2 - how hard, m/s^2, so the glow can read as a lean or a shove. */
   cushionPush: number;
+  /**
+   * G3 - the live track event chip, or "" when the world is quiet.
+   *
+   * A LABEL rather than a level, because the HUD's job here is the one word the
+   * driver can read at 300 km/h. The 0..1 levels the picture and the physics
+   * ride are published by track-events.ts to the layers that need them; the
+   * chip only has to say which of the three is happening and, for a gust, which
+   * way.
+   */
+  trackEvent: string;
   /** G2 - consecutive gates taken clean. */
   cleanGateChain: number;
   /** G2 - the passive-regen multiplier that chain is currently paying. */
@@ -163,6 +173,10 @@ export class GameUi {
   private readonly impactFlash = requiredElement<HTMLElement>("impact-flash");
   /** G2 - the air cushion's edge glow and the clean-gate counter. */
   private readonly cushionGlow = requiredElement<HTMLElement>("cushion-glow");
+  /** G3 - the live track event chip. */
+  private readonly trackEventChip = requiredElement<HTMLElement>("track-event-chip");
+  private readonly trackEventLabel = requiredElement<HTMLElement>("track-event-label");
+  private lastTrackEvent = "";
   private readonly cleanChain = requiredElement<HTMLElement>("clean-chain");
   private lastCushionState = "";
   private lastCleanChainLabel = "";
@@ -619,6 +633,23 @@ export class GameUi {
     // Hidden below the first chain that actually pays. A counter reading "x1"
     // through every clean lap would be a permanent HUD element that says
     // nothing, which is exactly the busy chrome the anti-references rule out.
+    // G3 - the track-event chip, held to the same discipline: it touches the DOM
+    // only when the label itself changes, which for a gust is twice per event
+    // rather than 120 times a second.
+    if (frame.trackEvent !== this.lastTrackEvent) {
+      const active = frame.trackEvent.length > 0;
+      this.trackEventLabel.textContent = frame.trackEvent;
+      this.trackEventChip.dataset.active = active ? "true" : "false";
+      this.trackEventChip.dataset.event = frame.trackEvent.startsWith("GUST")
+        ? "gust"
+        : frame.trackEvent === "SALT"
+          ? "salt"
+          : frame.trackEvent === "SQUALL"
+            ? "squall"
+            : "";
+      this.trackEventChip.setAttribute("aria-hidden", active ? "false" : "true");
+      this.lastTrackEvent = frame.trackEvent;
+    }
     const chainLabel = frame.cleanGateMultiplier > 1
       ? `CLEAN ×${frame.cleanGateChain}`
       : "";

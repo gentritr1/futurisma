@@ -41,6 +41,12 @@ import {
   stepRivalState,
 } from "../src/game/rival-race.js";
 import { CUSHION_PEAK_PUSH_MPS2 } from "../src/game/physics.js";
+import {
+  GUST_END_SECONDS,
+  GUST_HOLD_END_SECONDS,
+  GUST_HOLD_START_SECONDS,
+  GUST_RIVAL_LANE_BIAS_METERS,
+} from "../src/game/track-events-rules.js";
 import { loadCourseModel, loadRivalPace } from "./lib/rival-course-model.mjs";
 import {
   measuredPacePlayer,
@@ -920,6 +926,40 @@ for (const kind of MAPS) {
     player: player(),
     cushion: true,
   });
+  /**
+   * G3 — the same race with the wind blowing.
+   *
+   * A DELIBERATELY HOSTILE stand-in schedule, not the authored one. The real
+   * Bitterpan schedule gusts on ~65% of the open sectors and never on
+   * Greenwater; this one gusts on BOTH maps, every 5.1 s, for the whole race,
+   * at the full authored bias and with the sign alternating so the field is
+   * shoved one way and then the other. If a lane bias could reach a rival's
+   * speed by any path - a corner factor that read the contested lane, a pad
+   * resolved against it, a clamp that fed back - this is the run that would
+   * find it, and it would find it larger than the real schedule ever could.
+   */
+  const gustBias = (elapsedSeconds) => {
+    const phase = elapsedSeconds % GUST_END_SECONDS;
+    if (phase < GUST_HOLD_START_SECONDS || phase > GUST_HOLD_END_SECONDS) return 0;
+    const sign = Math.floor(elapsedSeconds / GUST_END_SECONDS) % 2 === 0 ? 1 : -1;
+    return sign * GUST_RIVAL_LANE_BIAS_METERS;
+  };
+  const gusted = simulateRivalField({
+    course,
+    pace,
+    totalLaps,
+    renderDeltaSeconds: RIVAL_FIXED_STEP_SECONDS,
+    player: player(),
+    gusts: gustBias,
+  });
+  const gusted60 = simulateRivalField({
+    course,
+    pace,
+    totalLaps,
+    renderDeltaSeconds: 1 / 60,
+    player: player(),
+    gusts: gustBias,
+  });
 
   const timing = (run) => run.states.map((state) => ({
     id: state.id,
@@ -979,6 +1019,88 @@ for (const kind of MAPS) {
     `${kind}: rival timing changed with the player's position. That is `
       + "rubber-banding, however it got in.",
   );
+
+  // 2b. G3 — AND A TRACK EVENT CANNOT MOVE A RIVAL EITHER. Same field, same
+  //     course, same stand-in player; the only difference is that the wind is
+  //     shoving every craft's target lane around for the whole race.
+  //
+  //     This is the `?events=0` proof, run as a model comparison rather than as
+  //     two browser soaks, because a soak can only ever show that two runs
+  //     AGREED - it cannot show that no path exists. What makes the claim
+  //     structural is upstream of this assertion: `driveTargetSpeed` reads the
+  //     profile, the course speed factor and the boost state; `onBoostPad` is
+  //     resolved against `paceLateralMeters`, the player-free lane the bias
+  //     never touches; and `state.lateralMeters` is written after the distance
+  //     integration and read by nothing that produces speed. This is what
+  //     catches the day someone adds a lateral term to any of the three.
+  assert.deepEqual(
+    timing(gusted),
+    timing(at120),
+    `${kind}: rival timing changed when the wind blew. A gust biases a TARGET `
+      + "LANE and nothing else; anything that let it reach a rival's speed is a "
+      + "longitudinal reaction to the weather, which principle 5 forbids as "
+      + "surely as a reaction to the player.",
+  );
+  assert.deepEqual(
+    timing(gusted60),
+    timing(gusted),
+    `${kind}: gusted rival timing differs between 60 Hz and 120 Hz.`,
+  );
+  assert.deepEqual(
+    gusted.gridSlots,
+    at120.gridSlots,
+    `${kind}: the wind moved the grid fan.`,
+  );
+  // And the bias has to actually DO something, or the comparison above is
+  // vacuous - two runs that were identical in every respect would pass it just
+  // as happily. Asserted on the SOLVER rather than on the finished states,
+  // because a finished rival's lateral is frozen at the flag and two runs that
+  // diverged all race can converge on it.
+  {
+    const laneInput = {
+      playerGapMeters: 400,
+      playerLateralMeters: 0,
+      rivalId: RIVAL_PROFILES[0].id,
+      lateralMeters: 0,
+      neighbourLaterals: [],
+      insideSign: 0,
+      sideSign: -1,
+      halfWidthMeters: 11,
+      laneHalfWidthMeters: 8,
+    };
+    const calm = rivalContestLaneMeters(0, laneInput);
+    const downwind = rivalContestLaneMeters(0, {
+      ...laneInput,
+      gustLaneBiasMeters: GUST_RIVAL_LANE_BIAS_METERS,
+    });
+    const upwind = rivalContestLaneMeters(0, {
+      ...laneInput,
+      gustLaneBiasMeters: -GUST_RIVAL_LANE_BIAS_METERS,
+    });
+    assert.ok(
+      Math.abs(downwind - calm - GUST_RIVAL_LANE_BIAS_METERS) < 1e-9,
+      `${kind}: a ${GUST_RIVAL_LANE_BIAS_METERS} m gust bias moved the target `
+        + `lane by ${(downwind - calm).toFixed(4)} m. The bias is not reaching `
+        + "`rivalContestLaneMeters`, which makes the timing-identity assertion "
+        + "above vacuous.",
+    );
+    assert.ok(
+      downwind > calm && upwind < calm,
+      `${kind}: the gust bias must move the lane WITH the wind on both signs.`,
+    );
+    // It is still only a preference. The lane clamp outranks it, exactly as it
+    // outranks the G2 cushion yield.
+    const pinned = rivalContestLaneMeters(7.8, {
+      ...laneInput,
+      gustLaneBiasMeters: GUST_RIVAL_LANE_BIAS_METERS * 4,
+    });
+    assert.ok(
+      pinned <= laneInput.laneHalfWidthMeters + 1e-9,
+      `${kind}: the gust bias pushed a rival's target lane to ${pinned.toFixed(2)} m, `
+        + `past the ${laneInput.laneHalfWidthMeters} m lane half-width. A gust `
+        + "biases a target; it does not get to widen the deck.",
+    );
+  }
 
   const finishes = at120.states.map((state) => state.finishTimeSeconds);
   assert.equal(
