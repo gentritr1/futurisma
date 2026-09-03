@@ -14,3 +14,4 @@ artifacts/**
 !artifacts/TOTEM_Phase1_v1.0.zip
 .claude/worktrees/
 shots/
+assets-in/
