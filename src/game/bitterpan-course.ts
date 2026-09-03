@@ -275,7 +275,20 @@ const SECTOR_LABELS: Record<string, string> = {
 // P19: 0x77dce3 -> deeper. Under AgX tone mapping the old value still read as
 // a pale ice slab against the dark deck; this keeps the cyan identity at a
 // luminance the road can sit under.
-const BOOST_PAD_COLOR = new THREE.Color(0x49a9bd);
+/**
+ * White, on purpose. Through P20.2 this was `0x49a9bd`, and every tone in the
+ * pad's canvas was a MULTIPLIER on that cyan — which is why the pad rendered as
+ * a teal object rather than a marking: measured on the P20.2 build, the pad
+ * interior came back at 49 HSV saturation against a deck at 11-17, a +32 to
+ * +38 chroma step. Road paint is not a different material from the road, it is
+ * a lighter, barely-tinted film ON it.
+ *
+ * With the multiplier at white, every tone in {@link createBoostPadTexture} is
+ * an ABSOLUTE authored value calibrated against the measured texel -> rendered
+ * transfer for this material (see that function), instead of a fraction of a
+ * colour chosen for a different reason.
+ */
+const BOOST_PAD_COLOR = new THREE.Color(0xffffff);
 const CABLE_COIL_COLOR = new THREE.Color(0xf06a32);
 const SALT_DRIFT_COLOR = new THREE.Color(0xe8e2cf);
 
@@ -359,16 +372,47 @@ function smoothstep(edge0: number, edge1: number, value: number): number {
 /**
  * The boost pad's paint, generated rather than authored.
  *
- * 64 x 256 greyscale-modulated, drawn once and shared by all four instances, so
- * it costs one 64 KB texture and NO draw call — the pads stay a single
- * instanced draw. The canvas maps u across the road and v along it (the pad's
- * local X is `right` and its local Z is the tangent), and the pad is about
- * 4.1 m x 16 m, so a 64 x 256 sheet is very close to square texels.
+ * 64 x 256, drawn once and shared by all four instances, so it costs one 64 KB
+ * texture and NO draw call — the pads stay a single instanced draw. The canvas
+ * maps u across the road and v along it (the pad's local X is `right` and its
+ * local Z is the tangent), and the pad is about 3.96 m x 16 m, so a 64 x 256
+ * sheet is very close to square texels: 16.2 px/m across, 16.0 px/m along.
  *
- * Values are a MULTIPLIER on `BOOST_PAD_COLOR`: 1.0 is exactly the P19 cyan, so
- * nothing here can push the pad brighter than the value that was already
- * accepted. Everything else is darker, which is where the interior structure
- * comes from.
+ * P20.7 — THE TONES ARE ABSOLUTE AND THEY WERE MEASURED, NOT PICKED.
+ *
+ * This material is `MeshBasicMaterial` with `toneMapped: true`, so what reaches
+ * the frame is the texel through AgX and then fog — not a value anyone can read
+ * off a hex code. So the transfer was measured: a six-band test texture
+ * (40/70/100/130/170/220) was rendered on the live pads and read back with
+ * scripts/visual/paint-probe.mjs + paint-luma.py, giving
+ *
+ *   texel  40  70 100 130 170 220
+ *   frame  38  78 108 134 158 182     (Rec.709 luma, 1280x720, four pads)
+ *
+ * against a Bitterpan deck that renders at 68-73 beside the pads. Near enough
+ * to identity through the midtones to author directly in, and every number
+ * below is chosen against that table.
+ *
+ * WHY IT IS NOT A PLATE ANY MORE. Two things made the P20.2 pad read as an
+ * object sunk into the road rather than a marking painted on it, and only one
+ * of them was a luma:
+ *
+ *  - CHROMA. Every tone was a multiplier on a saturated cyan, so the pad was
+ *    a teal surface next to a grey one — measured 49 HSV saturation against a
+ *    deck at 11-17. Paint is now authored near-neutral, and the cyan survives
+ *    only as a faint core down the middle.
+ *  - THE RIM. A hard `#565656` border ran the whole way round. It is worth
+ *    being exact about this, because the P20.2 note that added it is half
+ *    right: measured, that rim rendered at 75-84 against a deck at 68-73, so it
+ *    was never actually DARKER than the road — but it was 16 luma below the
+ *    field it enclosed, at a one-texel step, and a marking with a crisp darker
+ *    outline is a plate whatever the absolute value is. It is replaced by a
+ *    0.25 m ramp that runs the field down THROUGH the deck's own value, so the
+ *    pad has no outline at all and ends where the road already is.
+ *
+ * The pad's trigger footprint is not touched by any of this: it is
+ * `halfLengthMetres` / `lateralHalfFraction` in BITTERPAN_PRODUCTION.json and
+ * this function cannot see them.
  */
 function createBoostPadTexture(): THREE.CanvasTexture {
   const width = 64;
@@ -379,41 +423,104 @@ function createBoostPadTexture(): THREE.CanvasTexture {
   const context = canvas.getContext("2d");
   if (!context) throw new Error("Could not create the Bitterpan boost pad paint.");
 
-  // The field the chevrons sit on. Measured: at "#6a6a6a" the pad came back at
-  // mean luma 55.2 against a 66.6 deck -- DARKER than the road it is painted
-  // on, which trades a glowing plate for a hole. The field has to sit above the
-  // deck; the structure comes from the chevrons and the rim, not from sinking
-  // the whole marking.
-  context.fillStyle = "#909090";
+  // The field: the paint film itself. 86 renders at ~94, which is deck + 24 —
+  // inside the [deck+18, deck+55] the phase asks for with room on both sides,
+  // and light enough to read from the 90 m approach where the line choice is
+  // actually made. Barely cool rather than neutral (90 blue against 86 red is
+  // 4.4 HSV saturation) so it sits in the same family as the cyan core without
+  // becoming a colour of its own.
+  context.fillStyle = "rgb(86,88,90)";
   context.fillRect(0, 0, width, height);
+
+  // The faint cyan core: a 1.1 m band down the centre line, strongest at the
+  // centre and gone by its own edge. This is the whole of what is left of the
+  // P19/P20.2 cyan, and it is deliberately a CORE and not a field — a driver
+  // aiming at a pad aims at its middle, so that is where the colour goes.
+  //
+  // NEAR-ISO-LUMINANT WITH THE FIELD, which is the only reason it can be this
+  // chromatic without becoming a stripe: rgb(62,96,108) is luma 89.7 against
+  // the field's 88.0, so it reads purely as a hue shift and adds nothing to the
+  // pad's brightness structure. The first pass used rgba(104,138,148,0.85),
+  // which measured 4.5 HSV saturation on the frame — LESS chroma than the deck
+  // beside it (11-17), i.e. no cyan at all after AgX. This is the value that
+  // survives the tone curve.
+  const coreHalf = 9; // px, ~0.55 m each side of the centre line.
+  const core = context.createLinearGradient(width / 2 - coreHalf, 0, width / 2 + coreHalf, 0);
+  core.addColorStop(0, "rgba(62,96,108,0)");
+  core.addColorStop(0.5, "rgba(62,96,108,0.9)");
+  core.addColorStop(1, "rgba(62,96,108,0)");
+  context.fillStyle = core;
+  context.fillRect(width / 2 - coreHalf, 0, coreHalf * 2, height);
 
   // Chevrons pointing the way the craft is going. Local +Z is -tangent, so
   // travel runs from high v to low v and the apex points at the top of the
   // canvas as drawn.
-  const border = 6; // ~0.35 m on both axes at this pad size.
+  //
+  // 168 renders at ~154, which is 58 above the field and 84 above the deck.
+  // That is the second interior tone the phase asks for (>= 18 apart) and it is
+  // what carries the marking at distance, where the field itself has fogged
+  // most of the way back to the road.
+  //
+  // The brightness and the 0.22 stroke are both set by the MEAN, not by taste:
+  // the pad's interior mean has to land in [deck+18, deck+55], and the ladder
+  // is what moves it. Measured, rgb(200,205,207) at a 0.3 stroke covered 41% of
+  // the interior and put the mean at deck+55..+60 — over the ceiling, a pad
+  // reading as a bright block rather than a field with a ladder on it. 0.22
+  // covers ~30%, which is where the mean sits mid-range instead of at a limit.
+  const inset = 3; // px. Enough that the ladder does not start inside the ramp.
   const chevrons = 5;
-  const pitch = (height - border * 2) / chevrons;
-  context.strokeStyle = "#ffffff";
-  context.lineWidth = pitch * 0.3;
+  const pitch = (height - inset * 2) / chevrons;
+  context.strokeStyle = "rgb(168,173,175)";
+  context.lineWidth = pitch * 0.22;
   context.lineCap = "butt";
   context.lineJoin = "miter";
   for (let index = 0; index < chevrons; index += 1) {
-    const base = height - border - index * pitch - pitch * 0.25;
+    const base = height - inset - index * pitch - pitch * 0.25;
     context.beginPath();
-    context.moveTo(border + 2, base);
+    context.moveTo(inset + 2, base);
     context.lineTo(width / 2, base - pitch * 0.45);
-    context.lineTo(width - border - 2, base);
+    context.lineTo(width - inset - 2, base);
     context.stroke();
   }
 
-  // The border last, over everything, so no chevron leaks into it. A marking
-  // with a darker rim reads as painted onto the surface; a marking that runs
-  // to its own silhouette reads as a plate resting on it.
-  context.fillStyle = "#565656";
-  context.fillRect(0, 0, width, border);
-  context.fillRect(0, height - border, width, border);
-  context.fillRect(0, 0, border, height);
-  context.fillRect(width - border, 0, border, height);
+  // The soft edge, last, over everything.
+  //
+  // 3 px, against the phase's 0.25 m ceiling. The pad's WIDTH is a fraction of
+  // the deck half-width where it sits, so it is not one number: the widest of
+  // the four is 4.83 m at BP_LONG_PAN_EARLY, which puts 3 px at 0.226 m across
+  // and 0.188 m along. 4 px was the first value here and it is 0.302 m on that
+  // pad — over the ceiling, and caught by validate-map02.mjs rather than by
+  // anybody's arithmetic, which is why that check measures the widest pad
+  // instead of the first one.
+  //
+  // The ramp runs to `rgb(70,71,72)`, which renders at ~72: the measured
+  // Bitterpan deck beside the four pads is 67.8-72.9, so the paint lands within
+  // ~3 luma of the road it meets, under a deck texture whose own crazing varies
+  // by more than that. Painting the ramp as an rgba gradient over an already
+  // opaque canvas keeps the texture opaque — no alpha reaches the material, so
+  // the pad stays in the opaque pass and cannot sort against anything.
+  const rampPx = 3;
+  /**
+   * @param rect the band to paint, [x, y, w, h]
+   * @param from the point on the OUTER edge, where the ramp is fully the deck
+   *   value; the gradient runs from there to `to`, where it is fully
+   *   transparent and the field below shows through unchanged.
+   */
+  const ramp = (
+    rect: [number, number, number, number],
+    from: [number, number],
+    to: [number, number],
+  ) => {
+    const gradient = context.createLinearGradient(from[0], from[1], to[0], to[1]);
+    gradient.addColorStop(0, "rgba(70,71,72,1)");
+    gradient.addColorStop(1, "rgba(70,71,72,0)");
+    context.fillStyle = gradient;
+    context.fillRect(rect[0], rect[1], rect[2], rect[3]);
+  };
+  ramp([0, 0, rampPx, height], [0, 0], [rampPx, 0]);
+  ramp([width - rampPx, 0, rampPx, height], [width, 0], [width - rampPx, 0]);
+  ramp([0, 0, width, rampPx], [0, 0], [0, rampPx]);
+  ramp([0, height - rampPx, width, rampPx], [0, height], [0, height - rampPx]);
 
   const texture = new THREE.CanvasTexture(canvas);
   texture.name = "map02_boost_pad_paint";

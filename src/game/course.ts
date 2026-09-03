@@ -382,6 +382,135 @@ const SECTOR_LABELS: Record<string, string> = {
   RUNWAY_HOME: "HOME STRAIGHT",
 };
 /**
+ * The Greenwater boost pad's paint, generated rather than authored.
+ *
+ * 64 x 256, drawn once and shared by all four instances, so it costs one
+ * texture and NO draw call — the pads stay a single instanced draw. The pad is
+ * 4.8 m across by 18 m along (the instance scale in the roadside build), so the
+ * sheet is 13.3 px/m across and 14.2 px/m along: near enough square texels.
+ *
+ * IN THE RUNWAY'S OWN LANGUAGE. Greenwater Strip is a runway, and
+ * `greenwater_runway_1024` already carries the vocabulary a runway marks itself
+ * with — THRESHOLD_BARS is eight weathered white bars running along the strip.
+ * That is what a boost pad is here: a threshold marking, four bars with the
+ * centre left open, not the chevron ladder Bitterpan uses. The sheet itself is
+ * NOT sampled at runtime — it is hash-pinned in ATLAS_REGIONS.json and reaching
+ * it from here would couple the course build to an async texture load for no
+ * pixels gained. What is taken from it is its PALETTE, read off the pinned PNG:
+ * the threshold bars sit at luma 230 on a transparent ground, so the bar tone
+ * here is authored as a weathered off-white rather than a fresh 255.
+ *
+ * THE TONES ARE ABSOLUTE AND THEY WERE MEASURED. Same method as the Bitterpan
+ * pad, and the same reason: this is a `MeshBasicMaterial` with
+ * `toneMapped: true`, so a hex code says nothing about what lands in the frame.
+ * The transfer was measured with a six-band test texture
+ * (texel 40/70/100/130/170/220 -> frame 38/78/108/134/158/182, Rec.709 luma)
+ * and checked against Greenwater here: the pre-P20.7 pad was a flat
+ * `0xb9e62e`, luma 207, and rendered at 168-173 on the strip, which is what
+ * that curve predicts (~176) minus a little sunset fog. The Greenwater deck
+ * beside the four pads renders at 69.5-73.6.
+ */
+function createGreenwaterBoostPadTexture(): THREE.CanvasTexture {
+  const width = 64;
+  const height = 256;
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const context = canvas.getContext("2d");
+  if (!context) throw new Error("Could not create the Greenwater boost pad paint.");
+
+  // The field. 88.6 luma renders at ~96, deck + 24: inside the [deck+18,
+  // deck+55] the phase asks for, and warm rather than neutral because the
+  // Greenwater deck is timber, not concrete — a cool grey film on it would read
+  // as a plate for the same reason a teal one did on the salt pan.
+  context.fillStyle = "rgb(90,88,84)";
+  context.fillRect(0, 0, width, height);
+
+  // The faint acid-green core: a 1.5 m band down the centre, and all that is
+  // left of `0xb9e62e`. Boost is green on this map and has to stay green —
+  // this keeps the cue without letting it be the whole surface.
+  //
+  // NEAR-ISO-LUMINANT WITH THE FIELD (92.5 against 88.6), so it reads as a hue
+  // and adds nothing to the pad's brightness structure. That constraint is what
+  // sets the colour: the first pass used rgba(78,102,52), which measured 9.9
+  // HSV saturation on the frame — a green the driver cannot actually see, on
+  // the map where green MEANS boost. rgb(70,104,44) is 58% saturated at the
+  // same luma, so the cue comes back for free. It cannot be bought with
+  // brightness instead: the open-strip pads already sit at deck+51 against a
+  // deck+55 ceiling.
+  const coreHalf = 10; // px, ~0.75 m each side of the centre line.
+  const core = context.createLinearGradient(
+    width / 2 - coreHalf,
+    0,
+    width / 2 + coreHalf,
+    0,
+  );
+  core.addColorStop(0, "rgba(70,104,44,0)");
+  core.addColorStop(0.5, "rgba(70,104,44,0.95)");
+  core.addColorStop(1, "rgba(70,104,44,0)");
+  context.fillStyle = core;
+  context.fillRect(width / 2 - coreHalf, 0, coreHalf * 2, height);
+
+  // The threshold bars: four, running the length of the pad, paired either side
+  // of the core with the centre left open, which is how a real runway threshold
+  // is laid out and why the marking reads as a gate to fly through rather than
+  // a block to drive over.
+  //
+  // rgb(155,152,146) renders at ~145 — 49 above the field, so the second
+  // interior tone the phase asks for (>= 18 apart) is carried by the bars. NOT
+  // the sheet's own 230: at that value four bars put the pad's interior mean
+  // over the deck+55 ceiling, which is the flat-bright-block failure this is
+  // replacing, one tone later.
+  const barPx = 6; // ~0.45 m.
+  context.fillStyle = "rgb(155,152,146)";
+  for (const centre of [-19.5, -12.5, 12.5, 19.5]) {
+    context.fillRect(width / 2 + centre - barPx / 2, 0, barPx, height);
+  }
+
+  // The soft edge, last, over everything. 3 px is 0.23 m across and 0.21 m
+  // along, inside the phase's 0.25 m ceiling. It runs to rgb(70,62,54), luma
+  // 63, which renders at ~70 against a measured deck of 69.5-73.6 — so the
+  // paint ends where the strip already is and the pad carries no outline.
+  // Painted as an rgba gradient over an already opaque canvas, so the texture
+  // stays opaque and the pad stays in the opaque pass.
+  const rampPx = 3;
+  /**
+   * @param rect the band to paint, [x, y, w, h]
+   * @param from the point on the OUTER edge, where the ramp is fully the deck
+   *   value; it runs from there to `to`, where it is fully transparent and the
+   *   paint below shows through unchanged.
+   */
+  const ramp = (
+    rect: [number, number, number, number],
+    from: [number, number],
+    to: [number, number],
+  ) => {
+    const gradient = context.createLinearGradient(from[0], from[1], to[0], to[1]);
+    gradient.addColorStop(0, "rgba(70,62,54,1)");
+    gradient.addColorStop(1, "rgba(70,62,54,0)");
+    context.fillStyle = gradient;
+    context.fillRect(rect[0], rect[1], rect[2], rect[3]);
+  };
+  ramp([0, 0, rampPx, height], [0, 0], [rampPx, 0]);
+  ramp([width - rampPx, 0, rampPx, height], [width, 0], [width - rampPx, 0]);
+  ramp([0, 0, width, rampPx], [0, 0], [0, rampPx]);
+  ramp([0, height - rampPx, width, rampPx], [0, height], [0, height - rampPx]);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.name = "greenwater_boost_pad_paint";
+  texture.colorSpace = THREE.SRGBColorSpace;
+  // Read from 2 m to 300 m; point-sampling four bars at that range sparkles.
+  texture.magFilter = THREE.LinearFilter;
+  texture.minFilter = THREE.LinearMipmapLinearFilter;
+  texture.generateMipmaps = true;
+  texture.anisotropy = 4;
+  texture.wrapS = THREE.ClampToEdgeWrapping;
+  texture.wrapT = THREE.ClampToEdgeWrapping;
+  texture.needsUpdate = true;
+  return texture;
+}
+
+/**
  * P11 key/fill rebalance. The lap read flat because the hemisphere fill was
  * within a whisker of the key everywhere: nothing cast a readable form. Every
  * sector took the same ratio shift — key x1.18, hemisphere x0.82, rounded to
@@ -2538,7 +2667,15 @@ export class GreenwaterCourse implements RaceCourse {
     const boostMaterial = new THREE.MeshBasicMaterial({
       // P19: tone-mapped now. The pad was tone-mapping-exempt and read as a
       // glowing slab parked on the road rather than a painted strip on it.
-      color: 0xb9e62e,
+      //
+      // P20.7: white, and the paint is in the map. Tone mapping alone did not
+      // finish the job — measured on the P20.1 build, the pad's interior came
+      // back as ONE tone (no second mode at all) at deck+82 to deck+101, which
+      // is a flat acid-green rectangle filling the lane, not a marking. The
+      // colour now survives only as a faint core down the middle of
+      // createGreenwaterBoostPadTexture.
+      color: 0xffffff,
+      map: createGreenwaterBoostPadTexture(),
       toneMapped: true,
     });
     const boostPads = new THREE.InstancedMesh(
@@ -2546,6 +2683,7 @@ export class GreenwaterCourse implements RaceCourse {
       boostMaterial,
       BOOST_PAD_DISTANCES.length,
     );
+    boostPads.name = "greenwater_boost_pads";
     const boostObject = new THREE.Object3D();
     for (let index = 0; index < BOOST_PAD_DISTANCES.length; index += 1) {
       const distance = BOOST_PAD_DISTANCES[index];
