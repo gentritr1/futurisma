@@ -1121,6 +1121,252 @@ assert.ok(
     + "between 60 Hz and 120 Hz.",
 );
 
+// ---------------------------------------------------------------------------
+// G2 — the air cushion.
+//
+// The cushion is the one thing standing between "no player collision" and two
+// hulls drawn through one another, so its shape is pinned rather than trusted:
+// where it is zero, where it peaks, that it never points the wrong way, that it
+// cannot exceed its stated ceilings, and that it integrates the same at 60 Hz
+// and 120 Hz.
+// ---------------------------------------------------------------------------
+
+// 1. The envelope. Zero outside 2.4 m laterally or 5.5 m longitudinally, in
+//    both signs, and zero on the boundary itself rather than one epsilon
+//    inside it.
+for (const longitudinal of [-6, -5.5, 0, 5.5, 6, 40]) {
+  for (const lateral of [-3, -2.4, 2.4, 3]) {
+    const outside = physics.calculateCushion(lateral, longitudinal, 0);
+    assert.equal(
+      outside.lateralPush,
+      0,
+      `Cushion pushed ${outside.lateralPush} at lateral ${lateral} m / `
+        + `longitudinal ${longitudinal} m, outside its own envelope.`,
+    );
+    assert.equal(outside.speedScrub, 0);
+  }
+}
+assert.equal(
+  physics.calculateCushion(2.4, 0, 0).lateralPush,
+  0,
+  "The lateral range is exclusive: exactly at CUSHION_LATERAL_RANGE_METERS the "
+    + "cushion must already be off, or the push jumps at the boundary.",
+);
+assert.equal(physics.calculateCushion(0, 5.5, 0).lateralPush, 0);
+assert.ok(
+  Math.abs(physics.calculateCushion(2.39, 0, 0).lateralPush) < 0.01,
+  "The cushion must arrive smoothly, not step on at the range boundary.",
+);
+
+// 2. The peak. Full CUSHION_PEAK_PUSH_MPS2 first reached at
+//    CUSHION_LATERAL_PEAK_METERS and HELD from there down to zero gap - a
+//    cushion that softened as the hulls converged would let them converge.
+assert.equal(
+  Math.abs(physics.calculateCushion(physics.CUSHION_LATERAL_PEAK_METERS, 0, 0).lateralPush),
+  physics.CUSHION_PEAK_PUSH_MPS2,
+  `The cushion must reach its ${physics.CUSHION_PEAK_PUSH_MPS2} m/s^2 peak at `
+    + `${physics.CUSHION_LATERAL_PEAK_METERS} m.`,
+);
+for (const lateral of [0, 0.1, 0.4, 0.79, 0.8]) {
+  assert.equal(
+    Math.abs(physics.calculateCushion(lateral, 0, 0).lateralPush),
+    physics.CUSHION_PEAK_PUSH_MPS2,
+    `The cushion softened to ${physics.calculateCushion(lateral, 0, 0).lateralPush} `
+      + `at a ${lateral} m gap; inside the peak it must plateau, not fall away.`,
+  );
+}
+// Monotone: closing the gap can never reduce the push.
+let previousPush = 0;
+for (let lateral = 2.4; lateral >= 0; lateral -= 0.05) {
+  const push = Math.abs(physics.calculateCushion(lateral, 0, 0).lateralPush);
+  assert.ok(
+    push >= previousPush - 1e-12,
+    `Cushion push fell from ${previousPush} to ${push} as the gap closed to `
+      + `${lateral.toFixed(2)} m.`,
+  );
+  previousPush = push;
+}
+
+// 3. Direction. The push is ALWAYS away from the rival, over the whole
+//    envelope and at every closing speed. A cushion that pointed inward
+//    anywhere would be a magnet, and it would be invisible in a lap time.
+for (let lateral = -2.35; lateral <= 2.35; lateral += 0.05) {
+  for (const longitudinal of [-5, -2, 0, 2, 5]) {
+    for (const closing of [-4, 0, 1.5, 9]) {
+      const { lateralPush } = physics.calculateCushion(lateral, longitudinal, closing);
+      if (lateralPush === 0) continue;
+      assert.ok(
+        lateral >= 0 ? lateralPush < 0 : lateralPush > 0,
+        `Cushion pushed INTO the rival: gap ${lateral.toFixed(2)} m, push `
+          + `${lateralPush.toFixed(3)} m/s^2.`,
+      );
+      assert.ok(
+        Math.abs(lateralPush) <= physics.CUSHION_PEAK_PUSH_MPS2 + 1e-9,
+        `Cushion exceeded its ${physics.CUSHION_PEAK_PUSH_MPS2} m/s^2 ceiling at `
+          + `closing speed ${closing} m/s: ${lateralPush.toFixed(3)}.`,
+      );
+      assert.ok(Number.isFinite(lateralPush));
+    }
+  }
+}
+// Two craft on exactly the same line still separate. `Math.sign(0)` is 0, so
+// the naive spelling of this leaves them welded together.
+assert.ok(
+  physics.calculateCushion(0, 0, 0).lateralPush !== 0,
+  "A zero lateral gap must still resolve to a push, or two craft on identical "
+    + "lines sit inside one another forever.",
+);
+
+// 4. The closing term brings the peak SOONER, never higher.
+const lazy = physics.calculateCushion(1.6, 0, 0).lateralPush;
+const diving = physics.calculateCushion(1.6, 0, 3).lateralPush;
+assert.ok(
+  Math.abs(diving) > Math.abs(lazy),
+  "A craft diving across must meet the cushion sooner than one drifting in.",
+);
+assert.equal(
+  physics.calculateCushion(0.8, 0, 9).lateralPush,
+  physics.calculateCushion(0.8, 0, 0).lateralPush,
+  "At the peak the closing term must have nothing left to add; the cushion is "
+    + "a lean, and its ceiling does not move with how hard it was hit.",
+);
+
+// 5. The scrub ceiling. At most CUSHION_MAX_SCRUB_PER_SECOND of current speed
+//    per second, and never a function of the closing speed.
+let peakScrub = 0;
+for (let lateral = -2.4; lateral <= 2.4; lateral += 0.05) {
+  for (const longitudinal of [-5.5, -3, 0, 3, 5.5]) {
+    for (const closing of [0, 3, 20]) {
+      const { speedScrub } = physics.calculateCushion(lateral, longitudinal, closing);
+      assert.ok(speedScrub >= 0 && Number.isFinite(speedScrub));
+      peakScrub = Math.max(peakScrub, speedScrub);
+    }
+  }
+}
+assert.equal(
+  peakScrub,
+  physics.CUSHION_MAX_SCRUB_PER_SECOND,
+  `Cushion scrub peaked at ${peakScrub} against a stated ceiling of `
+    + `${physics.CUSHION_MAX_SCRUB_PER_SECOND} per second.`,
+);
+assert.equal(
+  physics.calculateCushion(1.5, 0, 0).speedScrub,
+  physics.calculateCushion(1.5, 0, 12).speedScrub,
+  "The scrub must read geometry only: leaning on a rival costs the same "
+    + "whether the player arrived there fast or drifted in.",
+);
+// A full second of the worst possible overlap, at boost speed, must cost less
+// than 2% of that speed. This is the "no speed loss above the stated scrub"
+// half of the phase's no-collision promise, in metres per second.
+const scrubbedOverASecond = physics.BOOST_MAX_SPEED
+  * physics.CUSHION_MAX_SCRUB_PER_SECOND;
+assert.ok(
+  scrubbedOverASecond <= physics.BOOST_MAX_SPEED * 0.02,
+  "The cushion scrub must stay inside 2% of current speed per second.",
+);
+
+// 6. NaN in, zero out — every field, in both arguments.
+for (const bad of [NaN, Infinity, -Infinity, undefined, null, "x"]) {
+  const a = physics.calculateCushion(bad, 0, 0);
+  const b = physics.calculateCushion(0.5, bad, 0);
+  const c = physics.calculateCushion(0.5, 0, bad);
+  for (const result of [a, b, c]) {
+    assert.ok(
+      Number.isFinite(result.lateralPush) && Number.isFinite(result.speedScrub),
+      `Cushion produced a non-finite result from ${String(bad)}.`,
+    );
+  }
+  assert.equal(a.lateralPush, 0);
+  assert.equal(b.lateralPush, 0);
+  // A bad closing speed must not disarm the cushion; it falls back to "not
+  // closing", which is the conservative reading.
+  assert.ok(c.lateralPush !== 0);
+}
+
+// 7. Rate independence. Two seconds of a held peak push, integrated at 60 Hz
+//    and at 120 Hz, must agree to well under a millimetre per second - and the
+//    settled velocity must be the damped one the constant block advertises,
+//    not the runaway 12 m/s an undamped integrator would reach.
+function cushionVelocityAfter(seconds, step, push) {
+  let velocity = 0;
+  for (let index = 0; index < Math.round(seconds / step); index += 1) {
+    velocity = physics.integrateCushionVelocity(velocity, push, step);
+  }
+  return velocity;
+}
+// Four seconds, not two: the damping constant sets a 1 / CUSHION_VELOCITY_
+// DAMPING second time constant, so the window has to be several of those or
+// this measures the ramp rather than the settled value.
+const cushionVelocity120 = cushionVelocityAfter(4, 1 / 120, physics.CUSHION_PEAK_PUSH_MPS2);
+const cushionVelocity60 = cushionVelocityAfter(4, 1 / 60, physics.CUSHION_PEAK_PUSH_MPS2);
+assert.ok(
+  Math.abs(cushionVelocity120 - cushionVelocity60) < 0.001,
+  `Cushion velocity drifts ${Math.abs(cushionVelocity120 - cushionVelocity60).toFixed(6)} `
+    + "m/s between 60 Hz and 120 Hz.",
+);
+const settledLean = physics.CUSHION_PEAK_PUSH_MPS2 / physics.CUSHION_VELOCITY_DAMPING;
+assert.ok(
+  Math.abs(cushionVelocity120 - settledLean) < 0.01,
+  `A held cushion settles at ${cushionVelocity120.toFixed(3)} m/s against the `
+    + `${settledLean} m/s the damping constant advertises.`,
+);
+assert.ok(
+  cushionVelocityAfter(12, 1 / 120, physics.CUSHION_PEAK_PUSH_MPS2) < settledLean + 0.01,
+  "A long contact must not accumulate lateral speed without limit; that is a "
+    + "shove, and the phase asked for a lean.",
+);
+// Released, it bleeds back to nothing rather than sticking.
+assert.ok(
+  Math.abs(cushionVelocityAfter(3, 1 / 120, 0)) < 1e-9,
+  "Cushion velocity must decay to zero once the contact ends.",
+);
+let releasing = cushionVelocity120;
+const RELEASE_SECONDS = 2;
+for (let index = 0; index < 120 * RELEASE_SECONDS; index += 1) {
+  releasing = physics.integrateCushionVelocity(releasing, 0, 1 / 120);
+}
+assert.ok(
+  Math.abs(releasing) < settledLean * 0.03,
+  `${RELEASE_SECONDS} s after the contact ended the lean is still `
+    + `${releasing.toFixed(4)} m/s. The cushion must let go of the craft.`,
+);
+
+// 8. The clean-gate chain reaches the passive regen and NOTHING else. Same
+//    discipline the slipstream regen bonus is held to.
+assert.equal(
+  physics.integrateBoostReserve(0, false, 1, 0, 0, 1),
+  physics.BOOST_RESERVE_REGEN_RATE,
+  "A chain of one must leave passive regen exactly where it was.",
+);
+assert.equal(
+  Number(physics.integrateBoostReserve(0, false, 1, 0, 0, 1.5).toFixed(6)),
+  Number((physics.BOOST_RESERVE_REGEN_RATE * 1.5).toFixed(6)),
+  "The capped chain must multiply passive regen by 1.5.",
+);
+assert.equal(
+  physics.integrateBoostReserve(1, true, 1, 0, 0, 1.5),
+  physics.integrateBoostReserve(1, true, 1, 0, 0, 1),
+  "The chain must not change the DRAIN rate; a tidy lap is not longer boost.",
+);
+assert.equal(
+  physics.integrateBoostReserve(0, false, 1, 0, 0),
+  physics.integrateBoostReserve(0, false, 1, 0, 0, 1),
+  "The chain multiplier must default to 1, so every existing caller is unmoved.",
+);
+
+console.log(
+  `Cushion PASS: zero outside ${physics.CUSHION_LATERAL_RANGE_METERS} m lateral / `
+    + `${physics.CUSHION_LONGITUDINAL_RANGE_METERS} m longitudinal, peak `
+    + `${physics.CUSHION_PEAK_PUSH_MPS2} m/s^2 from `
+    + `${physics.CUSHION_LATERAL_PEAK_METERS} m inward, monotone, never inward-`
+    + `pointing over the whole envelope, scrub ceiling `
+    + `${(physics.CUSHION_MAX_SCRUB_PER_SECOND * 100).toFixed(1)}%/s `
+    + `(${scrubbedOverASecond.toFixed(2)} m/s at boost speed), held lean settles `
+    + `${cushionVelocity120.toFixed(3)} m/s with 60/120 Hz drift `
+    + `${Math.abs(cushionVelocity120 - cushionVelocity60).toFixed(6)} m/s; `
+    + `clean-gate chain multiplies passive regen only.`,
+);
+
 console.log(
   `Slipstream PASS: full tow inside ${physics.SLIPSTREAM_NEAR_METERS}-`
     + `${physics.SLIPSTREAM_FULL_METERS} m and ${physics.SLIPSTREAM_LATERAL_FULL_METERS} m `

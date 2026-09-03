@@ -55,6 +55,152 @@ export const SLIPSTREAM_CRUISE_BONUS = 0.06;
 export const SLIPSTREAM_REGEN_BONUS = 1;
 /** Where the HUD chip reads as locked and the audio cue fires. */
 export const SLIPSTREAM_LOCK_THRESHOLD = 0.8;
+
+/*
+ * G2 air cushion. Racing contact without collision.
+ *
+ * PRODUCT.md principle 5 forbids player collision, and G1 honoured that by
+ * having nothing at all happen when two hulls occupy the same metre of deck:
+ * the Greenwater soak recorded a 1.23 m player-rival minimum with the craft
+ * simply drawn through one another. A hard collision is still the wrong answer
+ * - it costs the player a race for a contact the rival provoked - so what goes
+ * in its place is a LEAN: a soft lateral spring that pushes the PLAYER off the
+ * rival's line, plus a small speed cost for staying there.
+ *
+ * FRAME. Both gaps are CENTRE TO CENTRE in the G1 race-distance frame, the same
+ * numbers `RivalFleet.measureSeparation` reports. They are NOT hull-to-hull
+ * clearances: a TOTEM is 4.4 m across, so a 2.4 m centre gap is already deep
+ * visual overlap, and the whole envelope lives inside the span where the two
+ * craft are drawn touching. Reading these as hull clearances instead would put
+ * the outer edge at a 6.8 m centre gap and have the cushion firing across most
+ * of the deck, which is a different feature.
+ *
+ * SHAPE. Push = PEAK * across * along, where
+ *   - `across` ramps from 0 at CUSHION_LATERAL_RANGE_METERS to 1 at
+ *     CUSHION_LATERAL_PEAK_METERS and then HOLDS at 1 all the way to zero gap.
+ *     It plateaus rather than falling away again because a cushion that got
+ *     softer as the hulls converged would be a cushion that lets them converge;
+ *     "peaks at 0.8 m" is where the peak is first reached, not a spike.
+ *   - `along` is 1 while the craft are within CUSHION_LONGITUDINAL_FULL_METERS
+ *     of level and fades to 0 at CUSHION_LONGITUDINAL_RANGE_METERS, so a rival
+ *     six metres up the road never shoves.
+ * A craft diving across gets the same peak SOONER, through
+ * CUSHION_CLOSING_GAIN, never harder: the closing term can only bring `across`
+ * up to its clamp at 1, so the push is capped at PEAK whatever the closing
+ * speed. That is what keeps this a lean and not a wall.
+ *
+ * SIGN. Positive `lateralPush` moves the player toward positive lateral. The
+ * push is always AWAY from the rival, so it can never drive the two together;
+ * `scripts/validate-physics.mjs` asserts that over the whole envelope.
+ */
+export const CUSHION_LATERAL_RANGE_METERS = 2.4;
+export const CUSHION_LATERAL_PEAK_METERS = 0.8;
+export const CUSHION_LONGITUDINAL_FULL_METERS = 3;
+export const CUSHION_LONGITUDINAL_RANGE_METERS = 5.5;
+/** Peak lateral acceleration on the player, m/s^2, at or inside the peak gap. */
+export const CUSHION_PEAK_PUSH_MPS2 = 6;
+/** Ceiling on the scrub, as a share of current speed per second. */
+export const CUSHION_MAX_SCRUB_PER_SECOND = 0.02;
+/** Closing speed at which the closing term is fully spent, m/s. */
+export const CUSHION_CLOSING_REFERENCE_MPS = 3;
+/** How much earlier a fast closing reaches the peak: `across` * up to 1.6. */
+export const CUSHION_CLOSING_GAIN = 0.6;
+/**
+ * How fast the cushion's own lateral velocity bleeds off, per second.
+ *
+ * The cushion is an acceleration, so without this a two-second contact would
+ * fling the craft sideways at 12 m/s. With it, a sustained push settles at
+ * CUSHION_PEAK_PUSH_MPS2 / CUSHION_VELOCITY_DAMPING metres per second of
+ * lateral drift, and that ratio is the whole feel of the feature: it is how
+ * fast a lean can open a gap, and equally how fast a driver can close one back.
+ *
+ * MEASURED, not chosen. It began at 4 (a 1.5 m/s lean) and that was too weak to
+ * do the job the phase exists for: on the Greenwater demo soak the cushion was
+ * armed for 1.1 s over five laps and the player-rival minimum came out at
+ * 0.14 m - no better than the 1.19 m the cushion-off control managed, because a
+ * demo driver steering back onto its racing line simply out-pushed it. 2 gives
+ * a 3 m/s lean, which is the same order as the craft's own lateral authority at
+ * race speed, so the two can actually argue.
+ */
+export const CUSHION_VELOCITY_DAMPING = 2;
+
+/**
+ * The soft contact between the player and one rival, for one step.
+ *
+ * Pure and allocation free: the race loop hands it the same `target` object
+ * every step, so a whole race allocates nothing here.
+ *
+ * @param {number} lateralGapMeters signed, rival lateral minus player lateral
+ * @param {number} longitudinalGapMeters signed, rival distance minus player's
+ * @param {number} closingLateralSpeed m/s, positive when the gap is shrinking
+ * @param {{ lateralPush: number, speedScrub: number }} [target]
+ * @returns {{ lateralPush: number, speedScrub: number }} `lateralPush` in
+ *   m/s^2 on the player, `speedScrub` as a share of current speed per second
+ */
+export function calculateCushion(
+  lateralGapMeters,
+  longitudinalGapMeters,
+  closingLateralSpeed,
+  target = { lateralPush: 0, speedScrub: 0 },
+) {
+  target.lateralPush = 0;
+  target.speedScrub = 0;
+  if (!Number.isFinite(lateralGapMeters) || !Number.isFinite(longitudinalGapMeters)) {
+    return target;
+  }
+  const lateral = Math.abs(lateralGapMeters);
+  const longitudinal = Math.abs(longitudinalGapMeters);
+  if (
+    lateral >= CUSHION_LATERAL_RANGE_METERS
+    || longitudinal >= CUSHION_LONGITUDINAL_RANGE_METERS
+  ) return target;
+  const across = smoothstep(
+    CUSHION_LATERAL_RANGE_METERS - lateral,
+    0,
+    CUSHION_LATERAL_RANGE_METERS - CUSHION_LATERAL_PEAK_METERS,
+  );
+  const along = 1 - smoothstep(
+    longitudinal,
+    CUSHION_LONGITUDINAL_FULL_METERS,
+    CUSHION_LONGITUDINAL_RANGE_METERS,
+  );
+  const closing = Number.isFinite(closingLateralSpeed)
+    ? clamp(closingLateralSpeed, 0, CUSHION_CLOSING_REFERENCE_MPS)
+      / CUSHION_CLOSING_REFERENCE_MPS
+    : 0;
+  const firmness = clamp(across * (1 + CUSHION_CLOSING_GAIN * closing), 0, 1);
+  // Away from the rival. A gap of exactly zero resolves to a push toward
+  // negative lateral rather than to no push at all, so two craft on identical
+  // lines still separate instead of sitting inside one another.
+  const away = lateralGapMeters >= 0 ? -1 : 1;
+  target.lateralPush = away * CUSHION_PEAK_PUSH_MPS2 * firmness * along;
+  // The scrub reads the GEOMETRY only, never the closing term: leaning on a
+  // rival costs the same whether the player arrived there fast or drifted in.
+  target.speedScrub = CUSHION_MAX_SCRUB_PER_SECOND * across * along;
+  return target;
+}
+
+/**
+ * Integrates the cushion's own lateral velocity, damped so a long contact
+ * settles at a bounded lean instead of accelerating without limit.
+ *
+ * This is the exact solution of `v' = push - k v` over the step rather than an
+ * Euler step of it, so 60 Hz and 120 Hz reach the same velocity over the same
+ * wall-clock contact to floating point, not merely to integrator accuracy.
+ * @param {number} velocity
+ * @param {number} pushMetersPerSecondSquared
+ * @param {number} delta
+ */
+export function integrateCushionVelocity(velocity, pushMetersPerSecondSquared, delta) {
+  const current = Number.isFinite(velocity) ? velocity : 0;
+  const push = Number.isFinite(pushMetersPerSecondSquared)
+    ? pushMetersPerSecondSquared
+    : 0;
+  const step = Number.isFinite(delta) ? clamp(delta, 0, 0.1) : 0;
+  const settled = push / CUSHION_VELOCITY_DAMPING;
+  return settled + (current - settled) * Math.exp(-step * CUSHION_VELOCITY_DAMPING);
+}
+
 const OVERSPEED_DRAG_RATE = 0.45;
 const COAST_BASE_DECELERATION = 10;
 const COAST_SPEED_DRAG_RATE = 0.55;
@@ -246,6 +392,8 @@ export function resolveDriftRelease(charge, wasDrifting, isDrifting) {
  * @param {number} delta
  * @param {number} [reward] drift-release payout applied this step
  * @param {number} [slipstream] 0..1 tow, which speeds the refill but never the drain
+ * @param {number} [regenMultiplier] G2 clean-gate chain, which likewise only
+ *   ever multiplies the PASSIVE regen - see `cleanGateRegenMultiplier`
  */
 export function integrateBoostReserve(
   reserve,
@@ -253,14 +401,16 @@ export function integrateBoostReserve(
   delta,
   reward = 0,
   slipstream = 0,
+  regenMultiplier = 1,
 ) {
   const current = Number.isFinite(reserve) ? clamp(reserve, 0, 1) : 0;
   const payout = Number.isFinite(reward) ? Math.max(0, reward) : 0;
   const step = Number.isFinite(delta) ? Math.max(0, delta) : 0;
   const tow = Number.isFinite(slipstream) ? clamp(slipstream, 0, 1) : 0;
+  const chain = Number.isFinite(regenMultiplier) ? clamp(regenMultiplier, 1, 2) : 1;
   const rate = reserveBoostActive
     ? -BOOST_RESERVE_DRAIN_RATE
-    : BOOST_RESERVE_REGEN_RATE * (1 + SLIPSTREAM_REGEN_BONUS * tow);
+    : BOOST_RESERVE_REGEN_RATE * (1 + SLIPSTREAM_REGEN_BONUS * tow) * chain;
   return clamp(current + payout + rate * step, 0, 1);
 }
 

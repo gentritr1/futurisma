@@ -1,9 +1,20 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import {
+  CLEAN_GATE_LATERAL_FRACTION,
   GATE_MISS_RECOVERY_GRACE_SECONDS,
   GATE_MISS_RECOVERY_INSTANT_SPEED_MPS,
+  HAZARD_CONTACT_LATERAL_RADIUS_METERS,
+  HAZARD_NEAR_MISS_MARGIN_METERS,
+  HAZARD_NEAR_MISS_REWARD,
+  NEAR_MISS_LATERAL_MAXIMUM_METERS,
+  NEAR_MISS_LATERAL_MINIMUM_METERS,
+  NEAR_MISS_REWARD,
+  NEAR_MISS_SPEED_RATIO,
   calculateFinishDistanceMeters,
+  cleanGateRegenMultiplier,
+  resolveCleanGateChain,
+  resolveNearMiss,
   calculateRecoveryTelemetry,
   checkpointRequiresExtraCircuit,
   crossedForwardProgress,
@@ -287,6 +298,174 @@ assert.ok(
   GATE_MISS_RECOVERY_GRACE_SECONDS > 0
     && GATE_MISS_RECOVERY_GRACE_SECONDS <= 2,
   "A grace of 0 s reads as a teleport and one over 2 s reads as a hang.",
+);
+
+// ---------------------------------------------------------------------------
+// G2 — the near-miss table.
+//
+// Three outcomes, one of which is the whole point of the phase: a pass made
+// INSIDE the air cushion is contact, and contact does not pay. The table below
+// walks the band edge to edge so a future tuning pass cannot quietly widen it.
+// ---------------------------------------------------------------------------
+const FAST = NEAR_MISS_SPEED_RATIO + 0.05;
+const SLOW = NEAR_MISS_SPEED_RATIO - 0.05;
+
+const nearMissTable = [
+  // [lateral gap, speed ratio, kind, expected outcome, expected reward]
+  [0, FAST, "rival", "contact", 0],
+  [1.0, FAST, "rival", "contact", 0],
+  [1.59, FAST, "rival", "contact", 0],
+  // A pass at a hull's width and a half is contact however fast it was made —
+  // there is no speed at which driving through someone is a near miss.
+  [1.0, 1, "rival", "contact", 0],
+  [NEAR_MISS_LATERAL_MINIMUM_METERS, FAST, "rival", "near-miss", NEAR_MISS_REWARD],
+  [2.4, FAST, "rival", "near-miss", NEAR_MISS_REWARD],
+  [NEAR_MISS_LATERAL_MAXIMUM_METERS, FAST, "rival", "near-miss", NEAR_MISS_REWARD],
+  [-2.4, FAST, "rival", "near-miss", NEAR_MISS_REWARD],
+  [3.21, FAST, "rival", "none", 0],
+  [12, FAST, "rival", "none", 0],
+  // Inside the band but off the pace: a pass at a crawl is not a risk taken.
+  [2.4, SLOW, "rival", "none", 0],
+  [2.4, NEAR_MISS_SPEED_RATIO, "rival", "near-miss", NEAR_MISS_REWARD],
+  // The coil. The window is measured OUTWARD from the trip radius, because
+  // anything inside it is a strike rather than a pass — see the note on
+  // HAZARD_NEAR_MISS_MARGIN_METERS.
+  [0, FAST, "hazard", "contact", 0],
+  [2.5, FAST, "hazard", "contact", 0],
+  [
+    HAZARD_CONTACT_LATERAL_RADIUS_METERS,
+    FAST,
+    "hazard",
+    "near-miss",
+    HAZARD_NEAR_MISS_REWARD,
+  ],
+  [4, FAST, "hazard", "near-miss", HAZARD_NEAR_MISS_REWARD],
+  [
+    HAZARD_CONTACT_LATERAL_RADIUS_METERS + HAZARD_NEAR_MISS_MARGIN_METERS,
+    FAST,
+    "hazard",
+    "near-miss",
+    HAZARD_NEAR_MISS_REWARD,
+  ],
+  [5.7, FAST, "hazard", "none", 0],
+  [4, SLOW, "hazard", "none", 0],
+];
+for (const [gap, ratio, kind, outcome, reward] of nearMissTable) {
+  const result = resolveNearMiss(gap, ratio, kind);
+  assert.equal(
+    result.outcome,
+    outcome,
+    `${kind} pass at ${gap} m / ratio ${ratio} scored "${result.outcome}", `
+      + `expected "${outcome}".`,
+  );
+  assert.equal(
+    result.reward,
+    reward,
+    `${kind} pass at ${gap} m / ratio ${ratio} paid ${result.reward}, expected `
+      + `${reward}.`,
+  );
+}
+// The band cannot invert, and the reward for a rival pass must outweigh the
+// coil, which is a stationary object that never fights back.
+assert.ok(NEAR_MISS_LATERAL_MINIMUM_METERS < NEAR_MISS_LATERAL_MAXIMUM_METERS);
+assert.ok(NEAR_MISS_REWARD > HAZARD_NEAR_MISS_REWARD);
+for (const bad of [Number.NaN, Infinity, undefined, null]) {
+  assert.equal(resolveNearMiss(bad, FAST).reward, 0);
+  assert.equal(resolveNearMiss(2, bad).reward, 0);
+}
+
+// ---------------------------------------------------------------------------
+// G2 — the clean-gate chain.
+//
+// The probe that matters is the last one: a chain must NEVER survive a missed
+// gate. Getting that wrong is invisible in play — the counter would simply read
+// one higher than it earned — so it is asserted directly, from every chain
+// length including the capped one, and with a lateral that would have been
+// clean had the gate been made at all.
+// ---------------------------------------------------------------------------
+const GATE_HALF_WIDTH = 12;
+const CLEAN_LATERAL = CLEAN_GATE_LATERAL_FRACTION * GATE_HALF_WIDTH;
+
+assert.equal(
+  resolveCleanGateChain(0, {
+    lateralMeters: CLEAN_LATERAL,
+    gateHalfWidthMeters: GATE_HALF_WIDTH,
+  }).chain,
+  1,
+  `Exactly ${CLEAN_GATE_LATERAL_FRACTION} of the gate half-width must count as `
+    + "clean; the threshold is inclusive.",
+);
+assert.equal(
+  resolveCleanGateChain(0, {
+    lateralMeters: CLEAN_LATERAL + 0.01,
+    gateHalfWidthMeters: GATE_HALF_WIDTH,
+  }).chain,
+  0,
+  "A hair outside the clean band must reset the chain.",
+);
+// The ladder, gate by gate, and the cap.
+let chain = 0;
+const multipliers = [];
+for (let gate = 0; gate < 6; gate += 1) {
+  const step = resolveCleanGateChain(chain, {
+    lateralMeters: 0,
+    gateHalfWidthMeters: GATE_HALF_WIDTH,
+  });
+  chain = step.chain;
+  multipliers.push(step.multiplier);
+}
+assert.deepEqual(
+  multipliers,
+  [1, 1.15, 1.3, 1.5, 1.5, 1.5],
+  "The clean-gate ladder moved. One gate pays nothing, then 1.15 / 1.3, capped "
+    + "at 1.5 from four.",
+);
+assert.equal(chain, 6, "Six clean gates must leave a chain of six.");
+assert.equal(cleanGateRegenMultiplier(0), 1);
+assert.equal(cleanGateRegenMultiplier(400), 1.5, "The multiplier must stay capped.");
+assert.equal(cleanGateRegenMultiplier(Number.NaN), 1);
+assert.equal(cleanGateRegenMultiplier(-3), 1);
+
+// The probe: a miss resets the chain from ANY length, including the capped one,
+// and including a miss recorded at a lateral that would otherwise be clean.
+for (const startingChain of [0, 1, 2, 3, 4, 9]) {
+  for (const lateral of [0, CLEAN_LATERAL, GATE_HALF_WIDTH * 4]) {
+    const missed = resolveCleanGateChain(startingChain, {
+      lateralMeters: lateral,
+      gateHalfWidthMeters: GATE_HALF_WIDTH,
+      missed: true,
+    });
+    assert.equal(
+      missed.chain,
+      0,
+      `A missed gate left a chain of ${missed.chain} standing (was `
+        + `${startingChain}, lateral ${lateral} m). A chain must never survive `
+        + "a miss.",
+    );
+    assert.equal(missed.clean, false);
+    assert.equal(missed.multiplier, 1);
+  }
+}
+// ... and an off-centre crossing resets it just as completely, silently.
+assert.equal(
+  resolveCleanGateChain(9, {
+    lateralMeters: GATE_HALF_WIDTH * 0.9,
+    gateHalfWidthMeters: GATE_HALF_WIDTH,
+  }).chain,
+  0,
+);
+// A degenerate gate half-width must not hand out a chain for free.
+assert.equal(
+  resolveCleanGateChain(3, { lateralMeters: 1, gateHalfWidthMeters: 0 }).chain,
+  0,
+);
+assert.equal(
+  resolveCleanGateChain(3, {
+    lateralMeters: Number.NaN,
+    gateHalfWidthMeters: GATE_HALF_WIDTH,
+  }).chain,
+  0,
+  "An unreadable lateral must reset rather than extend the chain.",
 );
 
 // The wiring, in the race loop that owns the state machine.

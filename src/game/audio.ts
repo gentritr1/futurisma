@@ -451,6 +451,18 @@ export class EngineAudio {
   }
 
   /**
+   * G2 near miss. Deliberately in the same register as the drift cash-in - a
+   * short square blip and a sine over it - because it is the same event to the
+   * player: a risk taken, banked as reserve. Pitched a fifth above the drift's
+   * top so the two are still tellable apart in the same corner, and one voice
+   * shorter, since a near miss fires mid-overtake when the mix is busiest.
+   */
+  playNearMiss(): void {
+    this.playTone(630, 0.1, 0.02, "square", 0, 0.82);
+    this.playTone(945, 0.16, 0.012, "sine", 0.045, 0.9);
+  }
+
+  /**
    * One cue serves both drift edges. Entry keeps the original 210 Hz square
    * blip (`releaseCharge` 0); a rewarded release replays the same one-shot
    * pitched and opened up by the bank it paid out, so a big drift cashes in an

@@ -29,6 +29,12 @@
 
       <div class="image-treatment" aria-hidden="true"></div>
       <div id="impact-flash" class="impact-flash" aria-hidden="true"></div>
+      <!--
+        G2 air cushion. A faint edge glow on the side the contact is on, in the
+        course-edge colour language rather than the impact orange: the player is
+        being leaned on, not crashed into, and the two must not read alike.
+      -->
+      <div id="cushion-glow" class="cushion-glow" aria-hidden="true"></div>
 
       <header class="race-header" aria-label="Course status">
         <div class="race-header__identity">
@@ -62,6 +68,12 @@
         <section class="race-progress" aria-label="Course progress">
           <div class="race-progress__copy">
             <span id="checkpoint-value">NEXT GATE 01 / 08</span>
+            <!--
+              G2 clean-gate chain. Sits against the gate label because that is
+              the thing it counts; hidden entirely below the first paying
+              chain, so a normal lap never carries a "x1" that means nothing.
+            -->
+            <span id="clean-chain" class="clean-chain" aria-hidden="true" hidden></span>
             <span id="finish-value">12.6 KM TO FINISH</span>
           </div>
           <span id="sector-value" class="sector-value">RUNWAY 09</span>

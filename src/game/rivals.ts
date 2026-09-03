@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import type { RaceCourse } from "./course";
 import {
+  RIVAL_CUSHION_YIELD_METERS,
   RIVAL_DEFENCE_LOOKAHEAD_METERS,
   RIVAL_DRIFT_AIRBRAKE_GAIN,
   RIVAL_FIXED_STEP_SECONDS,
@@ -40,6 +41,7 @@ import {
 import {
   BOOST_MAX_SPEED,
   SLIPSTREAM_LOCK_THRESHOLD,
+  calculateCushion,
   calculateSlipstream,
 } from "./physics.js";
 import {
@@ -57,6 +59,18 @@ import type {
 import type { FieldOrderEntry, RaceGridEntry, RaceStandingEntry } from "./ui";
 
 const PLAYER_ID = "player";
+
+/**
+ * G2 — how long a rival keeps giving up its extra RIVAL_CUSHION_YIELD_METERS
+ * after the air cushion has let go of the player.
+ *
+ * Measured against the problem it solves: a contact in the five-lap demo soaks
+ * averages 0.22 s, and a rival's lateral rate limit means a 0.22 s request
+ * moves it a few centimetres. Holding the request for 0.6 s is what turns it
+ * into an actual line change without letting a single brush of contact hand the
+ * player a lane for the rest of the straight.
+ */
+const CUSHION_YIELD_HOLD_SECONDS = 0.6;
 const RIVAL_COUNT = RIVAL_PROFILES.length;
 const RIVAL_ROLL_AXIS = new THREE.Vector3(0, 0, 1);
 const DEG = Math.PI / 180;
@@ -282,6 +296,11 @@ export interface RivalFleetDiagnostics {
   updateSteps: number;
   minimumSeparationMeters: number;
   minimumRivalSeparationMeters: number;
+  /** G2 - the player half only, sampled after the cushion has moved the craft. */
+  playerRivalMinimumSeparationMeters: number;
+  cushionSeconds: number;
+  cushionPeakPush: number;
+  cushionContacts: number;
   closestApproach: {
     id: string;
     longitudinalMeters: number;
@@ -466,6 +485,47 @@ export class RivalFleet {
   private slipstreamPeak = 0;
   private slipstreamLocks = 0;
   private slipstreamLockedThisStep = false;
+  /**
+   * G2 air cushion. The fleet resolves it because the fleet already holds the
+   * race-distance frame both craft are compared in; the race loop applies the
+   * result to the player and never sees a rival's state.
+   *
+   * `cushionResult` is the single scratch handed to `calculateCushion`, so a
+   * whole race allocates nothing here. `cushionRivalIndex` is the craft being
+   * leaned on, and it is the only rival the extra yield reaches.
+   */
+  private readonly cushionResult = { lateralPush: 0, speedScrub: 0 };
+  private cushionRivalIndex = -1;
+  private cushionYieldSign = 0;
+  private cushionYieldHold = 0;
+  private heldCushionRivalIndex = -1;
+  private heldCushionYieldSign = 0;
+  private cushionSeconds = 0;
+  private cushionPeakPush = 0;
+  private cushionContacts = 0;
+  private cushionContactSide = 0;
+  private cushionActiveLastStep = false;
+  private cushionEnabled = true;
+  /**
+   * Player-versus-rival separation ONLY, and measured after the cushion has
+   * moved the player rather than before. `minimumSeparationMeters` mixes this
+   * with the rival-versus-rival pairs, so it can never fall below the fleet's
+   * own 3.5 m floor and cannot show what the cushion did.
+   */
+  private playerRivalMinimumSeparationMeters = Infinity;
+  /**
+   * G2 pass detection. The player's race distance last step, so a crossing
+   * from behind to ahead can be spotted without the race loop keeping a second
+   * copy of the frame conversion.
+   */
+  private previousPlayerRaceDistance = 0;
+  private hasPreviousPlayerRaceDistance = false;
+  /** Passes completed on THIS step, at most one per rival. Reused, never grown. */
+  private readonly passScratch = RIVAL_PROFILES.map(() => ({
+    id: "",
+    lateralGapMeters: 0,
+  }));
+  private passCount = 0;
 
   readonly stats: {
     drawCalls: number;
@@ -788,7 +848,36 @@ export class RivalFleet {
     this.slipstreamPeak = 0;
     this.slipstreamLocks = 0;
     this.slipstreamLockedThisStep = false;
+    this.cushionResult.lateralPush = 0;
+    this.cushionResult.speedScrub = 0;
+    this.cushionRivalIndex = -1;
+    this.cushionYieldSign = 0;
+    this.cushionYieldHold = 0;
+    this.heldCushionRivalIndex = -1;
+    this.heldCushionYieldSign = 0;
+    this.cushionSeconds = 0;
+    this.cushionPeakPush = 0;
+    this.cushionContacts = 0;
+    this.cushionContactSide = 0;
+    this.cushionActiveLastStep = false;
+    this.playerRivalMinimumSeparationMeters = Infinity;
+    this.previousPlayerRaceDistance = 0;
+    this.hasPreviousPlayerRaceDistance = false;
+    this.passCount = 0;
     this.updatePresentation(1, 0);
+  }
+
+  /** `?cushion=0`. Off, the fleet behaves exactly as it did in G1. */
+  setCushionEnabled(enabled: boolean): void {
+    this.cushionEnabled = enabled;
+    if (!enabled) {
+      this.cushionResult.lateralPush = 0;
+      this.cushionResult.speedScrub = 0;
+      this.cushionRivalIndex = -1;
+      this.cushionYieldSign = 0;
+      this.cushionYieldHold = 0;
+      this.cushionActiveLastStep = false;
+    }
   }
 
   /**
@@ -821,6 +910,169 @@ export class RivalFleet {
   /** Signed lateral offset from that rival's line. */
   get draftLateralMeters(): number {
     return this.draftLateral;
+  }
+
+  /**
+   * G2 — the cushion the player is currently inside, resolved against every
+   * rival and reported for the strongest.
+   *
+   * Called by the race loop from `updateRace`, with the player's post-move
+   * lateral, so the push answers where the craft actually is this step rather
+   * than where it was when the fleet was advanced. Returns the fleet's own
+   * scratch: read it, do not keep it.
+   *
+   * @param playerDistanceFromStart player race distance, start-line frame
+   * @param playerLateralMeters player lateral, after this step's move
+   * @param playerLateralSpeed player's lateral rate, m/s, signed
+   * @param deltaSeconds the step, used for the rivals' own lateral rate
+   */
+  resolveCushion(
+    playerDistanceFromStart: number,
+    playerLateralMeters: number,
+    playerLateralSpeed: number,
+    deltaSeconds: number,
+  ): { lateralPush: number; speedScrub: number } {
+    this.cushionResult.lateralPush = 0;
+    this.cushionResult.speedScrub = 0;
+    this.cushionRivalIndex = -1;
+    this.cushionYieldSign = 0;
+    if (!this.cushionEnabled) {
+      this.cushionActiveLastStep = false;
+      return this.cushionResult;
+    }
+    const playerRaceDistanceMeters = this.rivalFrameDistance(playerDistanceFromStart);
+    const step = deltaSeconds > 0 ? deltaSeconds : RIVAL_FIXED_STEP_SECONDS;
+    let strongest = 0;
+    let strongestPush = 0;
+    let strongestScrub = 0;
+    let strongestIndex = -1;
+    let strongestSign = 0;
+    for (let index = 0; index < this.states.length; index += 1) {
+      const state = this.states[index];
+      if (state.finished) continue;
+      // A craft the player is correctly DRAFTING is not a craft the player is
+      // leaning on, and the cushion must not break the one mechanic G1 built.
+      //
+      // The two windows overlap almost completely: a full tow runs from 4 m
+      // behind and the cushion reaches 5.5 m, both inside ~2.5 m of lateral, so
+      // every properly slotted wake also sits in the cushion. Measured: the
+      // Greenwater demo soak went from 13 slipstream locks to 4 the moment the
+      // cushion was armed, because the push was shoving the driver sideways out
+      // of its own tow. A locked tow is the one case where being that close is
+      // the game working, so it is excluded.
+      if (index === this.slipstreamRivalIndex && this.slipstream >= SLIPSTREAM_LOCK_THRESHOLD) {
+        continue;
+      }
+      const lateralGap = state.lateralMeters - playerLateralMeters;
+      const longitudinalGap = state.raceDistanceMeters - playerRaceDistanceMeters;
+      // Positive when the gap is shrinking. The rival's own lateral rate is
+      // taken from the step it just ran, so a craft already sliding away is not
+      // treated as diving in.
+      const rivalLateralSpeed = (state.lateralMeters - this.previousLaterals[index]) / step;
+      const closing = -Math.sign(lateralGap || 1)
+        * (rivalLateralSpeed - playerLateralSpeed);
+      const cushion = calculateCushion(
+        lateralGap,
+        longitudinalGap,
+        closing,
+        this.cushionResult,
+      );
+      const magnitude = Math.abs(cushion.lateralPush);
+      if (magnitude > strongest) {
+        strongest = magnitude;
+        strongestPush = cushion.lateralPush;
+        strongestScrub = cushion.speedScrub;
+        strongestIndex = index;
+        strongestSign = lateralGap >= 0 ? 1 : -1;
+      }
+    }
+    this.cushionResult.lateralPush = strongestPush;
+    this.cushionResult.speedScrub = strongestScrub;
+    const active = strongest > 0;
+    // The YIELD outlives the contact by CUSHION_YIELD_HOLD_SECONDS, and the
+    // push does not.
+    //
+    // A rival has a lateral rate limit; a contact in the demo soaks lasts about
+    // 0.2 s, which is not enough time for the lane solver to move a craft
+    // anywhere at all. Without the hold the extra yield was a request that was
+    // withdrawn before it could be acted on - measured as a soak where the
+    // rival lateral was indistinguishable from the cushion-off control. The
+    // hold is on the RIVAL's request only: the player stops being pushed the
+    // instant the contact ends, which is what keeps this a lean.
+    if (active) {
+      this.cushionRivalIndex = strongestIndex;
+      this.cushionYieldSign = strongestSign;
+      this.cushionYieldHold = CUSHION_YIELD_HOLD_SECONDS;
+    } else if (this.cushionYieldHold > 0) {
+      this.cushionYieldHold -= Math.max(0, deltaSeconds);
+      if (this.cushionYieldHold > 0) {
+        this.cushionRivalIndex = this.heldCushionRivalIndex;
+        this.cushionYieldSign = this.heldCushionYieldSign;
+      }
+    }
+    this.heldCushionRivalIndex = this.cushionRivalIndex;
+    this.heldCushionYieldSign = this.cushionYieldSign;
+    if (active) {
+      this.cushionSeconds += Math.max(0, deltaSeconds);
+      this.cushionPeakPush = Math.max(this.cushionPeakPush, strongest);
+      this.cushionContactSide = strongestSign;
+      if (!this.cushionActiveLastStep) this.cushionContacts += 1;
+    }
+    this.cushionActiveLastStep = active;
+    return this.cushionResult;
+  }
+
+  /** True while the player is inside a rival's cushion. Drives the HUD glow. */
+  get cushionActive(): boolean {
+    return this.cushionActiveLastStep;
+  }
+
+  /** Which side the contact is on: +1 when the rival sits at higher lateral. */
+  get cushionSide(): number {
+    return this.cushionContactSide;
+  }
+
+  /** Passes completed on the last step. Read with {@link passLateralGapMeters}. */
+  get passesThisStep(): number {
+    return this.passCount;
+  }
+
+  /** Lateral gap at the crossing for pass `index` of `passesThisStep`. */
+  passLateralGapMeters(index: number): number {
+    return this.passScratch[index]?.lateralGapMeters ?? 0;
+  }
+
+  /** Which craft was passed, for the diagnostics log. */
+  passRivalId(index: number): string {
+    return this.passScratch[index]?.id ?? "";
+  }
+
+  /**
+   * The separation that G2 is judged on, sampled AFTER the race loop has
+   * applied the cushion. `measureSeparation` runs before the player moves and
+   * mixes the rival-versus-rival pairs in, so it can never show what the
+   * cushion bought.
+   */
+  measurePlayerSeparation(
+    playerDistanceFromStart: number,
+    playerLateralMeters: number,
+  ): void {
+    const playerRaceDistanceMeters = this.rivalFrameDistance(playerDistanceFromStart);
+    // Same exclusion `measureSeparation` uses: once the player's distance is
+    // frozen on the finish line the field drives through it to take the flag,
+    // and that is not a near miss.
+    const raceDistance = this.course.length * this.totalLaps;
+    if (playerRaceDistanceMeters >= raceDistance - 1e-6) return;
+    for (const state of this.states) {
+      if (state.finished) continue;
+      this.playerRivalMinimumSeparationMeters = Math.min(
+        this.playerRivalMinimumSeparationMeters,
+        Math.hypot(
+          state.raceDistanceMeters - playerRaceDistanceMeters,
+          state.lateralMeters - playerLateralMeters,
+        ),
+      );
+    }
   }
 
 
@@ -891,6 +1143,13 @@ export class RivalFleet {
       sideSign: this.noBlockSide,
       halfWidthMeters,
       laneHalfWidthMeters,
+      // G2 — only the craft actually being leaned on gives up the extra road,
+      // and only laterally. A rival two lanes away is untouched by a contact it
+      // is not part of.
+      cushionYieldMeters: index === this.cushionRivalIndex
+        ? RIVAL_CUSHION_YIELD_METERS
+        : 0,
+      cushionYieldSign: index === this.cushionRivalIndex ? this.cushionYieldSign : 0,
     });
     drive.paceLateralMeters = paceLane;
     drive.laneHalfWidthMeters = laneHalfWidthMeters;
@@ -984,6 +1243,7 @@ export class RivalFleet {
       );
     }
     this.updateSteps += 1;
+    this.measurePasses(playerRaceDistanceMeters, playerLateralMeters);
     this.measureSeparation(playerRaceDistanceMeters, playerLateralMeters);
     this.measureFreeDeck(playerRaceDistanceMeters, playerLateralMeters);
     this.measureLeadChanges();
@@ -993,6 +1253,41 @@ export class RivalFleet {
       playerSpeedMetersPerSecond,
       deltaSeconds,
     );
+  }
+
+  /**
+   * G2 — every rival the player got past on this step.
+   *
+   * A pass is a race-distance crossing from behind to ahead, read off the two
+   * frames the fleet already keeps: `previousDistances` for the rivals and one
+   * scalar for the player. It is deliberately NOT a position-table change -
+   * the table is sorted output and would report a pass the player never made
+   * when a third craft finishes or recovers.
+   *
+   * The lateral gap recorded is the one at the crossing step, which is what
+   * `resolveNearMiss` scores. A pass completed while a rival is lapping is
+   * still a pass; the near-miss band, not this, decides whether it pays.
+   */
+  private measurePasses(
+    playerRaceDistanceMeters: number,
+    playerLateralMeters: number,
+  ): void {
+    this.passCount = 0;
+    if (this.hasPreviousPlayerRaceDistance) {
+      for (let index = 0; index < this.states.length; index += 1) {
+        const state = this.states[index];
+        if (state.finished) continue;
+        const previousGap = this.previousDistances[index] - this.previousPlayerRaceDistance;
+        const gap = state.raceDistanceMeters - playerRaceDistanceMeters;
+        if (previousGap <= 0 || gap > 0) continue;
+        const entry = this.passScratch[this.passCount];
+        entry.id = state.id;
+        entry.lateralGapMeters = state.lateralMeters - playerLateralMeters;
+        this.passCount += 1;
+      }
+    }
+    this.previousPlayerRaceDistance = playerRaceDistanceMeters;
+    this.hasPreviousPlayerRaceDistance = true;
   }
 
   /**
@@ -1436,6 +1731,15 @@ export class RivalFleet {
       minimumRivalSeparationMeters: Number.isFinite(this.minimumRivalSeparationMeters)
         ? this.minimumRivalSeparationMeters
         : 0,
+      // G2. Reported as 0 only when the race never sampled it at all - the
+      // same convention the two above use for an unstarted run.
+      playerRivalMinimumSeparationMeters:
+        Number.isFinite(this.playerRivalMinimumSeparationMeters)
+          ? this.playerRivalMinimumSeparationMeters
+          : 0,
+      cushionSeconds: this.cushionSeconds,
+      cushionPeakPush: this.cushionPeakPush,
+      cushionContacts: this.cushionContacts,
       closestApproach: { ...this.closestApproach },
       catchUpMultiplier: 1,
       articulatedGroups: [...this.articulatedGroups],

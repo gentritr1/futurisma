@@ -62,6 +62,17 @@ export interface DiagnosticsCore {
   sparkBursts: number;
   missedGates: number;
   impactLocations: readonly string[];
+  /** G2 — the cushion's actual effect, and the near-miss economy. */
+  cushionTravelMeters: number;
+  cushionLongestContactSeconds: number;
+  nearMisses: number;
+  hazardNearMisses: number;
+  nearMissReward: number;
+  /** Passes made INSIDE the cushion: contact, and deliberately unpaid. */
+  cushionRewardBlocked: number;
+  nearMissLocations: readonly string[];
+  peakCleanGateChain: number;
+  cleanGateChain: number;
   recoveries: number;
   /** P11: the subset of `recoveries` a missed gate asked for. */
   gateMissRecoveries: number;
@@ -164,6 +175,17 @@ function rivalFields(
     rivalMinimumRivalSeparationMeters: Number(
       (rivals?.minimumRivalSeparationMeters ?? 0).toFixed(2),
     ),
+    // G2 - the acceptance number for the air cushion, and the only one of the
+    // three that is sampled AFTER the cushion has moved the player.
+    // `rivalMinimumSeparationMeters` above mixes the rival-versus-rival pairs
+    // in and so is floored by the fleet's own clearance whatever the player
+    // does; this one is the player half alone.
+    playerRivalMinimumSeparationMeters: Number(
+      (rivals?.playerRivalMinimumSeparationMeters ?? 0).toFixed(2),
+    ),
+    cushionSeconds: Number((rivals?.cushionSeconds ?? 0).toFixed(2)),
+    cushionPeakPush: Number((rivals?.cushionPeakPush ?? 0).toFixed(2)),
+    cushionContacts: rivals?.cushionContacts ?? 0,
     rivalClosestApproach: rivals?.closestApproach
       ? {
         id: rivals.closestApproach.id,
@@ -369,6 +391,18 @@ export function buildDiagnosticsReport(
     impactSparkBursts: core.sparkBursts,
     missedGates: core.missedGates,
     impactLocations: core.impactLocations,
+    // G2 — the near-miss economy and the clean-gate chain. `nearMissLocations`
+    // is where each one was scored, so a soak can be argued with rather than
+    // just counted.
+    cushionTravelMeters: core.cushionTravelMeters,
+    cushionLongestContactSeconds: core.cushionLongestContactSeconds,
+    nearMisses: core.nearMisses,
+    hazardNearMisses: core.hazardNearMisses,
+    nearMissReward: core.nearMissReward,
+    cushionRewardBlocked: core.cushionRewardBlocked,
+    nearMissLocations: core.nearMissLocations,
+    peakCleanGateChain: core.peakCleanGateChain,
+    cleanGateChain: core.cleanGateChain,
     recoveries: core.recoveries,
     gateMissRecoveries: core.gateMissRecoveries,
     contextLost: core.contextLost,

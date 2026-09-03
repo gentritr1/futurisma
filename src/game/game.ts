@@ -30,6 +30,7 @@ import {
   resolveProbeSpawn,
   resolveQualityLock,
   resolveReducedMotion,
+  resolveLapCount,
   resolveRivalAudioProbeLateral,
   searchFlag,
   searchParam,
@@ -78,6 +79,7 @@ import { configureShadowMap } from "./shadows";
 import { applyRaceLivery, recordFinishedRace } from "./meta-runtime";
 import { save } from "./persistence";
 import { playerRaceDistanceMeters as calculatePlayerRaceDistance } from "./rival-race.js";
+import { RacingContact } from "./racing-contact";
 import {
   RivalFleet,
   openingRaceStatus,
@@ -221,6 +223,9 @@ export class FuturismaGame {
   private padBoostTime = 0;
   /** G1 - the tow the fleet measured on the last fixed step, 0..1. */
   private slipstream = 0;
+  /** G2 - the cushion, the near miss and the chain, plus the pose they move. */
+  private readonly contact: RacingContact;
+  private readonly contactPose = { lateralMeters: 0, speedMetersPerSecond: 0 };
   private impactShake = 0;
   private physicsAccumulator = 0;
   private adaptiveQualityDebt = 0;
@@ -239,7 +244,6 @@ export class FuturismaGame {
   private diagnosticMaximumCameraFov = 56;
   private diagnosticMaximumBrakeFovCompression = 0;
   private diagnosticImpacts = 0;
-  private diagnosticImpactSparkBursts = 0;
   private diagnosticMissedGates = 0;
   private diagnosticRecoveries = 0;
   private diagnosticGateMissRecoveries = 0;
@@ -276,6 +280,8 @@ export class FuturismaGame {
   private readonly demoMode = searchFlag("demo");
   private demoAutopilot = this.demoMode;
   private readonly diagnosticsMode = searchFlag("diagnostics");
+  /** G2 - `?cushion=0` puts the race back on the G1 no-contact model. */
+  private readonly cushionEnabled = searchParam("cushion") !== "0";
   // Every `?probe=` spawn pose is resolved by query-probes.ts; see ProbeSpawn.
   private readonly rivalAudioProbeLateral = resolveRivalAudioProbeLateral();
   private readonly contextLossProbe = probeSelected("context");
@@ -308,7 +314,7 @@ export class FuturismaGame {
     this.cameraProjection = this.course.createProjectionScratch();
     this.cameraSurfaceProjection = this.course.createProjectionScratch();
     this.cameraLookAhead = this.course.createSampleScratch();
-    this.totalLaps = this.resolveLapCount();
+    this.totalLaps = resolveLapCount(this.course);
     this.progress = this.course.startProgress;
     this.lateral = this.course.startLateral;
     this.renderer = new THREE.WebGLRenderer({
@@ -340,6 +346,7 @@ export class FuturismaGame {
 
     this.scene.add(this.course.group, this.vehicle.root);
     this.effects = new RaceEffects(this.reducedMotion, this.course.kind);
+    this.contact = new RacingContact(ui, this.audio, input, this.effects);
     this.camera.add(this.effects.speedLines);
     this.scene.add(this.camera, this.effects.sparkPoints);
     this.atmosphere = new RaceAtmosphere(
@@ -410,6 +417,8 @@ export class FuturismaGame {
       return false;
     }
     this.rivalFleet = rivalFleet;
+    // G2 kill switch: `?cushion=0` restores the G1 no-contact race exactly.
+    this.rivalFleet.setCushionEnabled(this.cushionEnabled);
     this.scene.add(this.rivalFleet.root, ghostRuntime.attach(this.course, this.vehicle));
     this.audio.attachSpatialScene(rivalFleet, this.camera, this.vehicle.root.position);
     this.ui.setRaceFormat(
@@ -774,7 +783,12 @@ export class FuturismaGame {
       if (this.driftActive) this.diagnosticDriftSeconds += delta;
     }
 
-    this.boostReserve = integrateBoostReserve(this.boostReserve, reserveBoost, delta, driftReward, slipstream);
+    // G2 - the clean-gate chain enters the reserve here, and only as a
+    // multiplier on the PASSIVE regen term.
+    this.boostReserve = integrateBoostReserve(
+      this.boostReserve, reserveBoost, delta,
+      driftReward, slipstream, this.contact.regenMultiplier,
+    );
 
     this.steerAmount = integrateSteering(
       this.steerAmount,
@@ -836,6 +850,26 @@ export class FuturismaGame {
     this.progress = afterMove.progress;
     this.lateral = afterMove.lateral;
     this.position.y = afterMove.position.y;
+    // G2 - both calls sit here, after the move is projected and BEFORE the
+    // apron clamp, for the reasons documented in racing-contact.ts.
+    this.contactPose.lateralMeters = this.lateral;
+    this.contactPose.speedMetersPerSecond = this.speed;
+    if (this.contact.stepCushion(
+      this.rivalFleet, this.contactPose, this.playerRaceDistance(),
+      delta, this.elapsedMs, afterMove, this.position,
+    )) {
+      this.lateral = this.contactPose.lateralMeters;
+      this.position.copy(afterMove.position).addScaledVector(afterMove.right, this.lateral);
+      this.position.y = afterMove.position.y;
+    }
+    this.speed = this.contactPose.speedMetersPerSecond;
+    const reward = this.contact.scorePasses(
+      this.rivalFleet, this.course, previousProgress, this.progress,
+      this.contactPose, this.lap, this.hazardTripCooldown <= 0, this.diagnosticsMode,
+    );
+    if (reward > 0) {
+      this.boostReserve = integrateBoostReserve(this.boostReserve, false, 0, reward);
+    }
 
     const cableTripSide = this.hazardTripCooldown <= 0
       ? this.course.cableTripSideAt(this.progress, this.lateral)
@@ -904,7 +938,10 @@ export class FuturismaGame {
         const impactStrength = apron.wallImpactStrength;
         this.speed *= apron.wallSpeedMultiplier;
         this.impactShake = 1;
-        this.emitImpactSparks(afterMove, Math.sign(this.lateral) || 1, impactStrength);
+        this.contact.impactBurst(
+          this.vehicle, afterMove, this.position, this.lateral, this.speed,
+          Math.sign(this.lateral) || 1, impactStrength, this.diagnosticsMode,
+        );
         this.audio.playImpact(impactStrength);
         this.input.pulse(impactStrength * 0.72, impactStrength, 120);
         this.ui.flashImpact(this.lateral < 0 ? "LEFT" : "RIGHT");
@@ -977,6 +1014,8 @@ export class FuturismaGame {
     }
 
     this.elapsedMs += delta * 1000;
+    // G2 - sampled where the lateral has been through cushion AND apron clamp.
+    this.rivalFleet?.measurePlayerSeparation(this.playerRaceDistance(), this.lateral);
     ghostRuntime.step(this.lap, this.progress, this.lateral, this.speed, this.steerAmount);
     this.updateCheckpointProgress(previousProgress, afterMove.tangent);
   }
@@ -1010,10 +1049,12 @@ export class FuturismaGame {
       this.travelDirection.dot(courseTangent) < 0.2
       || !crossedForwardProgress(previousProgress, this.progress, targetProgress)
     ) return;
-    if (
-      Math.abs(this.lateral)
-      > this.course.checkpointHalfWidth(this.nextCheckpointIndex)
-    ) {
+    // G2 - the chain is resolved on EVERY crossing, miss included, before any
+    // of the four branches below can return. See racing-contact.ts.
+    const gateHalfWidth = this.course.checkpointHalfWidth(this.nextCheckpointIndex);
+    const missedGate = Math.abs(this.lateral) > gateHalfWidth;
+    this.contact.crossGate(this.lateral, gateHalfWidth, missedGate, this.diagnosticsMode);
+    if (missedGate) {
       if (this.missedGateIndex !== this.nextCheckpointIndex) {
         this.missedGateIndex = this.nextCheckpointIndex;
         if (this.diagnosticsMode) this.diagnosticMissedGates += 1;
@@ -1402,6 +1443,9 @@ export class FuturismaGame {
       boostLocked: this.boostLockedUntilRelease,
       driftCharge: this.driftBank.charge,
       slipstream: this.slipstream,
+      cushionSide: this.contact.glowAt(this.elapsedMs),
+      cleanGateChain: this.contact.cleanGateChain,
+      cleanGateMultiplier: this.contact.regenMultiplier,
       braking: input.brake > 0.1,
       drifting: this.driftActive,
       skidsDown: this.speed < 11,
@@ -1527,6 +1571,7 @@ export class FuturismaGame {
     this.surfaceGrip = 1;
     this.padBoostTime = 0;
     this.slipstream = 0;
+    this.contact.reset();
     this.autopilot.reset();
     this.lap = 1;
     this.elapsedMs = 0;
@@ -1587,28 +1632,6 @@ export class FuturismaGame {
     this.syncPresentationPose();
     this.course.setLapBoard(1, this.totalLaps);
     this.course.setCheckpointProgress(1);
-  }
-
-  private emitImpactSparks(
-    sample: ReturnType<RaceCourse["sample"]>,
-    side: number,
-    strength: number,
-  ): void {
-    this.effects.emitImpactSparks(
-      sample, this.position, this.lateral, this.speed, side, strength,
-    );
-    this.vehicle.triggerImpactEffect(side, strength);
-    if (this.diagnosticsMode) this.diagnosticImpactSparkBursts += 1;
-  }
-
-  private resolveLapCount(): number {
-    const requested = Number.parseInt(searchParam("laps") ?? "", 10);
-    if (!Number.isFinite(requested)) return this.course.defaultLapCount;
-    return THREE.MathUtils.clamp(
-      requested,
-      this.course.minimumLapCount,
-      this.course.maximumLapCount,
-    );
   }
 
   private togglePause(): void {
@@ -1775,9 +1798,9 @@ export class FuturismaGame {
         maximumCameraFov: this.diagnosticMaximumCameraFov,
         maximumBrakeFovCompression: this.diagnosticMaximumBrakeFovCompression,
         impacts: this.diagnosticImpacts,
-        sparkBursts: this.diagnosticImpactSparkBursts,
         missedGates: this.diagnosticMissedGates,
         impactLocations: this.diagnosticImpactLocations,
+        ...this.contact.diagnostics(),
         recoveries: this.diagnosticRecoveries,
         gateMissRecoveries: this.diagnosticGateMissRecoveries,
         contextLost: this.contextLost,
@@ -1840,8 +1863,8 @@ export class FuturismaGame {
     this.diagnosticMaximumCameraFov = this.camera.fov;
     this.diagnosticMaximumBrakeFovCompression = 0;
     this.diagnosticImpacts = 0;
-    this.diagnosticImpactSparkBursts = 0;
     this.diagnosticMissedGates = 0;
+    this.contact.resetDiagnostics();
     this.diagnosticRecoveries = 0;
     this.diagnosticGateMissRecoveries = 0;
     this.diagnosticContextLosses = 0;

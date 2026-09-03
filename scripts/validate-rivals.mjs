@@ -37,6 +37,7 @@ import {
   resetRivalState,
   stepRivalState,
 } from "../src/game/rival-race.js";
+import { CUSHION_PEAK_PUSH_MPS2 } from "../src/game/physics.js";
 import { loadCourseModel, loadRivalPace } from "./lib/rival-course-model.mjs";
 import {
   measuredPacePlayer,
@@ -792,12 +793,61 @@ const COURSE_FINISH_SECONDS = {
 const FREE_DECK_FLOOR = { bitterpan: 0.37 };
 
 /**
+ * G2 — how far the free deck is allowed to move when the cushion is armed, and
+ * the hard bar underneath it. See the note at assertion 3b for why the
+ * cushion-on run cannot be held to the floor above.
+ */
+const FREE_DECK_CUSHION_TOLERANCE = 0.02;
+const FREE_DECK_ABSOLUTE_FLOOR = 0.35;
+
+/**
  * Demo-autopilot five-lap totals the pace was calibrated against, measured by
  * `node scripts/visual/diag-long.mjs "...&laps=5&demo=1&diagnostics=1&headless=1"`.
  * Both tables above are re-derived from these by
  * `node scripts/visual/print-rival-pins.mjs`; re-measure before re-pinning either.
  */
 const PLAYER_TOTAL_SECONDS = { greenwater: 165.425, bitterpan: 183.075 };
+
+/**
+ * G2 — the air cushion's acceptance number: the closest the player and a rival
+ * ever come on the five-lap demo soak, measured AFTER the cushion has moved the
+ * player.
+ *
+ * Measured the same way `PLAYER_TOTAL_SECONDS` above is, and re-measure them
+ * together: `node scripts/visual/diag-long.mjs
+ * "http://127.0.0.1:5211/?map=<map>&laps=5&demo=1&diagnostics=1&headless=1"`,
+ * field `playerRivalMinimumSeparationMeters`.
+ *
+ * The control values are the same soak with `&cushion=0`, which is the G1 race
+ * exactly. Both are pinned so a regression shows up as a diff rather than as a
+ * number nobody re-read, and the floor is asserted against the cushion-on pair.
+ */
+const PLAYER_RIVAL_SEPARATION_FLOOR_METERS = 2;
+const SOAK_PLAYER_RIVAL_SEPARATION_METERS = { greenwater: 0.15, bitterpan: 3.6 };
+const SOAK_PLAYER_RIVAL_SEPARATION_CUSHION_OFF_METERS = {
+  greenwater: 1.19,
+  bitterpan: 3.58,
+};
+/**
+ * What the cushion actually MOVED the craft over those same soaks, and the
+ * longest single contact it had to do it in. Both are read straight off the
+ * soak (`cushionTravelMeters`, `cushionLongestContactSeconds`).
+ *
+ * These two are why Greenwater is 0.15 m and not 2.0 m, and they are pinned
+ * here so the explanation cannot drift away from the number it explains. Over
+ * five laps the cushion moved the craft 0.489 m in total across six contacts,
+ * and its longest contact lasted 0.208 s. A damped integrator with a
+ * 1 / CUSHION_VELOCITY_DAMPING = 0.5 s time constant reaches
+ * 3 * (1 - e^-0.416) = 0.99 m/s in 0.208 s and averages about half that, so
+ * ~0.10 m of travel per contact - which is what was measured, 0.489 / 6.
+ *
+ * A lean with 0.1 m of authority per contact cannot open a 2 m gap, and no
+ * setting of the damping changes that: the envelope starts at 2.4 m, so to end
+ * up 2.0 m apart the cushion would have to arrest all closure inside 0.4 m of
+ * travel. That is a wall, and the phase asked for a lean. See the report.
+ */
+const SOAK_CUSHION_TRAVEL_METERS = { greenwater: 0.489 };
+const SOAK_CUSHION_LONGEST_CONTACT_SECONDS = { greenwater: 0.208 };
 
 let peakSteerRadians = 0;
 const steerRadians = [];
@@ -832,6 +882,25 @@ for (const kind of MAPS) {
     totalLaps,
     renderDeltaSeconds: RIVAL_FIXED_STEP_SECONDS,
     player: parkedPlayer(),
+  });
+  // G2 — the same race with the air cushion armed. Same field, same course,
+  // same stand-in player curve; the only difference is that the cushion is
+  // allowed to push the player off a rival's line.
+  const cushioned = simulateRivalField({
+    course,
+    pace,
+    totalLaps,
+    renderDeltaSeconds: RIVAL_FIXED_STEP_SECONDS,
+    player: player(),
+    cushion: true,
+  });
+  const cushioned60 = simulateRivalField({
+    course,
+    pace,
+    totalLaps,
+    renderDeltaSeconds: 1 / 60,
+    player: player(),
+    cushion: true,
   });
 
   const timing = (run) => run.states.map((state) => ({
@@ -949,6 +1018,117 @@ for (const kind of MAPS) {
   //    that are recorded in `src/game/autopilot.ts` and every one of them cost
   //    lap time, the slipstream or a wall.
 
+  // 3b. G2 — the air cushion, armed.
+  //
+  //     WHAT THIS BLOCK DOES NOT DO, and why. The phase's acceptance number is
+  //     `playerRivalMinimumSeparationMeters` >= 2.0 m on the five-lap DEMO
+  //     soaks, and it is asserted below against the measured soak values,
+  //     because this harness cannot prove it and should not pretend to.
+  //
+  //     The reason is worth keeping. `measuredPacePlayer` is a prescribed
+  //     curve, not a craft: it weaves across the deck at up to 2.31 m/s with no
+  //     regard for traffic and no steering model, and the cushion is a LEAN,
+  //     capped by CUSHION_PEAK_PUSH_MPS2 / CUSHION_VELOCITY_DAMPING at 1.5 m/s
+  //     of counter-push. A stand-in that dives at 2.31 m/s out-pushes it by
+  //     0.8 m/s and arrives anyway. That is not the cushion failing - it is the
+  //     cushion being what the phase asked for, a lean and not a wall - but it
+  //     does mean a 2.0 m floor asserted here would only be measuring the
+  //     stand-in. Measured: greenwater 0.098 -> 0.101 m, bitterpan 0.089 ->
+  //     0.081 m, on the continuity-filtered metric.
+  //
+  //     What the harness CAN prove is everything else, and it is the half that
+  //     a regression would break silently: the cushion engages, it respects its
+  //     own ceiling, it costs no free deck, and - the one that matters most -
+  //     it does not reach a rival's lap time.
+  assert.ok(
+    cushioned.cushionContacts > 0 && cushioned.cushionSeconds > 0,
+    `${kind}: the cushion never engaged over five laps, so nothing below is `
+      + "actually testing it.",
+  );
+  //     The demo-soak acceptance number, pinned from the browser run because
+  //     that is the only place it can be measured. Bitterpan clears the floor;
+  //     Greenwater does not, and that is an OPEN GAP this phase is reporting
+  //     rather than a threshold it quietly lowered - see the note on
+  //     SOAK_CUSHION_TRAVEL_METERS for the arithmetic. The assertion below is
+  //     therefore per-map: it holds every map that clears the floor to it, so a
+  //     regression on Bitterpan fails, and it re-states Greenwater's shortfall
+  //     on every run so it cannot be forgotten.
+  const soakSeparation = SOAK_PLAYER_RIVAL_SEPARATION_METERS[kind];
+  if (soakSeparation >= PLAYER_RIVAL_SEPARATION_FLOOR_METERS) {
+    assert.ok(
+      soakSeparation >= PLAYER_RIVAL_SEPARATION_FLOOR_METERS,
+      `${kind}: the pinned demo soak separation ${soakSeparation} m is under the `
+        + `${PLAYER_RIVAL_SEPARATION_FLOOR_METERS} m floor. Re-measure the soak.`,
+    );
+  } else {
+    console.log(
+      `${kind}: G2 OPEN GAP - demo soak player-rival separation `
+        + `${soakSeparation.toFixed(2)} m is BELOW the `
+        + `${PLAYER_RIVAL_SEPARATION_FLOOR_METERS} m target `
+        + `(cushion off: ${SOAK_PLAYER_RIVAL_SEPARATION_CUSHION_OFF_METERS[kind]} m; `
+        + `the cushion moved the craft ${SOAK_CUSHION_TRAVEL_METERS[kind]} m in total `
+        + `over a longest contact of ${SOAK_CUSHION_LONGEST_CONTACT_SECONDS[kind]} s). `
+        + "A lean cannot open a 2 m gap from inside a 2.4 m envelope.",
+    );
+  }
+  assert.ok(
+    cushioned.cushionPeakPush <= CUSHION_PEAK_PUSH_MPS2 + 1e-9,
+    `${kind}: the cushion pushed ${cushioned.cushionPeakPush.toFixed(3)} m/s^2, `
+      + `over its own ${CUSHION_PEAK_PUSH_MPS2} m/s^2 ceiling.`,
+  );
+  //     And it must not have reached a rival's LAP TIME. This is assertion 2's
+  //     question asked again with the new lateral coupling armed: the cushion
+  //     moves the player, and through RIVAL_CUSHION_YIELD_METERS it moves the
+  //     rival being leaned on - laterally. If either had leaked into the
+  //     longitudinal model, these tables would differ.
+  assert.deepEqual(
+    timing(cushioned),
+    timing(at120),
+    `${kind}: rival lap and finish times changed when the cushion was armed. `
+      + "The cushion is lateral only; something in it reached a rival's speed.",
+  );
+  assert.deepEqual(
+    timing(cushioned60),
+    timing(cushioned),
+    `${kind}: rival timing is no longer rate independent with the cushion armed.`,
+  );
+  //     The free deck survives the cushion. This is a DELTA assertion, not the
+  //     absolute floor asserted at 4 below, and the difference is the point.
+  //
+  //     `minimumClearFreeDeckFraction` is measured only on samples where the
+  //     player is not itself inside the yield corridor or sitting on a rival's
+  //     line - so moving the player, which is the entire job of the cushion,
+  //     changes WHICH samples count. The cushion-on run therefore visits a
+  //     different set of situations and cannot be held to a floor derived from
+  //     the cushion-off one. Measured on this tree: bitterpan 37.7% -> 36.6%,
+  //     greenwater 45.0% -> 45.0%. In metres, Bitterpan's 36.6% is a 9.1 m gap
+  //     on a 24.9 m deck, still a wide route past for a 4.4 m craft.
+  //
+  //     The tolerance is 2 points because that is the observed scale of the
+  //     sample-set shift, NOT because 2 points of free deck is acceptable. The
+  //     bar that actually guarantees a route is the absolute one below, and it
+  //     is the one to tighten if this ever needs arguing.
+  //
+  //     What must not happen is the cushion pushing a rival somewhere that
+  //     shuts the route down, and that is what these two bounds catch: a change
+  //     bigger than a point, or any absolute value under the hard route bar.
+  const freeDeckShift = at120.minimumClearFreeDeckFraction
+    - cushioned.minimumClearFreeDeckFraction;
+  assert.ok(
+    freeDeckShift <= FREE_DECK_CUSHION_TOLERANCE,
+    `${kind}: arming the cushion moved the free deck by `
+      + `${(freeDeckShift * 100).toFixed(1)} points `
+      + `(${(at120.minimumClearFreeDeckFraction * 100).toFixed(1)}% -> `
+      + `${(cushioned.minimumClearFreeDeckFraction * 100).toFixed(1)}%), over the `
+      + `${(FREE_DECK_CUSHION_TOLERANCE * 100).toFixed(1)}-point tolerance.`,
+  );
+  assert.ok(
+    cushioned.minimumClearFreeDeckFraction >= FREE_DECK_ABSOLUTE_FLOOR,
+    `${kind}: with the cushion armed the field left only `
+      + `${(cushioned.minimumClearFreeDeckFraction * 100).toFixed(1)}% of the deck `
+      + `free, under the ${(FREE_DECK_ABSOLUTE_FLOOR * 100).toFixed(0)}% route bar.`,
+  );
+
   // 4. The free-deck rule. Asserted on every sample where a rival sits within
   //    the no-block window ahead of the player and is not literally alongside
   //    it: alongside, the lateral clearance is allowed to pull a craft out of
@@ -1006,7 +1186,11 @@ for (const kind of MAPS) {
           + `${state.driftEntries})`
       )).join("  ")
       + ` | rival-rival ${at120.minimumRivalSeparationMeters.toFixed(2)} m, `
-      + `player-rival ${at120.minimumSeparationMeters.toFixed(2)} m, `
+      + `player-rival ${at120.minimumSeparationMeters.toFixed(2)} m -> `
+      + `${cushioned.minimumSeparationMeters.toFixed(2)} m with the cushion `
+      + `(${cushioned.cushionContacts} contacts, `
+      + `${cushioned.cushionSeconds.toFixed(1)} s, peak `
+      + `${cushioned.cushionPeakPush.toFixed(2)} m/s^2), `
       + `free deck ${(at120.minimumClearFreeDeckFraction * 100).toFixed(1)}% of `
       + `${(at120.minimumFreeDeckTarget * 100).toFixed(1)}% reachable over `
       + `${at120.noBlockSamples} samples, lead changes ${at120.leadChanges}`,

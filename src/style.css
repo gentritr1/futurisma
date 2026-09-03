@@ -117,6 +117,48 @@ body[data-boost="true"] .image-treatment::before {
   opacity: 1;
 }
 
+/*
+ * G2 air cushion. A soft vertical band on the contact side, sitting BELOW the
+ * impact flash in the stack and in a completely different colour: the impact is
+ * the warning orange at 42% and covers 42% of the screen, this is the course
+ * cyan at 16% down one edge. A player leaning on a rival must never mistake it
+ * for having hit something.
+ */
+.cushion-glow {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 140ms var(--ease-out);
+  background: linear-gradient(
+    var(--cushion-direction, to left),
+    oklch(0.86 0.13 210 / 0.16),
+    transparent 18%
+  );
+}
+
+.cushion-glow[data-side="left"] {
+  --cushion-direction: to right;
+}
+
+.cushion-glow[data-active="true"] {
+  opacity: 1;
+}
+
+/*
+ * G2 clean-gate chain. Deliberately the smallest thing on the progress block:
+ * it is a reward the player earns by driving well anyway, so it confirms rather
+ * than instructs. It shares the acid of a cleared gate, which is the same
+ * "you got that right" register.
+ */
+.clean-chain {
+  color: var(--acid);
+  font-size: 0.56rem;
+  letter-spacing: 0.14em;
+  opacity: 0.85;
+}
+
 .race-header {
   position: fixed;
   z-index: 10;
@@ -1496,6 +1538,7 @@ body[data-options="true"] .hud {
   }
 
   .impact-flash,
+  .cushion-glow,
   .image-treatment::before {
     transition: none;
   }

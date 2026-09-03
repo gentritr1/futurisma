@@ -23,7 +23,7 @@ import {
   SECTOR_KEY_DIRECTIONS,
   lerpKeyDirection,
 } from "./lighting-motion.js";
-import { isCircularHazardContact } from "./race-rules";
+import { crossedForwardProgress, isCircularHazardContact } from "./race-rules";
 import { APRON_EDGE_CROSS_SECTION, type EdgeType } from "./apron-profile";
 import DRIVABLE_LIMIT_TABLE from "./data/DRIVABLE_LIMITS.json";
 import { DrivableLimits } from "./drivable-limits";
@@ -357,6 +357,21 @@ export interface RaceCourse {
   ): ApronResolution;
   surfaceGripAt(progress: number, lateral: number, halfWidth: number): number;
   cableTripSideAt(progress: number, lateral: number): -1 | 0 | 1;
+  /**
+   * G2 — the lateral gap to the nearest cable coil whose station the craft
+   * crossed on this step, or NaN when none was crossed.
+   *
+   * A near miss is a thing that happens at an INSTANT: the coil goes by, or it
+   * does not. Sampling "am I near a coil" every frame would pay the reward for
+   * driving slowly alongside one, so the crossing is what the race loop asks
+   * about. Maps with no coils return NaN, which is the same answer as "none
+   * crossed" and needs no special case at the call site.
+   */
+  cablePassLateralMeters(
+    previousProgress: number,
+    progress: number,
+    lateral: number,
+  ): number;
   isOnBoostPad(progress: number, lateral: number, halfWidth: number): boolean;
   sectorLabelAt(progress: number): string;
   musicAt(progress: number): MusicProfile;
@@ -1471,6 +1486,25 @@ export class GreenwaterCourse implements RaceCourse {
       }
     }
     return 0;
+  }
+
+  cablePassLateralMeters(
+    previousProgress: number,
+    progress: number,
+    lateral: number,
+  ): number {
+    let nearest = Number.NaN;
+    for (const hazard of this.cableHazards) {
+      const hazardDistance = hazard.distance ?? 0;
+      if (!crossedForwardProgress(
+        previousProgress,
+        progress,
+        hazardDistance / this.length,
+      )) continue;
+      const gap = Math.abs(lateral - (hazard.lateralOffset ?? 0));
+      if (Number.isNaN(nearest) || gap < nearest) nearest = gap;
+    }
+    return nearest;
   }
 
   isOnBoostPad(progress: number, lateral: number, halfWidth: number): boolean {

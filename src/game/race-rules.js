@@ -202,6 +202,9 @@ export function resolveGateMissRecoveryDelay(speedMetersPerSecond) {
     : GATE_MISS_RECOVERY_GRACE_SECONDS;
 }
 
+export const HAZARD_CONTACT_DISTANCE_RADIUS_METERS = 3.2;
+export const HAZARD_CONTACT_LATERAL_RADIUS_METERS = 3.1;
+
 /**
  * @param {number} distance
  * @param {number} lateral
@@ -217,8 +220,8 @@ export function isCircularHazardContact(
   hazardDistance,
   hazardLateral,
   courseLength,
-  distanceRadius = 3.2,
-  lateralRadius = 3.1,
+  distanceRadius = HAZARD_CONTACT_DISTANCE_RADIUS_METERS,
+  lateralRadius = HAZARD_CONTACT_LATERAL_RADIUS_METERS,
 ) {
   const distanceDelta = Math.abs(
     ((distance - hazardDistance + courseLength / 2) % courseLength
@@ -227,4 +230,145 @@ export function isCircularHazardContact(
   );
   return distanceDelta <= distanceRadius
     && Math.abs(lateral - hazardLateral) <= lateralRadius;
+}
+
+/* ---------------------------------------------------------------------------
+ * G2 near miss — the reward for racing close.
+ *
+ * G1 gave the player a slipstream but nothing at all for the risk of using it.
+ * The near miss is the other half: a pass completed close enough to be a real
+ * decision, and fast enough to be a real pass, pays reserve.
+ *
+ * The band is deliberately bounded at BOTH ends. Below
+ * NEAR_MISS_LATERAL_MINIMUM_METERS the craft are inside the G2 air cushion and
+ * the player is leaning on the rival to get by, which is contact — it reads as
+ * one on screen and it pays nothing. Above NEAR_MISS_LATERAL_MAXIMUM_METERS the
+ * pass was made in clear air and needs no reward. The speed gate keeps a crawl
+ * past a parked craft from farming it.
+ * ------------------------------------------------------------------------- */
+export const NEAR_MISS_LATERAL_MINIMUM_METERS = 1.6;
+export const NEAR_MISS_LATERAL_MAXIMUM_METERS = 3.2;
+/** Share of BOOST_MAX_SPEED the pass has to be made at. */
+export const NEAR_MISS_SPEED_RATIO = 0.6;
+export const NEAR_MISS_REWARD = 0.12;
+/**
+ * The cable-coil variant, and the one place this phase had to interpret its
+ * brief rather than implement it.
+ *
+ * The brief asks for "passing a cable coil within 2.5 m without tripping". As
+ * written that is unreachable: `isCircularHazardContact` trips the coil at any
+ * lateral inside HAZARD_CONTACT_LATERAL_RADIUS_METERS (3.1 m), so every pass
+ * within 2.5 m of the coil's centre line is a strike, not a near miss. The
+ * window is therefore measured OUTWARD FROM THE TRIP BOUNDARY: 2.5 m of clear
+ * air beyond the radius that would otherwise have cost the player 42% of its
+ * speed. In centre-line terms that is 3.1 m to 5.6 m.
+ */
+export const HAZARD_NEAR_MISS_MARGIN_METERS = 2.5;
+export const HAZARD_NEAR_MISS_REWARD = 0.06;
+
+/**
+ * Scores one completed pass.
+ *
+ * Pure and total: every input lands in exactly one of the three outcomes, so
+ * the caller never has to guess what a gap of NaN or a pass at walking pace
+ * means.
+ *
+ * @param {number} lateralGapMeters signed gap at the crossing; only |gap| is read
+ * @param {number} speedRatio player speed over BOOST_MAX_SPEED
+ * @param {"rival" | "hazard"} [kind] a rival pass, or a cable coil left standing
+ * @returns {{ reward: number, outcome: "near-miss" | "contact" | "none" }}
+ *   `contact` is reported rather than silently dropped, so the race loop can
+ *   tell "too close to pay" apart from "nowhere near anything".
+ */
+export function resolveNearMiss(lateralGapMeters, speedRatio, kind = "rival") {
+  /** @type {{ reward: number, outcome: "near-miss" | "contact" | "none" }} */
+  const none = { reward: 0, outcome: "none" };
+  /** @type {{ reward: number, outcome: "near-miss" | "contact" | "none" }} */
+  const contact = { reward: 0, outcome: "contact" };
+  if (!Number.isFinite(lateralGapMeters) || !Number.isFinite(speedRatio)) return none;
+  const gap = Math.abs(lateralGapMeters);
+  if (kind === "hazard") {
+    // A coil that was actually struck is not this function's business; the
+    // caller only asks about coils it got past. Anything beyond the margin is a
+    // pass in clear air and pays nothing.
+    if (gap < HAZARD_CONTACT_LATERAL_RADIUS_METERS) return contact;
+    if (
+      gap > HAZARD_CONTACT_LATERAL_RADIUS_METERS + HAZARD_NEAR_MISS_MARGIN_METERS
+      || speedRatio < NEAR_MISS_SPEED_RATIO
+    ) return none;
+    return { reward: HAZARD_NEAR_MISS_REWARD, outcome: "near-miss" };
+  }
+  // Inside the cushion. This is the case the phase exists to distinguish: the
+  // player did get past, but by leaning on the other craft, and a lean does not
+  // pay — whatever speed it was made at.
+  if (gap < NEAR_MISS_LATERAL_MINIMUM_METERS) return contact;
+  if (gap > NEAR_MISS_LATERAL_MAXIMUM_METERS || speedRatio < NEAR_MISS_SPEED_RATIO) {
+    return none;
+  }
+  return { reward: NEAR_MISS_REWARD, outcome: "near-miss" };
+}
+
+/* ---------------------------------------------------------------------------
+ * G2 clean-gate chain — the reward for racing tidy.
+ *
+ * The near miss pays for one brave move. The chain pays for a whole lap of
+ * discipline, and it pays in the same currency so the two trade against each
+ * other: a driver can take the wide line into a gate to set up a pass, and lose
+ * the chain doing it.
+ *
+ * A chain survives only a clean gate. An off-centre crossing resets it
+ * SILENTLY — the gate was legal, nothing went wrong, and a warning for driving
+ * a normal racing line would be noise — while a MISS resets it on top of the
+ * missed-gate banner that already fires.
+ * ------------------------------------------------------------------------- */
+export const CLEAN_GATE_LATERAL_FRACTION = 0.35;
+/**
+ * Passive-regen multiplier by chain length: no bonus for the first gate, then
+ * three steps to the cap. Indexed directly by chain, clamped at the end.
+ *
+ * Chain 1 pays nothing on purpose. One tidy gate is not a chain, and paying for
+ * it would make the counter flicker on and off through every normal lap.
+ */
+export const CLEAN_GATE_REGEN_MULTIPLIERS = Object.freeze([1, 1, 1.15, 1.3, 1.5]);
+
+/** @param {number} chain */
+export function cleanGateRegenMultiplier(chain) {
+  const length = Number.isFinite(chain) ? Math.max(0, Math.floor(chain)) : 0;
+  return CLEAN_GATE_REGEN_MULTIPLIERS[
+    Math.min(length, CLEAN_GATE_REGEN_MULTIPLIERS.length - 1)
+  ];
+}
+
+/**
+ * Advances the clean-gate chain across one gate crossing.
+ *
+ * @param {number} previousChain
+ * @param {{
+ *   lateralMeters: number;
+ *   gateHalfWidthMeters: number;
+ *   missed?: boolean;
+ * }} crossing
+ * @returns {{ chain: number, clean: boolean, multiplier: number }}
+ */
+export function resolveCleanGateChain(previousChain, crossing) {
+  const chain = Number.isFinite(previousChain)
+    ? Math.max(0, Math.floor(previousChain))
+    : 0;
+  const lateral = Number.isFinite(crossing?.lateralMeters)
+    ? Math.abs(crossing.lateralMeters)
+    : Infinity;
+  const halfWidth = Number.isFinite(crossing?.gateHalfWidthMeters)
+    ? Math.max(0, crossing.gateHalfWidthMeters)
+    : 0;
+  // A miss can never leave the chain standing, whatever the lateral was: the
+  // craft is outside the gate, so "0.35 of the gate half-width" is not even a
+  // question that applies to it. `validate-race-rules.mjs` probes this
+  // directly, because getting it wrong is invisible — the chain would simply
+  // read one higher than it earned.
+  if (crossing?.missed) {
+    return { chain: 0, clean: false, multiplier: cleanGateRegenMultiplier(0) };
+  }
+  const clean = lateral <= CLEAN_GATE_LATERAL_FRACTION * halfWidth;
+  const next = clean ? chain + 1 : 0;
+  return { chain: next, clean, multiplier: cleanGateRegenMultiplier(next) };
 }

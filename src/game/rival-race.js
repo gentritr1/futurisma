@@ -167,6 +167,25 @@ export const RIVAL_LANE_CLEARANCE_METERS = 3.6;
  */
 export const RIVAL_NO_BLOCK_YIELD_OVERRIDE_METERS = 7;
 
+/**
+ * G2 — extra lateral room a rival gives up while the player is leaning on it
+ * through the air cushion.
+ *
+ * The cushion moves the PLAYER; this is the rival's half of the same moment,
+ * and it is deliberately small. A rival that bailed out of a contact entirely
+ * would be a rival that can be shoved off any line the player wants, which is
+ * the opposite of the pressure principle 5 asks for. 0.6 m is about a seventh
+ * of a hull: enough that a lean actually opens a gap over a second or two,
+ * nowhere near enough to make leaning a substitute for a pass.
+ *
+ * It is LATERAL ONLY, and it reaches the rival exactly the way the existing
+ * player-avoidance does — by widening the span the lane solver refuses to aim
+ * at. Nothing here can touch a rival's speed, which is what keeps
+ * `validate-rivals.mjs`'s longitudinal-independence proof true with the cushion
+ * armed.
+ */
+export const RIVAL_CUSHION_YIELD_METERS = 0.6;
+
 /** A rival defends the inside line while the player sits in this gap band. */
 export const RIVAL_DEFENCE_MINIMUM_GAP_METERS = 8;
 export const RIVAL_DEFENCE_MAXIMUM_GAP_METERS = 25;
@@ -954,6 +973,8 @@ export function nearestAllowedLane(desired, low, high, forbidden) {
  *   sideSign: number;
  *   halfWidthMeters: number;
  *   laneHalfWidthMeters: number;
+ *   cushionYieldMeters?: number;
+ *   cushionYieldSign?: number;
  * }} input
  */
 export function rivalContestLaneMeters(paceLaneMeters, input) {
@@ -962,6 +983,10 @@ export function rivalContestLaneMeters(paceLaneMeters, input) {
   const laneHalfWidth = Number.isFinite(input.laneHalfWidthMeters)
     ? Math.max(0, input.laneHalfWidthMeters)
     : 8;
+  const cushionYieldRaw = input.cushionYieldMeters ?? 0;
+  const cushionSignRaw = input.cushionYieldSign ?? 0;
+  const cushionYield = Number.isFinite(cushionYieldRaw) ? Math.max(0, cushionYieldRaw) : 0;
+  const cushionSign = Number.isFinite(cushionSignRaw) ? Math.sign(cushionSignRaw) : 0;
   let desired = lane;
   if (
     gap >= RIVAL_DEFENCE_MINIMUM_GAP_METERS
@@ -971,6 +996,18 @@ export function rivalContestLaneMeters(paceLaneMeters, input) {
   ) {
     desired += (input.insideSign > 0 ? 1 : -1) * RIVAL_DEFENCE_SHIFT_METERS;
   }
+  // G2 — the rival's half of an air-cushion contact: aim RIVAL_CUSHION_YIELD_
+  // METERS further from the player, on the side this craft is already on.
+  //
+  // It moves the DESIRED lane, not the forbidden span around the player, and
+  // the difference is not cosmetic. Widening the span was tried first and cost
+  // Bitterpan 0.9 points of free deck (37.7% -> 36.8%, under the 37% floor):
+  // a wider forbidden zone makes the corridor solve infeasible more often, and
+  // the relaxation that follows drops a rival OUT of the yield corridor, which
+  // is exactly what the free-deck rule measures. A shifted target can only ever
+  // be clamped by constraints that were already there, so the yield is strictly
+  // gentler and the corridor is left alone.
+  desired += cushionSign * cushionYield;
   desired = clamp(desired, -laneHalfWidth, laneHalfWidth);
 
   /** @type {number[][]} */

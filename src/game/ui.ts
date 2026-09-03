@@ -33,6 +33,12 @@ export interface HudFrame {
   driftCharge: number;
   /** G1 - tow strength from the craft ahead, 0..1. */
   slipstream: number;
+  /** G2 - which edge the air cushion is pushing from, null when clear. */
+  cushionSide: "LEFT" | "RIGHT" | null;
+  /** G2 - consecutive gates taken clean. */
+  cleanGateChain: number;
+  /** G2 - the passive-regen multiplier that chain is currently paying. */
+  cleanGateMultiplier: number;
   braking: boolean;
   drifting: boolean;
   skidsDown: boolean;
@@ -146,6 +152,11 @@ export class GameUi {
   private readonly lapEventTime = requiredElement<HTMLElement>("lap-event-time");
   private readonly countdown = requiredElement<HTMLElement>("countdown");
   private readonly impactFlash = requiredElement<HTMLElement>("impact-flash");
+  /** G2 - the air cushion's edge glow and the clean-gate counter. */
+  private readonly cushionGlow = requiredElement<HTMLElement>("cushion-glow");
+  private readonly cleanChain = requiredElement<HTMLElement>("clean-chain");
+  private lastCushionState = "";
+  private lastCleanChainLabel = "";
   private readonly errorPanel = requiredElement<HTMLElement>("error-panel");
   private readonly errorMessage = requiredElement<HTMLElement>("error-message");
   private lastLapLabel = "";
@@ -293,6 +304,9 @@ export class GameUi {
     this.turnCue.setAttribute("aria-hidden", "true");
     this.hideLapEvent();
     this.impactFlash.dataset.active = "false";
+    // G2 - a cushion contact or a chain in flight must not survive a phase
+    // change; both are race state, and the result screen is not a race.
+    this.clearRaceEventState();
     this.hazardUntil = 0;
     document.body.dataset.boost = "false";
     this.setSystemStatus("LAUNCH SEQUENCE");
@@ -331,6 +345,9 @@ export class GameUi {
     this.turnCue.setAttribute("aria-hidden", "true");
     this.hideLapEvent();
     this.impactFlash.dataset.active = "false";
+    // G2 - a cushion contact or a chain in flight must not survive a phase
+    // change; both are race state, and the result screen is not a race.
+    this.clearRaceEventState();
     this.setSystemStatus("CLASSIFICATION LOCKED");
     document.body.dataset.phase = "result";
     this.restartButton.focus({ preventScroll: true });
@@ -437,6 +454,25 @@ export class GameUi {
     this.lapEvent.dataset.active = "true";
     this.lapEvent.setAttribute("aria-hidden", "false");
     this.lapEventUntil = performance.now() + 1_500;
+  }
+
+  /**
+   * G2 — a one-off race event in the lap-event slot.
+   *
+   * Reuses the lap banner rather than adding a third centre-screen element:
+   * it is the established "something just happened, here is what" idiom, it is
+   * already cyan by default (`data-final` is what turns it acid), and two
+   * overlapping panels in the middle of the screen would be worse than one that
+   * is briefly interrupted. A near miss lasts 900 ms against the lap banner's
+   * 1500, so a pass on the line still hands the screen back to the lap.
+   */
+  flashRaceEvent(label: string, detail: string, durationMs = 900): void {
+    this.lapEventLabel.textContent = label;
+    this.lapEventTime.textContent = detail;
+    this.lapEvent.dataset.final = "false";
+    this.lapEvent.dataset.active = "true";
+    this.lapEvent.setAttribute("aria-hidden", "false");
+    this.lapEventUntil = performance.now() + durationMs;
   }
 
   flashHazard(label: string, durationMs = 900): void {
@@ -551,6 +587,33 @@ export class GameUi {
         ? "SLIPSTREAM · LOCK"
         : "SLIPSTREAM";
       this.lastSlipstreamState = slipstreamState;
+    }
+    // G2 — the cushion glow and the clean-gate counter. Both touch the DOM only
+    // on a state change, the same discipline the slipstream chip and the boost
+    // meter above are held to; the cushion in particular can be armed for
+    // several seconds at a time and must not write a style every frame.
+    const cushionState = frame.cushionSide ?? "none";
+    if (cushionState !== this.lastCushionState) {
+      this.cushionGlow.dataset.active = frame.cushionSide ? "true" : "false";
+      if (frame.cushionSide) {
+        this.cushionGlow.dataset.side = frame.cushionSide.toLowerCase();
+      }
+      this.lastCushionState = cushionState;
+    }
+    // Hidden below the first chain that actually pays. A counter reading "x1"
+    // through every clean lap would be a permanent HUD element that says
+    // nothing, which is exactly the busy chrome the anti-references rule out.
+    const chainLabel = frame.cleanGateMultiplier > 1
+      ? `CLEAN ×${frame.cleanGateChain}`
+      : "";
+    if (chainLabel !== this.lastCleanChainLabel) {
+      this.cleanChain.textContent = chainLabel;
+      this.cleanChain.hidden = chainLabel.length === 0;
+      this.cleanChain.setAttribute(
+        "aria-hidden",
+        chainLabel.length === 0 ? "true" : "false",
+      );
+      this.lastCleanChainLabel = chainLabel;
     }
     const boostPresentation = resolveBoostPresentation(frame.boostActive, frame.boostLocked);
     const boostState = boostPresentation.state;
@@ -690,6 +753,22 @@ export class GameUi {
       this.driveState.dataset.state = driveState;
       this.lastDriveState = driveState;
     }
+  }
+
+  /**
+   * G2 — puts the cushion glow and the clean-gate counter back to nothing.
+   *
+   * The cached `last*` strings are cleared with them, or the next frame would
+   * see "no change" against a DOM that had already been reset behind it and
+   * leave the glow off through a real contact.
+   */
+  private clearRaceEventState(): void {
+    this.cushionGlow.dataset.active = "false";
+    this.lastCushionState = "";
+    this.cleanChain.textContent = "";
+    this.cleanChain.hidden = true;
+    this.cleanChain.setAttribute("aria-hidden", "true");
+    this.lastCleanChainLabel = "";
   }
 
   private hideLapEvent(): void {

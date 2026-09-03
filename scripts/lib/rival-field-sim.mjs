@@ -10,6 +10,11 @@
  * one implementation rather than two drifting copies.
  */
 import {
+  calculateCushion,
+  integrateCushionVelocity,
+} from "../../src/game/physics.js";
+import {
+  RIVAL_CUSHION_YIELD_METERS,
   RIVAL_DEFENCE_LOOKAHEAD_METERS,
   RIVAL_FIXED_STEP_SECONDS,
   RIVAL_EVASIVE_LATERAL_GAIN,
@@ -40,6 +45,15 @@ import {
 const PLAYER_ID = "player";
 
 /**
+ * Largest lateral move a sub-step is allowed to make before its separation
+ * sample is discarded. See `minimumContinuousSeparationMeters`.
+ */
+const CONTINUOUS_LATERAL_STEP_METERS = 0.2;
+
+/** Mirrors `CUSHION_YIELD_HOLD_SECONDS` in `src/game/rivals.ts`. */
+const CUSHION_YIELD_HOLD_SECONDS = 0.6;
+
+/**
  * @param {{
  *   course: ReturnType<import("./rival-course-model.mjs").loadCourseModel>;
  *   pace: object | null;
@@ -61,6 +75,7 @@ export function simulateRivalField(options) {
     player = null,
     contest = true,
     onlyProfileIndex = null,
+    cushion = false,
   } = options;
 
   const profiles = onlyProfileIndex === null
@@ -109,17 +124,128 @@ export function simulateRivalField(options) {
     course.length,
   );
   const playerScratch = { raceDistanceMeters: 0, lateralMeters: 0 };
+  /**
+   * G2 — the air cushion, integrated onto the stand-in player.
+   *
+   * `measuredPacePlayer` is a function of time with no state, so the cushion
+   * cannot live inside it: what is kept here is the OFFSET the cushion has
+   * pushed the craft to, added on top of whatever lateral the curve asks for.
+   *
+   * That makes this a strictly harder test than the demo soak. The stand-in
+   * player weaves across the deck with no regard for traffic and steers
+   * straight into craft that are already sliding away from it; if the cushion
+   * still holds a separation floor against a driver actively trying to occupy
+   * the same metre of deck, it holds against a human.
+   */
+  let cushionOffsetMeters = 0;
+  let cushionVelocity = 0;
+  let cushionRivalIndex = -1;
+  let cushionYieldSign = 0;
+  let cushionSeconds = 0;
+  let cushionPeakPush = 0;
+  let cushionContacts = 0;
+  let cushionActive = false;
+  let cushionYieldHold = 0;
+  const cushionScratch = { lateralPush: 0, speedScrub: 0 };
   const readPlayer = (seconds) => {
     if (!player) return null;
     const raw = player(seconds);
     playerScratch.raceDistanceMeters = raw.raceDistanceMeters + playerDistanceOffset;
-    playerScratch.lateralMeters = raw.lateralMeters;
+    playerScratch.lateralMeters = raw.lateralMeters + cushionOffsetMeters;
     return playerScratch;
+  };
+  let previousPlayerLateral = 0;
+  let lastSampledLateral = 0;
+
+  /**
+   * One cushion step, run after the field has moved and before the separation
+   * is measured — the same order `game.ts` uses (cushion, then apron clamp,
+   * then `measurePlayerSeparation`).
+   */
+  const stepCushion = (field, playerState) => {
+    if (!cushion || !playerState) return;
+    const step = RIVAL_FIXED_STEP_SECONDS;
+    const playerLateralSpeed = (playerState.lateralMeters - previousPlayerLateral) / step;
+    previousPlayerLateral = playerState.lateralMeters;
+    let strongest = 0;
+    let push = 0;
+    let index = -1;
+    let sign = 0;
+    for (let slot = 0; slot < field.length; slot += 1) {
+      const state = field[slot];
+      if (state.finished) continue;
+      const lateralGap = state.lateralMeters - playerState.lateralMeters;
+      // Positive when the gap is shrinking. The harness does not keep the
+      // rivals' previous laterals, so only the PLAYER's rate is counted here -
+      // which understates the closing speed when a rival is moving toward the
+      // player, and therefore understates the cushion. That is the safe
+      // direction for an assertion floor: the game's own `resolveCushion`
+      // counts both and is never softer than this.
+      const closing = Math.sign(lateralGap || 1) * playerLateralSpeed;
+      const result = calculateCushion(
+        lateralGap,
+        state.raceDistanceMeters - playerState.raceDistanceMeters,
+        closing,
+        cushionScratch,
+      );
+      if (Math.abs(result.lateralPush) > strongest) {
+        strongest = Math.abs(result.lateralPush);
+        push = result.lateralPush;
+        index = slot;
+        sign = lateralGap >= 0 ? 1 : -1;
+      }
+    }
+    // Mirrors `RivalFleet.resolveCushion`: the yield outlives the contact by
+    // CUSHION_YIELD_HOLD_SECONDS so the lane solver has time to act on it,
+    // while the push on the player stops the instant the contact does.
+    if (strongest > 0) {
+      cushionRivalIndex = index;
+      cushionYieldSign = sign;
+      cushionYieldHold = CUSHION_YIELD_HOLD_SECONDS;
+    } else if (cushionYieldHold > 0) {
+      cushionYieldHold -= step;
+      if (cushionYieldHold <= 0) {
+        cushionRivalIndex = -1;
+        cushionYieldSign = 0;
+      }
+    }
+    cushionVelocity = integrateCushionVelocity(cushionVelocity, push, step);
+    // The harness has no apron model, so the deck edge is stood in for by a
+    // hard cap on the OFFSET: the cushion may lean the craft up to 4 m off the
+    // line it was going to drive, and no further. In the game the same job is
+    // done by the apron clamp, which runs immediately after the cushion.
+    cushionOffsetMeters = Math.min(
+      4,
+      Math.max(-4, cushionOffsetMeters + cushionVelocity * step),
+    );
+    const active = strongest > 0;
+    if (active) {
+      cushionSeconds += step;
+      cushionPeakPush = Math.max(cushionPeakPush, strongest);
+      if (!cushionActive) cushionContacts += 1;
+    }
+    cushionActive = active;
   };
 
   let elapsedSeconds = 0;
   let remainderSeconds = 0;
   let minimumSeparationMeters = Infinity;
+  /**
+   * G2 — the same minimum, but only over sub-steps where the stand-in player's
+   * lateral actually MOVED like a craft.
+   *
+   * `measuredPacePlayer` holds its grid lane for the first 200 m and then
+   * switches to a sine, and the switch is a step change: on Greenwater it jumps
+   * 5.33 m in one 1/120 s sub-step, which is 640 m/s of lateral speed. No
+   * cushion can act on a teleport, and the samples around one are not
+   * measurements of anything - both the cushion-on and cushion-off runs read
+   * the same 0.10 m there, from the same single frame.
+   *
+   * This metric drops any sub-step where the player moved more than
+   * CONTINUOUS_LATERAL_STEP_METERS, which at 1/120 s is 24 m/s - far above
+   * anything the handling model can produce and far below the discontinuity.
+   */
+  let minimumContinuousSeparationMeters = Infinity;
   let minimumRivalSeparationMeters = Infinity;
   let worstRivalPair = null;
   let worstPlayerContact = null;
@@ -188,6 +314,10 @@ export function simulateRivalField(options) {
       sideSign: noBlockSide,
       halfWidthMeters: sample.halfWidth,
       laneHalfWidthMeters,
+      // G2 — mirrors `RivalFleet.resolveDrive`: only the craft being leaned on
+      // gives up the extra road, and only on the side it is actually on.
+      cushionYieldMeters: index === cushionRivalIndex ? RIVAL_CUSHION_YIELD_METERS : 0,
+      cushionYieldSign: index === cushionRivalIndex ? cushionYieldSign : 0,
     });
     const drive = driveScratch[index];
     return Object.assign(drive, {
@@ -227,6 +357,7 @@ export function simulateRivalField(options) {
         Math.abs(field[index].lateralMeters - gridSlots[index]),
       );
     }
+    stepCushion(field, readPlayer(elapsedSeconds));
     const playerState = readPlayer(elapsedSeconds);
     freeDeckScratch.length = 0;
     // A free-deck sample is CONCLUSIVE only when the player is on the free side
@@ -244,6 +375,11 @@ export function simulateRivalField(options) {
           state.raceDistanceMeters - playerState.raceDistanceMeters,
           state.lateralMeters - playerState.lateralMeters,
         );
+        if (
+          contact < minimumContinuousSeparationMeters
+          && Math.abs(playerState.lateralMeters - lastSampledLateral)
+            <= CONTINUOUS_LATERAL_STEP_METERS
+        ) minimumContinuousSeparationMeters = contact;
         if (contact < minimumSeparationMeters) {
           minimumSeparationMeters = contact;
           worstPlayerContact = {
@@ -326,6 +462,7 @@ export function simulateRivalField(options) {
         );
       }
     }
+    if (playerState) lastSampledLateral = playerState.lateralMeters;
     laneScratch.length = 0;
     let leader = 0;
     for (let index = 1; index < field.length; index += 1) {
@@ -353,6 +490,7 @@ export function simulateRivalField(options) {
     gridSlots,
     maximumGridDriftMeters,
     minimumSeparationMeters,
+    minimumContinuousSeparationMeters,
     minimumRivalSeparationMeters,
     worstRivalPair,
     worstPlayerContact,
@@ -364,6 +502,10 @@ export function simulateRivalField(options) {
     alongsideSamples,
     noBlockSamples,
     leadChanges,
+    cushionSeconds,
+    cushionPeakPush,
+    cushionContacts,
+    cushionOffsetMeters,
     peakSteerRadians,
     elapsedSeconds,
   };

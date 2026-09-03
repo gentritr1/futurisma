@@ -10,7 +10,7 @@ import { resolveAudioZone } from "./audio-space.js";
 import type { AudioZone } from "./audio-space.js";
 import { resolveGatePostLateral } from "./furniture-placement.js";
 import { lerpKeyDirection } from "./lighting-motion.js";
-import { isCircularHazardContact } from "./race-rules";
+import { crossedForwardProgress, isCircularHazardContact } from "./race-rules";
 import type {
   CourseLightingProfile,
   CourseProjection,
@@ -1099,6 +1099,25 @@ export class BitterpanCourse implements RaceCourse {
       }
     }
     return 0;
+  }
+
+  /** G2 — see the note on `RaceCourse.cablePassLateralMeters`. */
+  cablePassLateralMeters(
+    previousProgress: number,
+    progress: number,
+    lateral: number,
+  ): number {
+    let nearest = Number.NaN;
+    for (const hazard of CABLE_HAZARDS) {
+      if (!crossedForwardProgress(
+        previousProgress,
+        progress,
+        hazard.distance / this.length,
+      )) continue;
+      const gap = Math.abs(lateral - hazard.lateralOffset);
+      if (Number.isNaN(nearest) || gap < nearest) nearest = gap;
+    }
+    return nearest;
   }
 
   boostPadLaneAt(

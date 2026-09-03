@@ -76,17 +76,28 @@ assert.ok(
 //     world-space separation the same frame drew, and a record of where the
 //     field's closest approach actually happened.
 //
+//   G2 racing contact  +2.7 KiB - src/game/racing-contact.ts (the air cushion's
+//     damped lateral integrator, the near-miss economy and the clean-gate
+//     chain, plus the contact feedback all three share), `calculateCushion` and
+//     `integrateCushionVelocity` in physics.js, `resolveNearMiss` /
+//     `resolveCleanGateChain` in race-rules.js, the fleet's cushion resolution
+//     and pass detection, one HUD glow, one counter and one audio cue.
+//     Measured 232.8 -> 235.5 KiB gzip on the merged tree. There is no data
+//     table in it: the whole cost is code, and the largest single piece is the
+//     cushion's own envelope plus the fleet-side selection loop that feeds it.
+//
 // Measured on the merged tree with `npx vite build && node
-// scripts/validate-build.mjs`: 232.8 KiB gzip over 10 initial chunks, against
-// the 224.2 KiB all four phases started from. The individual figures above were
-// each taken on their own branch and do not sum exactly to it - Rollup splits
-// differently once four phases share a tree, and this build has 10 initial
-// chunks where the pre-phase one had 8. The merged number is the real one and
-// the one this ceiling is set from. The validator prints it live every run.
-// Raise only with a fresh measurement and a note saying what the bytes bought.
+// scripts/validate-build.mjs`: 235.5 KiB gzip over 10 initial chunks, against
+// the 224.2 KiB all four P20 phases started from. The individual figures above
+// were each taken on their own branch and do not sum exactly to it - Rollup
+// splits differently once several phases share a tree, and this build has 10
+// initial chunks where the pre-phase one had 8. The merged number is the real
+// one and the one this ceiling is set from. The validator prints it live every
+// run. Raise only with a fresh measurement and a note saying what the bytes
+// bought.
 assert.ok(
-  javascriptGzip <= 234 * 1024,
-  `JavaScript bundle exceeds 234 KiB gzip (${(javascriptGzip / 1024).toFixed(1)} KiB).`,
+  javascriptGzip <= 237 * 1024,
+  `JavaScript bundle exceeds 237 KiB gzip (${(javascriptGzip / 1024).toFixed(1)} KiB).`,
 );
 // Re-baselined 2026-08-28 from a measured 4.35 KiB gzip (the 4 KiB ceiling
 // predated the HUD turn-cue and hazard styling) plus headroom for the planned

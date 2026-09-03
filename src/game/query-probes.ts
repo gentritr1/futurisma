@@ -117,6 +117,22 @@ export function searchFlag(name: string): boolean {
   return SEARCH.has(name);
 }
 
+/**
+ * `?laps=`, clamped to what the course itself allows.
+ *
+ * A query-string decision, so it lives with the other query-string decisions
+ * rather than in the race loop - see the note on `resolveProbeSpawn`.
+ */
+export function resolveLapCount(course: {
+  defaultLapCount: number;
+  minimumLapCount: number;
+  maximumLapCount: number;
+}): number {
+  const requested = Number.parseInt(SEARCH.get("laps") ?? "", 10);
+  if (!Number.isFinite(requested)) return course.defaultLapCount;
+  return Math.min(course.maximumLapCount, Math.max(course.minimumLapCount, requested));
+}
+
 export function readProbeNumber(parameter: string, fallback: number): number {
   const value = Number.parseFloat(SEARCH.get(parameter) ?? "");
   return Number.isFinite(value) ? value : fallback;
