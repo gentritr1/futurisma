@@ -223,3 +223,26 @@ export function cameraSurfaceClearance(offsetAlongUp, surfaceHeight) {
   if (!Number.isFinite(offsetAlongUp) || !Number.isFinite(surfaceHeight)) return 0;
   return offsetAlongUp - surfaceHeight;
 }
+
+/**
+ * H1.4 — how far a value has overshot a window, signed, and zero inside it.
+ *
+ * The chase camera's frame guard is written in angles: the hull's pitch and yaw
+ * from the view axis have to stay inside the window the acceptance is written
+ * in, and the correction is exactly the overshoot. Zero inside the window and
+ * continuous at both edges, so the guard eases in rather than snapping the
+ * moment the hull crosses a line — which is the difference between a camera
+ * that follows and one that twitches.
+ *
+ * @param {number} value
+ * @param {number} minimum
+ * @param {number} maximum
+ */
+export function angleExcess(value, minimum, maximum) {
+  if (!Number.isFinite(value) || !Number.isFinite(minimum) || !Number.isFinite(maximum)) {
+    return 0;
+  }
+  if (value > maximum) return value - maximum;
+  if (value < minimum) return value - minimum;
+  return 0;
+}
