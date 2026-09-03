@@ -3,8 +3,21 @@ import atlasRegionsJson from "./data/ATLAS_REGIONS.json";
 import setDressingJson from "./data/BITTERPAN_SET_DRESSING.json";
 import surfaceCrustJson from "./data/BITTERPAN_SURFACE_CRUST.json";
 import { type CourseSample, type RaceCourse, surfaceHeightAtLateral } from "./course";
+import {
+  PAN_FLOOR_DETAIL_FADE_FAR,
+  PAN_FLOOR_DETAIL_FADE_NEAR,
+  PAN_FLOOR_MACRO_RAMP_FAR,
+  PAN_FLOOR_MACRO_RAMP_NEAR,
+  PAN_FLOOR_MACRO_SEED,
+  PAN_FLOOR_ROTATED_SCALE,
+  PAN_FLOOR_SECONDARY_BLEND,
+  PAN_FLOOR_SECONDARY_SCALE,
+  PAN_FLOOR_SEGMENTS,
+  PAN_FLOOR_TILE_MEAN_LINEAR,
+  generatePanFloorColours,
+} from "./pan-floor-colour.js";
 import { activeRenderMode } from "./render-mode.js";
-import { applyPs2MaterialTreatment } from "./totem";
+import { applyPs2MaterialTreatment, composeShaderInjection } from "./totem";
 
 /**
  * P15 art pass 02 — the Bitterpan pan, given a ground and what was left on it.
@@ -141,6 +154,25 @@ export interface BitterpanSurfaceStats {
   groundMetresPerTile: number;
   groundAnisotropy: number;
   shaderModel: "unlit+lambert";
+  /**
+   * P20.6 — the pan floor's macro field, as the numbers a soak can see.
+   *
+   * The floor is not interactive, so nothing else in the diagnostics moves if
+   * this pass silently fails to run: `segments` reading 1 or `meanLuma`
+   * drifting off 1.0 is the only automated evidence that the field is on the
+   * mesh and that it is a variation pass rather than a re-grade.
+   */
+  panFloor: {
+    segments: number;
+    macroSeed: number;
+    secondaryScale: number;
+    vertices: number;
+    /** Mean of the generated vertex colours, as a luma multiplier. 1.0 = the
+     *  flat white the floor shipped with. */
+    meanLuma: number;
+    peakBrightness: number;
+    peakHue: number;
+  };
 }
 
 /** Corner order and winding, identical to `opening-surface.ts`. */
@@ -280,9 +312,12 @@ export class BitterpanSurface {
     decalMesh.receiveShadow = false;
     decalMesh.renderOrder = 1;
 
+    const panFloor = buildPanFloor(course, groundTexture);
+    const [meanR, meanG, meanB] = panFloor.colours.mean;
+
     const root = new THREE.Group();
     root.name = "bitterpan_surface_layer";
-    root.add(buildPanFloor(groundTexture), decalMesh);
+    root.add(panFloor.mesh, decalMesh);
 
     return new BitterpanSurface(root, {
       drawCalls: 2,
@@ -295,6 +330,15 @@ export class BitterpanSurface {
       groundMetresPerTile: SURFACE_CRUST.ground.metresPerTile,
       groundAnisotropy: groundTexture.anisotropy,
       shaderModel: "unlit+lambert",
+      panFloor: {
+        segments: PAN_FLOOR_SEGMENTS,
+        macroSeed: PAN_FLOOR_MACRO_SEED,
+        secondaryScale: PAN_FLOOR_SECONDARY_SCALE,
+        vertices: panFloor.colours.vertices,
+        meanLuma: 0.2126 * meanR + 0.7152 * meanG + 0.0722 * meanB,
+        peakBrightness: panFloor.colours.extremes.brightness,
+        peakHue: panFloor.colours.extremes.hue,
+      },
     });
   }
 
@@ -335,22 +379,124 @@ export class BitterpanSurface {
   }
 }
 
+/** A GLSL float literal, so a JS constant cannot land in a shader as `16`. */
+const glsl = (value: number): string => value.toFixed(6);
+
 /**
- * The ground the pan never had. A single quad the size of the visible world,
- * lit like the rest of the site rather than unlit like the decals over it.
+ * The varying the macro injection needs and Lambert does not provide.
+ *
+ * `vFogDepth` carries the same number, but only while `USE_FOG` is defined —
+ * one `?fog=0` style switch away from a shader that will not link. This is one
+ * float of its own.
  */
-function buildPanFloor(texture: THREE.Texture): THREE.Mesh {
-  const geometry = new THREE.PlaneGeometry(GROUND_SIZE_METRES, GROUND_SIZE_METRES, 1, 1);
+const PAN_DEPTH_VARYING = "varying float vPanDepth;\n";
+
+/**
+ * P20.6 — the second half of the macro pass, in the fragment shader.
+ *
+ * Three things happen here that a per-vertex colour cannot do:
+ *
+ * 1. **The 12 m tile stops repeating.** The SAME crust texture is sampled twice
+ *    more, at 1/37 and 1/23 of the base UV (444 m and 276 m per tile). Both
+ *    ratios are prime, so the three samples do not come back into phase inside
+ *    the 6,048 m plane. The pair is divided by the tile's own linear mean
+ *    before it multiplies, so the blend moves colour around a mean of 1.0
+ *    instead of darkening the pan — this is the "multiply toward mid-grey"
+ *    rule, with the grey measured off the asset rather than guessed.
+ * 2. **The near field is left alone.** Everything this phase adds ramps in
+ *    between 16 m and 52 m of view depth, so the 0-25 m crack pattern beside
+ *    the craft is bit-for-bit what it was before. That pattern was never the
+ *    complaint.
+ * 3. **The far field stops sparkling.** Past 300 m the crust sample fades to
+ *    the tile mean, so the far pan carries macro colour and fog only. Mips and
+ *    aniso 4 already fight the aliasing; this removes the signal instead.
+ *
+ * Composed through `composeShaderInjection` rather than assigned: in
+ * `?render=ps2` this material already carries the snap/grade/dither injection,
+ * and `material.onBeforeCompile = fn` would delete it while leaving its program
+ * cache key in place.
+ */
+function injectPanFloorMacro(shader: THREE.WebGLProgramParametersWithUniforms): void {
+  const [meanR, meanG, meanB] = PAN_FLOOR_TILE_MEAN_LINEAR;
+  const ramp = `smoothstep( ${glsl(PAN_FLOOR_MACRO_RAMP_NEAR)}, `
+    + `${glsl(PAN_FLOOR_MACRO_RAMP_FAR)}, vPanDepth )`;
+
+  shader.vertexShader = PAN_DEPTH_VARYING + shader.vertexShader.replace(
+    "#include <project_vertex>",
+    "#include <project_vertex>\n\tvPanDepth = - mvPosition.z;",
+  );
+
+  shader.fragmentShader = PAN_DEPTH_VARYING + shader.fragmentShader
+    .replace(
+      "#include <map_fragment>",
+      /* glsl */ `
+	vec3 panTileMean = vec3( ${glsl(meanR)}, ${glsl(meanG)}, ${glsl(meanB)} );
+	vec3 panCrust = texture2D( map, vMapUv ).rgb;
+	float panDetail = 1.0 - smoothstep( ${glsl(PAN_FLOOR_DETAIL_FADE_NEAR)}, ${glsl(PAN_FLOOR_DETAIL_FADE_FAR)}, vPanDepth );
+	panCrust = mix( panTileMean, panCrust, panDetail );
+	vec3 panWide = texture2D( map, vMapUv * ${glsl(PAN_FLOOR_SECONDARY_SCALE)} + vec2( 0.317, 0.611 ) ).rgb;
+	vec2 panTurnedUv = vec2( vMapUv.y, - vMapUv.x ) * ${glsl(PAN_FLOOR_ROTATED_SCALE)} + vec2( 0.083, 0.457 );
+	vec3 panCross = texture2D( map, panTurnedUv ).rgb;
+	vec3 panMacro = 0.5 * ( panWide + panCross ) / panTileMean;
+	panCrust *= mix( vec3( 1.0 ), panMacro, ${glsl(PAN_FLOOR_SECONDARY_BLEND)} * ${ramp} );
+	diffuseColor.rgb *= panCrust;
+`,
+    )
+    .replace(
+      "#include <color_fragment>",
+      /* glsl */ `
+#if defined( USE_COLOR ) || defined( USE_COLOR_ALPHA )
+	diffuseColor.rgb *= mix( vec3( 1.0 ), vColor.rgb, ${ramp} );
+#endif
+`,
+    );
+}
+
+/**
+ * The ground the pan never had — and, since P20.6, a ground with a distance
+ * cue on it.
+ *
+ * Still ONE mesh, ONE material, ONE draw call and ONE texture. What changed is
+ * that the quad is subdivided and carries a per-vertex colour field (see
+ * `pan-floor-colour.js` for the field and for why 128 segments rather than the
+ * 96 the phase brief suggested), and that the material's fragment stage samples
+ * the crust tile twice more at macro scales. 32,768 triangles is the whole cost;
+ * they are static, in one buffer, and never re-uploaded.
+ */
+function buildPanFloor(course: RaceCourse, texture: THREE.Texture): {
+  mesh: THREE.Mesh;
+  colours: ReturnType<typeof generatePanFloorColours>;
+} {
+  const geometry = new THREE.PlaneGeometry(
+    GROUND_SIZE_METRES,
+    GROUND_SIZE_METRES,
+    PAN_FLOOR_SEGMENTS,
+    PAN_FLOOR_SEGMENTS,
+  );
+  const colours = generatePanFloorColours({
+    segments: PAN_FLOOR_SEGMENTS,
+    sizeMetres: GROUND_SIZE_METRES,
+    centreXMetres: GROUND_CENTRE_X_METRES,
+    centreZMetres: GROUND_CENTRE_Z_METRES,
+    seed: PAN_FLOOR_MACRO_SEED,
+    lapLengthMetres: course.length,
+    ribbon: buildPanRibbon(course),
+  });
+  geometry.setAttribute("color", new THREE.BufferAttribute(colours.colors, 3));
+
   const material = new THREE.MeshLambertMaterial({
     name: GROUND_MATERIAL_NAME,
     map: texture,
     fog: true,
+    vertexColors: true,
   });
   const mesh = new THREE.Mesh(geometry, material);
   mesh.name = GROUND_MESH_NAME;
   mesh.rotation.x = -Math.PI / 2;
   mesh.position.set(GROUND_CENTRE_X_METRES, GROUND_Y_METRES, GROUND_CENTRE_Z_METRES);
   mesh.castShadow = false;
+  // P20.1 owns this line: the pan floor is where the craft's contact shadow
+  // lands, and subdividing the plane does not change that.
   mesh.receiveShadow = true;
   // Always under the camera, never worth a bounding-sphere test.
   mesh.frustumCulled = false;
@@ -368,7 +514,43 @@ function buildPanFloor(texture: THREE.Texture): THREE.Mesh {
     texture.anisotropy = 4;
     texture.needsUpdate = true;
   }
-  return mesh;
+  // AFTER the PS2 treatment, so the composition wraps that injection rather
+  // than being wrapped by it — and so a ps2 run keeps both.
+  composeShaderInjection(material, "bpPanFloorMacro", injectPanFloorMacro);
+  return { mesh, colours };
+}
+
+/**
+ * The centreline as a flat polyline, for the pan floor's sector biases.
+ *
+ * Sampled at the same 5 m as `CENTRELINE_STATIONS.json` so the validator's
+ * re-run of the generator — which reads that file, because it cannot build a
+ * `RaceCourse` under Node — walks a ribbon of the same shape and spacing.
+ */
+function buildPanRibbon(course: RaceCourse): Array<{
+  x: number;
+  z: number;
+  rightX: number;
+  rightZ: number;
+  distance: number;
+  curvature: number;
+}> {
+  const scratch = course.createSampleScratch();
+  const count = Math.max(2, Math.round(course.length / 5));
+  const nodes = [];
+  for (let index = 0; index < count; index += 1) {
+    const distance = (index * course.length) / count;
+    const sample = course.sample(distance / course.length, scratch);
+    nodes.push({
+      x: sample.position.x,
+      z: sample.position.z,
+      rightX: sample.right.x,
+      rightZ: sample.right.z,
+      distance,
+      curvature: sample.curvature,
+    });
+  }
+  return nodes;
 }
 
 /** Keeps a decal corner on the lap when it straddles the start line. */

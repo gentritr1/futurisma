@@ -995,6 +995,24 @@ export class SceneAssets {
       bpCrustTriangles: bitterpanSurface?.triangles ?? 0,
       bpGroundMetresPerTile: bitterpanSurface?.groundMetresPerTile ?? 0,
       bpGroundAnisotropy: bitterpanSurface?.groundAnisotropy ?? 0,
+      // P20.6 — the pan floor's macro colour field. Nested, like `midground`
+      // above, because the acceptance reads `panFloor.segments` directly. The
+      // floor is not interactive, so these are the only automated evidence
+      // that the field is on the mesh: `segments` collapsing to 1 means the
+      // subdivision never happened, and `meanLuma` off 1.0 means this stopped
+      // being a variation pass and became a re-grade.
+      panFloor: bitterpanSurface?.panFloor
+        ? {
+          segments: bitterpanSurface.panFloor.segments,
+          macroSeed: bitterpanSurface.panFloor.macroSeed,
+          secondaryScale: Number(bitterpanSurface.panFloor.secondaryScale.toFixed(6)),
+          vertices: bitterpanSurface.panFloor.vertices,
+          meanLuma: Number(bitterpanSurface.panFloor.meanLuma.toFixed(5)),
+          peakBrightness: Number(bitterpanSurface.panFloor.peakBrightness.toFixed(4)),
+          peakHue: Number(bitterpanSurface.panFloor.peakHue.toFixed(4)),
+        }
+        : { segments: 0, macroSeed: 0, secondaryScale: 0, vertices: 0, meanLuma: 0,
+          peakBrightness: 0, peakHue: 0 },
       plaqueBackingLoadMs: this.plaqueBackingLoadMs === null
         ? null
         : Number(this.plaqueBackingLoadMs.toFixed(1)),
