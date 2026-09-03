@@ -1107,6 +1107,18 @@ assert.notEqual(
   "Both maps sample the cloud lattice at the same period, so they would show the "
     + "same sky rotated. Give them different periods.",
 );
+// P20.5 round 2. Round 1 authored the horizontal and vertical cloud frequencies
+// independently, which landed at roughly 1:1 and read as soft round blobs —
+// smoke or a storm front, not the high cirrus and blown dust the two maps are
+// about. The vertical frequency is derived from `stretch` in the shader now, so
+// this is the number that decides the shape.
+for (const [map, profile] of Object.entries(sky.CLOUD_PROFILES)) {
+  assert.ok(
+    profile.stretch >= 4 && profile.stretch <= 8,
+    `${map} cloud stretch ${profile.stretch} is outside 4-8. Under 4 the band `
+      + "reads as blobs; over 8 it reads as scan lines.",
+  );
+}
 
 // --- ...and the sky reaches the dome. Data nothing reads is not a feature.
 for (const needle of [
@@ -1115,6 +1127,12 @@ for (const needle of [
   "uniform vec3 hazeColor;",
   "mix(sqrt(hazeColor), sqrt(topColor)",
   "skyRamp.x",
+  // Round 2: the cloud may only ADD light, and never past the haze it sits
+  // under. That single expression is what makes it brighter than the zenith and
+  // never darker than the horizon by construction rather than by tuning, and it
+  // is what took the storm-front look out of the upper frame.
+  "color += min(add, max(hazeColor - color, vec3(0.0)));",
+  "elevation * cloudShape.w * cloudStretch / 360.0",
 ]) {
   assert.ok(
     atmosphereSource.includes(needle),
@@ -1163,5 +1181,7 @@ console.log(
     + "its own fog and every zenith 20+ luma under its haze; cloud coverage "
     + `${sky.CLOUD_PROFILES.bitterpan.coverage}/${sky.CLOUD_PROFILES.greenwater.coverage} `
     + `drifting ${sky.CLOUD_PROFILES.bitterpan.driftPerSecond}/`
-    + `${sky.CLOUD_PROFILES.greenwater.driftPerSecond} turns per second.`,
+    + `${sky.CLOUD_PROFILES.greenwater.driftPerSecond} turns per second at `
+    + `${sky.CLOUD_PROFILES.bitterpan.stretch}:1 and `
+    + `${sky.CLOUD_PROFILES.greenwater.stretch}:1 stretch, adding light only.`,
 );
