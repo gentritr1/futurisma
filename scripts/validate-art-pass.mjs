@@ -711,6 +711,40 @@ assert.ok(
   "The coarse streak octave has to be coarser than the fine one.",
 );
 
+// P20.11 — the distance handovers that keep the far pan from crawling. These
+// moved: the feature fade was 1,150-1,800 m in P20.6, which is effectively
+// never, and the fine-octave fade is new. What is pinned is the ORDERING, not
+// the taste: each of the four numbers is an art decision, but a build where
+// they cross has a stretch of pan carrying nothing, or carries a term past the
+// distance its own field can be resolved at. See PAN_FLOOR_FEATURE_FADE_NEAR
+// in pan-floor-colour.js for the measurement each one came from.
+for (const [name, near, far] of [
+  ["fine streak octave",
+    panFloor.PAN_FLOOR_FINE_OCTAVE_FADE_NEAR, panFloor.PAN_FLOOR_FINE_OCTAVE_FADE_FAR],
+  ["features", panFloor.PAN_FLOOR_FEATURE_FADE_NEAR, panFloor.PAN_FLOOR_FEATURE_FADE_FAR],
+  ["vertex field", panFloor.PAN_FLOOR_MACRO_FADE_NEAR, panFloor.PAN_FLOOR_MACRO_FADE_FAR],
+]) {
+  assert.ok(near < far, `The ${name} fade runs ${near} -> ${far} m, which is backwards.`);
+}
+assert.ok(
+  panFloor.PAN_FLOOR_FINE_OCTAVE_FADE_NEAR > panFloor.PAN_FLOOR_MACRO_RAMP_FAR,
+  `The fine streak octave starts fading at ${panFloor.PAN_FLOOR_FINE_OCTAVE_FADE_NEAR} m, `
+    + `inside the ${panFloor.PAN_FLOOR_MACRO_RAMP_FAR} m where the whole layer has only `
+    + "just ramped in. It is the near-field streak; it has to survive the near field.",
+);
+assert.ok(
+  panFloor.PAN_FLOOR_FINE_OCTAVE_FADE_FAR <= panFloor.PAN_FLOOR_FEATURE_FADE_FAR,
+  "The fine octave has to hand over to the coarse one BEFORE the features "
+    + "themselves are gone, or the handover buys nothing.",
+);
+assert.ok(
+  panFloor.PAN_FLOOR_FEATURE_FADE_FAR <= panFloor.PAN_FLOOR_MACRO_FADE_NEAR,
+  `The features are gone by ${panFloor.PAN_FLOOR_FEATURE_FADE_FAR} m and the smooth vertex `
+    + `field only starts fading at ${panFloor.PAN_FLOOR_MACRO_FADE_NEAR} m. If that order `
+    + "flipped there would be a band of pan carrying neither, which is the flat wash this "
+    + "whole phase exists to remove.",
+);
+
 // Brine flats. The shoreline and the rim are in METRES on the ground, which is
 // the whole reason a pool has a shore instead of a blur; if either were a noise
 // fraction it would scale with distance and stop reading.

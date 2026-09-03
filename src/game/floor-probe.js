@@ -33,16 +33,36 @@
  * bypass in `buildPanFloor`.
  */
 
-/** @returns {0 | 1 | 2} 0 when off, 1 for the probe view, 2 for probe + bypass */
+/**
+ * P20.11 added modes 3-6: the same probe view as `=1` with ONE of the floor's
+ * terms switched off, so "which term is aliasing at 500 m" is answered by
+ * measurement rather than by argument. They are the reason the far-pan flicker
+ * was attributed to the thresholded streak bands and not to the tile break —
+ * see the table in `injectPanFloorMacro`.
+ *
+ *   3  the FEATURE terms off (wind streaks and brine flats), tile break and
+ *      vertex colour field still on
+ *   4  the tile-break samples off (the 1/37 and 1/23 secondary taps), features
+ *      still on
+ *   5  the streak and scour bands off only
+ *   6  the brine flats off only
+ *
+ * @returns {0 | 1 | 2 | 3 | 4 | 5 | 6} 0 when off, 1 for the probe view,
+ *   2 for probe + whole-phase bypass, 3-6 for the single-term diagnostics.
+ */
 export function panFloorProbeMode() {
   if (typeof window === "undefined") return 0;
   const raw = new URLSearchParams(window.location.search).get("floorprobe");
   if (raw === "1") return 1;
   if (raw === "2") return 2;
+  if (raw === "3") return 3;
+  if (raw === "4") return 4;
+  if (raw === "5") return 5;
+  if (raw === "6") return 6;
   return 0;
 }
 
-/** @returns {boolean} whether either probe view is on. */
+/** @returns {boolean} whether any probe view is on. */
 export function panFloorProbeActive() {
   return panFloorProbeMode() !== 0;
 }
