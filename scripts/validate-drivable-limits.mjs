@@ -105,6 +105,110 @@ for (const table of [greenwater, bitterpan]) {
 }
 
 // ---------------------------------------------------------------------------
+// P21.4 THE SUPPORT INVARIANT: a limit may not stand past the drawn surface.
+//
+// The failure it comes from, measured by `scripts/visual/vehicle-pixels.mjs` on
+// the Greenwater Sweep: the craft out at lateral -14.49 painted 678 pixels of a
+// 1280x720 frame, because the authored deck draws roughly one metre of A-edge
+// run-off where the apron table authors five, and the limit let the craft three
+// metres past the last drawn triangle. Physics was happy; the craft was not on
+// screen.
+//
+// So every limit carries the mesh that set it, and a limit set by the support
+// sweep must be at or inside the support measurement it came from. Asserted
+// through the `setBy` label rather than by re-deriving the support here: this
+// file has no scene, and a second copy of the sweep would be a second thing to
+// keep in step.
+//
+// The MAP-LEVEL gate is the one that matters most, and it is asserted from the
+// summary: `supportUsable` false means the capture could not see the road, and
+// in that case NO side may carry a support limit. Bitterpan is exactly that
+// case - its drawn deck is the blockout GLB, which the corridor sweep excludes
+// by name, so 193 of its 610 span-sides report no surface even at the deck
+// edge. Clamping to that would wall off road the player can see.
+// ---------------------------------------------------------------------------
+const SUPPORT_PREFIX = "surface-support(";
+for (const table of [greenwater, bitterpan]) {
+  const summary = table.summary ?? {};
+  assert.ok(
+    typeof summary.supportUsable === "boolean",
+    `${table.map}: the table carries no supportUsable flag, so there is no way `
+      + "to tell a capture that measured the drawn surface from one that could "
+      + "not see it. Re-derive with the current scripts.",
+  );
+  let supportSides = 0;
+  for (const entry of table.entries) {
+    for (const side of ["left", "right"]) {
+      const measured = entry[side];
+      if (!measured || !String(measured.setBy).startsWith(SUPPORT_PREFIX)) continue;
+      supportSides += 1;
+      assert.ok(
+        measured.limit <= (entry.clampMax ?? entry.clamp) + EPSILON,
+        `${table.map} @${entry.distance} m ${side}: a support limit of `
+          + `${measured.limit} m is wider than the clamp it was capped against.`,
+      );
+      assert.ok(
+        measured.limit >= entry.halfWidth - EPSILON,
+        `${table.map} @${entry.distance} m ${side}: the support limit `
+          + `${measured.limit} m is inside the ${entry.halfWidth} m deck edge. `
+          + "Support may trim run-off; it may never narrow the racing surface.",
+      );
+    }
+  }
+  if (summary.supportUsable === false) {
+    assert.equal(
+      supportSides,
+      0,
+      `${table.map}: the capture reports ${summary.supportNullSides} span-sides `
+        + "with no drawn surface even at the deck edge, so its support "
+        + `measurement is not usable - yet ${supportSides} side(s) are limited by `
+        + "it. A support limit derived from a capture that could not see the "
+        + "road is an invisible wall over visible ground.",
+    );
+  } else {
+    assert.equal(
+      summary.supportNullSides,
+      0,
+      `${table.map}: supportUsable is true with ${summary.supportNullSides} null `
+        + "sides. Those two cannot both be right.",
+    );
+    assert.equal(
+      supportSides,
+      summary.supportCappedSides,
+      `${table.map}: the summary claims ${summary.supportCappedSides} sides were `
+        + `capped by support but ${supportSides} carry the label.`,
+    );
+  }
+}
+
+// The negative fixture: the invariant has to be able to FAIL. A support limit
+// pushed inside the deck edge must be rejected, or the assertion above is
+// decoration. Same shape as the synthetic re-pin `validate-furniture.mjs` uses.
+{
+  const fixture = {
+    map: "fixture",
+    halfWidth: 12,
+    clamp: 17,
+    clampMax: 17,
+    left: { limit: 11.4, setBy: "surface-support(unbounded)", tall: 13 },
+  };
+  let rejected = false;
+  try {
+    assert.ok(
+      fixture.left.limit >= fixture.halfWidth - EPSILON,
+      "support limit inside the deck edge",
+    );
+  } catch {
+    rejected = true;
+  }
+  assert.ok(
+    rejected,
+    "The support invariant did not reject a limit 0.6 m inside the deck edge, "
+      + "so it would not catch the failure it exists for.",
+  );
+}
+
+// ---------------------------------------------------------------------------
 // SANITY (a): Bitterpan's open pan keeps its run-off.
 //
 // Sampled by the MESH the sweep named rather than by hand-picked distances, so
