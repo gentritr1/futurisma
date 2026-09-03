@@ -351,6 +351,38 @@ export class FuturismaGame {
   private readonly diagnosticsMode = searchFlag("diagnostics");
   /** G2 - `?cushion=0` puts the race back on the G1 no-contact model. */
   private readonly cushionEnabled = searchParam("cushion") !== "0";
+  /**
+   * H1.3 — QA scene switch, in the same family as `?cushion=0` and
+   * `?camguards=0`, but a runtime call rather than a URL flag because the
+   * measurement it exists for needs TWO renders of the SAME frame.
+   *
+   * `scripts/visual/vehicle-pixels.mjs` pauses the race, screenshots, calls
+   * `__futurismaHide(["totem_vehicle_root"])`, screenshots again, and counts the
+   * pixels that changed. That difference is the only honest answer to "was the
+   * craft drawn": every pose number H1 added says where the craft IS, and the
+   * frames this exists for had the hull dead centre of the frame at NDC
+   * (0.13, -0.45), 1.26 m of clearance, and zero pixels on screen.
+   *
+   * Restores everything before hiding, so consecutive calls never compound, and
+   * returns the names it walked so a harness can enumerate the scene.
+   */
+  private readonly hideHook: boolean = ((game: unknown) => {
+    (globalThis as unknown as Record<string, unknown>).__futurismaHide = (
+      names: string[],
+    ) => {
+      const self = game as { scene: THREE.Scene; renderRequested: boolean };
+      const wanted = new Set(names);
+      const seen: string[] = [];
+      self.scene.traverse((object) => {
+        if (!object.name) return;
+        seen.push(object.name);
+        object.visible = !wanted.has(object.name);
+      });
+      self.renderRequested = true;
+      return seen;
+    };
+    return true;
+  })(this);
   // Every `?probe=` spawn pose is resolved by query-probes.ts; see ProbeSpawn.
   private readonly rivalAudioProbeLateral = resolveRivalAudioProbeLateral();
   private readonly contextLossProbe = probeSelected("context");
@@ -413,6 +445,7 @@ export class FuturismaGame {
     this.scene.background = initialFog.color.clone();
     this.scene.fog = new THREE.FogExp2(initialFog.color, initialFog.density);
 
+    void this.hideHook;
     this.scene.add(this.course.group, this.vehicle.root);
     this.effects = new RaceEffects(this.reducedMotion, this.course.kind);
     this.contact = new RacingContact(ui, this.audio, input, this.effects);

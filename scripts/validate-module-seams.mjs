@@ -123,8 +123,13 @@ import { readFileSync } from "node:fs";
  * What is here is what has to touch `this.camera`, which is the one thing that
  * cannot leave the race loop, plus the `?camguards=0` kill switch that keeps
  * the guards' own before/after measurable.
+ *
+ * H1.3 adds 33 for `__futurismaHide`, the QA scene switch behind
+ * `scripts/visual/vehicle-pixels.mjs`. It is here rather than in a module
+ * because it needs `this.scene`, and it is a runtime call rather than a URL
+ * flag because the measurement needs two renders of the SAME paused frame.
  */
-const GAME_LINE_BUDGET = 2_251;
+const GAME_LINE_BUDGET = 2_284;
 
 function read(path) {
   return readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
