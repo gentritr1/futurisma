@@ -34,6 +34,32 @@ import { readFileSync } from "node:fs";
  * ~70 lines of world-contact handling that belongs with the rest of contact.
  */
 /**
+ * G3 — 1975 -> 1998, and the same disclosure the G2 note demanded.
+ *
+ * This is a WEAKENED assertion, again, and the honest reading is that the line
+ * budget is now measuring the WIRING COST of a subsystem seam rather than the
+ * size of the race loop's own logic. What G3 did with it: the phase's logic —
+ * the seeded event schedule, the gust envelope and its damped lateral, the salt
+ * patch and its decal, the squall, the HUD chip resolution and every piece of
+ * telemetry for the three — is ~700 lines, and all of it went into
+ * `src/game/track-events.ts` and `src/game/track-events-rules.js`.
+ *
+ * What is left in the race loop is 20 net lines of wiring: one field, one
+ * construct, one `scene.add`, one `reset`, one `resetDiagnostics`, one `step`,
+ * one extra argument on the existing `resolveTargetSurfaceGrip` call, one HUD
+ * field, one diagnostics contributor, and their comments. There is no
+ * arrangement of a feature that touches the lateral, the grip, the HUD frame
+ * and the diagnostics report that costs zero lines at those seams.
+ *
+ * The compensating half is below, extended for G3: the assertion list now names
+ * the G3 logic as well, so a future phase that "extracts" a track event by
+ * wrapping it in a private method of `Game` fails here rather than passing on a
+ * line count. A phase that needs room should extract again rather than move
+ * this number — the candidate named in the G2 note (the apron/boundary block
+ * inside `updateRace`, ~70 lines of world-contact handling that belongs with
+ * the rest of contact) is still the honest one and is still unclaimed.
+ */
+/**
  * G4 — 1975 -> 1992, and like G2's note above this is a WEAKENED assertion that
  * should be read as one.
  *
@@ -66,7 +92,18 @@ import { readFileSync } from "node:fs";
  * The compensating half is below: five assertions that the G4 logic is NOT in
  * `game.ts`, which is what the budget is a proxy for.
  */
-const GAME_LINE_BUDGET = 1_992;
+/**
+ * G3 + G4 merge — 1998 and 1992 became 2_012.
+ *
+ * Neither phase saw the other's wiring, so the two notes above are each honest
+ * about their own 20 and 17 lines and neither is the number this tree has. The
+ * merged count is what it is: both sets of call sites are present, none of them
+ * overlap, and nothing was removed to make room. Kept as a merge line rather
+ * than by editing either rationale, because a future phase deciding whether to
+ * spend more needs to see that the budget moved twice for two different reasons
+ * and not once for a big one.
+ */
+const GAME_LINE_BUDGET = 2_012;
 
 function read(path) {
   return readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
@@ -115,6 +152,44 @@ for (const owned of [
   );
 }
 
+// G3 — the track-events seam, on exactly the same terms as G2's above and for
+// the same reason: the budget is a proxy for this, and this is the thing that
+// actually matters. The race loop may ASK the schedule what it wants; it may
+// not contain the schedule, the envelopes, the wind bearing or the grip rule.
+for (const owned of [
+  "buildTrackEventSchedule",
+  "gustEnvelope",
+  "gustScudTraverse",
+  "squallEnvelope",
+  "saltPatchAlpha",
+  "eventSurfaceGrip",
+  "eventFogMultiplier",
+  "integrateGustVelocity",
+  "BITTERPAN_WIND_BEARING_DEGREES",
+]) {
+  assert.ok(
+    !game.includes(owned),
+    `src/game/game.ts references ${owned}. The G3 track-event model lives in `
+      + "src/game/track-events.ts and src/game/track-events-rules.js; the race "
+      + "loop calls TrackEvents instead.",
+  );
+}
+
+// And the audio seam G3 published rather than wired, asserted so the next phase
+// finds it. `audio.ts` was owned by another phase in parallel, so track-events
+// exposes a read-only state object for it instead of calling into it.
+const trackEvents = read("src/game/track-events.ts");
+assert.ok(
+  trackEvents.includes("export function trackEventState("),
+  "src/game/track-events.ts must publish `trackEventState()` — the read-only "
+    + "{ windGust, squall, saltDrop, lastEvent } view the audio phase wires to.",
+);
+assert.ok(
+  !trackEvents.includes('from "./audio"'),
+  "src/game/track-events.ts must not import audio.ts. G3 publishes a state "
+    + "object for the audio phase to read; it does not drive audio itself.",
+);
+
 // G4 — the race-modes seam, which is what the budget bump above is a proxy for.
 // The race loop may CALL the format; it may not contain any of its decisions.
 // Each of these names being absent from game.ts is the difference between a
@@ -158,6 +233,11 @@ const modules = {
   ],
   "src/game/effects.ts": ["export class RaceEffects"],
   "src/game/racing-contact.ts": ["export class RacingContact"],
+  "src/game/track-events.ts": ["export class TrackEvents"],
+  "src/game/track-events-rules.js": [
+    "export function buildTrackEventSchedule",
+    "export function gustEnvelope",
+  ],
   "src/game/race-modes.ts": ["export const raceModes"],
   "src/game/race-modes-rules.js": [
     "export function resolveModeLapCount",
@@ -201,6 +281,10 @@ const contributorOrder = [
   // P4a: lighting motion telemetry is contributed by atmosphere.ts, not by the
   // race loop, so it appends here rather than growing DiagnosticsCore.
   "...contributors.atmosphere,",
+  // G3: same rule, one phase later. The module that owns the event schedule
+  // owns its telemetry, and it appends AFTER every existing contributor so no
+  // emitted key order moves.
+  "...contributors.trackEvents,",
 ];
 let cursor = -1;
 for (const spread of contributorOrder) {
@@ -233,6 +317,7 @@ assert.ok(
 
 console.log(
   `Module seams PASS: game.ts ${gameLines}/${GAME_LINE_BUDGET} lines, lighting, `
-    + "effects, scene assets, autopilot and diagnostics extracted, contributor "
+    + "effects, scene assets, autopilot, track events and diagnostics extracted, "
+    + "contributor "
     + "spread order pinned.",
 );

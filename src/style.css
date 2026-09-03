@@ -579,6 +579,30 @@ body[data-graphics-context="lost"] .system-state__lamp {
   text-shadow: 0 0 7px oklch(0.86 0.13 210 / 0.5);
 }
 
+/*
+ * G3 track-event chip. Borrows the slipstream chip wholesale - same width,
+ * same mono, same fade - and sits one line above it, so the HUD gains a word
+ * rather than a widget. It has no bar of its own: a gust either is coming or is
+ * not, and a fill would invite the driver to watch a meter instead of the road.
+ *
+ * Amber rather than the route's cyan. Cyan on this HUD means "you are being
+ * rewarded" (slipstream, clean chain, cleared gate); a gust, a salt patch and a
+ * squall are all costs, and the one thing the colour must not do is read as an
+ * opportunity. The state is still carried twice over - the chip only exists
+ * while the event does, and the word itself names it.
+ */
+.track-event {
+  bottom: calc(clamp(22px, 4vh, 44px) + 56px);
+  color: var(--amber, oklch(0.82 0.14 74));
+}
+
+.track-event[data-event="salt"],
+.track-event[data-event="squall"],
+.track-event[data-event="gust"] {
+  opacity: 1;
+  text-shadow: 0 0 7px oklch(0.82 0.14 74 / 0.45);
+}
+
 .slipstream__track {
   display: block;
   height: 2px;

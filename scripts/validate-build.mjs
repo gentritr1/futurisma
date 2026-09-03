@@ -86,8 +86,34 @@ assert.ok(
 //     table in it: the whole cost is code, and the largest single piece is the
 //     cushion's own envelope plus the fleet-side selection loop that feeds it.
 //
+//   G3 live track events  +3.8 KiB - src/game/track-events.ts and
+//     src/game/track-events-rules.js: the seeded per-race schedule for
+//     Bitterpan's wind gusts, its conveyor salt drops and Greenwater's rain
+//     squall; the gust envelope and its damped lateral integrator
+//     (`integrateGustVelocity` in physics.js); the salt patch's decal geometry;
+//     the event grip term threaded through `resolveTargetSurfaceGrip`; the
+//     re-phased crossing-scud clock and the two other living-world hooks; the
+//     HUD chip; and 18 telemetry fields including the schedule digest a soak
+//     line has to carry to be argued with.
+//
+//     THERE IS NO DATA TABLE IN IT AND NO SHADER STRING: the whole cost is
+//     code. Measured 236.9 -> 240.7 KiB gzip on the merged tree.
+//
+//     What was tried to avoid moving the ceiling, and what it was worth.
+//     `track-events.ts` is imported statically by game.ts, atmosphere.ts and
+//     rivals.ts (all initial) and by living-world.ts (lazy), so Rollup promotes
+//     it — and physics.js with it — into a shared initial chunk, the same
+//     mechanism that cost P20.1 0.9 KiB. Rerouting living-world's four reads
+//     through a leaf signals module on the `time-of-day.ts` idiom, so that the
+//     promotion never happens, was built and MEASURED: 240.0 KiB against 240.7.
+//     0.7 KiB for a whole extra module and an indirection on every card read is
+//     not a trade worth making, so it was reverted and the ceiling moved
+//     instead. Recording the number here so the next phase does not re-derive
+//     it: on this tree, chunk promotion is worth well under a kilobyte and the
+//     code itself is the cost.
+//
 // Measured on the merged tree with `npx vite build && node
-// scripts/validate-build.mjs`: 235.5 KiB gzip over 10 initial chunks, against
+// scripts/validate-build.mjs`: 240.7 KiB gzip over 10 initial chunks, against
 // the 224.2 KiB all four P20 phases started from. The individual figures above
 // were each taken on their own branch and do not sum exactly to it - Rollup
 // splits differently once several phases share a tree, and this build has 10
@@ -119,6 +145,10 @@ assert.ok(
 //     No audio ASSETS were added and none can be: the project ships zero audio
 //     files and every sound in it is synthesised at run time from a seeded LCG.
 //     The served file list below is unchanged by this phase.
+// Re-baselined 2026-09-03 at the G3 + A1 merge: 242.8 KiB measured on the
+// merged tree (A1's lazy ambience chunk split and G3's events landed on one
+// build; the per-branch numbers of 238.9 and 240.7 do not sum under Rollup's
+// resplit). Ceiling 244; G4 (modes/time attack) is the next known cost.
 //
 //   G4 modes, tiers, sector deltas and the result stats  +3.1 KiB - measured
 //     238.9 -> 242.0 KiB gzip on the merged tree.
@@ -140,9 +170,15 @@ assert.ok(
 //     pays for the tier tables of the circuit they dispatched and neither of
 //     the other map's. The per-tier derivation notes in those files are the
 //     same: authored data, not shell.
+//
+//   G3 + G4 merge  re-measured on the merged tree, not summed. G3 set 244 from
+//     a measured 242.8 and G4 set 243 from a measured 242.0; neither had seen
+//     the other, and Rollup resplits when both land, so measured 246.0 KiB gzip / 255.9 KiB shell on
+//     the merged tree, ceilings 247 and 257. Taken with `npx vite build && node
+//     scripts/validate-build.mjs` after the merge.
 assert.ok(
-  javascriptGzip <= 243 * 1024,
-  `JavaScript bundle exceeds 243 KiB gzip (${(javascriptGzip / 1024).toFixed(1)} KiB).`,
+  javascriptGzip <= 247 * 1024,
+  `JavaScript bundle exceeds 247 KiB gzip (${(javascriptGzip / 1024).toFixed(1)} KiB).`,
 );
 // Re-baselined 2026-08-28 from a measured 4.35 KiB gzip (the 4 KiB ceiling
 // predated the HUD turn-cue and hazard styling) plus headroom for the planned
@@ -164,6 +200,11 @@ assert.ok(
 // ceiling goes 248 -> 251 for coherence rather than for headroom: at the JS
 // ceiling of 240 the shell is already ~248.8, so a 248 shell ceiling would fail
 // builds the JS ceiling explicitly allows.
+//
+// G3's own shell cost is one HUD chip - about 0.3 KiB of CSS reusing the
+// slipstream chip's rules and 0.2 KiB of HTML - on top of the +3.8 KiB of JS
+// itself. Re-measured on the merged tree at 249.7 KiB (HTML 3.7 + JS 240.7 +
+// CSS 5.4), so the ceiling goes to 253 with the same headroom the 248 one had.
 // G4 re-measure: 251.0 KiB (HTML 3.4 + JS 242.0 + CSS 5.6). Unlike A1 this
 // phase does touch both of the small halves - four HTML nodes (two chip rows,
 // the sector-delta span, the live chip and the result-stats list) and the CSS
@@ -171,9 +212,10 @@ assert.ok(
 // JS above. The ceiling goes 251 -> 254 on the same coherence argument A1 used:
 // at the JS ceiling of 243 the shell is already ~252, so a 251 shell ceiling
 // would fail builds the JS ceiling explicitly allows.
+// G3 + G4 merge: re-measured, for the same reason the JS ceiling above was.
 assert.ok(
-  shellGzip <= 254 * 1024,
-  `Initial app shell exceeds 254 KiB gzip (${(shellGzip / 1024).toFixed(1)} KiB).`,
+  shellGzip <= 257 * 1024,
+  `Initial app shell exceeds 257 KiB gzip (${(shellGzip / 1024).toFixed(1)} KiB).`,
 );
 assert.ok(
   html.includes('rel="preload"')

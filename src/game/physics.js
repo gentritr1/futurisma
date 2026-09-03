@@ -574,15 +574,80 @@ export function calculateGripRate(
  * grip into one target. Multiplying keeps both authored costs visible instead
  * of letting the wider one mask the other, and the floor stops a compounded
  * target from dropping below the handling model's usable range.
+ *
+ * G3 adds a THIRD authored term on the same footing: `eventGrip`, the grip a
+ * live track event is asking for at this place — Bitterpan's conveyor salt
+ * patch, Greenwater's rain squall. It multiplies rather than replaces for the
+ * reason the other two do: a squall over standing water has to be worse than
+ * either, and a `Math.min` would let the wider one mask the other. It defaults
+ * to 1, so every existing call site composes exactly as it did.
  * @param {number} courseGrip
  * @param {number} apronGrip
  * @param {number} [gripFloor]
+ * @param {number} [eventGrip]
  */
-export function resolveTargetSurfaceGrip(courseGrip, apronGrip, gripFloor = 0.2) {
+export function resolveTargetSurfaceGrip(
+  courseGrip,
+  apronGrip,
+  gripFloor = 0.2,
+  eventGrip = 1,
+) {
   const floor = Number.isFinite(gripFloor) ? clamp(gripFloor, 0.05, 1) : 0.2;
   const course = Number.isFinite(courseGrip) ? clamp(courseGrip, floor, 1) : 1;
   const apron = Number.isFinite(apronGrip) ? clamp(apronGrip, floor, 1) : 1;
-  return clamp(course * apron, floor, 1);
+  const event = Number.isFinite(eventGrip) ? clamp(eventGrip, floor, 1) : 1;
+  return clamp(course * apron * event, floor, 1);
+}
+
+/**
+ * G3 — how long a gust's lateral velocity takes to build and to bleed away.
+ *
+ * The craft is a hovering body in a crosswind, not a puck being shoved: the
+ * wind reaches a terminal sideways drift rather than accelerating the craft for
+ * as long as it blows. 0.35 s is deliberately the same constant the air cushion
+ * damps on (CUSHION_VELOCITY_TIME_CONSTANT_SECONDS), because both are the same
+ * physical claim about how fast this hull's lateral state can change.
+ */
+export const GUST_VELOCITY_TIME_CONSTANT_SECONDS = 0.35;
+/**
+ * The most lateral velocity a gust may ever hold the craft at, m/s.
+ *
+ * NOT a tuning knob — it is a derived ceiling, and it is here so the derivation
+ * cannot quietly come apart. Terminal drift is `push * tau`, so the 2.4 m/s^2
+ * ceiling gives 2.4 * 0.35 = 0.84 m/s. The cap sits just above it at 1.0 so a
+ * legal gust never touches it and an illegal one is bounded anyway.
+ */
+export const GUST_VELOCITY_CAP_MPS = 1;
+
+/**
+ * One step of a gust's lateral velocity, m/s.
+ *
+ * A first-order lag toward the terminal drift `push * tau`, integrated in
+ * CLOSED FORM rather than as `v += (a - v/tau) * dt`. The closed form is what
+ * makes it rate independent: the exponential of a sum is the product of the
+ * exponentials, so two 1/120 steps land on exactly the same velocity one 1/60
+ * step does, which an Euler step does not.
+ *
+ * This is deliberately NOT `integrateCushionVelocity`. That one integrates
+ * undamped while a push is applied, which is right for a contact that lasts
+ * tenths of a second and wrong for a wind that blows for four: 2.4 m/s^2 held
+ * undamped over a 4 s envelope reaches its 4 m/s cap and carries the craft
+ * more than ten metres sideways, which is not a gust, it is a tow.
+ *
+ * @param {number} velocity
+ * @param {number} pushMetersPerSecondSquared
+ * @param {number} delta
+ */
+export function integrateGustVelocity(velocity, pushMetersPerSecondSquared, delta) {
+  const current = Number.isFinite(velocity) ? velocity : 0;
+  const push = Number.isFinite(pushMetersPerSecondSquared)
+    ? pushMetersPerSecondSquared
+    : 0;
+  const step = Number.isFinite(delta) ? clamp(delta, 0, 0.1) : 0;
+  const decay = Math.exp(-step / GUST_VELOCITY_TIME_CONSTANT_SECONDS);
+  const terminal = push * GUST_VELOCITY_TIME_CONSTANT_SECONDS;
+  const next = terminal + (current - terminal) * decay;
+  return clamp(next, -GUST_VELOCITY_CAP_MPS, GUST_VELOCITY_CAP_MPS);
 }
 
 /**

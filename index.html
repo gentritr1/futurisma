@@ -114,6 +114,23 @@
           </div>
         </section>
 
+        <!--
+          G3 live track events. Same chip language as SLIPSTREAM below it and
+          stacked directly above, because the two say the same kind of thing:
+          "the world is doing something to your lap right now". `data-event`
+          carries which one, so the state-triggered screenshot harness can key
+          on a frame rather than on a guess about timing.
+        -->
+        <div
+          id="track-event-chip"
+          class="slipstream track-event"
+          role="status"
+          aria-hidden="true"
+          data-event=""
+        >
+          <span id="track-event-label" class="slipstream__label"></span>
+        </div>
+
         <div id="slipstream-chip" class="slipstream" role="status" aria-hidden="true">
           <span class="slipstream__label">SLIPSTREAM</span>
           <span class="slipstream__track" aria-hidden="true">

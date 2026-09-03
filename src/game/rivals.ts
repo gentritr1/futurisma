@@ -55,6 +55,7 @@ import {
 import type { MinimapContact } from "./minimap";
 import { raceModes } from "./race-modes";
 import { reverseGridOrder } from "./race-modes-rules.js";
+import { gustRivalLaneBiasMeters } from "./track-events";
 import { composeShaderInjection } from "./totem";
 import type {
   TotemRivalArticulationGroup,
@@ -1339,6 +1340,11 @@ export class RivalFleet {
         : 0,
       cushionYieldSign: index === this.cushionRivalIndex ? this.cushionYieldSign : 0,
       evasiveSideMeters: this.evasiveSides[index],
+      // G3 — the gust's lane bias, published rather than threaded. Every craft
+      // on the deck gets the same signed metres during the hold, so the field
+      // leans downwind together and the picture matches the push the player is
+      // taking. Lateral only; see the note in `rivalContestLaneMeters`.
+      gustLaneBiasMeters: gustRivalLaneBiasMeters(),
     });
     drive.paceLateralMeters = paceLane;
     drive.laneHalfWidthMeters = laneHalfWidthMeters;
