@@ -44,10 +44,18 @@ export const DECK_CLEARANCE_METRES = 0.5;
 
 /**
  * Above this height a thing is read as overhead structure rather than as an
- * obstacle on the road, so it may stand over the deck. 3.2 m clears the craft's
- * hover band and its canopy with room to spare.
+ * obstacle on the road, so it may stand over the deck.
+ *
+ * P13 set this to 3.2 m, which clears the craft's hover band and its canopy.
+ * H1 raises it to 4.6 m, because clearing the CRAFT turned out not to be the
+ * binding constraint: the chase camera rides a measured 4.09-4.20 m above the
+ * deck (`cameraSurfaceClearanceMeters` over a full Greenwater lap), so a plaque
+ * whose lower edge sat at 3.2 m was drawn across the player's eye line and read
+ * as an obstacle standing in the road rather than as overhead signage. 4.6 m is
+ * 0.4 m above the highest camera height measured over that lap and 0.5 m above
+ * its typical 4.1 m.
  */
-export const PLAQUE_BAND_BOTTOM_METRES = 3.2;
+export const PLAQUE_BAND_BOTTOM_METRES = 4.6;
 
 /**
  * How far inside the wall line a plaque is pinned in a barrier span. The

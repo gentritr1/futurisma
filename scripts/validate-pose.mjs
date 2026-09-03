@@ -33,6 +33,8 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import {
+  cameraSurfaceClearance,
+  chaseDistanceCorrection,
   hullClearance,
   lateralFromHorizontalOffset,
   presentationSurfaceLift,
@@ -426,10 +428,178 @@ assert.ok(
     + "offset instead of the impact.",
 );
 
+// ---------------------------------------------------------------------------
+// H1.2 — the two chase-camera guards.
+//
+// WHAT IS AND IS NOT PROVED HERE. There is no Node camera model below, on
+// purpose: re-implementing `updateCamera` in the validator would pin the
+// validator's arithmetic, not the game's, and the first time the two drifted
+// this file would go green on a broken camera. What is pinned instead is
+// (1) the two pure helpers the guards are built from, exactly, (2) the two
+// floors against numbers MEASURED in the browser, so neither can be retuned
+// into being either useless or intrusive without this failing, and (3) the
+// call sites, because a guard applied to `desired` instead of to the damped
+// camera is the exact mistake H1 started from. The framing itself is proved by
+// `hullNdcY` / `cameraSurfaceClearanceMeters` in a real run; the numbers from
+// those runs are quoted in the assertions below so a future retune has to
+// argue with them.
+// ---------------------------------------------------------------------------
+
+// Measured with `?camguards=0` over three Greenwater and two Bitterpan
+// drive-keys runs (`desiredChaseMeters` / `minimumChaseMeters` in the
+// diagnostics).
+const DESIRED_CHASE_GREENWATER_METRES = 7.26;
+const DESIRED_CHASE_BITTERPAN_METRES = 8.76;
+const MEASURED_CHASE_COLLAPSE_METRES = 4.93;
+
+const gameCameraSource = readFileSync(
+  new URL("../src/game/game.ts", import.meta.url),
+  "utf8",
+);
+const chaseFloor = Number(
+  /const MINIMUM_CHASE_METRES = ([\d.]+);/.exec(gameCameraSource)?.[1],
+);
+const surfaceFloor = Number(
+  /const MINIMUM_CAMERA_SURFACE_CLEARANCE_METRES = ([\d.]+);/
+    .exec(gameCameraSource)?.[1],
+);
+assert.ok(
+  Number.isFinite(chaseFloor) && Number.isFinite(surfaceFloor),
+  "game.ts no longer declares both camera floors as plain constants.",
+);
+
+// 1. The floor has to BIND. If it drops to or below the collapse the guard is
+//    decoration: the camera reached 4.93 m behind the hull unaided.
+assert.ok(
+  chaseFloor > MEASURED_CHASE_COLLAPSE_METRES,
+  `MINIMUM_CHASE_METRES is ${chaseFloor} m, at or under the ${MEASURED_CHASE_COLLAPSE_METRES} m `
+    + "the damped camera reached on its own in every measured Greenwater run. "
+    + "A floor the camera already clears catches nothing.",
+);
+// 2. And it has to stay INERT on an unbroken frame. Above either map's desired
+//    chase distance the guard would be pushing the camera back every frame,
+//    which is a feel change nobody asked for -- and on Bitterpan, whose damped
+//    camera never once went below its own desired 8.76 m, it would be pure
+//    regression.
+for (const [map, desired] of [
+  ["greenwater", DESIRED_CHASE_GREENWATER_METRES],
+  ["bitterpan", DESIRED_CHASE_BITTERPAN_METRES],
+]) {
+  assert.ok(
+    chaseFloor < desired,
+    `MINIMUM_CHASE_METRES is ${chaseFloor} m, at or beyond ${map}'s measured `
+      + `desired chase distance of ${desired} m. The guard would fire on every `
+      + "frame instead of only on the collapse it exists for.",
+  );
+}
+// 3. Same shape for the surface floor: under the 2.1 m the pre-existing guard
+//    already holds `desired` to, so it is a backstop for what damping and the
+//    impact shake do afterwards rather than a second, competing rule.
+assert.ok(
+  surfaceFloor > 0 && surfaceFloor < 2.1,
+  `MINIMUM_CAMERA_SURFACE_CLEARANCE_METRES is ${surfaceFloor} m; it must sit under `
+    + "the 2.1 m `cameraClearance` floor applied to `desired`, or the two guards "
+    + "fight over the same frame.",
+);
+
+// The helpers themselves.
+assert.equal(chaseDistanceCorrection(-chaseFloor, chaseFloor), 0);
+assert.equal(chaseDistanceCorrection(-DESIRED_CHASE_GREENWATER_METRES, chaseFloor), 0);
+assert.equal(chaseDistanceCorrection(-DESIRED_CHASE_BITTERPAN_METRES, chaseFloor), 0);
+assert.equal(
+  Number(chaseDistanceCorrection(-MEASURED_CHASE_COLLAPSE_METRES, chaseFloor).toFixed(6)),
+  Number((chaseFloor - MEASURED_CHASE_COLLAPSE_METRES).toFixed(6)),
+);
+// The worst frame the H1 camera survey caught, before the fix: 2.86 m behind
+// the hull, which put the craft at NDC y -1.216 -- off the bottom of the frame.
+assert.equal(
+  Number(chaseDistanceCorrection(-2.86, chaseFloor).toFixed(6)),
+  Number((chaseFloor - 2.86).toFixed(6)),
+);
+// A camera that has somehow got IN FRONT of the hull is pushed back hardest,
+// not left alone by a sign slip.
+assert.ok(chaseDistanceCorrection(3, chaseFloor) > chaseFloor);
+assert.equal(chaseDistanceCorrection(Number.NaN, chaseFloor), 0);
+assert.equal(chaseDistanceCorrection(-6, Number.NaN), 0);
+
+// `cameraSurfaceClearance` subtracts the run-off cross-section, which is the
+// whole reason it exists: the pre-existing measure took the height above the
+// banked PLANE, and the plane is not the drawn surface once the camera is over
+// the apron. B rises 0.14 m, A falls 0.12 m, C is flush.
+assert.equal(Number(cameraSurfaceClearance(2.1, 0.14).toFixed(6)), 1.96);
+assert.equal(Number(cameraSurfaceClearance(2.1, -0.12).toFixed(6)), 2.22);
+assert.equal(cameraSurfaceClearance(2.1, 0), 2.1);
+assert.equal(cameraSurfaceClearance(Number.NaN, 0), 0);
+assert.equal(cameraSurfaceClearance(2.1, Number.NaN), 0);
+// Over the widest run-off of either map, at the steepest cross-section, the
+// correction is never large enough to be mistaken for the bank term.
+const worstCrossSection = Math.max(
+  ...Object.values(APRON_CROSS_SECTION).map((edge) => Math.abs(edge.outerRise)),
+);
+assert.ok(
+  worstCrossSection <= 0.14,
+  `the apron cross-section now reaches ${worstCrossSection} m; the camera guard's `
+    + "reasoning assumed it stays inside 0.15 m.",
+);
+
+// The call sites. Both guards act on the camera the player is looking through,
+// not on `desired`.
+assert.ok(
+  /this\.cameraTarget\.lerp\(desired, positionDamping\);\s*\n(?:\s*\/\/[^\n]*\n)*\s*(?:if \(this\.cameraGuardsEnabled\) )?this\.holdChaseDistance\(\);/
+    .test(gameCameraSource),
+  "`holdChaseDistance` must run immediately after the damping lerp, on "
+    + "`cameraTarget`. Applied to `desired` it would do nothing: `desired` was "
+    + "measured at a steady 7.26 m (Greenwater) and 8.76 m (Bitterpan) behind "
+    + "the hull and was never the thing that collapsed.",
+);
+// Scoped to `updateCamera` itself: `calculateImpactShakeOffset` also appears in
+// the import list at the top of the file, and an index taken from there would
+// make this ordering check pass no matter where the guard sat.
+const updateCameraBody = gameCameraSource.slice(
+  gameCameraSource.indexOf("  private updateCamera("),
+);
+const shakeIndex = updateCameraBody.indexOf("calculateImpactShakeOffset(elapsed");
+const surfaceGuardIndex = updateCameraBody.indexOf(
+  "this.holdCameraOverSurface(sample.progress);",
+);
+const lookAtIndex = updateCameraBody.indexOf("this.camera.lookAt(this.cameraLook);");
+assert.ok(
+  shakeIndex > 0 && surfaceGuardIndex > 0 && lookAtIndex > 0,
+  "updateCamera no longer contains the impact shake, the surface guard and the "
+    + "lookAt this ordering rule is written against.",
+);
+assert.ok(
+  surfaceGuardIndex > shakeIndex && lookAtIndex > surfaceGuardIndex,
+  "`holdCameraOverSurface` must run AFTER the impact shake and before `lookAt`. "
+    + "The shake moves the camera position, so a guard that runs before it can "
+    + "be undone by it.",
+);
+// The numbers above were read with `?camguards=0`. If that switch goes, so does
+// the ability to reproduce them, and these assertions become folklore.
+assert.ok(
+  gameCameraSource.includes('searchParam("camguards") !== "0"'),
+  "the `?camguards=0` kill switch is gone. The desired-chase and collapse "
+    + "figures this file pins the floors against were measured with it; without "
+    + "it nobody can re-measure them.",
+);
+assert.ok(
+  gameCameraSource.includes("surfaceHeightAtLateral(surface, surface.lateral)"),
+  "the camera surface guard must evaluate the cross-section at the CAMERA's own "
+    + "lateral. `surface` is the projection of the camera position, and unlike "
+    + "the simulation's flattened pose it needs no lateral recovery: a real "
+    + "world point projects to its own lateral directly.",
+);
+
 console.log(
   `Pose PASS: presentation lift applied exactly once across ${checks} checks on `
     + `${bankedStations} banked stations (steepest ${steepest.bank} deg, `
     + `${steepest.map} ${steepest.sector}); both pre-H1 writers still fail the `
     + `invariant (-2.064 m and ${projectedError.toFixed(3)} m); `
-    + `${writers.length} banked position writers restore the centreline y.`,
+    + `${writers.length} banked position writers restore the centreline y. `
+    + `H1.2 camera: chase floor ${chaseFloor} m binds over the measured `
+    + `${MEASURED_CHASE_COLLAPSE_METRES} m collapse and stays inert under both `
+    + `maps' desired chase (${DESIRED_CHASE_GREENWATER_METRES} / `
+    + `${DESIRED_CHASE_BITTERPAN_METRES} m); surface floor ${surfaceFloor} m sits `
+    + "under the 2.1 m `desired` guard; both guards pinned to the damped camera "
+    + "and to the post-shake position by call-site assertions.",
 );

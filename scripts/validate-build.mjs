@@ -237,9 +237,11 @@ assert.ok(
 // at the JS ceiling of 243 the shell is already ~252, so a 251 shell ceiling
 // would fail builds the JS ceiling explicitly allows.
 // G3 + G4 merge: re-measured, for the same reason the JS ceiling above was.
+// H1 r2 merge 2026-09-03: shell measured 257.3 KiB on that branch (camera guards,
+// plaque re-derivation, pose diagnostics); ceiling 258 with the merged measurement.
 assert.ok(
-  shellGzip <= 257 * 1024,
-  `Initial app shell exceeds 257 KiB gzip (${(shellGzip / 1024).toFixed(1)} KiB).`,
+  shellGzip <= 258 * 1024,
+  `Initial app shell exceeds 258 KiB gzip (${(shellGzip / 1024).toFixed(1)} KiB).`,
 );
 assert.ok(
   html.includes('rel="preload"')

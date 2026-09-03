@@ -113,8 +113,18 @@ import { readFileSync } from "node:fs";
  * here is the wiring that can only be here, plus the comments that say why the
  * convention exists, which is the thing that was missing when two writers
  * broke it.
+ *
+ * H1.2 raises it a fourth time, by 130 lines, for the chase-camera guards the
+ * H1 review ruled a defect: two floors, the two short methods that apply them
+ * to the live camera, and the diagnostics that prove they work
+ * (`hullNdcY`, `cameraSurfaceClearanceMeters`, `chaseMeters`). The arithmetic
+ * is again NOT here -- `chaseDistanceCorrection` and `cameraSurfaceClearance`
+ * are in presentation.js and their floors are asserted in validate-pose.mjs.
+ * What is here is what has to touch `this.camera`, which is the one thing that
+ * cannot leave the race loop, plus the `?camguards=0` kill switch that keeps
+ * the guards' own before/after measurable.
  */
-const GAME_LINE_BUDGET = 2_106;
+const GAME_LINE_BUDGET = 2_251;
 
 function read(path) {
   return readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
