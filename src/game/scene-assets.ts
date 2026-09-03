@@ -167,7 +167,6 @@ const LIVING_WORLD_MOTION_B_URL = "/assets/greenwater/textures/greenwater_motion
 /** P12. Runway surface marking atlas, Greenwater opening straight only. */
 const OPENING_SURFACE_TEXTURE_URL = "/assets/greenwater/textures/greenwater_runway_1024.png";
 /** P12. Trackside board atlas, both maps. */
-const SIGNAGE_TEXTURE_URL = "/assets/greenwater/textures/futurisma_signage_1024.png";
 /**
  * P15 art pass 02. The pan crust: a 256 seamless tile for the ground itself and
  * a 1024 decal sheet for the 407 cracks, brine patches, windrows, scrape
@@ -197,7 +196,16 @@ const HANGAR_FIXTURES_TEXTURE_URL = "/assets/greenwater/textures/hangar_fixtures
  * `?art=base` returns this P18 one. The facade and trim sheets are unchanged —
  * a generated facade sheet was prepared and rejected on the crops, and no
  * generation in batch 1 covers the trim.
+ *
+ * H2b: the SIGNAGE sheet stays on its P12 pixel-authored edition. A generated
+ * one was prepared, wired to the same `?art=` switch, and REJECTED on the
+ * crops — the generation composes each board square and the cells are 4:1, so
+ * the SODIUM ROW face's three lines land at 31 px each against the base's 72 px
+ * headline and are an illegible smear at 55 m. The numbers and the reasoning
+ * are in `scripts/prepare-higgsfield-textures.py`, which still emits the sheet
+ * into `shots/higgsfield/` so the rejection stays reproducible.
  */
+const SIGNAGE_TEXTURE_URL = "/assets/greenwater/textures/futurisma_signage_1024.png";
 const BITTERPAN_FACADES_TEXTURE_URL = "/assets/map02/textures/bitterpan_facades_1024.png";
 const BITTERPAN_MASSING_PLACEMENTS_URL = "/data/map02/MASSING_PLACEMENTS.json";
 const TRIM_TEXTURE_URL = "/assets/greenwater/textures/futurisma_trim_512.png";

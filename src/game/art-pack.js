@@ -56,6 +56,7 @@ export const HORIZON_SHEETS = {
   hf: "/assets/greenwater/textures/futurisma_horizon_hf_1024.png",
 };
 
+
 /**
  * Parses `?art=`. Anything that is not `base` falls back to the default rather
  * than throwing, for the same reason `resolveRenderMode` does: a typo in a
