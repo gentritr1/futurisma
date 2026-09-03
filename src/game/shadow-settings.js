@@ -40,6 +40,32 @@ import { activeRenderMode } from "./render-mode.js";
 export const SHADOW_MAP_SIZE = 2048;
 /** Legal map sizes for the `?shadowMap=` A/B lever. Powers of two only. */
 export const SHADOW_MAP_SIZES = [512, 1024, 2048, 4096];
+
+/**
+ * The shadow filter. `"pcf"` is `THREE.PCFShadowMap`.
+ *
+ * P20.1 asked for `PCFSoftShadowMap` and wrote a comment explaining why it beat
+ * `VSMShadowMap`. That comment was describing a renderer state the game has
+ * never actually been in: three r184 deprecated `PCFSoftShadowMap`, and
+ * `WebGLShadowMap.render` replaces it with `PCFShadowMap` on the first shadow
+ * frame — with a console warning — before any shadow is drawn. So every measure-
+ * ment in P20.1's acceptance, including the contact-shadow luma and the acne
+ * check, was taken on PCF. Naming PCF here changes NOTHING about the frame; it
+ * makes the code say what the renderer does, and it silences a warning that
+ * fires on every load.
+ *
+ * VSM was measured against it rather than argued about a second time. On the
+ * Bitterpan headless soak (`?map=bitterpan&laps=1&demo=1&diagnostics=1&headless=1`),
+ * over a full lap each, and on the P20.1 acceptance crops. Numbers and the
+ * verdict live in `scripts/validate-shadows.mjs` beside the pin.
+ */
+export const SHADOW_MAP_TYPE = "pcf";
+/**
+ * Legal values for the `?shadowType=` A/B lever, so the VSM comparison above
+ * can be re-run by anyone rather than taken on trust. `"basic"` is unfiltered
+ * and is here to make the filter's cost visible, not as a shipping candidate.
+ */
+export const SHADOW_MAP_TYPES = ["basic", "pcf", "vsm"];
 /**
  * Side of the orthographic shadow box, in metres. 140 m covers the corridor
  * plus the trackside massing that shadows it; wider trades texel density for
@@ -101,6 +127,8 @@ export const SHADOW_UNLIT_FLOOR = 0.42;
 let cachedEnabled = null;
 /** @type {number | null} */
 let cachedMapSize = null;
+/** @type {string | null} */
+let cachedMapType = null;
 
 /**
  * `?shadows=0` (or `=off`/`=false`) is the kill switch. `?render=ps2` forces
@@ -134,6 +162,16 @@ export function resolveShadowMapSize(raw) {
   return SHADOW_MAP_SIZES.includes(value) ? value : SHADOW_MAP_SIZE;
 }
 
+/** Parses `?shadowType=`; anything unknown falls back to the default. */
+/**
+ * @param {string | null | undefined} raw
+ * @returns {string}
+ */
+export function resolveShadowMapType(raw) {
+  const value = typeof raw === "string" ? raw.trim().toLowerCase() : "";
+  return SHADOW_MAP_TYPES.includes(value) ? value : SHADOW_MAP_TYPE;
+}
+
 /**
  * @param {string} name
  * @returns {string | null}
@@ -162,6 +200,15 @@ export function shadowMapSize() {
     cachedMapSize = resolveShadowMapSize(searchValue("shadowMap"));
   }
   return cachedMapSize;
+}
+
+/** The shadow filter for this page load. Memoized on first read. */
+/** @returns {string} */
+export function shadowMapType() {
+  if (cachedMapType === null) {
+    cachedMapType = resolveShadowMapType(searchValue("shadowType"));
+  }
+  return cachedMapType;
 }
 
 /** World size of one shadow-map texel, in metres. */

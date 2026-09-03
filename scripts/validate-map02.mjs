@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { parseGlb } from "./lib/greenwater-package-validator.mjs";
 import { resolveApron, resolveApronProfile } from "../src/game/apron.js";
@@ -349,6 +350,122 @@ for (let index = 0; index < pads.pads.length; index += 1) {
         + `${pads.minimumSpacingMetres} m spacing.`,
     );
   }
+}
+
+// 3b. Boost pad PAINT. P20.7 item 1.
+//
+//     The pads above are a placement contract; this is the look contract, and
+//     it needs its own guard because the two are independent and the review
+//     history says so. P19 tone-mapped the pad and it still read as an object.
+//     P20.2 lifted its field to #909090 and it still read as an object — and,
+//     measured, it passed every luma criterion while doing so (field deck+39 to
+//     deck+46, two interior tones 56 apart, rim ABOVE the deck). What was
+//     actually wrong was chroma and a hard rim: the pad measured 49 HSV
+//     saturation against a deck at 11-17, with a one-texel step down to a
+//     #565656 border. Luma thresholds alone will not catch that a fourth time,
+//     so what is pinned here is the two decisions that fixed it.
+//
+//     Measured with scripts/visual/paint-probe.mjs + paint-luma.py, which
+//     project the pad's own top face out of the live scene rather than cropping
+//     a fixed rectangle — the demo lap is only reproducible to about 110 m, so a
+//     fixed crop is not measuring the same thing twice. Before -> after, four
+//     pads, 1280x720:
+//       chroma vs the deck beside it  +32..+38  ->  -4..-10
+//       rim vs the pad field          -27..-39  ->  -5..-16
+//       field vs the deck             +39..+46  ->  +41..+49  (target +18..+55)
+//       interior tones                2, 56 apart -> 2, 61 apart
+const bitterpanCourse = readFileSync(
+  new URL("../src/game/bitterpan-course.ts", import.meta.url),
+  "utf8",
+);
+assert.ok(
+  /const BOOST_PAD_COLOR = new THREE\.Color\(0xffffff\);/.test(bitterpanCourse),
+  "The Bitterpan boost pad's material colour must stay white. Every tone in "
+    + "createBoostPadTexture is authored as an ABSOLUTE value against a "
+    + "measured texel -> frame transfer; a tinted multiplier silently rescales "
+    + "all of them and is how the pad became a teal plate twice.",
+);
+assert.ok(
+  /toneMapped: true,/.test(bitterpanCourse.slice(
+    bitterpanCourse.indexOf("createBoostPads"),
+  )),
+  "The Bitterpan boost pad must stay tone-mapped; unmapped it is a glowing "
+    + "slab over the deck.",
+);
+{
+  // The soft edge, measured against the WIDEST pad on the lap (4.83 m, at
+  // BP_LONG_PAN_EARLY): 3 px of a 64 px sheet is 0.226 m across, and 3 px of
+  // 256 along a 16 m pad is 0.188 m. Both inside the phase's 0.25 m ceiling,
+  // and near enough to it that the ramp still reads as a fade rather than as a
+  // line — which is the failure it exists to avoid.
+  const ramp = /const rampPx = (\d+);/.exec(
+    bitterpanCourse.slice(bitterpanCourse.indexOf("createBoostPadTexture")),
+  );
+  assert.ok(ramp, "The Bitterpan boost pad paint has no edge ramp.");
+  const rampPx = Number(ramp[1]);
+  // The WIDEST pad, not the first one. The pad's width is a fraction of the
+  // deck half-width where it sits, so it varies along the lap; checking pad 0
+  // and calling it done is how a ramp lands inside the ceiling on one pad and
+  // outside it on another. (It also caught the first version of this paint:
+  // 4 px reads as 0.25 m on a 3.96 m pad, and the widest pad is 4.83 m.)
+  const padWidthMetres = Math.max(
+    ...production.boostPads.pads.map((pad) =>
+      production.boostPads.lateralHalfFraction * halfWidthAt(pad.distance) * 2),
+  );
+  const padLengthMetres = production.boostPads.halfLengthMetres * 2;
+  const acrossMetres = rampPx / 64 * padWidthMetres;
+  const alongMetres = rampPx / 256 * padLengthMetres;
+  assert.ok(
+    acrossMetres <= 0.25 && alongMetres <= 0.25,
+    `The Bitterpan boost pad's edge ramp is ${acrossMetres.toFixed(3)} m across `
+      + `and ${alongMetres.toFixed(3)} m along, over the 0.25 m ceiling.`,
+  );
+  assert.ok(
+    rampPx >= 3,
+    "An edge ramp under 3 px is a hard border with extra steps.",
+  );
+}
+// The P20.2 rim tone, as a PAINT instruction rather than as a word: the note
+// above createBoostPadTexture explains what #565656 used to be and why it went,
+// and that explanation is the opposite of a regression.
+assert.ok(
+  !/(fillStyle|strokeStyle|addColorStop)[^\n]*(#565656|rgb\(86, ?86, ?86\))/i
+    .test(bitterpanCourse),
+  "The P20.2 hard rim tone is being painted again in the Bitterpan boost pad "
+    + "paint. It rendered 16 luma below the field it enclosed at a one-texel "
+    + "step, which is the outline that made the pad read as a sunk plate.",
+);
+
+const greenwaterCourse = readFileSync(
+  new URL("../src/game/course.ts", import.meta.url),
+  "utf8",
+);
+assert.ok(
+  /function createGreenwaterBoostPadTexture\(\): THREE\.CanvasTexture/
+    .test(greenwaterCourse),
+  "Greenwater's boost pads must carry a generated paint map. Before P20.7 they "
+    + "were an untextured 0xb9e62e box: measured, ONE interior tone at deck+82 "
+    + "to deck+101, i.e. a flat acid-green rectangle filling the lane.",
+);
+assert.ok(
+  !/color: 0xb9e62e/.test(greenwaterCourse),
+  "Greenwater's boost pad is back to a flat acid-green multiplier; the colour "
+    + "belongs in the paint's core, not on the whole surface.",
+);
+{
+  const paint = greenwaterCourse.slice(
+    greenwaterCourse.indexOf("createGreenwaterBoostPadTexture"),
+  );
+  const ramp = /const rampPx = (\d+);/.exec(paint);
+  assert.ok(ramp, "The Greenwater boost pad paint has no edge ramp.");
+  // 3 px of 64 across a 4.8 m pad is 0.225 m; 3 px of 256 along an 18 m pad is
+  // 0.211 m. Both inside the 0.25 m ceiling.
+  const rampPx = Number(ramp[1]);
+  assert.ok(
+    rampPx / 64 * 4.8 <= 0.25 && rampPx / 256 * 18 <= 0.25 && rampPx >= 3,
+    `The Greenwater boost pad's edge ramp is ${rampPx} px, which is outside the `
+      + "[3 px, 0.25 m] band the phase allows.",
+  );
 }
 
 // 4. Hazards. Everything authored has to be reachable inside the ribbon and

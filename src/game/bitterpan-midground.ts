@@ -4,7 +4,7 @@ import midgroundJson from "./data/BITTERPAN_MIDGROUND.json";
 import { type RaceCourse, surfaceHeightAtLateral } from "./course";
 import { GROUND_Y_METRES } from "./bitterpan-surface";
 import { activeRenderMode } from "./render-mode.js";
-import { applyPs2MaterialTreatment } from "./totem";
+import { applyPs2MaterialTreatment, composeShaderInjection } from "./totem";
 
 /**
  * P20.3 — the 0-120 m band, given furniture.
@@ -51,6 +51,146 @@ import { applyPs2MaterialTreatment } from "./totem";
  * an assumption, so a future placement that DOES land on the apron rides the
  * authored cross-section instead of punching through it.
  */
+
+/**
+ * P20.7 item 2 — the sky fill that keeps a wind screen's road-facing side from
+ * being a black rectangle.
+ *
+ * THE MEASUREMENT THAT FORCED IT. P20.3 shipped 147 SCREEN_BAY instances and
+ * flagged the risk in its own note. Measured with scripts/visual/panel-probe.mjs
+ * on the P20.1 build, at stations 830 / 1343 / 2300, sampling the middle
+ * segment of every bay in frame and splitting the two faces by their own world
+ * normal against the live key light:
+ *
+ *   station   SHADOW faces        SUN faces
+ *   830       9.3  (8.1 - 15.1)   29.2 (26.8 - 34.9)
+ *   1343      18.0 (13.6 - 29.1)  26.6 (24.1 - 33.5)
+ *   2300      11.7 (9.1 - 18.4)   37.0
+ *
+ * (Rec.709 luma, 1280x720.) A panel at 8 luma beside a pan at ~110 is a hole in
+ * the frame, which is the taste risk that phase named.
+ *
+ * WHY IT IS NOT AN `emissive`. The obvious fix — `emissive = sky * k`, as a
+ * flat added radiance — cannot meet this phase's OTHER half, which is that the
+ * sun-facing side moves by no more than +-6. Emissive is added to every
+ * fragment regardless of which way it faces, and BOTH sides here sit low on the
+ * tone curve (9-18 and 27-37), so they are on the same near-linear stretch of
+ * it and move together. Worked through the measured transfer, lifting the
+ * shadow side from ~12 to 42 puts the sun side at ~47, i.e. +17. The curve does
+ * not save this the way it would against a genuinely bright sun side.
+ *
+ * WHAT THIS IS INSTEAD. A fill that is switched off by direct light: where the
+ * key already reaches a fragment, nothing is added; where it does not, a
+ * fraction of the sky colour is. It reads `reflectedLight.directDiffuse`, which
+ * three has already computed at that point in the Lambert shader, so it needs
+ * NO light direction of its own and therefore no per-frame uniform update and
+ * no import from atmosphere.ts — which matters, because the key direction is
+ * authored per sector and a fill keyed on a fixed direction would be wrong for
+ * two thirds of the lap.
+ *
+ * It is a cheat and it is worth naming as one: physically, a surface turned
+ * away from the sun on an open salt pan is lit by the whole sky dome, and the
+ * scene's one thin hemisphere term under-delivers that. This puts back
+ * something shaped like the missing sky, only where the sky is the only light
+ * there is.
+ *
+ * SCOPE. SCREEN_BAY only. The other five families are massing that reads
+ * correctly at these values, and widening the fill to them would change 422
+ * more instances that nothing in this phase measured.
+ */
+const SCREEN_BAY_FILL_FAMILY = "SCREEN_BAY";
+/**
+ * The fill colour: the authored S1 sky, `#c0a87f`, scaled down.
+ *
+ * THE SCALAR AND THE KNEE ARE A MEASURED PAIR, and they are set BELOW the
+ * phase's stated floor on purpose. P20.7 asks for every road-facing panel face
+ * to land in [42, 90] luma while the sun-facing side moves by no more than 6.
+ * Measured, those two cannot both hold on this layer: the sun-facing road-side
+ * faces render at 18.8-38.8 on the pre-fix build, so any setting that lifts the
+ * dark faces to 42 has already moved the bright ones past their own +-6.
+ *
+ * What the numbers say, at stations 830 / 1343 / 2300 (Rec.709 luma, 1280x720,
+ * scripts/visual/panel-probe.mjs + panel-luma.py, key light identified as the
+ * 1.55 caster rather than the 0.945 rim):
+ *
+ *   setting                 road-facing faces   flat%   edges%   (st 830)
+ *   pre-fix                 7.5 - 38.8          16.4    7.05
+ *   0.35 / 0.02 (shipped)   22.9 - 36.9         14.9    7.80
+ *   0.75 / 0.05 (hits 42)   35.3 - 58.2         16.5    6.97
+ *
+ * The last row is the point. Lifting the layer far enough to clear 42 lands the
+ * bays at the same value as the pan behind them, and the frame metrics agree
+ * with the eye: at the IDENTICAL camera pose (d = 893 m) the 42-clearing
+ * setting is WORSE than doing nothing on both of P20.3's own numbers, while the
+ * shipped setting improves both. A mid-ground layer that stops contrasting with
+ * the ground is the emptiness P20.3 was built to fix, one value later.
+ *
+ * So this ships the value that fixes the complaint that was actually made —
+ * "near-black rectangles at the roadside", darkest face 7.5 -> 22.9 — and the
+ * [42, 90] floor is reported unmet rather than met by washing the layer out.
+ * Raising it is one constant if that call goes the other way.
+ */
+const SCREEN_BAY_FILL_SKY = 0xc0a87f;
+const SCREEN_BAY_FILL_SCALE = 0.35;
+/**
+ * Where the fill has faded to nothing, as Rec.709 luma of the panel's ALREADY
+ * SHADED radiance (direct + indirect, linear). A fragment at or above this
+ * receives none of it; one at zero receives all of it, on a smoothstep.
+ *
+ * Keyed on total shaded luma rather than on the key light's own term, and that
+ * was a correction, not the first idea. Gating on `directDiffuse` looks more
+ * principled — "fill in where the sun does not reach" — but the scene carries a
+ * RIM light at 0.945 alongside the key at 1.55, and the rim reaches exactly the
+ * faces the key does not. Measured: with a direct-light gate, the two bays in
+ * the station 1343 frame moved +2.8 and -0.5 while their neighbours moved +21
+ * to +26, because the rim was switching their fill off. Darkness is the thing
+ * being complained about, so darkness is what the gate reads.
+ */
+const SCREEN_BAY_FILL_KNEE = 0.02;
+
+/**
+ * Arms the fill on one family's material. See {@link SCREEN_BAY_FILL_FAMILY}
+ * for why it exists and why it is not an `emissive`.
+ *
+ * Composed through `composeShaderInjection` rather than assigned, because
+ * `applyPs2MaterialTreatment` has already installed its own `onBeforeCompile`
+ * and its own program cache key on this material under `?render=ps2`; a plain
+ * assignment would delete that injection while leaving its cache key behind.
+ *
+ * TUNING. `reflectedLight` is in linear radiance and the fill is multiplied by
+ * `diffuseColor.rgb`, so no hex code predicts the frame and every value here
+ * came off a render. See {@link SCREEN_BAY_FILL_SKY} for the measurement table
+ * and for why the shipped pair sits below the phase's stated floor.
+ */
+function composeScreenBaySkyFill(material: THREE.Material): void {
+  const fill = new THREE.Color(SCREEN_BAY_FILL_SKY)
+    .multiplyScalar(SCREEN_BAY_FILL_SCALE);
+  composeShaderInjection(material, "bp-screen-bay-sky-fill", (shader) => {
+    shader.uniforms.uScreenBayFill = { value: fill };
+    shader.uniforms.uScreenBayFillKnee = { value: SCREEN_BAY_FILL_KNEE };
+    // The anchor is three's own Lambert chunk order: after
+    // `lights_fragment_end` both accumulators are final — which is what lets
+    // the gate read the panel's finished shading — and `diffuseColor` still
+    // holds the mapped, instance-tinted albedo, which is what keeps the fill
+    // from flattening the canvas texture into a wash.
+    shader.fragmentShader = shader.fragmentShader
+      .replace(
+        "#include <common>",
+        "#include <common>\nuniform vec3 uScreenBayFill;\n"
+          + "uniform float uScreenBayFillKnee;",
+      )
+      .replace(
+        "#include <lights_fragment_end>",
+        "#include <lights_fragment_end>\n"
+          + "float bpSkyFillLuma = dot(reflectedLight.directDiffuse "
+          + "+ reflectedLight.indirectDiffuse, vec3(0.2126, 0.7152, 0.0722));\n"
+          + "float bpSkyFillAmount = 1.0 - smoothstep(0.0, uScreenBayFillKnee, "
+          + "bpSkyFillLuma);\n"
+          + "reflectedLight.indirectDiffuse += uScreenBayFill "
+          + "* bpSkyFillAmount * diffuseColor.rgb;",
+      );
+  });
+}
 
 const GROUP_NAME = "BP_MIDGROUND";
 const MESH_PREFIX = "BP_MIDGROUND_";
@@ -732,6 +872,10 @@ export class BitterpanMidground {
       mesh.frustumCulled = false;
 
       applyPs2MaterialTreatment(mesh, { worldGeometry: true });
+      // AFTER the PS2 treatment, never before: that call assigns
+      // `onBeforeCompile` outright, so an injection installed first would be
+      // silently dropped under `?render=ps2`.
+      if (family === SCREEN_BAY_FILL_FAMILY) composeScreenBaySkyFill(material);
       // The treatment pins anisotropy to 1 and, outside `?render=ps2`, would
       // leave this sheet point-sampled. `bitterpan-facades.ts` re-asserts the
       // delivery's own filtering on the same texture for the same reason; these
