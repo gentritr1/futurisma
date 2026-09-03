@@ -17,6 +17,8 @@ import {
   PAN_FLOOR_FEATURE_FADE_FAR,
   PAN_FLOOR_FEATURE_FADE_NEAR,
   PAN_FLOOR_FEATURE_TRIM,
+  PAN_FLOOR_FINE_OCTAVE_FADE_FAR,
+  PAN_FLOOR_FINE_OCTAVE_FADE_NEAR,
   PAN_FLOOR_MACRO_FADE_FAR,
   PAN_FLOOR_MACRO_FADE_NEAR,
   PAN_FLOOR_MACRO_RAMP_FAR,
@@ -208,6 +210,12 @@ export interface BitterpanSurfaceStats {
   };
 }
 
+/**
+ * The review-only `?floorprobe` mode. Mirrors `floor-probe.js`, which owns the
+ * parsing and documents what each value hides; nothing here reads the URL.
+ */
+type PanFloorProbeMode = 0 | 1 | 2 | 3 | 4 | 5 | 6;
+
 /** Corner order and winding, identical to `opening-surface.ts`. */
 const CORNERS: ReadonlyArray<{ u: number; v: number; su: number; sv: number }> = [
   { u: -0.5, v: -0.5, su: 0, sv: 0 },
@@ -236,7 +244,7 @@ export class BitterpanSurface {
     course: RaceCourse,
     groundTexture: THREE.Texture,
     decalTexture: THREE.Texture,
-    probeMode: 0 | 1 | 2 = 0,
+    probeMode: PanFloorProbeMode = 0,
   ): BitterpanSurface {
     const sheetKey = "bitterpan_crust_1024";
     const sheet = ATLAS_SHEETS[sheetKey];
@@ -396,7 +404,7 @@ export class BitterpanSurface {
     course: RaceCourse,
     groundTextureUrl: string,
     decalTextureUrl: string,
-    probeMode: 0 | 1 | 2 = 0,
+    probeMode: PanFloorProbeMode = 0,
   ): Promise<BitterpanSurface> {
     const loader = new THREE.TextureLoader();
     const [groundTexture, decalTexture] = await Promise.all([
@@ -536,7 +544,18 @@ float panFootprint( vec2 world ) {
  * and `material.onBeforeCompile = fn` would delete it while leaving its program
  * cache key in place.
  */
-function injectPanFloorMacro(shader: THREE.WebGLProgramParametersWithUniforms): void {
+function injectPanFloorMacro(
+  shader: THREE.WebGLProgramParametersWithUniforms,
+  probeMode: PanFloorProbeMode = 0,
+): void {
+  // Review-only single-term switches — see `floor-probe.js`. Every one of these
+  // is a COMPILE-TIME literal folded into the generated source, so mode 0 emits
+  // byte-for-byte the shader it emitted without them.
+  const tileBreakBlend = probeMode === 4 ? 0 : PAN_FLOOR_SECONDARY_BLEND;
+  const streakProbe = probeMode === 3 || probeMode === 5
+    ? "\tpanBloom = 0.0;\n\tpanScourBand = 0.0;\n" : "";
+  const brineProbe = probeMode === 3 || probeMode === 6
+    ? "\tpanPool = 0.0;\n\tpanRimBand = 0.0;\n" : "";
   const [meanR, meanG, meanB] = PAN_FLOOR_TILE_MEAN_LINEAR;
   const [windX, windZ] = PAN_FLOOR_WIND_VECTOR;
   const [tintR, tintG, tintB] = PAN_FLOOR_BRINE_TINT;
@@ -574,7 +593,7 @@ function injectPanFloorMacro(shader: THREE.WebGLProgramParametersWithUniforms): 
 	vec2 panTurnedUv = vec2( vMapUv.y, - vMapUv.x ) * ${glsl(PAN_FLOOR_ROTATED_SCALE)} + vec2( 0.083, 0.457 );
 	vec3 panCross = texture2D( map, panTurnedUv ).rgb;
 	vec3 panMacro = 0.5 * ( panWide + panCross ) / panTileMean;
-	panCrust *= mix( vec3( 1.0 ), panMacro, ${glsl(PAN_FLOOR_SECONDARY_BLEND)} * ${vertexRamp} * panDetail );
+	panCrust *= mix( vec3( 1.0 ), panMacro, ${glsl(tileBreakBlend)} * ${vertexRamp} * panDetail );
 
 	// --- wind streaks -------------------------------------------------------
 	vec2 panAlong = vec2( ${glsl(windX)}, ${glsl(windZ)} );
@@ -586,23 +605,31 @@ function injectPanFloorMacro(shader: THREE.WebGLProgramParametersWithUniforms): 
 	// streak and reads from 20 m to about 120 m; past that it is sub-pixel from
 	// this camera whatever the filtering does. The coarse one is the same
 	// pattern at ${glsl(PAN_FLOOR_STREAK_OCTAVE_SCALE)}x, so its bands are tens
-	// of metres across and carry the read all the way to the horizon. Same
+	// of metres across and carry the read as far as the features go. Same
 	// bearing, so they never read as two patterns.
+	// P20.11: the FINE octave hands over to the coarse one across 70-180 m.
+	// Past there its 10 m cells are smaller than a pixel's depth footprint, so
+	// it is a point sample of an unresolvable field and it flickers rather than
+	// reads. The features as a whole then hand over to the smooth vertex field
+	// across 150-320 m. See PAN_FLOOR_FINE_OCTAVE_FADE_NEAR and
+	// PAN_FLOOR_FEATURE_FADE_NEAR for what each was worth, measured.
+	float panFineOctave = 1.0 - smoothstep( ${glsl(PAN_FLOOR_FINE_OCTAVE_FADE_NEAR)}, ${glsl(PAN_FLOOR_FINE_OCTAVE_FADE_FAR)}, vPanDepth );
 	float panStreak = panRidge( panStreakUv );
 	float panStreakWide = panRidge( panStreakUv / ${glsl(PAN_FLOOR_STREAK_OCTAVE_SCALE)} + 11.37 );
-	float panBloom = ${glsl(PAN_FLOOR_STREAK_BANDS[0].step)} * panBand( ${glsl(PAN_FLOOR_STREAK_BANDS[0].threshold)}, panStreak )
-		+ ${glsl(PAN_FLOOR_STREAK_BANDS[1].step)} * panBand( ${glsl(PAN_FLOOR_STREAK_BANDS[1].threshold)}, panStreak )
+	float panBloom = panFineOctave * ( ${glsl(PAN_FLOOR_STREAK_BANDS[0].step)} * panBand( ${glsl(PAN_FLOOR_STREAK_BANDS[0].threshold)}, panStreak )
+		+ ${glsl(PAN_FLOOR_STREAK_BANDS[1].step)} * panBand( ${glsl(PAN_FLOOR_STREAK_BANDS[1].threshold)}, panStreak ) )
 		+ ${glsl(PAN_FLOOR_STREAK_BANDS[0].step)} * panBand( ${glsl(PAN_FLOOR_STREAK_BANDS[0].threshold)}, panStreakWide )
 		+ ${glsl(PAN_FLOOR_STREAK_BANDS[1].step)} * panBand( ${glsl(PAN_FLOOR_STREAK_BANDS[1].threshold)}, panStreakWide );
 	float panScour = panRidge( panStreakUv * vec2( ${glsl(PAN_FLOOR_SCOUR_STRETCH[0])}, ${glsl(PAN_FLOOR_SCOUR_STRETCH[1])} ) + 37.19 );
 	float panScourWide = panRidge( panStreakUv * vec2( ${glsl(PAN_FLOOR_SCOUR_STRETCH[0])}, ${glsl(PAN_FLOOR_SCOUR_STRETCH[1])} ) / ${glsl(PAN_FLOOR_STREAK_OCTAVE_SCALE)} + 5.51 );
-	float panScourBand = ${glsl(PAN_FLOOR_SCOUR_STEP)} * panBand( ${glsl(PAN_FLOOR_SCOUR_THRESHOLD)}, panScour )
+	float panScourBand = panFineOctave * ${glsl(PAN_FLOOR_SCOUR_STEP)} * panBand( ${glsl(PAN_FLOOR_SCOUR_THRESHOLD)}, panScour )
 		+ ${glsl(PAN_FLOOR_SCOUR_STEP)} * panBand( ${glsl(PAN_FLOOR_SCOUR_THRESHOLD)}, panScourWide );
 	// Clamped to ONE octave's worth, so the accepted contrast ratios are the
 	// ratios that ship: a bloom core is 1.22:1 against the crust and a scour
 	// streak 0.85:1, whether one octave fires there or both.
 	panBloom = min( panBloom, ${glsl(PAN_FLOOR_STREAK_BANDS[0].step + PAN_FLOOR_STREAK_BANDS[1].step)} );
 	panScourBand = min( panScourBand, ${glsl(PAN_FLOOR_SCOUR_STEP)} );
+${streakProbe}
 
 	// --- brine flats, with a shoreline measured in metres --------------------
 	vec2 panPoolUv = vPanWorld / ${glsl(PAN_FLOOR_BRINE_SCALE_METRES)};
@@ -618,6 +645,7 @@ function injectPanFloorMacro(shader: THREE.WebGLProgramParametersWithUniforms): 
 	float panEdge = max( ${glsl(PAN_FLOOR_SHORE_METRES)}, panFootprint( vPanWorld ) );
 	float panPool = smoothstep( - panEdge, panEdge, panShoreMetres );
 	float panRimBand = panPool * ( 1.0 - smoothstep( ${glsl(PAN_FLOOR_RIM_METRES)} - panEdge, ${glsl(PAN_FLOOR_RIM_METRES)} + panEdge, panShoreMetres ) );
+${brineProbe}
 
 	// --- one product, trimmed so the features do not darken the pan ---------
 	vec3 panFeature = vec3( ${glsl(PAN_FLOOR_FEATURE_TRIM)} );
@@ -654,7 +682,7 @@ function injectPanFloorMacro(shader: THREE.WebGLProgramParametersWithUniforms): 
  * the crust tile twice more at macro scales. 32,768 triangles is the whole cost;
  * they are static, in one buffer, and never re-uploaded.
  */
-function buildPanFloor(course: RaceCourse, texture: THREE.Texture, probeMode: 0 | 1 | 2): {
+function buildPanFloor(course: RaceCourse, texture: THREE.Texture, probeMode: PanFloorProbeMode): {
   mesh: THREE.Mesh;
   colours: ReturnType<typeof generatePanFloorColours>;
 } {
@@ -717,7 +745,11 @@ function buildPanFloor(course: RaceCourse, texture: THREE.Texture, probeMode: 0 
   }
   // AFTER the PS2 treatment, so the composition wraps that injection rather
   // than being wrapped by it — and so a ps2 run keeps both.
-  if (!bypass) composeShaderInjection(material, "bpPanFloorMacro", injectPanFloorMacro);
+  if (!bypass) {
+    composeShaderInjection(material, "bpPanFloorMacro", (shader) => {
+      injectPanFloorMacro(shader, probeMode);
+    });
+  }
   return { mesh, colours };
 }
 

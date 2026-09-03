@@ -42,13 +42,27 @@
  *    samples of the same crust tile at 1/37 and 1/23, and a fade of the crust
  *    detail toward the tile mean past 300 m.
  *
- * ## Aliasing, and why the features may run to the horizon
+ * ## Aliasing, and how far the features may run — REVISED BY P20.11
  *
- * Every threshold in the fragment stage is widened to the PIXEL FOOTPRINT
- * (`fwidth`), so a streak edge that is crisp at 50 m averages to its own mean
- * at 900 m instead of sparkling. That is what lets the streaks keep their edges
- * where they read and dissolve where they would alias, with no LOD popping and
- * no hand-tuned cutoff.
+ * P20.6 claimed this section as solved: every threshold in the fragment stage
+ * is widened to the pixel footprint, "so a streak edge that is crisp at 50 m
+ * averages to its own mean at 900 m instead of sparkling", with no cutoff. Two
+ * of those three clauses were wrong and the measurement is in
+ * {@link PAN_FLOOR_FEATURE_FADE_NEAR}.
+ *
+ * It is not `fwidth`: `panBand` deliberately takes the SMALLER of the two
+ * screen-space derivatives, which is what keeps a streak running toward the
+ * horizon crisp instead of dissolving it, and is correct for that job. And a
+ * width built from a derivative cannot average anything to its mean once the
+ * field is past Nyquist, because the derivative is a finite difference between
+ * two pixels and stops reporting the footprint at exactly the distance the
+ * footprint starts to matter. At race speed the far pan crawled: 9.81 luma of
+ * frame-to-frame change against a 2.06 floor.
+ *
+ * So there IS a hand-tuned cutoff now, two of them, and they are the fix:
+ * the fine streak octave hands over to the coarse one across 70-180 m, and the
+ * features as a whole hand over to the smooth vertex field and fog across
+ * 150-320 m. Both are stated in metres, measured, and reversible.
  *
  * ## Why 128 segments and not the 96 the brief suggested
  *
@@ -370,22 +384,96 @@ export const PAN_FLOOR_MACRO_FADE_FAR = 1_400;
 /**
  * Where the FEATURES fade, in metres of view depth.
  *
- * Much later than the vertex field, because the streaks running toward the
- * horizon are the depth cue this round exists to deliver, and they only cost
- * the last stretch before `camera.far`.
+ * P20.6 shipped this at 1,150-1,800 m, i.e. effectively never, and wrote down
+ * the bill it was declining to pay: the far band's frame-to-frame swing went
+ * from 0.47 luma before the phase to 1.22 with the features, "the price of
+ * anisotropic thresholds ... keeping a streak edge crisp along the view is the
+ * same decision as letting it flicker a little as the camera moves." In motion
+ * at race speed that reads as the far pan crawling, and P20.11 is the round
+ * that pays it.
  *
- * A cost this does NOT buy back, stated rather than implied: the far band's
- * frame-to-frame high-pass swing goes from 0.47 luma on the pre-phase build to
- * 1.22 with these features, and pulling this fade in to 700 m changed that to
- * 1.216 — i.e. not at all. The extra swing comes from the 300-700 m range,
- * where the features are supposed to read, not from the last few hundred
- * metres. It is the price of anisotropic thresholds (see `panBand`): keeping a
- * streak edge crisp along the view is the same decision as letting it flicker
- * a little as the camera moves. Fixing it means softening the edges, which is
- * the thing round 1 was rejected for.
+ * ## What was tried, in order, and what each was worth
+ *
+ * Measured with `scripts/visual/pan-flicker.py` over a 16-frame burst on the
+ * long pan: mean |delta luma| between consecutive frames over rows 330-352,
+ * off-road columns, both frames above the calibrated 112 mask. The control is
+ * the same binary under `?floorprobe=2`, which bypasses this whole phase.
+ * Repeat runs of one build spread about 0.6 luma, so nothing below that is a
+ * result.
+ *
+ *   control (`floorprobe=2`)                       median 2.06   max 3.25
+ *   P20.6 as shipped (`floorprobe=1`)              median 9.81   max 12.13
+ *
+ * Which term, by single-term probe on the shipped build (see `floor-probe.js`):
+ *
+ *   `=4` tile break off, features on               median 9.16  — unchanged
+ *   `=6` brine off, streaks on                     median 8.52  — small
+ *   `=5` streaks off, brine on                     median 3.26  — the cause
+ *   `=3` all features off                          median 2.44
+ *
+ * So it is the thresholded streak bands, and the tile-break taps are not
+ * involved at all: their uv derivatives are 1/37 and 1/23 of the base, so the
+ * hardware already picks a mip that matches their footprint.
+ *
+ * Two fixes were then built, measured, and REMOVED for not working, which is
+ * worth recording so the next round does not rebuild them:
+ *
+ * 1. **Widening the terrace edge with distance** — mixing `panBand`'s width
+ *    from the anisotropic smaller derivative toward the larger one and scaling
+ *    it to 1.5 px past 300 m. Worth 9.81 -> 9.07, which is inside the 0.6 run
+ *    spread. Pulling the ramp in to 90-200 m and 2.5 px was worth nothing
+ *    either (4.63 / 5.02 against 4.42-4.99 without it).
+ * 2. **A depth-driven FLOOR on that width**, so it could not saturate. Made it
+ *    WORSE: 6.94 -> 7.48.
+ *
+ * Both failed for the same reason, and it is the finding of this round: the
+ * flicker is not in the EDGE, it is in the VALUE. Past Nyquist `panRidge`
+ * returns a point sample of a field the pixel cannot resolve, and that sample
+ * jitters as the camera moves. Any remapping of an aliased value — a wider
+ * smoothstep included — is still a function of a jittering input. Only two
+ * things work: lower the frequency of the value, or lower the amplitude of the
+ * term. This fade is the second, and {@link PAN_FLOOR_FINE_OCTAVE_FADE_NEAR}
+ * is the first.
+ *
+ * ## What it costs, stated
+ *
+ * Features are gone by 320 m, so past there the pan carries the smooth vertex
+ * field and fog only. The near and mid read survives because that read lives
+ * closer in: measured on 13 race-time-matched stations with
+ * `scripts/visual/pan-macro.py`, the blurred-and-detrended pan-band stdev is
+ * 2.86x the `floorprobe=2` control against 2.93x on the pre-fix build — 98% of
+ * it retained. That metric is entirely feature-driven, not an artefact: with
+ * the features switched off under `?floorprobe=3` it reads 1.03x.
  */
-export const PAN_FLOOR_FEATURE_FADE_NEAR = 1_150;
-export const PAN_FLOOR_FEATURE_FADE_FAR = 1_800;
+export const PAN_FLOOR_FEATURE_FADE_NEAR = 150;
+export const PAN_FLOOR_FEATURE_FADE_FAR = 320;
+
+
+/**
+ * P20.11 — where the FINE streak octave hands over to the coarse one, in
+ * metres of view depth.
+ *
+ * The other half of the fix above, and the more surgical one: rather than
+ * fading every feature, this removes the single term that is the furthest past
+ * Nyquist at any given distance. The fine octave's field is
+ * {@link PAN_FLOOR_STREAK_WIDTH_METRES} across; a chase-camera pixel at 250 m
+ * already spans more than that in DEPTH, so `panRidge` is point-sampling it.
+ * The coarse octave is the same pattern at
+ * {@link PAN_FLOOR_STREAK_OCTAVE_SCALE}x and stays resolvable much further
+ * out, so it is left alone and keeps carrying the convergence toward the
+ * horizon.
+ *
+ * P20.6 said as much and did not act on it: "the fine one is the authored
+ * 6-14 m streak and reads from 20 m to about 120 m; past that it is sub-pixel
+ * from this camera whatever the filtering does." It was still being summed at
+ * every distance.
+ *
+ * Worth, on the same instrument as above and in the presence of the feature
+ * fade: 130-330 m was worth 5.20 -> 4.55 and 70-180 m a further 4.55 -> ~4.4.
+ * Inside 70 m — the whole range the octave was authored for — nothing changes.
+ */
+export const PAN_FLOOR_FINE_OCTAVE_FADE_NEAR = 70;
+export const PAN_FLOOR_FINE_OCTAVE_FADE_FAR = 180;
 
 /**
  * One node of the centreline polyline the sector biases are measured against.
