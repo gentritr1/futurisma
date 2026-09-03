@@ -122,12 +122,19 @@ function derive(report, map) {
     for (const side of ["left", "right"]) {
       const tall = span[side];
       if (tall === null) continue;
-      const raw = Math.min(span.clamp, tall - HULL_MARGIN_METRES);
+      // P21 — capped and tested against the span's WIDEST clamp, not its
+      // narrowest. `resolveApron` re-applies `min(authoredLimit, derived)` at
+      // every station, so a limit derived against the wide end can never
+      // over-narrow the narrow end; reading the narrow end, however, silently
+      // dropped the entry wherever the edge type changed mid-bucket and left the
+      // wide end running at the full authored clamp. See `TallGeometrySpan.clampMax`.
+      const cap = span.clampMax ?? span.clamp;
+      const raw = Math.min(cap, tall - HULL_MARGIN_METRES);
       const limit = Math.max(span.halfWidth, raw);
       if (raw < span.halfWidth) flooredToDeck += 1;
-      if (limit < span.clamp - 1e-6) {
+      if (limit < cap - 1e-6) {
         trimmed += 1;
-        maxTrim = Math.max(maxTrim, span.clamp - limit);
+        maxTrim = Math.max(maxTrim, cap - limit);
         sides[side] = {
           limit: Number(limit.toFixed(3)),
           setBy: span[`${side}Mesh`],
@@ -140,6 +147,10 @@ function derive(report, map) {
         distance: span.distance,
         halfWidth: span.halfWidth,
         clamp: span.clamp,
+        // P21 — the cap the limit was actually derived against: the clamp at
+        // this span's WIDEST station. `clamp` above stays the narrowest, which
+        // is the number the deck-floor and run-off assertions want.
+        clampMax: span.clampMax ?? span.clamp,
         ...sides,
       });
     }
@@ -169,8 +180,10 @@ for (const { map, flag, out } of MAPS) {
     spanMetres: SPAN_METRES,
     hullMarginMetres: HULL_MARGIN_METRES,
     rule:
-      "limit = max(halfWidth, min(clamp, tallGeometryLateral - hullMargin)); "
-      + "geometry at or below 0.5 m above the local deck plane does not bound.",
+      "limit = max(halfWidth, min(clampMax, tallGeometryLateral - hullMargin)); "
+      + "geometry at or below TALL_GEOMETRY_MIN_HEIGHT_METRES (0.6 m, the "
+      + "measured hull-bottom clearance) above the local deck plane does not "
+      + "bound, and neither does a collidable hazard.",
     summary,
     entries,
   };

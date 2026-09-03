@@ -441,7 +441,15 @@ assert.ok(
 // that a regression would show up as: the table still has exactly the spans it
 // had, and none of them names this layer.
 // ---------------------------------------------------------------------------
-const PINNED_BITTERPAN_SPANS = 3;
+// P21 lowered the derivation's bounding floor from 0.85 m to the measured
+// hull-bottom clearance of 0.60 m AND excluded the collidable cable coils from
+// it, which removed the two coil-set entries at 2850 m and 2860 m. Those two
+// were invisible walls at a hazard the craft is meant to aim past — the exact
+// case P16 chose 0.85 m to prevent, which shipped anyway because the coil
+// measured 0.85 m tall on that span. What remains is the single BP_SIGNAGE_POSTS
+// span at 2990 m. The assertion this file exists for is unchanged: the count is
+// still pinned, and none of it may be set by the mid-ground layer.
+const PINNED_BITTERPAN_SPANS = 1;
 assert.equal(
   LIMITS.entries.length,
   PINNED_BITTERPAN_SPANS,
