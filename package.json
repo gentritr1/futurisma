@@ -20,6 +20,10 @@
     "validate:build": "node scripts/validate-build.mjs",
     "validate:map": "node scripts/validate-map.mjs",
     "validate:map02": "node scripts/validate-map02.mjs",
+    "validate:nightshift": "node scripts/validate-nightshift.mjs",
+    "validate:polarity": "node scripts/validate-polarity.mjs",
+    "validate:polarity-environment": "node scripts/validate-polarity-environment.mjs",
+    "validate:totem-evolution": "node --experimental-strip-types scripts/validate-totem-evolution.mjs",
     "validate:environment": "node scripts/validate-greenwater-package.mjs",
     "validate:environment:history": "node scripts/validate-greenwater-package.mjs GREENWATER_ENVIRONMENT_STAGE2.zip GREENWATER_ENVIRONMENT_STAGE1.zip",
     "validate:environment:accepted": "node scripts/validate-greenwater-package.mjs GREENWATER_ENVIRONMENT_v1.0.zip GREENWATER_ENVIRONMENT_STAGE2.zip",
@@ -40,7 +44,7 @@
     "validate:shadows": "node scripts/validate-shadows.mjs",
     "validate:security": "node scripts/validate-security.mjs",
     "validate:soundtrack": "node scripts/validate-soundtrack.mjs",
-    "test:code": "npm run validate:race-presence && npm run validate:map && npm run validate:map02 && npm run validate:package-boundary && npm run validate:physics && npm run validate:apron && npm run validate:drivable-limits && npm run validate:race && npm run validate:race-modes && npm run validate:rivals && npm run validate:control && npm run validate:audio && npm run validate:audio-ambience && npm run validate:camera && npm run validate:presentation && npm run validate:graphics && npm run validate:frames && npm run validate:render && npm run validate:lighting && npm run validate:living-world && npm run validate:decal-cells && npm run validate:art-pass && npm run validate:furniture && npm run validate:minimap && npm run validate:seams && npm run validate:shadows && npm run validate:persistence && npm run validate:ghost && npm run validate:security && npm run validate:soundtrack && npm run validate:midground && npm run validate:corridor && npm run validate:track-events && npm run validate:pose && npm run build && npm run validate:build",
+    "test:code": "npm run validate:tidal-pump-gantry && npm run validate:tideline-foundry && npm run validate:tideline && npm run validate:tideline-environment && npm run validate:tideline-runtime && npm run validate:polarity-simulation && npm run validate:power-kit && npm run validate:race-presence && npm run validate:map && npm run validate:map02 && npm run validate:nightshift && npm run validate:polarity && npm run validate:polarity-runtime && npm run validate:polarity-minimap && npm run validate:city-rivals && npm run validate:polarity-environment && npm run validate:totem-evolution && npm run validate:package-boundary && npm run validate:physics && npm run validate:apron && npm run validate:drivable-limits && npm run validate:race && npm run validate:race-modes && npm run validate:rivals && npm run validate:control && npm run validate:audio && npm run validate:audio-ambience && npm run validate:camera && npm run validate:presentation && npm run validate:graphics && npm run validate:frames && npm run validate:render && npm run validate:lighting && npm run validate:living-world && npm run validate:decal-cells && npm run validate:art-pass && npm run validate:furniture && npm run validate:minimap && npm run validate:seams && npm run validate:shadows && npm run validate:persistence && npm run validate:ghost && npm run validate:security && npm run validate:soundtrack && npm run validate:midground && npm run validate:corridor && npm run validate:track-events && npm run validate:pose && npm run build && npm run validate:build",
     "test:archives": "npm run validate:assets && npm run validate:environment:history && npm run validate:environment:accepted",
     "test": "npm run test:code && npm run test:archives",
     "validate:art-pass": "node scripts/validate-art-pass.mjs",
@@ -48,7 +52,17 @@
     "validate:drivable-limits": "node scripts/validate-drivable-limits.mjs",
     "validate:decal-cells": "node scripts/derive-decal-cells.mjs --check",
     "validate:midground": "node scripts/validate-midground.mjs",
-    "validate:corridor": "node scripts/validate-corridor.mjs"
+    "validate:corridor": "node scripts/validate-corridor.mjs",
+    "validate:polarity-runtime": "node scripts/validate-polarity-runtime.mjs",
+    "validate:polarity-minimap": "node scripts/validate-polarity-minimap.mjs",
+    "validate:city-rivals": "node scripts/validate-city-rivals.mjs",
+    "validate:tideline": "node scripts/validate-tideline.mjs",
+    "validate:tideline-environment": "node scripts/validate-tideline-environment.mjs",
+    "validate:tideline-runtime": "node scripts/validate-tideline-runtime.mjs",
+    "validate:polarity-simulation": "node scripts/validate-polarity-simulation.mjs",
+    "validate:power-kit": "node --experimental-strip-types scripts/validate-power-kit.mjs",
+    "validate:tideline-foundry": "node scripts/validate-tideline-foundry.mjs",
+    "validate:tidal-pump-gantry": "node scripts/validate-tidal-pump-gantry.mjs"
   },
   "dependencies": {
     "three": "0.184.0"

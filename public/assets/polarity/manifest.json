@@ -1,0 +1,14 @@
+{
+  "name": "Polarity",
+  "generator": "Blender 5.2.0 LTS",
+  "powerHalls": 21,
+  "capacitorBanks": 20,
+  "inverterRings": 7,
+  "pylons": 51,
+  "towers": 38,
+  "triangles": 94684,
+  "lightAnchors": 125,
+  "seed": 404,
+  "designClearanceMetres": 24,
+  "upperDeckHeightMetres": 22
+}

@@ -1,0 +1,16 @@
+Generation mode: built-in image_gen. No named model override was exposed.
+Original output: /Users/gentlegen/.codex/generated_images/01a06e0e-746a-7581-a881-6e802a32c9c3/exec-1a317553-77fd-41fe-842e-eb7eff67f175.png
+Shipped texture: public/assets/tideline/signage.webp (resized to 1024x1024, WebP quality 88).
+The original generated output was inspected before UV mapping in Blender. Blender render verified the orientation and readable placement on a framed placard.
+
+Use case: stylized-concept.
+Asset type: one original square game texture atlas for worn industrial sign faces, to be mapped onto 3D placards in a PS2-inspired maritime racing level.
+Make a 1024-by-1024 square image divided into an EXACT uniform 2-by-2 grid of FOUR equally sized square sign faces. Every sign fills its quadrant edge-to-edge; no outer margin, no mockup perspective, no cast shadows, no scene, no border or gutters between quadrants. Straight-on flat orthographic printable surfaces, entirely opaque.
+
+Visual identity: believable late-1990s / early-2000s maritime infrastructure, mothballed underwater reactor and night cargo port. Restrained salt corrosion, scuffed painted steel, stencilled engineering diagrams, bold utilitarian condensed typography readable at a distance. Paper bone, faded amber, petroleum teal and dark indigo. Industrial information hierarchy, big numbers, strong pictogram shapes, a little grain. No glossy futuristic cyberpunk styling, no generic neon lines, no real brands.
+
+TOP LEFT quadrant: faded petroleum teal sign, large bone-white text exactly "PELAGIC AUTHORITY", enormous stencil "07", a simple circular pressure-vessel cutaway drawing with three piping lines, small text exactly "TIDELINE REACTOR".
+TOP RIGHT quadrant: aged dark indigo freight terminal sign, large amber text exactly "PORT AFTERLIGHT", enormous bone-white "04", a bold cargo-crane pictogram and small text exactly "DEEPWATER FREIGHT".
+BOTTOM LEFT quadrant: aged bone-white ownership plate, bold dark text exactly "REACTOR 03", amber caution diagonal band confined to bottom edge, large dark text exactly "MOTHBALLED", small stamped inspection boxes and a simple turbine section diagram.
+BOTTOM RIGHT quadrant: deep teal pressure lock plate, bold bone-white text exactly "PRESSURE LOCK", large amber stencil "12", a simple three-valve piping schematic and large bone-white "3.2 BAR".
+All text stays well inside its own quadrant. Weathering must not obscure the main words or numerals. The quadrants should align precisely for direct UV mapping. No extra panels, no watermarks, no logos outside the fictional Pelagic Authority identity.

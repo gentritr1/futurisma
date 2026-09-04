@@ -82,7 +82,7 @@ export const DEFAULT_LIVERY = "works";
  * save file's vocabulary stays readable under Node, and so a course module can
  * never widen what is storable just by existing.
  */
-export const TRACK_CODES = ["greenwater", "bitterpan"];
+export const TRACK_CODES = ["greenwater", "bitterpan", "nightshift", "polarity", "tideline"];
 export const DEFAULT_TRACK = "greenwater";
 export { LIVERY_CODES, RACE_MODES, RIVAL_TIERS, DEFAULT_RACE_MODE, DEFAULT_RIVAL_TIER };
 

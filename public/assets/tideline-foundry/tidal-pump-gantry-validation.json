@@ -1,0 +1,28 @@
+{
+  "pass": true,
+  "triangles": 3180,
+  "primitives": 5,
+  "bytes": 291652,
+  "minimumCentralHeight": 13.204999923706055,
+  "minimumSupportLateral": 18.600000381469727,
+  "exactPartCounts": {
+    "concrete_foot": 2,
+    "repair_plate": 2,
+    "overhead_truss": 3,
+    "pump_drum": 1,
+    "ladder": 1,
+    "lamp_working": 3,
+    "lamp_dead": 1
+  },
+  "checks": [
+    "metre-scale zero root",
+    "indexes/normals/UV0/COLOR_0",
+    "finite non-degenerate geometry",
+    "painted AO/wear variation",
+    "six allowed roles",
+    "three amber lamps plus one dead",
+    "no maps or runtime images",
+    "reference planes excluded",
+    "source references and provenance present"
+  ]
+}

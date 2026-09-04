@@ -1,0 +1,17 @@
+{
+  "title": "Meridian Afterimage",
+  "artist": "Futurisma",
+  "bpm": 174,
+  "bars": 80,
+  "durationSeconds": 110.345,
+  "sampleRate": 44100,
+  "channels": 2,
+  "bitrateKbps": 160,
+  "integratedLufs": -14.4,
+  "truePeakDbtp": -1.57,
+  "loudnessRangeLu": 7.2,
+  "sha256": "b125a7012c0bfcdc219896ab4b29e50a92cd5847b12d5a1f58e6e1a35cc26676",
+  "source": "scripts/build-original-soundtrack.py",
+  "provenance": "Original composition and procedural synthesis. No third-party samples or recordings.",
+  "arrangement": "8-bar introduction, 32-bar drive, 8-bar breakdown, 24-bar return, 8-bar outro."
+}

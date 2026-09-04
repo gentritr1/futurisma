@@ -263,6 +263,56 @@ export const AMBIENCE_BEDS = {
 };
 
 /**
+ * Night circuits reuse the authored rain/machinery samples at new levels and
+ * route windows. They allocate only the beds this map uses; no birds or salt
+ * events follow the player into the city. Windows scale with the actual lap.
+ * @param {"nightshift" | "polarity"} map
+ * @param {number} lapLength
+ * @returns {AmbienceBed[]}
+ */
+export function cityAmbienceBeds(map, lapLength) {
+  const hum = AMBIENCE_BEDS.bitterpan.find((bed) => bed.id === "works_hum");
+  const water = AMBIENCE_BEDS.bitterpan.find((bed) => bed.id === "brine_lap");
+  const rain = AMBIENCE_BEDS.greenwater.find((bed) => bed.id === "rain_patter");
+  const pump = AMBIENCE_BEDS.greenwater.find((bed) => bed.id === "pump_thrum");
+  const wind = AMBIENCE_BEDS.bitterpan.find((bed) => bed.id === "dry_wind");
+  if (!hum || !water || !rain || !pump || !wind) {
+    throw new Error("The night circuit's base ambience loops are missing.");
+  }
+  const polarity = map === "polarity";
+  const lap = Number.isFinite(lapLength) && lapLength > 0 ? lapLength : 1;
+  return [
+    {
+      ...wind, id: "city_air", level: polarity ? .18 : .13,
+      event: null, eventGain: 0, reverbSend: .04,
+      note: "Air moving between buildings, kept below the passing craft's own wind.",
+      wind: { lowHz: 165, highHz: 710, lowLfoHz: .039, highLfoHz: .057, gustHz: 0 },
+    },
+    {
+      ...hum, level: polarity ? .115 : .065, window: null,
+      zone: "underpass", zoneGain: 1.45, reverbSend: .18,
+      note: "The city's electrical plant, with a stronger enclosed magnetic hum beneath the upper road.",
+    },
+    {
+      ...rain, level: polarity ? .022 : .057, event: null, eventGain: 0,
+      reverbSend: .12,
+      note: "Fine persistent rain on the road and rooftop metal, without a storm swell.",
+    },
+    {
+      ...pump, level: polarity ? .085 : .06, reverbSend: .22,
+      window: { startDistance: lap * (polarity ? .16 : .50),
+        endDistance: lap * (polarity ? .74 : .63), fadeMeters: 65 },
+      note: "Mechanical relays throb through the transfer structure and fade away from its approaches.",
+    },
+    {
+      ...water, level: .055, reverbSend: .13,
+      window: { startDistance: lap * .67, endDistance: lap * .84, fadeMeters: 50 },
+      note: "Water moving against the concrete below the last service district.",
+    },
+  ];
+}
+
+/**
  * Acceptance bands for the rendered RMS of each bed, in dBFS, measured at the
  * ambience bus with the bed at window gain 1 and the music silent (duck = 1).
  * For a bed that is audible at rest the band describes its RESTING level — no
@@ -731,4 +781,23 @@ export function ambienceBedIds() {
     for (const bed of beds) if (!ids.includes(bed.id)) ids.push(bed.id);
   }
   return ids;
+}
+
+/** Flooded machinery gives way to salt air as the circuit climbs.
+ * @param {number} lapLength @returns {AmbienceBed[]}
+ */
+export function tidelineAmbienceBeds(lapLength) {
+  const base = cityAmbienceBeds("polarity", lapLength);
+  const lap = Math.max(1, lapLength);
+  return base.map((bed, index) => {
+    if (index === 0) return { ...bed, id: "pelagic_wind", level: .18,
+      window: { startDistance: lap * .26, endDistance: lap * .93, fadeMeters: 70 } };
+    if (index === 1) return { ...bed, level: .10,
+      zone: "underpass", zoneGain: 1.8, reverbSend: .26 };
+    if (index === 2) return { ...bed, level: .045,
+      zone: "underpass", zoneGain: 1.9, reverbSend: .21 };
+    if (index === 3) return { ...bed, level: .09,
+      window: { startDistance: lap * .2, endDistance: lap * .44, fadeMeters: 70 } };
+    return { ...bed, level: .08, window: null };
+  });
 }

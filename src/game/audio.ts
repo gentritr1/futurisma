@@ -601,11 +601,11 @@ export class EngineAudio {
       0.1,
     );
     this.engineFilter?.frequency.setTargetAtTime(
-      820
+      (820
         + speedRatio * 1_850
         + brake * 420
         + driftIntensity * 480
-        + (boost ? 1_400 : 0),
+        + (boost ? 1_400 : 0)) * (ambienceCue().submerged ? .38 : 1),
       now,
       0.08,
     );
@@ -760,6 +760,34 @@ export class EngineAudio {
   playBoost(): void {
     this.playTone(115, 0.2, 0.04, "sawtooth", 0, 2.2);
     this.playTone(460, 0.14, 0.024, "square", 0.04, 1.5);
+  }
+
+  /** A directional magnetic pull, followed by a quiet rail-lock click. */
+  playGravityFlip(toCeiling: boolean): void {
+    this.playTone(toCeiling ? 140 : 560, .34, .034, "sine", 0, toCeiling ? 4 : .25);
+    this.playTone(toCeiling ? 280 : 420, .28, .013, "triangle", .035, toCeiling ? 2 : .5);
+    this.playTone(1120, .065, .014, "triangle", .28, .85);
+  }
+
+  playPowerPickup(): void {
+    this.playTone(698.46, .11, .022, "sine", 0, 1);
+    this.playTone(1046.5, .16, .018, "sine", .075, 1);
+    this.playTone(1396.9, .22, .012, "sine", .15, 1);
+  }
+
+  playPowerActivate(kind: "surge" | "shield"): void {
+    if (kind === "surge") {
+      this.playTone(87.31, .36, .035, "sawtooth", 0, 3);
+      this.playTone(349.23, .30, .019, "triangle", .06, 2);
+    } else {
+      this.playTone(349.23, .52, .024, "sine", 0, 1.02);
+      this.playTone(523.25, .48, .019, "sine", .045, .98);
+    }
+  }
+
+  playPowerDenied(): void {
+    this.playTone(220, .09, .016, "triangle", 0, .82);
+    this.playTone(180, .10, .012, "triangle", .105, 1);
   }
 
   /**
@@ -1807,7 +1835,7 @@ export class EngineAudio {
     gain.gain.exponentialRampToValueAtTime(amplitude, now + 0.012);
     gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
     oscillator.connect(gain);
-    gain.connect(this.master);
+    gain.connect(this.otherBus ?? this.master);
     this.activeOneShots += 1;
     this.diagnosticPeakActiveOneShots = Math.max(
       this.diagnosticPeakActiveOneShots,

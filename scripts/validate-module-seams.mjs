@@ -134,7 +134,10 @@ import { readFileSync } from "node:fs";
  * and the window is asserted in validate-pose.mjs; what is here is the camera
  * basis and the one write to `cameraLook`, which cannot leave the race loop.
  */
-const GAME_LINE_BUDGET = 2_552;
+// Polarity adds 25 lines of integration (load, input, simulation, pose, camera,
+// HUD and disposal). The cap is widened by that wiring cost only; gravity,
+// powers and their presentation remain in the dedicated runtime/world modules.
+const GAME_LINE_BUDGET = 2_577;
 
 function read(path) {
   return readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
@@ -142,6 +145,9 @@ function read(path) {
 
 const game = read("src/game/game.ts");
 const gameLines = game.split("\n").length - (game.endsWith("\n") ? 1 : 0);
+for (const owned of ["FLIP_SECONDS", "FLIP_COOLDOWN_SECONDS", "POWER_PICKUPS", "smoothTransfer", "crossedPickup"]) {
+  assert.ok(!game.includes(owned), `${owned} belongs in the Polarity subsystem, not the race loop.`);
+}
 
 assert.ok(
   gameLines <= GAME_LINE_BUDGET,

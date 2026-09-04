@@ -216,7 +216,9 @@ export class MetaUi {
       RACE_MODES.map((mode) => ({
         value: mode,
         label: RACE_MODE_LABELS[mode],
-        note: RACE_MODE_DECKS[mode],
+        note: selection === "polarity"
+          ? mode === "sprint" ? "2 LAPS · DEFEND" : mode === "timeattack" ? "3 LAPS · SOLO" : "3 LAPS · FULL FIELD"
+          : selection === "nightshift" || selection === "tideline" ? RACE_MODE_DECKS[mode].replace("5 LAPS", "3 LAPS") : RACE_MODE_DECKS[mode],
       })),
       "confirm",
       (value) => this.dispatchFormat("mode", value),

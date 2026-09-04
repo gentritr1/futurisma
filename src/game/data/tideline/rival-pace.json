@@ -1,0 +1,181 @@
+{
+  "cornerSpeedGain": 0.25,
+  "cornerSpeedFloor": 0.72,
+  "noBlockSide": -1,
+  "driftCurvature": 0.55,
+  "straightCurvature": 0.13,
+  "profiles": {
+    "rival-privateer": {
+      "cruiseSpeedMetersPerSecond": 88.0,
+      "padUse": false,
+      "boostWindows": [
+        {
+          "fromMeters": 790,
+          "toMeters": 1000
+        },
+        {
+          "fromMeters": 1220,
+          "toMeters": 1510
+        },
+        {
+          "fromMeters": 2110,
+          "toMeters": 2300
+        }
+      ]
+    },
+    "rival-nightform": {
+      "cruiseSpeedMetersPerSecond": 86.4,
+      "padUse": false,
+      "boostWindows": [
+        {
+          "fromMeters": 790,
+          "toMeters": 1000
+        },
+        {
+          "fromMeters": 1220,
+          "toMeters": 1510
+        },
+        {
+          "fromMeters": 2110,
+          "toMeters": 2300
+        }
+      ]
+    },
+    "rival-needle": {
+      "cruiseSpeedMetersPerSecond": 84.8,
+      "padUse": false,
+      "boostWindows": [
+        {
+          "fromMeters": 790,
+          "toMeters": 1000
+        },
+        {
+          "fromMeters": 1220,
+          "toMeters": 1510
+        },
+        {
+          "fromMeters": 2110,
+          "toMeters": 2300
+        }
+      ]
+    }
+  },
+  "tiers": {
+    "rookie": {
+      "profiles": {
+        "rival-privateer": {
+          "cruiseSpeedMetersPerSecond": 85.0,
+          "padUse": false,
+          "boostWindows": [
+            {
+              "fromMeters": 790,
+              "toMeters": 1000
+            },
+            {
+              "fromMeters": 1220,
+              "toMeters": 1510
+            },
+            {
+              "fromMeters": 2110,
+              "toMeters": 2300
+            }
+          ]
+        },
+        "rival-nightform": {
+          "cruiseSpeedMetersPerSecond": 83.4,
+          "padUse": false,
+          "boostWindows": [
+            {
+              "fromMeters": 790,
+              "toMeters": 1000
+            },
+            {
+              "fromMeters": 1220,
+              "toMeters": 1510
+            },
+            {
+              "fromMeters": 2110,
+              "toMeters": 2300
+            }
+          ]
+        },
+        "rival-needle": {
+          "cruiseSpeedMetersPerSecond": 81.8,
+          "padUse": false,
+          "boostWindows": [
+            {
+              "fromMeters": 790,
+              "toMeters": 1000
+            },
+            {
+              "fromMeters": 1220,
+              "toMeters": 1510
+            },
+            {
+              "fromMeters": 2110,
+              "toMeters": 2300
+            }
+          ]
+        }
+      }
+    },
+    "feral": {
+      "profiles": {
+        "rival-privateer": {
+          "cruiseSpeedMetersPerSecond": 92.0,
+          "padUse": false,
+          "boostWindows": [
+            {
+              "fromMeters": 790,
+              "toMeters": 1000
+            },
+            {
+              "fromMeters": 1220,
+              "toMeters": 1510
+            },
+            {
+              "fromMeters": 2110,
+              "toMeters": 2300
+            }
+          ]
+        },
+        "rival-nightform": {
+          "cruiseSpeedMetersPerSecond": 90.4,
+          "padUse": false,
+          "boostWindows": [
+            {
+              "fromMeters": 790,
+              "toMeters": 1000
+            },
+            {
+              "fromMeters": 1220,
+              "toMeters": 1510
+            },
+            {
+              "fromMeters": 2110,
+              "toMeters": 2300
+            }
+          ]
+        },
+        "rival-needle": {
+          "cruiseSpeedMetersPerSecond": 88.8,
+          "padUse": false,
+          "boostWindows": [
+            {
+              "fromMeters": 790,
+              "toMeters": 1000
+            },
+            {
+              "fromMeters": 1220,
+              "toMeters": 1510
+            },
+            {
+              "fromMeters": 2110,
+              "toMeters": 2300
+            }
+          ]
+        }
+      }
+    }
+  }
+}

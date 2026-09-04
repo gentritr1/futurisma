@@ -12,6 +12,24 @@
 export const SOUNDTRACK_MANIFEST_PATH = "/assets/audio/music/tracks.local.json";
 /** Where the (gitignored) audio files themselves are served from. */
 export const SOUNDTRACK_DIRECTORY = "/assets/audio/music/";
+export const ORIGINAL_SOUNDTRACK_DIRECTORY = "/assets/audio/original/";
+
+/** Ships with the game; entirely authored by the companion synthesis script. */
+export const ORIGINAL_SOUNDTRACK = Object.freeze({
+  file: "meridian-afterimage.mp3",
+  title: "Futurisma · Meridian Afterimage",
+  durationSeconds: 110.345,
+  original: true,
+});
+
+/**
+ * Private imports keep their own files and gain. The short original is also
+ * in the shuffle, and gives a fresh clone a recorded score without imports.
+ * @param {{ file: string, title: string, durationSeconds: number }[]} imported
+ */
+export function soundtrackPlaylist(imported) {
+  return [...imported.map((track) => ({ ...track, original: false })), ORIGINAL_SOUNDTRACK];
+}
 
 /**
  * A mix longer than this gets dropped into rather than started from the top.
@@ -86,9 +104,10 @@ export function normalizeManifest(payload) {
   return tracks;
 }
 
-/** @param {string} file */
-export function trackPath(file) {
-  return `${SOUNDTRACK_DIRECTORY}${encodeURIComponent(file)}`;
+/** @param {string} file @param {boolean} original */
+export function trackPath(file, original = false) {
+  const directory = original ? ORIGINAL_SOUNDTRACK_DIRECTORY : SOUNDTRACK_DIRECTORY;
+  return `${directory}${encodeURIComponent(file)}`;
 }
 
 /**

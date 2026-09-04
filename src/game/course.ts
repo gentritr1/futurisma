@@ -268,7 +268,7 @@ export interface TimeOfDayStop {
   keyScale: number;
 }
 
-export type CourseKind = "greenwater" | "bitterpan";
+export type CourseKind = "greenwater" | "bitterpan" | "nightshift" | "polarity" | "tideline";
 
 export interface RivalGridStart {
   raceDistanceMeters: number;
@@ -377,6 +377,8 @@ export interface RaceCourse {
   musicAt(progress: number): MusicProfile;
   /** Authored reverb room at this point on the lap. See `audio.zones` in the map. */
   audioZoneAt(progress: number): AudioZone;
+  /** Optional authored flight gaps: contact shadows require an actual road. */
+  travelModeAt?(progress: number): "submerged" | "surface" | "air";
   updateAtmosphere(elapsedSeconds: number, reducedMotion: boolean): boolean;
   vehicleHoverHeight(speedMetersPerSecond: number, boostActive: boolean): number;
   setCheckpointProgress(nextCheckpointIndex: number): void;
@@ -385,6 +387,8 @@ export interface RaceCourse {
   rivalGridStart(identity: string): RivalGridStart | null;
   /** The authored rival pace for this map, or null if it authors none. */
   readonly rivalPace: RivalPaceTable | null;
+  /** Optional authored line around a visible obstacle; null keeps the fleet's normal line. */
+  rivalHazardLaneAt?(courseDistanceMeters: number, lateralMeters: number): number | null;
   /**
    * The lateral line of the authored boost pad this course distance is running
    * up to, or null when there is none inside `approachMeters`. Rivals use it to

@@ -1,0 +1,21 @@
+{
+  "name": "TOTEM Evolution / rear gyro and driver instruments",
+  "source": "art/blender/build_totem_evolution.py",
+  "runtime": "totem_evolution.glb",
+  "triangles": 1520,
+  "meshes": 7,
+  "materials": 6,
+  "textures": 0,
+  "originalModelModified": false,
+  "gyroPivot": [
+    0,
+    0.235659,
+    2.51
+  ],
+  "signals": {
+    "TE_boost": "lime ready, amber recharging, cyan boost, white overdrive",
+    "TE_brake": "red under braking",
+    "TE_gravity": "cyan floor, pink ceiling, amber changing surface",
+    "TE_power": "amber power ready, violet shield, icy blue overdrive"
+  }
+}

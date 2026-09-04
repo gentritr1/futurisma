@@ -342,7 +342,9 @@ export function simulateRivalField(options) {
     });
     const drive = driveScratch[index];
     return Object.assign(drive, {
-      targetLateralMeters,
+      targetLateralMeters: course.rivalHazardLaneAt?.(
+        state.courseDistanceMeters, state.lateralMeters,
+      ) ?? targetLateralMeters,
       paceLateralMeters: paceLane,
       laneHalfWidthMeters,
       courseSpeedFactor: rivalCourseSpeedFactor(pace, sample.curvature),
@@ -369,6 +371,7 @@ export function simulateRivalField(options) {
   };
 
   const onSubStep = (field) => {
+    options.observeField?.(field);
     // The grid hold, measured rather than trusted: no rival may have moved a
     // millimetre off the slot it was given before RIVAL_GRID_HOLD_METERS.
     for (let index = 0; index < field.length; index += 1) {

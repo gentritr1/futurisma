@@ -1,0 +1,138 @@
+{
+  "name": "Pelagic Authority environmental signage",
+  "atlas": "signage.webp",
+  "imageSource": "Built-in image_gen original four-face atlas",
+  "source": "art/blender/build_tideline_signage.py",
+  "triangles": 1422,
+  "materials": 3,
+  "signs": [
+    {
+      "progress": 0.035,
+      "side": -1,
+      "tile": 0,
+      "position": [
+        -247.06239318847656,
+        -18.175222396850586,
+        -291.3974609375
+      ],
+      "sector": "REACTOR",
+      "minimumFaceLateral": 20.217686653137207,
+      "minimumFaceHeight": 4.8,
+      "mode": "submerged"
+    },
+    {
+      "progress": 0.08,
+      "side": 1,
+      "tile": 2,
+      "position": [
+        -129.70631408691406,
+        -17.17469024658203,
+        -346.5870666503906
+      ],
+      "sector": "REACTOR",
+      "minimumFaceLateral": 20.217673301696777,
+      "minimumFaceHeight": 4.8,
+      "mode": "submerged"
+    },
+    {
+      "progress": 0.125,
+      "side": -1,
+      "tile": 0,
+      "position": [
+        -32.838645935058594,
+        -16.280595779418945,
+        -430.8034362792969
+      ],
+      "sector": "REACTOR",
+      "minimumFaceLateral": 20.217666193842888,
+      "minimumFaceHeight": 4.8,
+      "mode": "submerged"
+    },
+    {
+      "progress": 0.195,
+      "side": 1,
+      "tile": 3,
+      "position": [
+        151.91152954101562,
+        -10.198226928710938,
+        -369.4803466796875
+      ],
+      "sector": "LOCK",
+      "minimumFaceLateral": 20.21767497062683,
+      "minimumFaceHeight": 4.8,
+      "mode": "submerged"
+    },
+    {
+      "progress": 0.235,
+      "side": -1,
+      "tile": 3,
+      "position": [
+        268.32867431640625,
+        1.7199020385742188,
+        -355.4068908691406
+      ],
+      "sector": "LOCK",
+      "minimumFaceLateral": 20.217671871185303,
+      "minimumFaceHeight": 4.8,
+      "mode": "submerged"
+    },
+    {
+      "progress": 0.32,
+      "side": 1,
+      "tile": 1,
+      "position": [
+        378.4341125488281,
+        13.462377548217773,
+        -149.4891815185547
+      ],
+      "sector": "DOCKS",
+      "minimumFaceLateral": 20.21766424179077,
+      "minimumFaceHeight": 4.8,
+      "mode": "surface"
+    },
+    {
+      "progress": 0.365,
+      "side": -1,
+      "tile": 1,
+      "position": [
+        452.04730224609375,
+        12.427301406860352,
+        -40.97625732421875
+      ],
+      "sector": "DOCKS",
+      "minimumFaceLateral": 20.217666633427143,
+      "minimumFaceHeight": 4.8,
+      "mode": "surface"
+    },
+    {
+      "progress": 0.41,
+      "side": 1,
+      "tile": 2,
+      "position": [
+        403.8602600097656,
+        14.254135131835938,
+        81.15859985351562
+      ],
+      "sector": "DOCKS",
+      "minimumFaceLateral": 20.21766221523285,
+      "minimumFaceHeight": 4.8,
+      "mode": "surface"
+    },
+    {
+      "progress": 0.72,
+      "side": -1,
+      "tile": 0,
+      "position": [
+        -226.78770446777344,
+        24.013771057128906,
+        412.1665954589844
+      ],
+      "sector": "BREAKWATER",
+      "minimumFaceLateral": 20.217676162719727,
+      "minimumFaceHeight": 4.8,
+      "mode": "surface"
+    }
+  ],
+  "flightArcsClear": true,
+  "minimumRoadFaceClearance": 8.21766221523285
+}

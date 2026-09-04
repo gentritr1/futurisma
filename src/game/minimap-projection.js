@@ -95,6 +95,35 @@ export function buildCourseOutline(course, stationCount = OUTLINE_STATION_COUNT)
 }
 
 /**
+ * Samples an open route branch including its exact junctions. Cached once by
+ * the minimap; the default is enough for a short bypass without a per-frame
+ * course query.
+ * @param {OutlineSampler} course
+ * @param {number} from
+ * @param {number} to
+ * @param {number} [stationCount]
+ * @returns {Float64Array}
+ */
+export function buildCourseSegment(course, from, to, stationCount = 32) {
+  if (!Number.isFinite(from) || !Number.isFinite(to) || to <= from
+    || !Number.isInteger(stationCount) || stationCount < 2) {
+    throw new Error("Minimap branch needs an ordered span and at least two stations.");
+  }
+  const points = new Float64Array(stationCount * 2);
+  const scratch = course.createSampleScratch?.();
+  for (let index = 0; index < stationCount; index++) {
+    const progress = from + (to - from) * index / (stationCount - 1);
+    const position = course.sample(progress, scratch).position;
+    if (!Number.isFinite(position.x) || !Number.isFinite(position.z)) {
+      throw new Error(`Minimap branch station ${index} sampled a non-finite point.`);
+    }
+    points[index * 2] = position.x;
+    points[index * 2 + 1] = position.z;
+  }
+  return points;
+}
+
+/**
  * @typedef {{ scale: number; offsetX: number; offsetY: number }} OutlineTransform
  */
 

@@ -1,9 +1,9 @@
 import { save } from "./persistence";
 
-export type MapSelection = "greenwater" | "bitterpan";
+export type MapSelection = "greenwater" | "bitterpan" | "nightshift" | "polarity" | "tideline";
 
 /**
- * P7 — the two dispatchable circuits. `label` and `mapCode` duplicate what the
+ * The dispatchable circuits. `label` and `mapCode` duplicate what the
  * course modules report once loaded, but the start screen has to name a circuit
  * *before* deciding which course module to import, so the selection surface
  * cannot read them off the course.
@@ -28,6 +28,24 @@ export const TRACKS: readonly TrackEntry[] = [
     mapCode: "MAP 02",
     deck: "SALT PLANT",
   },
+  {
+    selection: "nightshift",
+    label: "NIGHT SHIFT",
+    mapCode: "MAP 03",
+    deck: "MERIDIAN AFTER HOURS",
+  },
+  {
+    selection: "polarity",
+    label: "POLARITY",
+    mapCode: "MAP 04",
+    deck: "GRAVITY INTERCHANGE",
+  },
+  {
+    selection: "tideline",
+    label: "TIDELINE",
+    mapCode: "MAP 05",
+    deck: "DEPTH / COAST / FLIGHT",
+  },
 ];
 
 export function trackFor(selection: MapSelection): TrackEntry {
@@ -43,6 +61,6 @@ export function resolveMapSelection(search: string): MapSelection {
   const requested = new URLSearchParams(search).get("map")?.toLowerCase();
   // Present-but-unknown still counts as an override and still resolves to
   // Greenwater, exactly as it did before the stored dispatch existed.
-  if (requested !== undefined) return requested === "bitterpan" ? "bitterpan" : "greenwater";
-  return save.track === "bitterpan" ? "bitterpan" : "greenwater";
+  const selection = requested !== undefined ? requested : save.track;
+  return TRACKS.find((track) => track.selection === selection)?.selection ?? "greenwater";
 }

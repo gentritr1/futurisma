@@ -2,130 +2,165 @@
 
 # FUTURISMA
 
-**An anti-gravity racer that remembers the PS2 without imitating it.**
+### Five circuits. Two roads overhead. One more clean lap.
 
-Hypnotic, technical, feral. Two circuits, four ships, a procedural score, and a world that does things while you race it.
+**A futuristic hover racer with an early-2000s console soul.**
+
+Rain-soaked cities, drowned reactors, sodium-lit pumpworks and open-ocean glides.<br>
+Read the road, choose your line, and make the boost count.
+
+[Start racing](#start-racing) · [Explore the circuits](#five-circuits-six-atmospheres) · [Learn the controls](#controls) · [Inside the workshop](#built-in-blender)
 
 ![Bitterpan Works at 317 km/h](docs/media/bitterpan.jpg)
 
+*Three.js · TypeScript · Vite · Blender · atmospheric jungle · no account required*
+
 </div>
 
----
+## Five circuits, six atmospheres
 
-## Play
+| Circuit | The atmosphere | The racing idea |
+|---|---|---|
+| **01 · Greenwater Strip** | A humid wetland airfield: hangars, canopy passages and standing water. | Tight lines and a passing squall that changes grip. |
+| **02 · Bitterpan Works** | A salt harvest at noon: brine flats, conveyors, heat and distant machinery. | An exposed deck with visible gusts and salt patches. |
+| **03 · Night Shift** | Meridian at 02:17: neon motels, closed arcades, apartment towers and rain. | A roughly 1.96 km city circuit through six districts and an expressway underpass. |
+| **04 · Polarity** | A magnetic interchange: power halls, inverter rings and another road 22 metres above. | Optional gravity transfers, narrower express routes and a choice between distance and recharge. |
+| **05 · Tideline** | A drowned reactor rising into a working port, then out across the ocean. | A 2.75 km route through water, road and two guided airborne spans. |
+| **05 · Foundry edition** | Tideline reclaimed: damp concrete, oxidised steel, caged amber lamps and murky water. | The identical Tideline course with a separate industrial art treatment. Compare editions from the menu. |
+
+<table>
+<tr>
+<td width="50%"><img src="docs/media/greenwater.jpg" alt="Greenwater Strip's wetland circuit"></td>
+<td width="50%"><img src="public/assets/tideline-foundry/tidal-pump-gantry-preview.webp" alt="Blender preview of the Foundry tidal pump gantry"></td>
+</tr>
+<tr>
+<td><b>Where it began.</b> Greenwater's airfield and weathered racing deck.</td>
+<td><b>The Foundry workshop.</b> A Blender asset preview: repaired concrete feet, parallel steel trusses and three working lamps.</td>
+</tr>
+</table>
+
+## Start racing
+
+Use a current Node.js release with TypeScript stripping support, then:
 
 ```sh
 npm install
 npm run dev
 ```
 
-Open the URL Vite prints, pick a circuit, a format, a field and a livery in the paddock, press **Enter**.
+Open the address Vite prints. Choose your circuit, format, rival field and livery, then press **Enter**. Append `?map=tideline&edition=foundry` to start with the newest art edition.
 
-| Input | Keyboard | Gamepad |
+| Format | Your objective |
+|---|---|
+| **Field race** | Complete the circuit's default laps against three rivals. |
+| **Sprint** | Defend your lead for two laps with the field starting behind you. |
+| **Time attack** | Chase your best lap with a ghost and live gate deltas. Polarity currently keeps records without a ghost. |
+
+**Rookie → Works → Feral** selects progressively faster authored rival pace. Rivals never rubber-band to your speed. They contest lines, boost and drift; an air cushion handles close contact without a hard vehicle collision.
+
+Circuit choice, settings, liveries, records and supported ghosts are saved locally in your browser.
+
+## Controls
+
+| Action | Keyboard | Gamepad |
 |---|---|---|
-| Thrust / brake | `W` `S` or arrows | Triggers |
-| Steer | `A` `D` or arrows | Left stick |
-| Drift | Brake + steer at speed | Same |
-| Boost | `Shift` | A |
+| Thrust / brake | `W` / `S` or arrows | Triggers |
+| Steer | `A` / `D` or arrows | Left stick |
+| Drift | Brake + steer at speed | Brake + steer |
+| Nitro, every circuit | `Shift` | A |
+| Gravity transfer, Polarity junctions | `Space` | X |
+| Nitro, other circuits | `Space` or `Shift` | A |
+| Deploy power, Polarity and Tideline | `E` | B |
 | Recover to last gate | `R` | Y |
 | Pause | `Esc` or `P` | Start |
 | Mute | `M` | Back |
 
-Boost drains a plasma reserve that refills slowly, faster while you sit in a rival's slipstream, and pays out in a lump when you cash a drift. Clear every gate near its centre and the chain multiplies the refill. Pass a rival close and clean and the race pays you for it.
+### Fast lines reward practice
 
-## Two circuits
+**Commit to a road.** Polarity's lower deck is wider, recharges faster and supplies full-charge devices. The upper deck offers shorter, narrower express routes with slower recharge and 65%-charge devices. Transfers happen at four marked entry/exit windows, with six seconds between transfer starts. Staying on the lower road is a complete racing route. Reduced-motion mode hides the deck change behind a brief opaque transition instead of rolling the camera.
 
-<table>
-<tr>
-<td width="50%"><img src="docs/media/greenwater.jpg" alt="Greenwater Strip"></td>
-<td width="50%"><img src="docs/media/launch.jpg" alt="The field at launch"></td>
-</tr>
-<tr>
-<td><b>Greenwater Strip</b> · Map 01 · a wetland airfield. Humid, overcast, tight. A hangar, a canopy passage, standing water on the Water Table, and a squall that rolls in once a race and takes the grip with it.</td>
-<td><b>Bitterpan Works</b> · Map 02 · a salt harvest at noon. Wide, hot, exposed. Wind gusts you can see coming in the dust, salt dropped from a conveyor span, cable coils at the edge of the pan.</td>
-</tr>
-</table>
+**Read the current.** Tideline's lit underwater lane recharges nitro at 1.85× the normal rate. Its side changes with the lap's supply pattern. The two airborne spans use a guided corridor and an upright camera; this is hover racing with glides, not unrestricted flight.
 
-## Formats and fields
+**Choose your moment.** Carry one device and deploy it when it helps. Surge adds thrust; triggering it inside a painted launch window earns extra duration. Phase Shield absorbs phase fields, with an early timed absorption returning more nitro. Supplies vary by seed and lap, while the course stays learnable. The Foundry comparison link preserves the seed between editions.
 
-| Format | What it is |
-|---|---|
-| **Field race** | Five laps against three rivals |
-| **Sprint** | Two laps, the field behind you, defend the lead |
-| **Time attack** | Five laps alone against your best lap's ghost, with live gate deltas |
+**Build reserve.** Slipstream rivals, cash a drift, hit gates cleanly and make close passes. The vehicle's rotating rear turbine, engine cores, lights and mounted devices show speed, nitro and power state.
 
-| Field | Pace |
-|---|---|
-| **Rookie** | The field finishes a few seconds behind a clean run |
-| **Works** | Level with you |
-| **Feral** | The field is ahead unless you use everything |
+## Built in Blender
 
-Rivals run authored, deterministic pace. They boost, take pads, drift the hard corners and contest lanes, but they never rubber-band and never block the deck. Sit behind one and the slipstream locks; lean on one and an air cushion pushes you both apart without a collision.
+![Vehicle with mounted power mechanisms — Blender preview](public/assets/power-kit/vehicle-preview.png)
 
-Everything you set is remembered locally: livery, circuit, format, field, best laps and your ghosts. There is no account, no server and nothing leaves the browser.
+The ship's power kit uses modeled turbine housings, projector arms and mechanical mounts. Deployment, exhaust and shield effects animate in the game. Night Shift, Polarity, Tideline and Foundry all include authored Blender scenery.
 
-## The world
+The newest Foundry landmark follows a reference-first production sequence:
 
-- **Light.** One sun per sector, real shadows under every structure and under the craft.
-- **Sky.** A dome decoupled from the fog, with authored horizon and zenith per sector and a slow cirrus band.
-- **Ground.** Bitterpan's pan carries wind streaks and brine flats that converge to the horizon; Greenwater's decks carry runway paint and wear.
-- **Air.** Dust, heat, scud and haze cards near the road; mesas, rigs, treelines and pylons at the horizon; birds over Greenwater.
-- **Sound.** Almost everything is synthesised at start: per-sector ambience beds, wind that swells with the gusts, and rivals you can place by ear. The score is a 174 BPM F-minor set of four stems cut by the route, and it is the fallback — drop your own mixes into `public/assets/audio/music/` with the import script below and the game plays those instead, through the same MUSIC LEVEL bus. Your files are never committed. The one recorded thing that ships is the pit radio — seventeen lines in one voice that call the gates, the weather and the order, on their own ducked bus. Switch it off in the terminal or with `?voice=0`; nothing it says is anything the HUD is not already showing.
+**Front / side / top sheet → driver-height hero view → flat material-ID pass → measured Blender model → in-game clearance checks.**
 
-## URL switches
+The generated sheets establish silhouette and wear; measured geometry resolves perspective and scale inconsistencies. Foundry uses six material roles, vertex-painted damp staining and ambient occlusion, and restrained sodium emission. The editable scenes, build scripts and reference provenance live under [`art/`](art/).
 
-Useful while playing or testing. Combine with `&`.
+[Foundry art handoff](docs/visual-polish/TIDELINE-FOUNDRY.md) · [Gantry reference sheets](art/references/tideline-foundry/HANDOFF.md) · [Tideline course notes](docs/visual-polish/TIDELINE.md) · [Gravity and powers](docs/visual-polish/POLARITY.md)
 
-| Switch | Effect |
-|---|---|
-| `?map=bitterpan` | Map 02 (default is Greenwater) |
-| `?mode=race` `sprint` `timeattack` | Format |
-| `?tier=rookie` `works` `feral` | Field |
-| `?laps=1`…`9` | Race length (ignored by sprint) |
-| `?demo=1` | Autopilot showcase; any input hands control back to you |
-| `?diagnostics=1` | Once-a-second telemetry line for performance passes |
-| `?quality=low` / `high` | Lock the render scale |
-| `?motion=reduce` | The reduced-motion path |
-| `?render=ps2` | Era-accurate raster look, no shadows |
-| `?voice=0` | Silences the pit radio and never downloads it |
-| `?music=synth` | Forces the synthesised score even when you have tracks |
-| `?music=0` | Silences the music entirely, stems and tracks |
-| `?events=0` `cushion=0` `shadows=0` `living=0` | Kill switches for track events, the air cushion, shadow maps, the card layer |
+## Sound after midnight
 
-QA probes (`?diagnostics=1&probe=recovery` and friends) are listed in [docs/PROVENANCE.md](docs/PROVENANCE.md).
+**Meridian Afterimage** is the included original 174 BPM atmospheric jungle instrumental: pads, percussion and bass, with no third-party samples. Sector ambience adds machinery, rain, water, electrical hum and wind; underwater sections soften the engine. Pit radio calls gates, weather and race position.
 
-### Your own soundtrack
+Music shares one **MUSIC LEVEL** control with pause, mute and radio ducking. A fresh clone plays the original track. The procedural score remains available with `?music=synth` and as a fallback.
 
-Long DJ mixes work better here than short tracks, and a mix over five minutes starts at a random point each launch.
+### Bring your own mixes
 
 ```sh
-node scripts/music-import.mjs <youtube-url-or-audio-file> --title "Kool FM 1994"
+node scripts/music-import.mjs <youtube-url-or-audio-file> --title "Artist · Mix name"
 node scripts/music-import.mjs --list
-node scripts/music-import.mjs --remove kool-fm-1994
+node scripts/music-import.mjs --remove mix-slug
 ```
 
-Files land in `public/assets/audio/music/`, normalised to -14 LUFS, and are gitignored; `npm run test:code` fails if one is ever staged.
+Imported recordings are loudness-matched and stored in the gitignored `public/assets/audio/music/` directory. The code gate rejects staged or tracked recordings from that folder. The development library includes Peter Lix's *Jungle Classics 1994–1998* and Rob Playford's *Blueprint (1997)*; these private recordings are **not included in a clone**. Mixes longer than five minutes start at a random position each launch.
 
-## Verify
+The original track and its measured provenance live in [`public/assets/audio/original/`](public/assets/audio/original/). Rebuild it with `python3 scripts/build-original-soundtrack.py` using NumPy and ffmpeg.
+
+## Tune your run
+
+Append these to the local game URL, combining options with `&`.
+
+| Option | Result |
+|---|---|
+| `?map=greenwater`, `bitterpan`, `nightshift`, `polarity`, `tideline` | Select a circuit. |
+| `?map=tideline&edition=foundry` | The Foundry art edition. |
+| `?mode=race`, `sprint`, `timeattack` | Select the format. |
+| `?tier=rookie`, `works`, `feral` | Select rival pace. |
+| `?laps=1`…`9` | Set race length; sprint remains two laps. |
+| `?seed=714` | Repeat the power supply and route-choice pattern. |
+| `?demo=1` | Autopilot showcase; driving input returns control to you. |
+| `?motion=reduce` | Reduce decorative motion and gravity-roll effects. |
+| `?quality=low` / `high` | Lock the render scale. |
+| `?render=ps2` | Console-era raster treatment without shadows. |
+| `?music=synth` / `?music=0` | Use the procedural score / silence music. |
+| `?voice=0` | Silence pit radio without downloading it. |
+| `?diagnostics=1` | Show telemetry for local performance checks. |
+
+Additional QA probes and rendering switches are documented in [Provenance](docs/PROVENANCE.md).
+
+## Development and verification
 
 ```sh
-npm run test:code   # every code validator plus the production build
-npm test            # the same, then the accepted art-package audits
+npm run test:code   # code and asset validators, TypeScript, production build and budgets
+npm test            # the same checks plus accepted art-package archive audits
 ```
 
-`test:code` needs nothing but the tracked source and is the gate every branch runs. Thirty-odd validators pin the things that are easy to break silently: rival determinism at 60 and 120 Hz, drivable limits derived from the geometry you can see, the atlas orientation of every card, the save-file schema and its migrations, draw-call and gzip budgets, the content-security policy.
+The code gate covers all five circuits, 3D projections, gravity junctions, power timing and replay, rival determinism, scenery clearance, camera behavior, resource cleanup, saves, audio and build budgets. Archive audits additionally need the accepted art packages resolved by `scripts/lib/archive-root.mjs`.
 
-Screenshot and soak harnesses live in `scripts/visual/`. They are not shipped.
+Integrated three-lap browser checks completed for Tideline, Foundry and Polarity without missed gates, recoveries or browser errors. Exact conditions and local performance measurements are recorded in the course notes; they are not a cross-device guarantee.
 
-## Read more
+**Multiplayer status:** racing is currently local against AI or recorded ghosts. Powers have a deterministic simulation with replay and validated snapshots, documented in the [ability protocol](docs/visual-polish/ABILITY_PROTOCOL.md). Online sessions and networked racing are not implemented.
 
-- [docs/PERFORMANCE_BASELINE.md](docs/PERFORMANCE_BASELINE.md) — the frame-time and draw-call budget and how it was measured
-- [docs/PROVENANCE.md](docs/PROVENANCE.md) — accepted art freezes, archive hashes, the browser-storage exemption, the full verification notes
-- [docs/plans/ROADMAP.md](docs/plans/ROADMAP.md) — how the build was phased
-- [PRODUCT.md](PRODUCT.md) — what the game is trying to be, and what it refuses to be
+| Read more | Contents |
+|---|---|
+| [Product](PRODUCT.md) | The racing principles and scope. |
+| [Performance baseline](docs/PERFORMANCE_BASELINE.md) | Rendering budgets and measurement method. |
+| [Provenance](docs/PROVENANCE.md) | Accepted art, archive hashes and verification notes. |
+| [Roadmap](docs/plans/ROADMAP.md) | Earlier development phases. |
 
 <div align="center">
 
-*Three.js · Vite · TypeScript · one voice on the radio, every other sound synthesised · zero accounts*
+**Learn the current. Hold the line. Time the surge.**
 
 </div>

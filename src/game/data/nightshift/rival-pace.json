@@ -1,0 +1,145 @@
+{
+  "cornerSpeedGain": 0.25,
+  "cornerSpeedFloor": 0.72,
+  "noBlockSide": -1,
+  "driftCurvature": 0.55,
+  "straightCurvature": 0.13,
+  "profiles": {
+    "rival-privateer": {
+      "cruiseSpeedMetersPerSecond": 88.0,
+      "padUse": false,
+      "boostWindows": [
+        {
+          "fromMeters": 20,
+          "toMeters": 210
+        },
+        {
+          "fromMeters": 1200,
+          "toMeters": 1380
+        }
+      ]
+    },
+    "rival-nightform": {
+      "cruiseSpeedMetersPerSecond": 86.4,
+      "padUse": false,
+      "boostWindows": [
+        {
+          "fromMeters": 20,
+          "toMeters": 210
+        },
+        {
+          "fromMeters": 1200,
+          "toMeters": 1380
+        }
+      ]
+    },
+    "rival-needle": {
+      "cruiseSpeedMetersPerSecond": 84.8,
+      "padUse": false,
+      "boostWindows": [
+        {
+          "fromMeters": 20,
+          "toMeters": 210
+        },
+        {
+          "fromMeters": 1200,
+          "toMeters": 1380
+        }
+      ]
+    }
+  },
+  "tiers": {
+    "rookie": {
+      "profiles": {
+        "rival-privateer": {
+          "cruiseSpeedMetersPerSecond": 85.0,
+          "padUse": false,
+          "boostWindows": [
+            {
+              "fromMeters": 45,
+              "toMeters": 210
+            },
+            {
+              "fromMeters": 1225,
+              "toMeters": 1380
+            }
+          ]
+        },
+        "rival-nightform": {
+          "cruiseSpeedMetersPerSecond": 83.4,
+          "padUse": false,
+          "boostWindows": [
+            {
+              "fromMeters": 45,
+              "toMeters": 210
+            },
+            {
+              "fromMeters": 1225,
+              "toMeters": 1380
+            }
+          ]
+        },
+        "rival-needle": {
+          "cruiseSpeedMetersPerSecond": 81.8,
+          "padUse": false,
+          "boostWindows": [
+            {
+              "fromMeters": 45,
+              "toMeters": 210
+            },
+            {
+              "fromMeters": 1225,
+              "toMeters": 1380
+            }
+          ]
+        }
+      }
+    },
+    "feral": {
+      "profiles": {
+        "rival-privateer": {
+          "cruiseSpeedMetersPerSecond": 92.0,
+          "padUse": false,
+          "boostWindows": [
+            {
+              "fromMeters": 5,
+              "toMeters": 210
+            },
+            {
+              "fromMeters": 1185,
+              "toMeters": 1380
+            }
+          ]
+        },
+        "rival-nightform": {
+          "cruiseSpeedMetersPerSecond": 90.4,
+          "padUse": false,
+          "boostWindows": [
+            {
+              "fromMeters": 5,
+              "toMeters": 210
+            },
+            {
+              "fromMeters": 1185,
+              "toMeters": 1380
+            }
+          ]
+        },
+        "rival-needle": {
+          "cruiseSpeedMetersPerSecond": 88.8,
+          "padUse": false,
+          "boostWindows": [
+            {
+              "fromMeters": 5,
+              "toMeters": 210
+            },
+            {
+              "fromMeters": 1185,
+              "toMeters": 1380
+            }
+          ]
+        }
+      }
+    }
+  }
+}

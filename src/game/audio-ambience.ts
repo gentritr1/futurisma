@@ -7,6 +7,8 @@ import {
   airTearGain,
   ambienceDuck,
   bedTargetGain,
+  cityAmbienceBeds,
+  tidelineAmbienceBeds,
   PASS_BY_RELEASE_METERS,
   PASS_BY_SECONDS,
   PASS_BY_TRIGGER_METERS,
@@ -125,7 +127,11 @@ export class AmbienceField {
     this.bus = bus;
 
     const noise = createNoiseBuffer(context);
-    for (const bed of AMBIENCE_BEDS[map]) {
+    const beds = map === "tideline" ? tidelineAmbienceBeds(ambienceCue().lapLengthMeters)
+      : map === "nightshift" || map === "polarity"
+      ? cityAmbienceBeds(map, ambienceCue().lapLengthMeters)
+      : AMBIENCE_BEDS[map];
+    for (const bed of beds) {
       if (options.onlyBed && bed.id !== options.onlyBed) continue;
       const gain = context.createGain();
       gain.gain.value = 0;
@@ -489,4 +495,3 @@ export class RivalVoiceLayers {
     this.reset();
   }
 }
-

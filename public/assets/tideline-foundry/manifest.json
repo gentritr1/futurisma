@@ -1,0 +1,24 @@
+{
+  "name": "Tideline Foundry",
+  "generator": "Blender 5.2.0 LTS",
+  "triangles": 63517,
+  "gantries": 3,
+  "roles": [
+    "concrete",
+    "metal",
+    "jungle",
+    "water",
+    "signage",
+    "emissive"
+  ],
+  "lightAnchors": 27,
+  "vertexPaintRange": [
+    0.0065096483085623005,
+    0.8411238393401751
+  ],
+  "sourceGeometry": "art/blender/tideline_world.blend",
+  "recipe": "docs/GREENWATER_ENVIRONMENT_ART_BRIEF.md",
+  "decimationRatio": 0.62,
+  "routeLength": 2751.568119227306,
+  "routeCount": 918
+}

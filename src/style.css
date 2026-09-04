@@ -1940,3 +1940,64 @@ body[data-options="true"] .hud {
     transform: translateX(225%);
   }
 }
+
+/* Polarity's two decisions stay beside the racing view, clear of turn cues. */
+.polarity-hud {
+  position: absolute;
+  left: var(--pad);
+  top: clamp(112px, 21vh, 180px);
+  display: grid;
+  gap: 9px;
+  max-width: 230px;
+  padding: 12px 16px;
+  border-left: 2px solid #ffb47c;
+  background: linear-gradient(90deg, rgb(8 13 22 / 80%), rgb(8 13 22 / 0%));
+  font: 10px/1.35 var(--mono);
+  letter-spacing: .07em;
+  color: #bed0cf;
+}
+.polarity-hud[hidden], [data-polarity-control][hidden] { display: none; }
+.polarity-hud__deck { color: #ffb47c; letter-spacing: .16em; }
+.polarity-hud strong { color: #edf8f2; font-size: 12px; font-weight: 500; }
+.polarity-hud__route { opacity: .65; font-size: 9px; }
+.polarity-hud[data-deck="upper"] { border-color: #82eee6; }
+.polarity-hud[data-deck="upper"] .polarity-hud__deck { color: #82eee6; }
+.polarity-hud[data-ready="true"] #polarity-power { color: #dabaff; }
+body[data-map="polarity"] .intro-panel h1,
+body[data-map="nightshift"] .intro-panel h1 { font-size: clamp(3rem, 8vw, 6.4rem); letter-spacing: -.065em; }
+@media (max-width: 700px) {
+  .polarity-hud { top: 110px; max-width: 185px; padding: 8px 10px; gap: 6px; font-size: 8px; }
+  .polarity-hud strong { font-size: 10px; }
+  .polarity-hud__route { font-size: 8px; }
+}
+/* Four circuits add a second row: keep launch reachable at laptop heights. */
+.screen--intro { align-items: safe center; }
+@media (max-height: 900px) and (min-width: 701px) {
+  body[data-map="polarity"] .intro-panel h1,
+  body[data-map="nightshift"] .intro-panel h1 { font-size: clamp(2.6rem, 6vw, 3.6rem); }
+  .screen--intro .chip small { display: none; }
+  .screen--intro #grid-order { display: none; }
+  .screen--intro .intro-panel { margin-block: auto; }
+  .screen--intro .dispatch { gap: 10px; }
+}
+@media (max-width: 700px) {
+  .screen--intro { align-items: safe flex-end; }
+}
+
+#gravity-veil { position: fixed; inset: 0; z-index: 7; background: #051017; opacity: 0; pointer-events: none; }
+.power-charge { width: 92px; height: 3px; overflow: hidden; background: rgb(172 201 208 / 18%); }
+.power-charge i { display: block; height: 100%; background: #bfdcca; transform: scaleX(0); transform-origin: left; }
+body[data-map="tideline"] .polarity-hud { border-color: #8fd4ca; }
+body[data-map="tideline"] .polarity-hud__deck { color: #9eecdc; }
+body[data-map="tideline"] .intro-panel h1 { font-size: clamp(3rem, 8vw, 6rem); letter-spacing: -.03em; }
+body[data-map="polarity"] .intro-panel h1,
+body[data-map="nightshift"] .intro-panel h1 { letter-spacing: -.03em; }
+#track-select .chip:last-child { grid-column: 1 / -1; }
+.edition-switch { display: inline-block; margin: -.2rem 0 .8rem; color: #e4b775; font: 600 .66rem/1.4 var(--mono); letter-spacing: .06em; text-underline-offset: .3em; }
+.edition-switch:hover { color: #fff0cf; }
+.edition-switch:focus-visible { outline: 2px solid #e4b775; outline-offset: 5px; }
+.edition-switch[hidden] { display: none; }
+@media (max-height: 900px) and (min-width: 701px) {
+  body[data-map="tideline"] .intro-panel h1 { font-size: clamp(2.6rem, 6vw, 3.6rem); }
+  .screen--intro .intro-deck { line-height: 1.45; }
+}

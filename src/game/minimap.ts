@@ -1,10 +1,12 @@
 import type { RaceCourse } from "./course";
+import type { PolarityCourse } from "./polarity-course";
 import {
   OUTLINE_STATION_COUNT,
   RADAR_ALERT_RANGE_METERS,
   RADAR_LATERAL_RANGE_METERS,
   RADAR_LONGITUDINAL_RANGE_METERS,
   buildCourseOutline,
+  buildCourseSegment,
   fitOutlineTransform,
   projectRivalToRadar,
   radarSeparationMeters,
@@ -68,6 +70,7 @@ export interface MinimapDiagnostics {
   minimapNearestRivalMeters: number | null;
   minimapAlert: boolean;
   minimapDrawOps: number;
+  minimapShortcutPaths: number;
 }
 
 function rgba(channels: string, alpha: number): string {
@@ -83,6 +86,10 @@ export class Minimap {
 
   private readonly context: CanvasRenderingContext2D;
   private readonly outline: ReturnType<typeof buildCourseOutline>;
+  private readonly upperOutline: ReturnType<typeof buildCourseOutline> | null;
+  private readonly polarity: PolarityCourse | null;
+  private readonly shortcutPoints: Float64Array[] = [];
+  private shortcutPath = new Path2D();
   private readonly gateProgress: number[] = [];
 
   private outlinePath = new Path2D();
@@ -110,7 +117,22 @@ export class Minimap {
       lateralMeters: 0,
     }));
 
+    this.polarity = course.kind === "polarity" ? course as PolarityCourse : null;
     this.outline = buildCourseOutline(course, OUTLINE_STATION_COUNT);
+    this.upperOutline = null;
+    if (this.polarity) {
+      const polarity = this.polarity;
+      const upperSampler = {
+        length: course.length,
+        createSampleScratch: () => course.createSampleScratch(),
+        sample: (progress: number, target = course.createSampleScratch()) =>
+          polarity.sampleLane(progress, 1, target),
+      };
+      this.upperOutline = buildCourseOutline(upperSampler, OUTLINE_STATION_COUNT);
+      for (const shortcut of polarity.shortcuts) {
+        this.shortcutPoints.push(buildCourseSegment(upperSampler, shortcut.from, shortcut.to));
+      }
+    }
 
     // Gate ticks come from the course's own checkpoint table so both maps mark
     // their real gates. Greenwater and Bitterpan both publish eight.
@@ -138,8 +160,15 @@ export class Minimap {
     this.context.lineJoin = "round";
     this.context.lineCap = "round";
 
+    const bounds = { ...this.outline.bounds };
+    if (this.upperOutline) {
+      bounds.minX = Math.min(bounds.minX, this.upperOutline.bounds.minX);
+      bounds.maxX = Math.max(bounds.maxX, this.upperOutline.bounds.maxX);
+      bounds.minZ = Math.min(bounds.minZ, this.upperOutline.bounds.minZ);
+      bounds.maxZ = Math.max(bounds.maxZ, this.upperOutline.bounds.maxZ);
+    }
     const transform = fitOutlineTransform(
-      this.outline.bounds,
+      bounds,
       CANVAS_WIDTH,
       OUTLINE_HEIGHT,
       OUTLINE_PADDING,
@@ -153,6 +182,17 @@ export class Minimap {
       else outlinePath.lineTo(x, y);
     }
     this.outlinePath = outlinePath;
+
+    const shortcutPath = new Path2D();
+    for (const points of this.shortcutPoints) {
+      for (let index = 0; index < points.length; index += 2) {
+        const x = points[index] * transform.scale + transform.offsetX;
+        const y = points[index + 1] * transform.scale + transform.offsetY;
+        if (index === 0) shortcutPath.moveTo(x, y);
+        else shortcutPath.lineTo(x, y);
+      }
+    }
+    this.shortcutPath = shortcutPath;
 
     // Gate ticks: a short stroke normal to the centreline at each checkpoint.
     const gatePath = new Path2D();
@@ -188,13 +228,14 @@ export class Minimap {
   private outlinePointAt(
     progress: number,
     transform: { scale: number; offsetX: number; offsetY: number },
+    outline = this.outline,
   ): { x: number; y: number } {
-    const span = this.outline.stationCount - 1;
+    const span = outline.stationCount - 1;
     const wrapped = progress - Math.floor(progress);
     const scaled = wrapped * span;
     const index = Math.min(Math.floor(scaled), span - 1);
     const alpha = scaled - index;
-    const points = this.outline.points;
+    const points = outline.points;
     const x0 = points[index * 2];
     const z0 = points[index * 2 + 1];
     const x1 = points[(index + 1) * 2];
@@ -257,8 +298,18 @@ export class Minimap {
     context.stroke(this.gatePath);
     ops += 2;
 
-    // Player dot on the outline.
-    const player = this.outlinePointAt(playerProgress, this.outlineTransform);
+    if (this.shortcutPoints.length > 0) {
+      context.strokeStyle = rgba(CYAN, .55);
+      context.setLineDash([2.5, 2]);
+      context.stroke(this.shortcutPath);
+      context.setLineDash([]);
+      ops += 4;
+    }
+
+    // The upper player's dot follows its bypass instead of the lower detour.
+    const playerOutline = this.polarity?.lane === 1 && this.upperOutline
+      ? this.upperOutline : this.outline;
+    const player = this.outlinePointAt(playerProgress, this.outlineTransform, playerOutline);
     context.fillStyle = rgba(ACID, 0.92);
     context.beginPath();
     context.arc(player.x, player.y, 2.1, 0, Math.PI * 2);
@@ -309,6 +360,7 @@ export class Minimap {
       minimapAlert: this.nearestRivalMeters !== null
         && this.nearestRivalMeters <= RADAR_ALERT_RANGE_METERS,
       minimapDrawOps: this.drawOps,
+      minimapShortcutPaths: this.shortcutPoints.length,
     };
   }
 }

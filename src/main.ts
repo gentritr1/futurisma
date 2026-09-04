@@ -24,7 +24,13 @@ const ui = new GameUi();
 const input = new InputController();
 const courseAssemblyStartedAt = performance.now();
 const selection = resolveMapSelection(window.location.search);
-const course: RaceCourse = selection === "bitterpan"
+const course: RaceCourse = selection === "tideline"
+  ? new (await import("./game/tideline-course")).TidelineCourse()
+  : selection === "polarity"
+  ? new (await import("./game/polarity-course")).PolarityCourse()
+  : selection === "nightshift"
+  ? new (await import("./game/nightshift-course")).NightshiftCourse()
+  : selection === "bitterpan"
   ? new (await import("./game/bitterpan-course")).BitterpanCourse()
   : new (await import("./game/course")).GreenwaterCourse();
 const game = new FuturismaGame(

@@ -12,7 +12,7 @@ import type { AudioZone } from "./audio-space.js";
  * every frame, so it lives here on its own.
  */
 
-export type AmbienceMapId = "greenwater" | "bitterpan";
+export type AmbienceMapId = "greenwater" | "bitterpan" | "nightshift" | "polarity" | "tideline";
 
 export interface AmbienceEventLevels {
   windGust: number;
@@ -24,9 +24,10 @@ export interface AmbienceCue {
   map: AmbienceMapId | null;
   distanceMeters: number;
   lapLengthMeters: number;
+  submerged: boolean;
 }
 
-const cue: AmbienceCue = { map: null, distanceMeters: 0, lapLengthMeters: 1 };
+const cue: AmbienceCue = { map: null, distanceMeters: 0, lapLengthMeters: 1, submerged: false };
 
 const eventLevels: AmbienceEventLevels = { windGust: 0, squall: 0, saltDrop: 0 };
 
@@ -54,15 +55,18 @@ export function publishAmbienceCue(
     kind: string;
     length: number;
     audioZoneAt(progress: number): AudioZone;
+    travelModeAt?(progress: number): string;
   },
   progress: number,
 ): AudioZone {
   cue.map = course.kind === "bitterpan" || course.kind === "greenwater"
+    || course.kind === "nightshift" || course.kind === "polarity" || course.kind === "tideline"
     ? course.kind
     : null;
   cue.lapLengthMeters = course.length > 0 ? course.length : 1;
   const wrapped = Number.isFinite(progress) ? ((progress % 1) + 1) % 1 : 0;
   cue.distanceMeters = wrapped * cue.lapLengthMeters;
+  cue.submerged = course.travelModeAt?.(wrapped) === "submerged";
   return course.audioZoneAt(progress);
 }
 

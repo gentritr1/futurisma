@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
@@ -19,11 +20,13 @@ import {
   LONG_TRACK_SECONDS,
   meterDecibels,
   normalizeManifest,
+  ORIGINAL_SOUNDTRACK,
   RANDOM_START_MINIMUM_SECONDS,
   RANDOM_START_TAIL_SECONDS,
   resolveMusicMode,
   resolveTestOrder,
   shuffleOrder,
+  soundtrackPlaylist,
   trackPath,
   trackStartOffset,
   SOUNDTRACK_METER_FLOOR_DB,
@@ -62,6 +65,35 @@ import {
 
 const root = new URL("../", import.meta.url);
 const repositoryRoot = fileURLToPath(root);
+
+// The one shipped instrumental is original, separate from private imports,
+// and measured using the same loudness target as those imports.
+const originalReport = JSON.parse(await readFile(
+  new URL("public/assets/audio/original/meridian-afterimage.json", root), "utf8",
+));
+const originalAudio = await readFile(
+  new URL("public/assets/audio/original/meridian-afterimage.mp3", root),
+);
+assert.ok(originalReport.durationSeconds >= 90 && originalReport.durationSeconds <= 120);
+assert.ok(Math.abs(originalReport.durationSeconds - ORIGINAL_SOUNDTRACK.durationSeconds) < .01);
+assert.ok(originalReport.integratedLufs >= -15 && originalReport.integratedLufs <= -13);
+assert.ok(originalReport.truePeakDbtp <= -.8, "The encoded instrumental needs true-peak headroom.");
+assert.equal(originalReport.channels, 2);
+assert.equal(originalReport.sha256, createHash("sha256").update(originalAudio).digest("hex"));
+assert.ok(originalAudio.length > 1_000_000 && originalAudio.length < 3_000_000);
+assert.equal(trackPath(ORIGINAL_SOUNDTRACK.file, true),
+  "/assets/audio/original/meridian-afterimage.mp3");
+assert.deepEqual(soundtrackPlaylist([]), [ORIGINAL_SOUNDTRACK]);
+const importedFixture = [{ file: "mix.mp3", title: "Private mix", durationSeconds: 3600 }];
+const combinedFixture = soundtrackPlaylist(importedFixture);
+assert.deepEqual(combinedFixture[0], { ...importedFixture[0], original: false });
+assert.equal(combinedFixture[1], ORIGINAL_SOUNDTRACK);
+assert.equal(importedFixture.length, 1, "Building a playlist must not mutate private imports.");
+assert.equal(normalizeManifest({ tracks: [{ ...importedFixture[0], original: true }] })[0].original,
+  undefined, "The private manifest cannot redirect a recording into shipped assets.");
+console.log(`Original soundtrack PASS: ${originalReport.durationSeconds} s, `
+  + `${originalReport.integratedLufs} LUFS, ${originalReport.truePeakDbtp} dBTP, `
+  + "encoded file hash verified; separate shipped/private paths and fresh-clone playlist.");
 
 // ---------------------------------------------------------------------------
 // 1. The import script's pure half.

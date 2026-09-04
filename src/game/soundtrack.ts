@@ -3,6 +3,7 @@ import {
   resolveMusicMode,
   resolveTestOrder,
   shuffleOrder,
+  soundtrackPlaylist,
   trackPath,
   trackStartOffset,
   SOUNDTRACK_MANIFEST_PATH,
@@ -11,17 +12,14 @@ import {
 /**
  * M1 — the local soundtrack.
  *
- * The four synthesised stems are a score, and after twenty phases the verdict
- * on them was "there is no music". They stay: they are the fallback, they are
- * what a fresh clone sounds like, and they are the only music that ships. What
- * this module adds is the ability to put REAL mixes underneath the game —
- * vintage jungle and old-school drum and bass sets, 60 to 120 minutes each —
- * from files the player puts in `public/assets/audio/music/` themselves.
+ * Private vintage jungle and drum and bass mixes live in the user's ignored
+ * directory. Meridian Afterimage is a short, original instrumental that ships
+ * with the game and joins that playlist. The synthesised stems remain the
+ * explicit ?music=synth option and the fallback if no recording can play.
  *
- * NOTHING IT PLAYS IS EVER COMMITTED. The repository is public; the directory
- * is gitignored down to the file, `scripts/validate-soundtrack.mjs` fails the
- * build if `git ls-files` ever disagrees, and there is no code path that
- * fetches audio from anywhere but this origin.
+ * IMPORTED RECORDINGS ARE NEVER COMMITTED. The private directory is ignored,
+ * and the validator checks git's actual index. The original lives separately
+ * with its synthesis source and provenance. Every file remains same-origin.
  *
  * WHY AN `<audio>` ELEMENT AND NOT `decodeAudioData`. The pit radio decodes,
  * because seventeen clips are 29 seconds of speech. A 90-minute mix decoded to
@@ -67,6 +65,7 @@ interface SoundtrackTrack {
   file: string;
   title: string;
   durationSeconds: number;
+  original?: boolean;
 }
 
 export interface SoundtrackDiagnostics {
@@ -100,6 +99,7 @@ export class SoundtrackPlayer {
   private readonly testOrder: string | null;
   private readonly gain: GainNode;
   private readonly tracks: SoundtrackTrack[] = [];
+  private readonly failedTracks = new Set<number>();
   private element: HTMLAudioElement | null = null;
   private source: MediaElementAudioSourceNode | null = null;
   private order: number[] = [];
@@ -135,11 +135,11 @@ export class SoundtrackPlayer {
   }
 
   /**
-   * Reads the manifest and, if there is one, starts playing.
+   * Reads private imports and adds the shipped original, then starts playing.
    *
    * SILENT ON EVERY FAILURE, and that is a requirement rather than laziness.
    * The overwhelmingly common case is a fresh clone with no manifest at all:
-   * the fetch 404s, the stems play, and the console must stay clean — a
+   * the fetch 404s, the original plays, and the console must stay clean — a
    * `console.warn` on a path every single new player takes is noise that trains
    * people to ignore the console. The browser's own network line for the 404 is
    * the honest record of it, and `soundtrack.source` in the diagnostics says
@@ -166,8 +166,11 @@ export class SoundtrackPlayer {
       }
     } catch {
       // No manifest, a malformed one, or an offline page. All three mean the
-      // same thing to the player: the synthesised score is the score.
+      // same thing to the player: play the original without private imports.
     }
+    const playlist = soundtrackPlaylist(this.tracks);
+    this.tracks.length = 0;
+    this.tracks.push(...playlist);
     this.manifestResolved = true;
     if (this.disposed || this.tracks.length === 0) return;
     this.order = resolveTestOrder(this.testOrder, this.tracks)
@@ -182,7 +185,7 @@ export class SoundtrackPlayer {
    * True while a track is the score, true under `?music=0`, and true while the
    * manifest fetch is still in flight — that last one is what stops a player
    * with tracks from hearing one bar of stems before the mix arrives. It goes
-   * false the moment the fetch resolves with nothing.
+   * false only if every recording fails, or the explicit synth mode is used.
    */
   holdsStems(): boolean {
     if (this.mode === "off") return true;
@@ -231,6 +234,7 @@ export class SoundtrackPlayer {
     this.source = null;
     this.element = null;
     this.tracks.length = 0;
+    this.failedTracks.clear();
     this.order.length = 0;
     this.playing = -1;
     chip.title = "";
@@ -263,9 +267,8 @@ export class SoundtrackPlayer {
     element.preload = "auto";
     element.loop = false;
     element.addEventListener("ended", this.handleEnded);
-    // A file the manifest names but the directory does not hold must not stop
-    // the session. Treated exactly like a track that finished.
-    element.addEventListener("error", this.handleEnded);
+    // Remember failures so missing imports cannot make an endless request loop.
+    element.addEventListener("error", this.handleError);
     element.addEventListener("loadedmetadata", this.handleMetadata);
     this.element = element;
     this.source = this.context.createMediaElementSource(element);
@@ -276,6 +279,20 @@ export class SoundtrackPlayer {
   private readonly handleEnded = (): void => {
     if (this.disposed) return;
     this.ended = true;
+    this.advance();
+  };
+
+  private readonly handleError = (): void => {
+    if (this.disposed) return;
+    this.failedTracks.add(this.playing);
+    if (this.failedTracks.size >= this.tracks.length) {
+      this.element?.pause();
+      this.playing = -1;
+      this.tracks.length = 0;
+      chip.title = "";
+      chip.until = 0;
+      return;
+    }
     this.advance();
   };
 
@@ -307,8 +324,12 @@ export class SoundtrackPlayer {
   /** Starts the next track in the order, re-shuffling when the order runs out. */
   private advance(): void {
     if (this.disposed || this.tracks.length === 0) return;
+    while (this.cursor < this.order.length && this.failedTracks.has(this.order[this.cursor])) {
+      this.cursor += 1;
+    }
     if (this.cursor >= this.order.length) {
-      this.order = shuffleOrder(this.tracks.length, this.playing, Math.random);
+      this.order = shuffleOrder(this.tracks.length, this.playing, Math.random)
+        .filter((index) => !this.failedTracks.has(index));
       this.cursor = 0;
     }
     const index = this.order[this.cursor];
@@ -320,7 +341,7 @@ export class SoundtrackPlayer {
     const element = this.ensureElement();
     const duration = track.durationSeconds > 0 ? track.durationSeconds : 0;
     this.pendingOffset = trackStartOffset(duration, Math.random);
-    element.src = trackPath(track.file);
+    element.src = trackPath(track.file, track.original ?? false);
     chip.title = track.title;
     chip.until = performance.now() + SOUNDTRACK_CHIP_MS;
     if (this.paused) return;

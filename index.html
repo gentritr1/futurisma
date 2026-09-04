@@ -47,7 +47,15 @@
         </div>
       </header>
 
+      <div id="gravity-veil" aria-hidden="true"></div>
       <main class="hud">
+        <aside id="polarity-hud" class="polarity-hud" aria-label="Gravity and powers" hidden>
+          <span id="polarity-deck" class="polarity-hud__deck">LOWER DECK</span>
+          <strong id="polarity-flip">SPACE / FLIP UP</strong>
+          <span id="polarity-power">COLLECT A POWER DEVICE</span>
+          <span class="power-charge" aria-hidden="true"><i id="power-charge-fill"></i></span>
+          <span id="polarity-route" class="polarity-hud__route">SHIFT / NITRO</span>
+        </aside>
         <section class="telemetry telemetry--speed" aria-label="Speed">
           <span class="telemetry__label">VELOCITY</span>
           <span class="speed-readout"><strong id="speed-value">000</strong><small>KM/H</small></span>
@@ -195,7 +203,7 @@
             Four ships. Five laps through Greenwater Strip. Follow the amber turn
             markers, clear all eight gates, and bring TOTEM home through The Cradle.
           </p>
-
+          <a id="tideline-edition" class="edition-switch" href="/?map=tideline&amp;edition=foundry" hidden>TRY THE FOUNDRY CUT</a>
           <div class="dispatch">
             <div class="dispatch__row">
               <span class="dispatch__key" id="track-select-label">CIRCUIT</span>
@@ -260,6 +268,8 @@
             <div><dt>STEER</dt><dd>A D / ← →</dd></div>
             <div><dt>BRAKE</dt><dd>S / ↓</dd></div>
             <div><dt>DRIFT</dt><dd>BRAKE + STEER</dd></div>
+            <div data-polarity-control hidden><dt>FLIP GRAVITY</dt><dd>SPACE / X</dd></div>
+            <div data-power-control hidden><dt>USE POWER</dt><dd>E / B</dd></div>
             <div><dt>BOOST</dt><dd>SHIFT / A</dd></div>
             <div><dt>RECOVER</dt><dd>R / Y</dd></div>
             <div><dt>PAUSE</dt><dd>ESC / START</dd></div>

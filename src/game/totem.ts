@@ -5,6 +5,7 @@ import atlasRegionsJson from "./data/ATLAS_REGIONS.json";
 import liveryWearJson from "./data/TOTEM_LIVERY_WEAR.json";
 import wearCellsJson from "./data/TOTEM_WEAR_CELLS.json";
 import { disposeObject3DResources } from "./graphics-resources";
+import { TotemEvolution } from "./totem-evolution";
 import {
   TotemRacePresence,
   type RacePresenceVisualState,
@@ -25,6 +26,15 @@ import {
 export interface TotemVisualState extends RacePresenceVisualState {
   steer: number;
   lateralLoad: number;
+  gravitySign?: number;
+  gravityTransition?: number;
+  shieldActive?: boolean;
+  overdriveActive?: boolean;
+  powerReady?: boolean;
+  heldPowerKind?: "surge" | "shield" | null;
+  powerCharge?: number;
+  powerActivation?: number;
+  boostReserve?: number;
 }
 
 interface NeutralTransform {
@@ -768,6 +778,7 @@ export class TotemVehicle {
   private readonly neutral = new Map<string, NeutralTransform>();
   private readonly rotationOffset = new THREE.Quaternion();
   private racePresence: TotemRacePresence | null = null;
+  private evolution: TotemEvolution | null = null;
   private model: THREE.Object3D | null = null;
   private originalVisibleMeshes: OriginalVisibleMesh[] = [];
   private readonly pivotMatrices = new Map<string, THREE.Matrix4>();
@@ -849,6 +860,15 @@ export class TotemVehicle {
       this.nodes,
       effectsAtlas,
     );
+    // The original mesh capture above remains the rival asset contract. This
+    // separate assembly belongs only to the player and follows scene disposal.
+    try {
+      this.evolution = await TotemEvolution.load();
+      applyPs2MaterialTreatment(this.evolution.root);
+      this.model.add(this.evolution.root);
+    } catch (error) {
+      console.warn("TOTEM enhancement kit could not load; using the original craft.", error);
+    }
   }
 
   /**
@@ -1102,7 +1122,9 @@ export class TotemVehicle {
       0.34,
     );
     const pitch = state.brake * 0.055 - state.throttle * 0.025;
-    const bob = Math.sin(state.elapsed * 4.1) * 0.026 * (0.25 + state.speedRatio);
+    const bob = state.reducedMotion
+      ? 0
+      : Math.sin(state.elapsed * 4.1) * 0.026 * (0.25 + state.speedRatio);
     this.visual.position.y = bob;
     const pitchResponse = 1 - Math.exp(-state.delta * 8.5);
     const bankResponse = 1 - Math.exp(-state.delta * 7.2);
@@ -1145,6 +1167,7 @@ export class TotemVehicle {
     // rides in the fleet's shared instanced blob mesh alongside the rivals, so
     // every craft on track reads the same way for one draw call in total.
     this.racePresence?.update(state);
+    this.evolution?.update(state);
   }
 
   triggerImpactEffect(side: number, strength: number): void {
@@ -1153,6 +1176,7 @@ export class TotemVehicle {
 
   resetEffects(): void {
     this.racePresence?.reset();
+    this.evolution?.reset();
   }
 
   worldPosition(

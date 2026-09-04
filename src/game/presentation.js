@@ -11,6 +11,14 @@ export function calculatePresentationAlpha(accumulator, fixedStep) {
   return Math.min(1, Math.max(0, accumulator / fixedStep));
 }
 
+/** Contact blobs cannot hang in space over an authored flight gap.
+ * @param {boolean} visible
+ * @param {'submerged'|'surface'|'air'|undefined} travelMode
+ */
+export function groundBlobVisible(visible, travelMode) {
+  return visible && travelMode !== "air";
+}
+
 /**
  * P11 — the banked deck's height at a lateral offset.
  *

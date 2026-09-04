@@ -67,6 +67,14 @@ export const BITTERPAN_SKY_ZONES = Object.freeze([
   { sector: "S3", distance: 2550, horizon: 0x728b9e, zenith: 0x182634, blendDegrees: 20 },
 ]);
 
+/** The midnight city maps keep their own horizon and no visible sun. */
+export const NIGHTSHIFT_SKY_ZONES = Object.freeze([
+  { sector: "CITY_NIGHT", distance: 0, horizon: 0x172532, zenith: 0x050b16, blendDegrees: 22 },
+]);
+export const POLARITY_SKY_ZONES = Object.freeze([
+  { sector: "GRAVITY_NIGHT", distance: 0, horizon: 0x20213d, zenith: 0x060819, blendDegrees: 24 },
+]);
+
 /**
  * The accent band the dome has drawn at the horizon line since P4. It is the
  * sector rim colour, and against the old fog-coloured sky it was the loudest
@@ -78,6 +86,9 @@ export const BITTERPAN_SKY_ZONES = Object.freeze([
 export const SKY_BAND_STRENGTH = Object.freeze({
   greenwater: 0.34,
   bitterpan: 0.19,
+  nightshift: 0.012,
+  polarity: 0.018,
+  tideline: 0.012,
 });
 
 /**
@@ -136,24 +147,36 @@ export const CLOUD_PROFILES = Object.freeze({
     shadowCool: 0.7,
     seed: 0.71,
   }),
+  nightshift: Object.freeze({
+    coverage: 0.45, softness: 0.5, strength: 0.038,
+    driftPerSecond: 0.0015, azimuthPeriod: 32, stretch: 6,
+    lowDegrees: 4, highDegrees: 30, shadowCool: 0.7, seed: 0.19,
+  }),
+  polarity: Object.freeze({
+    coverage: 0.4, softness: 0.5, strength: 0.045,
+    driftPerSecond: 0.002, azimuthPeriod: 40, stretch: 7,
+    lowDegrees: 4, highDegrees: 32, shadowCool: 0.75, seed: 0.83,
+  }),
 });
 
 /** Hard ceiling from the P20.5 brief; the validator pins both maps under it. */
 export const CLOUD_MAX_DRIFT_PER_SECOND = 0.004;
 
-/** @param {"greenwater" | "bitterpan"} kind */
+/** @param {"greenwater" | "bitterpan" | "nightshift" | "polarity" | "tideline"} kind */
 export function skyZonesFor(kind) {
+  if (kind === "polarity") return POLARITY_SKY_ZONES;
+  if (kind === "nightshift" || kind === "tideline") return NIGHTSHIFT_SKY_ZONES;
   return kind === "bitterpan" ? BITTERPAN_SKY_ZONES : GREENWATER_SKY_ZONES;
 }
 
-/** @param {"greenwater" | "bitterpan"} kind */
+/** @param {"greenwater" | "bitterpan" | "nightshift" | "polarity" | "tideline"} kind */
 export function cloudProfileFor(kind) {
-  return kind === "bitterpan" ? CLOUD_PROFILES.bitterpan : CLOUD_PROFILES.greenwater;
+  return CLOUD_PROFILES[kind === "tideline" ? "nightshift" : kind];
 }
 
-/** @param {"greenwater" | "bitterpan"} kind */
+/** @param {"greenwater" | "bitterpan" | "nightshift" | "polarity" | "tideline"} kind */
 export function bandStrengthFor(kind) {
-  return kind === "bitterpan" ? SKY_BAND_STRENGTH.bitterpan : SKY_BAND_STRENGTH.greenwater;
+  return SKY_BAND_STRENGTH[kind];
 }
 
 /**

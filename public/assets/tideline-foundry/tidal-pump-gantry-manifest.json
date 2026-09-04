@@ -1,0 +1,153 @@
+{
+  "name": "Tidal Pump Gantry",
+  "root": "GW_LM_TIDAL_PUMP_GANTRY",
+  "coordinates": "metres, +Y up, local X across route, +Z along route",
+  "triangles": 3180,
+  "primitives": 5,
+  "materials": [
+    "GW_MAT_concrete",
+    "GW_MAT_metal",
+    "GW_MAT_jungle",
+    "GW_MAT_signage",
+    "GW_MAT_emissive"
+  ],
+  "textures": 0,
+  "bounds": {
+    "min": [
+      -24.2838077545166,
+      0,
+      -4.0
+    ],
+    "max": [
+      27.450000762939453,
+      20.049999999999997,
+      4.0
+    ]
+  },
+  "minimumCentralClearance": 13.205,
+  "minimumSupportLateral": 18.6,
+  "parts": [
+    {
+      "name": "GW_PART_concrete_foot_01",
+      "role": "concrete_foot",
+      "center": [
+        -21,
+        1.7,
+        0
+      ]
+    },
+    {
+      "name": "GW_PART_welded_repair_01",
+      "role": "repair_plate",
+      "center": [
+        -21,
+        7.8,
+        -2.89
+      ]
+    },
+    {
+      "name": "GW_PART_concrete_foot_02",
+      "role": "concrete_foot",
+      "center": [
+        21,
+        1.7,
+        0
+      ]
+    },
+    {
+      "name": "GW_PART_welded_repair_02",
+      "role": "repair_plate",
+      "center": [
+        21,
+        7.8,
+        -2.89
+      ]
+    },
+    {
+      "name": "GW_PART_overhead_truss_01",
+      "role": "overhead_truss",
+      "center": [
+        0,
+        16.7,
+        -2.9
+      ]
+    },
+    {
+      "name": "GW_PART_overhead_truss_02",
+      "role": "overhead_truss",
+      "center": [
+        0,
+        16.7,
+        0
+      ]
+    },
+    {
+      "name": "GW_PART_overhead_truss_03",
+      "role": "overhead_truss",
+      "center": [
+        0,
+        16.7,
+        2.9
+      ]
+    },
+    {
+      "name": "GW_PART_side_pump_drum_01",
+      "role": "pump_drum",
+      "center": [
+        25.2,
+        9.4,
+        0
+      ]
+    },
+    {
+      "name": "GW_PART_ladder_01",
+      "role": "ladder",
+      "center": [
+        -23.2,
+        11.7,
+        0
+      ]
+    },
+    {
+      "name": "GW_PART_caged_lamp_01",
+      "role": "lamp_working",
+      "center": [
+        -15,
+        13.8,
+        -2.9
+      ]
+    },
+    {
+      "name": "GW_PART_caged_lamp_02",
+      "role": "lamp_working",
+      "center": [
+        -5,
+        13.8,
+        -2.9
+      ]
+    },
+    {
+      "name": "GW_PART_caged_lamp_03",
+      "role": "lamp_working",
+      "center": [
+        5,
+        13.8,
+        -2.9
+      ]
+    },
+    {
+      "name": "GW_PART_caged_lamp_04",
+      "role": "lamp_dead",
+      "center": [
+        15,
+        13.8,
+        -2.9
+      ]
+    }
+  ],
+  "source": "art/blender/build_tidal_pump_gantry.py",
+  "referenceDirectory": "art/references/tideline-foundry",
+  "bytes": 291652,
+  "sha256": "6a341669526999cedb57c94019e1bc036362ddd594f1d3d220fbc88d518aaf4d",
+  "referenceCalibration": "Imagegen orthographic panels have scale drift. Imported plane crops calibrated to 46m width, 20m height, 8m depth. All three trusses share elevation."
+}

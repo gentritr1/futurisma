@@ -396,6 +396,24 @@ export class SceneAssets {
   async loadAuthoredEnvironment(): Promise<void> {
     const environmentLoadStartedAt = performance.now();
     try {
+      if (this.course.kind === "nightshift" || this.course.kind === "polarity" || this.course.kind === "tideline") {
+        const environment = this.course.kind === "tideline"
+          ? await (await import("./tideline-environment")).TidelineEnvironment.load()
+          : this.course.kind === "polarity"
+          ? await (await import("./polarity-environment")).PolarityEnvironment.load()
+          : await (await import("./nightshift-environment")).NightshiftEnvironment.load();
+        this.environmentLoadMs = performance.now() - environmentLoadStartedAt;
+        if (this.isDisposed()) {
+          disposeObject3DResources(environment.root);
+          return;
+        }
+        this.authoredEnvironment = environment;
+        environment.updateVisibility(this.camera);
+        this.scene.add(hiddenUnderFloorProbe(environment.root));
+        this.environmentReady = true;
+        this.requestRender();
+        return;
+      }
       if (this.course.kind === "bitterpan") {
         const { BitterpanEnvironment } = await import("./bitterpan-environment");
         const environment = await BitterpanEnvironment.load(
@@ -459,8 +477,8 @@ export class SceneAssets {
       this.environmentError = error instanceof Error
         ? error.message
         : `Unknown ${this.course.mapName} environment load error`;
-      if (this.course.kind === "bitterpan") {
-        console.error("Bitterpan accepted blockout environment failed to load.", error);
+      if (this.course.kind !== "greenwater") {
+        console.error(`${this.course.mapName} environment failed to load.`, error);
         throw error;
       }
       console.warn("Greenwater authored environment failed to load; using Phase 1 fallback.", error);

@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import type { RaceCourse } from "./course";
+import { groundBlobVisible } from "./presentation.js";
 import {
   RIVAL_CUSHION_YIELD_BLOCKED_METERS,
   RIVAL_CUSHION_YIELD_METERS,
@@ -1346,6 +1347,9 @@ export class RivalFleet {
       // taking. Lateral only; see the note in `rivalContestLaneMeters`.
       gustLaneBiasMeters: gustRivalLaneBiasMeters(),
     });
+    drive.targetLateralMeters = this.course.rivalHazardLaneAt?.(
+      state.courseDistanceMeters, state.lateralMeters,
+    ) ?? drive.targetLateralMeters;
     drive.paceLateralMeters = paceLane;
     drive.laneHalfWidthMeters = laneHalfWidthMeters;
     drive.courseSpeedFactor = rivalCourseSpeedFactor(
@@ -1744,7 +1748,7 @@ export class RivalFleet {
         this.backward,
         lateral,
         RIVAL_NOMINAL_HOVER_METERS + bob,
-        visible,
+        groundBlobVisible(visible, this.course.travelModeAt?.(distance / this.course.length)),
       );
     }
     for (const visual of this.visuals) {

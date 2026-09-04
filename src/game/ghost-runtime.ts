@@ -178,7 +178,11 @@ class GhostRuntime {
     this.bestOfRaceMs = null;
     this.triangles = 0;
     this.recorder.reset();
-    this.enabled = !isProbeRun();
+    // Format v1 records only a single road's progress/lateral coordinates.
+    // Polarity also needs the recorded deck and the continuous transfer pose;
+    // sampling its mutable player course would teleport a replay between roads.
+    // Keep that circuit's lap records, but do not record or replay a false ghost.
+    this.enabled = !isProbeRun() && course.kind !== "polarity";
     if (!this.enabled) return this.root;
     const batches = vehicle.createRivalVisualBatches();
     try {

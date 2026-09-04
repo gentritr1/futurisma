@@ -66,6 +66,7 @@ import {
   calculatePresentationAlpha,
   cameraSurfaceClearance,
   chaseDistanceCorrection,
+  groundBlobVisible,
   hullClearance,
   lateralFromHorizontalOffset,
   presentationSurfaceLift,
@@ -108,6 +109,7 @@ import {
   type TotemVisualState,
 } from "./totem";
 import { GameUi, type RaceStandingEntry } from "./ui";
+import { createCircuitRuntime, type CircuitRuntime } from "./circuit-runtime";
 
 const VEHICLE_MODEL_URL = "/assets/totem/models/totem_runtime.glb";
 const RACE_PRESENCE_FX_ATLAS_URL = "/assets/totem/textures/totem_race_presence_fx_256.png";
@@ -169,6 +171,7 @@ const MINIMUM_CAMERA_SURFACE_CLEARANCE_METRES = 1.6;
 const RESUME_COUNTDOWN_SECONDS = 2.7;
 
 export class FuturismaGame {
+  private circuitRuntime: CircuitRuntime | null = null;
   private readonly scene = new THREE.Scene();
   private readonly camera: THREE.PerspectiveCamera;
   private readonly renderer: THREE.WebGLRenderer;
@@ -562,8 +565,10 @@ export class FuturismaGame {
       this.vehicle.root.clear();
       return false;
     }
+    this.circuitRuntime = await createCircuitRuntime(this.course, this.input, this.audio, this.ui, this.reducedMotion, () => this.disposed);
+    if (this.disposed) { this.circuitRuntime?.dispose(); return false; }
     const rivalFleet = await RivalFleet.create(
-      this.course,
+      this.circuitRuntime?.course.rivalCourse ?? this.course,
       this.totalLaps,
       this.vehicle,
       () => this.disposed,
@@ -599,7 +604,7 @@ export class FuturismaGame {
     this.resetRaceState();
     this.updatePose(ZERO_INPUT, 0);
     this.snapCamera();
-    if (this.course.kind === "bitterpan") {
+    if (this.course.kind !== "greenwater") {
       await this.sceneAssets.loadAuthoredEnvironment();
       if (this.disposed) return false;
     }
@@ -656,6 +661,11 @@ export class FuturismaGame {
     }
     if (this.input.consumeMute()) {
       this.ui.setAudioMuted(this.audio.toggleMute());
+    }
+    if (this.circuitRuntime?.handleActions(this.phase === "running", this.progress, this.position, this.lateral, this.demoAutopilot)) {
+      this.lateral *= -1;
+      this.syncPresentationPose();
+      this.contact.resetMotion(this.lateral);
     }
 
     this.update(delta, input);
@@ -878,6 +888,7 @@ export class FuturismaGame {
   }
 
   private updateRace(delta: number, input: InputFrame): void {
+    this.circuitRuntime?.step(delta, this.progress, this.lateral, this.lap);
     if (this.diagnosticsMode) this.diagnosticPhysicsSteps += 1;
     this.recoveryImmunity = Math.max(0, this.recoveryImmunity - delta);
     this.hazardTripCooldown = Math.max(0, this.hazardTripCooldown - delta);
@@ -902,7 +913,7 @@ export class FuturismaGame {
       && input.throttle > 0.1
       && input.brake < 0.15
       && this.boostReserve > 0;
-    this.boostActive = reserveBoost || this.padBoostTime > 0;
+    this.boostActive = reserveBoost || this.padBoostTime > 0 || Boolean(this.circuitRuntime?.surgeActive);
     if (this.boostActive && !wasBoostActive) {
       this.audio.playBoost();
       this.input.pulse(0.16, 0.34, 90);
@@ -934,9 +945,10 @@ export class FuturismaGame {
       );
       this.input.pulse(0.24, 0.12, 90);
     }
-    const slipstream = this.rivalFleet?.slipstreamStrength ?? 0;
+    const slipstream = this.circuitRuntime?.ceiling ? 0 : this.rivalFleet?.slipstreamStrength ?? 0;
     if (this.rivalFleet?.slipstreamLocked) this.audio.playSlipstreamLock();
     this.slipstream = slipstream;
+    const speedBeforeStep = this.speed;
     this.speed = integrateSpeed(
       this.speed,
       input.throttle,
@@ -946,6 +958,7 @@ export class FuturismaGame {
       delta,
       slipstream,
     );
+    this.speed = this.circuitRuntime?.applySurge(speedBeforeStep, this.speed, input, delta) ?? this.speed;
     // G4 - out of the guard below: the result screen prints TOP SPEED in
     // ordinary play, and the value is identical, so `topSpeedKph` does not move.
     this.diagnosticTopSpeed = Math.max(this.diagnosticTopSpeed, this.speed);
@@ -959,7 +972,7 @@ export class FuturismaGame {
     // multiplier on the PASSIVE regen term.
     this.boostReserve = integrateBoostReserve(
       this.boostReserve, reserveBoost, delta,
-      driftReward, slipstream, this.contact.regenMultiplier,
+      driftReward, slipstream, this.contact.regenMultiplier * (this.circuitRuntime?.boostRechargeScale ?? 1),
     );
 
     this.steerAmount = integrateSteering(
@@ -1037,17 +1050,17 @@ export class FuturismaGame {
       delta, this.playerRaceDistance(), this.progress * this.course.length,
       this.lap, this.contactPose, this.diagnosticsMode,
     );
-    if (this.contact.stepCushion(
+    if ((!this.circuitRuntime?.ceiling && this.contact.stepCushion(
       this.rivalFleet, this.contactPose, this.playerRaceDistance(),
       delta, this.elapsedMs, afterMove, this.position,
       this.course.apronAt(afterMove, this.lateral, this.afterMoveApron).lateralLimit,
-    ) || gustMoved) {
+    )) || gustMoved) {
       this.lateral = this.contactPose.lateralMeters;
       this.position.copy(afterMove.position).addScaledVector(afterMove.right, this.lateral);
       this.position.y = afterMove.position.y;
     }
     this.speed = this.contactPose.speedMetersPerSecond;
-    const reward = this.contact.scorePasses(
+    const reward = this.circuitRuntime?.ceiling ? 0 : this.contact.scorePasses(
       this.rivalFleet, this.course, previousProgress, this.progress,
       this.contactPose, this.lap, this.hazardTripCooldown <= 0, this.diagnosticsMode,
     );
@@ -1055,7 +1068,10 @@ export class FuturismaGame {
       this.boostReserve = integrateBoostReserve(this.boostReserve, false, 0, reward);
     }
 
-    const cableTripSide = this.hazardTripCooldown <= 0
+    if (this.circuitRuntime?.shieldActive && this.course.cableTripSideAt(this.progress, this.lateral)) {
+      this.boostReserve = Math.min(1, this.boostReserve + this.circuitRuntime.onShieldImpact(this.progress, this.lateral));
+    }
+    const cableTripSide = this.hazardTripCooldown <= 0 && !this.circuitRuntime?.shieldActive
       ? this.course.cableTripSideAt(this.progress, this.lateral)
       : 0;
     if (cableTripSide !== 0) {
@@ -1068,7 +1084,7 @@ export class FuturismaGame {
       this.audio.playImpact(0.88);
       this.input.pulse(0.68, 0.82, 150);
       this.ui.flashImpact(cableTripSide < 0 ? "LEFT" : "RIGHT");
-      this.ui.flashHazard("CABLE STRIKE");
+      this.ui.flashHazard(this.circuitRuntime ? "PHASE FIELD · USE SHIELD OR CHANGE LANE" : "CABLE STRIKE");
       if (this.diagnosticsMode) {
         this.diagnosticImpacts += 1;
         this.diagnosticImpactLocations.push(
@@ -1118,7 +1134,7 @@ export class FuturismaGame {
       if (outwardMotion > 0) {
         this.travelDirection.addScaledVector(outward, -outwardMotion * 1.45).normalize();
       }
-      if (apron.wall && !wasWallContact) {
+      if (apron.wall && !wasWallContact && !this.circuitRuntime?.shieldActive) {
         const impactStrength = apron.wallImpactStrength;
         this.speed *= apron.wallSpeedMultiplier;
         this.impactShake = 1;
@@ -1138,7 +1154,7 @@ export class FuturismaGame {
           );
         }
       }
-      const scrub = apron.wallScrubMetresPerSecondSquared;
+      const scrub = this.circuitRuntime?.shieldActive ? 0 : apron.wallScrubMetresPerSecondSquared;
       this.speed = integrateEdgeScrub(this.speed, scrub, delta);
     }
     this.wallContact = outside
@@ -1205,6 +1221,7 @@ export class FuturismaGame {
   }
 
   private updateCoast(delta: number): void {
+    this.circuitRuntime?.advanceClocks(delta);
     const previousSpeed = this.speed;
     this.speed = integrateCoastSpeed(this.speed, delta);
     this.position.addScaledVector(this.travelDirection, this.speed * delta);
@@ -1322,6 +1339,7 @@ export class FuturismaGame {
       this.progress,
       previousCheckpoint,
     );
+    this.circuitRuntime?.recover(this.progress);
     const recovery = this.course.sample(this.progress, this.poseProjection);
     this.position.copy(recovery.position);
     this.forward.copy(recovery.tangent);
@@ -1379,6 +1397,7 @@ export class FuturismaGame {
       sample.up.y,
       surfaceHeightAtLateral(sample, this.presentationLateral),
     );
+    this.circuitRuntime?.present(sample, this.presentationPosition, this.presentationForward, this.vehicleVisualState);
     const speedRatio = this.speed / BOOST_MAX_SPEED;
     const vehiclePosition = this.scratchA
       .copy(this.presentationPosition)
@@ -1416,19 +1435,20 @@ export class FuturismaGame {
     this.vehicleVisualState.reducedMotion = this.reducedMotion;
     this.vehicleVisualState.elapsed = this.timer.getElapsed();
     this.vehicleVisualState.delta = delta;
+    this.vehicleVisualState.boostReserve = this.boostReserve;
     this.vehicle.updateVisual(this.vehicleVisualState);
-    // The player's ground blob rides in the fleet's shared instanced mesh, so
-    // it is placed here where the on-surface point and vehicle basis already
-    // exist. scratchB/C/D still hold right, up and backward from above.
+    // The fleet's shared contact blob uses the existing scratchB/C/D basis.
+    // Flight gaps and in-flight gravity transfers have no receiving surface.
     this.rivalFleet?.setPlayerShadow(
       this.presentationPosition,
       vehicleRight,
       vehicleUp,
       this.scratchD,
       this.vehicle.hoverHeightMeters(this.vehicleVisualState),
+      groundBlobVisible(!this.circuitRuntime?.isFlipping, this.course.travelModeAt?.(this.progress)),
     );
 
-    if (this.diagnosticsMode) this.recordHullClearance(vehiclePosition.y, sample);
+    if (this.diagnosticsMode && !this.circuitRuntime) this.recordHullClearance(vehiclePosition.y, sample);
     if (delta > 0) this.impactShake = Math.max(0, this.impactShake - delta * 3.6);
     return sample;
   }
@@ -1740,6 +1760,10 @@ export class FuturismaGame {
     brake: number,
     sample: CourseProjection,
   ): void {
+    if (this.circuitRuntime) {
+      this.circuitRuntime.updateCamera(this.camera, delta, this.vehicle.root.position, this.presentationForward, this.speed);
+      return;
+    }
     const vehicleRight = this.scratchA
       .crossVectors(this.presentationForward, sample.up)
       .normalize();
@@ -1925,6 +1949,7 @@ export class FuturismaGame {
   }
 
   private updateHud(input: InputFrame): void {
+    this.circuitRuntime?.updateHud(this.progress);
     const checkpoint = this.nextCheckpointIndex === 0
       ? this.course.checkpointCount
       : this.nextCheckpointIndex;
@@ -2100,6 +2125,7 @@ export class FuturismaGame {
   }
 
   private resetRaceState(): void {
+    this.circuitRuntime?.reset();
     const spawn = resolveProbeSpawn(this.course);
     this.progress = spawn.progress;
     this.speed = spawn.speedMps;
@@ -2526,6 +2552,7 @@ export class FuturismaGame {
 
   dispose(): void {
     if (this.disposed) return;
+    this.circuitRuntime?.dispose();
     this.disposed = true;
     this.running = false;
     cancelAnimationFrame(this.animationFrame);

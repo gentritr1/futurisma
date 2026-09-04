@@ -1,0 +1,21 @@
+{
+  "name": "Surge turbine and Phase iris projector",
+  "triangles": 3444,
+  "meshes": 8,
+  "materials": 5,
+  "textures": 0,
+  "groups": [
+    "PK_surge",
+    "PK_shield"
+  ],
+  "source": "art/blender/build_power_kit.py",
+  "refinementReference": "art/references/power-kit/multiview-refinement.png",
+  "refinements": [
+    "three vented flared turbine shrouds",
+    "three-prong aperture crown",
+    "bolted docking cleats",
+    "six articulated iris hinge barrels",
+    "six projector support arms",
+    "open housing vents"
+  ]
+}

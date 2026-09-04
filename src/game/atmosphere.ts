@@ -280,6 +280,11 @@ export class RaceAtmosphere {
       blendDegrees: zone.blendDegrees,
     }));
     this.cloudProfile = cloudProfileFor(course.kind);
+    if (course.kind === "nightshift" || course.kind === "polarity" || course.kind === "tideline") {
+      this.skyUniforms.sunShape.value.z = 0;
+      this.skyUniforms.hazeColor.value.copy(this.skyZones[0].horizon);
+      this.skyUniforms.topColor.value.copy(this.skyZones[0].zenith);
+    }
     // Static half of the sky uniforms: the ramp geometry, the cloud shape and
     // the elevation gate never change after construction, so they are written
     // once here and the per-frame path only touches colours and the drift phase.

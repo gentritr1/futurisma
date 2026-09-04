@@ -39,6 +39,8 @@ import {
   bedWindowGain,
   channelPeak,
   channelRmsDbfs,
+  cityAmbienceBeds,
+  tidelineAmbienceBeds,
   PASS_BY_RELEASE_METERS,
   PASS_BY_TRIGGER_METERS,
   renderAmbienceLoop,
@@ -86,6 +88,30 @@ const lapLength = {
   greenwater: greenwater.centreline.lapLength,
   bitterpan: 3_050,
 };
+
+for (const map of ["nightshift", "polarity", "tideline"]) {
+  for (const length of [1_958.9, 2_400]) {
+    const beds = map === "tideline" ? tidelineAmbienceBeds(length) : cityAmbienceBeds(map, length);
+    assert.equal(beds.length, 5, `${map} needs air, electricity, rain, relays and water.`);
+    assert.equal(new Set(beds.map((bed) => bed.id)).size, beds.length);
+    for (const bed of beds) {
+      assert.equal(bed.event, null, "City atmosphere must not inherit salt or squall event gain.");
+      assert.equal(bed.eventGain, 0);
+      assert.ok(bed.level > 0 && bed.level < .2, `${map}/${bed.id} must stay below the craft.`);
+      if (bed.kind === "loop") assert.ok(AMBIENCE_LOOP_SECONDS[bed.id]);
+      if (bed.window) {
+        assert.ok(bed.window.startDistance >= 0 && bed.window.endDistance < length);
+        assert.ok(bed.window.endDistance > bed.window.startDistance);
+      }
+      const at = bed.window ? (bed.window.startDistance + bed.window.endDistance) / 2 : 0;
+      assert.ok(bedTargetGain(bed, {
+        distanceMeters: at, lapLengthMeters: length, zone: "open", events: {},
+      }) > 0, `${map}/${bed.id} must be audible in its district.`);
+    }
+  }
+}
+console.log("City ambience PASS: five restrained beds per night map, "
+  + "windows scale with lap length; no inherited squall or salt events.");
 
 // ---------------------------------------------------------------------------
 // The plan itself. A bed with no id, no level and no way of ever being audible

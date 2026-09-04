@@ -110,12 +110,18 @@ export class RacingContact {
   ) {}
 
   reset(): void {
+    this.resetMotion();
+    this.chain = 0;
+  }
+
+  /** A deck transfer changes contact space, but does not break a clean gate chain. */
+  resetMotion(lateralMeters = 0): void {
     this.cushionLateralVelocity = 0;
-    this.previousLateral = 0;
+    this.previousLateral = lateralMeters;
     this.contactActive = false;
     this.glowSide = null;
     this.glowUntilMs = 0;
-    this.chain = 0;
+    this.currentContactSeconds = 0;
   }
 
   resetDiagnostics(): void {

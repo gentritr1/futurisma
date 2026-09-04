@@ -14,6 +14,7 @@ const CONTROL_KEYS = new Set([
   "ArrowLeft",
   "ArrowRight",
   "Space",
+  "KeyE",
   "Escape",
 ]);
 
@@ -32,7 +33,7 @@ const DRIVING_KEYS = new Set([
 ]);
 
 const START_KEYS = new Set(["Enter", "Escape", "KeyP"]);
-const ACTION_KEYS = new Set([...START_KEYS, "KeyR", "KeyM"]);
+const ACTION_KEYS = new Set([...START_KEYS, "KeyR", "KeyM", "Space", "KeyE"]);
 
 function hasHeldKeyboardAction(keys: ReadonlySet<string>): boolean {
   for (const code of ACTION_KEYS) {
@@ -52,6 +53,10 @@ export class InputController {
   private startRequested = false;
   private resetRequested = false;
   private muteRequested = false;
+  private flipRequested = false;
+  private powerRequested = false;
+  private gravityControls = false;
+  private powerControls = false;
   private controlIntentRequested = false;
   private actionsSuppressedUntilRelease = false;
   private previousGamepadButtons: boolean[] = [];
@@ -70,13 +75,15 @@ export class InputController {
     const keyboardBrake = this.keys.has("KeyS") || this.keys.has("ArrowDown") ? 1 : 0;
     const keyboardBoost = this.keys.has("ShiftLeft")
       || this.keys.has("ShiftRight")
-      || this.keys.has("Space");
+      || (!this.gravityControls && this.keys.has("Space"));
 
     const gamepad = this.activeGamepad();
     const actionControlHeld = hasHeldKeyboardAction(this.keys)
       || Boolean(gamepad?.buttons[9]?.pressed)
       || Boolean(gamepad?.buttons[3]?.pressed)
-      || Boolean(gamepad?.buttons[8]?.pressed);
+      || Boolean(gamepad?.buttons[8]?.pressed)
+      || Boolean(gamepad?.buttons[2]?.pressed)
+      || Boolean(gamepad?.buttons[1]?.pressed);
     const actionsWereSuppressed = this.actionsSuppressedUntilRelease;
     this.actionsSuppressedUntilRelease = resolveActionSuppression(
       actionsWereSuppressed,
@@ -115,6 +122,11 @@ export class InputController {
     ) {
       this.muteRequested = true;
     }
+    if (acceptActions) {
+      if (this.gravityControls && gamepad.buttons[2]?.pressed && !this.previousGamepadButtons[2]) this.flipRequested = true;
+      if (this.powerControls && gamepad.buttons[1]?.pressed && !this.previousGamepadButtons[1]) this.powerRequested = true;
+      if (this.flipRequested || this.powerRequested) this.controlIntentRequested = true;
+    }
     this.previousGamepadButtons.length = gamepad.buttons.length;
     for (let index = 0; index < gamepad.buttons.length; index += 1) {
       this.previousGamepadButtons[index] = gamepad.buttons[index].pressed;
@@ -135,6 +147,19 @@ export class InputController {
 
   requestStart(): void {
     if (!this.actionsSuppressedUntilRelease) this.startRequested = true;
+  }
+
+  setGravityControls(enabled: boolean): void { this.gravityControls = enabled; this.powerControls = enabled; }
+  setPowerControls(enabled: boolean): void { this.powerControls = enabled; }
+  consumeFlip(): boolean {
+    const requested = this.flipRequested;
+    this.flipRequested = false;
+    return requested;
+  }
+  consumePower(): boolean {
+    const requested = this.powerRequested;
+    this.powerRequested = false;
+    return requested;
   }
 
   suspendActionsUntilRelease(): void {
@@ -216,6 +241,9 @@ export class InputController {
     }
     if (event.code === "KeyR") this.resetRequested = true;
     if (event.code === "KeyM") this.muteRequested = true;
+    if (this.gravityControls && event.code === "Space") this.flipRequested = true;
+    if (this.powerControls && event.code === "KeyE") this.powerRequested = true;
+    if (this.flipRequested || this.powerRequested) this.controlIntentRequested = true;
   };
 
   private readonly handleKeyUp = (event: KeyboardEvent): void => {
@@ -227,6 +255,8 @@ export class InputController {
   };
 
   private clearPendingActions(): void {
+    this.flipRequested = false;
+    this.powerRequested = false;
     this.startRequested = false;
     this.resetRequested = false;
     this.muteRequested = false;
