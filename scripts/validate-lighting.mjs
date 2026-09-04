@@ -1162,6 +1162,157 @@ assert.ok(
   "The cloud drift phase must only advance when reduced motion is off.",
 );
 
+/* ------------------------------------------------------------------ */
+/* 9. H3 — the Hangar Six steam vents are steam, not a floating rock     */
+/* ------------------------------------------------------------------ */
+
+// The vents live here because their WARNING LAMPS do: the lamp cycle above is
+// the vent's telegraph, and the puff shares its clock. What is asserted is the
+// half of the vent that was reported as a defect — the puff read as a solid
+// grey lump at eye height on the LINK_APRON approach, because it was a
+// flat-shaded `DodecahedronGeometry` with a hard silhouette. It is a soft
+// camera-facing card now, and three properties keep it one:
+//
+//  a. NO SILHOUETTE. The sheet is generated from the STEAM cell's own measured
+//     radial alpha, and that profile has to reach the rim at nothing. A profile
+//     that ended on a step would put an edge back on the card.
+//  b. NOT OPAQUE. Six cards overlap almost entirely, so the ceiling that
+//     matters is the PLUME's, not one card's. This re-runs the composite walk
+//     `scripts/visual/steam-puff-stack.mjs` documents, against the constants
+//     parsed out of `course.ts`, so raising the envelope peak fails here.
+//  c. STILL AN OVERLAY. `corridor-sweep.ts` classifies by `transparent` +
+//     `depthWrite: false` and by nothing else; a puff material that started
+//     writing depth would become a corridor obstacle, silently.
+//
+// Read out of the source rather than restated, for the same reason the sector
+// palettes above are: two copies of 0.155 is how a number drifts.
+
+const { measureSteamPlume } = await import("./visual/steam-puff-stack.mjs");
+
+const steamNumber = (name) => {
+  const match = courseSource.match(
+    new RegExp(`const ${name} = (-?\\d+(?:\\.\\d+)?);`),
+  );
+  assert.ok(match, `course.ts must declare ${name}.`);
+  return Number(match[1]);
+};
+const steamStops = (() => {
+  const match = courseSource.match(
+    /const STEAM_CELL_RADIAL_ALPHA = \[([\s\S]*?)\] as const;/,
+  );
+  assert.ok(match, "course.ts must declare the measured STEAM_CELL_RADIAL_ALPHA.");
+  return match[1].split(",").map((raw) => raw.trim()).filter(Boolean).map(Number);
+})();
+
+assert.equal(
+  steamStops.length,
+  16,
+  "The STEAM cell profile is sixteen annulus means; a different length means "
+    + "the measurement in course.ts and the walk here no longer agree.",
+);
+assert.equal(steamStops[0], 1, "The profile is normalised to 1 at the centre.");
+for (let index = 1; index < steamStops.length; index += 1) {
+  assert.ok(
+    steamStops[index] < steamStops[index - 1],
+    `The STEAM profile must fall monotonically; stop ${index} does not. A rise `
+      + "anywhere in it is a ring, and a ring is an edge.",
+  );
+}
+assert.ok(
+  steamStops[steamStops.length - 1] <= 0.05,
+  `The profile reaches the rim at ${steamStops[steamStops.length - 1]}. Anything `
+    + "the eye can see there is the card's own boundary, which is exactly the "
+    + "hard silhouette this repair removed.",
+);
+
+const steamPlumeCeiling = Number(
+  courseSource.match(/export const STEAM_PLUME_PEAK_ALPHA = (\d+(?:\.\d+)?);/)?.[1],
+);
+assert.ok(
+  steamPlumeCeiling > 0,
+  "course.ts must export STEAM_PLUME_PEAK_ALPHA, the ceiling this holds.",
+);
+const steamVents = blockout.hazards.filter((hazard) => hazard.type === "steam_vent");
+assert.ok(steamVents.length > 0, "Greenwater must still author steam vents.");
+const steamOptions = {
+  peakAlpha: steamNumber("STEAM_PUFF_PEAK_ALPHA"),
+  lifeSeconds: steamNumber("STEAM_PUFF_LIFE_SECONDS"),
+  intervalSeconds: steamNumber("STEAM_PUFF_SPAWN_INTERVAL_SECONDS"),
+  puffsPerVent: steamNumber("STEAM_PUFFS_PER_VENT"),
+  birthMetres: steamNumber("STEAM_PUFF_BIRTH_METRES"),
+  deathMetres: steamNumber("STEAM_PUFF_DEATH_METRES"),
+  riseMetresPerSecond: steamNumber("STEAM_PUFF_RISE_METRES_PER_SECOND"),
+  baseHeightMetres: steamNumber("STEAM_PUFF_BASE_HEIGHT_METRES"),
+  driftMetresPerSecond: steamNumber("STEAM_PUFF_DRIFT_METRES_PER_SECOND"),
+  // The tightest vent on the map: the shortest cycle and the longest telegraph
+  // leave the least room, so the cycle that has to fit is that one.
+  telegraphSeconds: Math.max(...steamVents.map((vent) => vent.telegraphSeconds ?? 1)),
+  cycleSeconds: Math.min(...steamVents.map((vent) => vent.cycleSeconds ?? 4)),
+  stops: steamStops,
+};
+const steamPlume = measureSteamPlume(steamOptions);
+assert.ok(
+  steamPlume.plumeAlpha <= steamPlumeCeiling,
+  `The Hangar Six plume composites to ${steamPlume.plumeAlpha.toFixed(3)} at `
+    + `${steamPlume.at?.heightMetres} m, over the ${steamPlumeCeiling} ceiling. `
+    + "Six cards 0.24 m apart and 1.2-3.2 m across overlap almost entirely, so "
+    + "the envelope peak a reviewer reads is NOT what the player sees: at 0.45 "
+    + "per card the plume reaches 0.857 and reads as a grey wall. Re-find the "
+    + "card peak with `node scripts/visual/steam-puff-stack.mjs <peak>` rather "
+    + "than raising this ceiling.",
+);
+assert.ok(
+  steamPlume.cardAlpha < steamPlumeCeiling,
+  "One card must stay under the plume ceiling on its own.",
+);
+const steamLastDeath = steamOptions.telegraphSeconds
+  + (steamOptions.puffsPerVent - 1) * steamOptions.intervalSeconds
+  + steamOptions.lifeSeconds;
+assert.ok(
+  steamLastDeath <= steamOptions.cycleSeconds,
+  `The last puff of a burst dies at ${steamLastDeath.toFixed(2)} s of a `
+    + `${steamOptions.cycleSeconds} s cycle. Past the wrap it is cut off `
+    + "mid-dissolve — a hard edge in time, which is the same defect as a hard "
+    + "edge in space.",
+);
+// The overlay contract `corridor-sweep.ts` reads, and the shape that has no
+// silhouette to begin with.
+const steamMaterial = courseSource.match(
+  /const puffMaterial = new THREE\.MeshBasicMaterial\(\{[\s\S]*?\n {6}\}\);/,
+);
+assert.ok(steamMaterial, "course.ts must build the steam puff material.");
+assert.ok(
+  /transparent: true,/.test(steamMaterial[0])
+    && /depthWrite: false,/.test(steamMaterial[0]),
+  "The puff material must stay transparent with depthWrite false, or "
+    + "corridor-sweep.ts stops classifying it as a non-occluding overlay and "
+    + "the vent becomes an obstacle standing beside the deck.",
+);
+assert.ok(
+  /map: createSteamPuffTexture\(\)/.test(steamMaterial[0]),
+  "The puff must be a textured card. A bare quad has the straight edges the "
+    + "polyhedron had, on four sides instead of twelve.",
+);
+assert.ok(
+  // `new THREE.` rather than the bare name: the comment in `course.ts` names
+  // the defect it replaced, and a rule that forbids describing a defect is a
+  // rule that gets worked around by deleting the description.
+  !/new THREE\.DodecahedronGeometry/.test(courseSource),
+  "H3: the Hangar Six puff was a flat-shaded DodecahedronGeometry, which the "
+    + "player read as a rock hanging over the road. Nothing in the Greenwater "
+    + "course draws one now.",
+);
+
+console.log(
+  `H3 PASS: ${steamVents.length} Greenwater steam vents; card envelope peaks at `
+    + `${steamPlume.cardAlpha.toFixed(3)} and the plume composites to `
+    + `${steamPlume.plumeAlpha.toFixed(3)} (ceiling ${steamPlumeCeiling}) at `
+    + `${steamPlume.at?.heightMetres} m with ${steamPlume.at?.liveCards} cards live; `
+    + `the burst clears its ${steamOptions.cycleSeconds} s cycle by `
+    + `${(steamOptions.cycleSeconds - steamLastDeath).toFixed(2)} s; sheet falls `
+    + `${steamStops[0]} -> ${steamStops[steamStops.length - 1]} to the rim.`,
+);
+
 console.log(
   "Lighting motion PASS: 12 normalized sector key directions, max "
     + `${maxDelta.toFixed(3)}°/m over ${samples} samples (budget `

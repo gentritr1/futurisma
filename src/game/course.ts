@@ -417,6 +417,132 @@ const APRON_SURFACE_LABELS: Record<string, string> = {
 };
 /** P11: turn guide lights hug the inside deck edge instead of the apex. */
 const TURN_GUIDE_EDGE_INSET_METRES = 0.9;
+// ---------------------------------------------------------------------------
+// H3 — the Hangar Six steam vents.
+//
+// THE DEFECT. Approaching Hangar Six down the LINK_APRON the player saw "a
+// small grey hexagonal lump hanging in the air over the road" and read it as an
+// obstacle to steer around. It was HZ_STEAM_1's puff: a
+// `DodecahedronGeometry(1, 0)` — twelve flat pentagons, no smoothing — in a
+// `MeshBasicMaterial` at opacity 0.24. At 60-120 m, against the dark hangar
+// interior, a flat-shaded polyhedron with a hard silhouette is a rock. Steam
+// has no silhouette; that is most of what makes it read as steam.
+//
+// THE PUFF IS NOW A SOFT CAMERA-FACING CARD, in the living world's own
+// vocabulary. Same InstancedMesh, same instance count, same 30 Hz cadence, same
+// warning-lamp cycle (`validate-lighting.mjs` pins the flicker and nothing here
+// touches it) — the geometry becomes one quad and the material grows a sheet
+// whose alpha falls off to nothing at the rim, so the shape the player sees is
+// drawn by the texture rather than by an edge.
+//
+// WHY A GENERATED SHEET RATHER THAN THE ATLAS CELL. The look wanted is the
+// STEAM cell of `greenwater_motion_512` — the cell the accepted
+// STEAM_HANGAR_VENTS living-world zone draws from 700 to 815 m, 26 m past this
+// vent. But `course.ts` is built synchronously, before `scene-assets.ts` has
+// loaded any atlas, and the living-world layer is optional at runtime — it
+// loads last, `scene-assets.ts` catches its failure and keeps going, and
+// `?living=0` hides it. A course that took its puff sheet from there would draw
+// hard-edged untextured quads in exactly the cases the layer never arrived,
+// which is worse than the polyhedron it replaced.
+// So this follows the precedent `createGreenwaterBoostPadTexture` set directly
+// above: the pinned PNG is not sampled at runtime, it is MEASURED, and the
+// measurement is what is authored here. Same reason, same shape of answer.
+//
+// AND THE MEASUREMENT IS THE CELL'S OWN. `STEAM_CELL_RADIAL_ALPHA` below is the
+// mean alpha of the STEAM cell (slot 1 of the 2x2 sheet, x 256-512, y 0-256 of
+// `public/assets/greenwater/textures/greenwater_motion_512.png`) in sixteen
+// equal annuli from its centre to its edge, normalised to 1. Reproduce it with:
+//
+//   python3 - <<'PY'
+//   from PIL import Image; import math
+//   cell = Image.open("public/assets/greenwater/textures/"
+//                     "greenwater_motion_512.png").convert("RGBA").crop((256,0,512,256))
+//   px = cell.load(); w = cell.size[0]; c = (w - 1) / 2
+//   bins = [[0, 0] for _ in range(16)]
+//   for y in range(w):
+//       for x in range(w):
+//           r = math.hypot(x - c, y - c) / (w / 2)
+//           if r > 1: continue
+//           i = min(15, int(r * 16)); bins[i][0] += px[x, y][3]; bins[i][1] += 1
+//   print([round(s / n / 255, 3) for s, n in bins])
+//   PY
+//
+// -> [0.967, 0.876, 0.818, 0.745, 0.663, 0.612, 0.532, 0.471,
+//     0.405, 0.335, 0.287, 0.220, 0.166, 0.106, 0.061, 0.025]
+//
+// which is the row below divided by 0.967. The same run reports the cell 64.6%
+// covered with a mean covered colour of #e7eee7 — 64.6% is the figure
+// `living-world-zones.js` already quotes for this cell, which is the check that
+// the crop is the cell the zones draw and not its pre-P20.8 mirror.
+/**
+ * The STEAM cell's measured alpha falloff, centre to rim, normalised to 1 at the
+ * centre. Sixteen stops, linearly interpolated by {@link createSteamPuffTexture}.
+ */
+const STEAM_CELL_RADIAL_ALPHA = [
+  1, 0.905, 0.846, 0.77, 0.685, 0.633, 0.55, 0.487,
+  0.418, 0.346, 0.297, 0.227, 0.172, 0.11, 0.063, 0.026,
+] as const;
+/** The cell's own mean covered colour. The tint is the material's. */
+const STEAM_CELL_COLOR = { r: 0xe7, g: 0xee, b: 0xe7 } as const;
+/**
+ * The tint STEAM_HANGAR_VENTS carries in `living-world-zones.js`. Applied here
+ * as the material colour so the hazard vents at 674.5 / 731.5 m and the living
+ * world's own steam from 700 m are the same material rather than two greys that
+ * happen to be near each other.
+ */
+const STEAM_PUFF_TINT = 0xd8cbb2;
+/**
+ * THE CEILING IS ON THE PLUME, NOT ON ONE CARD, AND THAT IS THE WHOLE POINT.
+ *
+ * "Never opaque against any background" is a statement about the pixel the
+ * player sees, and six puffs leaving 0.16 s apart with a 1.5 m/s rise stand
+ * 0.24 m apart while they are 1.2-3.2 m across: they overlap almost completely,
+ * and transparency composites as `1 - prod(1 - a_i)`. Six cards at a 0.45
+ * envelope peak reach a MEASURED 0.857 through the middle of the plume — 86%
+ * opaque, which is a grey wall with soft edges and not much better than the
+ * polyhedron. The per-card number that holds the plume at 0.45 is 0.155.
+ *
+ * MEASURED, not reasoned: `node scripts/visual/steam-puff-stack.mjs` walks the
+ * 4 s cycle in 1 ms steps and the plume's own screen plane in 25 mm (rise) by
+ * 38 mm (lateral) steps, running the envelope, the rise, the growth, the
+ * outboard drift and the wobble this file runs, and compositing every live card
+ * through the sheet profile below.
+ *
+ *   peak 0.450 -> plume 0.857   peak 0.220 -> plume 0.574
+ *   peak 0.180 -> plume 0.497   peak 0.155 -> plume 0.443
+ *
+ * `validate-lighting.mjs` re-runs that walk against these constants, so raising
+ * either number fails the build rather than quietly thickening the steam.
+ */
+// Exported because it is the acceptance number for this repair rather than an
+// implementation detail: a reviewer reads it here, and `validate-lighting.mjs`
+// holds the constants below to it.
+export const STEAM_PLUME_PEAK_ALPHA = 0.45;
+/** Peak of ONE card's envelope. See {@link STEAM_PLUME_PEAK_ALPHA}. */
+const STEAM_PUFF_PEAK_ALPHA = 0.155;
+/**
+ * Seconds a puff lives. The vents are authored `cycleSeconds: 4`,
+ * `telegraphSeconds: 1`, and six puffs leave 0.16 s apart, so the last one is
+ * born at 1.0 + 5 * 0.16 = 1.80 s and 2.1 s of life buries it 0.1 s before the
+ * cycle wraps. A life longer than 2.2 s would be cut off mid-dissolve by the
+ * wrap, which is the hard edge in time that the soft sheet removes in space.
+ */
+const STEAM_PUFF_LIFE_SECONDS = 2.1;
+const STEAM_PUFFS_PER_VENT = 6;
+const STEAM_PUFF_SPAWN_INTERVAL_SECONDS = 0.16;
+/** Metres per second the puff climbs, and metres across as it is born / dies. */
+const STEAM_PUFF_RISE_METRES_PER_SECOND = 1.5;
+const STEAM_PUFF_BIRTH_METRES = 1.2;
+const STEAM_PUFF_DEATH_METRES = 3.2;
+/** Where the puff's centre starts, clear of the 0.41 m vent-base lip. */
+const STEAM_PUFF_BASE_HEIGHT_METRES = 0.7;
+/**
+ * Greenwater authors no wind, so the puff leans OUTBOARD — away from the
+ * corridor, the direction a vent standing 0.7 m off the deck edge would exhaust
+ * anyway. It is also the drift that takes the puff away from the racing line
+ * instead of across it, which is the read the defect report was about.
+ */
+const STEAM_PUFF_DRIFT_METRES_PER_SECOND = 0.55;
 const BOOST_PAD_DISTANCES = [1705, 1815, 1925, 2035] as const;
 const BOOST_PAD_HALF_LENGTH_METRES = 10;
 /** Middle of the authored 0.12..0.78 half-width strip `isOnBoostPad` accepts. */
@@ -563,6 +689,146 @@ function createGreenwaterBoostPadTexture(): THREE.CanvasTexture {
   texture.wrapT = THREE.ClampToEdgeWrapping;
   texture.needsUpdate = true;
   return texture;
+}
+
+/**
+ * H3 — the steam puff sheet, generated from the STEAM cell's measured profile.
+ *
+ * 128 x 128 for one 1.2-3.2 m card. The STEAM cell it is measured from is
+ * 256 px, but that cell is authored for the living world's 3-28 m cards; this
+ * one is never wider than 3.2 m and never nearer than the deck edge, and there
+ * is nothing on it sharp enough for the other 3/4 of those texels to carry.
+ *
+ * ALPHA IS THE WHOLE POINT. The radius runs to the quad's edge, the measured
+ * falloff is 2.6% of centre at the rim, and the outer eighth carries even that
+ * to zero, so the quad has no visible boundary at any alpha the envelope can
+ * reach — the shape is drawn by the texture, and the geometry has no say.
+ *
+ * The lobes are a fixed, seedless modulation, because steam is not a perfect
+ * radial gradient and six overlapping cards on a clean radial ramp read as
+ * concentric rings. Held to +/-22%, which keeps the generated sheet on the
+ * measured profile: its own annulus means run 0.904 / 0.831 / 0.778 / 0.726 /
+ * 0.677 ... against the measured 1.000 / 0.905 / 0.846 / 0.770 / 0.685 ..., a
+ * worst disagreement of 0.096 in the centre bin (fewest pixels, and where the
+ * lobes bite hardest) and under 0.02 outside it.
+ */
+function createSteamPuffTexture(): THREE.CanvasTexture {
+  const size = 128;
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+  const context = canvas.getContext("2d");
+  if (!context) throw new Error("Could not create the Greenwater steam puff sheet.");
+  const image = context.createImageData(size, size);
+  const data = image.data;
+  const centre = (size - 1) / 2;
+  const stops = STEAM_CELL_RADIAL_ALPHA;
+  for (let y = 0; y < size; y += 1) {
+    for (let x = 0; x < size; x += 1) {
+      const dx = (x - centre) / (size / 2);
+      const dy = (y - centre) / (size / 2);
+      const radius = Math.hypot(dx, dy);
+      let profile = 0;
+      if (radius < 1) {
+        // The stops are annulus means, so stop i sits at radius (i + 0.5)/16.
+        const scaled = radius * stops.length - 0.5;
+        const low = Math.max(0, Math.min(stops.length - 1, Math.floor(scaled)));
+        const high = Math.min(stops.length - 1, low + 1);
+        const blend = Math.max(0, Math.min(1, scaled - low));
+        profile = stops[low] + (stops[high] - stops[low]) * blend;
+        // The last stop is 2.6% of centre, not 0. Carry it to nothing over the
+        // outer eighth so the disc cannot end on a step.
+        if (radius > 0.875) profile *= (1 - radius) / 0.125;
+      }
+      const lobes = Math.sin(dx * 7.3 + 1.7) * Math.sin(dy * 6.1 - 0.9) * 0.5
+        + Math.sin((dx + dy) * 11.4 + 2.3) * 0.3
+        + Math.sin((dx - dy) * 4.7 - 1.1) * 0.2;
+      const alpha = profile * (1 + lobes * 0.22);
+      const offset = (y * size + x) * 4;
+      data[offset] = STEAM_CELL_COLOR.r;
+      data[offset + 1] = STEAM_CELL_COLOR.g;
+      data[offset + 2] = STEAM_CELL_COLOR.b;
+      data[offset + 3] = Math.round(Math.max(0, Math.min(1, alpha)) * 255);
+    }
+  }
+  context.putImageData(image, 0, 0);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.name = "greenwater_steam_puff";
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.magFilter = THREE.LinearFilter;
+  texture.minFilter = THREE.LinearMipmapLinearFilter;
+  texture.generateMipmaps = true;
+  texture.anisotropy = 1;
+  texture.wrapS = THREE.ClampToEdgeWrapping;
+  texture.wrapT = THREE.ClampToEdgeWrapping;
+  texture.needsUpdate = true;
+  return texture;
+}
+
+/**
+ * H3 — the two things an InstancedMesh cannot say on its own, said once.
+ *
+ * 1. CAMERA-FACING. The puff has to face the player from every approach, and
+ *    `updateAtmosphere(elapsedSeconds, reducedMotion)` has no camera — it is a
+ *    course-interface method both maps implement, and threading a camera
+ *    through it to re-orient twelve quads would put the billboard on the CPU at
+ *    30 Hz for nothing. Building the quad in VIEW space instead needs no camera
+ *    at all: the instance matrix places and scales the puff's centre, and the
+ *    quad is spread from there along the view axes, so it is exactly screen
+ *    facing on every frame including the ones between atmosphere ticks.
+ * 2. PER-INSTANCE ALPHA. `InstancedMesh` carries a matrix and a colour per
+ *    instance and no alpha, and the envelope this needs (0 -> 0.155 -> 0 over
+ *    each puff's own life) is alpha, not colour: fading a puff by darkening it
+ *    under NormalBlending turns steam into soot. One `InstancedBufferAttribute`
+ *    and one multiply in the fragment stage carry it instead.
+ *
+ * Kept as an injection into `MeshBasicMaterial` rather than a `ShaderMaterial`
+ * so the material stays an ordinary lit-by-nothing basic material for
+ * `corridor-sweep.ts` (which classifies it by `transparent` + `depthWrite`),
+ * for `disposeObject3DResources`, and for the `?render=ps2` treatment chain.
+ */
+function installSteamPuffBillboard(material: THREE.MeshBasicMaterial): void {
+  material.onBeforeCompile = (shader) => {
+    shader.vertexShader = shader.vertexShader
+      .replace(
+        "#include <common>",
+        "#include <common>\nattribute float puffAlpha;\nvarying float vPuffAlpha;",
+      )
+      .replace(
+        "#include <project_vertex>",
+        /* glsl */`
+        vPuffAlpha = puffAlpha;
+        vec4 mvPosition = vec4( 0.0, 0.0, 0.0, 1.0 );
+        #ifdef USE_INSTANCING
+          mvPosition = instanceMatrix * mvPosition;
+        #endif
+        mvPosition = modelViewMatrix * mvPosition;
+        #ifdef USE_INSTANCING
+          mvPosition.xy += vec2(
+            transformed.x * length( instanceMatrix[ 0 ].xyz ),
+            transformed.y * length( instanceMatrix[ 1 ].xyz )
+          );
+        #else
+          mvPosition.xy += transformed.xy;
+        #endif
+        gl_Position = projectionMatrix * mvPosition;
+        `,
+      );
+    shader.fragmentShader = shader.fragmentShader
+      .replace(
+        "#include <common>",
+        "#include <common>\nvarying float vPuffAlpha;",
+      )
+      .replace(
+        "#include <alphamap_fragment>",
+        "#include <alphamap_fragment>\ndiffuseColor.a *= vPuffAlpha;",
+      );
+  };
+  // three keys its program cache on `onBeforeCompile.toString()` by default,
+  // which is a long string recomputed per compile; this material has exactly
+  // one program.
+  material.customProgramCacheKey = () => "greenwater_steam_puff_billboard";
 }
 
 /**
@@ -1089,6 +1355,8 @@ export class GreenwaterCourse implements RaceCourse {
   private atmospherePreviousElapsedSeconds = -1;
   private atmosphereNextUpdateAt = 0;
   private steamPuffs: THREE.InstancedMesh | null = null;
+  /** H3: the per-instance alpha envelope, which no InstancedMesh field carries. */
+  private steamPuffAlpha: THREE.InstancedBufferAttribute | null = null;
   private steamWarnings: THREE.InstancedMesh | null = null;
   private cargoHookPivot: THREE.Group | null = null;
   private lapBoardTexture: THREE.CanvasTexture | null = null;
@@ -1577,8 +1845,9 @@ export class GreenwaterCourse implements RaceCourse {
 
     const puffs = this.steamPuffs;
     const warnings = this.steamWarnings;
-    if (puffs && warnings) {
-      const puffsPerVent = 6;
+    const puffAlpha = this.steamPuffAlpha;
+    if (puffs && warnings && puffAlpha) {
+      const puffsPerVent = STEAM_PUFFS_PER_VENT;
       for (let ventIndex = 0; ventIndex < this.steamVents.length; ventIndex += 1) {
         const vent = this.steamVents[ventIndex];
         const cycleTime = THREE.MathUtils.euclideanModulo(
@@ -1600,35 +1869,55 @@ export class GreenwaterCourse implements RaceCourse {
         );
         warnings.setMatrixAt(ventIndex, this.atmosphereTransform.matrix);
 
+        // H3 — one puff's life, in metres and seconds rather than multipliers.
+        //
+        // `age` is 0 at birth and 1 at death, and every number below is an
+        // absolute a crop of the frame can be measured against: 1.2 m across
+        // growing to 3.2, climbing 1.5 m/s from 0.7 m, leaning outboard at
+        // 0.55 m/s, and an alpha that opens to 0.155 and closes again — with
+        // the six of them together reaching 0.443 through the plume. The
+        // envelope peaks at age^0.75 = 0.5, i.e. 40% of the way through, so a
+        // puff arrives quickly and dissolves slowly — which is what separates
+        // steam from a thing that blinks.
+        const outboard = Math.sign(vent.lateralOffset) || 1;
         for (let puffIndex = 0; puffIndex < puffsPerVent; puffIndex += 1) {
           const instanceIndex = ventIndex * puffsPerVent + puffIndex;
           const ageSeconds = cycleTime
             - vent.telegraphSeconds
-            - puffIndex * 0.16;
-          const age = ageSeconds / 1.18;
+            - puffIndex * STEAM_PUFF_SPAWN_INTERVAL_SECONDS;
+          const age = ageSeconds / STEAM_PUFF_LIFE_SECONDS;
           const active = age >= 0 && age <= 1;
-          const fade = active ? Math.sin(age * Math.PI) : 0;
-          // Keep the vent readable as a hazard without letting its overlapping
-          // low-poly puffs merge into a solid, rock-like silhouette.
-          const scale = active
-            ? (0.82 + age * 1.78) * Math.max(0.16, fade)
-            : 0.001;
-          const wobble = reducedMotion ? 0 : Math.sin(age * 8 + ventIndex) * age * 0.7;
+          const fade = active
+            ? Math.sin(Math.PI * age ** 0.75) * STEAM_PUFF_PEAK_ALPHA
+            : 0;
+          const width = active
+            ? STEAM_PUFF_BIRTH_METRES
+              + (STEAM_PUFF_DEATH_METRES - STEAM_PUFF_BIRTH_METRES) * age
+            // Degenerate rather than merely transparent: a dead puff costs no
+            // fill, and there is no frame on which it can be seen shrinking.
+            : 0.0001;
+          const lived = active ? age * STEAM_PUFF_LIFE_SECONDS : 0;
+          const wobble = reducedMotion ? 0 : Math.sin(age * 8 + ventIndex) * age * 0.5;
           setCourseObjectTransform(
             this.atmosphereTransform,
             vent.sample,
-            vent.lateralOffset + wobble,
-            0.55 + Math.max(0, age) * 8.5,
+            vent.lateralOffset
+              + outboard * lived * STEAM_PUFF_DRIFT_METRES_PER_SECOND
+              + wobble,
+            STEAM_PUFF_BASE_HEIGHT_METRES
+              + lived * STEAM_PUFF_RISE_METRES_PER_SECOND,
             reducedMotion ? 0 : Math.cos(age * 7 + puffIndex) * age * 0.45,
-            scale,
-            scale * 1.5,
-            scale,
+            width,
+            width,
+            width,
           );
           puffs.setMatrixAt(instanceIndex, this.atmosphereTransform.matrix);
+          puffAlpha.setX(instanceIndex, fade);
         }
       }
       warnings.instanceMatrix.needsUpdate = true;
       puffs.instanceMatrix.needsUpdate = true;
+      puffAlpha.needsUpdate = true;
     }
 
     if (this.cargoHookPivot) {
@@ -2635,22 +2924,54 @@ export class GreenwaterCourse implements RaceCourse {
         && hazard.lateralOffset !== undefined,
     );
     if (steamHazards.length > 0) {
-      const puffsPerVent = 6;
-      const puffGeometry = new THREE.DodecahedronGeometry(1, 0);
+      const puffsPerVent = STEAM_PUFFS_PER_VENT;
+      const puffCount = steamHazards.length * puffsPerVent;
+      // H3: one quad, spread in view space by `installSteamPuffBillboard`. The
+      // unit plane's own vertices are the half-extents that injection reads.
+      const puffGeometry = new THREE.PlaneGeometry(1, 1);
+      const puffAlpha = new THREE.InstancedBufferAttribute(
+        new Float32Array(puffCount),
+        1,
+      );
+      puffAlpha.setUsage(THREE.DynamicDrawUsage);
+      puffGeometry.setAttribute("puffAlpha", puffAlpha);
       const puffMaterial = new THREE.MeshBasicMaterial({
-        color: 0xa7b9b1,
+        map: createSteamPuffTexture(),
+        // The STEAM cell's tint, not a grey: see STEAM_PUFF_TINT.
+        color: STEAM_PUFF_TINT,
         transparent: true,
-        opacity: 0.24,
+        // NormalBlending, so the puff stays vapour lit by the hangar rather
+        // than a lamp of its own; additive steam over the dark interior reads
+        // as a flare. Kept explicit because it is a decision, not a default.
+        blending: THREE.NormalBlending,
+        // Opacity is 1 and the ENVELOPE is per instance, in the `puffAlpha`
+        // attribute below: a material opacity would fade all twelve cards
+        // together, which is a vent that blinks rather than six puffs with
+        // lives of their own.
+        opacity: 1,
         depthWrite: false,
+        // A card the craft can fly through, seen from both sides.
+        side: THREE.DoubleSide,
+        // AND SEEN FROM BOTH SIDES IN ONE PASS. three draws a transparent
+        // DoubleSide material TWICE — back faces, then front faces — so that a
+        // folded transparent surface sorts against itself, and the pair costs
+        // two of `renderer.info.render.calls`. Measured: without this the
+        // Greenwater station set went 84 -> 85 calls at 630 m and 77 -> 78 at
+        // 815 m, which is the whole draw-call budget for this repair spent on a
+        // sort a flat quad cannot need. `living-world.ts` carries the same flag
+        // for the same reason, and the same evidence.
+        forceSinglePass: true,
       });
+      installSteamPuffBillboard(puffMaterial);
       const puffs = new THREE.InstancedMesh(
         puffGeometry,
         puffMaterial,
-        steamHazards.length * puffsPerVent,
+        puffCount,
       );
       puffs.name = "steam_vent_puffs";
       puffs.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
       puffs.frustumCulled = false;
+      this.steamPuffAlpha = puffAlpha;
       const warnings = new THREE.InstancedMesh(
         new THREE.BoxGeometry(1, 1, 1),
         new THREE.MeshBasicMaterial({ color: 0xffa22e, toneMapped: false }),
