@@ -58,6 +58,10 @@ import {
   createApronTelemetry,
 } from "./apron.js";
 import {
+  integrateOcclusionPull,
+  occlusionPull,
+} from "./camera-occlusion.js";
+import {
   angleExcess,
   calculatePresentationAlpha,
   cameraSurfaceClearance,
@@ -134,6 +138,32 @@ const MINIMUM_CHASE_METRES = 5.5;
 const HULL_FRAME_NDC_Y_MIN = -0.8;
 const HULL_FRAME_NDC_Y_MAX = 0.6;
 const HULL_FRAME_NDC_X_LIMIT = 0.75;
+/**
+ * H1.5 - the occlusion pull, all metres except the recovery rate.
+ *
+ * BACK_OFF stops the camera short of the ridge rather than on it, because a
+ * camera exactly on a wall renders its inside face across the whole frame.
+ * MINIMUM is the floor the pull may not go under: nearer than 3 m the craft
+ * fills the view and the cure is worse than the parapet. RECOVERY is outward
+ * only - see `integrateOcclusionPull` for why the two directions differ.
+ */
+const CAMERA_OCCLUSION_BACK_OFF_METRES = 0.35;
+const CAMERA_OCCLUSION_MINIMUM_METRES = 3;
+const CAMERA_OCCLUSION_RECOVERY_METRES_PER_SECOND = 6;
+/**
+ * H1.5 - when the sight-line cast is worth its 0.75 ms.
+ *
+ * The cast is real geometry, measured at 742-772 us against the authored
+ * environment group and 2.51 ms against the whole scene, so it cannot run
+ * every frame. It does not need to. Occlusion by drawn geometry needs the
+ * sight line to DESCEND across something, which needs the camera well above
+ * the hull, and it needs the craft off the line the camera is following.
+ * Both measured on the residue: the camera sat 3.9-4.0 m above the hull with
+ * 5.6-8.1 m of lateral separation. These gates sit under both, and a clean
+ * autopilot lap never reaches either.
+ */
+const CAMERA_OCCLUSION_DROP_METRES = 2.5;
+const CAMERA_OCCLUSION_LATERAL_METRES = 3;
 const MINIMUM_CAMERA_SURFACE_CLEARANCE_METRES = 1.6;
 
 const RESUME_COUNTDOWN_SECONDS = 2.7;
@@ -315,6 +345,14 @@ export class FuturismaGame {
   private diagnosticMinimumChaseMeters = Number.POSITIVE_INFINITY;
   private diagnosticDesiredChaseMeters = 0;
   private diagnosticCameraLateral = 0;
+  /** H1.5 - metres the sight-line guard is currently holding the camera in. */
+  private cameraOcclusionPull = 0;
+  private diagnosticMaximumCameraOcclusionPull = 0;
+  private diagnosticSightCastMicroseconds = 0;
+  private diagnosticSightCasts = 0;
+  private readonly sightCaster = new THREE.Raycaster();
+  private readonly sightHits: THREE.Intersection[] = [];
+  private readonly cameraScratchB = new THREE.Vector3();
   private diagnosticCameraLateralLag = 0;
   private diagnosticMaximumCameraLateralLag = 0;
   private diagnosticHullNdcX = 0;
@@ -1434,12 +1472,12 @@ export class FuturismaGame {
    * H1.2 (a) - the chase camera may not close inside `MINIMUM_CHASE_METRES` of
    * the hull along the craft's own forward. See `chaseDistanceCorrection`.
    */
-  private holdChaseDistance(): void {
+  private holdChaseDistance(floor: number): void {
     const back = this.cameraScratch
       .copy(this.cameraTarget)
       .sub(this.vehicle.root.position)
       .dot(this.presentationForward);
-    const correction = chaseDistanceCorrection(back, MINIMUM_CHASE_METRES);
+    const correction = chaseDistanceCorrection(back, floor);
     if (correction > 0) {
       this.cameraTarget.addScaledVector(this.presentationForward, -correction);
     }
@@ -1511,6 +1549,132 @@ export class FuturismaGame {
       this.diagnosticMaximumHullNdcY,
       this.diagnosticHullNdcY,
     );
+  }
+
+  /**
+   * H1.5 - the camera comes inside anything that would stand between it and the
+   * craft.
+   *
+   * P21 narrowed Greenwater's limits to where drawn surface exists and left one
+   * residue: the Sweep's authored concrete carries a parapet 4.36 m over the
+   * deck at lateral -12.85, INSIDE the racing surface, and on the bend the
+   * chase camera sights the craft across it. Craft at lateral -10.9, legally on
+   * the deck, 27 pixels drawn. The limit cannot narrow the racing surface and
+   * the art is frozen, so the camera moves.
+   *
+   * This is the standard third-person answer and it is deliberately the LAST
+   * guard to touch the camera: the chase floor has had its say, and where the
+   * two disagree the occluder wins, because a camera at a correct distance
+   * behind a wall shows nothing.
+   *
+   * @returns the camera's resulting distance from the hull, for diagnostics.
+   */
+  private holdCameraClearOfSight(
+    right: THREE.Vector3,
+    delta: number,
+  ): number {
+    const hull = this.vehicle.root.position;
+    const toCamera = this.cameraScratch.copy(this.cameraTarget).sub(hull);
+    const distance = toCamera.length();
+    let target = 0;
+    if (distance > CAMERA_OCCLUSION_MINIMUM_METRES && this.sightLineWorthCasting(
+      this.cameraTarget,
+      toCamera.dot(right),
+    )) {
+      const started = this.diagnosticsMode ? performance.now() : 0;
+      const blockedAt = this.castSightLine(toCamera, distance);
+      if (this.diagnosticsMode) {
+        this.diagnosticSightCastMicroseconds += (performance.now() - started) * 1000;
+        this.diagnosticSightCasts += 1;
+      }
+      target = occlusionPull(
+        distance,
+        blockedAt,
+        CAMERA_OCCLUSION_BACK_OFF_METRES,
+        CAMERA_OCCLUSION_MINIMUM_METRES,
+      );
+    }
+    this.cameraOcclusionPull = integrateOcclusionPull(
+      this.cameraOcclusionPull,
+      target,
+      delta,
+      CAMERA_OCCLUSION_RECOVERY_METRES_PER_SECOND,
+    );
+    if (this.cameraOcclusionPull <= 0) return distance;
+    const pulled = Math.max(
+      CAMERA_OCCLUSION_MINIMUM_METRES,
+      distance - this.cameraOcclusionPull,
+    );
+    this.cameraTarget
+      .copy(hull)
+      .addScaledVector(toCamera.divideScalar(distance), pulled);
+    if (this.diagnosticsMode && this.phase === "running") {
+      this.diagnosticMaximumCameraOcclusionPull = Math.max(
+        this.diagnosticMaximumCameraOcclusionPull,
+        this.cameraOcclusionPull,
+      );
+    }
+    return pulled;
+  }
+
+  /**
+   * H1.5 - the gate in front of the cast.
+   *
+   * Cheap enough to run every frame, and false on every frame of a clean lap.
+   * Occlusion needs the sight line to descend across something, so the camera
+   * has to be well above the hull, AND the craft has to be off the line the
+   * camera is trailing, or the only thing between them is the road they are
+   * both over.
+   */
+  private sightLineWorthCasting(
+    desired: THREE.Vector3,
+    lateralLag: number,
+  ): boolean {
+    return desired.y - this.vehicle.root.position.y > CAMERA_OCCLUSION_DROP_METRES
+      && Math.abs(lateralLag) > CAMERA_OCCLUSION_LATERAL_METRES;
+  }
+
+  /**
+   * H1.5 - metres along the sight line at which DRAWN geometry stands, or
+   * Infinity when it is clear.
+   *
+   * Against the authored environment only, which is deliberate on both counts.
+   * It is where the occluder measurably is: at craft lateral -11 with the
+   * camera at -3.5 the first hit is `GW_SECTOR_GREENWATER_SWEEP_concrete`,
+   * 2.92 m above the deck at lateral -8.47. And it is what a camera can
+   * legitimately be pulled inside of -- cards, decals, water, the sky and the
+   * craft's own effects are not things the player would ever describe as being
+   * in the way, and casting against them would pull the camera in on a
+   * particle.
+   *
+   * The alternative was a table: P21's corridor sweep already walks this
+   * geometry offline. It cannot serve, and the reason is in its own output --
+   * for Greenwater it reports `obstacle: 0, overhead: 0`, because it classifies
+   * the authored surface against the blockout deck and this occluder IS that
+   * disagreement. A table derived from a sweep that cannot see the thing would
+   * have shipped a guard that never fires.
+   */
+  private castSightLine(toCamera: THREE.Vector3, distance: number): number {
+    const environment = this.sceneAssets.authoredEnvironment;
+    if (!environment) return Number.POSITIVE_INFINITY;
+    // FROM THE CAMERA, not from the hull, and this is not a stylistic choice.
+    // The authored meshes are `FrontSide`, so a ray travelling up from the
+    // craft meets the UNDERSIDE of the road it is under and is skipped as a
+    // backface. Cast from the hull, this returned "clear" on frames whose
+    // pixel diff said the craft was not drawn at all; cast from the camera it
+    // hits the surface the camera is actually looking at.
+    this.sightCaster.set(
+      this.cameraTarget,
+      this.cameraScratchB.copy(toCamera).divideScalar(-distance),
+    );
+    this.sightCaster.near = CAMERA_OCCLUSION_BACK_OFF_METRES;
+    this.sightCaster.far = distance;
+    this.sightHits.length = 0;
+    this.sightCaster.intersectObject(environment.root, true, this.sightHits);
+    const first = this.sightHits.length > 0 ? this.sightHits[0].distance : null;
+    this.sightHits.length = 0;
+    // `occlusionPull` works outward from the hull, so convert.
+    return first === null ? Number.POSITIVE_INFINITY : distance - first;
   }
 
   /**
@@ -1638,11 +1802,22 @@ export class FuturismaGame {
         .sub(this.vehicle.root.position)
         .dot(this.presentationForward);
     }
+    // H1.5 - last write to `desired`, before the damping sees it, so the pull
+    // is smoothed by the same lerp as everything else rather than snapping.
     this.cameraTarget.lerp(desired, positionDamping);
     // H1.2 (a) - the damped camera, not `desired`, is what loses the craft.
     // Written back into `cameraTarget` so the next frame's lerp starts from the
     // corrected point instead of fighting the guard every frame.
-    if (this.cameraGuardsEnabled) this.holdChaseDistance();
+    if (this.cameraGuardsEnabled) this.holdChaseDistance(MINIMUM_CHASE_METRES);
+    // H1.5 - and last, because a camera at a correct distance behind a wall
+    // shows nothing. On the DAMPED camera for the same reason the chase floor
+    // is: the sight line that matters runs to where the camera IS, and while
+    // the camera lags laterally that is a different line from the one to
+    // `desired` - casting along `desired` reported the wall clear on frames
+    // where the player could not see the craft at all.
+    if (this.cameraGuardsEnabled) {
+      this.holdCameraClearOfSight(sample.right, delta);
+    }
     this.cameraLook.lerp(target, lookDamping);
     this.camera.position.copy(this.cameraTarget);
     const desiredCameraUp = this.scratchB.copy(sample.up);
@@ -2179,6 +2354,12 @@ export class FuturismaGame {
         minimumChaseMeters: this.diagnosticMinimumChaseMeters,
         desiredChaseMeters: this.diagnosticDesiredChaseMeters,
         cameraLateral: this.diagnosticCameraLateral,
+        cameraOcclusionPull: this.cameraOcclusionPull,
+        maximumCameraOcclusionPull: this.diagnosticMaximumCameraOcclusionPull,
+        sightCastMicroseconds: this.diagnosticSightCasts > 0
+          ? this.diagnosticSightCastMicroseconds / this.diagnosticSightCasts
+          : 0,
+        sightCasts: this.diagnosticSightCasts,
         cameraLateralLag: this.diagnosticCameraLateralLag,
         maximumCameraLateralLag: this.diagnosticMaximumCameraLateralLag,
         hullNdcX: this.diagnosticHullNdcX,

@@ -81,6 +81,11 @@ export interface DiagnosticsCore {
   minimumChaseMeters: number;
   desiredChaseMeters: number;
   cameraLateral: number;
+  /** H1.5 — the sight-line pull, and what the ridge walk costs. */
+  cameraOcclusionPull: number;
+  maximumCameraOcclusionPull: number;
+  sightCastMicroseconds: number;
+  sightCasts: number;
   cameraLateralLag: number;
   maximumCameraLateralLag: number;
   hullNdcX: number;
@@ -505,6 +510,12 @@ export function buildDiagnosticsReport(
       : null,
     desiredChaseMeters: Number(core.desiredChaseMeters.toFixed(2)),
     cameraLateralMeters: Number(core.cameraLateral.toFixed(2)),
+    cameraOcclusionPullMeters: Number(core.cameraOcclusionPull.toFixed(2)),
+    maximumCameraOcclusionPullMeters: Number(
+      core.maximumCameraOcclusionPull.toFixed(2),
+    ),
+    sightCastMicroseconds: Number(core.sightCastMicroseconds.toFixed(1)),
+    sightCasts: core.sightCasts,
     cameraLateralLagMeters: Number(core.cameraLateralLag.toFixed(2)),
     maximumCameraLateralLagMeters: Number(core.maximumCameraLateralLag.toFixed(2)),
     hullNdcX: Number(core.hullNdcX.toFixed(3)),

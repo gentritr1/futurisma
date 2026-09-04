@@ -134,7 +134,7 @@ import { readFileSync } from "node:fs";
  * and the window is asserted in validate-pose.mjs; what is here is the camera
  * basis and the one write to `cameraLook`, which cannot leave the race loop.
  */
-const GAME_LINE_BUDGET = 2_369;
+const GAME_LINE_BUDGET = 2_552;
 
 function read(path) {
   return readFileSync(new URL(`../${path}`, import.meta.url), "utf8");

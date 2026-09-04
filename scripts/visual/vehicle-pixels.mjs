@@ -54,7 +54,7 @@ const read = () => page.evaluate(() => {
       d: c.distanceMeters, lat: c.lateralMeters, v: c.speedKph, phase: c.phase,
       apron: c.onApron, sector: c.sector, hull: c.hullClearanceMeters,
       ndcX: c.hullNdcX, ndc: c.hullNdcY, chase: c.chaseMeters,
-      camClear: c.cameraSurfaceClearanceMeters, camLat: c.cameraLateralMeters, lag: c.cameraLateralLagMeters,
+      camClear: c.cameraSurfaceClearanceMeters, camLat: c.cameraLateralMeters, lag: c.cameraLateralLagMeters, pull: c.cameraOcclusionPullMeters, pullMax: c.maximumCameraOcclusionPullMeters, castUs: c.sightCastMicroseconds, casts: c.sightCasts,
     };
   } catch { return null; }
 });

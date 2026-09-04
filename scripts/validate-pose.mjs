@@ -33,6 +33,10 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import {
+  integrateOcclusionPull,
+  occlusionPull,
+} from "../src/game/camera-occlusion.js";
+import {
   angleExcess,
   cameraSurfaceClearance,
   chaseDistanceCorrection,
@@ -546,7 +550,7 @@ assert.ok(
 // The call sites. Both guards act on the camera the player is looking through,
 // not on `desired`.
 assert.ok(
-  /this\.cameraTarget\.lerp\(desired, positionDamping\);\s*\n(?:\s*\/\/[^\n]*\n)*\s*(?:if \(this\.cameraGuardsEnabled\) )?this\.holdChaseDistance\(\);/
+  /this\.cameraTarget\.lerp\(desired, positionDamping\);\s*\n(?:\s*\/\/[^\n]*\n)*\s*(?:if \(this\.cameraGuardsEnabled\) )?this\.holdChaseDistance\([A-Za-z_.]*\);/
     .test(gameCameraSource),
   "`holdChaseDistance` must run immediately after the damping lerp, on "
     + "`cameraTarget`. Applied to `desired` it would do nothing: `desired` was "
@@ -655,6 +659,100 @@ assert.ok(
     + "frame still aimed away from the craft.",
 );
 
+// ---------------------------------------------------------------------------
+// H1.5 — the sight-line pull.
+//
+// P21 narrowed Greenwater's limits to where drawn surface exists and left a
+// residue the limit cannot reach: the craft on the deck at lateral -11, the
+// camera at -3.5, and authored concrete between them. Measured 0-27 craft
+// pixels. The camera comes inside it.
+//
+// The bounds are what this pins. A pull with no floor puts the camera inside
+// the craft; a pull with no back-off puts it inside the wall; a recovery with
+// no rate limit snaps it back out the frame the sight line clears.
+// ---------------------------------------------------------------------------
+
+const occlusionBounds = Object.fromEntries(
+  [
+    "CAMERA_OCCLUSION_BACK_OFF_METRES",
+    "CAMERA_OCCLUSION_MINIMUM_METRES",
+    "CAMERA_OCCLUSION_RECOVERY_METRES_PER_SECOND",
+    "CAMERA_OCCLUSION_DROP_METRES",
+    "CAMERA_OCCLUSION_LATERAL_METRES",
+  ].map((name) => [
+    name,
+    Number(new RegExp(`const ${name} = ([\\d.]+);`).exec(gameCameraSource)?.[1]),
+  ]),
+);
+for (const [name, value] of Object.entries(occlusionBounds)) {
+  assert.ok(Number.isFinite(value), `game.ts no longer declares ${name}.`);
+}
+assert.ok(
+  occlusionBounds.CAMERA_OCCLUSION_MINIMUM_METRES >= 3
+    && occlusionBounds.CAMERA_OCCLUSION_MINIMUM_METRES
+      < occlusionBounds.CAMERA_OCCLUSION_DROP_METRES + MEASURED_CHASE_COLLAPSE_METRES,
+  `the pull's floor is ${occlusionBounds.CAMERA_OCCLUSION_MINIMUM_METRES} m. Under 3 m `
+    + "the craft fills the frame and the cure is worse than the occluder; at or "
+    + "above the chase distance the pull could never move the camera at all.",
+);
+assert.ok(
+  occlusionBounds.CAMERA_OCCLUSION_BACK_OFF_METRES > 0
+    && occlusionBounds.CAMERA_OCCLUSION_BACK_OFF_METRES < 1,
+  "the pull must stop SHORT of the geometry it found, by less than a metre. "
+    + "Zero puts the camera on the surface, where its inside face fills the "
+    + "frame; a metre is most of the room the pull has to work in.",
+);
+assert.ok(
+  occlusionBounds.CAMERA_OCCLUSION_RECOVERY_METRES_PER_SECOND > 0
+    && occlusionBounds.CAMERA_OCCLUSION_RECOVERY_METRES_PER_SECOND <= 6,
+  "the outward recovery is rate limited to at most 6 m/s, the figure the review "
+    + "set. Unlimited, the camera snaps back the frame the sight line clears.",
+);
+
+// The pull itself: zero when nothing blocks, exactly enough when something
+// does, and never past the floor.
+assert.equal(occlusionPull(8, Number.POSITIVE_INFINITY, 0.35, 3), 0);
+assert.equal(occlusionPull(8, 9, 0.35, 3), 0);
+assert.equal(Number(occlusionPull(8, 5.05, 0.35, 3).toFixed(6)), 3.3);
+// Floored: a wall right against the craft may not drag the camera into it.
+assert.equal(occlusionPull(8, 0.4, 0.35, 3), 5);
+assert.equal(occlusionPull(8, Number.NaN, 0.35, 3), 0);
+// Continuous at the edge, so the camera eases in rather than stepping.
+assert.ok(Math.abs(occlusionPull(8, 8.35 - 1e-9, 0.35, 3)) < 1e-8);
+
+// The rate limit, and the asymmetry that is its whole point.
+assert.equal(integrateOcclusionPull(0, 4, 1 / 60, 6), 4, "pulling in is immediate");
+assert.equal(
+  Number(integrateOcclusionPull(4, 0, 1 / 60, 6).toFixed(6)),
+  Number((4 - 6 / 60).toFixed(6)),
+  "letting go is rate limited",
+);
+assert.equal(integrateOcclusionPull(0.05, 0, 1, 6), 0, "and lands exactly on zero");
+assert.equal(integrateOcclusionPull(4, 0, 0, 6), 4, "a zero-length frame moves nothing");
+
+// The call site: on the DAMPED camera, after the chase floor, under the kill
+// switch. Casting along `desired` instead reported the wall clear on frames
+// where the player could not see the craft — measured, not argued.
+const chaseIndex = updateCameraBody.indexOf("this.holdChaseDistance(");
+const pullIndex = updateCameraBody.indexOf("this.holdCameraClearOfSight(");
+assert.ok(
+  chaseIndex > 0 && pullIndex > chaseIndex,
+  "`holdCameraClearOfSight` must run after the chase floor: where the two "
+    + "disagree the occluder wins, because a camera at a correct distance "
+    + "behind a wall shows nothing.",
+);
+assert.ok(
+  /if \(this\.cameraGuardsEnabled\) \{\s*\n\s*this\.holdCameraClearOfSight\(/
+    .test(gameCameraSource),
+  "the sight-line pull must sit under `?camguards=0` with the other two guards.",
+);
+assert.ok(
+  gameCameraSource.includes(".copy(this.cameraTarget).sub(hull)"),
+  "the cast must run to the DAMPED camera position, not to `desired`. Casting "
+    + "along `desired` reported the wall clear on frames where the player could "
+    + "not see the craft at all — measured, not argued.",
+);
+
 // The numbers above were read with `?camguards=0`. If that switch goes, so does
 // the ability to reproduce them, and these assertions become folklore.
 assert.ok(
@@ -686,5 +784,12 @@ console.log(
     + `window y [${frameWindow.HULL_FRAME_NDC_Y_MIN}, `
     + `${frameWindow.HULL_FRAME_NDC_Y_MAX}] / |x| <= `
     + `${frameWindow.HULL_FRAME_NDC_X_LIMIT}, strictly inside the reviewed `
-    + `y [${RULED_NDC_Y_MIN}, ${RULED_NDC_Y_MAX}] / |x| <= ${RULED_NDC_X_LIMIT}.`,
+    + `y [${RULED_NDC_Y_MIN}, ${RULED_NDC_Y_MAX}] / |x| <= ${RULED_NDC_X_LIMIT}. `
+    + `H1.5 sight-line pull floors at `
+    + `${occlusionBounds.CAMERA_OCCLUSION_MINIMUM_METRES} m, backs off `
+    + `${occlusionBounds.CAMERA_OCCLUSION_BACK_OFF_METRES} m and recovers at `
+    + `${occlusionBounds.CAMERA_OCCLUSION_RECOVERY_METRES_PER_SECOND} m/s, gated `
+    + `to sight lines dropping over `
+    + `${occlusionBounds.CAMERA_OCCLUSION_DROP_METRES} m across more than `
+    + `${occlusionBounds.CAMERA_OCCLUSION_LATERAL_METRES} m of lateral.`,
 );
