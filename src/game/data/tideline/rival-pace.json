@@ -10,16 +10,16 @@
       "padUse": false,
       "boostWindows": [
         {
-          "fromMeters": 790,
-          "toMeters": 1000
+          "fromMeters": 595.4,
+          "toMeters": 753.67
         },
         {
-          "fromMeters": 1220,
-          "toMeters": 1510
+          "fromMeters": 919.48,
+          "toMeters": 1138.04
         },
         {
-          "fromMeters": 2110,
-          "toMeters": 2300
+          "fromMeters": 1590.24,
+          "toMeters": 1733.44
         }
       ]
     },
@@ -28,16 +28,16 @@
       "padUse": false,
       "boostWindows": [
         {
-          "fromMeters": 790,
-          "toMeters": 1000
+          "fromMeters": 595.4,
+          "toMeters": 753.67
         },
         {
-          "fromMeters": 1220,
-          "toMeters": 1510
+          "fromMeters": 919.48,
+          "toMeters": 1138.04
         },
         {
-          "fromMeters": 2110,
-          "toMeters": 2300
+          "fromMeters": 1590.24,
+          "toMeters": 1733.44
         }
       ]
     },
@@ -46,16 +46,16 @@
       "padUse": false,
       "boostWindows": [
         {
-          "fromMeters": 790,
-          "toMeters": 1000
+          "fromMeters": 595.4,
+          "toMeters": 753.67
         },
         {
-          "fromMeters": 1220,
-          "toMeters": 1510
+          "fromMeters": 919.48,
+          "toMeters": 1138.04
         },
         {
-          "fromMeters": 2110,
-          "toMeters": 2300
+          "fromMeters": 1590.24,
+          "toMeters": 1733.44
         }
       ]
     }
@@ -68,16 +68,16 @@
           "padUse": false,
           "boostWindows": [
             {
-              "fromMeters": 790,
-              "toMeters": 1000
+              "fromMeters": 595.4,
+              "toMeters": 753.67
             },
             {
-              "fromMeters": 1220,
-              "toMeters": 1510
+              "fromMeters": 919.48,
+              "toMeters": 1138.04
             },
             {
-              "fromMeters": 2110,
-              "toMeters": 2300
+              "fromMeters": 1590.24,
+              "toMeters": 1733.44
             }
           ]
         },
@@ -86,16 +86,16 @@
           "padUse": false,
           "boostWindows": [
             {
-              "fromMeters": 790,
-              "toMeters": 1000
+              "fromMeters": 595.4,
+              "toMeters": 753.67
             },
             {
-              "fromMeters": 1220,
-              "toMeters": 1510
+              "fromMeters": 919.48,
+              "toMeters": 1138.04
             },
             {
-              "fromMeters": 2110,
-              "toMeters": 2300
+              "fromMeters": 1590.24,
+              "toMeters": 1733.44
             }
           ]
         },
@@ -104,16 +104,16 @@
           "padUse": false,
           "boostWindows": [
             {
-              "fromMeters": 790,
-              "toMeters": 1000
+              "fromMeters": 595.4,
+              "toMeters": 753.67
             },
             {
-              "fromMeters": 1220,
-              "toMeters": 1510
+              "fromMeters": 919.48,
+              "toMeters": 1138.04
             },
             {
-              "fromMeters": 2110,
-              "toMeters": 2300
+              "fromMeters": 1590.24,
+              "toMeters": 1733.44
             }
           ]
         }
@@ -126,16 +126,16 @@
           "padUse": false,
           "boostWindows": [
             {
-              "fromMeters": 790,
-              "toMeters": 1000
+              "fromMeters": 595.4,
+              "toMeters": 753.67
             },
             {
-              "fromMeters": 1220,
-              "toMeters": 1510
+              "fromMeters": 919.48,
+              "toMeters": 1138.04
             },
             {
-              "fromMeters": 2110,
-              "toMeters": 2300
+              "fromMeters": 1590.24,
+              "toMeters": 1733.44
             }
           ]
         },
@@ -144,16 +144,16 @@
           "padUse": false,
           "boostWindows": [
             {
-              "fromMeters": 790,
-              "toMeters": 1000
+              "fromMeters": 595.4,
+              "toMeters": 753.67
             },
             {
-              "fromMeters": 1220,
-              "toMeters": 1510
+              "fromMeters": 919.48,
+              "toMeters": 1138.04
             },
             {
-              "fromMeters": 2110,
-              "toMeters": 2300
+              "fromMeters": 1590.24,
+              "toMeters": 1733.44
             }
           ]
         },
@@ -162,16 +162,16 @@
           "padUse": false,
           "boostWindows": [
             {
-              "fromMeters": 790,
-              "toMeters": 1000
+              "fromMeters": 595.4,
+              "toMeters": 753.67
             },
             {
-              "fromMeters": 1220,
-              "toMeters": 1510
+              "fromMeters": 919.48,
+              "toMeters": 1138.04
             },
             {
-              "fromMeters": 2110,
-              "toMeters": 2300
+              "fromMeters": 1590.24,
+              "toMeters": 1733.44
             }
           ]
         }

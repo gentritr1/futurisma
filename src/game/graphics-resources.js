@@ -27,6 +27,11 @@ export function disposeObject3DResources(root) {
         : [];
     for (const material of objectMaterials) {
       materials.add(material);
+      if (material instanceof THREE.ShaderMaterial) {
+        for (const uniform of Object.values(material.uniforms)) {
+          if (uniform.value instanceof THREE.Texture) textures.add(uniform.value);
+        }
+      }
       for (const value of Object.values(material)) {
         if (value instanceof THREE.Texture) textures.add(value);
       }

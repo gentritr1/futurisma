@@ -1,4 +1,5 @@
 import type { RaceCourse } from "./course";
+import type { TidelineCourse } from "./tideline-course";
 import type { PolarityCourse } from "./polarity-course";
 import {
   OUTLINE_STATION_COUNT,
@@ -88,6 +89,7 @@ export class Minimap {
   private readonly outline: ReturnType<typeof buildCourseOutline>;
   private readonly upperOutline: ReturnType<typeof buildCourseOutline> | null;
   private readonly polarity: PolarityCourse | null;
+  private readonly tideline: TidelineCourse | null;
   private readonly shortcutPoints: Float64Array[] = [];
   private shortcutPath = new Path2D();
   private readonly gateProgress: number[] = [];
@@ -117,6 +119,7 @@ export class Minimap {
       lateralMeters: 0,
     }));
 
+    this.tideline = course.kind === "tideline" ? course as TidelineCourse : null;
     this.polarity = course.kind === "polarity" ? course as PolarityCourse : null;
     this.outline = buildCourseOutline(course, OUTLINE_STATION_COUNT);
     this.upperOutline = null;
@@ -132,6 +135,15 @@ export class Minimap {
       for (const shortcut of polarity.shortcuts) {
         this.shortcutPoints.push(buildCourseSegment(upperSampler, shortcut.from, shortcut.to));
       }
+    }
+
+    if (this.tideline) {
+      const tidal = this.tideline, cut = tidal.shortcut;
+      const sampler = {length: course.length, createSampleScratch: () => course.createSampleScratch(),
+        sample: (p: number, target = course.createSampleScratch()) => p >= cut.from && p <= cut.to
+          ? tidal.sampleShortcut(p, target) : course.sample(p, target)};
+      this.upperOutline = buildCourseOutline(sampler, OUTLINE_STATION_COUNT);
+      this.shortcutPoints.push(buildCourseSegment(sampler, cut.from, cut.to));
     }
 
     // Gate ticks come from the course's own checkpoint table so both maps mark
@@ -259,6 +271,7 @@ export class Minimap {
     playerProgress: number,
     contactCount: number,
     elapsedSeconds: number,
+    alternateRoad = false,
   ): void {
     const ratio = Math.min(window.devicePixelRatio || 1, 2);
     if (ratio !== this.pixelRatio) this.rebuild();
@@ -299,7 +312,7 @@ export class Minimap {
     ops += 2;
 
     if (this.shortcutPoints.length > 0) {
-      context.strokeStyle = rgba(CYAN, .55);
+      context.strokeStyle = this.tideline ? rgba("229, 180, 99", this.tideline.tide.shortcutOpen ? .85 : .22) : rgba(CYAN, .55);
       context.setLineDash([2.5, 2]);
       context.stroke(this.shortcutPath);
       context.setLineDash([]);
@@ -307,7 +320,7 @@ export class Minimap {
     }
 
     // The upper player's dot follows its bypass instead of the lower detour.
-    const playerOutline = this.polarity?.lane === 1 && this.upperOutline
+    const playerOutline = (this.polarity?.lane === 1 || alternateRoad) && this.upperOutline
       ? this.upperOutline : this.outline;
     const player = this.outlinePointAt(playerProgress, this.outlineTransform, playerOutline);
     context.fillStyle = rgba(ACID, 0.92);

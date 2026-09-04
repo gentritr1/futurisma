@@ -37,6 +37,11 @@ import {
  * a reward ends up paying silently.
  */
 
+/** Main-road lateral position keeps interactions across a separated fork honest. */
+export function rivalLateralFor(course: RaceCourse, position: THREE.Vector3, progress: number, lateral: number): number {
+  return course.rivalLateralAt?.(position, progress) ?? lateral;
+}
+
 /** The two race-loop values the cushion is allowed to move. Mutated in place. */
 export interface ContactPose {
   lateralMeters: number;

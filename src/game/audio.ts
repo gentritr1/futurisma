@@ -785,6 +785,13 @@ export class EngineAudio {
     }
   }
 
+  playTideDrain(): void {
+    // Two restrained rising/falling siren sweeps on the existing effects bus.
+    this.playTone(190,.8,.027,"sine",0,2.1);
+    this.playTone(399,.8,.023,"sine",.82,.476);
+    this.playTone(190,.8,.024,"sine",1.65,2.1);
+  }
+
   playPowerDenied(): void {
     this.playTone(220, .09, .016, "triangle", 0, .82);
     this.playTone(180, .10, .012, "triangle", .105, 1);

@@ -1,8 +1,8 @@
 {
-  "name": "Tideline Foundry",
-  "generator": "Blender 5.2.0 LTS",
-  "triangles": 63517,
-  "gantries": 3,
+  "name": "Tideline / tide rebuild",
+  "triangles": 70696,
+  "routeLength": 2073.797598046593,
+  "routeCount": 692,
   "roles": [
     "concrete",
     "metal",
@@ -11,14 +11,19 @@
     "signage",
     "emissive"
   ],
-  "lightAnchors": 27,
-  "vertexPaintRange": [
-    0.0065096483085623005,
-    0.8411238393401751
-  ],
-  "sourceGeometry": "art/blender/tideline_world.blend",
-  "recipe": "docs/GREENWATER_ENVIRONMENT_ART_BRIEF.md",
-  "decimationRatio": 0.62,
-  "routeLength": 2751.568119227306,
-  "routeCount": 918
+  "atlasSize": 1024,
+  "gantries": 3,
+  "lightAnchors": 58,
+  "census": {
+    "aqueductRibs": 35,
+    "reactors": 7,
+    "kelpBeds": 25,
+    "mantas": 0,
+    "portHalls": 12,
+    "cranes": 6,
+    "boats": 0,
+    "flightLenses": 0,
+    "pelagicCrowns": 0
+  },
+  "source": "art/blender/build_tideline.py"
 }

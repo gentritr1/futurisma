@@ -1,18 +1,11 @@
-# Tidal Pump Gantry
+# Tidal Pump Gantry / painted revision
 
-The three generated deliverables were inspected before modeling: `tidal-pump-orthographic.png`, `tidal-pump-hero.png`, and `tidal-pump-material-id.png`. `generation.json` records the built-in image generation prompts and sequence, including the two orthographic corrections. The image tool did not expose a named model override.
+The original orthographic, hero and material-ID references remain here with their generation record. The hero is now followed by six painted 1024 role sheets. `atlas-generation.json` records their exact native image-generation prompts and delivery hashes. Lossless PNG sources are in `art/textures/tideline-foundry`; JPEG delivery sheets are embedded by Blender. The image tool did not expose a named model override.
 
-The generated ortho panels still drift in scale. Separate front, side and top image planes in `art/blender/tidal_pump_gantry.blend` are calibrated to the explicit metre dimensions; they guide the silhouette while measured mesh geometry governs placement. The three open overhead trusses are parallel in depth at the same elevation. Five packed image planes live in the hidden `REFERENCE_PLANES_NOT_EXPORTED` collection. References are not runtime texture assets.
+The exported model uses metres, +Y up and a zero root. X spans the road; +Z faces the approach. Its bounds are approximately [-23.80, 0, -4] to [27.45, 23.71, 4]. The steelwork's height was calibrated against the hero composition; the concrete feet retain their authored scale. Supports stay 18.6 m from center and the portal clears 15.36 m vertically.
 
-The local-origin `GW_LM_TIDAL_PUMP_GANTRY` GLB uses metres and +Y up. Local X spans the route and local Z follows its depth. Bounds are `[-24.284, 0, -4]` to `[27.45, 20.05, 4]`. Lower supports remain at least 18.6 m from centre; the opening has 13.205 m minimum vertical clearance. The map assembly places three copies outside flight sections and validates actual world geometry.
+There are two concrete feet, two welded repair plates, three parallel overhead trusses, one exterior ladder, one side pump and four caged lamp heads. Three glow amber and the last is dead. The 3,504-triangle asset uses five indexed material primitives with normals, UV0 and restrained vertex tints. Painted base atlases carry the wear and baked shading. No PBR detail maps are used. The sixth role, water, is used by the map instead of the dry gantry.
 
-The model has two concrete feet, two welded repair plates, one exterior ladder, one side pump drum, three overhead trusses, and four caged lamp heads. Three lenses emit restrained amber and one is dead. It contains 3,180 triangles, five indexed material primitives, and no images or PBR texture maps. All primitives have normals, UV0 and painted CORNER vertex colours with dampening, ambient occlusion, wear and sun bleaching. Materials use the brief's `GW_MAT_concrete`, `metal`, `jungle`, `signage` and `emissive` roles. Water is absent from this dry module.
+Rebuild with Blender using `art/blender/build_tidal_pump_gantry.py`. It produces the GLB, manifest, preview and editable `art/blender/tidal_pump_gantry.blend`. Packed image planes are in the hidden `REFERENCE_PLANES_NOT_EXPORTED` collection; lights, cameras and reference planes are excluded from the GLB.
 
-Rebuild with Blender 5.2:
-
-```sh
-/Applications/Blender.app/Contents/MacOS/Blender --background --factory-startup --python art/blender/build_tidal_pump_gantry.py
-node scripts/validate-tidal-pump-gantry.mjs
-```
-
-Runtime output is `public/assets/tideline-foundry/tidal-pump-gantry.glb` plus its manifest and validation JSON. The public preview is a small WebP; the full rendered PNG is retained here as source review evidence. The source Blender file embeds the reference sheets and excludes its lights, cameras and references from export.
+Inspect the actual game-loader comparison at `http://127.0.0.1:5200/art-review.html`. The Blender and engine cameras share position (4, 2.4, 74) and look-at (0, 9.5, 0). The hero's camera is estimated from its composition because generated artwork has no camera metadata. Five shared visible details, independently named by a reviewer, are the acceptance condition; a green validator is not visual approval.

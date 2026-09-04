@@ -2,14 +2,14 @@
 
 # FUTURISMA
 
-### Five circuits. Two roads overhead. One more clean lap.
+### Five circuits. A changing tide. One more clean lap.
 
 **A futuristic hover racer with an early-2000s console soul.**
 
-Rain-soaked cities, drowned reactors, sodium-lit pumpworks and open-ocean glides.<br>
+Rain-soaked cities, drowned reactors, sodium-lit pumpworks and a changing tide.<br>
 Read the road, choose your line, and make the boost count.
 
-[Start racing](#start-racing) · [Explore the circuits](#five-circuits-six-atmospheres) · [Learn the controls](#controls) · [Inside the workshop](#built-in-blender)
+[Start racing](#start-racing) · [Explore the circuits](#five-circuits-five-identities) · [Learn the controls](#controls) · [Inside the workshop](#built-in-blender)
 
 ![Bitterpan Works at 317 km/h](docs/media/bitterpan.jpg)
 
@@ -17,7 +17,7 @@ Read the road, choose your line, and make the boost count.
 
 </div>
 
-## Five circuits, six atmospheres
+## Five circuits, five identities
 
 | Circuit | The atmosphere | The racing idea |
 |---|---|---|
@@ -25,8 +25,7 @@ Read the road, choose your line, and make the boost count.
 | **02 · Bitterpan Works** | A salt harvest at noon: brine flats, conveyors, heat and distant machinery. | An exposed deck with visible gusts and salt patches. |
 | **03 · Night Shift** | Meridian at 02:17: neon motels, closed arcades, apartment towers and rain. | A roughly 1.96 km city circuit through six districts and an expressway underpass. |
 | **04 · Polarity** | A magnetic interchange: power halls, inverter rings and another road 22 metres above. | Optional gravity transfers, narrower express routes and a choice between distance and recharge. |
-| **05 · Tideline** | A drowned reactor rising into a working port, then out across the ocean. | A 2.75 km route through water, road and two guided airborne spans. |
-| **05 · Foundry edition** | Tideline reclaimed: damp concrete, oxidised steel, caged amber lamps and murky water. | The identical Tideline course with a separate industrial art treatment. Compare editions from the menu. |
+| **05 · Tideline** | Drowned reactors, painted industrial steel, damp concrete and caged sodium lamps. | A 2.07 km road circuit: flooded on lap one, slick on lap two, with a shorter pump-hall route opening on lap three. |
 
 <table>
 <tr>
@@ -48,13 +47,13 @@ npm install
 npm run dev
 ```
 
-Open the address Vite prints. Choose your circuit, format, rival field and livery, then press **Enter**. Append `?map=tideline&edition=foundry` to start with the newest art edition.
+Open the address Vite prints. Choose your circuit, format, rival field and livery, then press **Enter**. Append `?map=tideline` for the rebuilt pumpworks. Older `edition=foundry` links open the same circuit. Choose the default three-lap race to experience the whole tide cycle.
 
 | Format | Your objective |
 |---|---|
 | **Field race** | Complete the circuit's default laps against three rivals. |
 | **Sprint** | Defend your lead for two laps with the field starting behind you. |
-| **Time attack** | Chase your best lap with a ghost and live gate deltas. Polarity currently keeps records without a ghost. |
+| **Time attack** | Chase your best lap with a ghost and live gate deltas. Polarity and Tideline currently keep records without a ghost. |
 
 **Rookie → Works → Feral** selects progressively faster authored rival pace. Rivals never rubber-band to your speed. They contest lines, boost and drift; an air cushion handles close contact without a hard vehicle collision.
 
@@ -79,9 +78,15 @@ Circuit choice, settings, liveries, records and supported ghosts are saved local
 
 **Commit to a road.** Polarity's lower deck is wider, recharges faster and supplies full-charge devices. The upper deck offers shorter, narrower express routes with slower recharge and 65%-charge devices. Transfers happen at four marked entry/exit windows, with six seconds between transfer starts. Staying on the lower road is a complete racing route. Reduced-motion mode hides the deck change behind a brief opaque transition instead of rolling the camera.
 
-**Read the current.** Tideline's lit underwater lane recharges nitro at 1.85× the normal rate. Its side changes with the lap's supply pattern. The two airborne spans use a guided corridor and an upright camera; this is hover racing with glides, not unrestricted flight.
+**Learn the tide.** Tideline publishes its schedule before the start and on the HUD. Lap one floods the reactor and lights a current lane with **1.85× nitro recharge**. Lap two lowers the water, exposing slick algae; the worn center line has more grip than the edges. Lap three drains the pump hall and opens a **20 m wide shortcut that saves 23 m**. The main road remains available. The camera stays upright throughout.
 
-**Choose your moment.** Carry one device and deploy it when it helps. Surge adds thrust; triggering it inside a painted launch window earns extra duration. Phase Shield absorbs phase fields, with an early timed absorption returning more nitro. Supplies vary by seed and lap, while the course stays learnable. The Foundry comparison link preserves the seed between editions.
+| Lap | Water and sound | Your decision |
+|---|---|---|
+| **01 · Flooded** | Hull creaks, submerged machinery, moving water. | Harvest the lit current for reserve. |
+| **02 · Ebb** | Drain siren, rising pump throb, lamps emerging from the water. | Brake early on exposed algae or hold the cleaner center. |
+| **03 · Drained** | Open sluices, drips, pump steam and sodium light. | Commit to the narrower pump hall or take the wider main road. |
+
+**Choose your moment.** Carry one device and deploy it when it helps. Surge adds thrust; triggering it inside a painted launch window earns extra duration. Phase Shield absorbs phase fields, with an early timed absorption returning more nitro. Supplies vary by seed and lap, while the course stays learnable.
 
 **Build reserve.** Slipstream rivals, cash a drift, hit gates cleanly and make close passes. The vehicle's rotating rear turbine, engine cores, lights and mounted devices show speed, nitro and power state.
 
@@ -89,19 +94,19 @@ Circuit choice, settings, liveries, records and supported ghosts are saved local
 
 ![Vehicle with mounted power mechanisms — Blender preview](public/assets/power-kit/vehicle-preview.png)
 
-The ship's power kit uses modeled turbine housings, projector arms and mechanical mounts. Deployment, exhaust and shield effects animate in the game. Night Shift, Polarity, Tideline and Foundry all include authored Blender scenery.
+The ship's power kit uses modeled turbine housings, projector arms and mechanical mounts. Deployment, exhaust and shield effects animate in the game. Night Shift, Polarity and Tideline include authored Blender scenery.
 
-The newest Foundry landmark follows a reference-first production sequence:
+The Tideline landmarks follow a reference-first production sequence:
 
-**Front / side / top sheet → driver-height hero view → flat material-ID pass → measured Blender model → in-game clearance checks.**
+**Front / side / top sheet → hero view → material-ID pass → painted 1024 atlases → Blender geometry → side-by-side game render.**
 
-The generated sheets establish silhouette and wear; measured geometry resolves perspective and scale inconsistencies. Foundry uses six material roles, vertex-painted damp staining and ambient occlusion, and restrained sodium emission. The editable scenes, build scripts and reference provenance live under [`art/`](art/).
+The generated sheets establish silhouette and wear; measured geometry resolves perspective and scale inconsistencies. Each of the six material roles has a painted 1024 atlas carrying stains, rust, baked shading and wear. Vertex colors only tint the surface. Repeated modules have three wear variants, including damage; every fourth surviving tunnel bay is structural, with caged lamps. Two ribs are broken, crown pipes run overhead, and cables sag between bays. World signs carry small place names and fleet numbers; instructions stay on the HUD. The editable scenes, build scripts and reference provenance live under [`art/`](art/).
 
-[Foundry art handoff](docs/visual-polish/TIDELINE-FOUNDRY.md) · [Gantry reference sheets](art/references/tideline-foundry/HANDOFF.md) · [Tideline course notes](docs/visual-polish/TIDELINE.md) · [Gravity and powers](docs/visual-polish/POLARITY.md)
+[Painted-art handoff](docs/visual-polish/TIDELINE-FOUNDRY.md) · [Gantry reference sheets](art/references/tideline-foundry/HANDOFF.md) · [Tideline course notes](docs/visual-polish/TIDELINE.md) · [Gravity and powers](docs/visual-polish/POLARITY.md)
 
 ## Sound after midnight
 
-**Meridian Afterimage** is the included original 174 BPM atmospheric jungle instrumental: pads, percussion and bass, with no third-party samples. Sector ambience adds machinery, rain, water, electrical hum and wind; underwater sections soften the engine. Pit radio calls gates, weather and race position.
+**Meridian Afterimage** is the included original 174 BPM atmospheric jungle instrumental: pads, percussion and bass, with no third-party samples. Sector ambience adds machinery, rain, water, electrical hum and wind. Tideline also adds hull creaks, drainage sirens and pumps that grow louder as the water falls; underwater sections soften the engine. Pit radio calls gates, weather and race position.
 
 Music shares one **MUSIC LEVEL** control with pause, mute and radio ducking. A fresh clone plays the original track. The procedural score remains available with `?music=synth` and as a fallback.
 
@@ -124,7 +129,7 @@ Append these to the local game URL, combining options with `&`.
 | Option | Result |
 |---|---|
 | `?map=greenwater`, `bitterpan`, `nightshift`, `polarity`, `tideline` | Select a circuit. |
-| `?map=tideline&edition=foundry` | The Foundry art edition. |
+| `?map=tideline&edition=foundry` | Compatibility link to the rebuilt Tideline. |
 | `?mode=race`, `sprint`, `timeattack` | Select the format. |
 | `?tier=rookie`, `works`, `feral` | Select rival pace. |
 | `?laps=1`…`9` | Set race length; sprint remains two laps. |
@@ -148,9 +153,9 @@ npm test            # the same checks plus accepted art-package archive audits
 
 The code gate covers all five circuits, 3D projections, gravity junctions, power timing and replay, rival determinism, scenery clearance, camera behavior, resource cleanup, saves, audio and build budgets. Archive audits additionally need the accepted art packages resolved by `scripts/lib/archive-root.mjs`.
 
-Integrated three-lap browser checks completed for Tideline, Foundry and Polarity without missed gates, recoveries or browser errors. Exact conditions and local performance measurements are recorded in the course notes; they are not a cross-device guarantee.
+The code gate includes the tide schedule, both physical routes, exposed-surface grip, pause/reset, minimap paths, painted asset contracts and resource cleanup. Exact browser conditions and local performance measurements are recorded in the course notes; they are not a cross-device guarantee.
 
-**Multiplayer status:** racing is currently local against AI or recorded ghosts. Powers have a deterministic simulation with replay and validated snapshots, documented in the [ability protocol](docs/visual-polish/ABILITY_PROTOCOL.md). Online sessions and networked racing are not implemented.
+**Multiplayer status:** racing is currently local against AI or recorded ghosts. Powers have a deterministic simulation with replay and validated snapshots; the tide uses a published schedule driven by the same fixed tick clock, documented in the [ability protocol](docs/visual-polish/ABILITY_PROTOCOL.md). Online sessions and networked racing are not implemented.
 
 | Read more | Contents |
 |---|---|

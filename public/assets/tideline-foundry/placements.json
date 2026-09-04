@@ -1,113 +1,306 @@
 [
   {
-    "id": "GW_PLACE_TIDAL_PUMP_000",
-    "progress": 0.055,
-    "sector": "REACTOR",
-    "position": [
-      -194.548509861148,
-      -25.3308146091931,
-      -316.0782766530958
-    ],
-    "basis": [
-      [
-        0.7250802516937256,
-        -0.6886415481567383,
-        -0.005607448052614927,
-        -194.5485076904297
-      ],
-      [
-        -0.6886643767356873,
-        -0.7250562310218811,
-        -0.005903963930904865,
-        316.0782775878906
-      ],
-      [
-        0.0,
-        -0.008142497390508652,
-        0.9999668598175049,
-        -25.330814361572266
-      ],
-      [
-        0.0,
-        0.0,
-        0.0,
-        1.0
-      ]
-    ],
-    "cullDistance": 200
+    "kind": "rib",
+    "index": 0,
+    "progress": 0.0,
+    "variant": 0,
+    "heavy": true,
+    "damaged": false
   },
   {
-    "id": "GW_PLACE_TIDAL_PUMP_001",
-    "progress": 0.185,
-    "sector": "LOCK",
-    "position": [
-      131.56585303168094,
-      -19.899085075261915,
-      -399.55921469448566
-    ],
-    "basis": [
-      [
-        -0.2737393379211426,
-        -0.9599053859710693,
-        -0.0604020431637764,
-        131.56585693359375
-      ],
-      [
-        -0.9618039131164551,
-        0.2731989920139313,
-        0.017191046848893166,
-        399.5592041015625
-      ],
-      [
-        0.0,
-        -0.06280078738927841,
-        0.9980260729789734,
-        -19.899085998535156
-      ],
-      [
-        0.0,
-        0.0,
-        0.0,
-        1.0
-      ]
-    ],
-    "cullDistance": 200
+    "kind": "rib",
+    "index": 1,
+    "progress": 0.011572971259397118,
+    "variant": 1,
+    "heavy": false,
+    "damaged": false
   },
   {
-    "id": "GW_PLACE_TIDAL_PUMP_002",
+    "kind": "rib",
+    "index": 2,
+    "progress": 0.023145942518794236,
+    "variant": 2,
+    "heavy": false,
+    "damaged": false
+  },
+  {
+    "kind": "rib",
+    "index": 3,
+    "progress": 0.034718913778191356,
+    "variant": 0,
+    "heavy": false,
+    "damaged": false
+  },
+  {
+    "kind": "rib",
+    "index": 11,
+    "progress": 0.1273026838533683,
+    "variant": 2,
+    "heavy": false,
+    "damaged": false
+  },
+  {
+    "kind": "rib",
+    "index": 12,
+    "progress": 0.13887565511276542,
+    "variant": 0,
+    "heavy": true,
+    "damaged": false
+  },
+  {
+    "kind": "rib",
+    "index": 13,
+    "progress": 0.15044862637216255,
+    "variant": 2,
+    "heavy": false,
+    "damaged": true
+  },
+  {
+    "kind": "rib",
+    "index": 26,
+    "progress": 0.3008972527443251,
+    "variant": 2,
+    "heavy": false,
+    "damaged": false
+  },
+  {
+    "kind": "rib",
+    "index": 60,
+    "progress": 0.6943782755638271,
+    "variant": 0,
+    "heavy": true,
+    "damaged": false
+  },
+  {
+    "kind": "rib",
+    "index": 61,
+    "progress": 0.7059512468232243,
+    "variant": 1,
+    "heavy": false,
+    "damaged": false
+  },
+  {
+    "kind": "rib",
+    "index": 62,
+    "progress": 0.7175242180826213,
+    "variant": 2,
+    "heavy": false,
+    "damaged": false
+  },
+  {
+    "kind": "rib",
+    "index": 63,
+    "progress": 0.7290971893420185,
+    "variant": 0,
+    "heavy": false,
+    "damaged": false
+  },
+  {
+    "kind": "rib",
+    "index": 64,
+    "progress": 0.7406701606014156,
+    "variant": 1,
+    "heavy": true,
+    "damaged": false
+  },
+  {
+    "kind": "rib",
+    "index": 65,
+    "progress": 0.7522431318608127,
+    "variant": 2,
+    "heavy": false,
+    "damaged": false
+  },
+  {
+    "kind": "rib",
+    "index": 66,
+    "progress": 0.7638161031202099,
+    "variant": 0,
+    "heavy": false,
+    "damaged": false
+  },
+  {
+    "kind": "rib",
+    "index": 67,
+    "progress": 0.7753890743796069,
+    "variant": 2,
+    "heavy": false,
+    "damaged": true
+  },
+  {
+    "kind": "rib",
+    "index": 68,
+    "progress": 0.7869620456390041,
+    "variant": 2,
+    "heavy": true,
+    "damaged": false
+  },
+  {
+    "kind": "rib",
+    "index": 69,
+    "progress": 0.7985350168984012,
+    "variant": 0,
+    "heavy": false,
+    "damaged": false
+  },
+  {
+    "kind": "rib",
+    "index": 70,
+    "progress": 0.8101079881577983,
+    "variant": 1,
+    "heavy": false,
+    "damaged": false
+  },
+  {
+    "kind": "rib",
+    "index": 71,
+    "progress": 0.8216809594171954,
+    "variant": 2,
+    "heavy": false,
+    "damaged": false
+  },
+  {
+    "kind": "rib",
+    "index": 72,
+    "progress": 0.8332539306765926,
+    "variant": 0,
+    "heavy": true,
+    "damaged": false
+  },
+  {
+    "kind": "rib",
+    "index": 73,
+    "progress": 0.8448269019359896,
+    "variant": 1,
+    "heavy": false,
+    "damaged": false
+  },
+  {
+    "kind": "rib",
+    "index": 74,
+    "progress": 0.8563998731953868,
+    "variant": 2,
+    "heavy": false,
+    "damaged": false
+  },
+  {
+    "kind": "rib",
+    "index": 75,
+    "progress": 0.867972844454784,
+    "variant": 0,
+    "heavy": false,
+    "damaged": false
+  },
+  {
+    "kind": "rib",
+    "index": 76,
+    "progress": 0.879545815714181,
+    "variant": 1,
+    "heavy": true,
+    "damaged": false
+  },
+  {
+    "kind": "rib",
+    "index": 77,
+    "progress": 0.8911187869735782,
+    "variant": 2,
+    "heavy": false,
+    "damaged": false
+  },
+  {
+    "kind": "rib",
+    "index": 78,
+    "progress": 0.9026917582329753,
+    "variant": 0,
+    "heavy": false,
+    "damaged": false
+  },
+  {
+    "kind": "rib",
+    "index": 79,
+    "progress": 0.9142647294923724,
+    "variant": 1,
+    "heavy": false,
+    "damaged": false
+  },
+  {
+    "kind": "rib",
+    "index": 80,
+    "progress": 0.9258377007517695,
+    "variant": 2,
+    "heavy": true,
+    "damaged": false
+  },
+  {
+    "kind": "rib",
+    "index": 81,
+    "progress": 0.9374106720111666,
+    "variant": 0,
+    "heavy": false,
+    "damaged": false
+  },
+  {
+    "kind": "rib",
+    "index": 82,
+    "progress": 0.9489836432705637,
+    "variant": 1,
+    "heavy": false,
+    "damaged": false
+  },
+  {
+    "kind": "rib",
+    "index": 83,
+    "progress": 0.9605566145299609,
+    "variant": 2,
+    "heavy": false,
+    "damaged": false
+  },
+  {
+    "kind": "rib",
+    "index": 84,
+    "progress": 0.9721295857893579,
+    "variant": 0,
+    "heavy": true,
+    "damaged": false
+  },
+  {
+    "kind": "rib",
+    "index": 85,
+    "progress": 0.9837025570487551,
+    "variant": 1,
+    "heavy": false,
+    "damaged": false
+  },
+  {
+    "kind": "rib",
+    "index": 86,
+    "progress": 0.9952755283081522,
+    "variant": 2,
+    "heavy": false,
+    "damaged": false
+  },
+  {
+    "kind": "pump_hall",
+    "from": 0.055,
+    "to": 0.27,
+    "width": 20
+  },
+  {
+    "kind": "gantry",
+    "progress": 0.035,
+    "variant": 0,
+    "damaged": false
+  },
+  {
+    "kind": "gantry",
     "progress": 0.325,
-    "sector": "DOCKS",
-    "position": [
-      403.43912619595517,
-      5.8560811963464685,
-      -145.88637523546717
-    ],
-    "basis": [
-      [
-        -0.9366545677185059,
-        -0.3502049148082733,
-        0.005905747413635254,
-        403.4391174316406
-      ],
-      [
-        -0.35025471448898315,
-        0.9365213513374329,
-        -0.01579320803284645,
-        145.88636779785156
-      ],
-      [
-        0.0,
-        0.016861295327544212,
-        0.9998578429222107,
-        5.856081008911133
-      ],
-      [
-        0.0,
-        0.0,
-        0.0,
-        1.0
-      ]
-    ],
-    "cullDistance": 200
+    "variant": 1,
+    "damaged": false
+  },
+  {
+    "kind": "gantry",
+    "progress": 0.645,
+    "variant": 2,
+    "damaged": true
   }
 ]

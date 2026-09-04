@@ -18,8 +18,6 @@ import {
   formatDeltaSeconds,
 } from "./race-modes-rules.js";
 import type { RaceResultSummary } from "./race-modes";
-import { isFoundryEdition } from "./tideline-style";
-import { resolveAbilitySeed } from "./ability-seed";
 
 /**
  * G2 round 2 - where the contact glow steps from a brush to a firm lean.
@@ -311,25 +309,15 @@ export class GameUi {
     }`;
     const polarity = course.mapCode === "MAP 04";
     const tideline = course.mapCode === "MAP 05";
-    const foundry = tideline && isFoundryEdition;
     document.body.dataset.map = tideline ? "tideline" : polarity ? "polarity" : course.mapCode === "MAP 03" ? "nightshift" : course.mapCode === "MAP 02" ? "bitterpan" : "greenwater";
-    document.querySelector<HTMLElement>(".intro-panel h1")!.textContent = foundry ? "FOUNDRY" : tideline ? "TIDELINE" : polarity ? "POLARITY" : course.mapCode === "MAP 03" ? "NIGHT SHIFT" : "TOTEM";
-    document.querySelector<HTMLElement>(".intro-code")!.textContent = foundry ? "PELAGIC PUMPWORKS · TIDELINE FOUNDRY CUT" : tideline ? "PELAGIC REACTOR · 03:42 AM" : polarity ? "VECTOR EXCHANGE · 02:14 AM" : course.mapCode === "MAP 03" ? "MERIDIAN DISTRICT · AFTER HOURS" : "KAIRO DYNAMICS · KD-0714";
+    document.querySelector<HTMLElement>(".intro-panel h1")!.textContent = tideline ? "TIDELINE" : polarity ? "POLARITY" : course.mapCode === "MAP 03" ? "NIGHT SHIFT" : "TOTEM";
+    document.querySelector<HTMLElement>(".intro-code")!.textContent = tideline ? "PELAGIC PUMPWORKS · THE TIDE CYCLE" : polarity ? "VECTOR EXCHANGE · 02:14 AM" : course.mapCode === "MAP 03" ? "MERIDIAN DISTRICT · AFTER HOURS" : "KAIRO DYNAMICS · KD-0714";
     const editionLink = document.getElementById("tideline-edition") as HTMLAnchorElement;
-    editionLink.hidden = !tideline;
-    if (tideline) {
-      const editionUrl = new URL(location.href);
-      editionUrl.searchParams.set("seed", String(resolveAbilitySeed()));
-      if (foundry) editionUrl.searchParams.delete("edition"); else editionUrl.searchParams.set("edition", "foundry");
-      editionLink.href = editionUrl.href;
-      editionLink.textContent = foundry ? "COMPARE / ORIGINAL TIDELINE" : "COMPARE / THE FOUNDRY CUT";
-    }
+    editionLink.hidden = true;
     document.querySelectorAll<HTMLElement>("[data-polarity-control]").forEach((element) => { element.hidden = !polarity; });
     document.querySelectorAll<HTMLElement>("[data-power-control]").forEach((element) => { element.hidden = !polarity && !tideline; });
-    this.introDeck.textContent = foundry
-      ? `Race the reclaimed pumpworks: corroded gantries, caged sodium lights and damp concrete. Dive through the reactor, climb the port, then glide over the ocean. Follow the lit current; time E on a launch strip. ${lapLabel}.`
-      : tideline
-      ? `Dive through the flooded reactor. Climb the drydock. Glide between ocean platforms. Follow the lit landing paths; time E on a launch strip for a stronger Surge. Supplies change each lap. ${lapLabel}.`
+    this.introDeck.textContent = tideline
+      ? `Lap 1: flooded reactor, lit recharge current. Lap 2: water falls, slick algae lowers grip. Lap 3: the drained pump hall opens a shorter line. Race the reactor and port; time E for Surge or Shield. ${lapLabel}.`
       : polarity ? `Choose your line. SPACE changes roads at marked junctions, with a six-second commitment. Upper: shorter, tighter. Lower: stronger devices and faster recharge. Time E on a launch strip. SHIFT fires nitro. ${lapLabel}.`
       : course.mapCode === "MAP 01"
       ? `Four ships. ${lapLabel} through Greenwater Strip. Follow the amber turn markers, clear all eight gates, and bring TOTEM home through The Cradle.`

@@ -1,4 +1,4 @@
-"""Tideline: drowned reactor, coastal drydock and two ocean flight crossings."""
+"""Tideline tide rebuild: textured reactor, enclosed port and drained pump-hall cut."""
 import bpy
 import json
 import math
@@ -7,41 +7,36 @@ from pathlib import Path
 from mathutils import Vector
 
 ROOT = Path(__file__).resolve().parents[2]
-OUT = ROOT / "public/assets/tideline"
+OUT = ROOT / "public/assets/tideline-foundry"
 route = json.loads((ROOT / "src/game/data/tideline/route.json").read_text())
 random.seed(508)
 bpy.ops.object.select_all(action="SELECT")
 bpy.ops.object.delete(use_global=False)
 materials, buckets, lights = {}, {}, []
+variant=0
+placements=[]
 origin, yaw, district = (0,0,0), 0, "REACTOR"
 census = {"aqueductRibs":0,"reactors":0,"kelpBeds":0,"mantas":0,"portHalls":0,"cranes":0,"boats":0,"flightLenses":0,"pelagicCrowns":0}
 
 
-def material(name,color,emission=0):
-    m=bpy.data.materials.new(name);m.diffuse_color=(*color,1);m.use_nodes=True
+def material(role):
+    name="GW_MAT_"+role
+    m=bpy.data.materials.new(name);m.use_nodes=True
     shader=m.node_tree.nodes.get("Principled BSDF")
-    shader.inputs["Base Color"].default_value=(*color,1)
-    shader.inputs["Roughness"].default_value=.74
-    if emission:
-        shader.inputs["Emission Color"].default_value=(*color,1)
-        shader.inputs["Emission Strength"].default_value=emission
-    materials[name]=m
-    return name
-
-METAL=material("TL_ocean_steel",(.055,.065,.19))
-CONCRETE=material("TL_weathered_ceramic",(.42,.46,.55))
-CERAMIC=material("TL_ochre_hull",(.46,.28,.085))
-DARK=material("TL_deep_glass",(.009,.017,.055))
-CYAN=material("TL_aqueduct_cyan",(.075,.72,.77),1.7)
-AMBER=material("TL_port_amber",(1,.49,.16),1.65)
-BIO=material("TL_living_teal",(.06,.34,.27),.12)
-WHITE=material("TL_navigation_white",(.73,.84,.94),.8)
-CHROME=material("TL_polished_chrome",(.63,.69,.79))
-chrome_shader=materials[CHROME].node_tree.nodes.get("Principled BSDF")
-chrome_shader.inputs["Metallic"].default_value=.78
-chrome_shader.inputs["Roughness"].default_value=.25
-VIOLET=material("TL_crown_violet",(.38,.065,.85),1.4)
-HAZARD=material("TL_hazard_yellow",(.90,.68,.075),.08)
+    shader.inputs["Roughness"].default_value=1;shader.inputs["Metallic"].default_value=0
+    image=bpy.data.images.load(str(OUT/'textures'/(role+'.jpg')),check_existing=True);image.pack()
+    texture=m.node_tree.nodes.new('ShaderNodeTexImage');texture.image=image
+    m.node_tree.links.new(texture.outputs['Color'],shader.inputs['Base Color'])
+    if role=='emissive':
+        m.node_tree.links.new(texture.outputs['Color'],shader.inputs['Emission Color'])
+        shader.inputs['Emission Strength'].default_value=.7
+    if role in ['jungle','signage']:
+        m.surface_render_method='DITHERED';m.alpha_threshold=.5
+    materials[name]=m;return name
+METAL=material('metal');CONCRETE=material('concrete');BIO=material('jungle')
+HAZARD=material('signage');AMBER=material('emissive')
+CERAMIC=CHROME=DARK=METAL
+CYAN=WHITE=VIOLET=AMBER
 
 def world(p):
     x,y,z = p
@@ -49,12 +44,21 @@ def world(p):
             origin[1]+math.sin(yaw)*x+math.cos(yaw)*y,origin[2]+z)
 
 
-def geometry(vertices, faces, mat):
-    verts, polys = buckets.setdefault((district,mat),([],[]))
-    offset=len(verts)
-    verts.extend(world(p) for p in vertices)
+def geometry(vertices, faces, mat, tile=None):
+    verts, polys, uvs = buckets.setdefault((district,mat),([],[],[]))
+    offset=len(verts);verts.extend(world(p) for p in vertices)
     polys.extend(tuple(offset+i for i in f) for f in faces)
-
+    region=(3 if mat==HAZARD else 0 if mat==AMBER else variant%3) if tile is None else tile
+    for face in faces:
+        points=[Vector(vertices[i]) for i in face]
+        normal=(points[1]-points[0]).cross(points[2]-points[0])
+        axis=max(range(3),key=lambda a:abs(normal[a]));axes=[a for a in range(3) if a!=axis]
+        # Blender Z is height, therefore v follows gravity on vertical panels.
+        if 2 in axes:axes=[next(a for a in axes if a!=2),2]
+        lo=[min(v[a] for v in points) for a in axes];span=[max(v[a] for v in points)-lo[j] for j,a in enumerate(axes)]
+        for point in points:
+            u=(point[axes[0]]-lo[0])/max(.001,span[0]);v=(point[axes[1]]-lo[1])/max(.001,span[1])
+            uvs.append(((region%2)*.5+.012+u*.476,(1-region//2)*.5+.012+v*.476))
 
 def box(center,size,mat):
     x,y,z=center; w,d,h=[v/2 for v in size]
@@ -97,12 +101,8 @@ def cylinder(center,radius,height,mat,segments=16):
 
 
 def sign(text,p,size,mat):
-    bpy.ops.object.text_add(location=world(p)); obj=bpy.context.object
-    obj.data.body=text;obj.data.size=size;obj.data.align_x="CENTER";obj.data.resolution_u=2
-    obj.rotation_euler=(math.pi/2,0,yaw);obj.data.materials.append(materials[mat])
-    obj.name=district+"_SIGN_"+text.replace(" ","_")
-    bpy.ops.object.convert(target="MESH")
-
+    x,y,z=p
+    geometry([(x-1,y,z-.4),(x+1,y,z-.4),(x+1,y,z+.4),(x-1,y,z+.4)],[(0,1,2,3)],HAZARD,tile=variant%3)
 
 def station(distance):
     return route["stations"][int(distance/route["length"]*route["count"])%route["count"]]
@@ -335,107 +335,158 @@ def pelagic_crown():
     lamp((0,-7,91),VIOLET,7,origin[2]+.035)
     census["pelagicCrowns"]+=1
 
-# The underwater aqueduct and reentry tunnel are physical frames around a clear
-# central driving volume. Runtime glass panes and water supply transparency.
-for distance in range(0,int(route["length"]),22):
-    s=station(distance);p=s["p"];district=s["sector"]
-    if s["mode"]!="submerged" and not (.89<distance/route["length"]<.95):continue
-    origin,yaw=anchor(s,1,0);yaw+=math.pi/2
-    arch(17,15,base=4,thickness=.95)
-    arch(16.8,14.8,base=4,thickness=.08,mat=CYAN)
-    for side in [-1,1]:
-        box((side*17,0,2.5),(1.8,2.4,5.8),CONCRETE)
-        hazard_plate((side*17,-1.3,4.8),2.25,2.7)
-        box((side*16.55,-.8,4.2),(.15,.08,1.8),CYAN)
-    if distance%66==0:lamp((0,0,17),CYAN,4,p[1]+.035)
-    census["aqueductRibs"]+=1
 
-# Seabed ecosystems and flooded energy infrastructure, kept off the aqueduct.
-for index,distance in enumerate(range(0,int(route["length"]),28)):
-    s=station(distance);district=s["sector"]
-    if s["mode"]!="submerged":continue
+# All placement tests include the lap-three branch as well as the main road.
+original_clear=clear
+def branch_clear(center,radius,vertical_radius=None):
+    vr=radius if vertical_radius is None else vertical_radius
+    for st in route['shortcut']['stations']:
+        if abs(center[2]-st['p'][1])>vr+10:continue
+        if (center[0]-st['p'][0])**2+(-center[1]-st['p'][2])**2<(route['shortcut']['width']/2+radius+2)**2:return False
+    return True
+def clear(center,radius,vertical_radius=None):
+    return original_clear(center,radius,vertical_radius) and branch_clear(center,radius,vertical_radius)
+
+# At least three wear variants; every fourth rib is a heavier structural bay.
+# Two upper-rib breaks leave only high fragments, never debris in the driving volume.
+for index,distance in enumerate(range(0,int(route['length']),24)):
+    st=station(distance)
+    if st['p'][1]>-3:continue
+    # The inner branch passes through these bays: leave an unobstructed mouth.
+    progress=distance/route['length']
+    if .035<progress<.105 or .215<progress<.29:continue
+    district=st['sector'];variant=index%3
+    origin,yaw=anchor(st,1,0);yaw+=math.pi/2
+    if any(not branch_clear(world((side*17,0,2.3)),2,3) for side in [-1,1]):continue
+    heavy=index%4==0;broken=index in [13,67]
+    if broken:variant=2
+    thickness=1.0 if heavy else .42
+    if broken:
+        for first,last in [(0,8),(13,24)]:
+            tube([(17*math.cos(i*math.pi/24),0,4+15*math.sin(i*math.pi/24)) for i in range(first,last+1)],thickness,METAL,6)
+    else:arch(17,15,base=4,thickness=thickness)
     for side in [-1,1]:
-        origin,yaw=anchor(s,side,28+random.random()*15,height=-32-random.random()*5)
-        if clear(origin,5,17):kelp_bed()
-    if index%6==0:
-        origin,yaw=anchor(s,-1 if index%2 else 1,78,height=-49)
+        box((side*17,0,2.3),(1.9,2.5,5.8),CONCRETE)
+        if heavy:
+            box((side*16.4,-.3,5.4),(.65,1.8,.4),METAL)
+            box((side*16.4,-.4,5.13),(.45,1.4,.14),AMBER if index%3!=1 else METAL)
+            for y in [-.85,-.4,.05]:box((side*16.4,y,5.0),(.64,.09,.40),METAL)
+            if index%3!=1:lamp((side*16.4,-.4,5.1),AMBER,2.3,st['p'][1]+.035)
+    # Crown pipes and cables span to the next frame, creating close parallax.
+    for side in [-1,1]:
+        tube([(side*8,0,17.5),(side*8,24,17.5)],.32,METAL,6)
+        tube([(side*13,0,12.7),(side*13,8,11.9),(side*13,16,11.9),(side*13,24,12.7)],.10,METAL,5)
+    placements.append({'kind':'rib','index':index,'progress':distance/route['length'],'variant':variant,'heavy':heavy,'damaged':broken})
+    census['aqueductRibs']+=1
+
+# Close retaining walls and drain joints keep the eye moving even on the quay.
+for index,distance in enumerate(range(0,int(route['length']),12)):
+    st=station(distance);district=st['sector'];variant=index%3
+    origin,yaw=anchor(st,1,0);yaw+=math.pi/2
+    for side in [-1,1]:
+        # Leave real mouths at the pump-hall fork, on its inner side.
+        if side==1 and (.035<distance/route['length']<.105 or .215<distance/route['length']<.29):continue
+        if not branch_clear(world((side*16.9,0,-.3)),6,2.6):continue
+        box((side*16.9,0,-.3),(2.2,11.6,5.2),CONCRETE)
+        if st['p'][1]>-3:
+            tube([(side*17.3,-6,2.3),(side*17.3,6,2.3)],.30,METAL,6)
+        if index%3==0:box((side*15.72,0,1.8),(.07,2.1,.10),AMBER)
+
+for index,distance in enumerate(range(20,int(route['length']),90)):
+    st=station(distance)
+    if st['p'][1]>-3:continue
+    district=st['sector'];variant=index%3
+    for side in [-1,1]:
+        origin,yaw=anchor(st,side,29,height=-26)
+        if clear(origin,7,15):kelp_bed()
+for index,progress in enumerate([.02,.16,.82,.96]):
+    st=station(progress*route['length']);district=st['sector'];variant=index%3
+    for side in [-1,1]:
+        origin,yaw=anchor(st,side,60,height=-25)
         if clear(origin,34,35):reactor()
-    if index%8==0:
-        origin,yaw=anchor(s,-1 if index%2 else 1,76,height=-13)
-        if clear(origin,27,7):manta()
 
-# Port Afterlight hugs the service road; lit cranes and drydock sheds make the
-# return to the surface unmistakable. Their concrete quays sit above the tide.
-words=["COUNTERTIDE","SALVAGE WORKS","PORT AFTERLIGHT","DEEP SERVICE"]
-for index,distance in enumerate(range(int(route["length"]*.275),int(route["length"]*.455),48)):
-    # Leave breathing room around the Crown's two pressure housings.
-    if abs(distance-route["length"]*.435)<55:continue
-    s=station(distance);district=s["sector"]
+# Port sheds and service machinery flank, rather than swallow, the road.
+for index,progress in enumerate([.35,.41,.48,.55,.62,.68]):
+    st=station(progress*route['length']);district=st['sector'];variant=index%3
     for side in [-1,1]:
-        origin,yaw=anchor(s,side,45+random.random()*10,height=.8)
-        if not clear(origin,22,30):continue
-        box((0,0,-1),(43,37,3),CONCRETE)
-        if index%3==0:crane()
-        else:hall(28,25,random.uniform(9,15),words[index%4])
+        origin,yaw=anchor(st,side,51)
+        if clear(origin,30,25):hall(28,33,13,'PUMP WORKS')
+        origin,yaw=anchor(st,side,43)
+        if index%2==0 and clear(origin,17,35):crane()
 
-# Navigation lenses frame the takeoff and landing points, above and outside the
-# glide corridor. The road and its guidance beacons are owned by the course.
-for arc in route["flightArcs"]:
-    for progress in [arc["from"]-.006,arc["to"]+.006]:
-        s=station(progress*route["length"]);district=s["sector"]
-        origin,yaw=anchor(s,1,0);yaw+=math.pi/2
-        arch(20,14,base=5,thickness=.8,mat=CONCRETE)
-        arch(19.4,13.4,base=5,thickness=.15,mat=WHITE)
-        for side in [-1,1]:
-            box((side*20,0,2),(2,3,5),METAL)
-            box((side*20,-1.6,5),(1.6,.1,.3),CYAN)
-        census["flightLenses"]+=1
+# The newly usable pump hall follows the narrower branch with clear shoulders.
+cut=route['shortcut'];district='LOCK';hall_side=cut['width']/2+4
+for index in range(28,len(cut['stations'])-30,7):
+    st=cut['stations'][index];variant=(index//7)%3
+    origin,yaw=anchor(st,1,0);yaw+=math.pi/2
+    for side in [-1,1]:
+        if not original_clear(world((side*hall_side,0,5.5)),1.3,5.5):continue
+        box((side*hall_side,0,5.5),(1.1,2.0,11),CONCRETE)
+        tube([(side*hall_side,0,10),(side*6,0,14),(0,0,14.5)],.4,METAL,6)
+    box((0,0,15),(hall_side*2+1,18,.8),METAL)
+    lamp((0,0,13.5),AMBER,2.4,st['p'][1]+.035)
+    box((0,0,13.7),(1.4,.6,.24),AMBER)
+placements.append({'kind':'pump_hall','from':cut['from'],'to':cut['to'],'width':cut['width']})
 
-# Slow ships below the flight routes and lighthouse pylons along the sea wall.
-for index,progress in enumerate([.38,.46,.52,.59,.69,.76,.81,.88]):
-    s=station(progress*route["length"]);district=s["sector"]
-    origin,yaw=anchor(s,-1 if index%2 else 1,68+index%3*25,height=0)
-    if clear(origin,22,24):boat()
-for progress in [.28,.4,.665,.7,.89]:
-    s=station(progress*route["length"]);district=s["sector"]
-    origin,yaw=anchor(s,1,48,height=-2)
-    if not clear(origin,9,55):continue
-    cylinder((0,0,18),5,40,CONCRETE,16)
-    cylinder((0,0,39),7,2,METAL,20)
-    cylinder((0,0,42),5,4,DARK,20)
-    cylinder((0,0,42),5.1,.4,AMBER,20)
-    cylinder((0,0,45),7,.8,METAL,20)
-    lamp((0,0,43),AMBER,8,0.035)
+# Build indexed per-sector/material meshes. Every surface has UV0 and an atlas.
+for (sector,mat),(vertices,faces,uvs) in buckets.items():
+    mesh=bpy.data.meshes.new('GW_GEO_'+sector+'_'+mat);mesh.from_pydata(vertices,[],faces);mesh.update()
+    mesh.materials.append(materials[mat]);uv=mesh.uv_layers.new(name='UVMap')
+    col=mesh.color_attributes.new(name='Tint',type='FLOAT_COLOR',domain='CORNER')
+    for i,value in enumerate(uvs):uv.data[i].uv=value;col.data[i].color=(.98,.98,.96,1)
+    obj=bpy.data.objects.new('GW_SECTOR_'+sector+'_'+mat,mesh);bpy.context.collection.objects.link(obj)
 
-# One landmark is readable across the port, then frames the first takeoff.
-s=station(route["length"]*.435);district=s["sector"]
-origin,yaw=anchor(s,1,0,height=s["p"][1]-32);yaw+=math.pi/2
-pelagic_crown()
+# Import complete textured gantries, preserving their UV islands and paint.
+from mathutils import Matrix
+for index,progress in enumerate([.035,.325,.645]):
+    before=set(bpy.context.scene.objects)
+    bpy.ops.import_scene.gltf(filepath=str(OUT/'tidal-pump-gantry.glb'))
+    added=[o for o in bpy.context.scene.objects if o not in before]
+    st=station(progress*route['length']);t=Vector((st['t'][0],-st['t'][2],st['t'][1])).normalized()
+    right=t.cross(Vector((0,0,1))).normalized();up=right.cross(t).normalized()
+    transform=Matrix((right,-t,up)).transposed().to_4x4();transform.translation=Vector((st['p'][0],-st['p'][2],st['p'][1]))
+    for obj in added:
+        if obj.parent is None:obj.matrix_world=transform@obj.matrix_world
+    bpy.context.view_layer.update()
+    for obj in added:
+        if obj.type=='MESH':
+            matrix=obj.matrix_world.copy();obj.parent=None;obj.data.transform(matrix);obj.matrix_world=Matrix.Identity(4)
+            obj.name=f'GW_GANTRY_{index}_'+obj.name
+            # Reuse the five atlas roles across all imported instances.
+            for slot in obj.material_slots:
+                slot.material=materials[slot.material.name.split('.')[0]]
+            # Whole gantry wear varies by instance, while atlas detail remains authoritative.
+            uv=obj.data.uv_layers.active
+            role=obj.data.materials[0].name if obj.data.materials else ''
+            if uv and index and any(r in role for r in ['metal','concrete','signage']):
+                for coord in uv.data:
+                    u,v=coord.uv
+                    if u<.5 and v>.5:
+                        coord.uv=(u+.5,v) if index==1 else (u,v-.5)
+            colors=obj.data.color_attributes.active_color
+            if colors:
+                for c in colors.data:c.color=(1-index*.035,1-index*.028,1-index*.02,1)
+    for x in [-15,-5,5]:
+        p=transform@Vector((x,-2.9,16.088));lights.append({'p':[p.x,p.z,-p.y],'color':AMBER,'size':2.4,'ground':st['p'][1]+.035})
+    placements.append({'kind':'gantry','progress':progress,'variant':index,'damaged':index==2})
 
-origin=(0,0,-55);yaw=0;district="REACTOR"
-box((0,0,-3),(2200,2200,6),METAL)
-for (sector,name),(vertices,faces) in buckets.items():
-    mesh=bpy.data.meshes.new(sector+"_"+name);mesh.from_pydata(vertices,[],faces);mesh.update()
-    obj=bpy.data.objects.new(sector+"_"+name,mesh);bpy.context.collection.objects.link(obj)
-    mesh.materials.append(materials[name])
-for sector in [d["id"] for d in route["districts"]]:
-    members=[o for o in bpy.context.scene.objects if o.type=="MESH" and o.name.startswith(sector+"_")]
-    if not members:continue
-    bpy.ops.object.select_all(action="DESELECT")
-    for obj in members:obj.select_set(True)
-    bpy.context.view_layer.objects.active=members[0];bpy.ops.object.join();members[0].name="TL_DISTRICT_"+sector
-OUT.mkdir(parents=True,exist_ok=True)
-bpy.ops.export_scene.gltf(filepath=str(OUT/"tideline_world.glb"),export_format="GLB",export_yup=True,
-    export_animations=False,export_cameras=False,export_lights=False)
-(OUT/"lights.json").write_text(json.dumps(lights))
-triangles=0
-for obj in bpy.context.scene.objects:
-    if obj.type=="MESH":obj.data.calc_loop_triangles();triangles+=len(obj.data.loop_triangles)
-(OUT/"manifest.json").write_text(json.dumps({"name":"Tideline","generator":"Blender "+bpy.app.version_string,
-    **census,"triangles":triangles,"lightAnchors":len(lights),"waterLevel":0,"seed":508,"reference":"art/reference/pelagic-crown-three-view.png","landmarkProgress":.435},indent=2)+"\n")
-scene=bpy.context.scene;scene.world.color=(.018,.035,.048)
-bpy.ops.object.camera_add(location=(720,850,460));camera=bpy.context.object
-camera.rotation_euler=(Vector((0,0,5))-camera.location).to_track_quat("-Z","Y").to_euler();scene.camera=camera
+# Dry basin floor is visible when the water drains. It stays below all roads.
+district='BASIN';origin,yaw=(0,0,-29),0
+# Floor uses an existing painted concrete atlas rather than a uniform sea of green.
+mesh=bpy.data.meshes.new('GW_GEO_BASIN');mesh.from_pydata([(-850,-850,-29),(850,-850,-29),(850,850,-29),(-850,850,-29)],[],[(0,1,2,3)])
+mesh.materials.append(materials[CONCRETE]);uv=mesh.uv_layers.new(name='UVMap')
+for i,v in enumerate([(0,0),(35,0),(35,35),(0,35)]):uv.data[i].uv=v
+col=mesh.color_attributes.new(name='Tint',type='FLOAT_COLOR',domain='CORNER')
+for c in col.data:c.color=(.4,.44,.35,1)
+obj=bpy.data.objects.new('GW_SECTOR_BASIN',mesh);bpy.context.collection.objects.link(obj)
+for obj in list(bpy.context.scene.objects):
+    if obj.type!='MESH':bpy.data.objects.remove(obj,do_unlink=True)
 bpy.context.preferences.filepaths.save_version=0
-bpy.ops.wm.save_as_mainfile(filepath=str(ROOT/"art/blender/tideline_world.blend"))
-print("TIDELINE",json.dumps(census),triangles,"triangles",len(lights),"light anchors")
+bpy.ops.wm.save_as_mainfile(filepath=str(ROOT/'art/blender/tideline_foundry.blend'))
+bpy.ops.export_scene.gltf(filepath=str(OUT/'foundry_world.glb'),export_format='GLB',export_vertex_color='ACTIVE',export_all_vertex_colors=False,export_yup=True,export_animations=False,export_lights=False,export_cameras=False)
+triangles=sum(sum(len(p.vertices)-2 for p in o.data.polygons) for o in bpy.context.scene.objects if o.type=='MESH')
+(OUT/'lights.json').write_text(json.dumps(lights))
+(OUT/'placements.json').write_text(json.dumps(placements,indent=2))
+(OUT/'manifest.json').write_text(json.dumps({'name':'Tideline / tide rebuild','triangles':triangles,'routeLength':route['length'],'routeCount':route['count'],
+ 'roles':['concrete','metal','jungle','water','signage','emissive'],'atlasSize':1024,'gantries':3,'lightAnchors':len(lights),'census':census,'source':'art/blender/build_tideline.py'},indent=2))
+print('TIDE WORLD',triangles,'triangles',census,len(lights),'lights')

@@ -92,7 +92,7 @@ const lapLength = {
 for (const map of ["nightshift", "polarity", "tideline"]) {
   for (const length of [1_958.9, 2_400]) {
     const beds = map === "tideline" ? tidelineAmbienceBeds(length) : cityAmbienceBeds(map, length);
-    assert.equal(beds.length, 5, `${map} needs air, electricity, rain, relays and water.`);
+    assert.equal(beds.length, map === "tideline" ? 6 : 5, `${map} needs its authored ambience layers.`);
     assert.equal(new Set(beds.map((bed) => bed.id)).size, beds.length);
     for (const bed of beds) {
       assert.equal(bed.event, null, "City atmosphere must not inherit salt or squall event gain.");

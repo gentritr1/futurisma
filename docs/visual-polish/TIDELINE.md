@@ -1,59 +1,39 @@
-# Tideline — MAP 05
+# Tideline — MAP 05 / Tide revision 2
 
-A drowned reactor circuit that climbs through a working port and crosses the sea on two guided glides. The route is 2,751.6 metres long, has eight ordered gates and defaults to three laps. Its broad ramps peak at 9.84 degrees and remain unbanked throughout.
+A 2,073.8 m continuous road through a drowned reactor and a working port. The former two air spans, Pelagic Crown and floating corridor beacons are removed from the playable map. There are eight ordered gates, a three-lap default, a 24 m main road and no authored roll. The steepest main-road pitch is 5.54 degrees. Existing `edition=foundry` links open this rebuilt map.
 
-The underwater section sits around 24 metres below the ocean. Cyan aqueduct ribs and transparent glazing frame the road; kelp, large manta silhouettes and sunken reactors give the water depth. Port Afterlight replaces the cyan with amber drydock halls, cranes and navigation towers. The two flight spans have no road triangles beneath them, with pairs of cyan beacons showing the guided corridor. The second span returns through an inclined aqueduct.
+## The published tide
 
-## Runtime contract
+| Lap | Level | Racing effect |
+|---|---:|---|
+| 1 | 0 m | Reactor flooded. A seeded, visibly lit current lane returns nitro at 1.85× normal recharge. |
+| 2 | −15 m | A five-second drain exposes slick algae. Exposed reactor grip is 0.70, or 0.82 on the cleaner center. Still-submerged road and the port retain normal grip. |
+| 3+ | −27 m | The pump-hall sluices lift and the shortcut opens. Exposed reactor grip recovers to 0.94. Extra laps stay drained. |
 
-- `TidelineCourse` implements the current `RaceCourse` contract.
-- `travelModeAt(progress)` returns `submerged`, `surface` or `air`.
-- `flightArcs` contains SKYLIFT (.470–.645, 481.5 m) and PELAGIC (.750–.875, 343.9 m).
-- Route stations contain 3D positions and tangents. The road is 24 m wide, the guided air corridor 20 m wide. Projection selects the nearest XZ segment and restores its true height, so temporary vertical lag cannot distort progress.
-- Local right stays horizontal; local up follows the road pitch. There is no authored roll.
-- `TidelineEnvironment.load()` loads the Blender scenery, then adds transparent water/glass and slow bubbles. Reduced motion freezes water and caustic drift and removes the bubble field.
+The menu and HUD publish `1 FLOODED → 2 SLICK → 3 PUMP HALL`. The default three-lap format includes all phases; sprint finishes after the ebb. Space/Shift use nitro and E deploys Surge or Shield. There are no gravity transfers on Tideline.
 
-## Authored assets
+`tideline-tide.js` owns the schedule. Water interpolation is driven by the 120 Hz ability clock, with no wall-clock randomness. Pause freezes the water, lamps and steam; reset restores lap one. Drain changes sound once per transition. The ambience field adds steel hull creaks, drips, water and pump throb; the pumps rise as the water falls. World light emission follows the waterline. Reduced motion freezes decorative water/lamp motion and hides bubbles and steam while preserving the tide state.
 
-`art/blender/build_tideline.py` builds `art/blender/tideline_world.blend` and the public GLB/manifest/light anchors. The Blender asset has 84,668 triangles, 46 primitives and a 4.34 MiB payload. It contains 45 aqueduct ribs, 6 reactors, 64 kelp beds, 5 mantas, 12 port halls, 6 cranes, 8 boats, 4 flight lenses, the Pelagic Crown transfer ring and 49 lamp anchors. The runtime water and glass add 11,204 triangles; water, glass and bubbles use three draw calls.
+## A real shortcut
 
-Nine framed Pelagic Authority signs use an original embedded 1024-pixel atlas. Scenery and signage together contain 86,090 triangles, 49 primitives and a 4.75 MiB payload. Their colour and emission textures survive the runtime Lambert conversion; all resources share scene disposal.
+The branch leaves at progress .055 and rejoins at .270. Its 422.7 m physical road replaces 445.9 m of main route, saving 23.2 m. It is 20 m wide, follows an enclosed pump hall and opens on lap three. Both paths cross the same ordered gates; neither bypasses a checkpoint. Recoveries return to the last valid main-road gate.
 
-## Verification
+Lap-one/two projection stays on the main road. Painted retractable rails mark both closed mouths; they lower in two seconds on lap three, before the craft arrives. Two sluices sit deeper in the separated hall and lift over five seconds, clear of the main road on every lap. Lap three chooses the nearby physical branch using a bounded progress hint. The main road stays valid throughout. Pickup capsules and phase fields sit outside the fork interval, so a branch driver cannot collect or strike devices through the other road's walls. Fleet interaction distances use the actual lateral separation from the main road; drafting, cushion contact and close-pass rewards are suppressed on the separated branch. AI rivals currently remain on the main road.
 
-- `node scripts/validate-tideline.mjs`: physical route continuity, 8,262 lateral/height projection checks, zero roll and modest pitch, two actual road gaps, ordered gates and safe recovery, plus all rival tiers deterministic at 60/120/240 Hz without overlap.
-- `node scripts/validate-tideline-environment.mjs`: GLB budgets and metadata, then 503,073 world-space vertex and triangle probes against the full 3D road/glide clearance envelope. Tests the actual loader's atlas preservation and resource cleanup for either partial asset-load failure.
-- Works rivals complete three laps in 96.14 / 98.15 / 99.91 seconds before the player's runtime tuning. Their pace is authored and independent of player speed.
-- Three visible phase bulkheads share the player's collision bounds. All rival tiers avoid them with a minimum 2.30 m hull clearance over 4,527 simulated near-field samples.
+The minimap caches both routes, dims the closed branch and highlights it in amber when open. The player marker follows the actual chosen road. The demo driver follows the chosen branch’s tangent and lateral center line, rather than correcting back toward the wider road.
 
-The course is a guided hover/glide circuit rather than unrestricted free flight.
+## Art and assets
 
-## Racing and verification
+[The painted-art handoff](TIDELINE-FOUNDRY.md) covers the six role atlases, Blender rebuild and side-by-side acceptance. The map uses warm concrete, oxidized steel, swamp green and sodium amber. Painted texture detail carries the age; fog carries depth. No bloom or PBR detail maps are added.
 
-The lit underwater lane returns nitro reserve at 1.85× the normal recharge rate.
-Its side is fixed for each lap, then changes with the shared supply phase. Air
-recharge is 0.75×. Three painted launch windows reward a timed Surge with one
-extra second; shield timing can absorb a bulkhead and return reserve. Both
-devices are Blender-built mechanisms that mount and deploy on the vehicle.
-Space/Shift remain nitro; E deploys the held device. The camera stays upright.
+## Checks and practical limits
 
-The integrated production-preview race on 2026-09-04 finished three laps in
-97.108 seconds, 0.965 seconds behind the leading Works rival. Lap times were
-33.442 / 32.242 / 31.425 seconds. It recorded zero missed gates, zero recoveries,
-zero context losses, twelve pickups and activations, nine perfect launches and
-two shield absorptions. Time by travel mode was approximately 36.1 seconds
-submerged, 35.6 on the surface and 25.4 in air. The local browser's observed
-95th-percentile frame time was 9.2–9.3 ms; this is not a cross-device guarantee.
-The browser reported no warnings/errors. A separate real-mix run confirmed
-Rob Playford playback and the five active ambience beds; paused power clocks
-held steady and resumed. Music balance still depends on the mix section and
-the user's saved slider setting.
+- `validate:tideline`: continuous geometry, height-independent projection, ordered gates, recovery and deterministic rival pace at 60/120/240 Hz.
+- `validate:tideline-runtime`: published schedule, monotonic drains, both routes, exposed grip, current recharge, power timing, pause/reset and equal fixed-tick outcomes.
+- `validate:tideline-driving`: the production demo controller and handling functions drive the full separate hall from −3, 0 and +3 m entry offsets with no edge contacts. Without traffic or powers, the section takes 6.383–6.392 seconds through the hall versus 6.658 seconds on the main road, a 0.267–0.275 second advantage.
+- `validate:tideline-foundry`: exported geometry and triangle-interior clearance against both routes, embedded atlases and render budgets.
+- `validate:tideline-environment`: varied/broken ribs, absent air landmarks, actual water and lamp shaders, reduced motion and cleanup for both partial-load failure orders.
 
+Production-browser checks, 5 September 2026, seed 3868938316, Works field: all three laps completed in 27.492 / 25.117 / 25.867 seconds, with zero missed gates or recoveries and 4.175–4.183 seconds on the separated pump-hall road. No browser console errors or warnings were recorded. The 95th-percentile frame time was 9.2–9.3 ms on the test machine. Three impacts were recorded outside the shortcut. Traffic and lap conditions make this a completion check, not an isolated shortcut speed comparison. All six ambience buses were active and the private Rob Playford mix was playing. The final sluice placement was separately checked across its full width against the main road; music balance still benefits from listening on the player's setup.
 
-## Reference-first landmark refinement
-
-The user's references established chunky silver industrial structures, cyan glass tunnels, hazard-yellow rails and saturated violet/indigo lighting. The new landmark is original: the Pelagic Crown. The built-in image generation tool first produced `art/reference/pelagic-crown-three-view.png`, showing the same machine from front, side and three-quarter views. Its exact generation prompt is saved beside it in `pelagic-crown-prompt.txt`.
-
-The Blender pass then followed the sheet's measurable shape: 90 m outer ring, 76 m empty aperture, 12 m depth, two 24 m spherical pressure pods, dark turbine ports, amber windows, cyan inner lip, violet status strips and four hazard clamps. The port's silver/indigo material contrast was increased and the aqueduct frames thickened. The runtime model deliberately omits the concept's tiny surface bolts to preserve clarity and the geometry budget.
-
-The ring frames the first glide approach at progress .435. Its plinth sits beneath the road and its aperture keeps the full driving volume clear. A Blender render (`pelagic-crown-blender-check.png`) exposed overlapping port rows; those four hall/crane placements were removed before the final export. The completed environment, signage, runtime water and glass total 97,294 triangles. Clearance validation also covers triangle interiors and the full air trajectory.
+Ghost playback is disabled here because its existing format cannot record the tide phase and branch. Local records remain available. Powers are replayable and the tide schedule is deterministic, but online sessions and a shared multiplayer race clock are not implemented. AI branch selection is also future work.

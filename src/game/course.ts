@@ -170,6 +170,8 @@ interface RawAudioZone {
 export type { ApronResolution } from "./apron.js";
 
 export interface CourseSample {
+  /** A physical branch separated from the AI fleet’s main road. */
+  alternateRoad?: boolean;
   position: THREE.Vector3;
   tangent: THREE.Vector3;
   right: THREE.Vector3;
@@ -333,6 +335,8 @@ export interface RaceCourse {
   createSampleScratch(): CourseSample;
   createProjectionScratch(): CourseProjection;
   sample(progress: number, target?: CourseSample): CourseSample;
+  demoSample?(progress: number, target?: CourseSample): CourseSample;
+  rivalLateralAt?(position: THREE.Vector3, progress: number): number;
   sampleAtDistance(distance: number): CourseSample;
   checkpointProgress(index: number): number;
   checkpointHalfWidth(index: number): number;

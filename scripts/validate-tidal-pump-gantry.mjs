@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFile, writeFile, stat } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { parseGeometry } from './lib/glb-geometry.mjs';
 
 const root = new URL('../', import.meta.url);
 const assetUrl = new URL('public/assets/tideline-foundry/tidal-pump-gantry.glb', root);
@@ -14,7 +14,7 @@ assert.equal(bytes.readUInt32LE(4), 2);
 assert.equal(bytes.readUInt32LE(8), bytes.length);
 assert.equal(createHash('sha256').update(bytes).digest('hex'), manifest.sha256);
 assert.equal(bytes.length, manifest.bytes);
-assert.ok(bytes.length < 512 * 1024);
+assert.ok(bytes.length < 8 * 1024 * 1024);
 const roles = new Set(['concrete', 'metal', 'jungle', 'water', 'signage', 'emissive']);
 for (const material of json.materials) {
   const role = material.name.replace('GW_MAT_', '');
@@ -22,12 +22,12 @@ for (const material of json.materials) {
   assert.equal(material.alphaMode, role === 'jungle' || role === 'signage' ? 'MASK' : 'OPAQUE');
   assert.equal(material.pbrMetallicRoughness?.metallicFactor, 0);
   assert.equal(material.pbrMetallicRoughness?.roughnessFactor ?? 1, 1);
-  for (const key of ['normalTexture', 'occlusionTexture', 'emissiveTexture']) assert.equal(material[key], undefined);
-  assert.equal(material.pbrMetallicRoughness?.baseColorTexture, undefined);
+  for (const key of ['normalTexture', 'occlusionTexture']) assert.equal(material[key], undefined);
+  assert.notEqual(material.pbrMetallicRoughness?.baseColorTexture, undefined, "Every role carries painted detail.");
   assert.equal(material.pbrMetallicRoughness?.metallicRoughnessTexture, undefined);
-  if (role === 'emissive') assert.ok(material.emissiveFactor[0] > material.emissiveFactor[1] * 2 && material.emissiveFactor[1] > material.emissiveFactor[2] * 5, 'The sole emissive role must remain amber.');
+  if (role === 'emissive') assert.ok(material.emissiveTexture, 'Amber comes from the painted lamp atlas.');
 }
-for (const key of ['images', 'textures', 'skins', 'animations', 'cameras']) assert.equal(json[key]?.length ?? 0, 0);
+for (const key of ['skins', 'animations', 'cameras']) assert.equal(json[key]?.length ?? 0, 0);
 assert.equal(json.extensions?.KHR_lights_punctual, undefined);
 assert.ok(!json.nodes.some(node => /REF_|CAM_|REFERENCE|light/i.test(node.name ?? '')), 'Reference planes, cameras and lights must not export.');
 const expectedParts = { concrete_foot: 2, repair_plate: 2, overhead_truss: 3, pump_drum: 1, ladder: 1, lamp_working: 3, lamp_dead: 1 };
@@ -50,7 +50,7 @@ for (const mesh of json.meshes) for (const primitive of mesh.primitives) {
 assert.equal(triangles, manifest.triangles);
 assert.ok(triangles <= 5500);
 assert.equal(primitives, 5);
-const gltf = await new GLTFLoader().parseAsync(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength), '');
+const gltf = await parseGeometry(bytes);
 const model = gltf.scene.getObjectByName('GW_LM_TIDAL_PUMP_GANTRY');
 assert.ok(model);
 assert.deepEqual(model.position.toArray(), [0, 0, 0]);
@@ -79,7 +79,7 @@ model.traverse(object => {
       lowest = Math.min(lowest, value); highest = Math.max(highest, value);
     }
   }
-  assert.ok(highest - lowest > .01, 'Vertex paint must contain actual variation.');
+  assert.ok(lowest > .85, 'Vertex tint must not bury the painted atlas detail.');
   for (let i = 0; i < index.count; i += 3) {
     a.fromBufferAttribute(position, index.getX(i));
     b.fromBufferAttribute(position, index.getX(i + 1));
@@ -91,6 +91,6 @@ model.traverse(object => {
 });
 assert.ok(minimumCentralHeight >= 12.5);
 assert.ok(minimumSupportLateral >= 18.5);
-const result = { pass: true, triangles, primitives, bytes: bytes.length, minimumCentralHeight, minimumSupportLateral, exactPartCounts: expectedParts, checks: ['metre-scale zero root', 'indexes/normals/UV0/COLOR_0', 'finite non-degenerate geometry', 'painted AO/wear variation', 'six allowed roles', 'three amber lamps plus one dead', 'no maps or runtime images', 'reference planes excluded', 'source references and provenance present'] };
+const result = { pass: true, triangles, primitives, bytes: bytes.length, minimumCentralHeight, minimumSupportLateral, exactPartCounts: expectedParts, checks: ['metre-scale zero root', 'indexes/normals/UV0/COLOR_0', 'finite non-degenerate geometry', 'painted atlas AO/wear and restrained vertex tint', 'six allowed roles', 'three amber lamps plus one dead', 'painted base atlases; no PBR detail maps', 'reference planes excluded', 'source references and provenance present'] };
 await writeFile(new URL('public/assets/tideline-foundry/tidal-pump-gantry-validation.json', root), `${JSON.stringify(result, null, 2)}\n`);
-console.log(`Tidal Pump Gantry PASS: ${triangles} triangles, ${primitives} draws, ${(bytes.length / 1024).toFixed(1)} KiB, painted vertex colour, no textures; ${minimumCentralHeight.toFixed(3)} m overhead and ${minimumSupportLateral.toFixed(3)} m support clearances.`);
+console.log(`Tidal Pump Gantry PASS: ${triangles} triangles, ${primitives} draws, ${(bytes.length / 1024).toFixed(1)} KiB, painted role atlases; ${minimumCentralHeight.toFixed(3)} m overhead and ${minimumSupportLateral.toFixed(3)} m support clearances.`);

@@ -1,165 +1,154 @@
 import * as THREE from "three";
-import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import type { TidelineCourse } from "./tideline-course";
 import route from "./data/tideline/route.json";
 import type { RaceEnvironment, RaceEnvironmentStats } from "./environment";
 import { disposeObject3DResources } from "./graphics-resources";
 import { NeonEnvironment } from "./neon-environment";
 import { resolveReducedMotion } from "./query-probes";
-import { isFoundryEdition } from "./tideline-style";
 
 /** Marine scenery, with the transparent water and glass kept outside the GLB's opaque batches. */
 export class TidelineEnvironment implements RaceEnvironment {
   readonly root: THREE.Group;
   readonly stats: RaceEnvironmentStats;
   private readonly clock = { value: 0 };
+  private readonly waterLevel = { value: 0 };
+  private readonly steam: THREE.Points;
   private readonly reducedMotion = resolveReducedMotion();
   private lastTime = performance.now();
   private readonly ocean: THREE.Mesh;
   private readonly glass: THREE.Mesh;
   private readonly bubbles: THREE.Points;
   private readonly extraTriangles: number;
-  private readonly signs: { mesh: THREE.Mesh; sphere: THREE.Sphere; triangles: number }[] = [];
-  private readonly signFrustum = new THREE.Frustum();
-  private readonly projection = new THREE.Matrix4();
-
-  private constructor(private readonly scenery: NeonEnvironment, signage: THREE.Group,
-    private readonly foundry = false) {
+  private constructor(private readonly scenery: NeonEnvironment,
+    private readonly waterTexture: THREE.Texture, private readonly course?: TidelineCourse) {
     this.root = scenery.root;
-    this.root.add(signage);
     this.ocean = this.createOcean();
     this.root.add(this.ocean);
     this.glass = this.createAqueductGlass();
     this.root.add(this.glass);
+    this.steam = this.createSteam();
+    this.root.add(this.steam);
+    this.installLampResponse();
     this.bubbles = this.createBubbles();
     this.root.add(this.bubbles);
     this.extraTriangles = (this.ocean.geometry.index!.count + this.glass.geometry.index!.count) / 3;
     this.stats = scenery.stats;
-    this.stats.meshes += 3;
-    this.stats.materials += 3;
+    this.stats.meshes += 4;
+    this.stats.materials += 4;
+    this.stats.textures += 1;
     this.stats.triangles += this.extraTriangles;
-    this.prepareSigns(signage);
   }
 
-  static async load(): Promise<TidelineEnvironment> {
-    const foundry = isFoundryEdition;
-    const [sceneryResult, signageResult] = await Promise.allSettled([NeonEnvironment.load({
-      rootName: foundry ? "tideline_foundry_seascape" : "tideline_blender_seascape",
-      modelUrl: foundry ? "/assets/tideline-foundry/foundry_world.glb" : "/assets/tideline/tideline_world.glb",
-      lightsUrl: foundry ? "/assets/tideline-foundry/lights.json" : "/assets/tideline/lights.json",
-      maximumDistance: foundry ? 200 : undefined,
-      opticalEffects: !foundry,
-      lightIntensity: foundry ? 65 : 100,
-      colors: {
-        GW_MAT_emissive: 0xf0b45c,
-        TL_aqueduct_cyan: 0x70dbe2,
-        TL_port_amber: 0xffbe77,
-        TL_navigation_white: 0xc0e5db,
-        TL_living_teal: 0x61c6aa,
-        TL_crown_violet: 0x9b7fff,
-      },
-    }), foundry ? Promise.resolve({ scene: new THREE.Group() })
-      : new GLTFLoader().loadAsync("/assets/tideline/signage.glb")]);
-    if (sceneryResult.status === "rejected" || signageResult.status === "rejected") {
+  static async load(course?: TidelineCourse): Promise<TidelineEnvironment> {
+    const [sceneryResult, waterResult] = await Promise.allSettled([
+      NeonEnvironment.load({
+        rootName: "tideline_pump_works",
+        modelUrl: "/assets/tideline-foundry/foundry_world.glb",
+        lightsUrl: "/assets/tideline-foundry/lights.json",
+        maximumDistance: 200,
+        opticalEffects: false,
+        lightIntensity: 65,
+        colors: { GW_MAT_emissive: 0xf0b45c },
+      }),
+      new THREE.TextureLoader().loadAsync("/assets/tideline-foundry/textures/water.jpg"),
+    ]);
+    if (sceneryResult.status === "rejected" || waterResult.status === "rejected") {
       if (sceneryResult.status === "fulfilled") disposeObject3DResources(sceneryResult.value.root);
-      if (signageResult.status === "fulfilled") disposeObject3DResources(signageResult.value.scene);
-      throw new Error("Tideline scenery or environmental signage could not be loaded.");
+      if (waterResult.status === "fulfilled") waterResult.value.dispose();
+      throw new Error("Tideline scenery or painted water could not be loaded.");
     }
-    try {
-      return new TidelineEnvironment(sceneryResult.value, signageResult.value.scene, foundry);
-    } catch (error) {
-      disposeObject3DResources(sceneryResult.value.root);
-      throw error;
-    }
+    waterResult.value.colorSpace = THREE.SRGBColorSpace;
+    waterResult.value.wrapS = waterResult.value.wrapT = THREE.RepeatWrapping;
+    return new TidelineEnvironment(sceneryResult.value, waterResult.value, course);
   }
 
   updateVisibility(camera: THREE.Camera): void {
     this.scenery.updateVisibility(camera);
-    this.projection.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
-    this.signFrustum.setFromProjectionMatrix(this.projection);
-    for (const sign of this.signs) {
-      sign.mesh.visible = this.signFrustum.intersectsSphere(sign.sphere);
-      if (sign.mesh.visible) {
-        this.stats.visibleGroups++;
-        this.stats.visibleTriangles += sign.triangles;
-      }
-    }
     const now = performance.now();
     const delta = Math.max(0, Math.min(.05, (now - this.lastTime) / 1000));
     this.lastTime = now;
-    if (!this.reducedMotion) this.clock.value += delta;
-    this.bubbles.visible = camera.position.y < -1 && !this.reducedMotion;
+    if (!this.reducedMotion) this.clock.value = this.course ? this.course.tide.elapsed : this.clock.value + delta;
+    this.waterLevel.value = this.course?.tide.waterLevel ?? 0;
+    this.ocean.position.y = this.waterLevel.value;
+    this.steam.visible = !this.reducedMotion && this.waterLevel.value < -3;
+    this.bubbles.visible = camera.position.y < this.waterLevel.value - 1 && !this.reducedMotion;
     this.bubbles.position.copy(camera.position);
-    this.stats.visibleGroups += this.bubbles.visible ? 3 : 2;
+    this.stats.visibleGroups += 2 + Number(this.bubbles.visible) + Number(this.steam.visible);
     this.stats.visibleTriangles += this.extraTriangles;
   }
 
-  private prepareSigns(signage: THREE.Group): void {
-    signage.name = "tideline_pelagic_authority_signs";
-    signage.updateMatrixWorld(true);
-    const replacements = new Map<THREE.Material, THREE.MeshLambertMaterial>();
-    const textures = new Set<THREE.Texture>();
-    const replace = (source: THREE.MeshStandardMaterial): THREE.MeshLambertMaterial => {
-      let material = replacements.get(source);
-      if (!material) {
-        material = new THREE.MeshLambertMaterial({ name: source.name, color: source.color,
-          map: source.map, emissive: source.emissive, emissiveMap: source.emissiveMap,
-          emissiveIntensity: source.emissiveIntensity, side: source.side });
-        replacements.set(source, material);
-        for (const texture of [source.map, source.emissiveMap]) {
-          if (!texture) continue;
-          texture.anisotropy = 2;
-          textures.add(texture);
-        }
-      }
-      return material;
-    };
-    signage.traverse(object => {
-      if (!(object instanceof THREE.Mesh)) return;
-      object.material = Array.isArray(object.material)
-        ? object.material.map(material => replace(material as THREE.MeshStandardMaterial))
-        : replace(object.material as THREE.MeshStandardMaterial);
-      object.geometry.computeBoundingSphere();
-      const triangles = (object.geometry.index?.count ?? object.geometry.getAttribute("position").count) / 3;
-      this.signs.push({ mesh: object, triangles,
-        sphere: object.geometry.boundingSphere!.clone().applyMatrix4(object.matrixWorld) });
-      this.stats.meshes++;
-      this.stats.triangles += triangles;
+  private installLampResponse(): void {
+    const seen=new Set<THREE.Material>();
+    this.root.traverse(object=>{
+      if(!(object instanceof THREE.Mesh))return;
+      const material=object.material as THREE.MeshLambertMaterial;
+      if(!material.name.includes("emissive")||seen.has(material))return;
+      seen.add(material);
+      material.onBeforeCompile=shader=>{
+        shader.uniforms.tideWaterLevel=this.waterLevel;shader.uniforms.tideLampTime=this.clock;
+        shader.vertexShader="varying float vTideLampHeight;\n"+shader.vertexShader;
+        shader.vertexShader=shader.vertexShader.replace("#include <begin_vertex>","#include <begin_vertex>\nvTideLampHeight=(modelMatrix*vec4(transformed,1.)).y;");
+        shader.fragmentShader="varying float vTideLampHeight; uniform float tideWaterLevel; uniform float tideLampTime;\n"+shader.fragmentShader;
+        shader.fragmentShader=shader.fragmentShader.replace("#include <emissivemap_fragment>",
+          "#include <emissivemap_fragment>\nfloat exposed=smoothstep(-.4,.4,vTideLampHeight-tideWaterLevel);\ntotalEmissiveRadiance*=mix(.18,1.,exposed)*(1.-.12*sin(tideLampTime*8.+vTideLampHeight));");
+      };
+      material.customProgramCacheKey=()=>"tideline-waterline-lamps";
     });
-    for (const source of replacements.keys()) source.dispose();
-    this.stats.materials += replacements.size;
-    this.stats.textures += textures.size;
+  }
+  private createSteam(): THREE.Points {
+    const positions:number[]=[];
+    for(const progress of [.035,.325,.645]) {
+      const s=route.stations[Math.floor(progress*route.count)];
+      const t=new THREE.Vector3(...s.t as [number,number,number]);const right=t.cross(new THREE.Vector3(0,1,0)).normalize();
+      for(let i=0;i<28;i++)positions.push(s.p[0]+right.x*25+(i%4)*.23,s.p[1]+10+(i/28)*8,s.p[2]+right.z*25+(i%3)*.21);
+    }
+    const geometry=new THREE.BufferGeometry();geometry.setAttribute("position",new THREE.Float32BufferAttribute(positions,3));
+    const material=new THREE.ShaderMaterial({uniforms:{time:this.clock},transparent:true,depthWrite:false,
+      vertexShader:`uniform float time;varying float fade;
+        void main(){vec3 p=position;p.y+=mod(time*.7+position.y,6.);p.x+=sin(time*.2+position.y)*.7;
+        vec4 mv=modelViewMatrix*vec4(p,1.);gl_Position=projectionMatrix*mv;gl_PointSize=clamp(900./max(1.,-mv.z),2.,24.);fade=1.-mod(time*.7+position.y,6.)/6.;}`,
+      fragmentShader:`varying float fade;void main(){float a=pow(max(0.,1.-length(gl_PointCoord-.5)*2.),2.);gl_FragColor=vec4(.48,.52,.43,a*fade*.12);}`});
+    const steam=new THREE.Points(geometry,material);steam.name="tideline_pump_steam";steam.frustumCulled=false;return steam;
   }
 
   private createOcean(): THREE.Mesh {
-    const geometry = new THREE.PlaneGeometry(2200, 2200, 32, 32);
+    const geometry = new THREE.PlaneGeometry(1800, 1800, 64, 64);
     geometry.rotateX(-Math.PI / 2);
     const material = new THREE.ShaderMaterial({
-      uniforms: { tidelineTime: this.clock, foundry: { value: this.foundry ? 1 : 0 } },
+      uniforms: { ...THREE.UniformsUtils.clone(THREE.UniformsLib.fog), tidelineTime: this.clock, foundry: { value: 1 }, waterAtlas: { value: this.waterTexture }, waterLevel: this.waterLevel }, fog:true,
       vertexShader: `
         uniform float tidelineTime;
         varying vec3 vWorld;
+        #include <fog_pars_vertex>
         void main() {
           vec3 p=position;
           p.y += sin(p.x*.031+tidelineTime*.15)*.18+sin(p.z*.023-tidelineTime*.11)*.12;
           vWorld=(modelMatrix*vec4(p,1.0)).xyz;
-          gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.0);
+          vec4 mvPosition=modelViewMatrix*vec4(p,1.0);
+          gl_Position=projectionMatrix*mvPosition;
+          #include <fog_vertex>
         }`,
       fragmentShader: `
         uniform float tidelineTime;
-        uniform float foundry;
+        uniform float foundry; uniform sampler2D waterAtlas; uniform float waterLevel;
         varying vec3 vWorld;
+        #include <fog_pars_fragment>
         void main() {
           vec2 p=vWorld.xz*.075+vec2(tidelineTime*.025,-tidelineTime*.019);
           float ripple=sin(p.x+sin(p.y*.67))*sin(p.y+sin(p.x*.8));
           float light=pow(max(0.0,ripple),8.0);
-          float below=1.0-step(0.0,cameraPosition.y);
+          float below=1.0-step(waterLevel,cameraPosition.y);
           vec3 upper=mix(vec3(.013,.053,.074),vec3(.042,.12,.14),ripple*.5+.5);
           vec3 lower=vec3(.026,.14,.17)+light*vec3(.018,.10,.11);
           upper=mix(upper,mix(vec3(.035,.048,.023),vec3(.074,.10,.043),ripple*.5+.5),foundry);
           lower=mix(lower,vec3(.064,.11,.047)+light*vec3(.023,.027,.010),foundry);
-          vec3 color=mix(upper,lower,below);
+          vec2 aUv=fract(vWorld.xz*.012+vec2(tidelineTime*.003,-tidelineTime*.002));
+          vec2 bUv=fract(vWorld.xz*.019+vec2(-tidelineTime*.002,tidelineTime*.0015));
+          vec3 paint=mix(texture2D(waterAtlas,aUv*.48+.01).rgb,texture2D(waterAtlas,bUv*.48+vec2(.51,.01)).rgb,.35);
+          vec3 color=paint*(.8+light*.16)+mix(upper,lower,below)*.28;
           float alpha=mix(.82,.48,below);
           gl_FragColor=vec4(color,alpha);
+          #include <fog_fragment>
           #include <colorspace_fragment>
         }`,
       transparent: true, depthWrite: false, side: THREE.DoubleSide,
@@ -176,7 +165,8 @@ export class TidelineEnvironment implements RaceEnvironment {
     for (let i = 0; i < route.count; i++) {
       const a = route.stations[i], b = route.stations[(i + 1) % route.count];
       const progress = i / route.count;
-      if (a.mode !== "submerged" && !(progress > .89 && progress < .95)) continue;
+      if (a.mode !== "submerged") continue;
+      if (progress > .035 && progress < .105 || progress > .215 && progress < .29) continue;
       const first = positions.length / 3;
       for (const station of [a, b]) {
         const tangent = new THREE.Vector3(...station.t as [number, number, number]);
@@ -199,7 +189,7 @@ export class TidelineEnvironment implements RaceEnvironment {
     geometry.setIndex(indices);
     geometry.computeVertexNormals();
     const material = new THREE.ShaderMaterial({
-      uniforms: { glassTint: { value: new THREE.Vector3(...(this.foundry ? [.13,.17,.085] : [.075,.20,.22])) } },
+      uniforms: { glassTint: { value: new THREE.Vector3(.13,.17,.085) } },
       vertexShader: `
         varying vec3 vNormal; varying vec3 vView;
         void main() {

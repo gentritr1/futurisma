@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
 import * as THREE from "three";
-import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { parseGeometry } from "./lib/glb-geometry.mjs";
 import { parseGlb } from "./lib/greenwater-package-validator.mjs";
 import { disposeObject3DResources } from "../src/game/graphics-resources.js";
 
@@ -12,13 +13,13 @@ const bytes = await readFile(new URL("foundry_world.glb", base));
 const manifest = JSON.parse(await readFile(new URL("manifest.json", base), "utf8"));
 const placements = JSON.parse(await readFile(new URL("placements.json", base), "utf8"));
 const lamps = JSON.parse(await readFile(new URL("lights.json", base), "utf8"));
-const { json } = parseGlb(bytes, "Tideline Foundry");
+const { json, binary } = parseGlb(bytes, "Tideline Foundry");
 const names = new Set(["concrete", "metal", "jungle", "water", "signage", "emissive"].map(role => `GW_MAT_${role}`));
-assert.ok(bytes.length < 8 * 1024 * 1024);
+assert.ok(bytes.length < 10 * 1024 * 1024);
 assert.equal(manifest.routeLength, route.length);
 assert.equal(manifest.routeCount, route.count);
 assert.equal(manifest.gantries, 3);
-assert.deepEqual(placements.map(p => p.progress), [.055, .185, .325]);
+assert.deepEqual(placements.filter(p=>p.kind==="gantry").map(p => p.progress), [.035, .325, .645]);
 assert.equal(lamps.length, manifest.lightAnchors);
 assert.ok(lamps.length > 15);
 for (const lamp of lamps) {
@@ -27,19 +28,43 @@ for (const lamp of lamps) {
 }
 assert.ok(!json.animations?.length && !json.skins?.length && !json.cameras?.length);
 assert.ok(!json.extensionsRequired?.length);
-assert.ok(!json.images?.length && !json.textures?.length, "Foundry AO and wear belong in vertex colours, with no PBR maps.");
-assert.ok(json.materials.length <= 6);
+assert.ok(json.images?.length >= 5 && json.textures?.length >= 5, "Painted atlases are required.");
+assert.ok(new Set(json.materials.map(m=>m.name.split(".")[0])).size <= 6);
 for (const material of json.materials) {
-  assert.ok(names.has(material.name), `Unknown material role ${material.name}.`);
+  assert.ok(names.has(material.name.split(".")[0]), `Unknown material role ${material.name}.`);
   assert.ok(!material.normalTexture && !material.occlusionTexture);
   assert.ok(!material.pbrMetallicRoughness?.metallicRoughnessTexture);
   assert.equal(material.pbrMetallicRoughness?.metallicFactor ?? 1, 0);
-  assert.equal(material.alphaMode ?? "OPAQUE", ["GW_MAT_jungle", "GW_MAT_signage"].includes(material.name) ? "MASK" : "OPAQUE");
-  if (material.name === "GW_MAT_emissive") {
-    const [red, green, blue] = material.emissiveFactor;
-    assert.ok(red > green && green > blue && red < .5, "The only emissive role is restrained sodium amber.");
+  assert.ok(material.pbrMetallicRoughness.baseColorTexture);
+  if (material.name.startsWith("GW_MAT_emissive")) assert.ok(material.emissiveTexture);
+}
+// Check the delivered paint itself, independently of mesh topology.
+const provenance = JSON.parse(await readFile(new URL("art/references/tideline-foundry/atlas-generation.json", root), "utf8"));
+assert.equal(provenance.atlases.length, 6);
+for (const atlas of provenance.atlases) {
+  const source = await readFile(new URL(atlas.paintedSource, root));
+  assert.equal(source.subarray(1,4).toString(), "PNG");
+  assert.equal(source.readUInt32BE(16), 1024); assert.equal(source.readUInt32BE(20), 1024);
+  const delivery = await readFile(new URL(atlas.delivery, root));
+  assert.equal(createHash("sha256").update(delivery).digest("hex"), atlas.sha256);
+  assert.equal(delivery.readUInt16BE(0), 0xffd8);
+  let size = null;
+  for (let offset = 2; offset < delivery.length - 9;) {
+    assert.equal(delivery[offset], 0xff);
+    const marker = delivery[offset+1], length = delivery.readUInt16BE(offset+2);
+    if (marker === 0xc0 || marker === 0xc2) { size=[delivery.readUInt16BE(offset+7),delivery.readUInt16BE(offset+5)]; break; }
+    offset += 2 + length;
+  }
+  assert.deepEqual(size, [1024,1024], `${atlas.role} delivery must retain the full painted atlas.`);
+  if (atlas.role !== "water") {
+    const image = json.images.find(image => image.name === atlas.role);
+    assert.ok(image && image.bufferView !== undefined && !image.uri);
+    const view = json.bufferViews[image.bufferView];
+    assert.ok(binary.subarray(view.byteOffset,view.byteOffset+view.byteLength).equals(delivery),
+      `The exported ${atlas.role} must embed the reviewed delivery atlas.`);
   }
 }
+assert.equal(json.images.length, 5, "All scenery instances share the five structural atlases.");
 let triangles = 0, primitives = 0;
 for (const mesh of json.meshes) for (const primitive of mesh.primitives) {
   primitives++;
@@ -52,11 +77,11 @@ for (const mesh of json.meshes) for (const primitive of mesh.primitives) {
 }
 assert.equal(triangles, manifest.triangles);
 assert.ok(triangles + 11_204 <= 100_000, "Foundry plus runtime water/glass exceeds the existing triangle budget.");
-assert.ok(primitives <= 50);
-const gltf = await new GLTFLoader().parseAsync(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength), "");
+assert.ok(primitives <= 55);
+const gltf = await parseGeometry(bytes);
 gltf.scene.updateMatrixWorld(true);
 const cells = new Map();
-for (const station of route.stations) {
+for (const station of [...route.stations, ...route.shortcut.stations.map(s=>({...s,width:route.shortcut.width}))]) {
   const tangent = new THREE.Vector3(...station.t);
   const right = new THREE.Vector3().crossVectors(tangent, new THREE.Vector3(0, 1, 0)).normalize();
   const up = new THREE.Vector3().crossVectors(right, tangent).normalize();
@@ -78,7 +103,7 @@ function check(point, nodeName) {
       if (height < -.25 || height > 7) continue;
       closeProbes++;
       assert.ok(Math.abs(relative.dot(station.right)) >= station.halfWidth + 2,
-        `${nodeName} intrudes into the road/glide corridor at ${point.toArray()}.`);
+        `${nodeName} intrudes into the road corridor at ${point.toArray()}.`);
     }
   }
 }
@@ -89,7 +114,7 @@ gltf.scene.traverse(object => {
   if (!object.isMesh) return;
   const geometry = object.geometry;
   const positions = geometry.getAttribute("position"), colors = geometry.getAttribute("color");
-  assert.ok(colors && object.material.vertexColors, "The loader must preserve the authored AO/paint channel.");
+  assert.ok(colors && object.material.vertexColors, "The loader must preserve the tint channel alongside the painted atlas.");
   assert.ok(positions.count > 0 && geometry.index);
   for (let index = 0; index < positions.count; index++) {
     point.fromBufferAttribute(positions, index).applyMatrix4(object.matrixWorld);
@@ -113,7 +138,7 @@ gltf.scene.traverse(object => {
     triangles: geometry.index.count / 3 });
 });
 assert.ok(probes > 100_000 && closeProbes > 1000);
-assert.ok(colorMaximum - colorMinimum > .3, "The six roles need authored value contrast, AO and weathering.");
+assert.ok(colorMaximum - colorMinimum > .1, "Vertex tints retain environment variation without replacing the atlas.");
 // Measure the same world-space frustum and distance cull used by the loader.
 const camera = new THREE.PerspectiveCamera(63, 16 / 9, .1, 900);
 const frustum = new THREE.Frustum(), matrix = new THREE.Matrix4();
@@ -131,4 +156,4 @@ for (let index = 0; index < route.count; index += 3) {
 assert.ok(peakDraws <= 24, `The Foundry contribution peaks at ${peakDraws} draws (limit 24).`);
 assert.ok(peakTriangles + 11_204 <= 100_000);
 disposeObject3DResources(gltf.scene);
-console.log(`Tideline Foundry PASS: ${triangles.toLocaleString()} authored triangles / ${primitives} primitives / ${(bytes.length / 1024 / 1024).toFixed(2)} MiB; ${probes.toLocaleString()} 3D clearance probes; six-role vertex-painted materials; peak authored visibility ${peakDraws} draws / ${peakTriangles.toLocaleString()} triangles.`);
+console.log(`Tideline Foundry PASS: ${triangles.toLocaleString()} authored triangles / ${primitives} primitives / ${(bytes.length / 1024 / 1024).toFixed(2)} MiB; ${probes.toLocaleString()} 3D clearance probes; six-role painted atlases; peak authored visibility ${peakDraws} draws / ${peakTriangles.toLocaleString()} triangles.`);

@@ -44,7 +44,7 @@ export const TRACKS: readonly TrackEntry[] = [
     selection: "tideline",
     label: "TIDELINE",
     mapCode: "MAP 05",
-    deck: "DEPTH / COAST / FLIGHT",
+    deck: "FLOOD / DRAIN / PUMP HALL",
   },
 ];
 

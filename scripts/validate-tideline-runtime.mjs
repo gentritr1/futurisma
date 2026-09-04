@@ -5,12 +5,14 @@ import { transformWithOxc } from 'vite';
 import { TIDELINE_ABILITY_CONFIG, TIDELINE_FIELDS, currentLane } from '../src/game/tideline-rules.js';
 import { disposeObject3DResources } from '../src/game/graphics-resources.js';
 import { groundBlobVisible } from '../src/game/presentation.js';
+import { TIDE_SCHEDULE, tideForLap, tideWaterLevel, tideGrip } from '../src/game/tideline-tide.js';
+const route = JSON.parse(await readFile(new URL('../src/game/data/tideline/route.json', import.meta.url), 'utf8'));
 
 const local = name => new URL(`../src/game/${name}`, import.meta.url).href;
 async function moduleUrl(relative, replacements = {}, embedRoute = false) {
   const file = new URL(relative, import.meta.url);
   let { code } = await transformWithOxc(await readFile(file, 'utf8'), file.pathname);
-  for (const [specifier, resolved] of Object.entries({ three: import.meta.resolve('three'), ...replacements })) {
+  for (const [specifier, resolved] of Object.entries({ three: import.meta.resolve('three'), './tideline-tide.js': local('tideline-tide.js'), ...replacements })) {
     code = code.replaceAll(`from ${JSON.stringify(specifier)}`, `from ${JSON.stringify(resolved)}`);
   }
   if (embedRoute) for (const [binding, fileName] of [['route', 'route'], ['rivalPace', 'rival-pace']]) {
@@ -29,7 +31,7 @@ const courseUrl = await moduleUrl('../src/game/tideline-course.ts', {
 const worldUrl = await moduleUrl('../src/game/tideline-world.ts', {
   './power-pickup-field': fieldUrl, './tideline-rules.js': local('tideline-rules.js'),
   './tideline-sky': await moduleUrl('../src/game/tideline-sky.ts', { './tideline-style': styleUrl }),
-});
+}, true);
 const runtimeUrl = await moduleUrl('../src/game/tideline-runtime.ts', {
   './ability-seed': await moduleUrl('../src/game/ability-seed.ts'), './tideline-world': worldUrl,
   './polarity-rules.js': local('polarity-rules.js'), './polarity-simulation.js': local('polarity-simulation.js'), './tideline-rules.js': local('tideline-rules.js'),
@@ -58,7 +60,7 @@ const { TidelineRuntime } = await import(runtimeUrl);
 const { PowerPickupField } = await import(fieldUrl);
 const course = new TidelineCourse(), input = new InputController();
 const audioEvents = [], messages = [];
-const audio = Object.fromEntries(['playPowerPickup', 'playPowerDenied', 'playPowerActivate'].map(name => [name, (...args) => audioEvents.push({ name, args })]));
+const audio = Object.fromEntries(['playPowerPickup', 'playPowerDenied', 'playPowerActivate', 'playTideDrain'].map(name => [name, (...args) => audioEvents.push({ name, args })]));
 const ui = { flashHazard: message => messages.push(message) };
 const camera = new THREE.PerspectiveCamera(57, 16 / 9, .1, 1800), sample = course.createProjectionScratch();
 const position = new THREE.Vector3(), state = {};
@@ -94,6 +96,17 @@ function collect(index, lap = 1) {
 try {
   runtime = new TidelineRuntime(course, input, audio, ui, false, 714); await runtime.ready;
   runtime.reset(); assert.equal(runtime.ceiling, false); assert.equal(runtime.isFlipping, false);
+  runtime.world.root.updateMatrixWorld(true);
+  for (const gate of runtime.world.sluices.children) {
+    for (let x=-route.shortcut.width/2; x<=route.shortcut.width/2; x+=.5) {
+      for (const y of [-3.25, 0, 3.25]) for (const z of [-.225, .225]) {
+        const point=gate.localToWorld(new THREE.Vector3(x,y,z));
+        const road=course.project(point,.15);
+        assert.ok(Math.abs(road.lateral)>road.halfWidth+2,
+          'Closed sluices must leave the entire main-road corridor clear.');
+      }
+    }
+  }
   for (const code of ['Space', 'ShiftLeft']) {
     key(code, true); assert.equal(input.read().boost, true, `${code} stays nitro in Tideline.`);
     assert.equal(input.consumeFlip(), false); key(code, false);
@@ -105,12 +118,12 @@ try {
     const progress = station / 1000;
     step(1, progress); const diagnostic = present(progress); modes.add(diagnostic.mode);
     assert.equal(groundBlobVisible(true, course.travelModeAt(progress)), diagnostic.mode !== 'air',
-      'Player and rival ground blobs must disappear across each actual flight gap and return over road.');
+      'Every station has a real road and a contact shadow.');
     assert.equal(groundBlobVisible(false, course.travelModeAt(progress)), false, 'Finished or flipping craft keep hidden blobs.');
     assert.equal(state.gravitySign, 1); assert.equal(state.gravityTransition, 0);
     assert.ok(sample.up.y > .95, 'The craft follows gentle true slopes without a roll reversal.');
   }
-  assert.deepEqual([...modes].sort(), ['air', 'submerged', 'surface']);
+  assert.deepEqual([...modes].sort(), ['submerged', 'surface']);
   assert.equal(groundBlobVisible(true, undefined), true, 'Existing road-only courses keep their contact shadows.');
   const playerSource = await readFile(new URL('../src/game/game.ts', import.meta.url), 'utf8');
   const rivalSource = await readFile(new URL('../src/game/rivals.ts', import.meta.url), 'utf8');
@@ -119,18 +132,73 @@ try {
   const device = PowerPickupField.instances[0];
   assert.equal(device.lastUpdate[0], runtime.simulation.state.tick / 120, 'World devices use simulation time.');
 
-  // The lit current and the granted recharge always agree for either seed phase.
+  // The schedule is published and deterministic, with a real shorter route.
+  assert.deepEqual(TIDE_SCHEDULE.map(t => t.waterLevel), [0, -15, -27]);
+  assert.equal(tideForLap(9).id, "dry");
+  for (const lap of [2, 3]) {
+    assert.equal(tideWaterLevel(lap, 0), tideForLap(lap - 1).waterLevel);
+    assert.equal(tideWaterLevel(lap, 5), tideForLap(lap).waterLevel);
+    const levels = Array.from({length: 601}, (_, i) => tideWaterLevel(lap, i / 120));
+    assert.ok(levels.every((level, i) => i === 0 || level <= levels[i-1]));
+  }
+  assert.equal(tideGrip(2, 4, 5), 1, 'Port grip stays dry.');
+  assert.equal(tideGrip(2, -18, 5), 1, 'Still-submerged reactor retains grip.');
+  assert.equal(tideGrip(2, -12, 5), .7);
+  assert.ok(tideGrip(2, -12, 0) > tideGrip(2, -12, 5), 'The clean center line rewards precision.');
+  assert.ok(route.shortcut.savings > 20 && route.shortcut.savings < 30);
+  assert.ok(!route.checkpoints.some(p => p > route.shortcut.from && p < route.shortcut.to),
+    'Both routes pass the same ordered gates.');
+  assert.ok([...TIDELINE_ABILITY_CONFIG.pickups, ...TIDELINE_FIELDS].every(p =>
+    p.progress < route.shortcut.from || p.progress > route.shortcut.to),
+    'Route-space powers cannot trigger through the walls of the other route.');
+  for (const lap of [1, 2, 3]) {
+    course.setLapBoard(lap); course.advanceTide(5);
+    let branchHits = 0;
+    for (let i = 1; i < route.shortcut.stations.length - 1; i++) {
+      const st = route.shortcut.stations[i];
+      const position = new THREE.Vector3(...st.p);
+      const projection = course.project(position, st.progress);
+      if (projection.sector === 'PUMP_HALL_CUT') {
+        branchHits++;
+        assert.equal(projection.alternateRoad, true);
+        assert.ok(projection.position.distanceTo(position) < .01);
+        assert.ok(Math.abs(projection.progress - st.progress) < .00001);
+      }
+    }
+    assert.equal(branchHits, lap === 3 ? route.shortcut.stations.length - 2 : 0);
+    for (const progress of [.06, .12, .2, .26]) {
+      const position = course.sample(progress).position;
+      assert.notEqual(course.project(position, progress).sector, 'PUMP_HALL_CUT', 'Main road remains valid on every lap.');
+    }
+  }
+
+  const cutMiddle = course.sampleShortcut(.16);
+  assert.ok(Math.abs(course.rivalLateralAt(cutMiddle.position, .16)) > 20,
+    'Fleet interactions use the physical gap to the other road, not branch-relative zero.');
   runtime.reset();
   for (const lap of [1, 2, 3]) {
     const lane = currentLane(714, lap);
-    step(1, .1, lane, lap); present(.1); assert.equal(runtime.boostRechargeScale, 1.85);
-    assert.equal(runtime.world.currents[0].visible, lane < 0);
-    assert.equal(runtime.world.currents[1].visible, lane > 0);
+    step(1, .1, lane, lap); present(.1);
+    assert.equal(runtime.boostRechargeScale, lap === 1 ? 1.85 : 1);
+    assert.equal(runtime.world.currents[0].visible, lap === 1 && lane < 0);
+    assert.equal(runtime.world.currents[1].visible, lap === 1 && lane > 0);
     step(1, .1, -lane, lap); assert.equal(runtime.boostRechargeScale, 1);
-    step(1, .21, lane, lap); assert.equal(runtime.boostRechargeScale, 1);
-    step(1, .5, lane, lap); assert.equal(runtime.boostRechargeScale, .75);
-    step(1, .96, lane, lap); assert.equal(runtime.boostRechargeScale, 1.85);
+    step(1, .5, lane, lap); assert.equal(runtime.boostRechargeScale, 1);
+    step(1, .96, lane, lap); assert.equal(runtime.boostRechargeScale, lap === 1 ? 1.85 : 1);
+    const frozenTide = {...course.tide};
+    for (let frame = 0; frame < 120; frame++) present(.1);
+    assert.deepEqual(course.tide, frozenTide, 'Paused presentation never advances the tide.');
+    step(600, .1, lane, lap); present(.1);
+    assert.equal(course.tide.waterLevel, tideForLap(lap).waterLevel);
+    for (const gate of runtime.world.sluices.children) {
+      assert.equal(gate.position.y - gate.userData.baseHeight, lap === 3 ? 15 : 0);
+    }
+    assert.equal(runtime.world.forkGuards.position.y,lap===3?-3:0,
+      'Visible mouth guards lower when the shortcut opens.');
   }
+  assert.equal(audioEvents.filter(e => e.name === 'playTideDrain').length, 2, 'One siren per actual drain.');
+  runtime.reset();
+  assert.deepEqual(course.tide, {lap:1, elapsed:0, waterLevel:0, draining:false, shortcutOpen:false});
 
   runtime.reset(); collect(3); present(.45);
   assert.match(elements.get('polarity-power').textContent, /PERFECT NOW/);
@@ -158,7 +226,7 @@ try {
   for (let frame = 0; frame < 840; frame++) { runtime.advanceClocks(dt); present(.235 + frame * .00001); }
   assert.equal(runtime.shieldActive, false);
   assert.equal(runtime.simulation.state.pickups, beforeCoastPickups, 'Finish coast cannot collect another capsule.');
-  runtime.recover(.119); step(1, .121, -2); assert.equal(runtime.simulation.state.pickups, 1, 'Recovery cannot farm the same capsule.');
+  runtime.recover(TIDELINE_ABILITY_CONFIG.pickups[1].progress - .001); step(1, TIDELINE_ABILITY_CONFIG.pickups[1].progress + .001, -2); assert.equal(runtime.simulation.state.pickups, 1, 'Recovery cannot farm the same capsule.');
   runtime.reset(); assert.equal(runtime.simulation.state.seed, 714);
   assert.equal(runtime.simulation.state.pickups, 0); assert.equal(runtime.simulation.state.powersUsed, 0);
   assert.equal(runtime.simulation.heldPowerKind, null); assert.equal(runtime.shieldActive, false);
@@ -170,53 +238,21 @@ try {
   runtime.reset();
   for (const progress of [.1, .35, .52, .69, .81, .96]) { step(1, progress); present(progress); assert.equal(camera.fov, 62); }
   runtime.dispose();
-  // Compile the real course/sky/world/runtime with the other edition flag.
-  // Both runtime constructors must retain one ability config and identical
-  // command results, even though their material/sky uniforms visibly differ.
-  const foundryStyle = `data:text/javascript;base64,${Buffer.from('export const isFoundryEdition = true;').toString('base64')}`;
-  const foundryCourseUrl = await moduleUrl('../src/game/tideline-course.ts', {
-    './apron.js': local('apron.js'), './tideline-rules.js': local('tideline-rules.js'), './tideline-style': foundryStyle,
-  }, true);
-  const foundryWorldUrl = await moduleUrl('../src/game/tideline-world.ts', {
-    './power-pickup-field': fieldUrl, './tideline-rules.js': local('tideline-rules.js'),
-    './tideline-sky': await moduleUrl('../src/game/tideline-sky.ts', { './tideline-style': foundryStyle }),
-  });
-  const foundryRuntimeUrl = await moduleUrl('../src/game/tideline-runtime.ts', {
-    './ability-seed': await moduleUrl('../src/game/ability-seed.ts'), './tideline-world': foundryWorldUrl,
-    './polarity-rules.js': local('polarity-rules.js'), './polarity-simulation.js': local('polarity-simulation.js'), './tideline-rules.js': local('tideline-rules.js'),
-  });
-  const { TidelineCourse: FoundryCourse } = await import(foundryCourseUrl);
-  const { TidelineRuntime: FoundryRuntime } = await import(foundryRuntimeUrl);
-  const foundryCourse = new FoundryCourse(), foundryInput = new InputController();
-  runtime = new TidelineRuntime(course, input, audio, ui, false, 714);
-  const foundryRuntime = new FoundryRuntime(foundryCourse, foundryInput, audio, ui, false, 714);
-  try {
-    await Promise.all([runtime.ready, foundryRuntime.ready]);
-    assert.equal(runtime.world.sky.root.material.uniforms.foundry.value, 0);
-    assert.equal(foundryRuntime.world.sky.root.material.uniforms.foundry.value, 1);
-    assert.deepEqual(foundryRuntime.simulation.config, runtime.simulation.config, 'A visual edition must use the same ability configuration.');
-    assert.deepEqual(foundryRuntime.simulation.snapshot(), runtime.simulation.snapshot());
-    for (let tick = 0; .002 + tick / 6000 < 3; tick++) {
-      const distance = .002 + tick / 6000, progress = distance % 1, lap = Math.floor(distance) + 1;
-      for (const racer of [runtime, foundryRuntime]) {
-        racer.step(dt, progress, 0, lap);
-        racer.handleActions(true, progress, position, 0, true);
-        const field = TIDELINE_FIELDS.find(field => Math.abs(field.progress - progress) * course.length < 2);
-        if (field && racer.shieldActive) racer.onShieldImpact(progress, 0);
-      }
-      assert.equal(foundryRuntime.boostRechargeScale, runtime.boostRechargeScale);
-      if (tick % 120 === 0) assert.deepEqual(foundryRuntime.simulation.snapshot(), runtime.simulation.snapshot(),
-        'The same three-lap input trace must produce identical ability state/events in either edition.');
+  // Equal command streams at different render rates preserve tide and powers.
+  const snapshots = [];
+  for (const hz of [60, 120, 240]) {
+    runtime = new TidelineRuntime(course, input, audio, ui, false, 714);
+    await runtime.ready; runtime.reset();
+    for (let lap = 1; lap <= 3; lap++) {
+      for (let frame = 0; frame < hz * 8; frame++) runtime.step(1 / hz, .4, 0, lap);
     }
-    assert.deepEqual(foundryRuntime.simulation.snapshot(), runtime.simulation.snapshot());
-    assert.equal(runtime.simulation.state.lap, 3);
-    assert.ok(runtime.simulation.state.pickups > 3 && runtime.simulation.state.powersUsed > 3, 'The edition trace must exercise real power transitions.');
-  } finally {
-    foundryRuntime.dispose(); foundryInput.dispose(); disposeObject3DResources(foundryCourse.group);
+    snapshots.push({tide: {...course.tide}, powers: runtime.simulation.snapshot()});
+    runtime.dispose();
   }
-  runtime.dispose();
+  assert.deepEqual(snapshots[0], snapshots[1]);
+  assert.deepEqual(snapshots[2], snapshots[1]);
   assert.ok(audioEvents.some(event => event.name === 'playPowerActivate' && event.args[0] === 'shield'));
-  console.log('Tideline runtime PASS: real 3D depth/height and basis, stable camera horizon in all travel modes, current lane/recharge agreement, nitro/power input, perfect launches, one-shot shield refunds, frozen rendering, coast/reset/disposal, reduced motion; original/Foundry ability configuration and three-lap command traces exactly identical.');
+  console.log('Tideline runtime PASS: published tide schedule, 23 m physical shortcut closed on laps 1/2, lap-3 projection and main-road alternative, exposed algae grip, current recharge, nitro/power controls, shield refunds, pause/reset and resource disposal; equal 60/120/240 Hz tide and command results.');
 } finally {
   runtime?.dispose(); input.dispose(); disposeObject3DResources(course.group);
   for (const [name, descriptor] of originals) {

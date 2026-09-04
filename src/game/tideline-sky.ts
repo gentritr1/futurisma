@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { isFoundryEdition } from "./tideline-style";
 
 /** Painted-sky treatment: broad cobalt light, an old moon and sparse star flares. */
 export class TidelineSky {
@@ -7,7 +6,7 @@ export class TidelineSky {
   private readonly aboveWater = { value: 0 };
   constructor() {
     this.root = new THREE.Mesh(new THREE.SphereGeometry(560, 48, 24), new THREE.ShaderMaterial({
-      uniforms: { aboveWater: this.aboveWater, foundry: { value: isFoundryEdition ? 1 : 0 } }, side: THREE.BackSide, depthWrite: false, depthTest: false,
+      uniforms: { aboveWater: this.aboveWater, foundry: { value: 1 } }, side: THREE.BackSide, depthWrite: false, depthTest: false,
       vertexShader: `varying vec3 vDirection;
         void main(){vDirection=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`,
       fragmentShader: `
@@ -41,11 +40,11 @@ export class TidelineSky {
           #include <colorspace_fragment>
         }`,
     }));
-    this.root.name = "tideline_painted_cobalt_sky";
+    this.root.name = "tideline_humid_sky";
     this.root.renderOrder = -990; this.root.frustumCulled = false;
   }
-  update(camera: THREE.Camera): void {
+  update(camera: THREE.Camera, waterLevel = 0): void {
     this.root.position.copy(camera.position);
-    this.aboveWater.value = THREE.MathUtils.smoothstep(camera.position.y, -4, 5);
+    this.aboveWater.value = THREE.MathUtils.smoothstep(camera.position.y-waterLevel, -4, 5);
   }
 }

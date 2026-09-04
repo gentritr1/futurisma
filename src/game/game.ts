@@ -94,7 +94,7 @@ import { applyRaceLivery, recordFinishedRace } from "./meta-runtime";
 import { raceModes } from "./race-modes";
 import { save } from "./persistence";
 import { playerRaceDistanceMeters as calculatePlayerRaceDistance } from "./rival-race.js";
-import { RacingContact } from "./racing-contact";
+import { RacingContact, rivalLateralFor } from "./racing-contact";
 import { TrackEvents } from "./track-events";
 import {
   RivalFleet,
@@ -690,7 +690,7 @@ export class FuturismaGame {
   };
 
   private readDemoInput(): InputFrame {
-    this.autopilot.setDraft(this.rivalFleet, this.slipstream, FIXED_STEP);
+    this.autopilot.setDraft(this.afterMoveProjection.alternateRoad ? null : this.rivalFleet, this.slipstream, FIXED_STEP);
     return this.autopilot.read(
       this.position,
       this.forward,
@@ -719,10 +719,10 @@ export class FuturismaGame {
       if (this.phase === "resuming") this.updateResumeCountdown(FIXED_STEP);
       if (this.phase === "running") {
         // Fleet first: `updateRace` reads the tow it measured for this step.
-        this.rivalFleet?.step(FIXED_STEP, this.playerRaceDistance(), this.lateral, this.speed);
+        this.rivalFleet?.step(FIXED_STEP, this.playerRaceDistance(), rivalLateralFor(this.course, this.position, this.progress, this.lateral), this.speed);
         this.updateRace(FIXED_STEP, this.resolveRaceInput(input));
       } else if (this.phase === "finished") {
-        this.rivalFleet?.step(FIXED_STEP, this.playerRaceDistance(), this.lateral, this.speed);
+        this.rivalFleet?.step(FIXED_STEP, this.playerRaceDistance(), rivalLateralFor(this.course, this.position, this.progress, this.lateral), this.speed);
         this.updateCoast(FIXED_STEP);
       }
       this.physicsAccumulator -= FIXED_STEP;
@@ -784,10 +784,10 @@ export class FuturismaGame {
       this.updateHud(presentationInput);
       this.minimap.update(
         this.playerRaceDistance(),
-        this.lateral,
+        rivalLateralFor(this.course, this.position, this.progress, this.lateral),
         this.progress,
         this.rivalFleet?.readRadarContacts(this.minimap.contacts) ?? 0,
-        now,
+        now, this.afterMoveProjection.alternateRoad,
       );
       if (now >= this.nextFieldOrderAt) {
         this.nextFieldOrderAt = now + 0.25;
@@ -945,8 +945,8 @@ export class FuturismaGame {
       );
       this.input.pulse(0.24, 0.12, 90);
     }
-    const slipstream = this.circuitRuntime?.ceiling ? 0 : this.rivalFleet?.slipstreamStrength ?? 0;
-    if (this.rivalFleet?.slipstreamLocked) this.audio.playSlipstreamLock();
+    const slipstream = this.circuitRuntime?.ceiling || beforeMove.alternateRoad ? 0 : this.rivalFleet?.slipstreamStrength ?? 0;
+    if (slipstream > 0 && this.rivalFleet?.slipstreamLocked) this.audio.playSlipstreamLock();
     this.slipstream = slipstream;
     const speedBeforeStep = this.speed;
     this.speed = integrateSpeed(
@@ -1050,7 +1050,7 @@ export class FuturismaGame {
       delta, this.playerRaceDistance(), this.progress * this.course.length,
       this.lap, this.contactPose, this.diagnosticsMode,
     );
-    if ((!this.circuitRuntime?.ceiling && this.contact.stepCushion(
+    if ((!this.circuitRuntime?.ceiling && !afterMove.alternateRoad && this.contact.stepCushion(
       this.rivalFleet, this.contactPose, this.playerRaceDistance(),
       delta, this.elapsedMs, afterMove, this.position,
       this.course.apronAt(afterMove, this.lateral, this.afterMoveApron).lateralLimit,
@@ -1060,7 +1060,7 @@ export class FuturismaGame {
       this.position.y = afterMove.position.y;
     }
     this.speed = this.contactPose.speedMetersPerSecond;
-    const reward = this.circuitRuntime?.ceiling ? 0 : this.contact.scorePasses(
+    const reward = this.circuitRuntime?.ceiling || afterMove.alternateRoad ? 0 : this.contact.scorePasses(
       this.rivalFleet, this.course, previousProgress, this.progress,
       this.contactPose, this.lap, this.hazardTripCooldown <= 0, this.diagnosticsMode,
     );
@@ -1215,7 +1215,7 @@ export class FuturismaGame {
 
     this.elapsedMs += delta * 1000;
     // G2 - sampled where the lateral has been through cushion AND apron clamp.
-    this.rivalFleet?.measurePlayerSeparation(this.playerRaceDistance(), this.lateral);
+    this.rivalFleet?.measurePlayerSeparation(this.playerRaceDistance(), rivalLateralFor(this.course, this.position, this.progress, this.lateral));
     ghostRuntime.step(this.lap, this.progress, this.lateral, this.speed, this.steerAmount);
     this.updateCheckpointProgress(previousProgress, afterMove.tangent);
   }

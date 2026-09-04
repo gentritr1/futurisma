@@ -25,9 +25,11 @@ export interface AmbienceCue {
   distanceMeters: number;
   lapLengthMeters: number;
   submerged: boolean;
+  tideLap: number;
+  draining: boolean;
 }
 
-const cue: AmbienceCue = { map: null, distanceMeters: 0, lapLengthMeters: 1, submerged: false };
+const cue: AmbienceCue = { map: null, distanceMeters: 0, lapLengthMeters: 1, submerged: false, tideLap: 1, draining: false };
 
 const eventLevels: AmbienceEventLevels = { windGust: 0, squall: 0, saltDrop: 0 };
 
@@ -56,6 +58,7 @@ export function publishAmbienceCue(
     length: number;
     audioZoneAt(progress: number): AudioZone;
     travelModeAt?(progress: number): string;
+    tide?: {lap: number; draining: boolean};
   },
   progress: number,
 ): AudioZone {
@@ -66,6 +69,7 @@ export function publishAmbienceCue(
   cue.lapLengthMeters = course.length > 0 ? course.length : 1;
   const wrapped = Number.isFinite(progress) ? ((progress % 1) + 1) % 1 : 0;
   cue.distanceMeters = wrapped * cue.lapLengthMeters;
+  cue.tideLap = course.tide?.lap ?? 1; cue.draining = course.tide?.draining ?? false;
   cue.submerged = course.travelModeAt?.(wrapped) === "submerged";
   return course.audioZoneAt(progress);
 }

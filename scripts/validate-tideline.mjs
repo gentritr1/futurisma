@@ -14,6 +14,7 @@ const route = JSON.parse(routeText);
 const paceText = await readFile(new URL("../src/game/data/tideline/rival-pace.json", import.meta.url), "utf8");
 const source = await readFile(courseUrl, "utf8");
 const code = (await transformWithOxc(source, courseUrl.pathname)).code
+  .replace('from "./tideline-tide.js"', `from ${JSON.stringify(new URL("../src/game/tideline-tide.js", import.meta.url).href)}`)
   .replace('from "./tideline-rules.js"', `from ${JSON.stringify(new URL("../src/game/tideline-rules.js", import.meta.url).href)}`)
   .replace('from "three"', `from ${JSON.stringify(import.meta.resolve("three"))}`)
   .replace('import route from "./data/tideline/route.json";', `const route = ${routeText};`)
@@ -37,7 +38,7 @@ assert.equal(styleSelector(undefined), false);
 for (const [search, expected] of [["?map=tideline", false], ["?map=tideline&edition=foundry", true], ["?edition=Foundry", false], ["?edition=unknown", false]]) {
   assert.equal(styleSelector({ search }), expected);
 }
-assert.notEqual(foundry.mapName, course.mapName, "The visual edition must identify itself without becoming a new course.");
+assert.equal(foundry.mapName, course.mapName, "Legacy edition links resolve to the rebuilt Tideline.");
 for (const key of ["kind", "length", "halfWidth", "checkpointCount", "orderedCheckpointCount", "defaultLapCount", "minimumLapCount",
   "maximumLapCount", "mapCode", "finishName", "startLabel", "startProgress", "startLateral", "recoveryHoldSeconds", "recoverySpeedMps",
   "recoveryImmunitySeconds", "surfaceGripRecoverySeconds", "flightArcs", "rivalPace"]) {
@@ -48,11 +49,11 @@ const close = (actual, expected, tolerance, label) => assert.ok(
   Math.abs(actual - expected) <= tolerance, `${label}: ${actual} versus ${expected}.`,
 );
 assert.equal(route.stations.length, route.count);
-assert.ok(route.length >= 2300 && route.length <= 2800);
+assert.ok(route.length >= 2000 && route.length <= 2200);
 assert.equal(course.orderedCheckpointCount, 8);
 assert.equal(course.checkpointCount, 7);
 assert.equal(course.defaultLapCount, 3);
-assert.equal(course.flightArcs.length, 2);
+assert.equal(course.flightArcs.length, 0);
 assert.equal(course.kind, "tideline");
 assert.equal(course.mapCode, "MAP 05");
 const sample = course.createSampleScratch();
@@ -123,9 +124,9 @@ for (let index = 0; index < route.count; index++) {
 }
 close(physicalLength, route.length, 1, "Physical route length");
 assert.ok(maximumPitch * 180 / Math.PI < 10.5);
-assert.ok(submergedSegments > route.count * .29 && airSegments > route.count * .29);
-assert.ok(Math.min(...route.stations.map(s => s.p[1])) <= -24);
-assert.ok(Math.max(...route.stations.map(s => s.p[1])) > 44);
+assert.ok(submergedSegments > route.count * .45 && airSegments === 0);
+assert.ok(Math.min(...route.stations.map(s => s.p[1])) <= -18);
+assert.ok(Math.max(...route.stations.map(s => s.p[1])) > 4);
 for (const progress of [.001, .15, .29, .49, .69, .81, .999]) {
   const sample = course.sample(progress);
   course.project(sample.position, (progress + .4) % 1, projection);
@@ -140,9 +141,9 @@ for (const attribute of ["position", "normal"]) {
   assert.deepEqual(foundryRoad.geometry.attributes[attribute].array, road.geometry.attributes[attribute].array,
     `Road ${attribute} data is identical between editions.`);
 }
-assert.equal(road.material.uniforms.foundry.value, 0);
+assert.equal(road.material.uniforms.foundry.value, 1);
 assert.equal(foundryRoad.material.uniforms.foundry.value, 1);
-assert.notDeepEqual(foundry.fogAt(.1), course.fogAt(.1), "The edition must actually exercise distinct visual state.");
+assert.deepEqual(foundry.fogAt(.1), course.fogAt(.1));
 assert.equal(road.geometry.index.count, solidSegments * 6);
 for (let i = 0; i < road.geometry.index.count; i += 6) {
   const segment = road.geometry.index.getX(i) / 2;
@@ -225,4 +226,4 @@ for (const tier of ["rookie", "works", "feral"]) {
 assert.ok(times[0] > times[1] + 1 && times[1] > times[2] + 1);
 disposeObject3DResources(course.group);
 disposeObject3DResources(foundry.group);
-console.log(`Tideline course PASS: ${route.length.toFixed(1)} m, 8 ordered gates, 2 real road gaps; max pitch ${(maximumPitch * 180 / Math.PI).toFixed(2)} degrees, no roll; ${route.count * 9} height-independent projections, worst error ${maximumProjectionError.toFixed(3)} m; all pace tiers deterministic at 60/120/240 Hz; original/Foundry geometry, projection, gates, recovery, physics inputs and rival results exactly identical.`);
+console.log(`Tideline course PASS: ${route.length.toFixed(1)} m, 8 ordered gates, continuous road and a real pump-hall branch; max pitch ${(maximumPitch * 180 / Math.PI).toFixed(2)} degrees, no roll; ${route.count * 9} height-independent projections, worst error ${maximumProjectionError.toFixed(3)} m; all pace tiers deterministic at 60/120/240 Hz; original/Foundry geometry, projection, gates, recovery, physics inputs and rival results exactly identical.`);

@@ -179,7 +179,10 @@ export class DemoAutopilot {
   /** Seconds the tow has been locked for, integrated by `setDraft`. */
   private draftLockedSeconds = 0;
 
+  private readonly drivingLine: ReturnType<RaceCourse["createSampleScratch"]>;
+
   constructor(private readonly course: RaceCourse) {
+    this.drivingLine = course.createSampleScratch();
     this.projection = course.createProjectionScratch();
     this.lookAheadSample = course.createSampleScratch();
   }
@@ -248,7 +251,7 @@ export class DemoAutopilot {
     );
     const lookAheadDistance = THREE.MathUtils.lerp(32, 52, speedRatio)
       - (turnCue?.hard ? 4 : 0);
-    const lookAhead = this.course.sample(
+    const lookAhead = (this.course.demoSample ?? this.course.sample).call(this.course,
       progress + lookAheadDistance / this.course.length,
       this.lookAheadSample,
     );
@@ -266,13 +269,17 @@ export class DemoAutopilot {
       : Number.POSITIVE_INFINITY;
     const holdingGridLane = raceDistanceMeters < GRID_LANE_HOLD_METERS;
     const laneTargetMeters = holdingGridLane ? this.course.startLateral : 0;
+    const drivingLine = this.course.demoSample?.(progress, this.drivingLine) ?? projection;
+    const lineLateral = drivingLine.alternateRoad
+      ? this.scratchA.copy(position).sub(drivingLine.position).dot(drivingLine.right)
+      : projection.lateral;
     const lateralCorrection = THREE.MathUtils.clamp(
-      (projection.lateral - laneTargetMeters) / Math.max(1, projection.halfWidth),
+      (lineLateral - laneTargetMeters) / Math.max(1, drivingLine.halfWidth),
       -1,
       1,
     );
     const lateralSlip = THREE.MathUtils.clamp(
-      travelDirection.dot(projection.right),
+      travelDirection.dot(drivingLine.right),
       -1,
       1,
     );

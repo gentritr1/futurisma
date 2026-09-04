@@ -398,7 +398,7 @@ export class SceneAssets {
     try {
       if (this.course.kind === "nightshift" || this.course.kind === "polarity" || this.course.kind === "tideline") {
         const environment = this.course.kind === "tideline"
-          ? await (await import("./tideline-environment")).TidelineEnvironment.load()
+          ? await (await import("./tideline-environment")).TidelineEnvironment.load(this.course as import("./tideline-course").TidelineCourse)
           : this.course.kind === "polarity"
           ? await (await import("./polarity-environment")).PolarityEnvironment.load()
           : await (await import("./nightshift-environment")).NightshiftEnvironment.load();

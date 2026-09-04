@@ -1,0 +1,84 @@
+{
+  "tool": "native imagegen",
+  "reference": "tidal-pump-hero.png",
+  "atlases": [
+    {
+      "role": "concrete",
+      "prompt": "Use case: stylized-concept. Asset type: a production colour texture atlas for Blender UV mapping in an early-2000s console racer. The attached gantry hero is a STYLE AND MATERIAL reference only. Generate a SQUARE 1024x1024 flat texture sheet, not a scene and not a rendered object. Orthographic surface details, painted diffuse colour with baked crevice shading, restrained broad brush detail readable at 256px; no perspective, no surrounding background, no normal maps, no photoreal PBR, no bloom, no labels outside the texture. Four equal square quadrants with no gutters or drawn grid. Each quadrant fills exactly one quarter of the image; opaque throughout. Match warm aged concrete, oxidized muted olive steel, swamp green and restrained sodium amber. CONCRETE role only. Top left: sun-bleached beige-grey concrete wall, hairline fractures, broad damp-dark bottom quarter and organic moss at the bottom. Top right: same wall with a broad recessed welded patch impression and flowing rust runoff below fasteners. Bottom left: damaged concrete with chipped corners, exposed aggregate, richer green moss creeping up from bottom. Bottom right: worn road concrete slab, faded cream lane stripe vertically through center, algae streaks along outer edges. All wear is hand-painted, detailed and believable. No actual steel parts and no legible words.",
+      "source": "/Users/gentlegen/.codex/generated_images/01a06de0-a82b-74d3-9aae-cf6dcac416a7/exec-0787ff9e-6921-408c-b789-64e74b2e35f4.png",
+      "paintedSource": "art/textures/tideline-foundry/concrete.png",
+      "delivery": "public/assets/tideline-foundry/textures/concrete.jpg",
+      "size": [
+        1024,
+        1024
+      ],
+      "encoding": "JPEG quality 88; lossless PNG retained as source",
+      "sha256": "7dd94c8d4e11d6d7d64f92e4345bc070a5560f7a32f4a256df12a99d93521349"
+    },
+    {
+      "role": "metal",
+      "prompt": "Use case: stylized-concept. Asset type: a production colour texture atlas for Blender UV mapping in an early-2000s console racer. The attached gantry hero is a STYLE AND MATERIAL reference only. Generate a SQUARE 1024x1024 flat texture sheet, not a scene and not a rendered object. Orthographic surface details, painted diffuse colour with baked crevice shading, restrained broad brush detail readable at 256px; no perspective, no surrounding background, no normal maps, no photoreal PBR, no bloom, no labels outside the texture. Four equal square quadrants with no gutters or drawn grid. Each quadrant fills exactly one quarter of the image; opaque throughout. Match warm aged concrete, oxidized muted olive steel, swamp green and restrained sodium amber. METAL role only. Top left: riveted olive steel column panel, rows of bolts along sides, long dark orange rust streaks, scraped sun-bleached paint, deep grime at bottom. Top right: same steel with welded rectangular dark grey repair plate bordered by orange heat scars and bolts. Bottom left: damaged flaking oxidized steel, peeled olive paint, corroded seam and dark scratches. Bottom right: long narrow horizontal structural beam strips, worn edges, rivets, vented grill, layered metal weld seams. Strong enough local contrast that truss edges and plates read at speed. No text.",
+      "source": "/Users/gentlegen/.codex/generated_images/01a06de0-a82b-74d3-9aae-cf6dcac416a7/exec-af7ee301-4760-43d7-95fb-67c76480d813.png",
+      "paintedSource": "art/textures/tideline-foundry/metal.png",
+      "delivery": "public/assets/tideline-foundry/textures/metal.jpg",
+      "size": [
+        1024,
+        1024
+      ],
+      "encoding": "JPEG quality 88; lossless PNG retained as source",
+      "sha256": "e3faa817dca05e4778c804a0fd64a48b77003e4046075181b1b0efd5379ae04a"
+    },
+    {
+      "role": "jungle",
+      "prompt": "Use case: stylized-concept. Asset type: a production colour texture atlas for Blender UV mapping in an early-2000s console racer. The attached gantry hero is a STYLE AND MATERIAL reference only. Generate a SQUARE 1024x1024 flat texture sheet, not a scene and not a rendered object. Orthographic surface details, painted diffuse colour with baked crevice shading, restrained broad brush detail readable at 256px; no perspective, no surrounding background, no normal maps, no photoreal PBR, no bloom, no labels outside the texture. Four equal square quadrants with no gutters or drawn grid. Each quadrant fills exactly one quarter of the image; opaque throughout. Match warm aged concrete, oxidized muted olive steel, swamp green and restrained sodium amber. JUNGLE role only, opaque painted vegetation surface to map on moss drapes and simple kelp geometry. Top left: dark wet moss with irregular olive leaf clusters and deep crevices. Top right: sagging wet ivy and moss strands, readable long strands with shadowed separations. Bottom left: damaged brown-green wilted algae mat with torn leaves and dry brown tips. Bottom right: ribbon-like underwater kelp blades in restrained dark swamp green. No text, no background or transparency.",
+      "source": "/Users/gentlegen/.codex/generated_images/01a06de0-a82b-74d3-9aae-cf6dcac416a7/exec-c987e7c1-89c5-4546-abba-1c659c8b9150.png",
+      "paintedSource": "art/textures/tideline-foundry/jungle.png",
+      "delivery": "public/assets/tideline-foundry/textures/jungle.jpg",
+      "size": [
+        1024,
+        1024
+      ],
+      "encoding": "JPEG quality 88; lossless PNG retained as source",
+      "sha256": "507176f5ed8678480bd80a5981498655fc6062933ea1dbb8a5c376a59bc8a0e9"
+    },
+    {
+      "role": "water",
+      "prompt": "Use case: stylized-concept. Asset type: a production colour texture atlas for Blender UV mapping in an early-2000s console racer. The attached gantry hero is a STYLE AND MATERIAL reference only. Generate a SQUARE 1024x1024 flat texture sheet, not a scene and not a rendered object. Orthographic surface details, painted diffuse colour with baked crevice shading, restrained broad brush detail readable at 256px; no perspective, no surrounding background, no normal maps, no photoreal PBR, no bloom, no labels outside the texture. Four equal square quadrants with no gutters or drawn grid. Each quadrant fills exactly one quarter of the image; opaque throughout. Match warm aged concrete, oxidized muted olive steel, swamp green and restrained sodium amber. WATER role only, hand-painted tileable water surface colour atlas. Four matching variations of dark translucent-feeling swamp green water, graphic soft elongated ripples and irregular sediment swirls with cream-grey foam flecks and restrained amber reflected lamp streaks. Top left and right quiet small ripples, bottom left darker flowing drain eddies, bottom right shallow silty water with algae threads. No white glossy reflections, no photoreal look, no land, no literal objects, no text. Low contrast broad motion with enough ripples to identify water.",
+      "source": "/Users/gentlegen/.codex/generated_images/01a06de0-a82b-74d3-9aae-cf6dcac416a7/exec-6e60386a-1aea-4762-a2df-a3c257b2b0eb.png",
+      "paintedSource": "art/textures/tideline-foundry/water.png",
+      "delivery": "public/assets/tideline-foundry/textures/water.jpg",
+      "size": [
+        1024,
+        1024
+      ],
+      "encoding": "JPEG quality 88; lossless PNG retained as source",
+      "sha256": "4bcb9dc524e29fce50b344138eed827032b29e91565ddf9a5e31a385e0abf502"
+    },
+    {
+      "role": "signage",
+      "prompt": "Use case: stylized-concept. Asset type: a production colour texture atlas for Blender UV mapping in an early-2000s console racer. The attached gantry hero is a STYLE AND MATERIAL reference only. Generate a SQUARE 1024x1024 flat texture sheet, not a scene and not a rendered object. Orthographic surface details, painted diffuse colour with baked crevice shading, restrained broad brush detail readable at 256px; no perspective, no surrounding background, no normal maps, no photoreal PBR, no bloom, no labels outside the texture. Four equal square quadrants with no gutters or drawn grid. Each quadrant fills exactly one quarter of the image; opaque throughout. Match warm aged concrete, oxidized muted olive steel, swamp green and restrained sodium amber. SIGNAGE role only. Four equal square face textures of weathered utilitarian industrial identity plates, all facing straight at viewer with no perspective. Top left exact stencilled text 'P-07' large in center and 'PELAGIC' small underneath; dark charcoal olive plate with cream-yellow worn paint, bolts, rust runoff. Top right exact 'P-08' and 'PUMP HALL'; same battered plate. Bottom left exact 'P-09' and 'LOCK WORKS'; damaged plate, peeling paint. Bottom right a worn yellow and charcoal diagonal hazard stripe plate, no lettering. No instructions, no tutorials. Local patina, edge wear, bolt shading and painted crevice AO like the reference.",
+      "source": "/Users/gentlegen/.codex/generated_images/01a06de0-a82b-74d3-9aae-cf6dcac416a7/exec-76226b88-3ae5-4126-abdb-d777b9ba1280.png",
+      "paintedSource": "art/textures/tideline-foundry/signage.png",
+      "delivery": "public/assets/tideline-foundry/textures/signage.jpg",
+      "size": [
+        1024,
+        1024
+      ],
+      "encoding": "JPEG quality 88; lossless PNG retained as source",
+      "sha256": "6e05a835af9694ed48b4396d0f1d8d2dcc40996af85718c17c3d864eb236d413"
+    },
+    {
+      "role": "emissive",
+      "prompt": "Use case: stylized-concept. Asset type: a production colour texture atlas for Blender UV mapping in an early-2000s console racer. The attached gantry hero is a STYLE AND MATERIAL reference only. Generate a SQUARE 1024x1024 flat texture sheet, not a scene and not a rendered object. Orthographic surface details, painted diffuse colour with baked crevice shading, restrained broad brush detail readable at 256px; no perspective, no surrounding background, no normal maps, no photoreal PBR, no bloom, no labels outside the texture. Four equal square quadrants with no gutters or drawn grid. Each quadrant fills exactly one quarter of the image; opaque throughout. Match warm aged concrete, oxidized muted olive steel, swamp green and restrained sodium amber. EMISSIVE role only, colour texture for old caged sodium lamp lenses. Four equal quadrants: top left aged golden amber ribbed frosted glass with dark soot around perimeter; top right warmer amber honey glass, subtle long vertical grime strips; bottom left a dead unlit dark grey green cracked lamp lens; bottom right small amber indicator lens surrounded by charcoal metal. These are flat surface textures with no modeled cage, no surrounding object, no bloom or halo. Amber is the only emitting colour, warm restrained painted glow. No words.",
+      "source": "/Users/gentlegen/.codex/generated_images/01a06de0-a82b-74d3-9aae-cf6dcac416a7/exec-09c796fe-6900-4d6f-987b-a300e45aab5f.png",
+      "paintedSource": "art/textures/tideline-foundry/emissive.png",
+      "delivery": "public/assets/tideline-foundry/textures/emissive.jpg",
+      "size": [
+        1024,
+        1024
+      ],
+      "encoding": "JPEG quality 88; lossless PNG retained as source",
+      "sha256": "2ee97f2715e5b7fee09f4de99debcbf9933825bd6afa3566d0c3164a8a0fbbfd"
+    }
+  ]
+}
