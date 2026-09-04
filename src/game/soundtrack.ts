@@ -55,10 +55,13 @@ export type SoundtrackState = "idle" | "playing" | "paused" | "ended";
  * the non-music mix (engine, wind, ambience beds) at cruise: level enough to be
  * the thing you are driving to, quiet enough that the engine still tells you
  * what the craft is doing. Measured on the Greenwater demo lap at MUSIC LEVEL
- * 100 through the `busMeters` readouts below; see the M1 report for the five
- * stations and the median.
+ * 100 through the `busMeters` readouts below. 0.34 measured a median of +1.7 dB
+ * against a synthetic -14 LUFS click-and-sine, but -0.1 dB (five stations,
+ * -9.0 to +0.5) against a real 1994-98 jungle mix at the same loudness, whose
+ * energy is spread wider in time; 0.4 (+1.4 dB) puts the real material inside
+ * the window, and the MUSIC LEVEL slider only goes down from here.
  */
-export const TRACK_GAIN = 0.34;
+export const TRACK_GAIN = 0.4;
 
 interface SoundtrackTrack {
   file: string;

@@ -115,6 +115,15 @@ assert.ok(
 //     code itself is the cost.
 //
 // Measured on the merged tree with `npx vite build && node
+//   M1 local soundtrack  +2.1 KiB - src/game/soundtrack.ts (the media-element
+//     player on the music bus, the title chip latch) and soundtrack-plan.js
+//     (the `?music=` parse, start-offset window, shuffle), plus the two bus
+//     meters and the stem hold in audio.ts and their diagnostics fields.
+//     Measured 251.6 KiB on the agent's branch and 252.5 KiB on the SAME commit
+//     fast-forwarded onto main (2026-09-04): 0.9 KiB of Rollup resplit noise on
+//     an unchanged tree. Ceilings 252/262 -> 254/264 so the next merge fails
+//     on spend, not on chunk boundaries. Measured shell 261.9 -> 262.7 KiB.
+//
 // scripts/validate-build.mjs`: 240.7 KiB gzip over 10 initial chunks, against
 // the 224.2 KiB all four P20 phases started from. The individual figures above
 // were each taken on their own branch and do not sum exactly to it - Rollup
@@ -237,8 +246,8 @@ assert.ok(
 //     working room H2a's note argues main needs and that neither branch's own
 //     number would have left.
 assert.ok(
-  javascriptGzip <= 252 * 1024,
-  `JavaScript bundle exceeds 252 KiB gzip (${(javascriptGzip / 1024).toFixed(1)} KiB).`,
+  javascriptGzip <= 254 * 1024,
+  `JavaScript bundle exceeds 254 KiB gzip (${(javascriptGzip / 1024).toFixed(1)} KiB).`,
 );
 // Re-baselined 2026-08-28 from a measured 4.35 KiB gzip (the 4 KiB ceiling
 // predated the HUD turn-cue and hazard styling) plus headroom for the planned
@@ -290,8 +299,8 @@ assert.ok(
 // the working margin H2a's note above argues main needs and is why neither
 // number moves again here.
 assert.ok(
-  shellGzip <= 262 * 1024,
-  `Initial app shell exceeds 262 KiB gzip (${(shellGzip / 1024).toFixed(1)} KiB).`,
+  shellGzip <= 264 * 1024,
+  `Initial app shell exceeds 264 KiB gzip (${(shellGzip / 1024).toFixed(1)} KiB).`,
 );
 
 // ---------------------------------------------------------------------------
