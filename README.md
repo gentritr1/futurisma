@@ -70,7 +70,7 @@ Everything you set is remembered locally: livery, circuit, format, field, best l
 - **Sky.** A dome decoupled from the fog, with authored horizon and zenith per sector and a slow cirrus band.
 - **Ground.** Bitterpan's pan carries wind streaks and brine flats that converge to the horizon; Greenwater's decks carry runway paint and wear.
 - **Air.** Dust, heat, scud and haze cards near the road; mesas, rigs, treelines and pylons at the horizon; birds over Greenwater.
-- **Sound.** Almost everything is synthesised at start: a 174 BPM F-minor score cut by the route, per-sector ambience beds, wind that swells with the gusts, and rivals you can place by ear. The one exception is the pit radio — seventeen recorded lines in one voice that call the gates, the weather and the order, on their own ducked bus. Switch it off in the terminal or with `?voice=0`; nothing it says is anything the HUD is not already showing.
+- **Sound.** Almost everything is synthesised at start: per-sector ambience beds, wind that swells with the gusts, and rivals you can place by ear. The score is a 174 BPM F-minor set of four stems cut by the route, and it is the fallback — drop your own mixes into `public/assets/audio/music/` with the import script below and the game plays those instead, through the same MUSIC LEVEL bus. Your files are never committed. The one recorded thing that ships is the pit radio — seventeen lines in one voice that call the gates, the weather and the order, on their own ducked bus. Switch it off in the terminal or with `?voice=0`; nothing it says is anything the HUD is not already showing.
 
 ## URL switches
 
@@ -88,9 +88,23 @@ Useful while playing or testing. Combine with `&`.
 | `?motion=reduce` | The reduced-motion path |
 | `?render=ps2` | Era-accurate raster look, no shadows |
 | `?voice=0` | Silences the pit radio and never downloads it |
+| `?music=synth` | Forces the synthesised score even when you have tracks |
+| `?music=0` | Silences the music entirely, stems and tracks |
 | `?events=0` `cushion=0` `shadows=0` `living=0` | Kill switches for track events, the air cushion, shadow maps, the card layer |
 
 QA probes (`?diagnostics=1&probe=recovery` and friends) are listed in [docs/PROVENANCE.md](docs/PROVENANCE.md).
+
+### Your own soundtrack
+
+Long DJ mixes work better here than short tracks, and a mix over five minutes starts at a random point each launch.
+
+```sh
+node scripts/music-import.mjs <youtube-url-or-audio-file> --title "Kool FM 1994"
+node scripts/music-import.mjs --list
+node scripts/music-import.mjs --remove kool-fm-1994
+```
+
+Files land in `public/assets/audio/music/`, normalised to -14 LUFS, and are gitignored; `npm run test:code` fails if one is ever staged.
 
 ## Verify
 

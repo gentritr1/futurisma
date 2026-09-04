@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
 import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -20,11 +21,31 @@ for (const directive of [
   "base-uri 'none'",
   "form-action 'none'",
   "frame-src 'none'",
-  "media-src 'none'",
+  // M1 - `media-src` moved from `'none'` to `'self'` and is pinned at `'self'`
+  // here, with the exact-string assertion below closing the obvious way to
+  // widen it by accident.
+  //
+  // WHY IT HAD TO MOVE. The local soundtrack streams a 60-120 minute mix
+  // through an `HTMLAudioElement` (`src/game/soundtrack.ts` explains why a
+  // `decodeAudioData` of that would be gigabytes of heap). A `fetch()` is
+  // governed by `connect-src`, which is why the pit radio needed no CSP change
+  // at all; a media element is governed by `media-src`, which is why this one
+  // did.
+  //
+  // WHY `'self'` IS STILL THE WHOLE STORY. The element is only ever pointed at
+  // a path from a manifest served by this origin, and `normalizeManifest` in
+  // `soundtrack-plan.js` rejects any file field containing a path separator, so
+  // there is no code path that names another host. `'self'` means a compromised
+  // manifest still cannot exfiltrate by pointing the element off-origin.
+  "media-src 'self'",
   "worker-src 'none'",
 ]) {
   assert.ok(csp.includes(directive), `CSP is missing: ${directive}.`);
 }
+assert.ok(
+  !/media-src [^;]*\*/.test(csp),
+  "CSP must not widen media-src past 'self'; the soundtrack is same-origin only.",
+);
 assert.ok(!csp.includes("'unsafe-inline'"), "CSP must not allow inline code or styles.");
 assert.ok(!csp.includes("'unsafe-eval'"), "CSP must not allow evaluated code.");
 assert.ok(!csp.includes("ws://"), "CSP must not grant cleartext WebSocket exceptions.");
@@ -35,6 +56,11 @@ for (const policy of [
   "Cross-Origin-Opener-Policy: same-origin",
   "Cross-Origin-Resource-Policy: same-origin",
   "Permissions-Policy:",
+  // M1 - the production headers carry the same `media-src` move as the meta
+  // policy above. They are the ones that actually apply on a deployed build, so
+  // a policy that only moved in `index.html` would ship a soundtrack that works
+  // in the dev server and is blocked in production.
+  "media-src 'self'",
   "Referrer-Policy: no-referrer",
   "Strict-Transport-Security: max-age=31536000",
   "X-Content-Type-Options: nosniff",
@@ -45,6 +71,44 @@ for (const policy of [
     `Production headers are missing: ${policy}.`,
   );
 }
+
+// ---------------------------------------------------------------------------
+// M1 - the other half of the `media-src 'self'` move, and the half that is not
+// about the browser at all.
+//
+// Loosening a CSP directive buys a capability, and the capability bought here
+// is "this origin may serve audio to a media element". The risk that comes with
+// it is not an injection - it is a COMMIT. The directory the soundtrack plays
+// from now holds 60-120 minute DJ sets somebody else recorded, this repository
+// is public, and one `git add -A` at the wrong moment publishes them.
+//
+// So the posture is asserted at both ends. The ignore rule is checked because
+// it is what makes the mistake unlikely; `git ls-files` is checked because it
+// is the only thing that makes it detectable. They are genuinely different
+// questions: `.gitignore` has no effect on a file that was already tracked when
+// the rule landed, or on one added with `git add -f`, and it is exactly those
+// two cases that would put the files in history without anyone noticing.
+// ---------------------------------------------------------------------------
+const MUSIC_DIRECTORY = "public/assets/audio/music";
+const MUSIC_AUDIO = /\.(?:mp3|m4a|ogg|wav)$/i;
+const gitignore = await readFile(new URL(".gitignore", root), "utf8");
+assert.ok(
+  gitignore.includes(`${MUSIC_DIRECTORY}/*`),
+  `.gitignore must contain "${MUSIC_DIRECTORY}/*". The local soundtrack is not `
+    + "shipped content and must never be committed.",
+);
+const trackedMusic = execFileSync("git", ["ls-files", "--", MUSIC_DIRECTORY], {
+  cwd: fileURLToPath(root),
+  encoding: "utf8",
+}).split("\n").map((line) => line.trim()).filter((line) => line.length > 0);
+const trackedAudio = trackedMusic.filter((file) => MUSIC_AUDIO.test(file));
+assert.deepEqual(
+  trackedAudio,
+  [],
+  `git is tracking ${trackedAudio.join(", ")}. Audio under ${MUSIC_DIRECTORY} is `
+    + "the player's own imported mixes; run `git rm --cached` on them before "
+    + "this reaches a public remote.",
+);
 
 const exactVersion = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/;
 for (const [name, version] of Object.entries({
@@ -223,6 +287,10 @@ for (const [label, relativePath, fixture] of [
   );
 }
 
+console.log(
+  `Local soundtrack: media-src 'self', ${trackedMusic.length} file(s) tracked under `
+    + `${MUSIC_DIRECTORY} and none of them audio.`,
+);
 console.log(
   `Security PASS: strict CSP/headers, pinned packages, no unsafe DOM/code/network `
     + `sinks; browser storage confined to ${STORAGE_OWNER} under the `

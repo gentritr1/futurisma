@@ -733,6 +733,51 @@ body[data-graphics-context="lost"] .system-state__lamp {
   transition: none;
 }
 
+/*
+ * M1 soundtrack title chip - the fourth colour on the event-chip family, and
+ * the only one that is not a warning.
+ *
+ * GUST is amber because you are about to be pushed, SALT is hazard orange
+ * because grip is going away, SQUALL is cyan because it is rain. All three cost
+ * the driver something. A track title costs nothing and demands nothing: it is
+ * the HUD saying what is playing, for four seconds, and then getting out of the
+ * way. So it takes neutral white at 70% - no hue at all, which is the only
+ * honest way to say "this is not one of the three".
+ *
+ * SMALLER THAN THE CHIP IT SITS ABOVE, deliberately. 0.54rem against the
+ * family's 0.62rem and no scrim, because a mix title can be forty characters of
+ * DJ set name and the anti-reference is chrome competing with the racing line.
+ * The three warning chips earn their scrim by being unmissable on any terrain;
+ * this one does not need to be read at 200 km/h, so it is allowed to be quiet.
+ * Legibility is carried by the same dark halo the family already uses.
+ *
+ * PLACEMENT. 90 px above the boost meter's own offset puts it clear of the
+ * track-event chip below it (42 px offset plus its 14 px padding either side of
+ * a 15 px line = a box ending at ~85 px), so the two can be lit together
+ * without touching. The selector is `.slipstream.soundtrack` rather than a bare
+ * `.soundtrack` on purpose: the narrow-viewport block at the bottom of this file
+ * re-bases `.slipstream` at (0,1,0), and a bare class would lose to it and drop
+ * this chip on top of the SLIPSTREAM one at small widths.
+ */
+.slipstream.soundtrack {
+  bottom: calc(clamp(22px, 4vh, 44px) + 90px);
+  font-size: 0.54rem;
+  letter-spacing: 0.1em;
+}
+
+.slipstream.soundtrack[data-active="true"] {
+  opacity: 1;
+  color: oklch(0.97 0 0 / 0.7);
+  text-shadow:
+    0 0 2px oklch(0.09 0.012 205 / 0.95),
+    0 0 5px oklch(0.09 0.012 205 / 0.85),
+    0 0 11px oklch(0.09 0.012 205 / 0.7);
+}
+
+.slipstream.soundtrack[data-reduced-motion="true"] {
+  transition: none;
+}
+
 .slipstream__track {
   display: block;
   height: 2px;

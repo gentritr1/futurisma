@@ -26,6 +26,9 @@ import {
 } from "./audio-space.js";
 import type { AudioZone } from "./audio-space.js";
 import { ambienceCue, ambienceEventLevels } from "./ambience-cue.js";
+import { meterDecibels } from "./soundtrack-plan.js";
+import { SoundtrackPlayer } from "./soundtrack";
+import type { SoundtrackDiagnostics } from "./soundtrack";
 import {
   dopplerRatio,
   inverseDistanceGain,
@@ -92,6 +95,22 @@ function clampVolume(volume: number, fallback: number): number {
   return volume < 0 ? 0 : volume > 1 ? 1 : volume;
 }
 
+/**
+ * The mean square of one analyser window, into a reused scratch array.
+ *
+ * `getFloatTimeDomainData` copies the most recent `fftSize` samples out of a
+ * ring the audio thread keeps anyway, so this allocates nothing and touches no
+ * AudioParam. The scratch array is owned by the caller for the same reason.
+ */
+function meanSquare(analyser: AnalyserNode, scratch: Float32Array<ArrayBuffer>): number {
+  analyser.getFloatTimeDomainData(scratch);
+  let total = 0;
+  for (let index = 0; index < scratch.length; index += 1) {
+    total += scratch[index] * scratch[index];
+  }
+  return total / scratch.length;
+}
+
 const BEAT_SECONDS = 60 / MUSIC_BPM;
 const BAR_SECONDS = BEAT_SECONDS * 4;
 const CONTROL_INTERVAL_SECONDS = 1 / 30;
@@ -103,6 +122,18 @@ const SPATIAL_LEAD_SECONDS = spatialLeadSeconds(
   CONTROL_INTERVAL_SECONDS,
 );
 const STEM_NAMES: StemName[] = ["trance", "jungle", "deep_dnb", "techstep"];
+/**
+ * M1 — the bus meters, and why they cost the frame loop nothing.
+ *
+ * An AnalyserNode's `getFloatTimeDomainData` is a copy out of a ring the audio
+ * thread already maintains, so the only cost is the copy and the sum. Both
+ * happen on the EXISTING 30 Hz control tick, never per frame: 2 048 samples is
+ * 42.7 ms at 48 kHz, which is longer than a 33.3 ms tick, so 30 consecutive
+ * ticks cover the last second with no gap and the readout is a genuine ~1 s
+ * RMS rather than a spot reading with a smoothing name.
+ */
+const METER_FFT_SIZE = 2_048;
+const METER_WINDOW_TICKS = 30;
 const STEM_GAIN: Record<StemName, number> = {
   trance: 0.075,
   jungle: 0.085,
@@ -303,6 +334,32 @@ export class EngineAudio {
    */
   private radio: PitRadio | null = null;
   private ambienceBus: GainNode | null = null;
+  /**
+   * M1 — the local soundtrack, and the bus that lets it be measured.
+   *
+   * `otherBus` is a unity gain carrying EVERYTHING THAT IS NOT MUSIC — the
+   * engine bed and its wind, the reverb return, the rival field, the ambience
+   * beds and the pit radio — into the master. Like `ambienceBus` before it, at
+   * unity it changes no level and a pre-M1 build and this one have identical
+   * signal paths; it exists so that "the music against the rest of the mix"
+   * is a thing an AnalyserNode can be pointed at rather than a thing a reviewer
+   * has to take on trust. `TRACK_GAIN` was chosen off exactly these two meters.
+   */
+  private soundtrack: SoundtrackPlayer | null = null;
+  private otherBus: GainNode | null = null;
+  private musicAnalyser: AnalyserNode | null = null;
+  private otherAnalyser: AnalyserNode | null = null;
+  private readonly meterSamples = new Float32Array(METER_FFT_SIZE);
+  private readonly musicMeanSquares = new Float32Array(METER_WINDOW_TICKS);
+  private readonly otherMeanSquares = new Float32Array(METER_WINDOW_TICKS);
+  private meterCursor = 0;
+  private meterFilled = 0;
+  /**
+   * Whether the four stems are being held silent because a real track is the
+   * score. Latched so that the transition (and only the transition) forces the
+   * stem automation to re-run — see the `musicProfileKey` reset in `update`.
+   */
+  private stemsHeld = false;
   /** The live music duck, so `setMusicVolume` composes with it rather than
    * cancelling it mid-line. 1 whenever no line is playing. */
   private radioMusicScale = 1;
@@ -339,11 +396,18 @@ export class EngineAudio {
     master.connect(compressor);
     compressor.connect(context.destination);
 
+    // M1 — everything that is not music goes through one unity bus, so the
+    // music/not-music ratio is measurable. See the field note on `otherBus`.
+    const otherBus = context.createGain();
+    otherBus.gain.value = 1;
+    otherBus.connect(master);
+    this.otherBus = otherBus;
+
     const filter = context.createBiquadFilter();
     filter.type = "lowpass";
     filter.frequency.value = 880;
     filter.Q.value = 1.2;
-    filter.connect(master);
+    filter.connect(otherBus);
 
     const engineGain = context.createGain();
     engineGain.gain.value = 0.02;
@@ -389,9 +453,9 @@ export class EngineAudio {
     this.harmonicOscillator = harmonicOscillator;
     this.harmonicGain = harmonicGain;
     this.windGain = windGain;
-    this.installReverb(context, master, filter);
-    this.installRivalVoices(context, master);
-    this.installMusic(context, master);
+    this.installReverb(context, otherBus, filter);
+    this.installRivalVoices(context, otherBus);
+    const musicBus = this.installMusic(context, master);
     // A1. The player's air is map-independent so it is built here; the beds are
     // not, so they wait for `publishAmbienceCue` to name a map. In practice the
     // frame loop has already published one by the time `start()` runs, which is
@@ -401,14 +465,28 @@ export class EngineAudio {
     // thing to duck. See the field note; at unity this changes no level.
     const ambienceBus = context.createGain();
     ambienceBus.gain.value = 1;
-    ambienceBus.connect(master);
+    ambienceBus.connect(otherBus);
     this.ambienceBus = ambienceBus;
     this.playerAir = new this.ambienceModule.PlayerAirField(context, ambienceBus);
     this.ensureAmbience(context, ambienceBus);
     if (!voiceKilled()) {
-      this.radio = new PitRadio(context, master, this.applyRadioDuck);
+      this.radio = new PitRadio(context, otherBus, this.applyRadioDuck);
       this.radio.setEnabled(resolveVoiceEnabled());
     }
+    // M1 — the soundtrack, built last and AWAITED.
+    //
+    // Awaited rather than fired and forgotten, because the first `element.play()`
+    // has to land inside the gesture that opened this AudioContext: the start
+    // button's click is what lets a media element make a sound at all, and a
+    // `play()` scheduled after that activation has lapsed is one the autoplay
+    // policy is entitled to refuse. What is being awaited is a few hundred bytes
+    // of same-origin JSON that in the overwhelmingly common case 404s
+    // immediately, so the countdown pays a round trip on the loopback and
+    // nothing more. The pit radio's 330 KB of clips stay un-awaited for exactly
+    // the opposite reason.
+    this.soundtrack = new SoundtrackPlayer(context, musicBus, window.location.search);
+    await this.soundtrack.start();
+    this.stemsHeld = this.soundtrack.holdsStems();
     this.diagnosticInitializationMs = performance.now() - initializationStartedAt;
   }
 
@@ -546,6 +624,18 @@ export class EngineAudio {
       this.diagnosticMaxMusicHighShelfDb,
       musicTargets.highShelfDb,
     );
+    this.sampleBusMeters();
+    // M1 — the stem hold is an EDGE, not a per-tick multiply. `setMusicProfile`
+    // early-returns on an unchanged profile key, so a track arriving (or a
+    // missing manifest releasing the hold) has to invalidate that key or the
+    // stems would sit at whatever level the last sector asked for until the
+    // next sector boundary — up to a third of a lap of the wrong score.
+    const stemsHeld = this.soundtrack?.holdsStems() ?? false;
+    if (stemsHeld !== this.stemsHeld) {
+      this.stemsHeld = stemsHeld;
+      this.musicProfileKey = -1;
+      this.setMusicProfile(this.lastMusicProfile);
+    }
     this.updateReverbZone(now, zone);
     this.updateRivals(now, racing);
     // A1. Same tick, same clock: the beds, the player's air and the pass-by
@@ -594,7 +684,11 @@ export class EngineAudio {
     );
     for (const name of STEM_NAMES) {
       const level = Math.max(0, Math.min(3, profile[name]));
-      const target = (level / 3) * STEM_GAIN[name];
+      // M1 — the profile is still TRACKED while a track plays (the ambience
+      // duck reads its levels, so the beds keep breathing with the sector), it
+      // is only not HEARD. That is why the hold multiplies the target here
+      // instead of short-circuiting the whole method.
+      const target = this.stemsHeld ? 0 : (level / 3) * STEM_GAIN[name];
       const gain = this.stemGains.get(name)?.gain;
       if (!gain) continue;
       const previous = this.stemAutomation.get(name) ?? {
@@ -816,6 +910,10 @@ export class EngineAudio {
   setPaused(paused: boolean): void {
     this.paused = paused;
     if (!paused) void this.context?.resume().catch(() => undefined);
+    // M1 — the media element has its own clock and does not stop when the
+    // AudioContext does, so a paused game would otherwise silently eat however
+    // many seconds of the mix the pause lasted.
+    this.soundtrack?.setPaused(paused);
     this.updateMasterGain();
   }
 
@@ -858,6 +956,8 @@ export class EngineAudio {
     reverbZoneTransitions: number;
     masterVolume: number;
     musicVolume: number;
+    /** M1 - the live level of each stem, sampled off its own scheduled ramp. */
+    musicStemGains: Record<string, number>;
     ambience: {
       map: string;
       bedZone: AudioZone;
@@ -877,6 +977,8 @@ export class EngineAudio {
       };
     };
     pitRadio: PitRadioDiagnostics;
+    soundtrack: SoundtrackDiagnostics;
+    busMeters: { musicDb: number; otherDb: number };
   } {
     const elapsed = this.context
       ? Math.max(0, this.context.currentTime - this.diagnosticControlStartedAt)
@@ -919,6 +1021,13 @@ export class EngineAudio {
       reverbZoneTransitions: this.diagnosticReverbTransitions,
       masterVolume: this.masterVolume,
       musicVolume: this.musicVolume,
+      // M1 - what the four stems are ACTUALLY at, which is the only field that
+      // can distinguish "the sector asked for silence" from "a track is playing
+      // and the stems are held". `musicProfileKey` reports the request; this
+      // reports the answer. Sampled off the scheduled ramp rather than read
+      // back from the AudioParam, the same discipline `reverbWet` above uses,
+      // so the number is identical on every engine and honest mid-transition.
+      musicStemGains: this.sampleStemGains(),
       // A1. Copied out here rather than shared, because `diagnostics()` runs
       // about once a second while the readouts below are mutated 30 times a
       // second — handing the report a live reference would make every emitted
@@ -943,6 +1052,12 @@ export class EngineAudio {
       // nothing fired" (loaded 17, linesPlayed 0), which are different bugs.
       pitRadio: this.radio?.diagnostics()
         ?? { linesPlayed: 0, linesDropped: 0, lastLine: "", queueDepth: 0, loaded: 0 },
+      // M1. `source` is the field that says which score is running, so it is
+      // reported before the context exists too - "stems" is the honest answer
+      // for a page that has not pressed start.
+      soundtrack: this.soundtrack?.diagnostics()
+        ?? { source: "stems", title: "", currentTime: 0, state: "idle", trackGain: 0 },
+      busMeters: this.busMeters(),
     };
   }
 
@@ -973,6 +1088,19 @@ export class EngineAudio {
     this.playerAir = null;
     this.radio?.dispose();
     this.radio = null;
+    this.soundtrack?.dispose();
+    this.soundtrack = null;
+    this.musicAnalyser?.disconnect();
+    this.musicAnalyser = null;
+    this.otherAnalyser?.disconnect();
+    this.otherAnalyser = null;
+    this.otherBus?.disconnect();
+    this.otherBus = null;
+    this.musicMeanSquares.fill(0);
+    this.otherMeanSquares.fill(0);
+    this.meterCursor = 0;
+    this.meterFilled = 0;
+    this.stemsHeld = false;
     this.ambienceBus?.disconnect();
     this.ambienceBus = null;
     this.radioMusicScale = 1;
@@ -1446,7 +1574,8 @@ export class EngineAudio {
     panner.positionZ.setTargetAtTime(position.z, now, SPATIAL_SMOOTHING_SECONDS);
   }
 
-  private installMusic(context: AudioContext, master: GainNode): void {
+  /** @returns the music bus, so `start()` can hang the soundtrack off it. */
+  private installMusic(context: AudioContext, master: GainNode): GainNode {
     const musicFilter = context.createBiquadFilter();
     musicFilter.type = "lowpass";
     musicFilter.frequency.value = 2100;
@@ -1463,6 +1592,19 @@ export class EngineAudio {
     this.musicFilter = musicFilter;
     this.musicShelf = musicShelf;
     this.musicBus = musicBus;
+    // M1 — the two meters. Sinks only: an AnalyserNode is pass-through and
+    // nothing is connected onward from either, so neither is in the signal
+    // path. Both tap PRE-master, so the master ceiling, the listener's master
+    // volume, mute and the compressor move them together and the DIFFERENCE
+    // the gain acceptance reads is unaffected by any of the four.
+    const musicAnalyser = context.createAnalyser();
+    musicAnalyser.fftSize = METER_FFT_SIZE;
+    musicBus.connect(musicAnalyser);
+    this.musicAnalyser = musicAnalyser;
+    const otherAnalyser = context.createAnalyser();
+    otherAnalyser.fftSize = METER_FFT_SIZE;
+    this.otherBus?.connect(otherAnalyser);
+    this.otherAnalyser = otherAnalyser;
 
     const startAt = context.currentTime + 0.08;
     this.musicStartTime = startAt;
@@ -1488,6 +1630,7 @@ export class EngineAudio {
       });
     }
     this.preparedStemSamples.clear();
+    return musicBus;
   }
 
   private createStemBuffer(context: AudioContext, stem: StemName): AudioBuffer {
@@ -1677,6 +1820,57 @@ export class EngineAudio {
     }, { once: true });
     oscillator.start(now);
     oscillator.stop(now + duration + 0.02);
+  }
+
+  /**
+   * One meter sample per control tick. See `METER_FFT_SIZE`.
+   *
+   * Mean square rather than RMS is what gets accumulated, because the average
+   * of squares over the window IS the window's mean square - averaging thirty
+   * RMS values would be an average of square roots and would read low on
+   * anything that is not steady state.
+   */
+  private sampleBusMeters(): void {
+    const music = this.musicAnalyser;
+    const other = this.otherAnalyser;
+    if (!music || !other) return;
+    this.musicMeanSquares[this.meterCursor] = meanSquare(music, this.meterSamples);
+    this.otherMeanSquares[this.meterCursor] = meanSquare(other, this.meterSamples);
+    this.meterCursor = (this.meterCursor + 1) % METER_WINDOW_TICKS;
+    if (this.meterFilled < METER_WINDOW_TICKS) this.meterFilled += 1;
+  }
+
+  private sampleStemGains(): Record<string, number> {
+    const now = this.context?.currentTime ?? 0;
+    const levels: Record<string, number> = {};
+    for (const name of STEM_NAMES) {
+      const automation = this.stemAutomation.get(name);
+      levels[name] = automation
+        ? Number(sampleLinearAutomation(
+          now,
+          automation.from,
+          automation.target,
+          automation.start,
+          automation.end,
+        ).toFixed(5))
+        : 0;
+    }
+    return levels;
+  }
+
+  private busMeters(): { musicDb: number; otherDb: number } {
+    const filled = this.meterFilled;
+    if (filled === 0) return { musicDb: meterDecibels(0), otherDb: meterDecibels(0) };
+    let music = 0;
+    let other = 0;
+    for (let index = 0; index < filled; index += 1) {
+      music += this.musicMeanSquares[index];
+      other += this.otherMeanSquares[index];
+    }
+    return {
+      musicDb: Number(meterDecibels(music / filled).toFixed(2)),
+      otherDb: Number(meterDecibels(other / filled).toFixed(2)),
+    };
   }
 
   private updateMasterGain(): void {

@@ -378,6 +378,11 @@ function audioFields(audio: ReturnType<EngineAudio["diagnostics"]>) {
     // asserted from the diagnostics line rather than from the slider's own DOM.
     masterVolume: Number(audio.masterVolume.toFixed(2)),
     musicVolume: Number(audio.musicVolume.toFixed(2)),
+    // M1 - the live stem levels. Four zeros with a non-zero `musicProfileKey`
+    // is the signature of a track holding the score; four zeros with a zero key
+    // is a sector that authored silence. They are different states and a soak
+    // that cannot tell them apart cannot review this phase.
+    musicStemGains: audio.musicStemGains,
     // A1 — the sound field, nested rather than flattened. `panners[i]` is read
     // back off the PannerNode AudioParams and `spatialSources[i]` is the rival
     // seam on the same tick, both in listener space (x right, y up, z forward),
@@ -408,6 +413,29 @@ function audioFields(audio: ReturnType<EngineAudio["diagnostics"]>) {
       lastLine: audio.pitRadio.lastLine,
       queueDepth: audio.pitRadio.queueDepth,
       loaded: audio.pitRadio.loaded,
+    },
+    // M1 - which score is actually running, and how loud it is against the rest
+    // of the mix. Appended after the H2b block for the same reason that one was
+    // appended after A1's: no emitted key order moves.
+    //
+    // `source` is the one a soak reads first. "stems" with a manifest present
+    // means the fallback took over (a 404 on the files, a refused autoplay, a
+    // malformed manifest); "track" with `state` stuck at "idle" means the
+    // element never started. Those are different bugs with one symptom.
+    soundtrack: {
+      source: audio.soundtrack.source,
+      title: audio.soundtrack.title,
+      currentTime: audio.soundtrack.currentTime,
+      state: audio.soundtrack.state,
+      trackGain: audio.soundtrack.trackGain,
+    },
+    // Music RMS against everything-else RMS, both in dBFS over the last ~1 s and
+    // both sampled PRE-master, so their DIFFERENCE is the mix balance rather
+    // than the listener's master volume. This is the pair `TRACK_GAIN` was set
+    // from and the pair a future re-balance has to re-measure.
+    busMeters: {
+      musicDb: audio.busMeters.musicDb,
+      otherDb: audio.busMeters.otherDb,
     },
   };
 }

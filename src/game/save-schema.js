@@ -20,7 +20,8 @@
  *
  * @typedef {object} SaveSettings
  * @property {number} masterVolume 0..1, the whole mix.
- * @property {number} musicVolume 0..1, the four music stems only.
+ * @property {number} musicVolume 0..1, the music bus - the four synthesised
+ *   stems and, since M1, a local soundtrack track played in their place.
  * @property {boolean} reducedMotion Composes with the URL and OS signals.
  * @property {QualityMode} quality
  * @property {PresentationMode} renderMode

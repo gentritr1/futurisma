@@ -8,7 +8,7 @@
     <link rel="icon" href="data:," />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; media-src 'none'; connect-src 'self' blob:; worker-src 'none'; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; media-src 'self'; connect-src 'self' blob:; worker-src 'none'; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'"
     />
     <meta
       name="description"
@@ -129,6 +129,22 @@
           data-event=""
         >
           <span id="track-event-label" class="slipstream__label"></span>
+        </div>
+
+        <!--
+          M1 local soundtrack. Same chip language as the two below it and one
+          line further up the stack, because it says the same kind of thing in
+          the same voice - only quieter, and only for four seconds when a mix
+          starts. It is the one chip here that reports rather than warns, which
+          is why it takes the neutral white rather than a hazard hue.
+        -->
+        <div
+          id="soundtrack-chip"
+          class="slipstream soundtrack"
+          role="status"
+          aria-hidden="true"
+        >
+          <span id="soundtrack-label" class="slipstream__label"></span>
         </div>
 
         <div id="slipstream-chip" class="slipstream" role="status" aria-hidden="true">

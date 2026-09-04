@@ -9,6 +9,7 @@ import {
 import { DRIFT_REWARD_MINIMUM_CHARGE, SLIPSTREAM_LOCK_THRESHOLD } from "./physics";
 import { publishRadioFrame } from "./pit-radio";
 import { resolveReducedMotion } from "./query-probes";
+import { soundtrackChip } from "./soundtrack";
 import {
   RACE_MODE_LABELS,
   RIVAL_TIER_LABELS,
@@ -208,6 +209,20 @@ export class GameUi {
   );
   private readonly trackEventLabel = requiredElement<HTMLElement>("track-event-label");
   private lastTrackEvent = "";
+  /**
+   * M1 - the soundtrack title chip.
+   *
+   * Read off a module-level latch rather than off the HUD frame, the same seam
+   * `publishRadioFrame` and `trackEventState` already use, because a track
+   * starting is a media event and the race loop has no business carrying it.
+   * The chip touches the DOM only when the visible title changes, which over a
+   * 90-minute mix is twice: once on, once off.
+   */
+  private readonly soundtrackChipElement = markReducedMotion(
+    requiredElement<HTMLElement>("soundtrack-chip"),
+  );
+  private readonly soundtrackLabel = requiredElement<HTMLElement>("soundtrack-label");
+  private lastSoundtrackLabel = "";
   private readonly cleanChain = requiredElement<HTMLElement>("clean-chain");
   private lastCushionState = "";
   private lastCleanChainLabel = "";
@@ -767,6 +782,18 @@ export class GameUi {
             : "";
       this.trackEventChip.setAttribute("aria-hidden", active ? "false" : "true");
       this.lastTrackEvent = frame.trackEvent;
+    }
+    // M1 - the title chip. `until` is a `performance.now()` deadline set when a
+    // track starts, so the four seconds are wall time and survive a frame-rate
+    // drop; an empty label is the hidden state and needs no separate flag.
+    const soundtrack = soundtrackChip();
+    const soundtrackLabel = soundtrack.until > performance.now() ? soundtrack.title : "";
+    if (soundtrackLabel !== this.lastSoundtrackLabel) {
+      const showing = soundtrackLabel.length > 0;
+      this.soundtrackLabel.textContent = soundtrackLabel;
+      this.soundtrackChipElement.dataset.active = showing ? "true" : "false";
+      this.soundtrackChipElement.setAttribute("aria-hidden", showing ? "false" : "true");
+      this.lastSoundtrackLabel = soundtrackLabel;
     }
     const chainLabel = frame.cleanGateMultiplier > 1
       ? `CLEAN ×${frame.cleanGateChain}`

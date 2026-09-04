@@ -17,3 +17,11 @@ shots/
 assets-in/
 # Python bytecode from the tracked preparation scripts.
 __pycache__/
+
+# M1 local soundtrack. The repository is PUBLIC: the mixes a player imports are
+# somebody else's recordings and must never be committed, so the directory is
+# ignored down to the file and only the placeholder that keeps it in the tree is
+# excepted. scripts/validate-soundtrack.mjs asserts both halves of this against
+# `git ls-files` on every run of `npm run test:code`.
+public/assets/audio/music/*
+!public/assets/audio/music/.gitkeep
