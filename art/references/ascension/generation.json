@@ -1,0 +1,46 @@
+{
+  "generated": "2026-09-05",
+  "tool": "Higgsfield MCP",
+  "routing": "gpt_image_2 (quality medium, 1k, 16:9) for count-heavy orthographic sheets; flux_2 pro (1k, 16:9) for mood/hero frames; tripo_h3_1_image_to_3d (texture on, pbr off, face_limit 20000, orientation align_image) for proportion maquettes",
+  "jobs": {
+    "ascension-01-apron.png": {
+      "model": "flux_2",
+      "job_id": "a0f60430-b97e-42bf-b979-92b670eb1c01"
+    },
+    "ascension-02-flame-trench.png": {
+      "model": "flux_2",
+      "job_id": "174db970-09cb-442a-aa80-15a880655e11"
+    },
+    "ascension-03-crawler.png": {
+      "model": "flux_2",
+      "job_id": "ae504a62-4c41-493e-9071-151794707733"
+    },
+    "ascension-04-launch.png": {
+      "model": "flux_2",
+      "job_id": "9e58084f-fecf-4f1d-a9bc-8e9e9fc29d96"
+    },
+    "sheet-rocket-platform-gptimage2.png": {
+      "model": "gpt_image_2",
+      "job_id": "e1ed39fb-0c29-484b-b787-685c2b5ffeb7"
+    },
+    "sheet-crawler-transporter-gptimage2.png": {
+      "model": "gpt_image_2",
+      "job_id": "9b0622ad-0978-409a-ab4f-c38acb3f53db"
+    },
+    "sheet-countdown-board-gptimage2.png": {
+      "model": "gpt_image_2",
+      "job_id": "7a2521ff-b4ce-48ed-b1ad-e371c8a032a2"
+    },
+    "sheet-trench-wall-module-gptimage2.png": {
+      "model": "gpt_image_2",
+      "job_id": "4d34d854-bd91-4a46-afff-530cedf0a75b"
+    },
+    "crawler-maquette-tripo.glb": {
+      "model": "tripo_h3_1_image_to_3d",
+      "job_id": "5bc5eddd-27bb-4609-90e2-ea5a0e02bdda",
+      "source": "crawler-front-crop.png"
+    }
+  },
+  "sheet_prompt_template": "Production turnaround sheet for a low-poly racing game asset, three true orthographic views on one wide image: FRONT (left), SIDE (centre), TOP (right), exactly the same metre scale, front and side on a shared ground baseline. Flat neutral grey background, soft even studio lighting, no perspective, no ground shadow, no text except the small view labels and a 1 m scale bar. Complete asset in every view with enough spacing and no cropping.\nASSET: <name, overall metres, EXACT counts of every part, placement of each part>\nROLE IN THE RACE: <what the driver must read from it and at what distance>\nSTORY WEAR: <twenty years of humid weathering: rust streaks under bolts, sun-bleached top faces, algae at the base, one welded repair plate, faded stencil>\nSTYLE: remembered early-2000s console racer, original design, honest low-poly geometry, hand-painted texture language readable at 256-512 px, painted ambient occlusion, restrained palette of grey concrete, rust red, off-white, olive steel, sodium amber, swamp green.\nAVOID: any real space-agency vehicle, any real logo, neon, photoreal PBR, bloom, tiny greebles, new details invented between views. Counts and proportions agree in every view.",
+  "hero_prompt_template": "Ascension Pad, a racing circuit through a working rocket launch complex in a humid jungle estuary, for a remembered early-2000s console anti-gravity racer. Chase-camera view 2.4 m above a 24 m wide concrete racing road <where>, <the asset described exactly as in its sheet>, sodium lamps, mist, tropical overcast dawn with one warm break. Yellow-black hazard kerbs, painted worn lane markings, damp stained concrete. Painted hand-textured surfaces, honest low-poly geometry, restrained palette of grey concrete, rust steel, sodium amber, swamp green and mist, fog for depth, no bloom, no lens flare, no neon, no photoreal PBR, no vehicles."
+}
