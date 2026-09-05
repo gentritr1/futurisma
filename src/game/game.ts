@@ -1,6 +1,5 @@
 import * as THREE from "three";
-import {resolveAbilitySeed} from "./ability-seed";
-import { applyTidelineRenderRule, auditTidelineGameplayMaterials } from "./tideline-render-rule";
+import {loadVehicleForRace,prepareTidelinePresentation} from "./race-presentation-setup";
 import { RaceAtmosphere, configureToneMapping } from "./atmosphere";
 import { EngineAudio, publishAmbienceCue } from "./audio";
 import { DemoAutopilot, alignDirectionToSurface } from "./autopilot";
@@ -113,8 +112,6 @@ import {
 import { GameUi, type RaceStandingEntry } from "./ui";
 import { createCircuitRuntime, type CircuitRuntime } from "./circuit-runtime";
 
-const VEHICLE_MODEL_URL = "/assets/totem/models/totem_runtime.glb";
-const RACE_PRESENCE_FX_ATLAS_URL = "/assets/totem/textures/totem_race_presence_fx_256.png";
 
 type RacePhase = "standby" | "countdown" | "running" | "paused" | "resuming" | "finished";
 
@@ -555,15 +552,11 @@ export class FuturismaGame {
   private updateTidelineMaterials: (() => void) | null = null;
 
   async initialize(): Promise<boolean> {
-    const vehicleLoadStartedAt = performance.now();
-    this.diagnosticVehicleLoadStartedMs = vehicleLoadStartedAt;
-    await this.vehicle.load(VEHICLE_MODEL_URL, RACE_PRESENCE_FX_ATLAS_URL, this.course.kind === "tideline");
-    this.diagnosticVehicleLoadMs = performance.now() - vehicleLoadStartedAt;
-    const vehicleResourceUrl = new URL(VEHICLE_MODEL_URL, window.location.href).href;
-    const vehicleResources = performance.getEntriesByName(vehicleResourceUrl, "resource");
-    const vehicleResource = vehicleResources[0];
-    this.diagnosticVehicleResourceRequests = vehicleResources.length;
-    this.diagnosticVehicleRequestStartMs = vehicleResource?.startTime ?? null;
+    const vehicleTiming = await loadVehicleForRace(this.vehicle, this.course.kind);
+    this.diagnosticVehicleLoadStartedMs = vehicleTiming.startedAt;
+    this.diagnosticVehicleLoadMs = vehicleTiming.elapsed;
+    this.diagnosticVehicleResourceRequests = vehicleTiming.requests;
+    this.diagnosticVehicleRequestStartMs = vehicleTiming.requestStart;
     if (this.disposed) {
       disposeObject3DResources(this.vehicle.root);
       this.vehicle.root.clear();
@@ -586,7 +579,6 @@ export class FuturismaGame {
       return false;
     }
     this.rivalFleet = rivalFleet;
-    if(this.course.kind === "tideline")rivalFleet?.enableTidelinePowers(resolveAbilitySeed(),this.reducedMotion);
     // G2 kill switch: `?cushion=0` restores the G1 no-contact race exactly.
     this.rivalFleet?.setCushionEnabled(this.cushionEnabled);
     this.scene.add(ghostRuntime.attach(this.course, this.vehicle));
@@ -613,10 +605,7 @@ export class FuturismaGame {
       await this.sceneAssets.loadAuthoredEnvironment();
       if (this.disposed) return false;
     }
-    if (this.course.kind === "tideline") {
-      this.updateTidelineMaterials = applyTidelineRenderRule(this.vehicle.root, this.course.group, this.effects.speedLines, this.effects.sparkPoints, ...(this.rivalFleet ? [this.rivalFleet.root] : []));
-      auditTidelineGameplayMaterials(this.scene);
-    }
+    this.updateTidelineMaterials = await prepareTidelinePresentation(this.course.kind, this.reducedMotion, this.scene, this.rivalFleet, this.vehicle.root, this.course.group, this.effects.speedLines, this.effects.sparkPoints);
     this.running = true;
     this.animationFrame = requestAnimationFrame(this.frame);
     if (this.course.kind === "greenwater") void this.sceneAssets.loadAuthoredEnvironment();

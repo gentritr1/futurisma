@@ -2,8 +2,8 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { disposeObject3DResources } from "./graphics-resources.js";
 import type { TotemVisualState } from "./totem";
-import { TidelinePowerField } from "./tideline-power-field";
-import { PowerKit, type PowerKitVisual } from "./power-kit";
+import type { TidelinePowerField } from "./tideline-power-field";
+import type { PowerKit, PowerKitVisual } from "./power-kit";
 
 export const TOTEM_EVOLUTION_URL = "/assets/totem-evolution/totem_evolution.glb";
 
@@ -43,6 +43,7 @@ export class TotemEvolution {
   private surgeConduit: THREE.InstancedMesh | null = null;
 
   static async load(pumpWorks = false): Promise<TotemEvolution> {
+    const {PowerKit}=await import("./power-kit");
     const [assetResult, kitResult] = await Promise.allSettled([
       new GLTFLoader().loadAsync(TOTEM_EVOLUTION_URL), PowerKit.load(pumpWorks),
     ]);
@@ -52,7 +53,7 @@ export class TotemEvolution {
     }
     const kit = kitResult.status === "fulfilled" ? kitResult.value : null;
     if (kitResult.status === "rejected") console.warn("Mechanical power modules could not load.", kitResult.reason);
-    try { return new TotemEvolution(assetResult.value.scene, kit); }
+    try { const Field=pumpWorks?(await import("./tideline-power-field")).TidelinePowerField:null; return new TotemEvolution(assetResult.value.scene, kit, Field); }
     catch (error) {
       disposeObject3DResources(assetResult.value.scene);
       kit?.dispose();
@@ -60,7 +61,7 @@ export class TotemEvolution {
     }
   }
 
-  constructor(asset: THREE.Object3D, powerKit: PowerKit | null = null) {
+  constructor(asset: THREE.Object3D, powerKit: PowerKit | null = null, Field:typeof TidelinePowerField|null=null) {
     this.root.name = "totem_evolution_player_only";
     const rotor = asset.getObjectByName("TE_gyro_pivot");
     if (!rotor) throw new Error("TOTEM evolution is missing its gyro pivot.");
@@ -87,7 +88,7 @@ export class TotemEvolution {
     this.brakeLamp = requiredMaterial("TE_brake");
     this.gravityLamp = requiredMaterial("TE_gravity");
     this.powerLamp = requiredMaterial("TE_power");
-    this.pumpField = powerKit?.templates.surge.userData.pumpHardware ? new TidelinePowerField() : null;
+    this.pumpField = powerKit?.templates.surge.userData.pumpHardware && Field ? new Field() : null;
     if(this.pumpField)this.root.add(this.pumpField.root);
     this.root.add(asset);
 

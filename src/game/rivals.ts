@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { TidelineRivalPowers, type RivalPowerEvent } from "./tideline-rival-powers";
+import type { TidelineRivalPowers, RivalPowerEvent } from "./tideline-rival-powers";
 import type { RaceCourse } from "./course";
 import { groundBlobVisible } from "./presentation.js";
 import {
@@ -409,8 +409,9 @@ export class RivalFleet {
   readonly root = new THREE.Group();
   private tidelinePowers: TidelineRivalPowers | null = null;
 
-  enableTidelinePowers(seed:number,reduced:boolean):void {
+  async enableTidelinePowers(seed:number,reduced:boolean):Promise<void> {
     if(this.tidelinePowers)return;
+    const {TidelineRivalPowers}=await import("./tideline-rival-powers");
     this.tidelinePowers=new TidelineRivalPowers(seed,this.course.length,this.states.length,reduced);
     this.root.add(this.tidelinePowers.root);
   }

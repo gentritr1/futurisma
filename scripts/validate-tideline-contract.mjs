@@ -1,0 +1,15 @@
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
+import {parseGeometry} from './lib/glb-geometry.mjs';
+import {typescriptModuleUrl} from './lib/typescript-module.mjs';
+const {assertTidelineContract}=await import(await typescriptModuleUrl(new URL('../src/game/tideline-contract.ts',import.meta.url)));
+const manifest=JSON.parse(await readFile(new URL('../public/assets/tideline/manifest.json',import.meta.url)));
+const bytes=await readFile(new URL('../public'+manifest.model,import.meta.url));
+assert.equal(createHash('sha256').update(bytes).digest('hex'),manifest.sha256);
+const {scene}=await parseGeometry(bytes);assertTidelineContract(scene,manifest);
+for(const key of Object.keys(manifest.census))assert.throws(()=>assertTidelineContract(scene,{...manifest,census:{...manifest.census,[key]:manifest.census[key]+1}}),new RegExp(key));
+for(const key of ['triangles','primitives'])assert.throws(()=>assertTidelineContract(scene,{...manifest,[key]:manifest[key]+1}),new RegExp(key));
+const identities=[];scene.traverse(o=>{if(o.userData.tidelineInstanceKind)identities.push(o.name);});assert.equal(new Set(identities).size,identities.length);
+assert.equal(manifest.census.flightLenses,0);assert.equal(manifest.census.pelagicCrowns,0);
+console.log(`Tideline contract PASS: ${manifest.triangles} loaded triangles, ${manifest.primitives} primitives, ${identities.length} unique instance anchors; every count drift rejected.`);

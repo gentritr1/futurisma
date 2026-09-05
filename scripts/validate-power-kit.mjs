@@ -85,6 +85,7 @@ const libraryResourceCount = resources.size;
 const evolutionUrl = new URL("../src/game/totem-evolution.ts", import.meta.url);
 const transformed = await transformWithOxc(await readFile(evolutionUrl, "utf8"), evolutionUrl.pathname);
 const code = transformed.code
+  .replace('import("./power-kit")', `import(${JSON.stringify(kitModule)})`)
   .replace('from "./tideline-power-field"', `from ${JSON.stringify(await typescriptModuleUrl(new URL("../src/game/tideline-power-field.ts",import.meta.url)))}`).replace('from "three"', `from ${JSON.stringify(import.meta.resolve("three"))}`)
   .replace('from "three/addons/loaders/GLTFLoader.js"', `from ${JSON.stringify(import.meta.resolve("three/addons/loaders/GLTFLoader.js"))}`)
   .replace('from "./graphics-resources.js"', `from ${JSON.stringify(new URL("../src/game/graphics-resources.js", import.meta.url).href)}`)
