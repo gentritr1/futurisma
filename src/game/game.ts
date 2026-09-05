@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import {loadVehicleForRace,prepareTidelinePresentation} from "./race-presentation-setup";
 import { RaceAtmosphere, configureToneMapping } from "./atmosphere";
 import { EngineAudio, publishAmbienceCue } from "./audio";
 import { DemoAutopilot, alignDirectionToSurface } from "./autopilot";
@@ -552,6 +551,7 @@ export class FuturismaGame {
   private updateTidelineMaterials: (() => void) | null = null;
 
   async initialize(): Promise<boolean> {
+    const {loadVehicleForRace,prepareTidelinePresentation}=await import("./race-presentation-setup");
     const vehicleTiming = await loadVehicleForRace(this.vehicle, this.course.kind);
     this.diagnosticVehicleLoadStartedMs = vehicleTiming.startedAt;
     this.diagnosticVehicleLoadMs = vehicleTiming.elapsed;
