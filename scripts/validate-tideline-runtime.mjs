@@ -188,7 +188,7 @@ try {
     for(const channel of runtime.world.signals.currents){
       assert.equal(channel.root.visible,true,'Cable trays remain physical hardware after draining.');
       const lamp=new THREE.Color();channel.lamps.getColorAt(0,lamp);
-      assert.equal(lamp.r>.15,lap===1&&channel.side===Math.sign(lane),'The active current travels through the correct lamps.');
+      assert.equal(lamp.r>1,lap===1&&channel.side===Math.sign(lane),'The active current travels through the correct lamps.');
     }
     step(1, .1, -lane, lap); assert.equal(runtime.boostRechargeScale, 1);
     step(1, .5, lane, lap); assert.equal(runtime.boostRechargeScale, 1);

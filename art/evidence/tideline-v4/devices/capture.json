@@ -64,6 +64,27 @@
       "fog": true
     },
     {
+      "object": "pump_device_batched_GW_MAT_metal",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_concrete",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_signage",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
       "object": "PK_shield_core",
       "material": "GW_MAT_emissive",
       "type": "MeshStandardMaterial",
@@ -135,6 +156,27 @@
     },
     {
       "object": "PK_shield_stencil",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_metal",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_concrete",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_signage",
       "material": "GW_MAT_signage",
       "type": "MeshStandardMaterial",
       "toneMapped": true,

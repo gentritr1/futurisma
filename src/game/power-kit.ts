@@ -7,6 +7,9 @@ export const PUMP_POWER_KIT_URL = "/assets/power-kit-v2/power_kit.glb";
 export const POWER_KIT_URL = "/assets/power-kit/power_kit.glb";
 
 /** A transform-only instance. Geometry and materials belong to its PowerKit. */
+type DeviceBatch = {update():void; dispose():void};
+type BatchFactory = (root:THREE.Object3D,lamp:THREE.Object3D)=>DeviceBatch;
+
 export class PowerKitVisual {
   readonly root: THREE.Object3D;
   readonly kind: PowerKitKind;
@@ -19,8 +22,9 @@ export class PowerKitVisual {
   private previousTime = 0;
   private angle = 0;
   private disposed = false;
+  private readonly batch: DeviceBatch | null;
 
-  constructor(kind: PowerKitKind, root: THREE.Object3D, release: () => void) {
+  constructor(kind: PowerKitKind, root: THREE.Object3D, release: () => void, batchFactory?: BatchFactory) {
     this.kind = kind;
     this.root = root;
     this.release = release;
@@ -38,6 +42,7 @@ export class PowerKitVisual {
       object.material = object.material.clone();
       this.lampMaterials.push(object.material);
     });
+    this.batch = this.pumpHardware && batchFactory ? batchFactory(root, this.core) : null;
   }
 
   update(elapsed: number, reducedMotion: boolean, charge = 1, activation = 0): void {
@@ -51,6 +56,7 @@ export class PowerKitVisual {
       if (this.kind === "surge") this.moving.rotation.z = this.angle;
       else for (const blade of this.moving.children) blade.rotation.z = firing * .68;
       for (const lamp of this.lampMaterials) lamp.emissiveIntensity = .55 + amount * .3 + firing * 1.4;
+      this.batch?.update();
       return;
     }
     if (this.kind === "surge") {
@@ -77,6 +83,7 @@ export class PowerKitVisual {
     if (this.disposed) return;
     this.disposed = true;
     this.root.removeFromParent();
+    this.batch?.dispose();
     for (const lamp of this.lampMaterials) lamp.dispose();
     this.root.clear();
     this.release();
@@ -99,11 +106,14 @@ export class PowerKit {
 
   static async load(pumpWorks = false): Promise<PowerKit> {
     const gltf = await new GLTFLoader().loadAsync(pumpWorks ? PUMP_POWER_KIT_URL : POWER_KIT_URL);
-    try { return new PowerKit(gltf.scene); }
+    try {
+      const Batch = pumpWorks ? (await import("./tideline-device-batch")).TidelineDeviceBatch : null;
+      return new PowerKit(gltf.scene, Batch ? (root,lamp) => new Batch(root,lamp) : undefined);
+    }
     catch (error) { disposeObject3DResources(gltf.scene); throw error; }
   }
 
-  constructor(asset: THREE.Object3D) {
+  constructor(asset: THREE.Object3D, private readonly batchFactory?: BatchFactory) {
     this.asset = asset;
     const surge = asset.getObjectByName("PK_surge");
     const shield = asset.getObjectByName("PK_shield");
@@ -133,7 +143,7 @@ export class PowerKit {
     if (this.disposed) throw new Error("A disposed power kit cannot create new instances.");
     const root = this.templates[kind].clone(true);
     root.name = `power_${kind}_instance`;
-    const visual = new PowerKitVisual(kind, root, () => this.instances.delete(visual));
+    const visual = new PowerKitVisual(kind, root, () => this.instances.delete(visual), this.batchFactory);
     this.instances.add(visual);
     return visual;
   }
