@@ -138,9 +138,11 @@ export class TidelineCourse implements RaceCourse {
     target.apronGripLeft = target.apronGripRight = 1;
     return target;
   }
+  // Explicit review switch; the accepted default still takes the opened hall.
+  private readonly demoPumpHall = typeof location === 'undefined' || new URLSearchParams(location.search).get('demoPumpHall') !== '0';
   demoSample(progress: number, target = this.createSampleScratch()): CourseSample {
     const cut=route.shortcut;
-    return this.tide.shortcutOpen && progress>=cut.from && progress<=cut.to
+    return this.demoPumpHall && this.tide.shortcutOpen && progress>=cut.from && progress<=cut.to
       ? this.sampleShortcut(progress,target) : this.sample(progress,target);
   }
   rivalLateralAt(position: THREE.Vector3, progress: number): number {
@@ -313,7 +315,8 @@ export class TidelineCourse implements RaceCourse {
   sectorLabelAt(progress: number): string { return route.districts[this.district(progress)].name; }
   musicAt(progress: number): MusicProfile { return MUSIC[this.district(progress)]; }
   audioZoneAt(progress: number): AudioZone {
-    return this.travelModeAt(progress) === "submerged" ? "underpass" : "open";
+    const insideDryHall = this.tide.shortcutOpen && progress >= route.shortcut.from && progress <= route.shortcut.to;
+    return insideDryHall || this.travelModeAt(progress) === "submerged" ? "underpass" : "open";
   }
   updateAtmosphere(elapsed: number, reducedMotion: boolean): boolean {
     const time = reducedMotion ? 0 : Math.floor(elapsed * 30) / 30;
@@ -427,7 +430,8 @@ export class TidelineCourse implements RaceCourse {
   }
   private createGates(): THREE.InstancedMesh {
     const mesh=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),
-      new THREE.MeshLambertMaterial({color:0xffffff,emissive:0xffffff,emissiveIntensity:.35}),route.checkpoints.length*2);
+      new THREE.MeshLambertMaterial({color:0xffffff,emissive:0xffffff,emissiveIntensity:.12}),route.checkpoints.length*2);
+    (mesh.material as THREE.MeshLambertMaterial).onBeforeCompile=shader=>{shader.fragmentShader=shader.fragmentShader.replace('#include <emissivemap_fragment>','#include <emissivemap_fragment>\n#ifdef USE_COLOR\ntotalEmissiveRadiance*=vColor.rgb;\n#endif');};
     const transform=new THREE.Object3D(),basis=new THREE.Matrix4();
     route.checkpoints.forEach((progress,i)=>{
       const s=this.sample(progress); basis.makeBasis(s.right,s.up,s.tangent.clone().negate());
