@@ -22,8 +22,22 @@ User-approved concept. Use these as the starting point; every asset is still reb
 | crawler-front-crop.png | Front view crop used for the Tripo maquette | |
 | crawler-maquette-tripo.glb | Proportion maquette of the crawler (if present) | Normalised to 1 m; scale to 12 m tall beside the sheet planes, lock silhouette, delete before export. Never ship. |
 
-## Still to generate (Codex, per the brief)
-- Hero view at chase height (FLUX.2) and material-ID pass (GPT Image 2) for each of the four sheets above.
+## Hero views at chase height (FLUX.2 pro, added after the sheets)
+
+| File | Notes |
+|---|---|
+| hero-rocket-platform-flux2.png | Platform on piers, original rocket 09 with two olive boosters, three swing arms, beacon, cage lamps. **A small logo-like mark appeared on the core: do not reproduce it.** |
+| hero-crawler-transporter-flux2.png | CT-2 straddling the road, clearance under the girders, beacon + horn, painted deck. |
+| hero-countdown-board-flux2.png | Board on A-frame, T-04:12 and PAD 09 CLEAR, beacon, horn, cage lamp, egrets. **A small logo appeared on the far gantry: do not reproduce it.** |
+| hero-trench-wall-module-flux2.png | Tiled modules both sides, two pipes, red valves, cage lamps, deflector ramp, light shaft, puddles. |
+
+Maquettes: `crawler-maquette-tripo.glb` and `rocket-platform-maquette-tripo.glb` (Tripo H3.1, normalised to 1 m; scale to sheet height, use for silhouette only, delete before export).
+
+## Division of labour
+Higgsfield (FLUX.2, Tripo) is run by the orchestrator, not Codex. Codex has GPT Image 2 only and uses it for every remaining sheet and material-ID pass, and for any secondary hero using `hero_prompt_template` in generation.json. Do not ask for Higgsfield access; everything that needed it is already here.
+
+## Still to generate (Codex, GPT Image 2)
+- Material-ID pass (GPT Image 2) for each of the four sheets above.
 - Sheets for: deluge water tower, propellant tank, vent stack, crawlerway gravel bed, mangrove pier, egret card set, service-tower swing arm.
 - Sky panorama 4096x1024, one lighting state, profile script before acceptance.
 

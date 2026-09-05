@@ -39,8 +39,30 @@
       "model": "tripo_h3_1_image_to_3d",
       "job_id": "5bc5eddd-27bb-4609-90e2-ea5a0e02bdda",
       "source": "crawler-front-crop.png"
+    },
+    "hero-rocket-platform-flux2.png": {
+      "model": "flux_2",
+      "job_id": "e2587115-9717-4692-a0df-01414983950b"
+    },
+    "hero-crawler-transporter-flux2.png": {
+      "model": "flux_2",
+      "job_id": "772316aa-19bc-4235-a09d-6fd5bbcc8178"
+    },
+    "hero-countdown-board-flux2.png": {
+      "model": "flux_2",
+      "job_id": "7893c9ae-caf5-4224-8f4b-30b08d441217"
+    },
+    "hero-trench-wall-module-flux2.png": {
+      "model": "flux_2",
+      "job_id": "f5b2791c-ba5d-4cab-921e-dfddd4d25613"
+    },
+    "rocket-platform-maquette-tripo.glb": {
+      "model": "tripo_h3_1_image_to_3d",
+      "job_id": "a419075e-ae35-4806-ac43-8b136ece84f1",
+      "source": "rocket-platform-front-crop.png"
     }
   },
   "sheet_prompt_template": "Production turnaround sheet for a low-poly racing game asset, three true orthographic views on one wide image: FRONT (left), SIDE (centre), TOP (right), exactly the same metre scale, front and side on a shared ground baseline. Flat neutral grey background, soft even studio lighting, no perspective, no ground shadow, no text except the small view labels and a 1 m scale bar. Complete asset in every view with enough spacing and no cropping.\nASSET: <name, overall metres, EXACT counts of every part, placement of each part>\nROLE IN THE RACE: <what the driver must read from it and at what distance>\nSTORY WEAR: <twenty years of humid weathering: rust streaks under bolts, sun-bleached top faces, algae at the base, one welded repair plate, faded stencil>\nSTYLE: remembered early-2000s console racer, original design, honest low-poly geometry, hand-painted texture language readable at 256-512 px, painted ambient occlusion, restrained palette of grey concrete, rust red, off-white, olive steel, sodium amber, swamp green.\nAVOID: any real space-agency vehicle, any real logo, neon, photoreal PBR, bloom, tiny greebles, new details invented between views. Counts and proportions agree in every view.",
-  "hero_prompt_template": "Ascension Pad, a racing circuit through a working rocket launch complex in a humid jungle estuary, for a remembered early-2000s console anti-gravity racer. Chase-camera view 2.4 m above a 24 m wide concrete racing road <where>, <the asset described exactly as in its sheet>, sodium lamps, mist, tropical overcast dawn with one warm break. Yellow-black hazard kerbs, painted worn lane markings, damp stained concrete. Painted hand-textured surfaces, honest low-poly geometry, restrained palette of grey concrete, rust steel, sodium amber, swamp green and mist, fog for depth, no bloom, no lens flare, no neon, no photoreal PBR, no vehicles."
+  "hero_prompt_template": "Ascension Pad, a racing circuit through a working rocket launch complex in a humid jungle estuary, for a remembered early-2000s console anti-gravity racer. Chase-camera view 2.4 m above a 24 m wide concrete racing road <where>, <the asset described exactly as in its sheet>, sodium lamps, mist, tropical overcast dawn with one warm break. Yellow-black hazard kerbs, painted worn lane markings, damp stained concrete. Painted hand-textured surfaces, honest low-poly geometry, restrained palette of grey concrete, rust steel, sodium amber, swamp green and mist, fog for depth, no bloom, no lens flare, no neon, no photoreal PBR, no vehicles.",
+  "division_of_labour": "Higgsfield (FLUX.2 heroes, Tripo maquettes) is run by the orchestrator, not Codex. Codex has GPT Image 2 only and uses it for every remaining sheet and material-ID pass. Where no hero exists for a secondary asset, Codex makes it with GPT Image 2 using hero_prompt_template."
 }
