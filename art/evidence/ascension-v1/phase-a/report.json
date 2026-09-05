@@ -1,0 +1,850 @@
+{
+  "script": "scripts/visual/ascension/report.mjs",
+  "rows": [
+    {
+      "file": "art/evidence/ascension-v1/phase-a/deluge/race.json",
+      "url": "http://127.0.0.1:5200/?map=ascension&seed=3868938316&tier=works&demo=1&headless=1&diagnostics=1&start=manual&quality=high&music=0&demoTrench=0",
+      "seed": 3868938316,
+      "tier": "works",
+      "lapsMs": [
+        33958,
+        31300,
+        31308
+      ],
+      "playerPosition": 4,
+      "missedGates": 0,
+      "recoveries": 0,
+      "impacts": 1,
+      "errors": [],
+      "physics": {
+        "windowSeconds": 96.566,
+        "expectedRateHz": 120,
+        "expectedSamples": 11587.92,
+        "observedSamples": 11588,
+        "residual": 0.07999999999992724,
+        "rivalUpdates": 11588,
+        "explanation": "Lap milliseconds are rounded in diagnostics; physics advances integer 120 Hz ticks."
+      },
+      "metrics": {
+        "script": "scripts/visual/ascension/instrument.mjs",
+        "samples": 11878,
+        "activeWindowMs": 95672.10000002384,
+        "activeExpectedSamples": 11869.987592469868,
+        "activeSampleResidual": 8.012407530131895,
+        "windowSamples": 720,
+        "windowMs": 5796,
+        "calibration": {
+          "samples": 120,
+          "windowMs": 967.2000000476837,
+          "hz": 124.06947890207186
+        },
+        "expectedRateHz": 124.06947890207186,
+        "expectedSamples": 719.1066997164086,
+        "sampleResidual": 0.8933002835914294,
+        "observedRateHz": 124.22360248447205,
+        "p95Ms": 8.399999976158142,
+        "peakMainCalls": 57,
+        "peakShadowCalls": 17,
+        "peakTotalCalls": 74,
+        "peakTriangles": 61398,
+        "peakShadowTriangles": 23624,
+        "sizes": [
+          "1280x720"
+        ],
+        "note": "Expected rendering rate comes from a separate pre-start requestAnimationFrame calibration. Physics remains 120 Hz. Each sampled delta covers one render interval, including any stalls."
+      }
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/deluge-before-batching/race.json",
+      "url": "http://127.0.0.1:5200/?map=ascension&seed=3868938316&tier=works&demo=1&headless=1&diagnostics=1&quality=high&music=0&demoTrench=0",
+      "seed": null,
+      "tier": "works",
+      "lapsMs": [
+        33308,
+        30108,
+        30108
+      ],
+      "playerPosition": 4,
+      "missedGates": 0,
+      "recoveries": 0,
+      "impacts": 2,
+      "errors": [],
+      "physics": {
+        "windowSeconds": 93.524,
+        "expectedRateHz": 120,
+        "expectedSamples": 11222.880000000001,
+        "observedSamples": 11223,
+        "residual": 0.11999999999898137,
+        "rivalUpdates": 11223,
+        "explanation": "Lap milliseconds are rounded in diagnostics; physics advances integer 120 Hz ticks."
+      },
+      "metrics": {
+        "script": "scripts/visual/ascension/instrument.mjs",
+        "samples": 11464,
+        "windowSamples": 720,
+        "windowMs": 5834.100000023842,
+        "expectedRateHz": 120,
+        "expectedSamples": 700.092000002861,
+        "observedRateHz": 123.41235151901024,
+        "p95Ms": 8.899999976158142,
+        "peakMainCalls": 69,
+        "peakShadowCalls": 22,
+        "peakTotalCalls": 91,
+        "peakTriangles": 61350,
+        "peakShadowTriangles": 24456,
+        "sizes": [
+          "1280x720"
+        ],
+        "note": "Expected 120 Hz is the configured headless pacing target, not a calibrated hardware refresh rate. Sample deficit is reported rather than omitted."
+      }
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench/race.json",
+      "url": "http://127.0.0.1:5200/?map=ascension&seed=3868938316&tier=works&demo=1&headless=1&diagnostics=1&start=manual&quality=high&music=0&demoTrench=1",
+      "seed": 3868938316,
+      "tier": "works",
+      "lapsMs": [
+        30108,
+        28508,
+        28383
+      ],
+      "playerPosition": 2,
+      "missedGates": 0,
+      "recoveries": 0,
+      "impacts": 4,
+      "errors": [],
+      "physics": {
+        "windowSeconds": 86.999,
+        "expectedRateHz": 120,
+        "expectedSamples": 10439.88,
+        "observedSamples": 10440,
+        "residual": 0.12000000000080036,
+        "rivalUpdates": 10440,
+        "explanation": "Lap milliseconds are rounded in diagnostics; physics advances integer 120 Hz ticks."
+      },
+      "metrics": {
+        "script": "scripts/visual/ascension/instrument.mjs",
+        "samples": 10670,
+        "activeWindowMs": 86095.29999995232,
+        "activeExpectedSamples": 10758.55045217616,
+        "activeSampleResidual": -88.55045217615952,
+        "windowSamples": 720,
+        "windowMs": 5807.5,
+        "calibration": {
+          "samples": 120,
+          "windowMs": 960.3000000715256,
+          "hz": 124.96094969391034
+        },
+        "expectedRateHz": 124.96094969391034,
+        "expectedSamples": 725.7107153473843,
+        "sampleResidual": -5.71071534738428,
+        "observedRateHz": 123.97761515281964,
+        "p95Ms": 8.399999976158142,
+        "peakMainCalls": 54,
+        "peakShadowCalls": 17,
+        "peakTotalCalls": 71,
+        "peakTriangles": 59418,
+        "peakShadowTriangles": 23624,
+        "sizes": [
+          "1280x720"
+        ],
+        "note": "Expected rendering rate comes from a separate pre-start requestAnimationFrame calibration. Physics remains 120 Hz. Each sampled delta covers one render interval, including any stalls."
+      }
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-before-batching/race.json",
+      "url": "http://127.0.0.1:5200/?map=ascension&seed=3868938316&tier=works&demo=1&headless=1&diagnostics=1&quality=high&music=0&demoTrench=1",
+      "seed": null,
+      "tier": "works",
+      "lapsMs": [
+        29417,
+        27142,
+        27875
+      ],
+      "playerPosition": 2,
+      "missedGates": 0,
+      "recoveries": 0,
+      "impacts": 2,
+      "errors": [],
+      "physics": {
+        "windowSeconds": 84.434,
+        "expectedRateHz": 120,
+        "expectedSamples": 10132.08,
+        "observedSamples": 10132,
+        "residual": -0.07999999999992724,
+        "rivalUpdates": 10132,
+        "explanation": "Lap milliseconds are rounded in diagnostics; physics advances integer 120 Hz ticks."
+      },
+      "metrics": {
+        "script": "scripts/visual/ascension/instrument.mjs",
+        "samples": 10348,
+        "windowSamples": 720,
+        "windowMs": 5805.399999976158,
+        "expectedRateHz": 120,
+        "expectedSamples": 696.647999997139,
+        "observedRateHz": 124.02246184637698,
+        "p95Ms": 8.399999976158142,
+        "peakMainCalls": 69,
+        "peakShadowCalls": 22,
+        "peakTotalCalls": 91,
+        "peakTriangles": 59402,
+        "peakShadowTriangles": 24456,
+        "sizes": [
+          "1280x720"
+        ],
+        "note": "Expected 120 Hz is the configured headless pacing target, not a calibrated hardware refresh rate. Sample deficit is reported rather than omitted."
+      }
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-calibration/race.json",
+      "url": "http://127.0.0.1:5200/?map=ascension&seed=3868938316&tier=works&demo=1&headless=1&diagnostics=1&start=manual&quality=high&music=0&demoTrench=1&calibrate=1",
+      "seed": 3868938316,
+      "tier": "works",
+      "lapsMs": [
+        30108,
+        28208,
+        27933
+      ],
+      "playerPosition": 3,
+      "missedGates": 0,
+      "recoveries": 0,
+      "impacts": 1,
+      "errors": [],
+      "physics": {
+        "windowSeconds": 86.249,
+        "expectedRateHz": 120,
+        "expectedSamples": 10349.88,
+        "observedSamples": 10350,
+        "residual": 0.12000000000080036,
+        "rivalUpdates": 10350,
+        "explanation": "Lap milliseconds are rounded in diagnostics; physics advances integer 120 Hz ticks."
+      },
+      "metrics": {
+        "script": "scripts/visual/ascension/instrument.mjs",
+        "samples": 10598,
+        "activeWindowMs": 85347.20000004768,
+        "activeExpectedSamples": 10623.030806989744,
+        "activeSampleResidual": -25.030806989743724,
+        "windowSamples": 720,
+        "windowMs": 5793.700000047684,
+        "calibration": {
+          "samples": 120,
+          "windowMs": 964.0999999046326,
+          "hz": 124.46841615171687
+        },
+        "expectedRateHz": 124.46841615171687,
+        "expectedSamples": 721.1326626641371,
+        "sampleResidual": -1.132662664137115,
+        "observedRateHz": 124.27291713310565,
+        "p95Ms": 8.399999976158142,
+        "peakMainCalls": 55,
+        "peakShadowCalls": 17,
+        "peakTotalCalls": 72,
+        "peakTriangles": 59478,
+        "peakShadowTriangles": 23624,
+        "sizes": [
+          "1280x720"
+        ],
+        "note": "Expected rendering rate comes from a separate pre-start requestAnimationFrame calibration. Physics remains 120 Hz. Each sampled delta covers one render interval, including any stalls."
+      }
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-feral-20260905/race.json",
+      "url": "http://127.0.0.1:5200/?map=ascension&seed=20260905&tier=feral&demo=1&headless=1&diagnostics=1&start=manual&quality=high&music=0&demoTrench=1",
+      "seed": 20260905,
+      "tier": "feral",
+      "lapsMs": [
+        30117,
+        28483,
+        28325
+      ],
+      "playerPosition": 4,
+      "missedGates": 0,
+      "recoveries": 0,
+      "impacts": 4,
+      "errors": [],
+      "physics": {
+        "windowSeconds": 86.925,
+        "expectedRateHz": 120,
+        "expectedSamples": 10431,
+        "observedSamples": 10431,
+        "residual": 0,
+        "rivalUpdates": 10431,
+        "explanation": "Lap milliseconds are rounded in diagnostics; physics advances integer 120 Hz ticks."
+      },
+      "metrics": {
+        "script": "scripts/visual/ascension/instrument.mjs",
+        "samples": 10687,
+        "activeWindowMs": 85996.10000002384,
+        "activeExpectedSamples": 10665.080611563235,
+        "activeSampleResidual": 21.919388436765075,
+        "windowSamples": 720,
+        "windowMs": 5797.200000047684,
+        "calibration": {
+          "samples": 120,
+          "windowMs": 967.6000000238419,
+          "hz": 124.01818933137989
+        },
+        "expectedRateHz": 124.01818933137989,
+        "expectedSamples": 718.9582471977891,
+        "sampleResidual": 1.0417528022109082,
+        "observedRateHz": 124.19788863487162,
+        "p95Ms": 8.399999976158142,
+        "peakMainCalls": 56,
+        "peakShadowCalls": 17,
+        "peakTotalCalls": 73,
+        "peakTriangles": 60440,
+        "peakShadowTriangles": 23624,
+        "sizes": [
+          "1280x720"
+        ],
+        "note": "Expected rendering rate comes from a separate pre-start requestAnimationFrame calibration. Physics remains 120 Hz. Each sampled delta covers one render interval, including any stalls."
+      }
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-feral-3868938316/race.json",
+      "url": "http://127.0.0.1:5200/?map=ascension&seed=3868938316&tier=feral&demo=1&headless=1&diagnostics=1&start=manual&quality=high&music=0&demoTrench=1",
+      "seed": 3868938316,
+      "tier": "feral",
+      "lapsMs": [
+        30117,
+        28483,
+        28325
+      ],
+      "playerPosition": 4,
+      "missedGates": 0,
+      "recoveries": 0,
+      "impacts": 4,
+      "errors": [],
+      "physics": {
+        "windowSeconds": 86.925,
+        "expectedRateHz": 120,
+        "expectedSamples": 10431,
+        "observedSamples": 10431,
+        "residual": 0,
+        "rivalUpdates": 10431,
+        "explanation": "Lap milliseconds are rounded in diagnostics; physics advances integer 120 Hz ticks."
+      },
+      "metrics": {
+        "script": "scripts/visual/ascension/instrument.mjs",
+        "samples": 10664,
+        "activeWindowMs": 86116.59999990463,
+        "activeExpectedSamples": 10751.136080688242,
+        "activeSampleResidual": -87.13608068824215,
+        "windowSamples": 720,
+        "windowMs": 5817.5,
+        "calibration": {
+          "samples": 120,
+          "windowMs": 961.1999999284744,
+          "hz": 124.84394507795416
+        },
+        "expectedRateHz": 124.84394507795416,
+        "expectedSamples": 726.2796504909983,
+        "sampleResidual": -6.279650490998279,
+        "observedRateHz": 123.76450365277181,
+        "p95Ms": 8.399999976158142,
+        "peakMainCalls": 56,
+        "peakShadowCalls": 17,
+        "peakTotalCalls": 73,
+        "peakTriangles": 60440,
+        "peakShadowTriangles": 23624,
+        "sizes": [
+          "1280x720"
+        ],
+        "note": "Expected rendering rate comes from a separate pre-start requestAnimationFrame calibration. Physics remains 120 Hz. Each sampled delta covers one render interval, including any stalls."
+      }
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-feral-714/race.json",
+      "url": "http://127.0.0.1:5200/?map=ascension&seed=714&tier=feral&demo=1&headless=1&diagnostics=1&start=manual&quality=high&music=0&demoTrench=1",
+      "seed": 714,
+      "tier": "feral",
+      "lapsMs": [
+        30117,
+        28483,
+        28325
+      ],
+      "playerPosition": 4,
+      "missedGates": 0,
+      "recoveries": 0,
+      "impacts": 4,
+      "errors": [],
+      "physics": {
+        "windowSeconds": 86.925,
+        "expectedRateHz": 120,
+        "expectedSamples": 10431,
+        "observedSamples": 10431,
+        "residual": 0,
+        "rivalUpdates": 10431,
+        "explanation": "Lap milliseconds are rounded in diagnostics; physics advances integer 120 Hz ticks."
+      },
+      "metrics": {
+        "script": "scripts/visual/ascension/instrument.mjs",
+        "samples": 10663,
+        "activeWindowMs": 86011.89999997616,
+        "activeExpectedSamples": 10676.971139713267,
+        "activeSampleResidual": -13.971139713266894,
+        "windowSamples": 720,
+        "windowMs": 5788.899999976158,
+        "calibration": {
+          "samples": 120,
+          "windowMs": 966.6999999284744,
+          "hz": 124.13365057295825
+        },
+        "expectedRateHz": 124.13365057295825,
+        "expectedSamples": 718.5972897988385,
+        "sampleResidual": 1.4027102011615398,
+        "observedRateHz": 124.37596089118233,
+        "p95Ms": 8.399999976158142,
+        "peakMainCalls": 56,
+        "peakShadowCalls": 17,
+        "peakTotalCalls": 73,
+        "peakTriangles": 60440,
+        "peakShadowTriangles": 23624,
+        "sizes": [
+          "1280x720"
+        ],
+        "note": "Expected rendering rate comes from a separate pre-start requestAnimationFrame calibration. Physics remains 120 Hz. Each sampled delta covers one render interval, including any stalls."
+      }
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-reduced/race.json",
+      "url": "http://127.0.0.1:5200/?map=ascension&seed=3868938316&tier=works&demo=1&headless=1&diagnostics=1&start=manual&quality=high&music=0&demoTrench=1&motion=reduce",
+      "seed": 3868938316,
+      "tier": "works",
+      "lapsMs": [
+        30108,
+        28508,
+        28383
+      ],
+      "playerPosition": 2,
+      "missedGates": 0,
+      "recoveries": 0,
+      "impacts": 4,
+      "errors": [],
+      "physics": {
+        "windowSeconds": 86.999,
+        "expectedRateHz": 120,
+        "expectedSamples": 10439.88,
+        "observedSamples": 10440,
+        "residual": 0.12000000000080036,
+        "rivalUpdates": 10440,
+        "explanation": "Lap milliseconds are rounded in diagnostics; physics advances integer 120 Hz ticks."
+      },
+      "metrics": {
+        "script": "scripts/visual/ascension/instrument.mjs",
+        "samples": 10686,
+        "activeWindowMs": 86064.10000002384,
+        "activeExpectedSamples": 10668.001239281599,
+        "activeSampleResidual": 17.998760718401172,
+        "windowSamples": 720,
+        "windowMs": 5802.600000023842,
+        "calibration": {
+          "samples": 120,
+          "windowMs": 968.1000000238419,
+          "hz": 123.95413696626868
+        },
+        "expectedRateHz": 123.95413696626868,
+        "expectedSamples": 719.2562751634259,
+        "sampleResidual": 0.7437248365740743,
+        "observedRateHz": 124.08230793041767,
+        "p95Ms": 8.399999976158142,
+        "peakMainCalls": 54,
+        "peakShadowCalls": 17,
+        "peakTotalCalls": 71,
+        "peakTriangles": 59418,
+        "peakShadowTriangles": 23624,
+        "sizes": [
+          "1280x720"
+        ],
+        "note": "Expected rendering rate comes from a separate pre-start requestAnimationFrame calibration. Physics remains 120 Hz. Each sampled delta covers one render interval, including any stalls."
+      }
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-reduced-unbatched/race.json",
+      "url": "http://127.0.0.1:5200/?map=ascension&seed=3868938316&tier=works&demo=1&headless=1&diagnostics=1&start=manual&quality=high&music=0&demoTrench=1&ascensionBatch=0&motion=reduce",
+      "seed": 3868938316,
+      "tier": "works",
+      "lapsMs": [
+        30108,
+        28508,
+        28383
+      ],
+      "playerPosition": 2,
+      "missedGates": 0,
+      "recoveries": 0,
+      "impacts": 4,
+      "errors": [],
+      "physics": {
+        "windowSeconds": 86.999,
+        "expectedRateHz": 120,
+        "expectedSamples": 10439.88,
+        "observedSamples": 10440,
+        "residual": 0.12000000000080036,
+        "rivalUpdates": 10440,
+        "explanation": "Lap milliseconds are rounded in diagnostics; physics advances integer 120 Hz ticks."
+      },
+      "metrics": {
+        "script": "scripts/visual/ascension/instrument.mjs",
+        "samples": 10688,
+        "activeWindowMs": 86109.60000002384,
+        "activeExpectedSamples": 10730.168224302037,
+        "activeSampleResidual": -42.16822430203683,
+        "windowSamples": 720,
+        "windowMs": 5800.299999952316,
+        "calibration": {
+          "samples": 120,
+          "windowMs": 963,
+          "hz": 124.61059190031153
+        },
+        "expectedRateHz": 124.61059190031153,
+        "expectedSamples": 722.7788161934351,
+        "sampleResidual": -2.778816193435091,
+        "observedRateHz": 124.1315104401357,
+        "p95Ms": 8.399999976158142,
+        "peakMainCalls": 64,
+        "peakShadowCalls": 17,
+        "peakTotalCalls": 81,
+        "peakTriangles": 59418,
+        "peakShadowTriangles": 23624,
+        "sizes": [
+          "1280x720"
+        ],
+        "note": "Expected rendering rate comes from a separate pre-start requestAnimationFrame calibration. Physics remains 120 Hz. Each sampled delta covers one render interval, including any stalls."
+      }
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-rookie-20260905/race.json",
+      "url": "http://127.0.0.1:5200/?map=ascension&seed=20260905&tier=rookie&demo=1&headless=1&diagnostics=1&start=manual&quality=high&music=0&demoTrench=1",
+      "seed": 20260905,
+      "tier": "rookie",
+      "lapsMs": [
+        30108,
+        28508,
+        28075
+      ],
+      "playerPosition": 1,
+      "missedGates": 0,
+      "recoveries": 0,
+      "impacts": 3,
+      "errors": [],
+      "physics": {
+        "windowSeconds": 86.691,
+        "expectedRateHz": 120,
+        "expectedSamples": 10402.92,
+        "observedSamples": 10403,
+        "residual": 0.07999999999992724,
+        "rivalUpdates": 10403,
+        "explanation": "Lap milliseconds are rounded in diagnostics; physics advances integer 120 Hz ticks."
+      },
+      "metrics": {
+        "script": "scripts/visual/ascension/instrument.mjs",
+        "samples": 10647,
+        "activeWindowMs": 85774.5,
+        "activeExpectedSamples": 10653.011798273676,
+        "activeSampleResidual": -6.011798273675595,
+        "windowSamples": 720,
+        "windowMs": 5795,
+        "calibration": {
+          "samples": 120,
+          "windowMs": 966.2000000476837,
+          "hz": 124.1978886297638
+        },
+        "expectedRateHz": 124.1978886297638,
+        "expectedSamples": 719.7267646094812,
+        "sampleResidual": 0.2732353905188347,
+        "observedRateHz": 124.24503882657463,
+        "p95Ms": 8.399999976158142,
+        "peakMainCalls": 54,
+        "peakShadowCalls": 17,
+        "peakTotalCalls": 71,
+        "peakTriangles": 58646,
+        "peakShadowTriangles": 23624,
+        "sizes": [
+          "1280x720"
+        ],
+        "note": "Expected rendering rate comes from a separate pre-start requestAnimationFrame calibration. Physics remains 120 Hz. Each sampled delta covers one render interval, including any stalls."
+      }
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-rookie-3868938316/race.json",
+      "url": "http://127.0.0.1:5200/?map=ascension&seed=3868938316&tier=rookie&demo=1&headless=1&diagnostics=1&start=manual&quality=high&music=0&demoTrench=1",
+      "seed": 3868938316,
+      "tier": "rookie",
+      "lapsMs": [
+        30108,
+        28508,
+        28075
+      ],
+      "playerPosition": 1,
+      "missedGates": 0,
+      "recoveries": 0,
+      "impacts": 3,
+      "errors": [],
+      "physics": {
+        "windowSeconds": 86.691,
+        "expectedRateHz": 120,
+        "expectedSamples": 10402.92,
+        "observedSamples": 10403,
+        "residual": 0.07999999999992724,
+        "rivalUpdates": 10403,
+        "explanation": "Lap milliseconds are rounded in diagnostics; physics advances integer 120 Hz ticks."
+      },
+      "metrics": {
+        "script": "scripts/visual/ascension/instrument.mjs",
+        "samples": 10645,
+        "activeWindowMs": 85788.60000002384,
+        "activeExpectedSamples": 10641.546413331173,
+        "activeSampleResidual": 3.4535866688274837,
+        "windowSamples": 720,
+        "windowMs": 5802.200000047684,
+        "calibration": {
+          "samples": 120,
+          "windowMs": 967.3999999761581,
+          "hz": 124.04382882257333
+        },
+        "expectedRateHz": 124.04382882257333,
+        "expectedSamples": 719.7271036002498,
+        "sampleResidual": 0.27289639975015234,
+        "observedRateHz": 124.09086208577486,
+        "p95Ms": 8.399999976158142,
+        "peakMainCalls": 54,
+        "peakShadowCalls": 17,
+        "peakTotalCalls": 71,
+        "peakTriangles": 58646,
+        "peakShadowTriangles": 23624,
+        "sizes": [
+          "1280x720"
+        ],
+        "note": "Expected rendering rate comes from a separate pre-start requestAnimationFrame calibration. Physics remains 120 Hz. Each sampled delta covers one render interval, including any stalls."
+      }
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-rookie-714/race.json",
+      "url": "http://127.0.0.1:5200/?map=ascension&seed=714&tier=rookie&demo=1&headless=1&diagnostics=1&start=manual&quality=high&music=0&demoTrench=1",
+      "seed": 714,
+      "tier": "rookie",
+      "lapsMs": [
+        30108,
+        28508,
+        28075
+      ],
+      "playerPosition": 1,
+      "missedGates": 0,
+      "recoveries": 0,
+      "impacts": 3,
+      "errors": [],
+      "physics": {
+        "windowSeconds": 86.691,
+        "expectedRateHz": 120,
+        "expectedSamples": 10402.92,
+        "observedSamples": 10403,
+        "residual": 0.07999999999992724,
+        "rivalUpdates": 10403,
+        "explanation": "Lap milliseconds are rounded in diagnostics; physics advances integer 120 Hz ticks."
+      },
+      "metrics": {
+        "script": "scripts/visual/ascension/instrument.mjs",
+        "samples": 10643,
+        "activeWindowMs": 85816.29999995232,
+        "activeExpectedSamples": 10635.08829828937,
+        "activeSampleResidual": 7.911701710629131,
+        "windowSamples": 720,
+        "windowMs": 5796.399999976158,
+        "calibration": {
+          "samples": 120,
+          "windowMs": 968.3000000715256,
+          "hz": 123.92853453592475
+        },
+        "expectedRateHz": 123.92853453592475,
+        "expectedSamples": 718.3393575810795,
+        "sampleResidual": 1.6606424189204745,
+        "observedRateHz": 124.21503001914317,
+        "p95Ms": 8.399999976158142,
+        "peakMainCalls": 54,
+        "peakShadowCalls": 17,
+        "peakTotalCalls": 71,
+        "peakTriangles": 58646,
+        "peakShadowTriangles": 23624,
+        "sizes": [
+          "1280x720"
+        ],
+        "note": "Expected rendering rate comes from a separate pre-start requestAnimationFrame calibration. Physics remains 120 Hz. Each sampled delta covers one render interval, including any stalls."
+      }
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-works-20260905/race.json",
+      "url": "http://127.0.0.1:5200/?map=ascension&seed=20260905&tier=works&demo=1&headless=1&diagnostics=1&start=manual&quality=high&music=0&demoTrench=1",
+      "seed": 20260905,
+      "tier": "works",
+      "lapsMs": [
+        30108,
+        28508,
+        28383
+      ],
+      "playerPosition": 2,
+      "missedGates": 0,
+      "recoveries": 0,
+      "impacts": 4,
+      "errors": [],
+      "physics": {
+        "windowSeconds": 86.999,
+        "expectedRateHz": 120,
+        "expectedSamples": 10439.88,
+        "observedSamples": 10440,
+        "residual": 0.12000000000080036,
+        "rivalUpdates": 10440,
+        "explanation": "Lap milliseconds are rounded in diagnostics; physics advances integer 120 Hz ticks."
+      },
+      "metrics": {
+        "script": "scripts/visual/ascension/instrument.mjs",
+        "samples": 10691,
+        "activeWindowMs": 86115.30000007153,
+        "activeExpectedSamples": 10701.984258236773,
+        "activeSampleResidual": -10.984258236772803,
+        "windowSamples": 720,
+        "windowMs": 5795.700000047684,
+        "calibration": {
+          "samples": 120,
+          "windowMs": 965.6000000238419,
+          "hz": 124.27506213446256
+        },
+        "expectedRateHz": 124.27506213446256,
+        "expectedSamples": 720.2609776186306,
+        "sampleResidual": -0.26097761863059077,
+        "observedRateHz": 124.23003260936147,
+        "p95Ms": 8.399999976158142,
+        "peakMainCalls": 55,
+        "peakShadowCalls": 17,
+        "peakTotalCalls": 72,
+        "peakTriangles": 59478,
+        "peakShadowTriangles": 23624,
+        "sizes": [
+          "1280x720"
+        ],
+        "note": "Expected rendering rate comes from a separate pre-start requestAnimationFrame calibration. Physics remains 120 Hz. Each sampled delta covers one render interval, including any stalls."
+      }
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-works-714/race.json",
+      "url": "http://127.0.0.1:5200/?map=ascension&seed=714&tier=works&demo=1&headless=1&diagnostics=1&start=manual&quality=high&music=0&demoTrench=1",
+      "seed": 714,
+      "tier": "works",
+      "lapsMs": [
+        30108,
+        28508,
+        28383
+      ],
+      "playerPosition": 2,
+      "missedGates": 0,
+      "recoveries": 0,
+      "impacts": 4,
+      "errors": [],
+      "physics": {
+        "windowSeconds": 86.999,
+        "expectedRateHz": 120,
+        "expectedSamples": 10439.88,
+        "observedSamples": 10440,
+        "residual": 0.12000000000080036,
+        "rivalUpdates": 10440,
+        "explanation": "Lap milliseconds are rounded in diagnostics; physics advances integer 120 Hz ticks."
+      },
+      "metrics": {
+        "script": "scripts/visual/ascension/instrument.mjs",
+        "samples": 10690,
+        "activeWindowMs": 86099.40000009537,
+        "activeExpectedSamples": 10693.363693620673,
+        "activeSampleResidual": -3.363693620673075,
+        "windowSamples": 720,
+        "windowMs": 5797,
+        "calibration": {
+          "samples": 120,
+          "windowMs": 966.1999999284744,
+          "hz": 124.19788864508727
+        },
+        "expectedRateHz": 124.19788864508727,
+        "expectedSamples": 719.9751604755709,
+        "sampleResidual": 0.02483952442912596,
+        "observedRateHz": 124.20217353803692,
+        "p95Ms": 8.399999976158142,
+        "peakMainCalls": 55,
+        "peakShadowCalls": 17,
+        "peakTotalCalls": 72,
+        "peakTriangles": 59418,
+        "peakShadowTriangles": 23624,
+        "sizes": [
+          "1280x720"
+        ],
+        "note": "Expected rendering rate comes from a separate pre-start requestAnimationFrame calibration. Physics remains 120 Hz. Each sampled delta covers one render interval, including any stalls."
+      }
+    }
+  ],
+  "schedule": {
+    "script": "scripts/build-ascension-route.mjs",
+    "measurementScript": "scripts/visual/ascension/race.mjs",
+    "measurement": "art/evidence/ascension-v1/phase-a/calibration/works-trench.json",
+    "worksLapSeconds": 28.0705,
+    "definition": "Mean of flying laps two and three in the full Works demo before schedule activation",
+    "launchTick": 8253,
+    "reopenTick": 10653,
+    "steamEndTick": 9937,
+    "rocketGoneTick": 9095,
+    "testTick": 4211,
+    "events": [
+      {
+        "id": "crawler-klaxon-1",
+        "tick": 1493,
+        "seconds": 12.441666666666666,
+        "multipleOfMeasuredL": 0.443229250161795
+      },
+      {
+        "id": "crawler-cross-1",
+        "tick": 1853,
+        "seconds": 15.441666666666666,
+        "multipleOfMeasuredL": 0.5501030144338956
+      },
+      {
+        "id": "deluge-test",
+        "tick": 4211,
+        "seconds": 35.09166666666667,
+        "multipleOfMeasuredL": 1.2501261704161546
+      },
+      {
+        "id": "crawler-klaxon-2",
+        "tick": 5030,
+        "seconds": 41.916666666666664,
+        "multipleOfMeasuredL": 1.4932639841351834
+      },
+      {
+        "id": "crawler-cross-2",
+        "tick": 5390,
+        "seconds": 44.916666666666664,
+        "multipleOfMeasuredL": 1.600137748407284
+      },
+      {
+        "id": "launch",
+        "tick": 8253,
+        "seconds": 68.775,
+        "multipleOfMeasuredL": 2.4500810459379068
+      },
+      {
+        "id": "rocket-gone",
+        "tick": 9095,
+        "seconds": 75.79166666666667,
+        "multipleOfMeasuredL": 2.700046905707653
+      },
+      {
+        "id": "steam-clear",
+        "tick": 9937,
+        "seconds": 82.80833333333334,
+        "multipleOfMeasuredL": 2.9500127654773993
+      },
+      {
+        "id": "trench-reopen",
+        "tick": 10653,
+        "seconds": 88.775,
+        "multipleOfMeasuredL": 3.1625728077519106
+      }
+    ]
+  }
+}

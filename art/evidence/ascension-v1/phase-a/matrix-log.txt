@@ -1,0 +1,9 @@
+{"laps":[30108,28508,28075],"missedGates":0,"recoveries":0,"errors":[]}
+{"laps":[30108,28508,28383],"missedGates":0,"recoveries":0,"errors":[]}
+{"laps":[30117,28483,28325],"missedGates":0,"recoveries":0,"errors":[]}
+{"laps":[30108,28508,28075],"missedGates":0,"recoveries":0,"errors":[]}
+{"laps":[30108,28508,28383],"missedGates":0,"recoveries":0,"errors":[]}
+{"laps":[30117,28483,28325],"missedGates":0,"recoveries":0,"errors":[]}
+{"laps":[30108,28508,28075],"missedGates":0,"recoveries":0,"errors":[]}
+{"laps":[30108,28508,28383],"missedGates":0,"recoveries":0,"errors":[]}
+{"laps":[30117,28483,28325],"missedGates":0,"recoveries":0,"errors":[]}

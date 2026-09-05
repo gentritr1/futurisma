@@ -124,6 +124,7 @@ export interface FieldOrderEntry {
 }
 
 export interface RaceCoursePresentation {
+  scheduleLabel?: string;
   mapName: string;
   mapCode: string;
   checkpointCount: number;
@@ -309,14 +310,17 @@ export class GameUi {
     }`;
     const polarity = course.mapCode === "MAP 04";
     const tideline = course.mapCode === "MAP 05";
-    document.body.dataset.map = tideline ? "tideline" : polarity ? "polarity" : course.mapCode === "MAP 03" ? "nightshift" : course.mapCode === "MAP 02" ? "bitterpan" : "greenwater";
-    document.querySelector<HTMLElement>(".intro-panel h1")!.textContent = tideline ? "TIDELINE" : polarity ? "POLARITY" : course.mapCode === "MAP 03" ? "NIGHT SHIFT" : "TOTEM";
-    document.querySelector<HTMLElement>(".intro-code")!.textContent = tideline ? "PELAGIC PUMPWORKS · THE TIDE CYCLE" : polarity ? "VECTOR EXCHANGE · 02:14 AM" : course.mapCode === "MAP 03" ? "MERIDIAN DISTRICT · AFTER HOURS" : "KAIRO DYNAMICS · KD-0714";
+    const ascension = course.mapCode === "MAP 06";
+    document.body.dataset.map = ascension ? "ascension" : tideline ? "tideline" : polarity ? "polarity" : course.mapCode === "MAP 03" ? "nightshift" : course.mapCode === "MAP 02" ? "bitterpan" : "greenwater";
+    document.querySelector<HTMLElement>(".intro-panel h1")!.textContent = ascension ? "ASCENSION PAD" : tideline ? "TIDELINE" : polarity ? "POLARITY" : course.mapCode === "MAP 03" ? "NIGHT SHIFT" : "TOTEM";
+    document.querySelector<HTMLElement>(".intro-code")!.textContent = ascension ? "PAD 09 · LAUNCH DAY / DAWN" : tideline ? "PELAGIC PUMPWORKS · THE TIDE CYCLE" : polarity ? "VECTOR EXCHANGE · 02:14 AM" : course.mapCode === "MAP 03" ? "MERIDIAN DISTRICT · AFTER HOURS" : "KAIRO DYNAMICS · KD-0714";
     const editionLink = document.getElementById("tideline-edition") as HTMLAnchorElement;
     editionLink.hidden = true;
     document.querySelectorAll<HTMLElement>("[data-polarity-control]").forEach((element) => { element.hidden = !polarity; });
-    document.querySelectorAll<HTMLElement>("[data-power-control]").forEach((element) => { element.hidden = !polarity && !tideline; });
-    this.introDeck.textContent = tideline
+    document.querySelectorAll<HTMLElement>("[data-power-control]").forEach((element) => { element.hidden = !polarity && !tideline && !ascension; });
+    this.introDeck.textContent = ascension
+      ? `Launch day: trench shortcut or Deluge Road. ${course.scheduleLabel ?? "Measuring Works lap"}. ${lapLabel}.`
+      : tideline
       ? `Lap 1: flooded reactor, lit recharge current. Lap 2: water falls outside the sealed chamber; condensation lowers deck grip. Lap 3: the drained pump hall opens a shorter line. Race the reactor and port; time E for Surge or Shield. ${lapLabel}.`
       : polarity ? `Choose your line. SPACE changes roads at marked junctions, with a six-second commitment. Upper: shorter, tighter. Lower: stronger devices and faster recharge. Time E on a launch strip. SHIFT fires nitro. ${lapLabel}.`
       : course.mapCode === "MAP 01"

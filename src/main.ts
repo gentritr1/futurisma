@@ -24,7 +24,9 @@ const ui = new GameUi();
 const input = new InputController();
 const courseAssemblyStartedAt = performance.now();
 const selection = resolveMapSelection(window.location.search);
-const course: RaceCourse = selection === "tideline"
+const course: RaceCourse = selection === "ascension"
+  ? new (await import("./game/ascension-course")).AscensionCourse()
+  : selection === "tideline"
   ? new (await import("./game/tideline-course")).TidelineCourse()
   : selection === "polarity"
   ? new (await import("./game/polarity-course")).PolarityCourse()

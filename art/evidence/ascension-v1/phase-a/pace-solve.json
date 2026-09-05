@@ -1,0 +1,61 @@
+{
+  "script": "scripts/solve-ascension-pace.mjs",
+  "playerSeconds": 86.249,
+  "scope": "Isolated production rival model, calibration targets; browser tier classification still required",
+  "measurements": [
+    {
+      "tier": "rookie",
+      "id": "rival-privateer",
+      "target": 89.249,
+      "measured": 89.2491149690804
+    },
+    {
+      "tier": "rookie",
+      "id": "rival-nightform",
+      "target": 91.249,
+      "measured": 91.25281888978029
+    },
+    {
+      "tier": "rookie",
+      "id": "rival-needle",
+      "target": 93.249,
+      "measured": 93.25166866963771
+    },
+    {
+      "tier": "works",
+      "id": "rival-privateer",
+      "target": 85.249,
+      "measured": 85.25012470006507
+    },
+    {
+      "tier": "works",
+      "id": "rival-nightform",
+      "target": 87.249,
+      "measured": 87.24891513372651
+    },
+    {
+      "tier": "works",
+      "id": "rival-needle",
+      "target": 89.249,
+      "measured": 89.25344655141915
+    },
+    {
+      "tier": "feral",
+      "id": "rival-privateer",
+      "target": 81.249,
+      "measured": 81.24761559713427
+    },
+    {
+      "tier": "feral",
+      "id": "rival-nightform",
+      "target": 83.249,
+      "measured": 83.2492612106469
+    },
+    {
+      "tier": "feral",
+      "id": "rival-needle",
+      "target": 85.249,
+      "measured": 85.24810674679273
+    }
+  ]
+}

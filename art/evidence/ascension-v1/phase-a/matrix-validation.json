@@ -1,0 +1,168 @@
+{
+  "script": "scripts/validate-ascension-matrix.mjs",
+  "rows": [
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-rookie-3868938316/race.json",
+      "seed": 3868938316,
+      "tier": "rookie",
+      "position": 1,
+      "lapsMs": [
+        30108,
+        28508,
+        28075
+      ],
+      "physics": {
+        "windowSeconds": 86.691,
+        "expectedRateHz": 120,
+        "expectedSamples": 10402.92,
+        "observedSamples": 10403,
+        "residual": 0.07999999999992724
+      }
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench/race.json",
+      "seed": 3868938316,
+      "tier": "works",
+      "position": 2,
+      "lapsMs": [
+        30108,
+        28508,
+        28383
+      ],
+      "physics": {
+        "windowSeconds": 86.999,
+        "expectedRateHz": 120,
+        "expectedSamples": 10439.88,
+        "observedSamples": 10440,
+        "residual": 0.12000000000080036
+      }
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-feral-3868938316/race.json",
+      "seed": 3868938316,
+      "tier": "feral",
+      "position": 4,
+      "lapsMs": [
+        30117,
+        28483,
+        28325
+      ],
+      "physics": {
+        "windowSeconds": 86.925,
+        "expectedRateHz": 120,
+        "expectedSamples": 10431,
+        "observedSamples": 10431,
+        "residual": 0
+      }
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-rookie-714/race.json",
+      "seed": 714,
+      "tier": "rookie",
+      "position": 1,
+      "lapsMs": [
+        30108,
+        28508,
+        28075
+      ],
+      "physics": {
+        "windowSeconds": 86.691,
+        "expectedRateHz": 120,
+        "expectedSamples": 10402.92,
+        "observedSamples": 10403,
+        "residual": 0.07999999999992724
+      }
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-works-714/race.json",
+      "seed": 714,
+      "tier": "works",
+      "position": 2,
+      "lapsMs": [
+        30108,
+        28508,
+        28383
+      ],
+      "physics": {
+        "windowSeconds": 86.999,
+        "expectedRateHz": 120,
+        "expectedSamples": 10439.88,
+        "observedSamples": 10440,
+        "residual": 0.12000000000080036
+      }
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-feral-714/race.json",
+      "seed": 714,
+      "tier": "feral",
+      "position": 4,
+      "lapsMs": [
+        30117,
+        28483,
+        28325
+      ],
+      "physics": {
+        "windowSeconds": 86.925,
+        "expectedRateHz": 120,
+        "expectedSamples": 10431,
+        "observedSamples": 10431,
+        "residual": 0
+      }
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-rookie-20260905/race.json",
+      "seed": 20260905,
+      "tier": "rookie",
+      "position": 1,
+      "lapsMs": [
+        30108,
+        28508,
+        28075
+      ],
+      "physics": {
+        "windowSeconds": 86.691,
+        "expectedRateHz": 120,
+        "expectedSamples": 10402.92,
+        "observedSamples": 10403,
+        "residual": 0.07999999999992724
+      }
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-works-20260905/race.json",
+      "seed": 20260905,
+      "tier": "works",
+      "position": 2,
+      "lapsMs": [
+        30108,
+        28508,
+        28383
+      ],
+      "physics": {
+        "windowSeconds": 86.999,
+        "expectedRateHz": 120,
+        "expectedSamples": 10439.88,
+        "observedSamples": 10440,
+        "residual": 0.12000000000080036
+      }
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-feral-20260905/race.json",
+      "seed": 20260905,
+      "tier": "feral",
+      "position": 4,
+      "lapsMs": [
+        30117,
+        28483,
+        28325
+      ],
+      "physics": {
+        "windowSeconds": 86.925,
+        "expectedRateHz": 120,
+        "expectedSamples": 10431,
+        "observedSamples": 10431,
+        "residual": 0
+      }
+    }
+  ],
+  "scope": "Nine complete private-browser races. Material-ID colour correction after this matrix does not alter route or physics; each raw capture records its input hashes."
+}

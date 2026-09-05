@@ -395,7 +395,7 @@ export function saltPatchAlpha(seconds) {
  * Builds one race's worth of events.
  *
  * @param {{
- *   kind: "greenwater" | "bitterpan" | "nightshift" | "polarity" | "tideline",
+ *   kind: "greenwater" | "bitterpan" | "nightshift" | "polarity" | "tideline" | "ascension",
  *   seed: number,
  *   totalLaps: number,
  *   courseLengthMeters: number,

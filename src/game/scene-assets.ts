@@ -396,6 +396,11 @@ export class SceneAssets {
   async loadAuthoredEnvironment(): Promise<void> {
     const environmentLoadStartedAt = performance.now();
     try {
+      if (this.course.kind === "ascension") {
+        const environment=await (await import("./ascension-environment")).AscensionEnvironment.load();
+        if(this.isDisposed()){disposeObject3DResources(environment.root);return;}
+        this.authoredEnvironment=environment;this.scene.add(environment.root);this.environmentReady=true;this.requestRender();return;
+      }
       if (this.course.kind === "nightshift" || this.course.kind === "polarity" || this.course.kind === "tideline") {
         const environment = this.course.kind === "tideline"
           ? await (await import("./tideline-environment")).TidelineEnvironment.load(this.course as import("./tideline-course").TidelineCourse)

@@ -1,0 +1,19 @@
+{
+  "script": "scripts/visual/ascension/instrument.mjs",
+  "samples": 10348,
+  "windowSamples": 720,
+  "windowMs": 5805.399999976158,
+  "expectedRateHz": 120,
+  "expectedSamples": 696.647999997139,
+  "observedRateHz": 124.02246184637698,
+  "p95Ms": 8.399999976158142,
+  "peakMainCalls": 69,
+  "peakShadowCalls": 22,
+  "peakTotalCalls": 91,
+  "peakTriangles": 59402,
+  "peakShadowTriangles": 24456,
+  "sizes": [
+    "1280x720"
+  ],
+  "note": "Expected 120 Hz is the configured headless pacing target, not a calibrated hardware refresh rate. Sample deficit is reported rather than omitted."
+}

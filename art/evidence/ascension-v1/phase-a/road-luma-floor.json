@@ -1,0 +1,151 @@
+{
+  "script": "scripts/visual/ascension/pin-road-floor.py",
+  "measurementScript": "scripts/visual/frame-metrics.py",
+  "baseRecordedFirst": "road-luma-base.json",
+  "referencePatches": {
+    "under": {
+      "x": 600,
+      "y": 500
+    },
+    "between": {
+      "x": 600,
+      "y": 530
+    }
+  },
+  "references": [
+    {
+      "file": "B.png",
+      "flat_pct": 8.2,
+      "hsplit": -11.9,
+      "skysat": 44.7,
+      "edges_pct": 10.55,
+      "midtone_pct": 28.1,
+      "horizon_row": 368,
+      "mode_rgb": [
+        2,
+        2,
+        2
+      ],
+      "lamp_luma_under": 35.047921180555555,
+      "lamp_luma_between": 27.46927847222222,
+      "lamp_ratio": 1.2758952229486875,
+      "sha256": "75667b2ca3b937843de6865448108db3bb0dae95ccd291b1e15b385c0149f2cd"
+    },
+    {
+      "file": "C.png",
+      "flat_pct": 8.5,
+      "hsplit": 9.0,
+      "skysat": 71.3,
+      "edges_pct": 9.96,
+      "midtone_pct": 14.7,
+      "horizon_row": 360,
+      "mode_rgb": [
+        2,
+        2,
+        2
+      ],
+      "lamp_luma_under": 26.25200520833333,
+      "lamp_luma_between": 21.846328819444444,
+      "lamp_ratio": 1.2016666701898027,
+      "sha256": "f32e6407f811d7de28c57cc27f351b1d44d52b1b05a37e6ac76abf300ce47392"
+    },
+    {
+      "file": "F.png",
+      "flat_pct": 6.7,
+      "hsplit": 30.8,
+      "skysat": 72.9,
+      "edges_pct": 9.91,
+      "midtone_pct": 10.2,
+      "horizon_row": 336,
+      "mode_rgb": [
+        2,
+        2,
+        2
+      ],
+      "lamp_luma_under": 21.140694791666665,
+      "lamp_luma_between": 15.381080208333332,
+      "lamp_ratio": 1.3744609939822579,
+      "sha256": "c855bec595aefcf3f034407c7eb27cbee6ffda95c6e67f31bc78465e1626b2c2"
+    },
+    {
+      "file": "H.png",
+      "flat_pct": 5.8,
+      "hsplit": -23.2,
+      "skysat": 60.9,
+      "edges_pct": 7.86,
+      "midtone_pct": 25.0,
+      "horizon_row": 384,
+      "mode_rgb": [
+        2,
+        2,
+        2
+      ],
+      "lamp_luma_under": 25.019123958333335,
+      "lamp_luma_between": 15.054633680555554,
+      "lamp_ratio": 1.6618885911948715,
+      "sha256": "956f2faa749ccd6066010d35cc0267c19ba2c95321451a53a91c964e8776120b"
+    },
+    {
+      "file": "J.png",
+      "flat_pct": 19.8,
+      "hsplit": 32.4,
+      "skysat": 51.0,
+      "edges_pct": 5.77,
+      "midtone_pct": 24.1,
+      "horizon_row": 352,
+      "mode_rgb": [
+        6,
+        2,
+        2
+      ],
+      "lamp_luma_under": 3.529478472222222,
+      "lamp_luma_between": 1.9208677083333332,
+      "lamp_ratio": 1.8374396409030278,
+      "sha256": "713ebc9eee9be73b2188b039b845c80b5cb02f8c3624aa9b7b9545bb2473b53b"
+    }
+  ],
+  "darkestAcceptedTunnelPatch": 3.529478472222222,
+  "rule": "85% of each sector blockout base, allowing texture shading variation, but never below the darkest measured accepted Tideline tunnel road patch. These are art acceptance floors, not proof of finished-art compliance.",
+  "floors": [
+    {
+      "sector": "APRON_SWEEP",
+      "baseLuma": 67.968,
+      "floor": 57.772800000000004
+    },
+    {
+      "sector": "CAUSEWAY",
+      "baseLuma": 68.96799999999999,
+      "floor": 58.62279999999999
+    },
+    {
+      "sector": "CRAWLERWAY",
+      "baseLuma": 68.96799999999999,
+      "floor": 58.62279999999999
+    },
+    {
+      "sector": "DELUGE_ROAD",
+      "baseLuma": 68.96799999999999,
+      "floor": 58.62279999999999
+    },
+    {
+      "sector": "MANGROVE_CUT",
+      "baseLuma": 68.96799999999999,
+      "floor": 58.62279999999999
+    },
+    {
+      "sector": "PAD_ROAD",
+      "baseLuma": 68.96799999999999,
+      "floor": 58.62279999999999
+    },
+    {
+      "sector": "TANK_FARM",
+      "baseLuma": 68.96799999999999,
+      "floor": 58.62279999999999
+    },
+    {
+      "sector": "TRENCH",
+      "baseLuma": 102.04419999999999,
+      "floor": 86.73756999999999
+    }
+  ]
+}

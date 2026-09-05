@@ -485,13 +485,7 @@ export class FuturismaGame {
       this.totalLaps,
       this.course.length,
       [],
-      {
-        mapName: this.course.mapName,
-        mapCode: this.course.mapCode,
-        checkpointCount: this.course.checkpointCount,
-        finishName: this.course.finishName,
-        startLabel: this.course.startLabel,
-      },
+      this.course,
     );
     this.ui.setDemoAutopilot(this.demoAutopilot);
     this.ui.setGraphicsContextLost(false);
@@ -590,13 +584,7 @@ export class FuturismaGame {
       this.totalLaps,
       this.course.length,
       this.rivalFleet?.gridEntries ?? [],
-      {
-        mapName: this.course.mapName,
-        mapCode: this.course.mapCode,
-        checkpointCount: this.course.checkpointCount,
-        finishName: this.course.finishName,
-        startLabel: this.course.startLabel,
-      },
+      this.course,
     );
     this.resetRaceState();
     this.updatePose(ZERO_INPUT, 0);

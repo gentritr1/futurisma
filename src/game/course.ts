@@ -270,7 +270,7 @@ export interface TimeOfDayStop {
   keyScale: number;
 }
 
-export type CourseKind = "greenwater" | "bitterpan" | "nightshift" | "polarity" | "tideline";
+export type CourseKind = "greenwater" | "bitterpan" | "nightshift" | "polarity" | "tideline" | "ascension";
 
 export interface RivalGridStart {
   raceDistanceMeters: number;
@@ -301,6 +301,7 @@ export interface RivalPaceTable {
 }
 
 export interface RaceCourse {
+  readonly scheduleLabel?: string;
   readonly kind: CourseKind;
   readonly group: THREE.Group;
   readonly length: number;

@@ -1,0 +1,900 @@
+{
+  "script": "scripts/visual/ascension/stations.mjs",
+  "records": [
+    {
+      "file": "base-PAD_ROAD.png",
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static blockout evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.04,
+      "tick": 0,
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -284.12425352253365,
+        9.76,
+        -310.2980516427386
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "render": {
+        "calls": 5,
+        "triangles": 28284
+      }
+    },
+    {
+      "file": "base-APRON_SWEEP.png",
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static blockout evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.12,
+      "tick": 0,
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -95.22699733969817,
+        9.76,
+        -393.8227858899833
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "render": {
+        "calls": 4,
+        "triangles": 28364
+      }
+    },
+    {
+      "file": "base-DELUGE_ROAD.png",
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static blockout evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.39,
+      "tick": 0,
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        470.80690739165016,
+        9.76,
+        -72.05927205904838
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "render": {
+        "calls": 3,
+        "triangles": 28232
+      }
+    },
+    {
+      "file": "base-CRAWLERWAY.png",
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static blockout evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.645,
+      "tick": 0,
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        79.41235691402544,
+        9.76,
+        332.679944855847
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "render": {
+        "calls": 6,
+        "triangles": 28344
+      }
+    },
+    {
+      "file": "base-MANGROVE_CUT.png",
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static blockout evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.7250000000000001,
+      "tick": 0,
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -124.25298089765646,
+        9.76,
+        295.7325102036956
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "render": {
+        "calls": 5,
+        "triangles": 28284
+      }
+    },
+    {
+      "file": "base-CAUSEWAY.png",
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static blockout evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.835,
+      "tick": 0,
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -361.37591596778765,
+        9.76,
+        140.99023338999015
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "render": {
+        "calls": 5,
+        "triangles": 28284
+      }
+    },
+    {
+      "file": "base-TANK_FARM.png",
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static blockout evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.9450000000000001,
+      "tick": 0,
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -427.4711238730956,
+        9.76,
+        -116.08776330188583
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "render": {
+        "calls": 5,
+        "triangles": 28284
+      }
+    },
+    {
+      "file": "base-TRENCH.png",
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static blockout evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.3975,
+      "tick": 0,
+      "trench": true,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        246.7989313535308,
+        -2.2397752991958413,
+        -48.00042821208598
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "render": {
+        "calls": 4,
+        "triangles": 28292
+      }
+    },
+    {
+      "file": "test-PAD_ROAD.png",
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static blockout evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.04,
+      "tick": 4331,
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -284.12425352253365,
+        9.76,
+        -310.2980516427386
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": true
+      },
+      "render": {
+        "calls": 5,
+        "triangles": 28284
+      }
+    },
+    {
+      "file": "test-APRON_SWEEP.png",
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static blockout evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.12,
+      "tick": 4331,
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -95.22699733969817,
+        9.76,
+        -393.8227858899833
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": true
+      },
+      "render": {
+        "calls": 4,
+        "triangles": 28364
+      }
+    },
+    {
+      "file": "test-DELUGE_ROAD.png",
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static blockout evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.39,
+      "tick": 4331,
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        470.80690739165016,
+        9.76,
+        -72.05927205904838
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": true
+      },
+      "render": {
+        "calls": 3,
+        "triangles": 28232
+      }
+    },
+    {
+      "file": "test-CRAWLERWAY.png",
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static blockout evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.645,
+      "tick": 4331,
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        79.41235691402544,
+        9.76,
+        332.679944855847
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": true
+      },
+      "render": {
+        "calls": 6,
+        "triangles": 28344
+      }
+    },
+    {
+      "file": "test-MANGROVE_CUT.png",
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static blockout evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.7250000000000001,
+      "tick": 4331,
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -124.25298089765646,
+        9.76,
+        295.7325102036956
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": true
+      },
+      "render": {
+        "calls": 5,
+        "triangles": 28284
+      }
+    },
+    {
+      "file": "test-CAUSEWAY.png",
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static blockout evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.835,
+      "tick": 4331,
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -361.37591596778765,
+        9.76,
+        140.99023338999015
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": true
+      },
+      "render": {
+        "calls": 5,
+        "triangles": 28284
+      }
+    },
+    {
+      "file": "test-TANK_FARM.png",
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static blockout evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.9450000000000001,
+      "tick": 4331,
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -427.4711238730956,
+        9.76,
+        -116.08776330188583
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": true
+      },
+      "render": {
+        "calls": 5,
+        "triangles": 28284
+      }
+    },
+    {
+      "file": "test-TRENCH.png",
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static blockout evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.3975,
+      "tick": 4331,
+      "trench": true,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        246.7989313535308,
+        -2.2397752991958413,
+        -48.00042821208598
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": true
+      },
+      "render": {
+        "calls": 4,
+        "triangles": 28292
+      }
+    },
+    {
+      "file": "launch-PAD_ROAD.png",
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static blockout evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.04,
+      "tick": 8373,
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -284.12425352253365,
+        9.76,
+        -310.2980516427386
+      ],
+      "schedule": {
+        "trenchOpen": false,
+        "steam": true,
+        "launched": true,
+        "rocketGone": false,
+        "deluge": true
+      },
+      "render": {
+        "calls": 5,
+        "triangles": 28284
+      }
+    },
+    {
+      "file": "launch-APRON_SWEEP.png",
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static blockout evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.12,
+      "tick": 8373,
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -95.22699733969817,
+        9.76,
+        -393.8227858899833
+      ],
+      "schedule": {
+        "trenchOpen": false,
+        "steam": true,
+        "launched": true,
+        "rocketGone": false,
+        "deluge": true
+      },
+      "render": {
+        "calls": 4,
+        "triangles": 28364
+      }
+    },
+    {
+      "file": "launch-DELUGE_ROAD.png",
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static blockout evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.39,
+      "tick": 8373,
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        470.80690739165016,
+        9.76,
+        -72.05927205904838
+      ],
+      "schedule": {
+        "trenchOpen": false,
+        "steam": true,
+        "launched": true,
+        "rocketGone": false,
+        "deluge": true
+      },
+      "render": {
+        "calls": 3,
+        "triangles": 28232
+      }
+    },
+    {
+      "file": "launch-CRAWLERWAY.png",
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static blockout evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.645,
+      "tick": 8373,
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        79.41235691402544,
+        9.76,
+        332.679944855847
+      ],
+      "schedule": {
+        "trenchOpen": false,
+        "steam": true,
+        "launched": true,
+        "rocketGone": false,
+        "deluge": true
+      },
+      "render": {
+        "calls": 6,
+        "triangles": 28344
+      }
+    },
+    {
+      "file": "launch-MANGROVE_CUT.png",
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static blockout evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.7250000000000001,
+      "tick": 8373,
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -124.25298089765646,
+        9.76,
+        295.7325102036956
+      ],
+      "schedule": {
+        "trenchOpen": false,
+        "steam": true,
+        "launched": true,
+        "rocketGone": false,
+        "deluge": true
+      },
+      "render": {
+        "calls": 5,
+        "triangles": 28284
+      }
+    },
+    {
+      "file": "launch-CAUSEWAY.png",
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static blockout evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.835,
+      "tick": 8373,
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -361.37591596778765,
+        9.76,
+        140.99023338999015
+      ],
+      "schedule": {
+        "trenchOpen": false,
+        "steam": true,
+        "launched": true,
+        "rocketGone": false,
+        "deluge": true
+      },
+      "render": {
+        "calls": 5,
+        "triangles": 28284
+      }
+    },
+    {
+      "file": "launch-TANK_FARM.png",
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static blockout evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.9450000000000001,
+      "tick": 8373,
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -427.4711238730956,
+        9.76,
+        -116.08776330188583
+      ],
+      "schedule": {
+        "trenchOpen": false,
+        "steam": true,
+        "launched": true,
+        "rocketGone": false,
+        "deluge": true
+      },
+      "render": {
+        "calls": 5,
+        "triangles": 28284
+      }
+    },
+    {
+      "file": "launch-TRENCH.png",
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static blockout evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.3975,
+      "tick": 8373,
+      "trench": true,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        246.7989313535308,
+        -2.2397752991958413,
+        -48.00042821208598
+      ],
+      "schedule": {
+        "trenchOpen": false,
+        "steam": true,
+        "launched": true,
+        "rocketGone": false,
+        "deluge": true
+      },
+      "render": {
+        "calls": 4,
+        "triangles": 28292
+      }
+    },
+    {
+      "file": "reopened-PAD_ROAD.png",
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static blockout evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.04,
+      "tick": 10773,
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -284.12425352253365,
+        9.76,
+        -310.2980516427386
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": true,
+        "rocketGone": true,
+        "deluge": false
+      },
+      "render": {
+        "calls": 5,
+        "triangles": 28284
+      }
+    },
+    {
+      "file": "reopened-APRON_SWEEP.png",
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static blockout evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.12,
+      "tick": 10773,
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -95.22699733969817,
+        9.76,
+        -393.8227858899833
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": true,
+        "rocketGone": true,
+        "deluge": false
+      },
+      "render": {
+        "calls": 4,
+        "triangles": 28364
+      }
+    },
+    {
+      "file": "reopened-DELUGE_ROAD.png",
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static blockout evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.39,
+      "tick": 10773,
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        470.80690739165016,
+        9.76,
+        -72.05927205904838
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": true,
+        "rocketGone": true,
+        "deluge": false
+      },
+      "render": {
+        "calls": 3,
+        "triangles": 28232
+      }
+    },
+    {
+      "file": "reopened-CRAWLERWAY.png",
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static blockout evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.645,
+      "tick": 10773,
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        79.41235691402544,
+        9.76,
+        332.679944855847
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": true,
+        "rocketGone": true,
+        "deluge": false
+      },
+      "render": {
+        "calls": 6,
+        "triangles": 28344
+      }
+    },
+    {
+      "file": "reopened-MANGROVE_CUT.png",
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static blockout evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.7250000000000001,
+      "tick": 10773,
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -124.25298089765646,
+        9.76,
+        295.7325102036956
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": true,
+        "rocketGone": true,
+        "deluge": false
+      },
+      "render": {
+        "calls": 5,
+        "triangles": 28284
+      }
+    },
+    {
+      "file": "reopened-CAUSEWAY.png",
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static blockout evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.835,
+      "tick": 10773,
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -361.37591596778765,
+        9.76,
+        140.99023338999015
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": true,
+        "rocketGone": true,
+        "deluge": false
+      },
+      "render": {
+        "calls": 5,
+        "triangles": 28284
+      }
+    },
+    {
+      "file": "reopened-TANK_FARM.png",
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static blockout evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.9450000000000001,
+      "tick": 10773,
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -427.4711238730956,
+        9.76,
+        -116.08776330188583
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": true,
+        "rocketGone": true,
+        "deluge": false
+      },
+      "render": {
+        "calls": 5,
+        "triangles": 28284
+      }
+    },
+    {
+      "file": "reopened-TRENCH.png",
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static blockout evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.3975,
+      "tick": 10773,
+      "trench": true,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        246.7989313535308,
+        -2.2397752991958413,
+        -48.00042821208598
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": true,
+        "rocketGone": true,
+        "deluge": false
+      },
+      "render": {
+        "calls": 4,
+        "triangles": 28292
+      }
+    },
+    {
+      "file": "board-1-150m.png",
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static blockout evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.04,
+      "tick": 0,
+      "trench": false,
+      "board": "1",
+      "boardDistance": 164.14157436964211,
+      "camera": [
+        -363.7327699725447,
+        6.4,
+        -238.48799081661244
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "render": {
+        "calls": 5,
+        "triangles": 28284
+      }
+    },
+    {
+      "file": "board-2-150m.png",
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static blockout evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.04,
+      "tick": 0,
+      "trench": false,
+      "board": "2",
+      "boardDistance": 163.7282452246082,
+      "camera": [
+        -159.34925785571525,
+        6.4,
+        273.72302252673154
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "render": {
+        "calls": 5,
+        "triangles": 28284
+      }
+    }
+  ],
+  "errors": [],
+  "roadPatches": {
+    "under": {
+      "x": 640,
+      "y": 430
+    },
+    "between": {
+      "x": 640,
+      "y": 455
+    }
+  }
+}

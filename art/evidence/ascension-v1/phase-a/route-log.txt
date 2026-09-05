@@ -1,0 +1,20 @@
+
+> futurisma-race@0.1.0 validate:ascension
+> node scripts/validate-ascension.mjs
+
+{
+  "script": "scripts/validate-ascension.mjs",
+  "routeMetres": 2599.9999999999914,
+  "orderedGates": 8,
+  "maxProjectionError": 0,
+  "minimumCrawlerClearance": 13,
+  "sweep": {
+    "directions": 2,
+    "secondsPerDirection": 6,
+    "hz": 120,
+    "inclusiveEndpoints": true,
+    "expectedSamples": 1442,
+    "samples": 1442
+  },
+  "scope": "Flat-ID crawler hierarchy translation; not a rendered animation or launch corridor acceptance"
+}

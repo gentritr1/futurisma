@@ -1,0 +1,50 @@
+{
+  "script": "scripts/visual/ascension/matrix.mjs",
+  "rows": [
+    {
+      "seed": 3868938316,
+      "tier": "rookie",
+      "code": 0
+    },
+    {
+      "seed": 3868938316,
+      "tier": "works",
+      "code": 0
+    },
+    {
+      "seed": 3868938316,
+      "tier": "feral",
+      "code": 0
+    },
+    {
+      "seed": 714,
+      "tier": "rookie",
+      "code": 0
+    },
+    {
+      "seed": 714,
+      "tier": "works",
+      "code": 0
+    },
+    {
+      "seed": 714,
+      "tier": "feral",
+      "code": 0
+    },
+    {
+      "seed": 20260905,
+      "tier": "rookie",
+      "code": 0
+    },
+    {
+      "seed": 20260905,
+      "tier": "works",
+      "code": 0
+    },
+    {
+      "seed": 20260905,
+      "tier": "feral",
+      "code": 0
+    }
+  ]
+}

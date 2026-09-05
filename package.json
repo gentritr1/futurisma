@@ -65,7 +65,9 @@
     "validate:tidal-pump-gantry": "node scripts/validate-tidal-pump-gantry.mjs",
     "validate:tideline-driving": "node scripts/validate-tideline-driving.mjs",
     "validate:tideline-hardware": "node scripts/validate-tideline-hardware.mjs && node scripts/validate-tideline-power-chain.mjs",
-    "validate:tideline-contract": "node scripts/validate-tideline-contract.mjs"
+    "validate:tideline-contract": "node scripts/validate-tideline-contract.mjs",
+    "validate:ascension": "node scripts/validate-ascension.mjs",
+    "validate:ascension-runtime": "node scripts/validate-ascension-runtime.mjs"
   },
   "dependencies": {
     "three": "0.184.0"

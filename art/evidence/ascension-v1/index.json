@@ -1,0 +1,649 @@
+{
+  "script": "scripts/visual/ascension/report.mjs",
+  "files": [
+    {
+      "file": "art/evidence/ascension-v1/README.md",
+      "sha256": "9d6c1b1fedd05453975d1545cd664d604e74340f410bfa7e9a1118ea875a3408"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/acceptance.json",
+      "sha256": "25aad0dbc5470cc53df9992326ac6b11879bf6fc2ea69fb7cdeadc763a3d491f"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/acceptance.txt",
+      "sha256": "490ed562dfae07b9384e366d84bca8fe2c668d8aaead78c3b77f2f0e04ffa281"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/calibration/previous-route-works-trench.json",
+      "sha256": "2057e8695c970bce0bf7562d5ad882e904e582d7f47206a4ef14b79ae65f8466"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/calibration/works-trench.json",
+      "sha256": "17d82b20117aa9a0acf05991931bda081cb8757d41f720e9ba442786e1bf2812"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/corridor-validation.txt",
+      "sha256": "3ac6caba73487583f735cffbcbb94775209e783331958b0e5605aba5ce93e7d6"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/corridor.json",
+      "sha256": "4a0264d1010854ae61020708256a1c739e7e9f003b036f0b617b23108601b355"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/deluge/finish.png",
+      "sha256": "4af4ca7a14a34b1584111201d6195eeb658c6fd467c0367f662cf69d1ba5ef60"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/deluge/metrics.json",
+      "sha256": "941f8531841d8f431fd275a05ea4ce0e10c7ec67330707d9b462bc3438ce53bd"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/deluge/race.json",
+      "sha256": "e871ea8bf11275bf7d589e4ccbc4e965665e3d46e6d0e52c087e6746534dd693"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/deluge/start.png",
+      "sha256": "5d580228ccd439d89520aecd71f04c876961f03025ca5befc83af86a25b2646c"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/deluge-before-batching/finish.png",
+      "sha256": "74bf9adefd5bfe494b3df7729ba8da1da898033b52d7f7fd17895a379d55c964"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/deluge-before-batching/metrics.json",
+      "sha256": "527f37d08a53852d7c8aa9ae112783789d70ca9e9ca0f0cae960945d982d2f83"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/deluge-before-batching/race.json",
+      "sha256": "c6e79c5b9d65b7fb961639020c3704213344456dce8c0b6b307b7eaef5a268b9"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/deluge-before-batching/start.png",
+      "sha256": "955982ec756b36c6d448aae366f52ed0b645af98e1ba522fffe5209c52b6d5ec"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/deluge-log.txt",
+      "sha256": "8d38fc567ce879d549a4c7d9db33b0d55a2c949711a89b12f191383dc0004033"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/driving-log.txt",
+      "sha256": "adac3149cbc46fcef28925928289705e1f772d769f1cd263bfc91b77635ff237"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/driving.json",
+      "sha256": "5541db986f0c31926c777e798cff40bacbfd7a3e5a758721db6d55dd0328cafc"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/matrix-log.txt",
+      "sha256": "5cd8a4393c94bfc8d6c3f41e04326eafcae1a23faf8b50a943b88dcb858b95e0"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/matrix-status.json",
+      "sha256": "bc591be0667a8f5177edc1f311a6ed2a1d0bd4f044a04aae7e8218c04447e1d8"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/matrix-validation.json",
+      "sha256": "62b75d8497df7e75076b725cc0d8dec19e42afd8991679ab30c9bede800eb7ee"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/matrix-validation.txt",
+      "sha256": "97b987050b57e1cfdbed1d8d7c9c5d36decc57e375a9dac6c372487edb056413"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/npm-test.txt",
+      "sha256": "3d944fb2d25ce7ee40477883b191ab55d885c7059a8f9d860ea232a6c1f703bb"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/pace-log.txt",
+      "sha256": "76ea88425f4279af56eab2eb8c90027cf8c99f782f3d0f52b481772cf855101d"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/pace-solve.json",
+      "sha256": "3aa279b1204acbd1f2e8dc2551eecf59294f0de78b2a8063cd6212eebef70e88"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/reduced-log.txt",
+      "sha256": "86c15e386be2d8840346c1382c9921798bb9c08f449427f2094910d5e218f84d"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/report-log.txt",
+      "sha256": "81ca6eff196be524861ac9b43104cb34b846ee5877faec6743599a1534d6316d"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/report.json",
+      "sha256": "ce9fcfa3a1ca8adf5685dbf9ca501eb8c1840ed36f6905154cbf2b8b9e136d09"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/road-luma-base.json",
+      "sha256": "37bbe84d346b8cb8b5026473b8c675171354cb9cf6e34c9a7c35b8544fe057e2"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/road-luma-floor.json",
+      "sha256": "fcd8f74981f61da318387fa24741b8be799e6b95414dd0dc400f631f83595c6d"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/road-luma-log.txt",
+      "sha256": "8f5932c12178067326761b674ec198e5a5a2b270873e13fd6425735316c5d166"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/route-log.txt",
+      "sha256": "d2818695bb73f5d916db0e24cb744af6af0e54cbf542964d36fe6f035e5c2069"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/route-validation.json",
+      "sha256": "cf2a9a5ee73fc3cf1c7a81d088353c4b6d3587d9a5a7c3e8c55f487ae6da62c2"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/route-validation.txt",
+      "sha256": "b5a225326f67a206fd813af54fa5a1c3b7ccbcb8a99579cd04562d5994b89bd2"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/runtime-log.txt",
+      "sha256": "3d0a3078d76786b34935edb6c0a8a69570867137d2ce57c24bda284cced4eb62"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/runtime-validation.json",
+      "sha256": "0b5ff0349b4b6bd76b2003b04b2fe861eb9745fefbc6911eb0bb4a8c1c425b69"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/runtime-validation.txt",
+      "sha256": "c2cb29090f2d05c7ebae7fe56ee05083013213a12ba787ce746ca6fb77d88069"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/schedule-build.txt",
+      "sha256": "8120f4971775050c725b358cb91b382ef9db4d0227945adec6d2c6cc93df78a2"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/stations/base-APRON_SWEEP.png",
+      "sha256": "331954fcef091f47f95a246b13ec37cbab837130d16a9ce3884b970fee7b60d4"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/stations/base-CAUSEWAY.png",
+      "sha256": "e62f7c9b96a16f2dd8515c609e4ad40d3154660c819eb96c376ae4c2cae6f91e"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/stations/base-CRAWLERWAY.png",
+      "sha256": "e649b3c48d2529b19460568ca9ee06c549bb837770e34c453137b8cb07c9deff"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/stations/base-DELUGE_ROAD.png",
+      "sha256": "4f85715b2ee4340bb96bf117146e262bc5251de44a5227f191a340d31bf735ad"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/stations/base-MANGROVE_CUT.png",
+      "sha256": "a8e9eb2228c429462dc7016e82465aea8b2334ac481f36b0eef5470593be2b03"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/stations/base-PAD_ROAD.png",
+      "sha256": "75cbd4f300d631131c71d5e2a70d0393072611d6850048923138ce8d75d1c413"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/stations/base-TANK_FARM.png",
+      "sha256": "8cf3fa3d34e0b0d856cc9afcbbb9c761c37cb085991015d051a1084c171b18a5"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/stations/base-TRENCH.png",
+      "sha256": "58cf46bf348630bba6b42f58dea9d60ca2bff6ed1bd17b13bb68384077b272fe"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/stations/board-1-150m.png",
+      "sha256": "5cff055445a43fca012f062b2695b9e03f0936013ab20c919b08a72e49f5fbb5"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/stations/board-2-150m.png",
+      "sha256": "1fee3d6ac7b9933019dc7dd41075c857feabbe6b030ec43cd8741c05b011ab80"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/stations/capture.json",
+      "sha256": "b6b93f48a4540f402fddb0f3ee060f29c2bb6f66d10b6f526ddff47576610d60"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/stations/launch-APRON_SWEEP.png",
+      "sha256": "11d5a2c59ddbd2a2a6699eff779c533a0923e3e8d49864d1f087062e910d641c"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/stations/launch-CAUSEWAY.png",
+      "sha256": "e62f7c9b96a16f2dd8515c609e4ad40d3154660c819eb96c376ae4c2cae6f91e"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/stations/launch-CRAWLERWAY.png",
+      "sha256": "e649b3c48d2529b19460568ca9ee06c549bb837770e34c453137b8cb07c9deff"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/stations/launch-DELUGE_ROAD.png",
+      "sha256": "4f85715b2ee4340bb96bf117146e262bc5251de44a5227f191a340d31bf735ad"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/stations/launch-MANGROVE_CUT.png",
+      "sha256": "3a297b3f1463bb359ba601b55f6e0bad83006285dfa96ea56d0e8504f6cd9fe2"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/stations/launch-PAD_ROAD.png",
+      "sha256": "6bf3d2b7955debcdb696efd128e9b41ab954960dff63e1e87eb50f4d4688bc49"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/stations/launch-TANK_FARM.png",
+      "sha256": "15a2dc77e22990b0f684ba88c47dab8eea5c29652a2d92029f1212b22e4d6e8c"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/stations/launch-TRENCH.png",
+      "sha256": "58cf46bf348630bba6b42f58dea9d60ca2bff6ed1bd17b13bb68384077b272fe"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/stations/reopened-APRON_SWEEP.png",
+      "sha256": "331954fcef091f47f95a246b13ec37cbab837130d16a9ce3884b970fee7b60d4"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/stations/reopened-CAUSEWAY.png",
+      "sha256": "e62f7c9b96a16f2dd8515c609e4ad40d3154660c819eb96c376ae4c2cae6f91e"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/stations/reopened-CRAWLERWAY.png",
+      "sha256": "e649b3c48d2529b19460568ca9ee06c549bb837770e34c453137b8cb07c9deff"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/stations/reopened-DELUGE_ROAD.png",
+      "sha256": "4f85715b2ee4340bb96bf117146e262bc5251de44a5227f191a340d31bf735ad"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/stations/reopened-MANGROVE_CUT.png",
+      "sha256": "c7db8cc8be745a2b1b36bf4346a86e0e8b5d7d8f3b0c9d9e797df9d9e189dda4"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/stations/reopened-PAD_ROAD.png",
+      "sha256": "132ad8ce25c14c2f048809843aea7609b8c21819cca03f01bd1954d3b122dca4"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/stations/reopened-TANK_FARM.png",
+      "sha256": "8cf3fa3d34e0b0d856cc9afcbbb9c761c37cb085991015d051a1084c171b18a5"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/stations/reopened-TRENCH.png",
+      "sha256": "58cf46bf348630bba6b42f58dea9d60ca2bff6ed1bd17b13bb68384077b272fe"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/stations/test-APRON_SWEEP.png",
+      "sha256": "331954fcef091f47f95a246b13ec37cbab837130d16a9ce3884b970fee7b60d4"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/stations/test-CAUSEWAY.png",
+      "sha256": "e62f7c9b96a16f2dd8515c609e4ad40d3154660c819eb96c376ae4c2cae6f91e"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/stations/test-CRAWLERWAY.png",
+      "sha256": "e649b3c48d2529b19460568ca9ee06c549bb837770e34c453137b8cb07c9deff"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/stations/test-DELUGE_ROAD.png",
+      "sha256": "4f85715b2ee4340bb96bf117146e262bc5251de44a5227f191a340d31bf735ad"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/stations/test-MANGROVE_CUT.png",
+      "sha256": "5db13e657df11c89a3d68a8cf80287520c48885cd9fd0e40fdd2e48721cc2a19"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/stations/test-PAD_ROAD.png",
+      "sha256": "256142cdfbb17d4f5c21f4697d9d3d96e34709a8e335998dbf4394c5370cfbc2"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/stations/test-TANK_FARM.png",
+      "sha256": "8cf3fa3d34e0b0d856cc9afcbbb9c761c37cb085991015d051a1084c171b18a5"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/stations/test-TRENCH.png",
+      "sha256": "58cf46bf348630bba6b42f58dea9d60ca2bff6ed1bd17b13bb68384077b272fe"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/stations-log.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/tier-log.txt",
+      "sha256": "fc33acc45f29ac5fb0c80df938cb1a5e7df590dc306609d2c3cbdfb0ce3899b8"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/tier-model.json",
+      "sha256": "8f1cd2c31a726f2139a321c1b6e2079f73cbd4766229067850e1a9d3de5e5a98"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/tier-validation.txt",
+      "sha256": "fc33acc45f29ac5fb0c80df938cb1a5e7df590dc306609d2c3cbdfb0ce3899b8"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench/finish.png",
+      "sha256": "460d5fd3004da936621707e9c5f000a96728f04ee3a755938bfd03ad28fb341e"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench/metrics.json",
+      "sha256": "7936256cf6c6e2d04a1303834fce41c27b9a9ea48e7a5079260fe85c7adddb8c"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench/race.json",
+      "sha256": "e555e2b232edcf63e169bc649a8ae3c44d1fd4741d5d8ae58c5b00317e5c2368"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench/start.png",
+      "sha256": "c3cc48dbce815f18cb453c34c52f6877edfd3a3c7820c05cc2e6f4a95dd10010"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-before-batching/finish.png",
+      "sha256": "659ed13f6ef0b0cb902f9a9cdba0ab610f3c380b701ca42dd9f507b8ab666028"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-before-batching/metrics.json",
+      "sha256": "e5167ed48f51befc92e9d09b6936f333347dd8dd8f0c81e5c78539419afde5c2"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-before-batching/race.json",
+      "sha256": "f93019f5043a7403784bdeb2a2bc312d23993060d470bd8c7b910d7b711484cd"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-before-batching/start.png",
+      "sha256": "ac310cee4ca2a097c9a0f7f17d4f49cb0c2416a56e8a0f2fea0002bff8dec52c"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-calibration/finish.png",
+      "sha256": "8f602a4b297886d3bfc451ca6612dbe1de39756f89675bc8a4e9fbba66fd99e9"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-calibration/metrics.json",
+      "sha256": "fb21963f3c4352627de555a0b7bf541ab270bc9d3b758c34bd5f6b143dbff1d6"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-calibration/race.json",
+      "sha256": "17d82b20117aa9a0acf05991931bda081cb8757d41f720e9ba442786e1bf2812"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-calibration/start.png",
+      "sha256": "bbaade814c1830ba491a9f0acab79793cf93322912812c169de907fc12f41b67"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-feral-20260905/finish.png",
+      "sha256": "2fe120a918c4514fc17b9b76a547ae88e5d2aa278bb07533c4fcabb41d856c37"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-feral-20260905/metrics.json",
+      "sha256": "b113638839cbd8c0d3c5b8662aaa0729486dd19734948d2bd6633339be027e28"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-feral-20260905/race.json",
+      "sha256": "189b92c1e228b5d9345b613da50e83954deda0b7645a71d2e1bd7040034d1bc8"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-feral-20260905/start.png",
+      "sha256": "f5d54afd04b6fa427b9a4d8864f66e9aa82f930b0c2efc7774334e8efe3321ab"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-feral-3868938316/finish.png",
+      "sha256": "4668a727b5bb1de876f71ec4cf34b83230cbfa451a923d63f504fe087802afa3"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-feral-3868938316/metrics.json",
+      "sha256": "64925582e2456c0c8b787dfac296893dffd8f2b4e7b12fd4d212a43fb2b695df"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-feral-3868938316/race.json",
+      "sha256": "80a6fe3f41d3b82f3822a204bddbc12878da7cf192b38f10738b4d972cea7485"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-feral-3868938316/start.png",
+      "sha256": "421bd464035fb5189e12adf0685fcd180dd5d7beeed6bd48b8bfc23335791ec6"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-feral-714/finish.png",
+      "sha256": "7a86de31528ad76a2637ab0903a5aed74cef95883a8560949094b4b604fd42f4"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-feral-714/metrics.json",
+      "sha256": "ad0efbfa4fbf1c5e96586674ad7cd2fe7c0908fa9682996fac06b11a04b0816a"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-feral-714/race.json",
+      "sha256": "b6f07b4e286dca5a6382fb0c52832cd72628038d26c55a78c82528e848e1f70c"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-feral-714/start.png",
+      "sha256": "421bd464035fb5189e12adf0685fcd180dd5d7beeed6bd48b8bfc23335791ec6"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-reduced/finish.png",
+      "sha256": "5b79ea6cfc99ba2061bf4e6947d25634ab1114f7e0f38dfc38958e94dd49b669"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-reduced/metrics.json",
+      "sha256": "0c2f76b70f23894bb0207e558599d9c09a5b0f49b52ef963ad2d512d2195e4ae"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-reduced/race.json",
+      "sha256": "568bb01a8257dfbedad6fe15bb8b5ec0aa0d039036584da9f55828579864eb14"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-reduced/start.png",
+      "sha256": "cfc0591267a1ec2e8806c9d5316c93d791008e7dde2d076f974c68e7d0b863fb"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-reduced-unbatched/finish.png",
+      "sha256": "f066a934c79293cac6df2148f3afc98d6538047cbb6b13453efc6606a473cc39"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-reduced-unbatched/metrics.json",
+      "sha256": "ca8c64ce35f879e13cc1d69497527587e38464ebd89802127cda860af21b9066"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-reduced-unbatched/race.json",
+      "sha256": "52bb0f0f5ddbf762e530d645dc2c533457a1c23ed9ac33e34f26250d4a5e3814"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-reduced-unbatched/start.png",
+      "sha256": "f0239d20940e84c6bfc5046894acdc1cc2b2014ab65f553fcb3c1675610e2396"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-rookie-20260905/finish.png",
+      "sha256": "577552edf140208b001110d020fa97676b4193c5aac503255b7635e4aa4eb089"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-rookie-20260905/metrics.json",
+      "sha256": "9268e88498421e2b3d9f56673a5a1ea0ad731ab1c40266ec4ff0e1ece8440f4e"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-rookie-20260905/race.json",
+      "sha256": "0032dfdc123458d61f4ed9d2bc5b239d1598ddcdce1647dc5576f11f8c73674c"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-rookie-20260905/start.png",
+      "sha256": "71edd2b81820b23bac4e4ccced45ba93418a361cb7b6e93cf55cba6321e35cd6"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-rookie-3868938316/finish.png",
+      "sha256": "cc13d97ffe309630e79dff73a9a47148946bd9c9b042896205bf77888aaa0747"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-rookie-3868938316/metrics.json",
+      "sha256": "042e01e0fc3ff65540bca5880f9980dc7431ebd223be15bcc685c7ca6818c3be"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-rookie-3868938316/race.json",
+      "sha256": "4605907912988d85721036d156ad5363e618f03bc85eeb0351756c7a54f8bf38"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-rookie-3868938316/start.png",
+      "sha256": "8aa624aed3f5ec895aeb55fadeae7c92406c48fdf001f4cbb87863dbcc3894e1"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-rookie-714/finish.png",
+      "sha256": "278f2b5cc09da028f8e3f732be31efd04fff5084e893300ca151901b864f41a5"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-rookie-714/metrics.json",
+      "sha256": "fe2a7bc663239c05357fe2cf63299b986151f8748e752b65302b0a0100ac5614"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-rookie-714/race.json",
+      "sha256": "88f64192b8b4a3ccbed7a5da8a565c7108764446ad2b8e46bd76ceedcc9c1730"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-rookie-714/start.png",
+      "sha256": "8aa624aed3f5ec895aeb55fadeae7c92406c48fdf001f4cbb87863dbcc3894e1"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-works-20260905/finish.png",
+      "sha256": "f24d1d5fc336cac16178dc39f29ab44ab7b42e9a2d8f11796fb5d5aba5ee3e1b"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-works-20260905/metrics.json",
+      "sha256": "d53958c403823e2335774694a1fe5a58e876fd837a6c0178756c2d1be3df9bbe"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-works-20260905/race.json",
+      "sha256": "d305d254bf9c7146cf1de0465499cc464f83a5e481e47012da1749b79dd34c1b"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-works-20260905/start.png",
+      "sha256": "537ceba0ff07c76d700cf84166eb5cdcec03bee622f511d3ad0c6f04b74cb0b2"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-works-714/finish.png",
+      "sha256": "05b8f6ab7a95bd8c4539401b5a9b075eb948f10418e4f746ea118db9a2a9a68d"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-works-714/metrics.json",
+      "sha256": "9f17c4d06b3a07c30f92c57cbf61fc77199d7d43d5771df48c9d33e42a5c3d42"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-works-714/race.json",
+      "sha256": "7c9608facd7c50133bd763068001f37328817c19b2abd4024fb955da0a33a756"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/trench-works-714/start.png",
+      "sha256": "537ceba0ff07c76d700cf84166eb5cdcec03bee622f511d3ad0c6f04b74cb0b2"
+    },
+    {
+      "file": "art/evidence/ascension-v1/phase-a/unbatched-log.txt",
+      "sha256": "86c15e386be2d8840346c1382c9921798bb9c08f449427f2094910d5e218f84d"
+    },
+    {
+      "file": "package.json",
+      "sha256": "8e111c54bea1a1d6100d90033196880f02aef95710f7f57472fd536edfa81c05"
+    },
+    {
+      "file": "scripts/visual/ascension/instrument.mjs",
+      "sha256": "cf3a16d070ca9db3fde9d7178dddd28143c1cf9d53c10d5b5aba373e480ebcdb"
+    },
+    {
+      "file": "scripts/visual/ascension/matrix.mjs",
+      "sha256": "aeffce7a809e9f6bdfc4d1b7a8798d949c66b4a075aa6dc04986eba010441d93"
+    },
+    {
+      "file": "scripts/visual/ascension/modules.mjs",
+      "sha256": "5bf068677002082cdf9e69951623bbdd94c7292333e1ccfb764c6ed1cc3500b1"
+    },
+    {
+      "file": "scripts/visual/ascension/pin-road-floor.py",
+      "sha256": "81ae86df3918d1715d7c8bc3f76b5d833ae129886f2028a887e39a8c227d37b3"
+    },
+    {
+      "file": "scripts/visual/ascension/progress.mjs",
+      "sha256": "35a2a2b6df039ace7b94a7fa99a9493c51b39f55bd9204f7ac17dfcd8e8c1d29"
+    },
+    {
+      "file": "scripts/visual/ascension/race.mjs",
+      "sha256": "cc5ef72b11230170a984a00101f221a3e5d16e6eba696e8a55102caebbbdf12d"
+    },
+    {
+      "file": "scripts/visual/ascension/report.mjs",
+      "sha256": "ee9ac6e71e6f7ad25093c8251695798fde767c9abc4f304342615cb8594b72fd"
+    },
+    {
+      "file": "scripts/visual/ascension/review.ts",
+      "sha256": "45d79cbbe4b40502ff4d52100cd941d0158facfe84121969b098beced46b3ed8"
+    },
+    {
+      "file": "scripts/visual/ascension/stations.mjs",
+      "sha256": "c8ba098b782c31c902d4c9f575d3f7bca6a2f576d2a46a308a82f087bb694485"
+    },
+    {
+      "file": "src/game/data/ascension/rival-pace.json",
+      "sha256": "28505420ee792ba19b23e09fa932c93f25f629c7fb9bdcfc0cb739c6cfa4c73f"
+    },
+    {
+      "file": "src/game/data/ascension/route.json",
+      "sha256": "dabee585023ea426e6ac90666d9c45a978743407e33370a93cc02432531f7880"
+    },
+    {
+      "file": "src/game/data/ascension/schedule.json",
+      "sha256": "c899830a1ba949ff851c87d166b2931b64a501c4745210bd77805d814fe2552b"
+    },
+    {
+      "file": "public/assets/ascension/blockout.glb",
+      "sha256": "6b06038d105980ae576025e629b18ba89ddf803ee63ee775971082f35d9b95f6"
+    },
+    {
+      "file": "public/assets/ascension/blockout.json",
+      "sha256": "b82b7a2797bac5dda41a83d7e1d7477223bdcabb177dfdb2ff13718246f418f1"
+    },
+    {
+      "file": "public/assets/ascension/lights.json",
+      "sha256": "ece17047c5c88dc323eaa916a55573a14349533a34fd36b43494170fff4b6a91"
+    },
+    {
+      "file": "art/blender/build_ascension.py",
+      "sha256": "a13aee558f529d923e99ccbe0294b21a90c617e2ff754419d21ba534886efc0c"
+    },
+    {
+      "file": "src/game/ascension-course.ts",
+      "sha256": "8ac6a2f5d3f3137d444f864b58148bfb80af351e43a0b2690c46beb4faeb6e32"
+    },
+    {
+      "file": "src/game/ascension-environment.ts",
+      "sha256": "8e71066f1bf1d49203506e667b72cde7138f23e72fb7dbdfc367b18c72972e48"
+    },
+    {
+      "file": "src/game/ascension-flat-batch.ts",
+      "sha256": "3307bf5b0187ba09f17e935a369eee24cf7cf8afed5f12d146faf528538a8ed1"
+    },
+    {
+      "file": "src/game/ascension-runtime.ts",
+      "sha256": "5debe7a609fef1809465bf525504bbdd48b06d940f75a6d4b883720a3c01b7e0"
+    },
+    {
+      "file": "src/game/ascension-schedule.js",
+      "sha256": "7ca47bb24ceba6b3c5f3c7fe42645c4e4772fb7ad62140b37e6723470206ecd8"
+    },
+    {
+      "file": "scripts/build-ascension-route.mjs",
+      "sha256": "39513602c388b6f60ba38d66fb1ac930f1ae23d51a3a6b50368d28d85d10b6d0"
+    },
+    {
+      "file": "scripts/measure-ascension-driving.mjs",
+      "sha256": "d8428c396525ff67638fc8d015064f81da2f21719a7e8d6609ef7fcb24a8b08c"
+    },
+    {
+      "file": "scripts/solve-ascension-pace.mjs",
+      "sha256": "73b4b0098dde4f62bc88529ec2d65c2d055bf4cd35295f179cd7fec8df2c9129"
+    },
+    {
+      "file": "scripts/validate-ascension-corridor.mjs",
+      "sha256": "cd6b65550a5be9e372eaa0ff9f355bca1f87d9bb6c8ba3c617790b3bf941c5be"
+    },
+    {
+      "file": "scripts/validate-ascension-evidence.mjs",
+      "sha256": "4f0b48577598376bb3c1c8bf0a18785d44d002123cb785c44645abe029f79b2a"
+    },
+    {
+      "file": "scripts/validate-ascension-matrix.mjs",
+      "sha256": "aa95398fa33b69eeca0417f4c910f79549796a387d35681c670be9a2f12d4683"
+    },
+    {
+      "file": "scripts/validate-ascension-runtime.mjs",
+      "sha256": "98b1b8d3635f899a84cda66c31ef3d1dae27b2a9a433b863c1d2664102e04387"
+    },
+    {
+      "file": "scripts/validate-ascension-tiers.mjs",
+      "sha256": "a29b67ae0e11c057e07b273b42e3d2c34e132804d8df7bf29dac062528bf8c24"
+    },
+    {
+      "file": "scripts/validate-ascension.mjs",
+      "sha256": "7a84cca76586722de2e6f5a567a2e2ae31f21288d0cc3b33272b74ed3ac5be02"
+    }
+  ]
+}

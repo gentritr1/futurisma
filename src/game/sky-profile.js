@@ -162,21 +162,21 @@ export const CLOUD_PROFILES = Object.freeze({
 /** Hard ceiling from the P20.5 brief; the validator pins both maps under it. */
 export const CLOUD_MAX_DRIFT_PER_SECOND = 0.004;
 
-/** @param {"greenwater" | "bitterpan" | "nightshift" | "polarity" | "tideline"} kind */
+/** @param {"greenwater" | "bitterpan" | "nightshift" | "polarity" | "tideline" | "ascension"} kind */
 export function skyZonesFor(kind) {
   if (kind === "polarity") return POLARITY_SKY_ZONES;
   if (kind === "nightshift" || kind === "tideline") return NIGHTSHIFT_SKY_ZONES;
   return kind === "bitterpan" ? BITTERPAN_SKY_ZONES : GREENWATER_SKY_ZONES;
 }
 
-/** @param {"greenwater" | "bitterpan" | "nightshift" | "polarity" | "tideline"} kind */
+/** @param {"greenwater" | "bitterpan" | "nightshift" | "polarity" | "tideline" | "ascension"} kind */
 export function cloudProfileFor(kind) {
-  return CLOUD_PROFILES[kind === "tideline" ? "nightshift" : kind];
+  return CLOUD_PROFILES[kind === "ascension" ? "greenwater" : kind === "tideline" ? "nightshift" : kind];
 }
 
-/** @param {"greenwater" | "bitterpan" | "nightshift" | "polarity" | "tideline"} kind */
+/** @param {"greenwater" | "bitterpan" | "nightshift" | "polarity" | "tideline" | "ascension"} kind */
 export function bandStrengthFor(kind) {
-  return SKY_BAND_STRENGTH[kind];
+  return SKY_BAND_STRENGTH[kind === "ascension" ? "greenwater" : kind];
 }
 
 /**
