@@ -32,7 +32,7 @@ export class TidelineSky {
           float v=clamp(.055+direction.y*.95,0.,.99);
           vec3 paint=texture2D(horizon,vec2(u+time*.00008*max(0.,direction.y),v)).rgb;
           vec3 underwater=vec3(.008,.065,.072)+vec3(.01,.04,.045)*max(direction.y,0.);
-          gl_FragColor=vec4(mix(underwater,paint*1.25,aboveWater),1.);
+          gl_FragColor=vec4(mix(underwater,paint*vec3(1.10,1.24,1.55),aboveWater),1.);
           #include <tonemapping_fragment>
           #include <colorspace_fragment>
           float haze=(1.-smoothstep(.01,.24,direction.y))*.82*aboveWater;
