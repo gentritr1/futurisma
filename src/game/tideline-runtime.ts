@@ -85,7 +85,7 @@ export class TidelineRuntime implements CircuitRuntime {
     if (lap !== this.announcedLap) {
       this.announcedLap = lap;
       this.audio.playTideDrain();
-      this.ui.flashHazard(lap === 2 ? "TIDE FALLING · REACTOR ALGAE EXPOSED / LOWER GRIP" : "TIDE DRAINED · PUMP HALL SHORTCUT OPEN", 4200);
+      this.ui.flashHazard(lap === 2 ? "TIDE FALLING · DAMP CHAMBER DECK / LOWER GRIP" : "TIDE DRAINED · PUMP HALL SHORTCUT OPEN", 4200);
     }
     this.mode = this.course.travelModeAt(progress);
     this.modeSeconds[this.mode] += ticks / ABILITY_TICK_RATE;
@@ -130,7 +130,7 @@ export class TidelineRuntime implements CircuitRuntime {
     camera.position.copy(this.cameraPosition); camera.up.set(0, 1, 0); camera.lookAt(this.cameraLook);
     camera.fov = THREE.MathUtils.lerp(camera.fov, this.reducedMotion ? 62 : 59 + Math.min(1, speed / 140) * 7, response);
     camera.updateProjectionMatrix(); this.cameraReady = true;
-    this.world.sky.update(camera, this.course.tide.waterLevel);
+    this.world.sky.update(camera, this.course.tide.waterLevel, this.reducedMotion ? 0 : this.course.tide.elapsed);
   }
 
   updateHud(progress: number): void {
@@ -142,7 +142,7 @@ export class TidelineRuntime implements CircuitRuntime {
     this.modeLabel.textContent = `LAP ${s.lap} / ${tideForLap(s.lap).label}`;
     this.travelLabel.textContent = mode === "submerged"
       ? this.ridingCurrent ? "CURRENT HARVEST / 1.85× RECHARGE" : tideForLap(s.lap).current ? "LIT CURRENT / FASTER RECHARGE" : "REACTOR DRAINING / WATCH THE WATERLINE"
-      : s.lap === 2 && height < -3 ? "SLICK ALGAE / BRAKE BEFORE TURNING" : "SPACE / NITRO";
+      : s.lap === 2 && height < -3 ? "DAMP DECK / BRAKE BEFORE TURNING" : "SPACE / NITRO";
     this.powerLabel.textContent = s.activePower ? `${s.powerPerfect ? "PERFECT " : ""}${label} ${this.simulation.powerSeconds.toFixed(1)}s`
       : this.simulation.heldPowerKind ? `E / ${label}${perfectReady ? " · PERFECT NOW" : ""}` : "COLLECT A POWER CAPSULE";
     if (this.chargeFill) this.chargeFill.style.transform = `scaleX(${s.activePower ? s.activeCharge : this.simulation.heldPowerCharge})`;

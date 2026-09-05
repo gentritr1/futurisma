@@ -5,6 +5,8 @@ Turns "it looks empty" into numbers that two builds can be compared on.
 Run on the PNGs produced by scripts/visual/shoot-stations.mjs.
 
   python3 scripts/visual/frame-metrics.py <dir-or-png> [more...] [--json]
+  Optional: --lamp-patches=capture.json measures 24-pixel-square road patches
+  named under/between in the capture’s roadPatches field, using Rec.709 luma.
 
 Per frame (1280x720 chase-camera frame; HUD margins excluded):
   flat%     share of world pixels within RGB distance 10 of the frame's modal
@@ -38,7 +40,7 @@ def luma(px):
     return 0.2126 * r + 0.7152 * g + 0.0722 * b
 
 
-def analyse(path):
+def analyse(path, lamp_patches=None):
     im = Image.open(path).convert("RGB")
     w, h = im.size
     world = im.crop(WORLD)
@@ -97,7 +99,7 @@ def analyse(path):
     # --- midtone share.
     mid = sum(1 for r, g, b in data if 70 <= luma((r, g, b)) <= 170) / len(data)
 
-    return {
+    result = {
         "file": os.path.basename(path),
         "flat_pct": round(flat * 100, 1),
         "hsplit": round(hsplit, 1),
@@ -107,6 +109,14 @@ def analyse(path):
         "horizon_row": best_row,
         "mode_rgb": [mr, mg, mb],
     }
+    if lamp_patches:
+        for name, point in lamp_patches.items():
+            x,y=point["x"],point["y"]
+            patch=im.crop((x-12,y-12,x+12,y+12))
+            result["lamp_luma_"+name]=sum(luma(p) for p in patch.getdata())/576
+        result["lamp_ratio"]=result["lamp_luma_under"]/max(.001,result["lamp_luma_between"])
+    return result
+
 
 
 def main(argv):
@@ -121,7 +131,9 @@ def main(argv):
             )
         else:
             paths.append(a)
-    rows = [analyse(p) for p in paths]
+    patch_file=next((a.split("=",1)[1] for a in argv if a.startswith("--lamp-patches=")),None)
+    lamp_patches=json.load(open(patch_file))["roadPatches"] if patch_file else None
+    rows = [analyse(p,lamp_patches) for p in paths]
     if as_json:
         print(json.dumps(rows, indent=1))
         return

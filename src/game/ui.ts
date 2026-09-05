@@ -317,7 +317,7 @@ export class GameUi {
     document.querySelectorAll<HTMLElement>("[data-polarity-control]").forEach((element) => { element.hidden = !polarity; });
     document.querySelectorAll<HTMLElement>("[data-power-control]").forEach((element) => { element.hidden = !polarity && !tideline; });
     this.introDeck.textContent = tideline
-      ? `Lap 1: flooded reactor, lit recharge current. Lap 2: water falls, slick algae lowers grip. Lap 3: the drained pump hall opens a shorter line. Race the reactor and port; time E for Surge or Shield. ${lapLabel}.`
+      ? `Lap 1: flooded reactor, lit recharge current. Lap 2: water falls outside the sealed chamber; condensation lowers deck grip. Lap 3: the drained pump hall opens a shorter line. Race the reactor and port; time E for Surge or Shield. ${lapLabel}.`
       : polarity ? `Choose your line. SPACE changes roads at marked junctions, with a six-second commitment. Upper: shorter, tighter. Lower: stronger devices and faster recharge. Time E on a launch strip. SHIFT fires nitro. ${lapLabel}.`
       : course.mapCode === "MAP 01"
       ? `Four ships. ${lapLabel} through Greenwater Strip. Follow the amber turn markers, clear all eight gates, and bring TOTEM home through The Cradle.`

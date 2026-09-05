@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { tideRoadMaterial } from "./tideline-materials";
 import { tideForLap, tideWaterLevel, tideGrip } from "./tideline-tide.js";
 import route from "./data/tideline/route.json";
 import rivalPace from "./data/tideline/rival-pace.json";
@@ -22,22 +23,21 @@ const APRON: ApronTable = {
   overrides: [],
 };
 const DISTRICT_COLORS = route.districts.map(d => new THREE.Color(d.color));
-const LIGHTING: CourseLightingProfile = {
-  sky: new THREE.Color(0x758cca), ground: new THREE.Color(0x302148),
-  key: new THREE.Color(0xa7b7dd), rim: new THREE.Color(0x5bdde3),
-  hemisphereIntensity: 1.05, keyIntensity: 1.05, rimIntensity: 1.35,
-  keyDirection: new THREE.Vector3(.35, .8, -.48).normalize(),
+const FLOODED_LIGHTING: CourseLightingProfile = {
+  sky:new THREE.Color(0x237f88),ground:new THREE.Color(0x05191c),
+  key:new THREE.Color(0x60cbd2),rim:new THREE.Color(0x228287),
+  hemisphereIntensity:.42,keyIntensity:.48,rimIntensity:.22,
+  keyDirection:new THREE.Vector3(.68,.35,-.55).normalize(),
 };
-const FOUNDRY_LIGHTING: CourseLightingProfile = {
-  ...LIGHTING, sky: new THREE.Color(0x879783), ground: new THREE.Color(0x3d3c2d),
-  key: new THREE.Color(0xc3b998), rim: new THREE.Color(0xa39767),
-  hemisphereIntensity: 2.2, keyIntensity: 1.45, rimIntensity: .65,
+const DRAINED_LIGHTING: CourseLightingProfile = {
+  sky:new THREE.Color(0x8c7758),ground:new THREE.Color(0x171007),
+  key:new THREE.Color(0xf1b765),rim:new THREE.Color(0x707b82),
+  hemisphereIntensity:.50,keyIntensity:1.1,rimIntensity:.3,
+  keyDirection:FLOODED_LIGHTING.keyDirection,
 };
-const FOUNDRY_FOG: Record<TidelineTravelMode, FogProfile> = {
-  submerged: { color: new THREE.Color(0x314d3e), density: .0055 },
-  surface: { color: new THREE.Color(0x535b4c), density: .0017 },
-  air: { color: new THREE.Color(0x51594e), density: .0015 },
-};
+const FLOODED_FOG={color:new THREE.Color(0x1b3537),density:.0032};
+const DRAINED_FOG={color:new THREE.Color(0x4c3825),density:.0035};
+const PORT_FOG={color:new THREE.Color(0x242f33),density:.0018};
 export type TidelineTravelMode = "submerged" | "surface" | "air";
 const MUSIC: MusicProfile[] = [
   { trance: 1, jungle: 0, deep_dnb: 2, techstep: 0 },
@@ -73,8 +73,9 @@ export class TidelineCourse implements RaceCourse {
   readonly flightArcs = route.flightArcs;
   readonly shortcut = route.shortcut;
   readonly tide = { lap: 1, elapsed: 0, waterLevel: 0, draining: false, shortcutOpen: false };
-  private readonly tideLapUniform = { value: 1 };
+
   private readonly waterUniform = { value: 0 };
+  private readonly effectsTexture = typeof Image === "undefined" ? null : new THREE.TextureLoader().load("/assets/tideline-v3/waterlight.jpg");
   private readonly branchScratch = this.createProjectionScratch();
   private readonly branchPoints = route.shortcut.stations.map(s => new THREE.Vector3(...s.p as [number, number, number]));
   private readonly branchTangents = route.shortcut.stations.map(s => new THREE.Vector3(...s.t as [number, number, number]));
@@ -101,6 +102,7 @@ export class TidelineCourse implements RaceCourse {
       this.turns.push({ from, to: route.stations[i].d, radius: 1 / peak,
         direction: sign < 0 ? "RIGHT" : "LEFT" });
     }
+    if (this.effectsTexture) this.effectsTexture.colorSpace=THREE.SRGBColorSpace;
     if (this.roadTexture) { this.roadTexture.colorSpace = THREE.SRGBColorSpace; this.roadTexture.anisotropy = 4; }
     this.group.add(this.createStreet(), this.createFurniture());
     const branch = this.createBranchRoad(); this.group.add(branch);
@@ -274,8 +276,11 @@ export class TidelineCourse implements RaceCourse {
     const index = Math.floor(wrapped * route.count);
     return route.stations[index].p[1] + 1 < this.tide.waterLevel ? "submerged" : "surface";
   }
-  fogAt(progress: number): FogProfile { return FOUNDRY_FOG[this.travelModeAt(progress)]; }
-  lightingAt(): CourseLightingProfile { return FOUNDRY_LIGHTING; }
+  fogAt(progress: number): FogProfile {
+    if (this.travelModeAt(progress)==="submerged") return FLOODED_FOG;
+    return this.tide.lap>=2 && this.sample(progress,this.branchScratch).position.y<-3 ? DRAINED_FOG : PORT_FOG;
+  }
+  lightingAt(_progress=0): CourseLightingProfile { return this.tide.lap===1 ? FLOODED_LIGHTING : DRAINED_LIGHTING; }
   edgeType(): "A" { return "A"; }
   apronAt(sample: CourseSample, lateral: number,
     target: ApronResolution = createApronResolution()): ApronResolution {
@@ -319,7 +324,7 @@ export class TidelineCourse implements RaceCourse {
   vehicleHoverHeight(_speed: number, boost: boolean): number { return boost ? 1.2 : .96; }
   setLapBoard(lap: number): void {
     if (lap === this.tide.lap) return;
-    this.tide.lap = lap; this.tide.elapsed = 0; this.tideLapUniform.value = lap;
+    this.tide.lap = lap; this.tide.elapsed = 0;
     this.tide.shortcutOpen = false;
     this.advanceTide(0);
   }
@@ -364,71 +369,8 @@ export class TidelineCourse implements RaceCourse {
     geometry.setAttribute("uv",new THREE.Float32BufferAttribute(uvs,2));
     geometry.setIndex(indices);
     geometry.computeVertexNormals();
-    const material = new THREE.ShaderMaterial({
-      uniforms:{ ...THREE.UniformsUtils.clone(THREE.UniformsLib.fog), tidelineTime: this.clock, foundry: { value: 1 }, roadAtlas: { value: this.roadTexture }, tideLap: this.tideLapUniform, waterLevel: this.waterUniform }, vertexColors:true, fog:true, side:THREE.DoubleSide,
-      vertexShader:`
-        varying vec2 vUv; varying vec3 vTint; varying vec3 vWorld;
-        #include <fog_pars_vertex>
-        void main() {
-          vUv=uv; vTint=color; vWorld=(modelMatrix*vec4(position,1.0)).xyz;
-          vec4 mvPosition=modelViewMatrix*vec4(position,1.0);
-          gl_Position=projectionMatrix*mvPosition;
-          #include <fog_vertex>
-        }`,
-      fragmentShader:`
-        uniform float tidelineTime; uniform float foundry; uniform sampler2D roadAtlas; uniform float tideLap; uniform float waterLevel;
-        varying vec2 vUv; varying vec3 vTint; varying vec3 vWorld;
-        #include <fog_pars_fragment>
-        float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
-        float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);
-          return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x),f.y);}
-        void main(){
-          float grain=noise(vWorld.xz*3.0);
-          float puddle=smoothstep(.42,.7,noise(vWorld.xz*.12));
-          float lamp=pow(.5+.5*cos(vUv.y*6.283185/55.0),6.0);
-          float side=pow(abs(vUv.x-.5)*2.0,2.0);
-          float reflection=pow(.5+.5*sin(vUv.y*3.1+grain*2.0),4.0);
-          vec3 color=vec3(.048,.054,.085)*(0.80+grain*.35-puddle*.20);
-          float panel=step(.975,fract(vUv.y/6.0));
-          float rib=step(.72,fract(vUv.y*2.0));
-          float service=step(.35,abs(vUv.x-.5));
-          color*=1.0-panel*.62-service*rib*.36;
-          color+=vec3(.015,.021,.030)*pow(noise(vWorld.xz*15.),3.0);
-          color+=vTint*(lamp*.075+side*.026);
-          color+=vTint*puddle*(.03+reflection*.055)*(.25+side);
-          vec2 flow=vWorld.xz*.19+vec2(tidelineTime*.07,-tidelineTime*.05);
-          float interference=abs(sin(flow.x+sin(flow.y)))*abs(sin(flow.y+sin(flow.x*.7)));
-          float caustic=pow(1.0-interference,12.0)*(1.0-smoothstep(-2.0,1.0,vWorld.y));
-          color+=vec3(.025,.12,.13)*caustic;
-          // Broad concrete repairs and damp deposits replace the metal panels.
-          float slab=step(.023,fract(vUv.y/9.0));
-          float repair=step(.64,noise(floor(vec2(vUv.x*8.0,vUv.y/9.0))));
-          vec2 atlasUv=vec2(.505+fract(vUv.x*3.0)*.485,.015+fract(vUv.y/12.0)*.47);
-          vec3 concrete=texture2D(roadAtlas,atlasUv).rgb*(.78+grain*.16);
-          concrete*=.68+slab*.32;
-          float algae=side*smoothstep(.39,.72,noise(vWorld.xz*.19));
-          float exposed=step(waterLevel+.2,vWorld.y)*(1.0-step(-3.0,vWorld.y));
-          concrete=mix(concrete,vec3(.045,.086,.025),algae*(.38+exposed*.33));
-          concrete*=1.0-step(1.5,tideLap)*(1.0-step(2.5,tideLap))*exposed*.10;
-          concrete+=vec3(.05,.039,.009)*lamp*side;
-          color=mix(color,concrete,foundry);
-          // Worn central lane paint and narrow yellow edge markings.
-          float dash=(1.0-smoothstep(.005,.012,abs(vUv.x-.5)))*step(.58,fract(vUv.y/18.0));
-          float edge=1.0-smoothstep(.002,.006,abs(abs(vUv.x-.5)-.473));
-          float hazard=step(.447,abs(vUv.x-.5))*(1.0-step(.465,abs(vUv.x-.5)));
-          float stripe=step(.5,fract(vUv.y*.65+vUv.x*14.0));
-          color=mix(color,mix(vec3(.009,.012,.025),vec3(.53,.34,.036),stripe),hazard*.88);
-          color=mix(color,vec3(.19,.22,.21),dash*.7);
-          color=mix(color,vec3(.48,.31,.045),edge*.85);
-          // Three paired, worn approach bars before each physical gantry.
-          float approach=min(abs(vUv.y-(${route.length}*.035-22.)),min(abs(vUv.y-(${route.length}*.325-22.)),abs(vUv.y-(${route.length}*.645-22.))));
-          float bars=(1.-step(14.,approach))*step(.62,fract(vUv.y/6.))*(1.-step(.32,abs(vUv.x-.5)))*step(.12,abs(vUv.x-.5));
-          color=mix(color,vec3(.38,.30,.12),bars*.65*(.45+grain*.55));
-          gl_FragColor=vec4(color,1.0);
-          #include <fog_fragment>
-          #include <colorspace_fragment>
-        }`,
-    });
+    const material=tideRoadMaterial(this.roadTexture,{time:this.clock,water:this.waterUniform,effects:this.effectsTexture},
+      route.checkpoints.map(p=>p*this.length),[.035,.325,.645].map(p=>p*this.length));
     const mesh=new THREE.Mesh(geometry,material); mesh.name="tideline_rain_polished_asphalt";
     return mesh;
   }
@@ -474,13 +416,13 @@ export class TidelineCourse implements RaceCourse {
       const sample=this.sampleShortcut(cut.stations[i].progress);
       for (const side of [-1,1]) {
         vertices.push(...sample.position.clone().addScaledVector(sample.right,side*cut.width/2));
-        uvs.push((side+1)*.24+.505, (i%2)*.47+.015);
+        uvs.push((side+1)/2, cut.stations[i].progress*this.length);
       }
       if(i<cut.stations.length-1){const k=i*2;indices.push(k,k+1,k+3,k,k+3,k+2);}
     }
     const geometry=new THREE.BufferGeometry();geometry.setAttribute("position",new THREE.Float32BufferAttribute(vertices,3));
     geometry.setAttribute("uv",new THREE.Float32BufferAttribute(uvs,2));geometry.setIndex(indices);geometry.computeVertexNormals();
-    const mesh=new THREE.Mesh(geometry,new THREE.MeshLambertMaterial({map:this.roadTexture,color:0xb9b49a,side:THREE.DoubleSide}));
+    const mesh=new THREE.Mesh(geometry,tideRoadMaterial(this.roadTexture,{time:this.clock,water:this.waterUniform,effects:this.effectsTexture},route.checkpoints.map(p=>p*this.length),[.035,.325,.645].map(p=>p*this.length)));
     mesh.name="tideline_pump_hall_shortcut_road";return mesh;
   }
   private createGates(): THREE.InstancedMesh {

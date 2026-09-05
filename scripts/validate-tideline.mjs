@@ -13,7 +13,11 @@ const routeText = await readFile(new URL("../src/game/data/tideline/route.json",
 const route = JSON.parse(routeText);
 const paceText = await readFile(new URL("../src/game/data/tideline/rival-pace.json", import.meta.url), "utf8");
 const source = await readFile(courseUrl, "utf8");
+const materialFile = new URL("../src/game/tideline-materials.ts", import.meta.url);
+const materialCode = (await transformWithOxc(await readFile(materialFile,"utf8"),materialFile.pathname)).code.replace('from "three"',`from ${JSON.stringify(import.meta.resolve("three"))}`);
+const materialUrl = `data:text/javascript;base64,${Buffer.from(materialCode).toString("base64")}`;
 const code = (await transformWithOxc(source, courseUrl.pathname)).code
+  .replace('from "./tideline-materials"', `from ${JSON.stringify(materialUrl)}`)
   .replace('from "./tideline-tide.js"', `from ${JSON.stringify(new URL("../src/game/tideline-tide.js", import.meta.url).href)}`)
   .replace('from "./tideline-rules.js"', `from ${JSON.stringify(new URL("../src/game/tideline-rules.js", import.meta.url).href)}`)
   .replace('from "three"', `from ${JSON.stringify(import.meta.resolve("three"))}`)
@@ -141,8 +145,7 @@ for (const attribute of ["position", "normal"]) {
   assert.deepEqual(foundryRoad.geometry.attributes[attribute].array, road.geometry.attributes[attribute].array,
     `Road ${attribute} data is identical between editions.`);
 }
-assert.equal(road.material.uniforms.foundry.value, 1);
-assert.equal(foundryRoad.material.uniforms.foundry.value, 1);
+assert.ok(road.material.isMeshLambertMaterial && foundryRoad.material.isMeshLambertMaterial, "Painted roads must respond to the real lamp lights.");
 assert.deepEqual(foundry.fogAt(.1), course.fogAt(.1));
 assert.equal(road.geometry.index.count, solidSegments * 6);
 for (let i = 0; i < road.geometry.index.count; i += 6) {

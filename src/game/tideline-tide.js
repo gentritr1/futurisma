@@ -1,7 +1,7 @@
 /** Published, race-wide schedule. Extra laps stay drained; sprint stops after ebb. */
 export const TIDE_SCHEDULE = Object.freeze([
   Object.freeze({lap:1,id:"flood",label:"FLOODED",waterLevel:0,grip:1,current:true,shortcut:false}),
-  Object.freeze({lap:2,id:"ebb",label:"DRAINING / SLICK ALGAE",waterLevel:-15,grip:.7,current:false,shortcut:false}),
+  Object.freeze({lap:2,id:"ebb",label:"DRAINING / DAMP DECK",waterLevel:-15,grip:.7,current:false,shortcut:false}),
   Object.freeze({lap:3,id:"dry",label:"DRAINED / PUMP HALL OPEN",waterLevel:-27,grip:.94,current:false,shortcut:true}),
 ]);
 export const TIDE_DRAIN_SECONDS=5;

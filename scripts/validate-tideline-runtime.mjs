@@ -26,6 +26,7 @@ export class PowerPickupField { static instances = []; root = new THREE.Group();
  constructor(){PowerPickupField.instances.push(this);} update(...args){this.lastUpdate=args;} dispose(){this.disposed=true;} }`).toString('base64')}`;
 const styleUrl = await moduleUrl('../src/game/tideline-style.ts');
 const courseUrl = await moduleUrl('../src/game/tideline-course.ts', {
+  './tideline-materials':await moduleUrl('../src/game/tideline-materials.ts'),
   './apron.js': local('apron.js'), './tideline-rules.js': local('tideline-rules.js'), './tideline-style': styleUrl,
 }, true);
 const worldUrl = await moduleUrl('../src/game/tideline-world.ts', {

@@ -1,6 +1,6 @@
 {
   "name": "Tideline / tide rebuild",
-  "triangles": 70696,
+  "triangles": 75526,
   "routeLength": 2073.797598046593,
   "routeCount": 692,
   "roles": [
@@ -21,7 +21,7 @@
     "mantas": 0,
     "portHalls": 12,
     "cranes": 6,
-    "boats": 0,
+    "boats": 2,
     "flightLenses": 0,
     "pelagicCrowns": 0
   },

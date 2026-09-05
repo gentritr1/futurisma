@@ -13,6 +13,7 @@ random.seed(508)
 bpy.ops.object.select_all(action="SELECT")
 bpy.ops.object.delete(use_global=False)
 materials, buckets, lights = {}, {}, []
+motion_pivots={}
 variant=0
 placements=[]
 origin, yaw, district = (0,0,0), 0, "REACTOR"
@@ -193,6 +194,9 @@ def manta():
 
 
 def hall(width,depth,height,word):
+    foundation=origin[2]+26
+    box((0,0,-foundation/2),(width+.7,depth+.7,foundation),CONCRETE)
+    # Historic wet bands are projected over these concrete retaining walls at runtime.
     box((0,0,height/2),(width,depth,height),CONCRETE)
     # Barrel roofs and exposed ribs distinguish the drydock from city boxes.
     points=[]
@@ -213,15 +217,22 @@ def hall(width,depth,height,word):
 
 
 def crane():
+    global district
     for x in [-7,7]:
         box((x,0,13),(1.3,2.1,26),CERAMIC)
         tube([(x,-.8,1),(-x,-.8,12),(x,-.8,25)],.19,METAL,5)
+    static_district=district
+    if census['cranes']<2:
+        district='MOTION_CRANE_'+str(census['cranes'])
+        motion_pivots[district]=world((0,0,27))
     box((0,0,27),(17,4,2),CERAMIC)
     box((0,-7,27),(2,22,1.6),METAL)
     tube([(0,-16,27),(0,-16,17)],.09,WHITE,4)
     box((0,1,29),(6,4,3),METAL)
     box((0,-1.1,29),(4.7,.08,1.7),DARK)
-    lamp((0,-2,29),AMBER,4)
+    # The fixed mast lamp is not attached to the moving boom.
+    lamp((0,0,26),AMBER,4)
+    district=static_district
     census["cranes"]+=1
 
 
@@ -236,7 +247,6 @@ def boat():
     box((0,-9.6,3.8),(7,.06,.15),AMBER)
     tube([(0,0,1),(0,0,17)],.16,WHITE,6)
     box((0,0,15),(9,.18,.18),METAL)
-    lamp((0,0,17),AMBER,3,0.035)
     census["boats"]+=1
 
 
@@ -347,6 +357,19 @@ def branch_clear(center,radius,vertical_radius=None):
 def clear(center,radius,vertical_radius=None):
     return original_clear(center,radius,vertical_radius) and branch_clear(center,radius,vertical_radius)
 
+def cable_clear(points):
+    candidates=[]
+    for a,b in zip(points,points[1:]):
+        for step in range(9):candidates.append(Vector(world(Vector(a).lerp(Vector(b),step/8))))
+    for st in route['stations']+route['shortcut']['stations']:
+        p=Vector((st['p'][0],-st['p'][2],st['p'][1]))
+        t=Vector((st['t'][0],-st['t'][2],st['t'][1])).normalized()
+        right=t.cross(Vector((0,0,1))).normalized();up=right.cross(t).normalized()
+        for candidate in candidates:
+            relative=candidate-p
+            if abs(relative.dot(t))<2 and -.5<relative.dot(up)<7.7 and abs(relative.dot(right))<st.get('width',route['shortcut']['width'])/2+2.7:return False
+    return True
+
 # At least three wear variants; every fourth rib is a heavier structural bay.
 # Two upper-rib breaks leave only high fragments, never debris in the driving volume.
 for index,distance in enumerate(range(0,int(route['length']),24)):
@@ -363,8 +386,8 @@ for index,distance in enumerate(range(0,int(route['length']),24)):
     thickness=1.0 if heavy else .42
     if broken:
         for first,last in [(0,8),(13,24)]:
-            tube([(17*math.cos(i*math.pi/24),0,4+15*math.sin(i*math.pi/24)) for i in range(first,last+1)],thickness,METAL,6)
-    else:arch(17,15,base=4,thickness=thickness)
+            tube([(17*math.cos(i*math.pi/24),0,4+10*math.sin(i*math.pi/24)) for i in range(first,last+1)],thickness,METAL,6)
+    else:arch(17,10,base=4,thickness=thickness)
     for side in [-1,1]:
         box((side*17,0,2.3),(1.9,2.5,5.8),CONCRETE)
         if heavy:
@@ -374,8 +397,13 @@ for index,distance in enumerate(range(0,int(route['length']),24)):
             if index%3!=1:lamp((side*16.4,-.4,5.1),AMBER,2.3,st['p'][1]+.035)
     # Crown pipes and cables span to the next frame, creating close parallax.
     for side in [-1,1]:
-        tube([(side*8,0,17.5),(side*8,24,17.5)],.32,METAL,6)
-        tube([(side*13,0,12.7),(side*13,8,11.9),(side*13,16,11.9),(side*13,24,12.7)],.10,METAL,5)
+        tube([(side*8,0,12.5),(side*8,24,12.5)],.32,METAL,6)
+        saved_district=district
+        district='MOTION_CABLES'
+        cable=[(side*13,0,9.2),(side*13,8,8.4),(side*13,16,8.4),(side*13,24,9.2)]
+        # Omit a span on rising approaches if its sag would enter headroom.
+        if cable_clear(cable):tube(cable,.10,METAL,5)
+        district=saved_district
     placements.append({'kind':'rib','index':index,'progress':distance/route['length'],'variant':variant,'heavy':heavy,'damaged':broken})
     census['aqueductRibs']+=1
 
@@ -428,6 +456,15 @@ for index in range(28,len(cut['stations'])-30,7):
     box((0,0,13.7),(1.4,.6,.24),AMBER)
 placements.append({'kind':'pump_hall','from':cut['from'],'to':cut['to'],'width':cut['width']})
 
+# A silted workboat rests outside the sealed tunnel. A second hull crosses the
+# deep channel at the far quay after drainage; both reuse the painted role atlas.
+district='STRANDED_BOAT';variant=2
+st=station(.115*route['length']);origin,yaw=anchor(st,-1,64,height=-24.2)
+if clear(origin,22,20):boat()
+district='MOTION_FERRY';variant=0;origin,yaw=(0,-510,-26.3),math.pi/2
+motion_pivots[district]=origin
+boat()
+
 # Build indexed per-sector/material meshes. Every surface has UV0 and an atlas.
 for (sector,mat),(vertices,faces,uvs) in buckets.items():
     mesh=bpy.data.meshes.new('GW_GEO_'+sector+'_'+mat);mesh.from_pydata(vertices,[],faces);mesh.update()
@@ -435,6 +472,10 @@ for (sector,mat),(vertices,faces,uvs) in buckets.items():
     col=mesh.color_attributes.new(name='Tint',type='FLOAT_COLOR',domain='CORNER')
     for i,value in enumerate(uvs):uv.data[i].uv=value;col.data[i].color=(.98,.98,.96,1)
     obj=bpy.data.objects.new('GW_SECTOR_'+sector+'_'+mat,mesh);bpy.context.collection.objects.link(obj)
+    if sector in motion_pivots:
+        pivot=Vector(motion_pivots[sector])
+        for vertex in mesh.vertices:vertex.co-=pivot
+        obj.location=pivot
 
 # Import complete textured gantries, preserving their UV islands and paint.
 from mathutils import Matrix
@@ -470,12 +511,26 @@ for index,progress in enumerate([.035,.325,.645]):
         p=transform@Vector((x,-2.9,16.088));lights.append({'p':[p.x,p.z,-p.y],'color':AMBER,'size':2.4,'ground':st['p'][1]+.035})
     placements.append({'kind':'gantry','progress':progress,'variant':index,'damaged':index==2})
 
-# Dry basin floor is visible when the water drains. It stays below all roads.
-district='BASIN';origin,yaw=(0,0,-29),0
-# Floor uses an existing painted concrete atlas rather than a uniform sea of green.
-mesh=bpy.data.meshes.new('GW_GEO_BASIN');mesh.from_pydata([(-850,-850,-29),(850,-850,-29),(850,850,-29),(-850,850,-29)],[],[(0,1,2,3)])
+# A shallow silt bed emerges above the final -27m tide. Depressions remain wet;
+# the outer channel stays deep enough for the ferry. Always below either road.
+grid=48;vertices=[];faces=[]
+for j in range(grid+1):
+    for i in range(grid+1):
+        x=-850+i*1700/grid;y=-850+j*1700/grid
+        radius=math.sqrt((x/470)**2+(y/430)**2)
+        height=-26.0+.35*math.sin(x*.027)*math.cos(y*.031)
+        height-=1.7*max(0,math.sin(x*.037+y*.015))**8
+        height-=12*min(1,max(0,(radius-1)*3))
+        vertices.append((x,y,height))
+for j in range(grid):
+    for i in range(grid):
+        a=j*(grid+1)+i;faces.append((a,a+1,a+grid+2,a+grid+1))
+mesh=bpy.data.meshes.new('GW_GEO_BASIN');mesh.from_pydata(vertices,[],faces)
 mesh.materials.append(materials[CONCRETE]);uv=mesh.uv_layers.new(name='UVMap')
-for i,v in enumerate([(0,0),(35,0),(35,35),(0,35)]):uv.data[i].uv=v
+for polygon in mesh.polygons:
+    for loop in polygon.loop_indices:
+        p=mesh.vertices[mesh.loops[loop].vertex_index].co
+        uv.data[loop].uv=((p.x+850)/48,(p.y+850)/48)
 col=mesh.color_attributes.new(name='Tint',type='FLOAT_COLOR',domain='CORNER')
 for c in col.data:c.color=(.4,.44,.35,1)
 obj=bpy.data.objects.new('GW_SECTOR_BASIN',mesh);bpy.context.collection.objects.link(obj)

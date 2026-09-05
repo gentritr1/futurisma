@@ -317,4 +317,6 @@ scene.render.image_settings.quality=86
 scene.render.filepath=str(OUT/'tidal-pump-gantry-preview.webp')
 bpy.ops.wm.save_as_mainfile(filepath=str(ROOT/'art/blender/tidal_pump_gantry.blend'))
 bpy.ops.render.render(write_still=True)
+scene.render.image_settings.file_format='PNG'
+bpy.data.images['Render Result'].save_render(str(REF/'tidal-pump-gantry-preview.png'),scene=scene)
 print(f'Tidal Pump Gantry: {triangles} triangles, {len(objects)} material batches, painted role atlases, bounds {minimum}..{maximum}')

@@ -20,7 +20,7 @@ The asset has 3,504 triangles and five material draws. Its lower support offset 
 
 Visual acceptance requires a reviewer to name five shared visible details. Geometry validators are an independent clearance and delivery check; passing them cannot accept the artwork.
 
-The independent visual review passed on 5 September 2026. A reviewer who did not author the asset identified these details in both views:
+The independent five-detail review was repeated on 5 September 2026 against the [saved comparison file](../../art/evidence/tideline-v3/gantry-hero-versus-model.png). A reviewer who did not author the asset identified these details in both views:
 
 - Weathered olive pillars on flared concrete feet.
 - Triangular steel bracing across the overhead span.
@@ -37,6 +37,6 @@ The reviewer also noted the larger pump, heavier truss and more regular rust str
 3. Run Blender with `art/blender/build_tideline.py`; `build_tideline_foundry.py` remains a compatibility entry point.
 4. Run `npm run test:code`, then inspect the side-by-side and actual race.
 
-Runtime assembly: `public/assets/tideline-foundry/foundry_world.glb`. Editable assembly: `art/blender/tideline_foundry.blend`. Lights, placements and counts are beside the GLB. The assembly shares five atlas materials across its three gantries and sector meshes. Current export: about 71,000 triangles, 41 primitives and 8.04 MiB. The environment remains below 100,000 triangles including water/glass. Distance/frustum culling limits authored visibility to 17 draws in the measured chase sweep.
+Runtime assembly: `public/assets/tideline-foundry/foundry_world.glb`. Editable assembly: `art/blender/tideline_foundry.blend`. Lights, placements and counts are beside the GLB. The assembly shares five atlas materials across its three gantries and sector meshes. Current export: 75,526 triangles, 52 primitives and 8.45 MiB. The environment remains below 100,000 triangles including water/glass. Distance/frustum culling limits authored visibility to 18 draws in the measured chase sweep.
 
 See [course notes](TIDELINE.md) for the tide, shortcut and runtime limitations. Earlier Crown/flight reference art remains archival and is not loaded by this map.

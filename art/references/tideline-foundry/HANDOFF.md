@@ -9,3 +9,5 @@ There are two concrete feet, two welded repair plates, three parallel overhead t
 Rebuild with Blender using `art/blender/build_tidal_pump_gantry.py`. It produces the GLB, manifest, preview and editable `art/blender/tidal_pump_gantry.blend`. Packed image planes are in the hidden `REFERENCE_PLANES_NOT_EXPORTED` collection; lights, cameras and reference planes are excluded from the GLB.
 
 Inspect the actual game-loader comparison at `http://127.0.0.1:5200/art-review.html`. The Blender and engine cameras share position (4, 2.4, 74) and look-at (0, 9.5, 0). The hero's camera is estimated from its composition because generated artwork has no camera metadata. Five shared visible details, independently named by a reviewer, are the acceptance condition; a green validator is not visual approval.
+
+The current Blender preview is saved as both a delivery WEBP and `tidal-pump-gantry-preview.png` here. A permanent actual-loader comparison is in `art/evidence/tideline-v3/gantry-hero-versus-model.png`.

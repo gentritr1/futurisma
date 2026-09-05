@@ -19,7 +19,7 @@ async function moduleUrl(name, replacements = {}) {
   }
   return `data:text/javascript;base64,${Buffer.from(code).toString('base64')}`;
 }
-const {TidelineCourse}=await import(await moduleUrl('tideline-course.ts'));
+const {TidelineCourse}=await import(await moduleUrl('tideline-course.ts',{'./tideline-materials':await moduleUrl('tideline-materials.ts')}));
 const {DemoAutopilot,alignDirectionToSurface}=await import(await moduleUrl('autopilot.ts'));
 const results=[];
 for (const lateral of [-3,0,3]) for (const branch of [false,true]) {

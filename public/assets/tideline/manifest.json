@@ -1,19 +1,6 @@
 {
-  "name": "Tideline",
-  "generator": "Blender 5.2.0 LTS",
-  "aqueductRibs": 45,
-  "reactors": 6,
-  "kelpBeds": 64,
-  "mantas": 5,
-  "portHalls": 12,
-  "cranes": 6,
-  "boats": 8,
-  "flightLenses": 4,
-  "pelagicCrowns": 1,
-  "triangles": 84668,
-  "lightAnchors": 49,
-  "waterLevel": 0,
-  "seed": 508,
-  "reference": "art/reference/pelagic-crown-three-view.png",
-  "landmarkProgress": 0.435
+  "name": "Tideline prototype (retired)",
+  "status": "retired",
+  "replacement": "/assets/tideline-foundry/manifest.json",
+  "note": "The playable tide circuit uses the Foundry world. Prototype Crown and flight-lens counts are not a playable-map contract."
 }

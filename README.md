@@ -25,16 +25,16 @@ Read the road, choose your line, and make the boost count.
 | **02 · Bitterpan Works** | A salt harvest at noon: brine flats, conveyors, heat and distant machinery. | An exposed deck with visible gusts and salt patches. |
 | **03 · Night Shift** | Meridian at 02:17: neon motels, closed arcades, apartment towers and rain. | A roughly 1.96 km city circuit through six districts and an expressway underpass. |
 | **04 · Polarity** | A magnetic interchange: power halls, inverter rings and another road 22 metres above. | Optional gravity transfers, narrower express routes and a choice between distance and recharge. |
-| **05 · Tideline** | Drowned reactors, painted industrial steel, damp concrete and caged sodium lamps. | A 2.07 km road circuit: flooded on lap one, slick on lap two, with a shorter pump-hall route opening on lap three. |
+| **05 · Tideline** | A sealed glass road beneath green water, warm lamp pools and a working refinery. | A 2.07 km road circuit: flooded on lap one, slick on lap two, with a shorter pump-hall route opening on lap three. |
 
 <table>
 <tr>
 <td width="50%"><img src="docs/media/greenwater.jpg" alt="Greenwater Strip's wetland circuit"></td>
-<td width="50%"><img src="public/assets/tideline-foundry/tidal-pump-gantry-preview.webp" alt="Blender preview of the Foundry tidal pump gantry"></td>
+<td width="50%"><img src="docs/media/tideline-tide.jpg" alt="The same Tideline glass chamber flooded and drained"></td>
 </tr>
 <tr>
 <td><b>Where it began.</b> Greenwater's airfield and weathered racing deck.</td>
-<td><b>The Foundry workshop.</b> A Blender asset preview: repaired concrete feet, parallel steel trusses and three working lamps.</td>
+<td><b>One chamber, two tides.</b> Water stays outside the glass. Caustics give way to exposed sky, wet walls and sodium light.</td>
 </tr>
 </table>
 
@@ -78,12 +78,12 @@ Circuit choice, settings, liveries, records and supported ghosts are saved local
 
 **Commit to a road.** Polarity's lower deck is wider, recharges faster and supplies full-charge devices. The upper deck offers shorter, narrower express routes with slower recharge and 65%-charge devices. Transfers happen at four marked entry/exit windows, with six seconds between transfer starts. Staying on the lower road is a complete racing route. Reduced-motion mode hides the deck change behind a brief opaque transition instead of rolling the camera.
 
-**Learn the tide.** Tideline publishes its schedule before the start and on the HUD. Lap one floods the reactor and lights a current lane with **1.85× nitro recharge**. Lap two lowers the water, exposing slick algae; the worn center line has more grip than the edges. Lap three drains the pump hall and opens a **20 m wide shortcut that saves 23 m**. The main road remains available. The camera stays upright throughout.
+**Learn the tide.** The vehicle races in a sealed air chamber; the changing water stays outside. Tideline publishes its schedule before the start and on the HUD. Lap one floods the reactor and lights a current lane with **1.85× nitro recharge**. Lap two lowers the water outside the glass; condensation leaves a slick deck; the worn center line has more grip than the edges. Lap three drains the pump hall and opens a **20 m wide shortcut that saves 23 m**. The main road remains available. The camera stays upright throughout.
 
 | Lap | Water and sound | Your decision |
 |---|---|---|
 | **01 · Flooded** | Hull creaks, submerged machinery, moving water. | Harvest the lit current for reserve. |
-| **02 · Ebb** | Drain siren, rising pump throb, lamps emerging from the water. | Brake early on exposed algae or hold the cleaner center. |
+| **02 · Ebb** | Drain siren, rising pump throb, lamps emerging from the water. | Brake early on the damp chamber deck or hold the cleaner center. |
 | **03 · Drained** | Open sluices, drips, pump steam and sodium light. | Commit to the narrower pump hall or take the wider main road. |
 
 **Choose your moment.** Carry one device and deploy it when it helps. Surge adds thrust; triggering it inside a painted launch window earns extra duration. Phase Shield absorbs phase fields, with an early timed absorption returning more nitro. Supplies vary by seed and lap, while the course stays learnable.
@@ -102,7 +102,7 @@ The Tideline landmarks follow a reference-first production sequence:
 
 The generated sheets establish silhouette and wear; measured geometry resolves perspective and scale inconsistencies. Each of the six material roles has a painted 1024 atlas carrying stains, rust, baked shading and wear. Vertex colors only tint the surface. Repeated modules have three wear variants, including damage; every fourth surviving tunnel bay is structural, with caged lamps. Two ribs are broken, crown pipes run overhead, and cables sag between bays. World signs carry small place names and fleet numbers; instructions stay on the HUD. The editable scenes, build scripts and reference provenance live under [`art/`](art/).
 
-[Painted-art handoff](docs/visual-polish/TIDELINE-FOUNDRY.md) · [Gantry reference sheets](art/references/tideline-foundry/HANDOFF.md) · [Tideline course notes](docs/visual-polish/TIDELINE.md) · [Gravity and powers](docs/visual-polish/POLARITY.md)
+[Saved phase comparisons](art/evidence/tideline-v3/tide-phase-pairs.png) · [Saved hero/model comparison](art/evidence/tideline-v3/gantry-hero-versus-model.png) · [Painted-art handoff](docs/visual-polish/TIDELINE-FOUNDRY.md) · [Gantry reference sheets](art/references/tideline-foundry/HANDOFF.md) · [Tideline course notes](docs/visual-polish/TIDELINE.md) · [Gravity and powers](docs/visual-polish/POLARITY.md)
 
 ## Sound after midnight
 

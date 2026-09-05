@@ -28,7 +28,7 @@ export class TidelineWorld {
     const sample = course.createSampleScratch();
     this.devices = new PowerPickupField(TIDELINE_ABILITY_CONFIG.pickups, course.length,
       pickup => course.sample(pickup.progress, sample));
-    this.ready = this.devices.ready;
+    this.ready = Promise.all([this.devices.ready,this.sky.ready]).then(()=>{});
     this.root.add(this.devices.root, this.sky.root, ...this.currents, this.sluices, this.forkGuards);
     for (const zone of TIDELINE_ABILITY_CONFIG.launchZones) {
       this.addRibbon(zone.from, zone.to, 0, 8, 0xd0e798, this.root);
