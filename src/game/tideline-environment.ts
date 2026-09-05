@@ -8,6 +8,7 @@ import { resolveReducedMotion } from "./query-probes";
 import { installTideSurface, type TideUniforms } from "./tideline-materials";
 import { chamberGeometry, chamberWaterMask, chamberFrames } from "./tideline-chamber";
 import { lampDecals, exteriorParticles, exteriorLightShafts } from "./tideline-effects";
+import { TIDELINE_FLARE_DIRECTION } from "./tideline-sky";
 import { TidelineMotion } from "./tideline-motion";
 
 /** Dry racing chamber within a visibly flooding and draining exterior basin. */
@@ -28,6 +29,10 @@ export class TidelineEnvironment implements RaceEnvironment {
  private constructor(private readonly scenery:NeonEnvironment,private readonly waterTexture:THREE.Texture,
    private readonly effectsTexture:THREE.Texture,private readonly mudTexture:THREE.Texture,private readonly course?:TidelineCourse){
   this.root=scenery.root;
+  const flareRim=new THREE.DirectionalLight(0xffb26c,.24);
+  flareRim.position.copy(TIDELINE_FLARE_DIRECTION).multiplyScalar(100);
+  flareRim.name='tideline_refinery_flare_rim';
+  this.root.add(flareRim);
   const uniforms:TideUniforms={time:this.clock,water:this.waterLevel,effects:effectsTexture};
   const seen=new Set<THREE.Material>();
   this.root.traverse(object=>{

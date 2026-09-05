@@ -1,0 +1,107 @@
+{
+  "script": "scripts/visual/tideline-v4/turntable-profile.py",
+  "skyRows": [
+    0,
+    180
+  ],
+  "isolation": "actual sky shader and chase camera; foreground geometry excluded",
+  "frames": [
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-00.png",
+      "maximumLumaRatioAcrossTenPercent": 1.026988199779713
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-01.png",
+      "maximumLumaRatioAcrossTenPercent": 1.028605637114083
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-02.png",
+      "maximumLumaRatioAcrossTenPercent": 1.0284941347067282
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-03.png",
+      "maximumLumaRatioAcrossTenPercent": 1.0232236237351067
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-04.png",
+      "maximumLumaRatioAcrossTenPercent": 1.0440886971023164
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-05.png",
+      "maximumLumaRatioAcrossTenPercent": 1.0390649146652968
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-06.png",
+      "maximumLumaRatioAcrossTenPercent": 1.037945472287866
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-07.png",
+      "maximumLumaRatioAcrossTenPercent": 1.0274650476751765
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-08.png",
+      "maximumLumaRatioAcrossTenPercent": 1.028339528858397
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-09.png",
+      "maximumLumaRatioAcrossTenPercent": 1.0273855732605583
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-10.png",
+      "maximumLumaRatioAcrossTenPercent": 1.0476531443801642
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-11.png",
+      "maximumLumaRatioAcrossTenPercent": 1.0348473298100247
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-12.png",
+      "maximumLumaRatioAcrossTenPercent": 1.0369075763144855
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-13.png",
+      "maximumLumaRatioAcrossTenPercent": 1.038569369672871
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-14.png",
+      "maximumLumaRatioAcrossTenPercent": 1.0519011661149782
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-15.png",
+      "maximumLumaRatioAcrossTenPercent": 1.123467286864053
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-16.png",
+      "maximumLumaRatioAcrossTenPercent": 1.0269582385838403
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-17.png",
+      "maximumLumaRatioAcrossTenPercent": 1.0296574048937317
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-18.png",
+      "maximumLumaRatioAcrossTenPercent": 1.023922173613842
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-19.png",
+      "maximumLumaRatioAcrossTenPercent": 1.021813486830597
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-20.png",
+      "maximumLumaRatioAcrossTenPercent": 1.0546799954539425
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-21.png",
+      "maximumLumaRatioAcrossTenPercent": 1.0374333816480437
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-22.png",
+      "maximumLumaRatioAcrossTenPercent": 1.0300389642056926
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-23.png",
+      "maximumLumaRatioAcrossTenPercent": 1.0354023796797742
+    }
+  ],
+  "accepted": true
+}

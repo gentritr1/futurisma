@@ -1,0 +1,42 @@
+{
+  "script": "scripts/visual/tideline-v4/turntable.mjs",
+  "state": {
+    "ready": true,
+    "lap": 3,
+    "station": 3,
+    "progress": 0.94,
+    "elapsed": 8,
+    "seed": 3868938316,
+    "meter": false,
+    "camera": [
+      -394.28114719523666,
+      -11.68407008462895,
+      -107.20243029726095
+    ],
+    "waterLevel": -27,
+    "pointLights": 4,
+    "lightIntensities": [
+      500,
+      500,
+      0,
+      0
+    ],
+    "roadPatches": {
+      "under": {
+        "x": 963,
+        "y": 570
+      },
+      "between": {
+        "x": 809,
+        "y": 447
+      }
+    },
+    "calls": 38,
+    "triangles": 78230
+  },
+  "frames": 24,
+  "yawStepDegrees": 15,
+  "exposure": 1.04,
+  "toneMapping": "AgX",
+  "errors": []
+}

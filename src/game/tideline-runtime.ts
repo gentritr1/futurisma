@@ -130,7 +130,7 @@ export class TidelineRuntime implements CircuitRuntime {
     camera.position.copy(this.cameraPosition); camera.up.set(0, 1, 0); camera.lookAt(this.cameraLook);
     camera.fov = THREE.MathUtils.lerp(camera.fov, this.reducedMotion ? 62 : 59 + Math.min(1, speed / 140) * 7, response);
     camera.updateProjectionMatrix(); this.cameraReady = true;
-    this.world.sky.update(camera, this.course.tide.waterLevel, this.reducedMotion ? 0 : this.course.tide.elapsed);
+    this.world.sky.update(camera, this.course.tide.waterLevel, this.reducedMotion ? 0 : this.course.tide.elapsed, this.course.fogAt(this.simulation.state.progress).color);
   }
 
   updateHud(progress: number): void {

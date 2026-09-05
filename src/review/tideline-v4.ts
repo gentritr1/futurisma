@@ -10,10 +10,10 @@ const query=new URLSearchParams(location.search);
 const lap=Math.max(1,Math.min(3,Number(query.get("lap")??1)));
 const station=Math.max(0,Math.min(4,Number(query.get("station")??0)));
 const elapsed=Math.max(0,Number(query.get("seconds")??8));
-const progress=query.get("view")==="lamp"?.004:[0,.125,.785,.94,.53][station];
+const progress=query.has("progress")?Number(query.get("progress")):query.get("view")==="lamp"?.004:[0,.125,.785,.94,.53][station];
 const renderer=new THREE.WebGLRenderer({canvas:document.getElementById("review-canvas") as HTMLCanvasElement,antialias:true});
 renderer.setSize(1280,720,false);renderer.setPixelRatio(1);
-renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.NoToneMapping;
+renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.AgXToneMapping;renderer.toneMappingExposure=1.04;
 const scene=new THREE.Scene(),course=new TidelineCourse();
 course.setLapBoard(lap);course.advanceTide(elapsed);course.updateAtmosphere(elapsed,false);
 const world=new TidelineWorld(course);course.group.add(world.root);scene.add(course.group);
@@ -51,3 +51,15 @@ const pixels=(lateral:number,forward:number)=>{
  return {x:Math.round((point.x*.5+.5)*1280),y:Math.round((-.5*point.y+.5)*720)};
 };
 document.getElementById("review-state")!.textContent=JSON.stringify({ready:true,lap,station,progress,elapsed,seed:3868938316,meter,camera:camera.position.toArray(),waterLevel:course.tide.waterLevel,pointLights:lights.length,lightIntensities:lights.map(l=>l.intensity),roadPatches:{under:pixels(8,0),between:pixels(8,15)},calls:renderer.info.render.calls,triangles:renderer.info.render.triangles});
+
+// Isolated V4 evidence surface: the same AgX exposure as gameplay.
+const aim=camera.getWorldDirection(new THREE.Vector3());
+Object.assign(window,{tidelineReview:{scene,course,world,environment,renderer,camera,
+ render(yaw=0,skyOnly=false) {
+  const direction=aim.clone().applyAxisAngle(new THREE.Vector3(0,1,0),yaw);
+  camera.lookAt(camera.position.clone().add(direction));camera.updateMatrixWorld();
+  environment.updateVisibility(camera);world.sky.update(camera,course.tide.waterLevel,0,fog.color);
+  if(skyOnly){const isolated=new THREE.Scene();isolated.add(world.sky.root);renderer.render(isolated,camera);world.root.add(world.sky.root);}
+  else renderer.render(scene,camera);
+ }
+}});

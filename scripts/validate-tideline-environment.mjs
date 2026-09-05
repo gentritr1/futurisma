@@ -36,7 +36,7 @@ let code = (await transformWithOxc(source, file.pathname)).code
   .replace('import { NeonEnvironment } from "./neon-environment";', 'const NeonEnvironment = {load: options => globalThis.__tidelineAssetPorts.scenery(options)};')
   .replace('import { resolveReducedMotion } from "./query-probes";', 'const resolveReducedMotion = () => globalThis.__tidelineAssetPorts.reduced ?? false;')
   .replace('from "./graphics-resources"', `from ${JSON.stringify(new URL("src/game/graphics-resources.js", root).href)}`);
-for(const name of ['tideline-materials','tideline-chamber','tideline-effects','tideline-motion']) {
+for(const name of ['tideline-sky','tideline-materials','tideline-chamber','tideline-effects','tideline-motion']) {
   code=code.replace(`from "./${name}"`,`from ${JSON.stringify(await compileLeaf(`src/game/${name}.ts`))}`);
 }
 const { TidelineEnvironment } = await import(`data:text/javascript;base64,${Buffer.from(code).toString("base64")}`);
