@@ -31,7 +31,7 @@ if(meter) {
   camera.lookAt(sample.position.clone().addScaledVector(sample.tangent,30).addScaledVector(sample.up,3));
 }
 const profile=(course as RaceCourse).lightingAt(progress);
-scene.add(new THREE.HemisphereLight(profile.sky,profile.ground,profile.hemisphereIntensity*.88));
+const hemisphere=new THREE.HemisphereLight(profile.sky,profile.ground,profile.hemisphereIntensity*.88);scene.add(hemisphere);
 const key=new THREE.DirectionalLight(profile.key,profile.keyIntensity);key.position.copy(profile.keyDirection).multiplyScalar(100);scene.add(key);
 const rim=new THREE.DirectionalLight(profile.rim,profile.rimIntensity*1.35);rim.position.set(-100,25,-80);scene.add(rim);
 const fog=course.fogAt(progress);scene.fog=new THREE.FogExp2(fog.color,fog.density);scene.background=fog.color;
@@ -64,5 +64,19 @@ Object.assign(window,{tidelineReview:{scene,course,world,environment,renderer,ca
   environment.updateVisibility(camera);world.sky.update(camera,course.tide.waterLevel,0,fog.color);
   if(skyOnly){const isolated=new THREE.Scene();isolated.add(world.sky.root);renderer.render(isolated,camera);world.root.add(world.sky.root);}
   else renderer.render(scene,camera);
+ }
+}});
+
+// Fixed-speed evidence samples the real road and authored presentation. This is
+// a camera rail at exactly 300 km/h, not a claim that the racing driver holds it.
+Object.assign(window,{tidelineApproach:{
+ renderAt(progress:number,seconds:number){
+  const s=course.sample(progress);course.updateAtmosphere(seconds,false);world.update(seconds,false,[],progress,3868938316,lap);
+  camera.position.copy(s.position).addScaledVector(s.tangent,-16).addScaledVector(s.up,6.4);
+  camera.lookAt(s.position.clone().addScaledVector(s.tangent,30).addScaledVector(s.up,3));camera.updateMatrixWorld();
+  const lighting=course.lightingAt(progress);hemisphere.color.copy(lighting.sky);hemisphere.groundColor.copy(lighting.ground);hemisphere.intensity=lighting.hemisphereIntensity*.88;key.color.copy(lighting.key);key.intensity=lighting.keyIntensity;key.position.copy(lighting.keyDirection).multiplyScalar(100);rim.color.copy(lighting.rim);rim.intensity=lighting.rimIntensity*1.35;
+  const f=course.fogAt(progress);(scene.fog as THREE.FogExp2).color.copy(f.color);(scene.fog as THREE.FogExp2).density=f.density;scene.background=f.color;
+  environment.updateVisibility(camera);world.sky.update(camera,course.tide.waterLevel,seconds,f.color);renderer.render(scene,camera);
+  return {progress,seconds,camera:camera.position.toArray()};
  }
 }});

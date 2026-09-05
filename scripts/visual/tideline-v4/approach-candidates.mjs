@@ -1,0 +1,8 @@
+import {mkdir,writeFile} from 'node:fs/promises';
+import {launchReviewBrowser} from './browser.mjs';
+import route from '../../../src/game/data/tideline/route.json' with {type:'json'};
+const out='/tmp/tideline-v4-approach-candidates';await mkdir(out,{recursive:true});
+const candidates=[['strip',.036,1],['strip',.32,3],['strip',.449,3],['strip',.736,3],['cradle',.03,1],['cradle',.285,3],['cradle',.335,3],['cradle',.42,3],['cradle',.67,3],['cradle',.72,3],['cradle',.88,3],['lane',.025,1],['lane',.94,1],['bulkhead',.31,3],['bulkhead',.53,3],['bulkhead',.905,3]];
+const browser=await launchReviewBrowser();try{const page=await browser.newPage();for(const [kind,target,lap]of candidates){await page.goto(`http://127.0.0.1:5215/tideline-v4-review.html?lap=${lap}&progress=${target}`,{waitUntil:'networkidle0'});await page.waitForFunction(()=>window.tidelineApproach);let low=70,high=180;
+for(let i=0;i<12;i++){const ahead=(low+high)/2;const distance=await page.evaluate(({p,target})=>{const state=window.tidelineApproach.renderAt(p,8.667),point=window.tidelineReview.course.sample(target).position;return Math.hypot(state.camera[0]-point.x,state.camera[1]-point.y,state.camera[2]-point.z);},{p:(target-ahead/route.length+1)%1,target});if(distance<121)low=ahead;else high=ahead;}
+await page.evaluate(p=>window.tidelineApproach.renderAt(p,8.667),(target-high/route.length+1)%1);await page.screenshot({path:`${out}/${kind}-${target}.png`,clip:{x:0,y:0,width:1280,height:720}});}await writeFile(out+'/capture.json',JSON.stringify({candidates,method:'Exploratory camera-distance candidates; binary search targets 121 metres from camera, not acceptance evidence'}));}finally{await browser.close();}
