@@ -1,0 +1,400 @@
+
+> futurisma-race@0.1.0 test
+> npm run test:code && npm run test:archives
+
+
+> futurisma-race@0.1.0 test:code
+> npm run validate:tidal-pump-gantry && npm run validate:tideline-foundry && npm run validate:tideline-contract && npm run validate:tideline && npm run validate:tideline-environment && npm run validate:tideline-runtime && npm run validate:tideline-hardware && npm run validate:tideline-driving && npm run validate:polarity-simulation && npm run validate:power-kit && npm run validate:race-presence && npm run validate:map && npm run validate:map02 && npm run validate:nightshift && npm run validate:polarity && npm run validate:polarity-runtime && npm run validate:polarity-minimap && npm run validate:city-rivals && npm run validate:polarity-environment && npm run validate:totem-evolution && npm run validate:package-boundary && npm run validate:physics && npm run validate:apron && npm run validate:drivable-limits && npm run validate:race && npm run validate:race-modes && npm run validate:rivals && npm run validate:control && npm run validate:audio && npm run validate:audio-ambience && npm run validate:camera && npm run validate:presentation && npm run validate:graphics && npm run validate:frames && npm run validate:render && npm run validate:lighting && npm run validate:living-world && npm run validate:decal-cells && npm run validate:art-pass && npm run validate:furniture && npm run validate:minimap && npm run validate:seams && npm run validate:shadows && npm run validate:persistence && npm run validate:ghost && npm run validate:security && npm run validate:soundtrack && npm run validate:midground && npm run validate:corridor && npm run validate:track-events && npm run validate:pose && npm run build && npm run validate:build
+
+
+> futurisma-race@0.1.0 validate:tidal-pump-gantry
+> node scripts/validate-tidal-pump-gantry.mjs
+
+Tidal Pump Gantry PASS: 3504 triangles, 5 draws, 2517.6 KiB, painted role atlases; 15.362 m overhead and 18.600 m support clearances.
+
+> futurisma-race@0.1.0 validate:tideline-foundry
+> node scripts/validate-tideline-foundry.mjs
+
+Tideline Foundry PASS: 74,554 authored triangles / 55 primitives / 8.39 MiB; 448,013 3D clearance probes; six-role painted atlases; peak authored visibility 18 draws / 44,892 triangles.
+
+> futurisma-race@0.1.0 validate:tideline-contract
+> node scripts/validate-tideline-contract.mjs
+
+Tideline contract PASS: 74554 loaded triangles, 55 primitives, 149 unique instance anchors; every count drift rejected.
+
+> futurisma-race@0.1.0 validate:tideline
+> node scripts/validate-tideline.mjs
+
+Tideline rookie: 75.84 / 77.62 / 79.12 s; fleet separation 13.60 m; minimum field clearance 2.30 m across 1515 samples.
+Tideline works: 73.41 / 75.02 / 76.56 s; fleet separation 13.60 m; minimum field clearance 2.30 m across 1452 samples.
+Tideline feral: 70.40 / 71.76 / 73.29 s; fleet separation 13.60 m; minimum field clearance 2.30 m across 1395 samples.
+Tideline course PASS: 2073.8 m, 8 ordered gates, continuous road and a real pump-hall branch; max pitch 5.54 degrees, no roll; 6228 height-independent projections, worst error 0.051 m; all pace tiers deterministic at 60/120/240 Hz; original/Foundry geometry, projection, gates, recovery, physics inputs and rival results exactly identical.
+
+> futurisma-race@0.1.0 validate:tideline-environment
+> node scripts/validate-tideline-environment.mjs
+
+Tideline environment PASS: painted lit road, exterior water/particulate, continuous dry-chamber mask, timed drainage, pause/reduced motion, triangle budget and all four partial-load cleanup orders.
+
+> futurisma-race@0.1.0 validate:tideline-runtime
+> node scripts/validate-tideline-runtime.mjs
+
+Tideline runtime PASS: published tide schedule, 23 m physical shortcut closed on laps 1/2, lap-3 projection and main-road alternative, exposed algae grip, current recharge, nitro/power controls, shield refunds, pause/reset and resource disposal; equal 60/120/240 Hz tide and command results.
+
+> futurisma-race@0.1.0 validate:tideline-hardware
+> node scripts/validate-tideline-hardware.mjs && node scripts/validate-tideline-power-chain.mjs
+
+Tideline hardware PASS: hoist attachment during retraction, collect jaws/sparks/reset, reduced motion, and 18 seeded rival power cues without pace-state writes.
+Tideline hardware PASS: distant silhouette, role batching, collection visibility, and steady reduced-motion dome.
+Tideline hardware PASS: all animated batch vertices match their authored pivots, at rest and partial/full activation.
+Tideline CHAIN PASS: inclusive 240-tick window, 60-tick reward, invalid-command atomicity, no repeated reward and reset.
+
+> futurisma-race@0.1.0 validate:tideline-driving
+> node scripts/validate-tideline-driving.mjs
+
+Tideline driving PASS / entry -3 m: main 6.658 s, pump hall 6.383 s; full branch without edge contacts.
+Tideline driving PASS / entry 0 m: main 6.658 s, pump hall 6.383 s; full branch without edge contacts.
+Tideline driving PASS / entry 3 m: main 6.658 s, pump hall 6.392 s; full branch without edge contacts.
+
+> futurisma-race@0.1.0 validate:polarity-simulation
+> node scripts/validate-polarity-simulation.mjs
+
+Polarity simulation PASS: deliberate route commitments, six demo flips/race at varied pace, seeded visible supply, skilled power timing, deterministic grouped replay, mid-action JSON restore, invalid snapshot rejection, and non-gravity map reuse.
+
+> futurisma-race@0.1.0 validate:power-kit
+> node scripts/validate-power-kit.mjs
+
+Power kit PASS: 3444 Blender triangles, 8 batches, 167552 bytes, no textures; distinct mechanical silhouettes, independent shared-resource clones, reduced motion, mounted inventory/deployment and exactly-once cleanup.
+Pump kit V2 PASS: 3340 triangles, four embedded painted atlases, contact AO, six role allowlist, turbine/iris pivots, independent lamp controls and reduced motion.
+
+> futurisma-race@0.1.0 validate:race-presence
+> node scripts/validate-race-presence.mjs
+
+ARCHIVES SKIPPED (1 accepted package(s) absent under /Users/gentlegen/Desktop/futurisma-race/polarity_work/artifacts: GREENWATER_RACE_PRESENCE_v1.6.zip — Race Presence provenance not audited)
+Race Presence v1.6 PASS: the v1.6 final freeze was NOT audited (archive absent); baked steering pivots, 6,114 visible triangles, 108 collision lines, one 256px eight-slot effects atlas, three blend-family batches, and NEEDLE 16 rival identity match the served bytes and source contracts.
+
+> futurisma-race@0.1.0 validate:map
+> node scripts/validate-map.mjs
+
+Greenwater PASS: 1258 samples, 2515.982 m, 8 gates, 9 music states.
+
+> futurisma-race@0.1.0 validate:map02
+> node scripts/validate-map02.mjs
+
+Map 02 PASS: 610 stations, 12 ordered checkpoints, 20 visible GLB primitives, 11268 visible triangles.
+Map 02 P8 PASS: 1048 open-pan / 125 berm / 47 works edge occurrences over 1220 (524 stations on the default), 4 boost pads, 3 salt-drift patches + 3 cable coils, 10 music triggers (50 boundaries over 5 laps), 3 sector lighting profiles, 4.1% of the lap enclosed.
+
+> futurisma-race@0.1.0 validate:nightshift
+> node scripts/validate-nightshift.mjs
+
+Night Shift PASS: 1958.9 m, 8 gates, route projection and recovery, 242 Blender buildings, 166678 triangles / 57 primitives / 10.9 MiB.
+
+> futurisma-race@0.1.0 validate:polarity
+> node scripts/validate-polarity.mjs
+
+Polarity PASS: 2173.8 m floor / 2040.3 m ceiling, 133.0 m shortcut savings, 4350 deck projections (max 0.109 m), 0.089 m minimum kerb clearance beyond full craft envelope, 0.250 m transfer landing margin, 8 required gates per deck, independent rival geometry, gravity/power rules.
+
+> futurisma-race@0.1.0 validate:polarity-runtime
+> node scripts/validate-polarity-runtime.mjs
+
+Polarity runtime PASS: keyboard/gamepad action edges and demo takeovers, suppression, committed junctions, inverted finite camera, reduced-motion occluded cut, paused timers/markers, finished-coast landing without pickups, recovery/reset, capsule inventory, shield duration and bounded surge release.
+
+> futurisma-race@0.1.0 validate:polarity-minimap
+> node scripts/validate-polarity-minimap.mjs
+
+Polarity minimap PASS: both express routes retain exact junctions and measured distance savings; cached cyan dashed paths reset styling; the player dot follows its selected deck without runtime sampling or lane mutation.
+
+> futurisma-race@0.1.0 validate:city-rivals
+> node scripts/validate-city-rivals.mjs
+
+polarity/rookie: 77.10 / 78.93 / 80.56 s, minimum rival separation 13.60 m, phase-field hull clearance 2.30 m over 1551 samples.
+polarity/works: 73.80 / 75.58 / 77.21 s, minimum rival separation 13.60 m, phase-field hull clearance 2.30 m over 1467 samples.
+polarity/feral: 70.12 / 71.70 / 73.32 s, minimum rival separation 13.60 m, phase-field hull clearance 2.30 m over 1392 samples.
+nightshift/rookie: 74.95 / 76.80 / 78.49 s, minimum rival separation 13.60 m.
+nightshift/works: 71.80 / 73.49 / 75.20 s, minimum rival separation 13.60 m.
+nightshift/feral: 68.25 / 69.88 / 71.46 s, minimum rival separation 13.60 m.
+City rivals PASS: actual course curvature and authored boost windows, all three tiers deterministic at60/120/240Hz, no rival overlaps and no player-dependent pace.
+
+> futurisma-race@0.1.0 validate:polarity-environment
+> node scripts/validate-polarity-environment.mjs
+
+Polarity environment PASS: 94,684 triangles, 48 primitives, 5.7 MiB; 124,148 exported vertices checked against both driving decks; 7 inverter rings and 125 light anchors.
+
+> futurisma-race@0.1.0 validate:totem-evolution
+> node scripts/validate-totem-evolution.mjs
+
+TOTEM evolution PASS: 1520 authored triangles, 7 asset draws, 75892 bytes, zero textures; gyro, signals, reduced motion, reset and unique cleanup verified.
+
+> futurisma-race@0.1.0 validate:package-boundary
+> node scripts/validate-package-boundary.mjs
+
+Package boundary PASS: canonical paths, symlinks, CRC, manifest bytes/hashes, GLB framing, and non-finite geometry reject corrupt input.
+
+> futurisma-race@0.1.0 validate:physics
+> node scripts/validate-physics.mjs
+
+Cushion PASS: pre-lean from 4.6 m at 3 m/s^2, field from 3.4 m lateral / 7 m longitudinal, peak 14 m/s^2 from 1.4 m inward, monotone, never inward-pointing over the whole envelope, scrub ceiling 2.0%/s (2.24 m/s at boost speed), lean capped at 4.00 m/s reached in 0.29 s and bled on a 0.35 s constant, 60/120 Hz drift 0.000000 m/s; 1.0 m overlap closing 1.5 m/s clears 2.2 m in 0.567 s (deadline 0.6 s, worst gap 0.926 m); clean-gate chain multiplies passive regen only.
+Slipstream PASS: full tow inside 4-16 m and 1.5 m of the line, gone by 26 m / 2.6 m; cruise cap 86 -> 91.16 m/s, terminal cruise 91.79 -> 95.85 m/s (+4.42%), regen 0.045 -> 0.090 per second; 60/120 Hz drift 0.00000 m/s.
+Physics PASS: cruise 330.0 km/h, boost 403.2 km/h, post-boost 379.9→346.2 km/h, finish run-out 98.1 m / 3.5 s settled, wet grip 0.805→0.990, 60/120 Hz speed drift 0.002 m/s, steering drift 0.0000, 240 s soak 11 boost exhaustions / 11 drift entries / 0.008% distance drift, drift bank 1.818 s to full / 0.833 s to empty, 240 s drift economy 40 entries / 20 rewards (+6.00 reserve), reserve low-water 0.011.
+
+> futurisma-race@0.1.0 validate:apron
+> node scripts/validate-apron.mjs
+
+Apron PASS: 2286 of 2516 edge occurrences opened to authored run-off, 230 hangar occurrences still walled, A=5 m @ 0.68 grip, boundary at 16.50 m in FUEL_ROW over a 2515.982 m lap; run-off drawn for A/B/C (A falls -0.12 m, B rises 0.14 m, C flush).
+
+> futurisma-race@0.1.0 validate:drivable-limits
+> node scripts/validate-drivable-limits.mjs
+
+Drivable limits PASS: 230 Greenwater spans and 1 Bitterpan spans limited, every one clearing its own bounding geometry by 1.6 m and never crossing the deck edge; Bitterpan's open pan (1000-1500 m) keeps its full authored run-off and no span is bounded by the superseded blockout; Cradle Bend trims 5.00 m across 16 spans, set by GW_SECTOR_T1_CRADLE_BEND_metal, surface-support(barrier_A_right), GW_SECTOR_WATER_TABLE_metal, surface-support(GW_SECTOR_T1_CRADLE_BEND_jungle).
+
+> futurisma-race@0.1.0 validate:race
+> node scripts/validate-race-rules.mjs
+
+Race rules PASS: countdown, turn urgency, open-edge and hysteretic wrong-way warnings, final-route filtering, forward crossings, wraparound, missed-gate penalty, finish, position, gap and boost presentation, cable contacts, recovery telemetry, gate-miss recovery (7 gates narrower than their legal lateral, 1 s grace above 15 m/s).
+
+> futurisma-race@0.1.0 validate:race-modes
+> node scripts/validate-race-modes.mjs
+
+Race modes PASS: 3 formats x 3 tiers parsed (11 hostile tokens collapsed to the defaults); sprint pinned at 2 laps against `?laps=` while race and timeattack honour it; the sprint grid is a permutation of the authored slots on both circuits with the player P1, the quickest rival rearmost and the fan still >= 3.2 m; delta arithmetic against an 8-gate fixture lap with 7 corrupt curves refused, U+2212 minus and a 4 ms dead band where text and colour agree; timeattack reports fieldSize 1 and refuses the fleet before its geometry or atlas is built; both maps' rookie/feral tiers authored, ordered, non-overlapping and inherited field by field, with no runtime multiplier in either module.
+
+> futurisma-race@0.1.0 validate:rivals
+> node scripts/validate-rivals.mjs
+
+greenwater: start line at ribbon 5.03 m of 2515.98; player race distance is corrected by +5.03 m into the rivals' frame
+bitterpan: start line at ribbon 3045.00 m of 3050.00; player race distance is corrected by -5.00 m into the rivals' frame
+greenwater grid: authored 0.00 / -3.20 / 3.10 / -0.40 (min gap 0.40 m) -> fanned 0.00 / -6.40 / 3.20 / -3.20 (min gap 3.20 m)
+bitterpan grid: authored 6.20 / -6.20 / 3.10 / -3.10 (min gap 3.10 m) -> fanned 6.20 / -6.30 / 3.00 / -3.10 (min gap 3.20 m)
+greenwater: G2 OPEN GAP - demo soak player-rival separation 0.93 m is BELOW the 1.9 m target (cushion off: 1.2 m; the cushion moved the craft 23.789 m in total over a longest contact of 0.433 s). The cushion is at its 14 m/s^2 ceiling at that instant; what is left is the approach, not the push. See the note above.
+greenwater: privateer 165.039s (lap1 35.045, boost 28.1s, pads 0, drifts 25)  nightform 167.700s (lap1 35.318, boost 33.6s, pads 20, drifts 25)  needle 169.333s (lap1 36.299, boost 35.5s, pads 20, drifts 25) | rival-rival 3.48 m, player-rival 0.10 m -> 0.38 m with the cushion (2 contacts, 1.3 s, peak 14.00 m/s^2), free deck 45.0% of 38.4% reachable over 1920 samples, lead changes 2
+bitterpan: privateer 182.667s (lap1 38.036, boost 27.3s, pads 10, drifts 10)  nightform 184.471s (lap1 39.189, boost 26.4s, pads 9, drifts 10)  needle 186.090s (lap1 39.448, boost 28.9s, pads 16, drifts 10) | rival-rival 3.45 m, player-rival 0.08 m -> 0.03 m with the cushion (3 contacts, 3.2 s, peak 14.00 m/s^2), free deck 37.4% of 40.0% reachable over 5052 samples, lead changes 0
+Rival tiers PASS: 3 tiers x 2 maps, each bit-identical at 60/120 Hz and longitudinally identical against a parked player (no rubber-banding in any tier), each best rival inside its window: greenwater rookie 4.98s mean / works 1.93s mean / feral -1.53s mean; bitterpan rookie 4.99s mean / works 1.33s mean / feral -1.52s mean.
+Rival race PASS: deterministic 120 Hz pacing, five-lap timing, bounded lanes, stable ranking/gaps, finish spread, safe-state recovery, bounded visual banking, rate-independent pose signals and pinned open-loop finish times; G1 - boost/pad/drift accumulators rate independent, every reserve window on an authored straight with each rival's set distinct, rival lap and finish times bit-identical at 60 Hz and 120 Hz AND between a moving player and a player left on the grid on both maps, lane solver always clear of player and neighbour, field-level free-deck rule held; livery sheet orientation pinned in both consumers (player swap sets flipY = true, rival atlas mirrors per quadrant at flipY = false).
+
+> futurisma-race@0.1.0 validate:control
+> node scripts/validate-control-mode.mjs
+
+Control mode PASS: single-owner keyboard actions, sanitized analogue input, deliberate manual takeover, keyboard override, and interruption-safe action edges.
+
+> futurisma-race@0.1.0 validate:audio
+> node scripts/validate-audio-timing.mjs
+
+Audio timing PASS: advancing-clock node safety, 174 BPM F-minor tonal plan, boost filter/shelf targets, unique stem profiles, interruption-safe ramps, stable 30 Hz control at 60/120 Hz rendering, deterministic impulse responses with measured 1.9 s hangar RT60, bar-quantized zone crossfades, closed [588, 846] hangar interval, and a rival field capped at 40% of the player engine.
+
+> futurisma-race@0.1.0 validate:audio-ambience
+> node scripts/validate-audio-ambience.mjs
+
+City ambience PASS: five restrained beds per night map, windows scale with lap length; no inherited squall or salt events.
+Track events -> ambience PASS: dry_wind on windGust 0.300 -> +5.11 dB; salt_patter on saltDrop silent -> 0.180; wetland on windGust 0.260 -> +4.57 dB; rain_patter on squall silent -> 0.200; salt_patter on saltDrop silent -> -24.69 dBFS pre-resample; rain_patter on squall silent -> -23.80 dBFS pre-resample.
+Audio ambience PASS: 9 beds across two maps, windows pinned to the authored sectors and rooms, -9 dB music duck monotonic and exact, sector crossfades 2.40-2.47 s at 85 m/s (budget 2.5 s; the 1 stretch(es) shorter than that reach 87 % instead), inverse distance 6/90 m giving 12.8 dB between 15 m and 60 m, Doppler capped at +-6 %, and 9 deterministic seeded loops baked in 117 ms (bitterpan 35 ms, greenwater 29 ms).
+Pit radio PASS: 17 lines served as 181.7 KiB, priority order pinned, queue depth 3 with eviction and dedupe, 1.4 s minimum gap, 3 s expiry, gate_clear held to one per 20 s against a gate every 4.8 s, chain steps 3 and 6, position changes held 1.5 s, and the gust word asserted against the HUD arrow it deliberately opposes.
+
+> futurisma-race@0.1.0 validate:camera
+> node scripts/validate-camera-feedback.mjs
+
+Camera feedback PASS: deterministic impact shake, bounded braking/boost lens, and 60/120 Hz FOV drift 0.0000 degrees.
+
+> futurisma-race@0.1.0 validate:presentation
+> node scripts/validate-presentation.mjs
+
+Presentation PASS: 144 Hz 94→0 repeats, 165 Hz 176→0 repeats, 240 Hz 474→0 repeats; bounded directional speed streaks; banked-deck lift 3.70 m at the 12° station (d=847.994 m), applied on the presentation pose and the spark origin and kept off the simulation's own position; P20.5 streak profiles Bitterpan 112 lines x0.95 length x0.8 opacity (#201a12, normal blend) and Greenwater 96 x0.8 additive, over one shared ramp.
+
+> futurisma-race@0.1.0 validate:graphics
+> node scripts/validate-graphics-resources.mjs
+
+Graphics resources PASS: shared geometry, material, and texture ownership disposes exactly once.
+
+> futurisma-race@0.1.0 validate:frames
+> node scripts/validate-frame-scheduling.mjs
+
+Frame scheduling PASS: idle work is skipped without delaying input polling.
+
+> futurisma-race@0.1.0 validate:render
+> node scripts/validate-render-quality.mjs
+
+Render quality PASS: 720-line adaptive target, 360-line floor, resize-safe degradation; ?render defaults to agx, snap grid clamps to 180-240 lines, Bayer closed form matches the canonical 4x4, grade is monotonic with an identity midrange, world geometry snaps and the craft, rivals, sky and HUD do not; MSAA is on outside ps2 and the painterly filter class reaches the baked GLB sheets only.
+
+> futurisma-race@0.1.0 validate:lighting
+> node scripts/validate-lighting.mjs
+
+H3 PASS: 2 Greenwater steam vents; card envelope peaks at 0.155 and the plume composites to 0.443 (ceiling 0.45) at 2.1 m with 6 cards live; the burst clears its 4 s cycle by 0.10 s; sheet falls 1 -> 0.026 to the rim.
+Lighting motion PASS: 12 normalized sector key directions, max 0.656°/m over 2515 samples (budget 0.9°, worst at d=603 m, total swing 34.1°); seeded flicker deterministic over 3600 ticks in [0.556, 0.997] with 547 strikes and a 0.167 slow sag; 5-stop ramp warms 1.51x lap 1 to lap 5 and zeroes under reduced motion; P11 regrade verified on all 12 sectors (10 x1.18/x0.82, 2 authored, rim boost 1.35), 3 hangar lamps at 640/715/790 m over a 62 m range (darkest deck point 65% of range, spill 38.4/34.4 m past the mouths); P20.5 sky authored on 3 Bitterpan and 12 Greenwater sectors, every haze cooler than its own fog and every zenith 20+ luma under its haze; cloud coverage 0.22/0.5 drifting 0.0022/0.0035 turns per second at 6:1 and 6:1 stretch, adding light only.
+
+> futurisma-race@0.1.0 validate:living-world
+> node scripts/validate-living-world.mjs
+
+Living world PASS: greenwater 7 calls / 280 cards / 560 tris (budget 7/280), bitterpan 7 calls / 300 cards / 600 tris (budget 7/300); 11 accepted Greenwater zones pinned byte-exact, 11 P9 zones pinned, 5 P12 zones, 9 P18 horizon zones (34 GW / 38 BP cards, 1 / 2 batches, every silhouette bottom-anchored at base 0, the two tone bands centred), 5 P20.4 zones (146 BP cards, +1 batch, 18 shoulder-tier cards at alpha 0.62 and 37 cards inside the drivable corridor all under alpha 0.35, every dust tint under luma 80, single-pass materials), two fog exemptions, 14 motions and 11 envelopes wired in the runtime.
+
+> futurisma-race@0.1.0 validate:decal-cells
+> node scripts/derive-decal-cells.mjs --check
+
+Decal cells CHECK: 12 cells / 19 quads and 12 wear placements re-derived identical from public/assets/totem/models/totem_runtime.glb.
+
+> futurisma-race@0.1.0 validate:art-pass
+> node scripts/validate-art-pass.mjs
+
+Art pass PASS: 10 sheets hash-matched to their regions (36/17/16 + 1/18/4/14 + 15/16/6 slots); 200 opening decals / 400 tris, 29 past halfWidth on the apron profile; signage greenwater 22 boards / 39 quads, bitterpan 12 / 12; every slot resolves, every board clears the deck by 0.5 m+, 3 hang above the clear span and 13 sit inside the run-off at their pinned depths. Pass 02: 297 pan crust decals + 110 set-dressing items = 407 on ONE merged mesh (814 tris, same sheet and material both sides); the crust tile is 12 m, linear, mipped, aniso 4; 13 plaque backings (7 chevron + 6 board) all flush at 4.6 m and inset 0.29 m inside a 0.35 m plaque; wear overlay in register with the livery chip strip at intensity 45/100, 4 liveries, 12 library slots APPLIED at 12 measured decal cells (19 quads, GLB sha pinned) — P15 shipped these resolved-and-not-applied and the history is kept at the assertion. Pass 03: 15 facade families over 226 placements on ONE sheet (+0 draw calls, alpha only on 4 lattice families, a grade band on every family); 34 + 38 horizon cards over 1 + 2 batches, every silhouette bottom-anchored and exactly one fog exemption; 26 board backs, the authored table and the apply/exclude rule agreeing placement for placement and no wall plaque among them; 254 edge strips of 24 m at 0.012 m lift (6 dash cycles a strip, spans matched to the accepted edge table, cyan pinned to 6 a lap). P20.6: pan floor macro field on 128 x 128 segments (seed 206101, +/-0.12 brightness at 189 m and 47.25 m, both whole multiples of the 47.25 m vertex spacing), re-run under Node to a mean within 2/255 of flat; tile-break at 1/37 and 1/23 blended 0.42 toward a tile mean recomputed from the PNG; wind streaks along 292 degrees terraced into 3 bands over two octaves, and brine flats at 110 m with a 2 m shoreline and a 3 m dried-salt rim, both measured in metres.
+
+> futurisma-race@0.1.0 validate:furniture
+> node scripts/validate-furniture.mjs
+
+Furniture PASS: 900 placements swept through the shipped resolution helper (107 edge, 39 gate, 167 structure, 587 flat) across both maps; every one clears the deck by 0.5 m+ (0.4 m for gate masts, tightest 0.425 m) or sits above the 4.6 m plaque band. 13 hangar placements resolve as wall plaques, dropping 7 posts and 6 deck-level approach arrows; 7 authored hazards measured off the deck with no exemption list (tightest 0.200 m spare), the rule proved failable by a synthetic re-pin at lateral 0; 34 P12 boards re-checked against the same deck predicate. H1: 33 barrier-span placements asserted directly against the 4.6 m plaque band and inside their wall line, the rule proved failable by a board re-pinned at its authored 1.41 m open-air height in HANGAR_SIX. P15: 13 plaque backings (7 chevron + 6 board) derived from those same wall placements, measured not exempted — every lower edge flush at 4.6 m and every panel 0.06 m outboard of the plaque it backs.
+
+> futurisma-race@0.1.0 validate:minimap
+> node scripts/validate-minimap.mjs
+
+Minimap PASS: 128 outline stations inside the bounding box on both maps, rings closed (Greenwater 0.000 m), radar projection clamped/nulled at ±80 m × ±20 m, pure functions deterministic.
+
+> futurisma-race@0.1.0 validate:seams
+> node scripts/validate-module-seams.mjs
+
+Module seams PASS: game.ts 2576/2577 lines, lighting, effects, scene assets, autopilot, track events and diagnostics extracted, contributor spread order pinned.
+
+> futurisma-race@0.1.0 validate:shadows
+> node scripts/validate-shadows.mjs
+
+Shadows PASS: kill switches (?shadows=0, ?render=ps2), map-size and filter parsing with the shipped filter pinned to PCF (?shadowType= A/B); 140 m box / 2048 map = 6.8 cm texel with the frustum clearing a 70 m caster at a 56 degree key; snapping matches Object3D.lookAt's basis over 4 key directions, stays on one global grid across 400 frames of travel, is idempotent and never moves the box more than half a texel; renderer switch, shadow-camera follow and the Greenwater non-casting families pinned in source.
+
+> futurisma-race@0.1.0 validate:persistence
+> node scripts/validate-persistence.mjs
+
+Persistence PASS: v4 round trip with per-mode ghosts and mode/tier best laps, v1 -> v4, v2 -> v4 and v3 -> v4 migrated field by field (the v2 ghost RELOCATED into ghosts.race, not dropped), the global two-replay budget held across 3 formats on one circuit with every lap time and split surviving; 25 hostile payloads absorbed to defaults, v1 -> v2 migrated field by field with nothing lost, settings.voice defaulted on every rung and 5 hostile values refused, 13 corrupt ghosts dropped while their course records survived, ghost follows bestLapMs, write budget inside the 64 KB read ceiling, volume grid stable across JSON, record folding correct, quota-exceeded and absent ports degrade to memory without throwing; the stored livery reaches the CRAFT — 3 of 4 applied at boot, works skipped as already baked into the GLB, 6 hostile tokens collapsed to it, main.ts awaits the restore ahead of the grid and the demo, 3 negative fixtures rejected.
+
+> futurisma-race@0.1.0 validate:ghost
+> node scripts/validate-ghost.mjs
+
+Ghost PASS: 690 frames for a 34.483 s lap at 20 Hz (every 6th of 120 Hz), 11327 chars / 11.06 KB stored (budget 16384), worst round-trip error 0.50 cm progress / 0.50 cm lateral, interpolation monotonic over 36483 ms, 31 hostile ghosts refused.
+
+> futurisma-race@0.1.0 validate:security
+> node scripts/validate-security.mjs
+
+Local soundtrack: media-src 'self', 1 file(s) tracked under public/assets/audio/music and none of them audio.
+Security PASS: strict CSP/headers, pinned packages, no unsafe DOM/code/network sinks; browser storage confined to src/game/persistence.ts under the "futurisma." prefix with a versioned, identity-free payload (135 source files scanned, 5 negative fixtures rejected).
+
+> futurisma-race@0.1.0 validate:soundtrack
+> node scripts/validate-soundtrack.mjs
+
+Original soundtrack PASS: 110.345 s, -14.4 LUFS, -1.57 dBTP, encoded file hash verified; separate shipped/private paths and fresh-clone playlist.
+Soundtrack PASS: slug/upsert/manifest pure functions, the start-offset window [30 s, duration-300 s] over 300 s, a no-immediate-repeat shuffle across 5 library sizes, the ?music= parse and the meter floor; media-src 'self' pinned in index.html and public/_headers; 1 file(s) tracked under public/assets/audio/music and none of them audio or a manifest.
+
+> futurisma-race@0.1.0 validate:midground
+> node scripts/validate-midground.mjs
+
+Bitterpan midground PASS: 705 instances across 6 families (26772 triangles) re-generated identical from seed 540016643; closest instance clears the run-off lip by 1.600 m (floor 1.5); closest approach to a signage board 6.43 m (floor 6); emptiest 150 m forward window 19 at 765 m and emptiest 200 m run 28 at 720 m; map02 drivable limits still 1 spans, none set by BP_MIDGROUND.
+
+> futurisma-race@0.1.0 validate:corridor
+> node scripts/validate-corridor.mjs
+
+Corridor PASS: 5 obstacle group(s) inside the drivable corridor across both maps — 1 collidable hazard mesh(es) and 0 pinned residual(s), nothing unaccounted for. Bounding floor 0.6 m clears the 0.558 m hull bottom; both DRIVABLE_LIMITS.json tables re-derive byte-identical from their captures. Bitterpan pan plane covers the ribbon on 0 station-side(s), with 82 grid vertices carved down by up to 0.8726 m.
+
+> futurisma-race@0.1.0 validate:track-events
+> node scripts/validate-track-events.mjs
+
+Gust chip direction PASS: GUST → carries the craft +2.04 m; GUST ← carries the craft -2.04 m (lateral positive to starboard).
+Track events PASS: 33 Bitterpan gusts over 5 laps (peak 2 -> 2.4 m/s^2 from lap 3), 3 salt drops none before lap 2, one Greenwater squall on lap 3 for 25 s at grip 0.88; schedule deterministic over 200 seeds, telegraph inside 0.8-1.6 s for every card phase, gust integration rate independent 60/120/240 Hz.
+
+> futurisma-race@0.1.0 validate:pose
+> node scripts/validate-pose.mjs
+
+Pose PASS: presentation lift applied exactly once across 9390 checks on 582 banked stations (steepest 12 deg, greenwater GREENWATER_SWEEP); both pre-H1 writers still fail the invariant (-2.064 m and 0.160 m); 4 banked position writers restore the centreline y. H1.2 camera: chase floor 5.5 m binds over the measured 4.93 m collapse and stays inert under both maps' desired chase (7.26 / 8.76 m); surface floor 1.6 m sits under the 2.1 m `desired` guard; both guards pinned to the damped camera and to the post-shake position by call-site assertions. H1.4 frame window y [-0.8, 0.6] / |x| <= 0.75, strictly inside the reviewed y [-0.85, 0.65] / |x| <= 0.8. H1.5 sight-line pull floors at 3 m, backs off 0.35 m and recovers at 6 m/s, gated to sight lines dropping over 2.5 m across more than 3 m of lateral.
+
+> futurisma-race@0.1.0 build
+> tsc --noEmit && vite build
+
+vite v8.2.2 building client environment for production...
+transforming...
+✓ 165 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                   16.02 kB │ gzip:  3.89 kB
+dist/assets/index-U3JX-3iu.css                    26.47 kB │ gzip:  6.39 kB
+dist/assets/power-kit-jdb5-DTy.js                  0.06 kB │ gzip:  0.07 kB
+dist/assets/signage-CM5PDz_N.js                    0.07 kB │ gzip:  0.08 kB
+dist/assets/polarity-course-BCwx5P2I.js            0.07 kB │ gzip:  0.08 kB
+dist/assets/ability-seed-Cbb4-gXM.js               0.07 kB │ gzip:  0.09 kB
+dist/assets/bitterpan-surface-BmJeCVjR.js          0.08 kB │ gzip:  0.08 kB
+dist/assets/tideline-power-field-BGlEFDl6.js       0.08 kB │ gzip:  0.09 kB
+dist/assets/time-of-day-CFqbYL6x.js                0.10 kB │ gzip:  0.11 kB
+dist/assets/course-BcWyATrg.js                     0.10 kB │ gzip:  0.11 kB
+dist/assets/ability-seed-DwJ9TULg.js               0.26 kB │ gzip:  0.22 kB
+dist/assets/nightshift-environment-CzdNhBWl.js     0.35 kB │ gzip:  0.25 kB
+dist/assets/polarity-environment-D5cI_8Kl.js       0.36 kB │ gzip:  0.27 kB
+dist/assets/apron-profile-DIRQVwWR.js              0.38 kB │ gzip:  0.23 kB
+dist/assets/art-pack-B47LmVhu.js                   0.57 kB │ gzip:  0.30 kB
+dist/assets/polarity-rules-BMKds2zP.js             0.72 kB │ gzip:  0.36 kB
+dist/assets/ambience-cue-CPZIv9H0.js               0.73 kB │ gzip:  0.39 kB
+dist/assets/drivable-limits-CXO87IBa.js            0.98 kB │ gzip:  0.50 kB
+dist/assets/preload-helper-Czpn1I53.js             1.19 kB │ gzip:  0.67 kB
+dist/assets/tideline-rival-powers-Cd4U8Aii.js      1.31 kB │ gzip:  0.71 kB
+dist/assets/race-presentation-setup-DDJh8GtW.js    1.33 kB │ gzip:  0.66 kB
+dist/assets/apron-BPrAqdhF.js                      1.51 kB │ gzip:  0.69 kB
+dist/assets/tideline-power-field-Dqk33N-6.js       1.77 kB │ gzip:  0.89 kB
+dist/assets/tideline-refraction-aW3Qiv5W.js        1.78 kB │ gzip:  0.87 kB
+dist/assets/tideline-sky-B73wo-Qj.js               1.84 kB │ gzip:  0.93 kB
+dist/assets/tideline-device-batch-CGNssHyc.js      1.85 kB │ gzip:  0.85 kB
+dist/assets/plaque-backing-C5_-RHNg.js             1.86 kB │ gzip:  1.08 kB
+dist/assets/tideline-rules-dh3pVe9e.js             1.92 kB │ gzip:  0.83 kB
+dist/assets/surface-character-CErkmNSv.js          2.26 kB │ gzip:  0.93 kB
+dist/assets/tideline-render-rule-C8__0Ujd.js       2.41 kB │ gzip:  1.06 kB
+dist/assets/audio-space-DErTRNgw.js                2.66 kB │ gzip:  1.18 kB
+dist/assets/course-repair-BStSlZBf.js              3.61 kB │ gzip:  1.61 kB
+dist/assets/power-kit-DwX8JcZz.js                  3.75 kB │ gzip:  1.60 kB
+dist/assets/BufferGeometryUtils-ChAH-gsh.js        4.76 kB │ gzip:  1.41 kB
+dist/assets/tideline-materials-CLTLOPrH.js         4.90 kB │ gzip:  1.70 kB
+dist/assets/neon-environment-DPMq9607.js           5.07 kB │ gzip:  2.08 kB
+dist/assets/race-rules-3obpmbSq.js                 5.78 kB │ gzip:  2.49 kB
+dist/assets/environment-CG13OS-V.js                7.06 kB │ gzip:  3.11 kB
+dist/assets/ATLAS_REGIONS-WfJM6XAf.js              7.47 kB │ gzip:  2.45 kB
+dist/assets/signage-backs-CRitMkh1.js              8.61 kB │ gzip:  3.80 kB
+dist/assets/corridor-sweep-COukSfDT.js             9.24 kB │ gzip:  3.82 kB
+dist/assets/polarity-simulation-BTSPQxkI.js       10.54 kB │ gzip:  3.63 kB
+dist/assets/road-edge-band-BZN95Id0.js            11.20 kB │ gzip:  5.23 kB
+dist/assets/signage-C12vOmJH.js                   13.12 kB │ gzip:  4.28 kB
+dist/assets/polarity-runtime-BgQldm0Z.js          13.27 kB │ gzip:  4.78 kB
+dist/assets/track-events-DveNNCVu.js              13.52 kB │ gzip:  4.83 kB
+dist/assets/tideline-course-xZ9FCX-2.js           14.25 kB │ gzip:  4.87 kB
+dist/assets/query-probes-MIKN-S0o.js              14.28 kB │ gzip:  5.40 kB
+dist/assets/audio-ambience-6q9Qk9aX.js            15.19 kB │ gzip:  5.56 kB
+dist/assets/BITTERPAN_PRODUCTION-DhZ6tibx.js      16.37 kB │ gzip:  6.54 kB
+dist/assets/bitterpan-environment-WStZKgzn.js     22.24 kB │ gzip:  8.94 kB
+dist/assets/opening-surface-DfbZlj3f.js           25.87 kB │ gzip:  5.18 kB
+dist/assets/living-world-1N9ThmOG.js              26.72 kB │ gzip:  8.54 kB
+dist/assets/tideline-runtime-BYvS-JfZ.js          28.19 kB │ gzip: 10.29 kB
+dist/assets/tideline-environment-Cbufs_Bo.js      28.41 kB │ gzip: 10.20 kB
+dist/assets/totem-BWQXUoH6.js                     41.75 kB │ gzip: 15.17 kB
+dist/assets/GLTFLoader-CHblGzij.js                43.85 kB │ gzip: 13.12 kB
+dist/assets/bitterpan-surface-CS2e-3Cb.js         83.12 kB │ gzip: 17.27 kB
+dist/assets/bitterpan-midground-DP2X9GcY.js       90.45 kB │ gzip: 20.51 kB
+dist/assets/nightshift-course-Dgwp3KTM.js        130.95 kB │ gzip: 51.84 kB
+dist/assets/route-L_6xY7fn.js                    179.01 kB │ gzip: 66.80 kB
+dist/assets/polarity-course-0_Aqhc6E.js          222.95 kB │ gzip: 76.83 kB
+dist/assets/three.core-DtLqOe7M.js               237.46 kB │ gzip: 63.88 kB
+dist/assets/index-CqAU8xUP.js                    262.94 kB │ gzip: 73.37 kB
+dist/assets/bitterpan-course-BkdlnYzB.js         263.98 kB │ gzip: 54.86 kB
+dist/assets/course-B36tyK2H.js                   266.11 kB │ gzip: 49.42 kB
+dist/assets/three.module-BURF7gtK.js             343.25 kB │ gzip: 83.36 kB
+
+✓ built in 996ms
+
+> futurisma-race@0.1.0 validate:build
+> node scripts/validate-build.mjs
+
+Art pack: 193.3 KiB of served texture — the generated horizon sheet, now the default, with ?art=base kept.
+Build PASS: 181.7 KiB of pit radio across 17 served files; 271.2 KiB gzip shell; 959.2 KiB raw / 261.2 KiB gzip initial JS across 17 file(s).
+
+> futurisma-race@0.1.0 test:archives
+> npm run validate:assets && npm run validate:environment:history && npm run validate:environment:accepted
+
+
+> futurisma-race@0.1.0 validate:assets
+> node scripts/validate-assets.mjs
+
+ARCHIVES SKIPPED (8 accepted package(s) absent under /Users/gentlegen/Desktop/futurisma-race/polarity_work/artifacts: GREENWATER_ENVIRONMENT_v1.0.zip, GREENWATER_VISUAL_IDENTITY_v1.2.zip, GREENWATER_LIVING_WORLD_v1.3.zip, +5 more)
+
+> futurisma-race@0.1.0 validate:environment:history
+> node scripts/validate-greenwater-package.mjs GREENWATER_ENVIRONMENT_STAGE2.zip GREENWATER_ENVIRONMENT_STAGE1.zip
+
+ARCHIVES SKIPPED (GREENWATER_ENVIRONMENT_STAGE2.zip, GREENWATER_ENVIRONMENT_STAGE1.zip not found under archive root /Users/gentlegen/Desktop/futurisma-race/polarity_work/artifacts)
+
+> futurisma-race@0.1.0 validate:environment:accepted
+> node scripts/validate-greenwater-package.mjs GREENWATER_ENVIRONMENT_v1.0.zip GREENWATER_ENVIRONMENT_STAGE2.zip
+
+ARCHIVES SKIPPED (GREENWATER_ENVIRONMENT_v1.0.zip, GREENWATER_ENVIRONMENT_STAGE2.zip not found under archive root /Users/gentlegen/Desktop/futurisma-race/polarity_work/artifacts)

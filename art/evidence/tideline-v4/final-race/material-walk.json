@@ -1,0 +1,2932 @@
+{
+  "script": "scripts/visual/tideline-v4/race.mjs",
+  "materials": [
+    {
+      "object": "tideline_rain_polished_asphalt",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "tideline_solid_road_kerbs",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "tideline_pump_hall_shortcut_road",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_rail_and_hoist",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "device_weight_bearing_tray",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_release_jaw_-1",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_release_jaw_1",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_release_sparks",
+      "material": "",
+      "type": "PointsMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_cage",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_capacitors",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_core",
+      "material": "GW_MAT_emissive",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_flange_bolts",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_gauge_needle",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_mount",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_plinth",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_stencil",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_metal",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_concrete",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_signage",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_core",
+      "material": "GW_MAT_emissive",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_flange_bolts",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_housing",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_0",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_1",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_2",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_3",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_4",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_5",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_plinth",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_stencil",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_metal",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_concrete",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_signage",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_emissive",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_emissive",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_tension_cables",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_DEVICE_stencil",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_rotating_hazard_beacon",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_rail_and_hoist",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "device_weight_bearing_tray",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_release_jaw_-1",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_release_jaw_1",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_release_sparks",
+      "material": "",
+      "type": "PointsMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_cage",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_capacitors",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_core",
+      "material": "GW_MAT_emissive",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_flange_bolts",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_gauge_needle",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_mount",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_plinth",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_stencil",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_metal",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_concrete",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_signage",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_core",
+      "material": "GW_MAT_emissive",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_flange_bolts",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_housing",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_0",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_1",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_2",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_3",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_4",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_5",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_plinth",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_stencil",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_metal",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_concrete",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_signage",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_emissive",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_emissive",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_tension_cables",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_DEVICE_stencil",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_rotating_hazard_beacon",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_rail_and_hoist",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "device_weight_bearing_tray",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_release_jaw_-1",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_release_jaw_1",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_release_sparks",
+      "material": "",
+      "type": "PointsMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_cage",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_capacitors",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_core",
+      "material": "GW_MAT_emissive",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_flange_bolts",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_gauge_needle",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_mount",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_plinth",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_stencil",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_metal",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_concrete",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_signage",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_core",
+      "material": "GW_MAT_emissive",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_flange_bolts",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_housing",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_0",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_1",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_2",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_3",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_4",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_5",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_plinth",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_stencil",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_metal",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_concrete",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_signage",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_emissive",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_emissive",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_tension_cables",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_DEVICE_stencil",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_rotating_hazard_beacon",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_rail_and_hoist",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "device_weight_bearing_tray",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_release_jaw_-1",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_release_jaw_1",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_release_sparks",
+      "material": "",
+      "type": "PointsMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_cage",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_capacitors",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_core",
+      "material": "GW_MAT_emissive",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_flange_bolts",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_gauge_needle",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_mount",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_plinth",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_stencil",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_metal",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_concrete",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_signage",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_core",
+      "material": "GW_MAT_emissive",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_flange_bolts",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_housing",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_0",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_1",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_2",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_3",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_4",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_5",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_plinth",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_stencil",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_metal",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_concrete",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_signage",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_emissive",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_emissive",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_tension_cables",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_DEVICE_stencil",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_rotating_hazard_beacon",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_rail_and_hoist",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "device_weight_bearing_tray",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_release_jaw_-1",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_release_jaw_1",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_release_sparks",
+      "material": "",
+      "type": "PointsMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_cage",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_capacitors",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_core",
+      "material": "GW_MAT_emissive",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_flange_bolts",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_gauge_needle",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_mount",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_plinth",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_stencil",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_metal",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_concrete",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_signage",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_core",
+      "material": "GW_MAT_emissive",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_flange_bolts",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_housing",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_0",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_1",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_2",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_3",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_4",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_5",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_plinth",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_stencil",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_metal",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_concrete",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_signage",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_emissive",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_emissive",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_tension_cables",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_DEVICE_stencil",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_rotating_hazard_beacon",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_rail_and_hoist",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "device_weight_bearing_tray",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_release_jaw_-1",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_release_jaw_1",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_release_sparks",
+      "material": "",
+      "type": "PointsMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_cage",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_capacitors",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_core",
+      "material": "GW_MAT_emissive",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_flange_bolts",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_gauge_needle",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_mount",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_plinth",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_stencil",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_metal",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_concrete",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_signage",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_core",
+      "material": "GW_MAT_emissive",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_flange_bolts",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_housing",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_0",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_1",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_2",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_3",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_4",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_5",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_plinth",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_stencil",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_metal",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_concrete",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_signage",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_emissive",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_emissive",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_tension_cables",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_DEVICE_stencil",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_rotating_hazard_beacon",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_rail_and_hoist",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "device_weight_bearing_tray",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_release_jaw_-1",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_release_jaw_1",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_release_sparks",
+      "material": "",
+      "type": "PointsMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_cage",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_capacitors",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_core",
+      "material": "GW_MAT_emissive",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_flange_bolts",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_gauge_needle",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_mount",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_plinth",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_stencil",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_metal",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_concrete",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_signage",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_core",
+      "material": "GW_MAT_emissive",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_flange_bolts",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_housing",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_0",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_1",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_2",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_3",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_4",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_5",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_plinth",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_stencil",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_metal",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_concrete",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_signage",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_emissive",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_emissive",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_tension_cables",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_DEVICE_stencil",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "cradle_rotating_hazard_beacon",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "road_identifier_posts_and_hangers",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "painted_launch_and_current_entrance_plates",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "launch_worn_chevron_paint",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "launch_flush_chasing_lamps",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "launch_faded_SURGE_stencil",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "launch_worn_chevron_paint",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "launch_flush_chasing_lamps",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "launch_faded_SURGE_stencil",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "launch_worn_chevron_paint",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "launch_flush_chasing_lamps",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "launch_faded_SURGE_stencil",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "launch_worn_chevron_paint",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "launch_flush_chasing_lamps",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "launch_faded_SURGE_stencil",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "submerged_cable_tray",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "sealed_channel_glass",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "current_travelling_lamps",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "current_channel_bubbles",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "submerged_cable_tray",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "sealed_channel_glass",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "current_travelling_lamps",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "current_channel_bubbles",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "bulkhead_pressure_flange",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "bulkhead_iris_hazard_ring",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "bulkhead_refracting_scan_membrane",
+      "material": "bulkhead_refracting_membrane",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "bulkhead_warning_status_lamps",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "bulkhead_membrane_burst_droplets",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "bulkhead_pressure_flange",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "bulkhead_iris_hazard_ring",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "bulkhead_refracting_scan_membrane",
+      "material": "bulkhead_refracting_membrane",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "bulkhead_warning_status_lamps",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "bulkhead_membrane_burst_droplets",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "bulkhead_pressure_flange",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "bulkhead_iris_hazard_ring",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "bulkhead_refracting_scan_membrane",
+      "material": "bulkhead_refracting_membrane",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "bulkhead_warning_status_lamps",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "bulkhead_membrane_burst_droplets",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_hall_sluice",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_hall_sluice",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_hall_mouth_guard",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_hall_mouth_guard",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_hall_mouth_guard",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "body_static",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "emissive_static",
+      "material": "TOTEM_emissive",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "canopy_body",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "canopy_glass",
+      "material": "TOTEM_glass",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "steering_fin_L_body",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "steering_fin_R_body",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "engine_flap_L_0_body",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "engine_flap_L_1_body",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "engine_flap_R_0_body",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "engine_flap_R_1_body",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "stabiliser_ring_body",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "stabiliser_ring_emissive",
+      "material": "TOTEM_emissive",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "airbrake_L_body",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "airbrake_R_body",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "elevon_L_body",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "elevon_R_body",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "skids_body",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "collision_proxy",
+      "material": "TOTEM_collision",
+      "type": "LineBasicMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "totem_race_presence_masked_alpha",
+      "material": "TOTEM_race_presence_masked_alpha",
+      "type": "ShaderMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "totem_race_presence_alpha",
+      "material": "TOTEM_race_presence_alpha",
+      "type": "ShaderMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "totem_race_presence_additive",
+      "material": "TOTEM_race_presence_additive",
+      "type": "ShaderMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "tideline_refund_hex_dome",
+      "material": "sodium_hex_refund_dome",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "surge_trailing_heat_cone",
+      "material": "surge_heat_refraction",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "TE_boost_meter",
+      "material": "TE_boost",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "TE_brake_lamps",
+      "material": "TE_brake",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "TE_gyro_alloy",
+      "material": "TE_alloy",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "TE_gyro_instruments",
+      "material": "TE_gravity",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "TE_instrument_housing",
+      "material": "TE_alloy",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "TE_power_lamps",
+      "material": "TE_power",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "TE_service_markings",
+      "material": "TE_ceramic",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "TE_twin_layered_exhaust",
+      "material": "TE_layered_engine_jets",
+      "type": "ShaderMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "TE_power_shield",
+      "material": "TE_shield_field",
+      "type": "ShaderMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "TE_telescopic_power_mounts",
+      "material": "",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "TE_surge_feed_conduit",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_cage",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_capacitors",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_core",
+      "material": "GW_MAT_emissive",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_flange_bolts",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_gauge_needle",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_mount",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_plinth",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_stencil",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_metal",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_concrete",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_signage",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_core",
+      "material": "GW_MAT_emissive",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_flange_bolts",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_housing",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_0",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_1",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_2",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_3",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_4",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_5",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_plinth",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_stencil",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_metal",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_concrete",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_device_batched_GW_MAT_signage",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "",
+      "type": "LineBasicMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "totem_impact_sparks",
+      "material": "",
+      "type": "PointsMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "rival_totem_body_steering_fins",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "rival_totem_body_airbrakes",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "rival_totem_body_hull",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "rival_totem_emissive_hull",
+      "material": "TOTEM_emissive",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "rival_totem_glass_hull",
+      "material": "TOTEM_glass",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "rival_engine_glow",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "totem_shadow_blobs",
+      "material": "TOTEM_shadow_blob",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "tideline_refund_hex_dome",
+      "material": "sodium_hex_refund_dome",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "surge_trailing_heat_cone",
+      "material": "surge_heat_refraction",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "tideline_refund_hex_dome",
+      "material": "sodium_hex_refund_dome",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "surge_trailing_heat_cone",
+      "material": "surge_heat_refraction",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "tideline_refund_hex_dome",
+      "material": "sodium_hex_refund_dome",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "surge_trailing_heat_cone",
+      "material": "surge_heat_refraction",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    }
+  ],
+  "accepted": true
+}

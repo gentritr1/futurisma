@@ -88,13 +88,18 @@ Circuit choice, settings, liveries, records and supported ghosts are saved local
 
 **Choose your moment.** Carry one device and deploy it when it helps. Surge adds thrust; triggering it inside a painted launch window earns extra duration. Phase Shield absorbs phase fields, with an early timed absorption returning more nitro. Supplies vary by seed and lap, while the course stays learnable.
 
+**Chain a clean escape.** On Tideline, absorb a bulkhead with Phase Shield, then deploy Surge while **CHAIN READY** is showing. The reward extends the burst; the existing HUD confirms it. Water-height gauges, exposed ladders and stranded hulls make the port’s changing tide visible from the road.
+
 **Build reserve.** Slipstream rivals, cash a drift, hit gates cleanly and make close passes. The vehicle's rotating rear turbine, engine cores, lights and mounted devices show speed, nitro and power state.
 
 ## Built in Blender
 
-![Vehicle with mounted power mechanisms — Blender preview](public/assets/power-kit/vehicle-preview.png)
+<table><tr>
+<td width="50%"><img src="art/evidence/tideline-v4/devices/surge-idle.png" alt="Painted salvaged Surge turbine rendered from the Blender model"></td>
+<td width="50%"><img src="art/evidence/tideline-v4/devices/shield-idle.png" alt="Phase Shield pressure housing with its mechanical iris"></td>
+</tr></table>
 
-The ship's power kit uses modeled turbine housings, projector arms and mechanical mounts. Deployment, exhaust and shield effects animate in the game. Night Shift, Polarity and Tideline include authored Blender scenery.
+Tideline’s power kit is salvaged pump hardware: a chipped olive Surge turbine and a bolted grey Phase Shield iris, each with a caged lamp. Suspended hoists carry the pickups; collection opens the jaws and retracts the carrier. Worn chevrons and recessed lamps mark launch strips, while glass-covered cable trays carry the current lanes. The ship’s mounted mechanisms show charge and deployment. Deployment, exhaust and shield effects animate in the game. Night Shift, Polarity and Tideline include authored Blender scenery.
 
 The Tideline landmarks follow a reference-first production sequence:
 
@@ -102,7 +107,7 @@ The Tideline landmarks follow a reference-first production sequence:
 
 The generated sheets establish silhouette and wear; measured geometry resolves perspective and scale inconsistencies. Each of the six material roles has a painted 1024 atlas carrying stains, rust, baked shading and wear. Vertex colors only tint the surface. Repeated modules have three wear variants, including damage; every fourth surviving tunnel bay is structural, with caged lamps. Two ribs are broken, crown pipes run overhead, and cables sag between bays. World signs carry small place names and fleet numbers; instructions stay on the HUD. The editable scenes, build scripts and reference provenance live under [`art/`](art/).
 
-[Saved phase comparisons](art/evidence/tideline-v3/tide-phase-pairs.png) · [Saved hero/model comparison](art/evidence/tideline-v3/gantry-hero-versus-model.png) · [Painted-art handoff](docs/visual-polish/TIDELINE-FOUNDRY.md) · [Gantry reference sheets](art/references/tideline-foundry/HANDOFF.md) · [Tideline course notes](docs/visual-polish/TIDELINE.md) · [Gravity and powers](docs/visual-polish/POLARITY.md)
+[V4 evidence and open review gaps](art/evidence/tideline-v4/README.md) · [Saved phase comparisons](art/evidence/tideline-v3/tide-phase-pairs.png) · [Saved hero/model comparison](art/evidence/tideline-v3/gantry-hero-versus-model.png) · [Painted-art handoff](docs/visual-polish/TIDELINE-FOUNDRY.md) · [Gantry reference sheets](art/references/tideline-foundry/HANDOFF.md) · [Tideline course notes](docs/visual-polish/TIDELINE.md) · [Gravity and powers](docs/visual-polish/POLARITY.md)
 
 ## Sound after midnight
 
@@ -130,6 +135,7 @@ Append these to the local game URL, combining options with `&`.
 |---|---|
 | `?map=greenwater`, `bitterpan`, `nightshift`, `polarity`, `tideline` | Select a circuit. |
 | `?map=tideline&edition=foundry` | Compatibility link to the rebuilt Tideline. |
+| `?map=tideline&demo=1&demoPumpHall=1` | Demo takes the opened pump hall on the final tide phase; use `demoPumpHall=0` to compare the main road. |
 | `?mode=race`, `sprint`, `timeattack` | Select the format. |
 | `?tier=rookie`, `works`, `feral` | Select rival pace. |
 | `?laps=1`…`9` | Set race length; sprint remains two laps. |
