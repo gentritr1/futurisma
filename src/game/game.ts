@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { applyTidelineRenderRule, auditTidelineGameplayMaterials } from "./tideline-render-rule";
 import { RaceAtmosphere, configureToneMapping } from "./atmosphere";
 import { EngineAudio, publishAmbienceCue } from "./audio";
 import { DemoAutopilot, alignDirectionToSurface } from "./autopilot";
@@ -550,6 +551,8 @@ export class FuturismaGame {
     this.renderRequested = true;
   };
 
+  private updateTidelineMaterials: (() => void) | null = null;
+
   async initialize(): Promise<boolean> {
     const vehicleLoadStartedAt = performance.now();
     this.diagnosticVehicleLoadStartedMs = vehicleLoadStartedAt;
@@ -607,6 +610,10 @@ export class FuturismaGame {
     if (this.course.kind !== "greenwater") {
       await this.sceneAssets.loadAuthoredEnvironment();
       if (this.disposed) return false;
+    }
+    if (this.course.kind === "tideline") {
+      this.updateTidelineMaterials = applyTidelineRenderRule(this.vehicle.root, this.course.group, this.effects.speedLines, this.effects.sparkPoints, ...(this.rivalFleet ? [this.rivalFleet.root] : []));
+      auditTidelineGameplayMaterials(this.scene);
     }
     this.running = true;
     this.animationFrame = requestAnimationFrame(this.frame);
@@ -757,6 +764,7 @@ export class FuturismaGame {
       this.boostActive,
     );
     this.effects.updateImpactSparks(delta);
+    this.updateTidelineMaterials?.();
     this.atmosphere.updateFog(delta, this.progress, this.lap, this.totalLaps, this.phase);
     // Reduced motion freezes the effect clock, but the cards still need to face
     // the moving chase camera so the approved still frame remains visible.

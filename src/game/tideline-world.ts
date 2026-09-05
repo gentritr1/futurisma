@@ -97,13 +97,13 @@ export class TidelineWorld {
     }
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
-    parent.add(new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ color, transparent: true, opacity: .36,
-      depthWrite: false, side: THREE.DoubleSide, toneMapped: false })));
+    parent.add(new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({ color, transparent: true, opacity: .36,
+      depthWrite: false, side: THREE.DoubleSide, emissive: 0x697965, emissiveIntensity: .35 })));
   }
 
   private addFields(): void {
-    const material = new THREE.MeshBasicMaterial({ color: 0xffb48d, transparent: true, opacity: .23, depthWrite: false, toneMapped: false });
-    const edgeMaterial = new THREE.MeshBasicMaterial({ color: 0xffc39b, toneMapped: false });
+    const material = new THREE.MeshLambertMaterial({ color: 0xffb48d, transparent: true, opacity: .23, depthWrite: false, emissive: 0x697965, emissiveIntensity: .35 });
+    const edgeMaterial = new THREE.MeshLambertMaterial({ color: 0xffc39b, emissive: 0x697965, emissiveIntensity: .35 });
     const geometry = new THREE.BoxGeometry(1, 1, 1);
     const fields = new THREE.InstancedMesh(geometry, material, TIDELINE_FIELDS.length);
     const frames = new THREE.InstancedMesh(geometry, edgeMaterial, TIDELINE_FIELDS.length * 3);
@@ -132,7 +132,7 @@ export class TidelineWorld {
     context.textAlign = "center"; context.fillStyle = color; context.font = "bold 28px monospace"; context.fillText(title, 256, 55);
     context.fillStyle = "#d2e4df"; context.font = "18px monospace"; context.fillText(subtitle, 256, 96);
     const texture = new THREE.CanvasTexture(canvas); texture.colorSpace = THREE.SRGBColorSpace;
-    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(2.4, .6), new THREE.MeshBasicMaterial({ map: texture, toneMapped: false, side: THREE.DoubleSide }));
+    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(2.4, .6), new THREE.MeshLambertMaterial({ map: texture, emissive: 0x697965, emissiveIntensity: .35, side: THREE.DoubleSide }));
     const sample = this.course.sample(progress);
     mesh.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(sample.right, sample.up, sample.tangent.clone().negate()));
     mesh.position.copy(sample.position).addScaledVector(sample.up, 2.2).addScaledVector(sample.right, sample.halfWidth + 1.5);

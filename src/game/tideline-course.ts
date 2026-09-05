@@ -384,7 +384,7 @@ export class TidelineCourse implements RaceCourse {
     const kerbs = new THREE.InstancedMesh(new THREE.BoxGeometry(.65, .45, 6.8),
       new THREE.MeshLambertMaterial({ color: 0x6a8185 }), distances.length * 2);
     const lamps = new THREE.InstancedMesh(new THREE.BoxGeometry(.18, .07, 1.3),
-      new THREE.MeshBasicMaterial({ color: 0xffffff, toneMapped: false }), distances.length * 2);
+      new THREE.MeshLambertMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: .35 }), distances.length * 2);
     const transform = new THREE.Object3D(), basis = new THREE.Matrix4();
     const cyan = new THREE.Color(0xcda25f), amber = new THREE.Color(0xe8bc78);
     for (let i = 0; i < distances.length; i++) {
@@ -427,7 +427,7 @@ export class TidelineCourse implements RaceCourse {
   }
   private createGates(): THREE.InstancedMesh {
     const mesh=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),
-      new THREE.MeshBasicMaterial({color:0xffffff,toneMapped:false}),route.checkpoints.length*2);
+      new THREE.MeshLambertMaterial({color:0xffffff,emissive:0xffffff,emissiveIntensity:.35}),route.checkpoints.length*2);
     const transform=new THREE.Object3D(),basis=new THREE.Matrix4();
     route.checkpoints.forEach((progress,i)=>{
       const s=this.sample(progress); basis.makeBasis(s.right,s.up,s.tangent.clone().negate());

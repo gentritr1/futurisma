@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import {applyTidelineRenderRule,auditTidelineGameplayMaterials} from "../game/tideline-render-rule";
 import { TidelineCourse } from "../game/tideline-course";
 import { TidelineEnvironment } from "../game/tideline-environment";
 import { TidelineWorld } from "../game/tideline-world";
@@ -44,6 +45,8 @@ if(meter) {
     const object=scene.getObjectByName(name);if(object)object.visible=false;
   }
 }
+applyTidelineRenderRule(course.group);
+auditTidelineGameplayMaterials(scene);
 await renderer.compileAsync(scene,camera);renderer.render(scene,camera);
 const lights:THREE.PointLight[]=[];scene.traverse(o=>{if(o instanceof THREE.PointLight)lights.push(o);});
 const pixels=(lateral:number,forward:number)=>{

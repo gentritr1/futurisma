@@ -14,7 +14,7 @@ try {
    const shadows=renderer.shadowMap.render.bind(renderer.shadowMap);
    renderer.shadowMap.render=(...args)=>{const calls=renderer.info.render.calls,triangles=renderer.info.render.triangles;const result=shadows(...args);shadowCalls+=renderer.info.render.calls-calls;shadowTriangles+=renderer.info.render.triangles-triangles;return result;};
    const render=renderer.render.bind(renderer);let last=performance.now();
-   renderer.render=(...args)=>{shadowCalls=0;shadowTriangles=0;const result=render(...args),now=performance.now();
+   renderer.render=(...args)=>{window.__v4Scene=args[0];shadowCalls=0;shadowTriangles=0;const result=render(...args),now=performance.now();
     const text=document.getElementById('time-value')?.textContent??'';const match=/^(\d+):(\d+)\.(\d+)$/.exec(text);
     const raceMs=match?Number(match[1])*60000+Number(match[2])*1000+Number(match[3]):0;
     window.__v4Frames.push({now,delta:now-last,raceMs,mainCalls:renderer.info.render.calls,mainTriangles:renderer.info.render.triangles,shadowCalls,shadowTriangles,width:renderer.domElement.width,height:renderer.domElement.height});last=now;return result;
@@ -38,6 +38,8 @@ try {
  const calibration=await page.evaluate(()=>new Promise(resolve=>{const samples=[];const tick=t=>{samples.push(t);if(samples.length<121)requestAnimationFrame(tick);else resolve({samples:120,windowMs:samples.at(-1)-samples[0],hz:120000/(samples.at(-1)-samples[0])});};requestAnimationFrame(tick);}));
  await page.click('#start-button');
  await page.waitForFunction(()=>{try{return JSON.parse(document.getElementById('futurisma-diagnostics').textContent).current.phase==='finished';}catch{return false;}},{timeout:240000});
+ const materials=await page.evaluate(()=>{const rows=[];window.__v4Scene.traverse(o=>{if(!o.userData.tidelineGameplay)return;for(const m of Array.isArray(o.material)?o.material:[o.material])rows.push({object:o.name,material:m.name,type:m.type,toneMapped:m.toneMapped,fog:m.fog});});return rows;});
+ await writeFile(out+'/material-walk.json',JSON.stringify({script:'scripts/visual/tideline-v4/race.mjs',materials,accepted:materials.every(m=>m.toneMapped!==false&&m.fog!==false)},null,2));
  const capture=await page.evaluate(()=>({frames:window.__v4Frames,diagnostics:JSON.parse(document.getElementById('futurisma-diagnostics').textContent),tide:JSON.parse(document.getElementById('tideline-diagnostics').textContent)}));
  const race=capture.frames.filter(f=>f.raceMs>500&&f.raceMs<capture.diagnostics.current.lapTimesMs.reduce((a,b)=>a+b,0));
  const window=race.slice(-720),ordered=window.map(f=>f.delta).sort((a,b)=>a-b);

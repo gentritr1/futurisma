@@ -1,0 +1,903 @@
+{
+  "script": "scripts/visual/tideline-v4/smoke.mjs",
+  "materials": [
+    {
+      "object": "tideline_rain_polished_asphalt",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "tideline_solid_road_kerbs",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "tideline_pump_hall_shortcut_road",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_cage",
+      "material": "PK_alloy",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_capacitors",
+      "material": "PK_copper",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_core",
+      "material": "PK_surge_light",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_mount",
+      "material": "PK_ceramic",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_core",
+      "material": "PK_shield_light",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_housing",
+      "material": "PK_alloy",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_lattice",
+      "material": "PK_shield_light",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_petals",
+      "material": "PK_ceramic",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_cage",
+      "material": "PK_alloy",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_capacitors",
+      "material": "PK_copper",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_core",
+      "material": "PK_surge_light",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_mount",
+      "material": "PK_ceramic",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_core",
+      "material": "PK_shield_light",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_housing",
+      "material": "PK_alloy",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_lattice",
+      "material": "PK_shield_light",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_petals",
+      "material": "PK_ceramic",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_cage",
+      "material": "PK_alloy",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_capacitors",
+      "material": "PK_copper",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_core",
+      "material": "PK_surge_light",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_mount",
+      "material": "PK_ceramic",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_core",
+      "material": "PK_shield_light",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_housing",
+      "material": "PK_alloy",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_lattice",
+      "material": "PK_shield_light",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_petals",
+      "material": "PK_ceramic",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_cage",
+      "material": "PK_alloy",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_capacitors",
+      "material": "PK_copper",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_core",
+      "material": "PK_surge_light",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_mount",
+      "material": "PK_ceramic",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_core",
+      "material": "PK_shield_light",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_housing",
+      "material": "PK_alloy",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_lattice",
+      "material": "PK_shield_light",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_petals",
+      "material": "PK_ceramic",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_cage",
+      "material": "PK_alloy",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_capacitors",
+      "material": "PK_copper",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_core",
+      "material": "PK_surge_light",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_mount",
+      "material": "PK_ceramic",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_core",
+      "material": "PK_shield_light",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_housing",
+      "material": "PK_alloy",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_lattice",
+      "material": "PK_shield_light",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_petals",
+      "material": "PK_ceramic",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_cage",
+      "material": "PK_alloy",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_capacitors",
+      "material": "PK_copper",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_core",
+      "material": "PK_surge_light",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_mount",
+      "material": "PK_ceramic",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_core",
+      "material": "PK_shield_light",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_housing",
+      "material": "PK_alloy",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_lattice",
+      "material": "PK_shield_light",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_petals",
+      "material": "PK_ceramic",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_cage",
+      "material": "PK_alloy",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_capacitors",
+      "material": "PK_copper",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_core",
+      "material": "PK_surge_light",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_mount",
+      "material": "PK_ceramic",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_core",
+      "material": "PK_shield_light",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_housing",
+      "material": "PK_alloy",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_lattice",
+      "material": "PK_shield_light",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_petals",
+      "material": "PK_ceramic",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_hall_sluice",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_hall_sluice",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_hall_mouth_guard",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_hall_mouth_guard",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "pump_hall_mouth_guard",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "body_static",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "emissive_static",
+      "material": "TOTEM_emissive",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "canopy_body",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "canopy_glass",
+      "material": "TOTEM_glass",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "steering_fin_L_body",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "steering_fin_R_body",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "engine_flap_L_0_body",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "engine_flap_L_1_body",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "engine_flap_R_0_body",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "engine_flap_R_1_body",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "stabiliser_ring_body",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "stabiliser_ring_emissive",
+      "material": "TOTEM_emissive",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "airbrake_L_body",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "airbrake_R_body",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "elevon_L_body",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "elevon_R_body",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "skids_body",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "collision_proxy",
+      "material": "TOTEM_collision",
+      "type": "LineBasicMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "totem_race_presence_masked_alpha",
+      "material": "TOTEM_race_presence_masked_alpha",
+      "type": "ShaderMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "totem_race_presence_alpha",
+      "material": "TOTEM_race_presence_alpha",
+      "type": "ShaderMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "totem_race_presence_additive",
+      "material": "TOTEM_race_presence_additive",
+      "type": "ShaderMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "TE_boost_meter",
+      "material": "TE_boost",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "TE_brake_lamps",
+      "material": "TE_brake",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "TE_gyro_alloy",
+      "material": "TE_alloy",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "TE_gyro_instruments",
+      "material": "TE_gravity",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "TE_instrument_housing",
+      "material": "TE_alloy",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "TE_power_lamps",
+      "material": "TE_power",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "TE_service_markings",
+      "material": "TE_ceramic",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "TE_twin_layered_exhaust",
+      "material": "TE_layered_engine_jets",
+      "type": "ShaderMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "TE_power_shield",
+      "material": "TE_shield_field",
+      "type": "ShaderMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "TE_telescopic_power_mounts",
+      "material": "",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "TE_surge_feed_conduit",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_cage",
+      "material": "PK_alloy",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_capacitors",
+      "material": "PK_copper",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_core",
+      "material": "PK_surge_light",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_mount",
+      "material": "PK_ceramic",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_core",
+      "material": "PK_shield_light",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_housing",
+      "material": "PK_alloy",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_lattice",
+      "material": "PK_shield_light",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_petals",
+      "material": "PK_ceramic",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "",
+      "material": "",
+      "type": "LineBasicMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "totem_impact_sparks",
+      "material": "",
+      "type": "PointsMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "rival_totem_body_steering_fins",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "rival_totem_body_airbrakes",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "rival_totem_body_hull",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "rival_totem_emissive_hull",
+      "material": "TOTEM_emissive",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "rival_totem_glass_hull",
+      "material": "TOTEM_glass",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "rival_engine_glow",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "totem_shadow_blobs",
+      "material": "TOTEM_shadow_blob",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true
+    }
+  ],
+  "errors": [],
+  "accepted": true
+}
