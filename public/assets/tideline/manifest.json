@@ -1,6 +1,24 @@
 {
-  "name": "Tideline prototype (retired)",
-  "status": "retired",
-  "replacement": "/assets/tideline-foundry/manifest.json",
-  "note": "The playable tide circuit uses the Foundry world. Prototype Crown and flight-lens counts are not a playable-map contract."
+  "name": "Tideline / Pump Works",
+  "schemaVersion": 1,
+  "status": "playable",
+  "model": "/assets/tideline-foundry/foundry_world.glb",
+  "sha256": "8a6e89a866a906740c2e107386652e9b81734e849102fffce9dcc67d276e49e5",
+  "census": {
+    "aqueductRibs": 35,
+    "reactors": 7,
+    "kelpBeds": 25,
+    "mantas": 0,
+    "portHalls": 12,
+    "cranes": 6,
+    "boats": 3,
+    "flightLenses": 0,
+    "pelagicCrowns": 0,
+    "gantries": 3,
+    "lightAnchors": 58
+  },
+  "triangles": 74554,
+  "primitives": 55,
+  "source": "scripts/regenerate-tideline-manifest.mjs",
+  "semantics": "Counts derive from instance anchors exported alongside merged geometry; mesh and triangle counts are measured from the parsed GLB."
 }

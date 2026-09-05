@@ -16,8 +16,14 @@ materials, buckets, lights = {}, {}, []
 motion_pivots={}
 variant=0
 placements=[]
+instance_markers=[]
 origin, yaw, district = (0,0,0), 0, "REACTOR"
 census = {"aqueductRibs":0,"reactors":0,"kelpBeds":0,"mantas":0,"portHalls":0,"cranes":0,"boats":0,"flightLenses":0,"pelagicCrowns":0}
+
+
+def mark_instance(kind):
+    census[kind]+=1
+    instance_markers.append((kind,census[kind],origin))
 
 
 def material(role):
@@ -151,7 +157,7 @@ def reactor():
     cylinder((0,0,28),8.5,.4,CYAN,24)
     for side in [-1,1]:
         tube([(side*18,0,6),(side*28,0,6),(side*32,0,-4)],1.25,METAL,10)
-    census["reactors"]+=1
+    mark_instance('reactors')
 
 
 def kelp_bed():
@@ -165,7 +171,7 @@ def kelp_bed():
             vertices.extend([(x+lean-width,y+math.sin(j*.5),z),(x+lean+width,y+math.sin(j*.5),z)])
         geometry(vertices,[(j*2,j*2+1,j*2+3,j*2+2) for j in range(6)],BIO)
         if i%3==0:cylinder((x,y,.6),.8,1.2,CONCRETE,7)
-    census["kelpBeds"]+=1
+    mark_instance('kelpBeds')
 
 
 def manta():
@@ -190,7 +196,7 @@ def manta():
     for x in [-1.8,1.8]:
         tube([(x,-6,.5),(x*1.4,-8,.2),(x*1.6,-9,-.3)],.45,BIO,6)
     for i in range(5):tube([(-3+i*.35,-2+i*.9,-.25),(3-i*.35,-2+i*.9,-.25)],.10,CYAN,4)
-    census["mantas"]+=1
+    mark_instance('mantas')
 
 
 def hall(width,depth,height,word):
@@ -213,7 +219,14 @@ def hall(width,depth,height,word):
         box((x,front-.13,height-2),(width*.14,.07,.16),WHITE)
     sign(word,(0,front-.18,height-1),.8,AMBER)
     lamp((0,front-1,height-1),AMBER,6)
-    census["portHalls"]+=1
+    # Recessed access ladder and two mooring levels on the exposed foundation.
+    for x in [-.8,.8]:box((x,front-.35,-foundation/2),( .10,.18,foundation),METAL)
+    # Flat rungs are sufficient at chase distance, and share the sector batch.
+    for level in range(-25,1,2):box((0,front-.46,level-origin[2]),(1.8,.16,.12),METAL)
+    for level in [-12,-23]:
+        points=[(3+.7*math.cos(i*math.tau/8),front-.48,level-origin[2]+.7*math.sin(i*math.tau/8)) for i in range(8)]
+        tube(points,.09,METAL,3,True)
+    mark_instance('portHalls')
 
 
 def crane():
@@ -233,7 +246,7 @@ def crane():
     # The fixed mast lamp is not attached to the moving boom.
     lamp((0,0,26),AMBER,4)
     district=static_district
-    census["cranes"]+=1
+    mark_instance('cranes')
 
 
 def boat():
@@ -247,7 +260,7 @@ def boat():
     box((0,-9.6,3.8),(7,.06,.15),AMBER)
     tube([(0,0,1),(0,0,17)],.16,WHITE,6)
     box((0,0,15),(9,.18,.18),METAL)
-    census["boats"]+=1
+    mark_instance('boats')
 
 
 def hazard_plate(center,width,height):
@@ -343,7 +356,7 @@ def pelagic_crown():
     box((0,-14.4,4),(35,1,5),CONCRETE)
     for x in range(-14,15,4):box((x,-15,4),(1.4,.08,2.8),DARK)
     lamp((0,-7,91),VIOLET,7,origin[2]+.035)
-    census["pelagicCrowns"]+=1
+    mark_instance('pelagicCrowns')
 
 
 # All placement tests include the lap-three branch as well as the main road.
@@ -405,7 +418,7 @@ for index,distance in enumerate(range(0,int(route['length']),24)):
         if cable_clear(cable):tube(cable,.10,METAL,5)
         district=saved_district
     placements.append({'kind':'rib','index':index,'progress':distance/route['length'],'variant':variant,'heavy':heavy,'damaged':broken})
-    census['aqueductRibs']+=1
+    mark_instance('aqueductRibs')
 
 # Close retaining walls and drain joints keep the eye moving even on the quay.
 for index,distance in enumerate(range(0,int(route['length']),12)):
@@ -415,7 +428,12 @@ for index,distance in enumerate(range(0,int(route['length']),12)):
         # Leave real mouths at the pump-hall fork, on its inner side.
         if side==1 and (.035<distance/route['length']<.105 or .215<distance/route['length']<.29):continue
         if not branch_clear(world((side*16.9,0,-.3)),6,2.6):continue
-        box((side*16.9,0,-.3),(2.2,11.6,5.2),CONCRETE)
+        if st['p'][1]>-3:
+            # The quay is a deep retaining wall, not a road-height floating box.
+            # A waist-height cap lets the chase view read the water against it.
+            bottom=-29-st['p'][1];top=1.05
+            box((side*16.9,0,(bottom+top)/2),(2.2,11.6,top-bottom),CONCRETE)
+        else:box((side*16.9,0,-.3),(2.2,11.6,5.2),CONCRETE)
         if st['p'][1]>-3:
             tube([(side*17.3,-6,2.3),(side*17.3,6,2.3)],.30,METAL,6)
         if index%3==0:box((side*15.72,0,1.8),(.07,2.1,.10),AMBER)
@@ -461,6 +479,10 @@ placements.append({'kind':'pump_hall','from':cut['from'],'to':cut['to'],'width':
 district='STRANDED_BOAT';variant=2
 st=station(.115*route['length']);origin,yaw=anchor(st,-1,64,height=-24.2)
 if clear(origin,22,20):boat()
+# A second stranded hull sits beside the port quay, visible as the last basin drains.
+district='STRANDED_PORT_BOAT';variant=2
+st=station(.535*route['length']);origin,yaw=anchor(st,1,34,height=-24.2)
+if clear(origin,22,12):boat()
 district='MOTION_FERRY';variant=0;origin,yaw=(0,-510,-26.3),math.pi/2
 motion_pivots[district]=origin
 boat()
@@ -510,17 +532,20 @@ for index,progress in enumerate([.035,.325,.645]):
     for x in [-15,-5,5]:
         p=transform@Vector((x,-2.9,16.088));lights.append({'p':[p.x,p.z,-p.y],'color':AMBER,'size':2.4,'ground':st['p'][1]+.035})
     placements.append({'kind':'gantry','progress':progress,'variant':index,'damaged':index==2})
+    instance_markers.append(('gantries',index+1,tuple(transform.translation)))
 
 # A shallow silt bed emerges above the final -27m tide. Depressions remain wet;
 # the outer channel stays deep enough for the ferry. Always below either road.
-grid=48;vertices=[];faces=[]
+grid=32;vertices=[];faces=[]
 for j in range(grid+1):
     for i in range(grid+1):
         x=-850+i*1700/grid;y=-850+j*1700/grid
-        radius=math.sqrt((x/470)**2+(y/430)**2)
+        radius=math.sqrt((x/850)**2+(y/700)**2)
         height=-26.0+.35*math.sin(x*.027)*math.cos(y*.031)
         height-=1.7*max(0,math.sin(x*.037+y*.015))**8
         height-=12*min(1,max(0,(radius-1)*3))
+        # Preserve the working ferry channel through the exposed harbour shoal.
+        height-=14*math.exp(-((y+510)/36)**4)
         vertices.append((x,y,height))
 for j in range(grid):
     for i in range(grid):
@@ -536,9 +561,14 @@ for c in col.data:c.color=(.4,.44,.35,1)
 obj=bpy.data.objects.new('GW_SECTOR_BASIN',mesh);bpy.context.collection.objects.link(obj)
 for obj in list(bpy.context.scene.objects):
     if obj.type!='MESH':bpy.data.objects.remove(obj,do_unlink=True)
+for index,lamp_data in enumerate(lights):
+    p=lamp_data['p'];instance_markers.append(('lightAnchors',index+1,(p[0],-p[2],p[1])))
+for kind,index,position in instance_markers:
+    marker=bpy.data.objects.new(f'TL_INSTANCE_{kind}_{index:03d}',None)
+    marker['tidelineInstanceKind']=kind;marker.location=position;bpy.context.collection.objects.link(marker)
 bpy.context.preferences.filepaths.save_version=0
 bpy.ops.wm.save_as_mainfile(filepath=str(ROOT/'art/blender/tideline_foundry.blend'))
-bpy.ops.export_scene.gltf(filepath=str(OUT/'foundry_world.glb'),export_format='GLB',export_vertex_color='ACTIVE',export_all_vertex_colors=False,export_yup=True,export_animations=False,export_lights=False,export_cameras=False)
+bpy.ops.export_scene.gltf(filepath=str(OUT/'foundry_world.glb'),export_format='GLB',export_extras=True,export_vertex_color='ACTIVE',export_all_vertex_colors=False,export_yup=True,export_animations=False,export_lights=False,export_cameras=False)
 triangles=sum(sum(len(p.vertices)-2 for p in o.data.polygons) for o in bpy.context.scene.objects if o.type=='MESH')
 (OUT/'lights.json').write_text(json.dumps(lights))
 (OUT/'placements.json').write_text(json.dumps(placements,indent=2))

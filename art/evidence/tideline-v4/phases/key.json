@@ -1,0 +1,396 @@
+{
+  "script": "scripts/visual/tideline-v4/phases.mjs",
+  "records": [
+    {
+      "id": "A",
+      "lap": 3,
+      "p": 0.4,
+      "state": {
+        "ready": true,
+        "lap": 3,
+        "station": 0,
+        "progress": 0.4,
+        "elapsed": 8,
+        "seed": 3868938316,
+        "meter": false,
+        "camera": [
+          331.5430862998033,
+          11.660044725805381,
+          -142.8840086706493
+        ],
+        "waterLevel": -27,
+        "pointLights": 4,
+        "lightIntensities": [
+          500,
+          500,
+          0,
+          0
+        ],
+        "roadPatches": {
+          "under": {
+            "x": 963,
+            "y": 570
+          },
+          "between": {
+            "x": 809,
+            "y": 447
+          }
+        },
+        "calls": 56,
+        "triangles": 60581
+      }
+    },
+    {
+      "id": "B",
+      "lap": 1,
+      "p": 0.125,
+      "state": {
+        "ready": true,
+        "lap": 1,
+        "station": 0,
+        "progress": 0.125,
+        "elapsed": 8,
+        "seed": 3868938316,
+        "meter": false,
+        "camera": [
+          -126.91884212687275,
+          -11.824581189282288,
+          -379.58290510208536
+        ],
+        "waterLevel": 0,
+        "pointLights": 4,
+        "lightIntensities": [
+          500,
+          500,
+          500,
+          500
+        ],
+        "roadPatches": {
+          "under": {
+            "x": 963,
+            "y": 570
+          },
+          "between": {
+            "x": 809,
+            "y": 447
+          }
+        },
+        "calls": 38,
+        "triangles": 83596
+      }
+    },
+    {
+      "id": "C",
+      "lap": 2,
+      "p": 0.5,
+      "state": {
+        "ready": true,
+        "lap": 2,
+        "station": 0,
+        "progress": 0.5,
+        "elapsed": 8,
+        "seed": 3868938316,
+        "meter": false,
+        "camera": [
+          317.1614798439025,
+          10.453390599582974,
+          60.0855119954419
+        ],
+        "waterLevel": -15,
+        "pointLights": 4,
+        "lightIntensities": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "roadPatches": {
+          "under": {
+            "x": 963,
+            "y": 570
+          },
+          "between": {
+            "x": 809,
+            "y": 447
+          }
+        },
+        "calls": 44,
+        "triangles": 60864
+      }
+    },
+    {
+      "id": "D",
+      "lap": 3,
+      "p": 0.8,
+      "state": {
+        "ready": true,
+        "lap": 3,
+        "station": 0,
+        "progress": 0.8,
+        "elapsed": 8,
+        "seed": 3868938316,
+        "meter": false,
+        "camera": [
+          -233.35814779120574,
+          -6.700669060051539,
+          119.68097782029011
+        ],
+        "waterLevel": -27,
+        "pointLights": 4,
+        "lightIntensities": [
+          500,
+          500,
+          0,
+          0
+        ],
+        "roadPatches": {
+          "under": {
+            "x": 963,
+            "y": 570
+          },
+          "between": {
+            "x": 809,
+            "y": 447
+          }
+        },
+        "calls": 55,
+        "triangles": 97122
+      }
+    },
+    {
+      "id": "E",
+      "lap": 1,
+      "p": 0.58,
+      "state": {
+        "ready": true,
+        "lap": 1,
+        "station": 0,
+        "progress": 0.58,
+        "elapsed": 8,
+        "seed": 3868938316,
+        "meter": false,
+        "camera": [
+          202.91457575794195,
+          10.5327902805213,
+          174.6273406025048
+        ],
+        "waterLevel": 0,
+        "pointLights": 4,
+        "lightIntensities": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "roadPatches": {
+          "under": {
+            "x": 963,
+            "y": 570
+          },
+          "between": {
+            "x": 809,
+            "y": 447
+          }
+        },
+        "calls": 52,
+        "triangles": 76358
+      }
+    },
+    {
+      "id": "F",
+      "lap": 2,
+      "p": 0.02,
+      "state": {
+        "ready": true,
+        "lap": 2,
+        "station": 0,
+        "progress": 0.02,
+        "elapsed": 8,
+        "seed": 3868938316,
+        "meter": false,
+        "camera": [
+          -282.6982461459478,
+          -11.618056570501555,
+          -228.71786887006175
+        ],
+        "waterLevel": -15,
+        "pointLights": 4,
+        "lightIntensities": [
+          500,
+          500,
+          500,
+          500
+        ],
+        "roadPatches": {
+          "under": {
+            "x": 963,
+            "y": 570
+          },
+          "between": {
+            "x": 809,
+            "y": 447
+          }
+        },
+        "calls": 64,
+        "triangles": 85586
+      }
+    },
+    {
+      "id": "G",
+      "lap": 3,
+      "p": 0.68,
+      "state": {
+        "ready": true,
+        "lap": 3,
+        "station": 0,
+        "progress": 0.68,
+        "elapsed": 8,
+        "seed": 3868938316,
+        "meter": false,
+        "camera": [
+          -0.7137659257466245,
+          6.066866424786,
+          202.73230817840653
+        ],
+        "waterLevel": -27,
+        "pointLights": 4,
+        "lightIntensities": [
+          500,
+          500,
+          500,
+          500
+        ],
+        "roadPatches": {
+          "under": {
+            "x": 963,
+            "y": 570
+          },
+          "between": {
+            "x": 809,
+            "y": 447
+          }
+        },
+        "calls": 51,
+        "triangles": 86460
+      }
+    },
+    {
+      "id": "H",
+      "lap": 1,
+      "p": 0.94,
+      "state": {
+        "ready": true,
+        "lap": 1,
+        "station": 0,
+        "progress": 0.94,
+        "elapsed": 8,
+        "seed": 3868938316,
+        "meter": false,
+        "camera": [
+          -394.28114719523666,
+          -11.68407008462895,
+          -107.20243029726095
+        ],
+        "waterLevel": 0,
+        "pointLights": 4,
+        "lightIntensities": [
+          500,
+          500,
+          0,
+          0
+        ],
+        "roadPatches": {
+          "under": {
+            "x": 963,
+            "y": 570
+          },
+          "between": {
+            "x": 809,
+            "y": 447
+          }
+        },
+        "calls": 63,
+        "triangles": 97642
+      }
+    },
+    {
+      "id": "I",
+      "lap": 2,
+      "p": 0.71,
+      "state": {
+        "ready": true,
+        "lap": 2,
+        "station": 0,
+        "progress": 0.71,
+        "elapsed": 8,
+        "seed": 3868938316,
+        "meter": false,
+        "camera": [
+          -61.54721719056783,
+          2.1802702800908884,
+          190.38255747054654
+        ],
+        "waterLevel": -15,
+        "pointLights": 4,
+        "lightIntensities": [
+          500,
+          500,
+          0,
+          0
+        ],
+        "roadPatches": {
+          "under": {
+            "x": 963,
+            "y": 570
+          },
+          "between": {
+            "x": 809,
+            "y": 447
+          }
+        },
+        "calls": 49,
+        "triangles": 86400
+      }
+    },
+    {
+      "id": "J",
+      "lap": 3,
+      "p": 0.14,
+      "state": {
+        "ready": true,
+        "lap": 3,
+        "station": 0,
+        "progress": 0.14,
+        "elapsed": 8,
+        "seed": 3868938316,
+        "meter": false,
+        "camera": [
+          -98.01839062830452,
+          -11.56415650722549,
+          -391.3599053322491
+        ],
+        "waterLevel": -27,
+        "pointLights": 4,
+        "lightIntensities": [
+          500,
+          500,
+          500,
+          500
+        ],
+        "roadPatches": {
+          "under": {
+            "x": 963,
+            "y": 570
+          },
+          "between": {
+            "x": 809,
+            "y": 447
+          }
+        },
+        "calls": 36,
+        "triangles": 80216
+      }
+    }
+  ],
+  "errors": []
+}

@@ -75,8 +75,8 @@ export function installTideSurface(material:THREE.MeshLambertMaterial,uniforms:T
     float historic=min(abs(vTideWorld.y+15.+streak*.3),abs(vTideWorld.y+27.+streak*.3));
     float band=1.-smoothstep(.3,1.5,historic);
     float fringe=(1.-smoothstep(.08,.38,historic-.75))*step(.65,streak);
-    diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.014,.04,.026),band*.62);
-    diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.075,.14,.034),fringe*.3);
+    diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.014,.04,.026),band*.82);
+    diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.075,.14,.034),fringe*.68);
   `);
   shader.fragmentShader=shader.fragmentShader.replace('#include <emissivemap_fragment>',`#include <emissivemap_fragment>
     ${lamps?'float exposed=smoothstep(-.4,.4,vTideWorld.y-tideWater);totalEmissiveRadiance*=mix(.28,1.5,exposed)*(1.-.12*sin(tideTime*8.+vTideWorld.y));':'totalEmissiveRadiance+=vec3(.055,.26,.3)*waterLight(vTideWorld);'}

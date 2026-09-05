@@ -1,0 +1,88 @@
+{
+  "script": "scripts/visual/tideline-v4/score-phases.py",
+  "frames": [
+    {
+      "frame": "A",
+      "expected": "drained",
+      "answer": "drained",
+      "confidence": 98,
+      "correct": true,
+      "port": true
+    },
+    {
+      "frame": "B",
+      "expected": "partly drained",
+      "answer": "partly drained",
+      "confidence": 96,
+      "correct": true,
+      "port": false
+    },
+    {
+      "frame": "C",
+      "expected": "flooded",
+      "answer": "flooded",
+      "confidence": 99,
+      "correct": true,
+      "port": false
+    },
+    {
+      "frame": "D",
+      "expected": "partly drained",
+      "answer": "partly drained",
+      "confidence": 99,
+      "correct": true,
+      "port": true
+    },
+    {
+      "frame": "E",
+      "expected": "drained",
+      "answer": "drained",
+      "confidence": 97,
+      "correct": true,
+      "port": true
+    },
+    {
+      "frame": "F",
+      "expected": "flooded",
+      "answer": "flooded",
+      "confidence": 99,
+      "correct": true,
+      "port": false
+    },
+    {
+      "frame": "G",
+      "expected": "partly drained",
+      "answer": "partly drained",
+      "confidence": 98,
+      "correct": true,
+      "port": true
+    },
+    {
+      "frame": "H",
+      "expected": "drained",
+      "answer": "drained",
+      "confidence": 97,
+      "correct": true,
+      "port": false
+    },
+    {
+      "frame": "I",
+      "expected": "flooded",
+      "answer": "flooded",
+      "confidence": 98,
+      "correct": true,
+      "port": true
+    },
+    {
+      "frame": "J",
+      "expected": "drained",
+      "answer": "drained",
+      "confidence": 97,
+      "correct": true,
+      "port": false
+    }
+  ],
+  "correct": 10,
+  "portFrames": 5,
+  "accepted": true
+}

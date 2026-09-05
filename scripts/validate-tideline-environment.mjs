@@ -23,20 +23,23 @@ const source = await readFile(file, "utf8");
 async function compileLeaf(relative) {
   const path = new URL(relative, root);
   let {code} = await transformWithOxc(await readFile(path,"utf8"),path.pathname);
-  code=code.replaceAll('from "three"',`from ${JSON.stringify(import.meta.resolve("three"))}`);
-  for(const match of [...code.matchAll(/import (\w+) from "([^"]+\.json)";/g)]) {
+  code=code.replaceAll(/from ['"]three['"]/g,`from ${JSON.stringify(import.meta.resolve("three"))}`);
+  code=code.replace(/from ['"]three\/addons\/utils\/BufferGeometryUtils.js['"]/g,`from ${JSON.stringify(import.meta.resolve('three/addons/utils/BufferGeometryUtils.js'))}`);
+  for(const match of [...code.matchAll(/import (\w+) from ['"]([^'"]+\.json)['"];/g)]) {
     code=code.replace(match[0],`const ${match[1]}=${await readFile(new URL(match[2],path),"utf8")};`);
   }
   return `data:text/javascript;base64,${Buffer.from(code).toString("base64")}`;
 }
 let code = (await transformWithOxc(source, file.pathname)).code
+  .replace('import contract from "../../public/assets/tideline/manifest.json";', 'const contract={};')
+  .replace('import { assertTidelineContract } from "./tideline-contract";', 'const assertTidelineContract=()=>{};')
   .replace('from "three"', `from ${JSON.stringify(import.meta.resolve("three"))}`)
   .replace('import route from "./data/tideline/route.json";', `const route = ${JSON.stringify(route)};`)
   .replaceAll(/new THREE.TextureLoader\(\).loadAsync\("([^"]+)"\)/g, (_,url)=>`globalThis.__tidelineAssetPorts.texture(${JSON.stringify(url)})`)
   .replace('import { NeonEnvironment } from "./neon-environment";', 'const NeonEnvironment = {load: options => globalThis.__tidelineAssetPorts.scenery(options)};')
   .replace('import { resolveReducedMotion } from "./query-probes";', 'const resolveReducedMotion = () => globalThis.__tidelineAssetPorts.reduced ?? false;')
   .replace('from "./graphics-resources"', `from ${JSON.stringify(new URL("src/game/graphics-resources.js", root).href)}`);
-for(const name of ['tideline-sky','tideline-materials','tideline-chamber','tideline-effects','tideline-motion']) {
+for(const name of ['tideline-quay-gauges','tideline-sky','tideline-materials','tideline-chamber','tideline-effects','tideline-motion']) {
   code=code.replace(`from "./${name}"`,`from ${JSON.stringify(await compileLeaf(`src/game/${name}.ts`))}`);
 }
 const { TidelineEnvironment } = await import(`data:text/javascript;base64,${Buffer.from(code).toString("base64")}`);

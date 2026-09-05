@@ -1,4 +1,6 @@
 import * as THREE from "three";
+import contract from "../../public/assets/tideline/manifest.json";
+import {assertTidelineContract} from "./tideline-contract";
 import type { TidelineCourse } from "./tideline-course";
 import route from "./data/tideline/route.json";
 import type { RaceEnvironment, RaceEnvironmentStats } from "./environment";
@@ -9,6 +11,7 @@ import { installTideSurface, type TideUniforms } from "./tideline-materials";
 import { chamberGeometry, chamberWaterMask, chamberFrames } from "./tideline-chamber";
 import { lampDecals, exteriorParticles, exteriorLightShafts } from "./tideline-effects";
 import { TIDELINE_FLARE_DIRECTION } from "./tideline-sky";
+import { TidelineQuayGauges } from "./tideline-quay-gauges";
 import { TidelineMotion } from "./tideline-motion";
 
 /** Dry racing chamber within a visibly flooding and draining exterior basin. */
@@ -24,6 +27,7 @@ export class TidelineEnvironment implements RaceEnvironment {
  private readonly shafts:THREE.InstancedMesh;
  private readonly steam:THREE.Points;
  private readonly motion:TidelineMotion;
+ private readonly gauges:TidelineQuayGauges;
  private readonly extraTriangles:number;
  private readonly extraDraws:number;
  private constructor(private readonly scenery:NeonEnvironment,private readonly waterTexture:THREE.Texture,
@@ -47,10 +51,11 @@ export class TidelineEnvironment implements RaceEnvironment {
   this.particles=exteriorParticles(uniforms);this.shafts=exteriorLightShafts(uniforms);this.steam=this.createSteam();
   let frameTexture:THREE.Texture|null=null;
   this.root.traverse(object=>{if(object instanceof THREE.Mesh&&object.name.includes('GW_MAT_metal'))frameTexture=(object.material as THREE.MeshLambertMaterial).map;});
+  this.gauges=new TidelineQuayGauges(frameTexture);
   const frames=new THREE.Mesh(chamberFrames(),new THREE.MeshLambertMaterial({map:frameTexture,color:0x8d9990,side:THREE.DoubleSide}));
   frames.name='tideline_pressure_window_gaskets';
   this.motion=new TidelineMotion(this.root,uniforms);
-  const extras=[this.ocean,this.glass,this.particles,this.shafts,this.steam,lampDecals(uniforms),this.motion.root,frames];
+  const extras=[this.ocean,this.glass,this.particles,this.shafts,this.steam,lampDecals(uniforms),this.motion.root,frames,this.gauges.root];
   this.root.add(...extras);
   let triangles=0,draws=0;
   for(const root of extras)root.traverse(object=>{if(object instanceof THREE.Mesh){draws++;triangles+=(object.geometry.index?.count??object.geometry.getAttribute('position').count)/3*(object instanceof THREE.InstancedMesh?object.count:1);}else if(object instanceof THREE.Points)draws++;});
@@ -71,6 +76,8 @@ export class TidelineEnvironment implements RaceEnvironment {
    throw new Error('Tideline scenery or painted water could not be loaded.');
   }
   const [scenery,water,effects,mud]=results.map(r=>(r as PromiseFulfilledResult<unknown>).value) as [NeonEnvironment,THREE.Texture,THREE.Texture,THREE.Texture];
+  try { assertTidelineContract(scenery.root,contract); }
+  catch(error){disposeObject3DResources(scenery.root);for(const texture of [water,effects,mud])texture.dispose();throw error;}
   for(const texture of [water,effects,mud]){texture.colorSpace=THREE.SRGBColorSpace;texture.wrapS=texture.wrapT=THREE.RepeatWrapping;texture.anisotropy=4;}
   return new TidelineEnvironment(scenery,water,effects,mud,course);
  }
@@ -81,6 +88,7 @@ export class TidelineEnvironment implements RaceEnvironment {
   this.scenery.updateVisibility(camera);
   this.motion.applyVisibility(this.course?.tide.lap??1);
   this.ocean.position.y=this.waterLevel.value;
+  this.gauges.update(this.waterLevel.value);
   const flooded=camera.position.y<this.waterLevel.value+2;
   this.particles.visible=!this.reducedMotion&&flooded;
   this.shafts.visible=flooded;
@@ -88,7 +96,7 @@ export class TidelineEnvironment implements RaceEnvironment {
   this.stats.visibleGroups+=this.extraDraws;this.stats.visibleTriangles+=this.extraTriangles;
  }
  private basinMaterial():THREE.MeshLambertMaterial {
-  const material=new THREE.MeshLambertMaterial({map:this.mudTexture,color:0xaaa084});
+  const material=new THREE.MeshLambertMaterial({map:this.mudTexture,color:0xb59c77});
   material.onBeforeCompile=shader=>{
    shader.vertexShader='varying vec3 basinWorld;\n'+shader.vertexShader;
    shader.vertexShader=shader.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\nbasinWorld=(modelMatrix*vec4(transformed,1.)).xyz;');
