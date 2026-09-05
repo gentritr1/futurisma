@@ -30,7 +30,8 @@ const courseUrl = await moduleUrl('../src/game/tideline-course.ts', {
   './apron.js': local('apron.js'), './tideline-rules.js': local('tideline-rules.js'), './tideline-style': styleUrl,
 }, true);
 const hardwareUrl=await moduleUrl('../src/game/tideline-hardware.ts',{'three/addons/utils/BufferGeometryUtils.js':import.meta.resolve('three/addons/utils/BufferGeometryUtils.js')});
-const signalsUrl=await moduleUrl('../src/game/tideline-road-signals.ts',{'./tideline-hardware':hardwareUrl,'./tideline-rules.js':local('tideline-rules.js')});
+const markersUrl=await moduleUrl('../src/game/tideline-road-markers.ts',{'./tideline-hardware':hardwareUrl,'./tideline-rules.js':local('tideline-rules.js')});
+const signalsUrl=await moduleUrl('../src/game/tideline-road-signals.ts',{'./tideline-road-markers':markersUrl,'./tideline-hardware':hardwareUrl,'./tideline-rules.js':local('tideline-rules.js')});
 const refractionUrl=await moduleUrl('../src/game/tideline-refraction.ts',{});
 const bulkheadsUrl=await moduleUrl('../src/game/tideline-bulkheads.ts',{'./tideline-refraction':refractionUrl,'./tideline-hardware':hardwareUrl,'./tideline-rules.js':local('tideline-rules.js')});
 const worldUrl = await moduleUrl('../src/game/tideline-world.ts', {
@@ -45,7 +46,7 @@ const inputUrl = await moduleUrl('../src/game/input.ts', { './action-gate': loca
 const elements = new Map();
 class ElementStub {
   id = ''; hidden = false; textContent = ''; dataset = {}; style = {}; width = 0; height = 0;
-  getContext() { return { fillRect() {}, strokeRect() {}, fillText() {} }; }
+  getContext() { return { fillRect() {}, strokeRect() {}, fillText() {}, beginPath() {}, moveTo() {}, lineTo() {}, stroke() {}, closePath() {}, fill() {} }; }
   remove() { elements.delete(this.id); }
 }
 for (const id of ['polarity-hud', 'polarity-deck', 'polarity-flip', 'polarity-power', 'polarity-route', 'power-charge-fill']) {

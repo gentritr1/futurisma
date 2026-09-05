@@ -26,7 +26,7 @@ export class TidelineCradles {
       for(const side of [-1,1])rail.box(side*(station.halfWidth+.7),4.25,0,.6,8.5,.7,1);
       rail.box(0,8.5,0,station.width+2,.8,.65,1);rail.box(pickup.lateral,8.15,0,1.2,.4,1.1,1);
       root.add(rail.mesh('cradle_rail_and_hoist',steel));
-      const swing=new THREE.Group();swing.position.set(pickup.lateral,8.05,0);root.add(swing);
+      const swing=new THREE.Group();swing.name='cradle_suspended_hook';swing.position.set(pickup.lateral,8.05,0);root.add(swing);
       const carrier=new THREE.Group();carrier.position.y=-5.8;swing.add(carrier);
       const cableBatch=new HardwareBatch();
       for(const side of [-1,1])cableBatch.box(side*.65,-.5,0,.13,1,.13,3);

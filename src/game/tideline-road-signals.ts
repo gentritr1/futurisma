@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import {tidelineRoadMarkers} from './tideline-road-markers';
 import type {TidelineCourse} from './tideline-course';
 import {TIDELINE_ABILITY_CONFIG,currentLane} from './tideline-rules.js';
 import {atlasTile,hardwareAtlas,hardwareMaterial,HardwareBatch} from './tideline-hardware';
@@ -9,7 +10,7 @@ export class TidelineRoadSignals {
  readonly root=new THREE.Group();readonly strips:Strip[]=[];readonly currents:Current[]=[];
  private readonly pose=new THREE.Object3D();private readonly color=new THREE.Color();
  constructor(private readonly course:TidelineCourse) {
-  this.root.name='tideline_deck_hardware';
+  this.root.name='tideline_deck_hardware';this.root.add(tidelineRoadMarkers(course));
   const metal=hardwareMaterial(hardwareAtlas('metal'));
   const paint=hardwareMaterial(this.wornRoadPaint(),0xffffff,.08);paint.transparent=true;paint.opacity=.82;paint.depthWrite=false;paint.polygonOffset=true;paint.polygonOffsetFactor=-1;
   const lamps=hardwareMaterial(null,0xffffff,.9);
