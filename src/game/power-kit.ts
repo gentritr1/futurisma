@@ -3,6 +3,7 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { disposeObject3DResources } from "./graphics-resources.js";
 
 export type PowerKitKind = "surge" | "shield";
+export const PUMP_POWER_KIT_URL = "/assets/power-kit-v2/power_kit.glb";
 export const POWER_KIT_URL = "/assets/power-kit/power_kit.glb";
 
 /** A transform-only instance. Geometry and materials belong to its PowerKit. */
@@ -13,6 +14,8 @@ export class PowerKitVisual {
   private readonly core: THREE.Object3D;
   private readonly secondary: THREE.Object3D;
   private readonly release: () => void;
+  private readonly pumpHardware: boolean;
+  private readonly lampMaterials: THREE.MeshStandardMaterial[] = [];
   private previousTime = 0;
   private angle = 0;
   private disposed = false;
@@ -29,6 +32,12 @@ export class PowerKitVisual {
     this.moving = find(kind === "surge" ? "cage" : "petals");
     this.core = find("core");
     this.secondary = find(kind === "surge" ? "capacitors" : "lattice");
+    this.pumpHardware = root.userData.pumpHardware === true;
+    if (this.pumpHardware) this.core.traverse(object => {
+      if (!(object instanceof THREE.Mesh) || !(object.material instanceof THREE.MeshStandardMaterial)) return;
+      object.material = object.material.clone();
+      this.lampMaterials.push(object.material);
+    });
   }
 
   update(elapsed: number, reducedMotion: boolean, charge = 1, activation = 0): void {
@@ -38,6 +47,12 @@ export class PowerKitVisual {
     const delta = THREE.MathUtils.clamp(elapsed - this.previousTime, 0, .1);
     this.previousTime = elapsed;
     if (!reducedMotion) this.angle = (this.angle + delta * (1 + amount * 1.4 + firing * 5)) % (Math.PI * 2);
+    if (this.pumpHardware) {
+      if (this.kind === "surge") this.moving.rotation.z = this.angle;
+      else for (const blade of this.moving.children) blade.rotation.z = firing * .68;
+      for (const lamp of this.lampMaterials) lamp.emissiveIntensity = .55 + amount * .3 + firing * 1.4;
+      return;
+    }
     if (this.kind === "surge") {
       this.moving.rotation.y = this.angle;
       this.secondary.rotation.y = -this.angle * .6;
@@ -62,6 +77,7 @@ export class PowerKitVisual {
     if (this.disposed) return;
     this.disposed = true;
     this.root.removeFromParent();
+    for (const lamp of this.lampMaterials) lamp.dispose();
     this.root.clear();
     this.release();
   }
@@ -81,8 +97,8 @@ export class PowerKit {
   private readonly instances = new Set<PowerKitVisual>();
   private disposed = false;
 
-  static async load(): Promise<PowerKit> {
-    const gltf = await new GLTFLoader().loadAsync(POWER_KIT_URL);
+  static async load(pumpWorks = false): Promise<PowerKit> {
+    const gltf = await new GLTFLoader().loadAsync(pumpWorks ? PUMP_POWER_KIT_URL : POWER_KIT_URL);
     try { return new PowerKit(gltf.scene); }
     catch (error) { disposeObject3DResources(gltf.scene); throw error; }
   }

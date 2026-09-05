@@ -312,6 +312,7 @@ function rivalFields(
       brakeRadians: Number(entry.brakeRadians.toFixed(4)),
       driftSignal: Number(entry.driftSignal.toFixed(3)),
     })),
+    ...(rivals?.powerEvents ? {rivalPowerEvents: rivals.powerEvents} : {}),
     rivals: (rivals?.states ?? []).map((state) => ({
       ...state,
       raceDistanceMeters: Number(state.raceDistanceMeters.toFixed(2)),

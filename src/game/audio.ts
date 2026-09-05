@@ -792,6 +792,17 @@ export class EngineAudio {
     this.playTone(190,.8,.024,"sine",1.65,2.1);
   }
 
+  playDeviceClunk(): void {
+    this.playTone(118,.13,.030,"triangle",0,.42);
+    this.playTone(1470,.045,.013,"square",0,.72);
+    this.playTone(310,.16,.012,"sine",.03,.8);
+  }
+
+  playBulkheadKlaxon(): void {
+    this.playTone(260,.28,.024,"square",0,1.35);
+    this.playTone(350,.28,.020,"square",.34,.74);
+  }
+
   playPowerDenied(): void {
     this.playTone(220, .09, .016, "triangle", 0, .82);
     this.playTone(180, .10, .012, "triangle", .105, 1);

@@ -1,0 +1,44 @@
+{
+  "name": "S-07 Surge pump / P-12 Phase bulkhead projector",
+  "triangles": 3340,
+  "materialRoles": [
+    "concrete",
+    "metal",
+    "signage",
+    "emissive"
+  ],
+  "allowedMaterialRoles": [
+    "concrete",
+    "metal",
+    "signage",
+    "emissive",
+    "water",
+    "jungle"
+  ],
+  "textures": 4,
+  "referenceTriplet": "art/references/power-kit-v2",
+  "source": "art/blender/build_power_kit_v2.py",
+  "lampsPerDevice": 1,
+  "pivots": {
+    "surge": "PK_surge_cage",
+    "shield": "PK_shield_petals"
+  },
+  "details": {
+    "surge": [
+      "chipped rectangular crash frame",
+      "six turbine vanes",
+      "bolted circular pump flange",
+      "pressure gauge",
+      "S-07 stencil",
+      "single caged amber lamp"
+    ],
+    "shield": [
+      "grey rectangular pressure case",
+      "six overlapping iris blades",
+      "bolted circular flange",
+      "side hydraulic barrels",
+      "P-12 stencil",
+      "single caged cyan lamp"
+    ]
+  }
+}

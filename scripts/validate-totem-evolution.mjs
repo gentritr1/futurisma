@@ -3,11 +3,14 @@ import fs from 'node:fs';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { transformWithOxc } from 'vite';
+import {typescriptModuleUrl} from './lib/typescript-module.mjs';
+const kitModule=await typescriptModuleUrl(new URL('../src/game/power-kit.ts',import.meta.url));
 const evolutionUrl = new URL('../src/game/totem-evolution.ts', import.meta.url);
 const transformed = await transformWithOxc(fs.readFileSync(evolutionUrl, 'utf8'), evolutionUrl.pathname);
-const code = transformed.code.replace('from "three/addons/loaders/GLTFLoader.js"', `from ${JSON.stringify(import.meta.resolve("three/addons/loaders/GLTFLoader.js"))}`).replace('from \"three\"', `from ${JSON.stringify(import.meta.resolve('three'))}`)
+const code = transformed.code
+  .replace('from "./tideline-power-field"', `from ${JSON.stringify(await typescriptModuleUrl(new URL("../src/game/tideline-power-field.ts",import.meta.url)))}`).replace('from "three/addons/loaders/GLTFLoader.js"', `from ${JSON.stringify(import.meta.resolve("three/addons/loaders/GLTFLoader.js"))}`).replace('from \"three\"', `from ${JSON.stringify(import.meta.resolve('three'))}`)
   .replace('from \"./graphics-resources.js\"', `from ${JSON.stringify(new URL('../src/game/graphics-resources.js', import.meta.url).href)}`)
-  .replace('from \"./power-kit\"', `from ${JSON.stringify(new URL('../src/game/power-kit.ts', import.meta.url).href)}`);
+  .replace('from \"./power-kit\"', `from ${JSON.stringify(kitModule)}`);
 const { TotemEvolution } = await import(`data:text/javascript;base64,${Buffer.from(code).toString('base64')}`);
 import { disposeObject3DResources } from '../src/game/graphics-resources.js';
 

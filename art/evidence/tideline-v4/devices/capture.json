@@ -1,0 +1,145 @@
+{
+  "script": "scripts/visual/tideline-v4/devices.mjs",
+  "camera": [
+    0.25,
+    0.22,
+    3.8
+  ],
+  "model": "/assets/power-kit-v2/power_kit.glb",
+  "materials": [
+    {
+      "object": "PK_surge_cage",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_capacitors",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_core",
+      "material": "GW_MAT_emissive",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_flange_bolts",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_gauge_needle",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_mount",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_plinth",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_surge_stencil",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_core",
+      "material": "GW_MAT_emissive",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_flange_bolts",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_housing",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_0",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_1",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_2",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_3",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_4",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_iris_blade_5",
+      "material": "GW_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_plinth",
+      "material": "GW_MAT_concrete",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    },
+    {
+      "object": "PK_shield_stencil",
+      "material": "GW_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true
+    }
+  ],
+  "errors": []
+}

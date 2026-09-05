@@ -3,7 +3,9 @@ import { readFile } from "node:fs/promises";
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { transformWithOxc } from "vite";
-import { PowerKit } from "../src/game/power-kit.ts";
+import { typescriptModuleUrl } from "./lib/typescript-module.mjs";
+const kitModule=await typescriptModuleUrl(new URL("../src/game/power-kit.ts",import.meta.url));
+const {PowerKit}=await import(kitModule);
 import { disposeObject3DResources } from "../src/game/graphics-resources.js";
 
 const bytes = await readFile(new URL("../public/assets/power-kit/power_kit.glb", import.meta.url));
@@ -82,10 +84,11 @@ const libraryResourceCount = resources.size;
 // Use the real ship assembly to verify that inventory becomes visible hardware.
 const evolutionUrl = new URL("../src/game/totem-evolution.ts", import.meta.url);
 const transformed = await transformWithOxc(await readFile(evolutionUrl, "utf8"), evolutionUrl.pathname);
-const code = transformed.code.replace('from "three"', `from ${JSON.stringify(import.meta.resolve("three"))}`)
+const code = transformed.code
+  .replace('from "./tideline-power-field"', `from ${JSON.stringify(await typescriptModuleUrl(new URL("../src/game/tideline-power-field.ts",import.meta.url)))}`).replace('from "three"', `from ${JSON.stringify(import.meta.resolve("three"))}`)
   .replace('from "three/addons/loaders/GLTFLoader.js"', `from ${JSON.stringify(import.meta.resolve("three/addons/loaders/GLTFLoader.js"))}`)
   .replace('from "./graphics-resources.js"', `from ${JSON.stringify(new URL("../src/game/graphics-resources.js", import.meta.url).href)}`)
-  .replace('from "./power-kit"', `from ${JSON.stringify(new URL("../src/game/power-kit.ts", import.meta.url).href)}`);
+  .replace('from "./power-kit"', `from ${JSON.stringify(kitModule)}`);
 const { TotemEvolution } = await import(`data:text/javascript;base64,${Buffer.from(code).toString("base64")}`);
 const hullBytes = await readFile(new URL("../public/assets/totem-evolution/totem_evolution.glb", import.meta.url));
 const hull = await new GLTFLoader().parseAsync(hullBytes.buffer.slice(hullBytes.byteOffset, hullBytes.byteOffset + hullBytes.byteLength), "");
@@ -127,3 +130,5 @@ disposeObject3DResources(scene);
 assert.equal(disposals.size, resources.size, "Scene cleanup releases mounted pistons, conduit, field and engine resources too.");
 for (const count of disposals.values()) assert.equal(count, 1, "Scene cleanup must not dispose the detached library twice.");
 console.log(`Power kit PASS: ${triangles} Blender triangles, 8 batches, ${bytes.length} bytes, no textures; distinct mechanical silhouettes, independent shared-resource clones, reduced motion, mounted inventory/deployment and exactly-once cleanup.`);
+
+await import("./validate-power-kit-v2.mjs");

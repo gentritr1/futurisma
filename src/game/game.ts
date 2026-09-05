@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import {resolveAbilitySeed} from "./ability-seed";
 import { applyTidelineRenderRule, auditTidelineGameplayMaterials } from "./tideline-render-rule";
 import { RaceAtmosphere, configureToneMapping } from "./atmosphere";
 import { EngineAudio, publishAmbienceCue } from "./audio";
@@ -556,7 +557,7 @@ export class FuturismaGame {
   async initialize(): Promise<boolean> {
     const vehicleLoadStartedAt = performance.now();
     this.diagnosticVehicleLoadStartedMs = vehicleLoadStartedAt;
-    await this.vehicle.load(VEHICLE_MODEL_URL, RACE_PRESENCE_FX_ATLAS_URL);
+    await this.vehicle.load(VEHICLE_MODEL_URL, RACE_PRESENCE_FX_ATLAS_URL, this.course.kind === "tideline");
     this.diagnosticVehicleLoadMs = performance.now() - vehicleLoadStartedAt;
     const vehicleResourceUrl = new URL(VEHICLE_MODEL_URL, window.location.href).href;
     const vehicleResources = performance.getEntriesByName(vehicleResourceUrl, "resource");
@@ -585,6 +586,7 @@ export class FuturismaGame {
       return false;
     }
     this.rivalFleet = rivalFleet;
+    if(this.course.kind === "tideline")rivalFleet?.enableTidelinePowers(resolveAbilitySeed(),this.reducedMotion);
     // G2 kill switch: `?cushion=0` restores the G1 no-contact race exactly.
     this.rivalFleet?.setCushionEnabled(this.cushionEnabled);
     this.scene.add(ghostRuntime.attach(this.course, this.vehicle));

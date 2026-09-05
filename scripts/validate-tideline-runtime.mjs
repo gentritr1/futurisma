@@ -23,18 +23,22 @@ async function moduleUrl(relative, replacements = {}, embedRoute = false) {
 }
 const fieldUrl = `data:text/javascript;base64,${Buffer.from(`import * as THREE from ${JSON.stringify(import.meta.resolve('three'))};
 export class PowerPickupField { static instances = []; root = new THREE.Group(); ready = Promise.resolve(); disposed = false;
- constructor(){PowerPickupField.instances.push(this);} update(...args){this.lastUpdate=args;} dispose(){this.disposed=true;} }`).toString('base64')}`;
+ constructor(){PowerPickupField.instances.push(this);} update(...args){this.lastUpdate=args;} dispose(){this.disposed=true;} } export {PowerPickupField as TidelineCradles};`).toString('base64')}`;
 const styleUrl = await moduleUrl('../src/game/tideline-style.ts');
 const courseUrl = await moduleUrl('../src/game/tideline-course.ts', {
   './tideline-materials':await moduleUrl('../src/game/tideline-materials.ts'),
   './apron.js': local('apron.js'), './tideline-rules.js': local('tideline-rules.js'), './tideline-style': styleUrl,
 }, true);
+const hardwareUrl=await moduleUrl('../src/game/tideline-hardware.ts',{'three/addons/utils/BufferGeometryUtils.js':import.meta.resolve('three/addons/utils/BufferGeometryUtils.js')});
+const signalsUrl=await moduleUrl('../src/game/tideline-road-signals.ts',{'./tideline-hardware':hardwareUrl,'./tideline-rules.js':local('tideline-rules.js')});
+const refractionUrl=await moduleUrl('../src/game/tideline-refraction.ts',{});
+const bulkheadsUrl=await moduleUrl('../src/game/tideline-bulkheads.ts',{'./tideline-refraction':refractionUrl,'./tideline-hardware':hardwareUrl,'./tideline-rules.js':local('tideline-rules.js')});
 const worldUrl = await moduleUrl('../src/game/tideline-world.ts', {
-  './power-pickup-field': fieldUrl, './tideline-rules.js': local('tideline-rules.js'),
+  './tideline-cradles':fieldUrl,'./tideline-road-signals':signalsUrl,'./tideline-bulkheads':bulkheadsUrl, './tideline-rules.js': local('tideline-rules.js'),
   './tideline-sky': await moduleUrl('../src/game/tideline-sky.ts', { './tideline-style': styleUrl }),
 }, true);
 const runtimeUrl = await moduleUrl('../src/game/tideline-runtime.ts', {
-  './ability-seed': await moduleUrl('../src/game/ability-seed.ts'), './tideline-world': worldUrl,
+  './tideline-power-chain.js':local('tideline-power-chain.js'),'./ability-seed': await moduleUrl('../src/game/ability-seed.ts'), './tideline-world': worldUrl,
   './polarity-rules.js': local('polarity-rules.js'), './polarity-simulation.js': local('polarity-simulation.js'), './tideline-rules.js': local('tideline-rules.js'),
 });
 const inputUrl = await moduleUrl('../src/game/input.ts', { './action-gate': local('action-gate.js'), './input-shaping': local('input-shaping.js') });
@@ -61,7 +65,7 @@ const { TidelineRuntime } = await import(runtimeUrl);
 const { PowerPickupField } = await import(fieldUrl);
 const course = new TidelineCourse(), input = new InputController();
 const audioEvents = [], messages = [];
-const audio = Object.fromEntries(['playPowerPickup', 'playPowerDenied', 'playPowerActivate', 'playTideDrain'].map(name => [name, (...args) => audioEvents.push({ name, args })]));
+const audio = Object.fromEntries(['playPowerPickup', 'playPowerDenied', 'playPowerActivate', 'playTideDrain', 'playDeviceClunk', 'playBulkheadKlaxon'].map(name => [name, (...args) => audioEvents.push({ name, args })]));
 const ui = { flashHazard: message => messages.push(message) };
 const camera = new THREE.PerspectiveCamera(57, 16 / 9, .1, 1800), sample = course.createProjectionScratch();
 const position = new THREE.Vector3(), state = {};
@@ -181,8 +185,11 @@ try {
     const lane = currentLane(714, lap);
     step(1, .1, lane, lap); present(.1);
     assert.equal(runtime.boostRechargeScale, lap === 1 ? 1.85 : 1);
-    assert.equal(runtime.world.currents[0].visible, lap === 1 && lane < 0);
-    assert.equal(runtime.world.currents[1].visible, lap === 1 && lane > 0);
+    for(const channel of runtime.world.signals.currents){
+      assert.equal(channel.root.visible,true,'Cable trays remain physical hardware after draining.');
+      const lamp=new THREE.Color();channel.lamps.getColorAt(0,lamp);
+      assert.equal(lamp.r>.15,lap===1&&channel.side===Math.sign(lane),'The active current travels through the correct lamps.');
+    }
     step(1, .1, -lane, lap); assert.equal(runtime.boostRechargeScale, 1);
     step(1, .5, lane, lap); assert.equal(runtime.boostRechargeScale, 1);
     step(1, .96, lane, lap); assert.equal(runtime.boostRechargeScale, lap === 1 ? 1.85 : 1);

@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { TidelineRivalPowers, type RivalPowerEvent } from "./tideline-rival-powers";
 import type { RaceCourse } from "./course";
 import { groundBlobVisible } from "./presentation.js";
 import {
@@ -315,6 +316,7 @@ export function openingRaceStatus(
 }
 
 export interface RivalFleetDiagnostics {
+  powerEvents?: RivalPowerEvent[];
   drawCalls: number;
   triangles: number;
   updateSteps: number;
@@ -405,6 +407,13 @@ interface RivalVisual {
 
 export class RivalFleet {
   readonly root = new THREE.Group();
+  private tidelinePowers: TidelineRivalPowers | null = null;
+
+  enableTidelinePowers(seed:number,reduced:boolean):void {
+    if(this.tidelinePowers)return;
+    this.tidelinePowers=new TidelineRivalPowers(seed,this.course.length,this.states.length,reduced);
+    this.root.add(this.tidelinePowers.root);
+  }
   /** Rebuilt by {@link setPlayerLivery}, so the grid list follows the choice. */
   gridEntries: readonly RaceGridEntry[] = [];
   /** Livery code per rival slot, in `RIVAL_PROFILES` order. */
@@ -871,6 +880,7 @@ export class RivalFleet {
   }
 
   reset(): void {
+    this.tidelinePowers?.reset();
     // The grid is fanned once, here, before anyone moves: the authored slots on
     // both maps put two craft closer than a field can hold station in, and the
     // launch now depends on every craft keeping the slot it was given.
@@ -1411,6 +1421,7 @@ export class RivalFleet {
 
     for (let index = 0; index < this.states.length; index += 1) {
       const state = this.states[index];
+      this.tidelinePowers?.step(index,state);
       if (state.finished) {
         if (!wasFinished[index]) {
           this.finishVisualAges[index] = 0;
@@ -1676,6 +1687,7 @@ export class RivalFleet {
       this.poseQuaternion.multiply(this.bankQuaternion);
       this.poseScale.setScalar(visible ? 1 : 0.00001);
       this.poseMatrix.compose(this.posePosition, this.poseQuaternion, this.poseScale);
+      this.tidelinePowers?.pose(index,this.poseMatrix);
 
       this.worldPositions[index].copy(this.posePosition);
       this.worldVelocities[index]
@@ -1964,6 +1976,7 @@ export class RivalFleet {
 
   diagnostics(): RivalFleetDiagnostics {
     return {
+      ...(this.tidelinePowers ? {powerEvents: this.tidelinePowers.events} : {}),
       drawCalls: this.stats.drawCalls,
       triangles: this.stats.triangles,
       updateSteps: this.updateSteps,

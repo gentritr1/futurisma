@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { disposeObject3DResources } from "./graphics-resources.js";
 import type { TotemVisualState } from "./totem";
+import { TidelinePowerField } from "./tideline-power-field";
 import { PowerKit, type PowerKitVisual } from "./power-kit";
 
 export const TOTEM_EVOLUTION_URL = "/assets/totem-evolution/totem_evolution.glb";
@@ -31,6 +32,7 @@ export class TotemEvolution {
   private readonly shieldMaterial: THREE.ShaderMaterial;
   private readonly placement = new THREE.Object3D();
   private readonly lightColor = new THREE.Color();
+  private readonly pumpField: TidelinePowerField | null;
   private rotorSpeed = 0;
   private engineStrength = 0;
   private surgeDevice: PowerKitVisual | null = null;
@@ -40,9 +42,9 @@ export class TotemEvolution {
   private powerMounts: THREE.InstancedMesh | null = null;
   private surgeConduit: THREE.InstancedMesh | null = null;
 
-  static async load(): Promise<TotemEvolution> {
+  static async load(pumpWorks = false): Promise<TotemEvolution> {
     const [assetResult, kitResult] = await Promise.allSettled([
-      new GLTFLoader().loadAsync(TOTEM_EVOLUTION_URL), PowerKit.load(),
+      new GLTFLoader().loadAsync(TOTEM_EVOLUTION_URL), PowerKit.load(pumpWorks),
     ]);
     if (assetResult.status === "rejected") {
       if (kitResult.status === "fulfilled") kitResult.value.dispose();
@@ -85,6 +87,8 @@ export class TotemEvolution {
     this.brakeLamp = requiredMaterial("TE_brake");
     this.gravityLamp = requiredMaterial("TE_gravity");
     this.powerLamp = requiredMaterial("TE_power");
+    this.pumpField = powerKit?.templates.surge.userData.pumpHardware ? new TidelinePowerField() : null;
+    if(this.pumpField)this.root.add(this.pumpField.root);
     this.root.add(asset);
 
     this.jetMaterial = new THREE.ShaderMaterial({
@@ -210,7 +214,7 @@ export class TotemEvolution {
       for (const [device, side] of [[this.surgeDevice, -1], [this.shieldDevice, 1]] as const) {
         device.root.name = side < 0 ? "TE_mounted_surge" : "TE_mounted_shield";
         device.root.position.set(side * .78, .64, -.05);
-        device.root.rotation.x = Math.PI / 2;
+        device.root.rotation.x = device.root.userData.pumpHardware ? -.18 : Math.PI / 2;
         device.root.scale.setScalar(.42);
         this.root.add(device.root);
       }
@@ -265,7 +269,8 @@ export class TotemEvolution {
     this.jetMaterial.uniforms.uTime.value = state.reducedMotion ? 0 : state.elapsed * 9;
     this.jetMaterial.uniforms.uStrength.value = this.engineStrength;
     this.jetMaterial.uniforms.uColor.value.copy(overdrive ? OVERDRIVE : BOOST);
-    this.shield.visible = state.shieldActive === true;
+    this.shield.visible = !this.pumpField && state.shieldActive === true;
+    this.pumpField?.update(state.elapsed,state.reducedMotion,overdrive,state.shieldActive === true,state.shieldRefundWindow === true);
     const charge = THREE.MathUtils.clamp(state.powerCharge ?? 1, 0, 1);
     const activation = THREE.MathUtils.clamp(state.powerActivation ?? 1, 0, 1);
     const response = 1 - Math.exp(-delta * 7);
@@ -316,6 +321,7 @@ export class TotemEvolution {
     this.engineStrength = 0;
     this.jetMaterial.uniforms.uStrength.value = 0;
     this.shield.visible = false;
+    this.pumpField?.update(0,true,false,false,false);
     if (this.surgeConduit) this.surgeConduit.visible = false;
     this.brakeLamp.emissiveIntensity = 0.08;
   }
