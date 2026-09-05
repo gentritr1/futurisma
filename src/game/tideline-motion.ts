@@ -9,6 +9,7 @@ export class TidelineMotion {
  private readonly ferries:{object:THREE.Object3D;base:THREE.Vector3}[]=[];
  private readonly gulls:{body:THREE.Group;wings:THREE.Mesh[];phase:number}[]=[];
  private readonly drain:THREE.InstancedMesh;
+ private readonly flock:THREE.InstancedMesh;
  constructor(scenery:THREE.Group,uniforms:TideUniforms){
   scenery.traverse(object=>{
    if(object.name.includes('MOTION_CRANE'))this.cranes.push(object);
@@ -32,9 +33,10 @@ export class TidelineMotion {
   let featherTexture:THREE.Texture|null=null;
   scenery.traverse(object=>{if(object instanceof THREE.Mesh&&object.name.includes('GW_MAT_metal'))featherTexture=(object.material as THREE.MeshLambertMaterial).map;});
   const wingMaterial=new THREE.MeshLambertMaterial({map:featherTexture,color:0xb6baa6,side:THREE.DoubleSide});
+  this.flock=new THREE.InstancedMesh(wingGeometry,wingMaterial,14);this.flock.name='tideline_quay_gulls';this.flock.frustumCulled=false;this.root.add(this.flock);
   for(let i=0;i<7;i++){
    const body=new THREE.Group(),wings=[new THREE.Mesh(wingGeometry,wingMaterial),new THREE.Mesh(wingGeometry,wingMaterial)];
-   wings[1].scale.x=-1;body.add(...wings);this.root.add(body);this.gulls.push({body,wings,phase:i*1.47});
+   wings[1].scale.x=-1;body.add(...wings);this.gulls.push({body,wings,phase:i*1.47});
   }
   this.root.name='tideline_working_port';
  }
@@ -43,10 +45,13 @@ export class TidelineMotion {
   this.cranes.forEach(crane=>{const index=Number(crane.name.match(/CRANE_(\d+)/)?.[1]??0);crane.rotation.y=Math.sin(time*.095+index*1.8)*.19;});
   for(const {object,base} of this.ferries){object.position.copy(base);object.position.x+=Math.sin(time*.012)*130;object.position.y=waterLevel+.7;}
   this.drain.visible=!reduced&&lap>1&&seconds<5;
+  let wingIndex=0;
   for(const {body,wings,phase} of this.gulls){
    body.position.set(190+Math.sin(time*.12+phase)*65,34+Math.sin(time*.3+phase)*3,180+Math.cos(time*.12+phase)*65);
    body.rotation.y=time*.12+phase;wings[0].rotation.z=Math.sin(time*3.1+phase)*.35;wings[1].rotation.z=-wings[0].rotation.z;
+   body.updateMatrixWorld(true);for(const wing of wings)this.flock.setMatrixAt(wingIndex++,wing.matrixWorld);
   }
+  this.flock.instanceMatrix.needsUpdate=true;
  }
  applyVisibility(lap:number):void {for(const {object} of this.ferries)object.visible=object.visible&&lap>=3;}
  private prepareCables(mesh:THREE.Mesh,uniforms:TideUniforms):void {
