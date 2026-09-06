@@ -21,7 +21,8 @@ const box=new THREE.Box3().setFromObject(asset),size=box.getSize(new THREE.Vecto
 const camera=new THREE.PerspectiveCamera(62,1280/720,.1,2000),distance=Math.max(size.x*.65,size.y*.95,size.z*.4);
 if(id==='egret-card-set')asset.position.y=2.2;
 camera.position.set(center.x+size.x*.22,2.4,box.max.z+distance);camera.lookAt(center.x,id==='egret-card-set'?2.3:Math.max(1,center.y),center.z);
+if(id==='crawler-transporter'&&parameters.has('low')){camera.position.set(box.max.x+size.z*.8,box.min.y+2.4,center.z-size.z*.2);camera.lookAt(center.x,box.min.y+2,center.z);}
 const fog=course.fogAt(0);scene.fog=new THREE.FogExp2(fog.color,fog.density);scene.background=fog.color.clone();
 const ground=new THREE.Mesh(new THREE.PlaneGeometry(500,500),new THREE.MeshLambertMaterial({color:0x85867b}));ground.rotation.x=-Math.PI/2;ground.position.y=box.min.y-.15;scene.add(ground);
 const sky=new AscensionSky();await sky.ready;scene.add(sky.root);sky.update(camera,fog.color);scene.updateMatrixWorld(true);renderer.render(scene,camera);
-const output=document.createElement('output');output.id='asset-state';output.hidden=true;output.textContent=JSON.stringify({script:'scripts/visual/ascension/assets.ts',asset:device??id,camera:camera.position.toArray(),dimensions:size.toArray(),materials,render:{calls:renderer.info.render.calls,triangles:renderer.info.render.triangles}});document.body.append(output);
+const output=document.createElement('output');output.id='asset-state';output.hidden=true;output.textContent=JSON.stringify({script:'scripts/visual/ascension/assets.ts',asset:device??id,inspection:parameters.has('low')?'Low tread-side asset card; not a driving camera':null,camera:camera.position.toArray(),dimensions:size.toArray(),materials,render:{calls:renderer.info.render.calls,triangles:renderer.info.render.triangles}});document.body.append(output);

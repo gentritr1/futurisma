@@ -1,0 +1,32 @@
+{
+  "script": "scripts/visual/ascension/record-road-base.py",
+  "measurementScript": "scripts/visual/frame-metrics.py",
+  "captureScript": "scripts/visual/ascension/stations.mjs",
+  "samples": 32,
+  "sampling": "One road patch at each discrete sector/schedule station; not a timed sample window.",
+  "patches": {
+    "under": {
+      "x": 640,
+      "y": 430
+    },
+    "between": {
+      "x": 640,
+      "y": 455
+    }
+  },
+  "sectorPatchOverrides": {
+    "PAD_ROAD": {
+      "under": {
+        "x": 500,
+        "y": 430
+      },
+      "between": {
+        "x": 500,
+        "y": 455
+      }
+    }
+  },
+  "patchNote": "Pad Road center pixels intersect the hanging device. Its road patch is moved left onto unobstructed asphalt; all other sector patches retain their positions.",
+  "blockoutPreserved": "../phase-a/road-luma-base.json",
+  "paintedGeometrySha256": "7949554a4c94bb0ad215ffe779cd6e7bec3d0cda7cb8a44c7c45b05581bf53b8"
+}

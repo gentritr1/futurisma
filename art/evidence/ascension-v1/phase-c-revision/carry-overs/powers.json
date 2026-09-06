@@ -1,0 +1,1652 @@
+{
+  "script": "scripts/visual/ascension/powers.mjs",
+  "scope": "Live demo flag supplies one Shield and a follow-up Surge; production field contact and CHAIN command award the reward. E is a real keyboard event before the launch strip.",
+  "playerE": {
+    "before": {
+      "script": "src/game/ascension-runtime.ts",
+      "powers": {
+        "version": 1,
+        "configId": "ascension-pad-powers-v1",
+        "configHash": "d4c0eb88",
+        "seed": 3868938316,
+        "tick": 412,
+        "lap": 1,
+        "progress": 0.04720857640265019,
+        "lateral": 0.8676397070281578,
+        "lane": 0,
+        "fromLane": 0,
+        "flipStartTick": -126,
+        "nextFlipTick": 0,
+        "heldPower": "surge",
+        "heldCharge": 1,
+        "activePower": null,
+        "activeCharge": 0,
+        "powerStartTick": 0,
+        "powerUntilTick": 0,
+        "powerPerfect": false,
+        "collectedLaps": [
+          1,
+          0,
+          0,
+          0
+        ],
+        "usedWindowLaps": [],
+        "shieldRewardLaps": {},
+        "flips": 0,
+        "pickups": 1,
+        "powersUsed": 0,
+        "perfectActivations": 0,
+        "shieldAbsorptions": 0,
+        "upperTicks": 0,
+        "eventSequence": 1,
+        "events": [
+          {
+            "id": "ascension-pad-powers-v1:e69b504c:1",
+            "sequence": 1,
+            "tick": 374,
+            "type": "pickup",
+            "lap": 1,
+            "lane": 0,
+            "index": 0,
+            "kind": "surge",
+            "perfect": false,
+            "refund": 0
+          }
+        ]
+      },
+      "chains": [],
+      "seed": 3868938316,
+      "tick": 412,
+      "progress": 0.04740512915067052,
+      "sector": "PAD ROAD",
+      "effects": {
+        "launchAge": 0,
+        "pad": [
+          231.0088653564453,
+          4,
+          -125.9814453125
+        ],
+        "smokeTop": 20,
+        "cloudGlow": 0,
+        "tick": 411,
+        "reducedMotion": false,
+        "crawlerPosition": [
+          6.681713104248047,
+          17,
+          330.3438720703125
+        ],
+        "treadTravel": 0,
+        "rocketHeight": 0,
+        "rocketVisible": true,
+        "steamVisible": false,
+        "smokeVisible": false,
+        "delugeVisible": false,
+        "floodVisible": false,
+        "lampScale": 1,
+        "klaxon": false
+      },
+      "trenchOccupied": false,
+      "schedule": {
+        "script": "scripts/build-ascension-route.mjs",
+        "measurementScript": "scripts/visual/ascension/race.mjs",
+        "measurement": "art/evidence/ascension-v1/phase-a/calibration/works-trench.json",
+        "worksLapSeconds": 28.0705,
+        "definition": "Mean of flying laps two and three in the full Works demo before schedule activation",
+        "launchTick": 8253,
+        "reopenTick": 10653,
+        "steamEndTick": 9937,
+        "rocketGoneTick": 9095,
+        "testTick": 4211,
+        "events": [
+          {
+            "id": "crawler-klaxon-1",
+            "tick": 1493
+          },
+          {
+            "id": "crawler-cross-1",
+            "tick": 1853
+          },
+          {
+            "id": "deluge-test",
+            "tick": 4211
+          },
+          {
+            "id": "crawler-klaxon-2",
+            "tick": 5030
+          },
+          {
+            "id": "crawler-cross-2",
+            "tick": 5390
+          },
+          {
+            "id": "launch",
+            "tick": 8253
+          },
+          {
+            "id": "rocket-gone",
+            "tick": 9095
+          },
+          {
+            "id": "steam-clear",
+            "tick": 9937
+          },
+          {
+            "id": "trench-reopen",
+            "tick": 10653
+          }
+        ]
+      },
+      "state": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "events": []
+    },
+    "after": {
+      "script": "src/game/ascension-runtime.ts",
+      "powers": {
+        "version": 1,
+        "configId": "ascension-pad-powers-v1",
+        "configHash": "d4c0eb88",
+        "seed": 3868938316,
+        "tick": 437,
+        "lap": 1,
+        "progress": 0.05227762311729678,
+        "lateral": 0.7277302386031916,
+        "lane": 0,
+        "fromLane": 0,
+        "flipStartTick": -126,
+        "nextFlipTick": 0,
+        "heldPower": null,
+        "heldCharge": 0,
+        "activePower": "surge",
+        "activeCharge": 1,
+        "powerStartTick": 415,
+        "powerUntilTick": 775,
+        "powerPerfect": false,
+        "collectedLaps": [
+          1,
+          0,
+          0,
+          0
+        ],
+        "usedWindowLaps": [],
+        "shieldRewardLaps": {},
+        "flips": 0,
+        "pickups": 1,
+        "powersUsed": 1,
+        "perfectActivations": 0,
+        "shieldAbsorptions": 0,
+        "upperTicks": 0,
+        "eventSequence": 2,
+        "events": [
+          {
+            "id": "ascension-pad-powers-v1:e69b504c:1",
+            "sequence": 1,
+            "tick": 374,
+            "type": "pickup",
+            "lap": 1,
+            "lane": 0,
+            "index": 0,
+            "kind": "surge",
+            "perfect": false,
+            "refund": 0
+          },
+          {
+            "id": "ascension-pad-powers-v1:e69b504c:2",
+            "sequence": 2,
+            "tick": 415,
+            "type": "power",
+            "lap": 1,
+            "lane": 0,
+            "index": -1,
+            "kind": "surge",
+            "perfect": false,
+            "refund": 0
+          }
+        ]
+      },
+      "chains": [],
+      "seed": 3868938316,
+      "tick": 437,
+      "progress": 0.05248948351673488,
+      "sector": "PAD ROAD",
+      "effects": {
+        "launchAge": 0,
+        "pad": [
+          231.0088653564453,
+          4,
+          -125.9814453125
+        ],
+        "smokeTop": 20,
+        "cloudGlow": 0,
+        "tick": 436,
+        "reducedMotion": false,
+        "crawlerPosition": [
+          6.681713104248047,
+          17,
+          330.3438720703125
+        ],
+        "treadTravel": 0,
+        "rocketHeight": 0,
+        "rocketVisible": true,
+        "steamVisible": false,
+        "smokeVisible": false,
+        "delugeVisible": false,
+        "floodVisible": false,
+        "lampScale": 1,
+        "klaxon": false
+      },
+      "trenchOccupied": false,
+      "schedule": {
+        "script": "scripts/build-ascension-route.mjs",
+        "measurementScript": "scripts/visual/ascension/race.mjs",
+        "measurement": "art/evidence/ascension-v1/phase-a/calibration/works-trench.json",
+        "worksLapSeconds": 28.0705,
+        "definition": "Mean of flying laps two and three in the full Works demo before schedule activation",
+        "launchTick": 8253,
+        "reopenTick": 10653,
+        "steamEndTick": 9937,
+        "rocketGoneTick": 9095,
+        "testTick": 4211,
+        "events": [
+          {
+            "id": "crawler-klaxon-1",
+            "tick": 1493
+          },
+          {
+            "id": "crawler-cross-1",
+            "tick": 1853
+          },
+          {
+            "id": "deluge-test",
+            "tick": 4211
+          },
+          {
+            "id": "crawler-klaxon-2",
+            "tick": 5030
+          },
+          {
+            "id": "crawler-cross-2",
+            "tick": 5390
+          },
+          {
+            "id": "launch",
+            "tick": 8253
+          },
+          {
+            "id": "rocket-gone",
+            "tick": 9095
+          },
+          {
+            "id": "steam-clear",
+            "tick": 9937
+          },
+          {
+            "id": "trench-reopen",
+            "tick": 10653
+          }
+        ]
+      },
+      "state": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "events": []
+    },
+    "pass": true
+  },
+  "chain": [
+    {
+      "tick": 1989,
+      "lap": 1,
+      "absorbedAt": 1976,
+      "rewardTicks": 60
+    }
+  ],
+  "capture": {
+    "windowMs": 4148,
+    "expectedRateHz": 10,
+    "expectedSamples": 41.48,
+    "observedSamples": 7,
+    "residual": -34.48
+  },
+  "records": [
+    {
+      "file": "000.png",
+      "wallMs": 557,
+      "script": "src/game/ascension-runtime.ts",
+      "powers": {
+        "version": 1,
+        "configId": "ascension-pad-powers-v1",
+        "configHash": "d4c0eb88",
+        "seed": 3868938316,
+        "tick": 1908,
+        "lap": 1,
+        "progress": 0.5483881021248558,
+        "lateral": -3.340564707586699,
+        "lane": 0,
+        "fromLane": 0,
+        "flipStartTick": -126,
+        "nextFlipTick": 0,
+        "heldPower": "surge",
+        "heldCharge": 1,
+        "activePower": null,
+        "activeCharge": 0,
+        "powerStartTick": 0,
+        "powerUntilTick": 0,
+        "powerPerfect": false,
+        "collectedLaps": [
+          1,
+          0,
+          0,
+          0
+        ],
+        "usedWindowLaps": [],
+        "shieldRewardLaps": {},
+        "flips": 0,
+        "pickups": 1,
+        "powersUsed": 0,
+        "perfectActivations": 0,
+        "shieldAbsorptions": 0,
+        "upperTicks": 0,
+        "eventSequence": 1,
+        "events": [
+          {
+            "id": "ascension-pad-powers-v1:e69b504c:1",
+            "sequence": 1,
+            "tick": 374,
+            "type": "pickup",
+            "lap": 1,
+            "lane": 0,
+            "index": 0,
+            "kind": "surge",
+            "perfect": false,
+            "refund": 0
+          }
+        ]
+      },
+      "chains": [],
+      "seed": 3868938316,
+      "tick": 1908,
+      "progress": 0.5487538549678216,
+      "sector": "TRENCH",
+      "effects": {
+        "launchAge": 0,
+        "pad": [
+          231.0088653564453,
+          4,
+          -125.9814453125
+        ],
+        "smokeTop": 20,
+        "cloudGlow": 0,
+        "tick": 1907,
+        "reducedMotion": false,
+        "crawlerPosition": [
+          14.181713104248047,
+          17,
+          330.3438720703125
+        ],
+        "treadTravel": 7.5,
+        "rocketHeight": 0,
+        "rocketVisible": true,
+        "steamVisible": false,
+        "smokeVisible": false,
+        "delugeVisible": false,
+        "floodVisible": false,
+        "lampScale": 1,
+        "klaxon": false
+      },
+      "trenchOccupied": true,
+      "schedule": {
+        "script": "scripts/build-ascension-route.mjs",
+        "measurementScript": "scripts/visual/ascension/race.mjs",
+        "measurement": "art/evidence/ascension-v1/phase-a/calibration/works-trench.json",
+        "worksLapSeconds": 28.0705,
+        "definition": "Mean of flying laps two and three in the full Works demo before schedule activation",
+        "launchTick": 8253,
+        "reopenTick": 10653,
+        "steamEndTick": 9937,
+        "rocketGoneTick": 9095,
+        "testTick": 4211,
+        "events": [
+          {
+            "id": "crawler-klaxon-1",
+            "tick": 1493
+          },
+          {
+            "id": "crawler-cross-1",
+            "tick": 1853
+          },
+          {
+            "id": "deluge-test",
+            "tick": 4211
+          },
+          {
+            "id": "crawler-klaxon-2",
+            "tick": 5030
+          },
+          {
+            "id": "crawler-cross-2",
+            "tick": 5390
+          },
+          {
+            "id": "launch",
+            "tick": 8253
+          },
+          {
+            "id": "rocket-gone",
+            "tick": 9095
+          },
+          {
+            "id": "steam-clear",
+            "tick": 9937
+          },
+          {
+            "id": "trench-reopen",
+            "tick": 10653
+          }
+        ]
+      },
+      "state": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "events": [
+        {
+          "id": "crawler-klaxon-1",
+          "tick": 1493,
+          "sequence": 1
+        },
+        {
+          "id": "crawler-cross-1",
+          "tick": 1853,
+          "sequence": 2
+        }
+      ]
+    },
+    {
+      "file": "001.png",
+      "wallMs": 1483,
+      "script": "src/game/ascension-runtime.ts",
+      "powers": {
+        "version": 1,
+        "configId": "ascension-pad-powers-v1",
+        "configHash": "d4c0eb88",
+        "seed": 3868938316,
+        "tick": 1974,
+        "lap": 1,
+        "progress": 0.5731165590215115,
+        "lateral": -6.071617911646793,
+        "lane": 0,
+        "fromLane": 0,
+        "flipStartTick": -126,
+        "nextFlipTick": 0,
+        "heldPower": null,
+        "heldCharge": 0,
+        "activePower": "shield",
+        "activeCharge": 1,
+        "powerStartTick": 1925,
+        "powerUntilTick": 2525,
+        "powerPerfect": false,
+        "collectedLaps": [
+          1,
+          0,
+          0,
+          0
+        ],
+        "usedWindowLaps": [],
+        "shieldRewardLaps": {},
+        "flips": 0,
+        "pickups": 1,
+        "powersUsed": 1,
+        "perfectActivations": 0,
+        "shieldAbsorptions": 0,
+        "upperTicks": 0,
+        "eventSequence": 2,
+        "events": [
+          {
+            "id": "ascension-pad-powers-v1:e69b504c:1",
+            "sequence": 1,
+            "tick": 374,
+            "type": "pickup",
+            "lap": 1,
+            "lane": 0,
+            "index": 0,
+            "kind": "surge",
+            "perfect": false,
+            "refund": 0
+          },
+          {
+            "id": "ascension-pad-powers-v1:e69b504c:2",
+            "sequence": 2,
+            "tick": 1925,
+            "type": "power",
+            "lap": 1,
+            "lane": 0,
+            "index": -1,
+            "kind": "shield",
+            "perfect": false,
+            "refund": 0
+          }
+        ]
+      },
+      "chains": [],
+      "seed": 3868938316,
+      "tick": 1974,
+      "progress": 0.5734986225895317,
+      "sector": "TRENCH",
+      "effects": {
+        "launchAge": 0,
+        "pad": [
+          231.0088653564453,
+          4,
+          -125.9814453125
+        ],
+        "smokeTop": 20,
+        "cloudGlow": 0,
+        "tick": 1973,
+        "reducedMotion": false,
+        "crawlerPosition": [
+          23.34837977091471,
+          17,
+          330.3438720703125
+        ],
+        "treadTravel": 16.666666666666664,
+        "rocketHeight": 0,
+        "rocketVisible": true,
+        "steamVisible": false,
+        "smokeVisible": false,
+        "delugeVisible": false,
+        "floodVisible": false,
+        "lampScale": 1,
+        "klaxon": false
+      },
+      "trenchOccupied": true,
+      "schedule": {
+        "script": "scripts/build-ascension-route.mjs",
+        "measurementScript": "scripts/visual/ascension/race.mjs",
+        "measurement": "art/evidence/ascension-v1/phase-a/calibration/works-trench.json",
+        "worksLapSeconds": 28.0705,
+        "definition": "Mean of flying laps two and three in the full Works demo before schedule activation",
+        "launchTick": 8253,
+        "reopenTick": 10653,
+        "steamEndTick": 9937,
+        "rocketGoneTick": 9095,
+        "testTick": 4211,
+        "events": [
+          {
+            "id": "crawler-klaxon-1",
+            "tick": 1493
+          },
+          {
+            "id": "crawler-cross-1",
+            "tick": 1853
+          },
+          {
+            "id": "deluge-test",
+            "tick": 4211
+          },
+          {
+            "id": "crawler-klaxon-2",
+            "tick": 5030
+          },
+          {
+            "id": "crawler-cross-2",
+            "tick": 5390
+          },
+          {
+            "id": "launch",
+            "tick": 8253
+          },
+          {
+            "id": "rocket-gone",
+            "tick": 9095
+          },
+          {
+            "id": "steam-clear",
+            "tick": 9937
+          },
+          {
+            "id": "trench-reopen",
+            "tick": 10653
+          }
+        ]
+      },
+      "state": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "events": [
+        {
+          "id": "crawler-klaxon-1",
+          "tick": 1493,
+          "sequence": 1
+        },
+        {
+          "id": "crawler-cross-1",
+          "tick": 1853,
+          "sequence": 2
+        }
+      ]
+    },
+    {
+      "file": "002.png",
+      "wallMs": 1972,
+      "script": "src/game/ascension-runtime.ts",
+      "powers": {
+        "version": 1,
+        "configId": "ascension-pad-powers-v1",
+        "configHash": "d4c0eb88",
+        "seed": 3868938316,
+        "tick": 2047,
+        "lap": 1,
+        "progress": 0.6087210056295507,
+        "lateral": 3.6317852576718765,
+        "lane": 0,
+        "fromLane": 0,
+        "flipStartTick": -126,
+        "nextFlipTick": 0,
+        "heldPower": null,
+        "heldCharge": 0,
+        "activePower": "surge",
+        "activeCharge": 1,
+        "powerStartTick": 1989,
+        "powerUntilTick": 2409,
+        "powerPerfect": false,
+        "collectedLaps": [
+          1,
+          0,
+          0,
+          0
+        ],
+        "usedWindowLaps": [],
+        "shieldRewardLaps": {
+          "trench-exit": 1
+        },
+        "flips": 0,
+        "pickups": 1,
+        "powersUsed": 2,
+        "perfectActivations": 1,
+        "shieldAbsorptions": 1,
+        "upperTicks": 0,
+        "eventSequence": 4,
+        "events": [
+          {
+            "id": "ascension-pad-powers-v1:e69b504c:1",
+            "sequence": 1,
+            "tick": 374,
+            "type": "pickup",
+            "lap": 1,
+            "lane": 0,
+            "index": 0,
+            "kind": "surge",
+            "perfect": false,
+            "refund": 0
+          },
+          {
+            "id": "ascension-pad-powers-v1:e69b504c:2",
+            "sequence": 2,
+            "tick": 1925,
+            "type": "power",
+            "lap": 1,
+            "lane": 0,
+            "index": -1,
+            "kind": "shield",
+            "perfect": false,
+            "refund": 0
+          },
+          {
+            "id": "ascension-pad-powers-v1:e69b504c:3",
+            "sequence": 3,
+            "tick": 1976,
+            "type": "absorb",
+            "lap": 1,
+            "lane": 0,
+            "index": 0,
+            "kind": "shield",
+            "perfect": true,
+            "refund": 0.18
+          },
+          {
+            "id": "ascension-pad-powers-v1:e69b504c:4",
+            "sequence": 4,
+            "tick": 1989,
+            "type": "power",
+            "lap": 1,
+            "lane": 0,
+            "index": -1,
+            "kind": "surge",
+            "perfect": false,
+            "refund": 0
+          }
+        ]
+      },
+      "chains": [
+        {
+          "tick": 1989,
+          "lap": 1,
+          "absorbedAt": 1976,
+          "rewardTicks": 60
+        }
+      ],
+      "seed": 3868938316,
+      "tick": 2047,
+      "progress": 0.6090050337580615,
+      "sector": "DELUGE ROAD",
+      "effects": {
+        "launchAge": 0,
+        "pad": [
+          231.0088653564453,
+          4,
+          -125.9814453125
+        ],
+        "smokeTop": 20,
+        "cloudGlow": 0,
+        "tick": 2046,
+        "reducedMotion": false,
+        "crawlerPosition": [
+          33.487268659803604,
+          17,
+          330.3438720703125
+        ],
+        "treadTravel": 26.805555555555554,
+        "rocketHeight": 0,
+        "rocketVisible": true,
+        "steamVisible": false,
+        "smokeVisible": false,
+        "delugeVisible": false,
+        "floodVisible": false,
+        "lampScale": 1,
+        "klaxon": false
+      },
+      "trenchOccupied": false,
+      "schedule": {
+        "script": "scripts/build-ascension-route.mjs",
+        "measurementScript": "scripts/visual/ascension/race.mjs",
+        "measurement": "art/evidence/ascension-v1/phase-a/calibration/works-trench.json",
+        "worksLapSeconds": 28.0705,
+        "definition": "Mean of flying laps two and three in the full Works demo before schedule activation",
+        "launchTick": 8253,
+        "reopenTick": 10653,
+        "steamEndTick": 9937,
+        "rocketGoneTick": 9095,
+        "testTick": 4211,
+        "events": [
+          {
+            "id": "crawler-klaxon-1",
+            "tick": 1493
+          },
+          {
+            "id": "crawler-cross-1",
+            "tick": 1853
+          },
+          {
+            "id": "deluge-test",
+            "tick": 4211
+          },
+          {
+            "id": "crawler-klaxon-2",
+            "tick": 5030
+          },
+          {
+            "id": "crawler-cross-2",
+            "tick": 5390
+          },
+          {
+            "id": "launch",
+            "tick": 8253
+          },
+          {
+            "id": "rocket-gone",
+            "tick": 9095
+          },
+          {
+            "id": "steam-clear",
+            "tick": 9937
+          },
+          {
+            "id": "trench-reopen",
+            "tick": 10653
+          }
+        ]
+      },
+      "state": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "events": [
+        {
+          "id": "crawler-klaxon-1",
+          "tick": 1493,
+          "sequence": 1
+        },
+        {
+          "id": "crawler-cross-1",
+          "tick": 1853,
+          "sequence": 2
+        }
+      ]
+    },
+    {
+      "file": "003.png",
+      "wallMs": 2522,
+      "script": "src/game/ascension-runtime.ts",
+      "powers": {
+        "version": 1,
+        "configId": "ascension-pad-powers-v1",
+        "configHash": "d4c0eb88",
+        "seed": 3868938316,
+        "tick": 2108,
+        "lap": 1,
+        "progress": 0.625529889283575,
+        "lateral": -7.732443245945034,
+        "lane": 0,
+        "fromLane": 0,
+        "flipStartTick": -126,
+        "nextFlipTick": 0,
+        "heldPower": null,
+        "heldCharge": 0,
+        "activePower": "surge",
+        "activeCharge": 1,
+        "powerStartTick": 1989,
+        "powerUntilTick": 2409,
+        "powerPerfect": false,
+        "collectedLaps": [
+          1,
+          0,
+          0,
+          0
+        ],
+        "usedWindowLaps": [],
+        "shieldRewardLaps": {
+          "trench-exit": 1
+        },
+        "flips": 0,
+        "pickups": 1,
+        "powersUsed": 2,
+        "perfectActivations": 1,
+        "shieldAbsorptions": 1,
+        "upperTicks": 0,
+        "eventSequence": 4,
+        "events": [
+          {
+            "id": "ascension-pad-powers-v1:e69b504c:1",
+            "sequence": 1,
+            "tick": 374,
+            "type": "pickup",
+            "lap": 1,
+            "lane": 0,
+            "index": 0,
+            "kind": "surge",
+            "perfect": false,
+            "refund": 0
+          },
+          {
+            "id": "ascension-pad-powers-v1:e69b504c:2",
+            "sequence": 2,
+            "tick": 1925,
+            "type": "power",
+            "lap": 1,
+            "lane": 0,
+            "index": -1,
+            "kind": "shield",
+            "perfect": false,
+            "refund": 0
+          },
+          {
+            "id": "ascension-pad-powers-v1:e69b504c:3",
+            "sequence": 3,
+            "tick": 1976,
+            "type": "absorb",
+            "lap": 1,
+            "lane": 0,
+            "index": 0,
+            "kind": "shield",
+            "perfect": true,
+            "refund": 0.18
+          },
+          {
+            "id": "ascension-pad-powers-v1:e69b504c:4",
+            "sequence": 4,
+            "tick": 1989,
+            "type": "power",
+            "lap": 1,
+            "lane": 0,
+            "index": -1,
+            "kind": "surge",
+            "perfect": false,
+            "refund": 0
+          }
+        ]
+      },
+      "chains": [
+        {
+          "tick": 1989,
+          "lap": 1,
+          "absorbedAt": 1976,
+          "rewardTicks": 60
+        }
+      ],
+      "seed": 3868938316,
+      "tick": 2108,
+      "progress": 0.6257970591016058,
+      "sector": "CRAWLERWAY",
+      "effects": {
+        "launchAge": 0,
+        "pad": [
+          231.0088653564453,
+          4,
+          -125.9814453125
+        ],
+        "smokeTop": 20,
+        "cloudGlow": 0,
+        "tick": 2107,
+        "reducedMotion": false,
+        "crawlerPosition": [
+          41.959490882025825,
+          17,
+          330.3438720703125
+        ],
+        "treadTravel": 35.27777777777778,
+        "rocketHeight": 0,
+        "rocketVisible": true,
+        "steamVisible": false,
+        "smokeVisible": false,
+        "delugeVisible": false,
+        "floodVisible": false,
+        "lampScale": 1,
+        "klaxon": false
+      },
+      "trenchOccupied": false,
+      "schedule": {
+        "script": "scripts/build-ascension-route.mjs",
+        "measurementScript": "scripts/visual/ascension/race.mjs",
+        "measurement": "art/evidence/ascension-v1/phase-a/calibration/works-trench.json",
+        "worksLapSeconds": 28.0705,
+        "definition": "Mean of flying laps two and three in the full Works demo before schedule activation",
+        "launchTick": 8253,
+        "reopenTick": 10653,
+        "steamEndTick": 9937,
+        "rocketGoneTick": 9095,
+        "testTick": 4211,
+        "events": [
+          {
+            "id": "crawler-klaxon-1",
+            "tick": 1493
+          },
+          {
+            "id": "crawler-cross-1",
+            "tick": 1853
+          },
+          {
+            "id": "deluge-test",
+            "tick": 4211
+          },
+          {
+            "id": "crawler-klaxon-2",
+            "tick": 5030
+          },
+          {
+            "id": "crawler-cross-2",
+            "tick": 5390
+          },
+          {
+            "id": "launch",
+            "tick": 8253
+          },
+          {
+            "id": "rocket-gone",
+            "tick": 9095
+          },
+          {
+            "id": "steam-clear",
+            "tick": 9937
+          },
+          {
+            "id": "trench-reopen",
+            "tick": 10653
+          }
+        ]
+      },
+      "state": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "events": [
+        {
+          "id": "crawler-klaxon-1",
+          "tick": 1493,
+          "sequence": 1
+        },
+        {
+          "id": "crawler-cross-1",
+          "tick": 1853,
+          "sequence": 2
+        }
+      ]
+    },
+    {
+      "file": "004.png",
+      "wallMs": 3068,
+      "script": "src/game/ascension-runtime.ts",
+      "powers": {
+        "version": 1,
+        "configId": "ascension-pad-powers-v1",
+        "configHash": "d4c0eb88",
+        "seed": 3868938316,
+        "tick": 2170,
+        "lap": 1,
+        "progress": 0.6432781452448983,
+        "lateral": -0.4419577269181671,
+        "lane": 0,
+        "fromLane": 0,
+        "flipStartTick": -126,
+        "nextFlipTick": 0,
+        "heldPower": null,
+        "heldCharge": 0,
+        "activePower": "surge",
+        "activeCharge": 1,
+        "powerStartTick": 1989,
+        "powerUntilTick": 2409,
+        "powerPerfect": false,
+        "collectedLaps": [
+          1,
+          0,
+          0,
+          0
+        ],
+        "usedWindowLaps": [],
+        "shieldRewardLaps": {
+          "trench-exit": 1
+        },
+        "flips": 0,
+        "pickups": 1,
+        "powersUsed": 2,
+        "perfectActivations": 1,
+        "shieldAbsorptions": 1,
+        "upperTicks": 0,
+        "eventSequence": 4,
+        "events": [
+          {
+            "id": "ascension-pad-powers-v1:e69b504c:1",
+            "sequence": 1,
+            "tick": 374,
+            "type": "pickup",
+            "lap": 1,
+            "lane": 0,
+            "index": 0,
+            "kind": "surge",
+            "perfect": false,
+            "refund": 0
+          },
+          {
+            "id": "ascension-pad-powers-v1:e69b504c:2",
+            "sequence": 2,
+            "tick": 1925,
+            "type": "power",
+            "lap": 1,
+            "lane": 0,
+            "index": -1,
+            "kind": "shield",
+            "perfect": false,
+            "refund": 0
+          },
+          {
+            "id": "ascension-pad-powers-v1:e69b504c:3",
+            "sequence": 3,
+            "tick": 1976,
+            "type": "absorb",
+            "lap": 1,
+            "lane": 0,
+            "index": 0,
+            "kind": "shield",
+            "perfect": true,
+            "refund": 0.18
+          },
+          {
+            "id": "ascension-pad-powers-v1:e69b504c:4",
+            "sequence": 4,
+            "tick": 1989,
+            "type": "power",
+            "lap": 1,
+            "lane": 0,
+            "index": -1,
+            "kind": "surge",
+            "perfect": false,
+            "refund": 0
+          }
+        ]
+      },
+      "chains": [
+        {
+          "tick": 1989,
+          "lap": 1,
+          "absorbedAt": 1976,
+          "rewardTicks": 60
+        }
+      ],
+      "seed": 3868938316,
+      "tick": 2170,
+      "progress": 0.6435810951123573,
+      "sector": "CRAWLERWAY",
+      "effects": {
+        "launchAge": 0,
+        "pad": [
+          231.0088653564453,
+          4,
+          -125.9814453125
+        ],
+        "smokeTop": 20,
+        "cloudGlow": 0,
+        "tick": 2169,
+        "reducedMotion": false,
+        "crawlerPosition": [
+          50.57060199313693,
+          17,
+          330.3438720703125
+        ],
+        "treadTravel": 43.888888888888886,
+        "rocketHeight": 0,
+        "rocketVisible": true,
+        "steamVisible": false,
+        "smokeVisible": false,
+        "delugeVisible": false,
+        "floodVisible": false,
+        "lampScale": 1,
+        "klaxon": false
+      },
+      "trenchOccupied": false,
+      "schedule": {
+        "script": "scripts/build-ascension-route.mjs",
+        "measurementScript": "scripts/visual/ascension/race.mjs",
+        "measurement": "art/evidence/ascension-v1/phase-a/calibration/works-trench.json",
+        "worksLapSeconds": 28.0705,
+        "definition": "Mean of flying laps two and three in the full Works demo before schedule activation",
+        "launchTick": 8253,
+        "reopenTick": 10653,
+        "steamEndTick": 9937,
+        "rocketGoneTick": 9095,
+        "testTick": 4211,
+        "events": [
+          {
+            "id": "crawler-klaxon-1",
+            "tick": 1493
+          },
+          {
+            "id": "crawler-cross-1",
+            "tick": 1853
+          },
+          {
+            "id": "deluge-test",
+            "tick": 4211
+          },
+          {
+            "id": "crawler-klaxon-2",
+            "tick": 5030
+          },
+          {
+            "id": "crawler-cross-2",
+            "tick": 5390
+          },
+          {
+            "id": "launch",
+            "tick": 8253
+          },
+          {
+            "id": "rocket-gone",
+            "tick": 9095
+          },
+          {
+            "id": "steam-clear",
+            "tick": 9937
+          },
+          {
+            "id": "trench-reopen",
+            "tick": 10653
+          }
+        ]
+      },
+      "state": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "events": [
+        {
+          "id": "crawler-klaxon-1",
+          "tick": 1493,
+          "sequence": 1
+        },
+        {
+          "id": "crawler-cross-1",
+          "tick": 1853,
+          "sequence": 2
+        }
+      ]
+    },
+    {
+      "file": "005.png",
+      "wallMs": 3632,
+      "script": "src/game/ascension-runtime.ts",
+      "powers": {
+        "version": 1,
+        "configId": "ascension-pad-powers-v1",
+        "configHash": "d4c0eb88",
+        "seed": 3868938316,
+        "tick": 2241,
+        "lap": 1,
+        "progress": 0.6653150219719901,
+        "lateral": 4.10079753775439,
+        "lane": 0,
+        "fromLane": 0,
+        "flipStartTick": -126,
+        "nextFlipTick": 0,
+        "heldPower": null,
+        "heldCharge": 0,
+        "activePower": "surge",
+        "activeCharge": 1,
+        "powerStartTick": 1989,
+        "powerUntilTick": 2409,
+        "powerPerfect": false,
+        "collectedLaps": [
+          1,
+          0,
+          0,
+          0
+        ],
+        "usedWindowLaps": [],
+        "shieldRewardLaps": {
+          "trench-exit": 1
+        },
+        "flips": 0,
+        "pickups": 1,
+        "powersUsed": 2,
+        "perfectActivations": 1,
+        "shieldAbsorptions": 1,
+        "upperTicks": 0,
+        "eventSequence": 4,
+        "events": [
+          {
+            "id": "ascension-pad-powers-v1:e69b504c:1",
+            "sequence": 1,
+            "tick": 374,
+            "type": "pickup",
+            "lap": 1,
+            "lane": 0,
+            "index": 0,
+            "kind": "surge",
+            "perfect": false,
+            "refund": 0
+          },
+          {
+            "id": "ascension-pad-powers-v1:e69b504c:2",
+            "sequence": 2,
+            "tick": 1925,
+            "type": "power",
+            "lap": 1,
+            "lane": 0,
+            "index": -1,
+            "kind": "shield",
+            "perfect": false,
+            "refund": 0
+          },
+          {
+            "id": "ascension-pad-powers-v1:e69b504c:3",
+            "sequence": 3,
+            "tick": 1976,
+            "type": "absorb",
+            "lap": 1,
+            "lane": 0,
+            "index": 0,
+            "kind": "shield",
+            "perfect": true,
+            "refund": 0.18
+          },
+          {
+            "id": "ascension-pad-powers-v1:e69b504c:4",
+            "sequence": 4,
+            "tick": 1989,
+            "type": "power",
+            "lap": 1,
+            "lane": 0,
+            "index": -1,
+            "kind": "surge",
+            "perfect": false,
+            "refund": 0
+          }
+        ]
+      },
+      "chains": [
+        {
+          "tick": 1989,
+          "lap": 1,
+          "absorbedAt": 1976,
+          "rewardTicks": 60
+        }
+      ],
+      "seed": 3868938316,
+      "tick": 2241,
+      "progress": 0.6656333685386682,
+      "sector": "CRAWLERWAY",
+      "effects": {
+        "launchAge": 0,
+        "pad": [
+          231.0088653564453,
+          4,
+          -125.9814453125
+        ],
+        "smokeTop": 20,
+        "cloudGlow": 0,
+        "tick": 2240,
+        "reducedMotion": false,
+        "crawlerPosition": [
+          60.43171310424805,
+          17,
+          330.3438720703125
+        ],
+        "treadTravel": 53.75,
+        "rocketHeight": 0,
+        "rocketVisible": true,
+        "steamVisible": false,
+        "smokeVisible": false,
+        "delugeVisible": false,
+        "floodVisible": false,
+        "lampScale": 1,
+        "klaxon": false
+      },
+      "trenchOccupied": false,
+      "schedule": {
+        "script": "scripts/build-ascension-route.mjs",
+        "measurementScript": "scripts/visual/ascension/race.mjs",
+        "measurement": "art/evidence/ascension-v1/phase-a/calibration/works-trench.json",
+        "worksLapSeconds": 28.0705,
+        "definition": "Mean of flying laps two and three in the full Works demo before schedule activation",
+        "launchTick": 8253,
+        "reopenTick": 10653,
+        "steamEndTick": 9937,
+        "rocketGoneTick": 9095,
+        "testTick": 4211,
+        "events": [
+          {
+            "id": "crawler-klaxon-1",
+            "tick": 1493
+          },
+          {
+            "id": "crawler-cross-1",
+            "tick": 1853
+          },
+          {
+            "id": "deluge-test",
+            "tick": 4211
+          },
+          {
+            "id": "crawler-klaxon-2",
+            "tick": 5030
+          },
+          {
+            "id": "crawler-cross-2",
+            "tick": 5390
+          },
+          {
+            "id": "launch",
+            "tick": 8253
+          },
+          {
+            "id": "rocket-gone",
+            "tick": 9095
+          },
+          {
+            "id": "steam-clear",
+            "tick": 9937
+          },
+          {
+            "id": "trench-reopen",
+            "tick": 10653
+          }
+        ]
+      },
+      "state": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "events": [
+        {
+          "id": "crawler-klaxon-1",
+          "tick": 1493,
+          "sequence": 1
+        },
+        {
+          "id": "crawler-cross-1",
+          "tick": 1853,
+          "sequence": 2
+        }
+      ]
+    },
+    {
+      "file": "006.png",
+      "wallMs": 4146,
+      "script": "src/game/ascension-runtime.ts",
+      "powers": {
+        "version": 1,
+        "configId": "ascension-pad-powers-v1",
+        "configHash": "d4c0eb88",
+        "seed": 3868938316,
+        "tick": 2304,
+        "lap": 1,
+        "progress": 0.6852556830358036,
+        "lateral": 0.47567407024219177,
+        "lane": 0,
+        "fromLane": 0,
+        "flipStartTick": -126,
+        "nextFlipTick": 0,
+        "heldPower": null,
+        "heldCharge": 0,
+        "activePower": "surge",
+        "activeCharge": 1,
+        "powerStartTick": 1989,
+        "powerUntilTick": 2409,
+        "powerPerfect": false,
+        "collectedLaps": [
+          1,
+          0,
+          0,
+          0
+        ],
+        "usedWindowLaps": [],
+        "shieldRewardLaps": {
+          "trench-exit": 1
+        },
+        "flips": 0,
+        "pickups": 1,
+        "powersUsed": 2,
+        "perfectActivations": 1,
+        "shieldAbsorptions": 1,
+        "upperTicks": 0,
+        "eventSequence": 4,
+        "events": [
+          {
+            "id": "ascension-pad-powers-v1:e69b504c:1",
+            "sequence": 1,
+            "tick": 374,
+            "type": "pickup",
+            "lap": 1,
+            "lane": 0,
+            "index": 0,
+            "kind": "surge",
+            "perfect": false,
+            "refund": 0
+          },
+          {
+            "id": "ascension-pad-powers-v1:e69b504c:2",
+            "sequence": 2,
+            "tick": 1925,
+            "type": "power",
+            "lap": 1,
+            "lane": 0,
+            "index": -1,
+            "kind": "shield",
+            "perfect": false,
+            "refund": 0
+          },
+          {
+            "id": "ascension-pad-powers-v1:e69b504c:3",
+            "sequence": 3,
+            "tick": 1976,
+            "type": "absorb",
+            "lap": 1,
+            "lane": 0,
+            "index": 0,
+            "kind": "shield",
+            "perfect": true,
+            "refund": 0.18
+          },
+          {
+            "id": "ascension-pad-powers-v1:e69b504c:4",
+            "sequence": 4,
+            "tick": 1989,
+            "type": "power",
+            "lap": 1,
+            "lane": 0,
+            "index": -1,
+            "kind": "surge",
+            "perfect": false,
+            "refund": 0
+          }
+        ]
+      },
+      "chains": [
+        {
+          "tick": 1989,
+          "lap": 1,
+          "absorbedAt": 1976,
+          "rewardTicks": 60
+        }
+      ],
+      "seed": 3868938316,
+      "tick": 2304,
+      "progress": 0.68557139170469,
+      "sector": "MANGROVE CUT",
+      "effects": {
+        "launchAge": 0,
+        "pad": [
+          231.0088653564453,
+          4,
+          -125.9814453125
+        ],
+        "smokeTop": 20,
+        "cloudGlow": 0,
+        "tick": 2303,
+        "reducedMotion": false,
+        "crawlerPosition": [
+          69.18171310424805,
+          17,
+          330.3438720703125
+        ],
+        "treadTravel": 62.5,
+        "rocketHeight": 0,
+        "rocketVisible": true,
+        "steamVisible": false,
+        "smokeVisible": false,
+        "delugeVisible": false,
+        "floodVisible": false,
+        "lampScale": 1,
+        "klaxon": false
+      },
+      "trenchOccupied": false,
+      "schedule": {
+        "script": "scripts/build-ascension-route.mjs",
+        "measurementScript": "scripts/visual/ascension/race.mjs",
+        "measurement": "art/evidence/ascension-v1/phase-a/calibration/works-trench.json",
+        "worksLapSeconds": 28.0705,
+        "definition": "Mean of flying laps two and three in the full Works demo before schedule activation",
+        "launchTick": 8253,
+        "reopenTick": 10653,
+        "steamEndTick": 9937,
+        "rocketGoneTick": 9095,
+        "testTick": 4211,
+        "events": [
+          {
+            "id": "crawler-klaxon-1",
+            "tick": 1493
+          },
+          {
+            "id": "crawler-cross-1",
+            "tick": 1853
+          },
+          {
+            "id": "deluge-test",
+            "tick": 4211
+          },
+          {
+            "id": "crawler-klaxon-2",
+            "tick": 5030
+          },
+          {
+            "id": "crawler-cross-2",
+            "tick": 5390
+          },
+          {
+            "id": "launch",
+            "tick": 8253
+          },
+          {
+            "id": "rocket-gone",
+            "tick": 9095
+          },
+          {
+            "id": "steam-clear",
+            "tick": 9937
+          },
+          {
+            "id": "trench-reopen",
+            "tick": 10653
+          }
+        ]
+      },
+      "state": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "events": [
+        {
+          "id": "crawler-klaxon-1",
+          "tick": 1493,
+          "sequence": 1
+        },
+        {
+          "id": "crawler-cross-1",
+          "tick": 1853,
+          "sequence": 2
+        }
+      ]
+    }
+  ],
+  "errors": []
+}

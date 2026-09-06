@@ -1,7 +1,7 @@
 import {mkdir,writeFile} from 'node:fs/promises';
 import {launchReviewBrowser} from '../tideline-v4/browser.mjs';
 import {instrument} from './instrument.mjs';
-const out='art/evidence/ascension-v1/phase-c/steam-speed';await mkdir(out,{recursive:true});
+const out=process.argv.find(a=>a.startsWith('--out='))?.slice(6)??'art/evidence/ascension-v1/phase-c/steam-speed';await mkdir(out,{recursive:true});
 const browser=await launchReviewBrowser(),errors=[];
 try{
  const page=await browser.newPage();page.on('pageerror',e=>errors.push(String(e)));page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});await instrument(page);

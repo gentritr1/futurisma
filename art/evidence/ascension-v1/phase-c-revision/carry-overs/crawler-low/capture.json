@@ -1,0 +1,62 @@
+{
+  "script": "scripts/visual/ascension/assets.mjs",
+  "records": [
+    {
+      "script": "scripts/visual/ascension/assets.ts",
+      "asset": "crawler-transporter",
+      "inspection": "Low tread-side asset card; not a driving camera",
+      "camera": [
+        58.35799827575684,
+        2.4,
+        -9.40449962615967
+      ],
+      "dimensions": [
+        37.939998626708984,
+        16.6929988861084,
+        49.23499870300293
+      ],
+      "materials": [
+        {
+          "name": "AP_MAT_emissive",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_metal",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_signage",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_metal",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_metal",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_metal",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_metal",
+          "toneMapped": true,
+          "fog": true
+        }
+      ],
+      "render": {
+        "calls": 9,
+        "triangles": 11042
+      }
+    }
+  ],
+  "errors": []
+}

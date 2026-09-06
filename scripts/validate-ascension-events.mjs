@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {AscensionEventPose,CRAWLER_CROSSING_TICKS,BELT_LENGTH,beltPose} from '../src/game/ascension-event-pose.js';
-const out='art/evidence/ascension-v1/phase-c';mkdirSync(out,{recursive:true});
+const out=process.argv.find(a=>a.startsWith('--out='))?.slice(6)??'art/evidence/ascension-v1/phase-c';mkdirSync(out,{recursive:true});
 const route=JSON.parse(readFileSync('src/game/data/ascension/route.json')),config=JSON.parse(readFileSync('src/game/data/ascension/schedule.json'));
 const buffer=readFileSync('public/assets/ascension/painted.glb'),size=buffer.readUInt32LE(12),json=JSON.parse(buffer.subarray(20,20+size));
 json.buffers[0].uri='data:application/octet-stream;base64,'+buffer.subarray(28+size).toString('base64');json.materials=[{doubleSided:true}];delete json.images;delete json.textures;delete json.samplers;for(const m of json.meshes)for(const p of m.primitives)p.material=0;

@@ -139,8 +139,8 @@ export class PolaritySimulation {
     return { ok: true, reason: state.powerPerfect ? "PERFECT LAUNCH" : "POWER ACTIVE",
       event: this.emit("power", -1, state.activePower, state.powerPerfect) };
   }
-  /** Exactly one authoritative 120 Hz tick. @param {number} progress @param {number} lateral @param {number} lap */
-  step(progress, lateral, lap) {
+  /** Exactly one authoritative 120 Hz tick. @param {number} progress @param {number} lateral @param {number} lap @param {readonly boolean[] | null} [eligiblePickups] */
+  step(progress, lateral, lap, eligiblePickups = null) {
     if (!Number.isFinite(progress) || !Number.isFinite(lateral) || Math.abs(lateral) > 1000
       || !integer(lap, this.state.lap, Math.min(999, this.state.lap + 1))) throw new Error("Invalid ability step.");
     this.advanceTicks(1);
@@ -149,6 +149,7 @@ export class PolaritySimulation {
     if (state.heldPower || this.isFlipping) return;
     for (let index = 0; index < this.config.pickups.length; index++) {
       const pickup = this.config.pickups[index];
+      if (eligiblePickups && !eligiblePickups[index]) continue;
       if (pickup.lane !== state.lane || state.collectedLaps[index] === lap || Math.abs(lateral - pickup.lateral) > 3.2) continue;
       if (!crossedPickup(previous, state.progress, pickup.progress)) continue;
       state.heldPower = this.pickupKind(index, lap);

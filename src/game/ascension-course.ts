@@ -1,3 +1,4 @@
+import {ascensionFieldAt} from './ascension-powers-config.js';
 import * as THREE from "three";
 import {flatIdBatch} from "./ascension-flat-batch";
 import { resolveAbilitySeed } from "./ability-seed";
@@ -281,7 +282,7 @@ export class AscensionCourse implements RaceCourse {
   surfaceGripAt(progress: number, _lateral = 0): number {
     return this.schedule.grip(this.occupiedTrench ? "TRENCH" : this.sample(progress,this.branchScratch).sector);
   }
-  cableTripSideAt(_progress: number, _lateral: number): -1 | 0 | 1 { return 0; }
+  cableTripSideAt(progress: number, lateral: number): -1 | 0 | 1 { const field=ascensionFieldAt(progress,lateral,this.length,this.trenchOccupied);return field?(lateral<field.lateral?-1:1):0; }
   rivalHazardLaneAt(): null { return null; }
 
   cablePassLateralMeters(): number { return Number.NaN; }

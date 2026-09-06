@@ -1,0 +1,214 @@
+{
+  "script": "scripts/visual/ascension/report-carry-overs.py",
+  "measurementScripts": [
+    "scripts/visual/ascension/instrument.mjs",
+    "scripts/visual/ascension/race.mjs",
+    "scripts/visual/ascension/powers.mjs",
+    "scripts/measure-ascension-driving.mjs",
+    "scripts/validate-ascension-events.mjs",
+    "scripts/visual/ascension/check-road-floor.py"
+  ],
+  "runs": [
+    {
+      "name": "trench",
+      "lapsMs": [
+        29975,
+        28100,
+        27983
+      ],
+      "peakTotalDraws": 124,
+      "peakMainTriangles": 213808,
+      "p95Ms": 9.600000023841858,
+      "egretsAtFinish": {
+        "tick": 10358,
+        "risenLap": 3,
+        "riseTick": 9125,
+        "launched": true,
+        "launchAge": 17.541666666666668,
+        "firstBirdPosition": [
+          68.2812728881836,
+          91.0293960571289,
+          277.7879638671875
+        ]
+      },
+      "windows": [
+        {
+          "name": "calibration intervals",
+          "seconds": 0.969,
+          "expectedHz": 123.83900928792569,
+          "expected": 120,
+          "observed": 120,
+          "residual": 0
+        },
+        {
+          "name": "all recorded renders including startup",
+          "seconds": 114.03339999997615,
+          "expectedHz": 123.83900928792569,
+          "expected": 14121.783281730792,
+          "observed": 11109,
+          "residual": -3012.7832817307917
+        },
+        {
+          "name": "active render intervals",
+          "seconds": 85.32510000002384,
+          "expectedHz": 123.83900928792569,
+          "expected": 10566.575851396141,
+          "observed": 10531,
+          "residual": -35.57585139614093
+        },
+        {
+          "name": "tail render intervals",
+          "seconds": 5.847299999952316,
+          "expectedHz": 123.83900928792569,
+          "expected": 724.1238390033827,
+          "observed": 720,
+          "residual": -4.123839003382727
+        }
+      ]
+    },
+    {
+      "name": "deluge",
+      "lapsMs": [
+        33408,
+        29992,
+        29867
+      ],
+      "peakTotalDraws": 127,
+      "peakMainTriangles": 207152,
+      "p95Ms": 8.600000023841858,
+      "egretsAtFinish": {
+        "tick": 11218,
+        "risenLap": 3,
+        "riseTick": 9982,
+        "launched": true,
+        "launchAge": 24.708333333333332,
+        "firstBirdPosition": [
+          68.27172088623047,
+          91.03645324707031,
+          277.7879638671875
+        ]
+      },
+      "windows": [
+        {
+          "name": "calibration intervals",
+          "seconds": 0.9645999999046325,
+          "expectedHz": 124.40389800110313,
+          "expected": 120,
+          "observed": 120,
+          "residual": 0
+        },
+        {
+          "name": "all recorded renders including startup",
+          "seconds": 120.58880000007153,
+          "expectedHz": 124.40389800110313,
+          "expected": 15001.716775284323,
+          "observed": 12006,
+          "residual": -2995.7167752843234
+        },
+        {
+          "name": "active render intervals",
+          "seconds": 92.49289999997616,
+          "expectedHz": 124.40389800110313,
+          "expected": 11506.477297423266,
+          "observed": 11429,
+          "residual": -77.47729742326555
+        },
+        {
+          "name": "tail render intervals",
+          "seconds": 5.817600000023842,
+          "expectedHz": 124.40389800110313,
+          "expected": 723.7321170141836,
+          "observed": 720,
+          "residual": -3.7321170141835864
+        }
+      ]
+    },
+    {
+      "name": "trench-reduced",
+      "lapsMs": [
+        29975,
+        28100,
+        27983
+      ],
+      "peakTotalDraws": 124,
+      "peakMainTriangles": 213808,
+      "p95Ms": 8.5,
+      "egretsAtFinish": {
+        "tick": 10354,
+        "risenLap": 3,
+        "riseTick": 9125,
+        "launched": true,
+        "launchAge": 17.508333333333333,
+        "firstBirdPosition": [
+          68.14044952392578,
+          91.1500015258789,
+          277.7879638671875
+        ]
+      },
+      "windows": [
+        {
+          "name": "calibration intervals",
+          "seconds": 0.9682999999523163,
+          "expectedHz": 123.92853455118184,
+          "expected": 120,
+          "observed": 120,
+          "residual": 0
+        },
+        {
+          "name": "all recorded renders including startup",
+          "seconds": 113.57479999995232,
+          "expectedHz": 123.92853455118184,
+          "expected": 14075.158525937659,
+          "observed": 11113,
+          "residual": -2962.158525937659
+        },
+        {
+          "name": "active render intervals",
+          "seconds": 85.28709999990463,
+          "expectedHz": 123.92853455118184,
+          "expected": 10569.50531910828,
+          "observed": 10537,
+          "residual": -32.50531910828067
+        },
+        {
+          "name": "tail render intervals",
+          "seconds": 5.806699999928474,
+          "expectedHz": 123.92853455118184,
+          "expected": 719.6158215694835,
+          "observed": 720,
+          "residual": 0.38417843051649925
+        }
+      ]
+    }
+  ],
+  "before": {
+    "checkpoint": "5a2db83",
+    "peakTotalDraws": 119,
+    "source": "art/evidence/ascension-v1/phase-c/trench/metrics.json"
+  },
+  "afterPeakTotalDraws": 127,
+  "headroomTo145": 18,
+  "roadSamples": 32,
+  "roadSampling": "8 sectors \u00d7 4 frozen states = 32 discrete samples; no temporal rate. Base recorded before floors were pinned.",
+  "chain": [
+    {
+      "tick": 1989,
+      "lap": 1,
+      "absorbedAt": 1976,
+      "rewardTicks": 60
+    }
+  ],
+  "chainCaptureReconciliation": {
+    "windowMs": 4148,
+    "expectedRateHz": 10,
+    "expectedSamples": 41.48,
+    "observedSamples": 7,
+    "residual": -34.48
+  },
+  "scopeNotes": [
+    "The full demos now use player powers, so their lap times are not compared as pure route savings. The isolated matched-input fork measurement still saves 3.525 seconds on every lap.",
+    "The low crawler card is an inspection view; the deck still limits tread visibility in the driving view.",
+    "The live final bird state reaches lap three; the every-lap trigger is implemented in source. The separate frozen scatter card is not a live per-lap classification.",
+    "Human art acceptance is not inferred from these numeric checks."
+  ]
+}

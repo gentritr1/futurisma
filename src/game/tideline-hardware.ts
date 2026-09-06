@@ -1,9 +1,9 @@
 import * as THREE from 'three';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
 
-export function hardwareAtlas(role: 'metal'|'signage'|'emissive'): THREE.Texture | null {
+export function hardwareAtlas(role: 'metal'|'signage'|'emissive',root='/assets/power-kit-v2/textures'): THREE.Texture | null {
   if(typeof Image==='undefined')return null;
-  const texture=new THREE.TextureLoader().load(`/assets/power-kit-v2/textures/${role}.jpg`);
+  const texture=new THREE.TextureLoader().load(`${root}/${role}.jpg`);
   texture.colorSpace=THREE.SRGBColorSpace;texture.anisotropy=4;return texture;
 }
 export function atlasTile(geometry: THREE.BufferGeometry,tile:number): THREE.BufferGeometry {

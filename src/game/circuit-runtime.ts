@@ -21,7 +21,7 @@ export async function createCircuitRuntime(course: RaceCourse, input: InputContr
     runtime = new TidelineRuntime(course as TidelineCourse, input, audio, ui, reducedMotion);
   } else if(course.kind === "ascension") {
     const {AscensionRuntime}=await import("./ascension-runtime");if(cancelled())return null;
-    runtime=new AscensionRuntime(course as import("./ascension-course").AscensionCourse,input);
+    runtime=new AscensionRuntime(course as import("./ascension-course").AscensionCourse,input,audio,ui);
   } else return null;
   await runtime.ready;
   if (cancelled()) { runtime.dispose(); return null; }

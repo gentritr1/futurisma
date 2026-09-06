@@ -1,0 +1,16 @@
+import assert from 'node:assert/strict';
+import {writeFileSync,mkdirSync} from 'node:fs';
+import {PolaritySimulation} from '../src/game/polarity-simulation.js';
+import {ASCENSION_ABILITY_CONFIG as config,ascensionFieldAt} from '../src/game/ascension-powers-config.js';
+import {TidelinePowerChain} from '../src/game/tideline-power-chain.js';
+const trench=new PolaritySimulation(config,3868938316),surface=new PolaritySimulation(config,3868938316);
+for(const s of [trench,surface])s.state.progress=.544;
+trench.step(.546,-6,1,[true,true,true,true]);surface.step(.546,-6,1,[true,false,true,true]);
+assert.equal(trench.heldPowerKind,'shield');assert.equal(surface.heldPowerKind,null);
+assert.ok(ascensionFieldAt(.575,-6,2600,true));assert.equal(ascensionFieldAt(.575,-6,2600,false),undefined);
+assert.ok(ascensionFieldAt(.935,0,2600,false));
+trench.requestPower();const chain=new TidelinePowerChain();assert.equal(trench.onShieldImpact('trench-exit'),.18);chain.absorb(trench.state.tick);
+assert.equal(trench.onShieldImpact('trench-exit'),0);
+trench.advanceTicks(13);trench.state.heldPower='surge';trench.state.heldCharge=1;
+const result=chain.request(trench,.624);assert.ok(result.chain);assert.equal(chain.events[0].rewardTicks,60);assert.equal(trench.state.lane,0);
+const out=process.argv.find(a=>a.startsWith('--out='))?.slice(6)??'art/evidence/ascension-v1/phase-c-revision/carry-overs/power-validation.json';mkdirSync(out.slice(0,out.lastIndexOf('/')),{recursive:true});writeFileSync(out,JSON.stringify({script:'scripts/validate-ascension-powers.mjs',branchPickupGating:true,fields:2,oneRefundPerLap:true,chainRewardTicks:60,chainRewardSeconds:60/120,gravity:false,note:'Discrete rule assertions, not sampled time windows. Live E and CHAIN evidence is separate.'},null,2));console.log('Ascension power rules passed');

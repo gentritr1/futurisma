@@ -1,22 +1,26 @@
 import * as THREE from 'three';
 import {refractingSurface,captureRefraction} from './tideline-refraction';
-import type {TidelineCourse} from './tideline-course';
+import type {RaceCourse} from './course';
 import {TIDELINE_FIELDS} from './tideline-rules.js';
 import {atlasTile,hardwareAtlas,hardwareMaterial,HardwareBatch} from './tideline-hardware';
 interface Door {root:THREE.Group;membrane:THREE.Mesh;lamps:THREE.InstancedMesh;droplets:THREE.InstancedMesh;burstAt:number;clock:{value:number}}
 export class TidelineBulkheads {
  readonly root=new THREE.Group();readonly doors:Door[]=[];
  private readonly pose=new THREE.Object3D();private readonly color=new THREE.Color();
- constructor(private readonly course:TidelineCourse) {
+ constructor(private readonly course:Pick<RaceCourse,'sample'|'length'>,private readonly fields:readonly {id:string,progress:number,lateral:number,halfWidth:number}[]=TIDELINE_FIELDS,atlasRoot?:string) {
   this.root.name='tideline_phase_bulkheads';
-  const steel=hardwareMaterial(hardwareAtlas('metal')),hazard=hardwareMaterial(hardwareAtlas('signage'));
-  for(const field of TIDELINE_FIELDS) {
+  const steel=hardwareMaterial(hardwareAtlas('metal',atlasRoot)),hazard=hardwareMaterial(hardwareAtlas('signage',atlasRoot));
+  for(const field of this.fields) {
    const s=course.sample(field.progress),root=new THREE.Group();root.name=`bulkhead_${field.id}`;
    root.position.copy(s.position).addScaledVector(s.right,field.lateral).addScaledVector(s.up,1.85);
    root.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(s.right,s.up,s.tangent.clone().negate()));
    const structure=new HardwareBatch();
    structure.add(atlasTile(new THREE.TorusGeometry(1.045,.085,5,32),1).scale(field.halfWidth,1.94,2));
    for(const side of [-1,1])structure.box(side*(field.halfWidth+.18),-.88,0,.35,2.15,.7);
+   for(let i=0;i<12;i++){const a=i*Math.PI/6,x=Math.cos(a)*field.halfWidth*1.06,y=Math.sin(a)*2.04;
+    structure.box(x,y,.14,.29,.22,.12,1);
+    for(const side of [-1,1])structure.add(atlasTile(new THREE.CylinderGeometry(.010,.013,.012,8).rotateX(Math.PI/2),1).translate(x+side*.12,y,.21));
+   }
    root.add(structure.mesh('bulkhead_pressure_flange',steel));
    const stripes=new THREE.Mesh(atlasTile(new THREE.RingGeometry(.96,1.10,32),3),hazard);stripes.scale.set(field.halfWidth,1.94,1);stripes.position.z=.18;stripes.name='bulkhead_iris_hazard_ring';root.add(stripes);
    const clock={value:0};
@@ -32,7 +36,7 @@ export class TidelineBulkheads {
  reset():void {for(const door of this.doors)door.burstAt=-100;}
  update(time:number,reduced:boolean,progress:number):void {
   for(const [index,door] of this.doors.entries()) {
-   const field=TIDELINE_FIELDS[index],distance=Math.abs(((field.progress-progress+1.5)%1)-.5)*this.course.length;
+   const field=this.fields[index],distance=Math.abs(((field.progress-progress+1.5)%1)-.5)*this.course.length;
    door.root.visible=distance<280;door.clock.value=reduced?0:time;
    const age=time-door.burstAt,burst=age>=0&&age<2.5;door.membrane.visible=!burst;
    for(let i=0;i<12;i++){
