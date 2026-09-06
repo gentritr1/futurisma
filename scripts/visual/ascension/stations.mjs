@@ -8,8 +8,8 @@ const selected=process.argv.find(a=>a.startsWith('--sectors='))?.slice(10).split
 const boardsOnly=process.argv.includes('--boards-only');
 const browser=await launchReviewBrowser(),records=boardsOnly?JSON.parse(readFileSync(out+'/capture.json')).records.filter(r=>!r.board):[],errors=[];
 try{
- const page=await browser.newPage();page.on('pageerror',e=>errors.push(String(e)));
- const phases=process.argv.includes('--trench-tour')?[['base',0]]:[['base',0],['test',schedule.testTick+120],['launch',schedule.launchTick+120],['reopened',schedule.reopenTick+120]];
+ const page=await browser.newPage();page.on('pageerror',e=>errors.push(String(e)));page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
+ const phases=(process.argv.includes('--trench-tour')||process.argv.includes('--base-only'))?[['base',0]]:[['base',0],['test',schedule.testTick+120],['launch',schedule.launchTick+120],['reopened',schedule.reopenTick+120]];
  const stations=route.districts.map((d,i)=>({id:d.id,progress:(d.from+(route.districts[i+1]?.from??1))/2}));stations.push({id:'TRENCH',progress:(route.shortcut.from+route.shortcut.to)/2,trench:true});
  if(process.argv.includes('--trench-tour')){stations.length=0;for(let i=0;i<10;i++)stations.push({id:'TRENCH_'+String(i).padStart(2,'0'),progress:route.shortcut.from+(route.shortcut.to-route.shortcut.from)*(i+.5)/10,trench:true});const zones=JSON.parse(readFileSync('public/assets/ascension/trench-zones.json'));for(const [i,transition] of zones.transitions.entries())stations.push({id:'TRANSITION_'+i,progress:transition.progress,trench:true,transition:true});}
  if(selected){for(let i=stations.length-1;i>=0;i--)if(!selected.includes(stations[i].id))stations.splice(i,1);}

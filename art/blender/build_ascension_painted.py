@@ -311,25 +311,8 @@ for i in range(0,route['count'],21):
    place('street-lamp',beside(u,side*(s['width']/2+3)),math.atan2(-t.x,-t.z),sector=s['sector'])
   # Mangroves use instanced camera-facing Greenwater canopy cards at runtime.
 for i in range(12):place('egret-card-set',beside(.72+i*.004,22)+Vector((0,8+i%3,0)),i*.5,sector='MANGROVE_CUT')
-# Estuary water and apron shoulders have real world surfaces below the race deck.
-a=Asset('estuary-water',materials)
-for x in range(-1088,1088,64):
- for z in range(-1088,1088,64):
-  # The raised estuary surrounds the low piers; the excavated inland trench stays dry.
-  estuary=min(math.hypot(x+32-st['p'][0],z+32-st['p'][2]) for st in route['stations'][int(route['count']*.67):int(route['count']*.9)])<300
-  beside_trench=min(math.hypot(x+32-st['p'][0],z+32-st['p'][2]) for st in route['shortcut']['stations'])<65
-  y=-4.3 if estuary and not beside_trench else -18.3
-  a.geometry([(x,y,z),(x,y,z+64),(x+64,y,z+64),(x+64,y,z)],[(0,1,2,3)],'water',0)
-save(a,['painted estuary water']);place('estuary-water',(0,0,0),sector='ESTUARY')
-# Continuous apron shoulders follow the accepted bank without overlapping slabs.
-a=Asset('apron-slab',materials)
-for i in range(int(route['count']*.08),int(route['count']*.16)):
- points=[]
- for j in [i,i+1]:
-  st=route['stations'][j];right=Vector(st['t']).cross(up).normalized()
-  for side in [-1,1]:points.append(Vector(st['p'])+right*35*side-Vector((0,1.2,0)))
- a.geometry(points,[(0,2,3,1)],'concrete',0)
-save(a,['continuous service apron shoulder']);place('apron-slab',(0,0,0),sector='APRON_SWEEP')
+# Estuary water and terrain use the shared runtime Lambert shader.
+# Continuous painted apron shoulders are authored with the runtime terrain.
 # Batch static surfaces by sector and material; moving hierarchies stay separate.
 bpy.context.view_layer.update();groups={}
 for root in list(world.children):

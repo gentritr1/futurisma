@@ -9,8 +9,8 @@
     "signage",
     "emissive"
   ],
-  "meshes": 102,
-  "triangles": 180078,
+  "meshes": 100,
+  "triangles": 177628,
   "placements": [
     {
       "asset": "rocket-platform",
@@ -2123,30 +2123,6 @@
       "scale": 1,
       "sector": "MANGROVE_CUT",
       "dynamic": false
-    },
-    {
-      "asset": "estuary-water",
-      "position": [
-        0,
-        0,
-        0
-      ],
-      "yaw": 0,
-      "scale": 1,
-      "sector": "ESTUARY",
-      "dynamic": false
-    },
-    {
-      "asset": "apron-slab",
-      "position": [
-        0,
-        0,
-        0
-      ],
-      "yaw": 0,
-      "scale": 1,
-      "sector": "APRON_SWEEP",
-      "dynamic": false
     }
   ],
   "features": {
@@ -2247,12 +2223,6 @@
       "cage",
       "glass",
       "base"
-    ],
-    "estuary-water": [
-      "painted estuary water"
-    ],
-    "apron-slab": [
-      "continuous service apron shoulder"
     ]
   },
   "maquettes": [
