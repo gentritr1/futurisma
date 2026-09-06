@@ -6,7 +6,8 @@ from pathlib import Path
 from mathutils import Vector,Matrix
 sys.path.insert(0,str(Path(__file__).parent))
 from ascension_mesh import Asset,coord,empty
-ROOT=Path(__file__).resolve().parents[2];OUT=ROOT/'public/assets/ascension';EVIDENCE=ROOT/'art/evidence/ascension-v1/phase-b'
+ROOT=Path(__file__).resolve().parents[2];OUT=ROOT/'public/assets/ascension';EVIDENCE=ROOT/'art/evidence/ascension-v1/phase-b-revision/build'
+EVIDENCE.mkdir(parents=True,exist_ok=True)
 bpy.ops.wm.read_factory_settings(use_empty=True);bpy.context.preferences.filepaths.save_version=0
 materials={}
 for role in ['concrete','metal','jungle','water','signage','emissive']:
@@ -265,22 +266,12 @@ for i in range(int(route['count']*.67),int(route['count']*.89),9):
  s=route['stations'][i];t=Vector(s['t']);place('mangrove-pier',Vector(s['p'])-Vector((0,.18,0)),math.atan2(-t.x,-t.z),scale=max(1,(s['width']+3)/26),sector=s['sector'])
 # Street lamps and mangrove silhouettes are authored geometry, outside the road.
 a=Asset('street-lamp',materials);a.beam((0,0,0),(0,7,0),.18);a.beam((0,7,0),(1.5,7,0),.18);a.lamp((1.5,6.5,0),.9);save(a,['metal mast','cantilever','cage','glass','base'])
-a=Asset('mangrove-tree',materials);a.cylinder((0,5,0),.7,10,'jungle',7,top_radius=.25,tile=1)
-for i in range(6):
- t=i*math.tau/6;a.beam((0,2,0),(math.cos(t)*2.5,-2,math.sin(t)*2.5),.3,'jungle',1);a.beam((0,7,0),(math.cos(t)*5,10,math.sin(t)*5),.25,'jungle',1)
- # Closed, flattened canopy lobes retain volume from chase height.
- cx,cz=math.cos(t)*4,math.sin(t)*4
- pts=[(cx+math.cos(j*math.tau/8)*r,y,cz+math.sin(j*math.tau/8)*r) for y,r in [(8.5,2.8),(10,4.2),(12,2.6) ] for j in range(8)]
- faces=[tuple(reversed(range(8))),tuple(range(16,24))]+[(k*8+j,k*8+(j+1)%8,(k+1)*8+(j+1)%8,(k+1)*8+j) for k in range(2) for j in range(8)]
- a.geometry(pts,faces,'jungle',0)
-save(a,['branching trunk','stilt roots','spread canopy','painted leaves','open silhouette'])
 for i in range(0,route['count'],21):
  s=route['stations'][i];u=i/route['count'];t=Vector(s['t'])
  for side in [-1,1]:
   if min(abs(u-route['shortcut']['from']),abs(u-route['shortcut']['to']))>.035:
    place('street-lamp',beside(u,side*(s['width']/2+3)),math.atan2(-t.x,-t.z),sector=s['sector'])
-  if .65<u<.91:
-   for offset in [30,47,66]:place('mangrove-tree',Vector((beside(u,side*offset).x,1,beside(u,side*offset).z)),i*.73,2.5+(i%3)*.2,sector=s['sector'])
+  # Mangroves use instanced camera-facing Greenwater canopy cards at runtime.
 for i in range(12):place('egret-card-set',beside(.72+i*.004,22)+Vector((0,8+i%3,0)),i*.5,sector='MANGROVE_CUT')
 # Estuary water and apron shoulders have real world surfaces below the race deck.
 a=Asset('estuary-water',materials)
