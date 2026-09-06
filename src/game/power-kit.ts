@@ -104,8 +104,8 @@ export class PowerKit {
   private readonly instances = new Set<PowerKitVisual>();
   private disposed = false;
 
-  static async load(pumpWorks = false): Promise<PowerKit> {
-    const gltf = await new GLTFLoader().loadAsync(pumpWorks ? PUMP_POWER_KIT_URL : POWER_KIT_URL);
+  static async load(pumpWorks = false, assetUrl?:string): Promise<PowerKit> {
+    const gltf = await new GLTFLoader().loadAsync(assetUrl ?? (pumpWorks ? PUMP_POWER_KIT_URL : POWER_KIT_URL));
     try {
       const Batch = pumpWorks ? (await import("./tideline-device-batch")).TidelineDeviceBatch : null;
       return new PowerKit(gltf.scene, Batch ? (root,lamp) => new Batch(root,lamp) : undefined);

@@ -1,0 +1,78 @@
+# Ascension Pad — Phase B working art
+
+**Not accepted.** The painted trench does not yet sustain the accepted long fork, and focal fidelity remains below the brief. See [every open gap](OPEN-GAPS.md) and the [focal comparisons](focal/review.html). No Phase C completion is claimed.
+
+## Executed and observed
+
+- Built the eleven focal assets and repaired device kit in Blender. The six runtime atlases are documented in `atlas-provenance.json`: four newly generated painted sources and two retained shared atlases. Source sheets, secondary heroes, material-ID passes, exact prompts and returned artifact IDs are in `art/references/ascension/generation.json`. No Higgsfield connection was used.
+- Maquettes were imported for silhouette comparison, measured, and removed before export. `model-build.json` names the removed objects and hashes the inputs; `painted-validation.json` checks the exported structure. This does not establish focal acceptance.
+- Branch labeling comes from actual shortcut occupancy. `trench/branch-hud-live.png` shows TRENCH; `deluge/branch-hud-live.png` shows DELUGE ROAD. Each companion JSON records the running HUD and course state. `validate-ascension-branch-label.mjs` separately exercises both projections.
+- The route and schedule files are byte-identical to approved `2ebd9d5`, checked by `report-phase-b.py`. The accepted fork was not shortened.
+- Device close-ups are `focal/surge.png` and `focal/shield.png`. `launch-lamp-housing.png` shows the physical frame, recessed lens and small fasteners. Full cradle and CHAIN acceptance remains open.
+
+### Racing and budget observations
+
+All values below come from `scripts/visual/ascension/race.mjs` and `instrument.mjs`, at 1280×720. Render rate is independently calibrated; physics remains 120 Hz. No race imported-source edits were made during the final runs. Host scheduling was not isolated.
+
+| Run | Lap times, ms | Main / shadow / total peak draws | Main / shadow peak triangles | p95, ms |
+|---|---|---|---|---|
+| trench | [30108, 28508, 28383] | 125 / 17 / 142 | 217838 / 23624 | 8.400 |
+| deluge | [33958, 31300, 31308] | 112 / 17 / 129 | 184154 / 23624 | 8.400 |
+| trench-reduced | [30108, 28508, 28383] | 125 / 17 / 142 | 217838 / 23624 | 8.400 |
+
+All final runs recorded zero missed gates, recoveries, console errors and material-walk violations. The reduced-motion lap times match the normal trench run. The material walk includes hidden meshes; only the two sky shaders are exempt from distance fog. Their horizon haze remains enabled.
+
+The approved Phase A trench baseline (`phase-a/trench/metrics.json`, same measurement scripts) was 54 main + 17 shadow = 71 total peak draws, 59,418 main triangles and 23,624 shadow triangles. The current limits are 145 total draws and 220,000 main triangles. Main and shadow peaks are separately reported; total peak is measured per frame, not assumed to be the sum of independent peaks.
+
+The current mean whole-lap Deluge-minus-trench difference is 3.189 s, computed by `report-phase-b.py` from the final races. The isolated Phase A fork timing remains unchanged in its own evidence; this number is not substituted for it.
+
+### Sample reconciliation
+
+`reconcile-phase-b.py` checks all final and retained draft windows in `sample-reconciliation.json`. The table below reports final runs. Expected samples = measured window seconds × pre-start calibrated Hz; residual = observed − expected. These presentation residuals are not missing simulation ticks.
+
+| Run / window | Seconds × expected Hz | Expected | Observed | Residual |
+|---|---|---|---|---|
+| trench / active | 86.193400 × 124.584718 | 10738.380399 | 10683 | -55.380399 |
+| trench / p95 | 5.810500 × 124.584718 | 723.899502 | 720 | -3.899502 |
+| deluge / active | 95.781800 × 124.365219 | 11911.924552 | 11877 | -34.924552 |
+| deluge / p95 | 5.796600 × 124.365219 | 720.895430 | 720 | -0.895430 |
+| trench-reduced / active | 86.177100 × 124.249327 | 10707.446677 | 10679 | -28.446677 |
+| trench-reduced / p95 | 5.806000 × 124.249327 | 721.391592 | 720 | -1.391592 |
+
+The calibration itself uses 120 intervals over its recorded duration; its expected rate is 120 / duration. Static station, silhouette and focal captures are discrete samples, not frame-rate windows.
+
+### Luma, sky and geometry
+
+- `record-road-base.py` recorded 8 sectors × 4 static schedule states = 32 painted frames before `pin-road-floor.py --phase phase-b` ran. Both Phase A base/floor files remain untouched. `check-road-floor.py` compares all painted samples against the newly pinned per-sector floors. These currently contain no steam or deluge rendering.
+- `sky-profile.json`, produced by the inherited `sky-profile.py`, profiles all 4096 columns over the upper 768 rows of the 4096×1024 runtime panorama. Its source-resolution limitation is in OPEN-GAPS. `sky-turntable.mjs` captures 24 views × one frame per 15° plus 24 masks. `check-sky-frames.py` tests adjacent 10%-width windows in the top 22% of each frame, excluding geometry by mask; it reports coverage and tested pairs. The unmasked failure is retained because it incorrectly included foliage.
+- `validate-ascension-painted-corridor.mjs` casts 15,179 spatial rays at route stations and every 2 m across the road, from road + 0.15 m through the remaining 8.85 m. Zero hits were observed. This is static painted-environment evidence only, not a moving crawler or launch sweep.
+- `validate-ascension-painted.mjs` finds 201,194 triangles and 110 primitives in the world GLB and verifies the manifest, UV0, vertex tint, six allowed roles and named device roots. The two-device GLB has 3,788 triangles. These counts are structural checks, not visual acceptance.
+- `stations.mjs` captures both countdown boards at measured road-anchor distances of approximately 164.14 m and 163.73 m (`stations/capture.json`). The time is legible in the reviewed frames; the second housing is partly overlapped by foliage. No blind-reader pass is claimed.
+
+### Checks
+
+`npm test` completed with exit 0; `npm-test.log` retains the complete output. Missing Greenwater archive checks explicitly skipped. `validate:ascension` and `validate:ascension-runtime` pass, with their original Phase A scopes. New painted structure, static corridor and branch-label scripts pass. `git diff --check` passes.
+
+The existing runtime validator reconciles 120 seconds × 120 Hz = 14,400 simulation ticks at each tested render cadence. The existing blockout crawler sweep reports 2 directions × (6 seconds × 120 Hz + one inclusive endpoint) = 1,442 samples. Neither validates the future animated painted crawler.
+
+## Visual judgment and inference
+
+The focal assessment is my inspection of saved images, not an independent blind review. Shared details are named per asset in `focal/assessment.json`; most assets still need revision. The long trench has readable lane geometry and visible hardware, but repetition dominates. Its art gate remains open. Static clearance and unchanged lap times suggest the painted shell preserves the route, but cannot establish moving-event clearance or steam speed readability.
+
+## Reproduction and evidence index
+
+Before every Node command: `export PATH=$HOME/.nvm/versions/node/v20.19.4/bin:$PATH`. Run the dev server at `127.0.0.1:5200`. Browser scripts use their own Puppeteer-core headless Chrome and private debugging port; never the shared Browser pane.
+
+Main scripts:
+
+- `art/blender/build_ascension_painted.py` (Blender background build).
+- `scripts/visual/ascension/assets.mjs`, `focal-review.py`.
+- `scripts/visual/ascension/stations.mjs --phase-b` and `--phase-b --trench-tour`.
+- `scripts/visual/ascension/record-road-base.py`, `pin-road-floor.py --phase phase-b`, `check-road-floor.py` in that order.
+- `scripts/visual/tideline-v4/sky-profile.py public/assets/ascension/horizon.png art/evidence/ascension-v1/phase-b/sky-profile.json`.
+- `scripts/visual/ascension/sky-turntable.mjs`, `check-sky-frames.py`, `strip-closeup.mjs`.
+- `scripts/visual/ascension/race.mjs --phase-b --trench`; `--phase-b`; `--phase-b --trench --reduced`.
+- `scripts/validate-ascension-painted.mjs`, `validate-ascension-painted-corridor.mjs`, `validate-ascension-branch-label.mjs`.
+- `scripts/visual/ascension/reconcile-phase-b.py`, `report-phase-b.py`, `evidence-index.py`.
+
+`evidence-index.json` lists every evidence file and its SHA-256. Race JSON files additionally hash the runtime inputs. Draft folders preserve earlier captures and superseded measurements; final run folders are `trench`, `deluge`, `trench-reduced`.

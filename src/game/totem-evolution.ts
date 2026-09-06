@@ -42,10 +42,10 @@ export class TotemEvolution {
   private powerMounts: THREE.InstancedMesh | null = null;
   private surgeConduit: THREE.InstancedMesh | null = null;
 
-  static async load(pumpWorks = false): Promise<TotemEvolution> {
+  static async load(pumpWorks = false, powerKitUrl?:string): Promise<TotemEvolution> {
     const {PowerKit}=await import("./power-kit");
     const [assetResult, kitResult] = await Promise.allSettled([
-      new GLTFLoader().loadAsync(TOTEM_EVOLUTION_URL), PowerKit.load(pumpWorks),
+      new GLTFLoader().loadAsync(TOTEM_EVOLUTION_URL), PowerKit.load(pumpWorks,powerKitUrl),
     ]);
     if (assetResult.status === "rejected") {
       if (kitResult.status === "fulfilled") kitResult.value.dispose();

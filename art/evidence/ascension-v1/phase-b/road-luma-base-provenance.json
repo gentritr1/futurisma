@@ -1,0 +1,19 @@
+{
+  "script": "scripts/visual/ascension/record-road-base.py",
+  "measurementScript": "scripts/visual/frame-metrics.py",
+  "captureScript": "scripts/visual/ascension/stations.mjs",
+  "samples": 32,
+  "sampling": "One road patch at each discrete sector/schedule station; not a timed sample window.",
+  "patches": {
+    "under": {
+      "x": 640,
+      "y": 430
+    },
+    "between": {
+      "x": 640,
+      "y": 455
+    }
+  },
+  "blockoutPreserved": "../phase-a/road-luma-base.json",
+  "paintedGeometrySha256": "e0d2be5aa28be8a35f1729cfcd1368b234c34114d2d566ddc9272a40974ec384"
+}

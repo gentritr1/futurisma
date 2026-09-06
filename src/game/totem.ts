@@ -790,7 +790,7 @@ export class TotemVehicle {
     this.root.add(this.visual);
   }
 
-  async load(url: string, effectsAtlasUrl: string, pumpWorks = false): Promise<void> {
+  async load(url: string, effectsAtlasUrl: string, pumpWorks = false, powerKitUrl?:string): Promise<void> {
     const [gltfResult, atlasResult] = await Promise.allSettled([
       new GLTFLoader().loadAsync(url),
       new THREE.TextureLoader().loadAsync(effectsAtlasUrl),
@@ -864,7 +864,7 @@ export class TotemVehicle {
     // The original mesh capture above remains the rival asset contract. This
     // separate assembly belongs only to the player and follows scene disposal.
     try {
-      this.evolution = await TotemEvolution.load(pumpWorks);
+      this.evolution = await TotemEvolution.load(pumpWorks,powerKitUrl);
       applyPs2MaterialTreatment(this.evolution.root);
       this.model.add(this.evolution.root);
     } catch (error) {

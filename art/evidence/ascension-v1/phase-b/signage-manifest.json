@@ -1,0 +1,93 @@
+{
+  "script": "scripts/visual/ascension/signage-manifest.py",
+  "atlas": "public/assets/ascension/textures/signage.jpg",
+  "atlasSha256": "99ed7c6e2673e149abfdf096e2205e4f8df09d8201e0b713112396ba3db2fdff",
+  "nonBoardHeights": "Conservative authored bounds; not a pixel OCR measurement.",
+  "entries": [
+    {
+      "text": "09",
+      "asset": "rocket-platform",
+      "uv": [
+        0.012,
+        0.585,
+        0.488,
+        0.985
+      ],
+      "panelMetres": [
+        0.78,
+        0.78
+      ],
+      "maximumLetterHeightMetres": 0.59
+    },
+    {
+      "text": "CT-2",
+      "asset": "crawler-transporter",
+      "uv": [
+        0.512,
+        0.585,
+        0.988,
+        0.985
+      ],
+      "panelMetres": [
+        1.8,
+        1.1
+      ],
+      "maximumLetterHeightMetres": 0.4
+    },
+    {
+      "text": "TRENCH 2",
+      "asset": "trench-wall-module",
+      "uv": [
+        0.012,
+        0.012,
+        0.488,
+        0.488
+      ],
+      "panelMetres": [
+        2.4,
+        2.4
+      ],
+      "maximumLetterHeightMetres": 0.59
+    },
+    {
+      "text": "S-07",
+      "asset": "power-kit / surge",
+      "uv": [
+        0.012,
+        0.505,
+        0.488,
+        0.567
+      ],
+      "maximumLetterHeightMetres": 0.2
+    },
+    {
+      "text": "P-12",
+      "asset": "power-kit / shield",
+      "uv": [
+        0.512,
+        0.505,
+        0.988,
+        0.567
+      ],
+      "maximumLetterHeightMetres": 0.2
+    },
+    {
+      "text": "SURGE",
+      "asset": "two launch strips",
+      "source": "src/game/ascension-road-signals.ts",
+      "maximumLetterHeightMetres": 0.59
+    },
+    {
+      "text": "T\u2212MM:SS / PAD 09 / TRENCH OPEN or TRENCH CLOSED / DELUGE ROAD",
+      "asset": "countdown boards 1 and 2",
+      "source": "src/game/ascension-runtime.ts",
+      "gameplaySizeException": true,
+      "displayMetres": [
+        26.4,
+        7
+      ],
+      "clockLetterHeightMetres": 3.828125,
+      "statusLetterHeightMetres": 1.50390625
+    }
+  ]
+}

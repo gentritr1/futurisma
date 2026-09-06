@@ -88,9 +88,11 @@ export class AscensionCourse implements RaceCourse {
       this.turns.push({ from, to: route.stations[i].d, radius: 1 / peak,
         direction: sign < 0 ? "RIGHT" : "LEFT" });
     }
-    const roadParts=new THREE.Group();roadParts.add(this.createStreet(),this.createFurniture(),this.createBranchRoad());roadParts.updateMatrixWorld(true);
+    const roadParts=new THREE.Group(),furniture=this.createFurniture();
+    const kerbs=furniture.getObjectByName('ascension_solid_road_kerbs')!;kerbs.removeFromParent();this.group.add(kerbs);
+    roadParts.add(furniture);roadParts.updateMatrixWorld(true);
     const meshes:THREE.Mesh[]=[];roadParts.traverse(object=>{if(object instanceof THREE.Mesh)meshes.push(object);});
-    this.group.add(flatIdBatch(meshes,'ascension_static_road_ids'));
+    this.group.add(flatIdBatch(meshes,'ascension_static_road_ids'),this.createStreet(),this.createBranchRoad());
     for(const mesh of meshes){mesh.geometry.dispose();for(const material of Array.isArray(mesh.material)?mesh.material:[mesh.material])material.dispose();}
     this.gates = this.createGates();
     this.group.add(this.gates);
@@ -290,7 +292,9 @@ export class AscensionCourse implements RaceCourse {
   cablePassLateralMeters(): number { return Number.NaN; }
   boostPadLaneAt(): null { return null; }
   isOnBoostPad(): boolean { return false; }
-  sectorLabelAt(progress: number): string { return route.districts[this.district(progress)].name; }
+  sectorLabelAt(progress: number): string {
+    return this.occupiedTrench ? "TRENCH" : route.districts[this.district(progress)].name;
+  }
   musicAt(progress: number): MusicProfile { return MUSIC[this.district(progress) % MUSIC.length]; }
   audioZoneAt(_progress: number): AudioZone { return this.occupiedTrench ? "underpass" : "open"; }
   updateAtmosphere(elapsed: number, reducedMotion: boolean): boolean {
@@ -324,6 +328,25 @@ export class AscensionCourse implements RaceCourse {
     if (this.gates.instanceColor) this.gates.instanceColor.needsUpdate = true;
   }
 
+  private createRoadMaterial(): THREE.MeshLambertMaterial {
+    const material=new THREE.MeshLambertMaterial({color:0xffffff});
+    if(typeof Image!=='undefined') {
+      const map=new THREE.TextureLoader().load('/assets/ascension/textures/concrete.jpg');
+      map.colorSpace=THREE.SRGBColorSpace;map.anisotropy=8;material.map=map;
+      material.onBeforeCompile=shader=>{
+        shader.fragmentShader=shader.fragmentShader.replace('#include <map_fragment>',`
+          #ifdef USE_MAP
+          vec2 continuousUv=vec2(clamp(vMapUv.x,0.,1.),vMapUv.y/12.);
+          vec2 roadUv=vec2(continuousUv.x,fract(continuousUv.y));
+          vec4 sampledDiffuseColor=textureGrad(map,vec2(.512,.012)+roadUv*.476,dFdx(continuousUv)*.476,dFdy(continuousUv)*.476);
+          diffuseColor*=sampledDiffuseColor;
+          #endif`);
+      };
+      material.customProgramCacheKey=()=> 'ascension-painted-road-v1';
+    }
+    return material;
+  }
+
   private createStreet(): THREE.Mesh {
     const positions:number[] = [], colors:number[] = [], uvs:number[] = [], indices:number[] = [];
     for (let i = 0; i <= route.count; i++) {
@@ -345,8 +368,8 @@ export class AscensionCourse implements RaceCourse {
     geometry.setAttribute("uv",new THREE.Float32BufferAttribute(uvs,2));
     geometry.setIndex(indices);
     geometry.computeVertexNormals();
-    const material=new THREE.MeshLambertMaterial({color:0x9e9e8a,vertexColors:true});
-    const mesh=new THREE.Mesh(geometry,material); mesh.name="ascension_blockout_concrete_road";
+    const material=this.createRoadMaterial();
+    const mesh=new THREE.Mesh(geometry,material); mesh.name="ascension_painted_concrete_road";
     return mesh;
   }
 
@@ -358,8 +381,18 @@ export class AscensionCourse implements RaceCourse {
     }
     const kerbs = new THREE.InstancedMesh(new THREE.BoxGeometry(.65, .45, 6.8),
       new THREE.MeshLambertMaterial({ color: 0x6a8185 }), distances.length * 2);
-    const lamps = new THREE.InstancedMesh(new THREE.BoxGeometry(.18, .07, 1.3),
-      new THREE.MeshLambertMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: .35 }), distances.length * 2);
+    if(typeof Image!=='undefined'){
+      const texture=new THREE.TextureLoader().load('/assets/ascension/textures/signage.jpg');texture.colorSpace=THREE.SRGBColorSpace;texture.anisotropy=8;
+      (kerbs.material as THREE.MeshLambertMaterial).map=texture;(kerbs.material as THREE.MeshLambertMaterial).color.set(0xffffff);
+      const uv=kerbs.geometry.getAttribute('uv');for(let i=0;i<uv.count;i++)uv.setXY(i,.512+uv.getX(i)*.476,.012+uv.getY(i)*.476);
+    }
+    const lamps = new THREE.InstancedMesh(new THREE.PlaneGeometry(.18,1.1).rotateX(-Math.PI/2),
+      new THREE.MeshLambertMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: .35 }), Math.ceil(distances.length/2) * 2);
+    const housingParts=[new THREE.BoxGeometry(.12,.16,1.5).translate(-.15,0,0),new THREE.BoxGeometry(.12,.16,1.5).translate(.15,0,0),new THREE.BoxGeometry(.18,.16,.2).translate(0,0,-.65),new THREE.BoxGeometry(.18,.16,.2).translate(0,0,.65)];
+    const housingSource=housingParts.map(geometry=>new THREE.Mesh(geometry,new THREE.MeshLambertMaterial({color:0x555846})));
+    const housingGeometry=flatIdBatch(housingSource,'deck_lamp_frame').geometry;
+    const housings=new THREE.InstancedMesh(housingGeometry,new THREE.MeshLambertMaterial({color:0x555846}),Math.ceil(distances.length/2)*2);
+    housings.name='ascension_recessed_deck_lamp_housings';lamps.name='ascension_recessed_deck_lamp_glass';
     const transform = new THREE.Object3D(), basis = new THREE.Matrix4();
     const cyan = new THREE.Color(0xcda25f), amber = new THREE.Color(0xe8bc78);
     for (let i = 0; i < distances.length; i++) {
@@ -375,12 +408,17 @@ export class AscensionCourse implements RaceCourse {
         transform.quaternion.setFromRotationMatrix(basis); transform.updateMatrix();
         kerbs.setMatrixAt(i * 2 + sideIndex, transform.matrix);
         transform.position.addScaledVector(sample.up, .26); transform.updateMatrix();
-        lamps.setMatrixAt(i * 2 + sideIndex, transform.matrix);
-        lamps.setColorAt(i * 2 + sideIndex, sample.position.y < -2 ? cyan : amber);
+        if(i%2===0){
+          const lampIndex=Math.floor(i/2)*2+sideIndex;
+          lamps.setMatrixAt(lampIndex,transform.matrix);
+          transform.position.addScaledVector(sample.up,.035);transform.updateMatrix();
+          housings.setMatrixAt(lampIndex,transform.matrix);
+          lamps.setColorAt(lampIndex,sample.position.y < -2 ? cyan : amber);
+        }
       }
     }
     kerbs.name = "ascension_solid_road_kerbs";
-    group.add(kerbs, lamps);
+    group.add(kerbs, housings, lamps);
     return group;
   }
 
@@ -397,7 +435,7 @@ export class AscensionCourse implements RaceCourse {
     }
     const geometry=new THREE.BufferGeometry();geometry.setAttribute("position",new THREE.Float32BufferAttribute(vertices,3));
     geometry.setAttribute("uv",new THREE.Float32BufferAttribute(uvs,2));geometry.setIndex(indices);geometry.computeVertexNormals();
-    const mesh=new THREE.Mesh(geometry,new THREE.MeshLambertMaterial({color:0x8d8a77}));
+    const mesh=new THREE.Mesh(geometry,this.createRoadMaterial());
     mesh.name="ascension_trench_road";return mesh;
   }
   private createGates(): THREE.InstancedMesh {

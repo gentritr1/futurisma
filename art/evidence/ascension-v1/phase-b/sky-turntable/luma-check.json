@@ -1,0 +1,178 @@
+{
+  "script": "scripts/visual/ascension/check-sky-frames.py",
+  "maskScript": "scripts/visual/ascension/review.ts?skyMask=1",
+  "region": "Top 22% of frame, geometry excluded by companion mask; each tested 10%-width window must contain at least 25% unobscured sky pixels. Occluded sky is not measured.",
+  "expectedDiscreteFrames": 24,
+  "actualFrames": 24,
+  "pass": true,
+  "rows": [
+    {
+      "file": "00.png",
+      "visibleSkyFractionInBand": 0.4869214794303797,
+      "testedAdjacentWindowPairs": 442,
+      "adjacentTenPercentWindowLumaRatio": 1.0135514208577852,
+      "pass": true
+    },
+    {
+      "file": "01.png",
+      "visibleSkyFractionInBand": 0.45468255537974683,
+      "testedAdjacentWindowPairs": 524,
+      "adjacentTenPercentWindowLumaRatio": 1.0099109330852551,
+      "pass": true
+    },
+    {
+      "file": "02.png",
+      "visibleSkyFractionInBand": 0.4395520174050633,
+      "testedAdjacentWindowPairs": 503,
+      "adjacentTenPercentWindowLumaRatio": 1.020325656120561,
+      "pass": true
+    },
+    {
+      "file": "03.png",
+      "visibleSkyFractionInBand": 0.47347211234177217,
+      "testedAdjacentWindowPairs": 547,
+      "adjacentTenPercentWindowLumaRatio": 1.032667273050598,
+      "pass": true
+    },
+    {
+      "file": "04.png",
+      "visibleSkyFractionInBand": 0.5908623417721519,
+      "testedAdjacentWindowPairs": 510,
+      "adjacentTenPercentWindowLumaRatio": 1.0284574701075444,
+      "pass": true
+    },
+    {
+      "file": "05.png",
+      "visibleSkyFractionInBand": 0.6670243275316455,
+      "testedAdjacentWindowPairs": 559,
+      "adjacentTenPercentWindowLumaRatio": 1.0395681409258704,
+      "pass": true
+    },
+    {
+      "file": "06.png",
+      "visibleSkyFractionInBand": 0.6169649920886076,
+      "testedAdjacentWindowPairs": 521,
+      "adjacentTenPercentWindowLumaRatio": 1.0397610000185196,
+      "pass": true
+    },
+    {
+      "file": "07.png",
+      "visibleSkyFractionInBand": 0.32775415348101267,
+      "testedAdjacentWindowPairs": 366,
+      "adjacentTenPercentWindowLumaRatio": 1.0294271660974432,
+      "pass": true
+    },
+    {
+      "file": "08.png",
+      "visibleSkyFractionInBand": 0.2899129746835443,
+      "testedAdjacentWindowPairs": 309,
+      "adjacentTenPercentWindowLumaRatio": 1.0415750258568057,
+      "pass": true
+    },
+    {
+      "file": "09.png",
+      "visibleSkyFractionInBand": 0.3016070015822785,
+      "testedAdjacentWindowPairs": 322,
+      "adjacentTenPercentWindowLumaRatio": 1.0384555735096515,
+      "pass": true
+    },
+    {
+      "file": "10.png",
+      "visibleSkyFractionInBand": 0.4017306170886076,
+      "testedAdjacentWindowPairs": 345,
+      "adjacentTenPercentWindowLumaRatio": 1.030362657377137,
+      "pass": true
+    },
+    {
+      "file": "11.png",
+      "visibleSkyFractionInBand": 0.46503164556962023,
+      "testedAdjacentWindowPairs": 378,
+      "adjacentTenPercentWindowLumaRatio": 1.0357922664327004,
+      "pass": true
+    },
+    {
+      "file": "12.png",
+      "visibleSkyFractionInBand": 0.29270668512658227,
+      "testedAdjacentWindowPairs": 204,
+      "adjacentTenPercentWindowLumaRatio": 1.0430695903791254,
+      "pass": true
+    },
+    {
+      "file": "13.png",
+      "visibleSkyFractionInBand": 0.19144086234177216,
+      "testedAdjacentWindowPairs": 187,
+      "adjacentTenPercentWindowLumaRatio": 1.040520181092597,
+      "pass": true
+    },
+    {
+      "file": "14.png",
+      "visibleSkyFractionInBand": 0.19160403481012658,
+      "testedAdjacentWindowPairs": 182,
+      "adjacentTenPercentWindowLumaRatio": 1.038062938977658,
+      "pass": true
+    },
+    {
+      "file": "15.png",
+      "visibleSkyFractionInBand": 0.2857545490506329,
+      "testedAdjacentWindowPairs": 174,
+      "adjacentTenPercentWindowLumaRatio": 1.0036332914561807,
+      "pass": true
+    },
+    {
+      "file": "16.png",
+      "visibleSkyFractionInBand": 0.4537776898734177,
+      "testedAdjacentWindowPairs": 365,
+      "adjacentTenPercentWindowLumaRatio": 1.0360404962474599,
+      "pass": true
+    },
+    {
+      "file": "17.png",
+      "visibleSkyFractionInBand": 0.4475474683544304,
+      "testedAdjacentWindowPairs": 362,
+      "adjacentTenPercentWindowLumaRatio": 1.0178824482802606,
+      "pass": true
+    },
+    {
+      "file": "18.png",
+      "visibleSkyFractionInBand": 0.40444026898734176,
+      "testedAdjacentWindowPairs": 492,
+      "adjacentTenPercentWindowLumaRatio": 1.0632233079886504,
+      "pass": true
+    },
+    {
+      "file": "19.png",
+      "visibleSkyFractionInBand": 0.3326789952531646,
+      "testedAdjacentWindowPairs": 362,
+      "adjacentTenPercentWindowLumaRatio": 1.021619812099481,
+      "pass": true
+    },
+    {
+      "file": "20.png",
+      "visibleSkyFractionInBand": 0.3591376582278481,
+      "testedAdjacentWindowPairs": 392,
+      "adjacentTenPercentWindowLumaRatio": 1.03335741059399,
+      "pass": true
+    },
+    {
+      "file": "21.png",
+      "visibleSkyFractionInBand": 0.43213508702531644,
+      "testedAdjacentWindowPairs": 404,
+      "adjacentTenPercentWindowLumaRatio": 1.0221755596233448,
+      "pass": true
+    },
+    {
+      "file": "22.png",
+      "visibleSkyFractionInBand": 0.4774970332278481,
+      "testedAdjacentWindowPairs": 297,
+      "adjacentTenPercentWindowLumaRatio": 1.0451255536562867,
+      "pass": true
+    },
+    {
+      "file": "23.png",
+      "visibleSkyFractionInBand": 0.4902294303797468,
+      "testedAdjacentWindowPairs": 335,
+      "adjacentTenPercentWindowLumaRatio": 1.026044171560478,
+      "pass": true
+    }
+  ]
+}

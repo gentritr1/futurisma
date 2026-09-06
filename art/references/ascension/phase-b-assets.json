@@ -1,0 +1,74 @@
+[
+  {
+    "id": "propellant-tank",
+    "description": "Propellant tank, 20 m diameter and 22 m tall: ONE off-white cylindrical tank with a shallow domed roof, TWO rust-red circumferential reinforcement bands, ONE olive vertical access ladder, ONE short bent vent at the roof, ONE rectangular olive repair plate, ONE amber caged glass lamp on a metal base at the ladder foot; round rivet-scale bolts, no other tanks.",
+    "where": "outside the Tank Farm left-right",
+    "details": [
+      "two rust-red bands",
+      "roof vent",
+      "ladder",
+      "repair plate",
+      "caged lamp"
+    ]
+  },
+  {
+    "id": "vent-stack",
+    "description": "Vent stack, 6 m wide and 26 m tall: ONE faceted rust-red exhaust pipe with a bent downwind elbow at the top, ONE square concrete plinth, TWO olive steel support collars, ONE ladder, ONE square mesh maintenance platform at 16 m with a low rail, ONE amber cage lamp with a glass lens and metal base on the platform. Small round rivets, no flames.",
+    "where": "beside the propellant tanks",
+    "details": [
+      "bent elbow",
+      "two collars",
+      "plinth",
+      "maintenance platform",
+      "ladder"
+    ]
+  },
+  {
+    "id": "crawlerway-gravel-bed",
+    "description": "Crawlerway gravel bed module 32 m long, 38 m wide, 2 m deep: ONE rectangular concrete viaduct deck, TWO parallel olive steel tread strips along its length separated by a broad gravel median, TWO raised concrete edge curbs, FOUR amber cage lamps with glass and metal bases along the curbs, ONE rust-red rectangular repair plate at one corner. The top is compacted pale grey gravel with darker shed stones along both strips. Structural deck only, no crawler and no support columns.",
+    "where": "on the raised crawler viaduct above the racing road",
+    "details": [
+      "two tread strips",
+      "gravel median",
+      "raised curbs",
+      "four cage lamps",
+      "repair plate"
+    ]
+  },
+  {
+    "id": "mangrove-pier",
+    "description": "Mangrove pier module, 24 m long, 26 m wide and 8 m high: ONE low stained concrete deck on FOUR square concrete piles, TWO low olive safety rails on its outer edges, ONE narrow maintenance ladder down the outside of the left rail, TWO amber cage lamps on short metal posts, ONE rust-red bolted repair plate on the side fascia. Swamp-green algae waterline around all piles. No trees attached; the pier is a standalone authored module.",
+    "where": "on the low estuary causeway through the Mangrove Cut",
+    "details": [
+      "four algae piles",
+      "low rails",
+      "ladder",
+      "two cage lamps",
+      "repair plate"
+    ]
+  },
+  {
+    "id": "egret-card-set",
+    "description": "Egret card set for an animated game bird, one original white egret 1 m tall with 1.5 m wingspan. Three consistent anatomical orthographic views FRONT SIDE TOP. ONE slender white body, ONE S-curved long neck, ONE yellow tapered beak, TWO thin black legs trailing, TWO white wings outstretched. Show the same single flying pose in all three views, no extra birds, no scenery, no labels beyond view labels and a correctly scaled one-metre bar. Keep feather shapes broad and readable as painted low-poly geometry.",
+    "where": "above the mangrove estuary beyond the racing corridor",
+    "details": [
+      "S-curved neck",
+      "yellow beak",
+      "black trailing legs",
+      "broad white wings",
+      "slim body"
+    ]
+  },
+  {
+    "id": "service-tower-swing-arm",
+    "description": "Service-tower swing arm, 18 m long, 3 m wide and 4 m tall: ONE olive rectangular truss bridge, THREE triangular brace bays along each side, ONE cylindrical vertical hinge at the tower end, ONE off-white flexible umbilical hose loop hanging from the rocket end, ONE rust-red repair plate at the central bay, ONE amber caged glass lamp with metal base at the rocket end, round rivet-scale bolts. No tower or rocket; the pivot must be isolated and visible for animation.",
+    "where": "high above the launch apron joining service tower to rocket",
+    "details": [
+      "three truss bays",
+      "cylindrical pivot",
+      "umbilical hose loop",
+      "repair plate",
+      "cage lamp"
+    ]
+  }
+]

@@ -1,0 +1,11 @@
+import assert from 'node:assert/strict';
+import {writeFileSync} from 'node:fs';
+import {sourceModule} from './visual/ascension/modules.mjs';
+const {AscensionCourse}=await import(await sourceModule('ascension-course.ts'));
+const course=new AscensionCourse(),progress=.4;
+course.project(course.sampleShortcut(progress).position,progress);
+assert.equal(course.sectorLabelAt(progress),'TRENCH');
+course.releaseTrench();course.project(course.sample(progress).position,progress);
+assert.equal(course.sectorLabelAt(progress),'DELUGE ROAD');
+const result={script:'scripts/validate-ascension-branch-label.mjs',progress,trench:'TRENCH',surface:'DELUGE ROAD',scope:'Actual course projection and HUD label source; rendered station proof is separate.'};
+writeFileSync('art/evidence/ascension-v1/phase-b/branch-label.json',JSON.stringify(result,null,2));console.log(result);
