@@ -2,8 +2,8 @@
 import argparse,importlib.util,json,hashlib
 from pathlib import Path
 spec=importlib.util.spec_from_file_location('frame_metrics','scripts/visual/frame-metrics.py');metrics=importlib.util.module_from_spec(spec);spec.loader.exec_module(metrics)
-parser=argparse.ArgumentParser();parser.add_argument('--phase',choices=['phase-a','phase-b'],default='phase-a');args=parser.parse_args()
-root=Path('art/evidence/ascension-v1')/args.phase
+parser=argparse.ArgumentParser();parser.add_argument('--phase',choices=['phase-a','phase-b'],default='phase-a');parser.add_argument('--root');args=parser.parse_args()
+root=Path(args.root) if args.root else Path('art/evidence/ascension-v1')/args.phase
 base=json.loads((root/'road-luma-base.json').read_text())
 patches={'under':{'x':600,'y':500},'between':{'x':600,'y':530}}
 references=[]

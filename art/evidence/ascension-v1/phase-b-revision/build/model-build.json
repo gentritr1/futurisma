@@ -9,8 +9,8 @@
     "signage",
     "emissive"
   ],
-  "meshes": 100,
-  "triangles": 177628,
+  "meshes": 504,
+  "triangles": 191628,
   "placements": [
     {
       "asset": "rocket-platform",

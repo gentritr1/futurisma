@@ -1,8 +1,9 @@
 """Record the painted base before the existing floor pinning script runs."""
-import importlib.util,json,hashlib
+import importlib.util,json,hashlib,argparse
 from pathlib import Path
 spec=importlib.util.spec_from_file_location('frame_metrics','scripts/visual/frame-metrics.py');metrics=importlib.util.module_from_spec(spec);spec.loader.exec_module(metrics)
-root=Path('art/evidence/ascension-v1/phase-b');capture=json.loads((root/'stations/capture.json').read_text());patches=capture['roadPatches'];rows=[]
+parser=argparse.ArgumentParser();parser.add_argument('--root',default='art/evidence/ascension-v1/phase-b');args=parser.parse_args()
+root=Path(args.root);capture=json.loads((root/'stations/capture.json').read_text());patches=capture['roadPatches'];rows=[]
 for record in capture['records']:
  if record.get('board'):continue
  path=root/'stations'/record['file'];row=metrics.analyse(str(path),patches);row['sha256']=hashlib.sha256(path.read_bytes()).hexdigest();rows.append(row)

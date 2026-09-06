@@ -1,0 +1,35 @@
+{
+  "script": "scripts/visual/ascension/check-preserved.py",
+  "files": [
+    {
+      "file": "public/assets/ascension/textures/concrete.jpg",
+      "unchangedFromD72e820": true,
+      "sha256": "d31966e55b69a599799823584dfb8a5989904b305138459f773b94e430e2a69c"
+    },
+    {
+      "file": "public/assets/ascension/trench-wall-module.glb",
+      "unchangedFromD72e820": true,
+      "sha256": "a1eb578e4a58e31138cadf353e5019e772357c7667b8542ab543f01188411738"
+    },
+    {
+      "file": "public/assets/ascension/horizon.png",
+      "unchangedFromD72e820": true,
+      "sha256": "88e7438a03340e99c0ab2fa881a71384324b852340e7fb0f06eee179a174aca5"
+    },
+    {
+      "file": "src/game/ascension-sky.ts",
+      "unchangedFromD72e820": true,
+      "sha256": "b14222c59e5fd73e65688ca5eb19b2282ccbf96b3ad850a3d263d8d9bd13bc10"
+    },
+    {
+      "file": "src/game/data/ascension/route.json",
+      "unchangedFromD72e820": true,
+      "sha256": "dabee585023ea426e6ac90666d9c45a978743407e33370a93cc02432531f7880"
+    },
+    {
+      "file": "src/game/data/ascension/schedule.json",
+      "unchangedFromD72e820": true,
+      "sha256": "c899830a1ba949ff851c87d166b2931b64a501c4745210bd77805d814fe2552b"
+    }
+  ]
+}

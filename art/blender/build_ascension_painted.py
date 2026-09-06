@@ -282,7 +282,7 @@ for name,root in library.items():
 # World layout authored from the accepted route; never edit route geometry here.
 route=json.loads((ROOT/'src/game/data/ascension/route.json').read_text());world=empty('ascension_painted_world');placements=[]
 def place(asset,p,yaw=0,scale=1,sector='PAD_ROAD',dynamic=False):
- source=library[asset];root=source.copy();root.name=asset+'_'+str(len(placements));bpy.context.collection.objects.link(root);root.parent=world;root.location=coord(p);root.rotation_euler.z=yaw;root.scale=source.scale*scale;root['sector']=sector;root['dynamic']=dynamic
+ source=library[asset];root=source.copy();root.name=asset+'_'+str(len(placements));bpy.context.collection.objects.link(root);root.parent=world;root.location=coord(p);root.rotation_euler.z=yaw;root.scale=source.scale*scale;root['sector']=sector;root['dynamic']=dynamic;root['instanceAsset']=asset if asset in ['street-lamp','trench-wall-module'] else ''
  def copy_children(src,dst):
   for child in src.children:
    o=child.copy();bpy.context.collection.objects.link(o);o.parent=dst;copy_children(child,o)
@@ -316,9 +316,9 @@ for i in range(12):place('egret-card-set',beside(.72+i*.004,22)+Vector((0,8+i%3,
 # Batch static surfaces by sector and material; moving hierarchies stay separate.
 bpy.context.view_layer.update();groups={}
 for root in list(world.children):
- if root.get('dynamic'):continue
+ if root.get('dynamic') or root.get('instanceAsset'):continue
  for o in root.children_recursive:
-  if o.type=='MESH':groups.setdefault((root['sector']+'_'+str(math.floor(root.location.x/180))+'_'+str(math.floor(root.location.y/180)),o.data.materials[0].name),[]).append(o)
+  if o.type=='MESH':groups.setdefault(('STATIC',o.data.materials[0].name),[]).append(o)
 for (sector,material),objects in groups.items():
  vertices=[];faces=[];uvs=[];colors=[]
  for obj in objects:

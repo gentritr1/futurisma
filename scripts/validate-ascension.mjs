@@ -36,4 +36,4 @@ for(const direction of [-1,1])for(let tick=0;tick<=6*120;tick++){
 }
 assert.ok(minimumCrawlerClearance>=9,`Crawler clearance ${minimumCrawlerClearance}`);
 const report={script:'scripts/validate-ascension.mjs',materialIds:Object.fromEntries(materialIds),routeMetres:route.length,orderedGates:8,maxProjectionError,minimumCrawlerClearance,sweep:{directions:2,secondsPerDirection:6,hz:120,inclusiveEndpoints:true,expectedSamples:2*(6*120+1),samples},scope:'Flat-ID crawler hierarchy translation; not a rendered animation or launch corridor acceptance'};
-writeFileSync('art/evidence/ascension-v1/phase-a/route-validation.json',JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2));
+writeFileSync(process.argv.find(a=>a.startsWith('--out='))?.slice(6)??'art/evidence/ascension-v1/phase-a/route-validation.json',JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2));

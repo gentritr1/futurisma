@@ -1,5 +1,5 @@
 """Four contiguous art zones, measured along the unchanged shortcut centreline."""
-import math,json
+import math,json,bpy
 from mathutils import Vector
 from ascension_mesh import Asset
 
@@ -13,6 +13,7 @@ def build_trench(route,place,library,materials,out):
  def sample(i,x=0,y=0,z=0):
   st=stations[i];t=Vector(st['t']);right=t.cross(Vector((0,1,0))).normalized()
   return Vector(st['p'])+right*x+Vector((0,y,0))+t*z
+ lod_cache={}
  zones=[{'name':names[i],'fromMetres':cuts[i],'toMetres':cuts[i+1],'lengthMetres':cuts[i+1]-cuts[i],'fromProgress':stations[at(cuts[i])]['progress'],'toProgress':stations[at(cuts[i+1])]['progress']} for i in range(4)]
  for i in range(20,len(stations)-20,10):
   st=stations[i];t=Vector(st['t']);k=zone(distances[i])
@@ -34,6 +35,18 @@ def build_trench(route,place,library,materials,out):
        shade=.035 if role=='emissive' else .64-(.60*max(0,min(1,(height-4)/5)))
        color.color=(shade,shade*.87,shade*.70,1)
       elif role=='concrete':color.color=(.37,.52,.49,1)
+   for mesh in list(wall.children):
+    if mesh.type!='MESH' or len(mesh.data.polygons)<100:continue
+    role=mesh.data.materials[0].name.split('_')[-1]
+    if role not in ['metal','signage']:continue
+    mesh['lodLevel']=0
+    cache_key=(k,mesh.data.materials[0].name,len(mesh.data.polygons))
+    lod=mesh.copy();bpy.context.collection.objects.link(lod);lod.parent=wall;lod['lodLevel']=1
+    if cache_key in lod_cache:lod.data=lod_cache[cache_key]
+    else:
+     lod.data=mesh.data.copy();bpy.context.view_layer.objects.active=lod
+     modifier=lod.modifiers.new('Distant module simplification','DECIMATE');modifier.ratio=.16
+     bpy.ops.object.modifier_apply(modifier=modifier.name);lod_cache[cache_key]=lod.data
  # The underside is a connected service apron with an exhaust opening under the rocket.
  a=Asset('trench-pad-underside',materials)
  for i in range(at(180),at(440),6):

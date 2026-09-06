@@ -88,12 +88,7 @@ export class AscensionCourse implements RaceCourse {
       this.turns.push({ from, to: route.stations[i].d, radius: 1 / peak,
         direction: sign < 0 ? "RIGHT" : "LEFT" });
     }
-    const roadParts=new THREE.Group(),furniture=this.createFurniture();
-    const kerbs=furniture.getObjectByName('ascension_solid_road_kerbs')!;kerbs.removeFromParent();this.group.add(kerbs);
-    roadParts.add(furniture);roadParts.updateMatrixWorld(true);
-    const meshes:THREE.Mesh[]=[];roadParts.traverse(object=>{if(object instanceof THREE.Mesh)meshes.push(object);});
-    this.group.add(flatIdBatch(meshes,'ascension_static_road_ids'),this.createStreet(),this.createBranchRoad());
-    for(const mesh of meshes){mesh.geometry.dispose();for(const material of Array.isArray(mesh.material)?mesh.material:[mesh.material])material.dispose();}
+    this.group.add(this.createFurniture(),this.createStreet(),this.createBranchRoad());
     this.gates = this.createGates();
     this.group.add(this.gates);
     this.setCheckpointProgress(1);

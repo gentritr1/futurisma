@@ -8,4 +8,4 @@ assert.equal(course.sectorLabelAt(progress),'TRENCH');
 course.releaseTrench();course.project(course.sample(progress).position,progress);
 assert.equal(course.sectorLabelAt(progress),'DELUGE ROAD');
 const result={script:'scripts/validate-ascension-branch-label.mjs',progress,trench:'TRENCH',surface:'DELUGE ROAD',scope:'Actual course projection and HUD label source; rendered station proof is separate.'};
-writeFileSync('art/evidence/ascension-v1/phase-b/branch-label.json',JSON.stringify(result,null,2));console.log(result);
+writeFileSync(process.argv.find(a=>a.startsWith('--out='))?.slice(6)??'art/evidence/ascension-v1/phase-b/branch-label.json',JSON.stringify(result,null,2));console.log(result);

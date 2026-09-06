@@ -1,3 +1,4 @@
+import {mergeAscensionStaticPaint} from './ascension-static-paint';
 import {AscensionRoadSignals} from './ascension-road-signals';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {ABILITY_TICK_RATE} from './polarity-simulation.js';
@@ -47,6 +48,7 @@ export class AscensionRuntime implements CircuitRuntime {
   course.group.add(this.boardHardware);
   this.ready=new GLTFLoader().loadAsync('/assets/ascension/countdown-board.glb').then(gltf=>{
    gltf.scene.traverse(object=>{if(object instanceof THREE.Mesh){const source=object.material as THREE.MeshStandardMaterial;object.material=new THREE.MeshLambertMaterial({color:source.color,map:source.map,emissive:source.emissive,emissiveMap:source.emissiveMap,emissiveIntensity:source.emissiveIntensity,vertexColors:true});}});
+   gltf.scene.traverse(o=>{if(o instanceof THREE.Mesh)o.name='AP_STATIC_'+o.name;});gltf.scene.updateMatrixWorld(true);mergeAscensionStaticPaint(gltf.scene);
    const instances=new Map<THREE.BufferGeometry,THREE.Mesh[]>();
    for(const board of this.boards){
     const housing=gltf.scene.clone(true);housing.position.y=10.5;housing.scale.set(3,2,1);housing.name='ascension_authored_board_housing';board.root.add(housing);

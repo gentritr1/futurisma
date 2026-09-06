@@ -33,7 +33,7 @@ export class AscensionTerrain {
    return {distance,height};
   };
   const smooth=(a:number,b:number,x:number)=>{const t=THREE.MathUtils.clamp((x-a)/(b-a),0,1);return t*t*(3-2*t);};
-  const steps=200,spacing=8;
+  const steps=100,spacing=16;
   for(let j=0;j<=steps;j++)for(let i=0;i<=steps;i++){
    const x=-800+i*spacing,z=-800+j*spacing,n=nearest(x,z,inland),cut=nearest(x,z,trench);
    const shore=1-smooth(95,170,n.distance);
@@ -85,7 +85,7 @@ export class AscensionTerrain {
     float wave=pow(max(0.,sin(waterWorld.x*.13+waterTime*.4)*cos(waterWorld.z*.16-waterTime*.3)),8.);
     diffuseColor.rgb*=paint*vec3(.3,.7,.75)+vec3(.02,.12,.13)*wave*.18;`);
   };
-  const seaGeometry=new THREE.PlaneGeometry(6000,6000,96,96);seaGeometry.rotateX(-Math.PI/2);
+  const seaGeometry=new THREE.PlaneGeometry(6000,6000,48,48);seaGeometry.rotateX(-Math.PI/2);
   const sea=new THREE.Mesh(seaGeometry,water);sea.position.y=-4.3;sea.name='ascension_tideline_water_horizon';sea.renderOrder=1;this.root.add(sea);
  }
  update(){this.time.value=performance.now()/1000;}

@@ -23,4 +23,4 @@ for(let u=middle;u<c.shortcut.to;u+=.001){const p=c.sampleShortcut(u).position;c
 c.project(c.sample(c.shortcut.to+.02).position,c.shortcut.to+.02);
 assert.equal(c.project(inside,middle).alternateRoad,false,'Closed entry must refuse new traversal');
 const report={script:'scripts/validate-ascension-runtime.mjs',config,renderRates:[60,120,240],windowSeconds:120,expectedTicks:120*120,ticks:signatures.map(s=>s.tick),snapshotRestore:true,insideAtClosure:true,entryRefused:true};
-writeFileSync('art/evidence/ascension-v1/phase-a/runtime-validation.json',JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2));
+writeFileSync(process.argv.find(a=>a.startsWith('--out='))?.slice(6)??'art/evidence/ascension-v1/phase-a/runtime-validation.json',JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2));

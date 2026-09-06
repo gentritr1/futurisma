@@ -55,4 +55,4 @@ for (const lateral of [0]) for (const branch of [false,true]) {
 
 const report={script:'scripts/measure-ascension-driving.mjs',clockHz:120,controller:'Production DemoAutopilot and handling; isolated no nitro, powers or traffic. Not a browser Works calibration.',results,forkSavingSeconds:results[0].forkSeconds.map((s,i)=>s-results[1].forkSeconds[i]),sampleReconciliation:results.map(r=>({branch:r.branch,windowSeconds:r.forkTicks.reduce((a,b)=>a+b,0)/120,expectedRateHz:120,observedSamples:r.forkTicks.reduce((a,b)=>a+b,0)})),savingSeconds:(results[0].seconds-results[1].seconds)/3};
 assert.ok(report.forkSavingSeconds.every(seconds=>seconds>=3&&seconds<=6));
-writeFileSync('art/evidence/ascension-v1/phase-a/driving.json',JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2));
+writeFileSync(process.argv.find(a=>a.startsWith('--out='))?.slice(6)??'art/evidence/ascension-v1/phase-a/driving.json',JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2));
