@@ -19,6 +19,7 @@ try{
   await page.goto(url,{waitUntil:'networkidle0'});await page.waitForSelector('#review-state');
   const file=`${phase}-${station.id}.png`;await page.screenshot({path:out+'/'+file});records.push({file,...await page.$eval('#review-state',e=>JSON.parse(e.textContent))});
  }
- for(const board of (process.argv.includes('--trench-tour')?[]:[1,2])){await page.goto(`http://127.0.0.1:5200/ascension-review.html?board=${board}`,{waitUntil:'networkidle0'});await page.waitForSelector('#review-state');const file=`board-${board}-150m.png`;await page.screenshot({path:out+'/'+file});records.push({file,...await page.$eval('#review-state',e=>JSON.parse(e.textContent))});}
+ for(const [phase,tick] of phases)for(const board of (process.argv.includes('--trench-tour')?[]:[1,2])){await page.goto(`http://127.0.0.1:5200/ascension-review.html?board=${board}&tick=${tick}`,{waitUntil:'networkidle0'});await page.waitForSelector('#review-state');const file=`${phase}-board-${board}-150m.png`;await page.screenshot({path:out+'/'+file});const record={file,...await page.$eval('#review-state',e=>JSON.parse(e.textContent))};records.push(record);if(!record.boardLegibility?.pass)errors.push(`Board digits failed: ${file} ${JSON.stringify(record.boardLegibility)}`);}
+
  await writeFile(out+'/capture.json',JSON.stringify({script:'scripts/visual/ascension/stations.mjs',records,errors,roadPatches:{under:{x:640,y:430},between:{x:640,y:455}}},null,2));if(errors.length)throw Error(errors.join('\n'));
 }finally{await browser.close();}

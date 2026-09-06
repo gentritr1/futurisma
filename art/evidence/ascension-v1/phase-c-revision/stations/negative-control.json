@@ -1,0 +1,13 @@
+{
+  "script": "scripts/visual/ascension/board-first-update.mjs",
+  "scope": "Negative control: restore the old -1 cache sentinel in the served module only. Production source is unchanged.",
+  "expectedPass": false,
+  "observed": {
+    "digitSamples": 0,
+    "backgroundSamples": 811,
+    "digitLuma": 0,
+    "backgroundLuma": 49.36353144266325,
+    "contrast": -49.36353144266325,
+    "pass": false
+  }
+}

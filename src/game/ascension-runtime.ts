@@ -18,7 +18,7 @@ export class AscensionRuntime implements CircuitRuntime {
  private readonly boards: {root:THREE.Group;canvas:HTMLCanvasElement;texture:THREE.CanvasTexture}[]=[];
  private readonly entryRail:THREE.Mesh;
  private readonly boardHardware=new THREE.Group();
- private lastSecond=-1;
+ private lastSecond:number|null|undefined=undefined;
  private readonly output=document.createElement('output');
  constructor(readonly course:AscensionCourse,private readonly input:InputController){
   this.signals=new AscensionRoadSignals(course);course.group.add(this.signals.root);
@@ -78,7 +78,7 @@ export class AscensionRuntime implements CircuitRuntime {
   document.getElementById('polarity-flip')!.textContent='SPACE / SHIFT · NITRO';
   document.getElementById('polarity-power')!.textContent='E / DEVICE';
   const clock=this.course.schedule,config=clock.config,seconds=config?Math.ceil((config.launchTick-clock.tick)/ABILITY_TICK_RATE):null;
-  if(seconds!==this.lastSecond){this.lastSecond=seconds??-1;
+  if(seconds!==this.lastSecond){this.lastSecond=seconds;
    const text=seconds===null?'CALIBRATING':`T${seconds<0?'+':'−'}${String(Math.floor(Math.abs(seconds)/60)).padStart(2,'0')}:${String(Math.abs(seconds)%60).padStart(2,'0')}`;
    for(const b of this.boards){const ctx=b.canvas.getContext('2d')!;ctx.fillStyle='#263125';ctx.fillRect(0,0,1024,256);ctx.fillStyle='#ffda98';ctx.font='bold 140px monospace';ctx.textAlign='center';ctx.fillText(text,512,145);ctx.font='bold 55px monospace';ctx.fillText(clock.state.trenchOpen?'PAD 09 / TRENCH OPEN':'TRENCH CLOSED / DELUGE ROAD',512,226);b.texture.needsUpdate=true;}
    const line=document.getElementById('polarity-route');if(line)line.textContent=text+' / '+(clock.state.trenchOpen?'TRENCH OPEN':'TAKE DELUGE ROAD');
@@ -87,6 +87,6 @@ export class AscensionRuntime implements CircuitRuntime {
  }
  onShieldImpact(){return 0;}
  recover(_progress:number){this.course.releaseTrench();}
- reset(){this.remainder=0;this.course.resetSchedule();}
+ reset(){this.lastSecond=undefined;this.remainder=0;this.course.resetSchedule();}
  dispose(){this.signals.dispose();this.boardHardware.removeFromParent();this.boardHardware.traverse(o=>{if(o instanceof THREE.Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose();}});this.entryRail.removeFromParent();this.entryRail.geometry.dispose();(this.entryRail.material as THREE.Material).dispose();for(const b of this.boards){b.root.removeFromParent();b.texture.dispose();b.root.traverse(o=>{if(o instanceof THREE.Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose();}});}this.output.remove();}
 }

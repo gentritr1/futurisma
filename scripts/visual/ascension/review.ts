@@ -18,6 +18,27 @@ if(parameters.get('target')==='pad'){const pad=environment.root.getObjectByName(
 if(parameters.has('yaw')){camera.position.copy(s.position).addScaledVector(s.up,2.4);const yaw=Number(parameters.get('yaw'))*Math.PI/180;camera.lookAt(camera.position.clone().add(new THREE.Vector3(Math.sin(yaw),.08,-Math.cos(yaw))));}
 const fog=course.fogAt(progress);scene.fog=new THREE.FogExp2(fog.color,fog.density);scene.background=fog.color.clone();course.project(s.position,progress);runtime.updateHud(progress);scene.updateMatrixWorld(true);environment.updateVisibility(camera);if(parameters.has('skyMask')){scene.background=new THREE.Color(0xffffff);scene.fog=null;scene.traverse(o=>{if(o instanceof THREE.Mesh){if(o.name==='ascension_dawn_panorama')o.visible=false;else o.material=new THREE.MeshBasicMaterial({color:0x000000,side:THREE.DoubleSide,toneMapped:false,fog:false});}});}
 renderer.render(scene,camera);
+// Read actual GPU pixels at projected digit and background texels, after the first render.
+// The expected glyph mask selects samples; it cannot make a black GPU board pass.
+let boardLegibility:unknown=null;
+if(board){
+ const display=scene.getObjectByName('ascension_board_displays') as THREE.InstancedMesh;
+ const paint=(display.material as THREE.MeshLambertMaterial).map!.image as HTMLCanvasElement;
+ const glyph=paint.getContext('2d')!.getImageData(0,0,1024,256).data;
+ const matrix=new THREE.Matrix4();display.getMatrixAt(Number(board)-1,matrix);matrix.premultiply(display.matrixWorld);
+ const gl=renderer.getContext(),pixels=new Uint8Array(1280*720*4);gl.readPixels(0,0,1280,720,gl.RGBA,gl.UNSIGNED_BYTE,pixels);
+ const bright:number[]=[],dark:number[]=[],seen=new Set<number>();
+ for(let y=48;y<142;y+=3)for(let x=180;x<844;x+=3){
+  const point=new THREE.Vector3((x/1024-.5)*26.4,(.5-y/256)*7,0).applyMatrix4(matrix).project(camera);
+  const px=Math.round((point.x*.5+.5)*1280),py=Math.round((point.y*.5+.5)*720);
+  if(px<0||px>=1280||py<0||py>=720||point.z>1)continue;
+  const at=(py*1280+px)*4;if(seen.has(at))continue;seen.add(at);
+  const luma=.2126*pixels[at]+.7152*pixels[at+1]+.0722*pixels[at+2];
+  (glyph[(y*1024+x)*4]>200?bright:dark).push(luma);
+ }
+ const mean=(values:number[])=>values.reduce((a,b)=>a+b,0)/Math.max(1,values.length);
+ boardLegibility={digitSamples:bright.length,backgroundSamples:dark.length,digitLuma:mean(bright),backgroundLuma:mean(dark),contrast:mean(bright)-mean(dark),pass:bright.length>=15&&mean(bright)>80&&mean(bright)-mean(dark)>8};
+}
 const instances:unknown[]=[];scene.traverse(o=>{if(o instanceof THREE.InstancedMesh)instances.push({name:o.name,count:o.count,trianglesPerInstance:(o.geometry.index?.count??o.geometry.attributes.position.count)/3});});
-const state={cameraTarget:parameters.get('target')??'road',effects:environment.root.getObjectByName('ascension_scheduled_effects')?.userData.eventState,instances,script:'scripts/visual/ascension/review.ts',scope:'Schedule-frozen evidence station; production course, board, authored environment and event poses, course lights, fog and tone mapping. No running race or vehicle. The optional pad camera tracks ascent from a fixed chase-height station and is not the driving camera.',progress,tick,sector:course.sectorLabelAt(progress),trench:parameters.has('trench'),board,boardDistance:board?camera.position.distanceTo(course.sample(board==='1'?150/course.length:.8).position):null,camera:camera.position.toArray(),schedule:course.schedule.state,render:{calls:renderer.info.render.calls,triangles:renderer.info.render.triangles}};
+const state={boardLegibility,cameraTarget:parameters.get('target')??'road',effects:environment.root.getObjectByName('ascension_scheduled_effects')?.userData.eventState,instances,script:'scripts/visual/ascension/review.ts',scope:'Schedule-frozen evidence station; production course, board, authored environment and event poses, course lights, fog and tone mapping. No running race or vehicle. The optional pad camera tracks ascent from a fixed chase-height station and is not the driving camera.',progress,tick,sector:course.sectorLabelAt(progress),trench:parameters.has('trench'),board,boardDistance:board?camera.position.distanceTo(course.sample(board==='1'?150/course.length:.8).position):null,camera:camera.position.toArray(),schedule:course.schedule.state,render:{calls:renderer.info.render.calls,triangles:renderer.info.render.triangles}};
 const output=document.createElement('output');output.id='review-state';output.textContent=JSON.stringify(state);document.body.append(output);
