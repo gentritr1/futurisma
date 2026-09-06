@@ -23,10 +23,11 @@ export class AscensionRuntime implements CircuitRuntime {
  constructor(readonly course:AscensionCourse,private readonly input:InputController){
   this.signals=new AscensionRoadSignals(course);course.group.add(this.signals.root);
   input.setPowerControls(true);document.getElementById('polarity-hud')!.hidden=false;this.output.id='ascension-diagnostics';this.output.hidden=true;document.body.append(this.output);
-  const entrance=course.sampleShortcut(course.shortcut.from+(course.shortcut.to-course.shortcut.from)*.16);
-  this.entryRail=new THREE.Mesh(new THREE.BoxGeometry(20,.7,.3),new THREE.MeshLambertMaterial({color:0xd2a345}));
+  const entrance=course.sampleShortcut(course.shortcut.from+(course.shortcut.to-course.shortcut.from)*.025);
+  this.entryRail=new THREE.Mesh(new THREE.BoxGeometry(20,.7,.3),new THREE.MeshLambertMaterial({color:0xd2a345,map:new THREE.TextureLoader().load('/assets/ascension/textures/signage.jpg')}));
   this.entryRail.position.copy(entrance.position);this.entryRail.position.y-=2;this.entryRail.userData.baseY=entrance.position.y+1.3;
   this.entryRail.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(entrance.right,entrance.up,entrance.tangent.clone().negate()));
+  const railUV=this.entryRail.geometry.attributes.uv;for(let i=0;i<railUV.count;i++)railUV.setXY(i,.512+railUV.getX(i)*.476,.012+railUV.getY(i)*.476);
   this.entryRail.name='ascension_entry_only_rail';this.entryRail.visible=false;course.group.add(this.entryRail);
   const masts:THREE.Mesh[]=[],signs:THREE.Mesh[]=[];
   for(const progress of [150/course.length,.80]){
@@ -63,9 +64,15 @@ export class AscensionRuntime implements CircuitRuntime {
  step(delta:number,_progress:number,_lateral:number,lap:number){this.remainder+=delta*ABILITY_TICK_RATE;const ticks=Math.floor(this.remainder+1e-7);this.remainder-=ticks;this.course.setLapBoard(lap);this.course.advanceSchedule(ticks);}
  advanceClocks(delta:number){this.step(delta,0,0,this.course.tide.lap);}
  applySurge(_previous:number,normal:number,_input:InputFrame,_delta:number){return normal;}
- present(_sample:CourseProjection,_position:THREE.Vector3,_forward:THREE.Vector3,state:TotemVisualState){state.gravitySign=1;state.gravityTransition=0;this.entryRail.visible=!this.course.schedule.state.trenchOpen&&!this.course.trenchOccupied;this.entryRail.position.y=this.entryRail.userData.baseY+((this.course.schedule.state.trenchOpen||this.course.trenchOccupied)?-3:0);}
+ private updateEntryRail(){
+  const clock=this.course.schedule,closed=!clock.state.trenchOpen&&!this.course.trenchOccupied;
+  const lowering=closed?THREE.MathUtils.clamp((clock.tick-(clock.config?.launchTick??0))/(.6*ABILITY_TICK_RATE),0,1):0;
+  this.entryRail.visible=true;this.entryRail.position.y=this.entryRail.userData.baseY+10*(1-lowering);
+ }
+ present(_sample:CourseProjection,_position:THREE.Vector3,_forward:THREE.Vector3,state:TotemVisualState){state.gravitySign=1;state.gravityTransition=0;this.updateEntryRail();}
  updateCamera(camera:THREE.PerspectiveCamera,_delta:number,position:THREE.Vector3,forward:THREE.Vector3,_speed:number){camera.position.copy(position).addScaledVector(forward,-11.5);camera.position.y+=4.8;const look=position.clone().addScaledVector(forward,19);look.y+=1.15;camera.up.set(0,1,0);camera.lookAt(look);camera.fov=62;camera.updateProjectionMatrix();}
  updateHud(progress:number){
+  this.updateEntryRail();
   this.signals.update(this.course.schedule.tick/ABILITY_TICK_RATE,this.reducedMotion,progress,false,this.surgeActive);
   document.getElementById('polarity-deck')!.textContent='PAD 09 / LAUNCH DAY';
   document.getElementById('polarity-flip')!.textContent='SPACE / SHIFT · NITRO';
@@ -76,7 +83,7 @@ export class AscensionRuntime implements CircuitRuntime {
    for(const b of this.boards){const ctx=b.canvas.getContext('2d')!;ctx.fillStyle='#263125';ctx.fillRect(0,0,1024,256);ctx.fillStyle='#ffda98';ctx.font='bold 140px monospace';ctx.textAlign='center';ctx.fillText(text,512,145);ctx.font='bold 55px monospace';ctx.fillText(clock.state.trenchOpen?'PAD 09 / TRENCH OPEN':'TRENCH CLOSED / DELUGE ROAD',512,226);b.texture.needsUpdate=true;}
    const line=document.getElementById('polarity-route');if(line)line.textContent=text+' / '+(clock.state.trenchOpen?'TRENCH OPEN':'TAKE DELUGE ROAD');
   }
-  this.output.textContent=JSON.stringify({script:'src/game/ascension-runtime.ts',seed:clock.seed,tick:clock.tick,progress,sector:this.course.sectorLabelAt(progress),trenchOccupied:this.course.trenchOccupied,schedule:config,state:clock.state,events:clock.events});
+  this.output.textContent=JSON.stringify({script:'src/game/ascension-runtime.ts',seed:clock.seed,tick:clock.tick,progress,sector:this.course.sectorLabelAt(progress),effects:this.course.group.userData.eventState,trenchOccupied:this.course.trenchOccupied,schedule:config,state:clock.state,events:clock.events});
  }
  onShieldImpact(){return 0;}
  recover(_progress:number){this.course.releaseTrench();}

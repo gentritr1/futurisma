@@ -1,0 +1,26 @@
+{
+  "script": "scripts/visual/ascension/reconcile-steam-video.py",
+  "decoder": "ffprobe -count_frames",
+  "captureScript": "scripts/visual/ascension/steam-probe.mjs",
+  "rows": [
+    {
+      "window": "recorder wall time",
+      "seconds": 8.039899999976159,
+      "expectedRateHz": 30,
+      "expectedFrames": 241.19699999928477,
+      "decodedFrames": 225,
+      "residual": -16.19699999928477,
+      "observedRateHz": 27.985422704345478
+    },
+    {
+      "window": "container video duration",
+      "seconds": 7.56881,
+      "expectedRateHz": 30,
+      "expectedFrames": 227.0643,
+      "decodedFrames": 225,
+      "residual": -2.064300000000003,
+      "observedRateHz": 29.727262277689622
+    }
+  ],
+  "interpretation": "captureStream(30) requests a maximum capture cadence, not a guaranteed fixed frame rate. The recording is variable-frame-rate. Recorder wall time includes start/stop and encoding latency and differs from the container time span. Both deficits remain explicit; no missing frames are silently counted as present. ffprobe r_frame_rate 1000/1 is not interpreted as an observed frame rate."
+}

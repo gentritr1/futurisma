@@ -6,7 +6,7 @@ from pathlib import Path
 from mathutils import Vector,Matrix
 sys.path.insert(0,str(Path(__file__).parent))
 from ascension_mesh import Asset,coord,empty
-ROOT=Path(__file__).resolve().parents[2];OUT=ROOT/'public/assets/ascension';EVIDENCE=ROOT/'art/evidence/ascension-v1/phase-c/trench-revision/build'
+ROOT=Path(__file__).resolve().parents[2];OUT=ROOT/'public/assets/ascension';EVIDENCE=ROOT/'art/evidence/ascension-v1/phase-c/build'
 EVIDENCE.mkdir(parents=True,exist_ok=True)
 bpy.ops.wm.read_factory_settings(use_empty=True);bpy.context.preferences.filepaths.save_version=0
 materials={}
@@ -294,7 +294,7 @@ def beside(u,offset):
  s=station(u);t=Vector(s['t']);return Vector(s['p'])+t.cross(up).normalized()*offset
 s=route['shortcut']['stations'][int(len(route['shortcut']['stations'])*.4)];p=Vector(s['p']);p.y=-12;t=Vector(s['t']);place('rocket-platform',p,math.atan2(-t.x,-t.z),sector='APRON_SWEEP',dynamic=True)
 s=station(.65);p=Vector(s['p']);p.y+=13;place('crawler-transporter',p,sector='CRAWLERWAY',dynamic=True)
-for x in [-38,0,38]:place('crawlerway-gravel-bed',p+Vector((x,-.1,0)),math.pi/2,sector='CRAWLERWAY')
+for x in [-64,-32,0,32,64]:place('crawlerway-gravel-bed',p+Vector((x,-.1,0)),math.pi/2,sector='CRAWLERWAY')
 for u in [.25,.35]:place('deluge-water-tower',beside(u,-42),sector='DELUGE_ROAD')
 for u in [.91,.94,.97]:place('propellant-tank',beside(u,36),sector='TANK_FARM')
 place('vent-stack',beside(.93,-34),sector='TANK_FARM')

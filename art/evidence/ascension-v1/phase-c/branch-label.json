@@ -1,0 +1,7 @@
+{
+  "script": "scripts/validate-ascension-branch-label.mjs",
+  "progress": 0.4,
+  "trench": "TRENCH",
+  "surface": "DELUGE ROAD",
+  "scope": "Actual course projection and HUD label source; rendered station proof is separate."
+}

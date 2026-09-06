@@ -384,6 +384,14 @@
       "artifact_id": "exec-ba43583c-2cf2-4426-ad8b-08e055846589",
       "output": "ground-water-atlas-v2.png",
       "note": "Service job ID not exposed by built-in tool. Water role packs water, grass, mud and gravel; original source retained in git."
+    },
+    "steam-vfx": {
+      "tool": "built-in GPT Image 2",
+      "prompt": "Create a single game VFX texture sprite, square 1024x1024, transparent background. A softly hand-painted cloud of pale warm grey launch-pad steam, billowing irregular cauliflower lobes merging into delicate wispy feathered edges. The steam is dense in the central third and fades smoothly to full transparency before every edge; ample transparent margin on all four sides. Neutral diffuse painting only, no baked directional light, no scene, no ground, no machinery, no text, no borders, no checkerboard. Restrained remembered early-2000s console racer art, broad soft painted shapes, no photoreal photograph, no neon or bloom. This one texture will be tinted as steam and smoke and rendered on camera-facing volumetric cards under shared Lambert lighting, fog and tone mapping; all lighting comes from the game. No hard rectangular silhouette, no surface cracks, no algae, no architectural details. Deliver actual alpha transparency.",
+      "job_id": null,
+      "artifact_id": "exec-2899ed5a-be49-4cd9-9205-6417be8d81dd",
+      "output": "public/assets/ascension/textures/steam.png",
+      "note": "Service job ID was not exposed. Dedicated transparent VFX card; six solid-surface atlases unchanged."
     }
   },
   "sheet_prompt_template": "Production turnaround sheet for a low-poly racing game asset, three true orthographic views on one wide image: FRONT (left), SIDE (centre), TOP (right), exactly the same metre scale, front and side on a shared ground baseline. Flat neutral grey background, soft even studio lighting, no perspective, no ground shadow, no text except the small view labels and a 1 m scale bar. Complete asset in every view with enough spacing and no cropping.\nASSET: <name, overall metres, EXACT counts of every part, placement of each part>\nROLE IN THE RACE: <what the driver must read from it and at what distance>\nSTORY WEAR: <twenty years of humid weathering: rust streaks under bolts, sun-bleached top faces, algae at the base, one welded repair plate, faded stencil>\nSTYLE: remembered early-2000s console racer, original design, honest low-poly geometry, hand-painted texture language readable at 256-512 px, painted ambient occlusion, restrained palette of grey concrete, rust red, off-white, olive steel, sodium amber, swamp green.\nAVOID: any real space-agency vehicle, any real logo, neon, photoreal PBR, bloom, tiny greebles, new details invented between views. Counts and proportions agree in every view.",

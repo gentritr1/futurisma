@@ -397,7 +397,7 @@ export class SceneAssets {
     const environmentLoadStartedAt = performance.now();
     try {
       if (this.course.kind === "ascension") {
-        const environment=await (await import("./ascension-painted-environment")).AscensionPaintedEnvironment.load();
+        const environment=await (await import("./ascension-painted-environment")).AscensionPaintedEnvironment.load(this.course as import("./ascension-course").AscensionCourse);
         if(this.isDisposed()){disposeObject3DResources(environment.root);return;}
         this.authoredEnvironment=environment;this.scene.add(environment.root);this.environmentReady=true;this.requestRender();return;
       }
