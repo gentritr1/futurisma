@@ -9,7 +9,7 @@ export function instanceAscensionProps(root:THREE.Group){
   prop.traverse(object=>{
    if(!(object instanceof THREE.Mesh)||Array.isArray(object.material))return;
    const variant=object.material.name.endsWith('concrete')?prop.userData.trenchZone??'default':'shared';
-   const key=[prop.userData.instanceAsset,variant,object.material.uuid,object.geometry.attributes.position.count,object.geometry.index?.count,object.userData.lodLevel??-1].join(':');
+   const key=[prop.userData.instanceAsset,variant,object.material.uuid,object.userData.paintVariant??0,object.geometry.attributes.position.count,object.geometry.index?.count,object.userData.lodLevel??-1].join(':');
    const group=groups.get(key)??[];
    if(group.length){
     const source=group[0].geometry;

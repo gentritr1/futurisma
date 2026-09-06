@@ -6,7 +6,7 @@ from pathlib import Path
 from mathutils import Vector,Matrix
 sys.path.insert(0,str(Path(__file__).parent))
 from ascension_mesh import Asset,coord,empty
-ROOT=Path(__file__).resolve().parents[2];OUT=ROOT/'public/assets/ascension';EVIDENCE=ROOT/'art/evidence/ascension-v1/phase-b-revision/build'
+ROOT=Path(__file__).resolve().parents[2];OUT=ROOT/'public/assets/ascension';EVIDENCE=ROOT/'art/evidence/ascension-v1/phase-c/trench-revision/build'
 EVIDENCE.mkdir(parents=True,exist_ok=True)
 bpy.ops.wm.read_factory_settings(use_empty=True);bpy.context.preferences.filepaths.save_version=0
 materials={}
@@ -56,9 +56,9 @@ for z in [-20.5,20.5]:
  for x in range(-20,21,5):a.beam((x,34,z),(x,35.3,z),.12)
  for y in [34.65,35.3]:a.beam((-21,y,z),(21,y,z),.10)
 # Soot follows the open exhaust cut, on the deck and its inner lip.
-a.tint=(.12,.10,.085,1)
-for x in [-7.3,7.3]:a.box((x,34.03,0),(1.6,.035,14),'concrete',0);a.box((x,32.5,0),(.12,3,13),'concrete',0)
-for z in [-7.3,7.3]:a.box((0,34.04,z),(13,.035,1.6),'concrete',0)
+a.tint=(.025,.023,.022,1)
+for x in [-7.3,7.3]:a.box((x,34.03,0),(1.6,.035,14),'concrete',3);a.box((x,32.5,0),(.12,3,13),'concrete',3)
+for z in [-7.3,7.3]:a.box((0,34.04,z),(13,.035,1.6),'concrete',3)
 a.tint=(1,1,1,1)
 save(a,['four piers and open exhaust hole','hazard deck rim','open service tower','repair plate','caged lamps and beacon'])
 r=Asset('rocket-ascent',materials);r.metric_uv=True
@@ -69,10 +69,11 @@ r.tint=(1,1,1,1)
 for y in [36.5,44,54,64,69]:r.cylinder((0,y,0),4.36,.18,'metal',16)
 r.box((0,57,4.34),(1.6,1.6,.035),'signage',4)
 for x in [-6.6,6.6]:
- r.tint=(1,1,1,1);r.cylinder((x,47,0),2.1,22,'metal',12);r.tint=(1.5,1.5,1.4,1);r.cylinder((x,59,0),2.1,2,'concrete',10,top_radius=.6);r.cylinder((x,35,0),2,2,'metal',10,top_radius=1.2)
-for angle in range(0,360,90):
+ r.tint=(.70,.65,.34,1);r.cylinder((x,47,0),2.1,22,'metal',12);r.tint=(1.5,1.5,1.4,1);r.cylinder((x,59,0),2.1,2,'concrete',10,top_radius=.6);r.cylinder((x,35,0),2,2,'metal',10,top_radius=1.2)
+r.tint=(.72,.69,.50,1)
+for angle in range(45,405,90):
  t=math.radians(angle);u=Vector((math.cos(t),0,math.sin(t)));v=Vector((-math.sin(t),0,math.cos(t)))*.12
- pts=[u*4+Vector((0,36,0))-v,u*8+Vector((0,36,0))-v,u*4+Vector((0,43,0))-v,u*4+Vector((0,36,0))+v,u*8+Vector((0,36,0))+v,u*4+Vector((0,43,0))+v];r.geometry(pts,[(0,2,1),(3,4,5),(0,1,4,3),(1,2,5,4),(2,0,3,5)],'concrete')
+ pts=[u*4+Vector((0,36,0))-v,u*6.8+Vector((0,36,0))-v,u*4+Vector((0,41,0))-v,u*4+Vector((0,36,0))+v,u*6.8+Vector((0,36,0))+v,u*4+Vector((0,41,0))+v];r.geometry(pts,[(0,2,1),(3,4,5),(0,1,4,3),(1,2,5,4),(2,0,3,5)],'concrete')
 r.tint=(1,1,1,1);save(r,['blunt faceted nose','two olive boosters','four fins','rust core and ceramic upper band','three separate nozzles'])
 r.root.parent=library['rocket-platform']
 for i,y in enumerate([46,62,77]):

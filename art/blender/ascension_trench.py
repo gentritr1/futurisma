@@ -23,30 +23,72 @@ def build_trench(route,place,library,materials,out):
    wall=place('trench-wall-module',q,math.atan2(-t.z,t.x)+(math.pi if side>0 else 0),sector='TRENCH')
    wall['trenchZone']=names[k]
    if k==0:wall.scale.z*=.62
-   for mesh in wall.children:
-    if mesh.type!='MESH':continue
-    role=mesh.data.materials[0].name.split('_')[-1]
-    if k in [2,3] and role in ['concrete','emissive']:
-     mesh.data=mesh.data.copy()
-     if k==2 and role=='emissive':mesh.data.materials[0]=materials['metal']
-     for loop,color in zip(mesh.data.loops,mesh.data.color_attributes['Color'].data):
-      height=mesh.data.vertices[loop.vertex_index].co.z
-      if k==2:
-       shade=.035 if role=='emissive' else .64-(.60*max(0,min(1,(height-4)/5)))
-       color.color=(shade,shade*.87,shade*.70,1)
-      elif role=='concrete':color.color=(.37,.52,.49,1)
+   if k==2:
+    # Dry refractory lining uses the dry cracked upper area of the existing atlas,
+    # never the algae waterline. Four vertical bands resolve the heat gradient.
+    lining=Asset('scorched-lining',materials)
+    for lo,hi,bottom,top in [(0,4,.52,.42),(4,6,.42,.18),(6,10,.18,.025),(10,14,.025,.015)]:
+     lining.box((0,(lo+hi)/2,0),(24,hi-lo,3),'concrete',0)
+    lining.box((0,.7,1.73),(4.3,1.4,.16),'metal',1)
+    lining.finish()
+    for part in lining.root.children:
+     if part.data.materials[0]==materials['concrete']:
+      for loop,uv,color in zip(part.data.loops,part.data.uv_layers.active.data,part.data.color_attributes['Color'].data):
+       height=part.data.vertices[loop.vertex_index].co.z
+       shade=.52 if height<=0 else .42 if height<=4 else .18 if height<=6 else .025 if height<=10 else .015
+       heat=max(0,1-abs(height-6)/3)
+       color.color=(shade*(1+.20*heat),shade*(1-.06*heat),shade*(1-.25*heat),1)
+       uv.uv.y=.72+(uv.uv.y-.512)/.476*.26
+      old=next(o for o in wall.children if o.type=='MESH' and o.data.materials[0]==materials['concrete']);old.data=part.data
+     else:
+      cover=part.copy();bpy.context.collection.objects.link(cover);cover.parent=wall;cover['paintVariant']='sealed-drain'
+    for child in list(lining.root.children):bpy.data.objects.remove(child,do_unlink=True)
+    bpy.data.objects.remove(lining.root,do_unlink=True)
+    # Two lamps on each wall: one survives on the left wall, none on the right.
+    glass=next(o for o in wall.children if o.type=='MESH' and o.data.materials[0]==materials['emissive'])
+    source=glass.data
+    for alive in [False,True]:
+     faces=[p for p in source.polygons if (side<0 and sum(source.vertices[v].co.x for v in p.vertices)/len(p.vertices)<0)==alive]
+     if not faces:continue
+     data=bpy.data.meshes.new('scorched-glass');data.from_pydata([v.co for v in source.vertices],[],[list(p.vertices) for p in faces]);data.materials.append(materials['emissive' if alive else 'metal']);data.update()
+     uv=data.uv_layers.new();color=data.color_attributes.new(name='Color',type='FLOAT_COLOR',domain='CORNER');loops=[j for p in faces for j in p.loop_indices]
+     for n,j in enumerate(loops):uv.data[n].uv=source.uv_layers.active.data[j].uv;color.data[n].color=(1,1,1,1) if alive else (.025,.025,.025,1)
+     obj=bpy.data.objects.new('scorched-lamp-glass',data);bpy.context.collection.objects.link(obj);obj.parent=wall;obj['paintVariant']='survivor' if alive else 'dead-'+str(side)
+    bpy.data.objects.remove(glass,do_unlink=True)
+   elif k==3:
+    for mesh in wall.children:
+     if mesh.type=='MESH' and mesh.data.materials[0]==materials['concrete']:
+      mesh.data=mesh.data.copy()
+      for color in mesh.data.color_attributes['Color'].data:color.color=(.37,.52,.49,1)
    for mesh in list(wall.children):
     if mesh.type!='MESH' or len(mesh.data.polygons)<100:continue
     role=mesh.data.materials[0].name.split('_')[-1]
     if role not in ['metal','signage']:continue
     mesh['lodLevel']=0
-    cache_key=(k,mesh.data.materials[0].name,len(mesh.data.polygons))
+    cache_key=(k,mesh.data.materials[0].name,len(mesh.data.polygons),mesh.get('paintVariant'))
     lod=mesh.copy();bpy.context.collection.objects.link(lod);lod.parent=wall;lod['lodLevel']=1
     if cache_key in lod_cache:lod.data=lod_cache[cache_key]
     else:
      lod.data=mesh.data.copy();bpy.context.view_layer.objects.active=lod
      modifier=lod.modifiers.new('Distant module simplification','DECIMATE');modifier.ratio=.16
      bpy.ops.object.modifier_apply(modifier=modifier.name);lod_cache[cache_key]=lod.data
+ # Fixed portal jambs mark all three boundaries; clear opening is 24 m x 11.5 m.
+ a=Asset('trench-zone-portals',materials)
+ for d in cuts[1:-1]:
+  i=at(d)
+  for side in [-1,1]:
+   a.beam(sample(i,side*13,0),sample(i,side*13,12.5),2,'metal',1)
+   a.beam(sample(i,side*11.95,0),sample(i,side*11.95,11.5),.18,'signage',3)
+  a.beam(sample(i,-14,12.5),sample(i,14,12.5),2,'metal',1)
+  a.beam(sample(i,-12,11.45),sample(i,12,11.45),.18,'signage',3)
+ a.finish();library[a.root.name]=a.root;place(a.root.name,(0,0,0),sector='TRENCH')
+ # Soot is dry, cracked and opaque. A scoured centre strip carries the racing line.
+ a=Asset('trench-scorched-floor',materials)
+ for i in range(at(440),at(700),2):
+  end=min(i+2,at(700))
+  for left,right,tint in [(-10,-1.2,(.065,.062,.058,1)),(-1.2,1.2,(1.05,1.01,.94,1)),(1.2,10,(.065,.062,.058,1))]:
+   a.tint=tint;a.geometry([sample(j,x,.025) for j in [i,end] for x in [left,right]],[(0,1,3,2)],'concrete',3)
+ a.finish();library[a.root.name]=a.root;place(a.root.name,(0,0,0),sector='TRENCH')
  # The underside is a connected service apron with an exhaust opening under the rocket.
  a=Asset('trench-pad-underside',materials)
  for i in range(at(180),at(440),6):

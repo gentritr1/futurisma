@@ -20,7 +20,7 @@ export class AscensionMangroves {
   const texture=new THREE.Texture();
   this.ready=new THREE.TextureLoader().loadAsync('/assets/ascension/textures/greenwater-jungle.png').then(loaded=>{texture.copy(loaded);texture.colorSpace=THREE.SRGBColorSpace;texture.needsUpdate=true;});
   const bark=new THREE.MeshLambertMaterial({map:texture,color:0xb3a990,alphaTest:.5,side:THREE.DoubleSide});
-  const leaf=new THREE.MeshLambertMaterial({map:texture,color:0xe4edc9,emissive:0xffffff,emissiveMap:texture,emissiveIntensity:.22,alphaTest:.5,side:THREE.DoubleSide});
+  const leaf=new THREE.MeshLambertMaterial({map:texture,color:0xc6bca4,emissive:0xffffff,emissiveMap:texture,emissiveIntensity:.08,alphaTest:.5,side:THREE.DoubleSide});
   const parts:THREE.BufferGeometry[]=[];
   const cylinder=(a:THREE.Vector3,b:THREE.Vector3,r:number)=>{
    const g=new THREE.CylinderGeometry(r*.65,r,a.distanceTo(b),7,1,true);g.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,1,0),b.clone().sub(a).normalize()));g.translate(...a.clone().add(b).multiplyScalar(.5).toArray());
@@ -37,7 +37,12 @@ export class AscensionMangroves {
   const positions:THREE.Vector3[]=[];
   for(let i=Math.floor(route.count*.65);i<route.count*.90;i+=13){
    const s=route.stations[i],right=new THREE.Vector3(s.t[2],0,-s.t[0]).normalize();
-   for(const side of [-1,1])for(const offset of [s.width/2+9,s.width/2+22,s.width/2+40])positions.push(new THREE.Vector3(s.p[0],0,s.p[2]).addScaledVector(right,side*offset));
+   for(const side of [-1,1])for(const [band,offset] of [s.width/2+9,s.width/2+22,s.width/2+40].entries()){
+    // Local deterministic placement hash does not consume the racing RNG.
+    const seed=i*71+band*137+side*29;
+    const jitter=(n:number)=>{const h=Math.sin(n*12.9898)*43758.5453;return h-Math.floor(h)-.5;};
+    positions.push(new THREE.Vector3(s.p[0],0,s.p[2]).addScaledVector(right,side*(offset+jitter(seed)*6)).addScaledVector(new THREE.Vector3(...s.t),jitter(seed+17)*24));
+   }
   }
   this.treePositions.push(...positions);
   const trunks=this.trunks=new THREE.InstancedMesh(geometry,bark,positions.length);trunks.frustumCulled=false;trunks.instanceMatrix.setUsage(THREE.DynamicDrawUsage);trunks.name='mangrove_thin_trunks_and_root_fans';
