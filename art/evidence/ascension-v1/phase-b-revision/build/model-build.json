@@ -9,8 +9,8 @@
     "signage",
     "emissive"
   ],
-  "meshes": 101,
-  "triangles": 178510,
+  "meshes": 102,
+  "triangles": 180078,
   "placements": [
     {
       "asset": "rocket-platform",
@@ -812,6 +812,42 @@
         300.175048828125
       ],
       "yaw": 0.6371443031772008,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-pad-underside",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-flame-deflector",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-deluge-hardware",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw": 0,
       "scale": 1,
       "sector": "TRENCH",
       "dynamic": false

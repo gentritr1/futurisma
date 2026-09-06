@@ -21,4 +21,4 @@ for(const [name,stations] of [['main',route.stations],['trench',route.shortcut.s
  }
 }
 const report={script:'scripts/validate-ascension-painted-corridor.mjs',input:file,sha256:createHash('sha256').update(buffer).digest('hex'),scope:'Static authored environment only. Upward 9m rays at every accepted route station and every 2m across each road. Moving crossings and ascent require Phase C sweeps.',sampling:'Spatial grid, not a timed sample window.',samples,hits,accepted:hits.length===0};
-writeFileSync('art/evidence/ascension-v1/phase-b/painted-corridor.json',JSON.stringify(report,null,2));console.log(JSON.stringify({samples,hits:hits.length,first:hits.slice(0,8)}));if(hits.length)process.exitCode=1;
+writeFileSync(process.argv.find(a=>a.startsWith('--out='))?.slice(6)??'art/evidence/ascension-v1/phase-b/painted-corridor.json',JSON.stringify(report,null,2));console.log(JSON.stringify({samples,hits:hits.length,first:hits.slice(0,8)}));if(hits.length)process.exitCode=1;

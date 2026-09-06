@@ -1,0 +1,10 @@
+{
+  "script": "scripts/validate-ascension-painted-corridor.mjs",
+  "input": "public/assets/ascension/painted.glb",
+  "sha256": "ca7d7eadefbd04728e1bd04a564cf3862b654e89b07afb2b2860564e3b643a99",
+  "scope": "Static authored environment only. Upward 9m rays at every accepted route station and every 2m across each road. Moving crossings and ascent require Phase C sweeps.",
+  "sampling": "Spatial grid, not a timed sample window.",
+  "samples": 15179,
+  "hits": [],
+  "accepted": true
+}

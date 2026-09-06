@@ -297,22 +297,8 @@ for x in [-38,0,38]:place('crawlerway-gravel-bed',p+Vector((x,-.1,0)),math.pi/2,
 for u in [.25,.35]:place('deluge-water-tower',beside(u,-42),sector='DELUGE_ROAD')
 for u in [.91,.94,.97]:place('propellant-tank',beside(u,36),sector='TANK_FARM')
 place('vent-stack',beside(.93,-34),sector='TANK_FARM')
-# Trench keeps its accepted length. Rhythmic modules, brighter repair bays and overhead pad breaks.
-for i in range(20,len(route['shortcut']['stations'])-20,10):
- s=route['shortcut']['stations'][i];p=Vector(s['p']);t=Vector(s['t']);right=t.cross(up).normalized()
- for side in [-1,1]:
-  q=p+right*14*side
-  if min(math.hypot(q.x-st['p'][0],q.z-st['p'][2]) for st in route['stations'])<28:continue
-  wall=place('trench-wall-module',q,math.atan2(-t.z,t.x)+(math.pi if side>0 else 0),sector='TRENCH')
-  # Scorched pad bays and cleaner service bays make the long descent legible.
-  progress=s['progress']
-  if .27<progress<.39:
-   for mesh in wall.children:
-    if mesh.type!='MESH' or not mesh.data.materials[0].name.endswith('concrete'):continue
-    mesh.data=mesh.data.copy()
-    for loop,color in zip(mesh.data.loops,mesh.data.color_attributes['Color'].data):
-     height=mesh.data.vertices[loop.vertex_index].co.z;shade=.34+.35*min(1,height/14)
-     color.color=(shade,shade*.94,shade*.87,1)
+from ascension_trench import build_trench
+build_trench(route,place,library,materials,OUT)
 
 for i in range(int(route['count']*.67),int(route['count']*.89),9):
  s=route['stations'][i];t=Vector(s['t']);place('mangrove-pier',Vector(s['p'])-Vector((0,.18,0)),math.atan2(-t.x,-t.z),scale=max(1,(s['width']+3)/26),sector=s['sector'])

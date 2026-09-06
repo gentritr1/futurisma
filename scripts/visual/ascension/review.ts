@@ -12,7 +12,7 @@ const parameters=new URLSearchParams(location.search),progress=Number(parameters
 course.advanceSchedule(tick);
 const s=parameters.has('trench')?course.sampleShortcut(progress):course.sample(progress);
 if(board){const b=course.sample(board==='1'?150/course.length:.8);const approach=course.sample(((board==='1'?150/course.length:.8)-165/course.length+1)%1);camera.position.copy(approach.position);camera.position.y+=2.4;camera.lookAt(camera.position.clone().addScaledVector(approach.tangent,100));}
-else{camera.position.copy(s.position).addScaledVector(s.tangent,-11.5);camera.position.y+=5.76;camera.lookAt(s.position.clone().addScaledVector(s.tangent,19).addScaledVector(s.up,2.11));}
+else{camera.position.copy(s.position).addScaledVector(s.tangent,parameters.has('transition')?-32:-11.5);camera.position.y+=5.76;camera.lookAt(s.position.clone().addScaledVector(s.tangent,19).addScaledVector(s.up,2.11));}
 if(parameters.has('yaw')){camera.position.copy(s.position).addScaledVector(s.up,2.4);const yaw=Number(parameters.get('yaw'))*Math.PI/180;camera.lookAt(camera.position.clone().add(new THREE.Vector3(Math.sin(yaw),.08,-Math.cos(yaw))));}
 const fog=course.fogAt(progress);scene.fog=new THREE.FogExp2(fog.color,fog.density);scene.background=fog.color.clone();course.project(s.position,progress);runtime.updateHud(progress);scene.updateMatrixWorld(true);environment.updateVisibility(camera);if(parameters.has('skyMask')){scene.background=new THREE.Color(0xffffff);scene.fog=null;scene.traverse(o=>{if(o instanceof THREE.Mesh){if(o.name==='ascension_dawn_panorama')o.visible=false;else o.material=new THREE.MeshBasicMaterial({color:0x000000,side:THREE.DoubleSide,toneMapped:false,fog:false});}});}
 renderer.render(scene,camera);
