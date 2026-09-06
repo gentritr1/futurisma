@@ -9,8 +9,8 @@
     "signage",
     "emissive"
   ],
-  "meshes": 100,
-  "triangles": 172682,
+  "meshes": 101,
+  "triangles": 178510,
   "placements": [
     {
       "asset": "rocket-platform",
@@ -2136,11 +2136,11 @@
       "three separate nozzles"
     ],
     "crawler-transporter": [
-      "four tread assemblies",
-      "four support legs",
-      "two corner cabs",
-      "hazard deck band and repair plate",
-      "beacon and horn"
+      "four 12m long 4m tall linked tread units",
+      "full-size paired cabs with glazed frames",
+      "working deck and open underframe",
+      "CT-2 stencil and hazard rim",
+      "beacon horn and caged lamps"
     ],
     "countdown-board": [
       "A-frame mast",

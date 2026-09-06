@@ -32,25 +32,42 @@ def arm(name='service-tower-swing-arm'):
  save(a,['three truss bays per side','hinge cylinder','umbilical loop','central repair plate','caged glass lamp']);return a.root
 
 arm()
-a=Asset('rocket-platform',materials)
+a=Asset('rocket-platform',materials);a.metric_uv=True
 # Piers outside the twenty-metre trench and a genuine deck exhaust opening.
 for x in [-18,18]:
  for z in [-17,17]:a.box((x,15,z),(5,30,5),'concrete',0)
 for x in [-14.5,14.5]:a.box((x,32,0),(16,4,42),'concrete',0)
 for z in [-14.5,14.5]:a.box((0,32,z),(13,4,13),'concrete',0)
-for z in [-21,21]:a.box((0,34.05,z),(45,.4,.4),'signage',3)
+for z in [-21,21]:
+ for x in range(-22,22,2):a.box((x+1,33.5,z),(2,1,.3),'signage',3)
 for x in [-22.5,22.5]:a.box((x,34.05,0),(.4,.4,42),'signage',3)
-a.plate((14,31,21.05),4,3);a.box((14,33,21.08),(.78,.78,.03),'signage',4)
+a.plate((14,31,21.05),4,3);a.box((14,32,21.12),(1.6,1.6,.03),'signage',4)
 # Tower uses open lattice, not a solid block.
 for x in [-20,-15]:
  for z in [-3,3]:a.beam((x,34,z),(x,84,z),.65)
 for y in range(34,84,8):
  for z in [-3,3]:a.beam((-20,y,z),(-15,min(y+8,84),z),.3);a.beam((-15,y,z),(-20,min(y+8,84),z),.3)
  for x in [-20,-15]:a.beam((x,y,-3),(x,min(y+8,84),3),.3)
-a.box((-17.5,84,0),(7,.6,8));a.lamp((-17.5,85.1,0),1.5)
-for x in [-20,20]:a.lamp((x,35.2,18),1.5)
+a.box((-17.5,84,0),(7,.6,8));a.lamp((-17.5,85.1,0),2.2)
+for x in [-20,20]:
+ for z in [-18,18]:a.lamp((x,35.2,z),1.5)
+# Repaired plates, drainage seams and guard rails give the deck working scale.
+for z in [-20.5,20.5]:
+ for x in range(-20,21,5):a.beam((x,34,z),(x,35.3,z),.12)
+ for y in [34.65,35.3]:a.beam((-21,y,z),(21,y,z),.10)
+# Soot follows the open exhaust cut, on the deck and its inner lip.
+a.tint=(.12,.10,.085,1)
+for x in [-7.3,7.3]:a.box((x,34.03,0),(1.6,.035,14),'concrete',0);a.box((x,32.5,0),(.12,3,13),'concrete',0)
+for z in [-7.3,7.3]:a.box((0,34.04,z),(13,.035,1.6),'concrete',0)
+a.tint=(1,1,1,1)
 save(a,['four piers and open exhaust hole','hazard deck rim','open service tower','repair plate','caged lamps and beacon'])
-r=Asset('rocket-ascent',materials);r.tint=(1.35,.65,.42,1);r.cylinder((0,54,0),4.3,36,'concrete',16);r.tint=(1.6,1.6,1.45,1);r.cylinder((0,75,0),4.3,6,'concrete',16,tile=1);r.cylinder((0,80,0),4.3,4,'concrete',12,top_radius=1.6,tile=1)
+r=Asset('rocket-ascent',materials);r.metric_uv=True
+# Distinct rust core, off-white ceramic bands and blunt original nose.
+for y,h in [(40,8),(49,10),(59,10),(66.5,5)]:r.cylinder((0,y,0),4.3,h,'metal',16,tile=2)
+r.tint=(1.35,1.35,1.25,1);r.cylinder((0,72.5,0),4.3,7,'concrete',16,tile=1);r.cylinder((0,77.5,0),4.3,3,'metal',16,tile=2);r.cylinder((0,81,0),4.3,4,'concrete',12,top_radius=1.6,tile=1)
+r.tint=(1,1,1,1)
+for y in [36.5,44,54,64,69]:r.cylinder((0,y,0),4.36,.18,'metal',16)
+r.box((0,57,4.34),(1.6,1.6,.035),'signage',4)
 for x in [-6.6,6.6]:
  r.tint=(1,1,1,1);r.cylinder((x,47,0),2.1,22,'metal',12);r.tint=(1.5,1.5,1.4,1);r.cylinder((x,59,0),2.1,2,'concrete',10,top_radius=.6);r.cylinder((x,35,0),2,2,'metal',10,top_radius=1.2)
 for angle in range(0,360,90):
@@ -59,39 +76,74 @@ for angle in range(0,360,90):
 r.tint=(1,1,1,1);save(r,['blunt faceted nose','two olive boosters','four fins','rust core and ceramic upper band','three separate nozzles'])
 r.root.parent=library['rocket-platform']
 for i,y in enumerate([46,62,77]):
- source=library['service-tower-swing-arm'];copy=source.copy();copy.name='swing-arm-pivot-'+str(i);bpy.context.collection.objects.link(copy);copy.parent=library['rocket-platform'];copy.location=coord((-17.5,y,0))
+ source=library['service-tower-swing-arm'];copy=source.copy();copy.name='swing-arm-pivot-'+str(i);bpy.context.collection.objects.link(copy);copy.parent=library['rocket-platform'];copy.location=coord((-17.5,y,0));copy.scale.x=13.2/18;copy['contactX']=-4.3
  for child in source.children:o=child.copy();o.data=child.data;bpy.context.collection.objects.link(o);o.parent=copy
-# Crawler silhouette: four tread assemblies, four legs, two glazed corner cabs.
-a=Asset('crawler-transporter',materials);a.box((0,9,0),(44,3,32),'metal',0)
-for z in [-16,16]:
- for x in [-16,-8,0,8,16]:
-  a.beam((x-3.6,6.4,z),(x+3.6,7.8,z),.24);a.beam((x+3.6,6.4,z),(x-3.6,7.8,z),.24)
+# Four articulated 12 m x 4 m track units carry the 36 m x 48 m working deck.
+a=Asset('crawler-transporter',materials);a.metric_uv=True
+a.box((0,8,0),(36,1,48),'metal',0)
+for z in [-24,24]:
+ for x in range(-18,18,6):a.box((x+3,9.5,z),(5.94,2,.2),'metal',0)
+ for x in range(-18,18,2):a.box((x+1,10.6,z),(2,.55,.35),'signage',3)
 for x in [-18,18]:
- for z in [-11,11]:
-  a.cylinder((x,5,z),1.25,6,'metal',8);a.box((x,7.8,z),(5,1.2,5));profile=[(0,-4.6),(.5,-5.5),(2.7,-5.5),(3.2,-4.6),(3.2,4.6),(2.7,5.5),(.5,5.5),(0,4.6)]
-  points=[(x+side*3.5,y,z+dz) for side in [-1,1] for y,dz in profile]
-  a.geometry(points,[tuple(reversed(range(8))),tuple(range(8,16))]+[(j,(j+1)%8,(j+1)%8+8,j+8) for j in range(8)],'metal',2)
-  for end in [-1,1]:
-   for y in [.65,1.15,1.65,2.15,2.65]:a.box((x,y,z+end*5.57),(7.15,.18,.22),'metal',2)
-for x,z in [(-19,13),(19,13)]:
- a.box((x,11,z),(4,3,4),'metal',0);a.box((x,11.5,z+2.02),(3,.9,.05),'emissive',2)
- for dx in [-1.5,-.5,.5,1.5]:a.beam((x+dx,11.05,z+2.08),(x+dx,11.95,z+2.08),.06)
- for y in [11.05,11.5,11.95]:a.beam((x-1.5,y,z+2.08),(x+1.5,y,z+2.08),.06)
- a.box((x,9.9,z+2.6),(4.5,.18,1.2),'metal',3)
- for dx in [-2.2,2.2]:a.beam((x+dx,10,z+3.1),(x+dx,11.2,z+3.1),.08)
- a.beam((x-2.2,11.2,z+3.1),(x+2.2,11.2,z+3.1),.08)
- a.lamp((x,13,z),.8)
-for z in [-16,16]:
- for x in range(-22,22):a.box((x+.5,10.6,z),(1,.35,.4),'signage',3)
-for x in [-19,19]:a.lamp((x,11,-13),.8)
-a.plate((0,9,16.05),3,1.4);a.box((0,9,16.12),(1.8,1.1,.03),'signage',5);a.lamp((19,14,13),.8);a.cylinder((20,13.3,13),.3,.8,'metal',8,axis=(1,0,0),top_radius=.6)
-save(a,['four tread assemblies','four support legs','two corner cabs','hazard deck band and repair plate','beacon and horn'])
-for i,(x,z) in enumerate([(-18,-11),(-18,11),(18,-11),(18,11)]):
- a=Asset('crawler-tread-'+str(i),materials)
+ for z in range(-24,24,6):a.box((x,9.5,z+3),(.2,2,5.94),'metal',0)
+for x in [-16,16]:
+ for z in [-17,17]:
+  a.cylinder((x,5.8,z),.75,3.6,'metal',10);a.box((x,4.25,z),(5.5,.5,5));a.box((x,7.2,z),(5.8,1,5.8))
+  for dx in [-2,2]:a.beam((x+dx,4.5,z),(x+dx,7.5,z),.45)
+for z in [-22,-10,2,14,22]:
+ a.beam((-17,7.5,z),(17,7.5,z),.5)
+ for x in [-12,0,12]:a.beam((x-5,7.1,z),(x+5,8.5,z),.25);a.beam((x+5,7.1,z),(x-5,8.5,z),.25)
+# Two full-size cabs with doors, glazing bars, walkways and handrails.
+for x in [-15.5,15.5]:
+ z=21
+ a.box((x,12.5,z),(5,4,5),'metal',0);a.box((x,14.65,z),(5.5,.3,5.5),'metal',1)
+ a.tint=(.24,.38,.42,1);a.box((x,13,z+2.52),(4,1.9,.06),'metal',0);a.tint=(1,1,1,1)
+ for dx in [-2,0,2]:a.beam((x+dx,12.05,z+2.58),(x+dx,13.95,z+2.58),.12)
+ for y in [12.05,13.95]:a.beam((x-2,y,z+2.58),(x+2,y,z+2.58),.12)
+ a.plate((x,11,z+2.6),1.5,.7)
+ a.box((x,10.65,24),(6,.25,2),'metal',3)
+ for dx in [-3,0,3]:a.beam((x+dx,10.8,25),(x+dx,12,25),.12)
+ a.beam((x-3,12,25),(x+3,12,25),.12);a.lamp((x,15.3,21),1.2)
+ a.ladder(x,7.8,25,3)
+a.plate((0,9.5,24.15),5,1.8);a.box((0,9.5,24.25),(2.4,1.5,.04),'signage',5)
+a.lamp((17.2,16,23),1.4);a.cylinder((17.5,15.2,24),.25,1.2,'metal',10,axis=(0,0,1),top_radius=.8)
+a.tint=(.025,.025,.025,1);a.cylinder((17.5,15.2,24.62),.70,.025,'metal',10,axis=(0,0,1));a.tint=(1,1,1,1);a.ring((17.5,15.2,24.65),.78,.06,segments=10)
+# Deck seams and bounded repairs, rather than one stretched face.
+for x in range(-18,18,6):
+ for z in range(-24,24,6):a.box((x+3,10.52,z+3),(5.94,.06,5.94),'metal',0)
+save(a,['four 12m long 4m tall linked tread units','full-size paired cabs with glazed frames','working deck and open underframe','CT-2 stencil and hazard rim','beacon horn and caged lamps'])
+for i,(x,z) in enumerate([(-16,-17),(-16,17),(16,-17),(16,17)]):
+ a=Asset('crawler-tread-'+str(i),materials);a.metric_uv=True
+ # Capsule side profile: 8m straight section and 1.9m radius ends, plus .1m links.
+ profile=[]
+ for j in range(9):
+  angle=math.pi/2-j*math.pi/8;profile.append((2+1.9*math.sin(angle),4+1.9*math.cos(angle)))
+ for j in range(9):
+  angle=-math.pi/2-j*math.pi/8;profile.append((2+1.9*math.sin(angle),-4+1.9*math.cos(angle)))
+ points=[(x+side*2.7,y,z+dz) for side in [-1,1] for y,dz in profile];n=len(profile)
+ a.geometry(points,[tuple(reversed(range(n))),tuple(range(n,n*2))]+[(j,(j+1)%n,(j+1)%n+n,j+n) for j in range(n)],'metal',2)
  for side in [-1,1]:
-  for dz in [-3,0,3]:a.cylinder((x+side*3.53,1.6,z+dz),1.2,.18,'metal',10,axis=(1,0,0),tile=3)
- for dz in range(-5,6):a.box((x,.13,z+dz),(7.15,.25,.6),'metal',2);a.box((x,3.1,z+dz),(7.15,.25,.6),'metal',2)
+  for dz in [-4,-2,0,2,4]:
+   a.cylinder((x+side*2.76,2,z+dz),1.25,.18,'metal',12,axis=(1,0,0),tile=3)
+   a.cylinder((x+side*2.9,2,z+dz),.55,.14,'metal',10,axis=(1,0,0),tile=1)
+ # Separate broad tread plates around the complete continuous belt.
+ perimeter=16+2*math.pi*1.9
+ for j in range(48):
+  d=j*perimeter/48
+  if d<8:y,dz,ny,nz=3.9,-4+d,1,0
+  elif d<8+math.pi*1.9:
+   angle=math.pi/2-(d-8)/1.9;y,dz,ny,nz=2+1.9*math.sin(angle),4+1.9*math.cos(angle),math.sin(angle),math.cos(angle)
+  elif d<16+math.pi*1.9:y,dz,ny,nz=.1,4-(d-8-math.pi*1.9),-1,0
+  else:
+   angle=-math.pi/2-(d-16-math.pi*1.9)/1.9;y,dz,ny,nz=2+1.9*math.sin(angle),-4+1.9*math.cos(angle),math.sin(angle),math.cos(angle)
+  center=Vector((x,y,z+dz));u=Vector((2.9,0,0));v=Vector((0,nz,-ny))*.255;w=Vector((0,ny,nz))*.1
+  pts=[center+u*sx+v*sy+w*sz for sx,sy,sz in [(-1,-1,-1),(1,-1,-1),(1,1,-1),(-1,1,-1),(-1,-1,1),(1,-1,1),(1,1,1),(-1,1,1)]]
+  a.geometry(pts,[(0,3,2,1),(4,5,6,7),(0,1,5,4),(1,2,6,5),(2,3,7,6),(3,0,4,7)],'metal',2)
  root=a.finish();root.parent=library['crawler-transporter']
+ vertices=[v for mesh in root.children for v in mesh.data.vertices]
+ low=min(v.co.z for v in vertices);height=max(v.co.z for v in vertices)-low;length=max(v.co.y for v in vertices)-min(v.co.y for v in vertices)
+ for v in vertices:v.co.z=(v.co.z-low)*4/height;v.co.y=-z+(v.co.y+z)*12/length
+ root['treadLength']=12;root['treadHeight']=4
 # Sheet-sized countdown board; game placement adds a taller clear-span frame.
 a=Asset('countdown-board',materials);a.box((0,.4,0),(8,.8,4),'concrete');a.beam((-2,.8,0),(0,6,0),.6);a.beam((2,.8,0),(0,6,0),.6);a.beam((-1,3,0),(1,5,0),.4);a.box((0,8,0),(10,5,1.6),'metal',0)
 for x in [-4.7,4.7]:a.box((x,8,.86),(.3,4.4,.1),'signage',3)
@@ -160,7 +212,7 @@ for o in objects:
   o.data=o.data.copy();inverse=o.matrix_world.inverted()
   for vertex in o.data.vertices:
    point=old_matrices[o]@vertex.co;point.z=fit_platform_height(point.z);vertex.co=inverse@point
-library['crawler-transporter'].scale=(.8,.8,.8)
+library['crawler-transporter'].scale=(1,1,1)
 bpy.context.view_layer.update()
 # Temporary maquettes are used only to record silhouette proportions beside the authored asset.
 maquettes=[]

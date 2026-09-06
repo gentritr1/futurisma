@@ -8,7 +8,7 @@ def empty(name):
 
 class Asset:
  def __init__(self,name,materials):
-  self.root=empty(name);self.materials=materials;self.parts={};self.tile=0;self.tint=(1,1,1,1)
+  self.root=empty(name);self.materials=materials;self.parts={};self.tile=0;self.tint=(1,1,1,1);self.metric_uv=False
  def geometry(self,points,faces,role='metal',tile=None):
   vertices,polygons,uvs,colours=self.parts.setdefault(role,([],[],[],[]));base=len(vertices);vertices.extend(coord(p) for p in points)
   tile=self.tile if tile is None else tile
@@ -17,7 +17,12 @@ class Asset:
    if 1 in axes:axes=[next(a for a in axes if a!=1),1]
    lo=[min(p[a] for p in vs) for a in axes];span=[max(p[a] for p in vs)-lo[j] for j,a in enumerate(axes)]
    for p in vs:
-    u=(p[axes[0]]-lo[0])/max(.0001,span[0]);v=(p[axes[1]]-lo[1])/max(.0001,span[1]);uvs.append((((tile-4 if tile in [4,5] else tile)%2)*.5+.012+u*.476,.585+v*.4 if tile in [4,5] else (1-tile//2)*.5+.012+v*.476));colours.append(self.tint)
+    u=(p[axes[0]]-lo[0])/max(.0001,span[0]);v=(p[axes[1]]-lo[1])/max(.0001,span[1]);
+    if self.metric_uv and role in ['concrete','metal'] and tile!=1:
+     aspect=span[0]/max(.0001,span[1])
+     if aspect<1:u=.5+(u-.5)*aspect
+     else:v=.5+(v-.5)/aspect
+    uvs.append((((tile-4 if tile in [4,5] else tile)%2)*.5+.012+u*.476,.585+v*.4 if tile in [4,5] else (1-tile//2)*.5+.012+v*.476));colours.append(self.tint)
  def box(self,c,s,role='metal',tile=None):
   points=[(c[0]+x*s[0]/2,c[1]+y*s[1]/2,c[2]+z*s[2]/2) for x,y,z in [(-1,-1,-1),(1,-1,-1),(1,1,-1),(-1,1,-1),(-1,-1,1),(1,-1,1),(1,1,1),(-1,1,1)]]
   self.geometry(points,[(0,3,2,1),(4,5,6,7),(0,1,5,4),(1,2,6,5),(2,3,7,6),(3,0,4,7)],role,tile)
