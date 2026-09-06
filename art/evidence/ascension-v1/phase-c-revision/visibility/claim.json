@@ -1,0 +1,2839 @@
+{
+  "script": "scripts/visual/ascension/launch-visibility.mjs",
+  "maskDefinition": "Same-frame RGB difference >=3/255, plume enabled versus disabled. Only persistent_launch_smoke changes. One binary mask per captured driving frame.",
+  "scope": "Unmodified seeded Works Deluge Road three-lap demo, normal chase camera. Capture passes are not performance benchmarks.",
+  "inputHashes": {
+    "src/game/ascension-effects.ts": "121c557220fac3cd4a35626eb635be01ef6ea884720c6e1e196f77562217133d",
+    "src/game/ascension-mangroves.ts": "71bff7156bba562cdb6d7bafc723eb79299233b3c0d54a93ecadd2845d25745c",
+    "src/game/ascension-sky.ts": "3ce5623fbd87ad1f004cf566a1b83fa9ca271e9ccf967599941e92b7c1b54b0c",
+    "src/game/data/ascension/route.json": "dabee585023ea426e6ac90666d9c45a978743407e33370a93cc02432531f7880"
+  },
+  "windowSeconds": 20,
+  "expectedRateHz": 10,
+  "inclusiveEndpointSamples": 1,
+  "expectedSamples": 201,
+  "captured": 201,
+  "residual": 0,
+  "plumeFrames": 201,
+  "fraction": 1,
+  "firstTickOffset": 0,
+  "lastTickOffset": 2400,
+  "observedWallWindowSeconds": 26.587,
+  "errors": [],
+  "records": [
+    {
+      "tick": 8253,
+      "secondsAfterT0": 0,
+      "now": 94640.20000004768,
+      "pixels": 18881,
+      "columnTopElevationDegrees": 1.8680052455362681,
+      "cloudGlow": 1,
+      "camera": [
+        -109.95014135196553,
+        9.86486075433604,
+        -393.5334613141723
+      ],
+      "file": "0000.png"
+    },
+    {
+      "tick": 8265,
+      "secondsAfterT0": 0.1,
+      "now": 94817.20000004768,
+      "pixels": 20960,
+      "columnTopElevationDegrees": 2.2719903444292653,
+      "cloudGlow": 1,
+      "camera": [
+        -101.5028152842458,
+        9.869513378038011,
+        -395.3979099891662
+      ],
+      "file": "0001.png"
+    },
+    {
+      "tick": 8277,
+      "secondsAfterT0": 0.2,
+      "now": 94959.39999997616,
+      "pixels": 28900,
+      "columnTopElevationDegrees": 3.4241054675237894,
+      "cloudGlow": 1,
+      "camera": [
+        -92.64021816133683,
+        9.872916777658777,
+        -397.12205091580523
+      ],
+      "file": "0002.png"
+    },
+    {
+      "tick": 8289,
+      "secondsAfterT0": 0.3,
+      "now": 95095.30000007153,
+      "pixels": 39840,
+      "columnTopElevationDegrees": 5.29254112811563,
+      "cloudGlow": 1,
+      "camera": [
+        -84.10752859127386,
+        9.875483986680848,
+        -398.55586920373077
+      ],
+      "file": "0003.png"
+    },
+    {
+      "tick": 8301,
+      "secondsAfterT0": 0.4,
+      "now": 95236.30000007153,
+      "pixels": 50013,
+      "columnTopElevationDegrees": 7.8427575885266965,
+      "cloudGlow": 1,
+      "camera": [
+        -75.30211520824417,
+        9.877215962562218,
+        -399.7998537951729
+      ],
+      "file": "0004.png"
+    },
+    {
+      "tick": 8313,
+      "secondsAfterT0": 0.5,
+      "now": 95369.80000007153,
+      "pixels": 59623,
+      "columnTopElevationDegrees": 11.015234514152041,
+      "cloudGlow": 1,
+      "camera": [
+        -66.69115569747026,
+        9.876888936714149,
+        -400.78410958266477
+      ],
+      "file": "0005.png"
+    },
+    {
+      "tick": 8325,
+      "secondsAfterT0": 0.6,
+      "now": 95503.89999997616,
+      "pixels": 71364,
+      "columnTopElevationDegrees": 14.750114680497404,
+      "cloudGlow": 1,
+      "camera": [
+        -57.36738587745371,
+        9.873331827125746,
+        -401.5916422213484
+      ],
+      "file": "0006.png"
+    },
+    {
+      "tick": 8337,
+      "secondsAfterT0": 0.7,
+      "now": 95626.70000004768,
+      "pixels": 82289,
+      "columnTopElevationDegrees": 18.901985104693164,
+      "cloudGlow": 1,
+      "camera": [
+        -49.11958051179345,
+        9.867035660658075,
+        -402.082946308004
+      ],
+      "file": "0007.png"
+    },
+    {
+      "tick": 8349,
+      "secondsAfterT0": 0.8,
+      "now": 95761.60000002384,
+      "pixels": 92176,
+      "columnTopElevationDegrees": 23.401499803322185,
+      "cloudGlow": 1,
+      "camera": [
+        -39.75223283630178,
+        9.856021590500921,
+        -402.387860975159
+      ],
+      "file": "0008.png"
+    },
+    {
+      "tick": 8361,
+      "secondsAfterT0": 0.9,
+      "now": 95891.10000002384,
+      "pixels": 103714,
+      "columnTopElevationDegrees": 28.044432823564755,
+      "cloudGlow": 1,
+      "camera": [
+        -31.1102328283949,
+        9.842563904365011,
+        -402.436478073255
+      ],
+      "file": "0009.png"
+    },
+    {
+      "tick": 8373,
+      "secondsAfterT0": 1,
+      "now": 96016.89999997616,
+      "pixels": 119689,
+      "columnTopElevationDegrees": 32.705889002443826,
+      "cloudGlow": 1,
+      "camera": [
+        -22.472145451003012,
+        9.826474350755365,
+        -402.26504396772833
+      ],
+      "file": "0010.png"
+    },
+    {
+      "tick": 8385,
+      "secondsAfterT0": 1.1,
+      "now": 96141.39999997616,
+      "pixels": 137148,
+      "columnTopElevationDegrees": 37.2540694763104,
+      "cloudGlow": 1,
+      "camera": [
+        -13.825161251739464,
+        9.808531048007744,
+        -401.8794120945339
+      ],
+      "file": "0011.png"
+    },
+    {
+      "tick": 8397,
+      "secondsAfterT0": 1.2,
+      "now": 96283.70000004768,
+      "pixels": 160431,
+      "columnTopElevationDegrees": 41.6205359682048,
+      "cloudGlow": 1,
+      "camera": [
+        -4.506786978393667,
+        9.788276287947685,
+        -401.2323103560065
+      ],
+      "file": "0012.png"
+    },
+    {
+      "tick": 8409,
+      "secondsAfterT0": 1.3,
+      "now": 96451.5,
+      "pixels": 182362,
+      "columnTopElevationDegrees": 45.65616881904262,
+      "cloudGlow": 1,
+      "camera": [
+        4.107548859101987,
+        9.76977621346074,
+        -400.42795632168446
+      ],
+      "file": "0013.png"
+    },
+    {
+      "tick": 8421,
+      "secondsAfterT0": 1.4,
+      "now": 96576.5,
+      "pixels": 200129,
+      "columnTopElevationDegrees": 49.35646815742831,
+      "cloudGlow": 1,
+      "camera": [
+        12.712765734694024,
+        9.76,
+        -399.43119206734883
+      ],
+      "file": "0014.png"
+    },
+    {
+      "tick": 8433,
+      "secondsAfterT0": 1.5,
+      "now": 96699,
+      "pixels": 207817,
+      "columnTopElevationDegrees": 52.70529287816754,
+      "cloudGlow": 1,
+      "camera": [
+        21.280235127681493,
+        9.76,
+        -398.2581066180186
+      ],
+      "file": "0015.png"
+    },
+    {
+      "tick": 8445,
+      "secondsAfterT0": 1.6,
+      "now": 96836.60000002384,
+      "pixels": 220293,
+      "columnTopElevationDegrees": 55.74811583395146,
+      "cloudGlow": 1,
+      "camera": [
+        30.50556910744643,
+        9.76,
+        -396.8113172642764
+      ],
+      "file": "0016.png"
+    },
+    {
+      "tick": 8457,
+      "secondsAfterT0": 1.7,
+      "now": 96961.60000002384,
+      "pixels": 234440,
+      "columnTopElevationDegrees": 58.404115710819156,
+      "cloudGlow": 1,
+      "camera": [
+        38.692673854754155,
+        9.76,
+        -395.38181506669684
+      ],
+      "file": "0017.png"
+    },
+    {
+      "tick": 8469,
+      "secondsAfterT0": 1.8,
+      "now": 97096.60000002384,
+      "pixels": 249652,
+      "columnTopElevationDegrees": 60.81365109299868,
+      "cloudGlow": 1,
+      "camera": [
+        47.882742595613706,
+        9.76,
+        -393.6296568143145
+      ],
+      "file": "0018.png"
+    },
+    {
+      "tick": 8481,
+      "secondsAfterT0": 1.9,
+      "now": 97229.70000004768,
+      "pixels": 256261,
+      "columnTopElevationDegrees": 62.90640793251224,
+      "cloudGlow": 1,
+      "camera": [
+        56.333763054691445,
+        9.76,
+        -391.8946175575728
+      ],
+      "file": "0019.png"
+    },
+    {
+      "tick": 8493,
+      "secondsAfterT0": 2,
+      "now": 97354.20000004768,
+      "pixels": 255842,
+      "columnTopElevationDegrees": 64.74993793764621,
+      "cloudGlow": 1,
+      "camera": [
+        64.75763866696843,
+        9.76,
+        -390.0614732670959
+      ],
+      "file": "0020.png"
+    },
+    {
+      "tick": 8505,
+      "secondsAfterT0": 2.1,
+      "now": 97489.10000002384,
+      "pixels": 246841,
+      "columnTopElevationDegrees": 66.37121859731988,
+      "cloudGlow": 1,
+      "camera": [
+        73.17254178654488,
+        9.76,
+        -388.13737401986873
+      ],
+      "file": "0021.png"
+    },
+    {
+      "tick": 8517,
+      "secondsAfterT0": 2.2,
+      "now": 97629.70000004768,
+      "pixels": 240804,
+      "columnTopElevationDegrees": 67.82611858396258,
+      "cloudGlow": 1,
+      "camera": [
+        82.25731890432492,
+        9.76,
+        -385.9647882673733
+      ],
+      "file": "0022.png"
+    },
+    {
+      "tick": 8529,
+      "secondsAfterT0": 2.3,
+      "now": 97763.80000007153,
+      "pixels": 233473,
+      "columnTopElevationDegrees": 69.06883930433281,
+      "cloudGlow": 1,
+      "camera": [
+        90.62791552168534,
+        9.76,
+        -383.88229962404574
+      ],
+      "file": "0023.png"
+    },
+    {
+      "tick": 8541,
+      "secondsAfterT0": 2.4,
+      "now": 97893.80000007153,
+      "pixels": 239326,
+      "columnTopElevationDegrees": 70.16435146601458,
+      "cloudGlow": 1,
+      "camera": [
+        99.26460222363305,
+        9.76,
+        -381.6567843027723
+      ],
+      "file": "0024.png"
+    },
+    {
+      "tick": 8553,
+      "secondsAfterT0": 2.5,
+      "now": 98024.5,
+      "pixels": 243476,
+      "columnTopElevationDegrees": 71.10288226909134,
+      "cloudGlow": 1,
+      "camera": [
+        107.60406934075377,
+        9.76,
+        -379.4359132510308
+      ],
+      "file": "0025.png"
+    },
+    {
+      "tick": 8565,
+      "secondsAfterT0": 2.6,
+      "now": 98150.39999997616,
+      "pixels": 244406,
+      "columnTopElevationDegrees": 71.90986405095039,
+      "cloudGlow": 1,
+      "camera": [
+        115.92371361327191,
+        9.76,
+        -377.1498319231826
+      ],
+      "file": "0026.png"
+    },
+    {
+      "tick": 8577,
+      "secondsAfterT0": 2.7,
+      "now": 98281.70000004768,
+      "pixels": 242725,
+      "columnTopElevationDegrees": 72.59553208953892,
+      "cloudGlow": 1,
+      "camera": [
+        124.22352480705767,
+        9.76,
+        -374.7970371740263
+      ],
+      "file": "0027.png"
+    },
+    {
+      "tick": 8589,
+      "secondsAfterT0": 2.8,
+      "now": 98419,
+      "pixels": 239839,
+      "columnTopElevationDegrees": 73.19400938076124,
+      "cloudGlow": 1,
+      "camera": [
+        133.18418614684717,
+        9.76,
+        -372.17146461011873
+      ],
+      "file": "0028.png"
+    },
+    {
+      "tick": 8601,
+      "secondsAfterT0": 2.9,
+      "now": 98544.10000002384,
+      "pixels": 234416,
+      "columnTopElevationDegrees": 73.65727615227887,
+      "cloudGlow": 1,
+      "camera": [
+        141.4450029689967,
+        9.76,
+        -369.6669361963199
+      ],
+      "file": "0029.png"
+    },
+    {
+      "tick": 8613,
+      "secondsAfterT0": 3,
+      "now": 98678.70000004768,
+      "pixels": 228537,
+      "columnTopElevationDegrees": 74.03098099200766,
+      "cloudGlow": 1,
+      "camera": [
+        150.115423990945,
+        9.76,
+        -366.9445674897779
+      ],
+      "file": "0030.png"
+    },
+    {
+      "tick": 8625,
+      "secondsAfterT0": 3.1,
+      "now": 98805.39999997616,
+      "pixels": 222661,
+      "columnTopElevationDegrees": 74.3401170630031,
+      "cloudGlow": 1,
+      "camera": [
+        158.53116089869945,
+        9.76,
+        -364.20196366244363
+      ],
+      "file": "0031.png"
+    },
+    {
+      "tick": 8637,
+      "secondsAfterT0": 3.2,
+      "now": 98927,
+      "pixels": 215832,
+      "columnTopElevationDegrees": 74.63534445511468,
+      "cloudGlow": 1,
+      "camera": [
+        166.71248684146093,
+        9.76,
+        -361.4330003331201
+      ],
+      "file": "0032.png"
+    },
+    {
+      "tick": 8649,
+      "secondsAfterT0": 3.3,
+      "now": 99049.39999997616,
+      "pixels": 204941,
+      "columnTopElevationDegrees": 74.92389380380821,
+      "cloudGlow": 1,
+      "camera": [
+        174.8571486621514,
+        9.76,
+        -358.56746818961636
+      ],
+      "file": "0033.png"
+    },
+    {
+      "tick": 8661,
+      "secondsAfterT0": 3.4,
+      "now": 99182.60000002384,
+      "pixels": 190110,
+      "columnTopElevationDegrees": 75.20551148131538,
+      "cloudGlow": 1,
+      "camera": [
+        182.9616237320653,
+        9.76,
+        -355.6001301763726
+      ],
+      "file": "0034.png"
+    },
+    {
+      "tick": 8673,
+      "secondsAfterT0": 3.5,
+      "now": 99308.30000007153,
+      "pixels": 178344,
+      "columnTopElevationDegrees": 75.48031770114315,
+      "cloudGlow": 1,
+      "camera": [
+        191.0320357210717,
+        9.76,
+        -352.52123708846574
+      ],
+      "file": "0035.png"
+    },
+    {
+      "tick": 8685,
+      "secondsAfterT0": 3.6,
+      "now": 99448.70000004768,
+      "pixels": 191499,
+      "columnTopElevationDegrees": 75.76937261785267,
+      "cloudGlow": 0.8959999999999998,
+      "camera": [
+        199.71444695651857,
+        9.76,
+        -349.0616486624346
+      ],
+      "file": "0036.png"
+    },
+    {
+      "tick": 8697,
+      "secondsAfterT0": 3.7,
+      "now": 99610.5,
+      "pixels": 213314,
+      "columnTopElevationDegrees": 76.02844678222293,
+      "cloudGlow": 0.6479999999999995,
+      "camera": [
+        207.68514580302204,
+        9.76,
+        -345.74195579570676
+      ],
+      "file": "0037.png"
+    },
+    {
+      "tick": 8709,
+      "secondsAfterT0": 3.8,
+      "now": 99734.39999997616,
+      "pixels": 238110,
+      "columnTopElevationDegrees": 76.27968216019113,
+      "cloudGlow": 0.3520000000000004,
+      "camera": [
+        215.60435865295085,
+        9.76,
+        -342.2969374668786
+      ],
+      "file": "0038.png"
+    },
+    {
+      "tick": 8721,
+      "secondsAfterT0": 3.9,
+      "now": 99863.60000002384,
+      "pixels": 250273,
+      "columnTopElevationDegrees": 76.5322825198703,
+      "cloudGlow": 0.1040000000000002,
+      "camera": [
+        223.7778112035156,
+        9.76,
+        -338.5768211998532
+      ],
+      "file": "0039.png"
+    },
+    {
+      "tick": 8733,
+      "secondsAfterT0": 4,
+      "now": 99989.10000002384,
+      "pixels": 251947,
+      "columnTopElevationDegrees": 76.76649441431846,
+      "cloudGlow": 0,
+      "camera": [
+        231.57758700044252,
+        9.76,
+        -334.86356004649423
+      ],
+      "file": "0040.png"
+    },
+    {
+      "tick": 8745,
+      "secondsAfterT0": 4.1,
+      "now": 100126.10000002384,
+      "pixels": 253687,
+      "columnTopElevationDegrees": 77.00926320156181,
+      "cloudGlow": 0,
+      "camera": [
+        239.93029675097233,
+        9.76,
+        -330.70225492352085
+      ],
+      "file": "0041.png"
+    },
+    {
+      "tick": 8757,
+      "secondsAfterT0": 4.2,
+      "now": 100254,
+      "pixels": 254386,
+      "columnTopElevationDegrees": 77.22414896167325,
+      "cloudGlow": 0,
+      "camera": [
+        247.60103010406738,
+        9.76,
+        -326.70636438713007
+      ],
+      "file": "0042.png"
+    },
+    {
+      "tick": 8769,
+      "secondsAfterT0": 4.3,
+      "now": 100376.20000004768,
+      "pixels": 255042,
+      "columnTopElevationDegrees": 77.42835804161261,
+      "cloudGlow": 0,
+      "camera": [
+        255.19375179785993,
+        9.76,
+        -322.5831050352415
+      ],
+      "file": "0043.png"
+    },
+    {
+      "tick": 8781,
+      "secondsAfterT0": 4.4,
+      "now": 100505,
+      "pixels": 255871,
+      "columnTopElevationDegrees": 77.62125011335422,
+      "cloudGlow": 0,
+      "camera": [
+        262.7082283422225,
+        9.76,
+        -318.3338397590906
+      ],
+      "file": "0044.png"
+    },
+    {
+      "tick": 8793,
+      "secondsAfterT0": 4.5,
+      "now": 100641.20000004768,
+      "pixels": 260675,
+      "columnTopElevationDegrees": 77.81660226937582,
+      "cloudGlow": 0,
+      "camera": [
+        270.755959314523,
+        9.76,
+        -313.59215208215903
+      ],
+      "file": "0045.png"
+    },
+    {
+      "tick": 8805,
+      "secondsAfterT0": 4.6,
+      "now": 100763.80000007153,
+      "pixels": 263926,
+      "columnTopElevationDegrees": 77.98406627717755,
+      "cloudGlow": 0,
+      "camera": [
+        278.1221782705429,
+        9.76,
+        -309.0765148590913
+      ],
+      "file": "0046.png"
+    },
+    {
+      "tick": 8817,
+      "secondsAfterT0": 4.7,
+      "now": 100893.60000002384,
+      "pixels": 265318,
+      "columnTopElevationDegrees": 78.14409494040558,
+      "cloudGlow": 0,
+      "camera": [
+        285.71710568034246,
+        9.76,
+        -304.2430768864052
+      ],
+      "file": "0047.png"
+    },
+    {
+      "tick": 8829,
+      "secondsAfterT0": 4.8,
+      "now": 101015.10000002384,
+      "pixels": 266561,
+      "columnTopElevationDegrees": 78.28269202300234,
+      "cloudGlow": 0,
+      "camera": [
+        292.91588668299676,
+        9.76,
+        -299.4938596664037
+      ],
+      "file": "0048.png"
+    },
+    {
+      "tick": 8841,
+      "secondsAfterT0": 4.9,
+      "now": 101142.89999997616,
+      "pixels": 267956,
+      "columnTopElevationDegrees": 78.40626680037357,
+      "cloudGlow": 0,
+      "camera": [
+        300.05244445668484,
+        9.76,
+        -294.6234234887202
+      ],
+      "file": "0049.png"
+    },
+    {
+      "tick": 8853,
+      "secondsAfterT0": 5,
+      "now": 101269,
+      "pixels": 270565,
+      "columnTopElevationDegrees": 78.51361787570269,
+      "cloudGlow": 0,
+      "camera": [
+        307.1094408222032,
+        9.76,
+        -289.648831531069
+      ],
+      "file": "0050.png"
+    },
+    {
+      "tick": 8865,
+      "secondsAfterT0": 5.1,
+      "now": 101399.80000007153,
+      "pixels": 271023,
+      "columnTopElevationDegrees": 78.61061547241042,
+      "cloudGlow": 0,
+      "camera": [
+        314.65340522709346,
+        9.76,
+        -284.1563558458912
+      ],
+      "file": "0051.png"
+    },
+    {
+      "tick": 8877,
+      "secondsAfterT0": 5.2,
+      "now": 101523.30000007153,
+      "pixels": 271108,
+      "columnTopElevationDegrees": 78.67855382256613,
+      "cloudGlow": 0,
+      "camera": [
+        321.17967197749704,
+        9.76,
+        -279.25906745242975
+      ],
+      "file": "0052.png"
+    },
+    {
+      "tick": 8889,
+      "secondsAfterT0": 5.3,
+      "now": 101657.30000007153,
+      "pixels": 271110,
+      "columnTopElevationDegrees": 78.73629463034865,
+      "cloudGlow": 0,
+      "camera": [
+        328.5711045348453,
+        9.76,
+        -273.54910176634706
+      ],
+      "file": "0053.png"
+    },
+    {
+      "tick": 8901,
+      "secondsAfterT0": 5.4,
+      "now": 101781,
+      "pixels": 271004,
+      "columnTopElevationDegrees": 78.77013629125587,
+      "cloudGlow": 0,
+      "camera": [
+        335.32632482180134,
+        9.76,
+        -268.1778207121507
+      ],
+      "file": "0054.png"
+    },
+    {
+      "tick": 8913,
+      "secondsAfterT0": 5.5,
+      "now": 101902.39999997616,
+      "pixels": 272119,
+      "columnTopElevationDegrees": 78.78489265937868,
+      "cloudGlow": 0,
+      "camera": [
+        342.0109974778056,
+        9.76,
+        -262.7171752269724
+      ],
+      "file": "0055.png"
+    },
+    {
+      "tick": 8925,
+      "secondsAfterT0": 5.6,
+      "now": 102025.20000004768,
+      "pixels": 273780,
+      "columnTopElevationDegrees": 78.78038438896643,
+      "cloudGlow": 0,
+      "camera": [
+        348.6299209061083,
+        9.76,
+        -257.16456978647216
+      ],
+      "file": "0056.png"
+    },
+    {
+      "tick": 8937,
+      "secondsAfterT0": 5.7,
+      "now": 102159.10000002384,
+      "pixels": 274945,
+      "columnTopElevationDegrees": 78.75381313632018,
+      "cloudGlow": 0,
+      "camera": [
+        355.70176228229013,
+        9.76,
+        -251.0673021400748
+      ],
+      "file": "0057.png"
+    },
+    {
+      "tick": 8949,
+      "secondsAfterT0": 5.8,
+      "now": 102282.20000004768,
+      "pixels": 274905,
+      "columnTopElevationDegrees": 78.70942666632605,
+      "cloudGlow": 0,
+      "camera": [
+        362.1602930373623,
+        9.76,
+        -245.3435977135072
+      ],
+      "file": "0058.png"
+    },
+    {
+      "tick": 8961,
+      "secondsAfterT0": 5.9,
+      "now": 102406.10000002384,
+      "pixels": 273708,
+      "columnTopElevationDegrees": 78.6462796148316,
+      "cloudGlow": 0,
+      "camera": [
+        368.55016109066986,
+        9.76,
+        -239.5269179529544
+      ],
+      "file": "0059.png"
+    },
+    {
+      "tick": 8973,
+      "secondsAfterT0": 6,
+      "now": 102527.5,
+      "pixels": 270850,
+      "columnTopElevationDegrees": 78.56477095663108,
+      "cloudGlow": 0,
+      "camera": [
+        374.8719484925224,
+        9.76,
+        -233.61215901186
+      ],
+      "file": "0060.png"
+    },
+    {
+      "tick": 8986,
+      "secondsAfterT0": 6.108333333333333,
+      "now": 102670.20000004768,
+      "pixels": 270276,
+      "columnTopElevationDegrees": 78.45268491871953,
+      "cloudGlow": 0,
+      "camera": [
+        381.85082863833657,
+        9.76,
+        -226.8830724458967
+      ],
+      "file": "0061.png"
+    },
+    {
+      "tick": 8997,
+      "secondsAfterT0": 6.2,
+      "now": 102827.70000004768,
+      "pixels": 264215,
+      "columnTopElevationDegrees": 78.34543335011486,
+      "cloudGlow": 0,
+      "camera": [
+        387.47686661865384,
+        9.76,
+        -221.29210128542854
+      ],
+      "file": "0062.png"
+    },
+    {
+      "tick": 9009,
+      "secondsAfterT0": 6.3,
+      "now": 102962.80000007153,
+      "pixels": 252644,
+      "columnTopElevationDegrees": 78.20173237361863,
+      "cloudGlow": 0,
+      "camera": [
+        394.02159657243294,
+        9.76,
+        -214.58210325187366
+      ],
+      "file": "0063.png"
+    },
+    {
+      "tick": 9021,
+      "secondsAfterT0": 6.4,
+      "now": 103087.20000004768,
+      "pixels": 235211,
+      "columnTopElevationDegrees": 78.05383506731425,
+      "cloudGlow": 0,
+      "camera": [
+        399.95977924391,
+        9.76,
+        -208.2793308908459
+      ],
+      "file": "0064.png"
+    },
+    {
+      "tick": 9033,
+      "secondsAfterT0": 6.5,
+      "now": 103210,
+      "pixels": 225160,
+      "columnTopElevationDegrees": 77.89280757970688,
+      "cloudGlow": 0,
+      "camera": [
+        405.77740977368194,
+        9.76,
+        -201.88259717769745
+      ],
+      "file": "0065.png"
+    },
+    {
+      "tick": 9045,
+      "secondsAfterT0": 6.6,
+      "now": 103333.5,
+      "pixels": 240966,
+      "columnTopElevationDegrees": 77.71928216027462,
+      "cloudGlow": 0,
+      "camera": [
+        411.486283245864,
+        9.76,
+        -195.36353534187097
+      ],
+      "file": "0066.png"
+    },
+    {
+      "tick": 9057,
+      "secondsAfterT0": 6.7,
+      "now": 103461.10000002384,
+      "pixels": 254372,
+      "columnTopElevationDegrees": 77.52655745460895,
+      "cloudGlow": 0,
+      "camera": [
+        417.2987389956169,
+        9.76,
+        -188.45460404969432
+      ],
+      "file": "0067.png"
+    },
+    {
+      "tick": 9069,
+      "secondsAfterT0": 6.8,
+      "now": 103584.10000002384,
+      "pixels": 279530,
+      "columnTopElevationDegrees": 77.33180358866775,
+      "cloudGlow": 0,
+      "camera": [
+        422.725624234985,
+        9.76,
+        -181.72198553326683
+      ],
+      "file": "0068.png"
+    },
+    {
+      "tick": 9081,
+      "secondsAfterT0": 6.9,
+      "now": 103723.5,
+      "pixels": 281472,
+      "columnTopElevationDegrees": 77.11059397416209,
+      "cloudGlow": 0,
+      "camera": [
+        428.44914205764337,
+        9.76,
+        -174.27722921057335
+      ],
+      "file": "0069.png"
+    },
+    {
+      "tick": 9093,
+      "secondsAfterT0": 7,
+      "now": 103852.70000004768,
+      "pixels": 278158,
+      "columnTopElevationDegrees": 76.89838736458722,
+      "cloudGlow": 0,
+      "camera": [
+        433.5695639148579,
+        9.76,
+        -167.2720864161623
+      ],
+      "file": "0070.png"
+    },
+    {
+      "tick": 9105,
+      "secondsAfterT0": 7.1,
+      "now": 103981.5,
+      "pixels": 277882,
+      "columnTopElevationDegrees": 76.68046761924012,
+      "cloudGlow": 0,
+      "camera": [
+        438.5039903958715,
+        9.76,
+        -160.1573056420344
+      ],
+      "file": "0071.png"
+    },
+    {
+      "tick": 9117,
+      "secondsAfterT0": 7.2,
+      "now": 104114.10000002384,
+      "pixels": 280601,
+      "columnTopElevationDegrees": 76.4573396861885,
+      "cloudGlow": 0,
+      "camera": [
+        443.2581536579527,
+        9.76,
+        -152.88169185349486
+      ],
+      "file": "0072.png"
+    },
+    {
+      "tick": 9129,
+      "secondsAfterT0": 7.3,
+      "now": 104247.10000002384,
+      "pixels": 286984,
+      "columnTopElevationDegrees": 76.21281281094303,
+      "cloudGlow": 0,
+      "camera": [
+        448.15242140477807,
+        9.76,
+        -144.85304946395163
+      ],
+      "file": "0073.png"
+    },
+    {
+      "tick": 9141,
+      "secondsAfterT0": 7.4,
+      "now": 104379.30000007153,
+      "pixels": 287350,
+      "columnTopElevationDegrees": 75.98567911464919,
+      "cloudGlow": 0,
+      "camera": [
+        452.4188793542898,
+        9.76,
+        -137.29616811528447
+      ],
+      "file": "0074.png"
+    },
+    {
+      "tick": 9153,
+      "secondsAfterT0": 7.5,
+      "now": 104514.5,
+      "pixels": 286210,
+      "columnTopElevationDegrees": 75.75083045210063,
+      "cloudGlow": 0,
+      "camera": [
+        456.5544522190905,
+        9.76,
+        -129.3350563775784
+      ],
+      "file": "0075.png"
+    },
+    {
+      "tick": 9165,
+      "secondsAfterT0": 7.6,
+      "now": 104644.39999997616,
+      "pixels": 284206,
+      "columnTopElevationDegrees": 75.52456869882982,
+      "cloudGlow": 0,
+      "camera": [
+        460.2734467022694,
+        9.76,
+        -121.51047628472318
+      ],
+      "file": "0076.png"
+    },
+    {
+      "tick": 9177,
+      "secondsAfterT0": 7.7,
+      "now": 104778.39999997616,
+      "pixels": 282806,
+      "columnTopElevationDegrees": 75.29211650795756,
+      "cloudGlow": 0,
+      "camera": [
+        463.8184201241142,
+        9.76,
+        -113.2752598843799
+      ],
+      "file": "0077.png"
+    },
+    {
+      "tick": 9189,
+      "secondsAfterT0": 7.8,
+      "now": 104910.30000007153,
+      "pixels": 279175,
+      "columnTopElevationDegrees": 75.06875861350582,
+      "cloudGlow": 0,
+      "camera": [
+        466.95435139053393,
+        9.76,
+        -105.17521322836107
+      ],
+      "file": "0078.png"
+    },
+    {
+      "tick": 9201,
+      "secondsAfterT0": 7.9,
+      "now": 105042.60000002384,
+      "pixels": 275011,
+      "columnTopElevationDegrees": 74.84763766240508,
+      "cloudGlow": 0,
+      "camera": [
+        469.7876552052874,
+        9.76,
+        -96.95466728169932
+      ],
+      "file": "0079.png"
+    },
+    {
+      "tick": 9213,
+      "secondsAfterT0": 8,
+      "now": 105177.70000004768,
+      "pixels": 270251,
+      "columnTopElevationDegrees": 74.61168190477345,
+      "cloudGlow": 0,
+      "camera": [
+        472.50102186801763,
+        9.76,
+        -87.9582456954403
+      ],
+      "file": "0080.png"
+    },
+    {
+      "tick": 9225,
+      "secondsAfterT0": 8.1,
+      "now": 105310,
+      "pixels": 265737,
+      "columnTopElevationDegrees": 74.39733244727923,
+      "cloudGlow": 0,
+      "camera": [
+        474.67739450713174,
+        9.76,
+        -79.58867864039392
+      ],
+      "file": "0081.png"
+    },
+    {
+      "tick": 9237,
+      "secondsAfterT0": 8.2,
+      "now": 105443.20000004768,
+      "pixels": 262963,
+      "columnTopElevationDegrees": 74.18484264956196,
+      "cloudGlow": 0,
+      "camera": [
+        476.5535240215951,
+        9.76,
+        -71.11267794251897
+      ],
+      "file": "0082.png"
+    },
+    {
+      "tick": 9249,
+      "secondsAfterT0": 8.3,
+      "now": 105578.39999997616,
+      "pixels": 265182,
+      "columnTopElevationDegrees": 73.96548109747687,
+      "cloudGlow": 0,
+      "camera": [
+        478.19161564615035,
+        9.76,
+        -62.20430083971012
+      ],
+      "file": "0083.png"
+    },
+    {
+      "tick": 9261,
+      "secondsAfterT0": 8.4,
+      "now": 105710.60000002384,
+      "pixels": 270009,
+      "columnTopElevationDegrees": 73.75790058650145,
+      "cloudGlow": 0,
+      "camera": [
+        479.46138521079826,
+        9.76,
+        -53.656390350460384
+      ],
+      "file": "0084.png"
+    },
+    {
+      "tick": 9273,
+      "secondsAfterT0": 8.5,
+      "now": 105846.10000002384,
+      "pixels": 270168,
+      "columnTopElevationDegrees": 73.5411445804128,
+      "cloudGlow": 0,
+      "camera": [
+        480.5026145267387,
+        9.76,
+        -44.65185138273078
+      ],
+      "file": "0085.png"
+    },
+    {
+      "tick": 9285,
+      "secondsAfterT0": 8.6,
+      "now": 105978.80000007153,
+      "pixels": 270736,
+      "columnTopElevationDegrees": 73.3348211347527,
+      "cloudGlow": 0,
+      "camera": [
+        481.23571645754754,
+        9.76,
+        -36.05117011588054
+      ],
+      "file": "0086.png"
+    },
+    {
+      "tick": 9297,
+      "secondsAfterT0": 8.7,
+      "now": 106110.5,
+      "pixels": 272327,
+      "columnTopElevationDegrees": 73.12726725439323,
+      "cloudGlow": 0,
+      "camera": [
+        481.73728897372575,
+        9.76,
+        -27.416750749929236
+      ],
+      "file": "0087.png"
+    },
+    {
+      "tick": 9309,
+      "secondsAfterT0": 8.8,
+      "now": 106240.30000007153,
+      "pixels": 273710,
+      "columnTopElevationDegrees": 72.9008972850747,
+      "cloudGlow": 0,
+      "camera": [
+        482.0415309401831,
+        9.76,
+        -18.072315871682576
+      ],
+      "file": "0088.png"
+    },
+    {
+      "tick": 9321,
+      "secondsAfterT0": 8.9,
+      "now": 106372.30000007153,
+      "pixels": 273283,
+      "columnTopElevationDegrees": 72.68932041892178,
+      "cloudGlow": 0,
+      "camera": [
+        482.1239798002331,
+        9.76,
+        -9.44712141746508
+      ],
+      "file": "0089.png"
+    },
+    {
+      "tick": 9333,
+      "secondsAfterT0": 9,
+      "now": 106509.80000007153,
+      "pixels": 272154,
+      "columnTopElevationDegrees": 72.46475477977935,
+      "cloudGlow": 0,
+      "camera": [
+        482.0297990135641,
+        9.76,
+        -0.4443877611750615
+      ],
+      "file": "0090.png"
+    },
+    {
+      "tick": 9345,
+      "secondsAfterT0": 9.1,
+      "now": 106642.5,
+      "pixels": 269393,
+      "columnTopElevationDegrees": 72.24505445388252,
+      "cloudGlow": 0,
+      "camera": [
+        481.7839476343264,
+        9.76,
+        8.191083902698002
+      ],
+      "file": "0091.png"
+    },
+    {
+      "tick": 9357,
+      "secondsAfterT0": 9.2,
+      "now": 106775.30000007153,
+      "pixels": 263829,
+      "columnTopElevationDegrees": 72.02120645349102,
+      "cloudGlow": 0,
+      "camera": [
+        481.40243056113377,
+        9.76,
+        16.802423691528805
+      ],
+      "file": "0092.png"
+    },
+    {
+      "tick": 9369,
+      "secondsAfterT0": 9.3,
+      "now": 106908.80000007153,
+      "pixels": 257136,
+      "columnTopElevationDegrees": 71.79528869843,
+      "cloudGlow": 0,
+      "camera": [
+        480.89754701314456,
+        9.76,
+        25.310932856368723
+      ],
+      "file": "0093.png"
+    },
+    {
+      "tick": 9381,
+      "secondsAfterT0": 9.4,
+      "now": 107042.5,
+      "pixels": 248340,
+      "columnTopElevationDegrees": 71.55022772129612,
+      "cloudGlow": 0,
+      "camera": [
+        480.2246448471698,
+        9.76,
+        34.34990088980012
+      ],
+      "file": "0094.png"
+    },
+    {
+      "tick": 9393,
+      "secondsAfterT0": 9.5,
+      "now": 107179,
+      "pixels": 239671,
+      "columnTopElevationDegrees": 71.32154706874316,
+      "cloudGlow": 0,
+      "camera": [
+        479.48340713796813,
+        9.76,
+        42.626726591389726
+      ],
+      "file": "0095.png"
+    },
+    {
+      "tick": 9405,
+      "secondsAfterT0": 9.6,
+      "now": 107310.89999997616,
+      "pixels": 228226,
+      "columnTopElevationDegrees": 71.09022672447473,
+      "cloudGlow": 0,
+      "camera": [
+        478.62629834960876,
+        9.76,
+        50.860363944211215
+      ],
+      "file": "0096.png"
+    },
+    {
+      "tick": 9417,
+      "secondsAfterT0": 9.7,
+      "now": 107444.10000002384,
+      "pixels": 222426,
+      "columnTopElevationDegrees": 70.85651465733737,
+      "cloudGlow": 0,
+      "camera": [
+        477.65247299755526,
+        9.76,
+        59.053495557913266
+      ],
+      "file": "0097.png"
+    },
+    {
+      "tick": 9429,
+      "secondsAfterT0": 9.8,
+      "now": 107579.39999997616,
+      "pixels": 217784,
+      "columnTopElevationDegrees": 70.60069264018516,
+      "cloudGlow": 0,
+      "camera": [
+        476.45908852411003,
+        9.76,
+        67.89906602874863
+      ],
+      "file": "0098.png"
+    },
+    {
+      "tick": 9441,
+      "secondsAfterT0": 9.9,
+      "now": 107712.10000002384,
+      "pixels": 216642,
+      "columnTopElevationDegrees": 70.36332316800954,
+      "cloudGlow": 0,
+      "camera": [
+        475.22546542610365,
+        9.76,
+        76.01399961880875
+      ],
+      "file": "0099.png"
+    },
+    {
+      "tick": 9453,
+      "secondsAfterT0": 10,
+      "now": 107844.5,
+      "pixels": 214955,
+      "columnTopElevationDegrees": 70.12399002405851,
+      "cloudGlow": 0,
+      "camera": [
+        473.84746748999464,
+        9.76,
+        84.12819449764237
+      ],
+      "file": "0100.png"
+    },
+    {
+      "tick": 9465,
+      "secondsAfterT0": 10.1,
+      "now": 107976.89999997616,
+      "pixels": 216114,
+      "columnTopElevationDegrees": 69.8853080947317,
+      "cloudGlow": 0,
+      "camera": [
+        472.3244323395637,
+        9.76,
+        92.17463046872648
+      ],
+      "file": "0101.png"
+    },
+    {
+      "tick": 9477,
+      "secondsAfterT0": 10.2,
+      "now": 108108.60000002384,
+      "pixels": 218738,
+      "columnTopElevationDegrees": 69.64702720832258,
+      "cloudGlow": 0,
+      "camera": [
+        470.6372853212327,
+        9.76,
+        100.18446288472194
+      ],
+      "file": "0102.png"
+    },
+    {
+      "tick": 9489,
+      "secondsAfterT0": 10.3,
+      "now": 108239.5,
+      "pixels": 227972,
+      "columnTopElevationDegrees": 69.39097905514478,
+      "cloudGlow": 0,
+      "camera": [
+        468.6142662499992,
+        9.76,
+        108.7902861184364
+      ],
+      "file": "0103.png"
+    },
+    {
+      "tick": 9501,
+      "secondsAfterT0": 10.4,
+      "now": 108370.80000007153,
+      "pixels": 236134,
+      "columnTopElevationDegrees": 69.15674098434731,
+      "cloudGlow": 0,
+      "camera": [
+        466.54343745327714,
+        9.76,
+        116.68717527706977
+      ],
+      "file": "0104.png"
+    },
+    {
+      "tick": 9513,
+      "secondsAfterT0": 10.5,
+      "now": 108503.5,
+      "pixels": 239755,
+      "columnTopElevationDegrees": 68.92402224010948,
+      "cloudGlow": 0,
+      "camera": [
+        464.23063224211353,
+        9.76,
+        124.59291379631316
+      ],
+      "file": "0105.png"
+    },
+    {
+      "tick": 9525,
+      "secondsAfterT0": 10.6,
+      "now": 108636,
+      "pixels": 239726,
+      "columnTopElevationDegrees": 68.69800784739138,
+      "cloudGlow": 0,
+      "camera": [
+        461.6847251647028,
+        9.76,
+        132.3673863115565
+      ],
+      "file": "0106.png"
+    },
+    {
+      "tick": 9537,
+      "secondsAfterT0": 10.7,
+      "now": 108771.20000004768,
+      "pixels": 238839,
+      "columnTopElevationDegrees": 68.46155174948612,
+      "cloudGlow": 0,
+      "camera": [
+        458.6333897215412,
+        9.76,
+        140.64646159379654
+      ],
+      "file": "0107.png"
+    },
+    {
+      "tick": 9549,
+      "secondsAfterT0": 10.8,
+      "now": 108904,
+      "pixels": 237470,
+      "columnTopElevationDegrees": 68.25112674187788,
+      "cloudGlow": 0,
+      "camera": [
+        455.51149240100074,
+        9.76,
+        148.17838452240682
+      ],
+      "file": "0108.png"
+    },
+    {
+      "tick": 9561,
+      "secondsAfterT0": 10.9,
+      "now": 109037.30000007153,
+      "pixels": 232393,
+      "columnTopElevationDegrees": 68.04888438303934,
+      "cloudGlow": 0,
+      "camera": [
+        452.0778716774448,
+        9.76,
+        155.5963552256271
+      ],
+      "file": "0109.png"
+    },
+    {
+      "tick": 9573,
+      "secondsAfterT0": 11,
+      "now": 109173.10000002384,
+      "pixels": 224771,
+      "columnTopElevationDegrees": 67.85610057975246,
+      "cloudGlow": 0,
+      "camera": [
+        448.35192546166735,
+        9.76,
+        162.8480371277615
+      ],
+      "file": "0110.png"
+    },
+    {
+      "tick": 9585,
+      "secondsAfterT0": 11.1,
+      "now": 109314.20000004768,
+      "pixels": 216666,
+      "columnTopElevationDegrees": 67.65815777931898,
+      "cloudGlow": 0,
+      "camera": [
+        443.9819127725645,
+        9.76,
+        170.50680386036578
+      ],
+      "file": "0111.png"
+    },
+    {
+      "tick": 9597,
+      "secondsAfterT0": 11.2,
+      "now": 109446.60000002384,
+      "pixels": 212107,
+      "columnTopElevationDegrees": 67.48541871643346,
+      "cloudGlow": 0,
+      "camera": [
+        439.63851309010187,
+        9.76,
+        177.3905026404784
+      ],
+      "file": "0112.png"
+    },
+    {
+      "tick": 9609,
+      "secondsAfterT0": 11.3,
+      "now": 109580.10000002384,
+      "pixels": 205044,
+      "columnTopElevationDegrees": 67.32004792057373,
+      "cloudGlow": 0,
+      "camera": [
+        434.944298955627,
+        9.76,
+        184.17192231235313
+      ],
+      "file": "0113.png"
+    },
+    {
+      "tick": 9621,
+      "secondsAfterT0": 11.4,
+      "now": 109713,
+      "pixels": 205396,
+      "columnTopElevationDegrees": 67.16683204335027,
+      "cloudGlow": 0,
+      "camera": [
+        430.05298991560676,
+        9.76,
+        190.63764663767128
+      ],
+      "file": "0114.png"
+    },
+    {
+      "tick": 9633,
+      "secondsAfterT0": 11.5,
+      "now": 109845.80000007153,
+      "pixels": 211369,
+      "columnTopElevationDegrees": 67.02246293193963,
+      "cloudGlow": 0,
+      "camera": [
+        424.9052676611095,
+        9.76,
+        196.89666313574062
+      ],
+      "file": "0115.png"
+    },
+    {
+      "tick": 9645,
+      "secondsAfterT0": 11.6,
+      "now": 109980.39999997616,
+      "pixels": 219373,
+      "columnTopElevationDegrees": 66.87546558031418,
+      "cloudGlow": 0,
+      "camera": [
+        419.06735064953557,
+        9.76,
+        203.43426087891092
+      ],
+      "file": "0116.png"
+    },
+    {
+      "tick": 9657,
+      "secondsAfterT0": 11.7,
+      "now": 110115.5,
+      "pixels": 225529,
+      "columnTopElevationDegrees": 66.74704902341158,
+      "cloudGlow": 0,
+      "camera": [
+        413.44343523794043,
+        9.76,
+        209.2666821478722
+      ],
+      "file": "0117.png"
+    },
+    {
+      "tick": 9669,
+      "secondsAfterT0": 11.8,
+      "now": 110247.20000004768,
+      "pixels": 231187,
+      "columnTopElevationDegrees": 66.62518762570282,
+      "cloudGlow": 0,
+      "camera": [
+        407.64834861534234,
+        9.76,
+        214.8808692592068
+      ],
+      "file": "0118.png"
+    },
+    {
+      "tick": 9681,
+      "secondsAfterT0": 11.9,
+      "now": 110379.60000002384,
+      "pixels": 236985,
+      "columnTopElevationDegrees": 66.50803502073907,
+      "cloudGlow": 0,
+      "camera": [
+        401.6730981068306,
+        9.76,
+        220.31825869700998
+      ],
+      "file": "0119.png"
+    },
+    {
+      "tick": 9693,
+      "secondsAfterT0": 12,
+      "now": 110512.89999997616,
+      "pixels": 239878,
+      "columnTopElevationDegrees": 66.39296401182622,
+      "cloudGlow": 0,
+      "camera": [
+        395.46182824837683,
+        9.76,
+        225.6555495956174
+      ],
+      "file": "0120.png"
+    },
+    {
+      "tick": 9705,
+      "secondsAfterT0": 12.1,
+      "now": 110654.39999997616,
+      "pixels": 240085,
+      "columnTopElevationDegrees": 66.2723825783442,
+      "cloudGlow": 0,
+      "camera": [
+        388.68287690998073,
+        9.76,
+        231.1842713864373
+      ],
+      "file": "0121.png"
+    },
+    {
+      "tick": 9717,
+      "secondsAfterT0": 12.2,
+      "now": 110785.30000007153,
+      "pixels": 237817,
+      "columnTopElevationDegrees": 66.16071746519404,
+      "cloudGlow": 0,
+      "camera": [
+        382.2715393567399,
+        9.76,
+        236.18782728124825
+      ],
+      "file": "0122.png"
+    },
+    {
+      "tick": 9729,
+      "secondsAfterT0": 12.3,
+      "now": 110916.89999997616,
+      "pixels": 235009,
+      "columnTopElevationDegrees": 66.04756522672193,
+      "cloudGlow": 0,
+      "camera": [
+        375.7304495953392,
+        9.76,
+        241.1075363522596
+      ],
+      "file": "0123.png"
+    },
+    {
+      "tick": 9741,
+      "secondsAfterT0": 12.4,
+      "now": 111050.5,
+      "pixels": 231657,
+      "columnTopElevationDegrees": 65.93193426203528,
+      "cloudGlow": 0,
+      "camera": [
+        369.0726002731686,
+        9.76,
+        245.95543546312157
+      ],
+      "file": "0124.png"
+    },
+    {
+      "tick": 9753,
+      "secondsAfterT0": 12.5,
+      "now": 111186.80000007153,
+      "pixels": 226661,
+      "columnTopElevationDegrees": 65.80321540544199,
+      "cloudGlow": 0,
+      "camera": [
+        361.7563980249832,
+        9.76,
+        251.1267805090013
+      ],
+      "file": "0125.png"
+    },
+    {
+      "tick": 9765,
+      "secondsAfterT0": 12.6,
+      "now": 111317.30000007153,
+      "pixels": 222388,
+      "columnTopElevationDegrees": 65.68019607190232,
+      "cloudGlow": 0,
+      "camera": [
+        354.8969562349709,
+        9.76,
+        255.84848205033853
+      ],
+      "file": "0126.png"
+    },
+    {
+      "tick": 9777,
+      "secondsAfterT0": 12.7,
+      "now": 111449.60000002384,
+      "pixels": 218446,
+      "columnTopElevationDegrees": 65.55276103718464,
+      "cloudGlow": 0,
+      "camera": [
+        347.9454770070051,
+        9.76,
+        260.5231894079939
+      ],
+      "file": "0127.png"
+    },
+    {
+      "tick": 9789,
+      "secondsAfterT0": 12.8,
+      "now": 111584.20000004768,
+      "pixels": 214895,
+      "columnTopElevationDegrees": 65.41819765194494,
+      "cloudGlow": 0,
+      "camera": [
+        340.77562014038665,
+        9.76,
+        265.23811990815426
+      ],
+      "file": "0128.png"
+    },
+    {
+      "tick": 9801,
+      "secondsAfterT0": 12.9,
+      "now": 111718,
+      "pixels": 210473,
+      "columnTopElevationDegrees": 65.28149506623808,
+      "cloudGlow": 0,
+      "camera": [
+        333.65887398682037,
+        9.76,
+        269.8164163018202
+      ],
+      "file": "0129.png"
+    },
+    {
+      "tick": 9813,
+      "secondsAfterT0": 13,
+      "now": 111852,
+      "pixels": 204119,
+      "columnTopElevationDegrees": 65.12743568722416,
+      "cloudGlow": 0,
+      "camera": [
+        325.8148812917934,
+        9.76,
+        274.7468570803392
+      ],
+      "file": "0130.png"
+    },
+    {
+      "tick": 9825,
+      "secondsAfterT0": 13.1,
+      "now": 111983.80000007153,
+      "pixels": 202683,
+      "columnTopElevationDegrees": 64.98159724976685,
+      "cloudGlow": 0,
+      "camera": [
+        318.5319812573848,
+        9.76,
+        279.21421740895016
+      ],
+      "file": "0131.png"
+    },
+    {
+      "tick": 9837,
+      "secondsAfterT0": 13.2,
+      "now": 112120.70000004768,
+      "pixels": 194596,
+      "columnTopElevationDegrees": 64.83198850484666,
+      "cloudGlow": 0,
+      "camera": [
+        311.1739935335199,
+        9.76,
+        283.61589610730954
+      ],
+      "file": "0132.png"
+    },
+    {
+      "tick": 9849,
+      "secondsAfterT0": 13.3,
+      "now": 112251.80000007153,
+      "pixels": 186132,
+      "columnTopElevationDegrees": 64.67899152797982,
+      "cloudGlow": 0,
+      "camera": [
+        303.7348187843524,
+        9.76,
+        287.94588804251305
+      ],
+      "file": "0133.png"
+    },
+    {
+      "tick": 9861,
+      "secondsAfterT0": 13.4,
+      "now": 112385.10000002384,
+      "pixels": 178226,
+      "columnTopElevationDegrees": 64.51026235581699,
+      "cloudGlow": 0,
+      "camera": [
+        295.5934087767585,
+        9.76,
+        292.53811272923656
+      ],
+      "file": "0134.png"
+    },
+    {
+      "tick": 9873,
+      "secondsAfterT0": 13.5,
+      "now": 112516.39999997616,
+      "pixels": 174043,
+      "columnTopElevationDegrees": 64.36084563062369,
+      "cloudGlow": 0,
+      "camera": [
+        288.4035126452092,
+        9.76,
+        296.4573061353367
+      ],
+      "file": "0135.png"
+    },
+    {
+      "tick": 9885,
+      "secondsAfterT0": 13.6,
+      "now": 112650.80000007153,
+      "pixels": 169339,
+      "columnTopElevationDegrees": 64.18937194135529,
+      "cloudGlow": 0,
+      "camera": [
+        280.1295029545611,
+        9.76,
+        300.79632709140634
+      ],
+      "file": "0136.png"
+    },
+    {
+      "tick": 9897,
+      "secondsAfterT0": 13.7,
+      "now": 112783.30000007153,
+      "pixels": 166266,
+      "columnTopElevationDegrees": 64.03020606177222,
+      "cloudGlow": 0,
+      "camera": [
+        272.39338749634726,
+        9.76,
+        304.67876285996084
+      ],
+      "file": "0137.png"
+    },
+    {
+      "tick": 9909,
+      "secondsAfterT0": 13.8,
+      "now": 112915.60000002384,
+      "pixels": 165578,
+      "columnTopElevationDegrees": 63.87112223807243,
+      "cloudGlow": 0,
+      "camera": [
+        264.5955114646921,
+        9.76,
+        308.42163323350337
+      ],
+      "file": "0138.png"
+    },
+    {
+      "tick": 9921,
+      "secondsAfterT0": 13.9,
+      "now": 113050.70000004768,
+      "pixels": 172206,
+      "columnTopElevationDegrees": 63.712378122623626,
+      "cloudGlow": 0,
+      "camera": [
+        256.7383337159491,
+        9.76,
+        312.02030359105623
+      ],
+      "file": "0139.png"
+    },
+    {
+      "tick": 9933,
+      "secondsAfterT0": 14,
+      "now": 113187.39999997616,
+      "pixels": 182394,
+      "columnTopElevationDegrees": 63.54109286373106,
+      "cloudGlow": 0,
+      "camera": [
+        248.1200359390756,
+        9.76,
+        315.7522668691944
+      ],
+      "file": "0140.png"
+    },
+    {
+      "tick": 9945,
+      "secondsAfterT0": 14.1,
+      "now": 113333.39999997616,
+      "pixels": 187569,
+      "columnTopElevationDegrees": 63.38519263328885,
+      "cloudGlow": 0,
+      "camera": [
+        240.0892332874711,
+        9.76,
+        319.0105327115793
+      ],
+      "file": "0141.png"
+    },
+    {
+      "tick": 9957,
+      "secondsAfterT0": 14.2,
+      "now": 113467.10000002384,
+      "pixels": 191598,
+      "columnTopElevationDegrees": 63.2328377439912,
+      "cloudGlow": 0,
+      "camera": [
+        231.99535530365486,
+        9.76,
+        322.0609925186453
+      ],
+      "file": "0142.png"
+    },
+    {
+      "tick": 9969,
+      "secondsAfterT0": 14.3,
+      "now": 113602,
+      "pixels": 192575,
+      "columnTopElevationDegrees": 63.07981954084792,
+      "cloudGlow": 0,
+      "camera": [
+        223.5335728429045,
+        9.76,
+        324.9799187744319
+      ],
+      "file": "0143.png"
+    },
+    {
+      "tick": 9981,
+      "secondsAfterT0": 14.4,
+      "now": 113735.5,
+      "pixels": 191319,
+      "columnTopElevationDegrees": 62.93633375843383,
+      "cloudGlow": 0,
+      "camera": [
+        215.25683825833076,
+        9.76,
+        327.5699304459326
+      ],
+      "file": "0144.png"
+    },
+    {
+      "tick": 9993,
+      "secondsAfterT0": 14.5,
+      "now": 113869.80000007153,
+      "pixels": 194103,
+      "columnTopElevationDegrees": 62.78717894482932,
+      "cloudGlow": 0,
+      "camera": [
+        206.23402882876374,
+        9.76,
+        330.0907798187818
+      ],
+      "file": "0145.png"
+    },
+    {
+      "tick": 10005,
+      "secondsAfterT0": 14.6,
+      "now": 114002.60000002384,
+      "pixels": 192670,
+      "columnTopElevationDegrees": 62.6547425136517,
+      "cloudGlow": 0,
+      "camera": [
+        197.79776100972492,
+        9.76,
+        332.16011590517945
+      ],
+      "file": "0146.png"
+    },
+    {
+      "tick": 10017,
+      "secondsAfterT0": 14.7,
+      "now": 114139.20000004768,
+      "pixels": 192997,
+      "columnTopElevationDegrees": 62.528415842299346,
+      "cloudGlow": 0,
+      "camera": [
+        189.32509999486805,
+        9.76,
+        333.9622814261803
+      ],
+      "file": "0147.png"
+    },
+    {
+      "tick": 10029,
+      "secondsAfterT0": 14.8,
+      "now": 114272.30000007153,
+      "pixels": 190863,
+      "columnTopElevationDegrees": 62.40806557304866,
+      "cloudGlow": 0,
+      "camera": [
+        180.78578190458433,
+        9.76,
+        335.4951282220357
+      ],
+      "file": "0148.png"
+    },
+    {
+      "tick": 10041,
+      "secondsAfterT0": 14.9,
+      "now": 114407.39999997616,
+      "pixels": 164986,
+      "columnTopElevationDegrees": 62.28482783841838,
+      "cloudGlow": 0,
+      "camera": [
+        171.49962924688688,
+        9.76,
+        336.84496153117493
+      ],
+      "file": "0149.png"
+    },
+    {
+      "tick": 10053,
+      "secondsAfterT0": 15,
+      "now": 114538.80000007153,
+      "pixels": 119699,
+      "columnTopElevationDegrees": 62.18155716511065,
+      "cloudGlow": 0,
+      "camera": [
+        163.2317214066056,
+        9.76,
+        337.7732325330284
+      ],
+      "file": "0150.png"
+    },
+    {
+      "tick": 10065,
+      "secondsAfterT0": 15.1,
+      "now": 114676.80000007153,
+      "pixels": 60300,
+      "columnTopElevationDegrees": 62.071674840896556,
+      "cloudGlow": 0,
+      "camera": [
+        153.87085941927063,
+        9.76,
+        338.518321469678
+      ],
+      "file": "0151.png"
+    },
+    {
+      "tick": 10077,
+      "secondsAfterT0": 15.2,
+      "now": 114814.20000004768,
+      "pixels": 36744,
+      "columnTopElevationDegrees": 61.976021262824815,
+      "cloudGlow": 0,
+      "camera": [
+        145.21023876220562,
+        9.76,
+        338.9303723823657
+      ],
+      "file": "0152.png"
+    },
+    {
+      "tick": 10089,
+      "secondsAfterT0": 15.3,
+      "now": 114949.70000004768,
+      "pixels": 31690,
+      "columnTopElevationDegrees": 61.88584074128756,
+      "cloudGlow": 0,
+      "camera": [
+        136.58123283373968,
+        9.76,
+        339.087182543507
+      ],
+      "file": "0153.png"
+    },
+    {
+      "tick": 10101,
+      "secondsAfterT0": 15.4,
+      "now": 115088.10000002384,
+      "pixels": 28759,
+      "columnTopElevationDegrees": 61.799737011628096,
+      "cloudGlow": 0,
+      "camera": [
+        127.9212024283062,
+        9.76,
+        339.003662859927
+      ],
+      "file": "0154.png"
+    },
+    {
+      "tick": 10113,
+      "secondsAfterT0": 15.5,
+      "now": 115225.60000002384,
+      "pixels": 24069,
+      "columnTopElevationDegrees": 61.71082992028948,
+      "cloudGlow": 0,
+      "camera": [
+        118.58929802331308,
+        9.76,
+        338.6635779412535
+      ],
+      "file": "0155.png"
+    },
+    {
+      "tick": 10125,
+      "secondsAfterT0": 15.6,
+      "now": 115359.30000007153,
+      "pixels": 20161,
+      "columnTopElevationDegrees": 61.63135887826627,
+      "cloudGlow": 0,
+      "camera": [
+        109.9766163262426,
+        9.76,
+        338.13831390701387
+      ],
+      "file": "0156.png"
+    },
+    {
+      "tick": 10137,
+      "secondsAfterT0": 15.7,
+      "now": 115495.70000004768,
+      "pixels": 21327,
+      "columnTopElevationDegrees": 61.55324532937058,
+      "cloudGlow": 0,
+      "camera": [
+        101.36413765105769,
+        9.76,
+        337.4321407530988
+      ],
+      "file": "0157.png"
+    },
+    {
+      "tick": 10149,
+      "secondsAfterT0": 15.8,
+      "now": 115632.30000007153,
+      "pixels": 21778,
+      "columnTopElevationDegrees": 61.47284202047577,
+      "cloudGlow": 0,
+      "camera": [
+        92.46285325818192,
+        9.76,
+        336.53384896152465
+      ],
+      "file": "0158.png"
+    },
+    {
+      "tick": 10161,
+      "secondsAfterT0": 15.9,
+      "now": 115765.89999997616,
+      "pixels": 23070,
+      "columnTopElevationDegrees": 61.39473377626855,
+      "cloudGlow": 0,
+      "camera": [
+        83.90139474781404,
+        9.76,
+        335.5303591179213
+      ],
+      "file": "0159.png"
+    },
+    {
+      "tick": 10173,
+      "secondsAfterT0": 16,
+      "now": 115904.5,
+      "pixels": 24658,
+      "columnTopElevationDegrees": 61.31285369450064,
+      "cloudGlow": 0,
+      "camera": [
+        75.1291145428841,
+        9.76,
+        334.3821786284417
+      ],
+      "file": "0160.png"
+    },
+    {
+      "tick": 10185,
+      "secondsAfterT0": 16.1,
+      "now": 116038.70000004768,
+      "pixels": 26471,
+      "columnTopElevationDegrees": 61.23042869431119,
+      "cloudGlow": 0,
+      "camera": [
+        66.58890592331329,
+        9.76,
+        333.16702964034573
+      ],
+      "file": "0161.png"
+    },
+    {
+      "tick": 10197,
+      "secondsAfterT0": 16.2,
+      "now": 116178.30000007153,
+      "pixels": 28625,
+      "columnTopElevationDegrees": 61.137216639714495,
+      "cloudGlow": 0,
+      "camera": [
+        57.36547938815741,
+        9.76,
+        331.7726548700674
+      ],
+      "file": "0162.png"
+    },
+    {
+      "tick": 10209,
+      "secondsAfterT0": 16.3,
+      "now": 116312.89999997616,
+      "pixels": 31125,
+      "columnTopElevationDegrees": 61.04598395596265,
+      "cloudGlow": 0,
+      "camera": [
+        48.833323784014965,
+        9.76,
+        330.43231923650933
+      ],
+      "file": "0163.png"
+    },
+    {
+      "tick": 10221,
+      "secondsAfterT0": 16.4,
+      "now": 116447.89999997616,
+      "pixels": 34174,
+      "columnTopElevationDegrees": 60.948862528761694,
+      "cloudGlow": 0,
+      "camera": [
+        40.30020036457916,
+        9.76,
+        329.0681709292556
+      ],
+      "file": "0164.png"
+    },
+    {
+      "tick": 10233,
+      "secondsAfterT0": 16.5,
+      "now": 116587.30000007153,
+      "pixels": 38247,
+      "columnTopElevationDegrees": 60.84180958292929,
+      "cloudGlow": 0,
+      "camera": [
+        31.47929309612979,
+        9.76,
+        327.6460025289189
+      ],
+      "file": "0165.png"
+    },
+    {
+      "tick": 10245,
+      "secondsAfterT0": 16.6,
+      "now": 116724.70000004768,
+      "pixels": 43275,
+      "columnTopElevationDegrees": 60.73487007685433,
+      "cloudGlow": 0,
+      "camera": [
+        23.126781071880043,
+        9.76,
+        326.2757630714483
+      ],
+      "file": "0166.png"
+    },
+    {
+      "tick": 10257,
+      "secondsAfterT0": 16.7,
+      "now": 116862.80000007153,
+      "pixels": 51339,
+      "columnTopElevationDegrees": 60.62315648436622,
+      "cloudGlow": 0,
+      "camera": [
+        14.69735483323463,
+        9.76,
+        324.8333611276153
+      ],
+      "file": "0167.png"
+    },
+    {
+      "tick": 10269,
+      "secondsAfterT0": 16.8,
+      "now": 116995.70000004768,
+      "pixels": 65564,
+      "columnTopElevationDegrees": 60.513478066759404,
+      "cloudGlow": 0,
+      "camera": [
+        6.549741609154791,
+        9.76,
+        323.33966097644293
+      ],
+      "file": "0168.png"
+    },
+    {
+      "tick": 10281,
+      "secondsAfterT0": 16.9,
+      "now": 117129,
+      "pixels": 91011,
+      "columnTopElevationDegrees": 60.40362110968303,
+      "cloudGlow": 0,
+      "camera": [
+        -1.5455562987553453,
+        9.76,
+        321.740718615148
+      ],
+      "file": "0169.png"
+    },
+    {
+      "tick": 10293,
+      "secondsAfterT0": 17,
+      "now": 117266.80000007153,
+      "pixels": 177695,
+      "columnTopElevationDegrees": 60.283399090514145,
+      "cloudGlow": 0,
+      "camera": [
+        -10.2527605192796,
+        9.76,
+        319.9175402842589
+      ],
+      "file": "0170.png"
+    },
+    {
+      "tick": 10305,
+      "secondsAfterT0": 17.1,
+      "now": 117400.10000002384,
+      "pixels": 206311,
+      "columnTopElevationDegrees": 60.16810057384941,
+      "cloudGlow": 0,
+      "camera": [
+        -18.276200582838733,
+        9.76,
+        318.204650529637
+      ],
+      "file": "0171.png"
+    },
+    {
+      "tick": 10317,
+      "secondsAfterT0": 17.2,
+      "now": 117533.60000002384,
+      "pixels": 215596,
+      "columnTopElevationDegrees": 60.045433209665624,
+      "cloudGlow": 0,
+      "camera": [
+        -26.28767146433574,
+        9.76,
+        316.5416684685706
+      ],
+      "file": "0172.png"
+    },
+    {
+      "tick": 10329,
+      "secondsAfterT0": 17.3,
+      "now": 117667,
+      "pixels": 213839,
+      "columnTopElevationDegrees": 59.90993577075408,
+      "cloudGlow": 0,
+      "camera": [
+        -34.4353494330666,
+        9.76,
+        314.9766965888755
+      ],
+      "file": "0173.png"
+    },
+    {
+      "tick": 10341,
+      "secondsAfterT0": 17.4,
+      "now": 117808,
+      "pixels": 211271,
+      "columnTopElevationDegrees": 59.7515945786583,
+      "cloudGlow": 0,
+      "camera": [
+        -43.13080283419293,
+        9.76,
+        313.4996194956848
+      ],
+      "file": "0174.png"
+    },
+    {
+      "tick": 10353,
+      "secondsAfterT0": 17.5,
+      "now": 117937.20000004768,
+      "pixels": 208145,
+      "columnTopElevationDegrees": 59.59169086585609,
+      "cloudGlow": 0,
+      "camera": [
+        -51.205293952947436,
+        9.76,
+        312.3213722114189
+      ],
+      "file": "0175.png"
+    },
+    {
+      "tick": 10365,
+      "secondsAfterT0": 17.6,
+      "now": 118068,
+      "pixels": 203994,
+      "columnTopElevationDegrees": 59.42160645211816,
+      "cloudGlow": 0,
+      "camera": [
+        -59.247828475819446,
+        9.76,
+        311.30600948677187
+      ],
+      "file": "0176.png"
+    },
+    {
+      "tick": 10377,
+      "secondsAfterT0": 17.7,
+      "now": 118200.70000004768,
+      "pixels": 200291,
+      "columnTopElevationDegrees": 59.249374573994075,
+      "cloudGlow": 0,
+      "camera": [
+        -67.09047465533895,
+        9.76,
+        310.37525964846776
+      ],
+      "file": "0177.png"
+    },
+    {
+      "tick": 10389,
+      "secondsAfterT0": 17.8,
+      "now": 118336,
+      "pixels": 196436,
+      "columnTopElevationDegrees": 59.072051019738645,
+      "cloudGlow": 0,
+      "camera": [
+        -75.05260893912032,
+        9.76,
+        309.3940872570541
+      ],
+      "file": "0178.png"
+    },
+    {
+      "tick": 10401,
+      "secondsAfterT0": 17.9,
+      "now": 118465.60000002384,
+      "pixels": 197258,
+      "columnTopElevationDegrees": 58.90975701475872,
+      "cloudGlow": 0,
+      "camera": [
+        -82.41303286782356,
+        9.76,
+        308.3564847882852
+      ],
+      "file": "0179.png"
+    },
+    {
+      "tick": 10413,
+      "secondsAfterT0": 18,
+      "now": 118606.60000002384,
+      "pixels": 198376,
+      "columnTopElevationDegrees": 58.7510294095438,
+      "cloudGlow": 0,
+      "camera": [
+        -89.87708334353579,
+        9.76,
+        307.06210990255084
+      ],
+      "file": "0180.png"
+    },
+    {
+      "tick": 10425,
+      "secondsAfterT0": 18.1,
+      "now": 118736.10000002384,
+      "pixels": 195405,
+      "columnTopElevationDegrees": 58.61313105236818,
+      "cloudGlow": 0,
+      "camera": [
+        -96.74469049945948,
+        9.76,
+        305.57184418011315
+      ],
+      "file": "0181.png"
+    },
+    {
+      "tick": 10437,
+      "secondsAfterT0": 18.2,
+      "now": 118867.70000004768,
+      "pixels": 191258,
+      "columnTopElevationDegrees": 58.48988736822228,
+      "cloudGlow": 0,
+      "camera": [
+        -103.38785288003298,
+        9.76,
+        303.7761403125191
+      ],
+      "file": "0182.png"
+    },
+    {
+      "tick": 10449,
+      "secondsAfterT0": 18.3,
+      "now": 119002.10000002384,
+      "pixels": 186262,
+      "columnTopElevationDegrees": 58.37411534876103,
+      "cloudGlow": 0,
+      "camera": [
+        -110.3019511734787,
+        9.76,
+        301.47421288155573
+      ],
+      "file": "0183.png"
+    },
+    {
+      "tick": 10461,
+      "secondsAfterT0": 18.4,
+      "now": 119133.60000002384,
+      "pixels": 182310,
+      "columnTopElevationDegrees": 58.28288404244018,
+      "cloudGlow": 0,
+      "camera": [
+        -116.40820365822582,
+        9.76,
+        299.0512430744475
+      ],
+      "file": "0184.png"
+    },
+    {
+      "tick": 10473,
+      "secondsAfterT0": 18.5,
+      "now": 119264.80000007153,
+      "pixels": 181158,
+      "columnTopElevationDegrees": 58.20264648221726,
+      "cloudGlow": 0,
+      "camera": [
+        -122.40667040431515,
+        9.76,
+        296.32269087126554
+      ],
+      "file": "0185.png"
+    },
+    {
+      "tick": 10485,
+      "secondsAfterT0": 18.6,
+      "now": 119393.5,
+      "pixels": 181517,
+      "columnTopElevationDegrees": 58.12969800163241,
+      "cloudGlow": 0,
+      "camera": [
+        -128.31575727655687,
+        9.76,
+        293.37185796016786
+      ],
+      "file": "0186.png"
+    },
+    {
+      "tick": 10497,
+      "secondsAfterT0": 18.7,
+      "now": 119526.89999997616,
+      "pixels": 182375,
+      "columnTopElevationDegrees": 58.05320673555689,
+      "cloudGlow": 0,
+      "camera": [
+        -134.73100080463732,
+        9.76,
+        289.9824132305048
+      ],
+      "file": "0187.png"
+    },
+    {
+      "tick": 10509,
+      "secondsAfterT0": 18.8,
+      "now": 119652.70000004768,
+      "pixels": 182521,
+      "columnTopElevationDegrees": 57.98330133649769,
+      "cloudGlow": 0,
+      "camera": [
+        -140.48537905798844,
+        9.76,
+        286.87990262223394
+      ],
+      "file": "0188.png"
+    },
+    {
+      "tick": 10521,
+      "secondsAfterT0": 18.9,
+      "now": 119783.89999997616,
+      "pixels": 181993,
+      "columnTopElevationDegrees": 57.905523388260036,
+      "cloudGlow": 0,
+      "camera": [
+        -146.5505050517417,
+        9.76,
+        283.62664607919487
+      ],
+      "file": "0189.png"
+    },
+    {
+      "tick": 10533,
+      "secondsAfterT0": 19,
+      "now": 119917.60000002384,
+      "pixels": 180991,
+      "columnTopElevationDegrees": 57.81328785110033,
+      "cloudGlow": 0,
+      "camera": [
+        -153.21350722909725,
+        9.76,
+        280.1330759943667
+      ],
+      "file": "0190.png"
+    },
+    {
+      "tick": 10545,
+      "secondsAfterT0": 19.1,
+      "now": 120049.30000007153,
+      "pixels": 179561,
+      "columnTopElevationDegrees": 57.719863746444446,
+      "cloudGlow": 0,
+      "camera": [
+        -159.4444578651081,
+        9.76,
+        276.96945663782793
+      ],
+      "file": "0191.png"
+    },
+    {
+      "tick": 10557,
+      "secondsAfterT0": 19.2,
+      "now": 120178.39999997616,
+      "pixels": 177398,
+      "columnTopElevationDegrees": 57.617308628529884,
+      "cloudGlow": 0,
+      "camera": [
+        -165.80242294067432,
+        9.76,
+        273.85336884268264
+      ],
+      "file": "0192.png"
+    },
+    {
+      "tick": 10569,
+      "secondsAfterT0": 19.3,
+      "now": 120308.70000004768,
+      "pixels": 174791,
+      "columnTopElevationDegrees": 57.506398273226814,
+      "cloudGlow": 0,
+      "camera": [
+        -172.25435620169864,
+        9.76,
+        270.7946889791729
+      ],
+      "file": "0193.png"
+    },
+    {
+      "tick": 10581,
+      "secondsAfterT0": 19.4,
+      "now": 120445.30000007153,
+      "pixels": 171779,
+      "columnTopElevationDegrees": 57.37847280434526,
+      "cloudGlow": 0,
+      "camera": [
+        -179.34918007469946,
+        9.76,
+        267.4969684492308
+      ],
+      "file": "0194.png"
+    },
+    {
+      "tick": 10593,
+      "secondsAfterT0": 19.5,
+      "now": 120575.89999997616,
+      "pixels": 169365,
+      "columnTopElevationDegrees": 57.255558042548046,
+      "cloudGlow": 0,
+      "camera": [
+        -185.9704632540585,
+        9.76,
+        264.41955643696076
+      ],
+      "file": "0195.png"
+    },
+    {
+      "tick": 10605,
+      "secondsAfterT0": 19.6,
+      "now": 120705.89999997616,
+      "pixels": 177989,
+      "columnTopElevationDegrees": 57.12862021326501,
+      "cloudGlow": 0,
+      "camera": [
+        -192.67120490736906,
+        9.76,
+        261.27829071842496
+      ],
+      "file": "0196.png"
+    },
+    {
+      "tick": 10617,
+      "secondsAfterT0": 19.7,
+      "now": 120838.5,
+      "pixels": 174247,
+      "columnTopElevationDegrees": 56.99757936450256,
+      "cloudGlow": 0,
+      "camera": [
+        -199.4581799892296,
+        9.76,
+        258.0658132389058
+      ],
+      "file": "0197.png"
+    },
+    {
+      "tick": 10630,
+      "secondsAfterT0": 19.808333333333334,
+      "now": 120971.10000002384,
+      "pixels": 171326,
+      "columnTopElevationDegrees": 56.84865716274308,
+      "cloudGlow": 0,
+      "camera": [
+        -206.98958293788021,
+        9.76,
+        254.48672048290737
+      ],
+      "file": "0198.png"
+    },
+    {
+      "tick": 10641,
+      "secondsAfterT0": 19.9,
+      "now": 121093.10000002384,
+      "pixels": 169707,
+      "columnTopElevationDegrees": 56.72062366176579,
+      "cloudGlow": 0,
+      "camera": [
+        -213.28762504768738,
+        9.76,
+        251.5074320927629
+      ],
+      "file": "0199.png"
+    },
+    {
+      "tick": 10653,
+      "secondsAfterT0": 20,
+      "now": 121227.20000004768,
+      "pixels": 167542,
+      "columnTopElevationDegrees": 56.5641259306049,
+      "cloudGlow": 0,
+      "camera": [
+        -220.7824046974664,
+        9.76,
+        247.98230358691515
+      ],
+      "file": "0200.png"
+    }
+  ]
+}

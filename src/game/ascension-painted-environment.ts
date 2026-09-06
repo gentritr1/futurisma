@@ -33,8 +33,8 @@ export class AscensionPaintedEnvironment implements RaceEnvironment {
  }
  static async load(course?:AscensionCourse){const environment=new AscensionPaintedEnvironment((await new GLTFLoader().loadAsync('/assets/ascension/painted.glb')).scene,course);await Promise.all([environment.sky.ready,environment.mangroves.ready,environment.terrain.ready,environment.effects?.ready]);return environment;}
  updateVisibility(camera:THREE.Camera){
-  camera.updateMatrixWorld(true);this.effects?.update(camera);this.root.updateMatrixWorld(true);this.updateInstances(camera);this.mangroves.update(camera);this.terrain.update();
-  this.sky.update(camera,this.root.parent instanceof THREE.Scene?this.root.parent.fog?.color:undefined);
+  camera.updateMatrixWorld(true);this.effects?.update(camera);this.root.updateMatrixWorld(true);this.updateInstances(camera);this.mangroves.update(camera,this.effects?.root.userData.eventState);this.terrain.update();
+  this.sky.update(camera,this.root.parent instanceof THREE.Scene?this.root.parent.fog?.color:undefined,this.effects?.root.userData.eventState?.cloudGlow??0);
   this.frustum.setFromProjectionMatrix(new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse));
   this.stats.visibleGroups=0;this.stats.visibleTriangles=0;
   for(const mesh of this.meshes)if(this.frustum.intersectsObject(mesh)){this.stats.visibleGroups++;this.stats.visibleTriangles+=(mesh.geometry.index?.count??mesh.geometry.attributes.position.count)/3;}

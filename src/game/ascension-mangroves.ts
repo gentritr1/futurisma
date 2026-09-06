@@ -53,14 +53,17 @@ export class AscensionMangroves {
   this.cards=new THREE.InstancedMesh(card,leaf,this.centers.length);this.cards.name='mangrove_camera_facing_canopy_cards';this.cards.instanceMatrix.setUsage(THREE.DynamicDrawUsage);this.cards.frustumCulled=false;this.root.add(this.cards);
   this.root.userData.dimensions={trunkDiameter:.4,maximumCanopyTop:8.9,canopyCards:this.centers.length,trunks:positions.length};
  }
- update(camera:THREE.Camera){
+ update(camera:THREE.Camera,event?:{launchAge:number,pad:number[]}){
   this.frustum.setFromProjectionMatrix(new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse));
   let trees=0,cards=0;
   this.treePositions.forEach((p,i)=>{
    this.sphere.center.copy(p);this.sphere.center.y=2;
    if(!this.frustum.intersectsSphere(this.sphere))return;
    this.pose.position.copy(p);this.pose.rotation.set(0,i*2.399,0);this.pose.scale.setScalar(1);this.pose.updateMatrix();this.trunks.setMatrixAt(trees++,this.pose.matrix);
-   for(let j=0;j<3;j++){const center=this.centers[i*3+j];this.pose.position.copy(center);this.pose.rotation.set(0,Math.atan2(camera.position.x-center.x,camera.position.z-center.z),0);this.pose.updateMatrix();this.cards.setMatrixAt(cards++,this.pose.matrix);}
+   const pad=event?new THREE.Vector3(...event.pad):null;
+   const arrival=event&&pad?event.launchAge-p.distanceTo(pad)/343:-1;
+   const ripple=arrival>=0&&arrival<1.4?Math.sin(arrival*Math.PI*4)*Math.sin(arrival/1.4*Math.PI):0;
+   for(let j=0;j<3;j++){const center=this.centers[i*3+j];this.pose.position.copy(center);if(pad)this.pose.position.addScaledVector(p.clone().sub(pad).setY(0).normalize(),ripple*1.5);this.pose.rotation.set(0,Math.atan2(camera.position.x-center.x,camera.position.z-center.z),0);this.pose.updateMatrix();this.cards.setMatrixAt(cards++,this.pose.matrix);}
   });
   this.trunks.count=trees;this.cards.count=cards;this.trunks.instanceMatrix.needsUpdate=true;this.cards.instanceMatrix.needsUpdate=true;
  }

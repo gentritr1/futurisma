@@ -70,7 +70,7 @@ export class AscensionEffects {
   };
   const cards=(name:string,count:number,m:THREE.Material)=>{const mesh=new THREE.InstancedMesh(new THREE.PlaneGeometry(1,1),m,count);mesh.name=name;mesh.frustumCulled=false;this.root.add(mesh);return mesh;};
   this.steam=cards('launch_apron_steam_wall',24,cardMaterial('steam_lit_fogged',0xc5c6b8,.40));
-  this.smoke=cards('persistent_launch_smoke',24,cardMaterial('smoke_lit_fogged',0x9c9e94,.64));
+  this.smoke=cards('persistent_launch_smoke',72,cardMaterial('smoke_lit_fogged',0x393a34,.86));
   const sheets=new THREE.MeshLambertMaterial({name:'deluge_lit_fogged',color:0xc4d2c7,map:delugePaint,transparent:true,opacity:.36,depthWrite:false,side:THREE.DoubleSide});
   sheets.onBeforeCompile=shader=>{shader.uniforms.eventTime=this.time;shader.fragmentShader='uniform float eventTime;\n'+shader.fragmentShader;shader.fragmentShader=shader.fragmentShader.replace('#include <map_fragment>',`vec2 flowUv=vec2(.012+vMapUv.x*.476,.512+fract(vMapUv.y-eventTime*.9)*.476);
    vec4 wetPaint=texture2D(map,flowUv);diffuseColor.rgb*=mix(vec3(1.),wetPaint.rgb,.25);
@@ -109,14 +109,26 @@ export class AscensionEffects {
    const b=beltPose(j*BELT_LENGTH/48+p.travel);this.dummy.position.set(0,b.y-2,b.z);this.dummy.rotation.set(b.angle,0,0);this.dummy.scale.set(1,1,1);this.dummy.updateMatrix();warp.makeScale(1,fy,fz);link.multiplyMatrices(warp,this.dummy.matrix);link.setPosition(link.elements[12]+x,link.elements[13]+2,link.elements[14]+z);this.links.setMatrixAt(instance++,link);
   }this.links.instanceMatrix.needsUpdate=true;
   this.beacon.rotation.y=this.reduced?0:seconds*2;this.beacon.userData.klaxon=p.klaxon;
-  this.steam.visible=clock.state.steam;this.smoke.visible=clock.state.launched;this.smoke.count=Math.min(24,Math.ceil((p.rocketHeight+40)/20));this.deluge.visible=clock.state.deluge;
+  this.steam.visible=clock.state.steam;this.smoke.visible=clock.state.launched;this.smoke.count=72;this.deluge.visible=clock.state.deluge;
   this.flood.visible=clock.state.launched||(tick>=c.testTick&&tick<c.testTick+10*ABILITY_TICK_RATE);
   this.gravel.visible=clock.events.some(e=>e.id.startsWith('crawler-cross'));
   const face=(mesh:THREE.InstancedMesh,i:number,position:THREE.Vector3,width:number,height:number)=>{this.dummy.position.copy(position);this.dummy.quaternion.copy(camera.quaternion);this.dummy.scale.set(width,height,1);this.dummy.updateMatrix();mesh.setMatrixAt(i,this.dummy.matrix);};
   for(let i=0;i<24;i++){
    const s=this.course.sample((i/24)*.16),drift=this.reduced?0:Math.sin(seconds*.18+i)*8;
    face(this.steam,i,s.position.clone().addScaledVector(s.right,(i%2?1:-1)*(20+drift)).addScaledVector(s.up,13),55,24);
-   face(this.smoke,i,this.pad.clone().add(new THREE.Vector3(Math.sin(i*2.4)*9+i*1.1,20+i*20,Math.cos(i*2.4)*9)),35+i*1.4,65);
+   
+  }
+  // The rising column feeds a broad cloud-deck anvil. Its placement is world-fixed,
+  // never attached to the camera: a driver can turn away and still see the spreading exhaust.
+  const launchAge=Math.max(0,(tick-c.launchTick)/ABILITY_TICK_RATE);
+  const rise=THREE.MathUtils.smoothstep(launchAge,0,3);
+  for(let i=0;i<24;i++){
+   face(this.smoke,i,this.pad.clone().add(new THREE.Vector3(Math.sin(i*2.4)*18,20+i*38*rise,Math.cos(i*2.4)*18)),60+i*3,100);
+  }
+  for(let i=0;i<48;i++){
+   const ring=Math.floor(i/16)+1,angle=(i%16)*Math.PI/8+ring*.17;
+   const radius=ring*310*rise;
+   face(this.smoke,24+i,this.pad.clone().add(new THREE.Vector3(Math.cos(angle)*radius,80+ring*12,Math.sin(angle)*radius)),370*rise+10,130*rise+10);
   }
   for(let i=0;i<14;i++){
    const progress=i<2?this.course.shortcut.from+.015+i*.005:this.course.shortcut.from+(this.course.shortcut.to-this.course.shortcut.from)*(.79+(i-2)*.015);
@@ -129,7 +141,7 @@ export class AscensionEffects {
   const wave=seconds-c.launchTick/ABILITY_TICK_RATE-camera.position.distanceTo(this.pad)/343;
   const flicker=!this.reduced&&wave>=0&&wave<1.2?(Math.floor(wave*12)%3===0?.28:1):1;
   this.lamps.forEach(l=>l.material.emissiveIntensity=l.base*flicker);
-  this.root.userData.eventState={tick,reducedMotion:this.reduced,crawlerPosition:p.crawler.toArray(),treadTravel:p.travel,rocketHeight:p.rocketHeight,rocketVisible:this.rocket.visible,steamVisible:this.steam.visible,smokeVisible:this.smoke.visible,delugeVisible:this.deluge.visible,floodVisible:this.flood.visible,lampScale:flicker,klaxon:p.klaxon};
+  this.root.userData.eventState={launchAge,pad:this.pad.toArray(),smokeTop:20+23*38*rise,cloudGlow:clock.state.launched?1-THREE.MathUtils.smoothstep(launchAge,3.5,4):0,tick,reducedMotion:this.reduced,crawlerPosition:p.crawler.toArray(),treadTravel:p.travel,rocketHeight:p.rocketHeight,rocketVisible:this.rocket.visible,steamVisible:this.steam.visible,smokeVisible:this.smoke.visible,delugeVisible:this.deluge.visible,floodVisible:this.flood.visible,lampScale:flicker,klaxon:p.klaxon};
   this.course.group.userData.eventState=this.root.userData.eventState;
  }
 }

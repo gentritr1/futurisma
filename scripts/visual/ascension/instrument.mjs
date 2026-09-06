@@ -9,7 +9,7 @@ export async function instrument(page){
    const render=renderer.render.bind(renderer);
    renderer.render=(...args)=>{draws=[];args[0].traverse(o=>{if(!o.isMesh||tagged.has(o))return;tagged.add(o);const previous=o.onBeforeRender;o.onBeforeRender=function(...a){previous.apply(this,a);draws.push({name:o.name,triangles:(o.geometry.index?.count??o.geometry.attributes.position.count)/3,castShadow:o.castShadow});};});shadowCalls=0;shadowTriangles=0;const result=render(...args),now=performance.now();window.__ascScene=args[0];window.__ascDraws=draws;
     const text=document.getElementById('ascension-diagnostics')?.textContent;let tick=0,effects=null;try{const d=JSON.parse(text);tick=d.tick;effects=d.effects??null;}catch{}
-    window.__ascFrames.push({now,delta:now-last,tick,effects,mainCalls:renderer.info.render.calls,shadowCalls,mainTriangles:renderer.info.render.triangles,shadowTriangles,width:renderer.domElement.width,height:renderer.domElement.height});last=now;return result;
+    window.__ascFrames.push({now,delta:now-last,tick,effects,mainCalls:renderer.info.render.calls,shadowCalls,mainTriangles:renderer.info.render.triangles,shadowTriangles,width:renderer.domElement.width,height:renderer.domElement.height});last=now;window.__ascCaptureFrame?.(renderer,args,render);return result;
    };
   };
  });

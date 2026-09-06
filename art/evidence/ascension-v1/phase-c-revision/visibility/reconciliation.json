@@ -1,0 +1,30 @@
+{
+  "script": "scripts/visual/ascension/reconcile-launch.mjs",
+  "sourceScript": "scripts/visual/ascension/launch-visibility.mjs",
+  "simulation": {
+    "windowSeconds": 20,
+    "expectedRateHz": 10,
+    "endpointSamples": 1,
+    "expected": 201,
+    "observed": 201,
+    "residual": 0
+  },
+  "wallClock": {
+    "windowSeconds": 26.587,
+    "equivalentExpectedAt10Hz": 266.87,
+    "observed": 201,
+    "residual": -65.87,
+    "note": "Capture is scheduled on the simulation clock. Synchronous PNG encoding and two extra renders slow wall time; this is not an FPS benchmark."
+  },
+  "plume": {
+    "frames": 201,
+    "total": 201,
+    "fraction": 1,
+    "passes": true
+  },
+  "column": {
+    "firstGeometric25DegreesAtSeconds": 0.9,
+    "atThreeSecondsDegrees": 74.03098099200766,
+    "note": "World-space column extent projected relative to the horizon; not an image segmentation estimate of the top."
+  }
+}
