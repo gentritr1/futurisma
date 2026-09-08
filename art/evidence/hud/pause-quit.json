@@ -72,7 +72,7 @@
       "phase": "paused",
       "panelUp": true,
       "onPaddock": false,
-      "holdProgress": "scaleX(0.657444)",
+      "holdProgress": "scaleX(0.630444)",
       "focused": "pause-quit"
     },
     {
