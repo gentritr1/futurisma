@@ -41,153 +41,228 @@
           <span class="wordmark">FUTURISMA</span>
           <span id="course-name" class="course-name">GREENWATER STRIP / MAP 01</span>
         </div>
-        <div class="system-state" role="status" aria-live="polite">
-          <span class="system-state__lamp" aria-hidden="true"></span>
-          <span id="system-status">SYSTEM STANDBY</span>
+        <div class="race-header__state">
+          <!--
+            M1 local soundtrack. It reports rather than warns, so it keeps the
+            header's quiet voice instead of a hazard hue, and it sits beside the
+            system lamp rather than in the drive cluster - that cluster is for
+            things acting on the lap, and a track title is not one of them. The
+            priority gate holds it while a safety alert is up.
+          -->
+          <div id="soundtrack-chip" class="soundtrack" role="status" aria-hidden="true">
+            <span id="soundtrack-label" class="soundtrack__label"></span>
+          </div>
+          <div class="system-state" role="status" aria-live="polite">
+            <span class="system-state__lamp" aria-hidden="true"></span>
+            <span id="system-status">SYSTEM STANDBY</span>
+          </div>
         </div>
       </header>
 
       <div id="gravity-veil" aria-hidden="true"></div>
       <main class="hud">
-        <aside id="polarity-hud" class="polarity-hud" aria-label="Gravity and powers" hidden>
-          <span id="polarity-deck" class="polarity-hud__deck">LOWER DECK</span>
-          <strong id="polarity-flip">SPACE / FLIP UP</strong>
-          <span id="polarity-power">COLLECT A POWER DEVICE</span>
-          <span class="power-charge" aria-hidden="true"><i id="power-charge-fill"></i></span>
-          <span id="polarity-route" class="polarity-hud__route">SHIFT / NITRO</span>
-        </aside>
-        <section class="telemetry telemetry--speed" aria-label="Speed">
-          <span class="telemetry__label">VELOCITY</span>
-          <span class="speed-readout"><strong id="speed-value">000</strong><small>KM/H</small></span>
-          <span id="drive-state" class="telemetry__sub">SKIDS DOWN</span>
+        <!--
+          UI pass. Nine blocks, each anchored to a corner or edge and scaled as a
+          unit from that anchor (see `.hud [data-block]` in style.css). Every id
+          below is the one the bindings already resolve - GameUi, polarity-runtime,
+          tideline-runtime and ascension-runtime all reach these by getElementById,
+          so the nodes are RE-PARENTED here, never recreated.
+        -->
+
+        <!-- Standing: who you are in the field, and how much race is left. -->
+        <section class="hud-standing" data-block="standing" aria-label="Standing">
+          <div class="hud-standing__row">
+            <span class="plate plate--accent hud-standing__tab" data-mode="race">
+              <b id="position-value">P1 / 4</b>
+            </span>
+            <span class="plate plate--dark hud-standing__lap">
+              <span class="hud-standing__lapcol">
+                <small class="hud-label">LAP</small>
+                <b id="lap-value">LAP 1 / 5</b>
+              </span>
+              <span id="lap-pips" class="hud-standing__pips" aria-hidden="true"></span>
+            </span>
+          </div>
+          <div class="hud-standing__stack">
+            <span id="gap-value" class="hud-standing__gap">FIELD LEAD</span>
+            <ol id="field-order" class="field-order" aria-label="Race positions"></ol>
+          </div>
         </section>
 
-        <section class="telemetry telemetry--timing" aria-label="Race timing">
-          <span class="telemetry__label">RACE TIME</span>
-          <time id="time-value" class="time-readout">00:00.000</time>
-          <span class="telemetry__sub">
-            <span id="lap-value">LAP 1 / 5</span><span id="last-lap-value" hidden></span>
-          </span>
-          <span class="telemetry__sub">
-            <span id="position-value">P1 / 4</span> · <span id="gap-value">FIELD LEAD</span>
-          </span>
-          <!--
-            G4 live delta. Time attack only, and it takes the slot the position
-            ladder occupies in a field race - which is the point: alone against
-            the clock, the stored best lap IS the field, so the readout that
-            says where you are against it belongs where "where you are against
-            them" already lives.
-          -->
+        <!-- Timing: the clock, and what it is worth against the record. -->
+        <section class="hud-timing" data-block="timing" aria-label="Race timing">
+          <span class="plate plate--cyan hud-timing__tag"><b class="hud-label">RACE TIME</b></span>
+          <time id="time-value" class="hud-timing__clock">00:00.000</time>
           <span id="delta-chip" class="delta-chip" data-tone="none" hidden>
             <span class="delta-chip__label">VS BEST</span>
-            <strong id="delta-chip-value">—</strong>
+            <strong id="delta-chip-value">&mdash;</strong>
           </span>
+          <!--
+            G4 sector delta. It moved up here from the gate strip in the UI pass:
+            it is a verdict on the clock, and the clock is what it is measured
+            against. Orange is slower, cyan is faster, and the sign carries it too
+            so the pair never depends on colour alone.
+          -->
+          <span id="sector-delta" class="sector-delta" aria-hidden="true" hidden></span>
+          <span id="last-lap-value" class="hud-timing__secondary" hidden></span>
         </section>
 
-        <section class="race-progress" aria-label="Course progress">
-          <div class="race-progress__copy">
-            <span id="checkpoint-value">NEXT GATE 01 / 08</span>
-            <!--
-              G2 clean-gate chain. Sits against the gate label because that is
-              the thing it counts; hidden entirely below the first paying
-              chain, so a normal lap never carries a "x1" that means nothing.
-            -->
-            <span id="clean-chain" class="clean-chain" aria-hidden="true" hidden></span>
-            <!--
-              G4 sector delta. Sits beside the clean-gate chain because both are
-              gate verdicts and both are earned by the same crossing; it speaks
-              the same register, one line of mono, hidden until there is a
-              record to measure against. Orange is slower and cyan is faster,
-              and the sign carries it too so the pair never depends on colour
-              alone.
-            -->
-            <span id="sector-delta" class="sector-delta" aria-hidden="true" hidden></span>
-            <span id="finish-value">12.6 KM TO FINISH</span>
+        <!-- Gate strip: the next gate, where you are on the lap, how far to go. -->
+        <section class="hud-gate" data-block="gate" aria-label="Course progress">
+          <div class="hud-gate__row">
+            <span class="hud-gate__left">
+              <span id="checkpoint-value">NEXT GATE 01 / 08</span>
+              <span id="sector-value" class="hud-gate__sector">RUNWAY 09</span>
+              <!--
+                G2 clean-gate chain. Against the gate label because that is the
+                thing it counts; hidden below the first paying chain, so a normal
+                lap never carries a "x1" that means nothing.
+              -->
+              <span id="clean-chain" class="clean-chain" aria-hidden="true" hidden></span>
+            </span>
+            <span id="finish-value" class="hud-gate__finish">12.6 KM TO FINISH</span>
           </div>
-          <span id="sector-value" class="sector-value">RUNWAY 09</span>
-          <span class="race-progress__track">
+          <span class="hud-gate__track">
             <span id="progress-fill"></span>
-            <b class="race-progress__finish-marker" aria-hidden="true">FINISH</b>
+            <b class="hud-gate__marker" aria-hidden="true"></b>
           </span>
         </section>
 
-        <section id="boost-meter" class="boost" aria-label="Boost charge">
-          <div class="boost__copy">
-            <span id="boost-label">PLASMA RESERVE</span>
-            <span id="boost-value">100%</span>
-          </div>
-          <div class="boost__track">
-            <span id="boost-fill"></span>
-            <span id="drift-charge" class="boost__charge" aria-hidden="true"></span>
-          </div>
-        </section>
-
-        <!--
-          G3 live track events. Same chip language as SLIPSTREAM below it and
-          stacked directly above, because the two say the same kind of thing:
-          "the world is doing something to your lap right now". `data-event`
-          carries which one, so the state-triggered screenshot harness can key
-          on a frame rather than on a guess about timing.
-        -->
-        <div
-          id="track-event-chip"
-          class="slipstream track-event"
-          role="status"
-          aria-hidden="true"
-          data-event=""
-        >
-          <span id="track-event-label" class="slipstream__label"></span>
+        <!-- Navigation cue. Owns its own slot; never contends with an alert. -->
+        <div id="turn-cue" class="hud-cue" data-block="cue" role="status" aria-hidden="true">
+          <span id="turn-arrow" class="hud-cue__arrow" aria-hidden="true"></span>
+          <span id="turn-label" class="hud-cue__label">TURN LEFT</span>
+          <strong id="turn-distance" class="hud-cue__distance">120 M</strong>
         </div>
 
         <!--
-          M1 local soundtrack. Same chip language as the two below it and one
-          line further up the stack, because it says the same kind of thing in
-          the same voice - only quieter, and only for four seconds when a mix
-          starts. It is the one chip here that reports rather than warns, which
-          is why it takes the neutral white rather than a hazard hue.
+          One shared slot below the cue: safety outranks reward. `resolveMessageSlots`
+          in ui.ts holds a lap banner or a near miss while an alert is up, so these
+          two never draw at once.
         -->
-        <div
-          id="soundtrack-chip"
-          class="slipstream soundtrack"
-          role="status"
-          aria-hidden="true"
-        >
-          <span id="soundtrack-label" class="slipstream__label"></span>
-        </div>
-
-        <div id="slipstream-chip" class="slipstream" role="status" aria-hidden="true">
-          <span class="slipstream__label">SLIPSTREAM</span>
-          <span class="slipstream__track" aria-hidden="true">
-            <span id="slipstream-fill"></span>
+        <div id="edge-warning" class="hud-alert" data-block="alert" role="status" aria-hidden="true">
+          <span id="edge-warning-label" class="hud-alert__label">COURSE EDGE</span>
+          <span class="hud-alert__track" aria-hidden="true">
+            <span id="edge-warning-fill"></span>
           </span>
         </div>
+        <div id="lap-event" class="hud-banner" data-block="alert" role="status" aria-hidden="true">
+          <strong id="lap-event-label" class="hud-banner__label">LAP 2 / 5</strong>
+          <span id="lap-event-time" class="hud-banner__detail">LAST 00:34.500</span>
+        </div>
+
+        <!-- Drive cluster: everything about the craft, in one 414 px footprint. -->
+        <section class="hud-drive" data-block="drive" aria-label="Craft">
+          <div class="hud-drive__chips">
+            <!--
+              G3 live track events and G1 slipstream sit directly above the reserve
+              they act on, because both say "the world is doing something to your
+              lap right now". `data-event` carries which one, so the screenshot
+              harness can key on a frame rather than a guess about timing.
+            -->
+            <div id="track-event-chip" class="hud-chip track-event" role="status" aria-hidden="true" data-event="">
+              <span id="track-event-label" class="hud-chip__label"></span>
+            </div>
+            <div id="slipstream-chip" class="hud-chip slipstream" role="status" aria-hidden="true">
+              <span class="hud-chip__label">SLIPSTREAM</span>
+              <span class="hud-chip__track" aria-hidden="true"><span id="slipstream-fill"></span></span>
+            </div>
+          </div>
+
+          <div class="hud-drive__speed">
+            <strong id="speed-value" class="hud-drive__number">000</strong>
+            <span class="hud-drive__unitcol">
+              <small class="hud-label">KM/H</small>
+              <span id="drive-state" class="hud-drive__state">SKIDS DOWN</span>
+            </span>
+          </div>
+
+          <div id="boost-meter" class="hud-reserve" aria-label="Plasma reserve">
+            <div class="hud-reserve__copy">
+              <span id="boost-label" class="hud-label">PLASMA RESERVE</span>
+              <span id="boost-value" class="hud-reserve__percent">100%</span>
+            </div>
+            <div class="hud-reserve__track">
+              <span id="drift-charge" class="hud-reserve__lip" aria-hidden="true"></span>
+              <span id="boost-fill" class="hud-reserve__fill"></span>
+            </div>
+          </div>
+
+          <!--
+            Abilities. `#polarity-hud` stays the show/hide container the three
+            circuit runtimes toggle, and all five ability ids keep the meaning
+            those runtimes already write: deck line, action, device state, charge
+            (scaleX 0..1) and route line. The glyph slot beside them is driven by
+            `ability-slots.js`, which READS those nodes rather than asking the
+            runtimes to write anything new - so no circuit runtime changes here.
+          -->
+          <aside id="polarity-hud" class="hud-abilities" aria-label="Gravity and powers" hidden>
+            <div class="hud-ability hud-device" data-device="empty">
+              <svg class="ability-slot" viewBox="0 0 72 72" width="56" height="56" aria-hidden="true"></svg>
+              <span class="hud-ability__text">
+                <span id="polarity-power" class="hud-ability__name">COLLECT A POWER DEVICE</span>
+                <span class="hud-ability__meter" aria-hidden="true">
+                  <i id="power-charge-fill"></i>
+                </span>
+              </span>
+            </div>
+            <div class="hud-ability hud-gravity" data-transfer="wait">
+              <svg class="ability-slot ability-slot--deck" viewBox="0 0 72 72" width="56" height="56" aria-hidden="true"></svg>
+              <span class="hud-ability__text">
+                <strong id="polarity-flip" class="hud-ability__action">SPACE / FLIP UP</strong>
+                <span id="polarity-deck" class="hud-ability__deck">LOWER DECK</span>
+                <span id="polarity-route" class="hud-ability__reason">SHIFT / NITRO</span>
+              </span>
+            </div>
+          </aside>
+        </section>
 
         <canvas
           id="minimap"
           class="minimap"
+          data-block="minimap"
           width="120"
           height="128"
           aria-hidden="true"
         ></canvas>
 
-        <div id="edge-warning" class="edge-warning" role="status" aria-hidden="true">
-          <span id="edge-warning-label">COURSE EDGE</span>
-          <span class="edge-warning__track" aria-hidden="true">
-            <span id="edge-warning-fill"></span>
-          </span>
-        </div>
-        <div id="turn-cue" class="turn-cue" role="status" aria-hidden="true">
-          <span id="turn-arrow" class="turn-arrow" aria-hidden="true">←</span>
-          <span id="turn-label">TURN LEFT</span>
-          <strong id="turn-distance">120 M</strong>
-        </div>
-        <div id="lap-event" class="lap-event" role="status" aria-hidden="true">
-          <strong id="lap-event-label">LAP 2 / 5</strong>
-          <span id="lap-event-time">LAST 00:34.500</span>
-        </div>
         <div id="countdown" class="countdown" aria-live="assertive"></div>
-        <ol id="field-order" class="result-laps field-order" aria-label="Race positions"></ol>
       </main>
+
+      <!--
+        Pause. The three routes out of a paused race, in the order a driver
+        wants them: back in, settings, out. QUIT is a hold rather than a press
+        because it throws the run away and shares a key with the pause itself.
+      -->
+      <section id="pause-panel" class="pause-panel" hidden aria-label="Paused">
+        <div class="pause-panel__card">
+          <p id="pause-reason" class="pause-panel__reason">PAUSED</p>
+          <h2 class="pause-panel__title">RACE PAUSED</h2>
+          <div class="pause-panel__actions">
+            <button id="pause-resume" class="launch-button" type="button">
+              <span>RESUME</span>
+              <kbd>ENTER</kbd>
+            </button>
+            <button id="pause-options" class="ghost-button" type="button">
+              <span>SYSTEM OPTIONS</span>
+              <kbd>O</kbd>
+            </button>
+            <button
+              id="pause-quit"
+              class="ghost-button quit-button"
+              type="button"
+              aria-describedby="pause-quit-hint"
+            >
+              <span class="quit-button__fill" aria-hidden="true"></span>
+              <span class="quit-button__text">QUIT TO PADDOCK</span>
+              <kbd>HOLD</kbd>
+            </button>
+          </div>
+          <p id="pause-quit-hint" class="pause-panel__hint">
+            Hold ESC, or hold Enter on QUIT, for <b>0.9s</b>. The run is lost.
+          </p>
+        </div>
+      </section>
 
       <section id="loading-screen" class="screen screen--loading">
         <div class="loading-mark" aria-hidden="true"></div>

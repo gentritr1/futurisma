@@ -172,9 +172,10 @@ body[data-boost="true"] .image-treatment::before {
  * "you got that right" register.
  */
 .clean-chain {
-  color: var(--acid);
-  font-size: 0.56rem;
+  font-family: var(--mono);
+  font-size: 11px;
   letter-spacing: 0.14em;
+  color: var(--acid);
   opacity: 0.85;
 }
 
@@ -187,8 +188,8 @@ body[data-boost="true"] .image-treatment::before {
  */
 .sector-delta {
   font-family: var(--mono);
-  font-size: 0.56rem;
-  letter-spacing: 0.12em;
+  font-size: 12px;
+  letter-spacing: 0.1em;
   font-variant-numeric: tabular-nums;
   color: var(--dim);
 }
@@ -213,7 +214,7 @@ body[data-boost="true"] .image-treatment::before {
   gap: 8px;
   margin-top: 2px;
   font-family: var(--mono);
-  font-size: 0.6rem;
+  font-size: 12px;
   letter-spacing: 0.12em;
   font-variant-numeric: tabular-nums;
   transition: color 160ms var(--ease-out);
@@ -222,13 +223,12 @@ body[data-boost="true"] .image-treatment::before {
 
 .delta-chip__label {
   color: var(--dim);
-  font-size: 0.52rem;
-  letter-spacing: 0.16em;
+  font-size: 11px;
+  letter-spacing: 0.14em;
 }
 
 .delta-chip strong {
-  font-size: 0.86rem;
-  font-weight: 600;
+  font: 700 34px/1 var(--condensed);
 }
 
 .delta-chip[data-tone="up"] {
@@ -281,10 +281,6 @@ body[data-boost="true"] .image-treatment::before {
 
 .course-name,
 .system-state,
-.telemetry__label,
-.telemetry__sub,
-.race-progress,
-.boost,
 .intro-code,
 .controls-list,
 .result-status,
@@ -332,101 +328,390 @@ body[data-graphics-context="lost"] .system-state__lamp {
   color: var(--warning);
 }
 
+@font-face {
+  font-family: "Barlow Condensed";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/assets/fonts/barlow-condensed/barlow-condensed-500.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Barlow Condensed";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/assets/fonts/barlow-condensed/barlow-condensed-600.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Barlow Condensed";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/assets/fonts/barlow-condensed/barlow-condensed-700.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Barlow Condensed";
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("/assets/fonts/barlow-condensed/barlow-condensed-800.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Barlow Condensed";
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/assets/fonts/barlow-condensed/barlow-condensed-700-italic.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Barlow Condensed";
+  font-style: italic;
+  font-weight: 800;
+  font-display: swap;
+  src: url("/assets/fonts/barlow-condensed/barlow-condensed-800-italic.woff2") format("woff2");
+}
+
+:root {
+  /*
+    Every Barlow rule carries the Arial Narrow step. The design prototype only
+    gave it to five numerals, which would have let a font failure reflow the
+    rest of the HUD while those five held their width.
+  */
+  --condensed: "Barlow Condensed", "Arial Narrow", Inter, sans-serif;
+  --lavender: #dabaff;
+  --amber: #ffb47c;
+  --deck-upper: #82eee6;
+  --plate-dark: oklch(0.11 0.014 205 / 0.9);
+  --plate-slot: oklch(0.16 0.016 205 / 0.9);
+  --hud-shadow: 0 0 3px oklch(0.09 0.012 205), 0 0 8px oklch(0.09 0.012 205 / 0.8);
+  --chamfer: polygon(
+    8px 0,
+    100% 0,
+    100% calc(100% - 8px),
+    calc(100% - 8px) 100%,
+    0 100%,
+    0 8px
+  );
+  /*
+    Set by `applyInterfaceScale` in ui.ts: the stored S/M/L step multiplied by a
+    viewport-height compensation. Declared here so the HUD still lays out if the
+    script never runs.
+  */
+  --hud-scale: 1;
+  --menu-scale: 1;
+}
+
+/* --------------------------------------------------------------- structure */
+
 .hud {
   position: fixed;
   inset: 0;
   z-index: 8;
   pointer-events: none;
-}
-
-.telemetry {
-  position: absolute;
-  bottom: clamp(36px, 6vh, 74px);
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.telemetry--speed {
-  left: var(--pad);
-}
-
-.telemetry--timing {
-  right: var(--pad);
-  align-items: flex-end;
-}
-
-.telemetry__label {
-  color: var(--cyan);
-}
-
-.speed-readout,
-.time-readout {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
   font-variant-numeric: tabular-nums;
 }
 
-.speed-readout strong {
-  font-size: clamp(2.5rem, 5vw, 4.3rem);
-  line-height: 0.9;
-  font-weight: 500;
-  letter-spacing: -0.04em;
+/*
+  One scale rule for every block. Scaling from the anchor corner is what keeps
+  a 414px cluster at 497px and still flush to the bottom-left at HUD SCALE L;
+  scaling the HUD root instead would grow the root past the viewport and carry
+  the right-hand blocks off screen.
+*/
+:where(.hud [data-block]) {
+  position: absolute;
+  transform: scale(var(--hud-scale));
 }
 
-.speed-readout small {
-  color: var(--muted);
-  font-size: 0.65rem;
+.hud-standing {
+  left: 34px;
+  top: 48px;
+  transform-origin: top left;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.time-readout {
-  font-family: var(--mono);
-  font-size: clamp(1.25rem, 2.5vw, 2rem);
+.hud-timing {
+  right: 34px;
+  top: 48px;
+  transform-origin: top right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  text-align: right;
+}
+
+.hud-gate {
+  left: 50%;
+  top: 50px;
+  width: 500px;
+  transform-origin: top center;
+  transform: translateX(-50%) scale(var(--hud-scale));
+}
+
+.hud-cue {
+  left: 50%;
+  top: 136px;
+  transform-origin: top center;
+  transform: translateX(-50%) scale(var(--hud-scale));
+}
+
+.hud-alert,
+.hud-banner {
+  left: 50%;
+  top: 196px;
+  transform-origin: top center;
+  transform: translateX(-50%) scale(var(--hud-scale));
+}
+
+.hud-drive {
+  left: 0;
+  bottom: 0;
+  width: 414px;
+  transform-origin: bottom left;
+  /* 34 left pad + 340 instruments + 40 fade. The fade is the block's own edge. */
+  padding: 14px 40px 20px 34px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: linear-gradient(
+    90deg,
+    oklch(0.09 0.012 205 / 0.76),
+    oklch(0.09 0.012 205 / 0.68) 80%,
+    oklch(0.09 0.012 205 / 0) 100%
+  );
+}
+
+.minimap {
+  right: 34px;
+  top: 50%;
+  transform-origin: center right;
+  transform: translateY(-50%) scale(var(--hud-scale));
+  width: 132px;
+  height: 140px;
+  clip-path: var(--chamfer);
+  background: oklch(0.1 0.014 205 / 0.72);
+}
+
+/* ------------------------------------------------------------ plate recipe */
+
+.plate {
+  display: inline-flex;
+  align-items: center;
+  transform: skewX(-10deg);
+}
+
+.plate > * {
+  display: inline-flex;
+  align-items: center;
+  transform: skewX(10deg);
+}
+
+.plate--accent {
+  background: var(--acid);
+  color: oklch(0.12 0.025 125);
+  box-shadow: 0 2px 0 oklch(0.3 0.05 205 / 0.5);
+}
+
+.plate--cyan {
+  background: var(--cyan);
+  color: oklch(0.12 0.02 210);
+}
+
+.plate--dark {
+  background: var(--plate-dark);
+}
+
+.hud-label {
+  font: 400 11px/1 var(--mono);
+  letter-spacing: 0.14em;
+  color: var(--dim);
+}
+
+/* ----------------------------------------------------------------- standing */
+
+.hud-standing__row {
+  display: flex;
+  align-items: stretch;
+  gap: 7px;
+  height: 66px;
+}
+
+.hud-standing__tab {
+  padding: 0 18px 0 16px;
+}
+
+.hud-standing__tab b {
+  font: 800 italic 62px/1 var(--condensed);
   letter-spacing: -0.02em;
 }
 
-.telemetry__sub {
+/* Time attack has no field to be second in: the tab counts the clock instead. */
+.hud-standing__tab[data-mode="attack"] {
+  background: var(--cyan);
+  color: oklch(0.12 0.02 210);
+}
+
+.hud-standing__lap {
+  gap: 14px;
+  padding: 0 18px 0 16px;
+}
+
+.hud-standing__lapcol {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.hud-standing__lap b {
+  font: 700 40px/0.9 var(--condensed);
+  color: var(--ink);
+}
+
+.hud-standing__pips {
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 14px;
+}
+
+.hud-standing__pips i {
+  display: block;
+  width: 10px;
+  height: 6px;
+  background: oklch(0.42 0.035 205 / 0.7);
+}
+
+.hud-standing__pips i[data-done="true"] {
+  background: var(--acid);
+}
+
+.hud-standing__stack {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding-left: 4px;
+  font: 400 12px/20px var(--mono);
+  letter-spacing: 0.08em;
+  text-shadow: var(--hud-shadow);
+}
+
+.hud-standing__gap {
+  font-size: 14px;
   color: var(--muted);
 }
 
-.telemetry__sub[data-state="boost"] {
-  color: var(--acid);
+.field-order {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
 }
 
-.telemetry__sub[data-state="drift"] {
-  color: var(--cyan);
-}
-
-.telemetry__sub[data-state="low-grip"],
-.telemetry__sub[data-state="hazard"],
-.telemetry__sub[data-state="lockout"] {
-  color: var(--warning);
-}
-
-.race-progress {
-  position: absolute;
-  top: 64px;
-  left: 50%;
-  width: min(360px, 44vw);
-  transform: translateX(-50%);
+.field-order li {
+  display: grid;
+  grid-template-columns: 4px 28px 120px 56px;
+  align-items: center;
+  gap: 0 10px;
   color: var(--muted);
-  text-align: center;
 }
 
-.race-progress__copy {
+.field-order li i {
+  width: 4px;
+  height: 12px;
+  background: oklch(0.42 0.035 205 / 0.7);
+}
+
+.field-order li[data-player="true"] {
+  color: var(--ink);
+}
+
+.field-order li[data-player="true"] i {
+  background: var(--acid);
+}
+
+.field-order li .gap {
+  text-align: right;
+}
+
+/* ------------------------------------------------------------------- timing */
+
+.hud-timing__tag {
+  padding: 3px 10px;
+}
+
+.hud-timing__tag b {
+  font: 400 10px/1 var(--mono);
+  letter-spacing: 0.16em;
+}
+
+.hud-timing__clock {
+  font: 600 36px/1 var(--mono);
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  text-shadow: var(--hud-shadow);
+}
+
+.hud-timing__secondary {
+  font: 400 12px/1.2 var(--mono);
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  text-shadow: var(--hud-shadow);
+}
+
+/* --------------------------------------------------------------------- gate */
+
+.hud-gate__row {
   display: flex;
   justify-content: space-between;
-  gap: 18px;
+  align-items: baseline;
+  gap: 20px;
+  font: 400 12px/1 var(--mono);
+  letter-spacing: 0.1em;
   white-space: nowrap;
+  color: var(--muted);
+  text-shadow: var(--hud-shadow);
 }
 
-.sector-value {
-  display: block;
-  margin-top: 5px;
+.hud-gate__left {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.hud-gate__sector {
+  font-size: 11px;
+  letter-spacing: 0.14em;
   color: var(--acid);
-  font-size: 0.59rem;
-  letter-spacing: 0.12em;
+}
+
+.hud-gate__finish {
+  flex-shrink: 0;
+}
+
+.hud-gate__track {
+  position: relative;
+  display: block;
+  height: 4px;
+  margin-top: 7px;
+  background: oklch(0.09 0.012 205 / 0.55);
+}
+
+.hud-gate__track > span {
+  display: block;
+  height: 100%;
+  background: var(--cyan);
+  transform-origin: left center;
+}
+
+.hud-gate__marker {
+  position: absolute;
+  right: 0;
+  top: -3px;
+  width: 3px;
+  height: 10px;
+  background: var(--acid);
 }
 
 #checkpoint-value[data-cleared="true"] {
@@ -437,572 +722,595 @@ body[data-graphics-context="lost"] .system-state__lamp {
   color: var(--warning);
 }
 
-#finish-value {
-  color: var(--ink);
-}
-
-#finish-value[data-final="true"] {
+#finish-value[data-final="true"],
+#finish-value[data-approach="true"] {
   color: var(--acid);
 }
 
-#finish-value[data-approach="true"] {
-  color: var(--ink);
-  text-shadow: 0 0 7px oklch(0.86 0.18 130 / 0.52);
-}
+/* ---------------------------------------------------------------- nav cue */
 
-.race-progress__track,
-.boost__track {
-  display: block;
-  height: 3px;
-  margin-top: 8px;
-  background: oklch(0.8 0.02 210 / 0.16);
-  overflow: hidden;
-}
-
-.race-progress__track {
-  position: relative;
-  overflow: visible;
-  border-right: 2px solid var(--acid);
-}
-
-.race-progress__track span,
-.boost__track span {
-  display: block;
-  width: 100%;
-  height: 100%;
-  transform: scaleX(0);
-  transform-origin: left center;
-  background: var(--cyan);
-}
-
-.boost {
-  position: absolute;
-  left: 50%;
-  bottom: clamp(22px, 4vh, 44px);
-  width: min(320px, 40vw);
-  transform: translateX(-50%);
-  color: var(--muted);
-}
-
-.boost__copy {
+.hud-cue {
   display: flex;
-  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 18px 8px 14px;
+  clip-path: var(--chamfer);
+  white-space: nowrap;
+  background: oklch(0.1 0.014 205 / 0.9);
+  opacity: 0;
+  transition: opacity 160ms var(--ease-out);
 }
 
-.boost__track span {
-  background: var(--acid);
+.hud-cue[data-active="true"] {
+  opacity: 1;
 }
 
 /*
- * P5 drift bank. A 1px acid lip riding the top edge of the plasma bar, so the
- * reserve fill underneath is never obscured and nothing new is added to the
- * HUD's silhouette. It is deliberately not readable as a number: the glanceable
- * signal is the armed state, which lights the lip and throws a short bloom the
- * moment the bank clears its reward minimum. That bloom is what a driver in a
- * corner sees in peripheral vision — the length is only there for the debrief.
- */
-.boost__track {
+  The arrow is a glyph `GameUi` writes, not a CSS triangle. It has to be, because
+  the cue carries a SECOND arrow for the turn after this one - a sequence a
+  border-triangle cannot express - and the finish cue swaps it for a diamond.
+  Styling the glyph keeps that information and still reads as the mock's shape.
+*/
+.hud-cue__arrow {
+  font-size: 18px;
+  line-height: 1;
+  color: var(--warning);
+  letter-spacing: 0.08em;
+}
+
+.hud-cue[data-mode="finish"] .hud-cue__arrow {
+  color: var(--acid);
+}
+
+.hud-cue__label {
+  font: 400 14px/1 var(--mono);
+  letter-spacing: 0.1em;
+  color: var(--ink);
+}
+
+.hud-cue__distance {
+  font: 700 26px/1 var(--condensed);
+  color: var(--ink);
+}
+
+.hud-cue[data-urgent="true"] {
+  background: oklch(0.12 0.03 38 / 0.94);
+}
+
+.hud-cue[data-urgent="true"] .hud-cue__distance {
+  color: var(--warning);
+}
+
+.hud-cue[data-mode="finish"] .hud-cue__distance {
+  color: var(--acid);
+}
+
+/* ------------------------------------------------------- alert and banner */
+
+.hud-alert {
+  min-width: 320px;
+  padding: 9px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  text-align: center;
+  white-space: nowrap;
+  border-left: 6px solid var(--warning);
+  background-color: oklch(0.12 0.03 38 / 0.94);
+  /* The hazard diagonal says "danger" without relying on the colour alone. */
+  background-image: repeating-linear-gradient(
+    135deg,
+    oklch(0.7 0.2 38 / 0.18) 0 6px,
+    transparent 6px 14px
+  );
+  opacity: 0;
+  transition: opacity 160ms var(--ease-out);
+}
+
+.hud-alert[data-active="true"] {
+  opacity: 1;
+}
+
+.hud-alert__label {
+  font: 600 14px/1 var(--mono);
+  letter-spacing: 0.1em;
+  color: var(--ink);
+}
+
+.hud-alert__track {
+  display: block;
+  height: 4px;
+  background: oklch(0.7 0.2 38 / 0.25);
+}
+
+.hud-alert__track > span {
+  display: block;
+  height: 100%;
+  background: var(--warning);
+  transform-origin: left center;
+}
+
+.hud-banner {
+  min-width: 260px;
+  padding: 9px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  clip-path: var(--chamfer);
+  border-top: 2px solid var(--cyan);
+  background: oklch(0.1 0.014 205 / 0.92);
+  opacity: 0;
+  transition: opacity 160ms var(--ease-out);
+}
+
+.hud-banner[data-active="true"] {
+  opacity: 1;
+}
+
+.hud-banner__label {
+  font: 700 24px/1 var(--condensed);
+  letter-spacing: 0.04em;
+  color: var(--cyan);
+}
+
+.hud-banner__detail {
+  font: 400 12px/1 var(--mono);
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.hud-banner[data-final="true"] {
+  border-top-color: var(--acid);
+}
+
+.hud-banner[data-final="true"] .hud-banner__label {
+  color: var(--acid);
+}
+
+/* ------------------------------------------------------------ drive cluster */
+
+.hud-drive__chips {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 300px;
+  margin-bottom: 4px;
+  font: 400 12px/1 var(--mono);
+  letter-spacing: 0.14em;
+}
+
+.hud-chip {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 160ms var(--ease-out);
+}
+
+.hud-chip[data-active="true"] {
+  opacity: 1;
+}
+
+.hud-chip__label {
+  color: var(--muted);
+}
+
+.hud-chip__track {
+  display: block;
+  height: 3px;
+  background: oklch(0.8 0.02 210 / 0.16);
+  transform: skewX(-10deg);
+}
+
+.hud-chip__track > span {
+  display: block;
+  height: 100%;
+  background: var(--cyan);
+  transform-origin: left center;
+}
+
+.slipstream[data-locked="true"] .hud-chip__label {
+  color: var(--cyan);
+}
+
+.track-event .hud-chip__label {
+  font-weight: 600;
+  color: var(--cyan);
+}
+
+.track-event[data-event="gust"] .hud-chip__label {
+  color: oklch(0.88 0.15 78);
+}
+
+.track-event[data-event="salt"] .hud-chip__label {
+  color: oklch(0.82 0.16 46);
+}
+
+.track-event[data-event="squall"] .hud-chip__label {
+  color: var(--cyan);
+}
+
+.hud-drive__speed {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  width: 340px;
+}
+
+.hud-drive__number {
+  font: 800 italic 92px/0.82 var(--condensed);
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.hud-drive__unitcol {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding-bottom: 5px;
+}
+
+.hud-drive__unitcol .hud-label {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+}
+
+.hud-drive__state {
+  font: 400 13px/1 var(--mono);
+  letter-spacing: 0.12em;
+  color: var(--muted);
+}
+
+.hud-drive__state[data-state="boost"] {
+  color: var(--cyan);
+}
+
+.hud-drive__state[data-state="drift"] {
+  color: var(--acid);
+}
+
+.hud-drive__state[data-state="low-grip"],
+.hud-drive__state[data-state="hazard"],
+.hud-drive__state[data-state="lockout"] {
+  color: var(--warning);
+}
+
+/* ------------------------------------------------------------ reserve meter */
+
+.hud-reserve {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.hud-reserve__copy {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  width: 300px;
+}
+
+.hud-reserve__percent {
+  font: 700 24px/1 var(--condensed);
+  color: var(--ink);
+}
+
+.hud-reserve__track {
   position: relative;
-  overflow: visible;
+  width: 300px;
+  height: 14px;
+  transform: skewX(-10deg);
+  /* The empty band is the same 22/3 dash as the fill, just unlit. */
+  background: repeating-linear-gradient(
+    90deg,
+    oklch(0.8 0.02 210 / 0.16) 0 22px,
+    transparent 22px 25px
+  );
 }
 
-.boost__track .boost__charge {
+.hud-reserve__fill {
   position: absolute;
-  top: -2px;
-  left: 0;
-  height: 1px;
-  opacity: 0.4;
+  inset: 0;
+  transform-origin: left center;
+  background: repeating-linear-gradient(90deg, var(--acid) 0 22px, transparent 22px 25px);
 }
 
-.boost[data-charge="armed"] .boost__track .boost__charge {
+.hud-reserve__fill[data-active="true"] {
+  background: repeating-linear-gradient(90deg, var(--cyan) 0 22px, transparent 22px 25px);
+  box-shadow: 0 0 10px oklch(0.86 0.13 210 / 0.5);
+  animation: hud-ignite 520ms var(--ease-out) both;
+}
+
+/*
+  Lockout is carried by the TRACK - the whole meter wears the hazard stripe -
+  while the fill keeps drawing the true reserve, solid so it cannot be read as
+  a normal charge. Colour, texture and the label all change together.
+*/
+.hud-reserve[data-state="locked"] .hud-reserve__track {
+  background: repeating-linear-gradient(
+    135deg,
+    var(--warning) 0 6px,
+    oklch(0.2 0.05 38) 6px 13px
+  );
+}
+
+.hud-reserve[data-state="locked"] .hud-reserve__fill {
+  background: var(--warning);
+  box-shadow: none;
+}
+
+.hud-reserve[data-state="locked"] #boost-label {
+  font-weight: 700;
+  color: var(--warning);
+}
+
+/* The drift bank is a separate lip above the meter. Reserve and bank never merge. */
+.hud-reserve__lip {
+  position: absolute;
+  left: 0;
+  top: -6px;
+  width: 100%;
+  height: 3px;
+  background: var(--acid);
+  transform-origin: left center;
+  opacity: 0.35;
+}
+
+.hud-reserve[data-charge="armed"] .hud-reserve__lip {
   opacity: 1;
   box-shadow: 0 0 6px oklch(0.86 0.18 130 / 0.8);
 }
 
-/* Locked recolours the reserve fill to warning; the bank stays acid, because a
- * locked reserve is exactly the state where earning one back is the read. */
-.boost[data-state="locked"] .boost__track .boost__charge {
-  background: var(--acid);
+/* ---------------------------------------------------------------- abilities */
+
+.hud-abilities {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+  width: 340px;
 }
 
-/*
- * P6 minimap / radar. Right rail, stacked above RACE TIME: the bottom-left
- * corner is VELOCITY, bottom-centre is the boost meter and the vertical middle
- * of the right rail is the field-order ladder, so this is the one free corner.
- * Deliberately small and low contrast — PRODUCT.md's HUD anti-reference is
- * "busy chrome that competes with the racing line", and the canvas itself
- * decides when a nearby rival earns more brightness.
- */
-.minimap {
-  position: absolute;
-  right: var(--pad);
-  bottom: calc(clamp(36px, 6vh, 74px) + 104px);
-  width: 120px;
-  height: 128px;
-  opacity: 0.82;
-  pointer-events: none;
+.hud-abilities[hidden],
+[data-polarity-control][hidden] {
+  display: none;
 }
 
-/*
- * G1 slipstream chip. Sits directly above the plasma reserve, because the two
- * are one economy: the tow is what refills the bar under it. Same uppercase
- * mono the rest of the HUD speaks, same cyan the route reads in, and it only
- * exists on screen while a tow is actually being had - PRODUCT.md's HUD
- * anti-reference is chrome that competes with the racing line, so a chip that
- * is lit whenever you are behind anyone would be exactly that.
- *
- * State is carried twice over, never by colour alone: the label brightens and
- * gains a `LOCK` suffix at the lock threshold, and the bar under it fills.
- */
-.slipstream {
-  position: absolute;
-  left: 50%;
-  bottom: calc(clamp(22px, 4vh, 44px) + 34px);
-  width: min(320px, 40vw);
-  transform: translateX(-50%);
+.hud-ability {
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  align-items: center;
+  gap: 16px;
+}
+
+.ability-slot {
+  display: block;
+  width: 56px;
+  height: 56px;
+}
+
+.hud-ability__text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  max-width: 268px;
+}
+
+.hud-ability__name,
+.hud-ability__action {
+  font: 700 22px/1 var(--condensed);
+  letter-spacing: 0.02em;
+  color: var(--ink);
+}
+
+.hud-device[data-device="empty"] .hud-ability__name {
+  font-size: 13px;
+  letter-spacing: 0.1em;
   font-family: var(--mono);
-  font-size: 0.62rem;
-  letter-spacing: 0.12em;
+  font-weight: 400;
   color: var(--dim);
-  opacity: 0;
-  transition: opacity 160ms var(--ease-out);
-  pointer-events: none;
 }
 
-.slipstream[data-active="true"] {
-  opacity: 1;
+.hud-device[data-device="held"] .hud-ability__name {
+  color: var(--lavender);
+}
+
+.hud-device[data-device="perfect"] .hud-ability__name {
+  color: var(--acid);
+}
+
+.hud-ability__meter {
+  display: block;
+  width: 140px;
+  height: 3px;
+  background: oklch(0.8 0.02 210 / 0.16);
+  transform: skewX(-10deg);
+}
+
+.hud-ability__meter > i {
+  display: block;
+  height: 100%;
+  background: var(--lavender);
+  transform-origin: left center;
+}
+
+.hud-device[data-device="active"] .hud-ability__meter > i {
+  background: var(--ink);
+}
+
+.hud-device[data-device="empty"] .hud-ability__meter {
+  visibility: hidden;
+}
+
+/*
+  The glyph slots. The device's identity is drawn twice - cut out of the plate
+  and again as an outline on top - so it survives an empty fill: a driver
+  glancing down must be able to tell WHICH device is gone, not just that one is.
+*/
+.ability-slot__plate {
+  fill: oklch(0.13 0.014 205 / 0.85);
+}
+
+.hud-device[data-device="held"] .ability-slot__plate,
+.hud-device[data-device="active"] .ability-slot__plate,
+.hud-device[data-device="perfect"] .ability-slot__plate {
+  fill: oklch(0.16 0.016 205);
+}
+
+.ability-slot__fill {
+  fill: var(--lavender);
+}
+
+.hud-device[data-device="active"] .ability-slot__fill {
+  fill: var(--ink);
+}
+
+.ability-slot__glyph {
+  stroke: var(--dim);
+}
+
+.hud-device[data-device="held"] .ability-slot__glyph,
+.hud-device[data-device="active"] .ability-slot__glyph {
+  stroke: var(--ink);
+}
+
+.hud-device[data-device="perfect"] .ability-slot__glyph {
+  stroke: var(--acid);
+}
+
+.ability-slot__outline {
+  stroke: oklch(0.42 0.035 205 / 0.5);
+}
+
+.hud-device[data-device="held"] .ability-slot__outline {
+  stroke: oklch(0.42 0.035 205 / 0.9);
+}
+
+.hud-device[data-device="active"] .ability-slot__outline {
+  stroke: var(--ink);
+}
+
+.hud-device[data-device="perfect"] .ability-slot__outline {
+  stroke: var(--acid);
+}
+
+/* The deck slot: two bars and an arrow at the deck you would arrive on. */
+.ability-slot__deck {
+  fill: none;
+  stroke: oklch(0.42 0.035 205 / 0.9);
+}
+
+.hud-gravity[data-deck="lower"] .ability-slot__deck--lower {
+  fill: var(--amber);
+  stroke: var(--amber);
+}
+
+.hud-gravity[data-deck="upper"] .ability-slot__deck--upper {
+  fill: var(--deck-upper);
+  stroke: var(--deck-upper);
+}
+
+.ability-slot__arrow {
+  fill: none;
+  stroke: oklch(0.42 0.035 205 / 0.9);
+  stroke-width: 1.5;
+}
+
+/* Solid only when the transfer is actually available. */
+.hud-gravity[data-transfer="ready"] .ability-slot__arrow {
+  fill: var(--ink);
+  stroke: var(--ink);
+}
+
+/* A circuit with no decks (Ascension) gets no deck slot rather than an empty one. */
+.hud-gravity[data-decked="false"] .ability-slot {
+  visibility: hidden;
+}
+
+.hud-ability__deck {
+  font: 400 10px/1 var(--mono);
+  letter-spacing: 0.14em;
+  color: var(--amber);
+}
+
+.hud-gravity[data-deck="upper"] .hud-ability__deck {
+  color: var(--deck-upper);
+}
+
+.hud-ability__reason {
+  font: 400 11.5px/1.35 var(--mono);
+  letter-spacing: 0.1em;
   color: var(--muted);
 }
 
-.slipstream[data-locked="true"] {
-  color: var(--cyan);
-  text-shadow: 0 0 7px oklch(0.86 0.13 210 / 0.5);
-}
+/* ------------------------------------------------------------------ motion */
 
-/*
- * G3 track-event chip, as re-cut by P20.10. Borrows the slipstream chip
- * wholesale - same width, same mono, same uppercase, same tracking, same place
- * in the stack - and sits one line above it, so the HUD gains a word rather
- * than a widget. It has no bar of its own: a gust either is coming or is not,
- * and a fill would invite the driver to watch a meter instead of the road.
- *
- * P20.10 - WHY THIS RENDERED AS SMALL GREY TEXT, which is a cascade bug and not
- * a taste call. `ui.ts` sets BOTH `data-active` and `data-event` on this chip,
- * and `.slipstream[data-active="true"] { color: var(--muted) }` above is an
- * attribute selector, i.e. specificity (0,2,0). The G3 rule that was supposed
- * to colour it was a bare `.track-event { color: ... }`, (0,1,0), so the
- * slipstream's grey won every time the chip was lit - the one state in which
- * anybody sees it. The three rules below carry the colour on the SAME
- * specificity as the rule they have to beat and come after it, which is what
- * makes them win rather than tie.
- *
- * ONE COLOUR PER EVENT, and P20.10 overrules G3's single amber. G3's argument
- * was that cyan on this HUD means "you are being rewarded", so no cost should
- * wear it. That holds for the slipstream's cyan; it does not hold for weather.
- * A squall is rain, cyan is what rain is, and the chip is on screen for 25 s
- * with the deck grip down - nothing about it reads as an opportunity, and the
- * word SQUALL names it besides. So:
- *
- *   GUST    amber, and the arrow is the actionable half - `track-events.ts`
- *           resolves it from the gust's own sign, which is the sign of the
- *           lateral acceleration applied to the craft, so the arrow points
- *           WHERE YOU WILL BE PUSHED rather than where the wind is from.
- *   SALT    the HUD's hazard orange, the same `--warning` the locked boost
- *           meter and the impact flash speak, because a salt patch is the one
- *           of the three that takes grip away under the craft.
- *   SQUALL  cyan.
- *
- * State is still carried twice over: the chip only exists while the event does,
- * the word itself names it, and the arrow carries the direction.
- *
- * SIZE. The chip element measures >= 14 px tall at 1280x720 through
- * `line-height`, not through a larger font: the slipstream chip's own block is
- * label plus a 2 px track and a 5 px margin, and this chip has no track, so at
- * the shared 0.62rem it was a 12 px line on its own. Same font, same weight,
- * same tracking - only the line box is opened up to the height the chip beside
- * it already occupies.
- */
-.track-event {
-  /*
-   * 42 px rather than G3's 56 px because the 14 px of bottom padding below
-   * puts the WORD back where it was; the chip's box grew downward, the text
-   * did not move.
-   */
-  bottom: calc(clamp(22px, 4vh, 44px) + 42px);
-  line-height: 1.5;
-  /*
-   * THE SCRIM, and it is sized from the measurement rather than by eye.
-   *
-   * Colour alone cannot carry 4.5:1 here and the arithmetic says so. The chip
-   * sits over whatever the craft is driving past: the squall chip landed on a
-   * 12 px surround of rgb(117,89,58) — bright Greenwater sand, measured — and
-   * the HUD's cyan is relative luminance 0.665, which is 4.05:1 and no lighter
-   * cyan closes it with any margin. A dark halo does not either: three stacked
-   * text-shadows moved that surround from rgb(120,91,60) to rgb(117,89,58),
-   * about 2.5%, because a 12 px ring is mostly the world and a blur off a 10 px
-   * mono glyph is thin by the time it gets there.
-   *
-   * So the chip carries its own ground, which is the language the HUD already
-   * speaks for a cue that must be read against terrain — `.turn-cue` and
-   * `.lap-event` both sit on a panel. This one is a gradient rather than a
-   * plate so it has no edge to notice: opaque under the word, gone by the
-   * middle of the chip. The geometry is chosen so the ACCEPTANCE's own 12 px
-   * surround lands on it — the label box is 43 x 10 px at x 480, so the ring
-   * spans x 468-535 and y 610-644, and the padded box below spans x 464-784
-   * and y 608-651 with the scrim at full strength out to x 547.
-   */
-  padding: 14px 0 14px 16px;
-  margin-left: -16px;
-  background: linear-gradient(
-    90deg,
-    oklch(0.09 0.012 205 / 0.55) 0%,
-    oklch(0.09 0.012 205 / 0.55) 26%,
-    oklch(0.09 0.012 205 / 0) 46%
-  );
-  /*
-   * P20.10 - the fade is authored on the OUT direction and overridden on the
-   * IN, because the two are not the same cue. A gust chip leads its hold by
-   * GUST_CHIP_LEAD_SECONDS; a 1.0 s rise inside that lead is the telegraph
-   * arriving, and a 0.6 s fall is it getting out of the way.
-   */
-  transition: opacity 600ms var(--ease-out);
-}
-
-.track-event[data-active="true"] {
-  transition-duration: 1000ms;
-}
-
-/*
- * CONTRAST IS CARRIED BY THE HALO, NOT ONLY BY THE HUE, and the numbers are why.
- * The acceptance is 4.5:1 measured as the glyph body against the 12 px surround
- * of the frame behind it. Colour alone does not reach it: `--warning` at
- * oklch(0.7 0.2 38) resolves to rgb(255,101,49), relative luminance 0.31, and
- * over the 12 px surround the salt chip actually landed on — rgb(57,69,69),
- * measured, `shots/p20.10/chips-bitterpan` — that is 3.07:1. The dark ring
- * below is what closes it, by darkening the surround the chip is measured
- * against rather than by making the text shout: it is three stacked shadows
- * rather than one, so the falloff covers the first ~11 px out from the glyph,
- * which is the band the measurement weights most heavily. The coloured glow
- * stays, one stop wider, so the chip still reads as lit rather than as stencil.
- *
- * `--warning` itself is NOT re-tuned: the locked boost meter and the impact
- * flash speak it, and moving it to satisfy a chip would re-grade two cues this
- * phase has no business touching. The salt chip takes a lighter step of the
- * same hazard hue instead.
- */
-.track-event[data-event="gust"] {
-  opacity: 1;
-  color: oklch(0.88 0.15 78);
-  text-shadow:
-    0 0 2px oklch(0.09 0.012 205 / 0.95),
-    0 0 5px oklch(0.09 0.012 205 / 0.85),
-    0 0 11px oklch(0.09 0.012 205 / 0.7),
-    0 0 14px oklch(0.88 0.15 78 / 0.35);
-}
-
-.track-event[data-event="salt"] {
-  opacity: 1;
-  color: oklch(0.82 0.16 46);
-  text-shadow:
-    0 0 2px oklch(0.09 0.012 205 / 0.95),
-    0 0 5px oklch(0.09 0.012 205 / 0.85),
-    0 0 11px oklch(0.09 0.012 205 / 0.7),
-    0 0 14px oklch(0.7 0.2 38 / 0.4);
-}
-
-.track-event[data-event="squall"] {
-  opacity: 1;
-  color: var(--cyan);
-  text-shadow:
-    0 0 2px oklch(0.09 0.012 205 / 0.95),
-    0 0 5px oklch(0.09 0.012 205 / 0.85),
-    0 0 11px oklch(0.09 0.012 205 / 0.7),
-    0 0 14px oklch(0.86 0.13 210 / 0.35);
-}
-
-/*
- * P20.10 - reduced motion, from ALL THREE of its sources rather than only the
- * operating system's. `resolveReducedMotion()` composes `?motion=reduce`, the
- * stored setting and `prefers-reduced-motion`, and `ui.ts` stamps the answer
- * here; the media query at the bottom of this file only ever saw the third.
- * A chip that is a warning is exactly the wrong thing to fade in for a driver
- * who asked for calm - it should simply be there.
- */
-.track-event[data-reduced-motion="true"],
-.track-event[data-reduced-motion="true"][data-active="true"] {
-  transition: none;
-}
-
-/*
- * M1 soundtrack title chip - the fourth colour on the event-chip family, and
- * the only one that is not a warning.
- *
- * GUST is amber because you are about to be pushed, SALT is hazard orange
- * because grip is going away, SQUALL is cyan because it is rain. All three cost
- * the driver something. A track title costs nothing and demands nothing: it is
- * the HUD saying what is playing, for four seconds, and then getting out of the
- * way. So it takes neutral white at 70% - no hue at all, which is the only
- * honest way to say "this is not one of the three".
- *
- * SMALLER THAN THE CHIP IT SITS ABOVE, deliberately. 0.54rem against the
- * family's 0.62rem and no scrim, because a mix title can be forty characters of
- * DJ set name and the anti-reference is chrome competing with the racing line.
- * The three warning chips earn their scrim by being unmissable on any terrain;
- * this one does not need to be read at 200 km/h, so it is allowed to be quiet.
- * Legibility is carried by the same dark halo the family already uses.
- *
- * PLACEMENT. 90 px above the boost meter's own offset puts it clear of the
- * track-event chip below it (42 px offset plus its 14 px padding either side of
- * a 15 px line = a box ending at ~85 px), so the two can be lit together
- * without touching. The selector is `.slipstream.soundtrack` rather than a bare
- * `.soundtrack` on purpose: the narrow-viewport block at the bottom of this file
- * re-bases `.slipstream` at (0,1,0), and a bare class would lose to it and drop
- * this chip on top of the SLIPSTREAM one at small widths.
- */
-.slipstream.soundtrack {
-  bottom: calc(clamp(22px, 4vh, 44px) + 90px);
-  font-size: 0.54rem;
-  letter-spacing: 0.1em;
-}
-
-.slipstream.soundtrack[data-active="true"] {
-  opacity: 1;
-  color: oklch(0.97 0 0 / 0.7);
-  text-shadow:
-    0 0 2px oklch(0.09 0.012 205 / 0.95),
-    0 0 5px oklch(0.09 0.012 205 / 0.85),
-    0 0 11px oklch(0.09 0.012 205 / 0.7);
-}
-
-.slipstream.soundtrack[data-reduced-motion="true"] {
-  transition: none;
-}
-
-.slipstream__track {
-  display: block;
-  height: 2px;
-  margin-top: 5px;
-  background: oklch(0.8 0.02 210 / 0.16);
-  overflow: hidden;
-}
-
-.slipstream__track span {
-  display: block;
-  width: 100%;
-  height: 100%;
-  transform: scaleX(0);
-  transform-origin: left center;
-  background: var(--cyan);
-}
-
-.slipstream[data-locked="true"] .slipstream__track span {
-  box-shadow: 0 0 6px oklch(0.86 0.13 210 / 0.7);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .slipstream,
-  .track-event,
-  .track-event[data-active="true"] {
-    transition: none;
+@keyframes hud-ignite {
+  0% {
+    filter: brightness(2.4);
+  }
+  100% {
+    filter: brightness(1);
   }
 }
 
-.boost__track span[data-active="true"] {
-  background: var(--cyan);
-  box-shadow: 0 0 7px oklch(0.86 0.13 210 / 0.62);
+@keyframes hud-kick {
+  0% {
+    color: var(--cyan);
+    transform: translateX(10px);
+  }
+  100% {
+    color: var(--ink);
+    transform: translateX(0);
+  }
 }
 
-.boost[data-state="locked"] {
-  color: var(--warning);
+@keyframes hud-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
 }
 
-.boost[data-state="locked"] .boost__track span {
-  background: var(--warning);
+.hud-drive__number[data-boost="true"] {
+  animation: hud-kick 520ms var(--ease-out) both;
 }
 
-.edge-warning {
-  position: absolute;
-  left: 50%;
-  bottom: 24%;
-  min-width: 236px;
-  padding: 7px 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  transform: translateX(-50%);
-  opacity: 0;
-  visibility: hidden;
-  color: var(--warning);
-  border: 1px solid currentColor;
-  font-family: var(--mono);
-  font-size: 0.7rem;
-  letter-spacing: 0.1em;
-  text-align: center;
-  transition:
-    opacity 100ms var(--ease-out),
-    visibility 0s linear 100ms;
+.ability-slot[data-pulse="true"] .ability-slot__outline {
+  animation: hud-pulse 800ms ease-in-out 3;
 }
 
-.edge-warning__track {
-  display: none;
-  height: 3px;
-  overflow: hidden;
-  background: oklch(0.7 0.2 38 / 0.18);
+/*
+  Reduced motion removes the three event animations and nothing else: every
+  number, width and colour is computed identically either way, so a driver who
+  turns motion down still reads exactly the same race. The fades on the cue,
+  alert and banner stay - they are opacity only, and removing them would make
+  those panels snap in and out, which is the jarring change the setting exists
+  to avoid.
+*/
+@media (prefers-reduced-motion: reduce) {
+  .hud-drive__number,
+  .hud-reserve__fill,
+  .ability-slot .ability-slot__outline {
+    animation: none !important;
+  }
 }
 
-.edge-warning__track span {
-  display: block;
-  width: 100%;
-  height: 100%;
-  transform: scaleX(0);
-  transform-origin: left center;
-  background: currentColor;
+[data-reduced-motion="true"] .hud-drive__number,
+[data-reduced-motion="true"].hud-reserve__fill,
+[data-reduced-motion="true"] .ability-slot__outline,
+body[data-reduced-motion="true"] .hud-drive__number,
+body[data-reduced-motion="true"] .hud-reserve__fill,
+body[data-reduced-motion="true"] .ability-slot__outline {
+  animation: none !important;
 }
 
-.edge-warning[data-recovery="true"] .edge-warning__track {
-  display: block;
-}
-
-.edge-warning[data-active="true"] {
-  opacity: 1;
-  visibility: visible;
-  transition-delay: 0s;
-}
-
-.turn-cue,
-.lap-event {
-  position: absolute;
-  left: 50%;
-  transform: translate(-50%, 8px);
-  opacity: 0;
-  visibility: hidden;
-  border-bottom: 1px solid var(--line);
-  font-family: var(--mono);
-  transition:
-    opacity 160ms var(--ease-out),
-    transform 200ms var(--ease-out),
-    visibility 0s linear 200ms;
-}
-
-.turn-cue {
-  top: 19%;
-  min-width: 180px;
-  padding: 9px 13px;
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 20px;
-  background: oklch(0.08 0.018 205 / 0.84);
-  border-top: 1px solid var(--acid);
-  font-size: 0.7rem;
-  letter-spacing: 0.08em;
-}
-
-.turn-arrow {
-  position: relative;
-  width: 30px;
-  height: 12px;
-  color: var(--warning);
-  font-size: 0;
-  line-height: 0;
-}
-
-.turn-arrow::before {
-  content: "";
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 7px;
-  height: 7px;
-  border: solid currentColor;
-  border-width: 0 0 3px 3px;
-  transform: rotate(var(--fr, 45deg));
-}
-
-.turn-cue[data-direction="right"] .turn-arrow::before {
-  --fr: 225deg;
-}
-
-.turn-cue[data-mode="finish"] .turn-arrow::before {
-  top: 3px;
-  left: 8px;
-  width: 8px;
-  height: 8px;
-  border: 0;
-  background: currentColor;
-}
-
-.turn-cue strong {
-  color: var(--cyan);
-  font-size: 0.72rem;
-  font-weight: 600;
-}
-
-.turn-cue[data-active="true"],
-.lap-event[data-active="true"] {
-  transform: translate(-50%, 0);
-  opacity: 1;
-  visibility: visible;
-  transition-delay: 0s;
-}
-
-.edge-warning[data-recovery="true"],
-.edge-warning[data-wrong-way="true"],
-.turn-cue[data-urgent="true"] {
-  background: oklch(0.09 0.027 38 / 0.9);
-}
-
-.turn-cue[data-urgent="true"] {
-  border-color: var(--warning);
-}
-
-.turn-cue[data-urgent="true"] strong {
-  color: var(--warning);
-}
-
-.turn-cue[data-mode="finish"] {
-  border-color: var(--acid);
-}
-
-.turn-cue[data-mode="finish"] .turn-arrow,
-.turn-cue[data-mode="finish"] strong {
-  color: var(--acid);
-}
-
-.lap-event {
-  top: 31%;
-  min-width: 248px;
-  padding: 10px 18px 9px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
-  background: oklch(0.07 0.016 205 / 0.9);
-  border-top: 1px solid var(--cyan);
-  text-align: center;
-}
-
-.lap-event strong {
-  color: var(--cyan);
-  font-size: 0.82rem;
-  letter-spacing: 0.14em;
-}
-
-.lap-event span {
-  color: var(--muted);
-  font-size: 0.62rem;
-  letter-spacing: 0.08em;
-}
-
-.lap-event[data-final="true"] {
-  border-top-color: var(--acid);
-}
-
-.lap-event[data-final="true"] strong {
-  color: var(--acid);
-}
 
 .countdown {
   position: absolute;
@@ -1254,20 +1562,6 @@ body[data-phase="resuming"] .hud::before {
   justify-self: end;
   color: var(--muted);
   font-weight: 500;
-}
-
-.field-order {
-  position: absolute;
-  top: 50%;
-  right: var(--pad);
-  width: auto;
-  margin: 0;
-  transform: translateY(-50%);
-}
-
-.field-order li {
-  grid-template-columns: auto 1fr;
-  min-height: 22px;
 }
 
 .result-laps li[data-best="true"] span,
@@ -1689,43 +1983,17 @@ body[data-options="true"] .hud {
     padding-inline: 14px;
   }
 
-  .race-progress {
-    top: 58px;
-    width: min(68vw, 360px);
-  }
-
-  .race-progress__copy {
-    gap: 10px;
-    font-size: 0.58rem;
-  }
-
-  .telemetry {
-    bottom: 62px;
-  }
-
-  .telemetry--speed {
-    left: 14px;
-  }
-
-  .telemetry--timing {
-    right: 14px;
-  }
-
-  .speed-readout strong {
-    font-size: 2.6rem;
-  }
-
-  .time-readout {
-    font-size: 1.12rem;
+  /*
+    Narrow viewports: the HUD blocks are already anchored and scaled, so the
+    only thing worth changing is how much of the screen they eat. Mobile is not
+    a claimed target - this keeps a small window legible, nothing more.
+  */
+  .hud {
+    --hud-scale: 0.8;
   }
 
   #last-lap-value {
     display: none;
-  }
-
-  .boost {
-    bottom: 24px;
-    width: 52vw;
   }
 
   .slipstream {
@@ -1740,17 +2008,6 @@ body[data-options="true"] .hud {
   /* Not enough right rail left once RACE TIME reflows; readability first. */
   .minimap {
     display: none;
-  }
-
-  .turn-cue {
-    top: 17%;
-    min-width: 166px;
-    padding: 8px 10px;
-  }
-
-  .lap-event {
-    top: 29%;
-    min-width: min(248px, calc(100vw - 36px));
   }
 
   .screen {
@@ -1903,9 +2160,10 @@ body[data-options="true"] .hud {
   .intro-panel,
   .result-panel,
   .launch-button,
-  .edge-warning,
-  .turn-cue,
-  .lap-event {
+  .hud-alert,
+  .hud-banner,
+  .hud-cue,
+  .hud-chip {
     transition: opacity 200ms var(--ease-out);
   }
 
@@ -1941,35 +2199,8 @@ body[data-options="true"] .hud {
   }
 }
 
-/* Polarity's two decisions stay beside the racing view, clear of turn cues. */
-.polarity-hud {
-  position: absolute;
-  left: var(--pad);
-  top: clamp(112px, 21vh, 180px);
-  display: grid;
-  gap: 9px;
-  max-width: 230px;
-  padding: 12px 16px;
-  border-left: 2px solid #ffb47c;
-  background: linear-gradient(90deg, rgb(8 13 22 / 80%), rgb(8 13 22 / 0%));
-  font: 10px/1.35 var(--mono);
-  letter-spacing: .07em;
-  color: #bed0cf;
-}
-.polarity-hud[hidden], [data-polarity-control][hidden] { display: none; }
-.polarity-hud__deck { color: #ffb47c; letter-spacing: .16em; }
-.polarity-hud strong { color: #edf8f2; font-size: 12px; font-weight: 500; }
-.polarity-hud__route { opacity: .65; font-size: 9px; }
-.polarity-hud[data-deck="upper"] { border-color: #82eee6; }
-.polarity-hud[data-deck="upper"] .polarity-hud__deck { color: #82eee6; }
-.polarity-hud[data-ready="true"] #polarity-power { color: #dabaff; }
 body[data-map="polarity"] .intro-panel h1,
 body[data-map="nightshift"] .intro-panel h1 { font-size: clamp(3rem, 8vw, 6.4rem); letter-spacing: -.065em; }
-@media (max-width: 700px) {
-  .polarity-hud { top: 110px; max-width: 185px; padding: 8px 10px; gap: 6px; font-size: 8px; }
-  .polarity-hud strong { font-size: 10px; }
-  .polarity-hud__route { font-size: 8px; }
-}
 /* Four circuits add a second row: keep launch reachable at laptop heights. */
 .screen--intro { align-items: safe center; }
 @media (max-height: 900px) and (min-width: 701px) {
@@ -1985,10 +2216,7 @@ body[data-map="nightshift"] .intro-panel h1 { font-size: clamp(3rem, 8vw, 6.4rem
 }
 
 #gravity-veil { position: fixed; inset: 0; z-index: 7; background: #051017; opacity: 0; pointer-events: none; }
-.power-charge { width: 92px; height: 3px; overflow: hidden; background: rgb(172 201 208 / 18%); }
-.power-charge i { display: block; height: 100%; background: #bfdcca; transform: scaleX(0); transform-origin: left; }
-body[data-map="tideline"] .polarity-hud { border-color: #8fd4ca; }
-body[data-map="tideline"] .polarity-hud__deck { color: #9eecdc; }
+body[data-map="tideline"] .hud-ability__deck { color: #9eecdc; }
 body[data-map="tideline"] .intro-panel h1 { font-size: clamp(3rem, 8vw, 6rem); letter-spacing: -.03em; }
 body[data-map="polarity"] .intro-panel h1,
 body[data-map="nightshift"] .intro-panel h1 { letter-spacing: -.03em; }
@@ -2000,4 +2228,103 @@ body[data-map="nightshift"] .intro-panel h1 { letter-spacing: -.03em; }
 @media (max-height: 900px) and (min-width: 701px) {
   body[data-map="tideline"] .intro-panel h1 { font-size: clamp(2.6rem, 6vw, 3.6rem); }
   .screen--intro .intro-deck { line-height: 1.45; }
+}
+
+/* ==========================================================================
+   Pause panel
+   --------------------------------------------------------------------------
+   The three routes out of a paused race. It scales with `--menu-scale` like
+   every other panel, and it sits above the dimmed HUD rather than replacing it
+   - the driver should still see the corner they stopped in.
+   ========================================================================== */
+
+.pause-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 12;
+  display: grid;
+  place-items: center;
+  background: oklch(0.055 0.012 210 / 0.72);
+}
+
+.pause-panel__card {
+  width: min(420px, calc(100vw - 48px));
+  padding: 28px 30px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  clip-path: var(--chamfer);
+  border-top: 2px solid var(--cyan);
+  background: var(--panel);
+  transform: scale(var(--menu-scale));
+}
+
+.pause-panel__reason {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  color: var(--dim);
+}
+
+.pause-panel__title {
+  margin: 0;
+  font: 800 italic 42px/1 var(--condensed);
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.pause-panel__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.pause-panel__hint {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.5;
+  letter-spacing: 0.08em;
+  color: var(--dim);
+}
+
+.pause-panel__hint b {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+/*
+  The quit button wears its own progress. The fill is a separate layer under the
+  label so the text never moves, and it is driven by `scaleX` from the same
+  polled hold the game loop runs - not by a CSS animation with its own duration,
+  which would keep running after the key came up.
+*/
+.quit-button {
+  position: relative;
+  overflow: hidden;
+}
+
+.quit-button__fill {
+  position: absolute;
+  inset: 0;
+  background: oklch(0.7 0.2 38 / 0.32);
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+.quit-button__text,
+.quit-button kbd {
+  position: relative;
+}
+
+.quit-button[data-holding="true"] {
+  border-color: var(--warning);
+  color: var(--ink);
+}
+
+.quit-button[data-holding="true"] .quit-button__text::after {
+  content: " · KEEP HOLDING";
+  color: var(--warning);
 }

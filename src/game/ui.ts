@@ -117,10 +117,35 @@ export interface RaceStandingEntry extends RaceGridEntry {
   gapMs: number;
 }
 
+/**
+ * The ladder's gap column.
+ *
+ * Signed against the player and rounded to a tenth, because a ladder read at
+ * 300 km/h is a glance and a hundredth is noise. The sign is the carrier, not
+ * the colour: a minus is ahead, a plus is behind. The player's own row is a
+ * dash rather than a zero - "0.0" invites the reader to compare it with the
+ * others, and it is not that kind of number.
+ */
+export function formatLadderGap(gapMs: number | null | undefined, player: boolean): string {
+  if (player) return "\u2014";
+  if (gapMs === null || gapMs === undefined || !Number.isFinite(gapMs)) return "";
+  const seconds = Math.abs(gapMs) / 1000;
+  if (seconds >= 100) return gapMs < 0 ? "\u2212>99s" : "+>99s";
+  const sign = gapMs < 0 ? "\u2212" : "+";
+  return `${sign}${seconds.toFixed(1)}`;
+}
+
 export interface FieldOrderEntry {
   position: number;
   name: string;
   player: boolean;
+  /**
+   * Signed milliseconds against the player: negative ahead, positive behind,
+   * `null` on the player's own row and whenever the field is not running. It is
+   * computed from the same distance-over-speed model as the gap line above the
+   * ladder, so the two can never tell different stories about the same rival.
+   */
+  gapMs?: number | null;
 }
 
 export interface RaceCoursePresentation {
@@ -173,6 +198,7 @@ export class GameUi {
   private readonly driveState = requiredElement<HTMLElement>("drive-state");
   private readonly timeValue = requiredElement<HTMLElement>("time-value");
   private readonly lapValue = requiredElement<HTMLElement>("lap-value");
+  private readonly lapPips = requiredElement<HTMLElement>("lap-pips");
   private readonly lastLapValue = requiredElement<HTMLElement>("last-lap-value");
   private readonly positionValue = requiredElement<HTMLElement>("position-value");
   private readonly gapValue = requiredElement<HTMLElement>("gap-value");
@@ -188,7 +214,7 @@ export class GameUi {
   private readonly slipstreamChip = requiredElement<HTMLElement>("slipstream-chip");
   private readonly slipstreamLabel = requiredElement<HTMLElement>(
     "slipstream-chip",
-  ).querySelector<HTMLElement>(".slipstream__label")!;
+  ).querySelector<HTMLElement>(".hud-chip__label")!;
   private readonly slipstreamFill = requiredElement<HTMLElement>("slipstream-fill");
   private readonly edgeWarning = requiredElement<HTMLElement>("edge-warning");
   private readonly edgeWarningLabel = requiredElement<HTMLElement>("edge-warning-label");
@@ -380,6 +406,26 @@ export class GameUi {
     this.dispatchRecord.dataset.recorded = bestLapMs === null ? "false" : "true";
   }
 
+  /**
+   * Pips are capped: past nine laps they stop being countable at a glance and
+   * the fraction beside them is the honest readout, so the row is dropped
+   * rather than drawn as a bar nobody can parse.
+   */
+  private renderLapPips(lap: number, totalLaps: number): void {
+    if (!Number.isFinite(totalLaps) || totalLaps < 2 || totalLaps > 9) {
+      this.lapPips.replaceChildren();
+      return;
+    }
+    const done = Math.min(Math.max(lap - 1, 0), totalLaps);
+    const fragment = document.createDocumentFragment();
+    for (let index = 0; index < totalLaps; index += 1) {
+      const pip = document.createElement("i");
+      pip.dataset.done = index < done ? "true" : "false";
+      fragment.append(pip);
+    }
+    this.lapPips.replaceChildren(fragment);
+  }
+
   updateFieldOrder(entries: readonly FieldOrderEntry[]): void {
     const key = entries.map((entry) => `${entry.player ? "Y" : "N"}${entry.name}`).join("|");
     if (key === this.lastFieldOrderKey) return;
@@ -387,13 +433,18 @@ export class GameUi {
     const fragment = document.createDocumentFragment();
     for (const entry of entries) {
       const row = document.createElement("li");
+      const bar = document.createElement("i");
       const position = document.createElement("span");
       const name = document.createElement("span");
+      const gap = document.createElement("span");
       name.className = "n";
-      position.textContent = `P${entry.position}${entry.player ? " · YOU" : ""}`;
-      name.textContent = entry.name;
+      gap.className = "gap";
+      position.textContent = `P${entry.position}`;
+      name.textContent = entry.player ? `${entry.name} · YOU` : entry.name;
+      gap.textContent = formatLadderGap(entry.gapMs, entry.player);
       row.dataset.best = entry.player ? "true" : "false";
-      row.append(position, name);
+      row.dataset.player = entry.player ? "true" : "false";
+      row.append(bar, position, name, gap);
       fragment.append(row);
     }
     this.fieldOrder.replaceChildren(fragment);
@@ -685,7 +736,7 @@ export class GameUi {
       this.gapValue.textContent = gapLabel;
       this.lastGapLabel = gapLabel;
     }
-    const lapLabel = `LAP ${Math.min(frame.lap, frame.totalLaps)} / ${frame.totalLaps}`;
+    const lapLabel = `${Math.min(frame.lap, frame.totalLaps)} / ${frame.totalLaps}`;
     const lastLapTimeLabel = frame.lastLapMs === null
       ? ""
       : ` · LAST ${formatRaceTime(frame.lastLapMs)}`;
@@ -702,6 +753,11 @@ export class GameUi {
         : `GATE ${frame.missedGate.toString().padStart(2, "0")} MISSED · RECOVER`;
     if (lapLabel !== this.lastLapLabel) {
       this.lapValue.textContent = lapLabel;
+      // One pip per lap, filled as it is completed. It is the same fact the
+      // text already carries, in a form that survives peripheral vision - the
+      // driver should not have to read a fraction to know how much race is
+      // left. Rebuilt only on the lap change, never per frame.
+      this.renderLapPips(frame.lap, frame.totalLaps);
       this.lastLapLabel = lapLabel;
     }
     if (lastLapTimeLabel !== this.lastLapTimeLabel) {
@@ -831,6 +887,9 @@ export class GameUi {
       this.boostMeter.dataset.state = boostState;
       this.boostLabel.textContent = boostPresentation.label;
       this.boostFill.dataset.active = boostState === "active" ? "true" : "false";
+      // Same edge, so the streak on the numeral and the flash on the meter are
+      // one event rather than two that happen to land together.
+      this.speedValue.dataset.boost = boostState === "active" ? "true" : "false";
       document.body.dataset.boost = boostState === "active" ? "true" : "false";
       this.lastBoostState = boostState;
     }
