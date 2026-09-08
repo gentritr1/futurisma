@@ -1,0 +1,15 @@
+{
+  "script": "scripts/visual/ascension/phase-e-packs.mjs",
+  "objectFamilies": 36,
+  "fogDistancesPerObject": 3,
+  "frames": 108,
+  "expected": 108,
+  "residual": 0,
+  "keySha256": "fd998d5e4edb097ee7608c7da0c4ecb79609488ed46235d1fb3072d4c312bd9f",
+  "materialWalk": {
+    "objects": 108,
+    "violations": []
+  },
+  "scope": "Original-scale fixtures. Consecutive triplets use one camera heading at three measured distances. Effect batches use one representative instance of their shared material. Keys and per-frame source labels withheld.",
+  "errors": []
+}

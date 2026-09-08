@@ -1,0 +1,2200 @@
+{
+  "script": "scripts/visual/ascension/feature-bursts.mjs",
+  "keySha256": "751fde08d98630bf13c97d574240e3281b8eec0e115718f5f1b4cc65e1e1e07f",
+  "scope": "Constant 300 km/h camera traverse through the production route, materials and chase-camera offsets. This isolates visual recognition; it is not a controller race, pickup activation or performance benchmark. No current lane exists on Ascension.",
+  "windowSeconds": 2,
+  "rateHz": 10,
+  "inclusiveEndpoint": 1,
+  "perBurstExpected": 21,
+  "bursts": 8,
+  "expected": 168,
+  "observed": 168,
+  "residual": 0,
+  "records": [
+    {
+      "file": "burst-01/000.png",
+      "seconds": 0,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 180,
+      "worldCameraToObjectMetres": 188.7961770450438,
+      "progress": 0.4806641222183255,
+      "camera": [
+        253.37527659887505,
+        0.6087021036332754,
+        109.97526667667036
+      ]
+    },
+    {
+      "file": "burst-01/001.png",
+      "seconds": 0.1,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 171.66666666666666,
+      "worldCameraToObjectMetres": 180.70582074261492,
+      "progress": 0.48503152396747706,
+      "camera": [
+        252.69062265667355,
+        0.9100567891134927,
+        118.27315572815166
+      ]
+    },
+    {
+      "file": "burst-01/002.png",
+      "seconds": 0.2,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 163.33333333333334,
+      "worldCameraToObjectMetres": 172.60783548168925,
+      "progress": 0.4893989257166287,
+      "camera": [
+        251.88594691666364,
+        1.22082649570521,
+        126.56112294099383
+      ]
+    },
+    {
+      "file": "burst-01/003.png",
+      "seconds": 0.3,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 155,
+      "worldCameraToObjectMetres": 164.5019085179482,
+      "progress": 0.4937663274657803,
+      "camera": [
+        250.9564473509619,
+        1.540049685607265,
+        134.8368899633941
+      ]
+    },
+    {
+      "file": "burst-01/004.png",
+      "seconds": 0.4,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 146.66666666666666,
+      "worldCameraToObjectMetres": 156.3873228375845,
+      "progress": 0.4981337292149319,
+      "camera": [
+        249.8952448328893,
+        1.8667900444904997,
+        143.09766860632607
+      ]
+    },
+    {
+      "file": "burst-01/005.png",
+      "seconds": 0.5,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 138.33333333333334,
+      "worldCameraToObjectMetres": 148.26453386246203,
+      "progress": 0.5025011309640834,
+      "camera": [
+        248.7005891776368,
+        2.199790365229565,
+        151.34115669256983
+      ]
+    },
+    {
+      "file": "burst-01/006.png",
+      "seconds": 0.6,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 130,
+      "worldCameraToObjectMetres": 140.1330924733473,
+      "progress": 0.5068685327132351,
+      "camera": [
+        247.36621270954873,
+        2.5380012545952693,
+        159.56418697269544
+      ]
+    },
+    {
+      "file": "burst-01/007.png",
+      "seconds": 0.7,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 121.66666666666667,
+      "worldCameraToObjectMetres": 131.99230013020585,
+      "progress": 0.5112359344623867,
+      "camera": [
+        245.8839355725639,
+        2.880350601215569,
+        167.7628188001042
+      ]
+    },
+    {
+      "file": "burst-01/008.png",
+      "seconds": 0.8,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 113.33333333333333,
+      "worldCameraToObjectMetres": 123.84254409089651,
+      "progress": 0.5156033362115382,
+      "camera": [
+        244.25076462222813,
+        3.225614436669326,
+        175.93384023329563
+      ]
+    },
+    {
+      "file": "burst-01/009.png",
+      "seconds": 0.9,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 105,
+      "worldCameraToObjectMetres": 115.68333714968277,
+      "progress": 0.5199707379606898,
+      "camera": [
+        242.4585428128114,
+        3.572679959128142,
+        184.07260498327764
+      ]
+    },
+    {
+      "file": "burst-01/010.png",
+      "seconds": 1,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 96.66666666666667,
+      "worldCameraToObjectMetres": 107.51404651096745,
+      "progress": 0.5243381397098414,
+      "camera": [
+        240.4973885522133,
+        3.9203854002929495,
+        192.17346000540013
+      ]
+    },
+    {
+      "file": "burst-01/011.png",
+      "seconds": 1.1,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 88.33333333333333,
+      "worldCameraToObjectMetres": 99.33512484573242,
+      "progress": 0.5287055414589931,
+      "camera": [
+        238.36270192870148,
+        4.2675738249169255,
+        200.2316652657502
+      ]
+    },
+    {
+      "file": "burst-01/012.png",
+      "seconds": 1.2,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 80.00000000000001,
+      "worldCameraToObjectMetres": 91.14621908323859,
+      "progress": 0.5330729432081447,
+      "camera": [
+        236.04387658096482,
+        4.613089255926334,
+        208.2402339929591
+      ]
+    },
+    {
+      "file": "burst-01/013.png",
+      "seconds": 1.3,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 71.66666666666667,
+      "worldCameraToObjectMetres": 82.94711529496239,
+      "progress": 0.5374403449572962,
+      "camera": [
+        233.5288700540636,
+        4.9557335078651,
+        216.1907886588123
+      ]
+    },
+    {
+      "file": "burst-01/014.png",
+      "seconds": 1.4,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 63.33333333333334,
+      "worldCameraToObjectMetres": 74.73882251177513,
+      "progress": 0.5418077467064478,
+      "camera": [
+        230.81105255543775,
+        5.294439720677387,
+        224.07603707107546
+      ]
+    },
+    {
+      "file": "burst-01/015.png",
+      "seconds": 1.5,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 55,
+      "worldCameraToObjectMetres": 66.52196689034187,
+      "progress": 0.5461751484555994,
+      "camera": [
+        227.87675267144047,
+        5.628039008362887,
+        231.88515434075214
+      ]
+    },
+    {
+      "file": "burst-01/016.png",
+      "seconds": 1.6,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 46.66666666666666,
+      "worldCameraToObjectMetres": 58.29818905672655,
+      "progress": 0.5505425502047511,
+      "camera": [
+        224.71135977724606,
+        5.955348473237046,
+        239.60539542137124
+      ]
+    },
+    {
+      "file": "burst-01/017.png",
+      "seconds": 1.7,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 38.33333333333334,
+      "worldCameraToObjectMetres": 50.071531489499336,
+      "progress": 0.5549099519539026,
+      "camera": [
+        221.30590466871473,
+        6.275417088487989,
+        247.22521085160915
+      ]
+    },
+    {
+      "file": "burst-01/018.png",
+      "seconds": 1.8,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 30,
+      "worldCameraToObjectMetres": 41.84857656804973,
+      "progress": 0.5592773537030542,
+      "camera": [
+        217.6432866083905,
+        6.587086261694488,
+        254.72739788544902
+      ]
+    },
+    {
+      "file": "burst-01/019.png",
+      "seconds": 1.9,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 21.666666666666686,
+      "worldCameraToObjectMetres": 33.6432816734688,
+      "progress": 0.5636447554522058,
+      "camera": [
+        213.70645325614632,
+        6.889241157801381,
+        262.09219619981025
+      ]
+    },
+    {
+      "file": "burst-01/020.png",
+      "seconds": 2,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 13.333333333333343,
+      "worldCameraToObjectMetres": 25.488510915405882,
+      "progress": 0.5680121572013574,
+      "camera": [
+        209.48457217101512,
+        7.18106652045142,
+        269.30100321734307
+      ]
+    },
+    {
+      "file": "burst-02/000.png",
+      "seconds": 0,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 180,
+      "worldCameraToObjectMetres": 189.9356560707976,
+      "progress": 0.7457692307692307,
+      "camera": [
+        -171.01426225890933,
+        9.76,
+        269.2264459518029
+      ]
+    },
+    {
+      "file": "burst-02/001.png",
+      "seconds": 0.1,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 171.66666666666666,
+      "worldCameraToObjectMetres": 181.98166427126137,
+      "progress": 0.7489743589743589,
+      "camera": [
+        -179.0763317154709,
+        9.76,
+        267.1018618040097
+      ]
+    },
+    {
+      "file": "burst-02/002.png",
+      "seconds": 0.2,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 163.33333333333334,
+      "worldCameraToObjectMetres": 174.05872806472456,
+      "progress": 0.7521794871794871,
+      "camera": [
+        -187.1626544117449,
+        9.76,
+        265.0053512911905
+      ]
+    },
+    {
+      "file": "burst-02/003.png",
+      "seconds": 0.3,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 155,
+      "worldCameraToObjectMetres": 166.0646106203201,
+      "progress": 0.7553846153846153,
+      "camera": [
+        -195.17758929568853,
+        9.76,
+        262.60226430544344
+      ]
+    },
+    {
+      "file": "burst-02/004.png",
+      "seconds": 0.4,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 146.66666666666666,
+      "worldCameraToObjectMetres": 157.9503996933689,
+      "progress": 0.7585897435897435,
+      "camera": [
+        -203.0117642424125,
+        9.76,
+        259.66403063648016
+      ]
+    },
+    {
+      "file": "burst-02/005.png",
+      "seconds": 0.5,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 138.33333333333334,
+      "worldCameraToObjectMetres": 149.72908791581432,
+      "progress": 0.7617948717948717,
+      "camera": [
+        -210.5750020017228,
+        9.76,
+        256.11473921577584
+      ]
+    },
+    {
+      "file": "burst-02/006.png",
+      "seconds": 0.6,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 130,
+      "worldCameraToObjectMetres": 141.44453665676824,
+      "progress": 0.7650000000000001,
+      "camera": [
+        -217.8464205770513,
+        9.76,
+        252.02811637244884
+      ]
+    },
+    {
+      "file": "burst-02/007.png",
+      "seconds": 0.7,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 121.66666666666667,
+      "worldCameraToObjectMetres": 133.13403233060043,
+      "progress": 0.7682051282051283,
+      "camera": [
+        -224.89049160564832,
+        9.76,
+        247.57377147268176
+      ]
+    },
+    {
+      "file": "burst-02/008.png",
+      "seconds": 0.8,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 113.33333333333333,
+      "worldCameraToObjectMetres": 124.81602954078559,
+      "progress": 0.7714102564102565,
+      "camera": [
+        -231.8211096691733,
+        9.76,
+        242.94644032420587
+      ]
+    },
+    {
+      "file": "burst-02/009.png",
+      "seconds": 0.9,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 105,
+      "worldCameraToObjectMetres": 116.49988640170783,
+      "progress": 0.7746153846153847,
+      "camera": [
+        -238.75091958463636,
+        9.76,
+        238.31743304199958
+      ]
+    },
+    {
+      "file": "burst-02/010.png",
+      "seconds": 1,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 96.66666666666667,
+      "worldCameraToObjectMetres": 108.19242836984016,
+      "progress": 0.7778205128205129,
+      "camera": [
+        -245.73663040456867,
+        9.76,
+        233.7738380311561
+      ]
+    },
+    {
+      "file": "burst-02/011.png",
+      "seconds": 1.1,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 88.33333333333333,
+      "worldCameraToObjectMetres": 99.89473429066939,
+      "progress": 0.7810256410256411,
+      "camera": [
+        -252.7683361129331,
+        9.76,
+        229.3005509811942
+      ]
+    },
+    {
+      "file": "burst-02/012.png",
+      "seconds": 1.2,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 80.00000000000001,
+      "worldCameraToObjectMetres": 91.59858024642193,
+      "progress": 0.7842307692307693,
+      "camera": [
+        -259.7695055388339,
+        9.76,
+        224.77888972045892
+      ]
+    },
+    {
+      "file": "burst-02/013.png",
+      "seconds": 1.3,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 71.66666666666667,
+      "worldCameraToObjectMetres": 83.30238353458591,
+      "progress": 0.7874358974358975,
+      "camera": [
+        -266.71769343515416,
+        9.76,
+        220.17618541255413
+      ]
+    },
+    {
+      "file": "burst-02/014.png",
+      "seconds": 1.4,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 63.33333333333334,
+      "worldCameraToObjectMetres": 75.00743036483298,
+      "progress": 0.7906410256410257,
+      "camera": [
+        -273.61225709319325,
+        9.76,
+        215.49341417510908
+      ]
+    },
+    {
+      "file": "burst-02/015.png",
+      "seconds": 1.5,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 55,
+      "worldCameraToObjectMetres": 66.71535048614088,
+      "progress": 0.7938461538461539,
+      "camera": [
+        -280.4509908340062,
+        9.76,
+        210.72930413560726
+      ]
+    },
+    {
+      "file": "burst-02/016.png",
+      "seconds": 1.6,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 46.66666666666666,
+      "worldCameraToObjectMetres": 58.42858037047662,
+      "progress": 0.7970512820512821,
+      "camera": [
+        -287.2307117464032,
+        9.76,
+        205.88138502795425
+      ]
+    },
+    {
+      "file": "burst-02/017.png",
+      "seconds": 1.7,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 38.33333333333334,
+      "worldCameraToObjectMetres": 50.15110391561564,
+      "progress": 0.8002564102564103,
+      "camera": [
+        -293.94707121519104,
+        9.76,
+        200.9459096488664
+      ]
+    },
+    {
+      "file": "burst-02/018.png",
+      "seconds": 1.8,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 30,
+      "worldCameraToObjectMetres": 41.890133239218166,
+      "progress": 0.8034615384615384,
+      "camera": [
+        -300.5975187390765,
+        9.76,
+        195.92175949647583
+      ]
+    },
+    {
+      "file": "burst-02/019.png",
+      "seconds": 1.9,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 21.666666666666686,
+      "worldCameraToObjectMetres": 33.659682547739564,
+      "progress": 0.8066666666666666,
+      "camera": [
+        -307.17824144083625,
+        9.76,
+        190.80635158464816
+      ]
+    },
+    {
+      "file": "burst-02/020.png",
+      "seconds": 2,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 13.333333333333343,
+      "worldCameraToObjectMetres": 25.491581703839607,
+      "progress": 0.8098717948717948,
+      "camera": [
+        -313.68508284211487,
+        9.76,
+        185.5969319990455
+      ]
+    },
+    {
+      "file": "burst-03/000.png",
+      "seconds": 0,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 180,
+      "worldCameraToObjectMetres": 190.49135930226,
+      "progress": 0.005769230769230749,
+      "camera": [
+        -351.6458540847785,
+        9.76,
+        -252.50401879252195
+      ]
+    },
+    {
+      "file": "burst-03/001.png",
+      "seconds": 0.1,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 171.66666666666666,
+      "worldCameraToObjectMetres": 182.3280088613351,
+      "progress": 0.008974358974358942,
+      "camera": [
+        -345.86831864629374,
+        9.76,
+        -258.5144506917246
+      ]
+    },
+    {
+      "file": "burst-03/002.png",
+      "seconds": 0.2,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 163.33333333333334,
+      "worldCameraToObjectMetres": 174.14222346489993,
+      "progress": 0.012179487179487136,
+      "camera": [
+        -339.95297049827633,
+        9.76,
+        -264.38871067384616
+      ]
+    },
+    {
+      "file": "burst-03/003.png",
+      "seconds": 0.3,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 155,
+      "worldCameraToObjectMetres": 165.93745310592465,
+      "progress": 0.01538461538461533,
+      "camera": [
+        -333.9114449513503,
+        9.76,
+        -270.13267576473464
+      ]
+    },
+    {
+      "file": "burst-03/004.png",
+      "seconds": 0.4,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 146.66666666666666,
+      "worldCameraToObjectMetres": 157.71648589995962,
+      "progress": 0.018589743589743524,
+      "camera": [
+        -327.7534394373538,
+        9.76,
+        -275.7512503137022
+      ]
+    },
+    {
+      "file": "burst-03/005.png",
+      "seconds": 0.5,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 138.33333333333334,
+      "worldCameraToObjectMetres": 149.4813477667942,
+      "progress": 0.021794871794871717,
+      "camera": [
+        -321.4856863213676,
+        9.76,
+        -281.2467545075849
+      ]
+    },
+    {
+      "file": "burst-03/006.png",
+      "seconds": 0.6,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 130,
+      "worldCameraToObjectMetres": 141.23420035968778,
+      "progress": 0.02499999999999991,
+      "camera": [
+        -315.11609588281306,
+        9.76,
+        -286.6235727548942
+      ]
+    },
+    {
+      "file": "burst-03/007.png",
+      "seconds": 0.7,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 121.66666666666667,
+      "worldCameraToObjectMetres": 132.97689535946085,
+      "progress": 0.028205128205128327,
+      "camera": [
+        -308.6516629205145,
+        9.76,
+        -291.8857595097054
+      ]
+    },
+    {
+      "file": "burst-03/008.png",
+      "seconds": 0.8,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 113.33333333333333,
+      "worldCameraToObjectMetres": 124.71094984060913,
+      "progress": 0.03141025641025652,
+      "camera": [
+        -302.0979829919703,
+        9.76,
+        -297.03622046264763
+      ]
+    },
+    {
+      "file": "burst-03/009.png",
+      "seconds": 0.9,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 105,
+      "worldCameraToObjectMetres": 116.43766926102252,
+      "progress": 0.034615384615384714,
+      "camera": [
+        -295.4595985017469,
+        9.76,
+        -302.0769354940882
+      ]
+    },
+    {
+      "file": "burst-03/010.png",
+      "seconds": 1,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 96.66666666666667,
+      "worldCameraToObjectMetres": 108.15801101404826,
+      "progress": 0.03782051282051291,
+      "camera": [
+        -288.7385360001166,
+        9.76,
+        -307.0066319483606
+      ]
+    },
+    {
+      "file": "burst-03/011.png",
+      "seconds": 1.1,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 88.33333333333333,
+      "worldCameraToObjectMetres": 99.87354066293612,
+      "progress": 0.0410256410256411,
+      "camera": [
+        -281.9407037783113,
+        9.76,
+        -311.8298129616236
+      ]
+    },
+    {
+      "file": "burst-03/012.png",
+      "seconds": 1.2,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 80.00000000000001,
+      "worldCameraToObjectMetres": 91.58546775563205,
+      "progress": 0.044230769230769296,
+      "camera": [
+        -275.06914560761135,
+        9.76,
+        -316.5473024147569
+      ]
+    },
+    {
+      "file": "burst-03/013.png",
+      "seconds": 1.3,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 71.66666666666667,
+      "worldCameraToObjectMetres": 83.29514360429279,
+      "progress": 0.04743589743589749,
+      "camera": [
+        -268.1267409668421,
+        9.76,
+        -321.1598895687126
+      ]
+    },
+    {
+      "file": "burst-03/014.png",
+      "seconds": 1.4,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 63.33333333333334,
+      "worldCameraToObjectMetres": 75.00406518618068,
+      "progress": 0.05064102564102568,
+      "camera": [
+        -261.11506650808604,
+        9.76,
+        -325.66643161820144
+      ]
+    },
+    {
+      "file": "burst-03/015.png",
+      "seconds": 1.5,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 55,
+      "worldCameraToObjectMetres": 66.71428029913953,
+      "progress": 0.05384615384615388,
+      "camera": [
+        -254.03614374364827,
+        9.76,
+        -330.06650269934994
+      ]
+    },
+    {
+      "file": "burst-03/016.png",
+      "seconds": 1.6,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 46.66666666666666,
+      "worldCameraToObjectMetres": 58.42873718572636,
+      "progress": 0.05705128205128207,
+      "camera": [
+        -246.89298367805094,
+        9.76,
+        -334.3615169596956
+      ]
+    },
+    {
+      "file": "burst-03/017.png",
+      "seconds": 1.7,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 38.33333333333334,
+      "worldCameraToObjectMetres": 50.151791378190374,
+      "progress": 0.060256410256410264,
+      "camera": [
+        -239.68728479737842,
+        9.76,
+        -338.55082485024167
+      ]
+    },
+    {
+      "file": "burst-03/018.png",
+      "seconds": 1.8,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 30,
+      "worldCameraToObjectMetres": 41.8908567082778,
+      "progress": 0.06346153846153846,
+      "camera": [
+        -232.42051402534383,
+        9.76,
+        -342.6333900698253
+      ]
+    },
+    {
+      "file": "burst-03/019.png",
+      "seconds": 1.9,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 21.666666666666686,
+      "worldCameraToObjectMetres": 33.660142905857654,
+      "progress": 0.06666666666666665,
+      "camera": [
+        -225.09258214707376,
+        9.76,
+        -346.60509525266616
+      ]
+    },
+    {
+      "file": "burst-03/020.png",
+      "seconds": 2,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 13.333333333333343,
+      "worldCameraToObjectMetres": 25.49176033726135,
+      "progress": 0.06987179487179485,
+      "camera": [
+        -217.70609011967142,
+        9.76,
+        -350.46688134105017
+      ]
+    },
+    {
+      "file": "burst-04/000.png",
+      "seconds": 0,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 180,
+      "worldCameraToObjectMetres": 189.83246426495134,
+      "progress": 0.9707692307692308,
+      "camera": [
+        -405.1591494889607,
+        9.76,
+        -179.05090490106377
+      ]
+    },
+    {
+      "file": "burst-04/001.png",
+      "seconds": 0.1,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 171.66666666666666,
+      "worldCameraToObjectMetres": 181.6527452498102,
+      "progress": 0.973974358974359,
+      "camera": [
+        -400.639263335539,
+        9.76,
+        -186.05201243180588
+      ]
+    },
+    {
+      "file": "burst-04/002.png",
+      "seconds": 0.2,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 163.33333333333334,
+      "worldCameraToObjectMetres": 173.4807170629458,
+      "progress": 0.9771794871794872,
+      "camera": [
+        -396.0901487462113,
+        9.76,
+        -193.03412922703788
+      ]
+    },
+    {
+      "file": "burst-04/003.png",
+      "seconds": 0.3,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 155,
+      "worldCameraToObjectMetres": 165.34760310351615,
+      "progress": 0.9803846153846154,
+      "camera": [
+        -391.636221728964,
+        9.76,
+        -200.07937381965624
+      ]
+    },
+    {
+      "file": "burst-04/004.png",
+      "seconds": 0.4,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 146.66666666666666,
+      "worldCameraToObjectMetres": 157.21744508451607,
+      "progress": 0.9835897435897436,
+      "camera": [
+        -387.12067516669737,
+        9.76,
+        -207.0874411458966
+      ]
+    },
+    {
+      "file": "burst-04/005.png",
+      "seconds": 0.5,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 138.33333333333334,
+      "worldCameraToObjectMetres": 149.07076898290092,
+      "progress": 0.9867948717948718,
+      "camera": [
+        -382.46032040315765,
+        9.76,
+        -214.00040612386118
+      ]
+    },
+    {
+      "file": "burst-04/006.png",
+      "seconds": 0.6,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 130,
+      "worldCameraToObjectMetres": 140.907046706384,
+      "progress": 0.99,
+      "camera": [
+        -377.65127013445033,
+        9.76,
+        -220.811203113203
+      ]
+    },
+    {
+      "file": "burst-04/007.png",
+      "seconds": 0.7,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 121.66666666666667,
+      "worldCameraToObjectMetres": 132.72597353081542,
+      "progress": 0.9932051282051282,
+      "camera": [
+        -372.6903701416853,
+        9.76,
+        -227.51278405590335
+      ]
+    },
+    {
+      "file": "burst-04/008.png",
+      "seconds": 0.8,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 113.33333333333333,
+      "worldCameraToObjectMetres": 124.52688673297457,
+      "progress": 0.9964102564102564,
+      "camera": [
+        -367.57218971322675,
+        9.76,
+        -234.09565888211648
+      ]
+    },
+    {
+      "file": "burst-04/009.png",
+      "seconds": 0.9,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 105,
+      "worldCameraToObjectMetres": 116.30951810483731,
+      "progress": 0.9996153846153847,
+      "camera": [
+        -362.2925343246375,
+        9.76,
+        -240.55051846440804
+      ]
+    },
+    {
+      "file": "burst-04/010.png",
+      "seconds": 1,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 96.66666666666667,
+      "worldCameraToObjectMetres": 108.0705429466563,
+      "progress": 0.002820512820512766,
+      "camera": [
+        -356.82397802733874,
+        9.76,
+        -246.84489324760722
+      ]
+    },
+    {
+      "file": "burst-04/011.png",
+      "seconds": 1.1,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 88.33333333333333,
+      "worldCameraToObjectMetres": 99.81522775059292,
+      "progress": 0.00602564102564096,
+      "camera": [
+        -351.1876719031438,
+        9.76,
+        -252.98864800184228
+      ]
+    },
+    {
+      "file": "burst-04/012.png",
+      "seconds": 1.2,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 80.00000000000001,
+      "worldCameraToObjectMetres": 91.54792014942929,
+      "progress": 0.009230769230769154,
+      "camera": [
+        -345.4016986192309,
+        9.76,
+        -258.9911001719476
+      ]
+    },
+    {
+      "file": "burst-04/013.png",
+      "seconds": 1.3,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 71.66666666666667,
+      "worldCameraToObjectMetres": 83.2716216558001,
+      "progress": 0.012435897435897347,
+      "camera": [
+        -339.47480693673526,
+        9.76,
+        -264.85367028184066
+      ]
+    },
+    {
+      "file": "burst-04/014.png",
+      "seconds": 1.4,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 63.33333333333334,
+      "worldCameraToObjectMetres": 74.99009092530439,
+      "progress": 0.015641025641025763,
+      "camera": [
+        -333.42265810201013,
+        9.76,
+        -270.5863619767877
+      ]
+    },
+    {
+      "file": "burst-04/015.png",
+      "seconds": 1.5,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 55,
+      "worldCameraToObjectMetres": 66.70661133997912,
+      "progress": 0.018846153846153957,
+      "camera": [
+        -327.2550922238958,
+        9.76,
+        -276.1943498118098
+      ]
+    },
+    {
+      "file": "burst-04/016.png",
+      "seconds": 1.6,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 46.66666666666666,
+      "worldCameraToObjectMetres": 58.424932909331154,
+      "progress": 0.02205128205128215,
+      "camera": [
+        -320.9797489859861,
+        9.76,
+        -281.68118271797846
+      ]
+    },
+    {
+      "file": "burst-04/017.png",
+      "seconds": 1.7,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 38.33333333333334,
+      "worldCameraToObjectMetres": 50.15014286314247,
+      "progress": 0.025256410256410344,
+      "camera": [
+        -314.60317489677595,
+        9.76,
+        -287.0497692216749
+      ]
+    },
+    {
+      "file": "burst-04/018.png",
+      "seconds": 1.8,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 30,
+      "worldCameraToObjectMetres": 41.89024055755807,
+      "progress": 0.028461538461538538,
+      "camera": [
+        -308.13077005274897,
+        9.76,
+        -292.3021204358631
+      ]
+    },
+    {
+      "file": "burst-04/019.png",
+      "seconds": 1.9,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 21.666666666666686,
+      "worldCameraToObjectMetres": 33.65999687479712,
+      "progress": 0.03166666666666673,
+      "camera": [
+        -301.56952293445227,
+        9.76,
+        -297.44288252948724
+      ]
+    },
+    {
+      "file": "burst-04/020.png",
+      "seconds": 2,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 13.333333333333343,
+      "worldCameraToObjectMetres": 25.49174631854526,
+      "progress": 0.034871794871794926,
+      "camera": [
+        -294.9240365862931,
+        9.76,
+        -302.4741557298347
+      ]
+    },
+    {
+      "file": "burst-05/000.png",
+      "seconds": 0,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 180,
+      "worldCameraToObjectMetres": 187.2801003103414,
+      "progress": 0.8407692307692307,
+      "camera": [
+        -371.1045390724253,
+        9.76,
+        129.56800121558527
+      ]
+    },
+    {
+      "file": "burst-05/001.png",
+      "seconds": 0.1,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 171.66666666666666,
+      "worldCameraToObjectMetres": 179.2264091340783,
+      "progress": 0.8439743589743589,
+      "camera": [
+        -376.2733470042286,
+        9.76,
+        123.03040581309202
+      ]
+    },
+    {
+      "file": "burst-05/002.png",
+      "seconds": 0.2,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 163.33333333333334,
+      "worldCameraToObjectMetres": 171.18094896560723,
+      "progress": 0.8471794871794871,
+      "camera": [
+        -381.38876152493526,
+        9.76,
+        116.45056517998648
+      ]
+    },
+    {
+      "file": "burst-05/003.png",
+      "seconds": 0.3,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 155,
+      "worldCameraToObjectMetres": 163.1409254919711,
+      "progress": 0.8503846153846153,
+      "camera": [
+        -386.4367724662277,
+        9.76,
+        109.81847495747446
+      ]
+    },
+    {
+      "file": "burst-05/004.png",
+      "seconds": 0.4,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 146.66666666666666,
+      "worldCameraToObjectMetres": 155.10489510637532,
+      "progress": 0.8535897435897437,
+      "camera": [
+        -391.4075893765212,
+        9.76,
+        103.12780402923934
+      ]
+    },
+    {
+      "file": "burst-05/005.png",
+      "seconds": 0.5,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 138.33333333333334,
+      "worldCameraToObjectMetres": 147.06957778031105,
+      "progress": 0.8567948717948719,
+      "camera": [
+        -396.2848182588463,
+        9.76,
+        96.36817597368326
+      ]
+    },
+    {
+      "file": "burst-05/006.png",
+      "seconds": 0.6,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 130,
+      "worldCameraToObjectMetres": 139.03411867117302,
+      "progress": 0.8600000000000001,
+      "camera": [
+        -401.0596915567035,
+        9.76,
+        89.53527278954893
+      ]
+    },
+    {
+      "file": "burst-05/007.png",
+      "seconds": 0.7,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 121.66666666666667,
+      "worldCameraToObjectMetres": 130.99656470044008,
+      "progress": 0.8632051282051283,
+      "camera": [
+        -405.7191790623773,
+        9.76,
+        82.62246330156715
+      ]
+    },
+    {
+      "file": "burst-05/008.png",
+      "seconds": 0.8,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 113.33333333333333,
+      "worldCameraToObjectMetres": 122.95494981725162,
+      "progress": 0.8664102564102565,
+      "camera": [
+        -410.2494563861616,
+        9.76,
+        75.6234268347591
+      ]
+    },
+    {
+      "file": "burst-05/009.png",
+      "seconds": 0.9,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 105,
+      "worldCameraToObjectMetres": 114.90724485171859,
+      "progress": 0.8696153846153847,
+      "camera": [
+        -414.6355494204476,
+        9.76,
+        68.53206610582242
+      ]
+    },
+    {
+      "file": "burst-05/010.png",
+      "seconds": 1,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 96.66666666666667,
+      "worldCameraToObjectMetres": 106.84978435821732,
+      "progress": 0.8728205128205129,
+      "camera": [
+        -418.8544648363006,
+        9.76,
+        61.33911028718207
+      ]
+    },
+    {
+      "file": "burst-05/011.png",
+      "seconds": 1.1,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 88.33333333333333,
+      "worldCameraToObjectMetres": 98.78204392521398,
+      "progress": 0.8760256410256411,
+      "camera": [
+        -422.89408222438135,
+        9.76,
+        54.04265226157535
+      ]
+    },
+    {
+      "file": "burst-05/012.png",
+      "seconds": 1.2,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 80.00000000000001,
+      "worldCameraToObjectMetres": 90.70157332611066,
+      "progress": 0.8792307692307693,
+      "camera": [
+        -426.73272427132304,
+        9.76,
+        46.637008587155485
+      ]
+    },
+    {
+      "file": "burst-05/013.png",
+      "seconds": 1.3,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 71.66666666666667,
+      "worldCameraToObjectMetres": 82.60672583757444,
+      "progress": 0.8824358974358975,
+      "camera": [
+        -430.34959550525826,
+        9.76,
+        39.11869473065548
+      ]
+    },
+    {
+      "file": "burst-05/014.png",
+      "seconds": 1.4,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 63.33333333333334,
+      "worldCameraToObjectMetres": 74.4951507897705,
+      "progress": 0.8856410256410256,
+      "camera": [
+        -433.71618593596094,
+        9.76,
+        31.48313589666664
+      ]
+    },
+    {
+      "file": "burst-05/015.png",
+      "seconds": 1.5,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 55,
+      "worldCameraToObjectMetres": 66.36637029035731,
+      "progress": 0.8888461538461538,
+      "camera": [
+        -436.80737061074717,
+        9.76,
+        23.729809625912285
+      ]
+    },
+    {
+      "file": "burst-05/016.png",
+      "seconds": 1.6,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 46.66666666666666,
+      "worldCameraToObjectMetres": 58.22798348960581,
+      "progress": 0.8920512820512823,
+      "camera": [
+        -439.6512535377295,
+        9.76,
+        15.874005746193891
+      ]
+    },
+    {
+      "file": "burst-05/017.png",
+      "seconds": 1.7,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 38.33333333333334,
+      "worldCameraToObjectMetres": 50.07145839113343,
+      "progress": 0.8952564102564105,
+      "camera": [
+        -442.1962524526409,
+        9.76,
+        7.90086893042221
+      ]
+    },
+    {
+      "file": "burst-05/018.png",
+      "seconds": 1.8,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 30,
+      "worldCameraToObjectMetres": 41.875729377505934,
+      "progress": 0.8984615384615386,
+      "camera": [
+        -444.2050483219677,
+        9.76,
+        -0.2272349162739271
+      ]
+    },
+    {
+      "file": "burst-05/019.png",
+      "seconds": 1.9,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 21.666666666666686,
+      "worldCameraToObjectMetres": 33.6612394875307,
+      "progress": 0.9016666666666668,
+      "camera": [
+        -445.47100079914554,
+        9.76,
+        -8.48481426567407
+      ]
+    },
+    {
+      "file": "burst-05/020.png",
+      "seconds": 2,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 13.333333333333343,
+      "worldCameraToObjectMetres": 25.492140887291534,
+      "progress": 0.904871794871795,
+      "camera": [
+        -446.0642250039242,
+        9.76,
+        -16.80062735004431
+      ]
+    },
+    {
+      "file": "burst-06/000.png",
+      "seconds": 0,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 180,
+      "worldCameraToObjectMetres": 183.04782187031907,
+      "progress": 0.8657692307692308,
+      "camera": [
+        -409.3538226170378,
+        9.76,
+        77.0300565968505
+      ]
+    },
+    {
+      "file": "burst-06/001.png",
+      "seconds": 0.1,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 171.66666666666666,
+      "worldCameraToObjectMetres": 175.44779793555418,
+      "progress": 0.868974358974359,
+      "camera": [
+        -413.7681819112629,
+        9.76,
+        69.9566363991022
+      ]
+    },
+    {
+      "file": "burst-06/002.png",
+      "seconds": 0.2,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 163.33333333333334,
+      "worldCameraToObjectMetres": 167.8376138804338,
+      "progress": 0.8721794871794872,
+      "camera": [
+        -418.02439040643935,
+        9.76,
+        62.78580905532778
+      ]
+    },
+    {
+      "file": "burst-06/003.png",
+      "seconds": 0.3,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 155,
+      "worldCameraToObjectMetres": 160.21258099558187,
+      "progress": 0.8753846153846154,
+      "camera": [
+        -422.1053390058205,
+        9.76,
+        55.51238247005934
+      ]
+    },
+    {
+      "file": "burst-06/004.png",
+      "seconds": 0.4,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 146.66666666666666,
+      "worldCameraToObjectMetres": 152.56387510446575,
+      "progress": 0.8785897435897436,
+      "camera": [
+        -425.98265876437546,
+        9.76,
+        48.12731409561485
+      ]
+    },
+    {
+      "file": "burst-06/005.png",
+      "seconds": 0.5,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 138.33333333333334,
+      "worldCameraToObjectMetres": 144.8891973964037,
+      "progress": 0.8817948717948718,
+      "camera": [
+        -429.64326740988525,
+        9.76,
+        40.63078189595111
+      ]
+    },
+    {
+      "file": "burst-06/006.png",
+      "seconds": 0.6,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 130,
+      "worldCameraToObjectMetres": 137.18167711817006,
+      "progress": 0.8850000000000002,
+      "camera": [
+        -433.06176938338973,
+        9.76,
+        33.01885320946719
+      ]
+    },
+    {
+      "file": "burst-06/007.png",
+      "seconds": 0.7,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 121.66666666666667,
+      "worldCameraToObjectMetres": 129.43444980846067,
+      "progress": 0.8882051282051284,
+      "camera": [
+        -436.2111077842123,
+        9.76,
+        25.28945563218489
+      ]
+    },
+    {
+      "file": "burst-06/008.png",
+      "seconds": 0.8,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 113.33333333333333,
+      "worldCameraToObjectMetres": 121.6533556085884,
+      "progress": 0.8914102564102566,
+      "camera": [
+        -439.10527876120534,
+        9.76,
+        17.454159155840696
+      ]
+    },
+    {
+      "file": "burst-06/009.png",
+      "seconds": 0.9,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 105,
+      "worldCameraToObjectMetres": 113.82684511770451,
+      "progress": 0.8946153846153848,
+      "camera": [
+        -441.7211350002208,
+        9.76,
+        9.50715947268855
+      ]
+    },
+    {
+      "file": "burst-06/010.png",
+      "seconds": 1,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 96.66666666666667,
+      "worldCameraToObjectMetres": 105.89332459864269,
+      "progress": 0.897820512820513,
+      "camera": [
+        -443.8438125283204,
+        9.76,
+        1.4089052913388116
+      ]
+    },
+    {
+      "file": "burst-06/011.png",
+      "seconds": 1.1,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 88.33333333333333,
+      "worldCameraToObjectMetres": 97.82683508303828,
+      "progress": 0.9010256410256412,
+      "camera": [
+        -445.2768070423775,
+        9.76,
+        -6.826523949528529
+      ]
+    },
+    {
+      "file": "burst-06/012.png",
+      "seconds": 1.2,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 80.00000000000001,
+      "worldCameraToObjectMetres": 89.6588060848944,
+      "progress": 0.9042307692307694,
+      "camera": [
+        -446.0102023824143,
+        9.76,
+        -15.134827424458122
+      ]
+    },
+    {
+      "file": "burst-06/013.png",
+      "seconds": 1.3,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 71.66666666666667,
+      "worldCameraToObjectMetres": 81.43291164362289,
+      "progress": 0.9074358974358976,
+      "camera": [
+        -446.2102774565103,
+        9.76,
+        -23.465862754634024
+      ]
+    },
+    {
+      "file": "burst-06/014.png",
+      "seconds": 1.4,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 63.33333333333334,
+      "worldCameraToObjectMetres": 73.21115990953889,
+      "progress": 0.9106410256410258,
+      "camera": [
+        -446.30793722298216,
+        9.76,
+        -31.802284166885144
+      ]
+    },
+    {
+      "file": "burst-06/015.png",
+      "seconds": 1.5,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 55,
+      "worldCameraToObjectMetres": 65.07840827079401,
+      "progress": 0.913846153846154,
+      "camera": [
+        -446.6956403719165,
+        9.76,
+        -40.127101566750085
+      ]
+    },
+    {
+      "file": "burst-06/016.png",
+      "seconds": 1.6,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 46.66666666666666,
+      "worldCameraToObjectMetres": 57.09348500740308,
+      "progress": 0.9170512820512822,
+      "camera": [
+        -447.4349104659144,
+        9.76,
+        -48.432762747462725
+      ]
+    },
+    {
+      "file": "burst-06/017.png",
+      "seconds": 1.7,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 38.33333333333334,
+      "worldCameraToObjectMetres": 49.24798471891644,
+      "progress": 0.9202564102564104,
+      "camera": [
+        -448.3438589586239,
+        9.76,
+        -56.76044509604402
+      ]
+    },
+    {
+      "file": "burst-06/018.png",
+      "seconds": 1.8,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 30,
+      "worldCameraToObjectMetres": 41.43245759642894,
+      "progress": 0.9234615384615386,
+      "camera": [
+        -448.98453340056653,
+        9.76,
+        -65.18564395599032
+      ]
+    },
+    {
+      "file": "burst-06/019.png",
+      "seconds": 1.9,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 21.666666666666686,
+      "worldCameraToObjectMetres": 33.5096212766744,
+      "progress": 0.9266666666666667,
+      "camera": [
+        -448.7397098308811,
+        9.76,
+        -73.676740217389
+      ]
+    },
+    {
+      "file": "burst-06/020.png",
+      "seconds": 2,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 13.333333333333343,
+      "worldCameraToObjectMetres": 25.468046057691552,
+      "progress": 0.9298717948717949,
+      "camera": [
+        -447.1415930883995,
+        9.76,
+        -81.98821070507694
+      ]
+    },
+    {
+      "file": "burst-07/000.png",
+      "seconds": 0,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 180,
+      "worldCameraToObjectMetres": 190.24111955155425,
+      "progress": 0.4506641222183256,
+      "camera": [
+        255.06240516706004,
+        -1.1278473097669002,
+        52.84561928029366
+      ]
+    },
+    {
+      "file": "burst-07/001.png",
+      "seconds": 0.1,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 171.66666666666666,
+      "worldCameraToObjectMetres": 182.04605856885175,
+      "progress": 0.45503152396747715,
+      "camera": [
+        255.1238941145243,
+        -0.9169044266005644,
+        61.16663754384223
+      ]
+    },
+    {
+      "file": "burst-07/002.png",
+      "seconds": 0.2,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 163.33333333333334,
+      "worldCameraToObjectMetres": 173.84453083992918,
+      "progress": 0.45939892571662877,
+      "camera": [
+        255.08551346831825,
+        -0.6905246498950364,
+        69.48841477747487
+      ]
+    },
+    {
+      "file": "burst-07/003.png",
+      "seconds": 0.3,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 155,
+      "worldCameraToObjectMetres": 165.63637690444975,
+      "progress": 0.4637663274657804,
+      "camera": [
+        254.94375883933807,
+        -0.4492602650142228,
+        77.80972302085944
+      ]
+    },
+    {
+      "file": "burst-07/004.png",
+      "seconds": 0.4,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 146.66666666666666,
+      "worldCameraToObjectMetres": 157.42158127273092,
+      "progress": 0.46813372921493196,
+      "camera": [
+        254.6956383366831,
+        -0.19385357420119753,
+        86.12920729383731
+      ]
+    },
+    {
+      "file": "burst-07/005.png",
+      "seconds": 0.5,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 138.33333333333334,
+      "worldCameraToObjectMetres": 149.2004928055797,
+      "progress": 0.4725011309640835,
+      "camera": [
+        254.3403608986201,
+        0.0746100611957834,
+        94.44553224114475
+      ]
+    },
+    {
+      "file": "burst-07/006.png",
+      "seconds": 0.6,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 130,
+      "worldCameraToObjectMetres": 140.97298818787232,
+      "progress": 0.47686853271323515,
+      "camera": [
+        253.8734915756727,
+        0.3554208431928174,
+        102.75706859783163
+      ]
+    },
+    {
+      "file": "burst-07/007.png",
+      "seconds": 0.7,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 121.66666666666667,
+      "worldCameraToObjectMetres": 132.73911582751379,
+      "progress": 0.48123593446238677,
+      "camera": [
+        253.29148255990137,
+        0.6476617546018266,
+        111.06210332735459
+      ]
+    },
+    {
+      "file": "burst-07/008.png",
+      "seconds": 0.8,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 113.33333333333333,
+      "worldCameraToObjectMetres": 124.49928058235841,
+      "progress": 0.48560333621153834,
+      "camera": [
+        252.59275265882118,
+        0.9501878587972712,
+        119.3589474258621
+      ]
+    },
+    {
+      "file": "burst-07/009.png",
+      "seconds": 0.9,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 105,
+      "worldCameraToObjectMetres": 116.2534165560424,
+      "progress": 0.4899707379606899,
+      "camera": [
+        251.7716968517275,
+        1.262144897673977,
+        127.64542056679026
+      ]
+    },
+    {
+      "file": "burst-07/010.png",
+      "seconds": 1,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 96.66666666666667,
+      "worldCameraToObjectMetres": 108.00178884727188,
+      "progress": 0.49433813970984153,
+      "camera": [
+        250.82404777006158,
+        1.5824836627428072,
+        135.91921592040356
+      ]
+    },
+    {
+      "file": "burst-07/011.png",
+      "seconds": 1.1,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 88.33333333333333,
+      "worldCameraToObjectMetres": 99.74494983408192,
+      "progress": 0.49870554145899315,
+      "camera": [
+        249.74722853032867,
+        1.910024847197338,
+        144.1781246829069
+      ]
+    },
+    {
+      "file": "burst-07/012.png",
+      "seconds": 1.2,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 80.00000000000001,
+      "worldCameraToObjectMetres": 91.48316352217385,
+      "progress": 0.5030729432081447,
+      "camera": [
+        248.53414765975134,
+        2.2437908606786254,
+        152.41904105508533
+      ]
+    },
+    {
+      "file": "burst-07/013.png",
+      "seconds": 1.3,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 71.66666666666667,
+      "worldCameraToObjectMetres": 83.21713393163019,
+      "progress": 0.5074403449572963,
+      "camera": [
+        247.17958285762322,
+        2.582642764781857,
+        160.63886558129073
+      ]
+    },
+    {
+      "file": "burst-07/014.png",
+      "seconds": 1.4,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 63.33333333333334,
+      "worldCameraToObjectMetres": 74.94808928554858,
+      "progress": 0.5118077467064479,
+      "camera": [
+        245.6796880817165,
+        2.9253992929136867,
+        168.83447636930507
+      ]
+    },
+    {
+      "file": "burst-07/015.png",
+      "seconds": 1.5,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 55,
+      "worldCameraToObjectMetres": 66.67736114713266,
+      "progress": 0.5161751484555995,
+      "camera": [
+        244.02544227665834,
+        3.2709748214672922,
+        177.0013887939804
+      ]
+    },
+    {
+      "file": "burst-07/016.png",
+      "seconds": 1.6,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 46.66666666666666,
+      "worldCameraToObjectMetres": 58.40745632481389,
+      "progress": 0.5205425502047512,
+      "camera": [
+        242.21038325776777,
+        3.6181956803772795,
+        185.1351975670854
+      ]
+    },
+    {
+      "file": "burst-07/017.png",
+      "seconds": 1.7,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 38.33333333333334,
+      "worldCameraToObjectMetres": 50.1425909226052,
+      "progress": 0.5249099519539027,
+      "camera": [
+        240.229013333224,
+        3.965902194021459,
+        193.2313588091653
+      ]
+    },
+    {
+      "file": "burst-07/018.png",
+      "seconds": 1.8,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 30,
+      "worldCameraToObjectMetres": 41.889813372656896,
+      "progress": 0.5292773537030543,
+      "camera": [
+        238.0698122048704,
+        4.312930662351665,
+        201.2831853125245
+      ]
+    },
+    {
+      "file": "burst-07/019.png",
+      "seconds": 1.9,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 21.666666666666686,
+      "worldCameraToObjectMetres": 33.6634293928717,
+      "progress": 0.5336447554522059,
+      "camera": [
+        235.72472075819115,
+        4.658117664223537,
+        209.2842264968141
+      ]
+    },
+    {
+      "file": "burst-07/020.png",
+      "seconds": 2,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 13.333333333333343,
+      "worldCameraToObjectMetres": 25.495760051973463,
+      "progress": 0.5380121572013575,
+      "camera": [
+        233.18612643160398,
+        5.00035664956884,
+        217.22759518472355
+      ]
+    },
+    {
+      "file": "burst-08/000.png",
+      "seconds": 0,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 180,
+      "worldCameraToObjectMetres": 190.30456370615866,
+      "progress": 0.7257692307692309,
+      "camera": [
+        -125.89859264006438,
+        9.76,
+        294.59585859366433
+      ]
+    },
+    {
+      "file": "burst-08/001.png",
+      "seconds": 0.1,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 171.66666666666666,
+      "worldCameraToObjectMetres": 182.0343080334261,
+      "progress": 0.7289743589743591,
+      "camera": [
+        -132.64813977204304,
+        9.76,
+        289.7026026439095
+      ]
+    },
+    {
+      "file": "burst-08/002.png",
+      "seconds": 0.2,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 163.33333333333334,
+      "worldCameraToObjectMetres": 173.76387709985224,
+      "progress": 0.7321794871794873,
+      "camera": [
+        -139.34240562754346,
+        9.76,
+        284.6933788359125
+      ]
+    },
+    {
+      "file": "burst-08/003.png",
+      "seconds": 0.3,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 155,
+      "worldCameraToObjectMetres": 165.434213081275,
+      "progress": 0.7353846153846155,
+      "camera": [
+        -146.25311785815097,
+        9.76,
+        279.94545799196203
+      ]
+    },
+    {
+      "file": "burst-08/004.png",
+      "seconds": 0.4,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 146.66666666666666,
+      "worldCameraToObjectMetres": 157.0599950086543,
+      "progress": 0.7385897435897437,
+      "camera": [
+        -153.53612529327373,
+        9.76,
+        275.7941016644502
+      ]
+    },
+    {
+      "file": "burst-08/005.png",
+      "seconds": 0.5,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 138.33333333333334,
+      "worldCameraToObjectMetres": 148.73351591926397,
+      "progress": 0.7417948717948719,
+      "camera": [
+        -161.19023675444393,
+        9.76,
+        272.43850977340196
+      ]
+    },
+    {
+      "file": "burst-08/006.png",
+      "seconds": 0.6,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 130,
+      "worldCameraToObjectMetres": 140.527216457087,
+      "progress": 0.7450000000000001,
+      "camera": [
+        -169.09255362593075,
+        9.76,
+        269.7805604721955
+      ]
+    },
+    {
+      "file": "burst-08/007.png",
+      "seconds": 0.7,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 121.66666666666667,
+      "worldCameraToObjectMetres": 132.44745546836464,
+      "progress": 0.7482051282051283,
+      "camera": [
+        -177.1358328852759,
+        9.76,
+        267.5950218657151
+      ]
+    },
+    {
+      "file": "burst-08/008.png",
+      "seconds": 0.8,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 113.33333333333333,
+      "worldCameraToObjectMetres": 124.41992400246438,
+      "progress": 0.7514102564102565,
+      "camera": [
+        -185.2225163898381,
+        9.76,
+        265.519258750358
+      ]
+    },
+    {
+      "file": "burst-08/009.png",
+      "seconds": 0.9,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 105,
+      "worldCameraToObjectMetres": 116.35678359400703,
+      "progress": 0.7546153846153847,
+      "camera": [
+        -193.26471892207053,
+        9.76,
+        263.21788180128846
+      ]
+    },
+    {
+      "file": "burst-08/010.png",
+      "seconds": 1,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 96.66666666666667,
+      "worldCameraToObjectMetres": 108.20265597153015,
+      "progress": 0.7578205128205129,
+      "camera": [
+        -201.1550778832818,
+        9.76,
+        260.42758316140953
+      ]
+    },
+    {
+      "file": "burst-08/011.png",
+      "seconds": 1.1,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 88.33333333333333,
+      "worldCameraToObjectMetres": 99.9587626671065,
+      "progress": 0.7610256410256411,
+      "camera": [
+        -208.7879335335495,
+        9.76,
+        257.0218117486172
+      ]
+    },
+    {
+      "file": "burst-08/012.png",
+      "seconds": 1.2,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 80.00000000000001,
+      "worldCameraToObjectMetres": 91.66351541597668,
+      "progress": 0.7642307692307693,
+      "camera": [
+        -216.12256679448828,
+        9.76,
+        253.04486847033763
+      ]
+    },
+    {
+      "file": "burst-08/013.png",
+      "seconds": 1.3,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 71.66666666666667,
+      "worldCameraToObjectMetres": 83.35253442847788,
+      "progress": 0.7674358974358975,
+      "camera": [
+        -223.21440759896208,
+        9.76,
+        248.66509178963688
+      ]
+    },
+    {
+      "file": "burst-08/014.png",
+      "seconds": 1.4,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 63.33333333333334,
+      "worldCameraToObjectMetres": 75.04169876558859,
+      "progress": 0.7706410256410257,
+      "camera": [
+        -230.16294148664565,
+        9.76,
+        244.06484972836162
+      ]
+    },
+    {
+      "file": "burst-08/015.png",
+      "seconds": 1.5,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 55,
+      "worldCameraToObjectMetres": 66.73570215020834,
+      "progress": 0.7738461538461539,
+      "camera": [
+        -237.08324072460962,
+        9.76,
+        239.42155419257796
+      ]
+    },
+    {
+      "file": "burst-08/016.png",
+      "seconds": 1.6,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 46.66666666666666,
+      "worldCameraToObjectMetres": 58.438943447590695,
+      "progress": 0.777051282051282,
+      "camera": [
+        -244.05447660069956,
+        9.76,
+        234.85568735940575
+      ]
+    },
+    {
+      "file": "burst-08/017.png",
+      "seconds": 1.7,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 38.33333333333334,
+      "worldCameraToObjectMetres": 50.15678547618635,
+      "progress": 0.7802564102564102,
+      "camera": [
+        -251.08207056898942,
+        9.76,
+        230.3763544386689
+      ]
+    },
+    {
+      "file": "burst-08/018.png",
+      "seconds": 1.8,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 30,
+      "worldCameraToObjectMetres": 41.89334183739799,
+      "progress": 0.7834615384615384,
+      "camera": [
+        -258.0936969014269,
+        9.76,
+        225.87102210588404
+      ]
+    },
+    {
+      "file": "burst-08/019.png",
+      "seconds": 1.9,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 21.666666666666686,
+      "worldCameraToObjectMetres": 33.66116777984851,
+      "progress": 0.7866666666666666,
+      "camera": [
+        -265.0553304925693,
+        9.76,
+        221.28865965451476
+      ]
+    },
+    {
+      "file": "burst-08/020.png",
+      "seconds": 2,
+      "speedKph": 300,
+      "nominalAlongRoadDistanceMetres": 13.333333333333343,
+      "worldCameraToObjectMetres": 25.49202360763474,
+      "progress": 0.7898717948717948,
+      "camera": [
+        -271.96290188705836,
+        9.76,
+        216.6251175264286
+      ]
+    }
+  ],
+  "errors": []
+}

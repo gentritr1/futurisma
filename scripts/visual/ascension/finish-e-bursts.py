@@ -1,0 +1,12 @@
+import json,subprocess,sys
+from pathlib import Path
+root=Path(sys.argv[1] if len(sys.argv)>1 else 'art/evidence/ascension-v1/phase-e/feature-bursts');data=json.loads((root/'capture.json').read_text());sections=[];results=[]
+for folder in sorted(p for p in root.glob('burst-*') if p.is_dir()):
+ rows=[r for r in data['records'] if r['file'].startswith(folder.name+'/')];assert len(rows)>=20
+ eligible=[r for r in rows if r['worldCameraToObjectMetres']>=120];assert eligible,folder
+ frame=eligible[0];subprocess.run(['ffmpeg','-v','error','-y','-framerate','10','-i',str(folder/'%03d.png'),'-frames:v','20','-c:v','libx264','-crf','20','-pix_fmt','yuv420p',str(folder/'burst.mp4')],check=True)
+ results.append({'folder':folder.name,'reviewFrame':frame['file'],'distanceMetres':frame['worldCameraToObjectMetres'],'minimumSpeedKph':min(r['speedKph'] for r in rows),'maximumSpeedKph':max(r['speedKph'] for r in rows),'capturedSamples':len(rows),'expectedSamples':20+data.get('inclusiveEndpoint',data.get('endpointSamples',0)),'sampleResidual':len(rows)-(20+data.get('inclusiveEndpoint',data.get('endpointSamples',0))),'videoSeconds':2,'rate':10,'videoFrames':20,'expected':20,'residual':0,'endpointStill':folder.name+'/020.png' if (folder/'020.png').exists() else None})
+ sections.append(f'<section><h2>{folder.name}</h2><p>Name the object from this single approach frame ({frame["worldCameraToObjectMetres"]:.1f} m away), then inspect the burst.</p><img src="{frame["file"]}"><video src="{folder.name}/burst.mp4" controls loop></video><textarea></textarea></section>')
+(root/'video-reconciliation.json').write_text(json.dumps({'script':'scripts/visual/ascension/finish-e-bursts.py','scope':'20 image frames at 10 fps produce each exact 2 s clip. A T+2 s endpoint still is retained only in the fixed-camera pack; live captures use a half-open window. No video frames are duplicated.','results':results},indent=2))
+pageTitle='Live speed recognition' if 'Unmodified live' in data['scope'] else 'Speed recognition at 300 km/h'
+(root/'index.html').write_text('<!doctype html><meta charset="utf-8"><title>Speed recognition</title><style>body{background:#20241f;color:#eee;font:18px system-ui;max-width:1280px;margin:auto}img,video{width:100%}textarea{width:98%;height:80px}section{margin:50px 0}</style><h1>'+pageTitle+'</h1><p>'+data['scope']+' Object identities are withheld until classification.</p>'+''.join(sections))

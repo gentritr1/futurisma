@@ -1,0 +1,265 @@
+{
+  "script": "scripts/visual/ascension/check-road-floor.py",
+  "measurementScript": "scripts/visual/frame-metrics.py",
+  "pinScript": "scripts/visual/ascension/pin-road-floor.py",
+  "sampling": "8 sectors \u00d7 4 static schedule states = 32 frames; no temporal rate. Schedule-frozen road-patch compliance; live speed readability is a separate capture.",
+  "accepted": true,
+  "rows": [
+    {
+      "file": "base-PAD_ROAD.png",
+      "phase": "base",
+      "sector": "PAD_ROAD",
+      "luma": 95.20334479166667,
+      "floor": 80.92284307291666,
+      "passes": true
+    },
+    {
+      "file": "base-APRON_SWEEP.png",
+      "phase": "base",
+      "sector": "APRON_SWEEP",
+      "luma": 127.6505,
+      "floor": 108.50292499999999,
+      "passes": true
+    },
+    {
+      "file": "base-DELUGE_ROAD.png",
+      "phase": "base",
+      "sector": "DELUGE_ROAD",
+      "luma": 125.17785138888888,
+      "floor": 106.40117368055554,
+      "passes": true
+    },
+    {
+      "file": "base-CRAWLERWAY.png",
+      "phase": "base",
+      "sector": "CRAWLERWAY",
+      "luma": 121.92788229166666,
+      "floor": 103.63869994791666,
+      "passes": true
+    },
+    {
+      "file": "base-MANGROVE_CUT.png",
+      "phase": "base",
+      "sector": "MANGROVE_CUT",
+      "luma": 124.50383194444446,
+      "floor": 105.82825715277778,
+      "passes": true
+    },
+    {
+      "file": "base-CAUSEWAY.png",
+      "phase": "base",
+      "sector": "CAUSEWAY",
+      "luma": 126.82504895833333,
+      "floor": 107.80129161458332,
+      "passes": true
+    },
+    {
+      "file": "base-TANK_FARM.png",
+      "phase": "base",
+      "sector": "TANK_FARM",
+      "luma": 97.97785555555555,
+      "floor": 83.28117722222221,
+      "passes": true
+    },
+    {
+      "file": "base-TRENCH.png",
+      "phase": "base",
+      "sector": "TRENCH",
+      "luma": 101.50498923611111,
+      "floor": 86.27924085069445,
+      "passes": true
+    },
+    {
+      "file": "test-PAD_ROAD.png",
+      "phase": "test",
+      "sector": "PAD_ROAD",
+      "luma": 95.20334479166667,
+      "floor": 80.92284307291666,
+      "passes": true
+    },
+    {
+      "file": "test-APRON_SWEEP.png",
+      "phase": "test",
+      "sector": "APRON_SWEEP",
+      "luma": 127.6505,
+      "floor": 108.50292499999999,
+      "passes": true
+    },
+    {
+      "file": "test-DELUGE_ROAD.png",
+      "phase": "test",
+      "sector": "DELUGE_ROAD",
+      "luma": 125.17785138888888,
+      "floor": 106.40117368055554,
+      "passes": true
+    },
+    {
+      "file": "test-CRAWLERWAY.png",
+      "phase": "test",
+      "sector": "CRAWLERWAY",
+      "luma": 121.92788229166666,
+      "floor": 103.63869994791666,
+      "passes": true
+    },
+    {
+      "file": "test-MANGROVE_CUT.png",
+      "phase": "test",
+      "sector": "MANGROVE_CUT",
+      "luma": 124.50383194444446,
+      "floor": 105.82825715277778,
+      "passes": true
+    },
+    {
+      "file": "test-CAUSEWAY.png",
+      "phase": "test",
+      "sector": "CAUSEWAY",
+      "luma": 126.82504895833333,
+      "floor": 107.80129161458332,
+      "passes": true
+    },
+    {
+      "file": "test-TANK_FARM.png",
+      "phase": "test",
+      "sector": "TANK_FARM",
+      "luma": 97.97785555555555,
+      "floor": 83.28117722222221,
+      "passes": true
+    },
+    {
+      "file": "test-TRENCH.png",
+      "phase": "test",
+      "sector": "TRENCH",
+      "luma": 107.82040763888888,
+      "floor": 86.27924085069445,
+      "passes": true
+    },
+    {
+      "file": "launch-PAD_ROAD.png",
+      "phase": "launch",
+      "sector": "PAD_ROAD",
+      "luma": 95.50920347222223,
+      "floor": 80.92284307291666,
+      "passes": true
+    },
+    {
+      "file": "launch-APRON_SWEEP.png",
+      "phase": "launch",
+      "sector": "APRON_SWEEP",
+      "luma": 127.77314479166665,
+      "floor": 108.50292499999999,
+      "passes": true
+    },
+    {
+      "file": "launch-DELUGE_ROAD.png",
+      "phase": "launch",
+      "sector": "DELUGE_ROAD",
+      "luma": 125.17785138888888,
+      "floor": 106.40117368055554,
+      "passes": true
+    },
+    {
+      "file": "launch-CRAWLERWAY.png",
+      "phase": "launch",
+      "sector": "CRAWLERWAY",
+      "luma": 121.92788229166666,
+      "floor": 103.63869994791666,
+      "passes": true
+    },
+    {
+      "file": "launch-MANGROVE_CUT.png",
+      "phase": "launch",
+      "sector": "MANGROVE_CUT",
+      "luma": 124.50383194444446,
+      "floor": 105.82825715277778,
+      "passes": true
+    },
+    {
+      "file": "launch-CAUSEWAY.png",
+      "phase": "launch",
+      "sector": "CAUSEWAY",
+      "luma": 126.82504895833333,
+      "floor": 107.80129161458332,
+      "passes": true
+    },
+    {
+      "file": "launch-TANK_FARM.png",
+      "phase": "launch",
+      "sector": "TANK_FARM",
+      "luma": 97.97785555555555,
+      "floor": 83.28117722222221,
+      "passes": true
+    },
+    {
+      "file": "launch-TRENCH.png",
+      "phase": "launch",
+      "sector": "TRENCH",
+      "luma": 108.51287881944444,
+      "floor": 86.27924085069445,
+      "passes": true
+    },
+    {
+      "file": "reopened-PAD_ROAD.png",
+      "phase": "reopened",
+      "sector": "PAD_ROAD",
+      "luma": 95.20334479166667,
+      "floor": 80.92284307291666,
+      "passes": true
+    },
+    {
+      "file": "reopened-APRON_SWEEP.png",
+      "phase": "reopened",
+      "sector": "APRON_SWEEP",
+      "luma": 127.6505,
+      "floor": 108.50292499999999,
+      "passes": true
+    },
+    {
+      "file": "reopened-DELUGE_ROAD.png",
+      "phase": "reopened",
+      "sector": "DELUGE_ROAD",
+      "luma": 125.17785138888888,
+      "floor": 106.40117368055554,
+      "passes": true
+    },
+    {
+      "file": "reopened-CRAWLERWAY.png",
+      "phase": "reopened",
+      "sector": "CRAWLERWAY",
+      "luma": 121.92788229166666,
+      "floor": 103.63869994791666,
+      "passes": true
+    },
+    {
+      "file": "reopened-MANGROVE_CUT.png",
+      "phase": "reopened",
+      "sector": "MANGROVE_CUT",
+      "luma": 124.50383194444446,
+      "floor": 105.82825715277778,
+      "passes": true
+    },
+    {
+      "file": "reopened-CAUSEWAY.png",
+      "phase": "reopened",
+      "sector": "CAUSEWAY",
+      "luma": 126.82504895833333,
+      "floor": 107.80129161458332,
+      "passes": true
+    },
+    {
+      "file": "reopened-TANK_FARM.png",
+      "phase": "reopened",
+      "sector": "TANK_FARM",
+      "luma": 97.97785555555555,
+      "floor": 83.28117722222221,
+      "passes": true
+    },
+    {
+      "file": "reopened-TRENCH.png",
+      "phase": "reopened",
+      "sector": "TRENCH",
+      "luma": 107.43861215277778,
+      "floor": 86.27924085069445,
+      "passes": true
+    }
+  ]
+}

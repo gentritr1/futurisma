@@ -1,8 +1,8 @@
 """Measure visible sky only, using a companion black-geometry / white-sky mask."""
 from PIL import Image
 from pathlib import Path
-import json
-root=Path('art/evidence/ascension-v1/phase-b/sky-turntable');rows=[]
+import json,sys
+root=Path(sys.argv[1] if len(sys.argv)>1 else 'art/evidence/ascension-v1/phase-b/sky-turntable');rows=[]
 for path in sorted(root.glob('[0-9][0-9].png')):
  im=Image.open(path).convert('RGB');mask=Image.open(root/('mask-'+path.name)).convert('RGB');w,h=im.size;band=int(h*.22)
  sums=[];counts=[]

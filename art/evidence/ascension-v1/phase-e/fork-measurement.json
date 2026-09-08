@@ -1,0 +1,79 @@
+{
+  "script": "scripts/measure-ascension-driving.mjs",
+  "clockHz": 120,
+  "controller": "Production DemoAutopilot and handling; isolated no nitro, powers or traffic. Not a browser Works calibration.",
+  "results": [
+    {
+      "lateral": 0,
+      "branch": false,
+      "seconds": 96.40833333335613,
+      "branchSeconds": 0.025,
+      "minimumBranchProgress": 0.16,
+      "maximumBranchProgress": 0.16,
+      "edgeSteps": 0,
+      "lapTimes": [
+        33.766666666665394,
+        31.324999999999143,
+        31.31666666669159
+      ],
+      "forkTicks": [
+        1717,
+        1717,
+        1717
+      ],
+      "forkSeconds": [
+        14.308333333333334,
+        14.308333333333334,
+        14.308333333333334
+      ],
+      "completed": 3,
+      "missedGates": 0
+    },
+    {
+      "lateral": 0,
+      "branch": true,
+      "seconds": 86.08333333334791,
+      "branchSeconds": 27.41666666666575,
+      "minimumBranchProgress": 0.16,
+      "maximumBranchProgress": 0.635,
+      "edgeSteps": 1,
+      "lapTimes": [
+        30.308333333332254,
+        27.891666666665085,
+        27.88333333335057
+      ],
+      "forkTicks": [
+        1294,
+        1294,
+        1294
+      ],
+      "forkSeconds": [
+        10.783333333333333,
+        10.783333333333333,
+        10.783333333333333
+      ],
+      "completed": 3,
+      "missedGates": 0
+    }
+  ],
+  "forkSavingSeconds": [
+    3.5250000000000004,
+    3.5250000000000004,
+    3.5250000000000004
+  ],
+  "sampleReconciliation": [
+    {
+      "branch": false,
+      "windowSeconds": 42.925,
+      "expectedRateHz": 120,
+      "observedSamples": 5151
+    },
+    {
+      "branch": true,
+      "windowSeconds": 32.35,
+      "expectedRateHz": 120,
+      "observedSamples": 3882
+    }
+  ],
+  "savingSeconds": 3.4416666666694056
+}

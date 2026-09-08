@@ -1,0 +1,30 @@
+import {mkdir,writeFile,copyFile,readFile} from 'node:fs/promises';
+import {randomInt,createHash} from 'node:crypto';
+import {launchReviewBrowser} from '../tideline-v4/browser.mjs';
+const root='art/evidence/ascension-v1/phase-e',privateRoot='/Users/gentlegen/Desktop/futurisma-race/ascension-private-review-keys';
+await mkdir(root,{recursive:true});await mkdir(privateRoot,{recursive:true});
+const schedule=JSON.parse(await readFile('src/game/data/ascension/schedule.json'));
+const section=process.argv.find(a=>a.startsWith('--section='))?.slice(10)??'blind';
+const browser=await launchReviewBrowser(),errors=[];try{const page=await browser.newPage();page.on('pageerror',e=>errors.push(String(e)));
+if(section==='blind'){
+ const out=root+'/phase-blind';await mkdir(out,{recursive:true});
+ const cases=[];for(const after of [false,true])for(const progress of [.045,.115,.70,.795,.94])cases.push({after,progress,tick:after?schedule.rocketGoneTick+120:Math.max(0,schedule.launchTick-8*120)});
+ for(let i=cases.length-1;i>0;i--){const j=randomInt(i+1);[cases[i],cases[j]]=[cases[j],cases[i]];}
+ const key=[];for(const [i,c] of cases.entries()){await page.goto(`http://127.0.0.1:5200/ascension-review.html?progress=${c.progress}&tick=${c.tick}`,{waitUntil:'networkidle0'});await page.waitForSelector('#review-state');const file=`view-${String(i+1).padStart(2,'0')}.png`;await page.screenshot({path:out+'/'+file});key.push({file,expected:c.after?'after T-0':'before T-0',...await page.$eval('#review-state',e=>JSON.parse(e.textContent))});}
+ const secret=JSON.stringify(key,null,2);await writeFile(privateRoot+'/phase-blind.json',secret);await writeFile(out+'/manifest.json',JSON.stringify({script:'scripts/visual/ascension/phase-e-packs.mjs',frames:10,states:2,framesPerState:5,keySha256:createHash('sha256').update(secret).digest('hex'),status:'Key withheld until user classification',errors},null,2));
+ await writeFile(out+'/index.html',html('Before or after launch?',Array.from({length:10},(_,i)=>`view-${String(i+1).padStart(2,'0')}.png`),'Classify each frame as before T-0 or after T-0, and state your confidence. The answer key is withheld.'));
+}
+if(section==='pairs'){
+ const out=root+'/phase-pairs';await mkdir(out,{recursive:true});const key=[];
+ for(const [i,progress] of [.08,.13,.78].entries())for(const after of [false,true]){const tick=schedule.launchTick+(after?6:-6)*120;await page.goto(`http://127.0.0.1:5200/ascension-review.html?progress=${progress}&tick=${tick}`,{waitUntil:'networkidle0'});await page.waitForSelector('#review-state');const file=`station-${i+1}-${after?'b':'a'}.png`;await page.screenshot({path:out+'/'+file});key.push({file,expected:after?'after T-0':'before T-0',...await page.$eval('#review-state',e=>JSON.parse(e.textContent))});}
+ const secret=JSON.stringify(key,null,2);await writeFile(privateRoot+'/phase-pairs.json',secret);await writeFile(out+'/manifest.json',JSON.stringify({script:'scripts/visual/ascension/phase-e-packs.mjs',stations:3,states:2,expected:6,observed:key.length,keySha256:createHash('sha256').update(secret).digest('hex'),errors},null,2));await writeFile(out+'/index.html',html('Phase pairs',key.map(r=>r.file),'Compare each station pair. Describe the launch-state differences. State labels are withheld.'));
+}
+if(section==='pasted'){
+ const out=root+'/pasted-on';await mkdir(out,{recursive:true});
+ const ids=['rocket-platform','crawler-transporter','countdown-board','trench-wall-module','deluge-water-tower','propellant-tank','vent-stack','crawlerway-gravel-bed','mangrove-pier','egret-card-set','service-tower-swing-arm','surge','shield','cradle-pad','cradle-trench','cradle-causeway','cradle-tank','strip-pad','strip-causeway','bulkhead-trench','bulkhead-tank','entry-rail','gate-marker','steam','smoke','deluge','flame','engine-glow','gravel','flood','craft-nitro','craft-shield','craft-surge','craft-wet-drift','rival-surge','rival-shield'];
+ const key=process.argv.includes('--append')?JSON.parse(await readFile(privateRoot+'/pasted-on.json')):[];let n=key.length;const pending=ids.filter(id=>!key.some(r=>r.id===id));for(const id of pending)for(let distance=0;distance<3;distance++){await page.goto(`http://127.0.0.1:5200/ascension-pasted.html?object=${id}&distance=${distance}`,{waitUntil:'networkidle0'});await page.waitForFunction(()=>!!window.__pastedState,{timeout:30000});const file=`view-${String(++n).padStart(3,'0')}.png`;await page.screenshot({path:out+'/'+file});key.push({file,...await page.evaluate(()=>window.__pastedState)});if(errors.length)throw Error(errors.join());}
+ const secret=JSON.stringify(key,null,2);await writeFile(privateRoot+'/pasted-on.json',secret);const violations=key.flatMap(r=>r.violations);await writeFile(out+'/manifest.json',JSON.stringify({script:'scripts/visual/ascension/phase-e-packs.mjs',objectFamilies:ids.length,fogDistancesPerObject:3,frames:n,expected:ids.length*3,residual:n-ids.length*3,keySha256:createHash('sha256').update(secret).digest('hex'),materialWalk:{objects:key.length,violations},scope:'Original-scale fixtures. Consecutive triplets use one camera heading at three measured distances. Effect batches use one representative instance of their shared material. Keys and per-frame source labels withheld.',errors},null,2));await writeFile(out+'/index.html',html('Fog integration review',key.map(r=>r.file),'For each triplet, identify any object that appears to bypass fog or tone mapping beside the countdown board. Record visible issues; source labels and material results are withheld until classification.'));
+}
+if(errors.length)throw Error(errors.join());
+}finally{await browser.close();}
+function html(title,files,prompt){return `<!doctype html><meta charset="utf-8"><title>${title}</title><style>body{background:#20241f;color:#eee;font:18px system-ui;max-width:1280px;margin:30px auto}img{width:100%}section{margin:50px 0}textarea{width:98%;height:80px}</style><h1>${title}</h1><p>${prompt}</p>`+files.map((f,i)=>`<section><h2>View ${i+1}</h2><img src="${f}"><textarea aria-label="Classification for view ${i+1}"></textarea></section>`).join('');}

@@ -1,0 +1,6127 @@
+{
+  "script": "scripts/visual/ascension/sky-turntable.mjs",
+  "sampling": "24 discrete azimuth stations, one frame per 15 degrees; not a timed frame-rate sample.",
+  "records": [
+    {
+      "file": "00.png",
+      "yaw": 0,
+      "egrets": {
+        "tick": 9215,
+        "risenLap": 1,
+        "riseTick": 9215,
+        "launched": true,
+        "launchAge": 8.016666666666667,
+        "firstBirdPosition": [
+          8.342436790466309,
+          83.35089111328125,
+          277.7879638671875
+        ]
+      },
+      "boardLegibility": null,
+      "cameraTarget": "road",
+      "effects": {
+        "launchAge": 8.016666666666667,
+        "pad": [
+          231.0088653564453,
+          4,
+          -125.9814453125
+        ],
+        "smokeTop": 894,
+        "cloudGlow": 0,
+        "tick": 9215,
+        "reducedMotion": false,
+        "crawlerPosition": [
+          6.681713104248047,
+          17,
+          330.3438720703125
+        ],
+        "treadTravel": 0,
+        "rocketHeight": 1200,
+        "rocketVisible": false,
+        "steamVisible": true,
+        "smokeVisible": true,
+        "delugeVisible": true,
+        "floodVisible": true,
+        "lampScale": 1,
+        "klaxon": false
+      },
+      "instances": [
+        {
+          "name": "ascension_solid_road_kerbs",
+          "count": 744,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_housings",
+          "count": 372,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_glass",
+          "count": 372,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "",
+          "count": 16,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "ascension_board_masts",
+          "count": 6,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_board_displays",
+          "count": 2,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "ascension_authored_board_ascension_static_props_shared_paint",
+          "count": 2,
+          "trianglesPerInstance": 460
+        },
+        {
+          "name": "crawler_rotating_tread_links",
+          "count": 192,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_emissive",
+          "count": 32,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_metal",
+          "count": 32,
+          "trianglesPerInstance": 216
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_ENTRY RAMP_AP_MAT_concrete",
+          "count": 6,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 22,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 1556
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 23,
+          "trianglesPerInstance": 225
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 0,
+          "trianglesPerInstance": 300
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 23,
+          "trianglesPerInstance": 25
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_PAD UNDERSIDE_AP_MAT_concrete",
+          "count": 17,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 0,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_SCORCHED ZONE_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_DELUGE EXIT_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "mangrove_thin_trunks_and_root_fans",
+          "count": 29,
+          "trianglesPerInstance": 308
+        },
+        {
+          "name": "mangrove_camera_facing_canopy_cards",
+          "count": 87,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_apron_steam_wall",
+          "count": 24,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "persistent_launch_smoke",
+          "count": 72,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "deluge_water_sheets",
+          "count": 14,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "crawler_shed_gravel",
+          "count": 96,
+          "trianglesPerInstance": 5
+        }
+      ],
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Schedule-frozen evidence station; production course, board, authored environment and event poses, course lights, fog and tone mapping. No running race or vehicle. The optional pad camera tracks ascent from a fixed chase-height station and is not the driving camera.",
+      "progress": 0.74,
+      "tick": 9215,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": false,
+        "steam": true,
+        "launched": true,
+        "rocketGone": true,
+        "deluge": true
+      },
+      "render": {
+        "calls": 44,
+        "triangles": 141796
+      }
+    },
+    {
+      "file": "01.png",
+      "yaw": 15,
+      "egrets": {
+        "tick": 9215,
+        "risenLap": 1,
+        "riseTick": 9215,
+        "launched": true,
+        "launchAge": 8.016666666666667,
+        "firstBirdPosition": [
+          8.342436790466309,
+          83.35089111328125,
+          277.7879638671875
+        ]
+      },
+      "boardLegibility": null,
+      "cameraTarget": "road",
+      "effects": {
+        "launchAge": 8.016666666666667,
+        "pad": [
+          231.0088653564453,
+          4,
+          -125.9814453125
+        ],
+        "smokeTop": 894,
+        "cloudGlow": 0,
+        "tick": 9215,
+        "reducedMotion": false,
+        "crawlerPosition": [
+          6.681713104248047,
+          17,
+          330.3438720703125
+        ],
+        "treadTravel": 0,
+        "rocketHeight": 1200,
+        "rocketVisible": false,
+        "steamVisible": true,
+        "smokeVisible": true,
+        "delugeVisible": true,
+        "floodVisible": true,
+        "lampScale": 1,
+        "klaxon": false
+      },
+      "instances": [
+        {
+          "name": "ascension_solid_road_kerbs",
+          "count": 744,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_housings",
+          "count": 372,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_glass",
+          "count": 372,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "",
+          "count": 16,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "ascension_board_masts",
+          "count": 6,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_board_displays",
+          "count": 2,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "ascension_authored_board_ascension_static_props_shared_paint",
+          "count": 2,
+          "trianglesPerInstance": 460
+        },
+        {
+          "name": "crawler_rotating_tread_links",
+          "count": 192,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_emissive",
+          "count": 32,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_metal",
+          "count": 32,
+          "trianglesPerInstance": 216
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_ENTRY RAMP_AP_MAT_concrete",
+          "count": 6,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 26,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 1556
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 35,
+          "trianglesPerInstance": 225
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 0,
+          "trianglesPerInstance": 300
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 35,
+          "trianglesPerInstance": 25
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_PAD UNDERSIDE_AP_MAT_concrete",
+          "count": 20,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 3,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 4,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 8,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_SCORCHED ZONE_AP_MAT_concrete",
+          "count": 9,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 5,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_DELUGE EXIT_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "mangrove_thin_trunks_and_root_fans",
+          "count": 7,
+          "trianglesPerInstance": 308
+        },
+        {
+          "name": "mangrove_camera_facing_canopy_cards",
+          "count": 21,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_apron_steam_wall",
+          "count": 24,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "persistent_launch_smoke",
+          "count": 72,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "deluge_water_sheets",
+          "count": 14,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "crawler_shed_gravel",
+          "count": 96,
+          "trianglesPerInstance": 5
+        }
+      ],
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Schedule-frozen evidence station; production course, board, authored environment and event poses, course lights, fog and tone mapping. No running race or vehicle. The optional pad camera tracks ascent from a fixed chase-height station and is not the driving camera.",
+      "progress": 0.74,
+      "tick": 9215,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": false,
+        "steam": true,
+        "launched": true,
+        "rocketGone": true,
+        "deluge": true
+      },
+      "render": {
+        "calls": 49,
+        "triangles": 139224
+      }
+    },
+    {
+      "file": "02.png",
+      "yaw": 30,
+      "egrets": {
+        "tick": 9215,
+        "risenLap": 1,
+        "riseTick": 9215,
+        "launched": true,
+        "launchAge": 8.016666666666667,
+        "firstBirdPosition": [
+          8.342436790466309,
+          83.35089111328125,
+          277.7879638671875
+        ]
+      },
+      "boardLegibility": null,
+      "cameraTarget": "road",
+      "effects": {
+        "launchAge": 8.016666666666667,
+        "pad": [
+          231.0088653564453,
+          4,
+          -125.9814453125
+        ],
+        "smokeTop": 894,
+        "cloudGlow": 0,
+        "tick": 9215,
+        "reducedMotion": false,
+        "crawlerPosition": [
+          6.681713104248047,
+          17,
+          330.3438720703125
+        ],
+        "treadTravel": 0,
+        "rocketHeight": 1200,
+        "rocketVisible": false,
+        "steamVisible": true,
+        "smokeVisible": true,
+        "delugeVisible": true,
+        "floodVisible": true,
+        "lampScale": 1,
+        "klaxon": false
+      },
+      "instances": [
+        {
+          "name": "ascension_solid_road_kerbs",
+          "count": 744,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_housings",
+          "count": 372,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_glass",
+          "count": 372,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "",
+          "count": 16,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "ascension_board_masts",
+          "count": 6,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_board_displays",
+          "count": 2,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "ascension_authored_board_ascension_static_props_shared_paint",
+          "count": 2,
+          "trianglesPerInstance": 460
+        },
+        {
+          "name": "crawler_rotating_tread_links",
+          "count": 192,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_emissive",
+          "count": 31,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_metal",
+          "count": 31,
+          "trianglesPerInstance": 216
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_ENTRY RAMP_AP_MAT_concrete",
+          "count": 6,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 26,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 1556
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 45,
+          "trianglesPerInstance": 225
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 0,
+          "trianglesPerInstance": 300
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 45,
+          "trianglesPerInstance": 25
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_PAD UNDERSIDE_AP_MAT_concrete",
+          "count": 20,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 9,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 9,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 18,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_SCORCHED ZONE_AP_MAT_concrete",
+          "count": 19,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 10,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_DELUGE EXIT_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "mangrove_thin_trunks_and_root_fans",
+          "count": 7,
+          "trianglesPerInstance": 308
+        },
+        {
+          "name": "mangrove_camera_facing_canopy_cards",
+          "count": 21,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_apron_steam_wall",
+          "count": 24,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "persistent_launch_smoke",
+          "count": 72,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "deluge_water_sheets",
+          "count": 14,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "crawler_shed_gravel",
+          "count": 96,
+          "trianglesPerInstance": 5
+        }
+      ],
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Schedule-frozen evidence station; production course, board, authored environment and event poses, course lights, fog and tone mapping. No running race or vehicle. The optional pad camera tracks ascent from a fixed chase-height station and is not the driving camera.",
+      "progress": 0.74,
+      "tick": 9215,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": false,
+        "steam": true,
+        "launched": true,
+        "rocketGone": true,
+        "deluge": true
+      },
+      "render": {
+        "calls": 49,
+        "triangles": 142668
+      }
+    },
+    {
+      "file": "03.png",
+      "yaw": 45,
+      "egrets": {
+        "tick": 9215,
+        "risenLap": 1,
+        "riseTick": 9215,
+        "launched": true,
+        "launchAge": 8.016666666666667,
+        "firstBirdPosition": [
+          8.342436790466309,
+          83.35089111328125,
+          277.7879638671875
+        ]
+      },
+      "boardLegibility": null,
+      "cameraTarget": "road",
+      "effects": {
+        "launchAge": 8.016666666666667,
+        "pad": [
+          231.0088653564453,
+          4,
+          -125.9814453125
+        ],
+        "smokeTop": 894,
+        "cloudGlow": 0,
+        "tick": 9215,
+        "reducedMotion": false,
+        "crawlerPosition": [
+          6.681713104248047,
+          17,
+          330.3438720703125
+        ],
+        "treadTravel": 0,
+        "rocketHeight": 1200,
+        "rocketVisible": false,
+        "steamVisible": true,
+        "smokeVisible": true,
+        "delugeVisible": true,
+        "floodVisible": true,
+        "lampScale": 1,
+        "klaxon": false
+      },
+      "instances": [
+        {
+          "name": "ascension_solid_road_kerbs",
+          "count": 744,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_housings",
+          "count": 372,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_glass",
+          "count": 372,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "",
+          "count": 16,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "ascension_board_masts",
+          "count": 6,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_board_displays",
+          "count": 2,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "ascension_authored_board_ascension_static_props_shared_paint",
+          "count": 2,
+          "trianglesPerInstance": 460
+        },
+        {
+          "name": "crawler_rotating_tread_links",
+          "count": 192,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_emissive",
+          "count": 33,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_metal",
+          "count": 34,
+          "trianglesPerInstance": 216
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_ENTRY RAMP_AP_MAT_concrete",
+          "count": 6,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 33,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 1556
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 55,
+          "trianglesPerInstance": 225
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 0,
+          "trianglesPerInstance": 300
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 55,
+          "trianglesPerInstance": 25
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_PAD UNDERSIDE_AP_MAT_concrete",
+          "count": 20,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 11,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 11,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 22,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_SCORCHED ZONE_AP_MAT_concrete",
+          "count": 22,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 11,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_DELUGE EXIT_AP_MAT_concrete",
+          "count": 7,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "mangrove_thin_trunks_and_root_fans",
+          "count": 13,
+          "trianglesPerInstance": 308
+        },
+        {
+          "name": "mangrove_camera_facing_canopy_cards",
+          "count": 39,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_apron_steam_wall",
+          "count": 24,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "persistent_launch_smoke",
+          "count": 72,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "deluge_water_sheets",
+          "count": 14,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "crawler_shed_gravel",
+          "count": 96,
+          "trianglesPerInstance": 5
+        }
+      ],
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Schedule-frozen evidence station; production course, board, authored environment and event poses, course lights, fog and tone mapping. No running race or vehicle. The optional pad camera tracks ascent from a fixed chase-height station and is not the driving camera.",
+      "progress": 0.74,
+      "tick": 9215,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": false,
+        "steam": true,
+        "launched": true,
+        "rocketGone": true,
+        "deluge": true
+      },
+      "render": {
+        "calls": 50,
+        "triangles": 148760
+      }
+    },
+    {
+      "file": "04.png",
+      "yaw": 60,
+      "egrets": {
+        "tick": 9215,
+        "risenLap": 1,
+        "riseTick": 9215,
+        "launched": true,
+        "launchAge": 8.016666666666667,
+        "firstBirdPosition": [
+          8.342436790466309,
+          83.35089111328125,
+          277.7879638671875
+        ]
+      },
+      "boardLegibility": null,
+      "cameraTarget": "road",
+      "effects": {
+        "launchAge": 8.016666666666667,
+        "pad": [
+          231.0088653564453,
+          4,
+          -125.9814453125
+        ],
+        "smokeTop": 894,
+        "cloudGlow": 0,
+        "tick": 9215,
+        "reducedMotion": false,
+        "crawlerPosition": [
+          6.681713104248047,
+          17,
+          330.3438720703125
+        ],
+        "treadTravel": 0,
+        "rocketHeight": 1200,
+        "rocketVisible": false,
+        "steamVisible": true,
+        "smokeVisible": true,
+        "delugeVisible": true,
+        "floodVisible": true,
+        "lampScale": 1,
+        "klaxon": false
+      },
+      "instances": [
+        {
+          "name": "ascension_solid_road_kerbs",
+          "count": 744,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_housings",
+          "count": 372,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_glass",
+          "count": 372,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "",
+          "count": 16,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "ascension_board_masts",
+          "count": 6,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_board_displays",
+          "count": 2,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "ascension_authored_board_ascension_static_props_shared_paint",
+          "count": 2,
+          "trianglesPerInstance": 460
+        },
+        {
+          "name": "crawler_rotating_tread_links",
+          "count": 192,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_emissive",
+          "count": 35,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_metal",
+          "count": 35,
+          "trianglesPerInstance": 216
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_ENTRY RAMP_AP_MAT_concrete",
+          "count": 6,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 34,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 1556
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 56,
+          "trianglesPerInstance": 225
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 0,
+          "trianglesPerInstance": 300
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 56,
+          "trianglesPerInstance": 25
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_PAD UNDERSIDE_AP_MAT_concrete",
+          "count": 20,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 11,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 11,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 22,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_SCORCHED ZONE_AP_MAT_concrete",
+          "count": 22,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 11,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_DELUGE EXIT_AP_MAT_concrete",
+          "count": 8,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "mangrove_thin_trunks_and_root_fans",
+          "count": 21,
+          "trianglesPerInstance": 308
+        },
+        {
+          "name": "mangrove_camera_facing_canopy_cards",
+          "count": 63,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_apron_steam_wall",
+          "count": 24,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "persistent_launch_smoke",
+          "count": 72,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "deluge_water_sheets",
+          "count": 14,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "crawler_shed_gravel",
+          "count": 96,
+          "trianglesPerInstance": 5
+        }
+      ],
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Schedule-frozen evidence station; production course, board, authored environment and event poses, course lights, fog and tone mapping. No running race or vehicle. The optional pad camera tracks ascent from a fixed chase-height station and is not the driving camera.",
+      "progress": 0.74,
+      "tick": 9215,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": false,
+        "steam": true,
+        "launched": true,
+        "rocketGone": true,
+        "deluge": true
+      },
+      "render": {
+        "calls": 57,
+        "triangles": 157858
+      }
+    },
+    {
+      "file": "05.png",
+      "yaw": 75,
+      "egrets": {
+        "tick": 9215,
+        "risenLap": 1,
+        "riseTick": 9215,
+        "launched": true,
+        "launchAge": 8.016666666666667,
+        "firstBirdPosition": [
+          8.342436790466309,
+          83.35089111328125,
+          277.7879638671875
+        ]
+      },
+      "boardLegibility": null,
+      "cameraTarget": "road",
+      "effects": {
+        "launchAge": 8.016666666666667,
+        "pad": [
+          231.0088653564453,
+          4,
+          -125.9814453125
+        ],
+        "smokeTop": 894,
+        "cloudGlow": 0,
+        "tick": 9215,
+        "reducedMotion": false,
+        "crawlerPosition": [
+          6.681713104248047,
+          17,
+          330.3438720703125
+        ],
+        "treadTravel": 0,
+        "rocketHeight": 1200,
+        "rocketVisible": false,
+        "steamVisible": true,
+        "smokeVisible": true,
+        "delugeVisible": true,
+        "floodVisible": true,
+        "lampScale": 1,
+        "klaxon": false
+      },
+      "instances": [
+        {
+          "name": "ascension_solid_road_kerbs",
+          "count": 744,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_housings",
+          "count": 372,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_glass",
+          "count": 372,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "",
+          "count": 16,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "ascension_board_masts",
+          "count": 6,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_board_displays",
+          "count": 2,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "ascension_authored_board_ascension_static_props_shared_paint",
+          "count": 2,
+          "trianglesPerInstance": 460
+        },
+        {
+          "name": "crawler_rotating_tread_links",
+          "count": 192,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_emissive",
+          "count": 35,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_metal",
+          "count": 36,
+          "trianglesPerInstance": 216
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_ENTRY RAMP_AP_MAT_concrete",
+          "count": 4,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 31,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 1556
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 54,
+          "trianglesPerInstance": 225
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 0,
+          "trianglesPerInstance": 300
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 54,
+          "trianglesPerInstance": 25
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_PAD UNDERSIDE_AP_MAT_concrete",
+          "count": 20,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 11,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 11,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 22,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_SCORCHED ZONE_AP_MAT_concrete",
+          "count": 22,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 11,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_DELUGE EXIT_AP_MAT_concrete",
+          "count": 8,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "mangrove_thin_trunks_and_root_fans",
+          "count": 32,
+          "trianglesPerInstance": 308
+        },
+        {
+          "name": "mangrove_camera_facing_canopy_cards",
+          "count": 96,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_apron_steam_wall",
+          "count": 24,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "persistent_launch_smoke",
+          "count": 72,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "deluge_water_sheets",
+          "count": 14,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "crawler_shed_gravel",
+          "count": 96,
+          "trianglesPerInstance": 5
+        }
+      ],
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Schedule-frozen evidence station; production course, board, authored environment and event poses, course lights, fog and tone mapping. No running race or vehicle. The optional pad camera tracks ascent from a fixed chase-height station and is not the driving camera.",
+      "progress": 0.74,
+      "tick": 9215,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": false,
+        "steam": true,
+        "launched": true,
+        "rocketGone": true,
+        "deluge": true
+      },
+      "render": {
+        "calls": 58,
+        "triangles": 162512
+      }
+    },
+    {
+      "file": "06.png",
+      "yaw": 90,
+      "egrets": {
+        "tick": 9215,
+        "risenLap": 1,
+        "riseTick": 9215,
+        "launched": true,
+        "launchAge": 8.016666666666667,
+        "firstBirdPosition": [
+          8.342436790466309,
+          83.35089111328125,
+          277.7879638671875
+        ]
+      },
+      "boardLegibility": null,
+      "cameraTarget": "road",
+      "effects": {
+        "launchAge": 8.016666666666667,
+        "pad": [
+          231.0088653564453,
+          4,
+          -125.9814453125
+        ],
+        "smokeTop": 894,
+        "cloudGlow": 0,
+        "tick": 9215,
+        "reducedMotion": false,
+        "crawlerPosition": [
+          6.681713104248047,
+          17,
+          330.3438720703125
+        ],
+        "treadTravel": 0,
+        "rocketHeight": 1200,
+        "rocketVisible": false,
+        "steamVisible": true,
+        "smokeVisible": true,
+        "delugeVisible": true,
+        "floodVisible": true,
+        "lampScale": 1,
+        "klaxon": false
+      },
+      "instances": [
+        {
+          "name": "ascension_solid_road_kerbs",
+          "count": 744,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_housings",
+          "count": 372,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_glass",
+          "count": 372,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "",
+          "count": 16,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "ascension_board_masts",
+          "count": 6,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_board_displays",
+          "count": 2,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "ascension_authored_board_ascension_static_props_shared_paint",
+          "count": 2,
+          "trianglesPerInstance": 460
+        },
+        {
+          "name": "crawler_rotating_tread_links",
+          "count": 192,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_emissive",
+          "count": 29,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_metal",
+          "count": 30,
+          "trianglesPerInstance": 216
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_ENTRY RAMP_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 17,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 1556
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 39,
+          "trianglesPerInstance": 225
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 0,
+          "trianglesPerInstance": 300
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 39,
+          "trianglesPerInstance": 25
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_PAD UNDERSIDE_AP_MAT_concrete",
+          "count": 9,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 11,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 11,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 22,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_SCORCHED ZONE_AP_MAT_concrete",
+          "count": 22,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 11,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_DELUGE EXIT_AP_MAT_concrete",
+          "count": 8,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "mangrove_thin_trunks_and_root_fans",
+          "count": 36,
+          "trianglesPerInstance": 308
+        },
+        {
+          "name": "mangrove_camera_facing_canopy_cards",
+          "count": 108,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_apron_steam_wall",
+          "count": 24,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "persistent_launch_smoke",
+          "count": 72,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "deluge_water_sheets",
+          "count": 14,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "crawler_shed_gravel",
+          "count": 96,
+          "trianglesPerInstance": 5
+        }
+      ],
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Schedule-frozen evidence station; production course, board, authored environment and event poses, course lights, fog and tone mapping. No running race or vehicle. The optional pad camera tracks ascent from a fixed chase-height station and is not the driving camera.",
+      "progress": 0.74,
+      "tick": 9215,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": false,
+        "steam": true,
+        "launched": true,
+        "rocketGone": true,
+        "deluge": true
+      },
+      "render": {
+        "calls": 55,
+        "triangles": 156306
+      }
+    },
+    {
+      "file": "07.png",
+      "yaw": 105,
+      "egrets": {
+        "tick": 9215,
+        "risenLap": 1,
+        "riseTick": 9215,
+        "launched": true,
+        "launchAge": 8.016666666666667,
+        "firstBirdPosition": [
+          8.342436790466309,
+          83.35089111328125,
+          277.7879638671875
+        ]
+      },
+      "boardLegibility": null,
+      "cameraTarget": "road",
+      "effects": {
+        "launchAge": 8.016666666666667,
+        "pad": [
+          231.0088653564453,
+          4,
+          -125.9814453125
+        ],
+        "smokeTop": 894,
+        "cloudGlow": 0,
+        "tick": 9215,
+        "reducedMotion": false,
+        "crawlerPosition": [
+          6.681713104248047,
+          17,
+          330.3438720703125
+        ],
+        "treadTravel": 0,
+        "rocketHeight": 1200,
+        "rocketVisible": false,
+        "steamVisible": true,
+        "smokeVisible": true,
+        "delugeVisible": true,
+        "floodVisible": true,
+        "lampScale": 1,
+        "klaxon": false
+      },
+      "instances": [
+        {
+          "name": "ascension_solid_road_kerbs",
+          "count": 744,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_housings",
+          "count": 372,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_glass",
+          "count": 372,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "",
+          "count": 16,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "ascension_board_masts",
+          "count": 6,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_board_displays",
+          "count": 2,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "ascension_authored_board_ascension_static_props_shared_paint",
+          "count": 2,
+          "trianglesPerInstance": 460
+        },
+        {
+          "name": "crawler_rotating_tread_links",
+          "count": 192,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_emissive",
+          "count": 24,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_metal",
+          "count": 24,
+          "trianglesPerInstance": 216
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_ENTRY RAMP_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 8,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 1556
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 26,
+          "trianglesPerInstance": 225
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 0,
+          "trianglesPerInstance": 300
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 26,
+          "trianglesPerInstance": 25
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_PAD UNDERSIDE_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 9,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 8,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 17,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_SCORCHED ZONE_AP_MAT_concrete",
+          "count": 18,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 9,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_DELUGE EXIT_AP_MAT_concrete",
+          "count": 8,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "mangrove_thin_trunks_and_root_fans",
+          "count": 35,
+          "trianglesPerInstance": 308
+        },
+        {
+          "name": "mangrove_camera_facing_canopy_cards",
+          "count": 105,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_apron_steam_wall",
+          "count": 24,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "persistent_launch_smoke",
+          "count": 72,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "deluge_water_sheets",
+          "count": 14,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "crawler_shed_gravel",
+          "count": 96,
+          "trianglesPerInstance": 5
+        }
+      ],
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Schedule-frozen evidence station; production course, board, authored environment and event poses, course lights, fog and tone mapping. No running race or vehicle. The optional pad camera tracks ascent from a fixed chase-height station and is not the driving camera.",
+      "progress": 0.74,
+      "tick": 9215,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": false,
+        "steam": true,
+        "launched": true,
+        "rocketGone": true,
+        "deluge": true
+      },
+      "render": {
+        "calls": 44,
+        "triangles": 145146
+      }
+    },
+    {
+      "file": "08.png",
+      "yaw": 120,
+      "egrets": {
+        "tick": 9215,
+        "risenLap": 1,
+        "riseTick": 9215,
+        "launched": true,
+        "launchAge": 8.016666666666667,
+        "firstBirdPosition": [
+          8.342436790466309,
+          83.35089111328125,
+          277.7879638671875
+        ]
+      },
+      "boardLegibility": null,
+      "cameraTarget": "road",
+      "effects": {
+        "launchAge": 8.016666666666667,
+        "pad": [
+          231.0088653564453,
+          4,
+          -125.9814453125
+        ],
+        "smokeTop": 894,
+        "cloudGlow": 0,
+        "tick": 9215,
+        "reducedMotion": false,
+        "crawlerPosition": [
+          6.681713104248047,
+          17,
+          330.3438720703125
+        ],
+        "treadTravel": 0,
+        "rocketHeight": 1200,
+        "rocketVisible": false,
+        "steamVisible": true,
+        "smokeVisible": true,
+        "delugeVisible": true,
+        "floodVisible": true,
+        "lampScale": 1,
+        "klaxon": false
+      },
+      "instances": [
+        {
+          "name": "ascension_solid_road_kerbs",
+          "count": 744,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_housings",
+          "count": 372,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_glass",
+          "count": 372,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "",
+          "count": 16,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "ascension_board_masts",
+          "count": 6,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_board_displays",
+          "count": 2,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "ascension_authored_board_ascension_static_props_shared_paint",
+          "count": 2,
+          "trianglesPerInstance": 460
+        },
+        {
+          "name": "crawler_rotating_tread_links",
+          "count": 192,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_emissive",
+          "count": 18,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_metal",
+          "count": 18,
+          "trianglesPerInstance": 216
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_ENTRY RAMP_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 8,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 1556
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 15,
+          "trianglesPerInstance": 225
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 0,
+          "trianglesPerInstance": 300
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 15,
+          "trianglesPerInstance": 25
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_PAD UNDERSIDE_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 4,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 3,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 6,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_SCORCHED ZONE_AP_MAT_concrete",
+          "count": 7,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 3,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_DELUGE EXIT_AP_MAT_concrete",
+          "count": 8,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "mangrove_thin_trunks_and_root_fans",
+          "count": 38,
+          "trianglesPerInstance": 308
+        },
+        {
+          "name": "mangrove_camera_facing_canopy_cards",
+          "count": 114,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_apron_steam_wall",
+          "count": 24,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "persistent_launch_smoke",
+          "count": 72,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "deluge_water_sheets",
+          "count": 14,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "crawler_shed_gravel",
+          "count": 96,
+          "trianglesPerInstance": 5
+        }
+      ],
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Schedule-frozen evidence station; production course, board, authored environment and event poses, course lights, fog and tone mapping. No running race or vehicle. The optional pad camera tracks ascent from a fixed chase-height station and is not the driving camera.",
+      "progress": 0.74,
+      "tick": 9215,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": false,
+        "steam": true,
+        "launched": true,
+        "rocketGone": true,
+        "deluge": true
+      },
+      "render": {
+        "calls": 44,
+        "triangles": 140598
+      }
+    },
+    {
+      "file": "09.png",
+      "yaw": 135,
+      "egrets": {
+        "tick": 9215,
+        "risenLap": 1,
+        "riseTick": 9215,
+        "launched": true,
+        "launchAge": 8.016666666666667,
+        "firstBirdPosition": [
+          8.342436790466309,
+          83.35089111328125,
+          277.7879638671875
+        ]
+      },
+      "boardLegibility": null,
+      "cameraTarget": "road",
+      "effects": {
+        "launchAge": 8.016666666666667,
+        "pad": [
+          231.0088653564453,
+          4,
+          -125.9814453125
+        ],
+        "smokeTop": 894,
+        "cloudGlow": 0,
+        "tick": 9215,
+        "reducedMotion": false,
+        "crawlerPosition": [
+          6.681713104248047,
+          17,
+          330.3438720703125
+        ],
+        "treadTravel": 0,
+        "rocketHeight": 1200,
+        "rocketVisible": false,
+        "steamVisible": true,
+        "smokeVisible": true,
+        "delugeVisible": true,
+        "floodVisible": true,
+        "lampScale": 1,
+        "klaxon": false
+      },
+      "instances": [
+        {
+          "name": "ascension_solid_road_kerbs",
+          "count": 744,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_housings",
+          "count": 372,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_glass",
+          "count": 372,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "",
+          "count": 16,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "ascension_board_masts",
+          "count": 6,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_board_displays",
+          "count": 2,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "ascension_authored_board_ascension_static_props_shared_paint",
+          "count": 2,
+          "trianglesPerInstance": 460
+        },
+        {
+          "name": "crawler_rotating_tread_links",
+          "count": 192,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_emissive",
+          "count": 11,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_metal",
+          "count": 11,
+          "trianglesPerInstance": 216
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_ENTRY RAMP_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 5,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 1556
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 6,
+          "trianglesPerInstance": 225
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 0,
+          "trianglesPerInstance": 300
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 6,
+          "trianglesPerInstance": 25
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_PAD UNDERSIDE_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 0,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_SCORCHED ZONE_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_DELUGE EXIT_AP_MAT_concrete",
+          "count": 6,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "mangrove_thin_trunks_and_root_fans",
+          "count": 38,
+          "trianglesPerInstance": 308
+        },
+        {
+          "name": "mangrove_camera_facing_canopy_cards",
+          "count": 114,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_apron_steam_wall",
+          "count": 24,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "persistent_launch_smoke",
+          "count": 72,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "deluge_water_sheets",
+          "count": 14,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "crawler_shed_gravel",
+          "count": 96,
+          "trianglesPerInstance": 5
+        }
+      ],
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Schedule-frozen evidence station; production course, board, authored environment and event poses, course lights, fog and tone mapping. No running race or vehicle. The optional pad camera tracks ascent from a fixed chase-height station and is not the driving camera.",
+      "progress": 0.74,
+      "tick": 9215,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": false,
+        "steam": true,
+        "launched": true,
+        "rocketGone": true,
+        "deluge": true
+      },
+      "render": {
+        "calls": 39,
+        "triangles": 135628
+      }
+    },
+    {
+      "file": "10.png",
+      "yaw": 150,
+      "egrets": {
+        "tick": 9215,
+        "risenLap": 1,
+        "riseTick": 9215,
+        "launched": true,
+        "launchAge": 8.016666666666667,
+        "firstBirdPosition": [
+          8.342436790466309,
+          83.35089111328125,
+          277.7879638671875
+        ]
+      },
+      "boardLegibility": null,
+      "cameraTarget": "road",
+      "effects": {
+        "launchAge": 8.016666666666667,
+        "pad": [
+          231.0088653564453,
+          4,
+          -125.9814453125
+        ],
+        "smokeTop": 894,
+        "cloudGlow": 0,
+        "tick": 9215,
+        "reducedMotion": false,
+        "crawlerPosition": [
+          6.681713104248047,
+          17,
+          330.3438720703125
+        ],
+        "treadTravel": 0,
+        "rocketHeight": 1200,
+        "rocketVisible": false,
+        "steamVisible": true,
+        "smokeVisible": true,
+        "delugeVisible": true,
+        "floodVisible": true,
+        "lampScale": 1,
+        "klaxon": false
+      },
+      "instances": [
+        {
+          "name": "ascension_solid_road_kerbs",
+          "count": 744,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_housings",
+          "count": 372,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_glass",
+          "count": 372,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "",
+          "count": 16,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "ascension_board_masts",
+          "count": 6,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_board_displays",
+          "count": 2,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "ascension_authored_board_ascension_static_props_shared_paint",
+          "count": 2,
+          "trianglesPerInstance": 460
+        },
+        {
+          "name": "crawler_rotating_tread_links",
+          "count": 192,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_emissive",
+          "count": 4,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_metal",
+          "count": 5,
+          "trianglesPerInstance": 216
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_ENTRY RAMP_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 0,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 1556
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 225
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 0,
+          "trianglesPerInstance": 300
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 0,
+          "trianglesPerInstance": 25
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_PAD UNDERSIDE_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 0,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_SCORCHED ZONE_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_DELUGE EXIT_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "mangrove_thin_trunks_and_root_fans",
+          "count": 25,
+          "trianglesPerInstance": 308
+        },
+        {
+          "name": "mangrove_camera_facing_canopy_cards",
+          "count": 75,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_apron_steam_wall",
+          "count": 24,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "persistent_launch_smoke",
+          "count": 72,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "deluge_water_sheets",
+          "count": 14,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "crawler_shed_gravel",
+          "count": 96,
+          "trianglesPerInstance": 5
+        }
+      ],
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Schedule-frozen evidence station; production course, board, authored environment and event poses, course lights, fog and tone mapping. No running race or vehicle. The optional pad camera tracks ascent from a fixed chase-height station and is not the driving camera.",
+      "progress": 0.74,
+      "tick": 9215,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": false,
+        "steam": true,
+        "launched": true,
+        "rocketGone": true,
+        "deluge": true
+      },
+      "render": {
+        "calls": 34,
+        "triangles": 128046
+      }
+    },
+    {
+      "file": "11.png",
+      "yaw": 165,
+      "egrets": {
+        "tick": 9215,
+        "risenLap": 1,
+        "riseTick": 9215,
+        "launched": true,
+        "launchAge": 8.016666666666667,
+        "firstBirdPosition": [
+          8.342436790466309,
+          83.35089111328125,
+          277.7879638671875
+        ]
+      },
+      "boardLegibility": null,
+      "cameraTarget": "road",
+      "effects": {
+        "launchAge": 8.016666666666667,
+        "pad": [
+          231.0088653564453,
+          4,
+          -125.9814453125
+        ],
+        "smokeTop": 894,
+        "cloudGlow": 0,
+        "tick": 9215,
+        "reducedMotion": false,
+        "crawlerPosition": [
+          6.681713104248047,
+          17,
+          330.3438720703125
+        ],
+        "treadTravel": 0,
+        "rocketHeight": 1200,
+        "rocketVisible": false,
+        "steamVisible": true,
+        "smokeVisible": true,
+        "delugeVisible": true,
+        "floodVisible": true,
+        "lampScale": 1,
+        "klaxon": false
+      },
+      "instances": [
+        {
+          "name": "ascension_solid_road_kerbs",
+          "count": 744,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_housings",
+          "count": 372,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_glass",
+          "count": 372,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "",
+          "count": 16,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "ascension_board_masts",
+          "count": 6,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_board_displays",
+          "count": 2,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "ascension_authored_board_ascension_static_props_shared_paint",
+          "count": 2,
+          "trianglesPerInstance": 460
+        },
+        {
+          "name": "crawler_rotating_tread_links",
+          "count": 192,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_emissive",
+          "count": 2,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_metal",
+          "count": 2,
+          "trianglesPerInstance": 216
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_ENTRY RAMP_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 0,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 1556
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 225
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 0,
+          "trianglesPerInstance": 300
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 0,
+          "trianglesPerInstance": 25
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_PAD UNDERSIDE_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 0,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_SCORCHED ZONE_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_DELUGE EXIT_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "mangrove_thin_trunks_and_root_fans",
+          "count": 18,
+          "trianglesPerInstance": 308
+        },
+        {
+          "name": "mangrove_camera_facing_canopy_cards",
+          "count": 54,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_apron_steam_wall",
+          "count": 24,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "persistent_launch_smoke",
+          "count": 72,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "deluge_water_sheets",
+          "count": 14,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "crawler_shed_gravel",
+          "count": 96,
+          "trianglesPerInstance": 5
+        }
+      ],
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Schedule-frozen evidence station; production course, board, authored environment and event poses, course lights, fog and tone mapping. No running race or vehicle. The optional pad camera tracks ascent from a fixed chase-height station and is not the driving camera.",
+      "progress": 0.74,
+      "tick": 9215,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": false,
+        "steam": true,
+        "launched": true,
+        "rocketGone": true,
+        "deluge": true
+      },
+      "render": {
+        "calls": 25,
+        "triangles": 118930
+      }
+    },
+    {
+      "file": "12.png",
+      "yaw": 180,
+      "egrets": {
+        "tick": 9215,
+        "risenLap": 1,
+        "riseTick": 9215,
+        "launched": true,
+        "launchAge": 8.016666666666667,
+        "firstBirdPosition": [
+          8.342436790466309,
+          83.35089111328125,
+          277.7879638671875
+        ]
+      },
+      "boardLegibility": null,
+      "cameraTarget": "road",
+      "effects": {
+        "launchAge": 8.016666666666667,
+        "pad": [
+          231.0088653564453,
+          4,
+          -125.9814453125
+        ],
+        "smokeTop": 894,
+        "cloudGlow": 0,
+        "tick": 9215,
+        "reducedMotion": false,
+        "crawlerPosition": [
+          6.681713104248047,
+          17,
+          330.3438720703125
+        ],
+        "treadTravel": 0,
+        "rocketHeight": 1200,
+        "rocketVisible": false,
+        "steamVisible": true,
+        "smokeVisible": true,
+        "delugeVisible": true,
+        "floodVisible": true,
+        "lampScale": 1,
+        "klaxon": false
+      },
+      "instances": [
+        {
+          "name": "ascension_solid_road_kerbs",
+          "count": 744,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_housings",
+          "count": 372,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_glass",
+          "count": 372,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "",
+          "count": 16,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "ascension_board_masts",
+          "count": 6,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_board_displays",
+          "count": 2,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "ascension_authored_board_ascension_static_props_shared_paint",
+          "count": 2,
+          "trianglesPerInstance": 460
+        },
+        {
+          "name": "crawler_rotating_tread_links",
+          "count": 192,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_emissive",
+          "count": 1,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_metal",
+          "count": 1,
+          "trianglesPerInstance": 216
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_ENTRY RAMP_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 0,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 1556
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 225
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 0,
+          "trianglesPerInstance": 300
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 0,
+          "trianglesPerInstance": 25
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_PAD UNDERSIDE_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 0,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_SCORCHED ZONE_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_DELUGE EXIT_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "mangrove_thin_trunks_and_root_fans",
+          "count": 11,
+          "trianglesPerInstance": 308
+        },
+        {
+          "name": "mangrove_camera_facing_canopy_cards",
+          "count": 33,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_apron_steam_wall",
+          "count": 24,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "persistent_launch_smoke",
+          "count": 72,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "deluge_water_sheets",
+          "count": 14,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "crawler_shed_gravel",
+          "count": 96,
+          "trianglesPerInstance": 5
+        }
+      ],
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Schedule-frozen evidence station; production course, board, authored environment and event poses, course lights, fog and tone mapping. No running race or vehicle. The optional pad camera tracks ascent from a fixed chase-height station and is not the driving camera.",
+      "progress": 0.74,
+      "tick": 9215,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": false,
+        "steam": true,
+        "launched": true,
+        "rocketGone": true,
+        "deluge": true
+      },
+      "render": {
+        "calls": 23,
+        "triangles": 112828
+      }
+    },
+    {
+      "file": "13.png",
+      "yaw": 195,
+      "egrets": {
+        "tick": 9215,
+        "risenLap": 1,
+        "riseTick": 9215,
+        "launched": true,
+        "launchAge": 8.016666666666667,
+        "firstBirdPosition": [
+          8.342436790466309,
+          83.35089111328125,
+          277.7879638671875
+        ]
+      },
+      "boardLegibility": null,
+      "cameraTarget": "road",
+      "effects": {
+        "launchAge": 8.016666666666667,
+        "pad": [
+          231.0088653564453,
+          4,
+          -125.9814453125
+        ],
+        "smokeTop": 894,
+        "cloudGlow": 0,
+        "tick": 9215,
+        "reducedMotion": false,
+        "crawlerPosition": [
+          6.681713104248047,
+          17,
+          330.3438720703125
+        ],
+        "treadTravel": 0,
+        "rocketHeight": 1200,
+        "rocketVisible": false,
+        "steamVisible": true,
+        "smokeVisible": true,
+        "delugeVisible": true,
+        "floodVisible": true,
+        "lampScale": 1,
+        "klaxon": false
+      },
+      "instances": [
+        {
+          "name": "ascension_solid_road_kerbs",
+          "count": 744,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_housings",
+          "count": 372,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_glass",
+          "count": 372,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "",
+          "count": 16,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "ascension_board_masts",
+          "count": 6,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_board_displays",
+          "count": 2,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "ascension_authored_board_ascension_static_props_shared_paint",
+          "count": 2,
+          "trianglesPerInstance": 460
+        },
+        {
+          "name": "crawler_rotating_tread_links",
+          "count": 192,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_emissive",
+          "count": 0,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 216
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_ENTRY RAMP_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 0,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 1556
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 225
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 0,
+          "trianglesPerInstance": 300
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 0,
+          "trianglesPerInstance": 25
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_PAD UNDERSIDE_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 0,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_SCORCHED ZONE_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_DELUGE EXIT_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "mangrove_thin_trunks_and_root_fans",
+          "count": 8,
+          "trianglesPerInstance": 308
+        },
+        {
+          "name": "mangrove_camera_facing_canopy_cards",
+          "count": 24,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_apron_steam_wall",
+          "count": 24,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "persistent_launch_smoke",
+          "count": 72,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "deluge_water_sheets",
+          "count": 14,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "crawler_shed_gravel",
+          "count": 96,
+          "trianglesPerInstance": 5
+        }
+      ],
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Schedule-frozen evidence station; production course, board, authored environment and event poses, course lights, fog and tone mapping. No running race or vehicle. The optional pad camera tracks ascent from a fixed chase-height station and is not the driving camera.",
+      "progress": 0.74,
+      "tick": 9215,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": false,
+        "steam": true,
+        "launched": true,
+        "rocketGone": true,
+        "deluge": true
+      },
+      "render": {
+        "calls": 21,
+        "triangles": 111642
+      }
+    },
+    {
+      "file": "14.png",
+      "yaw": 210,
+      "egrets": {
+        "tick": 9215,
+        "risenLap": 1,
+        "riseTick": 9215,
+        "launched": true,
+        "launchAge": 8.016666666666667,
+        "firstBirdPosition": [
+          8.342436790466309,
+          83.35089111328125,
+          277.7879638671875
+        ]
+      },
+      "boardLegibility": null,
+      "cameraTarget": "road",
+      "effects": {
+        "launchAge": 8.016666666666667,
+        "pad": [
+          231.0088653564453,
+          4,
+          -125.9814453125
+        ],
+        "smokeTop": 894,
+        "cloudGlow": 0,
+        "tick": 9215,
+        "reducedMotion": false,
+        "crawlerPosition": [
+          6.681713104248047,
+          17,
+          330.3438720703125
+        ],
+        "treadTravel": 0,
+        "rocketHeight": 1200,
+        "rocketVisible": false,
+        "steamVisible": true,
+        "smokeVisible": true,
+        "delugeVisible": true,
+        "floodVisible": true,
+        "lampScale": 1,
+        "klaxon": false
+      },
+      "instances": [
+        {
+          "name": "ascension_solid_road_kerbs",
+          "count": 744,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_housings",
+          "count": 372,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_glass",
+          "count": 372,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "",
+          "count": 16,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "ascension_board_masts",
+          "count": 6,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_board_displays",
+          "count": 2,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "ascension_authored_board_ascension_static_props_shared_paint",
+          "count": 2,
+          "trianglesPerInstance": 460
+        },
+        {
+          "name": "crawler_rotating_tread_links",
+          "count": 192,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_emissive",
+          "count": 0,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_metal",
+          "count": 1,
+          "trianglesPerInstance": 216
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_ENTRY RAMP_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 0,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 1556
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 225
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 0,
+          "trianglesPerInstance": 300
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 0,
+          "trianglesPerInstance": 25
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_PAD UNDERSIDE_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 0,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_SCORCHED ZONE_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_DELUGE EXIT_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "mangrove_thin_trunks_and_root_fans",
+          "count": 8,
+          "trianglesPerInstance": 308
+        },
+        {
+          "name": "mangrove_camera_facing_canopy_cards",
+          "count": 24,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_apron_steam_wall",
+          "count": 24,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "persistent_launch_smoke",
+          "count": 72,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "deluge_water_sheets",
+          "count": 14,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "crawler_shed_gravel",
+          "count": 96,
+          "trianglesPerInstance": 5
+        }
+      ],
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Schedule-frozen evidence station; production course, board, authored environment and event poses, course lights, fog and tone mapping. No running race or vehicle. The optional pad camera tracks ascent from a fixed chase-height station and is not the driving camera.",
+      "progress": 0.74,
+      "tick": 9215,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": false,
+        "steam": true,
+        "launched": true,
+        "rocketGone": true,
+        "deluge": true
+      },
+      "render": {
+        "calls": 22,
+        "triangles": 111858
+      }
+    },
+    {
+      "file": "15.png",
+      "yaw": 225,
+      "egrets": {
+        "tick": 9215,
+        "risenLap": 1,
+        "riseTick": 9215,
+        "launched": true,
+        "launchAge": 8.016666666666667,
+        "firstBirdPosition": [
+          8.342436790466309,
+          83.35089111328125,
+          277.7879638671875
+        ]
+      },
+      "boardLegibility": null,
+      "cameraTarget": "road",
+      "effects": {
+        "launchAge": 8.016666666666667,
+        "pad": [
+          231.0088653564453,
+          4,
+          -125.9814453125
+        ],
+        "smokeTop": 894,
+        "cloudGlow": 0,
+        "tick": 9215,
+        "reducedMotion": false,
+        "crawlerPosition": [
+          6.681713104248047,
+          17,
+          330.3438720703125
+        ],
+        "treadTravel": 0,
+        "rocketHeight": 1200,
+        "rocketVisible": false,
+        "steamVisible": true,
+        "smokeVisible": true,
+        "delugeVisible": true,
+        "floodVisible": true,
+        "lampScale": 1,
+        "klaxon": false
+      },
+      "instances": [
+        {
+          "name": "ascension_solid_road_kerbs",
+          "count": 744,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_housings",
+          "count": 372,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_glass",
+          "count": 372,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "",
+          "count": 16,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "ascension_board_masts",
+          "count": 6,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_board_displays",
+          "count": 2,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "ascension_authored_board_ascension_static_props_shared_paint",
+          "count": 2,
+          "trianglesPerInstance": 460
+        },
+        {
+          "name": "crawler_rotating_tread_links",
+          "count": 192,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_emissive",
+          "count": 1,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_metal",
+          "count": 1,
+          "trianglesPerInstance": 216
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_ENTRY RAMP_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 0,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 1556
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 225
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 0,
+          "trianglesPerInstance": 300
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 0,
+          "trianglesPerInstance": 25
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_PAD UNDERSIDE_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 0,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_SCORCHED ZONE_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_DELUGE EXIT_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "mangrove_thin_trunks_and_root_fans",
+          "count": 12,
+          "trianglesPerInstance": 308
+        },
+        {
+          "name": "mangrove_camera_facing_canopy_cards",
+          "count": 36,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_apron_steam_wall",
+          "count": 24,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "persistent_launch_smoke",
+          "count": 72,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "deluge_water_sheets",
+          "count": 14,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "crawler_shed_gravel",
+          "count": 96,
+          "trianglesPerInstance": 5
+        }
+      ],
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Schedule-frozen evidence station; production course, board, authored environment and event poses, course lights, fog and tone mapping. No running race or vehicle. The optional pad camera tracks ascent from a fixed chase-height station and is not the driving camera.",
+      "progress": 0.74,
+      "tick": 9215,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": false,
+        "steam": true,
+        "launched": true,
+        "rocketGone": true,
+        "deluge": true
+      },
+      "render": {
+        "calls": 23,
+        "triangles": 113142
+      }
+    },
+    {
+      "file": "16.png",
+      "yaw": 240,
+      "egrets": {
+        "tick": 9215,
+        "risenLap": 1,
+        "riseTick": 9215,
+        "launched": true,
+        "launchAge": 8.016666666666667,
+        "firstBirdPosition": [
+          8.342436790466309,
+          83.35089111328125,
+          277.7879638671875
+        ]
+      },
+      "boardLegibility": null,
+      "cameraTarget": "road",
+      "effects": {
+        "launchAge": 8.016666666666667,
+        "pad": [
+          231.0088653564453,
+          4,
+          -125.9814453125
+        ],
+        "smokeTop": 894,
+        "cloudGlow": 0,
+        "tick": 9215,
+        "reducedMotion": false,
+        "crawlerPosition": [
+          6.681713104248047,
+          17,
+          330.3438720703125
+        ],
+        "treadTravel": 0,
+        "rocketHeight": 1200,
+        "rocketVisible": false,
+        "steamVisible": true,
+        "smokeVisible": true,
+        "delugeVisible": true,
+        "floodVisible": true,
+        "lampScale": 1,
+        "klaxon": false
+      },
+      "instances": [
+        {
+          "name": "ascension_solid_road_kerbs",
+          "count": 744,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_housings",
+          "count": 372,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_glass",
+          "count": 372,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "",
+          "count": 16,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "ascension_board_masts",
+          "count": 6,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_board_displays",
+          "count": 2,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "ascension_authored_board_ascension_static_props_shared_paint",
+          "count": 2,
+          "trianglesPerInstance": 460
+        },
+        {
+          "name": "crawler_rotating_tread_links",
+          "count": 192,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_emissive",
+          "count": 1,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_metal",
+          "count": 2,
+          "trianglesPerInstance": 216
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_ENTRY RAMP_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 0,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 1556
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 225
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 0,
+          "trianglesPerInstance": 300
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 0,
+          "trianglesPerInstance": 25
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_PAD UNDERSIDE_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 0,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_SCORCHED ZONE_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_DELUGE EXIT_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "mangrove_thin_trunks_and_root_fans",
+          "count": 16,
+          "trianglesPerInstance": 308
+        },
+        {
+          "name": "mangrove_camera_facing_canopy_cards",
+          "count": 48,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_apron_steam_wall",
+          "count": 24,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "persistent_launch_smoke",
+          "count": 72,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "deluge_water_sheets",
+          "count": 14,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "crawler_shed_gravel",
+          "count": 96,
+          "trianglesPerInstance": 5
+        }
+      ],
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Schedule-frozen evidence station; production course, board, authored environment and event poses, course lights, fog and tone mapping. No running race or vehicle. The optional pad camera tracks ascent from a fixed chase-height station and is not the driving camera.",
+      "progress": 0.74,
+      "tick": 9215,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": false,
+        "steam": true,
+        "launched": true,
+        "rocketGone": true,
+        "deluge": true
+      },
+      "render": {
+        "calls": 23,
+        "triangles": 114614
+      }
+    },
+    {
+      "file": "17.png",
+      "yaw": 255,
+      "egrets": {
+        "tick": 9215,
+        "risenLap": 1,
+        "riseTick": 9215,
+        "launched": true,
+        "launchAge": 8.016666666666667,
+        "firstBirdPosition": [
+          8.342436790466309,
+          83.35089111328125,
+          277.7879638671875
+        ]
+      },
+      "boardLegibility": null,
+      "cameraTarget": "road",
+      "effects": {
+        "launchAge": 8.016666666666667,
+        "pad": [
+          231.0088653564453,
+          4,
+          -125.9814453125
+        ],
+        "smokeTop": 894,
+        "cloudGlow": 0,
+        "tick": 9215,
+        "reducedMotion": false,
+        "crawlerPosition": [
+          6.681713104248047,
+          17,
+          330.3438720703125
+        ],
+        "treadTravel": 0,
+        "rocketHeight": 1200,
+        "rocketVisible": false,
+        "steamVisible": true,
+        "smokeVisible": true,
+        "delugeVisible": true,
+        "floodVisible": true,
+        "lampScale": 1,
+        "klaxon": false
+      },
+      "instances": [
+        {
+          "name": "ascension_solid_road_kerbs",
+          "count": 744,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_housings",
+          "count": 372,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_glass",
+          "count": 372,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "",
+          "count": 16,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "ascension_board_masts",
+          "count": 6,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_board_displays",
+          "count": 2,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "ascension_authored_board_ascension_static_props_shared_paint",
+          "count": 2,
+          "trianglesPerInstance": 460
+        },
+        {
+          "name": "crawler_rotating_tread_links",
+          "count": 192,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_emissive",
+          "count": 4,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_metal",
+          "count": 4,
+          "trianglesPerInstance": 216
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_ENTRY RAMP_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 0,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 1556
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 225
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 0,
+          "trianglesPerInstance": 300
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 0,
+          "trianglesPerInstance": 25
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_PAD UNDERSIDE_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 0,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_SCORCHED ZONE_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_DELUGE EXIT_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "mangrove_thin_trunks_and_root_fans",
+          "count": 29,
+          "trianglesPerInstance": 308
+        },
+        {
+          "name": "mangrove_camera_facing_canopy_cards",
+          "count": 87,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_apron_steam_wall",
+          "count": 24,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "persistent_launch_smoke",
+          "count": 72,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "deluge_water_sheets",
+          "count": 14,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "crawler_shed_gravel",
+          "count": 96,
+          "trianglesPerInstance": 5
+        }
+      ],
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Schedule-frozen evidence station; production course, board, authored environment and event poses, course lights, fog and tone mapping. No running race or vehicle. The optional pad camera tracks ascent from a fixed chase-height station and is not the driving camera.",
+      "progress": 0.74,
+      "tick": 9215,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": false,
+        "steam": true,
+        "launched": true,
+        "rocketGone": true,
+        "deluge": true
+      },
+      "render": {
+        "calls": 36,
+        "triangles": 122498
+      }
+    },
+    {
+      "file": "18.png",
+      "yaw": 270,
+      "egrets": {
+        "tick": 9215,
+        "risenLap": 1,
+        "riseTick": 9215,
+        "launched": true,
+        "launchAge": 8.016666666666667,
+        "firstBirdPosition": [
+          8.342436790466309,
+          83.35089111328125,
+          277.7879638671875
+        ]
+      },
+      "boardLegibility": null,
+      "cameraTarget": "road",
+      "effects": {
+        "launchAge": 8.016666666666667,
+        "pad": [
+          231.0088653564453,
+          4,
+          -125.9814453125
+        ],
+        "smokeTop": 894,
+        "cloudGlow": 0,
+        "tick": 9215,
+        "reducedMotion": false,
+        "crawlerPosition": [
+          6.681713104248047,
+          17,
+          330.3438720703125
+        ],
+        "treadTravel": 0,
+        "rocketHeight": 1200,
+        "rocketVisible": false,
+        "steamVisible": true,
+        "smokeVisible": true,
+        "delugeVisible": true,
+        "floodVisible": true,
+        "lampScale": 1,
+        "klaxon": false
+      },
+      "instances": [
+        {
+          "name": "ascension_solid_road_kerbs",
+          "count": 744,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_housings",
+          "count": 372,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_glass",
+          "count": 372,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "",
+          "count": 16,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "ascension_board_masts",
+          "count": 6,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_board_displays",
+          "count": 2,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "ascension_authored_board_ascension_static_props_shared_paint",
+          "count": 2,
+          "trianglesPerInstance": 460
+        },
+        {
+          "name": "crawler_rotating_tread_links",
+          "count": 192,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_emissive",
+          "count": 14,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_metal",
+          "count": 14,
+          "trianglesPerInstance": 216
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_ENTRY RAMP_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 0,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 1556
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 225
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 0,
+          "trianglesPerInstance": 300
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 0,
+          "trianglesPerInstance": 25
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_PAD UNDERSIDE_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 0,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_SCORCHED ZONE_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_DELUGE EXIT_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "mangrove_thin_trunks_and_root_fans",
+          "count": 56,
+          "trianglesPerInstance": 308
+        },
+        {
+          "name": "mangrove_camera_facing_canopy_cards",
+          "count": 168,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_apron_steam_wall",
+          "count": 24,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "persistent_launch_smoke",
+          "count": 72,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "deluge_water_sheets",
+          "count": 14,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "crawler_shed_gravel",
+          "count": 96,
+          "trianglesPerInstance": 5
+        }
+      ],
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Schedule-frozen evidence station; production course, board, authored environment and event poses, course lights, fog and tone mapping. No running race or vehicle. The optional pad camera tracks ascent from a fixed chase-height station and is not the driving camera.",
+      "progress": 0.74,
+      "tick": 9215,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": false,
+        "steam": true,
+        "launched": true,
+        "rocketGone": true,
+        "deluge": true
+      },
+      "render": {
+        "calls": 36,
+        "triangles": 133416
+      }
+    },
+    {
+      "file": "19.png",
+      "yaw": 285,
+      "egrets": {
+        "tick": 9215,
+        "risenLap": 1,
+        "riseTick": 9215,
+        "launched": true,
+        "launchAge": 8.016666666666667,
+        "firstBirdPosition": [
+          8.342436790466309,
+          83.35089111328125,
+          277.7879638671875
+        ]
+      },
+      "boardLegibility": null,
+      "cameraTarget": "road",
+      "effects": {
+        "launchAge": 8.016666666666667,
+        "pad": [
+          231.0088653564453,
+          4,
+          -125.9814453125
+        ],
+        "smokeTop": 894,
+        "cloudGlow": 0,
+        "tick": 9215,
+        "reducedMotion": false,
+        "crawlerPosition": [
+          6.681713104248047,
+          17,
+          330.3438720703125
+        ],
+        "treadTravel": 0,
+        "rocketHeight": 1200,
+        "rocketVisible": false,
+        "steamVisible": true,
+        "smokeVisible": true,
+        "delugeVisible": true,
+        "floodVisible": true,
+        "lampScale": 1,
+        "klaxon": false
+      },
+      "instances": [
+        {
+          "name": "ascension_solid_road_kerbs",
+          "count": 744,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_housings",
+          "count": 372,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_glass",
+          "count": 372,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "",
+          "count": 16,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "ascension_board_masts",
+          "count": 6,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_board_displays",
+          "count": 2,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "ascension_authored_board_ascension_static_props_shared_paint",
+          "count": 2,
+          "trianglesPerInstance": 460
+        },
+        {
+          "name": "crawler_rotating_tread_links",
+          "count": 192,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_emissive",
+          "count": 18,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_metal",
+          "count": 19,
+          "trianglesPerInstance": 216
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_ENTRY RAMP_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 0,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 1556
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 225
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 0,
+          "trianglesPerInstance": 300
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 0,
+          "trianglesPerInstance": 25
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_PAD UNDERSIDE_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 0,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_SCORCHED ZONE_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_DELUGE EXIT_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "mangrove_thin_trunks_and_root_fans",
+          "count": 60,
+          "trianglesPerInstance": 308
+        },
+        {
+          "name": "mangrove_camera_facing_canopy_cards",
+          "count": 180,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_apron_steam_wall",
+          "count": 24,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "persistent_launch_smoke",
+          "count": 72,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "deluge_water_sheets",
+          "count": 14,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "crawler_shed_gravel",
+          "count": 96,
+          "trianglesPerInstance": 5
+        }
+      ],
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Schedule-frozen evidence station; production course, board, authored environment and event poses, course lights, fog and tone mapping. No running race or vehicle. The optional pad camera tracks ascent from a fixed chase-height station and is not the driving camera.",
+      "progress": 0.74,
+      "tick": 9215,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": false,
+        "steam": true,
+        "launched": true,
+        "rocketGone": true,
+        "deluge": true
+      },
+      "render": {
+        "calls": 36,
+        "triangles": 135864
+      }
+    },
+    {
+      "file": "20.png",
+      "yaw": 300,
+      "egrets": {
+        "tick": 9215,
+        "risenLap": 1,
+        "riseTick": 9215,
+        "launched": true,
+        "launchAge": 8.016666666666667,
+        "firstBirdPosition": [
+          8.342436790466309,
+          83.35089111328125,
+          277.7879638671875
+        ]
+      },
+      "boardLegibility": null,
+      "cameraTarget": "road",
+      "effects": {
+        "launchAge": 8.016666666666667,
+        "pad": [
+          231.0088653564453,
+          4,
+          -125.9814453125
+        ],
+        "smokeTop": 894,
+        "cloudGlow": 0,
+        "tick": 9215,
+        "reducedMotion": false,
+        "crawlerPosition": [
+          6.681713104248047,
+          17,
+          330.3438720703125
+        ],
+        "treadTravel": 0,
+        "rocketHeight": 1200,
+        "rocketVisible": false,
+        "steamVisible": true,
+        "smokeVisible": true,
+        "delugeVisible": true,
+        "floodVisible": true,
+        "lampScale": 1,
+        "klaxon": false
+      },
+      "instances": [
+        {
+          "name": "ascension_solid_road_kerbs",
+          "count": 744,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_housings",
+          "count": 372,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_glass",
+          "count": 372,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "",
+          "count": 16,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "ascension_board_masts",
+          "count": 6,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_board_displays",
+          "count": 2,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "ascension_authored_board_ascension_static_props_shared_paint",
+          "count": 2,
+          "trianglesPerInstance": 460
+        },
+        {
+          "name": "crawler_rotating_tread_links",
+          "count": 192,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_emissive",
+          "count": 26,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_metal",
+          "count": 26,
+          "trianglesPerInstance": 216
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_ENTRY RAMP_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 0,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 1556
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 225
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 0,
+          "trianglesPerInstance": 300
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 0,
+          "trianglesPerInstance": 25
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_PAD UNDERSIDE_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 0,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_SCORCHED ZONE_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_DELUGE EXIT_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "mangrove_thin_trunks_and_root_fans",
+          "count": 59,
+          "trianglesPerInstance": 308
+        },
+        {
+          "name": "mangrove_camera_facing_canopy_cards",
+          "count": 177,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_apron_steam_wall",
+          "count": 24,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "persistent_launch_smoke",
+          "count": 72,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "deluge_water_sheets",
+          "count": 14,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "crawler_shed_gravel",
+          "count": 96,
+          "trianglesPerInstance": 5
+        }
+      ],
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Schedule-frozen evidence station; production course, board, authored environment and event poses, course lights, fog and tone mapping. No running race or vehicle. The optional pad camera tracks ascent from a fixed chase-height station and is not the driving camera.",
+      "progress": 0.74,
+      "tick": 9215,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": false,
+        "steam": true,
+        "launched": true,
+        "rocketGone": true,
+        "deluge": true
+      },
+      "render": {
+        "calls": 39,
+        "triangles": 139464
+      }
+    },
+    {
+      "file": "21.png",
+      "yaw": 315,
+      "egrets": {
+        "tick": 9215,
+        "risenLap": 1,
+        "riseTick": 9215,
+        "launched": true,
+        "launchAge": 8.016666666666667,
+        "firstBirdPosition": [
+          8.342436790466309,
+          83.35089111328125,
+          277.7879638671875
+        ]
+      },
+      "boardLegibility": null,
+      "cameraTarget": "road",
+      "effects": {
+        "launchAge": 8.016666666666667,
+        "pad": [
+          231.0088653564453,
+          4,
+          -125.9814453125
+        ],
+        "smokeTop": 894,
+        "cloudGlow": 0,
+        "tick": 9215,
+        "reducedMotion": false,
+        "crawlerPosition": [
+          6.681713104248047,
+          17,
+          330.3438720703125
+        ],
+        "treadTravel": 0,
+        "rocketHeight": 1200,
+        "rocketVisible": false,
+        "steamVisible": true,
+        "smokeVisible": true,
+        "delugeVisible": true,
+        "floodVisible": true,
+        "lampScale": 1,
+        "klaxon": false
+      },
+      "instances": [
+        {
+          "name": "ascension_solid_road_kerbs",
+          "count": 744,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_housings",
+          "count": 372,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_glass",
+          "count": 372,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "",
+          "count": 16,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "ascension_board_masts",
+          "count": 6,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_board_displays",
+          "count": 2,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "ascension_authored_board_ascension_static_props_shared_paint",
+          "count": 2,
+          "trianglesPerInstance": 460
+        },
+        {
+          "name": "crawler_rotating_tread_links",
+          "count": 192,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_emissive",
+          "count": 30,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_metal",
+          "count": 31,
+          "trianglesPerInstance": 216
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_ENTRY RAMP_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 0,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 1556
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 225
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 0,
+          "trianglesPerInstance": 300
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 0,
+          "trianglesPerInstance": 25
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_PAD UNDERSIDE_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 0,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_SCORCHED ZONE_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_DELUGE EXIT_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "mangrove_thin_trunks_and_root_fans",
+          "count": 59,
+          "trianglesPerInstance": 308
+        },
+        {
+          "name": "mangrove_camera_facing_canopy_cards",
+          "count": 177,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_apron_steam_wall",
+          "count": 24,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "persistent_launch_smoke",
+          "count": 72,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "deluge_water_sheets",
+          "count": 14,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "crawler_shed_gravel",
+          "count": 96,
+          "trianglesPerInstance": 5
+        }
+      ],
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Schedule-frozen evidence station; production course, board, authored environment and event poses, course lights, fog and tone mapping. No running race or vehicle. The optional pad camera tracks ascent from a fixed chase-height station and is not the driving camera.",
+      "progress": 0.74,
+      "tick": 9215,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": false,
+        "steam": true,
+        "launched": true,
+        "rocketGone": true,
+        "deluge": true
+      },
+      "render": {
+        "calls": 39,
+        "triangles": 140656
+      }
+    },
+    {
+      "file": "22.png",
+      "yaw": 330,
+      "egrets": {
+        "tick": 9215,
+        "risenLap": 1,
+        "riseTick": 9215,
+        "launched": true,
+        "launchAge": 8.016666666666667,
+        "firstBirdPosition": [
+          8.342436790466309,
+          83.35089111328125,
+          277.7879638671875
+        ]
+      },
+      "boardLegibility": null,
+      "cameraTarget": "road",
+      "effects": {
+        "launchAge": 8.016666666666667,
+        "pad": [
+          231.0088653564453,
+          4,
+          -125.9814453125
+        ],
+        "smokeTop": 894,
+        "cloudGlow": 0,
+        "tick": 9215,
+        "reducedMotion": false,
+        "crawlerPosition": [
+          6.681713104248047,
+          17,
+          330.3438720703125
+        ],
+        "treadTravel": 0,
+        "rocketHeight": 1200,
+        "rocketVisible": false,
+        "steamVisible": true,
+        "smokeVisible": true,
+        "delugeVisible": true,
+        "floodVisible": true,
+        "lampScale": 1,
+        "klaxon": false
+      },
+      "instances": [
+        {
+          "name": "ascension_solid_road_kerbs",
+          "count": 744,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_housings",
+          "count": 372,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_glass",
+          "count": 372,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "",
+          "count": 16,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "ascension_board_masts",
+          "count": 6,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_board_displays",
+          "count": 2,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "ascension_authored_board_ascension_static_props_shared_paint",
+          "count": 2,
+          "trianglesPerInstance": 460
+        },
+        {
+          "name": "crawler_rotating_tread_links",
+          "count": 192,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_emissive",
+          "count": 33,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_metal",
+          "count": 33,
+          "trianglesPerInstance": 216
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_ENTRY RAMP_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 0,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 1556
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 225
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 0,
+          "trianglesPerInstance": 300
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 0,
+          "trianglesPerInstance": 25
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_PAD UNDERSIDE_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 0,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_SCORCHED ZONE_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_DELUGE EXIT_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "mangrove_thin_trunks_and_root_fans",
+          "count": 56,
+          "trianglesPerInstance": 308
+        },
+        {
+          "name": "mangrove_camera_facing_canopy_cards",
+          "count": 168,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_apron_steam_wall",
+          "count": 24,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "persistent_launch_smoke",
+          "count": 72,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "deluge_water_sheets",
+          "count": 14,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "crawler_shed_gravel",
+          "count": 96,
+          "trianglesPerInstance": 5
+        }
+      ],
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Schedule-frozen evidence station; production course, board, authored environment and event poses, course lights, fog and tone mapping. No running race or vehicle. The optional pad camera tracks ascent from a fixed chase-height station and is not the driving camera.",
+      "progress": 0.74,
+      "tick": 9215,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": false,
+        "steam": true,
+        "launched": true,
+        "rocketGone": true,
+        "deluge": true
+      },
+      "render": {
+        "calls": 40,
+        "triangles": 140242
+      }
+    },
+    {
+      "file": "23.png",
+      "yaw": 345,
+      "egrets": {
+        "tick": 9215,
+        "risenLap": 1,
+        "riseTick": 9215,
+        "launched": true,
+        "launchAge": 8.016666666666667,
+        "firstBirdPosition": [
+          8.342436790466309,
+          83.35089111328125,
+          277.7879638671875
+        ]
+      },
+      "boardLegibility": null,
+      "cameraTarget": "road",
+      "effects": {
+        "launchAge": 8.016666666666667,
+        "pad": [
+          231.0088653564453,
+          4,
+          -125.9814453125
+        ],
+        "smokeTop": 894,
+        "cloudGlow": 0,
+        "tick": 9215,
+        "reducedMotion": false,
+        "crawlerPosition": [
+          6.681713104248047,
+          17,
+          330.3438720703125
+        ],
+        "treadTravel": 0,
+        "rocketHeight": 1200,
+        "rocketVisible": false,
+        "steamVisible": true,
+        "smokeVisible": true,
+        "delugeVisible": true,
+        "floodVisible": true,
+        "lampScale": 1,
+        "klaxon": false
+      },
+      "instances": [
+        {
+          "name": "ascension_solid_road_kerbs",
+          "count": 744,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_housings",
+          "count": 372,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_recessed_deck_lamp_glass",
+          "count": 372,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "",
+          "count": 16,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_recessed_lit_lenses",
+          "count": 22,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_faded_SURGE_stencil",
+          "count": 3,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "bulkhead_warning_status_lamps",
+          "count": 12,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "bulkhead_membrane_burst_droplets",
+          "count": 32,
+          "trianglesPerInstance": 20
+        },
+        {
+          "name": "ascension_board_masts",
+          "count": 6,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_board_displays",
+          "count": 2,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "ascension_authored_board_ascension_static_props_shared_paint",
+          "count": 2,
+          "trianglesPerInstance": 460
+        },
+        {
+          "name": "crawler_rotating_tread_links",
+          "count": 192,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_emissive",
+          "count": 33,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_street-lamp_shared_AP_MAT_metal",
+          "count": 33,
+          "trianglesPerInstance": 216
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_ENTRY RAMP_AP_MAT_concrete",
+          "count": 6,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 8,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 1556
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 8,
+          "trianglesPerInstance": 225
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 0,
+          "trianglesPerInstance": 300
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_signage",
+          "count": 8,
+          "trianglesPerInstance": 25
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_PAD UNDERSIDE_AP_MAT_concrete",
+          "count": 2,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_emissive",
+          "count": 0,
+          "trianglesPerInstance": 28
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 12
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_SCORCHED ZONE_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 48
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_shared_AP_MAT_metal",
+          "count": 0,
+          "trianglesPerInstance": 56
+        },
+        {
+          "name": "ascension_prop_instances_trench-wall-module_DELUGE EXIT_AP_MAT_concrete",
+          "count": 0,
+          "trianglesPerInstance": 36
+        },
+        {
+          "name": "mangrove_thin_trunks_and_root_fans",
+          "count": 47,
+          "trianglesPerInstance": 308
+        },
+        {
+          "name": "mangrove_camera_facing_canopy_cards",
+          "count": 141,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "launch_apron_steam_wall",
+          "count": 24,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "persistent_launch_smoke",
+          "count": 72,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "deluge_water_sheets",
+          "count": 14,
+          "trianglesPerInstance": 2
+        },
+        {
+          "name": "crawler_shed_gravel",
+          "count": 96,
+          "trianglesPerInstance": 5
+        }
+      ],
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Schedule-frozen evidence station; production course, board, authored environment and event poses, course lights, fog and tone mapping. No running race or vehicle. The optional pad camera tracks ascent from a fixed chase-height station and is not the driving camera.",
+      "progress": 0.74,
+      "tick": 9215,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": false,
+        "steam": true,
+        "launched": true,
+        "rocketGone": true,
+        "deluge": true
+      },
+      "render": {
+        "calls": 45,
+        "triangles": 140152
+      }
+    }
+  ],
+  "errors": []
+}
