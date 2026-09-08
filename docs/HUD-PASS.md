@@ -108,7 +108,35 @@ while the player is driving. Escape is deliberately **not** in that set.
 | Pause → countdown → resume, live | `scripts/visual/hud/pause-quit.mjs`, real keyboard against a running race |
 | Four quit cancellations, live | same script; each holds ~1.6s, longer than the 0.9s confirm, and the race stays paused |
 | The hold that must work | same script; navigation counter confirms the reload, phase lands on `intro` |
-| HUD at 1280×720 and 1920×1080, M and L, five states | `scripts/visual/hud/capture-hud.mjs`, 20 real races |
+| HUD at 1280×720 and 1920×1080, M and L, five states | `scripts/visual/hud/capture-hud.mjs`, 20 real races, 0 errors |
+
+### The 20 captures, measured
+
+Every frame is a real race with the clock already running — the capture waits
+for `#time-value` to have advanced, not for a timeout, because on the heavier
+circuits `phase === "race"` is set while the environment is still streaming and
+an earlier version of this script caught Tideline on the GO card.
+
+| Viewport | HUD SCALE | `--hud-scale` | Cluster width | Clear of standing block |
+| --- | --- | ---: | ---: | ---: |
+| 1280×720 | M | 1.0000 | 414 px | 128–292 px |
+| 1280×720 | L | 1.2000 | **496.8 px** | 19–216 px |
+| 1920×1080 | M | 1.2247 | 507.03 px | 366–566 px |
+| 1920×1080 | L | 1.4697 | 608.46 px | 233–473 px |
+
+414 → 496.8 px at L is the reference's own acceptance number (≤ 497) reached
+exactly, which is the check that anchor-corner scaling reproduces the intended
+geometry rather than approximating it.
+
+**The margin worth watching:** 19.3 px. That is Tideline at 1280×720, HUD SCALE
+L — the circuit with two ability rows, which makes the drive cluster its
+tallest. It clears the standing block, so the acceptance holds, but it is the
+tightest configuration the game can currently produce and a third ability row
+would break it.
+
+Ladder rows 4/4 and lap pips correct (5 on Greenwater's five laps, 3 on
+Polarity and Tideline's three) in all 20. Barlow Condensed reported loaded in
+all 20. Speeds 207–329 km/h, i.e. every frame is a moving race.
 
 The captures set HUD SCALE **through the terminal**, not by writing the save
 file. The first run of that script wrote a fixture with no `schemaVersion`,

@@ -142,9 +142,22 @@ const run = async () => {
         if ((await page.evaluate(() => document.body.dataset.phase)) === "intro") {
           await page.keyboard.press("Enter");
         }
-        await page.waitForFunction(() => document.body.dataset.phase === "race", null, {
-          timeout: 90000,
-        });
+        /*
+          `phase === "race"` is set when the countdown STARTS, and on the heavier
+          circuits the environment is still streaming at that point - a Tideline
+          capture taken on that signal caught the GO card with the clock still on
+          00:00.000. Waiting for the race clock to have actually advanced is the
+          honest condition: it can only be true once the race is under way.
+        */
+        await page.waitForFunction(
+          () => {
+            if (document.body.dataset.phase !== "race") return false;
+            const clock = document.getElementById("time-value")?.textContent ?? "";
+            return clock !== "" && clock !== "00:00.000";
+          },
+          null,
+          { timeout: 120000 },
+        );
         await page.waitForTimeout(testCase.settle);
 
         const state = await readState(page);
