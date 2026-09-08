@@ -1,0 +1,9 @@
+{
+  "script": "scripts/visual/ascension/audio-capture.mjs",
+  "seconds": 12,
+  "rate": 48000,
+  "expectedFrames": 576000,
+  "observedFrames": 576000,
+  "residual": 0,
+  "errors": []
+}
