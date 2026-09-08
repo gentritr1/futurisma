@@ -1,0 +1,69 @@
+{
+  "script": "scripts/visual/ascension/reconcile-audio.py",
+  "captureScript": "scripts/visual/ascension/audio-capture.mjs",
+  "scope": "Real post-master game mix. Opus decoded at 48000 Hz; context runs at its recorded native rate. Exact PCM clip lengths do not imply sample-exact MediaRecorder start alignment: MediaRecorder framing and decoder warnings remain uncertainty. Raw decoded duration shortfalls are reported separately; the audio-clock trim is approximate, not a sample-exact T-0 proof.",
+  "clips": [
+    {
+      "decoderWarnings": "[opus @ 0x774c1c700] Error parsing Opus packet header.",
+      "durationDiscrepancySeconds": -0.07868480725623606,
+      "kind": "trench",
+      "rawDecodedFrames": 492480,
+      "rawContextWindowSeconds": 10.338684807256236,
+      "expectedFramesAt48000": 496256.87074829935,
+      "residualFrames": -3776.8707482993486,
+      "wallWindowSeconds": 10.336700000047683,
+      "wallExpectedFramesAt48000": 496161.6000022888,
+      "wallResidualFrames": -3681.6000022888184,
+      "trimOffsetSeconds": 0,
+      "trimStartFrame": 0,
+      "roundingSeconds": 0.0,
+      "clipSeconds": 10,
+      "clipFrames": 480000,
+      "clipExpectedFrames": 480000,
+      "clipResidual": 0,
+      "peak": 0.280029296875,
+      "rms": 0.05410520335665201,
+      "startOccupied": true,
+      "stopOccupied": true
+    },
+    {
+      "decoderWarnings": "[opus @ 0x9ff03c700] Error parsing Opus packet header.",
+      "durationDiscrepancySeconds": -0.187709750566885,
+      "kind": "launch",
+      "rawDecodedFrames": 1103040,
+      "rawContextWindowSeconds": 23.167709750566885,
+      "expectedFramesAt48000": 1112050.0680272104,
+      "residualFrames": -9010.068027210422,
+      "wallWindowSeconds": 23.166700000047683,
+      "wallExpectedFramesAt48000": 1112001.6000022888,
+      "wallResidualFrames": -8961.600002288818,
+      "trimOffsetSeconds": 1.9562811791383155,
+      "trimStartFrame": 93901,
+      "roundingSeconds": -1.0345804982048179e-05,
+      "clipSeconds": 20,
+      "clipFrames": 960000,
+      "clipExpectedFrames": 960000,
+      "clipResidual": 0,
+      "peak": 0.24847412109375,
+      "rms": 0.042538583184659216,
+      "startOccupied": false,
+      "stopOccupied": false
+    }
+  ],
+  "launchArrival": {
+    "id": "pressure-arrival",
+    "cue": "launch",
+    "tick": 8339,
+    "contextTime": 73.5027664399093,
+    "distance": 243.3946644442399,
+    "delaySeconds": 0.7166666666666667,
+    "expectedDelaySeconds": 0.7096054356974925,
+    "residualSeconds": 0.007061230969174215
+  },
+  "musicDuck": {
+    "ticks": 480,
+    "rate": 120,
+    "seconds": 4,
+    "residualTicks": 0
+  }
+}

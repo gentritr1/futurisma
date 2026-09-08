@@ -1,3 +1,4 @@
+import type {AscensionSoundGraph} from './ascension-sound-graph';
 import * as THREE from "three";
 import {
   advanceFixedRateDeadline,
@@ -363,6 +364,19 @@ export class EngineAudio {
   /** The live music duck, so `setMusicVolume` composes with it rather than
    * cancelling it mid-line. 1 whenever no line is playing. */
   private radioMusicScale = 1;
+  private launchMusicScale = 1;
+  private ascensionEnabled = false;
+  ascensionSound: AscensionSoundGraph | null = null;
+  async enableAscension(): Promise<void> { this.ascensionEnabled=true; await this.ensureAscensionSound(); }
+  private async ensureAscensionSound(): Promise<void> {
+    if(!this.ascensionEnabled||!this.context||!this.otherBus)return;
+    if(!this.ascensionSound){const {AscensionSoundGraph}=await import('./ascension-sound-graph');
+    if(!this.ascensionSound)this.ascensionSound=new AscensionSoundGraph(this.context,this.otherBus,scale=>{
+      this.launchMusicScale=scale;
+      this.musicBus?.gain.setTargetAtTime(this.musicVolume*this.radioMusicScale*scale,this.context!.currentTime,.025);
+    },resolveVoiceEnabled);}
+    await this.ascensionSound.ready;
+  }
 
   constructor() {
     const preparationStartedAt = performance.now();
@@ -375,6 +389,7 @@ export class EngineAudio {
   async start(): Promise<void> {
     if (this.context) {
       await this.context.resume();
+      await this.ensureAscensionSound();
       return;
     }
 
@@ -485,6 +500,7 @@ export class EngineAudio {
     // nothing more. The pit radio's 330 KB of clips stay un-awaited for exactly
     // the opposite reason.
     this.soundtrack = new SoundtrackPlayer(context, musicBus, window.location.search);
+    await this.ensureAscensionSound();
     await this.soundtrack.start();
     this.stemsHeld = this.soundtrack.holdsStems();
     this.diagnosticInitializationMs = performance.now() - initializationStartedAt;
@@ -507,7 +523,7 @@ export class EngineAudio {
     const now = this.context.currentTime;
     this.radioMusicScale = musicScale;
     this.musicBus?.gain.setTargetAtTime(
-      this.musicVolume * musicScale,
+      this.musicVolume * musicScale * this.launchMusicScale,
       now,
       RADIO_DUCK_SECONDS,
     );
@@ -947,7 +963,7 @@ export class EngineAudio {
     // H2b — the product, not the setting. Moving the slider while a radio line
     // is playing would otherwise undo the duck for the rest of the sentence.
     this.musicBus.gain.setTargetAtTime(
-      this.musicVolume * this.radioMusicScale,
+      this.musicVolume * this.radioMusicScale * this.launchMusicScale,
       this.context.currentTime,
       0.045,
     );
@@ -1108,6 +1124,7 @@ export class EngineAudio {
   }
 
   dispose(): void {
+    this.ascensionSound?.dispose();this.ascensionSound=null;this.launchMusicScale=1;
     for (const source of this.persistentSources) {
       try {
         source.stop();

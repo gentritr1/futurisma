@@ -1,0 +1,46 @@
+{
+  "script": "scripts/validate-ascension-audio.mjs",
+  "scope": "Pure cue decisions with a fake audio graph. This validates schedule/distance logic, not audible output. The separate live audio capture tests the real graph.",
+  "results": [
+    {
+      "distance": 343,
+      "launch": {
+        "id": "pressure-arrival",
+        "cue": "launch",
+        "tick": 8373,
+        "contextTime": 69.775,
+        "distance": 343,
+        "delaySeconds": 1,
+        "expectedDelaySeconds": 1,
+        "residualSeconds": 0
+      },
+      "duckTicks": 480,
+      "duckSeconds": 4,
+      "windowSeconds": 73.775,
+      "rateHz": 120,
+      "expectedSamples": 8854,
+      "observedSamples": 8854,
+      "residual": 0
+    },
+    {
+      "distance": 686,
+      "launch": {
+        "id": "pressure-arrival",
+        "cue": "launch",
+        "tick": 8493,
+        "contextTime": 70.775,
+        "distance": 686,
+        "delaySeconds": 2,
+        "expectedDelaySeconds": 2,
+        "residualSeconds": 0
+      },
+      "duckTicks": 480,
+      "duckSeconds": 4,
+      "windowSeconds": 73.775,
+      "rateHz": 120,
+      "expectedSamples": 8854,
+      "observedSamples": 8854,
+      "residual": 0
+    }
+  ]
+}

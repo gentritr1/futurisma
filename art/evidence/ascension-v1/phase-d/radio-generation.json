@@ -1,0 +1,41 @@
+{
+  "script": "scripts/build-ascension-radio.py",
+  "records": [
+    {
+      "id": "minus-sixty",
+      "prompt": "T minus sixty. Launch day.",
+      "engine": "macOS say / Samantha / 165 words per minute",
+      "job_id": null,
+      "job_id_note": "Offline local synthesis has no service job ID.",
+      "file": "public/assets/ascension/audio/minus-sixty.wav",
+      "sha256": "1542222a7dc9c8b2a503b6105436d1129866935fee22f887228d9a65c5225268",
+      "sampleRate": 48000,
+      "sampleFrames": 96965,
+      "seconds": 2.0201041666666666
+    },
+    {
+      "id": "deluge-armed",
+      "prompt": "Deluge armed.",
+      "engine": "macOS say / Samantha / 165 words per minute",
+      "job_id": null,
+      "job_id_note": "Offline local synthesis has no service job ID.",
+      "file": "public/assets/ascension/audio/deluge-armed.wav",
+      "sha256": "cd776fe5c81addb3feb146572b32bb21d67ab7ec3c00d0a885afe8d8f8307e6d",
+      "sampleRate": 48000,
+      "sampleFrames": 39918,
+      "seconds": 0.831625
+    },
+    {
+      "id": "clear-trench",
+      "prompt": "Clear the trench. Take Deluge Road.",
+      "engine": "macOS say / Samantha / 165 words per minute",
+      "job_id": null,
+      "job_id_note": "Offline local synthesis has no service job ID.",
+      "file": "public/assets/ascension/audio/clear-trench.wav",
+      "sha256": "316cbe4c70077406c6576a76c0c3caf5d49c0bbd8f1732343c1fc20b085c8bdb",
+      "sampleRate": 48000,
+      "sampleFrames": 107464,
+      "seconds": 2.2388333333333335
+    }
+  ]
+}

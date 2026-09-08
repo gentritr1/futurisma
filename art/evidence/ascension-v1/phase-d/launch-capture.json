@@ -1,0 +1,1236 @@
+{
+  "script": "scripts/visual/ascension/audio-capture.mjs",
+  "scope": "Live game output tapped after the master compressor, including the shipped original Meridian Afterimage selected through the existing musictest option. Private imported recordings are not copied into evidence. No separate synthetic evidence soundtrack.",
+  "requestedSeconds": 23,
+  "soundtrack": {
+    "source": "track",
+    "title": "Futurisma · Meridian Afterimage",
+    "currentTime": 95.5,
+    "state": "playing",
+    "trackGain": 0.4
+  },
+  "timing": {
+    "wallSeconds": 23.166700000047683,
+    "audioContextSeconds": 23.167709750566885,
+    "encodingCallbackDelaySeconds": 0.20810000002384185,
+    "sampleRate": 44100,
+    "audioStart": 70.80344671201814,
+    "audioStop": 93.97115646258503,
+    "stopState": {
+      "script": "src/game/ascension-runtime.ts",
+      "audio": {
+        "script": "src/game/ascension-audio.ts",
+        "ducked": false,
+        "duckEvents": [
+          {
+            "tick": 8253,
+            "scale": 0.25
+          },
+          {
+            "tick": 8733,
+            "scale": 1
+          }
+        ],
+        "records": [
+          {
+            "id": "radio-sixty",
+            "cue": "minus-sixty",
+            "tick": 1053,
+            "contextTime": 12.579410430839003,
+            "distance": 0
+          },
+          {
+            "id": "crawler-klaxon-1",
+            "cue": "klaxon",
+            "tick": 1493,
+            "contextTime": 16.248163265306122,
+            "distance": 0
+          },
+          {
+            "id": "drip-2490",
+            "cue": "drip",
+            "tick": 2490,
+            "contextTime": 24.61315192743764,
+            "distance": 0
+          },
+          {
+            "id": "bird-lap-1",
+            "cue": "egrets",
+            "tick": 2655,
+            "contextTime": 25.994739229024944,
+            "distance": 0
+          },
+          {
+            "id": "radio-deluge",
+            "cue": "deluge-armed",
+            "tick": 3971,
+            "contextTime": 36.95455782312925,
+            "distance": 0
+          },
+          {
+            "id": "rehearsal",
+            "cue": "deluge",
+            "tick": 4211,
+            "contextTime": 38.95727891156463,
+            "distance": 0
+          },
+          {
+            "id": "drip-4570",
+            "cue": "drip",
+            "tick": 4570,
+            "contextTime": 42.00489795918367,
+            "distance": 0
+          },
+          {
+            "id": "crawler-klaxon-2",
+            "cue": "klaxon",
+            "tick": 5030,
+            "contextTime": 45.91165532879818,
+            "distance": 0
+          },
+          {
+            "id": "drip-6236",
+            "cue": "drip",
+            "tick": 6236,
+            "contextTime": 55.95428571428572,
+            "distance": 0
+          },
+          {
+            "id": "bird-lap-2",
+            "cue": "egrets",
+            "tick": 6404,
+            "contextTime": 57.35328798185941,
+            "distance": 0
+          },
+          {
+            "id": "radio-clear",
+            "cue": "clear-trench",
+            "tick": 7653,
+            "contextTime": 67.76743764172336,
+            "distance": 0
+          },
+          {
+            "id": "launch-deluge",
+            "cue": "deluge",
+            "tick": 8253,
+            "contextTime": 72.75972789115646,
+            "distance": 0
+          },
+          {
+            "id": "pressure-arrival",
+            "cue": "launch",
+            "tick": 8339,
+            "contextTime": 73.5027664399093,
+            "distance": 243.3946644442399,
+            "delaySeconds": 0.7166666666666667,
+            "expectedDelaySeconds": 0.7096054356974925,
+            "residualSeconds": 0.007061230969174215
+          },
+          {
+            "id": "launch-birds",
+            "cue": "egrets",
+            "tick": 8339,
+            "contextTime": 73.5027664399093,
+            "distance": 0
+          },
+          {
+            "id": "bird-lap-3",
+            "cue": "egrets",
+            "tick": 9983,
+            "contextTime": 87.20544217687075,
+            "distance": 0
+          }
+        ]
+      },
+      "egrets": {
+        "tick": 10789,
+        "risenLap": 3,
+        "riseTick": 9982,
+        "launched": true,
+        "launchAge": 21.133333333333333,
+        "firstBirdPosition": [
+          68.28207397460938,
+          91.02881622314453,
+          277.7879638671875
+        ]
+      },
+      "powers": {
+        "version": 1,
+        "configId": "ascension-pad-powers-v1",
+        "configHash": "d4c0eb88",
+        "seed": 3868938316,
+        "tick": 10790,
+        "lap": 3,
+        "progress": 0.8980069196641443,
+        "lateral": -6.447847338344486,
+        "lane": 0,
+        "fromLane": 0,
+        "flipStartTick": -126,
+        "nextFlipTick": 0,
+        "heldPower": null,
+        "heldCharge": 0,
+        "activePower": "surge",
+        "activeCharge": 1,
+        "powerStartTick": 10524,
+        "powerUntilTick": 11004,
+        "powerPerfect": true,
+        "collectedLaps": [
+          3,
+          0,
+          3,
+          0
+        ],
+        "usedWindowLaps": [],
+        "shieldRewardLaps": {},
+        "flips": 0,
+        "pickups": 5,
+        "powersUsed": 5,
+        "perfectActivations": 5,
+        "shieldAbsorptions": 0,
+        "upperTicks": 0,
+        "eventSequence": 10,
+        "events": [
+          {
+            "id": "ascension-pad-powers-v1:e69b504c:1",
+            "sequence": 1,
+            "tick": 374,
+            "type": "pickup",
+            "lap": 1,
+            "lane": 0,
+            "index": 0,
+            "kind": "surge",
+            "perfect": false,
+            "refund": 0
+          },
+          {
+            "id": "ascension-pad-powers-v1:e69b504c:2",
+            "sequence": 2,
+            "tick": 542,
+            "type": "power",
+            "lap": 1,
+            "lane": 0,
+            "index": -1,
+            "kind": "surge",
+            "perfect": true,
+            "refund": 0
+          },
+          {
+            "id": "ascension-pad-powers-v1:e69b504c:3",
+            "sequence": 3,
+            "tick": 4178,
+            "type": "pickup",
+            "lap": 2,
+            "lane": 0,
+            "index": 0,
+            "kind": "surge",
+            "perfect": false,
+            "refund": 0
+          },
+          {
+            "id": "ascension-pad-powers-v1:e69b504c:4",
+            "sequence": 4,
+            "tick": 4303,
+            "type": "power",
+            "lap": 2,
+            "lane": 0,
+            "index": -1,
+            "kind": "surge",
+            "perfect": true,
+            "refund": 0
+          },
+          {
+            "id": "ascension-pad-powers-v1:e69b504c:5",
+            "sequence": 5,
+            "tick": 6867,
+            "type": "pickup",
+            "lap": 2,
+            "lane": 0,
+            "index": 2,
+            "kind": "surge",
+            "perfect": false,
+            "refund": 0
+          },
+          {
+            "id": "ascension-pad-powers-v1:e69b504c:6",
+            "sequence": 6,
+            "tick": 6940,
+            "type": "power",
+            "lap": 2,
+            "lane": 0,
+            "index": -1,
+            "kind": "surge",
+            "perfect": true,
+            "refund": 0
+          },
+          {
+            "id": "ascension-pad-powers-v1:e69b504c:7",
+            "sequence": 7,
+            "tick": 7763,
+            "type": "pickup",
+            "lap": 3,
+            "lane": 0,
+            "index": 0,
+            "kind": "surge",
+            "perfect": false,
+            "refund": 0
+          },
+          {
+            "id": "ascension-pad-powers-v1:e69b504c:8",
+            "sequence": 8,
+            "tick": 7887,
+            "type": "power",
+            "lap": 3,
+            "lane": 0,
+            "index": -1,
+            "kind": "surge",
+            "perfect": true,
+            "refund": 0
+          },
+          {
+            "id": "ascension-pad-powers-v1:e69b504c:9",
+            "sequence": 9,
+            "tick": 10451,
+            "type": "pickup",
+            "lap": 3,
+            "lane": 0,
+            "index": 2,
+            "kind": "surge",
+            "perfect": false,
+            "refund": 0
+          },
+          {
+            "id": "ascension-pad-powers-v1:e69b504c:10",
+            "sequence": 10,
+            "tick": 10524,
+            "type": "power",
+            "lap": 3,
+            "lane": 0,
+            "index": -1,
+            "kind": "surge",
+            "perfect": true,
+            "refund": 0
+          }
+        ]
+      },
+      "chains": [],
+      "seed": 3868938316,
+      "tick": 10790,
+      "progress": 0.8983413989218443,
+      "sector": "TANK FARM",
+      "effects": {
+        "launchAge": 21.133333333333333,
+        "pad": [
+          231.0088653564453,
+          4,
+          -125.9814453125
+        ],
+        "smokeTop": 894,
+        "cloudGlow": 0,
+        "tick": 10789,
+        "reducedMotion": false,
+        "crawlerPosition": [
+          6.681713104248047,
+          17,
+          330.3438720703125
+        ],
+        "treadTravel": 0,
+        "rocketHeight": 1200,
+        "rocketVisible": false,
+        "steamVisible": false,
+        "smokeVisible": true,
+        "delugeVisible": false,
+        "floodVisible": true,
+        "lampScale": 1,
+        "klaxon": false
+      },
+      "trenchOccupied": false,
+      "schedule": {
+        "script": "scripts/build-ascension-route.mjs",
+        "measurementScript": "scripts/visual/ascension/race.mjs",
+        "measurement": "art/evidence/ascension-v1/phase-a/calibration/works-trench.json",
+        "worksLapSeconds": 28.0705,
+        "definition": "Mean of flying laps two and three in the full Works demo before schedule activation",
+        "launchTick": 8253,
+        "reopenTick": 10653,
+        "steamEndTick": 9937,
+        "rocketGoneTick": 9095,
+        "testTick": 4211,
+        "events": [
+          {
+            "id": "crawler-klaxon-1",
+            "tick": 1493
+          },
+          {
+            "id": "crawler-cross-1",
+            "tick": 1853
+          },
+          {
+            "id": "deluge-test",
+            "tick": 4211
+          },
+          {
+            "id": "crawler-klaxon-2",
+            "tick": 5030
+          },
+          {
+            "id": "crawler-cross-2",
+            "tick": 5390
+          },
+          {
+            "id": "launch",
+            "tick": 8253
+          },
+          {
+            "id": "rocket-gone",
+            "tick": 9095
+          },
+          {
+            "id": "steam-clear",
+            "tick": 9937
+          },
+          {
+            "id": "trench-reopen",
+            "tick": 10653
+          }
+        ]
+      },
+      "state": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": true,
+        "rocketGone": true,
+        "deluge": false
+      },
+      "events": [
+        {
+          "id": "crawler-klaxon-1",
+          "tick": 1493,
+          "sequence": 1
+        },
+        {
+          "id": "crawler-cross-1",
+          "tick": 1853,
+          "sequence": 2
+        },
+        {
+          "id": "deluge-test",
+          "tick": 4211,
+          "sequence": 3
+        },
+        {
+          "id": "crawler-klaxon-2",
+          "tick": 5030,
+          "sequence": 4
+        },
+        {
+          "id": "crawler-cross-2",
+          "tick": 5390,
+          "sequence": 5
+        },
+        {
+          "id": "launch",
+          "tick": 8253,
+          "sequence": 6
+        },
+        {
+          "id": "rocket-gone",
+          "tick": 9095,
+          "sequence": 7
+        },
+        {
+          "id": "steam-clear",
+          "tick": 9937,
+          "sequence": 8
+        },
+        {
+          "id": "trench-reopen",
+          "tick": 10653,
+          "sequence": 9
+        }
+      ]
+    }
+  },
+  "start": {
+    "script": "src/game/ascension-runtime.ts",
+    "audio": {
+      "script": "src/game/ascension-audio.ts",
+      "ducked": false,
+      "duckEvents": [],
+      "records": [
+        {
+          "id": "radio-sixty",
+          "cue": "minus-sixty",
+          "tick": 1053,
+          "contextTime": 12.579410430839003,
+          "distance": 0
+        },
+        {
+          "id": "crawler-klaxon-1",
+          "cue": "klaxon",
+          "tick": 1493,
+          "contextTime": 16.248163265306122,
+          "distance": 0
+        },
+        {
+          "id": "drip-2490",
+          "cue": "drip",
+          "tick": 2490,
+          "contextTime": 24.61315192743764,
+          "distance": 0
+        },
+        {
+          "id": "bird-lap-1",
+          "cue": "egrets",
+          "tick": 2655,
+          "contextTime": 25.994739229024944,
+          "distance": 0
+        },
+        {
+          "id": "radio-deluge",
+          "cue": "deluge-armed",
+          "tick": 3971,
+          "contextTime": 36.95455782312925,
+          "distance": 0
+        },
+        {
+          "id": "rehearsal",
+          "cue": "deluge",
+          "tick": 4211,
+          "contextTime": 38.95727891156463,
+          "distance": 0
+        },
+        {
+          "id": "drip-4570",
+          "cue": "drip",
+          "tick": 4570,
+          "contextTime": 42.00489795918367,
+          "distance": 0
+        },
+        {
+          "id": "crawler-klaxon-2",
+          "cue": "klaxon",
+          "tick": 5030,
+          "contextTime": 45.91165532879818,
+          "distance": 0
+        },
+        {
+          "id": "drip-6236",
+          "cue": "drip",
+          "tick": 6236,
+          "contextTime": 55.95428571428572,
+          "distance": 0
+        },
+        {
+          "id": "bird-lap-2",
+          "cue": "egrets",
+          "tick": 6404,
+          "contextTime": 57.35328798185941,
+          "distance": 0
+        },
+        {
+          "id": "radio-clear",
+          "cue": "clear-trench",
+          "tick": 7653,
+          "contextTime": 67.76743764172336,
+          "distance": 0
+        }
+      ]
+    },
+    "egrets": {
+      "tick": 8016,
+      "risenLap": 2,
+      "riseTick": 6402,
+      "launched": false,
+      "launchAge": 0,
+      "firstBirdPosition": [
+        -111.78351593017578,
+        11.080231666564941,
+        277.7879638671875
+      ]
+    },
+    "powers": {
+      "version": 1,
+      "configId": "ascension-pad-powers-v1",
+      "configHash": "d4c0eb88",
+      "seed": 3868938316,
+      "tick": 8017,
+      "lap": 3,
+      "progress": 0.11494546398406258,
+      "lateral": -2.596925245801775,
+      "lane": 0,
+      "fromLane": 0,
+      "flipStartTick": -126,
+      "nextFlipTick": 0,
+      "heldPower": null,
+      "heldCharge": 0,
+      "activePower": "surge",
+      "activeCharge": 1,
+      "powerStartTick": 7887,
+      "powerUntilTick": 8367,
+      "powerPerfect": true,
+      "collectedLaps": [
+        3,
+        0,
+        2,
+        0
+      ],
+      "usedWindowLaps": [],
+      "shieldRewardLaps": {},
+      "flips": 0,
+      "pickups": 4,
+      "powersUsed": 4,
+      "perfectActivations": 4,
+      "shieldAbsorptions": 0,
+      "upperTicks": 0,
+      "eventSequence": 8,
+      "events": [
+        {
+          "id": "ascension-pad-powers-v1:e69b504c:1",
+          "sequence": 1,
+          "tick": 374,
+          "type": "pickup",
+          "lap": 1,
+          "lane": 0,
+          "index": 0,
+          "kind": "surge",
+          "perfect": false,
+          "refund": 0
+        },
+        {
+          "id": "ascension-pad-powers-v1:e69b504c:2",
+          "sequence": 2,
+          "tick": 542,
+          "type": "power",
+          "lap": 1,
+          "lane": 0,
+          "index": -1,
+          "kind": "surge",
+          "perfect": true,
+          "refund": 0
+        },
+        {
+          "id": "ascension-pad-powers-v1:e69b504c:3",
+          "sequence": 3,
+          "tick": 4178,
+          "type": "pickup",
+          "lap": 2,
+          "lane": 0,
+          "index": 0,
+          "kind": "surge",
+          "perfect": false,
+          "refund": 0
+        },
+        {
+          "id": "ascension-pad-powers-v1:e69b504c:4",
+          "sequence": 4,
+          "tick": 4303,
+          "type": "power",
+          "lap": 2,
+          "lane": 0,
+          "index": -1,
+          "kind": "surge",
+          "perfect": true,
+          "refund": 0
+        },
+        {
+          "id": "ascension-pad-powers-v1:e69b504c:5",
+          "sequence": 5,
+          "tick": 6867,
+          "type": "pickup",
+          "lap": 2,
+          "lane": 0,
+          "index": 2,
+          "kind": "surge",
+          "perfect": false,
+          "refund": 0
+        },
+        {
+          "id": "ascension-pad-powers-v1:e69b504c:6",
+          "sequence": 6,
+          "tick": 6940,
+          "type": "power",
+          "lap": 2,
+          "lane": 0,
+          "index": -1,
+          "kind": "surge",
+          "perfect": true,
+          "refund": 0
+        },
+        {
+          "id": "ascension-pad-powers-v1:e69b504c:7",
+          "sequence": 7,
+          "tick": 7763,
+          "type": "pickup",
+          "lap": 3,
+          "lane": 0,
+          "index": 0,
+          "kind": "surge",
+          "perfect": false,
+          "refund": 0
+        },
+        {
+          "id": "ascension-pad-powers-v1:e69b504c:8",
+          "sequence": 8,
+          "tick": 7887,
+          "type": "power",
+          "lap": 3,
+          "lane": 0,
+          "index": -1,
+          "kind": "surge",
+          "perfect": true,
+          "refund": 0
+        }
+      ]
+    },
+    "chains": [],
+    "seed": 3868938316,
+    "tick": 8017,
+    "progress": 0.11527192557004229,
+    "sector": "APRON SWEEP",
+    "effects": {
+      "launchAge": 0,
+      "pad": [
+        231.0088653564453,
+        4,
+        -125.9814453125
+      ],
+      "smokeTop": 20,
+      "cloudGlow": 0,
+      "tick": 8016,
+      "reducedMotion": false,
+      "crawlerPosition": [
+        6.681713104248047,
+        17,
+        330.3438720703125
+      ],
+      "treadTravel": 0,
+      "rocketHeight": 0,
+      "rocketVisible": true,
+      "steamVisible": false,
+      "smokeVisible": false,
+      "delugeVisible": false,
+      "floodVisible": false,
+      "lampScale": 1,
+      "klaxon": false
+    },
+    "trenchOccupied": false,
+    "schedule": {
+      "script": "scripts/build-ascension-route.mjs",
+      "measurementScript": "scripts/visual/ascension/race.mjs",
+      "measurement": "art/evidence/ascension-v1/phase-a/calibration/works-trench.json",
+      "worksLapSeconds": 28.0705,
+      "definition": "Mean of flying laps two and three in the full Works demo before schedule activation",
+      "launchTick": 8253,
+      "reopenTick": 10653,
+      "steamEndTick": 9937,
+      "rocketGoneTick": 9095,
+      "testTick": 4211,
+      "events": [
+        {
+          "id": "crawler-klaxon-1",
+          "tick": 1493
+        },
+        {
+          "id": "crawler-cross-1",
+          "tick": 1853
+        },
+        {
+          "id": "deluge-test",
+          "tick": 4211
+        },
+        {
+          "id": "crawler-klaxon-2",
+          "tick": 5030
+        },
+        {
+          "id": "crawler-cross-2",
+          "tick": 5390
+        },
+        {
+          "id": "launch",
+          "tick": 8253
+        },
+        {
+          "id": "rocket-gone",
+          "tick": 9095
+        },
+        {
+          "id": "steam-clear",
+          "tick": 9937
+        },
+        {
+          "id": "trench-reopen",
+          "tick": 10653
+        }
+      ]
+    },
+    "state": {
+      "trenchOpen": true,
+      "steam": false,
+      "launched": false,
+      "rocketGone": false,
+      "deluge": false
+    },
+    "events": [
+      {
+        "id": "crawler-klaxon-1",
+        "tick": 1493,
+        "sequence": 1
+      },
+      {
+        "id": "crawler-cross-1",
+        "tick": 1853,
+        "sequence": 2
+      },
+      {
+        "id": "deluge-test",
+        "tick": 4211,
+        "sequence": 3
+      },
+      {
+        "id": "crawler-klaxon-2",
+        "tick": 5030,
+        "sequence": 4
+      },
+      {
+        "id": "crawler-cross-2",
+        "tick": 5390,
+        "sequence": 5
+      }
+    ]
+  },
+  "finish": {
+    "script": "src/game/ascension-runtime.ts",
+    "audio": {
+      "script": "src/game/ascension-audio.ts",
+      "ducked": false,
+      "duckEvents": [
+        {
+          "tick": 8253,
+          "scale": 0.25
+        },
+        {
+          "tick": 8733,
+          "scale": 1
+        }
+      ],
+      "records": [
+        {
+          "id": "radio-sixty",
+          "cue": "minus-sixty",
+          "tick": 1053,
+          "contextTime": 12.579410430839003,
+          "distance": 0
+        },
+        {
+          "id": "crawler-klaxon-1",
+          "cue": "klaxon",
+          "tick": 1493,
+          "contextTime": 16.248163265306122,
+          "distance": 0
+        },
+        {
+          "id": "drip-2490",
+          "cue": "drip",
+          "tick": 2490,
+          "contextTime": 24.61315192743764,
+          "distance": 0
+        },
+        {
+          "id": "bird-lap-1",
+          "cue": "egrets",
+          "tick": 2655,
+          "contextTime": 25.994739229024944,
+          "distance": 0
+        },
+        {
+          "id": "radio-deluge",
+          "cue": "deluge-armed",
+          "tick": 3971,
+          "contextTime": 36.95455782312925,
+          "distance": 0
+        },
+        {
+          "id": "rehearsal",
+          "cue": "deluge",
+          "tick": 4211,
+          "contextTime": 38.95727891156463,
+          "distance": 0
+        },
+        {
+          "id": "drip-4570",
+          "cue": "drip",
+          "tick": 4570,
+          "contextTime": 42.00489795918367,
+          "distance": 0
+        },
+        {
+          "id": "crawler-klaxon-2",
+          "cue": "klaxon",
+          "tick": 5030,
+          "contextTime": 45.91165532879818,
+          "distance": 0
+        },
+        {
+          "id": "drip-6236",
+          "cue": "drip",
+          "tick": 6236,
+          "contextTime": 55.95428571428572,
+          "distance": 0
+        },
+        {
+          "id": "bird-lap-2",
+          "cue": "egrets",
+          "tick": 6404,
+          "contextTime": 57.35328798185941,
+          "distance": 0
+        },
+        {
+          "id": "radio-clear",
+          "cue": "clear-trench",
+          "tick": 7653,
+          "contextTime": 67.76743764172336,
+          "distance": 0
+        },
+        {
+          "id": "launch-deluge",
+          "cue": "deluge",
+          "tick": 8253,
+          "contextTime": 72.75972789115646,
+          "distance": 0
+        },
+        {
+          "id": "pressure-arrival",
+          "cue": "launch",
+          "tick": 8339,
+          "contextTime": 73.5027664399093,
+          "distance": 243.3946644442399,
+          "delaySeconds": 0.7166666666666667,
+          "expectedDelaySeconds": 0.7096054356974925,
+          "residualSeconds": 0.007061230969174215
+        },
+        {
+          "id": "launch-birds",
+          "cue": "egrets",
+          "tick": 8339,
+          "contextTime": 73.5027664399093,
+          "distance": 0
+        },
+        {
+          "id": "bird-lap-3",
+          "cue": "egrets",
+          "tick": 9983,
+          "contextTime": 87.20544217687075,
+          "distance": 0
+        }
+      ]
+    },
+    "egrets": {
+      "tick": 10965,
+      "risenLap": 3,
+      "riseTick": 9982,
+      "launched": true,
+      "launchAge": 22.6,
+      "firstBirdPosition": [
+        68.00794982910156,
+        91.30740356445312,
+        277.7879638671875
+      ]
+    },
+    "powers": {
+      "version": 1,
+      "configId": "ascension-pad-powers-v1",
+      "configHash": "d4c0eb88",
+      "seed": 3868938316,
+      "tick": 10966,
+      "lap": 3,
+      "progress": 0.9433120204739436,
+      "lateral": -1.9816717029644018,
+      "lane": 0,
+      "fromLane": 0,
+      "flipStartTick": -126,
+      "nextFlipTick": 0,
+      "heldPower": null,
+      "heldCharge": 0,
+      "activePower": "surge",
+      "activeCharge": 1,
+      "powerStartTick": 10524,
+      "powerUntilTick": 11004,
+      "powerPerfect": true,
+      "collectedLaps": [
+        3,
+        0,
+        3,
+        0
+      ],
+      "usedWindowLaps": [],
+      "shieldRewardLaps": {},
+      "flips": 0,
+      "pickups": 5,
+      "powersUsed": 5,
+      "perfectActivations": 5,
+      "shieldAbsorptions": 0,
+      "upperTicks": 0,
+      "eventSequence": 10,
+      "events": [
+        {
+          "id": "ascension-pad-powers-v1:e69b504c:1",
+          "sequence": 1,
+          "tick": 374,
+          "type": "pickup",
+          "lap": 1,
+          "lane": 0,
+          "index": 0,
+          "kind": "surge",
+          "perfect": false,
+          "refund": 0
+        },
+        {
+          "id": "ascension-pad-powers-v1:e69b504c:2",
+          "sequence": 2,
+          "tick": 542,
+          "type": "power",
+          "lap": 1,
+          "lane": 0,
+          "index": -1,
+          "kind": "surge",
+          "perfect": true,
+          "refund": 0
+        },
+        {
+          "id": "ascension-pad-powers-v1:e69b504c:3",
+          "sequence": 3,
+          "tick": 4178,
+          "type": "pickup",
+          "lap": 2,
+          "lane": 0,
+          "index": 0,
+          "kind": "surge",
+          "perfect": false,
+          "refund": 0
+        },
+        {
+          "id": "ascension-pad-powers-v1:e69b504c:4",
+          "sequence": 4,
+          "tick": 4303,
+          "type": "power",
+          "lap": 2,
+          "lane": 0,
+          "index": -1,
+          "kind": "surge",
+          "perfect": true,
+          "refund": 0
+        },
+        {
+          "id": "ascension-pad-powers-v1:e69b504c:5",
+          "sequence": 5,
+          "tick": 6867,
+          "type": "pickup",
+          "lap": 2,
+          "lane": 0,
+          "index": 2,
+          "kind": "surge",
+          "perfect": false,
+          "refund": 0
+        },
+        {
+          "id": "ascension-pad-powers-v1:e69b504c:6",
+          "sequence": 6,
+          "tick": 6940,
+          "type": "power",
+          "lap": 2,
+          "lane": 0,
+          "index": -1,
+          "kind": "surge",
+          "perfect": true,
+          "refund": 0
+        },
+        {
+          "id": "ascension-pad-powers-v1:e69b504c:7",
+          "sequence": 7,
+          "tick": 7763,
+          "type": "pickup",
+          "lap": 3,
+          "lane": 0,
+          "index": 0,
+          "kind": "surge",
+          "perfect": false,
+          "refund": 0
+        },
+        {
+          "id": "ascension-pad-powers-v1:e69b504c:8",
+          "sequence": 8,
+          "tick": 7887,
+          "type": "power",
+          "lap": 3,
+          "lane": 0,
+          "index": -1,
+          "kind": "surge",
+          "perfect": true,
+          "refund": 0
+        },
+        {
+          "id": "ascension-pad-powers-v1:e69b504c:9",
+          "sequence": 9,
+          "tick": 10451,
+          "type": "pickup",
+          "lap": 3,
+          "lane": 0,
+          "index": 2,
+          "kind": "surge",
+          "perfect": false,
+          "refund": 0
+        },
+        {
+          "id": "ascension-pad-powers-v1:e69b504c:10",
+          "sequence": 10,
+          "tick": 10524,
+          "type": "power",
+          "lap": 3,
+          "lane": 0,
+          "index": -1,
+          "kind": "surge",
+          "perfect": true,
+          "refund": 0
+        }
+      ]
+    },
+    "chains": [],
+    "seed": 3868938316,
+    "tick": 10966,
+    "progress": 0.9435498924927588,
+    "sector": "TANK FARM",
+    "effects": {
+      "launchAge": 22.6,
+      "pad": [
+        231.0088653564453,
+        4,
+        -125.9814453125
+      ],
+      "smokeTop": 894,
+      "cloudGlow": 0,
+      "tick": 10965,
+      "reducedMotion": false,
+      "crawlerPosition": [
+        6.681713104248047,
+        17,
+        330.3438720703125
+      ],
+      "treadTravel": 0,
+      "rocketHeight": 1200,
+      "rocketVisible": false,
+      "steamVisible": false,
+      "smokeVisible": true,
+      "delugeVisible": false,
+      "floodVisible": true,
+      "lampScale": 1,
+      "klaxon": false
+    },
+    "trenchOccupied": false,
+    "schedule": {
+      "script": "scripts/build-ascension-route.mjs",
+      "measurementScript": "scripts/visual/ascension/race.mjs",
+      "measurement": "art/evidence/ascension-v1/phase-a/calibration/works-trench.json",
+      "worksLapSeconds": 28.0705,
+      "definition": "Mean of flying laps two and three in the full Works demo before schedule activation",
+      "launchTick": 8253,
+      "reopenTick": 10653,
+      "steamEndTick": 9937,
+      "rocketGoneTick": 9095,
+      "testTick": 4211,
+      "events": [
+        {
+          "id": "crawler-klaxon-1",
+          "tick": 1493
+        },
+        {
+          "id": "crawler-cross-1",
+          "tick": 1853
+        },
+        {
+          "id": "deluge-test",
+          "tick": 4211
+        },
+        {
+          "id": "crawler-klaxon-2",
+          "tick": 5030
+        },
+        {
+          "id": "crawler-cross-2",
+          "tick": 5390
+        },
+        {
+          "id": "launch",
+          "tick": 8253
+        },
+        {
+          "id": "rocket-gone",
+          "tick": 9095
+        },
+        {
+          "id": "steam-clear",
+          "tick": 9937
+        },
+        {
+          "id": "trench-reopen",
+          "tick": 10653
+        }
+      ]
+    },
+    "state": {
+      "trenchOpen": true,
+      "steam": false,
+      "launched": true,
+      "rocketGone": true,
+      "deluge": false
+    },
+    "events": [
+      {
+        "id": "crawler-klaxon-1",
+        "tick": 1493,
+        "sequence": 1
+      },
+      {
+        "id": "crawler-cross-1",
+        "tick": 1853,
+        "sequence": 2
+      },
+      {
+        "id": "deluge-test",
+        "tick": 4211,
+        "sequence": 3
+      },
+      {
+        "id": "crawler-klaxon-2",
+        "tick": 5030,
+        "sequence": 4
+      },
+      {
+        "id": "crawler-cross-2",
+        "tick": 5390,
+        "sequence": 5
+      },
+      {
+        "id": "launch",
+        "tick": 8253,
+        "sequence": 6
+      },
+      {
+        "id": "rocket-gone",
+        "tick": 9095,
+        "sequence": 7
+      },
+      {
+        "id": "steam-clear",
+        "tick": 9937,
+        "sequence": 8
+      },
+      {
+        "id": "trench-reopen",
+        "tick": 10653,
+        "sequence": 9
+      }
+    ]
+  },
+  "errors": []
+}

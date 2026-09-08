@@ -1,3 +1,4 @@
+import {AscensionAudio} from './ascension-audio';
 import {AscensionPowers} from './ascension-powers';
 import type {EngineAudio} from './audio';
 import type {GameUi} from './ui';
@@ -18,6 +19,7 @@ export class AscensionRuntime implements CircuitRuntime {
  get surgeActive(){return this.powers.simulation.surgeActive;}
  get shieldActive(){return this.powers.simulation.shieldActive;}
  private remainder=0;
+ private readonly sound?:AscensionAudio;
  readonly signals:AscensionRoadSignals;
  private readonly reducedMotion=new URLSearchParams(location.search).get('motion')==='reduce';
  private readonly boards: {root:THREE.Group;canvas:HTMLCanvasElement;texture:THREE.CanvasTexture}[]=[];
@@ -27,7 +29,7 @@ export class AscensionRuntime implements CircuitRuntime {
  private readonly output=document.createElement('output');
  constructor(readonly course:AscensionCourse,private readonly input:InputController,audio?:EngineAudio,ui?:GameUi){
   this.signals=new AscensionRoadSignals(course);course.group.add(this.signals.root);
-  this.powers=new AscensionPowers(course,this.signals,audio,ui);
+  this.powers=new AscensionPowers(course,this.signals,audio,ui);if(audio)this.sound=new AscensionAudio(audio);
   input.setPowerControls(true);document.getElementById('polarity-hud')!.hidden=false;this.output.id='ascension-diagnostics';this.output.hidden=true;document.body.append(this.output);
   const entrance=course.sampleShortcut(course.shortcut.from+(course.shortcut.to-course.shortcut.from)*.025);
   this.entryRail=new THREE.Mesh(new THREE.BoxGeometry(20,.7,.3),new THREE.MeshLambertMaterial({color:0xd2a345,map:new THREE.TextureLoader().load('/assets/ascension/textures/signage.jpg')}));
@@ -65,7 +67,7 @@ export class AscensionRuntime implements CircuitRuntime {
    for(const [geometry,parts] of instances){const batch=new THREE.InstancedMesh(geometry,parts[0].material,parts.length);batch.name='ascension_authored_board_'+parts[0].name;parts.forEach((part,i)=>{batch.setMatrixAt(i,part.matrixWorld);part.removeFromParent();});this.boardHardware.add(batch);}
 
   });
-  this.ready=Promise.all([hardwareReady,this.powers.ready]).then(()=>undefined);
+  this.ready=Promise.all([hardwareReady,this.powers.ready,this.sound?.ready]).then(()=>undefined);
  }
  handleActions(_running:boolean,_progress:number,_position:THREE.Vector3,_lateral:number,_demo:boolean){this.powers.handleActions(this.input.consumePower(),_running,_progress,_demo);return false;}
  step(delta:number,_progress:number,_lateral:number,lap:number){this.remainder+=delta*ABILITY_TICK_RATE;const ticks=Math.floor(this.remainder+1e-7);this.remainder-=ticks;this.course.setLapBoard(lap);this.course.advanceSchedule(ticks);this.powers.step(ticks,_progress,_lateral,lap);}
@@ -77,7 +79,7 @@ export class AscensionRuntime implements CircuitRuntime {
   this.entryRail.visible=true;this.entryRail.position.y=this.entryRail.userData.baseY+10*(1-lowering);
  }
  present(_sample:CourseProjection,_position:THREE.Vector3,_forward:THREE.Vector3,state:TotemVisualState){this.powers.present(state);state.gravitySign=1;state.gravityTransition=0;this.updateEntryRail();}
- updateCamera(camera:THREE.PerspectiveCamera,_delta:number,position:THREE.Vector3,forward:THREE.Vector3,_speed:number){camera.position.copy(position).addScaledVector(forward,-11.5);camera.position.y+=4.8;const look=position.clone().addScaledVector(forward,19);look.y+=1.15;camera.up.set(0,1,0);camera.lookAt(look);camera.fov=62;camera.updateProjectionMatrix();}
+ updateCamera(camera:THREE.PerspectiveCamera,_delta:number,position:THREE.Vector3,forward:THREE.Vector3,_speed:number){camera.position.copy(position).addScaledVector(forward,-11.5);camera.position.y+=4.8;const look=position.clone().addScaledVector(forward,19);look.y+=1.15;camera.up.set(0,1,0);camera.lookAt(look);camera.fov=62;camera.updateProjectionMatrix();this.sound?.update(this.course,camera);}
  updateHud(progress:number){
   this.updateEntryRail();
   this.signals.update(this.course.schedule.tick/ABILITY_TICK_RATE,this.reducedMotion,progress,this.powers.simulation.heldPowerKind==='surge',this.surgeActive);
@@ -90,10 +92,10 @@ export class AscensionRuntime implements CircuitRuntime {
    for(const b of this.boards){const ctx=b.canvas.getContext('2d')!;ctx.fillStyle='#263125';ctx.fillRect(0,0,1024,256);ctx.fillStyle='#ffda98';ctx.font='bold 140px monospace';ctx.textAlign='center';ctx.fillText(text,512,145);ctx.font='bold 55px monospace';ctx.fillText(clock.state.trenchOpen?'PAD 09 / TRENCH OPEN':'TRENCH CLOSED / DELUGE ROAD',512,226);b.texture.needsUpdate=true;}
    const line=document.getElementById('polarity-route');if(line)line.textContent=text+' / '+(clock.state.trenchOpen?'TRENCH OPEN':'TAKE DELUGE ROAD');
   }
-  this.output.textContent=JSON.stringify({script:'src/game/ascension-runtime.ts',egrets:this.course.group.userData.egrets,powers:this.powers.simulation.state,chains:this.powers.chain.events,seed:clock.seed,tick:clock.tick,progress,sector:this.course.sectorLabelAt(progress),effects:this.course.group.userData.eventState,trenchOccupied:this.course.trenchOccupied,schedule:config,state:clock.state,events:clock.events});
+  this.output.textContent=JSON.stringify({script:'src/game/ascension-runtime.ts',audio:this.sound?.diagnostics,egrets:this.course.group.userData.egrets,powers:this.powers.simulation.state,chains:this.powers.chain.events,seed:clock.seed,tick:clock.tick,progress,sector:this.course.sectorLabelAt(progress),effects:this.course.group.userData.eventState,trenchOccupied:this.course.trenchOccupied,schedule:config,state:clock.state,events:clock.events});
  }
  onShieldImpact(progress:number,lateral:number){return this.powers.absorb(progress,lateral);}
- recover(_progress:number){this.course.releaseTrench();this.powers.simulation.recover(_progress);}
+ recover(_progress:number){this.course.releaseTrench();this.powers.simulation.recover(_progress);this.powers.chain.absorbedAt=-10000;}
  reset(){this.powers.reset();this.lastSecond=undefined;this.remainder=0;this.course.resetSchedule();}
- dispose(){this.powers.dispose();this.signals.dispose();this.boardHardware.removeFromParent();this.boardHardware.traverse(o=>{if(o instanceof THREE.Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose();}});this.entryRail.removeFromParent();this.entryRail.geometry.dispose();(this.entryRail.material as THREE.Material).dispose();for(const b of this.boards){b.root.removeFromParent();b.texture.dispose();b.root.traverse(o=>{if(o instanceof THREE.Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose();}});}this.output.remove();}
+ dispose(){this.sound?.dispose();this.powers.dispose();this.signals.dispose();this.boardHardware.removeFromParent();this.boardHardware.traverse(o=>{if(o instanceof THREE.Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose();}});this.entryRail.removeFromParent();this.entryRail.geometry.dispose();(this.entryRail.material as THREE.Material).dispose();for(const b of this.boards){b.root.removeFromParent();b.texture.dispose();b.root.traverse(o=>{if(o instanceof THREE.Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose();}});}this.output.remove();}
 }
