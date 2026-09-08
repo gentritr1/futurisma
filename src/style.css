@@ -1977,6 +1977,21 @@ body[data-options="true"] .hud {
   transform: translateY(1px);
 }
 
+/*
+  The secondary buttons had no press state, so SYSTEM OPTIONS and QUIT felt
+  dead under the finger while LAUNCH did not. Same 1px dip as the primary, so
+  the panel answers a press the same way wherever you press it.
+*/
+.ghost-button:active {
+  transform: translateY(1px);
+}
+
+/* The quit button is already saying something while held; it should not also
+   be sinking. The fill is the feedback there. */
+.quit-button[data-holding="true"]:active {
+  transform: none;
+}
+
 @media (max-width: 700px) {
 
   .race-header {

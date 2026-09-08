@@ -418,6 +418,32 @@
             <output id="option-music-value" class="option__value">100</output>
           </div>
 
+          <!--
+            The two interface sizes. They apply LIVE - both are pure CSS scales
+            read off `<body>`, so nothing has to be rebuilt to honour them - and
+            they sit above the damping row because a driver who needs a bigger
+            HUD usually needs it before anything else on this panel.
+          -->
+          <div class="option option--choice">
+            <span class="option__key" id="option-hud-scale-label">HUD SCALE</span>
+            <div
+              id="option-hud-scale"
+              class="chip-row"
+              role="radiogroup"
+              aria-labelledby="option-hud-scale-label"
+            ></div>
+          </div>
+
+          <div class="option option--choice">
+            <span class="option__key" id="option-menu-scale-label">MENU TEXT</span>
+            <div
+              id="option-menu-scale"
+              class="chip-row"
+              role="radiogroup"
+              aria-labelledby="option-menu-scale-label"
+            ></div>
+          </div>
+
           <div class="option option--choice">
             <span class="option__key" id="option-motion-label">MOTION DAMPING</span>
             <div
@@ -459,7 +485,7 @@
           </div>
 
           <p id="options-note" class="options-note" data-pending="false">
-            LEVELS AND RADIO APPLY LIVE · DAMPING, RESOLUTION AND PIPELINE ON NEXT RELINK
+            LEVELS, RADIO AND INTERFACE SIZE APPLY LIVE · DAMPING, RESOLUTION AND PIPELINE ON NEXT RELINK
           </p>
 
           <button id="options-relink" class="launch-button" type="button" hidden>
