@@ -24,6 +24,15 @@ const arg = (name, fallback) => {
 const PORT = Number(arg("port", "5310"));
 const OUT = arg("out", "art/evidence/hud");
 const BASE = `http://127.0.0.1:${PORT}/`;
+/**
+ * Kept in step with `persistence.ts` by the assertion below rather than by
+ * hope: if the schema moves and this payload stops parsing, every capture lands
+ * on the default scale and the run fails loudly.
+ */
+const SCHEMA_VERSION = 5;
+const USER_STEP = { s: 0.88, m: 1, l: 1.2 };
+const viewportTerm = (height) =>
+  Math.min(1.35, Math.max(1, Math.sqrt(height / 720)));
 
 /** The two viewports the brief names, at a CSS pixel ratio of 1. */
 const VIEWPORTS = [
@@ -88,43 +97,64 @@ const run = async () => {
         });
         const page = await context.newPage();
         page.on("pageerror", (error) => errors.push(`${testCase.id}: ${error.message}`));
+        /*
+          The scale arrives as a STORED setting, the way it does for a returning
+          player. It has to be a payload `parseSave` accepts: the first run of
+          this script wrote one with no `schemaVersion`, the parser correctly
+          refused it, and every "L" capture was silently an "M". The assertion
+          after the settle is what makes that failure loud instead of quiet -
+          never trust the fixture, check the value the page actually computed.
+
+          (Reachability of the setting is proven separately, by clicking the
+          terminal rows in `options-interface.png`; the terminal cannot be
+          opened mid-race, and these cases are all mid-race.)
+        */
+        await page.addInitScript(
+          ({ value, schemaVersion }) => {
+            localStorage.setItem(
+              "futurisma.save.v1",
+              JSON.stringify({ schemaVersion, settings: { hudScale: value, menuScale: value } }),
+            );
+          },
+          { value: scale, schemaVersion: SCHEMA_VERSION },
+        );
         page.on("console", (message) => {
           if (message.type() === "error") errors.push(`${testCase.id}: ${message.text()}`);
         });
         await page.goto(BASE + testCase.query, { waitUntil: "load" });
 
-        // HUD SCALE is set THROUGH THE TERMINAL, the way a player sets it -
-        // writing the save file directly would prove the CSS works and nothing
-        // about whether the setting is reachable. `parseSave` rejects a payload
-        // with no schemaVersion, so a hand-written fixture silently lands on
-        // defaults, which is exactly how the first run of this capture reported
-        // a passing L that was really an M.
-        if (scale !== "m") {
-          await page.waitForSelector("#options-button", { timeout: 60000 });
-          await page.click("#options-button");
-          await page.waitForSelector("#option-hud-scale .chip", { timeout: 30000 });
-          await page.click(`#option-hud-scale .chip:nth-child(${scale === "s" ? 1 : 3})`);
-          await page.click(`#option-menu-scale .chip:nth-child(${scale === "s" ? 1 : 3})`);
-          await page.click("#options-close");
-          await page.waitForTimeout(400);
-        }
+
         // Start the race the way a player does, then wait for the GAME to say
         // it is racing rather than guessing at a timeout - a frame taken during
         // the countdown is not a HUD capture. Enter is the launch key and, with
         // the focus rule, it activates the launch control when that control has
         // focus and reaches the race when nothing does; both paths land here.
+        // Wait for the game to settle on a screen, then only press Enter if it
+        // is actually waiting to be launched. `demo=1` with a stored save skips
+        // the paddock and starts racing on its own - and Enter on a race that is
+        // already running PAUSES it, which is how this script previously hung
+        // waiting for a phase it had just left.
         await page.waitForFunction(
           () => ["intro", "race", "countdown"].includes(document.body.dataset.phase ?? ""),
           null,
           { timeout: 90000 },
         );
-        await page.keyboard.press("Enter");
+        if ((await page.evaluate(() => document.body.dataset.phase)) === "intro") {
+          await page.keyboard.press("Enter");
+        }
         await page.waitForFunction(() => document.body.dataset.phase === "race", null, {
           timeout: 90000,
         });
         await page.waitForTimeout(testCase.settle);
 
         const state = await readState(page);
+        const expected = (USER_STEP[scale] * viewportTerm(viewport.height)).toFixed(4);
+        if (state.hudScale !== expected) {
+          errors.push(
+            `${testCase.id} @ ${viewport.name} scale ${scale}: --hud-scale is `
+              + `${state.hudScale}, expected ${expected}. The stored setting did not arrive.`,
+          );
+        }
         const name = `${viewport.name}-scale-${scale}-${testCase.id}`;
         await page.screenshot({ path: join(OUT, `${name}.png`) });
         results.push({ name, viewport: viewport.name, scale, case: testCase.id, note: testCase.note, ...state });
