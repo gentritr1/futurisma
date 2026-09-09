@@ -50,7 +50,7 @@ import {
  * does not bend for a small field. The cost of the rung is one identity step;
  * the cost of skipping it would be a v3 build reading a v4 file as its own.
  */
-export const SCHEMA_VERSION = 4;
+export const SCHEMA_VERSION = 5;
 
 /**
  * The single storage key. Every key this game writes is prefixed `futurisma.`

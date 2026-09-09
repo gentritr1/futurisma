@@ -36,6 +36,7 @@ import {
   searchParam,
 } from "./query-probes";
 import { InputController } from "./input";
+import { PauseMenu } from "./pause-menu";
 import {
   BOOST_MAX_SPEED,
   calculateDriftIntent,
@@ -442,6 +443,7 @@ export class FuturismaGame {
   private readonly contextLossProbe = probeSelected("context");
   private readonly focusLossProbe = probeSelected("focus");
   private readonly reducedMotion = resolveReducedMotion();
+  private readonly pauseMenu: PauseMenu;
 
   constructor(
     canvas: HTMLCanvasElement,
@@ -451,6 +453,7 @@ export class FuturismaGame {
     courseAssemblyMs = 0,
   ) {
     this.course = course;
+    this.pauseMenu = new PauseMenu(input, () => this.togglePause());
     this.minimap = new Minimap(ui.minimapCanvas, course, this.reducedMotion);
     this.camera = new THREE.PerspectiveCamera(
       58,
@@ -690,6 +693,11 @@ export class FuturismaGame {
   }
 
   private update(delta: number, input: InputFrame): void {
+    // The quit hold is polled here, ahead of the early return: `paused` is one
+    // of the phases that does not run the physics loop, so the loop below can
+    // never host it. Poll-based means it is re-tested from the inputs that are
+    // true this frame, and dies the moment one stops being true.
+    this.pauseMenu.step(delta, this.phase === "paused");
     if (!phaseRunsContinuousPresentation(this.phase, this.speed)) {
       this.physicsAccumulator = 0;
       return;
@@ -2212,6 +2220,7 @@ export class FuturismaGame {
     if (this.phase === "paused") {
       if (this.pausedBeforeStart) {
         this.pausedBeforeStart = false;
+        this.pauseMenu.setPaused(false);
         this.phase = "countdown";
         this.countdown = 3.7;
         this.countdownStage = "";
@@ -2225,6 +2234,7 @@ export class FuturismaGame {
       this.countdownStage = "";
       this.physicsAccumulator = 0;
       this.audio.setPaused(false);
+      this.pauseMenu.setPaused(false);
       this.ui.setResuming();
     }
   }
@@ -2244,6 +2254,7 @@ export class FuturismaGame {
     this.physicsAccumulator = 0;
     this.audio.setPaused(true);
     this.ui.setPaused(true, reason);
+    this.pauseMenu.setPaused(true, reason);
     this.renderRequested = true;
   }
 

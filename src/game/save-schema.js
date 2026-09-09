@@ -27,6 +27,10 @@
  * @property {PresentationMode} renderMode
  * @property {boolean} voice Schema v4. The pit radio. `?voice=0` overrides it
  *   downward and nothing overrides it upward.
+ * @property {InterfaceScale} hudScale Schema v5. In-race HUD size.
+ * @property {InterfaceScale} menuScale Schema v5. Menu and terminal text size.
+ *
+ * @typedef {"s" | "m" | "l"} InterfaceScale
  *
  * @typedef {object} ModeBest
  * @property {number | null} bestLapMs Schema v3. The fastest lap set on this
@@ -76,6 +80,13 @@ import {
 export const QUALITY_MODES = ["adaptive", "high", "low"];
 /** @type {readonly PresentationMode[]} */
 export const PRESENTATION_MODES = ["agx", "ps2"];
+/**
+ * The two interface scales. `"m"` is the size the game shipped at, so a stored
+ * file that predates this pass, or any value this build does not recognise,
+ * lands on the layout the player already knows.
+ * @type {readonly InterfaceScale[]}
+ */
+export const INTERFACE_SCALES = ["s", "m", "l"];
 export const DEFAULT_LIVERY = "works";
 /**
  * Circuit tokens. Kept here rather than imported from `map-selection.ts` so the
@@ -144,6 +155,10 @@ export function defaultSettings() {
     // volume sliders and the mute key already govern it, and `?voice=0` is
     // there for a soak that needs the mix without it.
     voice: true,
+    // UI pass — the two interface scales. "m" is the shipped size, so a driver
+    // who never opens INTERFACE sees exactly the layout they saw before.
+    hudScale: "m",
+    menuScale: "m",
   };
 }
 
@@ -227,6 +242,14 @@ export function normalizeSettings(raw) {
   // H2b. A v3 file has no `voice` key at all and lands on the default, which is
   // exactly what the v3 -> v4 migration relies on: see the ladder entry.
   if (typeof source.voice === "boolean") settings.voice = source.voice;
+  // UI pass. Same shape, same reason: a file written before this build has
+  // neither scale key and lands on "m", the size the game already shipped at.
+  if (INTERFACE_SCALES.includes(/** @type {InterfaceScale} */ (source.hudScale))) {
+    settings.hudScale = /** @type {InterfaceScale} */ (source.hudScale);
+  }
+  if (INTERFACE_SCALES.includes(/** @type {InterfaceScale} */ (source.menuScale))) {
+    settings.menuScale = /** @type {InterfaceScale} */ (source.menuScale);
+  }
   return settings;
 }
 
@@ -550,6 +573,29 @@ const MIGRATIONS = [
      * this build reads moves. The one relocation on the whole ladder is still
      * v2's `ghost` and it happens a rung earlier, untouched by this.
      * `scripts/validate-persistence.mjs` walks v1 -> v4 field by field.
+     *
+     * @param {Record<string, unknown>} source
+     * @returns {Record<string, unknown>}
+     */
+    step: (source) => source,
+  },
+  {
+    from: 4,
+    to: 5,
+    /**
+     * v4 → v5. The UI pass gave `settings` two enums, `hudScale` and
+     * `menuScale`, for the interface size rows.
+     *
+     * PURELY ADDITIVE, and an identity for the same reason v3 -> v4 is: a v4
+     * file has neither key, `normalizeSettings` supplies `"m"` for a missing or
+     * unrecognised one, and `"m"` is the size the game shipped at. So a
+     * returning player arrives at the layout they left, with every other field
+     * byte-identical. Writing the defaults in here would produce the same
+     * result and additionally misreport what the stored file said.
+     *
+     * WIPE RISK: none. Nothing is relocated, renamed, or dropped, and no field
+     * this build reads moves. `scripts/validate-persistence.mjs` walks v1 -> v5
+     * field by field.
      *
      * @param {Record<string, unknown>} source
      * @returns {Record<string, unknown>}

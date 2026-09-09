@@ -16,6 +16,7 @@ import type { MapSelection } from "./map-selection";
 import { TRACKS, trackFor } from "./map-selection";
 import { storedBestLapMs } from "./meta-runtime";
 import { save } from "./persistence";
+import { applyInterfaceScale } from "./interface-scale.js";
 import {
   RACE_MODES,
   RACE_MODE_DECKS,
@@ -182,6 +183,8 @@ export class MetaUi {
   private readonly tierGroup: ChipGroup;
   private readonly liveryGroup: ChipGroup;
   private readonly motionGroup: ChipGroup;
+  private readonly hudScaleGroup: ChipGroup;
+  private readonly menuScaleGroup: ChipGroup;
   private readonly voiceGroup: ChipGroup;
   private readonly qualityGroup: ChipGroup;
   private readonly renderGroup: ChipGroup;
@@ -243,6 +246,36 @@ export class MetaUi {
       "select",
       (value) => {
         void this.hooks.applyLivery(value);
+      },
+    );
+    /*
+      The two interface scales. Unlike damping, resolution and pipeline, these
+      need no relink: both are CSS custom properties on `<body>` that every
+      block reads through `scale()`, so writing them applies on the next frame.
+      That is why they call `applyInterfaceScale` directly instead of going
+      through `refreshPending`'s pending-relink path.
+    */
+    const scaleChips = [
+      { value: "s", label: "S" },
+      { value: "m", label: "M" },
+      { value: "l", label: "L" },
+    ];
+    this.hudScaleGroup = new ChipGroup(
+      requiredElement<HTMLElement>("option-hud-scale"),
+      scaleChips,
+      "select",
+      (value) => {
+        save.updateSettings({ hudScale: value as "s" | "m" | "l" });
+        applyInterfaceScale(save.settings);
+      },
+    );
+    this.menuScaleGroup = new ChipGroup(
+      requiredElement<HTMLElement>("option-menu-scale"),
+      scaleChips,
+      "select",
+      (value) => {
+        save.updateSettings({ menuScale: value as "s" | "m" | "l" });
+        applyInterfaceScale(save.settings);
       },
     );
     this.motionGroup = new ChipGroup(
@@ -327,6 +360,8 @@ export class MetaUi {
     this.tierGroup.setValue(raceModes.tier);
     this.liveryGroup.setValue(save.livery);
     this.motionGroup.setValue(settings.reducedMotion ? "on" : "off");
+    this.hudScaleGroup.setValue(settings.hudScale);
+    this.menuScaleGroup.setValue(settings.menuScale);
     this.voiceGroup.setValue(settings.voice ? "on" : "off");
     this.qualityGroup.setValue(settings.quality);
     this.renderGroup.setValue(settings.renderMode);
@@ -404,7 +439,7 @@ export class MetaUi {
     this.optionsNote.dataset.pending = pending ? "true" : "false";
     this.optionsNote.textContent = pending
       ? "CONFIGURATION CHANGED · RELINK TO APPLY"
-      : "LEVELS AND RADIO APPLY LIVE · DAMPING, RESOLUTION AND PIPELINE ON NEXT RELINK";
+      : "LEVELS, RADIO AND INTERFACE SIZE APPLY LIVE · DAMPING, RESOLUTION AND PIPELINE ON NEXT RELINK";
     this.optionsRelink.hidden = !pending;
   }
 
