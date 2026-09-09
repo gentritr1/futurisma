@@ -444,5 +444,25 @@
         "seconds": 2.2388333333333335
       }
     ]
+  },
+  "shield_hero_proposal": {
+    "tool": "built-in image_gen (GPT Image 2 requested)",
+    "template": "hero_prompt_template",
+    "status": "Proposal only; runtime unchanged; review pending",
+    "jobs": [
+      {
+        "artifact_id": "exec-ef606d4a-cb66-42fa-b8bf-031173d23327",
+        "job_id": null,
+        "prompt": "Use case: stylized-concept. Ascension Pad, a racing circuit through a working rocket launch complex in a humid jungle estuary, for a remembered early-2000s console anti-gravity racer. Chase-camera view 2.4 m above a 24 m wide concrete racing road beside the Tank Farm service apron. One original P-12 Phase Shield pressure-bulkhead projector standing on the roadside: 1.4 m wide, 1.75 m tall, 1.1 m deep. A compact rectangular olive steel pressure case, six overlapping off-white ceramic-faced iris blades inside a bolted circular steel flange, two vertical side hydraulic barrels, one small caged sodium-amber emissive GLASS lamp mounted at the upper right, tiny round rivet-scale bolts, a low METAL skid base with two bolted feet, a faded exact P-12 stencil upper left. Humid service wear: rust streaks below small bolts, sun-bleached top, one welded repair patch. The iris and protective construction must read as launch-complex blast equipment, not a turbine or washing machine. Full device visible at close three-quarter chase height, occupying the middle half of a 16:9 landscape frame including all base feet. Sodium lamps, mist, tropical overcast dawn with one warm break. Yellow-black hazard kerbs, painted worn lane markings, damp stained concrete. Painted hand-textured surfaces, honest low-poly geometry, restrained palette of grey concrete, rust steel, off-white, olive, sodium amber, swamp green and mist, fog for depth. No cyan glass or cyan decorative light. No bloom, no lens flare, no neon, no photoreal PBR, no vehicles, no real logos, no text other than P-12. This is a proposed native device hero, not a production screenshot.",
+        "status": "Superseded: photoreal treatment"
+      },
+      {
+        "artifact_id": "exec-8822d7f7-3d21-4499-9070-dcfd21f9afa3",
+        "job_id": null,
+        "prompt": "Precise style-transfer correction of the attached P-12 hero. Keep composition, road, full device silhouette, six overlapping iris blades, two hydraulic cylinders, caged amber GLASS lamp, P-12 stencil and metal feet unchanged. Render the ENTIRE image as a remembered early-2000s console game: clearly faceted low-poly forms, broad hand-painted diffuse texture strokes readable at 256-512 px, simple painted ambient occlusion, matte surfaces, simplified vegetation cards, diffuse atmospheric fog. Remove photoreal microdetail, realistic specular reflections, glossy wet-road reflections and tiny noisy scratches. The concrete is matte stained painted grey, steel is worn matte olive, iris blades matte off-white ceramic, lamp restrained sodium amber. Change the oversized front-foot hex nuts into small round rivet-scale bolt heads. No cyan, no bloom, no lens flare, no photoreal PBR. This is an art proposal, not a runtime screenshot.",
+        "status": "Current proposal"
+      }
+    ],
+    "note": "Service job IDs not exposed. Pair mapping withheld outside checkout; generation previews have been visible, so no claim of independent source blindness."
   }
 }
