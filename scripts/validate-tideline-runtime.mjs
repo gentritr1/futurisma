@@ -42,7 +42,7 @@ const runtimeUrl = await moduleUrl('../src/game/tideline-runtime.ts', {
   './tideline-power-chain.js':local('tideline-power-chain.js'),'./ability-seed': await moduleUrl('../src/game/ability-seed.ts'), './tideline-world': worldUrl,
   './polarity-rules.js': local('polarity-rules.js'), './polarity-simulation.js': local('polarity-simulation.js'), './tideline-rules.js': local('tideline-rules.js'),
 });
-const inputUrl = await moduleUrl('../src/game/input.ts', { './action-gate': local('action-gate.js'), './input-shaping': local('input-shaping.js') });
+const inputUrl = await moduleUrl('../src/game/input.ts', { './menu-key.js': local('menu-key.js'), './action-gate': local('action-gate.js'), './input-shaping': local('input-shaping.js') });
 const elements = new Map();
 class ElementStub {
   id = ''; hidden = false; textContent = ''; dataset = {}; style = {}; width = 0; height = 0;

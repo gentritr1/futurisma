@@ -109,7 +109,7 @@ export class PauseMenu {
       this.hold,
       {
         paused,
-        terminalOpen: this.optionsScreen ? !this.optionsScreen.hidden : false,
+        terminalOpen: (this.optionsScreen ? !this.optionsScreen.hidden : false) || document.body.dataset.controls === "true",
         actionsSuppressed: this.input.actionsSuppressed,
         escapeHeld: this.input.isHeld("Escape"),
         buttonHeld: this.buttonHeld || this.input.isGamepadCancelHeld(),

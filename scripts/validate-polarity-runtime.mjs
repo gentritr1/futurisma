@@ -38,7 +38,7 @@ const worldUrl = await moduleUrl("../src/game/polarity-world.ts", {
   "./polarity-simulation.js": local("polarity-simulation.js"),
 });
 const inputUrl = await moduleUrl("../src/game/input.ts", {
-  "./action-gate": local("action-gate.js"), "./input-shaping": local("input-shaping.js"),
+  "./menu-key.js": local("menu-key.js"), "./action-gate": local("action-gate.js"), "./input-shaping": local("input-shaping.js"),
 });
 const runtimeUrl = await moduleUrl("../src/game/polarity-runtime.ts", {
   "./polarity-rules.js": local("polarity-rules.js"), "./polarity-world": worldUrl,

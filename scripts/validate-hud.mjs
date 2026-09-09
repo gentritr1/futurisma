@@ -11,6 +11,8 @@
  *    lands on the size the game shipped at.
  */
 
+import {transformWithOxc} from "vite";
+import {isMenuOnlyKey} from "../src/game/menu-key.js";
 import assert from "node:assert/strict";
 import {readFileSync} from "node:fs";
 import {INPUT_PROMPTS} from "../src/game/input-prompt-map.js";
@@ -183,3 +185,29 @@ for(const kbd of html.matchAll(/<kbd([^>]*)>/g)){
 }
 assert.equal(INPUT_PROMPTS.confirm.gamepad,'A');
 assert.equal(INPUT_PROMPTS.back.gamepad,'B');
+
+for(const code of ['KeyO','KeyC'])assert.equal(isMenuOnlyKey(code),true,'O and C are exclusively menu keys');
+assert.equal(isMenuOnlyKey('Other','O'),true);
+assert.equal(isMenuOnlyKey('KeyW','w'),false);
+const inputSource=readFileSync(new URL('../src/game/input.ts',import.meta.url),'utf8');
+assert.ok(inputSource.indexOf('if (isMenuOnlyKey(event.code,event.key)) return;')<inputSource.indexOf('this.keys.add(event.code)'), 'Menu keys must return before the race key set');
+
+// Execute InputController itself under the same DOM-free contract as runtime tests.
+let {code:inputCode}=await transformWithOxc(inputSource,'input.ts');
+for(const [specifier,file] of [['./menu-key.js','menu-key.js'],['./action-gate','action-gate.js'],['./input-shaping','input-shaping.js']])inputCode=inputCode.replaceAll(`from "${specifier}"`,`from "${new URL('../src/game/'+file,import.meta.url).href}"`);
+const savedGlobals=new Map(['window','navigator'].map(name=>[name,Object.getOwnPropertyDescriptor(globalThis,name)]));
+const inputWindow=new EventTarget();
+Object.defineProperty(globalThis,'window',{configurable:true,value:inputWindow});
+Object.defineProperty(globalThis,'navigator',{configurable:true,value:{getGamepads:()=>[]}});
+try{
+ const {InputController}=await import('data:text/javascript;base64,'+Buffer.from(inputCode).toString('base64'));
+ const input=new InputController();
+ for(const code of ['KeyO','KeyC']){
+  const event=new Event('keydown',{cancelable:true});Object.assign(event,{code,key:code.slice(3).toLowerCase(),repeat:false});inputWindow.dispatchEvent(event);
+  assert.equal(input.isHeld(code),false,'Menu shortcuts never enter the race key set');
+  assert.deepEqual(input.read(),{throttle:0,brake:0,steer:0,boost:false});
+  for(const method of ['consumeStart','consumeReset','consumeMute','consumeFlip','consumePower','consumeControlIntent'])assert.equal(input[method](),false);
+ }
+ input.dispose();
+}finally{for(const [name,descriptor] of savedGlobals){if(descriptor)Object.defineProperty(globalThis,name,descriptor);else delete globalThis[name];}}
+console.log('HUD menu-key boundary PASS against production InputController.');

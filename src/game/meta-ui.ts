@@ -1,3 +1,4 @@
+import {isMenuOnlyKey} from './menu-key.js';
 /**
  * P7 — the meta layer's DOM: circuit dispatch, livery issue and the service
  * terminal.
@@ -169,6 +170,14 @@ class ChipGroup {
 }
 
 export class MetaUi {
+  private readonly controlsScreen = requiredElement<HTMLElement>("controls-screen");
+  private readonly controlsButton = requiredElement<HTMLButtonElement>("controls-button");
+  private readonly controlsClose = requiredElement<HTMLButtonElement>("controls-close");
+  private readonly controlsOptions = requiredElement<HTMLButtonElement>("controls-options");
+  private controlsOpen = false;
+  private controlsReturnFocus: HTMLElement | null = null;
+  private returnTo = "intro";
+
   private readonly optionsScreen = requiredElement<HTMLElement>("options-screen");
   private readonly optionsButton = requiredElement<HTMLButtonElement>("options-button");
   private readonly optionsClose = requiredElement<HTMLButtonElement>("options-close");
@@ -330,6 +339,10 @@ export class MetaUi {
     this.optionsRelink.addEventListener("click", this.handleRelinkClick);
     window.addEventListener("keydown", this.handleWindowKeyDown, { capture: true });
     this.optionsScreen.addEventListener("keydown", this.handlePanelKeyDown);
+    this.controlsButton.addEventListener("click", this.handleControlsOpen);
+    this.controlsClose.addEventListener("click", this.handleControlsClose);
+    this.controlsOptions.addEventListener("click", this.handleOpenClick);
+    this.controlsScreen.addEventListener("keydown", this.handleControlsKeyDown);
 
     this.syncFromSave();
   }
@@ -471,9 +484,27 @@ export class MetaUi {
     window.location.reload();
   };
 
+  private readonly handleControlsOpen = (): void => { if(this.canOpen()&&!this.open)this.setControls(true); };
+  private readonly handleControlsClose = (): void => this.setControls(false);
+  private readonly handleControlsKeyDown = (event:KeyboardEvent): void => {
+    if(event.key==='Tab')return;
+    if(event.key==='Escape'){event.preventDefault();this.setControls(false);}
+    event.stopPropagation();
+  };
+  private setControls(open:boolean): void {
+    if(open===this.controlsOpen)return;
+    this.controlsOpen=open;this.controlsScreen.hidden=!open;document.body.dataset.controls=String(open);
+    if(open){this.controlsReturnFocus=document.activeElement as HTMLElement|null;this.controlsScreen.dataset.returnTo=document.body.dataset.phase??'intro';this.controlsClose.focus();}
+    else{this.controlsReturnFocus?.focus();this.controlsReturnFocus=null;}
+    this.hooks.suspendInput();
+  }
+
   private setOpen(open: boolean): void {
     if (open === this.open) return;
     this.open = open;
+    if(open){this.returnTo=this.controlsOpen?'controls':document.body.dataset.phase??'intro';this.optionsScreen.dataset.returnTo=this.returnTo;}
+    this.controlsScreen.hidden=open||this.returnTo!=='controls';
+    document.body.dataset.controls=String(!open&&this.returnTo==='controls');
     this.optionsScreen.hidden = !open;
     document.body.dataset.options = open ? "true" : "false";
     if (open) {
@@ -512,6 +543,19 @@ export class MetaUi {
    * them on the way back up instead, after the control has had them.
    */
   private readonly handleWindowKeyDown = (event: KeyboardEvent): void => {
+    if(isMenuOnlyKey(event.code,event.key)){
+      event.preventDefault();event.stopPropagation();
+      if(event.repeat||event.altKey||event.ctrlKey||event.metaKey||!this.canOpen())return;
+      if(event.code==='KeyC'||event.key.toLowerCase()==='c'){if(!this.open)this.setControls(true);}
+      else this.setOpen(true);
+      return;
+    }
+    if(this.controlsOpen&&!this.open){
+      const target=event.target;
+      if(target instanceof Node&&this.controlsScreen.contains(target))return;
+      if(event.key==='Escape')this.setControls(false);
+      event.preventDefault();event.stopPropagation();return;
+    }
     if (this.open) {
       // `target` is only guaranteed to be an `EventTarget`; `contains()` throws
       // on anything that is not a `Node`, which would swallow the whole handler.
@@ -522,21 +566,6 @@ export class MetaUi {
       event.stopPropagation();
       return;
     }
-    // Matched on `key` as well as `code`: a non-QWERTY layout puts `o` on a
-    // different physical key, and `code` alone silently loses it there.
-    const wantsTerminal = event.code === "KeyO"
-      || (event.key.length === 1 && event.key.toLowerCase() === "o");
-    if (
-      !wantsTerminal
-      || event.repeat
-      || event.altKey
-      || event.ctrlKey
-      || event.metaKey
-      || !this.canOpen()
-    ) return;
-    event.preventDefault();
-    event.stopPropagation();
-    this.setOpen(true);
   };
 
   /**
@@ -557,6 +586,10 @@ export class MetaUi {
   dispose(): void {
     window.removeEventListener("keydown", this.handleWindowKeyDown, { capture: true });
     this.optionsScreen.removeEventListener("keydown", this.handlePanelKeyDown);
+    this.controlsButton.removeEventListener("click", this.handleControlsOpen);
+    this.controlsClose.removeEventListener("click", this.handleControlsClose);
+    this.controlsOptions.removeEventListener("click", this.handleOpenClick);
+    this.controlsScreen.removeEventListener("keydown", this.handleControlsKeyDown);
     this.masterSlider.removeEventListener("input", this.handleMasterInput);
     this.musicSlider.removeEventListener("input", this.handleMusicInput);
     this.optionsButton.removeEventListener("click", this.handleOpenClick);

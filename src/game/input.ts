@@ -1,3 +1,4 @@
+import {isMenuOnlyKey} from './menu-key.js';
 import { resolveActionSuppression } from "./action-gate";
 import { resolveSteeringInput, sanitizeTrigger } from "./input-shaping";
 
@@ -322,6 +323,7 @@ export class InputController {
 
   private readonly handleKeyDown = (event: KeyboardEvent): void => {
     this.setActiveDevice("keyboard");
+    if (isMenuOnlyKey(event.code,event.key)) return;
     if (CONTROL_KEYS.has(event.code)) event.preventDefault();
     this.keys.add(event.code);
     if (DRIVING_KEYS.has(event.code)) this.controlIntentRequested = true;

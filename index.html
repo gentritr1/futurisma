@@ -338,18 +338,8 @@
             <kbd data-prompt="options">O</kbd>
           </button>
 
-          <dl class="controls-list">
-            <div><dt>THRUST</dt><dd>W / ↑</dd></div>
-            <div><dt>STEER</dt><dd>A D / ← →</dd></div>
-            <div><dt>BRAKE</dt><dd>S / ↓</dd></div>
-            <div><dt>DRIFT</dt><dd>BRAKE + STEER</dd></div>
-            <div data-polarity-control hidden><dt>FLIP GRAVITY</dt><dd>SPACE / X</dd></div>
-            <div data-power-control hidden><dt>USE POWER</dt><dd>E / B</dd></div>
-            <div><dt>BOOST</dt><dd>SHIFT / A</dd></div>
-            <div><dt>RECOVER</dt><dd>R / Y</dd></div>
-            <div><dt>PAUSE</dt><dd>ESC / START</dd></div>
-            <div><dt>MUTE</dt><dd>M / BACK</dd></div>
-          </dl>
+          <button id="controls-button" class="ghost-button" type="button"><span>CONTROLS</span><kbd data-prompt="controls">C</kbd></button>
+
         </div>
         <p id="intro-footer" class="intro-footer">WORKS LIVERY 07 · GREENWATER FIELD RACE</p>
       </section>
@@ -377,6 +367,27 @@
             <span>RACE AGAIN</span>
             <kbd data-prompt="confirm">ENTER</kbd>
           </button>
+        </div>
+      </section>
+
+      <section id="controls-screen" class="screen screen--options" aria-label="Controls" hidden>
+        <div class="intro-panel options-panel">
+          <p class="intro-code">KAIRO DYNAMICS · DRIVER CONTROLS</p>
+          <h2 class="options-title">CONTROLS</h2>
+          <dl class="controls-list">
+            <div><dt>THRUST</dt><dd>W / ↑</dd></div>
+            <div><dt>STEER</dt><dd>A D / ← →</dd></div>
+            <div><dt>BRAKE</dt><dd>S / ↓</dd></div>
+            <div><dt>DRIFT</dt><dd>BRAKE + STEER</dd></div>
+            <div data-polarity-control hidden><dt>FLIP GRAVITY</dt><dd>SPACE / X</dd></div>
+            <div data-power-control hidden><dt>USE POWER</dt><dd>E / B</dd></div>
+            <div><dt>BOOST</dt><dd>SHIFT / A</dd></div>
+            <div><dt>RECOVER</dt><dd>R / Y</dd></div>
+            <div><dt>PAUSE</dt><dd>ESC / START</dd></div>
+            <div><dt>MUTE</dt><dd>M / BACK</dd></div>
+          </dl>
+          <button id="controls-options" class="ghost-button" type="button"><span>SYSTEM OPTIONS</span><kbd data-prompt="options">O</kbd></button>
+          <button id="controls-close" class="ghost-button" type="button"><span>BACK</span><kbd data-prompt="back">ESC</kbd></button>
         </div>
       </section>
 
