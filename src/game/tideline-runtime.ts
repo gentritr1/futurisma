@@ -162,6 +162,11 @@ export class TidelineRuntime implements CircuitRuntime {
     this.powerLabel.textContent = s.activePower ? `${s.powerPerfect ? "PERFECT " : ""}${label} ${this.simulation.powerSeconds.toFixed(1)}s`
       : this.simulation.heldPowerKind ? `E / ${label}${perfectReady ? " · PERFECT NOW" : ""}` : "COLLECT A POWER CAPSULE";
     if(this.shieldActive && s.tick-s.powerStartTick<=144)this.powerLabel.textContent += " · RETURN WINDOW";
+    this.powerLabel.dataset.device = s.activePower ? (s.powerPerfect ? "perfect" : "active") : this.simulation.heldPowerKind ? (perfectReady ? "perfect" : "held") : "empty";
+    this.powerLabel.dataset.kind = s.activePower ?? this.simulation.heldPowerKind ?? "";
+    this.powerLabel.dataset.charge = String(s.activePower ? s.activeCharge : this.simulation.heldPowerCharge);
+    this.modeLabel.dataset.deck = "none";
+    this.travelLabel.dataset.transfer = "ready";
     if (this.chargeFill) this.chargeFill.style.transform = `scaleX(${s.activePower ? s.activeCharge : this.simulation.heldPowerCharge})`;
     const tide = tideForLap(s.lap);
     this.routeLabel.textContent = perfectReady ? "SURGE WINDOW / E FOR +1s"

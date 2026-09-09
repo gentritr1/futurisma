@@ -53,6 +53,14 @@ export class AscensionPowers {
   this.devices.update(time,reduced,this.simulation.getPickupStates(),progress);this.bulkheads.update(time,reduced,progress);
   const held=this.simulation.heldPowerKind,active=this.simulation.state.activePower;
   const label=document.getElementById('polarity-power');if(label)label.textContent=this.simulation.state.tick<this.chainUntil?'CHAIN · BULKHEAD → SURGE / +0.5s':active?`${active==='surge'?'SURGE':'PHASE SHIELD'} ${this.simulation.powerSeconds.toFixed(1)}s`:held?`E / ${held==='surge'?'SURGE':'PHASE SHIELD'}`:'COLLECT A DEVICE';
+  if(label){
+   const chain=this.simulation.state.tick<this.chainUntil;
+   label.dataset.device=chain?'perfect':active?'active':held?'held':'empty';
+   label.dataset.kind=chain?'surge':active??held??'';
+   label.dataset.charge=String(active?this.simulation.state.activeCharge:this.simulation.heldPowerCharge);
+  }
+  const deck=document.getElementById('polarity-deck');if(deck)deck.dataset.deck='none';
+  const transfer=document.getElementById('polarity-flip');if(transfer)transfer.dataset.transfer='ready';
   const fill=document.getElementById('power-charge-fill');if(fill)fill.style.transform=`scaleX(${active?this.simulation.state.activeCharge:this.simulation.heldPowerCharge})`;
  }
  private use(progress:number){const result=this.chain.request(this.simulation,progress);if(result.chain){this.chainUntil=this.simulation.state.tick+240;this.ui?.flashHazard('CHAIN · BULKHEAD → SURGE / +0.5s',2000);}if(!result.ok)this.audio?.playPowerDenied();this.dispatch();}

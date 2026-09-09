@@ -1,31 +1,5 @@
-/**
- * The two 56px ability slots: the device glyph and the deck indicator.
- *
- * Three circuit runtimes (polarity, tideline, ascension) already write the
- * ability HUD, each through the same five ids, and each with its own vocabulary.
- * This module does not ask them to write anything new. It OBSERVES those nodes
- * and derives the slot state from what they already say, which is why a UI pass
- * can land beside in-flight circuit work without touching a single runtime file.
- *
- * What it derives:
- *
- * - `data-device` on `.hud-device`: `empty | held | active | perfect`, read from
- *   `#polarity-power`'s text. "COLLECT" means empty, a leading key prompt means
- *   held, a trailing duration means active, and a chain or perfect note means
- *   perfect.
- * - the device slot's charge fill, read from `#power-charge-fill`'s own
- *   `scaleX`, which the runtimes already set to the charge 0..1.
- * - `data-deck` on `.hud-gravity`: `upper | lower | none`, read from
- *   `#polarity-deck`.
- * - `data-transfer` on `.hud-gravity`: `ready` when the action line names a key,
- *   `wait` otherwise.
- *
- * A MutationObserver is the right instrument here rather than a per-frame poll:
- * these nodes change a handful of times a lap, and the observer costs nothing on
- * the frames where they do not.
- */
-
-import { readCharge, readDeck, readDeviceKind, readDeviceState } from "./ability-text.js";
+/** Render the authoritative attributes written by the three circuit runtimes. */
+import {readAbilityAttributes} from './ability-state.js';
 
 /**
  * The SVG namespace, read off the authored element rather than written as a URL
@@ -145,7 +119,6 @@ export function bindAbilitySlots(root: ParentNode = document): () => void {
   const deviceRow = root.querySelector<HTMLElement>(".hud-device");
   const gravityRow = root.querySelector<HTMLElement>(".hud-gravity");
   const powerLabel = root.querySelector<HTMLElement>("#polarity-power");
-  const chargeFill = root.querySelector<HTMLElement>("#power-charge-fill");
   const deckLabel = root.querySelector<HTMLElement>("#polarity-deck");
   const actionLabel = root.querySelector<HTMLElement>("#polarity-flip");
   if (!deviceRow || !gravityRow || !powerLabel || !deckLabel || !actionLabel) {
@@ -163,14 +136,9 @@ export function bindAbilitySlots(root: ParentNode = document): () => void {
   const deck = new DeckSlot(deckSvg);
 
   const sync = (): void => {
-    const text = powerLabel.textContent ?? "";
-    const state = readDeviceState(text);
-    device.render(readDeviceKind(text), state, readCharge(chargeFill?.style.transform ?? ""));
+    const {state,kind,charge,deck:deckState,ready} = readAbilityAttributes(powerLabel.dataset,deckLabel.dataset,actionLabel.dataset);
+    device.render(kind, state, charge);
     deviceRow.dataset.device = state;
-
-    const deckState = readDeck(deckLabel.textContent ?? "");
-    // A key prompt in the action line is the runtimes' own "you may do this now".
-    const ready = (actionLabel.textContent ?? "").includes("/");
     deck.render(deckState, ready);
     gravityRow.dataset.deck = deckState;
     gravityRow.dataset.transfer = ready ? "ready" : "wait";
@@ -181,15 +149,11 @@ export function bindAbilitySlots(root: ParentNode = document): () => void {
   sync();
   const observer = new MutationObserver(sync);
   const options: MutationObserverInit = {
-    characterData: true,
-    childList: true,
-    subtree: true,
     attributes: true,
-    attributeFilter: ["style"],
+    attributeFilter: ["data-device", "data-kind", "data-charge", "data-deck", "data-transfer"],
   };
   observer.observe(powerLabel, options);
   observer.observe(deckLabel, options);
   observer.observe(actionLabel, options);
-  if (chargeFill) observer.observe(chargeFill, options);
   return () => observer.disconnect();
 }

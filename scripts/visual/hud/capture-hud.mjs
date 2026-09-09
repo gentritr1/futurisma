@@ -7,11 +7,12 @@
  * when it has not been. Every frame here is the game running its own loop, its
  * own clock and its own input path; nothing is faked or posed.
  *
- *   node scripts/visual/hud/capture-hud.mjs --out art/evidence/hud
+ *   node scripts/visual/hud/capture-hud.mjs --out=art/evidence/hud
  *
  * Flags: --port (default 5310), --out, --url-extra
  */
 
+import {execFileSync} from "node:child_process";
 import { chromium } from "playwright";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -21,6 +22,9 @@ const arg = (name, fallback) => {
   return hit ? hit.slice(name.length + 3) : fallback;
 };
 
+// Historical renderer is a test oracle only; it is never loaded by the game.
+const legacySource=execFileSync('git',['show','2862475:src/game/ability-text.js'],{encoding:'utf8'});
+const legacy=await import('data:text/javascript;base64,'+Buffer.from(legacySource).toString('base64'));
 const PORT = Number(arg("port", "5310"));
 const OUT = arg("out", "art/evidence/hud");
 /** `--only=1280x720-scale-m-race,1920x1080-scale-l-ascension` re-runs named captures. */
@@ -78,6 +82,13 @@ const readState = async (page) =>
       clusterWidth: cluster ? Number(cluster.width.toFixed(2)) : null,
       clusterTop: cluster ? Number(cluster.top.toFixed(2)) : null,
       standingBottom: standing ? Number(standing.bottom.toFixed(2)) : null,
+      slots: {
+        device: document.querySelector('.hud-device')?.getAttribute('data-device'),
+        deck: document.querySelector('.hud-gravity')?.getAttribute('data-deck'),
+        transfer: document.querySelector('.hud-gravity')?.getAttribute('data-transfer'),
+        power: {...document.getElementById('polarity-power')?.dataset},
+        powerText: text('#polarity-power'), deckText:text('#polarity-deck'), actionText:text('#polarity-flip'),
+      },
       fontLoaded: document.fonts.check('700 92px "Barlow Condensed"'),
     };
   });
@@ -166,6 +177,11 @@ const run = async () => {
         await page.waitForTimeout(testCase.settle);
 
         const state = await readState(page);
+        if(['polarity','tideline','ascension'].includes(testCase.id)){
+          const expectedSlots={device:legacy.readDeviceState(state.slots.powerText??''),deck:legacy.readDeck(state.slots.deckText??''),transfer:(state.slots.actionText??'').includes('/')?'ready':'wait'};
+          state.slots.legacyExpected=expectedSlots;
+          for(const key of ['device','deck','transfer'])if(state.slots[key]!==expectedSlots[key])errors.push(`${name}: ${key} differs from baseline renderer`);
+        }
         const expected = (USER_STEP[scale] * viewportTerm(viewport.height)).toFixed(4);
         if (state.hudScale !== expected) {
           errors.push(

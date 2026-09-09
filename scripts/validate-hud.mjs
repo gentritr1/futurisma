@@ -6,10 +6,7 @@
  * 1. The quit-hold state machine, including the case that motivated it: a hold
  *    started on the QUIT button must die when focus leaves the button, even
  *    though the key is still physically down.
- * 2. The ability text readers, against the phrases the three circuit runtimes
- *    actually write - copied from `polarity-runtime.ts`, `tideline-runtime.ts`
- *    and `ascension-powers.ts` rather than invented here, because the whole
- *    point of reading their words is that their words are the contract.
+ * 2. Authoritative ability attributes, independent of display copy.
  * 3. The interface scale, including that an unknown or missing stored value
  *    lands on the size the game shipped at.
  */
@@ -22,12 +19,7 @@ import {
   quitHoldProgress,
   stepQuitHold,
 } from "../src/game/quit-hold.js";
-import {
-  readCharge,
-  readDeck,
-  readDeviceKind,
-  readDeviceState,
-} from "../src/game/ability-text.js";
+import {readAbilityAttributes} from "../src/game/ability-state.js";
 import {
   hudScaleValue,
   menuScaleValue,
@@ -144,38 +136,16 @@ for (const exit of [
   assert.equal(hold(state, inputs, 3), false, "a fired hold must not fire again");
 }
 
-/* -------------------------------------------------------------- ability text */
-
-// Phrases copied from the runtimes, not invented for the test.
-const DEVICE_PHRASES = [
-  // polarity-runtime.ts / tideline-runtime.ts
-  ["COLLECT A POWER DEVICE", "empty", null],
-  ["COLLECT A DEVICE", "empty", null],
-  // ascension-powers.ts
-  ["E / SURGE", "held", "surge"],
-  ["E / PHASE SHIELD", "held", "shield"],
-  ["SURGE 2.6s", "active", "surge"],
-  ["PHASE SHIELD 4.1s", "active", "shield"],
-  ["CHAIN · BULKHEAD → SURGE / +0.5s", "perfect", "surge"],
-  ["PERFECT SURGE 1.6s", "perfect", "surge"],
-];
-for (const [text, state, kind] of DEVICE_PHRASES) {
-  assert.equal(readDeviceState(text), state, `state of "${text}"`);
-  assert.equal(readDeviceKind(text), kind, `kind of "${text}"`);
+/* ------------------------------------------------------ ability attributes */
+for(const state of ["held","active","perfect","empty"]){
+ for(const kind of ["surge","shield"]){
+  const result=readAbilityAttributes({device:state,kind,charge:"0.5"},{deck:"upper"},{transfer:"ready"});
+  assert.deepEqual(result,{state,kind,charge:.5,deck:"upper",ready:true});
+ }
 }
-
-// Deck lines, including Ascension's, which names no deck at all.
-assert.equal(readDeck("LOWER DECK"), "lower");
-assert.equal(readDeck("UPPER EXPRESS · SUPPLY A"), "upper");
-assert.equal(readDeck("PAD 09 / LAUNCH DAY"), "none", "a deckless circuit must read none");
-assert.equal(readDeck("SUBMERGED / 24m"), "none");
-
-// The charge comes back out of the transform the runtimes already write.
-assert.equal(readCharge("scaleX(0.5)"), 0.5);
-assert.equal(readCharge("scaleX(1)"), 1);
-assert.equal(readCharge(""), 0, "an unset transform is zero charge, not a crash");
-assert.equal(readCharge("none"), 0);
-assert.equal(readCharge("scaleX(4)"), 1, "charge is clamped");
+assert.deepEqual(readAbilityAttributes({}, {}, {}),{state:"empty",kind:null,charge:0,deck:"none",ready:false});
+assert.equal(readAbilityAttributes({charge:"4"},{deck:"lower"},{transfer:"wait"}).charge,1);
+assert.equal(readAbilityAttributes({charge:"NaN"},{},{}).charge,0);
 
 /* ------------------------------------------------------------ interface scale */
 
@@ -202,4 +172,4 @@ assert.equal(viewportScale(0), 1);
 const largest = hudScaleValue("l", 1080);
 assert.ok(Math.abs(largest - 1.2 * 1.2247) < 0.002, "L at 1080p is the step times the term");
 
-console.log("validate:hud — quit hold, ability text and interface scale all pass");
+console.log("validate:hud — quit hold, ability attributes and interface scale all pass");
