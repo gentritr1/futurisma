@@ -95,6 +95,14 @@ const handleRestartClick = (): void => {
   void beginTrial();
 };
 
+const circuitSelect=document.getElementById('circuit-select-button')!;
+const handleCircuitSelect=():void=>{
+  const url=new URL(window.location.href);
+  url.searchParams.delete('demo');url.searchParams.delete('start');
+  window.location.assign(url.href);
+};
+circuitSelect.addEventListener('click',handleCircuitSelect);
+
 ui.startButton.addEventListener("click", handleStartClick);
 ui.restartButton.addEventListener("click", handleRestartClick);
 
@@ -125,6 +133,7 @@ if (import.meta.hot) {
   import.meta.hot.dispose(() => {
     ui.startButton.removeEventListener("click", handleStartClick);
     ui.restartButton.removeEventListener("click", handleRestartClick);
+    circuitSelect.removeEventListener('click',handleCircuitSelect);
     meta.dispose();
     game.dispose();
   });

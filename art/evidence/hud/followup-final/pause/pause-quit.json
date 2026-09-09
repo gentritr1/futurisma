@@ -1,0 +1,91 @@
+{
+  "script": "scripts/visual/hud/pause-quit.mjs",
+  "url": "http://127.0.0.1:5200/?map=polarity&demo=1",
+  "overHoldMs": 1600,
+  "results": [
+    {
+      "id": "pause/panel-up",
+      "expectation": "phase paused, panel up",
+      "phase": "paused",
+      "panelUp": true,
+      "onPaddock": false,
+      "holdProgress": "scaleX(0)",
+      "focused": "pause-resume"
+    },
+    {
+      "id": "pause/countdown",
+      "expectation": "phase resuming, panel down",
+      "phase": "resuming",
+      "panelUp": false,
+      "onPaddock": false,
+      "holdProgress": "scaleX(0)",
+      "focused": ""
+    },
+    {
+      "id": "pause/resumed",
+      "expectation": "phase race",
+      "phase": "race",
+      "panelUp": false,
+      "onPaddock": false,
+      "holdProgress": "scaleX(0)",
+      "focused": "",
+      "resumeWaitMs": 8639
+    },
+    {
+      "id": "cancel/tab-away-mid-hold",
+      "expectation": "hold Enter on QUIT, Tab away, keep holding — must NOT quit",
+      "phase": "paused",
+      "panelUp": true,
+      "onPaddock": false,
+      "holdProgress": "scaleX(0)",
+      "focused": ""
+    },
+    {
+      "id": "cancel/escape-into-options",
+      "expectation": "hold Escape, open the options terminal — must NOT quit",
+      "phase": "paused",
+      "panelUp": true,
+      "onPaddock": false,
+      "holdProgress": "scaleX(0)",
+      "focused": "option-master"
+    },
+    {
+      "id": "cancel/escape-not-armed",
+      "expectation": "the Escape that paused must not also quit — must NOT quit",
+      "phase": "paused",
+      "panelUp": true,
+      "onPaddock": false,
+      "holdProgress": "scaleX(0)",
+      "focused": "pause-resume"
+    },
+    {
+      "id": "cancel/pointer-release",
+      "expectation": "press QUIT with the pointer, release early — must NOT quit",
+      "phase": "paused",
+      "panelUp": true,
+      "onPaddock": false,
+      "holdProgress": "scaleX(0)",
+      "focused": "pause-quit"
+    },
+    {
+      "id": "quit/mid-hold",
+      "expectation": "fill is visible, still paused",
+      "phase": "paused",
+      "panelUp": true,
+      "onPaddock": false,
+      "holdProgress": "scaleX(0.638)",
+      "focused": "pause-quit"
+    },
+    {
+      "id": "quit/completed",
+      "expectation": "an uninterrupted hold quits",
+      "phase": "intro",
+      "panelUp": false,
+      "onPaddock": true,
+      "holdProgress": "scaleX(0)",
+      "focused": "start-button",
+      "reloaded": true
+    }
+  ],
+  "errors": []
+}

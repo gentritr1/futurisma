@@ -1,3 +1,4 @@
+import {resultPresentation} from './result-presentation.js';
 import {
   formatRaceGap,
   formatRacePosition,
@@ -492,8 +493,13 @@ export class GameUi {
     standings: readonly RaceStandingEntry[] = [],
     summary: RaceResultSummary | null = null,
   ): void {
-    const newBestLap = summary?.newBestLap ?? false;
-    this.resultTime.textContent = formatRaceTime(elapsedMs);
+    const {timeAttack,newBestLap,previousBestLapMs}=resultPresentation(summary);
+    this.resultTime.textContent = timeAttack ? formatRaceTime(bestLapMs) : formatRacePosition(position,racerCount);
+    this.resultScreen.querySelector('.result-status')!.textContent = timeAttack ? 'BEST LAP' : 'CLASSIFICATION LOCKED';
+    this.resultScreen.dataset.mode=summary?.mode??'race';
+    this.resultScreen.dataset.newBestLap=String(newBestLap);
+    this.resultScreen.dataset.previousBestLapMs=previousBestLapMs===null?'':String(previousBestLapMs);
+
     // G4 — the format and the field the time was set against, ahead of the
     // classification. A 2-lap sprint time and a 5-lap race time are different
     // numbers about different things, and a screen that printed them the same
@@ -501,7 +507,8 @@ export class GameUi {
     const format = summary
       ? `${RACE_MODE_LABELS[summary.mode]} · ${RIVAL_TIER_LABELS[summary.tier]} · `
       : "";
-    this.resultDetail.textContent = `${format}${
+    const previous=timeAttack?`PREVIOUS BEST ${previousBestLapMs===null?'—':formatRaceTime(previousBestLapMs)} · `:'';
+    this.resultDetail.textContent = `${previous}RACE TIME ${formatRaceTime(elapsedMs)} · ${format}${
       formatRacePosition(position, racerCount)
     } · TOTEM / ${this.playerLiveryLabel} · ${totalLaps} ${
       totalLaps === 1 ? "LAP" : "LAPS"

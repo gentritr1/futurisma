@@ -6,6 +6,10 @@ const out=arg('out','art/evidence/hud/followup-3-menus');mkdirSync(out,{recursiv
 const browser=await chromium.launch(),page=await browser.newPage({viewport:{width:1280,height:720}}),records=[],errors=[];
 page.on('pageerror',e=>errors.push(e.message));
 const record=async(name,expected)=>{
+ await page.waitForFunction(expected=>{
+  const state={phase:document.body.dataset.phase,controls:!document.getElementById('controls-screen').hidden,options:!document.getElementById('options-screen').hidden,pause:!document.getElementById('pause-panel').hidden,returnTo:document.getElementById('options-screen').dataset.returnTo};
+  return Object.entries(expected).every(([key,value])=>state[key]===value);
+ },expected,{timeout:10000});
  const state=await page.evaluate(()=>({phase:document.body.dataset.phase,controls:!document.getElementById('controls-screen').hidden,options:!document.getElementById('options-screen').hidden,pause:!document.getElementById('pause-panel').hidden,returnTo:document.getElementById('options-screen').dataset.returnTo,time:document.getElementById('time-value').textContent}));
  for(const [key,value] of Object.entries(expected))assert.equal(state[key],value,name+':'+key);
  records.push({name,...state});await page.screenshot({path:out+'/'+name+'.png'});return state;

@@ -1,3 +1,4 @@
+import {resultPresentation} from "../src/game/result-presentation.js";
 /**
  * HUD pass — the logic a screenshot cannot check.
  *
@@ -211,3 +212,11 @@ try{
  input.dispose();
 }finally{for(const [name,descriptor] of savedGlobals){if(descriptor)Object.defineProperty(globalThis,name,descriptor);else delete globalThis[name];}}
 console.log('HUD menu-key boundary PASS against production InputController.');
+
+for(const mode of ['race','sprint','timeattack']){
+ for(const newBestLap of [false,undefined])assert.equal(resultPresentation({mode,newBestLap,previousBestLapMs:90000}).newBestLap,false,'NEW BEST cannot show without the recorded true flag');
+ assert.equal(resultPresentation({mode,newBestLap:true}).newBestLap,true);
+}
+assert.equal(resultPresentation(null).newBestLap,false);
+assert.deepEqual(resultPresentation({mode:'timeattack',previousBestLapMs:12345}),{timeAttack:true,newBestLap:false,previousBestLapMs:12345});
+console.log('HUD result verdict PASS: no NEW BEST without summary.newBestLap.');

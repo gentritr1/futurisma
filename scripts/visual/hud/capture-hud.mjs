@@ -87,6 +87,9 @@ const readState = async (page) =>
         deck: document.querySelector('.hud-gravity')?.getAttribute('data-deck'),
         transfer: document.querySelector('.hud-gravity')?.getAttribute('data-transfer'),
         power: {...document.getElementById('polarity-power')?.dataset},
+        kind: document.getElementById('polarity-power')?.dataset.kind || null,
+        fill: document.querySelector('.hud-device .ability-slot__fill')?.style.transform ?? '',
+        chargeTransform: document.getElementById('power-charge-fill')?.style.transform ?? '',
         powerText: text('#polarity-power'), deckText:text('#polarity-deck'), actionText:text('#polarity-flip'),
       },
       fontLoaded: document.fonts.check('700 92px "Barlow Condensed"'),
@@ -179,8 +182,10 @@ const run = async () => {
         const state = await readState(page);
         if(['polarity','tideline','ascension'].includes(testCase.id)){
           const expectedSlots={device:legacy.readDeviceState(state.slots.powerText??''),deck:legacy.readDeck(state.slots.deckText??''),transfer:(state.slots.actionText??'').includes('/')?'ready':'wait'};
+          expectedSlots.kind=legacy.readDeviceKind(state.slots.powerText??'');
+          expectedSlots.fill=`scaleY(${expectedSlots.device==='empty'?0:legacy.readCharge(state.slots.chargeTransform)})`;
           state.slots.legacyExpected=expectedSlots;
-          for(const key of ['device','deck','transfer'])if(state.slots[key]!==expectedSlots[key])errors.push(`${name}: ${key} differs from baseline renderer`);
+          for(const key of ['device','deck','transfer','kind','fill'])if(state.slots[key]!==expectedSlots[key])errors.push(`${name}: ${key} differs from baseline renderer`);
         }
         const expected = (USER_STEP[scale] * viewportTerm(viewport.height)).toFixed(4);
         if (state.hudScale !== expected) {

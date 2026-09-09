@@ -170,17 +170,9 @@ class ChipGroup {
 }
 
 export class MetaUi {
-  private readonly controlsScreen = requiredElement<HTMLElement>("controls-screen");
-  private readonly controlsButton = requiredElement<HTMLButtonElement>("controls-button");
-  private readonly controlsClose = requiredElement<HTMLButtonElement>("controls-close");
-  private readonly controlsOptions = requiredElement<HTMLButtonElement>("controls-options");
-  private controlsOpen = false;
-  private controlsReturnFocus: HTMLElement | null = null;
-  private returnTo = "intro";
-
-  private readonly optionsScreen = requiredElement<HTMLElement>("options-screen");
+  private navigation: import('./menu-navigation').MenuNavigation | null = null;
+  private navigationLoading: Promise<import('./menu-navigation').MenuNavigation> | null = null;
   private readonly optionsButton = requiredElement<HTMLButtonElement>("options-button");
-  private readonly optionsClose = requiredElement<HTMLButtonElement>("options-close");
   private readonly optionsRelink = requiredElement<HTMLButtonElement>("options-relink");
   private readonly optionsNote = requiredElement<HTMLElement>("options-note");
   private readonly masterSlider = requiredElement<HTMLInputElement>("option-master");
@@ -197,9 +189,6 @@ export class MetaUi {
   private readonly voiceGroup: ChipGroup;
   private readonly qualityGroup: ChipGroup;
   private readonly renderGroup: ChipGroup;
-  private open = false;
-  /** Where focus came from, so closing the terminal puts it back. */
-  private returnFocus: HTMLElement | null = null;
 
   constructor(
     private readonly ui: GameUi,
@@ -335,14 +324,10 @@ export class MetaUi {
     this.masterSlider.addEventListener("input", this.handleMasterInput);
     this.musicSlider.addEventListener("input", this.handleMusicInput);
     this.optionsButton.addEventListener("click", this.handleOpenClick);
-    this.optionsClose.addEventListener("click", this.handleCloseClick);
     this.optionsRelink.addEventListener("click", this.handleRelinkClick);
     window.addEventListener("keydown", this.handleWindowKeyDown, { capture: true });
-    this.optionsScreen.addEventListener("keydown", this.handlePanelKeyDown);
-    this.controlsButton.addEventListener("click", this.handleControlsOpen);
-    this.controlsClose.addEventListener("click", this.handleControlsClose);
-    this.controlsOptions.addEventListener("click", this.handleOpenClick);
-    this.controlsScreen.addEventListener("keydown", this.handleControlsKeyDown);
+    document.getElementById('controls-button')!.addEventListener('click',this.handleControlsOpen);
+
 
     this.syncFromSave();
   }
@@ -472,128 +457,28 @@ export class MetaUi {
     this.hooks.setMusicVolume(volume);
   };
 
-  private readonly handleOpenClick = (): void => {
-    this.setOpen(true);
-  };
-
-  private readonly handleCloseClick = (): void => {
-    this.setOpen(false);
-  };
-
-  private readonly handleRelinkClick = (): void => {
-    window.location.reload();
-  };
-
-  private readonly handleControlsOpen = (): void => { if(this.canOpen()&&!this.open)this.setControls(true); };
-  private readonly handleControlsClose = (): void => this.setControls(false);
-  private readonly handleControlsKeyDown = (event:KeyboardEvent): void => {
-    if(event.key==='Tab')return;
-    if(event.key==='Escape'){event.preventDefault();this.setControls(false);}
-    event.stopPropagation();
-  };
-  private setControls(open:boolean): void {
-    if(open===this.controlsOpen)return;
-    this.controlsOpen=open;this.controlsScreen.hidden=!open;document.body.dataset.controls=String(open);
-    if(open){this.controlsReturnFocus=document.activeElement as HTMLElement|null;this.controlsScreen.dataset.returnTo=document.body.dataset.phase??'intro';this.controlsClose.focus();}
-    else{this.controlsReturnFocus?.focus();this.controlsReturnFocus=null;}
+  private openMenu(surface:'controls'|'options'): void {
     this.hooks.suspendInput();
+    this.navigationLoading ??= import('./menu-navigation').then(({MenuNavigation})=>this.navigation=new MenuNavigation(this.hooks.suspendInput));
+    void this.navigationLoading.then(menu=>{if(['intro','paused','result'].includes(document.body.dataset.phase??'intro'))menu.show(surface);});
   }
-
-  private setOpen(open: boolean): void {
-    if (open === this.open) return;
-    this.open = open;
-    if(open){this.returnTo=this.controlsOpen?'controls':document.body.dataset.phase??'intro';this.optionsScreen.dataset.returnTo=this.returnTo;}
-    this.controlsScreen.hidden=open||this.returnTo!=='controls';
-    document.body.dataset.controls=String(!open&&this.returnTo==='controls');
-    this.optionsScreen.hidden = !open;
-    document.body.dataset.options = open ? "true" : "false";
-    if (open) {
-      this.returnFocus = document.activeElement as HTMLElement | null;
-      this.masterSlider.focus({ preventScroll: true });
-    } else {
-      this.returnFocus?.focus({ preventScroll: true });
-      this.returnFocus = null;
-    }
-    // Whatever key opened or closed the terminal must not also reach the race
-    // loop as a start, pause or mute.
-    this.hooks.suspendInput();
-  }
-
-  /**
-   * The terminal opens from the paddock, from a pause and from the result
-   * screen — never mid-race, where it would be a second pause with none of the
-   * pause's consequences.
-   */
-  private canOpen(): boolean {
-    const phase = document.body.dataset.phase;
-    return phase === undefined
-      || phase === "intro"
-      || phase === "paused"
-      || phase === "result";
-  }
-
-  /**
-   * Capture phase on `window`, ahead of the race loop's own keyboard listener.
-   * `O` opens the terminal; while it is up, anything typed *outside* it is
-   * swallowed so the game underneath is not being driven by accident.
-   *
-   * Keys aimed at the panel's own controls are deliberately left alone here:
-   * stopping them in the capture phase would stop them before they ever reached
-   * the slider or chip they were meant for. {@link handlePanelKeyDown} catches
-   * them on the way back up instead, after the control has had them.
-   */
-  private readonly handleWindowKeyDown = (event: KeyboardEvent): void => {
-    if(isMenuOnlyKey(event.code,event.key)){
-      event.preventDefault();event.stopPropagation();
-      if(event.repeat||event.altKey||event.ctrlKey||event.metaKey||!this.canOpen())return;
-      if(event.code==='KeyC'||event.key.toLowerCase()==='c'){if(!this.open)this.setControls(true);}
-      else this.setOpen(true);
-      return;
-    }
-    if(this.controlsOpen&&!this.open){
-      const target=event.target;
-      if(target instanceof Node&&this.controlsScreen.contains(target))return;
-      if(event.key==='Escape')this.setControls(false);
-      event.preventDefault();event.stopPropagation();return;
-    }
-    if (this.open) {
-      // `target` is only guaranteed to be an `EventTarget`; `contains()` throws
-      // on anything that is not a `Node`, which would swallow the whole handler.
-      const target = event.target;
-      if (target instanceof Node && this.optionsScreen.contains(target)) return;
-      if (event.key === "Escape") this.setOpen(false);
-      event.preventDefault();
-      event.stopPropagation();
-      return;
-    }
-  };
-
-  /**
-   * Bubble phase on the terminal itself: whatever the panel's controls did not
-   * already claim stops here rather than reaching the race loop's `window`
-   * listener, so `Escape` closes the terminal instead of resuming the race and
-   * `Enter` never launches from behind an open panel.
-   */
-  private readonly handlePanelKeyDown = (event: KeyboardEvent): void => {
-    if (event.key === "Tab") return;
-    if (event.key === "Escape") {
-      event.preventDefault();
-      this.setOpen(false);
-    }
-    event.stopPropagation();
+  private readonly handleOpenClick = (): void => this.openMenu('options');
+  private readonly handleControlsOpen = (): void => this.openMenu('controls');
+  private readonly handleRelinkClick = (): void => window.location.reload();
+  private readonly handleWindowKeyDown = (event:KeyboardEvent): void => {
+    if(!isMenuOnlyKey(event.code,event.key))return;
+    event.preventDefault();event.stopPropagation();
+    if(event.repeat||event.altKey||event.ctrlKey||event.metaKey||!['intro','paused','result'].includes(document.body.dataset.phase??'intro'))return;
+    this.openMenu(event.code==='KeyC'||event.key.toLowerCase()==='c'?'controls':'options');
   };
 
   dispose(): void {
     window.removeEventListener("keydown", this.handleWindowKeyDown, { capture: true });
-    this.optionsScreen.removeEventListener("keydown", this.handlePanelKeyDown);
-    this.controlsButton.removeEventListener("click", this.handleControlsOpen);
-    this.controlsClose.removeEventListener("click", this.handleControlsClose);
-    this.controlsOptions.removeEventListener("click", this.handleOpenClick);
-    this.controlsScreen.removeEventListener("keydown", this.handleControlsKeyDown);
+    this.navigation?.dispose();
+    document.getElementById('controls-button')?.removeEventListener('click',this.handleControlsOpen);
     this.masterSlider.removeEventListener("input", this.handleMasterInput);
     this.musicSlider.removeEventListener("input", this.handleMusicInput);
     this.optionsButton.removeEventListener("click", this.handleOpenClick);
-    this.optionsClose.removeEventListener("click", this.handleCloseClick);
     this.optionsRelink.removeEventListener("click", this.handleRelinkClick);
     this.trackGroup.dispose();
     this.formatGroup.dispose();

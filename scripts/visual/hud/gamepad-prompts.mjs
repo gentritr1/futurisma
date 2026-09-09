@@ -18,20 +18,23 @@ try{
  await page.waitForFunction(()=>document.body.dataset.phase==='intro',null,{timeout:120000});
  await page.locator('#options-button').focus();
  const keyboard=await prompts();
+ const allKeyboard=await page.locator('kbd').evaluateAll(nodes=>nodes.map(n=>({action:n.dataset.prompt,text:n.textContent.trim()})));
  await page.evaluate(()=>window.__connect());await page.waitForTimeout(200);
  const gamepad=await prompts();
+ const allGamepad=await page.locator('kbd').evaluateAll(nodes=>nodes.map(n=>({action:n.dataset.prompt,text:n.textContent.trim()})));
  await press(0);await page.waitForFunction(()=>document.body.dataset.options==='true');
  const optionsGamepad=await prompts();await page.screenshot({path:out+'/pad-options.png'});
  await page.keyboard.press('Tab');const optionsKeyboard=await prompts();
  await press(1);await page.waitForFunction(()=>document.body.dataset.options==='false');
  await page.evaluate(()=>window.__disconnect());await page.waitForTimeout(200);
  const disconnected=await prompts();
+ const allDisconnected=await page.locator('kbd').evaluateAll(nodes=>nodes.map(n=>({action:n.dataset.prompt,text:n.textContent.trim()})));
  if(!probe){
   const {INPUT_PROMPTS}=await import('../../../src/game/input-prompt-map.js');
-  for(const [device,rows] of [['keyboard',keyboard],['gamepad',gamepad],['gamepad',optionsGamepad],['keyboard',optionsKeyboard],['keyboard',disconnected]])for(const row of rows){assert.ok(row.action,'Every kbd has an action');assert.equal(row.text,INPUT_PROMPTS[row.action][device]);}
-  assert.deepEqual(disconnected,keyboard);
+  for(const [device,rows] of [['keyboard',keyboard],['gamepad',gamepad],['gamepad',optionsGamepad],['keyboard',optionsKeyboard],['keyboard',disconnected],['keyboard',allKeyboard],['gamepad',allGamepad],['keyboard',allDisconnected]])for(const row of rows){assert.ok(row.action,'Every kbd has an action');assert.equal(row.text,INPUT_PROMPTS[row.action][device]);}
+  assert.deepEqual(disconnected,keyboard);assert.deepEqual(allDisconnected,allKeyboard);
  }
  assert.deepEqual(errors,[]);
- writeFileSync(out+'/gamepad.json',JSON.stringify({script:'scripts/visual/hud/gamepad-prompts.mjs',probeOnly:probe,executed:{confirmButton:0,confirmObserved:'Focused SYSTEM OPTIONS activated and terminal opened',backButton:1,backObserved:'Terminal closed and returned to paddock'},keyboard,gamepad,optionsGamepad,optionsKeyboard,disconnected,errors},null,2)+'\n');
+ writeFileSync(out+'/gamepad.json',JSON.stringify({script:'scripts/visual/hud/gamepad-prompts.mjs',probeOnly:probe,executed:{confirmButton:0,confirmObserved:'Focused SYSTEM OPTIONS activated and terminal opened',backButton:1,backObserved:'Terminal closed and returned to paddock'},keyboard,gamepad,optionsGamepad,optionsKeyboard,disconnected,allKeyboard,allGamepad,allDisconnected,errors},null,2)+'\n');
  console.log('Observed standard button 0 confirm and button 1 back.'+(probe?' Before prompt mapping.':' All visible prompts switched and restored.'));
 }finally{await browser.close();}
