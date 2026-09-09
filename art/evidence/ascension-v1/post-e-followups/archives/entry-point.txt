@@ -1,0 +1,19 @@
+
+> futurisma-race@0.1.0 test:archives
+> npm run validate:assets && npm run validate:environment:history && npm run validate:environment:accepted
+
+
+> futurisma-race@0.1.0 validate:assets
+> node scripts/validate-assets.mjs
+
+ARCHIVES SKIPPED (7 accepted package(s) absent under /Users/gentlegen/Desktop/futurisma-race/polarity_work/artifacts: GREENWATER_VISUAL_IDENTITY_v1.2.zip, GREENWATER_LIVING_WORLD_v1.3.zip, GREENWATER_SURFACE_CHARACTER_v1.4_REVIEW.zip, +4 more)
+
+> futurisma-race@0.1.0 validate:environment:history
+> node scripts/validate-greenwater-package.mjs GREENWATER_ENVIRONMENT_STAGE2.zip GREENWATER_ENVIRONMENT_STAGE1.zip
+
+Greenwater package PASS: stage 2, 23 entries, 44 roots, 179 meshes, 2296 art-kit triangles, 71/25 painted/reserved atlas slots. Runtime: 2267 placements, 63 meshes, 55488 triangles. Accepted Stage 1 contract preserved: 12 immutable files byte-identical, 2 generated assets semantically identical, 895 geometry buffers byte-identical.
+
+> futurisma-race@0.1.0 validate:environment:accepted
+> node scripts/validate-greenwater-package.mjs GREENWATER_ENVIRONMENT_v1.0.zip GREENWATER_ENVIRONMENT_STAGE2.zip
+
+Greenwater package PASS: stage 3, 43 entries, 44 roots, 179 meshes, 2296 art-kit triangles, 71/25 painted/reserved atlas slots. Runtime: 2267 placements, 63 meshes, 55488 triangles. Acceptance renders: 18. Accepted Stage 2 contract preserved: 14 immutable files byte-identical, 3 generated assets semantically identical, 1186 unchanged accessor payloads byte-identical; exactly 12 deck meshes carry the winding fix.

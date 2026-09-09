@@ -1,0 +1,51 @@
+{
+  "script": "scripts/validate-greenwater-package.mjs",
+  "method": "Original downloads copied unchanged; no regeneration or validator edits.",
+  "candidates": [
+    {
+      "source": "GREENWATER_ENVIRONMENT_STAGE1.zip",
+      "sha256": "2cef84b0bbf7002d7dc57c712ffa8a10adfa2fda1aa8e140b9abdda7a7612070",
+      "bytes": 1886539,
+      "selected": true,
+      "exitCode": 0,
+      "output": "Greenwater package PASS: stage 1, 20 entries, 44 roots, 179 meshes, 2296 art-kit triangles, 71/25 painted/reserved atlas slots.\n",
+      "destination": "GREENWATER_ENVIRONMENT_STAGE1.zip"
+    },
+    {
+      "source": "GREENWATER_ENVIRONMENT_STAGE2.zip",
+      "sha256": "8dea5c6521d0f63f0c388c76807dbda826fb640b3e425aed3eaf26773b750212",
+      "bytes": 8327163,
+      "selected": false,
+      "exitCode": 1,
+      "output": "Greenwater package FAIL: GW_PLACE_surface_kerb_drain_1125 position must contain three finite numbers; got [null,0.073,null].\n",
+      "destination": null
+    },
+    {
+      "source": "GREENWATER_ENVIRONMENT_STAGE2 (1).zip",
+      "sha256": "4eae06930b7e7f5ea487f0cdd6a9ade627aa3e155733c121f5d5459241ee9be0",
+      "bytes": 8348120,
+      "selected": true,
+      "exitCode": 0,
+      "output": "Greenwater package PASS: stage 2, 23 entries, 44 roots, 179 meshes, 2296 art-kit triangles, 71/25 painted/reserved atlas slots. Runtime: 2267 placements, 63 meshes, 55488 triangles. Accepted Stage 1 contract preserved: 12 immutable files byte-identical, 2 generated assets semantically identical, 895 geometry buffers byte-identical.\n",
+      "destination": "GREENWATER_ENVIRONMENT_STAGE2.zip"
+    },
+    {
+      "source": "GREENWATER_ENVIRONMENT_v1.0.zip",
+      "sha256": "f532abcf18855a01747a6935777707cbc15e789472596ae6befc3b5d7667b973",
+      "bytes": 11552085,
+      "selected": false,
+      "exitCode": 1,
+      "output": "Greenwater package FAIL: Stage 4 deck winding correction is not PASS.\n+ actual - expected\n\n+ undefined\n- true\n",
+      "destination": null
+    },
+    {
+      "source": "GREENWATER_ENVIRONMENT_v1.0 (1).zip",
+      "sha256": "a773bf7f6f7e6ab160dfba385d67455e2ff7a9ade57369fafd416310825564af",
+      "bytes": 14902852,
+      "selected": true,
+      "exitCode": 0,
+      "output": "Greenwater package PASS: stage 3, 43 entries, 44 roots, 179 meshes, 2296 art-kit triangles, 71/25 painted/reserved atlas slots. Runtime: 2267 placements, 63 meshes, 55488 triangles. Acceptance renders: 18. Accepted Stage 2 contract preserved: 14 immutable files byte-identical, 3 generated assets semantically identical, 1186 unchanged accessor payloads byte-identical; exactly 12 deck meshes carry the winding fix.\n",
+      "destination": "GREENWATER_ENVIRONMENT_v1.0.zip"
+    }
+  ]
+}
