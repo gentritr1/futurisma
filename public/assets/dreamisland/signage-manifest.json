@@ -1,0 +1,225 @@
+{
+ "script": "art/blender/build_dreamisland_painted.py",
+ "letterCapMetres": 0.59,
+ "source": "public/assets/dreamisland/textures/signage.jpg",
+ "measurement": "Letter height = plate height x the glyph fraction measured in scripts/prepare-dreamisland-atlases.py letter_band().",
+ "signs": [
+  {
+   "id": "plate-dream-island@0.002",
+   "tile": "plate-dream-island",
+   "progress": 0.002,
+   "side": "left",
+   "sector": "BEACH",
+   "position": [
+    3.024,
+    3.4,
+    -14.828
+   ],
+   "plateHeightMetres": 0.62,
+   "plateWidthMetres": 1.798,
+   "letterHeightMetres": 0.1739,
+   "letterCapMetres": 0.59,
+   "gameplaySizeException": false,
+   "roadHalfWidthMetres": 12.223,
+   "roadFaceClearanceMetres": 2.6,
+   "deckClearanceMetres": 4.65,
+   "heightAboveDeckMetres": 3.4
+  },
+  {
+   "id": "plate-07@0.002",
+   "tile": "plate-07",
+   "progress": 0.002,
+   "side": "right",
+   "sector": "BEACH",
+   "position": [
+    2.976,
+    3.4,
+    14.818
+   ],
+   "plateHeightMetres": 0.62,
+   "plateWidthMetres": 0.62,
+   "letterHeightMetres": 0.2633,
+   "letterCapMetres": 0.59,
+   "gameplaySizeException": false,
+   "roadHalfWidthMetres": 12.223,
+   "roadFaceClearanceMetres": 2.6,
+   "deckClearanceMetres": 4.65,
+   "heightAboveDeckMetres": 3.4
+  },
+  {
+   "id": "plate-beach@0.010",
+   "tile": "plate-beach",
+   "progress": 0.01,
+   "side": "left",
+   "sector": "BEACH",
+   "position": [
+    24.0,
+    3.4,
+    -15.6
+   ],
+   "plateHeightMetres": 0.62,
+   "plateWidthMetres": 1.333,
+   "letterHeightMetres": 0.2197,
+   "letterCapMetres": 0.59,
+   "gameplaySizeException": false,
+   "roadHalfWidthMetres": 13.0,
+   "roadFaceClearanceMetres": 2.6,
+   "deckClearanceMetres": 4.65,
+   "heightAboveDeckMetres": 3.4
+  },
+  {
+   "id": "plate-gate-1@0.125",
+   "tile": "plate-gate-1",
+   "progress": 0.125,
+   "side": "right",
+   "sector": "GROVE",
+   "position": [
+    299.962,
+    3.4,
+    14.6
+   ],
+   "plateHeightMetres": 0.62,
+   "plateWidthMetres": 0.62,
+   "letterHeightMetres": 0.4721,
+   "letterCapMetres": 0.59,
+   "gameplaySizeException": false,
+   "roadHalfWidthMetres": 12.0,
+   "roadFaceClearanceMetres": 2.6,
+   "deckClearanceMetres": 4.65,
+   "heightAboveDeckMetres": 3.4
+  },
+  {
+   "id": "plate-gate-2@0.283",
+   "tile": "plate-gate-2",
+   "progress": 0.283,
+   "side": "left",
+   "sector": "POINT",
+   "position": [
+    624.736,
+    21.742,
+    170.221
+   ],
+   "plateHeightMetres": 0.62,
+   "plateWidthMetres": 0.62,
+   "letterHeightMetres": 0.4721,
+   "letterCapMetres": 0.59,
+   "gameplaySizeException": false,
+   "roadHalfWidthMetres": 9.299,
+   "roadFaceClearanceMetres": 2.6,
+   "deckClearanceMetres": 4.65,
+   "heightAboveDeckMetres": 3.4
+  },
+  {
+   "id": "plate-gate-3@0.392",
+   "tile": "plate-gate-3",
+   "progress": 0.392,
+   "side": "right",
+   "sector": "BASIN",
+   "position": [
+    593.045,
+    17.404,
+    406.525
+   ],
+   "plateHeightMetres": 0.62,
+   "plateWidthMetres": 0.62,
+   "letterHeightMetres": 0.4721,
+   "letterCapMetres": 0.59,
+   "gameplaySizeException": false,
+   "roadHalfWidthMetres": 8.388,
+   "roadFaceClearanceMetres": 2.6,
+   "deckClearanceMetres": 4.65,
+   "heightAboveDeckMetres": 3.4
+  },
+  {
+   "id": "plate-gate-4@0.517",
+   "tile": "plate-gate-4",
+   "progress": 0.517,
+   "side": "left",
+   "sector": "COURT",
+   "position": [
+    444.118,
+    17.401,
+    667.612
+   ],
+   "plateHeightMetres": 0.62,
+   "plateWidthMetres": 0.62,
+   "letterHeightMetres": 0.4721,
+   "letterCapMetres": 0.59,
+   "gameplaySizeException": false,
+   "roadHalfWidthMetres": 10.925,
+   "roadFaceClearanceMetres": 2.6,
+   "deckClearanceMetres": 4.65,
+   "heightAboveDeckMetres": 3.4
+  },
+  {
+   "id": "plate-gate-5@0.658",
+   "tile": "plate-gate-5",
+   "progress": 0.658,
+   "side": "right",
+   "sector": "REEF",
+   "position": [
+    154.778,
+    3.401,
+    679.452
+   ],
+   "plateHeightMetres": 0.62,
+   "plateWidthMetres": 0.62,
+   "letterHeightMetres": 0.4721,
+   "letterCapMetres": 0.59,
+   "gameplaySizeException": false,
+   "roadHalfWidthMetres": 12.425,
+   "roadFaceClearanceMetres": 2.6,
+   "deckClearanceMetres": 4.65,
+   "heightAboveDeckMetres": 3.4
+  },
+  {
+   "id": "plate-gate-6@0.750",
+   "tile": "plate-gate-6",
+   "progress": 0.75,
+   "side": "left",
+   "sector": "REEF",
+   "position": [
+    24.614,
+    3.4,
+    499.452
+   ],
+   "plateHeightMetres": 0.62,
+   "plateWidthMetres": 0.62,
+   "letterHeightMetres": 0.4721,
+   "letterCapMetres": 0.59,
+   "gameplaySizeException": false,
+   "roadHalfWidthMetres": 13.0,
+   "roadFaceClearanceMetres": 2.6,
+   "deckClearanceMetres": 4.65,
+   "heightAboveDeckMetres": 3.4
+  },
+  {
+   "id": "plate-beach@0.850",
+   "tile": "plate-beach",
+   "progress": 0.85,
+   "side": "right",
+   "sector": "CUT",
+   "position": [
+    48.435,
+    3.4,
+    260.984
+   ],
+   "plateHeightMetres": 0.62,
+   "plateWidthMetres": 1.333,
+   "letterHeightMetres": 0.2197,
+   "letterCapMetres": 0.59,
+   "gameplaySizeException": false,
+   "roadHalfWidthMetres": 12.0,
+   "roadFaceClearanceMetres": 2.6,
+   "deckClearanceMetres": 4.65,
+   "heightAboveDeckMetres": 3.4
+  }
+ ],
+ "count": 10,
+ "maximumLetterHeightMetres": 0.4721,
+ "minimumRoadFaceClearance": 2.6,
+ "minimumDeckClearance": 4.65,
+ "flightArcsClear": true,
+ "flightArcsNote": "Dream Island authors no flight arcs, so no sign can intersect one.",
+ "gameplaySizeExceptions": []
+}

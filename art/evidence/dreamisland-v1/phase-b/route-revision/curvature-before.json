@@ -1,0 +1,179 @@
+{
+  "script": "scripts/measure-dreamisland-route.mjs",
+  "route": {
+    "lengthMetres": 2399.9999999992324,
+    "stations": 800,
+    "revision": "blockout-a"
+  },
+  "turnFloorCurvature": 0.0045,
+  "turnFloorRadiusMetres": 222.22222222222223,
+  "minimumRunMetres": 25,
+  "globalMinimumRadiusMetres": 47.982711297511536,
+  "districts": [
+    {
+      "fromMetres": 0,
+      "toMetres": 299.99999999990405,
+      "id": "BEACH",
+      "name": "BEACH STRAIGHT",
+      "width": 26,
+      "lengthMetres": 299.99999999990405,
+      "stations": 100,
+      "maximumCurvature": 0.001893785053016848,
+      "minimumRadiusMetres": 528.043031286457,
+      "maximumPitchDegrees": 0.01075012398639935,
+      "foldGuard": 0.024619205689219024,
+      "turns": [],
+      "alternations": 0
+    },
+    {
+      "fromMetres": 299.99999999990405,
+      "toMetres": 679.9999999997825,
+      "id": "GROVE",
+      "name": "PALM GROVE",
+      "width": 22,
+      "lengthMetres": 379.99999999987847,
+      "stations": 127,
+      "maximumCurvature": 0.011383353322080937,
+      "minimumRadiusMetres": 87.84757634292552,
+      "maximumPitchDegrees": 3.710279872647678,
+      "foldGuard": 0.12521688654289032,
+      "turns": [
+        {
+          "direction": "RIGHT",
+          "fromMetres": 317.9999999998983,
+          "toMetres": 410.9999999998686,
+          "lengthMetres": 92.99999999997027,
+          "radiusMetres": 87.84757634292552,
+          "netTurnDegrees": -38.6149893891474
+        },
+        {
+          "direction": "LEFT",
+          "fromMetres": 446.99999999985704,
+          "toMetres": 533.9999999998292,
+          "lengthMetres": 86.9999999999722,
+          "radiusMetres": 94.0487078274456,
+          "netTurnDegrees": 33.74187211055907
+        },
+        {
+          "direction": "RIGHT",
+          "fromMetres": 569.9999999998176,
+          "toMetres": 662.999999999788,
+          "lengthMetres": 92.99999999997033,
+          "radiusMetres": 87.95989226547472,
+          "netTurnDegrees": -38.56568193724217
+        }
+      ],
+      "alternations": 2
+    },
+    {
+      "fromMetres": 679.9999999997825,
+      "toMetres": 939.9999999996993,
+      "id": "POINT",
+      "name": "WATCHTOWER POINT",
+      "width": 14,
+      "lengthMetres": 259.9999999999168,
+      "stations": 87,
+      "maximumCurvature": 0.00731146558925136,
+      "minimumRadiusMetres": 136.77148415635128,
+      "maximumPitchDegrees": 5.298383005919043,
+      "foldGuard": 0.05118025912475952,
+      "turns": [
+        {
+          "direction": "RIGHT",
+          "fromMetres": 737.999999999764,
+          "toMetres": 881.9999999997178,
+          "lengthMetres": 143.99999999995384,
+          "radiusMetres": 136.77148415635128,
+          "netTurnDegrees": -38.40340106284645
+        }
+      ],
+      "alternations": 0
+    },
+    {
+      "fromMetres": 939.9999999996993,
+      "toMetres": 1239.9999999996035,
+      "id": "BASIN",
+      "name": "BASIN CAUSEWAY",
+      "width": 20,
+      "lengthMetres": 299.99999999990416,
+      "stations": 100,
+      "maximumCurvature": 0.0020520482261776446,
+      "minimumRadiusMetres": 487.3179817331596,
+      "maximumPitchDegrees": 0.09799390756838991,
+      "foldGuard": 0.020520482261776447,
+      "turns": [],
+      "alternations": 0
+    },
+    {
+      "fromMetres": 1239.9999999996035,
+      "toMetres": 1579.9999999994945,
+      "id": "COURT",
+      "name": "CLOCK COURT",
+      "width": 24,
+      "lengthMetres": 339.9999999998911,
+      "stations": 113,
+      "maximumCurvature": 0.005940330904985924,
+      "minimumRadiusMetres": 168.34079043655055,
+      "maximumPitchDegrees": 3.540407188149042,
+      "foldGuard": 0.07128397085983108,
+      "turns": [
+        {
+          "direction": "RIGHT",
+          "fromMetres": 1241.9999999996026,
+          "toMetres": 1577.9999999994952,
+          "lengthMetres": 335.9999999998927,
+          "radiusMetres": 168.34079043655055,
+          "netTurnDegrees": -72.80356912659627
+        }
+      ],
+      "alternations": 0
+    },
+    {
+      "fromMetres": 1579.9999999994945,
+      "toMetres": 2039.9999999993474,
+      "id": "REEF",
+      "name": "REEF SHALLOWS",
+      "width": 26,
+      "lengthMetres": 459.9999999998529,
+      "stations": 153,
+      "maximumCurvature": 0.0035201668695943066,
+      "minimumRadiusMetres": 284.0774420774116,
+      "maximumPitchDegrees": 0.008169834767771111,
+      "foldGuard": 0.045762169304725986,
+      "turns": [],
+      "alternations": 0
+    },
+    {
+      "fromMetres": 2039.9999999993474,
+      "toMetres": 2399.9999999992324,
+      "id": "CUT",
+      "name": "MOSSY CUT",
+      "width": 22,
+      "lengthMetres": 359.99999999988495,
+      "stations": 120,
+      "maximumCurvature": 0.020840839814149095,
+      "minimumRadiusMetres": 47.982711297511536,
+      "maximumPitchDegrees": 0,
+      "foldGuard": 0.22924923795564006,
+      "turns": [
+        {
+          "direction": "LEFT",
+          "fromMetres": 2069.999999999338,
+          "toMetres": 2189.9999999992997,
+          "lengthMetres": 119.9999999999618,
+          "radiusMetres": 75.20076683027379,
+          "netTurnDegrees": 58.205192817069886
+        },
+        {
+          "direction": "RIGHT",
+          "fromMetres": 2222.9999999992892,
+          "toMetres": 2393.9999999992347,
+          "lengthMetres": 170.99999999994543,
+          "radiusMetres": 47.982711297511536,
+          "netTurnDegrees": -129.99123843474433
+        }
+      ],
+      "alternations": 1
+    }
+  ]
+}

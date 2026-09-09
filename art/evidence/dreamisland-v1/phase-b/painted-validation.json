@@ -1,0 +1,339 @@
+{
+  "script": "scripts/validate-dreamisland-painted.mjs",
+  "painted": {
+    "file": "public/assets/dreamisland/painted.glb",
+    "sha256": "9b368cb6376001008de0312f9c98c288f078f6dc1404302c0a243a732063fcff",
+    "meshes": 9,
+    "triangles": 67526,
+    "trianglesPerMesh": {
+      "DI_FISH_DI_MAT_emissive": 160,
+      "DI_FISH_DI_MAT_jungle": 864,
+      "DI_STATIC_DI_MAT_concrete": 23412,
+      "DI_STATIC_DI_MAT_emissive": 1364,
+      "DI_STATIC_DI_MAT_jungle": 32144,
+      "DI_STATIC_DI_MAT_jungle-card": 7180,
+      "DI_STATIC_DI_MAT_metal": 2152,
+      "DI_STATIC_DI_MAT_signage": 212,
+      "DI_STATIC_DI_MAT_water": 38
+    },
+    "placements": 533,
+    "routeRevision": "esses-b"
+  },
+  "features": {
+    "clock-tower": 5,
+    "watchtower-ruin": 5,
+    "waterfall-cliff": 5,
+    "palm-upright": 5,
+    "palm-lean": 5,
+    "palm-tall": 5,
+    "undergrowth-card-set": 5,
+    "goldfish-orange": 5,
+    "goldfish-white": 5,
+    "goldfish-red": 5,
+    "goldfish-gold": 5,
+    "stone-causeway-module": 5,
+    "reef-pier-module": 5,
+    "sea-stack": 5,
+    "mossy-block-wall-module": 5,
+    "gate-furniture": 5,
+    "sand-verge": 5,
+    "signage-plates": 5
+  },
+  "targets": [
+    {
+      "asset": "clock-tower",
+      "key": "heightMetres",
+      "target": 14,
+      "measured": 14
+    },
+    {
+      "asset": "watchtower-ruin",
+      "key": "heightMetres",
+      "target": 24,
+      "measured": 24
+    },
+    {
+      "asset": "watchtower-ruin",
+      "key": "widthMetres",
+      "target": 16,
+      "measured": 16
+    },
+    {
+      "asset": "waterfall-cliff",
+      "key": "dropMetres",
+      "target": 16,
+      "measured": 16.1
+    },
+    {
+      "asset": "palm-upright",
+      "key": "heightMetres",
+      "target": 8.6,
+      "measured": 8.6
+    },
+    {
+      "asset": "palm-lean",
+      "key": "heightMetres",
+      "target": 7.2,
+      "measured": 7.238
+    },
+    {
+      "asset": "palm-tall",
+      "key": "heightMetres",
+      "target": 11,
+      "measured": 11.02
+    },
+    {
+      "asset": "undergrowth-card-set",
+      "key": "heightMetres",
+      "target": 2.1,
+      "measured": 2.1
+    },
+    {
+      "asset": "goldfish-orange",
+      "key": "lengthMetres",
+      "target": 6.6,
+      "measured": 6.6
+    },
+    {
+      "asset": "goldfish-white",
+      "key": "lengthMetres",
+      "target": 6.6,
+      "measured": 6.6
+    },
+    {
+      "asset": "goldfish-red",
+      "key": "lengthMetres",
+      "target": 6.6,
+      "measured": 6.6
+    },
+    {
+      "asset": "goldfish-gold",
+      "key": "lengthMetres",
+      "target": 6.6,
+      "measured": 6.6
+    },
+    {
+      "asset": "stone-causeway-module",
+      "key": "roadLengthMetres",
+      "target": 20,
+      "measured": 20
+    },
+    {
+      "asset": "reef-pier-module",
+      "key": "roadLengthMetres",
+      "target": 26,
+      "measured": 26
+    },
+    {
+      "asset": "sea-stack",
+      "key": "heightMetres",
+      "target": 24,
+      "measured": 24
+    },
+    {
+      "asset": "mossy-block-wall-module",
+      "key": "lengthMetres",
+      "target": 12,
+      "measured": 12
+    }
+  ],
+  "cells": [
+    {
+      "key": "roadSand",
+      "role": "concrete",
+      "cell": "road-sand",
+      "is": "Pale sandy concrete road surface with tyre-polish lanes deskewed onto U.",
+      "manifestUv": [
+        0.004,
+        0.504,
+        0.496,
+        0.996
+      ],
+      "sampledRect": [
+        0.004,
+        0.0040000000000000036,
+        0.492,
+        0.492
+      ]
+    },
+    {
+      "key": "causewayPaving",
+      "role": "concrete",
+      "cell": "causeway-paving",
+      "is": "Dry limestone paving blocks with mossy joints, the causeway deck.",
+      "manifestUv": [
+        0.504,
+        0.504,
+        0.996,
+        0.996
+      ],
+      "sampledRect": [
+        0.504,
+        0.0040000000000000036,
+        0.492,
+        0.492
+      ]
+    },
+    {
+      "key": "kerbCyan",
+      "role": "concrete",
+      "cell": "kerb-cyan",
+      "is": "White kerb stone with one cyan stripe; the stripe runs along V.",
+      "manifestUv": [
+        0.004,
+        0.004,
+        0.496,
+        0.496
+      ],
+      "sampledRect": [
+        0.004,
+        0.504,
+        0.492,
+        0.492
+      ]
+    },
+    {
+      "key": "wallBlock",
+      "role": "concrete",
+      "cell": "wall-block",
+      "is": "Weathered limestone wall blocks, the cut walls and the sea stacks.",
+      "manifestUv": [
+        0.504,
+        0.004,
+        0.996,
+        0.496
+      ],
+      "sampledRect": [
+        0.504,
+        0.504,
+        0.492,
+        0.492
+      ]
+    },
+    {
+      "key": "rail",
+      "role": "metal",
+      "cell": "rail",
+      "is": "Galvanised guard rail post and beam with rivets.",
+      "manifestUv": [
+        0.504,
+        0.504,
+        0.996,
+        0.996
+      ],
+      "sampledRect": [
+        0.504,
+        0.0040000000000000036,
+        0.492,
+        0.492
+      ]
+    },
+    {
+      "key": "causticShallows",
+      "role": "water",
+      "cell": "caustic-shallows",
+      "is": "Turquoise shallows with a white caustic web, seen straight down.",
+      "manifestUv": [
+        0.004,
+        0.504,
+        0.496,
+        0.996
+      ],
+      "sampledRect": [
+        0.004,
+        0.0040000000000000036,
+        0.492,
+        0.492
+      ]
+    },
+    {
+      "key": "cobaltFacets",
+      "role": "water",
+      "cell": "cobalt-facets",
+      "is": "Deep cobalt sea with low-poly wave facets. Verdict-mandated tiling fix.",
+      "manifestUv": [
+        0.504,
+        0.504,
+        0.996,
+        0.996
+      ],
+      "sampledRect": [
+        0.504,
+        0.0040000000000000036,
+        0.492,
+        0.492
+      ]
+    },
+    {
+      "key": "foamGradient",
+      "role": "water",
+      "cell": "foam-gradient",
+      "is": "Surf foam dissolving into cyan. V is distance from shore: tiles in U only.",
+      "manifestUv": [
+        0.004,
+        0.004,
+        0.496,
+        0.496
+      ],
+      "sampledRect": [
+        0.004,
+        0.504,
+        0.492,
+        0.492
+      ]
+    },
+    {
+      "key": "foamGlow",
+      "role": "emissive",
+      "cell": "foam-glow",
+      "is": "Cyan foam-line glow band; the night shore rail. Tiles in U.",
+      "manifestUv": [
+        0.004,
+        0.504,
+        0.496,
+        0.996
+      ],
+      "sampledRect": [
+        0.004,
+        0.0040000000000000036,
+        0.492,
+        0.492
+      ]
+    },
+    {
+      "key": "shallowsGlow",
+      "role": "emissive",
+      "cell": "shallows-glow",
+      "is": "Turquoise lit-from-within shallows glow.",
+      "manifestUv": [
+        0.504,
+        0.504,
+        0.996,
+        0.996
+      ],
+      "sampledRect": [
+        0.504,
+        0.0040000000000000036,
+        0.492,
+        0.492
+      ]
+    }
+  ],
+  "signage": {
+    "count": 10,
+    "maximumLetterHeightMetres": 0.4721,
+    "minimumRoadFaceClearance": 2.6,
+    "minimumDeckClearance": 4.65,
+    "flightArcsClear": true
+  },
+  "corridor": {
+    "samples": 9729,
+    "boreSamples": 21,
+    "openClearanceMetres": 8.85,
+    "boreClearanceMetres": 7.4,
+    "rideHeightMetres": 0.15,
+    "intrusions": 0,
+    "note": "Spatial sweep: an upward ray at every station every 2 m across the road. Not a timed sample window, and not proof that anything rendered."
+  },
+  "scope": "Manifest contract, target metres, atlas cell agreement across the V flip, signage cap and static corridor clearance. Rendered-pixel proof is scripts/visual/dreamisland/atlas-proof.mjs."
+}

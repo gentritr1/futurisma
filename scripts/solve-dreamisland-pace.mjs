@@ -3,7 +3,14 @@ import {sourceModule} from './visual/dreamisland/modules.mjs';
 import {simulateRivalField} from './lib/rival-field-sim.mjs';
 const {DreamIslandCourse}=await import(await sourceModule('dreamisland-course.ts'));
 const course=new DreamIslandCourse();course.gridStart=()=>null;
-const calibration=JSON.parse(readFileSync('art/evidence/dreamisland-v1/phase-a/calibration/works-calibration.json'));
+const flag=(name,fallback)=>process.argv.find(a=>a.startsWith('--'+name+'='))?.slice(name.length+3)??fallback;
+// The calibration is whichever capture the PUBLISHED schedule names, so a route
+// revision can never leave the rival field solved against a lap that no longer
+// exists. `--calibration=` overrides it; `--out=` moves the evidence file.
+const schedule=JSON.parse(readFileSync('src/game/data/dreamisland/schedule.json','utf8'));
+const calibrationFile=flag('calibration',schedule.measurement);
+if(!calibrationFile)throw Error('The published schedule names no calibration; run the calibration race first');
+const calibration=JSON.parse(readFileSync(calibrationFile));
 if(calibration.errors.length)throw Error('Calibration contains browser errors');
 const laps=calibration.diagnostics.current.lapTimesMs;
 if(laps.length!==3)throw Error('Calibration must complete three laps');
@@ -32,9 +39,9 @@ for(const [tier,shift] of [['rookie',4],['works',0],['feral',-4]]){
 }
 if(!converged)pace.unsolved=true;
 writeFileSync('src/game/data/dreamisland/rival-pace.json',JSON.stringify(pace,null,2));
-const out='art/evidence/dreamisland-v1/phase-a';mkdirSync(out,{recursive:true});
+const out=flag('out','art/evidence/dreamisland-v1/phase-a');mkdirSync(out,{recursive:true});
 writeFileSync(out+'/pace-solve.json',JSON.stringify({script:'scripts/solve-dreamisland-pace.mjs',
- measurement:'art/evidence/dreamisland-v1/phase-a/calibration/works-calibration.json',playerSeconds,playerLapTimesMs:laps,
+ measurement:calibrationFile,playerSeconds,playerLapTimesMs:laps,
  bisection:{low:75,high:115,iterations:18},tierShiftSeconds:{rookie:4,works:0,feral:-4},profileOffsetSeconds:[-1,1,3],
  converged,scope:'Isolated production rival model against the measured player race total; browser tier classification is the separate soak.',
  measurements},null,2));

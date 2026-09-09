@@ -8,7 +8,9 @@ const tier=flag('tier')??'works',seed=flag('seed')??'3868938316',calibrate=proce
 const out=flag('out')??'art/evidence/dreamisland-v1/phase-a/'+(calibrate?'calibration':'soak-'+tier)+(reduced?'-reduced':'');
 await mkdir(out,{recursive:true});
 const inputFiles=['src/game/dreamisland-course.ts','src/game/dreamisland-runtime.ts','src/game/dreamisland-schedule.js',
- 'src/game/dreamisland-powers.ts','src/game/dreamisland-powers-config.js','src/game/dreamisland-environment.ts',
+ 'src/game/dreamisland-powers.ts','src/game/dreamisland-powers-config.js',
+ 'src/game/dreamisland-painted-environment.ts','src/game/dreamisland-materials.ts',
+ 'src/game/dreamisland-sky.ts','src/game/dreamisland-water.ts',
  'src/game/data/dreamisland/route.json','src/game/data/dreamisland/schedule.json','src/game/data/dreamisland/rival-pace.json'];
 const inputHashes=Object.fromEntries(inputFiles.map(file=>[file,createHash('sha256').update(readFileSync(file)).digest('hex')]));
 const browser=await launchReviewBrowser();
@@ -43,7 +45,7 @@ try{
  }
  await page.waitForFunction(()=>{try{return JSON.parse(document.getElementById('futurisma-diagnostics').textContent).current.phase==='finished';}catch{return false;}},{timeout:240000});
  const materialWalk=await page.evaluate(()=>{const rows=[];window.__diScene.traverse(o=>{if(!o.isMesh&&!o.isPoints)return;for(const m of Array.isArray(o.material)?o.material:[o.material])rows.push({object:o.name,material:m.name,type:m.type,toneMapped:m.toneMapped,fog:m.fog,visible:o.visible});});return rows;});
- await writeFile(out+'/material-walk.json',JSON.stringify({script:'scripts/visual/dreamisland/race.mjs',scope:'Live scene at race finish, hidden objects included; the sky dome runs its own haze shader.',rows:materialWalk,violations:materialWalk.filter(r=>r.toneMapped===false||(r.fog===false&&!['sky_backdrop'].includes(r.object)))},null,2));
+ await writeFile(out+'/material-walk.json',JSON.stringify({script:'scripts/visual/dreamisland/race.mjs',scope:'Live scene at race finish, hidden objects included. Two names are exempt from the fog rule: the shared sky_backdrop and dreamisland_panorama, both ShaderMaterials, for which three defaults fog to false; each mixes the fog colour itself as a haze term.',rows:materialWalk,violations:materialWalk.filter(r=>r.toneMapped===false||(r.fog===false&&!['sky_backdrop','dreamisland_panorama'].includes(r.object)))},null,2));
  const capture=await page.evaluate(()=>({frames:window.__diFrames,draws:window.__diDraws,
   diagnostics:JSON.parse(document.getElementById('futurisma-diagnostics').textContent),
   dreamisland:JSON.parse(document.getElementById('dreamisland-diagnostics').textContent)}));

@@ -1,0 +1,37 @@
+{
+  "script": "scripts/visual/dreamisland/instrument.mjs",
+  "samples": 11972,
+  "activeWindowMs": 96363.60000002384,
+  "activeExpectedSamples": 11943.433174378593,
+  "activeSampleResidual": 28.56682562140668,
+  "windowSamples": 720,
+  "windowMs": 5786.200000047684,
+  "calibration": {
+    "samples": 120,
+    "windowMs": 968.2000000476837,
+    "hz": 123.94133442892999
+  },
+  "expectedRateHz": 123.94133442892999,
+  "expectedSamples": 717.1493492785847,
+  "sampleResidual": 2.8506507214152634,
+  "observedRateHz": 124.43399813246457,
+  "p95Ms": 8.300000071525574,
+  "peakMainCalls": 53,
+  "peakShadowCalls": 17,
+  "peakTotalCalls": 70,
+  "peakTriangles": 43378,
+  "peakShadowTriangles": 23624,
+  "sizes": [
+    "1280x720"
+  ],
+  "schedule": {
+    "framesWithGripBelowOne": 429,
+    "minimumGrip": 0.85,
+    "gripDropSectors": [
+      "BASIN CAUSEWAY"
+    ],
+    "maximumNightBlend": 1,
+    "framesAtFullNight": 2316
+  },
+  "note": "Expected rendering rate comes from a separate pre-start requestAnimationFrame calibration. Physics remains 120 Hz. Each sampled delta covers one render interval, including any stalls."
+}

@@ -30,6 +30,10 @@ Hypnotic, technical, feral. Quiet atmospheric tension should give way to sharp m
 1. Speed must remain readable: silhouette, course edges, timing, and boost state survive fog and motion.
 2. Every visual effect has a racing purpose: feedback, orientation, danger, or atmosphere.
 3. Preserve the tension between humid organic space and repaired aerospace machinery.
+   On Dream Island (Map 07) that tension reads with the roles swapped rather than
+   dropped: the racing surface IS the machinery — concrete kerbs, launch strips,
+   the reef pier, the stone causeway, and a clock tower whose hands are the race
+   schedule — while the foliage and the water are the humid organic space.
 4. The PS2 era is the memory, not the method: capture its atmosphere — fog, restraint,
    worn industrial fiction, honest geometry — with whatever rendering reads best today.
    Coherence and legibility at speed beat era-accurate degradation; pixel-crisp

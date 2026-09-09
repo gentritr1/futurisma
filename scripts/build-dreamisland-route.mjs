@@ -8,7 +8,20 @@ import {mkdirSync,writeFileSync,readFileSync} from 'node:fs';
 // design intent was 30/90/30/130/40/40 degrees, and the minimum-norm correction
 // that makes the loop close in position and heading was solved once, offline,
 // and written here. This script integrates it; it does not solve anything.
-const TURN={GROVE:58.765125,POINT:69.246402,BASIN:-7.745486,COURT:108.855401,REEF:53.52966,CUT:77.348893};
+//
+// Phase B revision (GROVE esses). Phase A's grove measured a minimum radius of
+// 87.8 m — a sweeper, not the esses the district table asks for. The wave below
+// is five half-lobes instead of three, at amplitude .0172 instead of .011.
+// Raising the amplitude moves where the loop ends, so the six constants were
+// re-solved for closure by `node scripts/design/solve-dreamisland-closure.mjs
+// --grove-lobes=5 --grove-amplitude=0.0172`, started from the phase-A constants
+// so the correction is the smallest one that closes: every other district's net
+// turn moved by less than 0.13 degrees and its arc length is unchanged.
+const TURN={GROVE:58.892214,POINT:69.333471,BASIN:-7.766680,COURT:108.726051,REEF:53.439587,CUT:77.375347};
+// GROVE wave: half-lobe count and radians-per-metre amplitude. `2/(k*pi)` is the
+// mean of `sin(k*pi*t)` over the district for odd k and is subtracted so the wave
+// stays zero-mean and TURN.GROVE remains the district's entire net turn.
+const GROVE_LOBES=5,GROVE_AMPLITUDE=.0172;
 const LENGTH=2400,BOUNDS=[0,300,680,940,1240,1580,2040];
 const smooth=t=>t<=0?0:t>=1?1:t*t*(3-2*t),rad=deg=>deg*Math.PI/180;
 // Sea level across the beach and the reef pier; +22 m at the watchtower bore,
@@ -22,7 +35,8 @@ const height=s=>s<300?0:s<810?22*smooth((s-300)/510):s<940?22-8*smooth((s-810)/1
 // is a right-hand sweep and the cut is a left-then-right chicane.
 function curvature(s){
  if(s<300)return 0;                                                              // BEACH: the surf-line straight
- if(s<680){const t=(s-300)/380;return rad(TURN.GROVE)/380+.011*(Math.sin(3*Math.PI*t)-2/(3*Math.PI));} // GROVE: three-phase esses, zero-mean wave
+ if(s<680){const t=(s-300)/380;                                                  // GROVE: five-phase esses, zero-mean wave
+  return rad(TURN.GROVE)/380+GROVE_AMPLITUDE*(Math.sin(GROVE_LOBES*Math.PI*t)-2/(GROVE_LOBES*Math.PI));}
  if(s<940){const t=(s-680)/260;return rad(TURN.POINT)*Math.PI/(2*260)*Math.sin(Math.PI*t);}            // POINT: one shaped corner under the tower
  if(s<1240)return rad(TURN.BASIN)/300;                                           // BASIN: the causeway runs nearly straight
  if(s<1580)return rad(TURN.COURT)/340;                                           // COURT: constant-radius banked right sweep
@@ -71,7 +85,7 @@ const stations=Array.from({length:count},(_,i)=>{
   curvature:Math.atan2(a.clone().cross(b).y,a.dot(b))/(length*.0016),width:widthAt(u*length),sector:district.id};
 });
 const out=new URL('../src/game/data/dreamisland/',import.meta.url);mkdirSync(out,{recursive:true});
-const data={name:'Dream Island',revision:'blockout-a',length,count,districts,flightArcs:[],
+const data={name:'Dream Island',revision:'esses-b',length,count,districts,flightArcs:[],
  checkpoints:[0,.125,.283,.392,.517,.658,.750,.850],stations};
 writeFileSync(new URL('route.json',out),JSON.stringify(data));
 const spacing=stations.map((s,i)=>Math.hypot(...s.p.map((v,axis)=>v-stations[(i+1)%count].p[axis])));

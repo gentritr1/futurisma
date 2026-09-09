@@ -240,7 +240,7 @@ assert.equal(markers.count,(route.checkpoints.length+stripMarks+DREAMISLAND_FIEL
 assert.equal(course.deviceMarkerOffset,(route.checkpoints.length+stripMarks+DREAMISLAND_FIELDS.length)*2,
   'The device markers the powers module tints must be the last block of instances.');
 assert.equal(course.group.children.filter(child=>child.isMesh||child.isInstancedMesh).length,2,
-  'The course spends two draws; the island massing is one more in dreamisland-environment.ts.');
+  'The course spends two draws; the painted island is nine more in dreamisland-painted-environment.ts.');
 
 const out=new URL('../art/evidence/dreamisland-v1/phase-a/',import.meta.url);
 mkdirSync(out,{recursive:true});

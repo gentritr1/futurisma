@@ -1,30 +1,30 @@
 {
   "script": "scripts/build-dreamisland-route.mjs",
   "measurementScript": "scripts/visual/dreamisland/race.mjs",
-  "measurement": "art/evidence/dreamisland-v1/phase-a/calibration/works-calibration.json",
-  "worksLapSeconds": 31.254,
+  "measurement": "art/evidence/dreamisland-v1/phase-b/route-revision/calibration/works-calibration.json",
+  "worksLapSeconds": 32.579,
   "definition": "Mean of flying laps two and three in the full Works demo with the schedule inert",
-  "chimeTick": 6938,
-  "strikeTick": 7688,
-  "fishRiseTick": 8168,
-  "nightSettledTick": 9128,
+  "chimeTick": 7233,
+  "strikeTick": 8014,
+  "fishRiseTick": 8494,
+  "nightSettledTick": 9454,
   "nightRampTicks": 1440,
   "events": [
     {
       "id": "chime-warning",
-      "tick": 6938
+      "tick": 7233
     },
     {
       "id": "strike",
-      "tick": 7688
+      "tick": 8014
     },
     {
       "id": "fish-rise",
-      "tick": 8168
+      "tick": 8494
     },
     {
       "id": "night-settled",
-      "tick": 9128
+      "tick": 9454
     }
   ]
 }

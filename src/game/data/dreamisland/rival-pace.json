@@ -6,17 +6,17 @@
   "straightCurvature": 0.13,
   "profiles": {
     "rival-privateer": {
-      "cruiseSpeedMetersPerSecond": 86.81739807128906,
+      "cruiseSpeedMetersPerSecond": 84.83100891113281,
       "padUse": false,
       "boostWindows": []
     },
     "rival-nightform": {
-      "cruiseSpeedMetersPerSecond": 85.28648376464844,
+      "cruiseSpeedMetersPerSecond": 83.34968566894531,
       "padUse": false,
       "boostWindows": []
     },
     "rival-needle": {
-      "cruiseSpeedMetersPerSecond": 83.45191955566406,
+      "cruiseSpeedMetersPerSecond": 81.62879943847656,
       "padUse": false,
       "boostWindows": []
     }
@@ -25,17 +25,17 @@
     "rookie": {
       "profiles": {
         "rival-privateer": {
-          "cruiseSpeedMetersPerSecond": 83.09089660644531,
+          "cruiseSpeedMetersPerSecond": 81.31462097167969,
           "padUse": false,
           "boostWindows": []
         },
         "rival-nightform": {
-          "cruiseSpeedMetersPerSecond": 81.57981872558594,
+          "cruiseSpeedMetersPerSecond": 79.83421325683594,
           "padUse": false,
           "boostWindows": []
         },
         "rival-needle": {
-          "cruiseSpeedMetersPerSecond": 79.93461608886719,
+          "cruiseSpeedMetersPerSecond": 78.41239929199219,
           "padUse": false,
           "boostWindows": []
         }
@@ -44,17 +44,17 @@
     "feral": {
       "profiles": {
         "rival-privateer": {
-          "cruiseSpeedMetersPerSecond": 91.03187561035156,
+          "cruiseSpeedMetersPerSecond": 88.69834899902344,
           "padUse": false,
           "boostWindows": []
         },
         "rival-nightform": {
-          "cruiseSpeedMetersPerSecond": 89.23423767089844,
+          "cruiseSpeedMetersPerSecond": 87.12120056152344,
           "padUse": false,
           "boostWindows": []
         },
         "rival-needle": {
-          "cruiseSpeedMetersPerSecond": 87.39616394042969,
+          "cruiseSpeedMetersPerSecond": 85.25154113769531,
           "padUse": false,
           "boostWindows": []
         }

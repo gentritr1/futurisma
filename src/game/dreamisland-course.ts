@@ -6,6 +6,7 @@ import route from "./data/dreamisland/route.json";
 import rivalPace from "./data/dreamisland/rival-pace.json";
 import { createApronResolution, resolveApron } from "./apron.js";
 import { DREAMISLAND_ABILITY_CONFIG, DREAMISLAND_FIELDS } from "./dreamisland-powers-config.js";
+import { CELL } from "./dreamisland-materials";
 import type { ApronResolution, ApronTable } from "./apron.js";
 import type { AudioZone } from "./audio-space.js";
 import type { CourseSample, CourseProjection, CourseLightingProfile, FogProfile,
@@ -55,10 +56,17 @@ const KERB_CORNERS: readonly [number, number, number][] = [
   [-.325,-.225,-3.4],[.325,-.225,-3.4],[.325,.225,-3.4],[-.325,.225,-3.4],
   [-.325,-.225,3.4],[.325,-.225,3.4],[.325,.225,3.4],[-.325,.225,3.4],
 ];
-const BOX_FACES: readonly [number, number, number][] = [
-  [0,2,1],[0,3,2],[4,5,6],[4,6,7],[0,1,5],[0,5,4],
-  [3,7,6],[3,6,2],[1,2,6],[1,6,5],[0,4,7],[0,7,3],
+/** The kerb box as six QUADS rather than twelve triangles: every face needs its
+ * own four corners so the cyan stripe can run along the kerb on all of them. */
+const BOX_FACES: readonly [number, number, number, number][] = [
+  [0,3,2,1],[4,5,6,7],[0,1,5,4],[3,7,6,2],[1,2,6,5],[0,4,7,3],
 ];
+/** Where each corner of a kerb face lands in the kerb quadrant. The stripe runs
+ * up the middle of the cell in V, so V is the along-the-kerb axis. */
+const KERB_FACE_UV: readonly [number, number][] = [[0,0],[1,0],[1,1],[0,1]];
+/** Stations of road that share one road-sand tile. At 3 m a station and a deck
+ * 14-26 m wide, four stations is the tile that reads closest to square. */
+const DECK_STATIONS = 4;
 const LAUNCH_STRIPS = DREAMISLAND_ABILITY_CONFIG.launchZones.map(z => [z.from, z.to] as const);
 const STRIP_DISTANCES = LAUNCH_STRIPS.flatMap(([from, to]) => {
   const marks: number[] = [];
@@ -110,7 +118,7 @@ export class DreamIslandCourse implements RaceCourse {
   /** Decision 6: the night still happens under `?motion=reduce` — it is gameplay
    * and it changes grip — but it arrives as a step at the strike instead of a
    * 12 s ramp, so the grip change lands on the same tick in both modes. */
-  private readonly reducedMotion = typeof location !== "undefined" && new URLSearchParams(location.search).get("motion") === "reduce";
+  readonly reducedMotion = typeof location !== "undefined" && new URLSearchParams(location.search).get("motion") === "reduce";
   readonly tide = { lap: 1, elapsed: 0, waterLevel: -30, draining: false, shortcutOpen: false };
 
   private readonly scratch = this.createProjectionScratch();
@@ -356,37 +364,56 @@ export class DreamIslandCourse implements RaceCourse {
    * Road ribbon and kerbs in ONE mesh. Draw calls are the binding budget on this
    * project, so the kerbs are merged into the road's own buffers with their own
    * flat vertex colour rather than left as a second instanced draw.
+   *
+   * Phase B re-skins both onto the painted concrete atlas: the deck samples the
+   * road-sand quadrant and the kerbs sample the cyan-kerb quadrant, from ONE
+   * texture and one draw. That is why the ribbon is authored per quad rather
+   * than as a shared strip - an atlas quadrant has nowhere to wrap to, so the
+   * repeat has to live in the UVs, and a repeat in the UVs needs the vertex at
+   * the wrap to exist twice. `dreamisland-painted-environment.ts` supplies the
+   * map; without it the material is exactly the phase-A vertex-coloured Lambert.
    */
   private createStreet(): THREE.Mesh {
     const positions:number[] = [], colors:number[] = [], uvs:number[] = [], indices:number[] = [];
-    for (let i = 0; i <= route.count; i++) {
-      const sample = this.sample(i / route.count);
+    const push = (point: THREE.Vector3, color: THREE.Color, cell: readonly number[], s: number, t: number) => {
+      positions.push(point.x, point.y, point.z);
+      colors.push(color.r, color.g, color.b);
+      uvs.push(cell[0] + cell[2] * s, cell[1] + cell[3] * t);
+    };
+    const edge = new THREE.Vector3();
+    for (let i = 0; i < route.count; i++) {
       const color = DISTRICT_COLORS[this.district(i / route.count)];
-      for (const side of [-1,1]) {
-        const p = sample.position.clone().addScaledVector(sample.right, sample.halfWidth * side);
-        positions.push(p.x, p.y, p.z);
-        colors.push(color.r, color.g, color.b);
-        uvs.push((side+1)/2, i / route.count * this.length);
+      const base = positions.length / 3;
+      // DECK_STATIONS stations of road share one road-sand tile, so a 26 m wide
+      // deck carries a roughly square piece of surface rather than a smear.
+      for (const step of [0, 1]) {
+        const sample = this.sample((i + step) / route.count);
+        const v = ((i % DECK_STATIONS) + step) / DECK_STATIONS;
+        for (const side of [-1, 1]) {
+          push(edge.copy(sample.position).addScaledVector(sample.right, sample.halfWidth * side),
+            color, CELL.roadSand, (side + 1) / 2, v);
+        }
       }
-      if (i < route.count) {
-        const k=i*2; indices.push(k,k+1,k+3,k,k+3,k+2);
-      }
+      indices.push(base, base+1, base+3, base, base+3, base+2);
     }
     const kerb = new THREE.Color(0xd8d2c0), corner = new THREE.Vector3();
     for (let distance = 0; distance < this.length; distance += 7) {
       const sample = this.sampleAtDistance(distance);
       for (const side of [-1,1]) {
-        const base = positions.length / 3;
-        for (const [lateral, rise, along] of KERB_CORNERS) {
-          corner.copy(sample.position)
-            .addScaledVector(sample.right, (sample.halfWidth + .4) * side + lateral)
-            .addScaledVector(sample.up, .13 + rise)
-            .addScaledVector(sample.tangent, along);
-          positions.push(corner.x, corner.y, corner.z);
-          colors.push(kerb.r, kerb.g, kerb.b);
-          uvs.push(0, 0);
+        // Each face carries its own four corners: the cyan stripe has to run
+        // along the kerb on every face, which shared corners cannot express.
+        for (const face of BOX_FACES) {
+          const base = positions.length / 3;
+          for (const [index, vertex] of face.entries()) {
+            const [lateral, rise, along] = KERB_CORNERS[vertex];
+            corner.copy(sample.position)
+              .addScaledVector(sample.right, (sample.halfWidth + .4) * side + lateral)
+              .addScaledVector(sample.up, .13 + rise)
+              .addScaledVector(sample.tangent, along);
+            push(corner, kerb, CELL.kerbCyan, KERB_FACE_UV[index][0], KERB_FACE_UV[index][1]);
+          }
+          indices.push(base, base+1, base+2, base, base+2, base+3);
         }
-        for (const face of BOX_FACES) indices.push(base+face[0], base+face[1], base+face[2]);
       }
     }
     const geometry = new THREE.BufferGeometry();
@@ -400,6 +427,22 @@ export class DreamIslandCourse implements RaceCourse {
     return mesh;
   }
 
+  /** Phase B hands the course its painted atlases. The road and the markers keep
+   * their phase-A geometry and draw counts and gain a map; called once, from
+   * `dreamisland-painted-environment.ts`, after the textures have loaded. */
+  applyPaintedAtlases(concrete: THREE.Texture, metal: THREE.Texture): number {
+    let skinned = 0;
+    for (const [object, texture] of [[this.group.getObjectByName("dreamisland_blockout_road"), concrete],
+      [this.markers, metal]] as const) {
+      const material = (object as THREE.Mesh | undefined)?.material as THREE.MeshLambertMaterial | undefined;
+      if (!material) continue;
+      material.map = texture;
+      material.needsUpdate = true;
+      skinned += 1;
+    }
+    return skinned;
+  }
+
   /**
    * Ordered gates, the two launch strips, the watchtower phase-field posts and
    * the five device markers. One box geometry, one emissive material multiplied
@@ -408,7 +451,13 @@ export class DreamIslandCourse implements RaceCourse {
   private createMarkers(): THREE.InstancedMesh {
     const fields = DREAMISLAND_FIELDS, pickups = DREAMISLAND_ABILITY_CONFIG.pickups;
     const count = (route.checkpoints.length + STRIP_DISTANCES.length + fields.length) * 2 + pickups.length;
-    const mesh = new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),
+    // The marker box's own UVs are 0..1 per face; squeezing them into the metal
+    // rail quadrant is what lets phase B re-skin all of them with one map.
+    const box = new THREE.BoxGeometry(1,1,1), boxUv = box.attributes.uv;
+    for (let i = 0; i < boxUv.count; i++) {
+      boxUv.setXY(i, CELL.rail[0] + CELL.rail[2] * boxUv.getX(i), CELL.rail[1] + CELL.rail[3] * boxUv.getY(i));
+    }
+    const mesh = new THREE.InstancedMesh(box,
       new THREE.MeshLambertMaterial({color:0xffffff,emissive:0xffffff,emissiveIntensity:.12}), count);
     (mesh.material as THREE.MeshLambertMaterial).onBeforeCompile=shader=>{shader.fragmentShader=shader.fragmentShader.replace('#include <emissivemap_fragment>','#include <emissivemap_fragment>\n#ifdef USE_COLOR\ntotalEmissiveRadiance*=vColor.rgb;\n#endif');};
     const transform=new THREE.Object3D(),basis=new THREE.Matrix4();

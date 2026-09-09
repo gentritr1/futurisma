@@ -1,0 +1,195 @@
+{
+  "script": "scripts/measure-dreamisland-route.mjs",
+  "route": {
+    "lengthMetres": 2399.9999999980478,
+    "stations": 800,
+    "revision": "esses-b"
+  },
+  "turnFloorCurvature": 0.0045,
+  "turnFloorRadiusMetres": 222.22222222222223,
+  "minimumRunMetres": 25,
+  "globalMinimumRadiusMetres": 47.97975713663894,
+  "districts": [
+    {
+      "fromMetres": 0,
+      "toMetres": 299.99999999975597,
+      "id": "BEACH",
+      "name": "BEACH STRAIGHT",
+      "width": 26,
+      "lengthMetres": 299.99999999975597,
+      "stations": 100,
+      "maximumCurvature": 0.001894259022506879,
+      "minimumRadiusMetres": 527.910907705004,
+      "maximumPitchDegrees": 0.010751266886594099,
+      "foldGuard": 0.024625367292589427,
+      "turns": [],
+      "alternations": 0
+    },
+    {
+      "fromMetres": 299.99999999975597,
+      "toMetres": 679.9999999994468,
+      "id": "GROVE",
+      "name": "PALM GROVE",
+      "width": 22,
+      "lengthMetres": 379.99999999969083,
+      "stations": 127,
+      "maximumCurvature": 0.017873747430247843,
+      "minimumRadiusMetres": 55.9479764331734,
+      "maximumPitchDegrees": 3.7136854733122098,
+      "foldGuard": 0.19661122173272627,
+      "turns": [
+        {
+          "direction": "RIGHT",
+          "fromMetres": 305.9999999997511,
+          "toMetres": 368.99999999969987,
+          "lengthMetres": 62.999999999948784,
+          "radiusMetres": 55.97201387044813,
+          "netTurnDegrees": -41.05559700469564
+        },
+        {
+          "direction": "LEFT",
+          "fromMetres": 383.99999999968765,
+          "toMetres": 443.9999999996388,
+          "lengthMetres": 59.99999999995117,
+          "radiusMetres": 59.30271100758865,
+          "netTurnDegrees": 36.90451126918396
+        },
+        {
+          "direction": "RIGHT",
+          "fromMetres": 458.99999999962665,
+          "toMetres": 521.9999999995754,
+          "lengthMetres": 62.99999999994873,
+          "radiusMetres": 56.153944065768925,
+          "netTurnDegrees": -40.92258314598377
+        },
+        {
+          "direction": "LEFT",
+          "fromMetres": 536.9999999995632,
+          "toMetres": 593.9999999995168,
+          "lengthMetres": 56.999999999953616,
+          "radiusMetres": 59.64709585048661,
+          "netTurnDegrees": 34.85686366945085
+        },
+        {
+          "direction": "RIGHT",
+          "fromMetres": 611.9999999995022,
+          "toMetres": 671.9999999994534,
+          "lengthMetres": 59.99999999995123,
+          "radiusMetres": 55.9479764331734,
+          "netTurnDegrees": -39.117367708317346
+        }
+      ],
+      "alternations": 4
+    },
+    {
+      "fromMetres": 679.9999999994468,
+      "toMetres": 939.9999999992353,
+      "id": "POINT",
+      "name": "WATCHTOWER POINT",
+      "width": 14,
+      "lengthMetres": 259.99999999978854,
+      "stations": 87,
+      "maximumCurvature": 0.007320661690650161,
+      "minimumRadiusMetres": 136.59967394439016,
+      "maximumPitchDegrees": 5.298383037195928,
+      "foldGuard": 0.05124463183455113,
+      "turns": [
+        {
+          "direction": "RIGHT",
+          "fromMetres": 737.9999999993997,
+          "toMetres": 881.9999999992825,
+          "lengthMetres": 143.9999999998828,
+          "radiusMetres": 136.59967394439016,
+          "netTurnDegrees": -38.451703494935195
+        }
+      ],
+      "alternations": 0
+    },
+    {
+      "fromMetres": 939.9999999992353,
+      "toMetres": 1239.9999999989914,
+      "id": "BASIN",
+      "name": "BASIN CAUSEWAY",
+      "width": 20,
+      "lengthMetres": 299.999999999756,
+      "stations": 100,
+      "maximumCurvature": 0.0020498073615696968,
+      "minimumRadiusMetres": 487.85072136448093,
+      "maximumPitchDegrees": 0.09799292705488472,
+      "foldGuard": 0.020498073615696968,
+      "turns": [],
+      "alternations": 0
+    },
+    {
+      "fromMetres": 1239.9999999989914,
+      "toMetres": 1579.9999999987147,
+      "id": "COURT",
+      "name": "CLOCK COURT",
+      "width": 24,
+      "lengthMetres": 339.9999999997233,
+      "stations": 113,
+      "maximumCurvature": 0.005933361963275147,
+      "minimumRadiusMetres": 168.53851259868387,
+      "maximumPitchDegrees": 3.5404063092554345,
+      "foldGuard": 0.07120034355930177,
+      "turns": [
+        {
+          "direction": "RIGHT",
+          "fromMetres": 1241.9999999989896,
+          "toMetres": 1577.9999999987162,
+          "lengthMetres": 335.9999999997267,
+          "radiusMetres": 168.53851259868387,
+          "netTurnDegrees": -72.71815909844997
+        }
+      ],
+      "alternations": 0
+    },
+    {
+      "fromMetres": 1579.9999999987147,
+      "toMetres": 2039.9999999983406,
+      "id": "REEF",
+      "name": "REEF SHALLOWS",
+      "width": 26,
+      "lengthMetres": 459.99999999962597,
+      "stations": 153,
+      "maximumCurvature": 0.0035148868894565683,
+      "minimumRadiusMetres": 284.5041765069739,
+      "maximumPitchDegrees": 0.008176635279779484,
+      "foldGuard": 0.04569352956293539,
+      "turns": [],
+      "alternations": 0
+    },
+    {
+      "fromMetres": 2039.9999999983406,
+      "toMetres": 2399.9999999980478,
+      "id": "CUT",
+      "name": "MOSSY CUT",
+      "width": 22,
+      "lengthMetres": 359.99999999970714,
+      "stations": 120,
+      "maximumCurvature": 0.02084212300516975,
+      "minimumRadiusMetres": 47.97975713663894,
+      "maximumPitchDegrees": 0,
+      "foldGuard": 0.22926335305686726,
+      "turns": [
+        {
+          "direction": "LEFT",
+          "fromMetres": 2069.9999999983165,
+          "toMetres": 2189.9999999982188,
+          "lengthMetres": 119.99999999990223,
+          "radiusMetres": 75.20808206997987,
+          "netTurnDegrees": 58.199531391754284
+        },
+        {
+          "direction": "RIGHT",
+          "fromMetres": 2222.999999998192,
+          "toMetres": 2393.9999999980528,
+          "lengthMetres": 170.99999999986085,
+          "radiusMetres": 47.97975713663894,
+          "netTurnDegrees": -129.9992421231787
+        }
+      ],
+      "alternations": 1
+    }
+  ]
+}
