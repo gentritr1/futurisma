@@ -1,0 +1,46 @@
+{
+  "script": "scripts/visual/hud/gamepad-prompts.mjs",
+  "probeOnly": true,
+  "executed": {
+    "confirmButton": 0,
+    "confirmObserved": "Focused SYSTEM OPTIONS activated and terminal opened",
+    "backButton": 1,
+    "backObserved": "Terminal closed and returned to paddock"
+  },
+  "keyboard": [
+    {
+      "text": "ENTER"
+    },
+    {
+      "text": "O"
+    }
+  ],
+  "gamepad": [
+    {
+      "text": "ENTER"
+    },
+    {
+      "text": "O"
+    }
+  ],
+  "optionsGamepad": [
+    {
+      "text": "ENTER"
+    },
+    {
+      "text": "O"
+    },
+    {
+      "text": "ESC"
+    }
+  ],
+  "disconnected": [
+    {
+      "text": "ENTER"
+    },
+    {
+      "text": "O"
+    }
+  ],
+  "errors": []
+}

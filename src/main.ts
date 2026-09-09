@@ -34,6 +34,7 @@ const ui = new GameUi();
 // reads: the slots only ever show something once a device circuit has loaded.
 void import("./game/ability-slots").then(({ bindAbilitySlots }) => bindAbilitySlots());
 const input = new InputController();
+void import("./game/input-prompts").then(({bindInputPrompts}) => bindInputPrompts(input));
 const courseAssemblyStartedAt = performance.now();
 const selection = resolveMapSelection(window.location.search);
 const course: RaceCourse = selection === "ascension"

@@ -12,6 +12,8 @@
  */
 
 import assert from "node:assert/strict";
+import {readFileSync} from "node:fs";
+import {INPUT_PROMPTS} from "../src/game/input-prompt-map.js";
 import {
   QUIT_HOLD_SECONDS,
   QUIT_HOLD_MAX_STEP,
@@ -173,3 +175,11 @@ const largest = hudScaleValue("l", 1080);
 assert.ok(Math.abs(largest - 1.2 * 1.2247) < 0.002, "L at 1080p is the step times the term");
 
 console.log("validate:hud — quit hold, ability attributes and interface scale all pass");
+
+const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
+for(const kbd of html.matchAll(/<kbd([^>]*)>/g)){
+ const action=/data-prompt="([^"]+)"/.exec(kbd[1])?.[1];
+ assert.ok(action && INPUT_PROMPTS[action], 'Every kbd must use the single prompt map');
+}
+assert.equal(INPUT_PROMPTS.confirm.gamepad,'A');
+assert.equal(INPUT_PROMPTS.back.gamepad,'B');

@@ -241,11 +241,11 @@
           <div class="pause-panel__actions">
             <button id="pause-resume" class="launch-button" type="button">
               <span>RESUME</span>
-              <kbd>ENTER</kbd>
+              <kbd data-prompt="confirm">ENTER</kbd>
             </button>
             <button id="pause-options" class="ghost-button" type="button">
               <span>SYSTEM OPTIONS</span>
-              <kbd>O</kbd>
+              <kbd data-prompt="options">O</kbd>
             </button>
             <button
               id="pause-quit"
@@ -255,7 +255,7 @@
             >
               <span class="quit-button__fill" aria-hidden="true"></span>
               <span class="quit-button__text">QUIT TO PADDOCK</span>
-              <kbd>HOLD</kbd>
+              <kbd data-prompt="quit">HOLD</kbd>
             </button>
           </div>
           <p id="pause-quit-hint" class="pause-panel__hint">
@@ -330,12 +330,12 @@
 
           <button id="start-button" class="launch-button" type="button">
             <span>LAUNCH RACE</span>
-            <kbd>ENTER</kbd>
+            <kbd data-prompt="confirm">ENTER</kbd>
           </button>
 
           <button id="options-button" class="ghost-button" type="button">
             <span>SYSTEM OPTIONS</span>
-            <kbd>O</kbd>
+            <kbd data-prompt="options">O</kbd>
           </button>
 
           <dl class="controls-list">
@@ -375,7 +375,7 @@
           <dl id="result-stats" class="result-stats" aria-label="Race statistics" hidden></dl>
           <button id="restart-button" class="launch-button" type="button">
             <span>RACE AGAIN</span>
-            <kbd>ENTER</kbd>
+            <kbd data-prompt="confirm">ENTER</kbd>
           </button>
         </div>
       </section>
@@ -490,12 +490,12 @@
 
           <button id="options-relink" class="launch-button" type="button" hidden>
             <span>RELINK SYSTEM</span>
-            <kbd>APPLY</kbd>
+            <kbd data-prompt="apply">APPLY</kbd>
           </button>
 
           <button id="options-close" class="ghost-button" type="button">
             <span>RETURN TO PADDOCK</span>
-            <kbd>ESC</kbd>
+            <kbd data-prompt="back">ESC</kbd>
           </button>
         </div>
       </section>

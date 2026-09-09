@@ -77,6 +77,21 @@ function hasHeldKeyboardAction(keys: ReadonlySet<string>): boolean {
 }
 
 export class InputController {
+  activeDevice: "keyboard" | "gamepad" = "keyboard";
+  onDeviceChange: ((device: "keyboard" | "gamepad") => void) | null = null;
+  onMenuButton: ((button: number) => boolean) | null = null;
+  private connectedPadIndex: number | null = null;
+
+  private setActiveDevice(device: "keyboard" | "gamepad"): void {
+    if (device === this.activeDevice) return;
+    this.activeDevice = device;
+    this.onDeviceChange?.(device);
+  }
+  private readonly handleKeyboardActivity = (): void => this.setActiveDevice("keyboard");
+  private readonly handlePadConnection = (): void => {
+    this.setActiveDevice(this.activeGamepad() ? "gamepad" : "keyboard");
+  };
+
   private readonly keys = new Set<string>();
   private readonly frame: InputFrame = {
     throttle: 0,
@@ -96,9 +111,12 @@ export class InputController {
   private previousGamepadButtons: boolean[] = [];
 
   constructor() {
+    window.addEventListener("keydown", this.handleKeyboardActivity, {capture: true});
     window.addEventListener("keydown", this.handleKeyDown, { passive: false });
     window.addEventListener("keyup", this.handleKeyUp);
     window.addEventListener("blur", this.clearKeys);
+    window.addEventListener("gamepadconnected", this.handlePadConnection);
+    window.addEventListener("gamepaddisconnected", this.handlePadConnection);
   }
 
   read(): InputFrame {
@@ -112,6 +130,13 @@ export class InputController {
       || (!this.gravityControls && this.keys.has("Space"));
 
     const gamepad = this.activeGamepad();
+    if (gamepad) {
+      if (this.connectedPadIndex !== gamepad.index || gamepad.buttons.some(button => button.pressed) || gamepad.axes.some(axis => Math.abs(axis) > .2)) this.setActiveDevice("gamepad");
+      this.connectedPadIndex = gamepad.index;
+    } else {
+      this.connectedPadIndex = null;
+      this.setActiveDevice("keyboard");
+    }
     const actionControlHeld = hasHeldKeyboardAction(this.keys)
       || Boolean(gamepad?.buttons[9]?.pressed)
       || Boolean(gamepad?.buttons[3]?.pressed)
@@ -135,30 +160,31 @@ export class InputController {
       return this.frame;
     }
 
+    const handled = gamepad.buttons.map((button,index) => acceptActions && button.pressed && !this.previousGamepadButtons[index] ? this.onMenuButton?.(index) ?? false : false);
     if (
-      acceptActions
+      acceptActions && !handled[9]
       && gamepad.buttons[9]?.pressed
       && !this.previousGamepadButtons[9]
     ) {
       this.startRequested = true;
     }
     if (
-      acceptActions
+      acceptActions && !handled[3]
       && gamepad.buttons[3]?.pressed
       && !this.previousGamepadButtons[3]
     ) {
       this.resetRequested = true;
     }
     if (
-      acceptActions
+      acceptActions && !handled[8]
       && gamepad.buttons[8]?.pressed
       && !this.previousGamepadButtons[8]
     ) {
       this.muteRequested = true;
     }
     if (acceptActions) {
-      if (this.gravityControls && gamepad.buttons[2]?.pressed && !this.previousGamepadButtons[2]) this.flipRequested = true;
-      if (this.powerControls && gamepad.buttons[1]?.pressed && !this.previousGamepadButtons[1]) this.powerRequested = true;
+      if (!handled[2] && this.gravityControls && gamepad.buttons[2]?.pressed && !this.previousGamepadButtons[2]) this.flipRequested = true;
+      if (!handled[1] && this.powerControls && gamepad.buttons[1]?.pressed && !this.previousGamepadButtons[1]) this.powerRequested = true;
       if (this.flipRequested || this.powerRequested) this.controlIntentRequested = true;
     }
     this.previousGamepadButtons.length = gamepad.buttons.length;
@@ -251,9 +277,12 @@ export class InputController {
   }
 
   dispose(): void {
+    window.removeEventListener("keydown", this.handleKeyboardActivity, {capture: true});
     window.removeEventListener("keydown", this.handleKeyDown);
     window.removeEventListener("keyup", this.handleKeyUp);
     window.removeEventListener("blur", this.clearKeys);
+    window.removeEventListener("gamepadconnected", this.handlePadConnection);
+    window.removeEventListener("gamepaddisconnected", this.handlePadConnection);
     this.clearKeys();
   }
 
@@ -292,6 +321,7 @@ export class InputController {
   }
 
   private readonly handleKeyDown = (event: KeyboardEvent): void => {
+    this.setActiveDevice("keyboard");
     if (CONTROL_KEYS.has(event.code)) event.preventDefault();
     this.keys.add(event.code);
     if (DRIVING_KEYS.has(event.code)) this.controlIntentRequested = true;
