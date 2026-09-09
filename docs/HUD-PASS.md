@@ -184,3 +184,72 @@ CONTROLS view and its `C` binding, `activeDevice` keyboard/gamepad prompt
 swapping, the results-screen changes (`showResult` leading with position or best
 lap, CIRCUIT SELECT), `data-transfer`/`data-device` stamping from inside the
 circuit runtimes, and genuine HUD-free per-circuit backdrop captures.
+
+## Merge onto `work/ascension-pad` — 2026-09-09
+
+Merged as `d903b25` from `work/hud-redesign`; no file was touched by both
+sides since `8ad5931`, and Codex's phase E commits touch no source. Then the
+full suite was run **end to end**, which the pass above had not done, and it
+found two things the per-validator runs had not.
+
+**1. `validate:tideline-runtime` threw `ReferenceError: Element is not
+defined`.** That validator, and `validate:polarity-runtime`, drive
+`InputController` under a Node stub — a bare `EventTarget` for `window`, no
+DOM globals — and the focus-owned-keys rule did `target instanceof Element`.
+Fixed by duck-typing the target on `closest`: anything without it (window,
+document, a stub) owns no keys, which is also the right answer in a browser.
+Both validators pass again; the browser behaviour is unchanged and re-observed
+below. **Rule kept from this:** nothing on the input path may touch a DOM
+global by name, and "ran the validators I thought relevant" is not "ran the
+suite".
+
+**2. `validate:build` failed on all three initial-shell ceilings.** Codex's
+phase E baseline sat *exactly* on the JS-gzip and shell ceilings
+(262.0 / 272.0 KiB against 262 / 272), so any byte broke them. Measured on the
+merged tree against that baseline of 961.6 raw / 262.0 gzip / 272.0 shell:
+
+| Arrangement | JS raw | JS gzip | Shell gzip |
+| --- | ---: | ---: | ---: |
+| HUD as merged | 970.5 (+8.9) | 265.0 (+3.0) | 276.8 (+4.8) |
+| `ability-slots.ts` lazy | 966.9 (+5.3) | 263.8 (+1.8) | 275.5 (+3.5) |
+
+The ability-slot renderer is circuit-specific presentation — it only ever
+shows a device circuit's state — so it now loads with the runtimes it reads,
+as the build validator's own rule for circuit code already asks. The pause
+menu was not split: it must exist before the first pause on every circuit, and
+the repo's G3 note already judged a null-guarded indirection for ~1 KiB not
+worth it. Ceilings re-pinned at measured + ~1.5 KiB, as M1 did:
+964 / 262 / 272 → 969 / 266 / 277, with the rationale in `validate-build.mjs`.
+
+**A harness fault found while re-verifying.** `pause-quit.mjs` waited a fixed
+nine seconds for the race to start. Against a dev server that was also serving
+the 24-capture run, Polarity was still streaming at nine seconds, Escape paused
+a race that had not started, the panel opened with focus on RESUME, and the
+quit hold never began — reported as `quit/completed did NOT reach the
+paddock`. That is the same trap `capture-hud.mjs` had already closed; the
+pause script now waits for `#time-value` to advance, then acts. Both scripts
+parse `--flag=value` only; `--port 5200` silently falls back to 5310 *and*
+`--out` to the committed evidence directory — one such run overwrote two
+evidence PNGs, restored from git before anything was committed.
+
+### Re-verified on the merged tree — executed and observed
+
+- `npm run test:code` end to end: exit 0 after the two fixes, 66 PASS lines;
+  `validate:build` reports 966.9 KiB raw / 263.8 KiB gzip / 275.5 KiB shell.
+- `pause-quit.mjs`, solo, now asserting every phase it records: 9 observations,
+  0 failures — panel up, `resuming`, back to `race`, four cancellations held
+  paused, and the working hold at `scaleX(0.657)` mid-way then the paddock.
+  Stored as `art/evidence/hud/pause-quit.json` and its five PNGs.
+- `capture-hud.mjs` across 24 captures (the 20 above plus **Ascension** at both
+  viewports and both scales): 0 page errors, every frame a moving race after
+  four frames from the shared-server run were re-shot solo. The harness now
+  fails a frame whose `phase` is not `race` or whose speed reads 000, and
+  exits non-zero — the shared-server run had recorded three reloaded frames as
+  passes. Table in `art/evidence/hud/capture-merged.json`; Ascension frames
+  added to the evidence directory. Ascension clears the standing block by
+  45.1 px at 1280×720 L (same as Polarity — one ability row plus the pad line);
+  Tideline's 19.3 px remains the tightest.
+- The lazily loaded `ability-slots` chunk returns 200 and stamps runtime state
+  on Polarity, Tideline and Ascension with 0 page errors.
+
+Still unverified after the merge: everything in "Not verified" above.

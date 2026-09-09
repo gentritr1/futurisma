@@ -9,7 +9,6 @@ import { configureRenderMode } from "./game/render-mode.js";
 import { resolveQualityLock, resolveReducedMotion, searchParam } from "./game/query-probes";
 import { GameUi } from "./game/ui";
 import { applyInterfaceScale } from "./game/interface-scale.js";
-import { bindAbilitySlots } from "./game/ability-slots";
 
 const canvasElement = document.getElementById("game-canvas");
 if (!(canvasElement instanceof HTMLCanvasElement)) {
@@ -31,7 +30,9 @@ window.addEventListener("resize", () => applyInterfaceScale(save.settings));
 const ui = new GameUi();
 // The ability glyph slots derive their state from the nodes the circuit
 // runtimes already write, so this binds once and needs nothing from them.
-bindAbilitySlots();
+// Circuit-specific presentation stays out of first paint, like the runtimes it
+// reads: the slots only ever show something once a device circuit has loaded.
+void import("./game/ability-slots").then(({ bindAbilitySlots }) => bindAbilitySlots());
 const input = new InputController();
 const courseAssemblyStartedAt = performance.now();
 const selection = resolveMapSelection(window.location.search);

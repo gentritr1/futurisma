@@ -59,7 +59,20 @@ const run = async () => {
     await page.goto(url, { waitUntil: "load" });
     await page.waitForTimeout(2500);
     await page.keyboard.press("Enter");
-    await page.waitForTimeout(9000);
+    // Wait for the race, not for a clock on the wall. Under a loaded dev server
+    // Polarity can still be streaming nine seconds in, and an Escape that lands
+    // before the clock runs pauses a race that has not started - the panel then
+    // opens with focus on RESUME and the quit hold never begins. That is the
+    // trap capture-hud.mjs already closed; this is the same wait.
+    await page.waitForFunction(
+      () => {
+        const clock = document.getElementById("time-value")?.textContent ?? "";
+        return /\d/.test(clock) && clock.trim() !== "00:00.000";
+      },
+      undefined,
+      { timeout: 90_000 },
+    );
+    await page.waitForTimeout(1500);
     return { context, page };
   };
 
@@ -76,17 +89,28 @@ const run = async () => {
     await page.keyboard.press("Escape");
     await page.waitForTimeout(400);
     await page.screenshot({ path: join(OUT, "pause-panel.png") });
-    await record(page, "pause/panel-up", "phase paused, panel up");
+    const up = await record(page, "pause/panel-up", "phase paused, panel up");
+    if (up.phase !== "paused" || !up.panelUp) errors.push(`pause/panel-up: phase ${up.phase}, panelUp ${up.panelUp}`);
 
     // A device is live here, so this frame is also the evidence that the
     // ability slot survives the pause without recomputing from a wall clock.
     await page.keyboard.press("Enter");
     await page.waitForTimeout(600);
     await page.screenshot({ path: join(OUT, "pause-countdown.png") });
-    await record(page, "pause/countdown", "phase resuming, panel down");
+    const countdown = await record(page, "pause/countdown", "phase resuming, panel down");
+    if (countdown.phase !== "resuming" || countdown.panelUp) errors.push(`pause/countdown: phase ${countdown.phase}, panelUp ${countdown.panelUp}`);
 
-    await page.waitForTimeout(2600);
-    await record(page, "pause/resumed", "phase race");
+    // The countdown is 2.7 s of simulation time, not wall time: a slow frame
+    // stretches it, and a fixed 2.6 s wait once recorded "resumed" while the
+    // body still said `resuming`. Wait for the phase itself, and fail if the
+    // race does not come back within a generous bound.
+    const resumedAt = Date.now();
+    await page
+      .waitForFunction(() => document.body.dataset.phase === "race", undefined, { timeout: 15_000 })
+      .catch(() => undefined);
+    const resumed = await record(page, "pause/resumed", "phase race");
+    results[results.length - 1].resumeWaitMs = Date.now() - resumedAt;
+    if (resumed.phase !== "race") errors.push(`pause/resumed: phase is ${resumed.phase}, not race`);
     await context.close();
   }
 

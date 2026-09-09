@@ -1,6 +1,6 @@
 {
   "script": "scripts/visual/hud/pause-quit.mjs",
-  "url": "http://127.0.0.1:5310/?map=polarity&demo=1",
+  "url": "http://127.0.0.1:5200/?map=polarity&demo=1",
   "overHoldMs": 1600,
   "results": [
     {
@@ -15,7 +15,7 @@
     {
       "id": "pause/countdown",
       "expectation": "phase resuming, panel down",
-      "phase": "race",
+      "phase": "resuming",
       "panelUp": false,
       "onPaddock": false,
       "holdProgress": "scaleX(0)",
@@ -28,7 +28,8 @@
       "panelUp": false,
       "onPaddock": false,
       "holdProgress": "scaleX(0)",
-      "focused": ""
+      "focused": "",
+      "resumeWaitMs": 9993
     },
     {
       "id": "cancel/tab-away-mid-hold",
@@ -72,7 +73,7 @@
       "phase": "paused",
       "panelUp": true,
       "onPaddock": false,
-      "holdProgress": "scaleX(0.630444)",
+      "holdProgress": "scaleX(0.657333)",
       "focused": "pause-quit"
     },
     {

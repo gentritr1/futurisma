@@ -55,10 +55,14 @@ const CONTROL_OWNED_KEYS = new Set(["Enter", "NumpadEnter", "Space"]);
  * the player is actually driving.
  */
 function targetOwnsKeys(target: EventTarget | null): boolean {
-  if (!(target instanceof Element)) return false;
-  if (target.id === "game-canvas") return false;
+  // Duck-typed on purpose: the runtime validators drive this controller under a
+  // Node stub with no global `Element`, and dispatch from a bare EventTarget.
+  // Anything without `closest` (window, document, a stub) owns no keys.
+  const element = target as Partial<Element> | null;
+  if (!element || typeof element.closest !== "function") return false;
+  if (element.id === "game-canvas") return false;
   return Boolean(
-    target.closest(
+    element.closest(
       'button, a[href], input, select, textarea, [role="button"], [role="radio"], [tabindex]:not([tabindex="-1"])',
     ),
   );

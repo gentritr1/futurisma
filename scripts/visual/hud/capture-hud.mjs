@@ -23,6 +23,8 @@ const arg = (name, fallback) => {
 
 const PORT = Number(arg("port", "5310"));
 const OUT = arg("out", "art/evidence/hud");
+/** `--only=1280x720-scale-m-race,1920x1080-scale-l-ascension` re-runs named captures. */
+const ONLY = new Set(arg("only", "").split(",").filter(Boolean));
 const BASE = `http://127.0.0.1:${PORT}/`;
 /**
  * Kept in step with `persistence.ts` by the assertion below rather than by
@@ -50,6 +52,7 @@ const CASES = [
   { id: "race-rivals", query: "?map=greenwater&demo=1&laps=5", settle: 26000, note: "rivals close" },
   { id: "polarity", query: "?map=polarity&demo=1", settle: 16000, note: "gravity decks and device" },
   { id: "tideline", query: "?map=tideline&demo=1", settle: 18000, note: "travel modes" },
+  { id: "ascension", query: "?map=ascension&demo=1", settle: 18000, note: "deckless pad, launch day" },
   { id: "reduced", query: "?map=greenwater&demo=1&laps=5&motion=reduce", settle: 14000, note: "reduced motion" },
 ];
 
@@ -88,6 +91,8 @@ const run = async () => {
   for (const viewport of VIEWPORTS) {
     for (const scale of ["m", "l"]) {
       for (const testCase of CASES) {
+        const name = `${viewport.name}-scale-${scale}-${testCase.id}`;
+        if (ONLY.size > 0 && !ONLY.has(name)) continue;
         // HUD SCALE L has to be a stored setting, not a query flag, or the test
         // proves nothing about the path a player actually takes to it.
         const context = await browser.newContext({
@@ -168,7 +173,12 @@ const run = async () => {
               + `${state.hudScale}, expected ${expected}. The stored setting did not arrive.`,
           );
         }
-        const name = `${viewport.name}-scale-${scale}-${testCase.id}`;
+        // A frame is only evidence if it is a moving race. A page reload (Vite
+        // HMR, a crash) leaves `phase` null and a stalled craft reads 000, and
+        // an earlier run recorded three such frames as passes.
+        if (state.phase !== "race" || state.speed === "000") {
+          errors.push(`${name}: not a moving race at capture (phase=${state.phase}, speed=${state.speed})`);
+        }
         await page.screenshot({ path: join(OUT, `${name}.png`) });
         results.push({ name, viewport: viewport.name, scale, case: testCase.id, note: testCase.note, ...state });
         console.log(name, JSON.stringify({ hudScale: state.hudScale, speed: state.speed, clusterWidth: state.clusterWidth }));
@@ -184,6 +194,7 @@ const run = async () => {
   );
   console.log(`\n${results.length} captures, ${errors.length} console/page errors`);
   if (errors.length) console.log(errors.slice(0, 10).join("\n"));
+  process.exitCode = errors.length ? 1 : 0;
 };
 
 await run();
