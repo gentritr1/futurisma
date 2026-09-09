@@ -44,7 +44,7 @@ const shellGzip = gzipSync(html).byteLength + javascriptGzip + stylesheetGzip;
 // The overall 272 KiB shell ceiling is unchanged. Course/environment/sky data
 // and the deterministic ability simulation still load with their circuit.
 for (const name of javascriptNames) {
-  assert.ok(!/tideline-(course|runtime|world|sky|environment)-|polarity-simulation-/.test(name), "Circuit-specific presentation/rules must stay lazy.");
+  assert.ok(!/tideline-(course|runtime|world|sky|environment)-|dreamisland-|polarity-simulation-/.test(name), "Circuit-specific presentation/rules must stay lazy.");
 }
 
 // HUD pass (2026-09-09): the approved interface bound to the running game.
@@ -63,9 +63,24 @@ for (const name of javascriptNames) {
 // null-guarded step() for ~1 KiB is the indirection G3 already judged not
 // worth it. Ceilings re-pinned at measured + ~1.5 KiB, as M1 did, so the next
 // merge fails on spend rather than on chunk boundaries: 964/262/272 -> 969/266/277.
+// Dream Island (Map 07) registration, measured 2026-09-09 with `npx vite build`
+// on the merged tree: 970.3 KiB raw / 264.8 KiB gzip JS / 276.7 KiB shell,
+// against 968.9 / 264.4 / 276.3 without the map. The whole +1.5 KiB raw lands in
+// the entry chunk and is the seventh circuit's registration and nothing else:
+// the CourseKind and MapSelection unions, the TRACKS row, TRACK_CODES, the
+// DREAMISLAND sky zone / cloud profile / band strength (all three lookups, or
+// the atmosphere throws on construction), the main.ts, circuit-runtime and
+// scene-assets dispatch arms, the render-rule arm, the intro copy, and rollup's
+// own asset-URL bookkeeping for the four new lazy chunks. Everything the map
+// actually is - course, runtime, powers, environment, its 150 KiB route.json -
+// stays lazy, which the assertion above this one pins by name.
+// Only the RAW ceiling moves, 969 -> 972 (measured + 1.7 KiB, the same
+// measured-plus-headroom rule the HUD pass used). The two compressed ceilings
+// that decide what a visitor downloads are untouched and both still pass with
+// 1.2 KiB and 0.3 KiB to spare.
 assert.ok(
-  javascript.rawBytes <= 969 * 1024,
-  `Initial JavaScript exceeds 969 KiB raw (${(javascript.rawBytes / 1024).toFixed(1)} KiB).`,
+  javascript.rawBytes <= 972 * 1024,
+  `Initial JavaScript exceeds 972 KiB raw (${(javascript.rawBytes / 1024).toFixed(1)} KiB).`,
 );
 // The JavaScript ceiling, re-baselined four times on 2026-09-03 from 224.2 KiB
 // gzip. Every rationale is kept, because each one names what its bytes bought

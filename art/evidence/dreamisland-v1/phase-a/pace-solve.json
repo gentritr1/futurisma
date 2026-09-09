@@ -1,0 +1,92 @@
+{
+  "script": "scripts/solve-dreamisland-pace.mjs",
+  "measurement": "art/evidence/dreamisland-v1/phase-a/calibration/works-calibration.json",
+  "playerSeconds": 94.941,
+  "playerLapTimesMs": [
+    32433,
+    31350,
+    31158
+  ],
+  "bisection": {
+    "low": 75,
+    "high": 115,
+    "iterations": 18
+  },
+  "tierShiftSeconds": {
+    "rookie": 4,
+    "works": 0,
+    "feral": -4
+  },
+  "profileOffsetSeconds": [
+    -1,
+    1,
+    3
+  ],
+  "converged": true,
+  "scope": "Isolated production rival model against the measured player race total; browser tier classification is the separate soak.",
+  "measurements": [
+    {
+      "tier": "rookie",
+      "id": "rival-privateer",
+      "target": 97.941,
+      "measured": 97.94077637862402,
+      "solved": 83.09089660644531
+    },
+    {
+      "tier": "rookie",
+      "id": "rival-nightform",
+      "target": 99.941,
+      "measured": 99.94122493563799,
+      "solved": 81.57981872558594
+    },
+    {
+      "tier": "rookie",
+      "id": "rival-needle",
+      "target": 101.941,
+      "measured": 101.94111996500153,
+      "solved": 79.93461608886719
+    },
+    {
+      "tier": "works",
+      "id": "rival-privateer",
+      "target": 93.941,
+      "measured": 93.94089621469834,
+      "solved": 86.81739807128906
+    },
+    {
+      "tier": "works",
+      "id": "rival-nightform",
+      "target": 95.941,
+      "measured": 95.94111714260158,
+      "solved": 85.28648376464844
+    },
+    {
+      "tier": "works",
+      "id": "rival-needle",
+      "target": 97.941,
+      "measured": 97.94017712406838,
+      "solved": 83.45191955566406
+    },
+    {
+      "tier": "feral",
+      "id": "rival-privateer",
+      "target": 89.941,
+      "measured": 89.94093876347115,
+      "solved": 91.03187561035156
+    },
+    {
+      "tier": "feral",
+      "id": "rival-nightform",
+      "target": 91.941,
+      "measured": 91.94278251457708,
+      "solved": 89.23423767089844
+    },
+    {
+      "tier": "feral",
+      "id": "rival-needle",
+      "target": 93.941,
+      "measured": 93.94665476768951,
+      "solved": 87.39616394042969
+    }
+  ]
+}

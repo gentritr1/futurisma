@@ -10,14 +10,14 @@ export async function loadVehicleForRace(vehicle:TotemVehicle,kind:string){
  return {startedAt,elapsed,requests:resources.length,requestStart:resources[0]?.startTime??null};
 }
 export async function prepareTidelinePresentation(kind:string,reduced:boolean,scene:THREE.Scene,rivals:RivalFleet|null,...roots:THREE.Object3D[]):Promise<(()=>void)|null> {
- if(kind!=='tideline'&&kind!=='ascension')return null;
+ if(kind!=='tideline'&&kind!=='ascension'&&kind!=='dreamisland')return null;
  const {resolveAbilitySeed}=await import("./ability-seed");
  const {applyTidelineRenderRule,auditTidelineGameplayMaterials}=await import("./tideline-render-rule");
  await rivals?.enableTidelinePowers(resolveAbilitySeed(),reduced);
- if(kind==='ascension')for(const root of [...roots,...(rivals?[rivals.root]:[])])root.traverse(object=>{
+ if(kind==='ascension'||kind==='dreamisland')for(const root of [...roots,...(rivals?[rivals.root]:[])])root.traverse(object=>{
   // Glass and luminous lenses do not occlude sunlight. Keep solid hull shadows.
   if(/^(stabiliser_ring_emissive|emissive_static|canopy_glass|rival_totem_emissive_hull|rival_totem_glass_hull)$/.test(object.name))object.castShadow=false;
  });
- if(kind==='ascension'){const ghost=scene.getObjectByName('totem_ghost_hull');if(ghost)roots.push(ghost);}
+ if(kind==='ascension'||kind==='dreamisland'){const ghost=scene.getObjectByName('totem_ghost_hull');if(ghost)roots.push(ghost);}
  const update=applyTidelineRenderRule(...roots,...(rivals?[rivals.root]:[]));auditTidelineGameplayMaterials(scene);return update;
 }

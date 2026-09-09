@@ -1,0 +1,75 @@
+{
+  "script": "scripts/validate-dreamisland-runtime.mjs",
+  "config": {
+    "script": "scripts/build-dreamisland-route.mjs",
+    "measurementScript": "scripts/visual/dreamisland/race.mjs",
+    "measurement": "art/evidence/dreamisland-v1/phase-a/calibration/works-calibration.json",
+    "worksLapSeconds": 31.254,
+    "definition": "Mean of flying laps two and three in the full Works demo with the schedule inert",
+    "chimeTick": 6938,
+    "strikeTick": 7688,
+    "fishRiseTick": 8168,
+    "nightSettledTick": 9128,
+    "nightRampTicks": 1440,
+    "events": [
+      {
+        "id": "chime-warning",
+        "tick": 6938
+      },
+      {
+        "id": "strike",
+        "tick": 7688
+      },
+      {
+        "id": "fish-rise",
+        "tick": 8168
+      },
+      {
+        "id": "night-settled",
+        "tick": 9128
+      }
+    ]
+  },
+  "determinism": {
+    "renderRates": [
+      60,
+      120,
+      240
+    ],
+    "windowSeconds": 120,
+    "tickRateHz": 120,
+    "expectedTicks": 14400,
+    "ticks": [
+      14400,
+      14400,
+      14400
+    ],
+    "frames": [
+      7200,
+      14400,
+      28800
+    ],
+    "expectedFrames": [
+      7200,
+      14400,
+      28800
+    ],
+    "reconciliation": "frames = render rate x window seconds; ticks = 120 Hz x window seconds, identical at every render rate",
+    "identicalSnapshots": true
+  },
+  "snapshotRestore": true,
+  "knownLimitation": "snapshot/restore has exactly one caller, this validator. Pause, resume and the save system do not snapshot the schedule; restore exists to make determinism provable, not to make pause deterministic.",
+  "grip": {
+    "sector": "BASIN",
+    "beforeStrike": 1,
+    "afterStrike": 0.85,
+    "reachesCraftVia": "course.surfaceGripAt"
+  },
+  "nightTurn": {
+    "rampTicks": 1440,
+    "midpointBlend": 0.5,
+    "settledBlend": 1,
+    "reducedMotion": "step 0 -> 1 at strikeTick, same tick as the grip change"
+  },
+  "scope": "Pure clock, grip and blend arithmetic in Node. Not a rendered crossfade: the sky and water are phases B and C and the five-point capture instrument does not exist yet."
+}

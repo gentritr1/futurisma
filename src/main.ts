@@ -37,7 +37,9 @@ const input = new InputController();
 void import("./game/input-prompts").then(({bindInputPrompts}) => bindInputPrompts(input));
 const courseAssemblyStartedAt = performance.now();
 const selection = resolveMapSelection(window.location.search);
-const course: RaceCourse = selection === "ascension"
+const course: RaceCourse = selection === "dreamisland"
+  ? new (await import("./game/dreamisland-course")).DreamIslandCourse()
+  : selection === "ascension"
   ? new (await import("./game/ascension-course")).AscensionCourse()
   : selection === "tideline"
   ? new (await import("./game/tideline-course")).TidelineCourse()

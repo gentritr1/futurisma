@@ -1,0 +1,41 @@
+{
+  "script": "scripts/validate-dreamisland.mjs",
+  "routeMetres": 2399.9999999992324,
+  "stations": 800,
+  "spacing": {
+    "minimum": 2.999515841819292,
+    "maximum": 2.9999999999991473,
+    "summedMetres": 2399.9622160214653
+  },
+  "maximumCurvature": 0.020840839814149095,
+  "minimumRadiusMetres": 47.982711297511536,
+  "maximumPitchDegrees": 5.298383005919043,
+  "courtPeakBankRadians": 0.05499710721101155,
+  "orderedGates": 8,
+  "projection": {
+    "samples": 7200,
+    "expectedSamples": 7200,
+    "worstProgressErrorMetres": 0.049558249920862135,
+    "worstLateralErrorMetres": 0.00046321705212637454,
+    "note": "Spatial sweep over every station at three laterals and three heights; not a timed sample window."
+  },
+  "schedule": {
+    "reproducedFrom": "art/evidence/dreamisland-v1/phase-a/calibration/works-calibration.json",
+    "worksLapSeconds": 31.254,
+    "ticks": {
+      "chime": 6938,
+      "strike": 7688,
+      "fishRise": 8168,
+      "nightSettled": 9128
+    }
+  },
+  "pace": {
+    "unsolved": false,
+    "tierFinishSeconds": [
+      97.94165984971016,
+      93.94094108193946,
+      89.94101364421354
+    ]
+  },
+  "scope": "Route geometry, sampling, gates, apron, powers configuration, published schedule provenance and the isolated rival model. Not a rendered frame and not a browser soak."
+}

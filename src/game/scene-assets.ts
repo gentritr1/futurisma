@@ -396,8 +396,12 @@ export class SceneAssets {
   async loadAuthoredEnvironment(): Promise<void> {
     const environmentLoadStartedAt = performance.now();
     try {
-      if (this.course.kind === "ascension") {
-        const environment=await (await import("./ascension-painted-environment")).AscensionPaintedEnvironment.load(this.course as import("./ascension-course").AscensionCourse);
+      // Both painted circuits add their authored root straight to the scene:
+      // they do their own batching and neither needs the culling wrapper.
+      if (this.course.kind === "ascension" || this.course.kind === "dreamisland") {
+        const environment=this.course.kind === "ascension"
+          ? await (await import("./ascension-painted-environment")).AscensionPaintedEnvironment.load(this.course as import("./ascension-course").AscensionCourse)
+          : await (await import("./dreamisland-environment")).DreamIslandEnvironment.load(this.course as import("./dreamisland-course").DreamIslandCourse);
         if(this.isDisposed()){disposeObject3DResources(environment.root);return;}
         this.authoredEnvironment=environment;this.scene.add(environment.root);this.environmentReady=true;this.requestRender();return;
       }

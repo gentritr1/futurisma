@@ -270,7 +270,7 @@ export interface TimeOfDayStop {
   keyScale: number;
 }
 
-export type CourseKind = "greenwater" | "bitterpan" | "nightshift" | "polarity" | "tideline" | "ascension";
+export type CourseKind = "greenwater" | "bitterpan" | "nightshift" | "polarity" | "tideline" | "ascension" | "dreamisland";
 
 export interface RivalGridStart {
   raceDistanceMeters: number;

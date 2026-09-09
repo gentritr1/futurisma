@@ -1,0 +1,64 @@
+{
+  "cornerSpeedGain": 0.25,
+  "cornerSpeedFloor": 0.72,
+  "noBlockSide": -1,
+  "driftCurvature": 0.55,
+  "straightCurvature": 0.13,
+  "profiles": {
+    "rival-privateer": {
+      "cruiseSpeedMetersPerSecond": 86.81739807128906,
+      "padUse": false,
+      "boostWindows": []
+    },
+    "rival-nightform": {
+      "cruiseSpeedMetersPerSecond": 85.28648376464844,
+      "padUse": false,
+      "boostWindows": []
+    },
+    "rival-needle": {
+      "cruiseSpeedMetersPerSecond": 83.45191955566406,
+      "padUse": false,
+      "boostWindows": []
+    }
+  },
+  "tiers": {
+    "rookie": {
+      "profiles": {
+        "rival-privateer": {
+          "cruiseSpeedMetersPerSecond": 83.09089660644531,
+          "padUse": false,
+          "boostWindows": []
+        },
+        "rival-nightform": {
+          "cruiseSpeedMetersPerSecond": 81.57981872558594,
+          "padUse": false,
+          "boostWindows": []
+        },
+        "rival-needle": {
+          "cruiseSpeedMetersPerSecond": 79.93461608886719,
+          "padUse": false,
+          "boostWindows": []
+        }
+      }
+    },
+    "feral": {
+      "profiles": {
+        "rival-privateer": {
+          "cruiseSpeedMetersPerSecond": 91.03187561035156,
+          "padUse": false,
+          "boostWindows": []
+        },
+        "rival-nightform": {
+          "cruiseSpeedMetersPerSecond": 89.23423767089844,
+          "padUse": false,
+          "boostWindows": []
+        },
+        "rival-needle": {
+          "cruiseSpeedMetersPerSecond": 87.39616394042969,
+          "padUse": false,
+          "boostWindows": []
+        }
+      }
+    }
+  }
+}
