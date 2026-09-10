@@ -69,9 +69,9 @@
     "validate:tideline-contract": "node scripts/validate-tideline-contract.mjs",
     "validate:ascension": "node scripts/validate-ascension.mjs",
     "validate:ascension-runtime": "node scripts/validate-ascension-runtime.mjs",
-    "validate:dreamisland": "node scripts/validate-dreamisland.mjs",
-    "validate:dreamisland-runtime": "node scripts/validate-dreamisland-runtime.mjs",
-    "validate:dreamisland-painted": "node scripts/validate-dreamisland-painted.mjs"
+    "validate:dreamisland": "node scripts/validate-dreamisland.mjs --out=art/evidence/dreamisland-v1/phase-c/validators",
+    "validate:dreamisland-runtime": "node scripts/validate-dreamisland-runtime.mjs --out=art/evidence/dreamisland-v1/phase-c/validators",
+    "validate:dreamisland-painted": "node scripts/validate-dreamisland-painted.mjs --out=art/evidence/dreamisland-v1/phase-c/validators"
   },
   "dependencies": {
     "three": "0.184.0"

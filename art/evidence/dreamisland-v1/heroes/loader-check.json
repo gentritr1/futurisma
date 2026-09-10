@@ -1,0 +1,661 @@
+{
+  "status": "VERIFIED",
+  "threeRevision": "184",
+  "atlasInputs": {
+    "public/assets/dreamisland/textures/concrete.jpg": "1fa66bf620bd081fae2809c79e704dd1403f92f1b90e76a2f0a9284fe3db1b67",
+    "public/assets/dreamisland/textures/metal.jpg": "ae8c28ae95073d0c2acee9c16ab13e6ddb1c30f4906ad41b1a9e049b69f3943a",
+    "public/assets/dreamisland/textures/jungle.jpg": "66dd4473ab6ee37e219d2c9c47fcce88a8d7b05777dd7a784d102a1a2dc1f7bb",
+    "public/assets/dreamisland/textures/water.jpg": "de31e9f54dc8eeea23cd6fc5ce269e21273b81a482667a0a9ed74930ececa607",
+    "public/assets/dreamisland/textures/signage.jpg": "e360e9cda4171a8f657de4df703117d0b887c545a3a76d43c46abb8a13e0831d",
+    "public/assets/dreamisland/textures/emissive.jpg": "b1464210c8b7f4513497a06c313ba65ba2a2354d2358d9f8eacd80735d5e1d79",
+    "public/assets/dreamisland/jungle-card.png": "829f518b7b2597b55824e70f09fbd7b008eb706cb49880535145d24cb799bb42"
+  },
+  "assets": {
+    "clock-tower": {
+      "meshes": 11,
+      "triangles": 4804,
+      "bounds": {
+        "min": [
+          -4,
+          0,
+          -4
+        ],
+        "max": [
+          4,
+          14,
+          4
+        ],
+        "size": [
+          8,
+          14,
+          8
+        ]
+      },
+      "bytes": 426040,
+      "sha256": "bf51f9c27d120e7b6969c6e22958a6d69d32146bf2c8686d3bc8c6817e992339",
+      "embeddedTextures": 0,
+      "meshDetails": [
+        {
+          "name": "clock_bezel",
+          "material": "DI_MAT_metal",
+          "triangles": 480,
+          "tintedVertices": 960
+        },
+        {
+          "name": "clock_cornice_and_pitched_roof",
+          "material": "DI_MAT_concrete",
+          "triangles": 52,
+          "tintedVertices": 104
+        },
+        {
+          "name": "clock_face_3_2m",
+          "material": "DI_MAT_emissive",
+          "triangles": 48,
+          "tintedVertices": 0
+        },
+        {
+          "name": "clock_hour_hand",
+          "material": "DI_MAT_metal",
+          "triangles": 12,
+          "tintedVertices": 24
+        },
+        {
+          "name": "clock_minute_hand",
+          "material": "DI_MAT_metal",
+          "triangles": 12,
+          "tintedVertices": 24
+        },
+        {
+          "name": "clock_moss_courses",
+          "material": "DI_MAT_jungle",
+          "triangles": 384,
+          "tintedVertices": 768
+        },
+        {
+          "name": "clock_plinth_three_tiers",
+          "material": "DI_MAT_concrete",
+          "triangles": 36,
+          "tintedVertices": 72
+        },
+        {
+          "name": "clock_roof_finial",
+          "material": "DI_MAT_concrete",
+          "triangles": 96,
+          "tintedVertices": 0
+        },
+        {
+          "name": "clock_square_block_courses",
+          "material": "DI_MAT_concrete",
+          "triangles": 3084,
+          "tintedVertices": 6168
+        },
+        {
+          "name": "clock_winding_stair_parapet",
+          "material": "DI_MAT_concrete",
+          "triangles": 300,
+          "tintedVertices": 600
+        },
+        {
+          "name": "clock_winding_stair_treads",
+          "material": "DI_MAT_concrete",
+          "triangles": 300,
+          "tintedVertices": 600
+        }
+      ],
+      "materials": [
+        "DI_MAT_concrete",
+        "DI_MAT_emissive",
+        "DI_MAT_jungle",
+        "DI_MAT_metal"
+      ],
+      "targetMeasurements": {
+        "height": 14,
+        "plinth": [
+          8,
+          1.2000000476837158,
+          8
+        ],
+        "faceDiameter": [
+          3.199999988079071,
+          3.200000286102295
+        ],
+        "hands": 2,
+        "steps": 25
+      }
+    },
+    "watchtower": {
+      "meshes": 13,
+      "triangles": 9278,
+      "bounds": {
+        "min": [
+          -14,
+          0,
+          -14.251358985900879
+        ],
+        "max": [
+          14,
+          30,
+          14.251358985900879
+        ],
+        "size": [
+          28,
+          30,
+          28.502717971801758
+        ]
+      },
+      "bytes": 802640,
+      "sha256": "340285676a4cdd8cf6ee43b08f99ceee5045a43ad679dcd8fc8131844ce36d2c",
+      "embeddedTextures": 0,
+      "meshDetails": [
+        {
+          "name": "watchtower_back_arch_keystone",
+          "material": "DI_MAT_concrete",
+          "triangles": 12,
+          "tintedVertices": 24
+        },
+        {
+          "name": "watchtower_back_arch_voussoirs",
+          "material": "DI_MAT_concrete",
+          "triangles": 552,
+          "tintedVertices": 1104
+        },
+        {
+          "name": "watchtower_back_arched_window",
+          "material": "DI_MAT_concrete",
+          "triangles": 180,
+          "tintedVertices": 0
+        },
+        {
+          "name": "watchtower_back_window_recess",
+          "material": "DI_MAT_concrete",
+          "triangles": 12,
+          "tintedVertices": 24
+        },
+        {
+          "name": "watchtower_crenellations_nine_of_twelve",
+          "material": "DI_MAT_concrete",
+          "triangles": 216,
+          "tintedVertices": 432
+        },
+        {
+          "name": "watchtower_crown_cornice",
+          "material": "DI_MAT_concrete",
+          "triangles": 576,
+          "tintedVertices": 1152
+        },
+        {
+          "name": "watchtower_front_arch_keystone",
+          "material": "DI_MAT_concrete",
+          "triangles": 12,
+          "tintedVertices": 24
+        },
+        {
+          "name": "watchtower_front_arch_voussoirs",
+          "material": "DI_MAT_concrete",
+          "triangles": 552,
+          "tintedVertices": 1104
+        },
+        {
+          "name": "watchtower_front_arched_window",
+          "material": "DI_MAT_concrete",
+          "triangles": 180,
+          "tintedVertices": 0
+        },
+        {
+          "name": "watchtower_front_window_recess",
+          "material": "DI_MAT_concrete",
+          "triangles": 12,
+          "tintedVertices": 24
+        },
+        {
+          "name": "watchtower_drum_concrete",
+          "material": "DI_MAT_concrete",
+          "triangles": 4430,
+          "tintedVertices": 8746
+        },
+        {
+          "name": "watchtower_drum_jungle",
+          "material": "DI_MAT_jungle",
+          "triangles": 2288,
+          "tintedVertices": 4376
+        },
+        {
+          "name": "watchtower_upper_chamber_floor",
+          "material": "DI_MAT_concrete",
+          "triangles": 256,
+          "tintedVertices": 0
+        }
+      ],
+      "materials": [
+        "DI_MAT_concrete",
+        "DI_MAT_jungle"
+      ],
+      "merlons": {
+        "occupiedSlots": [
+          0,
+          2,
+          3,
+          4,
+          6,
+          7,
+          9,
+          10,
+          11
+        ],
+        "missingSlots": [
+          1,
+          5,
+          8
+        ]
+      },
+      "targetMeasurements": {
+        "height": 30,
+        "baseWidth": 28,
+        "crownWidth": 20,
+        "flankSamples": [
+          {
+            "y": 1,
+            "side": "left",
+            "jamb": [
+              -7,
+              1,
+              0
+            ],
+            "outside": [
+              -14,
+              1,
+              0
+            ],
+            "width": 7
+          },
+          {
+            "y": 1,
+            "side": "right",
+            "jamb": [
+              7,
+              1,
+              0
+            ],
+            "outside": [
+              14,
+              1,
+              0
+            ],
+            "width": 7
+          },
+          {
+            "y": 4,
+            "side": "left",
+            "jamb": [
+              -7,
+              4,
+              0
+            ],
+            "outside": [
+              -14,
+              4,
+              0
+            ],
+            "width": 7
+          },
+          {
+            "y": 4,
+            "side": "right",
+            "jamb": [
+              7,
+              4,
+              0
+            ],
+            "outside": [
+              14,
+              4,
+              0
+            ],
+            "width": 7
+          },
+          {
+            "y": 7.5,
+            "side": "left",
+            "jamb": [
+              -7,
+              7.5,
+              0
+            ],
+            "outside": [
+              -14,
+              7.5,
+              0
+            ],
+            "width": 7
+          },
+          {
+            "y": 7.5,
+            "side": "right",
+            "jamb": [
+              7,
+              7.5,
+              0
+            ],
+            "outside": [
+              14,
+              7.5,
+              0
+            ],
+            "width": 7
+          }
+        ],
+        "minimumFlank": 7,
+        "ceilingSamples": [
+          [
+            0.001,
+            9.99998596425754,
+            -10
+          ],
+          [
+            0.001,
+            9.99998596425754,
+            0
+          ],
+          [
+            0.001,
+            9.99998596425754,
+            10
+          ]
+        ],
+        "chamberFloor": 17,
+        "overburden": 7.00001403574246,
+        "mossBandAngularSectors": 12,
+        "mossTintedVertices": 4376
+      },
+      "bore": {
+        "width": 14,
+        "springHeight": 8,
+        "crownHeight": 10,
+        "fullDepth": true,
+        "contactToleranceMetres": 0.001,
+        "testedTriangles": 9278,
+        "nominalRectangleMin": [
+          -7,
+          0,
+          -15.251358985900879
+        ],
+        "nominalRectangleMax": [
+          7,
+          8,
+          15.251358985900879
+        ],
+        "rectangleIntersectingTriangles": 0,
+        "archSegments": 32,
+        "archedVolumeIntersectingTriangles": 0,
+        "envelope14x10": {
+          "intersectingTriangles": 1168,
+          "interpretation": "Expected upper-corner masonry; the user confirmed a true arch, not full rectangular clearance"
+        },
+        "method": "World-space THREE.Box3 SAT on every exported triangle; convex polygon clipping against the full-depth arch; 1 mm boundary contact tolerance",
+        "intersectingTriangles": 0
+      }
+    },
+    "waterfall-cliff": {
+      "meshes": 6,
+      "triangles": 1212,
+      "bounds": {
+        "min": [
+          -10.97249984741211,
+          0.04500000178813934,
+          -8.015999794006348
+        ],
+        "max": [
+          10.97249984741211,
+          16.045000076293945,
+          3.309999942779541
+        ],
+        "size": [
+          21.94499969482422,
+          16.000000074505806,
+          11.325999736785889
+        ]
+      },
+      "bytes": 111384,
+      "sha256": "cd530cf9015421ae243a2536369725ee1033172fe221fcf3666de4e317772f28",
+      "embeddedTextures": 0,
+      "meshDetails": [
+        {
+          "name": "waterfall_blossom_clump_left",
+          "material": "DI_MAT_jungle-card",
+          "triangles": 6,
+          "tintedVertices": 0
+        },
+        {
+          "name": "waterfall_blossom_clump_right",
+          "material": "DI_MAT_jungle-card",
+          "triangles": 6,
+          "tintedVertices": 0
+        },
+        {
+          "name": "waterfall_mossy_ledge_caps",
+          "material": "DI_MAT_jungle",
+          "triangles": 312,
+          "tintedVertices": 624
+        },
+        {
+          "name": "waterfall_plunge_pool_foam_ring",
+          "material": "DI_MAT_water",
+          "triangles": 96,
+          "tintedVertices": 0
+        },
+        {
+          "name": "waterfall_projecting_shadow_ledges",
+          "material": "DI_MAT_concrete",
+          "triangles": 60,
+          "tintedVertices": 120
+        },
+        {
+          "name": "waterfall_stacked_block_cliff",
+          "material": "DI_MAT_concrete",
+          "triangles": 732,
+          "tintedVertices": 1464
+        }
+      ],
+      "materials": [
+        "DI_MAT_concrete",
+        "DI_MAT_jungle",
+        "DI_MAT_jungle-card",
+        "DI_MAT_water"
+      ],
+      "targetMeasurements": {
+        "drop": 16,
+        "lip": [
+          0,
+          16,
+          -3.5
+        ],
+        "poolDatum": [
+          0,
+          0,
+          -3.5
+        ],
+        "blossomClumps": 2
+      },
+      "cardTriangles": 12,
+      "solidTriangles": 1200
+    },
+    "sea-stack-set": {
+      "meshes": 8,
+      "triangles": 1304,
+      "bounds": {
+        "min": [
+          -32.80038547515869,
+          0,
+          -5.829975605010986
+        ],
+        "max": [
+          35.727272510528564,
+          40,
+          5.812896251678467
+        ],
+        "size": [
+          68.52765798568726,
+          40,
+          11.642871856689453
+        ]
+      },
+      "bytes": 112724,
+      "sha256": "ef8183ae3c7c790d7685febd13e0874bd15566f02800feb40f8a0f00b70f756f",
+      "embeddedTextures": 0,
+      "meshDetails": [
+        {
+          "name": "stack_18_moss_cap",
+          "material": "DI_MAT_jungle",
+          "triangles": 48,
+          "tintedVertices": 108
+        },
+        {
+          "name": "stack_18_tapered_block_courses",
+          "material": "DI_MAT_concrete",
+          "triangles": 160,
+          "tintedVertices": 288
+        },
+        {
+          "name": "stack_26_moss_cap",
+          "material": "DI_MAT_jungle",
+          "triangles": 64,
+          "tintedVertices": 144
+        },
+        {
+          "name": "stack_26_tapered_block_courses",
+          "material": "DI_MAT_concrete",
+          "triangles": 224,
+          "tintedVertices": 384
+        },
+        {
+          "name": "stack_32_moss_cap",
+          "material": "DI_MAT_jungle",
+          "triangles": 56,
+          "tintedVertices": 126
+        },
+        {
+          "name": "stack_32_tapered_block_courses",
+          "material": "DI_MAT_concrete",
+          "triangles": 328,
+          "tintedVertices": 0
+        },
+        {
+          "name": "stack_40_moss_cap",
+          "material": "DI_MAT_jungle",
+          "triangles": 72,
+          "tintedVertices": 162
+        },
+        {
+          "name": "stack_40_tapered_block_courses",
+          "material": "DI_MAT_concrete",
+          "triangles": 352,
+          "tintedVertices": 594
+        }
+      ],
+      "materials": [
+        "DI_MAT_concrete",
+        "DI_MAT_jungle"
+      ],
+      "stacks": {
+        "18": {
+          "meshes": 2,
+          "triangles": 208,
+          "bounds": {
+            "min": [
+              -32.80038547515869,
+              0,
+              -4.763139724731445
+            ],
+            "max": [
+              -21.5,
+              18,
+              4.763139724731445
+            ],
+            "size": [
+              11.300385475158691,
+              18,
+              9.52627944946289
+            ]
+          }
+        },
+        "26": {
+          "meshes": 2,
+          "triangles": 288,
+          "bounds": {
+            "min": [
+              -13,
+              0,
+              -4
+            ],
+            "max": [
+              -4.889997482299805,
+              26,
+              4
+            ],
+            "size": [
+              8.110002517700195,
+              26,
+              8
+            ]
+          }
+        },
+        "32": {
+          "meshes": 2,
+          "triangles": 384,
+          "bounds": {
+            "min": [
+              3.3548154830932617,
+              0,
+              -5.829975605010986
+            ],
+            "max": [
+              16.5,
+              32,
+              5.812896251678467
+            ],
+            "size": [
+              13.145184516906738,
+              32,
+              11.642871856689453
+            ]
+          }
+        },
+        "40": {
+          "meshes": 2,
+          "triangles": 424,
+          "bounds": {
+            "min": [
+              24.301537036895752,
+              0,
+              -4.924038887023926
+            ],
+            "max": [
+              35.727272510528564,
+              40,
+              4.924038887023926
+            ],
+            "size": [
+              11.425735473632812,
+              40,
+              9.848077774047852
+            ]
+          }
+        }
+      },
+      "naturalArch": {
+        "boxMin": [
+          7.1,
+          0.1,
+          -15
+        ],
+        "boxMax": [
+          10.1,
+          7.8,
+          15
+        ],
+        "testedTriangles": 384,
+        "intersectingTriangles": 0
+      }
+    }
+  }
+}

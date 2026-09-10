@@ -69,7 +69,7 @@ export class DreamIslandRuntime implements CircuitRuntime {
   document.getElementById('polarity-flip')!.textContent='SPACE / SHIFT · NITRO';
   this.course.group.userData.playerProgress=progress;
   this.output.textContent=JSON.stringify({script:'src/game/dreamisland-runtime.ts',seed:clock.seed,tick:clock.tick,progress,
-   sector:this.course.sectorLabelAt(progress),nightBlend:this.course.nightBlend,reducedMotion:this.reducedMotion,
+   sector:this.course.sectorLabelAt(progress),nightBlend:this.course.nightBlend,nightBlendPinned:this.course.nightBlendPinned,reducedMotion:this.reducedMotion,
    grip:this.course.surfaceGripAt(progress),powers:this.powers.simulation.state,schedule:config,state:clock.state,events:clock.events,
    // Phase B's painted world, water and sky publish their own counters here.
    // Every one of them reads zero if the module loaded and did nothing.

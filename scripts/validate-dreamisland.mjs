@@ -242,7 +242,13 @@ assert.equal(course.deviceMarkerOffset,(route.checkpoints.length+stripMarks+DREA
 assert.equal(course.group.children.filter(child=>child.isMesh||child.isInstancedMesh).length,2,
   'The course spends two draws; the painted island is nine more in dreamisland-painted-environment.ts.');
 
-const out=new URL('../art/evidence/dreamisland-v1/phase-a/',import.meta.url);
+// Phase C: `--out=` so a route revision cannot overwrite the evidence of an
+// earlier phase. Default stays the phase directory this validator was written
+// for, and a relative path is resolved against the repo root, which is where
+// every validator here is run from.
+const outFlag=process.argv.find(a=>a.startsWith('--out='))?.slice(6);
+const out=outFlag?new URL(outFlag.replace(/\/?$/,'/'),new URL('../',import.meta.url))
+ :new URL('../art/evidence/dreamisland-v1/phase-a/',import.meta.url);
 mkdirSync(out,{recursive:true});
 const report={script:'scripts/validate-dreamisland.mjs',routeMetres:route.length,stations:route.count,
   spacing:{minimum:minimumGap,maximum:maximumGap,summedMetres:physicalLength},

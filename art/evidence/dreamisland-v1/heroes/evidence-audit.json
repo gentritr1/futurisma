@@ -1,0 +1,626 @@
+{
+  "status": "VERIFIED",
+  "frames": [
+    {
+      "file": "clock-tower-front.png",
+      "assetSha256": "bf51f9c27d120e7b6969c6e22958a6d69d32146bf2c8686d3bc8c6817e992339",
+      "pngSha256": "e2577dc16e22844fb734f0e4907fd0aa546f8ce74322e2332bfec91a5d22fb8b",
+      "size": [
+        1280,
+        960
+      ],
+      "ruler": {
+        "metres": 2,
+        "pixels": 97.28468169665463,
+        "segmentCentresRgb": [
+          [
+            239,
+            243,
+            228
+          ],
+          [
+            33,
+            44,
+            48
+          ],
+          [
+            239,
+            243,
+            229
+          ],
+          [
+            32,
+            43,
+            48
+          ]
+        ],
+        "allFourHalfMetreSegmentsVisible": true
+      }
+    },
+    {
+      "file": "clock-tower-side.png",
+      "assetSha256": "bf51f9c27d120e7b6969c6e22958a6d69d32146bf2c8686d3bc8c6817e992339",
+      "pngSha256": "e1015b72147c0a6d74cfe65c56af35275357769dc28793683a2116e2c0e547d8",
+      "size": [
+        1280,
+        960
+      ],
+      "ruler": {
+        "metres": 2,
+        "pixels": 97.28468169665463,
+        "segmentCentresRgb": [
+          [
+            238,
+            243,
+            228
+          ],
+          [
+            33,
+            44,
+            49
+          ],
+          [
+            239,
+            243,
+            229
+          ],
+          [
+            32,
+            43,
+            48
+          ]
+        ],
+        "allFourHalfMetreSegmentsVisible": true
+      }
+    },
+    {
+      "file": "clock-tower-back.png",
+      "assetSha256": "bf51f9c27d120e7b6969c6e22958a6d69d32146bf2c8686d3bc8c6817e992339",
+      "pngSha256": "8d7965cfcd6a3f7c0e4699ef6e58332f46d3bf05f749b3bc5e918b8de744d88f",
+      "size": [
+        1280,
+        960
+      ],
+      "ruler": {
+        "metres": 2,
+        "pixels": 97.28468169665463,
+        "segmentCentresRgb": [
+          [
+            239,
+            243,
+            228
+          ],
+          [
+            33,
+            44,
+            48
+          ],
+          [
+            239,
+            243,
+            229
+          ],
+          [
+            32,
+            43,
+            48
+          ]
+        ],
+        "allFourHalfMetreSegmentsVisible": true
+      }
+    },
+    {
+      "file": "clock-tower-three-quarter.png",
+      "assetSha256": "bf51f9c27d120e7b6969c6e22958a6d69d32146bf2c8686d3bc8c6817e992339",
+      "pngSha256": "10aad3d783c89f834d52a1e621ed1cf84e27ca36cd8576717ae21e1148cc3792",
+      "size": [
+        1280,
+        960
+      ],
+      "ruler": {
+        "metres": 2,
+        "pixels": 97.28468169665463,
+        "segmentCentresRgb": [
+          [
+            239,
+            243,
+            229
+          ],
+          [
+            33,
+            45,
+            49
+          ],
+          [
+            239,
+            243,
+            229
+          ],
+          [
+            33,
+            44,
+            49
+          ]
+        ],
+        "allFourHalfMetreSegmentsVisible": true
+      }
+    },
+    {
+      "file": "clock-tower-40m.png",
+      "assetSha256": "bf51f9c27d120e7b6969c6e22958a6d69d32146bf2c8686d3bc8c6817e992339",
+      "pngSha256": "39abdcd881b7e198a0cad3a6cf1864fb90e0d0cc301208afd10dee25fa464fc4",
+      "size": [
+        1280,
+        960
+      ],
+      "distanceMetres": 39.99999935925006
+    },
+    {
+      "file": "watchtower-front.png",
+      "assetSha256": "340285676a4cdd8cf6ee43b08f99ceee5045a43ad679dcd8fc8131844ce36d2c",
+      "pngSha256": "4cc199995cbad5a574e0ef478f579564caefb398a2b47d38e9a3bf3687ad5ebe",
+      "size": [
+        1280,
+        960
+      ],
+      "ruler": {
+        "metres": 2,
+        "pixels": 41.02262861413887,
+        "segmentCentresRgb": [
+          [
+            235,
+            239,
+            226
+          ],
+          [
+            33,
+            44,
+            48
+          ],
+          [
+            239,
+            242,
+            228
+          ],
+          [
+            33,
+            44,
+            49
+          ]
+        ],
+        "allFourHalfMetreSegmentsVisible": true
+      }
+    },
+    {
+      "file": "watchtower-side.png",
+      "assetSha256": "340285676a4cdd8cf6ee43b08f99ceee5045a43ad679dcd8fc8131844ce36d2c",
+      "pngSha256": "bc4f20310c9ff96c95eb01319f620284d07ddf67a14f9ea3a15330d5ad537f24",
+      "size": [
+        1280,
+        960
+      ],
+      "ruler": {
+        "metres": 2,
+        "pixels": 41.02262861413887,
+        "segmentCentresRgb": [
+          [
+            235,
+            239,
+            226
+          ],
+          [
+            33,
+            44,
+            48
+          ],
+          [
+            239,
+            242,
+            228
+          ],
+          [
+            33,
+            44,
+            49
+          ]
+        ],
+        "allFourHalfMetreSegmentsVisible": true
+      }
+    },
+    {
+      "file": "watchtower-back.png",
+      "assetSha256": "340285676a4cdd8cf6ee43b08f99ceee5045a43ad679dcd8fc8131844ce36d2c",
+      "pngSha256": "8892c5d8201733038dc6b80dccb0d206338c79c89b784d6e726cd2e76c1b366c",
+      "size": [
+        1280,
+        960
+      ],
+      "ruler": {
+        "metres": 2,
+        "pixels": 41.02262861413887,
+        "segmentCentresRgb": [
+          [
+            235,
+            239,
+            226
+          ],
+          [
+            33,
+            44,
+            48
+          ],
+          [
+            239,
+            242,
+            228
+          ],
+          [
+            33,
+            44,
+            49
+          ]
+        ],
+        "allFourHalfMetreSegmentsVisible": true
+      }
+    },
+    {
+      "file": "watchtower-three-quarter.png",
+      "assetSha256": "340285676a4cdd8cf6ee43b08f99ceee5045a43ad679dcd8fc8131844ce36d2c",
+      "pngSha256": "8ccda8fd3fac60158518044b932a408d8e5dc1d5218f8cec464ee64057519a7d",
+      "size": [
+        1280,
+        960
+      ],
+      "ruler": {
+        "metres": 2,
+        "pixels": 41.02262861413887,
+        "segmentCentresRgb": [
+          [
+            237,
+            240,
+            227
+          ],
+          [
+            33,
+            44,
+            49
+          ],
+          [
+            238,
+            242,
+            228
+          ],
+          [
+            38,
+            48,
+            52
+          ]
+        ],
+        "allFourHalfMetreSegmentsVisible": true
+      }
+    },
+    {
+      "file": "waterfall-cliff-front.png",
+      "assetSha256": "cd530cf9015421ae243a2536369725ee1033172fe221fcf3666de4e317772f28",
+      "pngSha256": "ff0f0b4af2059e29caac6f03cd9397131699667dd379a4571149157020f47c31",
+      "size": [
+        1280,
+        960
+      ],
+      "ruler": {
+        "metres": 2,
+        "pixels": 70.97006114675008,
+        "segmentCentresRgb": [
+          [
+            238,
+            242,
+            228
+          ],
+          [
+            33,
+            44,
+            48
+          ],
+          [
+            238,
+            242,
+            228
+          ],
+          [
+            33,
+            44,
+            48
+          ]
+        ],
+        "allFourHalfMetreSegmentsVisible": true
+      }
+    },
+    {
+      "file": "waterfall-cliff-side.png",
+      "assetSha256": "cd530cf9015421ae243a2536369725ee1033172fe221fcf3666de4e317772f28",
+      "pngSha256": "3c5040a7ad7d7719d8d7e193090277419aca03e5fc7abe5e765741562506f3af",
+      "size": [
+        1280,
+        960
+      ],
+      "ruler": {
+        "metres": 2,
+        "pixels": 70.97006114675008,
+        "segmentCentresRgb": [
+          [
+            238,
+            242,
+            228
+          ],
+          [
+            33,
+            44,
+            48
+          ],
+          [
+            238,
+            242,
+            228
+          ],
+          [
+            33,
+            44,
+            48
+          ]
+        ],
+        "allFourHalfMetreSegmentsVisible": true
+      }
+    },
+    {
+      "file": "waterfall-cliff-back.png",
+      "assetSha256": "cd530cf9015421ae243a2536369725ee1033172fe221fcf3666de4e317772f28",
+      "pngSha256": "0f9f2bd1aa2c286098dd8d9404f1c4364f23420ba2688987113f842b9d8abce7",
+      "size": [
+        1280,
+        960
+      ],
+      "ruler": {
+        "metres": 2,
+        "pixels": 70.97006114675008,
+        "segmentCentresRgb": [
+          [
+            238,
+            242,
+            228
+          ],
+          [
+            33,
+            44,
+            48
+          ],
+          [
+            238,
+            242,
+            228
+          ],
+          [
+            33,
+            44,
+            48
+          ]
+        ],
+        "allFourHalfMetreSegmentsVisible": true
+      }
+    },
+    {
+      "file": "waterfall-cliff-three-quarter.png",
+      "assetSha256": "cd530cf9015421ae243a2536369725ee1033172fe221fcf3666de4e317772f28",
+      "pngSha256": "88fcd43181fedfdb769bd4574d5835065abb68d51ea1efb395ee10cce5efe505",
+      "size": [
+        1280,
+        960
+      ],
+      "ruler": {
+        "metres": 2,
+        "pixels": 70.97006114675008,
+        "segmentCentresRgb": [
+          [
+            239,
+            244,
+            229
+          ],
+          [
+            32,
+            44,
+            49
+          ],
+          [
+            239,
+            243,
+            229
+          ],
+          [
+            32,
+            44,
+            49
+          ]
+        ],
+        "allFourHalfMetreSegmentsVisible": true
+      }
+    },
+    {
+      "file": "sea-stack-set-front.png",
+      "assetSha256": "ef8183ae3c7c790d7685febd13e0874bd15566f02800feb40f8a0f00b70f756f",
+      "pngSha256": "0078f3ddf4403eeaee2cd1ceddc707464f1cfc93590557f3559bfaaa897bb91a",
+      "size": [
+        1280,
+        960
+      ],
+      "ruler": {
+        "metres": 2,
+        "pixels": 28.300893929335167,
+        "segmentCentresRgb": [
+          [
+            221,
+            226,
+            214
+          ],
+          [
+            40,
+            53,
+            60
+          ],
+          [
+            230,
+            235,
+            221
+          ],
+          [
+            40,
+            53,
+            60
+          ]
+        ],
+        "allFourHalfMetreSegmentsVisible": true
+      }
+    },
+    {
+      "file": "sea-stack-set-side.png",
+      "assetSha256": "ef8183ae3c7c790d7685febd13e0874bd15566f02800feb40f8a0f00b70f756f",
+      "pngSha256": "592930e06cacf46d19a70636b30a5c84031ecce2f9a67929e54e559f09e0e160",
+      "size": [
+        1280,
+        960
+      ],
+      "ruler": {
+        "metres": 2,
+        "pixels": 28.300893929335167,
+        "segmentCentresRgb": [
+          [
+            221,
+            226,
+            214
+          ],
+          [
+            40,
+            53,
+            60
+          ],
+          [
+            230,
+            235,
+            221
+          ],
+          [
+            40,
+            53,
+            60
+          ]
+        ],
+        "allFourHalfMetreSegmentsVisible": true
+      }
+    },
+    {
+      "file": "sea-stack-set-back.png",
+      "assetSha256": "ef8183ae3c7c790d7685febd13e0874bd15566f02800feb40f8a0f00b70f756f",
+      "pngSha256": "8b93c87314b3b36ae3558cd0ab08b0ec83c114c2c16637944559487318ed8547",
+      "size": [
+        1280,
+        960
+      ],
+      "ruler": {
+        "metres": 2,
+        "pixels": 28.300893929335167,
+        "segmentCentresRgb": [
+          [
+            221,
+            226,
+            214
+          ],
+          [
+            40,
+            53,
+            60
+          ],
+          [
+            230,
+            235,
+            221
+          ],
+          [
+            40,
+            53,
+            60
+          ]
+        ],
+        "allFourHalfMetreSegmentsVisible": true
+      }
+    },
+    {
+      "file": "sea-stack-set-three-quarter.png",
+      "assetSha256": "ef8183ae3c7c790d7685febd13e0874bd15566f02800feb40f8a0f00b70f756f",
+      "pngSha256": "111c9ad672c436391a54342735417ff44f461f3359f9429bdb50431e69d881fc",
+      "size": [
+        1280,
+        960
+      ],
+      "ruler": {
+        "metres": 2,
+        "pixels": 28.300893929335167,
+        "segmentCentresRgb": [
+          [
+            229,
+            234,
+            223
+          ],
+          [
+            75,
+            83,
+            85
+          ],
+          [
+            232,
+            237,
+            224
+          ],
+          [
+            75,
+            83,
+            85
+          ]
+        ],
+        "allFourHalfMetreSegmentsVisible": true
+      }
+    },
+    {
+      "file": "sea-stack-set-300m.png",
+      "assetSha256": "ef8183ae3c7c790d7685febd13e0874bd15566f02800feb40f8a0f00b70f756f",
+      "pngSha256": "3e38afb4d246d7926370cd1a2d7f5ce504ba1ee8816a8f72dc5b51e16a40fab6",
+      "size": [
+        1280,
+        960
+      ],
+      "distanceMetres": 300.0
+    },
+    {
+      "file": "watchtower-40m.png",
+      "assetSha256": "340285676a4cdd8cf6ee43b08f99ceee5045a43ad679dcd8fc8131844ce36d2c",
+      "pngSha256": "0d72405a0f441f6082f96d5e105115380531f8dd458bd8c3b4fdc34c4c525eca",
+      "size": [
+        1280,
+        960
+      ],
+      "distanceMetres": 40.00000078678131
+    }
+  ],
+  "turntables": 16,
+  "distanceFrames": 3,
+  "rulerPixelChecks": 16,
+  "atlasGridSamples": 175,
+  "atlasMaximumChannelError": 0,
+  "atlasProbeFiles": [
+    "atlas-pixel-0-emissive.png",
+    "atlas-pixel-1-concrete.png",
+    "atlas-pixel-2-concrete.png",
+    "atlas-pixel-3-metal.png",
+    "atlas-pixel-4-jungle.png",
+    "atlas-pixel-5-water.png",
+    "atlas-pixel-6-jungle-card.png",
+    "atlas-pixel-7-jungle-card.png"
+  ]
+}

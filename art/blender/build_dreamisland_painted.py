@@ -37,7 +37,10 @@ from dreamisland_mesh import Asset,coord,empty,triangles
 
 ROOT=Path(__file__).resolve().parents[2]
 OUT=ROOT/'public/assets/dreamisland'
-EVIDENCE=ROOT/'art/evidence/dreamisland-v1/phase-b/build'
+# Phase C writes its own build record; phase B's stays where phase B left it,
+# because a later revision overwriting an earlier phase's evidence is the
+# residual this directory split exists to close.
+EVIDENCE=ROOT/'art/evidence/dreamisland-v1/phase-c/build'
 EVIDENCE.mkdir(parents=True,exist_ok=True)
 route=json.loads((ROOT/'src/game/data/dreamisland/route.json').read_text())
 atlas=json.loads((OUT/'atlas-manifest.json').read_text())
@@ -316,7 +319,40 @@ def beside(u,offset,rise=0.):
  p,t,right,s=frame(u);return p+right*offset+UP*rise
 def yaw_at(u):
  _,t,_,_=frame(u);return math.atan2(-t.x,-t.z)
+# --- Phase C. Four focal assets now ship as separate hero GLBs built by
+# `art/blender/build_dreamisland_heroes.py` and loaded at runtime by
+# `src/game/dreamisland-painted-environment.ts`. Their placements stay HERE and
+# stay in `painted.json` - the placement list is the source of truth for where
+# they stand - but their geometry is no longer copied into the batched world, or
+# the island would carry both versions of every one of them. Each such placement
+# is tagged `hero` with the GLB and, for the sea stacks, the named child of the
+# set to instance and the scale that reproduces the height this layout was
+# authored at.
+HERO_GLB={'clock-tower':'clock-tower.glb','watchtower-ruin':'watchtower.glb',
+ 'waterfall-cliff':'waterfall-cliff.glb','sea-stack':'sea-stack-set.glb'}
+# The hero set carries four stacks at exactly these heights; the painted layout
+# asked for six heights via `scale` on one 24 m stack. Each placement takes the
+# nearest hero silhouette and a scale that keeps the height the layout chose,
+# so the reef horizon does not move when the silhouettes get better.
+HERO_STACK_HEIGHTS={'sea_stack_18m':18.,'sea_stack_26m':26.,'sea_stack_32m':32.,'sea_stack_40m':40.}
+SEA_STACK_AUTHORED_HEIGHT=24.
+def hero_for(asset,scale):
+ if asset not in HERO_GLB:return None
+ record={'glb':'heroes/'+HERO_GLB[asset]}
+ if asset=='sea-stack':
+  wanted=SEA_STACK_AUTHORED_HEIGHT*scale
+  child=min(HERO_STACK_HEIGHTS,key=lambda name:abs(HERO_STACK_HEIGHTS[name]-wanted))
+  record.update({'child':child,'wantedHeightMetres':round(wanted,3),
+   'childHeightMetres':HERO_STACK_HEIGHTS[child],
+   'heroScale':round(wanted/HERO_STACK_HEIGHTS[child],5)})
+ else:record['heroScale']=scale
+ return record
 def place(asset,position,yaw=0.,scale=1.,sector='BEACH',dynamic=False,group='STATIC'):
+ hero=hero_for(asset,scale)
+ if hero is not None:
+  placements.append({'asset':asset,'position':[round(v,3) for v in position],'yaw':round(yaw,5),
+   'scale':scale,'sector':sector,'dynamic':dynamic,'batch':'HERO','hero':hero})
+  return None
  source=library[asset];root=source.copy();root.name=asset+'_'+str(len(placements))
  bpy.context.collection.objects.link(root);root.parent=world
  root.location=coord(tuple(position));root.rotation_euler.z=yaw
@@ -333,9 +369,37 @@ def sector_at(u):return station(u)['sector']
 def half_width(u):return station(u)['width']/2
 
 # The watchtower straddles the road on the POINT centreline; the bore is the corner.
+#
+# PHASE C, MEASURED. The hero drum is 28.5 m DEEP, so the road passes through
+# 28.5 m of a 137 m radius curve inside a bore that decision 5 fixed at 14 m -
+# exactly the road's own width there. Over that depth the road's two edges sweep
+# an envelope 14.778 m wide (measured off route.json in the bore's local frame),
+# so a 14 m bore cannot contain it at ANY placement: the best centring anywhere
+# in POINT still buries 0.39 m of road edge in masonry, and the flattest station
+# in the district (.2975, curvature .0029) still misses by 0.112 m because bore
+# width and road width are equal to begin with.
+#
+# The placement therefore carries two numbers that decision 5 did not:
+#   BORE_LATERAL 0.38 m - the offset that centres the swept envelope in the bore
+#                         (the road bows to ONE side of the tangent, so the
+#                         correction is a shift, not a rotation: the best yaw
+#                         correction measured 0.000 rad).
+#   BORE_SCALE   1.10   - the smallest uniform scale in 0.02 steps that leaves a
+#                         real margin. 1.06 is the first that clears at all and
+#                         it clears by 22 mm, which is not a margin; 1.10 leaves
+#                         0.302 m. A uniform scale keeps decision 5's rule that
+#                         the opening take no more than half the footprint width
+#                         (15.4 m of bore in a 30.8 m drum).
+# This is a deliberate deviation from decision 5's literal metres and it is
+# flagged in painted.json for review. `scripts/validate-dreamisland-painted.mjs`
+# asserts the containment directly, because a vertical ray cannot see a road
+# buried in a wall: with no floor or ceiling inside solid masonry there is
+# nothing above the ray to hit.
 BORE_U=.3375
+BORE_LATERAL=.38
+BORE_SCALE=1.10
 p,t,right,s=frame(BORE_U)
-place('watchtower-ruin',p,yaw_at(BORE_U),sector='POINT')
+place('watchtower-ruin',beside(BORE_U,BORE_LATERAL),yaw_at(BORE_U),scale=BORE_SCALE,sector='POINT')
 # The clock tower stands off the inside of the Clock Court sweep, face to the road.
 TOWER_U=.5875
 place('clock-tower',beside(TOWER_U,26,-1.4),yaw_at(TOWER_U)+math.pi,sector='COURT')
@@ -383,14 +447,21 @@ for index,distance in enumerate(range(12,2400,23)):
   place('undergrowth-card-set',beside(u,side*(half_width(u)+4.8),-.15),
    (index*2.3)%math.tau,sector=sector)
 
-# The goldfish rest in the basin pool until `fish-rise`. Phase B places them
-# static and at rest; the drift paths are phase C. They go in their own batch so
-# the runtime can hide the whole shoal with one `visible = false`.
-FISH_NAMES=[name for name,_ in LIVERIES]
-for index,(u,offset,rise) in enumerate([(.415,-30,-6.4),(.428,-42,-7.1),(.441,-22,-6.8),
- (.454,-52,-7.4),(.466,-33,-6.6),(.478,-45,-7.2),(.489,-25,-6.9),(.500,-38,-7.6)]):
- place(FISH_NAMES[index%4],beside(u,offset,rise),(index*1.31)%math.tau,
-  sector='BASIN',group='FISH')
+# The goldfish. Phase B placed eight in one batch, static and at rest. Phase C
+# splits them into TWO named shoals, because decision 3's ambience is two
+# authored closed paths - a figure-eight over the basin pool and a long loop over
+# the reef shallows - and a single batch can only ever be moved as one body.
+#
+# Every resting position comes from `src/game/data/dreamisland/fish-paths.json`,
+# which is also what `src/game/dreamisland-fish.ts` reads at runtime and what
+# `scripts/validate-dreamisland-runtime.mjs` asserts against. One file: the
+# geometry the world exports and the drift the runtime plays cannot disagree
+# about where a shoal starts.
+FISH_PATHS=json.loads((ROOT/'src/game/data/dreamisland/fish-paths.json').read_text())
+for shoal in FISH_PATHS['shoals']:
+ for fish in shoal['fish']:
+  place(fish['livery'],beside(fish['progress'],fish['lateral'],fish['rise']),
+   fish['yaw']%math.tau,sector=shoal['sector'],group=shoal['batch'])
 
 # The sand verge. The road is otherwise a ribbon over open water and every palm
 # and fern stands on nothing. It is authored as one route-following ribbon on the
@@ -512,6 +583,37 @@ bpy.ops.wm.save_as_mainfile(filepath=str(ROOT/'art/blender/dreamisland_painted.b
 bpy.ops.export_scene.gltf(filepath=str(OUT/'painted.glb'),export_format='GLB',use_selection=True,
  export_yup=True,export_vertex_color='ACTIVE',export_extras=True)
 
+# --- Phase C. What `painted.json` records for a hero-backed asset must describe
+# what SHIPS, not the placeholder this script still authors and no longer
+# places. The five silhouette features, the target metres, the measured bounds
+# and the triangle count are therefore taken from the hero build's own record.
+HERO_ASSET={'clock-tower':'clock-tower','watchtower-ruin':'watchtower',
+ 'waterfall-cliff':'waterfall-cliff','sea-stack':'sea-stack-set'}
+HERO_TARGET={
+ 'clock-tower':{'heightMetres':14.,'widthMetres':8.},
+ 'watchtower-ruin':{'heightMetres':30.,'widthMetres':28.,'boreWidthMetres':14.,
+  'boreSpringHeightMetres':8.,'boreCrownHeightMetres':10.,'minimumFlankMetres':7.,
+  'placedScale':BORE_SCALE,'placedLateralOffsetMetres':BORE_LATERAL,
+  'placedHeightMetres':round(30.*BORE_SCALE,3),'placedBoreWidthMetres':round(14.*BORE_SCALE,3),
+  'deviation':'Decision 5 fixes the drum at 28 x 30 m and the bore at 14 x 8 m. At scale 1 that bore cannot contain the 14 m road across its own 28.5 m depth on this route: the swept envelope is 14.778 m. Placed at scale 1.10 with a 0.38 m lateral offset, which leaves 0.302 m of measured lateral clearance. Flagged for review; the asset itself is unmodified.'},
+ 'waterfall-cliff':{'dropMetres':16.},
+ 'sea-stack':{'heightMetres':40.,'stackHeightsMetres':[18.,26.,32.,40.]},
+}
+heroes_record=json.loads((OUT/'heroes/heroes.json').read_text())
+for asset,hero_name in HERO_ASSET.items():
+ record=heroes_record['assets'][hero_name]
+ size=record['bounds']['size']
+ details[asset]=list(record['features'])
+ assert len(details[asset])==5,asset+' hero record must carry exactly five features'
+ measured[asset]={'target':HERO_TARGET[asset],
+  'measured':{'widthMetres':round(size[0],3),'heightMetres':round(size[1],3),
+   'depthMetres':round(size[2],3),'baseMetres':round(record['bounds']['min'][1],3),
+   'topMetres':round(record['bounds']['max'][1],3)},
+  'triangles':record['triangles'],
+  'source':'public/assets/dreamisland/heroes/'+record['file'],
+  'sha256':record['sha256'],
+  'note':'Built by art/blender/build_dreamisland_heroes.py and loaded at runtime; not inside painted.glb.'}
+
 meshes=[o for o in world.children_recursive if o.type=='MESH']
 per_mesh={o.name:sum(len(p.vertices)-2 for p in o.data.polygons) for o in meshes}
 total=sum(per_mesh.values())
@@ -521,8 +623,14 @@ manifest={'script':'art/blender/build_dreamisland_painted.py','phase':'B painted
  'atlasManifest':'public/assets/dreamisland/atlas-manifest.json',
  'route':{'revision':route['revision'],'lengthMetres':LENGTH,'stations':COUNT},
  'meshes':len(meshes),'triangles':total,'trianglesPerMesh':per_mesh,
+ 'heroes':{'note':'These assets are NOT in painted.glb. They ship as separate GLBs under public/assets/dreamisland/heroes/ and are placed at the positions recorded below with batch "HERO". Removing them from the batch is what stops the island carrying two of each.',
+  'assets':HERO_GLB,'placements':len([p for p in placements if p['batch']=='HERO'])},
  'assets':measured,
  'placements':placements,'features':details,
+ 'fishPaths':{'file':'src/game/data/dreamisland/fish-paths.json',
+  'shoals':[{'id':shoal['id'],'batch':shoal['batch'],'fish':len(shoal['fish']),
+    'rest':shoal['rest'],'periodSeconds':shoal['periodSeconds']} for shoal in FISH_PATHS['shoals']],
+  'note':'Resting placements are read from that file; the runtime drives the same shoals along the paths in it.'},
  'maquettes':[],'maquettesRemovedBeforeWorldExport':True,
  'maquetteNote':'None lifted. DREAM-ISLAND-LEVEL.md section 7 supersedes the concept doc: the two orthographic sheets are the modelling reference.'}
 (OUT/'painted.json').write_text(json.dumps(manifest,indent=1))

@@ -65,7 +65,14 @@ export class DreamIslandWater {
   const shallows=[
    ribbon(course,.6583,.85,14,50,-.55,TILES.shallows),
    ribbon(course,.6583,.85,-14,-50,-.55,TILES.shallows),
-   ribbon(course,.0,.125,34,96,-1.2,TILES.shallows),
+   // -0.55, NOT -1.2. The sea is one 7.2 km plane at y = -0.8 and depth testing
+   // does not care about renderOrder, so a band authored BELOW it is drawn and
+   // then covered. Measured, not guessed: at the BEACH pose the glow isolation
+   // frame had ZERO lit pixels at every one of the five crossfade blends, while
+   // the reef bands - authored at -0.55 and -0.5, above the sea - had 90,041.
+   // The beach foam rail is section 2's stated night cue for the start straight,
+   // so it not drawing is the cue not existing.
+   ribbon(course,.0,.125,34,96,-.55,TILES.shallows),
    pool(course,.4541,-46,92,72,TILES.shallows),
   ];
   const shallowsMaterial=new THREE.MeshLambertMaterial({name:'dreamisland_shallows',
@@ -79,7 +86,7 @@ export class DreamIslandWater {
   // 3. The foam: the beach shore line and the reef drop-off. V runs across the
   //    strip because the foam quadrant's V axis IS distance from shore.
   const foam=[
-   ribbon(course,.0,.125,27,35,-1.1,TILES.foam,true),
+   ribbon(course,.0,.125,27,35,-.5,TILES.foam,true),   // above the sea, as the reef's are
    ribbon(course,.6583,.85,48,56,-.5,TILES.foam,true),
    ribbon(course,.6583,.85,-48,-56,-.5,TILES.foam,true),
   ];
@@ -134,7 +141,20 @@ function ribbon(course:DreamIslandCourse,from:number,to:number,inner:number,oute
    // to the open-water end exactly on the shore line.
    uvs.push(along/tile,across?index*.999:lateral/tile);
   }
-  if(i<steps){const k=i*2;indices.push(k,k+1,k+3,k,k+3,k+2);}
+  // WINDING. `inner` and `outer` are signed laterals, so a band on the left of
+  // the road runs the opposite way round and the same index order gives it a
+  // DOWNWARD normal. With backface culling on - which is three's default and
+  // what these materials use - the reef's left-hand shallows and its left-hand
+  // foam line drew nothing at all, and half the night state's edge cue was
+  // simply missing from every frame phase B shot. Measured, not guessed: the
+  // shallows carried 78 down-facing vertices of 233 and the foam 78 of 208,
+  // exactly the two negative-lateral reef ribbons, and an isolation frame at the
+  // REEF pose had 0 lit pixels in the left half of the screen.
+  if(i<steps){
+   const k=i*2;
+   if(outer<inner)indices.push(k,k+3,k+1,k,k+2,k+3);
+   else indices.push(k,k+1,k+3,k,k+3,k+2);
+  }
  }
  const geometry=new THREE.BufferGeometry();
  geometry.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));

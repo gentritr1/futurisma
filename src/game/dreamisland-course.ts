@@ -119,6 +119,18 @@ export class DreamIslandCourse implements RaceCourse {
    * and it changes grip — but it arrives as a step at the strike instead of a
    * 12 s ramp, so the grip change lands on the same tick in both modes. */
   readonly reducedMotion = typeof location !== "undefined" && new URLSearchParams(location.search).get("motion") === "reduce";
+  /** See `nightBlend`. Null unless BOTH `?diagnostics` and a finite `?nightBlend=`
+   * in [0, 1] are present, so the pin cannot exist outside a review capture. */
+  private readonly pinnedNightBlend: number | null = DreamIslandCourse.readPinnedNightBlend();
+  private static readPinnedNightBlend(): number | null {
+    if (typeof location === "undefined") return null;
+    const query = new URLSearchParams(location.search);
+    if (!query.has("diagnostics")) return null;
+    const raw = query.get("nightBlend");
+    if (raw === null) return null;
+    const value = Number(raw);
+    return Number.isFinite(value) ? THREE.MathUtils.clamp(value, 0, 1) : null;
+  }
   readonly tide = { lap: 1, elapsed: 0, waterLevel: -30, draining: false, shortcutOpen: false };
 
   private readonly scratch = this.createProjectionScratch();
@@ -290,7 +302,18 @@ export class DreamIslandCourse implements RaceCourse {
    * not the authored 12 s one. Returning an already-blended profile every frame
    * gives the atmosphere a curve it simply tracks.
    */
+  /** Published so a capture's own evidence records whether the review pin was
+   * in force, rather than the harness asserting it from the URL it typed. */
+  get nightBlendPinned(): number | null { return this.pinnedNightBlend; }
   get nightBlend(): number {
+    // Review-only pin. `scripts/visual/dreamisland/crossfade-profile.mjs` has to
+    // photograph ONE pose at five points on the ramp, and the ramp is driven by
+    // an integer clock it cannot rewind. `?nightBlend=` freezes the blend so the
+    // five captures differ by the blend and nothing else. It is honoured ONLY
+    // alongside `?diagnostics`, which no played race carries, and it is visual
+    // only: grip still comes from `schedule.grip(sector, tick)`, so a pinned
+    // blend cannot move a lap time or a gate.
+    if (this.pinnedNightBlend !== null) return this.pinnedNightBlend;
     const config = this.schedule.config;
     if (!config) return 0;
     if (this.reducedMotion) return this.schedule.tick >= config.strikeTick ? 1 : 0;

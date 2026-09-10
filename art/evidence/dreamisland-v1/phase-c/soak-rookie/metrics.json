@@ -1,0 +1,83 @@
+{
+  "script": "scripts/visual/dreamisland/instrument.mjs",
+  "samples": 11966,
+  "activeWindowMs": 96414.80000007153,
+  "activeExpectedSamples": 11944.844104608503,
+  "activeSampleResidual": 21.155895391497324,
+  "windowSamples": 720,
+  "windowMs": 5808.800000071526,
+  "calibration": {
+    "samples": 120,
+    "windowMs": 968.6000000238419,
+    "hz": 123.8901507299672
+  },
+  "expectedRateHz": 123.8901507299672,
+  "expectedSamples": 719.6531075690948,
+  "sampleResidual": 0.34689243090519994,
+  "observedRateHz": 123.94986916250075,
+  "p95Ms": 8.5,
+  "peakMainCalls": 74,
+  "peakShadowCalls": 17,
+  "peakTotalCalls": 91,
+  "peakTriangles": 124282,
+  "peakShadowTriangles": 23624,
+  "sizes": [
+    "1280x720"
+  ],
+  "lightingStates": {
+    "day": {
+      "frames": 8165,
+      "peakMainCalls": 74,
+      "peakShadowCalls": 17,
+      "minimumShadowCalls": 17,
+      "peakTotalCalls": 91,
+      "peakTriangles": 123852,
+      "peakShadowTriangles": 23624,
+      "minimumShadowTriangles": 23624
+    },
+    "crossfade": {
+      "frames": 1488,
+      "peakMainCalls": 74,
+      "peakShadowCalls": 17,
+      "minimumShadowCalls": 17,
+      "peakTotalCalls": 91,
+      "peakTriangles": 124282,
+      "peakShadowTriangles": 23624,
+      "minimumShadowTriangles": 23624
+    },
+    "night": {
+      "frames": 2313,
+      "peakMainCalls": 71,
+      "peakShadowCalls": 17,
+      "minimumShadowCalls": 17,
+      "peakTotalCalls": 88,
+      "peakTriangles": 119446,
+      "peakShadowTriangles": 23624,
+      "minimumShadowTriangles": 23624
+    },
+    "note": "Split on the course own nightBlend. renderer.info.render.calls EXCLUDES the shadow pass, so the shadow columns come from wrapping shadowMap.render and differencing the counters around it."
+  },
+  "emissiveStability": {
+    "settledFrames": 2313,
+    "comparisons": 2312,
+    "framesWithAnEmissiveChange": 0,
+    "largestChange": 0,
+    "values": [
+      1.25,
+      1.15,
+      1.45
+    ],
+    "note": "Sampled off the live materials inside the render wrapper, so it is what the renderer saw, not what the course intended."
+  },
+  "schedule": {
+    "framesWithGripBelowOne": 430,
+    "minimumGrip": 0.85,
+    "gripDropSectors": [
+      "BASIN CAUSEWAY",
+      "CLOCK COURT"
+    ],
+    "maximumNightBlend": 1,
+    "framesAtFullNight": 2313
+  },
+  "note": "Expected rendering rate comes from a separate pre-start requestAnimationFrame calibration. Physics remains 120 Hz. Each sampled delta covers one render interval, including any stalls."
+}

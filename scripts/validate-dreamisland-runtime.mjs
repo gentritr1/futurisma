@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
+import * as THREE from 'three';
 import {DreamIslandSchedule} from '../src/game/dreamisland-schedule.js';
 import {sourceModule} from './visual/dreamisland/modules.mjs';
 
@@ -109,7 +110,92 @@ reduced.advanceSchedule(1);
 assert.equal(reduced.nightBlend,1,'Reduced motion jumps 0 -> 1 at the strike with no ramp.');
 assert.equal(reduced.surfaceGripAt(.45),.85,'Grip changes on the same tick in both motion modes.');
 
-const out=new URL('../art/evidence/dreamisland-v1/phase-a/',import.meta.url);
+// Phase C: `--out=` so a route revision cannot overwrite the evidence of an
+// earlier phase. Default stays the phase directory this validator was written
+// for, and a relative path is resolved against the repo root, which is where
+// every validator here is run from.
+// --- Decision 3: the fish are ambience and never an obstacle. The paths are
+// authored in ROUTE space, so where one is over the road its `rise` is its
+// height above the deck - but a Catmull-Rom overshoots between waypoints and a
+// goldfish hangs 1.507 m below its own origin, so the floor is MEASURED here
+// rather than read off the waypoints. This is a second implementation of the
+// same rule from the same authored file: it repeats the spline and the two
+// ramps in plain arithmetic and takes only the road geometry from the course,
+// so a bug in `dreamisland-fish.ts` shows up as a disagreement rather than as
+// two copies of one mistake agreeing.
+const fishPaths=JSON.parse(readFileSync(new URL('../src/game/data/dreamisland/fish-paths.json',import.meta.url),'utf8'));
+const clampUnit=t=>t<0?0:t>1?1:t;
+const smoothstep=t=>{const x=clampUnit(t);return x*x*(3-2*x);};
+const closedSpline=(values,u)=>{
+  const count=values.length,scaled=((u%1)+1)%1*count;
+  const i=Math.floor(scaled),t=scaled-i;
+  const p0=values[(i-1+count)%count],p1=values[i%count],p2=values[(i+1)%count],p3=values[(i+2)%count];
+  return .5*((2*p1)+(-p0+p2)*t+(2*p0-5*p1+4*p2-p3)*t*t+(-p0+3*p1-3*p2+p3)*t*t*t);
+};
+const FISH_HALF_WIDTH=3.013,FISH_LOWEST=fishPaths.fishLowestPointMetres;
+const RISE_WINDOW=fishPaths.riseSeconds*TICK_RATE;
+const worldOf=(progress,lateral,rise)=>{
+  const sample=course.sample(((progress%1)+1)%1);
+  const right=new THREE.Vector3().copy(sample.tangent).cross(new THREE.Vector3(0,1,0)).normalize();
+  return {point:sample.position.clone().addScaledVector(right,lateral).setY(sample.position.y+rise),
+    right,deck:sample.position.y,halfWidth:sample.halfWidth,centre:sample.position.clone()};
+};
+const fishReport=[];
+let worstClearance=Infinity,worstRow=null,deckSamples=0;
+for(const shoal of fishPaths.shoals){
+  const progresses=shoal.path.map(p=>p.progress),laterals=shoal.path.map(p=>p.lateral),rises=shoal.path.map(p=>p.rise);
+  // The whole rise plus two full circuits, one tick at a time: 120 Hz is the
+  // finest the runtime can ever sample this at, so nothing can hide between
+  // two samples of this sweep.
+  const span=Math.ceil(RISE_WINDOW+shoal.periodSeconds*TICK_RATE*2);
+  const offsets=shoal.fish.map(fish=>{
+    const rest=worldOf(shoal.rest.progress,shoal.rest.lateral,shoal.rest.rise);
+    const here=worldOf(fish.progress,fish.lateral,fish.rise);
+    return {offset:here.point.clone().sub(rest.point),progressOffset:fish.progress-shoal.rest.progress,livery:fish.livery};
+  });
+  let shoalWorst=Infinity,shoalRow=null,shoalSamples=0;
+  for(let since=0;since<=span;since++){
+    const lift=smoothstep(since/(RISE_WINDOW*.6)),swim=smoothstep((since-RISE_WINDOW*.4)/(RISE_WINDOW*.6));
+    const u=since/(shoal.periodSeconds*TICK_RATE);
+    const progress=shoal.rest.progress+(closedSpline(progresses,u)-shoal.rest.progress)*swim;
+    const lateral=shoal.rest.lateral+(closedSpline(laterals,u)-shoal.rest.lateral)*swim;
+    const rise=shoal.rest.rise+(closedSpline(rises,u)-shoal.rest.rise)*lift;
+    const centre=worldOf(progress,lateral,rise);
+    const ahead=(()=>{
+      const s2=since+6;
+      const lift2=smoothstep(s2/(RISE_WINDOW*.6)),swim2=smoothstep((s2-RISE_WINDOW*.4)/(RISE_WINDOW*.6));
+      const u2=s2/(shoal.periodSeconds*TICK_RATE);
+      return worldOf(shoal.rest.progress+(closedSpline(progresses,u2)-shoal.rest.progress)*swim2,
+        shoal.rest.lateral+(closedSpline(laterals,u2)-shoal.rest.lateral)*swim2,
+        shoal.rest.rise+(closedSpline(rises,u2)-shoal.rest.rise)*lift2).point;
+    })();
+    const heading=Math.atan2(ahead.x-centre.point.x,ahead.z-centre.point.z);
+    const turn=(((heading-shoal.startHeadingYaw+Math.PI)%(Math.PI*2))+Math.PI*2)%(Math.PI*2)-Math.PI;
+    const rotation=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),turn*swim);
+    for(const fish of offsets){
+      const world=fish.offset.clone().applyQuaternion(rotation).add(centre.point);
+      const at=worldOf(progress+fish.progressOffset,0,0);
+      const offset=world.clone().sub(at.centre).dot(at.right);
+      if(Math.abs(offset)>at.halfWidth+FISH_HALF_WIDTH)continue;
+      shoalSamples++;deckSamples++;
+      const clearance=world.y+FISH_LOWEST-at.deck;
+      if(clearance<shoalWorst){shoalWorst=clearance;shoalRow={since,livery:fish.livery,lateral:+offset.toFixed(3),clearance:+clearance.toFixed(3)};}
+    }
+  }
+  if(shoalWorst<worstClearance){worstClearance=shoalWorst;worstRow={shoal:shoal.id,...shoalRow};}
+  fishReport.push({id:shoal.id,batch:shoal.batch,fish:shoal.fish.length,periodSeconds:shoal.periodSeconds,
+    ticksSwept:span+1,deckSamples:shoalSamples,
+    minimumDeckClearanceMetres:Number.isFinite(shoalWorst)?+shoalWorst.toFixed(3):null,worst:shoalRow});
+}
+assert.ok(deckSamples>0,'No shoal ever passes over the deck, so the six metre rule was never tested. '
+  +'Either the paths do not cross the road or the sweep is not measuring what it thinks.');
+assert.ok(worstClearance>=fishPaths.minimumDeckClearanceMetres,
+  `Decision 3 puts the fish at least ${fishPaths.minimumDeckClearanceMetres} m above the deck wherever a path crosses `
+  +`the road; the worst point of the drift measures ${worstClearance.toFixed(3)} m: ${JSON.stringify(worstRow)}`);
+
+const outFlag=process.argv.find(a=>a.startsWith('--out='))?.slice(6);
+const out=outFlag?new URL(outFlag.replace(/\/?$/,'/'),new URL('../',import.meta.url))
+ :new URL('../art/evidence/dreamisland-v1/phase-a/',import.meta.url);
 mkdirSync(out,{recursive:true});
 const report={script:'scripts/validate-dreamisland-runtime.mjs',config,
   determinism:{renderRates:[60,120,240],windowSeconds:WINDOW_SECONDS,tickRateHz:TICK_RATE,
@@ -120,8 +206,13 @@ const report={script:'scripts/validate-dreamisland-runtime.mjs',config,
   snapshotRestore:true,
   knownLimitation:'snapshot/restore has exactly one caller, this validator. Pause, resume and the save system do not snapshot the schedule; restore exists to make determinism provable, not to make pause deterministic.',
   grip:{sector:'BASIN',beforeStrike:1,afterStrike:.85,reachesCraftVia:'course.surfaceGripAt'},
+  fish:{source:'src/game/data/dreamisland/fish-paths.json',
+    floorMetres:fishPaths.minimumDeckClearanceMetres,fishLowestPointMetres:FISH_LOWEST,
+    riseSeconds:fishPaths.riseSeconds,deckSamples,
+    minimumDeckClearanceMetres:+worstClearance.toFixed(3),worst:worstRow,shoals:fishReport,
+    method:'Every tick of the rise plus two full circuits per shoal, per fish, with the fish turned by the shoal turn; lateral measured against the road at that fish own progress and height against the deck under it. A second implementation of the rule in the validator, not a call into dreamisland-fish.ts.'},
   nightTurn:{rampTicks:config.nightRampTicks,midpointBlend:midBlend,settledBlend:1,
     reducedMotion:'step 0 -> 1 at strikeTick, same tick as the grip change'},
   scope:'Pure clock, grip and blend arithmetic in Node. Not a rendered crossfade: the sky and water are phases B and C and the five-point capture instrument does not exist yet.'};
 writeFileSync(new URL('runtime-validation.json',out),JSON.stringify(report,null,2));
-console.log(`Dream Island runtime PASS: 60/120/240 Hz identical over ${WINDOW_SECONDS} s (${framesSeen.join('/')} frames, ${ticksSeen.join('/')} ticks against an expected ${expectedTicks}); all ${config.events.length} events fired once; BASIN grip 1 -> .85 at tick ${config.strikeTick}; night blend 0 -> ${midBlend.toFixed(3)} -> 1 over ${config.nightRampTicks} ticks and a step at the same tick under ?motion=reduce.`);
+console.log(`Dream Island runtime PASS: fish clear the deck by ${worstClearance.toFixed(3)} m over ${deckSamples} on-deck samples (floor ${fishPaths.minimumDeckClearanceMetres} m);  60/120/240 Hz identical over ${WINDOW_SECONDS} s (${framesSeen.join('/')} frames, ${ticksSeen.join('/')} ticks against an expected ${expectedTicks}); all ${config.events.length} events fired once; BASIN grip 1 -> .85 at tick ${config.strikeTick}; night blend 0 -> ${midBlend.toFixed(3)} -> 1 over ${config.nightRampTicks} ticks and a step at the same tick under ?motion=reduce.`);

@@ -3,6 +3,8 @@ import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import type {RaceEnvironment,RaceEnvironmentStats} from './environment';
 import type {DreamIslandCourse} from './dreamisland-course';
 import {applyDreamIslandCardCutout,dreamIslandFlowInstallations} from './dreamisland-materials';
+import {loadDreamIslandHeroes,type HeroBuild,type HeroPlacement} from './dreamisland-heroes';
+import {DreamIslandShoals} from './dreamisland-fish';
 import {DreamIslandSky} from './dreamisland-sky';
 import {DreamIslandWater} from './dreamisland-water';
 
@@ -20,6 +22,18 @@ import {DreamIslandWater} from './dreamisland-water';
  * headroom for the whole map. It is used, not decorative - `manifest` below
  * feeds the diagnostics counters, so a silent no-op reads as zero rather than
  * as a green soak.
+ *
+ * Phase C adds two things on top of that world:
+ *
+ *  * THE HEROES. Four focal assets are no longer inside `painted.glb`; they are
+ *    separate GLBs placed from the same `painted.json` placement list, merged by
+ *    material at load and bound to the materials this class already built. See
+ *    `dreamisland-heroes.ts`.
+ *  * THE SHOALS. The goldfish are batched into named shoals rather than one
+ *    heap, and each shoal is translated along an authored closed path in ROUTE
+ *    space, so "at least six metres above the deck" is a property of the
+ *    authored data rather than something to hope for. See
+ *    `dreamisland-fish.ts`.
  */
 export class DreamIslandPaintedEnvironment implements RaceEnvironment {
  readonly stats:RaceEnvironmentStats={meshes:0,triangles:0,materials:0,textures:0,visibleGroups:0,
@@ -27,19 +41,28 @@ export class DreamIslandPaintedEnvironment implements RaceEnvironment {
  /** Every counter here reads zero if the module quietly did nothing. */
  readonly counters={paintedMeshes:0,paintedTriangles:0,manifestTriangles:0,emissiveMaterials:0,
   cardMaterials:0,fishMeshes:0,fishVisible:0,reskinnedCourseDraws:0,waterSurfaces:0,waterTriangles:0,
-  skyPanoramas:0,flowShaders:0};
+  skyPanoramas:0,flowShaders:0,heroPlacements:0,heroSourceMeshes:0,heroMeshes:0,heroTriangles:0,
+  fishShoals:0,fishShoalMeshes:0,fishDeckSamples:0,
+  /** Metres, over the whole race. `null` until a shoal has actually been over
+   * the deck, so a race that never saw one reads as unmeasured rather than as
+   * a comfortable number. */
+  fishMinimumDeckClearance:null as number|null};
+ /** What the hero merge actually did, so the phase report quotes a measurement
+  * instead of restating the brief. Null until `attachHeroes` has run. */
+ heroReport:HeroBuild['report']|null=null;
  private readonly sky=new DreamIslandSky();
  private readonly water:DreamIslandWater;
  private readonly meshes:THREE.Mesh[]=[];
  private readonly emissive:THREE.MeshLambertMaterial[]=[];
  private readonly fish:THREE.Mesh[]=[];
+ private shoals:DreamIslandShoals|null=null;
+ private readonly byRole=new Map<string,THREE.MeshLambertMaterial>();
  private readonly frustum=new THREE.Frustum();
  private readonly projection=new THREE.Matrix4();
  private constructor(readonly root:THREE.Group,private readonly course:DreamIslandCourse,
   manifest:{triangles?:number;meshes?:number}){
   root.name='dreamisland_painted_world';
   const converted=new Map<THREE.Material,THREE.MeshLambertMaterial>(),textures=new Set<THREE.Texture>();
-  const byRole=new Map<string,THREE.MeshLambertMaterial>();
   root.traverse(object=>{
    if(!(object instanceof THREE.Mesh))return;
    const source=object.material as THREE.MeshStandardMaterial;
@@ -49,7 +72,7 @@ export class DreamIslandPaintedEnvironment implements RaceEnvironment {
      emissive:source.emissive,emissiveMap:source.emissiveMap,emissiveIntensity:source.emissiveIntensity,
      vertexColors:!!object.geometry.attributes.color,side:THREE.DoubleSide});
     applyDreamIslandCardCutout(material);
-    converted.set(source,material);byRole.set(source.name,material);
+    converted.set(source,material);this.byRole.set(source.name,material);
     // An atlas plus mipmaps is a trap: past mip level 8 a 1024 sheet's levels
     // average ACROSS the quadrant boundaries, so at a grazing angle the sand
     // road sampled the whole concrete sheet - moss, kerb cyan and all - and came
@@ -68,9 +91,9 @@ export class DreamIslandPaintedEnvironment implements RaceEnvironment {
    object.material=material;object.castShadow=false;object.receiveShadow=false;
    object.geometry.computeBoundingSphere();
    this.meshes.push(object);
-   // The shoal rests in the basin until `fish-rise`; it batches on its own so
-   // one `visible = false` hides all four liveries.
-   if(object.name.startsWith('DI_FISH_')){this.fish.push(object);object.visible=false;this.counters.fishMeshes++;}
+   // Each shoal batches on its own so it can be moved as one whole-mesh
+   // transform; `visible = false` on all of them hides the lot.
+   if(object.name.startsWith('DI_FISH')){this.fish.push(object);object.visible=false;this.counters.fishMeshes++;}
   });
   for(const mesh of this.meshes){
    this.stats.triangles+=(mesh.geometry.index?.count??mesh.geometry.attributes.position.count)/3;
@@ -80,7 +103,7 @@ export class DreamIslandPaintedEnvironment implements RaceEnvironment {
   this.counters.manifestTriangles=manifest.triangles??0;
   // The road and the markers keep their phase-A draws and take the GLB's own
   // concrete and metal maps, so nothing new is downloaded for them.
-  const concrete=byRole.get('DI_MAT_concrete')?.map,metal=byRole.get('DI_MAT_metal')?.map;
+  const concrete=this.byRole.get('DI_MAT_concrete')?.map,metal=this.byRole.get('DI_MAT_metal')?.map;
   if(concrete&&metal)this.counters.reskinnedCourseDraws=course.applyPaintedAtlases(concrete,metal);
   this.water=new DreamIslandWater(course);
   this.counters.waterSurfaces=this.water.surfaces;
@@ -96,13 +119,51 @@ export class DreamIslandPaintedEnvironment implements RaceEnvironment {
    this.stats.contractDrift.push(`painted.json declares ${manifest.meshes} meshes; the GLB carries ${this.counters.paintedMeshes}`);
   }
  }
+ /** The shoals need the fish meshes converted and hidden first, which the
+  * constructor has just done, and they re-origin those meshes' buffers, which
+  * has to happen once and before anything reads a bounding sphere. */
+ private buildShoals():void{
+  this.shoals=new DreamIslandShoals(this.course,this.fish);
+  this.counters.fishShoals=this.shoals.shoals.length;
+  // Deliberately a SECOND count. `fishMeshes` is what the GLB carried; this is
+  // what the paths file claimed. They differ only if a shoal's batch name and
+  // its meshes have drifted apart, which is exactly the silent failure a single
+  // number would hide.
+  this.counters.fishShoalMeshes=this.shoals.meshCount;
+ }
+ /**
+  * The four hero GLBs, merged by material and bound to the materials above.
+  * Runs after the constructor because it needs those materials to exist; a
+  * placement list with no `batch: "HERO"` rows leaves every counter at zero,
+  * which is what a silent no-op has to look like.
+  */
+ private async attachHeroes(placements:HeroPlacement[]):Promise<void>{
+  const built=await loadDreamIslandHeroes(placements,this.byRole,material=>{
+   applyDreamIslandCardCutout(material);
+   if(material.emissiveMap){material.emissiveIntensity=0;this.emissive.push(material);this.counters.emissiveMaterials++;}
+   this.stats.materials+=1;
+  });
+  this.heroReport=built.report;
+  for(const mesh of built.meshes){this.root.add(mesh);this.meshes.push(mesh);}
+  this.counters.heroPlacements=built.report.placements;
+  this.counters.heroSourceMeshes=built.report.sourceMeshes;
+  this.counters.heroMeshes=built.report.mergedMeshes;
+  this.counters.heroTriangles=built.report.triangles;
+  this.stats.meshes=this.meshes.length;
+  this.stats.triangles+=built.report.triangles;
+  if(built.report.missingChildren.length){
+   this.stats.contractDrift.push('hero set children missing: '+built.report.missingChildren.join(', '));
+  }
+ }
  static async load(course:DreamIslandCourse):Promise<DreamIslandPaintedEnvironment>{
   const [gltf,manifest]=await Promise.all([
    new GLTFLoader().loadAsync('/assets/dreamisland/painted.glb'),
    fetch('/assets/dreamisland/painted.json').then(response=>response.json()).catch(()=>({})),
   ]);
   const environment=new DreamIslandPaintedEnvironment(gltf.scene as THREE.Group,course,manifest);
-  await Promise.all([environment.sky.ready,environment.water.ready]);
+  environment.buildShoals();
+  await Promise.all([environment.sky.ready,environment.water.ready,
+   environment.attachHeroes((manifest.placements??[]) as HeroPlacement[])]);
   environment.counters.skyPanoramas=environment.sky.loadedPanoramas;
   return environment;
  }
@@ -112,9 +173,13 @@ export class DreamIslandPaintedEnvironment implements RaceEnvironment {
   this.sky.update(camera,this.root.parent instanceof THREE.Scene?this.root.parent.fog?.color:undefined,blend);
   this.water.update(this.course.tide.elapsed,blend,reduced);
   for(const material of this.emissive)material.emissiveIntensity=blend*1.25;
-  const risen=this.course.schedule.state.fishRisen;
-  for(const mesh of this.fish)mesh.visible=risen;
-  this.counters.fishVisible=risen?this.fish.length:0;
+  // Decision 3 and decision 6 both live here: the shoals drift on authored
+  // closed paths from `fish-rise`, and under reduced motion they never spawn.
+  this.shoals?.update(this.course.schedule.tick,this.course.schedule.config?.fishRiseTick??null,reduced);
+  this.counters.fishVisible=this.shoals?.visibleMeshes??0;
+  this.counters.fishDeckSamples=this.shoals?.deckSamples??0;
+  this.counters.fishMinimumDeckClearance=this.shoals&&this.shoals.deckSamples>0
+   ?Math.round(this.shoals.minimumDeckClearance*1000)/1000:null;
   this.counters.flowShaders=dreamIslandFlowInstallations();
   this.frustum.setFromProjectionMatrix(this.projection.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse));
   this.stats.visibleGroups=0;this.stats.visibleTriangles=0;

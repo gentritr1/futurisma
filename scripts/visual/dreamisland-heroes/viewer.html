@@ -1,0 +1,161 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Dream Island hero GLB review</title>
+<link rel="icon" href="data:,">
+<style>
+html,body{margin:0;background:#273338;color:#edf1df;font:14px system-ui}canvas{display:block}
+#label{position:absolute;top:28px;left:34px;letter-spacing:.08em}#detail{position:absolute;top:53px;left:34px;color:#c8d0c3}
+#scale{position:absolute;border-top:2px solid #eaf2d9;border-bottom:2px solid #eaf2d9;width:9px;background:repeating-linear-gradient(to bottom,#f7f2d8 0%,#f7f2d8 25%,#293c3d 25%,#293c3d 50%);box-shadow:0 0 0 1px #253237}
+#scale span{position:absolute;left:18px;top:0;width:60px;color:#f1f4df}
+</style>
+<div id="label"></div><div id="detail"></div><div id="scale"><span>2 m</span></div>
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+const renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});
+renderer.setSize(1280,960);renderer.setPixelRatio(1);
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.25;
+document.body.append(renderer.domElement);
+const scene=new THREE.Scene();scene.background=new THREE.Color('#273d49');
+const ambient=new THREE.HemisphereLight(0xe4f0e7,0x728272,2.15);scene.add(ambient);
+const key=new THREE.DirectionalLight(0xffedc9,3.1);key.position.set(-28,46,-30);key.castShadow=true;
+key.shadow.mapSize.set(2048,2048);key.shadow.normalBias=.07;key.shadow.bias=-.00006;
+Object.assign(key.shadow.camera,{left:-65,right:65,top:55,bottom:-55,near:1,far:160});
+scene.add(key);scene.add(key.target);
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(500,500),new THREE.MeshLambertMaterial({color:0x657b78}));
+ground.rotation.x=-Math.PI/2;ground.position.y=-.045;ground.receiveShadow=true;scene.add(ground);
+const camera=new THREE.OrthographicCamera(-10,10,10,-10,.1,1000);
+const textures=new Map(), roots=new Map();
+const textureLoader=new THREE.TextureLoader();
+const manifest=await fetch('/public/assets/dreamisland/heroes/heroes.json').then(r=>r.json());
+const atlas=await fetch('/public/assets/dreamisland/atlas-manifest.json').then(r=>r.json());
+for(const role of [...manifest.roles,'jungle-card']){
+ const file=role==='jungle-card'?'jungle-card.png':'textures/'+role+'.jpg';
+ const texture=await textureLoader.loadAsync('/public/assets/dreamisland/'+file);
+ texture.flipY=false;texture.colorSpace=THREE.SRGBColorSpace;texture.anisotropy=16;
+ textures.set(role,texture);
+}
+for(const [name,spec] of Object.entries(manifest.assets)){
+ const {scene:root}=await new GLTFLoader().loadAsync('/public/assets/dreamisland/heroes/'+spec.file);
+ root.traverse(mesh=>{
+  if(!mesh.isMesh)return;
+  const role=mesh.material.name.slice(7);
+  const material=new THREE.MeshLambertMaterial({name:mesh.material.name,map:textures.get(role),vertexColors:true,side:THREE.DoubleSide});
+  if(role==='jungle-card'){
+   material.onBeforeCompile=shader=>{shader.fragmentShader=shader.fragmentShader.replace('#include <map_fragment>',
+    '#include <map_fragment>\nif(min(diffuseColor.r,diffuseColor.b)-diffuseColor.g>.025)discard;');};
+   material.customProgramCacheKey=()=>'dreamisland-card-cutout-v1';
+  }
+  mesh.material=material;mesh.castShadow=role!=='jungle-card'&&role!=='water';mesh.receiveShadow=true;
+ });
+ root.visible=false;scene.add(root);root.updateMatrixWorld(true);roots.set(name,root);
+}
+const directions={front:[0,.10,-1],side:[1,.16,0],back:[0,.14,1],'three-quarter':[.8,.44,-1]};
+window.renderHero=async(name,view)=>{
+ for(const root of roots.values())root.visible=false;
+ const root=roots.get(name);root.visible=true;
+ const box=new THREE.Box3().setFromObject(root,true),size=box.getSize(new THREE.Vector3()),center=box.getCenter(new THREE.Vector3());
+ const direction=new THREE.Vector3(...directions[view]).normalize();
+ camera.position.copy(center).addScaledVector(direction,Math.max(65,size.length()*1.5));camera.lookAt(center);camera.updateMatrixWorld();
+ const inverse=camera.matrixWorldInverse;
+ const corners=[];
+ for(const x of [box.min.x,box.max.x])for(const y of [box.min.y,box.max.y])for(const z of [box.min.z,box.max.z])corners.push(new THREE.Vector3(x,y,z).applyMatrix4(inverse));
+ const projected=new THREE.Box3().setFromPoints(corners), projectedSize=projected.getSize(new THREE.Vector3());
+ const height=Math.max(projectedSize.y*1.25,projectedSize.x/(1280/960)*1.28);
+ camera.top=height/2;camera.bottom=-height/2;camera.left=-height*1280/960/2;camera.right=-camera.left;camera.updateProjectionMatrix();
+ const label=document.querySelector('#label'),detail=document.querySelector('#detail');
+ label.textContent='FUTURISMA / DREAM ISLAND — '+name.toUpperCase()+' / '+view.toUpperCase();
+ detail.textContent='Exported GLB · shared painted atlases · metres · '+manifest.assets[name].triangles.toLocaleString()+' triangles';
+ const scale=document.querySelector('#scale');scale.style.height=(2/height*960)+'px';scale.style.left='1190px';scale.style.bottom='62px';
+ renderer.render(scene,camera);await new Promise(requestAnimationFrame);renderer.render(scene,camera);
+ return {name,view,camera:'orthographic',cameraPosition:camera.position.toArray(),target:center.toArray(),verticalSpanMetres:height,scaleBarMetres:2,scaleBarPixels:2/height*960,bounds:{min:box.min.toArray(),max:box.max.toArray()},draws:renderer.info.render.calls,triangles:renderer.info.render.triangles};
+};
+window.renderDistance=async(name,distance)=>{
+ for(const root of roots.values())root.visible=false;
+ const root=roots.get(name);root.visible=true;
+ const center=new THREE.Box3().setFromObject(root,true).getCenter(new THREE.Vector3());
+ const vfov=name==='watchtower'?65:50;
+ const perspective=new THREE.PerspectiveCamera(vfov,1280/960,.1,1000);
+ const direction=name==='watchtower'?new THREE.Vector3(.35,.15,-1).normalize():new THREE.Vector3(0,0,-1);
+ perspective.position.copy(center).addScaledVector(direction,distance);perspective.lookAt(center);
+ document.querySelector('#label').textContent='FUTURISMA / DREAM ISLAND — '+name.toUpperCase()+' / '+distance+' m';
+ document.querySelector('#detail').textContent=vfov+'° vertical field of view · exported geometry · shared atlases';
+ const scale=document.querySelector('#scale');scale.style.height=(2/(2*distance*Math.tan(vfov/2*Math.PI/180))*960)+'px';
+ renderer.render(scene,perspective);await new Promise(requestAnimationFrame);renderer.render(scene,perspective);
+ return {name,distanceMetres:distance,verticalFovDegrees:vfov,cameraPosition:perspective.position.toArray(),target:center.toArray()};
+};
+// Pixel proof: sample a real exported UV, then compare the GPU result to the
+// decoded source texel. A flipped atlas row or absent card discard throws.
+window.checkAtlasPixels=async()=>{
+ const claims=[['clock-tower','clock_face_3_2m','emissive','clock-face'],
+ ['clock-tower','clock_square_block_courses','concrete','wall-block'],
+ ['clock-tower','clock_plinth_three_tiers','concrete','causeway-paving'],
+ ['clock-tower','clock_bezel','metal','clock-ring-hands'],
+ ['watchtower','watchtower_tapered_block_drum','jungle','moss-blossom'],
+ ['waterfall-cliff','waterfall_plunge_pool_foam_ring','water','foam-gradient'],
+ ['waterfall-cliff','waterfall_blossom_clump_left','jungle-card','blossom-shrub']];
+ const results=[];
+ for(const [asset,nodeName,role,cell] of claims){
+  const root=roots.get(asset),candidates=[];
+  root.getObjectByName(nodeName).traverse(mesh=>{if(mesh.isMesh&&mesh.material.name==='DI_MAT_'+role)candidates.push(mesh);});
+  const mesh=candidates[0];if(!mesh)throw Error('Missing pixel-proof consumer '+nodeName+' '+role);
+  const uv=mesh.geometry.attributes.uv,index=mesh.geometry.index;
+  const indices=[0,1,2].map(i=>index?index.getX(i):i);
+  const u=indices.reduce((sum,i)=>sum+uv.getX(i),0)/3,v=indices.reduce((sum,i)=>sum+uv.getY(i),0)/3;
+  const texture=textures.get(role).clone();texture.minFilter=texture.magFilter=THREE.NearestFilter;texture.generateMipmaps=false;texture.needsUpdate=true;
+  const geometry=new THREE.PlaneGeometry(2,2);
+  const sampleUv=geometry.attributes.uv;for(let i=0;i<sampleUv.count;i++)sampleUv.setXY(i,u,v);
+  const test=new THREE.Scene();test.background=new THREE.Color(0x263238);
+  const material=new THREE.MeshBasicMaterial({map:texture,toneMapped:false});
+  if(role==='jungle-card'){material.onBeforeCompile=mesh.material.onBeforeCompile;material.customProgramCacheKey=mesh.material.customProgramCacheKey;}
+  test.add(new THREE.Mesh(geometry,material));
+  const testCamera=new THREE.OrthographicCamera(-1,1,1,-1,.1,3);testCamera.position.z=1;
+  renderer.render(test,testCamera);
+  const gl=renderer.getContext(),pixel=new Uint8Array(4);gl.readPixels(640,480,1,1,gl.RGBA,gl.UNSIGNED_BYTE,pixel);
+  const canvas=document.createElement('canvas'),source=texture.image;canvas.width=source.width;canvas.height=source.height;
+  const ctx=canvas.getContext('2d');ctx.drawImage(source,0,0);
+  const x=Math.min(source.width-1,Math.floor(u*source.width)),y=Math.min(source.height-1,Math.floor(v*source.height));
+  const expected=[...ctx.getImageData(x,y,1,1).data];
+  const difference=Math.max(...pixel.slice(0,3).map((value,i)=>Math.abs(value-expected[i])));
+  if(difference>3)throw Error('Atlas pixel mismatch '+nodeName+': '+pixel+' versus '+expected);
+  const cellRect=atlas.roles[role][cell].sprite?.uv??atlas.roles[role][cell].uv;
+  if(u<cellRect[0]||u>cellRect[2]||1-v<cellRect[1]||1-v>cellRect[3])throw Error('Exported UV addresses wrong named cell '+cell);
+  const pointProof={asset,node:nodeName,role,cell,exportedUv:[u,v],sourcePixel:[x,y],rendered:[...pixel],expected,maxChannelError:difference};
+  // Render the actual consumer's exported UV extent, and compare a 5x5 grid
+  // against the source sheet. This produces a useful cell image as well as a
+  // point check; the extent is measured from the GLB, not supplied by the test.
+  const us=Array.from({length:uv.count},(_,i)=>uv.getX(i)),vs=Array.from({length:uv.count},(_,i)=>uv.getY(i));
+  const u0=Math.min(...us),u1=Math.max(...us),v0=Math.min(...vs),v1=Math.max(...vs);
+  [[u0,v0],[u1,v0],[u0,v1],[u1,v1]].forEach(([a,b],i)=>sampleUv.setXY(i,a,b));sampleUv.needsUpdate=true;
+  renderer.render(test,testCamera);
+  const grid=[];
+  for(let row=0;row<5;row++)for(let col=0;col<5;col++){
+   const px=Math.floor((col+.5)*1280/5),py=Math.floor((row+.5)*960/5);
+   gl.readPixels(px,py,1,1,gl.RGBA,gl.UNSIGNED_BYTE,pixel);
+   const su=u0+(u1-u0)*(px+.5)/1280,sv=v1-(v1-v0)*(py+.5)/960;
+   const sx=Math.min(source.width-1,Math.floor(su*source.width)),sy=Math.min(source.height-1,Math.floor(sv*source.height));
+   let sourcePixel=[...ctx.getImageData(sx,sy,1,1).data];
+   const linear=sourcePixel.slice(0,3).map(value=>{value/=255;return value<=.04045?value/12.92:((value+.055)/1.055)**2.4;});
+   const discarded=role==='jungle-card'&&Math.min(linear[0],linear[2])-linear[1]>.025;
+   if(discarded)sourcePixel=[38,50,56,255];
+   const error=Math.max(...pixel.slice(0,3).map((value,i)=>Math.abs(value-sourcePixel[i])));
+   if(error>3)throw Error('Atlas grid mismatch '+nodeName+' '+col+','+row+': '+pixel+' vs '+sourcePixel);
+   grid.push({sample:[col,row],sourcePixel:[sx,sy],rendered:[...pixel],expected:sourcePixel,discarded,error});
+  }
+  pointProof.uvExtent=[u0,v0,u1,v1];pointProof.grid=grid;pointProof.image=renderer.domElement.toDataURL('image/png');
+  results.push(pointProof);
+  if(role==='jungle-card'){
+   for(let i=0;i<sampleUv.count;i++)sampleUv.setXY(i,.03,.51);sampleUv.needsUpdate=true;
+   renderer.render(test,testCamera);gl.readPixels(640,480,1,1,gl.RGBA,gl.UNSIGNED_BYTE,pixel);
+   const background=[38,50,56];
+   if(Math.max(...background.map((value,i)=>Math.abs(value-pixel[i])))>3)throw Error('Magenta card discard failed: '+pixel);
+   results.push({role,check:'magenta discard before lighting',rendered:[...pixel],expected:background,image:renderer.domElement.toDataURL('image/png')});
+  }
+  texture.dispose();geometry.dispose();material.dispose();
+ }
+ return results;
+};
+window.reviewReady=true;
+</script>

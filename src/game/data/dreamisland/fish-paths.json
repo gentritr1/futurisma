@@ -1,0 +1,269 @@
+{
+ "script": "src/game/data/dreamisland/fish-paths.json, authored for phase C",
+ "consumers": [
+  "art/blender/build_dreamisland_painted.py",
+  "src/game/dreamisland-fish.ts",
+  "scripts/validate-dreamisland-runtime.mjs"
+ ],
+ "coordinates": "ROUTE space, not world space: {progress, lateral, rise} is the point station(progress).position + right(progress) * lateral + (0,1,0) * rise, with right = tangent x (0,1,0), which is exactly what `beside()` computes in the Blender build. Authoring the drift in route space is what makes \"at least six metres above the deck\" a property of the DATA rather than something to hope for: where a path is over the road, `rise` IS the height above the deck.",
+ "fishLowestPointMetres": -1.507,
+ "fishLowestPointSource": "public/assets/dreamisland/painted.json -> assets[\"goldfish-orange\"].measured.baseMetres",
+ "fishNoseAxis": "local +Z (the body cylinder is authored on axis (0,0,1)), so the yaw that faces a world heading (hx, hz) is atan2(hx, hz). Each shoal rests already pointing along the START of its path, and the runtime turns it by the CHANGE in heading, so the authored scatter survives and no fish ever swims backwards.",
+ "riseSeconds": 6,
+ "riseNote": "From the `fish-rise` event the shoal moves from its resting point in the water to its path over six seconds, smoothstepped. Position is a pure function of the absolute tick, so the drift is snapshot-safe and identical at 60, 120 and 240 Hz.",
+ "minimumDeckClearanceMetres": 6,
+ "clearanceRule": "Decision 3: fish are ambience, never an obstacle. The authored rise over the road is well above the six metre floor - it also clears the 8.85 m the static corridor check demands of authored geometry, so a fish never occupies a volume this project treats as drivable air.",
+ "interpolation": "Closed centripetal Catmull-Rom through the waypoints in (progress, lateral, rise). A spline can overshoot between waypoints, so the clearance is MEASURED by dense sampling rather than inferred from the waypoints.",
+ "shoals": [
+  {
+   "id": "basin-eight",
+   "batch": "FISHBASIN",
+   "sector": "BASIN",
+   "periodSeconds": 34,
+   "shape": "A slow figure-eight over the basin pool that crosses the causeway twice per circuit of it.",
+   "startHeadingYaw": -1.48479,
+   "rest": {
+    "progress": 0.455,
+    "lateral": -42.0,
+    "rise": -7.05
+   },
+   "fish": [
+    {
+     "livery": "goldfish-orange",
+     "progress": 0.448,
+     "lateral": -34.0,
+     "rise": -6.6,
+     "yaw": -1.70479
+    },
+    {
+     "livery": "goldfish-white",
+     "progress": 0.455,
+     "lateral": -46.0,
+     "rise": -7.2,
+     "yaw": -1.39479
+    },
+    {
+     "livery": "goldfish-red",
+     "progress": 0.462,
+     "lateral": -36.0,
+     "rise": -6.9,
+     "yaw": -1.54479
+    },
+    {
+     "livery": "goldfish-gold",
+     "progress": 0.455,
+     "lateral": -52.0,
+     "rise": -7.5,
+     "yaw": -1.29479
+    }
+   ],
+   "path": [
+    {
+     "progress": 0.459,
+     "lateral": -26.0,
+     "rise": 11.222
+    },
+    {
+     "progress": 0.46895,
+     "lateral": 3.698,
+     "rise": 11.4
+    },
+    {
+     "progress": 0.47738,
+     "lateral": 16.0,
+     "rise": 11.4
+    },
+    {
+     "progress": 0.48302,
+     "lateral": 3.698,
+     "rise": 11.4
+    },
+    {
+     "progress": 0.485,
+     "lateral": -26.0,
+     "rise": 11.222
+    },
+    {
+     "progress": 0.48302,
+     "lateral": -55.698,
+     "rise": 8.582
+    },
+    {
+     "progress": 0.47738,
+     "lateral": -68.0,
+     "rise": 8.2
+    },
+    {
+     "progress": 0.46895,
+     "lateral": -55.698,
+     "rise": 8.582
+    },
+    {
+     "progress": 0.459,
+     "lateral": -26.0,
+     "rise": 11.222
+    },
+    {
+     "progress": 0.44905,
+     "lateral": 3.698,
+     "rise": 11.4
+    },
+    {
+     "progress": 0.44062,
+     "lateral": 16.0,
+     "rise": 11.4
+    },
+    {
+     "progress": 0.43498,
+     "lateral": 3.698,
+     "rise": 11.4
+    },
+    {
+     "progress": 0.433,
+     "lateral": -26.0,
+     "rise": 11.222
+    },
+    {
+     "progress": 0.43498,
+     "lateral": -55.698,
+     "rise": 8.582
+    },
+    {
+     "progress": 0.44062,
+     "lateral": -68.0,
+     "rise": 8.2
+    },
+    {
+     "progress": 0.44905,
+     "lateral": -55.698,
+     "rise": 8.582
+    }
+   ]
+  },
+  {
+   "id": "reef-loop",
+   "batch": "FISHREEF",
+   "sector": "REEF",
+   "periodSeconds": 46,
+   "shape": "A long loop over the reef shallows that crosses the pier at each end.",
+   "startHeadingYaw": -2.9243,
+   "rest": {
+    "progress": 0.755,
+    "lateral": -34.0,
+    "rise": -3.4
+   },
+   "fish": [
+    {
+     "livery": "goldfish-orange",
+     "progress": 0.742,
+     "lateral": -28.0,
+     "rise": -3.1,
+     "yaw": -3.1443
+    },
+    {
+     "livery": "goldfish-white",
+     "progress": 0.755,
+     "lateral": -38.0,
+     "rise": -3.4,
+     "yaw": -2.8343
+    },
+    {
+     "livery": "goldfish-red",
+     "progress": 0.768,
+     "lateral": -30.0,
+     "rise": -3.3,
+     "yaw": -2.9843
+    },
+    {
+     "livery": "goldfish-gold",
+     "progress": 0.755,
+     "lateral": -40.0,
+     "rise": -3.8,
+     "yaw": -2.7343
+    }
+   ],
+   "path": [
+    {
+     "progress": 0.76,
+     "lateral": 36.0,
+     "rise": 9.556
+    },
+    {
+     "progress": 0.78373,
+     "lateral": 32.955,
+     "rise": 9.995
+    },
+    {
+     "progress": 0.80384,
+     "lateral": 24.284,
+     "rise": 11.0
+    },
+    {
+     "progress": 0.81728,
+     "lateral": 11.307,
+     "rise": 11.0
+    },
+    {
+     "progress": 0.822,
+     "lateral": -4.0,
+     "rise": 11.0
+    },
+    {
+     "progress": 0.81728,
+     "lateral": -19.307,
+     "rise": 11.0
+    },
+    {
+     "progress": 0.80384,
+     "lateral": -32.284,
+     "rise": 10.092
+    },
+    {
+     "progress": 0.78373,
+     "lateral": -40.955,
+     "rise": 8.84
+    },
+    {
+     "progress": 0.76,
+     "lateral": -44.0,
+     "rise": 8.4
+    },
+    {
+     "progress": 0.73627,
+     "lateral": -40.955,
+     "rise": 8.84
+    },
+    {
+     "progress": 0.71616,
+     "lateral": -32.284,
+     "rise": 10.092
+    },
+    {
+     "progress": 0.70272,
+     "lateral": -19.307,
+     "rise": 11.0
+    },
+    {
+     "progress": 0.698,
+     "lateral": -4.0,
+     "rise": 11.0
+    },
+    {
+     "progress": 0.70272,
+     "lateral": 11.307,
+     "rise": 11.0
+    },
+    {
+     "progress": 0.71616,
+     "lateral": 24.284,
+     "rise": 11.0
+    },
+    {
+     "progress": 0.73627,
+     "lateral": 32.955,
+     "rise": 9.995
+    }
+   ]
+  }
+ ]
+}

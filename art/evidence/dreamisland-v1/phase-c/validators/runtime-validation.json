@@ -1,0 +1,123 @@
+{
+  "script": "scripts/validate-dreamisland-runtime.mjs",
+  "config": {
+    "script": "scripts/build-dreamisland-route.mjs",
+    "measurementScript": "scripts/visual/dreamisland/race.mjs",
+    "measurement": "art/evidence/dreamisland-v1/phase-b/route-revision/calibration/works-calibration.json",
+    "worksLapSeconds": 32.579,
+    "definition": "Mean of flying laps two and three in the full Works demo with the schedule inert",
+    "chimeTick": 7233,
+    "strikeTick": 8014,
+    "fishRiseTick": 8494,
+    "nightSettledTick": 9454,
+    "nightRampTicks": 1440,
+    "events": [
+      {
+        "id": "chime-warning",
+        "tick": 7233
+      },
+      {
+        "id": "strike",
+        "tick": 8014
+      },
+      {
+        "id": "fish-rise",
+        "tick": 8494
+      },
+      {
+        "id": "night-settled",
+        "tick": 9454
+      }
+    ]
+  },
+  "determinism": {
+    "renderRates": [
+      60,
+      120,
+      240
+    ],
+    "windowSeconds": 120,
+    "tickRateHz": 120,
+    "expectedTicks": 14400,
+    "ticks": [
+      14400,
+      14400,
+      14400
+    ],
+    "frames": [
+      7200,
+      14400,
+      28800
+    ],
+    "expectedFrames": [
+      7200,
+      14400,
+      28800
+    ],
+    "reconciliation": "frames = render rate x window seconds; ticks = 120 Hz x window seconds, identical at every render rate",
+    "identicalSnapshots": true
+  },
+  "snapshotRestore": true,
+  "knownLimitation": "snapshot/restore has exactly one caller, this validator. Pause, resume and the save system do not snapshot the schedule; restore exists to make determinism provable, not to make pause deterministic.",
+  "grip": {
+    "sector": "BASIN",
+    "beforeStrike": 1,
+    "afterStrike": 0.85,
+    "reachesCraftVia": "course.surfaceGripAt"
+  },
+  "fish": {
+    "source": "src/game/data/dreamisland/fish-paths.json",
+    "floorMetres": 6,
+    "fishLowestPointMetres": -1.507,
+    "riseSeconds": 6,
+    "deckSamples": 21249,
+    "minimumDeckClearanceMetres": 8.442,
+    "worst": {
+      "shoal": "reef-loop",
+      "since": 467,
+      "livery": "goldfish-gold",
+      "lateral": -15.899,
+      "clearance": 8.442
+    },
+    "shoals": [
+      {
+        "id": "basin-eight",
+        "batch": "FISHBASIN",
+        "fish": 4,
+        "periodSeconds": 34,
+        "ticksSwept": 8881,
+        "deckSamples": 9840,
+        "minimumDeckClearanceMetres": 9.435,
+        "worst": {
+          "since": 3019,
+          "livery": "goldfish-gold",
+          "lateral": -13.002,
+          "clearance": 9.435
+        }
+      },
+      {
+        "id": "reef-loop",
+        "batch": "FISHREEF",
+        "fish": 4,
+        "periodSeconds": 46,
+        "ticksSwept": 11761,
+        "deckSamples": 11409,
+        "minimumDeckClearanceMetres": 8.442,
+        "worst": {
+          "since": 467,
+          "livery": "goldfish-gold",
+          "lateral": -15.899,
+          "clearance": 8.442
+        }
+      }
+    ],
+    "method": "Every tick of the rise plus two full circuits per shoal, per fish, with the fish turned by the shoal turn; lateral measured against the road at that fish own progress and height against the deck under it. A second implementation of the rule in the validator, not a call into dreamisland-fish.ts."
+  },
+  "nightTurn": {
+    "rampTicks": 1440,
+    "midpointBlend": 0.5,
+    "settledBlend": 1,
+    "reducedMotion": "step 0 -> 1 at strikeTick, same tick as the grip change"
+  },
+  "scope": "Pure clock, grip and blend arithmetic in Node. Not a rendered crossfade: the sky and water are phases B and C and the five-point capture instrument does not exist yet."
+}

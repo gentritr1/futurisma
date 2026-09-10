@@ -1,0 +1,176 @@
+{
+  "status": "VERIFIED",
+  "renderer": "Blender 5.2.0 LTS / Cycles CPU / 24 samples / denoised",
+  "input": "Exported GLBs re-imported; existing shared atlas files bound by DI_MAT role; imported vertex colours",
+  "frames": [
+    {
+      "asset": "clock-tower",
+      "view": "front",
+      "file": "clock-tower-front.png",
+      "cameraType": "orthographic",
+      "cameraPositionGame": [
+        0.0,
+        7.0,
+        -110.0
+      ],
+      "targetGame": [
+        0.0,
+        7.0,
+        -0.0
+      ],
+      "verticalSpanMetres": 19.735892295837402,
+      "scaleBarMetres": 2,
+      "scaleBarPixels": 97.28468169665463,
+      "boundsGame": {
+        "min": [
+          -4.0,
+          0.0,
+          -4.0
+        ],
+        "max": [
+          4.0,
+          14.0,
+          4.0
+        ],
+        "size": [
+          8.0,
+          14.0,
+          8.0
+        ]
+      },
+      "assetSha256": "bf51f9c27d120e7b6969c6e22958a6d69d32146bf2c8686d3bc8c6817e992339"
+    },
+    {
+      "asset": "clock-tower",
+      "view": "side",
+      "file": "clock-tower-side.png",
+      "cameraType": "orthographic",
+      "cameraPositionGame": [
+        110.0,
+        7.0,
+        -0.0
+      ],
+      "targetGame": [
+        0.0,
+        7.0,
+        -0.0
+      ],
+      "verticalSpanMetres": 19.735892295837402,
+      "scaleBarMetres": 2,
+      "scaleBarPixels": 97.28468169665463,
+      "boundsGame": {
+        "min": [
+          -4.0,
+          0.0,
+          -4.0
+        ],
+        "max": [
+          4.0,
+          14.0,
+          4.0
+        ],
+        "size": [
+          8.0,
+          14.0,
+          8.0
+        ]
+      },
+      "assetSha256": "bf51f9c27d120e7b6969c6e22958a6d69d32146bf2c8686d3bc8c6817e992339"
+    },
+    {
+      "asset": "clock-tower",
+      "view": "back",
+      "file": "clock-tower-back.png",
+      "cameraType": "orthographic",
+      "cameraPositionGame": [
+        0.0,
+        7.0,
+        110.0
+      ],
+      "targetGame": [
+        0.0,
+        7.0,
+        -0.0
+      ],
+      "verticalSpanMetres": 19.735892295837402,
+      "scaleBarMetres": 2,
+      "scaleBarPixels": 97.28468169665463,
+      "boundsGame": {
+        "min": [
+          -4.0,
+          0.0,
+          -4.0
+        ],
+        "max": [
+          4.0,
+          14.0,
+          4.0
+        ],
+        "size": [
+          8.0,
+          14.0,
+          8.0
+        ]
+      },
+      "assetSha256": "bf51f9c27d120e7b6969c6e22958a6d69d32146bf2c8686d3bc8c6817e992339"
+    },
+    {
+      "asset": "clock-tower",
+      "view": "three-quarter",
+      "file": "clock-tower-three-quarter.png",
+      "cameraType": "orthographic",
+      "cameraPositionGame": [
+        65.29454803466797,
+        41.27963638305664,
+        -81.61817932128906
+      ],
+      "targetGame": [
+        0.0,
+        7.0,
+        -0.0
+      ],
+      "verticalSpanMetres": 19.735892295837402,
+      "scaleBarMetres": 2,
+      "scaleBarPixels": 97.28468169665463,
+      "boundsGame": {
+        "min": [
+          -4.0,
+          0.0,
+          -4.0
+        ],
+        "max": [
+          4.0,
+          14.0,
+          4.0
+        ],
+        "size": [
+          8.0,
+          14.0,
+          8.0
+        ]
+      },
+      "assetSha256": "bf51f9c27d120e7b6969c6e22958a6d69d32146bf2c8686d3bc8c6817e992339"
+    },
+    {
+      "asset": "clock-tower",
+      "file": "clock-tower-40m.png",
+      "cameraType": "perspective",
+      "distanceMetres": 39.99999935925006,
+      "verticalFovDegrees": 50,
+      "cameraPositionGame": [
+        17.870681762695312,
+        8.787068367004395,
+        -35.741363525390625
+      ],
+      "targetGame": [
+        0.0,
+        7.0,
+        -0.0
+      ],
+      "scaleBarMetres": 2,
+      "scaleBarDepthMetres": 40,
+      "scaleBarPixels": 51.4681660922294,
+      "assetSha256": "bf51f9c27d120e7b6969c6e22958a6d69d32146bf2c8686d3bc8c6817e992339"
+    }
+  ]
+}

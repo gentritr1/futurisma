@@ -1,0 +1,128 @@
+{
+ "script": "scripts/visual/dreamisland/contact-sheet.py",
+ "sheet": "art/evidence/dreamisland-v1/phase-c/eyeball-contact-sheet.png",
+ "tileWidth": 384,
+ "tiles": [
+  {
+   "row": 0,
+   "column": 0,
+   "label": "BEACH day",
+   "source": "art/evidence/dreamisland-v1/phase-c/frames/day-beach.png",
+   "nightBlend": 0
+  },
+  {
+   "row": 0,
+   "column": 1,
+   "label": "POINT day",
+   "source": "art/evidence/dreamisland-v1/phase-c/frames/day-point.png",
+   "nightBlend": 0
+  },
+  {
+   "row": 0,
+   "column": 2,
+   "label": "BASIN day",
+   "source": "art/evidence/dreamisland-v1/phase-c/frames/day-basin.png",
+   "nightBlend": 0
+  },
+  {
+   "row": 0,
+   "column": 3,
+   "label": "REEF day",
+   "source": "art/evidence/dreamisland-v1/phase-c/frames/day-reef.png",
+   "nightBlend": 0
+  },
+  {
+   "row": 1,
+   "column": 0,
+   "label": "BEACH night",
+   "source": "art/evidence/dreamisland-v1/phase-c/frames/night-beach.png",
+   "nightBlend": 1
+  },
+  {
+   "row": 1,
+   "column": 1,
+   "label": "POINT night",
+   "source": "art/evidence/dreamisland-v1/phase-c/frames/night-point.png",
+   "nightBlend": 1
+  },
+  {
+   "row": 1,
+   "column": 2,
+   "label": "BASIN night",
+   "source": "art/evidence/dreamisland-v1/phase-c/frames/night-basin.png",
+   "nightBlend": 1
+  },
+  {
+   "row": 1,
+   "column": 3,
+   "label": "REEF night",
+   "source": "art/evidence/dreamisland-v1/phase-c/frames/night-reef.png",
+   "nightBlend": 1
+  },
+  {
+   "row": 2,
+   "column": 0,
+   "label": "crossfade 0.00",
+   "source": "art/evidence/dreamisland-v1/phase-c/crossfade-shipped/blend-000.png",
+   "nightBlend": 0
+  },
+  {
+   "row": 2,
+   "column": 1,
+   "label": "crossfade 0.25",
+   "source": "art/evidence/dreamisland-v1/phase-c/crossfade-shipped/blend-025.png",
+   "nightBlend": 0.25
+  },
+  {
+   "row": 2,
+   "column": 2,
+   "label": "crossfade 0.50",
+   "source": "art/evidence/dreamisland-v1/phase-c/crossfade-shipped/blend-050.png",
+   "nightBlend": 0.5
+  },
+  {
+   "row": 2,
+   "column": 3,
+   "label": "crossfade 0.75",
+   "source": "art/evidence/dreamisland-v1/phase-c/crossfade-shipped/blend-075.png",
+   "nightBlend": 0.75
+  },
+  {
+   "row": 2,
+   "column": 4,
+   "label": "crossfade 1.00",
+   "source": "art/evidence/dreamisland-v1/phase-c/crossfade-shipped/blend-100.png",
+   "nightBlend": 1
+  },
+  {
+   "row": 3,
+   "column": 0,
+   "label": "REEF night BEFORE the water fixes",
+   "source": "art/evidence/dreamisland-v1/phase-c/pier-edge/before/blend-100.png",
+   "nightBlend": 1
+  },
+  {
+   "row": 3,
+   "column": 1,
+   "label": "REEF night AFTER",
+   "source": "art/evidence/dreamisland-v1/phase-c/pier-edge/after/blend-100.png",
+   "nightBlend": 1
+  },
+  {
+   "row": 3,
+   "column": 2,
+   "label": "BEACH night BEFORE",
+   "source": "art/evidence/dreamisland-v1/phase-c/crossfade/blend-100.png",
+   "nightBlend": 1
+  },
+  {
+   "row": 3,
+   "column": 3,
+   "label": "BEACH night AFTER",
+   "source": "art/evidence/dreamisland-v1/phase-c/crossfade-shipped/blend-100.png",
+   "nightBlend": 1
+  }
+ ],
+ "missing": [],
+ "note": "A user eyeball on this sheet is what closes the look of phase B and phase C. No number on it is an acceptance."
+}

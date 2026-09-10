@@ -1,0 +1,22 @@
+{
+  "status": "VERIFIED",
+  "method": "Pillow read-only measurement of existing emissive.jpg; no image written",
+  "clockWhiteInsetPixels": [
+    820,
+    784,
+    850,
+    818
+  ],
+  "minimumChannel": [
+    252,
+    252,
+    250
+  ],
+  "maximumChannel": [
+    255,
+    255,
+    255
+  ],
+  "darkPixelsBelow128": 0,
+  "renderedPixelProof": "VERIFIED (render-check.json): clock-face point and 25 grid samples match existing source pixels with zero RGB-channel error."
+}

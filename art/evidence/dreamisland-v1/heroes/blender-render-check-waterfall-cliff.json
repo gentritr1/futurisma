@@ -1,0 +1,155 @@
+{
+  "status": "VERIFIED",
+  "renderer": "Blender 5.2.0 LTS / Cycles CPU / 24 samples / denoised",
+  "input": "Exported GLBs re-imported; existing shared atlas files bound by DI_MAT role; imported vertex colours",
+  "frames": [
+    {
+      "asset": "waterfall-cliff",
+      "view": "front",
+      "file": "waterfall-cliff-front.png",
+      "cameraType": "orthographic",
+      "cameraPositionGame": [
+        0.0,
+        8.045000076293945,
+        -112.35299682617188
+      ],
+      "targetGame": [
+        0.0,
+        8.045000076293945,
+        -2.3529999256134033
+      ],
+      "verticalSpanMetres": 27.053661346435547,
+      "scaleBarMetres": 2,
+      "scaleBarPixels": 70.97006114675008,
+      "boundsGame": {
+        "min": [
+          -10.97249984741211,
+          0.04500000178813934,
+          -8.015999794006348
+        ],
+        "max": [
+          10.97249984741211,
+          16.045000076293945,
+          3.309999942779541
+        ],
+        "size": [
+          21.94499969482422,
+          16.000000074505806,
+          11.325999736785889
+        ]
+      },
+      "assetSha256": "cd530cf9015421ae243a2536369725ee1033172fe221fcf3666de4e317772f28"
+    },
+    {
+      "asset": "waterfall-cliff",
+      "view": "side",
+      "file": "waterfall-cliff-side.png",
+      "cameraType": "orthographic",
+      "cameraPositionGame": [
+        110.0,
+        8.045000076293945,
+        -2.3529999256134033
+      ],
+      "targetGame": [
+        0.0,
+        8.045000076293945,
+        -2.3529999256134033
+      ],
+      "verticalSpanMetres": 27.053661346435547,
+      "scaleBarMetres": 2,
+      "scaleBarPixels": 70.97006114675008,
+      "boundsGame": {
+        "min": [
+          -10.97249984741211,
+          0.04500000178813934,
+          -8.015999794006348
+        ],
+        "max": [
+          10.97249984741211,
+          16.045000076293945,
+          3.309999942779541
+        ],
+        "size": [
+          21.94499969482422,
+          16.000000074505806,
+          11.325999736785889
+        ]
+      },
+      "assetSha256": "cd530cf9015421ae243a2536369725ee1033172fe221fcf3666de4e317772f28"
+    },
+    {
+      "asset": "waterfall-cliff",
+      "view": "back",
+      "file": "waterfall-cliff-back.png",
+      "cameraType": "orthographic",
+      "cameraPositionGame": [
+        0.0,
+        8.045000076293945,
+        107.64700317382812
+      ],
+      "targetGame": [
+        0.0,
+        8.045000076293945,
+        -2.3529999256134033
+      ],
+      "verticalSpanMetres": 27.053661346435547,
+      "scaleBarMetres": 2,
+      "scaleBarPixels": 70.97006114675008,
+      "boundsGame": {
+        "min": [
+          -10.97249984741211,
+          0.04500000178813934,
+          -8.015999794006348
+        ],
+        "max": [
+          10.97249984741211,
+          16.045000076293945,
+          3.309999942779541
+        ],
+        "size": [
+          21.94499969482422,
+          16.000000074505806,
+          11.325999736785889
+        ]
+      },
+      "assetSha256": "cd530cf9015421ae243a2536369725ee1033172fe221fcf3666de4e317772f28"
+    },
+    {
+      "asset": "waterfall-cliff",
+      "view": "three-quarter",
+      "file": "waterfall-cliff-three-quarter.png",
+      "cameraType": "orthographic",
+      "cameraPositionGame": [
+        65.29454803466797,
+        42.32463836669922,
+        -83.97117614746094
+      ],
+      "targetGame": [
+        0.0,
+        8.045000076293945,
+        -2.3529999256134033
+      ],
+      "verticalSpanMetres": 27.053661346435547,
+      "scaleBarMetres": 2,
+      "scaleBarPixels": 70.97006114675008,
+      "boundsGame": {
+        "min": [
+          -10.97249984741211,
+          0.04500000178813934,
+          -8.015999794006348
+        ],
+        "max": [
+          10.97249984741211,
+          16.045000076293945,
+          3.309999942779541
+        ],
+        "size": [
+          21.94499969482422,
+          16.000000074505806,
+          11.325999736785889
+        ]
+      },
+      "assetSha256": "cd530cf9015421ae243a2536369725ee1033172fe221fcf3666de4e317772f28"
+    }
+  ]
+}
