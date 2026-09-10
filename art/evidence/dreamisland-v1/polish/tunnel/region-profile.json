@@ -1,0 +1,39 @@
+{
+  "instrument": "/Users/gentlegen/Desktop/futurisma-race/polarity_work/scripts/visual/dreamisland-heroes/polish-regions.py",
+  "capture": "art/evidence/dreamisland-v1/polish/tunnel/pose-capture.json",
+  "method": "Full/isolated render equality at 2/255; isolated/blank difference above 6/255; display luma .2126/.7152/.0722",
+  "results": [
+    {
+      "blend": 1,
+      "metrics": {
+        "mouth": {
+          "pixels": 18939,
+          "meanLuma": 0.5511995915058562,
+          "meanChroma": 0.2313907705750868,
+          "visibleBoundsPixels": [
+            569,
+            188,
+            799,
+            350
+          ],
+          "widthPixels": 230,
+          "heightPixels": 162
+        },
+        "drum": {
+          "pixels": 46362,
+          "meanLuma": 0.17261498910111472,
+          "meanChroma": 0.09650626654181799,
+          "visibleBoundsPixels": [
+            535,
+            72,
+            906,
+            365
+          ],
+          "widthPixels": 371,
+          "heightPixels": 293
+        },
+        "mouthToDrum": 3.193231331625398
+      }
+    }
+  ]
+}

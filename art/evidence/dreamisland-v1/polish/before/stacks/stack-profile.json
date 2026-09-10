@@ -1,0 +1,42 @@
+{
+  "instrument": "/Users/gentlegen/Desktop/futurisma-race/polarity_work/scripts/visual/dreamisland-heroes/polish-stacks.py",
+  "method": "Exact stack/full and stack/blank masks above the camera horizon; 3x3 dilation joins course gaps for connected-component labeling only. All luma uses original undilated pixels. Background is the sky-only frame at identical pixels. Components are associated with the nearest projected live placement centre.",
+  "results": [
+    {
+      "blend": 0,
+      "components": [
+        {
+          "pixels": 3018,
+          "bounds": [
+            112,
+            209,
+            161,
+            288
+          ],
+          "meanLuma": 0.36599709741550696,
+          "skyMeanLuma": 0.7740838799880455,
+          "silhouetteContrast": 0.40808678257253855,
+          "placement": {
+            "index": 3,
+            "child": "sea_stack_32m",
+            "position": [
+              -137.552,
+              -6,
+              380.576
+            ],
+            "height": 32.4,
+            "distance": 220.10447975264145,
+            "screen": [
+              135.0815961374414,
+              268.7911951512307
+            ],
+            "inFront": true
+          }
+        }
+      ],
+      "qualifyingPlacements": [
+        3
+      ]
+    }
+  ]
+}

@@ -74,6 +74,7 @@ export function applyDreamIslandAtlasFlow(
   options: {
     cell: AtlasCell; tile: THREE.Vector2; scroll: THREE.Vector2;
     time: { value: number }; emissiveCell?: AtlasCell; key: string;
+    swell?: {night:{value:number}};
   },
 ): void {
   const cell = new THREE.Vector4(...options.cell);
@@ -88,7 +89,7 @@ export function applyDreamIslandAtlasFlow(
   material.userData.diUniforms = uniforms;
   material.onBeforeCompile = shader => {
     Object.assign(shader.uniforms, uniforms);
-    const patched = "uniform vec4 diCell;uniform vec4 diEmissiveCell;uniform vec2 diTile;uniform vec2 diScroll;uniform float diTime;\n"
+    let patched = "uniform vec4 diCell;uniform vec4 diEmissiveCell;uniform vec2 diTile;uniform vec2 diScroll;uniform float diTime;\n"
       + shader.fragmentShader
         .replace("#include <map_fragment>",
           "vec2 diUv=diCell.xy+diCell.zw*fract(vMapUv*diTile+diScroll*diTime);\n"
@@ -96,6 +97,32 @@ export function applyDreamIslandAtlasFlow(
         .replace("#include <emissivemap_fragment>",
           "vec2 diGlowUv=diEmissiveCell.xy+diEmissiveCell.zw*fract(vMapUv*diTile+diScroll*diTime);\n"
           + THREE.ShaderChunk.emissivemap_fragment.replaceAll("vEmissiveMapUv", "diGlowUv"));
+    if(options.swell){
+      shader.uniforms.diSeaNight=options.swell.night;
+      // Wave displacement happens before the ordinary Lambert projection and
+      // lighting. The far quad has diPatch=0; no extra surface draw is needed.
+      shader.vertexShader='attribute float diPatch;attribute float diPatchFade;varying vec2 diSeaUv;uniform float diTime;\n'+shader.vertexShader
+        .replace('#include <beginnormal_vertex>',`#include <beginnormal_vertex>
+          vec2 diNormalWorld=position.xz+diPatch*floor(cameraPosition.xz/16.)*16.;
+          objectNormal=normalize(vec3(-diPatchFade*.14*.07*cos(diNormalWorld.x*.07+diTime*.18),1.,
+            -diPatchFade*.10*.045*cos(diNormalWorld.y*.045-diTime*.11)));`)
+        .replace('#include <begin_vertex>',`#include <begin_vertex>
+          transformed.xz+=diPatch*floor(cameraPosition.xz/16.)*16.;
+          transformed.y+=diPatchFade*(.32+.14*sin(transformed.x*.07+diTime*.18)
+            +.10*sin(transformed.z*.045-diTime*.11));
+          diSeaUv=transformed.xz/42.;`);
+      patched='varying vec2 diSeaUv;uniform float diSeaNight;\n'+patched;
+      patched=patched.replace('fract(vMapUv*diTile+diScroll*diTime)','fract(diSeaUv*diTile+diScroll*diTime)')
+        .replace('#include <color_fragment>',`#include <color_fragment>
+          vec2 diSlowUv=diCell.xy+diCell.zw*fract(diSeaUv*.37+vec2(-.0011,.0007)*diTime);
+          vec3 diSlow=texture2D(map,diSlowUv).rgb;
+          diffuseColor.rgb*=mix(vec3(.80),diSlow*2.4,.30);`)
+        .replace('#include <fog_fragment>',`#include <fog_fragment>
+          #ifdef USE_FOG
+            float diHorizon=smoothstep(120.,600.,vFogDepth)*(1.-diSeaNight);
+            gl_FragColor.rgb=mix(gl_FragColor.rgb,fogColor,diHorizon);
+          #endif`);
+    }
     // A chunk that three renames would leave the include in place and the flow
     // would silently do nothing, which is the failure this project keeps
     // catching late. Fail loudly at compile instead.
@@ -109,7 +136,7 @@ export function applyDreamIslandAtlasFlow(
   // A stable key keeps three from re-deriving the program key from
   // `onBeforeCompile.toString()` on every material; the cell, tile and scroll
   // are uniforms, so every surface can safely share one compiled program.
-  material.customProgramCacheKey = () => "dreamisland-atlas-flow-v1";
+  material.customProgramCacheKey = () => options.swell?"dreamisland-sea-swell-v1":"dreamisland-atlas-flow-v1";
 }
 /** How many materials actually got the flow patch. Reads zero if the module
  * silently no-ops, which is what the diagnostics counter is for. */

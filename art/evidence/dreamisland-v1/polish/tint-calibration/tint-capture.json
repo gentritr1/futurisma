@@ -1,0 +1,216 @@
+{
+  "script": "scripts/visual/dreamisland-heroes/polish-tint-capture.mjs",
+  "captures": [
+    {
+      "name": "stacks-before",
+      "source": "art/evidence/dreamisland-v1/polish/before/heroes/sea-stack-set.glb",
+      "sha256": "ef8183ae3c7c790d7685febd13e0874bd15566f02800feb40f8a0f00b70f756f",
+      "geometry": {
+        "scale": 1,
+        "triangles": 1304,
+        "meshes": 8,
+        "materials": [
+          "DI_MAT_jungle",
+          "DI_MAT_concrete"
+        ],
+        "bounds": {
+          "min": [
+            -32.80038547515869,
+            0,
+            -5.829975605010986
+          ],
+          "max": [
+            35.727272510528564,
+            40,
+            5.812896251678467
+          ],
+          "size": [
+            68.52765798568726,
+            40,
+            11.642871856689453
+          ]
+        }
+      },
+      "pose": {
+        "position": [
+          1.4634435176849365,
+          24.765808824737228,
+          -39.72361321614314
+        ],
+        "target": [
+          1.4634435176849365,
+          20,
+          -0.008539676666259766
+        ],
+        "fov": 70,
+        "far": 650,
+        "quaternion": [
+          0,
+          0.9982176211846098,
+          0.05967898086042504,
+          0
+        ],
+        "horizonRow": 298.3040061087406
+      },
+      "frames": {
+        "full": "stacks-before-full.png",
+        "stone": "stacks-before-stone.png",
+        "cap": "stacks-before-cap.png",
+        "blank": "stacks-before-blank.png"
+      }
+    },
+    {
+      "name": "stacks-after",
+      "source": "public/assets/dreamisland/heroes/sea-stack-set.glb",
+      "sha256": "ea0b0e20af2a856009168e695a156e856f25b64a97fa9ad837eddd91651949d4",
+      "geometry": {
+        "scale": 1,
+        "triangles": 1304,
+        "meshes": 8,
+        "materials": [
+          "DI_MAT_jungle",
+          "DI_MAT_concrete"
+        ],
+        "bounds": {
+          "min": [
+            -32.80038547515869,
+            0,
+            -5.829975605010986
+          ],
+          "max": [
+            35.727272510528564,
+            40,
+            5.812896251678467
+          ],
+          "size": [
+            68.52765798568726,
+            40,
+            11.642871856689453
+          ]
+        }
+      },
+      "pose": {
+        "position": [
+          1.4634435176849365,
+          24.765808824737228,
+          -39.72361321614314
+        ],
+        "target": [
+          1.4634435176849365,
+          20,
+          -0.008539676666259766
+        ],
+        "fov": 70,
+        "far": 650,
+        "quaternion": [
+          0,
+          0.9982176211846098,
+          0.05967898086042504,
+          0
+        ],
+        "horizonRow": 298.3040061087406
+      },
+      "frames": {
+        "full": "stacks-after-full.png",
+        "stone": "stacks-after-stone.png",
+        "cap": "stacks-after-cap.png",
+        "blank": "stacks-after-blank.png"
+      }
+    },
+    {
+      "name": "watchtower-accents",
+      "source": "public/assets/dreamisland/heroes/watchtower.glb",
+      "sha256": "293112f84da3246713c64c817c73cfcf6122866738e3fee2429b976a53bfddd7",
+      "geometry": {
+        "scale": 1,
+        "triangles": 9438,
+        "meshes": 16,
+        "materials": [
+          "DI_MAT_concrete",
+          "DI_MAT_jungle-card",
+          "DI_MAT_jungle",
+          "DI_MAT_emissive"
+        ],
+        "bounds": {
+          "min": [
+            -14,
+            0,
+            -14.251358985900879
+          ],
+          "max": [
+            14,
+            30,
+            14.251358985900879
+          ],
+          "size": [
+            28,
+            30,
+            28.502717971801758
+          ]
+        }
+      },
+      "pose": {
+        "position": [
+          13.083540778447937,
+          20.607231762191972,
+          -37.381545081279825
+        ],
+        "target": [
+          0,
+          15,
+          0
+        ],
+        "fov": 70,
+        "far": 650,
+        "quaternion": [
+          -0.011772285964394962,
+          0.9834280486132019,
+          0.06927085522670014,
+          0.16712939627774578
+        ],
+        "horizonRow": 287.20965076428513
+      },
+      "frames": {
+        "full": "watchtower-full.png",
+        "ivy": "watchtower-ivy.png",
+        "joints": "watchtower-joints.png",
+        "blank": "watchtower-blank.png"
+      }
+    },
+    {
+      "name": "shoulder",
+      "pose": {
+        "position": [
+          108.49998270988567,
+          4.8,
+          0
+        ],
+        "target": [
+          138.99998270988567,
+          1.15,
+          0
+        ],
+        "fov": 62,
+        "far": 650,
+        "quaternion": [
+          -0.04208533716391777,
+          -0.7058532598180726,
+          -0.04208533716391776,
+          0.7058532598180725
+        ],
+        "horizonRow": 288.29956590791534
+      },
+      "geometry": {
+        "triangles": 2436,
+        "cell": "road-sand",
+        "role": "DI_MAT_concrete"
+      },
+      "frames": {
+        "full": "shoulder-full.png",
+        "shoulder": "shoulder-isolated.png",
+        "blank": "shoulder-blank.png"
+      }
+    }
+  ],
+  "errors": []
+}

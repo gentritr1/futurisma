@@ -17,7 +17,9 @@ You are taking over a level build mid-flight. You have no access to the conversa
 
 **Phase C — DONE, reviewed 2026-09-10, APPROVE (reproduced: test:code PASS with fish-clearance, bore-containment and sky assertions inside it; feral soak 92 draws / 148,002 tris vs 110 / 180k, 0 missed gates, residual .72 frames). All four Codex heroes integrated (watchtower at scale 1.10 + 0.38 m offset — decision 5 ruling in the brief). Crossfade instrument + target as a measured delta, dark-sky gate clause with byte-identical control proof, fish drift at 8.442 m clearance, both-state shadow numbers, 14/14 atlas cells decided by quadrant-ID, validator --out. Evidence + eyeball contact sheet: art/evidence/dreamisland-v1/phase-c/. Reserve to the 110/180k gate: 18 draws / 32k tris. `test:code` now needs python3 + Pillow.
 
-**NEXT: the Codex polish pass — docs/briefs/DREAM-ISLAND-CODEX-POLISH.md is FINAL** (9 residuals from the contact sheet, each with a measurable). Phase D (sprint/timeattack/ghost) after that.
+**Codex polish pass — DONE and reviewed 2026-09-11, APPROVE** (reproduced: test:code PASS; feral soak 93 draws / 151,404 tris vs 110 / 180k, 0 missed gates, residual +3.1 fr; crossfade T1/T2/T3 on a new polish baseline with bit-exact repeat; night road luma .1375 at blend 1, sky steps within 1.7x). Before/after: art/evidence/dreamisland-v1/polish/eyeball-before-after.png; strike flipbook polish/index.html. Reserve to the gate: 17 draws / 28.6k tris.
+
+**NEXT: Phase D** — sprint, timeattack, solo ghost; pace re-solve only if the route changes (it did not); the PRODUCT.md decision-8 line is already in. Then a second polish round if the user's eyeball asks for it.
 
 **Codex hero track (parallel, docs/briefs/DREAM-ISLAND-CODEX-3D.md):** clock-tower, waterfall-cliff, sea-stack-set APPROVED; watchtower being REBUILT to the revised spec (28 m base → 20 m crown, 30 m tall, arched 14×8 bore, 14×10 clearance box). Evidence art/evidence/dreamisland-v1/heroes/. Integration into painted.json is a Phase C step: bind DI_MAT_* (incl. DI_MAT_jungle-card) to the shared atlases, replace the painted world's own four, re-measure draws against the reserve.
 

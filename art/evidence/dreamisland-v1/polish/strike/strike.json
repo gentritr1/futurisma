@@ -1,0 +1,1419 @@
+{
+  "script": "scripts/visual/dreamisland-heroes/polish-strike.mjs",
+  "url": "http://127.0.0.1:5217/?map=dreamisland&seed=3868938316&tier=works&demo=1&headless=1&diagnostics=1&start=manual&quality=high&music=0",
+  "schedule": {
+    "script": "scripts/build-dreamisland-route.mjs",
+    "measurementScript": "scripts/visual/dreamisland/race.mjs",
+    "measurement": "art/evidence/dreamisland-v1/phase-b/route-revision/calibration/works-calibration.json",
+    "worksLapSeconds": 32.579,
+    "definition": "Mean of flying laps two and three in the full Works demo with the schedule inert",
+    "chimeTick": 7233,
+    "strikeTick": 8014,
+    "fishRiseTick": 8494,
+    "nightSettledTick": 9454,
+    "nightRampTicks": 1440,
+    "events": [
+      {
+        "id": "chime-warning",
+        "tick": 7233
+      },
+      {
+        "id": "strike",
+        "tick": 8014
+      },
+      {
+        "id": "fish-rise",
+        "tick": 8494
+      },
+      {
+        "id": "night-settled",
+        "tick": 9454
+      }
+    ]
+  },
+  "pose": {
+    "position": [
+      108.49998270988567,
+      4.8,
+      0
+    ],
+    "target": [
+      138.99998270988567,
+      1.15,
+      0
+    ],
+    "fov": 62,
+    "far": 650,
+    "quaternion": [
+      -0.04208533716391777,
+      -0.7058532598180726,
+      -0.04208533716391776,
+      0.7058532598180725
+    ],
+    "horizonRow": 288.29956590791534
+  },
+  "frames": [
+    {
+      "targetTick": 8014,
+      "tick": 8014,
+      "nightBlend": 0,
+      "now": 94583.20000004768,
+      "state": {
+        "lights": [
+          {
+            "name": "",
+            "type": "PointLight",
+            "intensity": 17,
+            "color": [
+              0.6653648627566672,
+              0.8276769218358889,
+              0.8938237417157995
+            ],
+            "position": [
+              0,
+              2.3,
+              0.9
+            ]
+          },
+          {
+            "name": "",
+            "type": "HemisphereLight",
+            "intensity": 1.056,
+            "color": [
+              0.5209955731953768,
+              0.775822218312646,
+              0.8631572134510892
+            ],
+            "position": [
+              0,
+              1,
+              0
+            ],
+            "groundColor": [
+              0.158960835050774,
+              0.2541520943200296,
+              0.08437621153575764
+            ]
+          },
+          {
+            "name": "",
+            "type": "DirectionalLight",
+            "intensity": 1.35,
+            "color": [
+              1,
+              0.8713671191959567,
+              0.623960391667596
+            ],
+            "position": [
+              241.6785780044099,
+              99.1773698531587,
+              -88.44909094845787
+            ]
+          },
+          {
+            "name": "",
+            "type": "DirectionalLight",
+            "intensity": 0.405,
+            "color": [
+              0.3915724777393922,
+              0.6866853124288864,
+              0.8069522576650873
+            ],
+            "position": [
+              -100,
+              25,
+              -80
+            ]
+          },
+          {
+            "name": "dreamisland_night_ground_fill",
+            "type": "HemisphereLight",
+            "intensity": 0,
+            "color": [
+              0.3,
+              0.18,
+              0.035
+            ],
+            "position": [
+              0,
+              1,
+              0
+            ],
+            "groundColor": [
+              0.15,
+              0.09,
+              0.0175
+            ]
+          },
+          {
+            "name": "dreamisland_tunnel_lamp_-1",
+            "type": "PointLight",
+            "intensity": 0,
+            "color": [
+              1,
+              0.8069522576650873,
+              0.407240211891531
+            ],
+            "position": [
+              663.0990765335861,
+              28.6,
+              299.6334161428029
+            ]
+          },
+          {
+            "name": "dreamisland_tunnel_lamp_1",
+            "type": "PointLight",
+            "intensity": 0,
+            "color": [
+              1,
+              0.8069522576650873,
+              0.407240211891531
+            ],
+            "position": [
+              648.6069234664138,
+              28.6,
+              298.73458385719715
+            ]
+          }
+        ],
+        "fog": {
+          "color": [
+            0.48514994004665124,
+            0.7083757798856457,
+            0.775822218312646
+          ],
+          "density": 0.0016000000000000003
+        },
+        "skyBlend": 0
+      },
+      "file": "00.png",
+      "secondsFromStrike": 0
+    },
+    {
+      "targetTick": 8174,
+      "tick": 8178,
+      "nightBlend": 0.035957604595336076,
+      "now": 95941.89999985695,
+      "state": {
+        "lights": [
+          {
+            "name": "",
+            "type": "PointLight",
+            "intensity": 17,
+            "color": [
+              0.6608407692780868,
+              0.82776516960965,
+              0.8918286195923689
+            ],
+            "position": [
+              0,
+              2.3,
+              0.9
+            ]
+          },
+          {
+            "name": "",
+            "type": "HemisphereLight",
+            "intensity": 1.0402819238449261,
+            "color": [
+              0.5095425349316905,
+              0.7588758360708122,
+              0.8448945279209248
+            ],
+            "position": [
+              0,
+              1,
+              0
+            ],
+            "groundColor": [
+              0.15546596057767123,
+              0.24860283863664506,
+              0.08275162408606519
+            ]
+          },
+          {
+            "name": "",
+            "type": "DirectionalLight",
+            "intensity": 1.3265568466437108,
+            "color": [
+              0.9854139838150865,
+              0.864807799039247,
+              0.6323561575782389
+            ],
+            "position": [
+              241.6785780044099,
+              99.1773698531587,
+              -88.44909094845787
+            ]
+          },
+          {
+            "name": "",
+            "type": "DirectionalLight",
+            "intensity": 0.4074112957737896,
+            "color": [
+              0.3833468532328847,
+              0.6868457629266361,
+              0.8033247628952155
+            ],
+            "position": [
+              -100,
+              25,
+              -80
+            ]
+          },
+          {
+            "name": "dreamisland_night_ground_fill",
+            "type": "HemisphereLight",
+            "intensity": 0.017978802297668038,
+            "color": [
+              0.3,
+              0.18,
+              0.035
+            ],
+            "position": [
+              0,
+              1,
+              0
+            ],
+            "groundColor": [
+              0.15,
+              0.09,
+              0.0175
+            ]
+          },
+          {
+            "name": "dreamisland_tunnel_lamp_-1",
+            "type": "PointLight",
+            "intensity": 39.55336505486969,
+            "color": [
+              1,
+              0.8069522576650873,
+              0.407240211891531
+            ],
+            "position": [
+              663.0990765335861,
+              28.6,
+              299.6334161428029
+            ]
+          },
+          {
+            "name": "dreamisland_tunnel_lamp_1",
+            "type": "PointLight",
+            "intensity": 39.55336505486969,
+            "color": [
+              1,
+              0.8069522576650873,
+              0.407240211891531
+            ],
+            "position": [
+              648.6069234664138,
+              28.6,
+              298.73458385719715
+            ]
+          }
+        ],
+        "fog": {
+          "color": [
+            0.4679747575619614,
+            0.6838866775061658,
+            0.7503878207046811
+          ],
+          "density": 0.0016503888226157288
+        },
+        "skyBlend": 0.035957604595336076
+      },
+      "file": "01.png",
+      "secondsFromStrike": 1.3666666666666667
+    },
+    {
+      "targetTick": 8334,
+      "tick": 8335,
+      "nightBlend": 0.1269212420428241,
+      "now": 97255.5,
+      "state": {
+        "lights": [
+          {
+            "name": "",
+            "type": "PointLight",
+            "intensity": 17,
+            "color": [
+              0.6451291599772052,
+              0.8280716430610919,
+              0.8848998106587586
+            ],
+            "position": [
+              0,
+              2.3,
+              0.9
+            ]
+          },
+          {
+            "name": "",
+            "type": "HemisphereLight",
+            "intensity": 0.9856950165055177,
+            "color": [
+              0.46976756932607255,
+              0.7000231757295159,
+              0.7814705113320969
+            ],
+            "position": [
+              0,
+              1,
+              0
+            ],
+            "groundColor": [
+              0.14332869981217106,
+              0.22933096956036347,
+              0.07710963560692803
+            ]
+          },
+          {
+            "name": "",
+            "type": "DirectionalLight",
+            "intensity": 1.2451417149585133,
+            "color": [
+              0.9347585787844909,
+              0.8420281027156443,
+              0.6615135997032224
+            ],
+            "position": [
+              241.6785780044099,
+              99.1773698531587,
+              -88.44909094845787
+            ]
+          },
+          {
+            "name": "",
+            "type": "DirectionalLight",
+            "intensity": 0.4157854236042672,
+            "color": [
+              0.35478029086764595,
+              0.6874029873838036,
+              0.79072692847047
+            ],
+            "position": [
+              -100,
+              25,
+              -80
+            ]
+          },
+          {
+            "name": "dreamisland_night_ground_fill",
+            "type": "HemisphereLight",
+            "intensity": 0.06346062102141205,
+            "color": [
+              0.3,
+              0.18,
+              0.035
+            ],
+            "position": [
+              0,
+              1,
+              0
+            ],
+            "groundColor": [
+              0.15,
+              0.09,
+              0.0175
+            ]
+          },
+          {
+            "name": "dreamisland_tunnel_lamp_-1",
+            "type": "PointLight",
+            "intensity": 139.6133662471065,
+            "color": [
+              1,
+              0.8069522576650873,
+              0.407240211891531
+            ],
+            "position": [
+              663.0990765335861,
+              28.6,
+              299.6334161428029
+            ]
+          },
+          {
+            "name": "dreamisland_tunnel_lamp_1",
+            "type": "PointLight",
+            "intensity": 139.6133662471065,
+            "color": [
+              1,
+              0.8069522576650873,
+              0.407240211891531
+            ],
+            "position": [
+              648.6069234664138,
+              28.6,
+              298.73458385719715
+            ]
+          }
+        ],
+        "fog": {
+          "color": [
+            0.4245258935396228,
+            0.6219354475693877,
+            0.6860452331284702
+          ],
+          "density": 0.001802760914308009
+        },
+        "skyBlend": 0.1269212420428241
+      },
+      "file": "02.png",
+      "secondsFromStrike": 2.675
+    },
+    {
+      "targetTick": 8494,
+      "tick": 8494,
+      "nightBlend": 0.25925925925925924,
+      "now": 98576.09999990463,
+      "state": {
+        "lights": [
+          {
+            "name": "",
+            "type": "PointLight",
+            "intensity": 17,
+            "color": [
+              0.6203692248989339,
+              0.8285546147679106,
+              0.8739806962586626
+            ],
+            "position": [
+              0,
+              2.3,
+              0.9
+            ]
+          },
+          {
+            "name": "",
+            "type": "HemisphereLight",
+            "intensity": 0.8996714745522734,
+            "color": [
+              0.4070861757605951,
+              0.6072772309107195,
+              0.681520563298799
+            ],
+            "position": [
+              0,
+              1,
+              0
+            ],
+            "groundColor": [
+              0.12420158286146035,
+              0.19896041884033616,
+              0.06821842237850637
+            ]
+          },
+          {
+            "name": "",
+            "type": "DirectionalLight",
+            "intensity": 1.1168395572157495,
+            "color": [
+              0.8549306938172451,
+              0.8061295648081691,
+              0.7074628312706432
+            ],
+            "position": [
+              241.6785780044099,
+              99.1773698531587,
+              -88.44909094845787
+            ]
+          },
+          {
+            "name": "",
+            "type": "DirectionalLight",
+            "intensity": 0.4289822169720945,
+            "color": [
+              0.3097622270889713,
+              0.6882811177598376,
+              0.7708739931975686
+            ],
+            "position": [
+              -100,
+              25,
+              -80
+            ]
+          },
+          {
+            "name": "dreamisland_night_ground_fill",
+            "type": "HemisphereLight",
+            "intensity": 0.12962962962962962,
+            "color": [
+              0.3,
+              0.18,
+              0.035
+            ],
+            "position": [
+              0,
+              1,
+              0
+            ],
+            "groundColor": [
+              0.15,
+              0.09,
+              0.0175
+            ]
+          },
+          {
+            "name": "dreamisland_tunnel_lamp_-1",
+            "type": "PointLight",
+            "intensity": 285.18518518518516,
+            "color": [
+              1,
+              0.8069522576650873,
+              0.407240211891531
+            ],
+            "position": [
+              663.0990765335861,
+              28.6,
+              299.6334161428029
+            ]
+          },
+          {
+            "name": "dreamisland_tunnel_lamp_1",
+            "type": "PointLight",
+            "intensity": 285.18518518518516,
+            "color": [
+              1,
+              0.8069522576650873,
+              0.407240211891531
+            ],
+            "position": [
+              648.6069234664138,
+              28.6,
+              298.73458385719715
+            ]
+          }
+        ],
+        "fog": {
+          "color": [
+            0.3613145194524537,
+            0.5318059940425808,
+            0.5924367242633078
+          ],
+          "density": 0.0020319905441677413
+        },
+        "skyBlend": 0.25925925925925924
+      },
+      "file": "03.png",
+      "secondsFromStrike": 4
+    },
+    {
+      "targetTick": 8654,
+      "tick": 8655,
+      "nightBlend": 0.4180385688603824,
+      "now": 99922.09999990463,
+      "state": {
+        "lights": [
+          {
+            "name": "",
+            "type": "PointLight",
+            "intensity": 17,
+            "color": [
+              0.5892045254085221,
+              0.8291625189509306,
+              0.8602370851423695
+            ],
+            "position": [
+              0,
+              2.3,
+              0.9
+            ]
+          },
+          {
+            "name": "",
+            "type": "HemisphereLight",
+            "intensity": 0.7913958338610162,
+            "color": [
+              0.3281907025724331,
+              0.49054027299483577,
+              0.5557161100684822
+            ],
+            "position": [
+              0,
+              1,
+              0
+            ],
+            "groundColor": [
+              0.10012676804459972,
+              0.160733780379616,
+              0.057027278803493106
+            ]
+          },
+          {
+            "name": "",
+            "type": "DirectionalLight",
+            "intensity": 0.9553488999347548,
+            "color": [
+              0.7544533687315806,
+              0.7609449897075078,
+              0.7652979584261552
+            ],
+            "position": [
+              241.6785780044099,
+              99.1773698531587,
+              -88.44909094845787
+            ]
+          },
+          {
+            "name": "",
+            "type": "DirectionalLight",
+            "intensity": 0.4455926845781396,
+            "color": [
+              0.253099137106404,
+              0.6893863980926007,
+              0.7458856093497633
+            ],
+            "position": [
+              -100,
+              25,
+              -80
+            ]
+          },
+          {
+            "name": "dreamisland_night_ground_fill",
+            "type": "HemisphereLight",
+            "intensity": 0.2090192844301912,
+            "color": [
+              0.3,
+              0.18,
+              0.035
+            ],
+            "position": [
+              0,
+              1,
+              0
+            ],
+            "groundColor": [
+              0.15,
+              0.09,
+              0.0175
+            ]
+          },
+          {
+            "name": "dreamisland_tunnel_lamp_-1",
+            "type": "PointLight",
+            "intensity": 459.8424257464206,
+            "color": [
+              1,
+              0.8069522576650873,
+              0.407240211891531
+            ],
+            "position": [
+              663.0990765335861,
+              28.6,
+              299.6334161428029
+            ]
+          },
+          {
+            "name": "dreamisland_tunnel_lamp_1",
+            "type": "PointLight",
+            "intensity": 459.8424257464206,
+            "color": [
+              1,
+              0.8069522576650873,
+              0.407240211891531
+            ],
+            "position": [
+              648.6069234664138,
+              28.6,
+              298.73458385719715
+            ]
+          }
+        ],
+        "fog": {
+          "color": [
+            0.28547343804888115,
+            0.42366856908548645,
+            0.4801251245958223
+          ],
+          "density": 0.0023143019431347083
+        },
+        "skyBlend": 0.4180385688603824
+      },
+      "file": "04.png",
+      "secondsFromStrike": 5.341666666666667
+    },
+    {
+      "targetTick": 8814,
+      "tick": 8816,
+      "nightBlend": 0.5850473626114541,
+      "now": 101260.20000004768,
+      "state": {
+        "lights": [
+          {
+            "name": "",
+            "type": "PointLight",
+            "intensity": 17,
+            "color": [
+              0.555698512265804,
+              0.8298160932153652,
+              0.8454609563100478
+            ],
+            "position": [
+              0,
+              2.3,
+              0.9
+            ]
+          },
+          {
+            "name": "",
+            "type": "HemisphereLight",
+            "intensity": 0.6749857577377542,
+            "color": [
+              0.24336804088250444,
+              0.36503320537899464,
+              0.4204603324652275
+            ],
+            "position": [
+              0,
+              1,
+              0
+            ],
+            "groundColor": [
+              0.07424328208605856,
+              0.11963528523574751,
+              0.04499537700954834
+            ]
+          },
+          {
+            "name": "",
+            "type": "DirectionalLight",
+            "intensity": 0.7817259170804574,
+            "color": [
+              0.646427473089584,
+              0.7123658282868548,
+              0.8274780712547589
+            ],
+            "position": [
+              241.6785780044099,
+              99.1773698531587,
+              -88.44909094845787
+            ]
+          },
+          {
+            "name": "",
+            "type": "DirectionalLight",
+            "intensity": 0.46345104852886737,
+            "color": [
+              0.19217911321055278,
+              0.6905747149370272,
+              0.7190199205637237
+            ],
+            "position": [
+              -100,
+              25,
+              -80
+            ]
+          },
+          {
+            "name": "dreamisland_night_ground_fill",
+            "type": "HemisphereLight",
+            "intensity": 0.29252368130572703,
+            "color": [
+              0.3,
+              0.18,
+              0.035
+            ],
+            "position": [
+              0,
+              1,
+              0
+            ],
+            "groundColor": [
+              0.15,
+              0.09,
+              0.0175
+            ]
+          },
+          {
+            "name": "dreamisland_tunnel_lamp_-1",
+            "type": "PointLight",
+            "intensity": 643.5520988725995,
+            "color": [
+              1,
+              0.8069522576650873,
+              0.407240211891531
+            ],
+            "position": [
+              663.0990765335861,
+              28.6,
+              299.6334161428029
+            ]
+          },
+          {
+            "name": "dreamisland_tunnel_lamp_1",
+            "type": "PointLight",
+            "intensity": 643.5520988725995,
+            "color": [
+              1,
+              0.8069522576650873,
+              0.407240211891531
+            ],
+            "position": [
+              648.6069234664138,
+              28.6,
+              298.73458385719715
+            ]
+          }
+        ],
+        "fog": {
+          "color": [
+            0.20570153606866315,
+            0.30992641372027874,
+            0.3619924482928429
+          ],
+          "density": 0.0026133761764469297
+        },
+        "skyBlend": 0.5850473626114541
+      },
+      "file": "05.png",
+      "secondsFromStrike": 6.683333333333334
+    },
+    {
+      "targetTick": 8974,
+      "tick": 8978,
+      "nightBlend": 0.7444366855281206,
+      "now": 102610.89999985695,
+      "state": {
+        "lights": [
+          {
+            "name": "",
+            "type": "PointLight",
+            "intensity": 17,
+            "color": [
+              0.5227175978074191,
+              0.8304594248112701,
+              0.8309163956376369
+            ],
+            "position": [
+              0,
+              2.3,
+              0.9
+            ]
+          },
+          {
+            "name": "",
+            "type": "HemisphereLight",
+            "intensity": 0.5604000340838565,
+            "color": [
+              0.1598747008240491,
+              0.24149305623235204,
+              0.287324252916332
+            ],
+            "position": [
+              0,
+              1,
+              0
+            ],
+            "groundColor": [
+              0.048765436284252846,
+              0.07918087644247554,
+              0.033152036468030666
+            ]
+          },
+          {
+            "name": "",
+            "type": "DirectionalLight",
+            "intensity": 0.6108239144716607,
+            "color": [
+              0.5400945349305897,
+              0.6645479885322365,
+              0.8886837113730781
+            ],
+            "position": [
+              241.6785780044099,
+              99.1773698531587,
+              -88.44909094845787
+            ]
+          },
+          {
+            "name": "",
+            "type": "DirectionalLight",
+            "intensity": 0.481029540225772,
+            "color": [
+              0.13221381419530787,
+              0.6917444087477641,
+              0.6925752647957031
+            ],
+            "position": [
+              -100,
+              25,
+              -80
+            ]
+          },
+          {
+            "name": "dreamisland_night_ground_fill",
+            "type": "HemisphereLight",
+            "intensity": 0.3722183427640603,
+            "color": [
+              0.3,
+              0.18,
+              0.035
+            ],
+            "position": [
+              0,
+              1,
+              0
+            ],
+            "groundColor": [
+              0.15,
+              0.09,
+              0.0175
+            ]
+          },
+          {
+            "name": "dreamisland_tunnel_lamp_-1",
+            "type": "PointLight",
+            "intensity": 818.8803540809326,
+            "color": [
+              1,
+              0.8069522576650873,
+              0.407240211891531
+            ],
+            "position": [
+              663.0990765335861,
+              28.6,
+              299.6334161428029
+            ]
+          },
+          {
+            "name": "dreamisland_tunnel_lamp_1",
+            "type": "PointLight",
+            "intensity": 818.8803540809326,
+            "color": [
+              1,
+              0.8069522576650873,
+              0.407240211891531
+            ],
+            "position": [
+              648.6069234664138,
+              28.6,
+              298.73458385719715
+            ]
+          }
+        ],
+        "fog": {
+          "color": [
+            0.12956908125102545,
+            0.2013735362127349,
+            0.24924935933711662
+          ],
+          "density": 0.002903932241160619
+        },
+        "skyBlend": 0.7444366855281206
+      },
+      "file": "06.png",
+      "secondsFromStrike": 8.033333333333333
+    },
+    {
+      "targetTick": 9134,
+      "tick": 9135,
+      "nightBlend": 0.874519085835691,
+      "now": 103914.5,
+      "state": {
+        "lights": [
+          {
+            "name": "",
+            "type": "PointLight",
+            "intensity": 17,
+            "color": [
+              0.4949234472319118,
+              0.831001582466393,
+              0.8186591942827837
+            ],
+            "position": [
+              0,
+              2.3,
+              0.9
+            ]
+          },
+          {
+            "name": "",
+            "type": "HemisphereLight",
+            "intensity": 0.4638347050339741,
+            "color": [
+              0.08951199245933927,
+              0.13738152494552025,
+              0.17512590114886006
+            ],
+            "position": [
+              0,
+              1,
+              0
+            ],
+            "groundColor": [
+              0.027294379638795833,
+              0.04508855523464177,
+              0.023171246191784397
+            ]
+          },
+          {
+            "name": "",
+            "type": "DirectionalLight",
+            "intensity": 0.4667989208603307,
+            "color": [
+              0.45048411196744315,
+              0.6242502508811973,
+              0.9402638086946796
+            ],
+            "position": [
+              241.6785780044099,
+              99.1773698531587,
+              -88.44909094845787
+            ]
+          },
+          {
+            "name": "",
+            "type": "DirectionalLight",
+            "intensity": 0.49584353956865174,
+            "color": [
+              0.08167899496711242,
+              0.6927301499388966,
+              0.6702894441505157
+            ],
+            "position": [
+              -100,
+              25,
+              -80
+            ]
+          },
+          {
+            "name": "dreamisland_night_ground_fill",
+            "type": "HemisphereLight",
+            "intensity": 0.4372595429178455,
+            "color": [
+              0.3,
+              0.18,
+              0.035
+            ],
+            "position": [
+              0,
+              1,
+              0
+            ],
+            "groundColor": [
+              0.15,
+              0.09,
+              0.0175
+            ]
+          },
+          {
+            "name": "dreamisland_tunnel_lamp_-1",
+            "type": "PointLight",
+            "intensity": 961.9709944192601,
+            "color": [
+              1,
+              0.8069522576650873,
+              0.407240211891531
+            ],
+            "position": [
+              663.0990765335861,
+              28.6,
+              299.6334161428029
+            ]
+          },
+          {
+            "name": "dreamisland_tunnel_lamp_1",
+            "type": "PointLight",
+            "intensity": 961.9709944192601,
+            "color": [
+              1,
+              0.8069522576650873,
+              0.407240211891531
+            ],
+            "position": [
+              648.6069234664138,
+              28.6,
+              298.73458385719715
+            ]
+          }
+        ],
+        "fog": {
+          "color": [
+            0.06743510462848963,
+            0.1127802816077337,
+            0.15723634766808164
+          ],
+          "density": 0.0031447535296822327
+        },
+        "skyBlend": 0.874519085835691
+      },
+      "file": "07.png",
+      "secondsFromStrike": 9.341666666666667
+    },
+    {
+      "targetTick": 9294,
+      "tick": 9297,
+      "nightBlend": 0.9669308696898578,
+      "now": 105265.79999995232,
+      "state": {
+        "lights": [
+          {
+            "name": "",
+            "type": "PointLight",
+            "intensity": 17,
+            "color": [
+              0.47371022666951984,
+              0.8314153713277028,
+              0.8093041785534213
+            ],
+            "position": [
+              0,
+              2.3,
+              0.9
+            ]
+          },
+          {
+            "name": "",
+            "type": "HemisphereLight",
+            "intensity": 0.3901335275775842,
+            "color": [
+              0.03580933844755734,
+              0.05792088914461463,
+              0.0894931930610806
+            ],
+            "position": [
+              0,
+              1,
+              0
+            ],
+            "groundColor": [
+              0.010907109263673954,
+              0.01906840659577716,
+              0.015553646764098964
+            ]
+          },
+          {
+            "name": "",
+            "type": "DirectionalLight",
+            "intensity": 0.3568752897108854,
+            "color": [
+              0.3820911002133234,
+              0.5934939665819319,
+              0.9796310841269775
+            ],
+            "position": [
+              241.6785780044099,
+              99.1773698531587,
+              -88.44909094845787
+            ]
+          },
+          {
+            "name": "",
+            "type": "DirectionalLight",
+            "intensity": 0.5071499702011663,
+            "color": [
+              0.04310950303549065,
+              0.6934824933230963,
+              0.6532803246425839
+            ],
+            "position": [
+              -100,
+              25,
+              -80
+            ]
+          },
+          {
+            "name": "dreamisland_night_ground_fill",
+            "type": "HemisphereLight",
+            "intensity": 0.4834654348449289,
+            "color": [
+              0.3,
+              0.18,
+              0.035
+            ],
+            "position": [
+              0,
+              1,
+              0
+            ],
+            "groundColor": [
+              0.15,
+              0.09,
+              0.0175
+            ]
+          },
+          {
+            "name": "dreamisland_tunnel_lamp_-1",
+            "type": "PointLight",
+            "intensity": 1063.6239566588436,
+            "color": [
+              1,
+              0.8069522576650873,
+              0.407240211891531
+            ],
+            "position": [
+              663.0990765335861,
+              28.6,
+              299.6334161428029
+            ]
+          },
+          {
+            "name": "dreamisland_tunnel_lamp_1",
+            "type": "PointLight",
+            "intensity": 1063.6239566588436,
+            "color": [
+              1,
+              0.8069522576650873,
+              0.407240211891531
+            ],
+            "position": [
+              648.6069234664138,
+              28.6,
+              298.73458385719715
+            ]
+          }
+        ],
+        "fog": {
+          "color": [
+            0.023294532160075057,
+            0.049842784481782754,
+            0.09186942234978462
+          ],
+          "density": 0.003322869918777117
+        },
+        "skyBlend": 0.9669308696898578
+      },
+      "file": "08.png",
+      "secondsFromStrike": 10.691666666666666
+    },
+    {
+      "targetTick": 9454,
+      "tick": 9454,
+      "nightBlend": 1,
+      "now": 106575.20000004768,
+      "state": {
+        "lights": [
+          {
+            "name": "",
+            "type": "PointLight",
+            "intensity": 17,
+            "color": [
+              0.46374047663485485,
+              0.8316098430488759,
+              0.8049075256209829
+            ],
+            "position": [
+              0,
+              2.3,
+              0.9
+            ]
+          },
+          {
+            "name": "",
+            "type": "HemisphereLight",
+            "intensity": 0.3554955849634688,
+            "color": [
+              0.010570264770797227,
+              0.020576126985536538,
+              0.04924769182209557
+            ],
+            "position": [
+              0,
+              1,
+              0
+            ],
+            "groundColor": [
+              0.0032054503425348073,
+              0.006839505423919372,
+              0.011973541521009531
+            ]
+          },
+          {
+            "name": "",
+            "type": "DirectionalLight",
+            "intensity": 0.3052135855279008,
+            "color": [
+              0.34994787946562944,
+              0.5790391851612178,
+              0.998132843181029
+            ],
+            "position": [
+              241.6785780044099,
+              99.1773698531587,
+              -88.44909094845787
+            ]
+          },
+          {
+            "name": "",
+            "type": "DirectionalLight",
+            "intensity": 0.5124637454885589,
+            "color": [
+              0.02498268479064497,
+              0.6938360782706833,
+              0.6452864102199686
+            ],
+            "position": [
+              -100,
+              25,
+              -80
+            ]
+          },
+          {
+            "name": "dreamisland_night_ground_fill",
+            "type": "HemisphereLight",
+            "intensity": 0.5,
+            "color": [
+              0.3,
+              0.18,
+              0.035
+            ],
+            "position": [
+              0,
+              1,
+              0
+            ],
+            "groundColor": [
+              0.15,
+              0.09,
+              0.0175
+            ]
+          },
+          {
+            "name": "dreamisland_tunnel_lamp_-1",
+            "type": "PointLight",
+            "intensity": 1100,
+            "color": [
+              1,
+              0.8069522576650873,
+              0.407240211891531
+            ],
+            "position": [
+              663.0990765335861,
+              28.6,
+              299.6334161428029
+            ]
+          },
+          {
+            "name": "dreamisland_tunnel_lamp_1",
+            "type": "PointLight",
+            "intensity": 1100,
+            "color": [
+              1,
+              0.8069522576650873,
+              0.407240211891531
+            ],
+            "position": [
+              648.6069234664138,
+              28.6,
+              298.73458385719715
+            ]
+          }
+        ],
+        "fog": {
+          "color": [
+            0.00749903204046059,
+            0.027320891633823854,
+            0.06847816983662756
+          ],
+          "density": 0.003397620709350698
+        },
+        "skyBlend": 1
+      },
+      "file": "09.png",
+      "secondsFromStrike": 12
+    }
+  ],
+  "errors": [],
+  "method": "Canvas readback inside the actual render hook, at ten evenly spaced authored schedule ticks. Shared atmosphere smoothing and shipped schedule remain active; no diagnostic blend override."
+}

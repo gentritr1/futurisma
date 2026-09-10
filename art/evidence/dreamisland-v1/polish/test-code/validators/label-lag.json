@@ -1,0 +1,16 @@
+{
+ "script": "scripts/visual/dreamisland/label-lag.mjs",
+ "stations": 800,
+ "disagreements": 1,
+ "gameplayAffected": false,
+ "rows": [
+  {
+   "station": 227,
+   "progress": 0.28375,
+   "sampleSector": "GROVE",
+   "hudLabel": "POINT",
+   "stationSector": "POINT",
+   "gripDiffers": false
+  }
+ ]
+}

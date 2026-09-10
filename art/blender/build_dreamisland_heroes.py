@@ -19,7 +19,7 @@ from mathutils import Matrix, Quaternion, Vector
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / 'public/assets/dreamisland/heroes'
-EVIDENCE = ROOT / 'art/evidence/dreamisland-v1/heroes'
+EVIDENCE = ROOT / 'art/evidence/dreamisland-v1/polish/build-heroes'
 ATLAS_PATH = ROOT / 'public/assets/dreamisland/atlas-manifest.json'
 ATLAS = json.loads(ATLAS_PATH.read_text())
 ROLES = ['concrete', 'metal', 'jungle', 'water', 'signage', 'emissive']
@@ -312,8 +312,10 @@ def watchtower():
             blocks.wedge(y0,y1,radius(y0)-.32,radius(y0),radius(y1)-.32,radius(y1),
                          a+.0025,a+TAU/20-.0025)
     sources.append((blocks.finish(root),False))
-    surfaces={role:Mesh('watchtower_drum_'+role,role,cell)
-              for role,cell in [('concrete','wall-block'),('jungle','moss-blossom')]}
+    # Keep the existing lower-region node/clearance contract; both regions now
+    # sample stone. The historical node suffix does not select its material.
+    surfaces={region:Mesh('watchtower_drum_'+region,'concrete','wall-block')
+              for region in ['concrete','jungle']}
     for obj,is_core in sources:
         # Recalculate source normals as well as the cutter before booleans.
         bpy.context.view_layer.objects.active=obj
@@ -333,23 +335,48 @@ def watchtower():
             pts=[game_point(obj.data.vertices[index].co) for index in face.vertices]
             center=sum((Vector(p) for p in pts),Vector())/len(pts)
             a=math.atan2(center.z,center.x)
-            moss=center.y < 10 + (0 if is_core else 1.1*math.sin(a*3)+.7*math.cos(a*7))
-            role='jungle' if moss else 'concrete'
+            role='jungle' if center.y<10 else 'concrete'
             shade=(.48 if is_core else .76)+.025*(face.index%5)
             tint=(shade,shade+.035,shade*.91,1)
             surfaces[role].geometry(pts,[tuple(range(len(pts)))],tint)
         bpy.data.objects.remove(obj,do_unlink=True)
     for role,surface in surfaces.items():
-        obj=surface.finish(drum_root,{'structuralSurface':True,'mossBand':role=='jungle'})
-        if role=='jungle':
-            colours=obj.data.color_attributes['Color']
-            for face in obj.data.polygons:
-                for loop in face.loop_indices:
-                    p=obj.data.vertices[obj.data.loops[loop].vertex_index].co
-                    y=p.z
-                    a=math.atan2(-p.y,p.x)
-                    patch=.055*math.sin(a*7+y*.9)
-                    colours.data[loop].color=(.38+.033*y+patch,.52+.026*y+patch,.27+.030*y+patch,1)
+        obj=surface.finish(drum_root,{'structuralSurface':True,'mossBand':role=='jungle','mossTintFadeMetres':10})
+        colours=obj.data.color_attributes['Color']
+        for face in obj.data.polygons:
+            for loop in face.loop_indices:
+                p=obj.data.vertices[obj.data.loops[loop].vertex_index].co
+                y=p.z
+                a=math.atan2(-p.y,p.x)
+                amount=max(0,1-y/10)*(.65+.15*math.sin(a*7+y*.3))
+                stone=tuple(colours.data[loop].color)
+                moss=(.34,.47,.27,1)
+                colours.data[loop].color=tuple(stone[k]*(1-amount)+moss[k]*amount for k in range(4))
+    # Narrow surface strands keep the courses exposed and stay outside the bore.
+    ivy=Mesh('watchtower_ivy_strands','jungle-card','fern')
+    roots=Mesh('watchtower_moss_in_course_joints','jungle','moss-blossom')
+    for a,top,length in [(.3,13,5),(2.5,11,4),(3.6,15,6),(5.8,12,5)]:
+        # A narrow damp seam under each climbing strand, on the existing
+        # masonry contour; the broad lower surface remains the stone cell.
+        for y in [top-length,top-length+1.16]:
+            roots.wedge(y,y+.08,radius(y)-.04,radius(y)+.015,
+                        radius(y+.08)-.04,radius(y+.08)+.015,a-.035,a+.035,(.38,.52,.30,1))
+        for dy in [0,length*.45]:
+            y=top-dy
+            pts=[]
+            for tangent,height in [(-.45,y-length*.6),(.45,y-length*.6),(.45,y),(-.45,y)]:
+                r=radius(height)+.06
+                pts.append((r*math.cos(a)-tangent*math.sin(a),height,r*math.sin(a)+tangent*math.cos(a)))
+            ivy.geometry(pts,[(0,1,2,3)],(.70,.80,.62,1))
+    ivy.finish(root,{'card':True,'surfaceStrands':True})
+    roots.finish(root,{'mossInMortarJoints':True})
+    lamps=Mesh('watchtower_tunnel_lamp_discs','emissive','lamp-disc')
+    for side in [-1,1]:
+        for i in range(24):
+            a,b=i*TAU/24,(i+1)*TAU/24
+            lamps.geometry([(side*7.025,6,0),(side*7.025,6+.7*math.cos(a),.7*math.sin(a)),
+                            (side*7.025,6+.7*math.cos(b),.7*math.sin(b))],[(0,1,2)])
+    lamps.finish(root,{'lampCount':2,'flushWithBoreWall':True})
     crown=Mesh('watchtower_crown_cornice')
     for i in range(48):
         crown.wedge(27.65,28.5,8.1,9.95,8.1,10,i*TAU/48,(i+1)*TAU/48,(.85,.88,.79,1))
@@ -439,14 +466,24 @@ def waterfall_cliff():
     # Top lip front edge at Z=-3.5; the runtime sheet drops vertically here.
     ledges.box((0,15.76,-2.5),(9,.48,2),(.69,.8,.65,1))
     ledges.finish(root)
+    sheets=Mesh('waterfall_scrolling_sheet_cards','water','waterfall')
+    for x,z in [(-3,-3.68),(0,-3.76),(3,-3.68)]:
+        sheets.geometry([(x-1.65,0,z),(x+1.65,0,z),(x+1.65,16,z),(x-1.65,16,z)],[(0,1,2,3)])
+    sheet_obj=sheets.finish(root,{'scrollingSheet':True,'dropMetres':16})
+    u0,v0,u1,v1=rect('water','waterfall')
+    for face in sheet_obj.data.polygons:
+        left=u0+(u1-u0)*face.index/3;right=u0+(u1-u0)*(face.index+1)/3
+        for loop,uv in zip(face.loop_indices,[(left,v0),(right,v0),(right,v1),(left,v1)]):
+            sheet_obj.data.uv_layers.active.data[loop].uv=uv
     foam=Mesh('waterfall_plunge_pool_foam_ring','water','foam-gradient')
     n=48
     for i in range(n):
         a,b=i*TAU/n,(i+1)*TAU/n
         pts=[]
-        for radius,t in [(1,a),(1.16,a),(1.16,b),(1,b)]:
+        for radius,t in [(1,a),(1.5,a),(1.5,b),(1,b)]:
             pts.append((6.2*radius*math.cos(t),.08+.025*math.sin(t*7),-5+2.6*radius*math.sin(t)))
-        foam.geometry(pts,[(0,1,2,3)])
+        u0,v0,u1,v1=rect('water','foam-gradient')
+        foam.geometry(pts,[(0,1,2,3)],uv_rect=(u0,v0+(v1-v0)*.78,u1,v1))
     foam.finish(root)
     for x,y,z,label in [(-7.4,4.3,-2.7,'left'),(7.8,7.9,-2.5,'right')]:
         cards=Mesh('waterfall_blossom_clump_'+label,'jungle-card','blossom-shrub')
@@ -496,17 +533,17 @@ def sea_stacks():
                  for y,t in [(y0,t0),(y1,t1)] for side in range(sides)]
             faces=[tuple(range(sides)),tuple(reversed(range(sides,2*sides)))]
             faces += [(i,i+sides,(i+1)%sides+sides,(i+1)%sides) for i in range(sides)]
-            rock.geometry(pts,faces,(.72,.73+.024*(row%3),.69,1))
+            rock.geometry(pts,faces,(.28,.33+.012*(row%3),.37,1))
         obj=rock.finish(part)
         if label=='32':
             cutter=prism('temporary_natural_arch',[(px-1.4,py) for px,py in arch_outline(2.25,8,4.5,segments=9)],-15,15,parent=part)
             subtract(obj,cutter)
-            project_uvs(obj,'concrete','wall-block')
+            project_uvs(obj,'concrete','wall-block',[(.28,.34,.37,1)]*len(obj.data.polygons))
             obj['naturalArch']=True
         rtop=radius*profile(1)
         for i in range(sides):
             cap.wedge(height-.32,height,0,rtop+.15,0,rtop*.93,i*TAU/sides,(i+1)*TAU/sides,
-                      (.57,.76,.43,1),(lean,zlean))
+                      (.32,.45,.31,1),(lean,zlean))
         cap.finish(part)
         part['heightMetres']=height
         part['leanMetres']=[lean,zlean]
@@ -526,8 +563,8 @@ ASSETS = {
     'watchtower': {
         'builder':watchtower,'budget':10000,
         'targetMetres':{'height':30,'width':28,'depth':28,'crownWidth':20,'boreWidth':14,'boreSpringHeight':8,'boreCrownHeight':10,'minimumFlank':7,'minimumOverburden':6},
-        'calibration':'REVISED 2026-09-10: 28 m base drum stays full width through Y=10 to retain 7 m flanks, then tapers to a 19.6 m body and 20 m crown. Merlon tops Y=30. The full-depth elliptical bore is 14 m wide, spring Y=8, crown Y=10, tessellated into 32 arch segments. The solid drum reaches the upper chamber floor at Y=17, giving 7 m of masonry above the arch. A 14 x 10 rectangle is the arch envelope, not a clear rectangular volume. Surface vertex tint and the jungle moss cell form the lower band; no ivy slabs. Projecting portal trim is included in overall depth.',
-        'features':['tapered drum with individual block courses','twelve crenellation slots with exactly three missing merlons','two recessed arched windows on opposite faces','full-depth arched tunnel with a keystone at both mouths','lower-third ivy and moss with jungle atlas and vertex tint'],
+        'calibration':'REVISED 2026-09-10: 28 m base drum stays full width through Y=10 to retain 7 m flanks, then tapers to a 19.6 m body and 20 m crown. Merlon tops Y=30. The full-depth elliptical bore is 14 m wide, spring Y=8, crown Y=10, tessellated into 32 arch segments. The solid drum reaches the upper chamber floor at Y=17, giving 7 m of masonry above the arch. A 14 x 10 rectangle is the arch envelope, not a clear rectangular volume. Stone-cell vertex tint fades the lower moss by Y=10; narrow keyed ivy strands and moss-filled course joints retain sparse accents. Two flush emissive discs light the bore. Projecting portal trim is included in overall depth.',
+        'features':['tapered drum with individual block courses','twelve crenellation slots with exactly three missing merlons','two recessed arched windows on opposite faces','full-depth arched tunnel with a keystone at both mouths','stone-cell moss tint, narrow ivy strands and two tunnel lamps'],
         'featureFrames':[['side','three-quarter'],['three-quarter','back'],['front','back'],['front','back'],['front','side']],
         'anchors':['watchtower_tunnel_axis','missing_merlon_01','missing_merlon_05','missing_merlon_08'],
         'references':['sheets/s6_watchtower_ortho.png','heroes/03_watchtower_point_day.png'],
@@ -535,8 +572,8 @@ ASSETS = {
     'waterfall-cliff': {
         'builder':waterfall_cliff,'budget':5000,
         'targetMetres':{'drop':16,'width':22},
-        'calibration':'Cliff horizontal envelope X=+/-11; the named sheet lip is Y=16 and pool datum Y=0. Water is deliberately absent: a later runtime card spans that exact 16 m drop. Stone/moss cap upper surface may sit slightly above the lip.',
-        'features':['stacked mossy stone block cliff with ledges','elliptical plunge-pool foam ring mesh','two blossom clumps on the existing jungle-card sheet','projecting block ledges that cast distinct shadows','overhanging top lip with waterfall_sheet_anchor'],
+        'calibration':'Cliff horizontal envelope X=+/-11; the named sheet lip is Y=16 and pool datum Y=0. Three scrolling sheet cards span that exact 16 m drop; the runtime wraps their UVs inside the waterfall cell. Stone/moss cap upper surface may sit slightly above the lip.',
+        'features':['stacked mossy stone block cliff with ledges','elliptical plunge-pool foam ring mesh','two blossom clumps on the existing jungle-card sheet','projecting block ledges that cast distinct shadows','overhanging top lip, waterfall_sheet_anchor and full-drop scrolling sheets'],
         'featureFrames':[['front','three-quarter'],['three-quarter'],['front','three-quarter'],['side','three-quarter'],['side','three-quarter']],
         'anchors':['waterfall_sheet_anchor','waterfall_pool_datum'],
         'references':['heroes/04_basin_causeway_night.png','heroes/05d_clock_court_day.png'],
@@ -624,11 +661,12 @@ def main():
               'atlasFiles':ATLAS['files'],'assets':{}}
     chosen=next((arg.split('=',1)[1] for arg in sys.argv if arg.startswith('--asset=')),None)
     if chosen:
-        assert chosen in ASSETS,chosen
+        selected=chosen.split(',')
+        assert all(name in ASSETS for name in selected),chosen
         manifest=json.loads((OUT/'heroes.json').read_text())
         assert manifest['atlasManifestSha256']==hashlib.sha256(ATLAS_PATH.read_bytes()).hexdigest()
     for name,spec in ASSETS.items():
-        if chosen and name!=chosen:
+        if chosen and name not in selected:
             continue
         root=spec['builder']()
         path=OUT/(name+'.glb')

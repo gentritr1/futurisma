@@ -1,0 +1,226 @@
+{
+  "script": "scripts/visual/dreamisland-heroes/polish-road-trials.mjs",
+  "frames": [
+    {
+      "blend": 0,
+      "candidate": {
+        "name": "current",
+        "rgb": null
+      },
+      "deckVertices": 3200,
+      "pose": {
+        "position": [
+          108.49998270988567,
+          4.8,
+          0
+        ],
+        "target": [
+          138.99998270988567,
+          1.15,
+          0
+        ],
+        "fov": 62,
+        "far": 650,
+        "quaternion": [
+          -0.04208533716391777,
+          -0.7058532598180726,
+          -0.04208533716391776,
+          0.7058532598180725
+        ],
+        "horizonRow": 288.29956590791534
+      },
+      "frames": {
+        "full": "current-0-full.png",
+        "kerb": "current-0-kerb.png",
+        "blank": "current-0-blank.png"
+      }
+    },
+    {
+      "blend": 0,
+      "candidate": {
+        "name": "neutral",
+        "rgb": [
+          0.42,
+          0.53,
+          1
+        ]
+      },
+      "deckVertices": 3200,
+      "pose": {
+        "position": [
+          108.49998270988567,
+          4.8,
+          0
+        ],
+        "target": [
+          138.99998270988567,
+          1.15,
+          0
+        ],
+        "fov": 62,
+        "far": 650,
+        "quaternion": [
+          -0.04208533716391777,
+          -0.7058532598180726,
+          -0.04208533716391776,
+          0.7058532598180725
+        ],
+        "horizonRow": 288.29956590791534
+      },
+      "frames": {
+        "full": "neutral-0-full.png",
+        "kerb": "neutral-0-kerb.png",
+        "blank": "neutral-0-blank.png"
+      }
+    },
+    {
+      "blend": 0,
+      "candidate": {
+        "name": "cool",
+        "rgb": [
+          0.33,
+          0.47,
+          1
+        ]
+      },
+      "deckVertices": 3200,
+      "pose": {
+        "position": [
+          108.49998270988567,
+          4.8,
+          0
+        ],
+        "target": [
+          138.99998270988567,
+          1.15,
+          0
+        ],
+        "fov": 62,
+        "far": 650,
+        "quaternion": [
+          -0.04208533716391777,
+          -0.7058532598180726,
+          -0.04208533716391776,
+          0.7058532598180725
+        ],
+        "horizonRow": 288.29956590791534
+      },
+      "frames": {
+        "full": "cool-0-full.png",
+        "kerb": "cool-0-kerb.png",
+        "blank": "cool-0-blank.png"
+      }
+    },
+    {
+      "blend": 1,
+      "candidate": {
+        "name": "current",
+        "rgb": null
+      },
+      "deckVertices": 3200,
+      "pose": {
+        "position": [
+          108.49998270988567,
+          4.8,
+          0
+        ],
+        "target": [
+          138.99998270988567,
+          1.15,
+          0
+        ],
+        "fov": 62,
+        "far": 650,
+        "quaternion": [
+          -0.04208533716391777,
+          -0.7058532598180726,
+          -0.04208533716391776,
+          0.7058532598180725
+        ],
+        "horizonRow": 288.29956590791534
+      },
+      "frames": {
+        "full": "current-1-full.png",
+        "kerb": "current-1-kerb.png",
+        "blank": "current-1-blank.png"
+      }
+    },
+    {
+      "blend": 1,
+      "candidate": {
+        "name": "neutral",
+        "rgb": [
+          0.42,
+          0.53,
+          1
+        ]
+      },
+      "deckVertices": 3200,
+      "pose": {
+        "position": [
+          108.49998270988567,
+          4.8,
+          0
+        ],
+        "target": [
+          138.99998270988567,
+          1.15,
+          0
+        ],
+        "fov": 62,
+        "far": 650,
+        "quaternion": [
+          -0.04208533716391777,
+          -0.7058532598180726,
+          -0.04208533716391776,
+          0.7058532598180725
+        ],
+        "horizonRow": 288.29956590791534
+      },
+      "frames": {
+        "full": "neutral-1-full.png",
+        "kerb": "neutral-1-kerb.png",
+        "blank": "neutral-1-blank.png"
+      }
+    },
+    {
+      "blend": 1,
+      "candidate": {
+        "name": "cool",
+        "rgb": [
+          0.33,
+          0.47,
+          1
+        ]
+      },
+      "deckVertices": 3200,
+      "pose": {
+        "position": [
+          108.49998270988567,
+          4.8,
+          0
+        ],
+        "target": [
+          138.99998270988567,
+          1.15,
+          0
+        ],
+        "fov": 62,
+        "far": 650,
+        "quaternion": [
+          -0.04208533716391777,
+          -0.7058532598180726,
+          -0.04208533716391776,
+          0.7058532598180725
+        ],
+        "horizonRow": 288.29956590791534
+      },
+      "frames": {
+        "full": "cool-1-full.png",
+        "kerb": "cool-1-kerb.png",
+        "blank": "cool-1-blank.png"
+      }
+    }
+  ],
+  "errors": []
+}

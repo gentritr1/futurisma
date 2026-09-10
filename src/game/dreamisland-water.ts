@@ -26,6 +26,7 @@ export class DreamIslandWater {
  /** Zero if the module never built a surface, so a silent no-op is visible. */
  surfaces=0;
  private readonly time={value:0};
+ private readonly seaBlend={value:0};
  private readonly sea:THREE.Mesh;
  private readonly shallows:THREE.Mesh;
  private readonly foam:THREE.Mesh;
@@ -46,16 +47,34 @@ export class DreamIslandWater {
     // Same atlas/mip trap as the painted world: keep the mip low at grazing angles.
     texture.anisotropy=16;apply(texture);}));
   };
-  // 1. The deep sea: one quad, the cobalt facet quadrant, a slow drift.
-  const seaGeometry=new THREE.PlaneGeometry(7200,7200).rotateX(-Math.PI/2)
-   .translate(centre.x,-.8,centre.z);
-  metreUv(seaGeometry,TILES.sea,centre);
+  // One sea draw: a far quad below a camera-centred, 30 x 30 swell grid.
+  // Both surfaces sample the same cobalt cell. The near grid is 1,800 tris;
+  // its world-space waves and UVs do not slide when the camera moves.
+  const farSea=new THREE.PlaneGeometry(7200,7200).rotateX(-Math.PI/2)
+   .translate(centre.x,-1.2,centre.z);
+  const nearSea=new THREE.PlaneGeometry(480,480,30,30).rotateX(-Math.PI/2)
+   .translate(0,-1.2,0);
+  metreUv(farSea,TILES.sea,centre);metreUv(nearSea,TILES.sea,new THREE.Vector3());
+  const farVertices=farSea.attributes.position.count;
+  const nearTriangles=(nearSea.index?.count??nearSea.attributes.position.count)/3;
+  const seaGeometry=merge([farSea,nearSea]);
+  const patch=new Float32Array(seaGeometry.attributes.position.count);
+  const fade=new Float32Array(patch.length),seaPositions=seaGeometry.attributes.position;
+  for(let i=farVertices;i<patch.length;i++){
+   patch[i]=1;
+   const edge=Math.max(Math.abs(seaPositions.getX(i)),Math.abs(seaPositions.getZ(i)));
+   fade[i]=1-THREE.MathUtils.smoothstep(edge,176,240);
+  }
+  seaGeometry.setAttribute('diPatch',new THREE.Float32BufferAttribute(patch,1));
+  seaGeometry.setAttribute('diPatchFade',new THREE.Float32BufferAttribute(fade,1));
   const seaMaterial=new THREE.MeshLambertMaterial({name:'dreamisland_sea'});
   applyDreamIslandAtlasFlow(seaMaterial,{cell:CELL.cobaltFacets,tile:new THREE.Vector2(1,1),
-   scroll:new THREE.Vector2(.004,.0026),time:this.time,key:'sea'});
+   scroll:new THREE.Vector2(.004,.0026),time:this.time,key:'sea',swell:{night:this.seaBlend}});
   load('/assets/dreamisland/textures/water.jpg',t=>{seaMaterial.map=t;seaMaterial.needsUpdate=true;});
   this.sea=new THREE.Mesh(seaGeometry,seaMaterial);this.sea.name='dreamisland_sea';
   this.sea.frustumCulled=false;this.sea.renderOrder=-10;
+  this.sea.userData.swell={nearTriangles,gridSegments:30,widthMetres:480,
+   authoredUpperBoundMetres:-1.2+.32+.14+.10,farHeightMetres:-1.2};
   // 2. The shallows: the reef either side of the pier, the beach inshore band
   //    and the basin pool, merged into one draw.
   // Laterals are absolute metres from the road centre. The reef pier is 26 m
@@ -65,7 +84,7 @@ export class DreamIslandWater {
   const shallows=[
    ribbon(course,.6583,.85,14,50,-.55,TILES.shallows),
    ribbon(course,.6583,.85,-14,-50,-.55,TILES.shallows),
-   // -0.55, NOT -1.2. The sea is one 7.2 km plane at y = -0.8 and depth testing
+   // -0.55, NOT -1.2. The far sea is at y = -1.2 and its near swell stays below -0.55; depth testing
    // does not care about renderOrder, so a band authored BELOW it is drawn and
    // then covered. Measured, not guessed: at the BEACH pose the glow isolation
    // frame had ZERO lit pixels at every one of the five crossfade blends, while
@@ -73,7 +92,7 @@ export class DreamIslandWater {
    // The beach foam rail is section 2's stated night cue for the start straight,
    // so it not drawing is the cue not existing.
    ribbon(course,.0,.125,34,96,-.55,TILES.shallows),
-   pool(course,.4541,-46,92,72,TILES.shallows),
+   pool(course,.4725,-46,110,150,TILES.shallows),
   ];
   const shallowsMaterial=new THREE.MeshLambertMaterial({name:'dreamisland_shallows',
    emissive:0x8ff4ec,emissiveIntensity:0});
@@ -106,9 +125,10 @@ export class DreamIslandWater {
  /** The night readability cue: the sea darkens, the two bands light up. */
  update(elapsed:number,nightBlend:number,reducedMotion:boolean){
   this.time.value=reducedMotion?0:elapsed;
+  this.seaBlend.value=nightBlend;
   (this.sea.material as THREE.MeshLambertMaterial).color.lerpColors(this.seaDay,this.seaNight,nightBlend);
-  (this.shallows.material as THREE.MeshLambertMaterial).emissiveIntensity=nightBlend*1.15;
-  (this.foam.material as THREE.MeshLambertMaterial).emissiveIntensity=nightBlend*1.45;
+  (this.shallows.material as THREE.MeshLambertMaterial).emissiveIntensity=nightBlend*1.20;
+  (this.foam.material as THREE.MeshLambertMaterial).emissiveIntensity=nightBlend*1.50;
  }
 }
 
@@ -169,7 +189,7 @@ function pool(course:DreamIslandCourse,progress:number,lateral:number,width:numb
  const sample=course.sample(progress);
  const centre=sample.position.clone().addScaledVector(sample.right,lateral);
  const geometry=new THREE.PlaneGeometry(width,depth,4,4).rotateX(-Math.PI/2)
-  .translate(centre.x,sample.position.y-4.1,centre.z);
+   .translate(centre.x,sample.position.y-3,centre.z);
  metreUv(geometry,tile,new THREE.Vector3(0,0,0));
  return geometry;
 }

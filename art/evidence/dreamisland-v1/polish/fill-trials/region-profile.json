@@ -1,0 +1,61 @@
+{
+  "instrument": "/Users/gentlegen/Desktop/futurisma-race/polarity_work/scripts/visual/dreamisland-heroes/polish-regions.py",
+  "capture": "art/evidence/dreamisland-v1/polish/fill-trials/pose-capture.json",
+  "method": "Full/isolated render equality at 2/255; isolated/blank difference above 6/255; display luma .2126/.7152/.0722",
+  "results": [
+    {
+      "blend": 1,
+      "metrics": {
+        "kerb": {
+          "pixels": 425432,
+          "meanLuma": 0.14733875835920784,
+          "meanChroma": 0.1887528026874828,
+          "visibleBoundsPixels": [
+            0,
+            269,
+            1280,
+            720
+          ],
+          "widthPixels": 1280,
+          "heightPixels": 451
+        }
+      }
+    },
+    {
+      "blend": 1,
+      "metrics": {
+        "kerb": {
+          "pixels": 431135,
+          "meanLuma": 0.13750010561907158,
+          "meanChroma": 0.027588274179167305,
+          "visibleBoundsPixels": [
+            0,
+            269,
+            1280,
+            720
+          ],
+          "widthPixels": 1280,
+          "heightPixels": 451
+        }
+      }
+    },
+    {
+      "blend": 1,
+      "metrics": {
+        "kerb": {
+          "pixels": 431079,
+          "meanLuma": 0.12677613778903815,
+          "meanChroma": 0.04795328675709275,
+          "visibleBoundsPixels": [
+            0,
+            269,
+            1280,
+            720
+          ],
+          "widthPixels": 1280,
+          "heightPixels": 451
+        }
+      }
+    }
+  ]
+}

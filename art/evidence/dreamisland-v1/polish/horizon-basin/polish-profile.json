@@ -1,0 +1,674 @@
+{
+  "status": "VERIFIED",
+  "script": "scripts/visual/dreamisland-heroes/polish-profile.py",
+  "pose": {
+    "progress": 0.4557064676479,
+    "station": 365,
+    "sector": "BASIN",
+    "roadPoint": [
+      509.48800752969214,
+      14,
+      539.1326812392068
+    ],
+    "tangent": [
+      -0.5622788666110319,
+      0,
+      0.8269476864727379
+    ],
+    "camera": [
+      515.954214495719,
+      18.8,
+      529.6227828447703
+    ],
+    "lookAt": [
+      498.80470906408254,
+      15.15,
+      554.8446872821888
+    ],
+    "fov": 62,
+    "viewport": [
+      1280,
+      720
+    ],
+    "chase": {
+      "back": 11.5,
+      "rise": 4.8,
+      "lookAhead": 19,
+      "lookRise": 1.15,
+      "fov": 62
+    },
+    "watchtower": {
+      "placement": [
+        655.853,
+        22,
+        299.184
+      ],
+      "metres": 269.59959722624217,
+      "offAxisDegrees": 177.04828505152415,
+      "halfHorizontalDegrees": 46.88858508098213,
+      "inFrame": false
+    }
+  },
+  "method": "Display luma on exact sea/sky isolation masks. Horizon step compares three rows of sky with three rows of sea, skipping the antialiased boundary row, per unobstructed column. Profile is aligned to each column boundary.",
+  "blends": [
+    {
+      "blend": 0,
+      "frame": "blend-000.png",
+      "seaPixels": 39873,
+      "seaMeanLuma": 0.43472139234225526,
+      "seaLumaStd": 0.16359149481577753,
+      "horizonColumns": 0,
+      "horizonMeanStep": null,
+      "horizonMaximumStep": null,
+      "horizonMedianRow": null,
+      "horizonAlignedRowProfile": [
+        {
+          "offsetPixels": -60,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -59,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -58,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -57,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -56,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -55,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -54,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -53,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -52,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -51,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -50,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -49,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -48,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -47,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -46,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -45,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -44,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -43,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -42,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -41,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -40,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -39,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -38,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -37,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -36,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -35,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -34,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -33,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -32,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -31,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -30,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -29,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -28,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -27,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -26,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -25,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -24,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -23,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -22,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -21,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -20,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -19,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -18,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -17,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -16,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -15,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -14,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -13,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -12,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -11,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -10,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -9,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -8,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -7,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -6,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -5,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -4,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -3,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -2,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": -1,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 0,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 1,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 2,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 3,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 4,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 5,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 6,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 7,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 8,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 9,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 10,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 11,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 12,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 13,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 14,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 15,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 16,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 17,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 18,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 19,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 20,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 21,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 22,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 23,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 24,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 25,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 26,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 27,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 28,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 29,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 30,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 31,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 32,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 33,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 34,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 35,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 36,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 37,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 38,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 39,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 40,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 41,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 42,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 43,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 44,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 45,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 46,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 47,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 48,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 49,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 50,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 51,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 52,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 53,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 54,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 55,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 56,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 57,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 58,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 59,
+          "pixels": 0,
+          "meanLuma": null
+        },
+        {
+          "offsetPixels": 60,
+          "pixels": 0,
+          "meanLuma": null
+        }
+      ],
+      "horizonTransitions": []
+    }
+  ]
+}

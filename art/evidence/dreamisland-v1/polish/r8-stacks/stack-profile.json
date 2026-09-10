@@ -1,0 +1,71 @@
+{
+  "instrument": "/Users/gentlegen/Desktop/futurisma-race/polarity_work/scripts/visual/dreamisland-heroes/polish-stacks.py",
+  "method": "Exact stack/full and stack/blank masks above the camera horizon; 3x3 dilation joins course gaps for connected-component labeling only. All luma uses original undilated pixels. Background is the sky-only frame at identical pixels. Components are associated with the nearest projected live placement centre.",
+  "results": [
+    {
+      "blend": 0,
+      "components": [
+        {
+          "pixels": 3331,
+          "bounds": [
+            361,
+            199,
+            409,
+            288
+          ],
+          "meanLuma": 0.18686659508714926,
+          "skyMeanLuma": 0.7575270145572489,
+          "silhouetteContrast": 0.5706604194700996,
+          "placement": {
+            "index": 3,
+            "child": "sea_stack_32m",
+            "position": [
+              -57.573,
+              -6,
+              378.734
+            ],
+            "height": 32.4,
+            "distance": 162.72193521757106,
+            "screen": [
+              384.29979357887123,
+              266.2668929940465
+            ],
+            "inFront": true
+          }
+        },
+        {
+          "pixels": 337,
+          "bounds": [
+            1006,
+            249,
+            1022,
+            288
+          ],
+          "meanLuma": 0.18246803747018092,
+          "skyMeanLuma": 0.791331520335137,
+          "silhouetteContrast": 0.6088634828649561,
+          "placement": {
+            "index": 4,
+            "child": "sea_stack_26m",
+            "position": [
+              103.419,
+              -6,
+              294.117
+            ],
+            "height": 22.79992,
+            "distance": 221.10145361442508,
+            "screen": [
+              1005.8862562812774,
+              286.3681966355425
+            ],
+            "inFront": true
+          }
+        }
+      ],
+      "qualifyingPlacements": [
+        3,
+        4
+      ]
+    }
+  ]
+}

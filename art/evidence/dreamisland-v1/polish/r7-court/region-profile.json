@@ -1,0 +1,69 @@
+{
+  "instrument": "/Users/gentlegen/Desktop/futurisma-race/polarity_work/scripts/visual/dreamisland-heroes/polish-regions.py",
+  "capture": "art/evidence/dreamisland-v1/polish/r7-court/pose-capture.json",
+  "method": "Full/isolated render equality at 2/255; isolated/blank difference above 6/255; display luma .2126/.7152/.0722",
+  "results": [
+    {
+      "blend": 0,
+      "metrics": {
+        "clockface": {
+          "pixels": 2847,
+          "meanLuma": 0.6696154344786737,
+          "meanChroma": 0.03504617864005459,
+          "visibleBoundsPixels": [
+            1089,
+            163,
+            1167,
+            226
+          ],
+          "widthPixels": 78,
+          "heightPixels": 63
+        },
+        "clockhands": {
+          "pixels": 110,
+          "meanLuma": 0.00917865240641711,
+          "meanChroma": 0.004242424242424241,
+          "visibleBoundsPixels": [
+            1104,
+            169,
+            1133,
+            213
+          ],
+          "widthPixels": 29,
+          "heightPixels": 44
+        }
+      }
+    },
+    {
+      "blend": 1,
+      "metrics": {
+        "clockface": {
+          "pixels": 2847,
+          "meanLuma": 0.7795783499659082,
+          "meanChroma": 0.020471497344986395,
+          "visibleBoundsPixels": [
+            1089,
+            163,
+            1167,
+            226
+          ],
+          "widthPixels": 78,
+          "heightPixels": 63
+        },
+        "clockhands": {
+          "pixels": 110,
+          "meanLuma": 0.0031573404634581107,
+          "meanChroma": 0.004884135472370765,
+          "visibleBoundsPixels": [
+            1104,
+            169,
+            1133,
+            213
+          ],
+          "widthPixels": 29,
+          "heightPixels": 44
+        }
+      }
+    }
+  ]
+}

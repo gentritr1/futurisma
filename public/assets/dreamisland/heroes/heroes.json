@@ -160,13 +160,13 @@
         "minimumFlank": 7,
         "minimumOverburden": 6
       },
-      "calibration": "REVISED 2026-09-10: 28 m base drum stays full width through Y=10 to retain 7 m flanks, then tapers to a 19.6 m body and 20 m crown. Merlon tops Y=30. The full-depth elliptical bore is 14 m wide, spring Y=8, crown Y=10, tessellated into 32 arch segments. The solid drum reaches the upper chamber floor at Y=17, giving 7 m of masonry above the arch. A 14 x 10 rectangle is the arch envelope, not a clear rectangular volume. Surface vertex tint and the jungle moss cell form the lower band; no ivy slabs. Projecting portal trim is included in overall depth.",
+      "calibration": "REVISED 2026-09-10: 28 m base drum stays full width through Y=10 to retain 7 m flanks, then tapers to a 19.6 m body and 20 m crown. Merlon tops Y=30. The full-depth elliptical bore is 14 m wide, spring Y=8, crown Y=10, tessellated into 32 arch segments. The solid drum reaches the upper chamber floor at Y=17, giving 7 m of masonry above the arch. A 14 x 10 rectangle is the arch envelope, not a clear rectangular volume. Stone-cell vertex tint fades the lower moss by Y=10; narrow keyed ivy strands and moss-filled course joints retain sparse accents. Two flush emissive discs light the bore. Projecting portal trim is included in overall depth.",
       "features": [
         "tapered drum with individual block courses",
         "twelve crenellation slots with exactly three missing merlons",
         "two recessed arched windows on opposite faces",
         "full-depth arched tunnel with a keystone at both mouths",
-        "lower-third ivy and moss with jungle atlas and vertex tint"
+        "stone-cell moss tint, narrow ivy strands and two tunnel lamps"
       ],
       "featureFrames": [
         [
@@ -200,7 +200,7 @@
         "sheets/s6_watchtower_ortho.png",
         "heroes/03_watchtower_point_day.png"
       ],
-      "triangles": 9278,
+      "triangles": 9438,
       "bounds": {
         "min": [
           -14.0,
@@ -218,11 +218,13 @@
           28.502717971801758
         ]
       },
-      "bytes": 802640,
-      "sha256": "340285676a4cdd8cf6ee43b08f99ceee5045a43ad679dcd8fc8131844ce36d2c",
+      "bytes": 821896,
+      "sha256": "293112f84da3246713c64c817c73cfcf6122866738e3fee2429b976a53bfddd7",
       "materials": [
         "DI_MAT_concrete",
-        "DI_MAT_jungle"
+        "DI_MAT_jungle-card",
+        "DI_MAT_jungle",
+        "DI_MAT_emissive"
       ],
       "measurement": "Exported GLB index and position accessors, with node transforms, parsed by build_dreamisland_heroes.py; independently checked by GLTFLoader.",
       "file": "watchtower.glb"
@@ -233,13 +235,13 @@
         "drop": 16,
         "width": 22
       },
-      "calibration": "Cliff horizontal envelope X=+/-11; the named sheet lip is Y=16 and pool datum Y=0. Water is deliberately absent: a later runtime card spans that exact 16 m drop. Stone/moss cap upper surface may sit slightly above the lip.",
+      "calibration": "Cliff horizontal envelope X=+/-11; the named sheet lip is Y=16 and pool datum Y=0. Three scrolling sheet cards span that exact 16 m drop; the runtime wraps their UVs inside the waterfall cell. Stone/moss cap upper surface may sit slightly above the lip.",
       "features": [
         "stacked mossy stone block cliff with ledges",
         "elliptical plunge-pool foam ring mesh",
         "two blossom clumps on the existing jungle-card sheet",
         "projecting block ledges that cast distinct shadows",
-        "overhanging top lip with waterfall_sheet_anchor"
+        "overhanging top lip, waterfall_sheet_anchor and full-drop scrolling sheets"
       ],
       "featureFrames": [
         [
@@ -270,12 +272,12 @@
         "heroes/04_basin_causeway_night.png",
         "heroes/05d_clock_court_day.png"
       ],
-      "triangles": 1212,
+      "triangles": 1218,
       "bounds": {
         "min": [
           -10.97249984741211,
-          0.04500000178813934,
-          -8.015999794006348
+          0.0,
+          -8.899999618530273
         ],
         "max": [
           10.97249984741211,
@@ -284,12 +286,12 @@
         ],
         "size": [
           21.94499969482422,
-          16.000000074505806,
-          11.325999736785889
+          16.045000076293945,
+          12.209999561309814
         ]
       },
-      "bytes": 111384,
-      "sha256": "cd530cf9015421ae243a2536369725ee1033172fe221fcf3666de4e317772f28",
+      "bytes": 112828,
+      "sha256": "12f39fa91bd54d1ba7436c7df2d2f330a2811ea30f79ce4bf62b1662ebeda418",
       "materials": [
         "DI_MAT_jungle-card",
         "DI_MAT_jungle",
@@ -368,7 +370,7 @@
         ]
       },
       "bytes": 112724,
-      "sha256": "ef8183ae3c7c790d7685febd13e0874bd15566f02800feb40f8a0f00b70f756f",
+      "sha256": "ea0b0e20af2a856009168e695a156e856f25b64a97fa9ad837eddd91651949d4",
       "materials": [
         "DI_MAT_jungle",
         "DI_MAT_concrete"

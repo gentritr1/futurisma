@@ -37,10 +37,10 @@ from dreamisland_mesh import Asset,coord,empty,triangles
 
 ROOT=Path(__file__).resolve().parents[2]
 OUT=ROOT/'public/assets/dreamisland'
-# Phase C writes its own build record; phase B's stays where phase B left it,
+# Polish writes its own build record; earlier phase evidence remains untouched,
 # because a later revision overwriting an earlier phase's evidence is the
 # residual this directory split exists to close.
-EVIDENCE=ROOT/'art/evidence/dreamisland-v1/phase-c/build'
+EVIDENCE=ROOT/'art/evidence/dreamisland-v1/polish/build'
 EVIDENCE.mkdir(parents=True,exist_ok=True)
 route=json.loads((ROOT/'src/game/data/dreamisland/route.json').read_text())
 atlas=json.loads((OUT/'atlas-manifest.json').read_text())
@@ -401,11 +401,11 @@ BORE_SCALE=1.10
 p,t,right,s=frame(BORE_U)
 place('watchtower-ruin',beside(BORE_U,BORE_LATERAL),yaw_at(BORE_U),scale=BORE_SCALE,sector='POINT')
 # The clock tower stands off the inside of the Clock Court sweep, face to the road.
-TOWER_U=.5875
-place('clock-tower',beside(TOWER_U,26,-1.4),yaw_at(TOWER_U)+math.pi,sector='COURT')
+TOWER_U=.5345
+place('clock-tower',beside(TOWER_U,26,-1.4),yaw_at(TOWER_U)+math.pi,sector='COURT',scale=18/14)
 # The waterfall drops into the basin pool on the left of the causeway.
-FALL_U=.4541
-place('waterfall-cliff',beside(FALL_U,-46,-3.),yaw_at(FALL_U)+math.pi/2,sector='BASIN')
+FALL_U=.4875
+place('waterfall-cliff',beside(FALL_U,-46,-3.),yaw_at(FALL_U)-math.pi*.75,sector='BASIN')
 
 # Causeway modules across the basin, pier modules over the reef shallows.
 # Both runs stop one module short of their district's exit taper: the road grows
@@ -423,7 +423,7 @@ for distance in range(2046,2400,12):
   place('mossy-block-wall-module',beside(u,side*(half_width(u)+3.4)),
    yaw_at(u),sector='CUT')
 # Sea stacks on the reef horizon, four heights between 18 and 40 m.
-for u,offset,scale in [(.68,150,.78),(.72,-190,1.65),(.76,210,1.1),(.80,-160,1.35),(.84,175,.95)]:
+for u,offset,scale in [(.68,150,.78),(.72,-190,1.65),(.76,210,1.1),(.80,-80,1.35),(.84,75,.95)]:
  place('sea-stack',beside(u,offset,-6),u*7.3,sector='REEF',scale=scale)
 for u,offset,scale in [(.30,-130,1.2)]:
  place('sea-stack',beside(u,offset,-24),u*11.,sector='POINT',scale=scale)
@@ -436,16 +436,28 @@ for index,distance in enumerate(range(6,2400,17)):
  density=2 if sector=='GROVE' else 1
  for side in (-1,1):
   for slot in range(density):
-   offset=side*(half_width(u)+5.5+slot*6.2+(index%3)*1.7)
-   place(PALM_NAMES[(index+slot+(0 if side<0 else 1))%3],beside(u,offset,-.2),
-    (index*1.7+slot)%math.tau,sector=sector)
+   # Leave a clear view of the face during the COURT-entry clock moment.
+   if sector=='COURT' and side==1 and abs(u-TOWER_U)<.024:continue
+   if sector=='GROVE':
+    # The taller variants root in the raised bank. Their card feet stay above
+    # the open corridor plus the additional two-metre canopy clearance.
+    offset=side*(half_width(u)+3.2+slot*4.2)
+    scale=.90+.05*((index+slot)%3)
+    place('palm-tall',beside(u,offset,3.5),yaw_at(u)+(math.pi if side>0 else 0),sector=sector,scale=scale)
+   else:
+    offset=side*(half_width(u)+5.5+slot*6.2+(index%3)*1.7)
+    place(PALM_NAMES[(index+slot+(0 if side<0 else 1))%3],beside(u,offset,-.2),
+     (index*1.7+slot)%math.tau,sector=sector)
 # Understory along every verge, always outside the kerb.
 for index,distance in enumerate(range(12,2400,23)):
  u=distance/LENGTH;sector=sector_at(u)
  if sector=='REEF':continue
  for side in (-1,1):
-  place('undergrowth-card-set',beside(u,side*(half_width(u)+4.8),-.15),
-   (index*2.3)%math.tau,sector=sector)
+  count=2 if sector in ('GROVE','CUT') else 1
+  for slot in range(count):
+   position=beside(u,side*(half_width(u)+4.8+slot*3.4),3.5 if sector=='GROVE' else -.15)
+   if slot:position+=frame(u)[1]*8
+   place('undergrowth-card-set',position,(index*2.3+slot*.9)%math.tau,sector=sector)
 
 # The goldfish. Phase B placed eight in one batch, static and at rest. Phase C
 # splits them into TWO named shoals, because decision 3's ambience is two
@@ -475,18 +487,44 @@ for index in range(0,COUNT,VERGE_STEP):
  next_u=min(index+VERGE_STEP,COUNT)/COUNT
  p0,t0,r0,s0=frame(u);p1,t1,r1,s1=frame(next_u)
  for side in (-1,1):
-  for band in range(2):
-   inner=VERGE_INNER+(VERGE_OUTER-VERGE_INNER)*band/2
-   outer=VERGE_INNER+(VERGE_OUTER-VERGE_INNER)*(band+1)/2
-   drop=-.35-band*.55
-   corners=[p0+r0*(side*inner)+UP*drop,p0+r0*(side*outer)+UP*(drop-.55),
-    p1+r1*(side*outer)+UP*(drop-.55),p1+r1*(side*inner)+UP*drop]
+  # Raised grove banks place the canopy over the road without low cards
+  # crossing the corridor. Elsewhere the shore descends gently to the swell.
+  bands=[(.9,-.15),(2.8,3.5),(9,3.5),(17,-.35)] if sector=='GROVE' else [(.9,-.15),(8.95,-.25),(17,-.35)]
+  for (inner,inner_y),(outer,outer_y) in zip(bands,bands[1:]):
+   corners=[p0+r0*(side*(s0['width']/2+inner))+UP*inner_y,
+    p0+r0*(side*(s0['width']/2+outer))+UP*outer_y,
+    p1+r1*(side*(s1['width']/2+outer))+UP*outer_y,
+    p1+r1*(side*(s1['width']/2+inner))+UP*inner_y]
    order=(0,1,2,3) if side>0 else (3,2,1,0)
    verge.geometry([tuple(c) for c in corners],[order],'jungle','sand',tile=1)
 save(verge,['continuous sand shoulder','two stepped bands falling away from the kerb',
  'skipped where the road is over water','one sand tile per band segment',
  'ground for the palms and the understory'])
 place('sand-verge',(0,0,0),0.,sector='ALL')
+
+# A short sand shoulder bridges the deck tint to the wider beach. It sits below
+# the collision datum and joins the existing concrete batch.
+shoulder=Asset('road-sand-shoulder',materials,rects);shoulder.metric=False
+for index in range(0,COUNT,4):
+ u=index/COUNT
+ if sector_at(u) in ('BASIN','REEF'):continue
+ p0,t0,r0,s0=frame(u);p1,t1,r1,s1=frame((index+4)/COUNT)
+ # Match the road tint selected by the rendered BEACH calibration.
+ linear=(.42,.53,1)
+ for side in (-1,1):
+  for band in range(3):
+   inner=-.1+band*.8;outer=inner+.8
+   amount=(band+.5)/3
+   shoulder.tint=tuple(v*(1-amount)+.86*amount for v in linear)+(1,)
+   corners=[p0+r0*(side*(s0['width']/2+inner))+UP*(-.06-band*.04),
+    p0+r0*(side*(s0['width']/2+outer))+UP*(-.10-band*.04),
+    p1+r1*(side*(s1['width']/2+outer))+UP*(-.10-band*.04),
+    p1+r1*(side*(s1['width']/2+inner))+UP*(-.06-band*.04)]
+   shoulder.geometry([tuple(c) for c in corners],[(0,1,2,3) if side>0 else (3,2,1,0)],'concrete','road-sand',tile=1)
+save(shoulder,['below-deck sand transition','three tint bands','follows the accepted route',
+ 'skips causeway and reef water','merged into the existing concrete batch'])
+place('road-sand-shoulder',(0,0,0),0.,sector='ALL')
+
 
 # Gate furniture on both sides of every ordered gate, plus the two launch strips.
 GATE_PLATES=['plate-dream-island','plate-gate-1','plate-gate-2','plate-gate-3',
@@ -579,7 +617,7 @@ for name in [o.name for o in library.values()]:
 assert not any('tripo' in o.name.lower() or 'maquette' in o.name.lower() for o in bpy.data.objects)
 bpy.ops.object.select_all(action='DESELECT');world.select_set(True)
 for o in world.children_recursive:o.select_set(True)
-bpy.ops.wm.save_as_mainfile(filepath=str(ROOT/'art/blender/dreamisland_painted.blend'))
+bpy.ops.wm.save_as_mainfile(filepath=str(EVIDENCE/'dreamisland_painted.blend'))
 bpy.ops.export_scene.gltf(filepath=str(OUT/'painted.glb'),export_format='GLB',use_selection=True,
  export_yup=True,export_vertex_color='ACTIVE',export_extras=True)
 

@@ -1,0 +1,433 @@
+{
+  "script": "scripts/visual/dreamisland/crossfade-profile.mjs",
+  "base": "http://127.0.0.1:5217",
+  "seed": "3868938316",
+  "blends": [
+    0,
+    0.25,
+    0.5,
+    0.75,
+    1
+  ],
+  "pose": {
+    "progress": 0.05,
+    "station": 40,
+    "sector": "BEACH",
+    "roadPoint": [
+      119.99998270988567,
+      0,
+      0
+    ],
+    "tangent": [
+      1,
+      0,
+      0
+    ],
+    "camera": [
+      108.49998270988567,
+      4.8,
+      0
+    ],
+    "lookAt": [
+      138.99998270988567,
+      1.15,
+      0
+    ],
+    "fov": 62,
+    "viewport": [
+      1280,
+      720
+    ],
+    "chase": {
+      "back": 11.5,
+      "rise": 4.8,
+      "lookAhead": 19,
+      "lookRise": 1.15,
+      "fov": 62
+    },
+    "watchtower": {
+      "placement": [
+        655.853,
+        22,
+        299.184
+      ],
+      "metres": 624.0210183900797,
+      "offAxisDegrees": 28.661083930926207,
+      "halfHorizontalDegrees": 46.88858508098213,
+      "inFrame": true
+    }
+  },
+  "errors": [],
+  "inputHashes": {
+    "public/assets/dreamisland/sky-day.jpg": "de27f5773ac732e071d5842f37fd8146298f0a767aa92b31b9bbddd8a1c71a6c",
+    "public/assets/dreamisland/sky-night.jpg": "1952bfd54028f77136f1166f3e58d2f27f650cba7ca187a5103dd8eaebcfb0d3",
+    "public/assets/dreamisland/painted.glb": "4d97c3bc4b50fa8eb9833ef040223b72aee57123aa946a2453e705b7fe77ebb6",
+    "src/game/dreamisland-course.ts": "3ad18b3763816411c48f20b6ecd2ccd08ab23d077ed9ea128fde35b585884872",
+    "src/game/dreamisland-sky.ts": "f36cde81fe8291449d237706507f2ce4416040e7bb4ccc20b77cf0c6a3025895",
+    "src/game/dreamisland-water.ts": "83a9ca293a6f433623faf7b984439ffe8560b73d68161e1390877d5c476b217c"
+  },
+  "captures": [
+    {
+      "blend": 0,
+      "label": "000",
+      "url": "http://127.0.0.1:5217/?map=dreamisland&seed=3868938316&tier=works&demo=1&headless=1&diagnostics=1&start=manual&quality=high&music=0&nightBlend=0",
+      "frames": {
+        "full": "blend-000.png",
+        "sky": "blend-000-sky.png",
+        "road": "blend-000-road.png",
+        "glow": "blend-000-glow.png",
+        "sea": "blend-000-sea.png",
+        "blank": "blend-000-blank.png"
+      },
+      "pinned": {
+        "position": [
+          108.49998270988567,
+          4.8,
+          0
+        ],
+        "quaternion": [
+          -0.04208533716391777,
+          -0.7058532598180726,
+          -0.04208533716391776,
+          0.7058532598180725
+        ],
+        "fov": 62
+      },
+      "settle": {
+        "polls": 7,
+        "stableReadings": 6,
+        "settled": true,
+        "state": {
+          "hemisphereIntensity": 1.056,
+          "keyIntensity": 1.35,
+          "fogDensity": 0.0016,
+          "fogColor": 12180452,
+          "background": 12180452
+        }
+      },
+      "drewSky": 1,
+      "drewRoad": 1,
+      "drewGlow": 2,
+      "drewSea": 1,
+      "applied": {
+        "skyUniformNightBlend": 0,
+        "seaColor": 16777215,
+        "shallowsEmissiveIntensity": 0,
+        "foamEmissiveIntensity": 0,
+        "paintedCounters": {
+          "paintedMeshes": 10,
+          "paintedTriangles": 64944,
+          "manifestTriangles": 64944,
+          "emissiveMaterials": 1,
+          "cardMaterials": 1,
+          "fishMeshes": 4,
+          "fishVisible": 0,
+          "reskinnedCourseDraws": 2,
+          "waterSurfaces": 3,
+          "waterTriangles": 438,
+          "skyPanoramas": 2,
+          "flowShaders": 0,
+          "heroPlacements": 9,
+          "heroSourceMeshes": 42,
+          "heroMeshes": 12,
+          "heroTriangles": 17174,
+          "fishShoals": 2,
+          "fishShoalMeshes": 4,
+          "fishDeckSamples": 0,
+          "fishMinimumDeckClearance": null
+        },
+        "diagnostics": null
+      }
+    },
+    {
+      "blend": 0.25,
+      "label": "025",
+      "url": "http://127.0.0.1:5217/?map=dreamisland&seed=3868938316&tier=works&demo=1&headless=1&diagnostics=1&start=manual&quality=high&music=0&nightBlend=0.25",
+      "frames": {
+        "full": "blend-025.png",
+        "sky": "blend-025-sky.png",
+        "road": "blend-025-road.png",
+        "glow": "blend-025-glow.png",
+        "sea": "blend-025-sea.png",
+        "blank": "blend-025-blank.png"
+      },
+      "pinned": {
+        "position": [
+          108.49998270988567,
+          4.8,
+          0
+        ],
+        "quaternion": [
+          -0.04208533716391777,
+          -0.7058532598180726,
+          -0.04208533716391776,
+          0.7058532598180725
+        ],
+        "fov": 62
+      },
+      "settle": {
+        "polls": 7,
+        "stableReadings": 6,
+        "settled": true,
+        "state": {
+          "hemisphereIntensity": 0.8799999999999999,
+          "keyIntensity": 1.0875000000000001,
+          "fogDensity": 0.00205,
+          "fogColor": 10731977,
+          "background": 10731977
+        }
+      },
+      "drewSky": 1,
+      "drewRoad": 1,
+      "drewGlow": 2,
+      "drewSea": 1,
+      "applied": {
+        "skyUniformNightBlend": 0.25,
+        "seaColor": 14803426,
+        "shallowsEmissiveIntensity": 0.2875,
+        "foamEmissiveIntensity": 0.3625,
+        "paintedCounters": {
+          "paintedMeshes": 10,
+          "paintedTriangles": 64944,
+          "manifestTriangles": 64944,
+          "emissiveMaterials": 1,
+          "cardMaterials": 1,
+          "fishMeshes": 4,
+          "fishVisible": 0,
+          "reskinnedCourseDraws": 2,
+          "waterSurfaces": 3,
+          "waterTriangles": 438,
+          "skyPanoramas": 2,
+          "flowShaders": 0,
+          "heroPlacements": 9,
+          "heroSourceMeshes": 42,
+          "heroMeshes": 12,
+          "heroTriangles": 17174,
+          "fishShoals": 2,
+          "fishShoalMeshes": 4,
+          "fishDeckSamples": 0,
+          "fishMinimumDeckClearance": null
+        },
+        "diagnostics": null
+      }
+    },
+    {
+      "blend": 0.5,
+      "label": "050",
+      "url": "http://127.0.0.1:5217/?map=dreamisland&seed=3868938316&tier=works&demo=1&headless=1&diagnostics=1&start=manual&quality=high&music=0&nightBlend=0.5",
+      "frames": {
+        "full": "blend-050.png",
+        "sky": "blend-050-sky.png",
+        "road": "blend-050-road.png",
+        "glow": "blend-050-glow.png",
+        "sea": "blend-050-sea.png",
+        "blank": "blend-050-blank.png"
+      },
+      "pinned": {
+        "position": [
+          108.49998270988567,
+          4.8,
+          0
+        ],
+        "quaternion": [
+          -0.04208533716391777,
+          -0.7058532598180726,
+          -0.04208533716391776,
+          0.7058532598180725
+        ],
+        "fov": 62
+      },
+      "settle": {
+        "polls": 7,
+        "stableReadings": 6,
+        "settled": true,
+        "state": {
+          "hemisphereIntensity": 0.7040000000000001,
+          "keyIntensity": 0.8250000000000001,
+          "fogDensity": 0.0025,
+          "fogColor": 8954281,
+          "background": 8954281
+        }
+      },
+      "drewSky": 1,
+      "drewRoad": 1,
+      "drewGlow": 2,
+      "drewSea": 1,
+      "applied": {
+        "skyUniformNightBlend": 0.5,
+        "seaColor": 12369342,
+        "shallowsEmissiveIntensity": 0.575,
+        "foamEmissiveIntensity": 0.725,
+        "paintedCounters": {
+          "paintedMeshes": 10,
+          "paintedTriangles": 64944,
+          "manifestTriangles": 64944,
+          "emissiveMaterials": 1,
+          "cardMaterials": 1,
+          "fishMeshes": 4,
+          "fishVisible": 0,
+          "reskinnedCourseDraws": 2,
+          "waterSurfaces": 3,
+          "waterTriangles": 438,
+          "skyPanoramas": 2,
+          "flowShaders": 0,
+          "heroPlacements": 9,
+          "heroSourceMeshes": 42,
+          "heroMeshes": 12,
+          "heroTriangles": 17174,
+          "fishShoals": 2,
+          "fishShoalMeshes": 4,
+          "fishDeckSamples": 0,
+          "fishMinimumDeckClearance": null
+        },
+        "diagnostics": null
+      }
+    },
+    {
+      "blend": 0.75,
+      "label": "075",
+      "url": "http://127.0.0.1:5217/?map=dreamisland&seed=3868938316&tier=works&demo=1&headless=1&diagnostics=1&start=manual&quality=high&music=0&nightBlend=0.75",
+      "frames": {
+        "full": "blend-075.png",
+        "sky": "blend-075-sky.png",
+        "road": "blend-075-road.png",
+        "glow": "blend-075-glow.png",
+        "sea": "blend-075-sea.png",
+        "blank": "blend-075-blank.png"
+      },
+      "pinned": {
+        "position": [
+          108.49998270988567,
+          4.8,
+          0
+        ],
+        "quaternion": [
+          -0.04208533716391777,
+          -0.7058532598180726,
+          -0.04208533716391776,
+          0.7058532598180725
+        ],
+        "fov": 62
+      },
+      "settle": {
+        "polls": 7,
+        "stableReadings": 6,
+        "settled": true,
+        "state": {
+          "hemisphereIntensity": 0.5280000000000001,
+          "keyIntensity": 0.5625,
+          "fogDensity": 0.00295,
+          "fogColor": 6518398,
+          "background": 6518398
+        }
+      },
+      "drewSky": 1,
+      "drewRoad": 1,
+      "drewGlow": 2,
+      "drewSea": 1,
+      "applied": {
+        "skyUniformNightBlend": 0.75,
+        "seaColor": 9145486,
+        "shallowsEmissiveIntensity": 0.8624999999999999,
+        "foamEmissiveIntensity": 1.0875,
+        "paintedCounters": {
+          "paintedMeshes": 10,
+          "paintedTriangles": 64944,
+          "manifestTriangles": 64944,
+          "emissiveMaterials": 1,
+          "cardMaterials": 1,
+          "fishMeshes": 4,
+          "fishVisible": 0,
+          "reskinnedCourseDraws": 2,
+          "waterSurfaces": 3,
+          "waterTriangles": 438,
+          "skyPanoramas": 2,
+          "flowShaders": 0,
+          "heroPlacements": 9,
+          "heroSourceMeshes": 42,
+          "heroMeshes": 12,
+          "heroTriangles": 17174,
+          "fishShoals": 2,
+          "fishShoalMeshes": 4,
+          "fishDeckSamples": 0,
+          "fishMinimumDeckClearance": null
+        },
+        "diagnostics": null
+      }
+    },
+    {
+      "blend": 1,
+      "label": "100",
+      "url": "http://127.0.0.1:5217/?map=dreamisland&seed=3868938316&tier=works&demo=1&headless=1&diagnostics=1&start=manual&quality=high&music=0&nightBlend=1",
+      "frames": {
+        "full": "blend-100.png",
+        "sky": "blend-100-sky.png",
+        "road": "blend-100-road.png",
+        "glow": "blend-100-glow.png",
+        "sea": "blend-100-sea.png",
+        "blank": "blend-100-blank.png"
+      },
+      "pinned": {
+        "position": [
+          108.49998270988567,
+          4.8,
+          0
+        ],
+        "quaternion": [
+          -0.04208533716391777,
+          -0.7058532598180726,
+          -0.04208533716391776,
+          0.7058532598180725
+        ],
+        "fov": 62
+      },
+      "settle": {
+        "polls": 7,
+        "stableReadings": 6,
+        "settled": true,
+        "state": {
+          "hemisphereIntensity": 0.35200000000000004,
+          "keyIntensity": 0.3,
+          "fogDensity": 0.0034,
+          "fogColor": 726308,
+          "background": 726308
+        }
+      },
+      "drewSky": 1,
+      "drewRoad": 1,
+      "drewGlow": 2,
+      "drewSea": 1,
+      "applied": {
+        "skyUniformNightBlend": 1,
+        "seaColor": 1712688,
+        "shallowsEmissiveIntensity": 1.15,
+        "foamEmissiveIntensity": 1.45,
+        "paintedCounters": {
+          "paintedMeshes": 10,
+          "paintedTriangles": 64944,
+          "manifestTriangles": 64944,
+          "emissiveMaterials": 1,
+          "cardMaterials": 1,
+          "fishMeshes": 4,
+          "fishVisible": 0,
+          "reskinnedCourseDraws": 2,
+          "waterSurfaces": 3,
+          "waterTriangles": 438,
+          "skyPanoramas": 2,
+          "flowShaders": 0,
+          "heroPlacements": 9,
+          "heroSourceMeshes": 42,
+          "heroMeshes": 12,
+          "heroTriangles": 17174,
+          "fishShoals": 2,
+          "fishShoalMeshes": 4,
+          "fishDeckSamples": 0,
+          "fishMinimumDeckClearance": null
+        },
+        "diagnostics": null
+      }
+    }
+  ],
+  "regions": "sky = full frame equals the dome-alone frame; road = full frame equals the road-alone frame AND the road-alone frame differs from the blank frame. Both are computed by scripts/visual/dreamisland/crossfade-profile.py from the frames beside this file.",
+  "target": "NONE. This script measures; it states no midpoint target. The target is written afterwards, as a delta against these five captures."
+}

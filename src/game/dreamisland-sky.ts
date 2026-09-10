@@ -37,8 +37,12 @@ export class DreamIslandSky {
    side:THREE.BackSide,depthWrite:false,depthTest:false,
    vertexShader:'varying vec3 direction; void main(){direction=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
    fragmentShader:`uniform sampler2D dayPanorama;uniform sampler2D nightPanorama;uniform vec3 haze;uniform float nightBlend;varying vec3 direction;
-    vec4 panorama(vec2 uv){return mix(texture2D(dayPanorama,uv),texture2D(nightPanorama,uv),nightBlend);}
-    void main(){vec3 d=normalize(direction);float u=fract(atan(d.z,d.x)/6.283185+.42);float v=clamp(.15+d.y*.8,0.,.99);
+    // Perceptual pacing applies only to the panorama mix. The course still
+    // owns the unmodified clock, light/fog ramp, grip and reduced-motion jump.
+    vec4 panorama(vec2 uv){float mixWeight=1.-pow(1.-nightBlend,2.8);return mix(texture2D(dayPanorama,uv),texture2D(nightPanorama,uv),mixWeight);}
+    void main(){vec3 d=normalize(direction);float u=fract(atan(d.z,d.x)/6.283185+.42);float v=clamp(.30+max(d.y,0.)*.69,.30,.99);
+    // Source row-profile places the painted day shoreline at v=.268.
+    // The .30 lower bound samples sky above it throughout the dome.
     // Both panorama edges blended over a narrow azimuth band, so a source that
     // does not tile exactly still closes. Same band on both states.
     float edge=smoothstep(0.,.055,min(u,1.-u));

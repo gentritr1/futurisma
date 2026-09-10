@@ -1,0 +1,534 @@
+{
+  "script": "scripts/visual/dreamisland/atlas-quadrant-proof.mjs",
+  "url": "http://127.0.0.1:5217/?map=dreamisland&seed=3868938316&tier=works&demo=1&headless=1&diagnostics=1&start=manual&quality=high&music=0",
+  "errors": [],
+  "atlasManifest": {
+    "file": "public/assets/dreamisland/atlas-manifest.json",
+    "sha256": "ef4e7750c089970df097358fb5575235a378ccc6dbdf91c3c0e496f2d7a46675"
+  },
+  "quadrantColours": {
+    "TL": [
+      255,
+      0,
+      0
+    ],
+    "TR": [
+      0,
+      255,
+      0
+    ],
+    "BL": [
+      0,
+      0,
+      255
+    ],
+    "BR": [
+      255,
+      255,
+      0
+    ]
+  },
+  "materialsSwapped": 17,
+  "method": "Every atlas map and emissiveMap in the live scene replaced by a 1024x1024 four-colour quadrant sheet with the sampler settings copied from the texture it replaced; the shipped mesh isolated over the longest contiguous run of its own index buffer inside the claimed rect and rendered unlit; the mean of the pixels that differ from a background frame taken from the same camera compared against the four colours.",
+  "convention": "Manifest rects are bottom-origin V; every sampler on this map runs flipY:false, so the rect a UV must land in is [u0, 1-v1, u1, 1-v0], and the manifest TL is the debug sheet top-left.",
+  "claims": 9,
+  "decided": 9,
+  "undecided": [],
+  "results": [
+    {
+      "id": "watchtower-ivy",
+      "mesh": "DI_HERO_watchtower-ruin_DI_MAT_jungle-card",
+      "role": "jungle-card",
+      "cell": "fern",
+      "at": [
+        0.3,
+        0.35
+      ],
+      "is": "Tropical fern clump, the verge and joint cards.",
+      "claimed": "TR",
+      "rect": [
+        0.529297,
+        0.561523,
+        0.970703,
+        0.896484
+      ],
+      "census": {
+        "matchedTriangles": 16,
+        "isolatedTriangles": 16,
+        "totalTriangles": 16
+      },
+      "drawn": true,
+      "framed": {
+        "seen": 24,
+        "position": [
+          691.1634289218382,
+          -21.286365135424532,
+          306.4585004076359
+        ],
+        "distance": 73.95313486759363,
+        "target": [
+          669.2028198242188,
+          34.540000915527344,
+          306.2633056640625
+        ],
+        "samples": 24
+      },
+      "backgroundPixels": 921600,
+      "maskedPixels": 1135,
+      "mean": [
+        22.93920704845815,
+        250.58325991189426,
+        26.01409691629956
+      ],
+      "distances": {
+        "TL": 342.5214081072028,
+        "TR": 34.96352458475173,
+        "BL": 340.22451584085155,
+        "BR": 233.55610130475054
+      },
+      "nearest": "TR",
+      "margin": 198.59257671999882,
+      "decided": true
+    },
+    {
+      "id": "watchtower-moss-joints",
+      "mesh": "DI_HERO_watchtower-ruin_DI_MAT_jungle",
+      "role": "jungle",
+      "cell": "moss-blossom",
+      "at": [
+        0.3,
+        0.35
+      ],
+      "is": "Moss over stone with small white blossoms; the mossy tops.",
+      "claimed": "TR",
+      "rect": [
+        0.504,
+        0.504,
+        0.996,
+        0.996
+      ],
+      "census": {
+        "matchedTriangles": 96,
+        "isolatedTriangles": 96,
+        "totalTriangles": 96
+      },
+      "drawn": true,
+      "framed": {
+        "seen": 24,
+        "position": [
+          743.1891934196213,
+          46.656899708965035,
+          304.2142676205831
+        ],
+        "distance": 73.78450045217382,
+        "target": [
+          669.435546875,
+          31.899999618530273,
+          306.34783935546875
+        ],
+        "samples": 24
+      },
+      "backgroundPixels": 921600,
+      "maskedPixels": 90,
+      "mean": [
+        112.12222222222222,
+        231.25555555555556,
+        121.25555555555556
+      ],
+      "distances": {
+        "TL": 297.6509719639953,
+        "TR": 166.84753852278166,
+        "BL": 289.72072951570294,
+        "BR": 188.89353556376082
+      },
+      "nearest": "TR",
+      "margin": 22.04599704097916,
+      "decided": true
+    },
+    {
+      "id": "watchtower-lamps",
+      "mesh": "DI_HERO_watchtower-ruin_DI_MAT_emissive",
+      "role": "emissive",
+      "cell": "lamp-disc",
+      "at": [
+        0.32,
+        0.35
+      ],
+      "is": "Warm pale-yellow lamp disc for the tunnel and gate lamps.",
+      "claimed": "BL",
+      "rect": [
+        0.004,
+        0.004,
+        0.496,
+        0.496
+      ],
+      "census": {
+        "matchedTriangles": 48,
+        "isolatedTriangles": 48,
+        "totalTriangles": 48
+      },
+      "drawn": true,
+      "framed": {
+        "seen": 24,
+        "position": [
+          611.0734747490393,
+          36.02761431784313,
+          296.40669822296167
+        ],
+        "distance": 37.13806968186702,
+        "target": [
+          648.1403198242188,
+          28.600000381469727,
+          298.7056579589844
+        ],
+        "samples": 24
+      },
+      "backgroundPixels": 921600,
+      "maskedPixels": 845,
+      "mean": [
+        20.557396449704143,
+        16.339644970414202,
+        251.66508875739646
+      ],
+      "distances": {
+        "TL": 344.33361040779715,
+        "TR": 347.4430723311468,
+        "BL": 26.470968617440768,
+        "BR": 418.63757155988446
+      },
+      "nearest": "BL",
+      "margin": 317.8626417903564,
+      "decided": true
+    },
+    {
+      "id": "waterfall-sheet",
+      "mesh": "DI_HERO_waterfall-cliff_DI_MAT_water",
+      "role": "water",
+      "cell": "waterfall",
+      "at": [
+        0.42,
+        0.47
+      ],
+      "is": "Vertical white and pale-blue streaks on dark stone; V scrolls with time.",
+      "claimed": "BR",
+      "rect": [
+        0.504,
+        0.004,
+        0.996,
+        0.496
+      ],
+      "census": {
+        "matchedTriangles": 6,
+        "isolatedTriangles": 6,
+        "totalTriangles": 102
+      },
+      "drawn": true,
+      "framed": {
+        "seen": 18,
+        "position": [
+          513.9250250758417,
+          19.253995149148665,
+          663.3687224003112
+        ],
+        "distance": 41.269975745743324,
+        "target": [
+          504.8321228027344,
+          11,
+          623.1129150390625
+        ],
+        "samples": 18
+      },
+      "backgroundPixels": 921600,
+      "maskedPixels": 39484,
+      "mean": [
+        254.44119136865567,
+        254.7127950562253,
+        1.8189646439063925
+      ],
+      "distances": {
+        "TL": 254.71990276540404,
+        "TR": 254.4478551376615,
+        "BL": 440.1358477725247,
+        "BR": 1.9244183905728671
+      },
+      "nearest": "BR",
+      "margin": 252.52343674708862,
+      "decided": true
+    },
+    {
+      "id": "waterfall-foam-ring",
+      "mesh": "DI_HERO_waterfall-cliff_DI_MAT_water",
+      "role": "water",
+      "cell": "foam-gradient",
+      "at": [
+        0.42,
+        0.47
+      ],
+      "is": "Surf foam dissolving into cyan. V is distance from shore: tiles in U only.",
+      "claimed": "BL",
+      "rect": [
+        0.004,
+        0.004,
+        0.496,
+        0.496
+      ],
+      "census": {
+        "matchedTriangles": 96,
+        "isolatedTriangles": 96,
+        "totalTriangles": 102
+      },
+      "drawn": true,
+      "framed": {
+        "seen": 24,
+        "position": [
+          500.1207281744537,
+          -8.893562487820782,
+          622.9058865993464
+        ],
+        "distance": 24.966953014408755,
+        "target": [
+          500.1207275390625,
+          11.079999923706055,
+          622.9058837890625
+        ],
+        "samples": 24
+      },
+      "backgroundPixels": 921600,
+      "maskedPixels": 67572,
+      "mean": [
+        2.2852808855739064,
+        2.7043597939975137,
+        254.66231575208667
+      ],
+      "distances": {
+        "TL": 358.7825774521307,
+        "TR": 358.48459888801096,
+        "BL": 3.5566980856756065,
+        "BR": 438.6008599948881
+      },
+      "nearest": "BL",
+      "margin": 354.92790080233533,
+      "decided": true
+    },
+    {
+      "id": "waterfall-cliff",
+      "mesh": "DI_HERO_waterfall-cliff_DI_MAT_concrete",
+      "role": "concrete",
+      "cell": "wall-block",
+      "at": [
+        0.42,
+        0.47
+      ],
+      "is": "Weathered limestone wall blocks, the cut walls and the sea stacks.",
+      "claimed": "BR",
+      "rect": [
+        0.504,
+        0.004,
+        0.996,
+        0.496
+      ],
+      "census": {
+        "matchedTriangles": 792,
+        "isolatedTriangles": 792,
+        "totalTriangles": 792
+      },
+      "drawn": true,
+      "framed": {
+        "seen": 24,
+        "position": [
+          509.60247802734375,
+          43.99274524878273,
+          624.1370849609375
+        ],
+        "distance": 22.456454310407327,
+        "target": [
+          509.60247802734375,
+          17.045000076293945,
+          624.1370849609375
+        ],
+        "samples": 24
+      },
+      "backgroundPixels": 921600,
+      "maskedPixels": 181440,
+      "mean": [
+        254.63730709876543,
+        254.81910273368607,
+        1.0361166225749558
+      ],
+      "distances": {
+        "TL": 254.82146730955975,
+        "TR": 254.6394793192672,
+        "BL": 440.76137233729344,
+        "BR": 1.112568028096231
+      },
+      "nearest": "BR",
+      "margin": 253.52691129117096,
+      "decided": true
+    },
+    {
+      "id": "stack-stone",
+      "mesh": "DI_HERO_sea-stack_DI_MAT_concrete",
+      "role": "concrete",
+      "cell": "wall-block",
+      "at": [
+        0.7,
+        0.79
+      ],
+      "is": "Weathered limestone wall blocks, the cut walls and the sea stacks.",
+      "claimed": "BR",
+      "rect": [
+        0.504,
+        0.004,
+        0.996,
+        0.496
+      ],
+      "census": {
+        "matchedTriangles": 1512,
+        "isolatedTriangles": 1512,
+        "totalTriangles": 1512
+      },
+      "drawn": true,
+      "framed": {
+        "seen": 24,
+        "position": [
+          -54.20157241821289,
+          374.8897671699524,
+          373.809814453125
+        ],
+        "distance": 315,
+        "target": [
+          -54.20157241821289,
+          -3.1102328300476074,
+          373.809814453125
+        ],
+        "samples": 24
+      },
+      "backgroundPixels": 921600,
+      "maskedPixels": 1611,
+      "mean": [
+        238.28864059590316,
+        249.00248292985722,
+        29.100558659217878
+      ],
+      "distances": {
+        "TL": 251.25355430848205,
+        "TR": 240.13389798678722,
+        "BL": 412.08527071512134,
+        "BR": 34.08932763223896
+      },
+      "nearest": "BR",
+      "margin": 206.04457035454826,
+      "decided": true
+    },
+    {
+      "id": "stack-moss",
+      "mesh": "DI_HERO_sea-stack_DI_MAT_jungle",
+      "role": "jungle",
+      "cell": "moss-blossom",
+      "at": [
+        0.7,
+        0.79
+      ],
+      "is": "Moss over stone with small white blossoms; the mossy tops.",
+      "claimed": "TR",
+      "rect": [
+        0.504,
+        0.504,
+        0.996,
+        0.996
+      ],
+      "census": {
+        "matchedTriangles": 368,
+        "isolatedTriangles": 368,
+        "totalTriangles": 368
+      },
+      "drawn": true,
+      "framed": {
+        "seen": 24,
+        "position": [
+          -59.8201789855957,
+          404.07600021362305,
+          376.5561218261719
+        ],
+        "distance": 315,
+        "target": [
+          -59.8201789855957,
+          26.076000213623047,
+          376.5561218261719
+        ],
+        "samples": 24
+      },
+      "backgroundPixels": 921600,
+      "maskedPixels": 249,
+      "mean": [
+        50.558232931726906,
+        246.22088353413653,
+        35.28112449799197
+      ],
+      "distances": {
+        "TL": 321.9719201361691,
+        "TR": 62.273313296650265,
+        "BL": 333.8521269325335,
+        "BR": 207.64938418825622
+      },
+      "nearest": "TR",
+      "margin": 145.37607089160596,
+      "decided": true
+    },
+    {
+      "id": "road-sand-shoulder",
+      "mesh": "DI_STATIC_DI_MAT_concrete",
+      "role": "concrete",
+      "cell": "road-sand",
+      "at": [
+        0.03,
+        0.06
+      ],
+      "is": "Pale sandy concrete road surface with tyre-polish lanes deskewed onto U.",
+      "claimed": "TL",
+      "rect": [
+        0.004,
+        0.504,
+        0.496,
+        0.996
+      ],
+      "census": {
+        "matchedTriangles": 2436,
+        "isolatedTriangles": 1644,
+        "totalTriangles": 23180
+      },
+      "drawn": true,
+      "framed": {
+        "seen": 24,
+        "position": [
+          646.9555052473536,
+          135.83848990205985,
+          304.22059113422927
+        ],
+        "distance": 94.97300718403794,
+        "target": [
+          648.8681030273438,
+          21.890438079833984,
+          304.4579162597656
+        ],
+        "samples": 24
+      },
+      "backgroundPixels": 921600,
+      "maskedPixels": 39334,
+      "mean": [
+        251.3395535668887,
+        11.56960898967814,
+        11.644607718513246
+      ],
+      "distances": {
+        "TL": 16.818192803680688,
+        "TR": 350.09359226292503,
+        "BL": 350.03896067702703,
+        "BR": 243.736232481849
+      },
+      "nearest": "TL",
+      "margin": 226.9180396781683,
+      "decided": true
+    }
+  ]
+}

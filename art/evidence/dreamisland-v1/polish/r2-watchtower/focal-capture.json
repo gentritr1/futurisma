@@ -1,0 +1,148 @@
+{
+  "status": "VERIFIED",
+  "script": "scripts/visual/dreamisland-heroes/polish-focals.mjs",
+  "frames": [
+    {
+      "asset": "watchtower",
+      "distance": 40,
+      "blend": 0,
+      "source": "public/assets/dreamisland/heroes/watchtower.glb",
+      "sourceSha256": "2e24cc860a8a0ca8332e94d0c5e3610844ae630533c4378e87acd5a938ddddf2",
+      "geometry": {
+        "triangles": 9342,
+        "meshes": 15,
+        "materials": [
+          "DI_MAT_concrete",
+          "DI_MAT_jungle-card",
+          "DI_MAT_emissive"
+        ],
+        "bounds": {
+          "min": [
+            -14,
+            0,
+            -14.251358985900879
+          ],
+          "max": [
+            14,
+            30,
+            14.251358985900879
+          ],
+          "size": [
+            28,
+            30,
+            28.502717971801758
+          ]
+        }
+      },
+      "pose": {
+        "position": [
+          13.083540778447937,
+          20.607231762191972,
+          -37.381545081279825
+        ],
+        "target": [
+          0,
+          15,
+          0
+        ],
+        "fov": 70,
+        "far": 650,
+        "quaternion": [
+          -0.011772285964394962,
+          0.9834280486132019,
+          0.06927085522670014,
+          0.16712939627774578
+        ]
+      },
+      "settle": {
+        "stable": 6,
+        "polls": 7,
+        "state": {
+          "lights": [
+            {
+              "name": "",
+              "type": "PointLight",
+              "intensity": 0,
+              "color": [
+                1,
+                1,
+                1
+              ]
+            },
+            {
+              "name": "",
+              "type": "HemisphereLight",
+              "intensity": 1.056,
+              "color": [
+                0.5209955731953768,
+                0.775822218312646,
+                0.8631572134510892
+              ],
+              "groundColor": [
+                0.158960835050774,
+                0.2541520943200296,
+                0.08437621153575764
+              ]
+            },
+            {
+              "name": "",
+              "type": "DirectionalLight",
+              "intensity": 1.35,
+              "color": [
+                1,
+                0.8713671191959567,
+                0.623960391667596
+              ]
+            },
+            {
+              "name": "",
+              "type": "DirectionalLight",
+              "intensity": 0.405,
+              "color": [
+                0.3915724777393922,
+                0.6866853124288864,
+                0.8069522576650873
+              ]
+            },
+            {
+              "name": "dreamisland_tunnel_lamp_-1",
+              "type": "PointLight",
+              "intensity": 0,
+              "color": [
+                1,
+                0.8069522576650873,
+                0.407240211891531
+              ]
+            },
+            {
+              "name": "dreamisland_tunnel_lamp_1",
+              "type": "PointLight",
+              "intensity": 0,
+              "color": [
+                1,
+                0.8069522576650873,
+                0.407240211891531
+              ]
+            }
+          ],
+          "fog": {
+            "color": [
+              0.48514994004665124,
+              0.7083757798856457,
+              0.775822218312646
+            ],
+            "density": 0.0016
+          },
+          "skyBlend": 0
+        }
+      },
+      "frames": {
+        "full": "watchtower-40m-day.png",
+        "lower": "watchtower-40m-day-lower.png",
+        "stone": "watchtower-40m-day-stone.png",
+        "blank": "watchtower-40m-day-blank.png"
+      }
+    }
+  ],
+  "errors": []
+}

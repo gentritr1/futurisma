@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {REVISION} from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {inspectAsset, verifyAtlasInputs} from './inspect.mjs';
-const out = 'art/evidence/dreamisland-v1/heroes';
+const out = process.argv.find(a=>a.startsWith('--out='))?.slice(6)??'art/evidence/dreamisland-v1/heroes';
 mkdirSync(out, {recursive: true});
 assert.equal(REVISION, '184', 'The loader check requires three r184');
 const manifest = JSON.parse(readFileSync('public/assets/dreamisland/heroes/heroes.json', 'utf8'));

@@ -1,0 +1,109 @@
+{
+  "instrument": "/Users/gentlegen/Desktop/futurisma-race/polarity_work/scripts/visual/dreamisland-heroes/polish-tint-profile.py",
+  "method": "Shared game lighting/fog/AgX, exact visible full/isolated equality and isolated/blank difference; calibrated geometry and pose recorded in tint-capture.json",
+  "results": [
+    {
+      "name": "stacks-before",
+      "pose": {
+        "position": [
+          1.4634435176849365,
+          24.765808824737228,
+          -39.72361321614314
+        ],
+        "target": [
+          1.4634435176849365,
+          20,
+          -0.008539676666259766
+        ],
+        "fov": 70,
+        "far": 650,
+        "quaternion": [
+          0,
+          0.9982176211846098,
+          0.05967898086042504,
+          0
+        ],
+        "horizonRow": 298.3040061087406
+      },
+      "metrics": {
+        "stone": {
+          "pixels": 164230,
+          "meanLuma": 0.3669512010105388,
+          "meanChroma": 0.12988057160390795
+        },
+        "cap": {
+          "pixels": 1365,
+          "meanLuma": 0.2807244375493787,
+          "meanChroma": 0.28123536594124826
+        }
+      }
+    },
+    {
+      "name": "stacks-after",
+      "pose": {
+        "position": [
+          1.4634435176849365,
+          24.765808824737228,
+          -39.72361321614314
+        ],
+        "target": [
+          1.4634435176849365,
+          20,
+          -0.008539676666259766
+        ],
+        "fov": 70,
+        "far": 650,
+        "quaternion": [
+          0,
+          0.9982176211846098,
+          0.05967898086042504,
+          0
+        ],
+        "horizonRow": 298.3040061087406
+      },
+      "metrics": {
+        "stone": {
+          "pixels": 164139,
+          "meanLuma": 0.2226119440134969,
+          "meanChroma": 0.08244838873413006
+        },
+        "cap": {
+          "pixels": 1364,
+          "meanLuma": 0.20424654361451322,
+          "meanChroma": 0.2150278879880398
+        }
+      }
+    },
+    {
+      "name": "shoulder",
+      "pose": {
+        "position": [
+          108.49998270988567,
+          4.8,
+          0
+        ],
+        "target": [
+          138.99998270988567,
+          1.15,
+          0
+        ],
+        "fov": 62,
+        "far": 650,
+        "quaternion": [
+          -0.04208533716391777,
+          -0.7058532598180726,
+          -0.04208533716391776,
+          0.7058532598180725
+        ],
+        "horizonRow": 288.29956590791534
+      },
+      "metrics": {
+        "shoulder": {
+          "pixels": 53,
+          "meanLuma": 0.4468675397706251,
+          "meanChroma": 0.23248242693303728
+        }
+      }
+    }
+  ]
+}

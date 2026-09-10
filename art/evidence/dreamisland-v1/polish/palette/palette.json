@@ -1,0 +1,305 @@
+{
+  "instrument": "/Users/gentlegen/Desktop/futurisma-race/polarity_work/scripts/visual/dreamisland-heroes/polish-palette.py",
+  "reference": "art/references/dreamisland/heroes/08_the_strike.png",
+  "gameDay": "art/evidence/dreamisland-v1/polish/crossfade-baseline/blend-000.png",
+  "gameNight": "art/evidence/dreamisland-v1/polish/crossfade-baseline/blend-100.png",
+  "method": "Eight-color Pillow MEDIANCUT on each complete HUD-free game frame and each reference half separately; percentages are each swatch index pixel counts. Different scene composition changes swatch proportions.",
+  "palettes": {
+    "Reference day": [
+      {
+        "rgb": [
+          91,
+          158,
+          225
+        ],
+        "hex": "#5b9ee1",
+        "pixelShare": 0.20016927083333333
+      },
+      {
+        "rgb": [
+          191,
+          218,
+          234
+        ],
+        "hex": "#bfdaea",
+        "pixelShare": 0.19624131944444445
+      },
+      {
+        "rgb": [
+          145,
+          157,
+          162
+        ],
+        "hex": "#919da2",
+        "pixelShare": 0.17847439236111112
+      },
+      {
+        "rgb": [
+          241,
+          247,
+          248
+        ],
+        "hex": "#f1f7f8",
+        "pixelShare": 0.13274739583333334
+      },
+      {
+        "rgb": [
+          63,
+          76,
+          132
+        ],
+        "hex": "#3f4c84",
+        "pixelShare": 0.12921875
+      },
+      {
+        "rgb": [
+          217,
+          225,
+          229
+        ],
+        "hex": "#d9e1e5",
+        "pixelShare": 0.10021484375
+      },
+      {
+        "rgb": [
+          143,
+          214,
+          229
+        ],
+        "hex": "#8fd6e5",
+        "pixelShare": 0.041065538194444445
+      },
+      {
+        "rgb": [
+          119,
+          127,
+          151
+        ],
+        "hex": "#777f97",
+        "pixelShare": 0.021868489583333334
+      }
+    ],
+    "Game day": [
+      {
+        "rgb": [
+          122,
+          179,
+          209
+        ],
+        "hex": "#7ab3d1",
+        "pixelShare": 0.2098122829861111
+      },
+      {
+        "rgb": [
+          109,
+          112,
+          103
+        ],
+        "hex": "#6d7067",
+        "pixelShare": 0.20442491319444445
+      },
+      {
+        "rgb": [
+          97,
+          100,
+          88
+        ],
+        "hex": "#616458",
+        "pixelShare": 0.15623372395833332
+      },
+      {
+        "rgb": [
+          166,
+          205,
+          219
+        ],
+        "hex": "#a6cddb",
+        "pixelShare": 0.12873046875
+      },
+      {
+        "rgb": [
+          98,
+          107,
+          99
+        ],
+        "hex": "#626b63",
+        "pixelShare": 0.09015190972222223
+      },
+      {
+        "rgb": [
+          101,
+          164,
+          196
+        ],
+        "hex": "#65a4c4",
+        "pixelShare": 0.077314453125
+      },
+      {
+        "rgb": [
+          49,
+          77,
+          79
+        ],
+        "hex": "#314d4f",
+        "pixelShare": 0.07277235243055556
+      },
+      {
+        "rgb": [
+          130,
+          145,
+          134
+        ],
+        "hex": "#829186",
+        "pixelShare": 0.060559895833333335
+      }
+    ],
+    "Reference night": [
+      {
+        "rgb": [
+          0,
+          0,
+          0
+        ],
+        "hex": "#000000",
+        "pixelShare": 0.3195030381944444
+      },
+      {
+        "rgb": [
+          186,
+          177,
+          158
+        ],
+        "hex": "#bab19e",
+        "pixelShare": 0.22052083333333333
+      },
+      {
+        "rgb": [
+          52,
+          67,
+          57
+        ],
+        "hex": "#344339",
+        "pixelShare": 0.12592447916666666
+      },
+      {
+        "rgb": [
+          148,
+          97,
+          60
+        ],
+        "hex": "#94613c",
+        "pixelShare": 0.10822916666666667
+      },
+      {
+        "rgb": [
+          27,
+          9,
+          32
+        ],
+        "hex": "#1b0920",
+        "pixelShare": 0.06651258680555555
+      },
+      {
+        "rgb": [
+          0,
+          0,
+          5
+        ],
+        "hex": "#000005",
+        "pixelShare": 0.05890625
+      },
+      {
+        "rgb": [
+          0,
+          6,
+          5
+        ],
+        "hex": "#000605",
+        "pixelShare": 0.054876302083333335
+      },
+      {
+        "rgb": [
+          95,
+          186,
+          173
+        ],
+        "hex": "#5fbaad",
+        "pixelShare": 0.04552734375
+      }
+    ],
+    "Game night": [
+      {
+        "rgb": [
+          32,
+          36,
+          32
+        ],
+        "hex": "#202420",
+        "pixelShare": 0.26083441840277777
+      },
+      {
+        "rgb": [
+          0,
+          0,
+          1
+        ],
+        "hex": "#000001",
+        "pixelShare": 0.19534613715277777
+      },
+      {
+        "rgb": [
+          30,
+          40,
+          44
+        ],
+        "hex": "#1e282c",
+        "pixelShare": 0.16911458333333335
+      },
+      {
+        "rgb": [
+          20,
+          28,
+          29
+        ],
+        "hex": "#141c1d",
+        "pixelShare": 0.11406901041666667
+      },
+      {
+        "rgb": [
+          7,
+          12,
+          15
+        ],
+        "hex": "#070c0f",
+        "pixelShare": 0.08441297743055555
+      },
+      {
+        "rgb": [
+          48,
+          67,
+          52
+        ],
+        "hex": "#304334",
+        "pixelShare": 0.07154079861111111
+      },
+      {
+        "rgb": [
+          2,
+          2,
+          4
+        ],
+        "hex": "#020204",
+        "pixelShare": 0.06671875
+      },
+      {
+        "rgb": [
+          23,
+          34,
+          37
+        ],
+        "hex": "#172225",
+        "pixelShare": 0.037963324652777776
+      }
+    ]
+  }
+}
