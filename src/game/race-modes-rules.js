@@ -29,6 +29,16 @@
  */
 
 /**
+ * One row of the starting grid, in the shape `ui.ts` paints it.
+ *
+ * @typedef {object} StartingGridRow
+ * @property {number} position
+ * @property {string} name
+ * @property {string} team
+ * @property {boolean} player
+ */
+
+/**
  * The three formats, in the order the paddock chip row prints them.
  * @type {readonly RaceMode[]}
  */
@@ -152,6 +162,37 @@ export function modeHasField(mode) {
 export function modeFieldSize(mode, fieldCount = 3) {
   const rivals = Number.isFinite(fieldCount) ? Math.max(0, Math.floor(fieldCount)) : 0;
   return modeHasField(mode) ? rivals + 1 : 1;
+}
+
+/**
+ * The rows the paddock's starting grid lists: the craft this format will put on
+ * track, and nothing else.
+ *
+ * `index.html` shipped four placeholder rows and the start screen only replaced
+ * them when something handed it a non-empty grid. A fieldless format never
+ * hands it one — `RivalFleet.create` refuses before any geometry exists, so
+ * there is no fleet to read the rows off — and a time attack therefore listed
+ * three rivals it was never going to spawn, on every circuit. Composing the
+ * player's row here rather than lifting it out of the fleet is what makes the
+ * fieldless case expressible at all.
+ *
+ * The field's own grid wins whenever the format has one, so the names and
+ * liveries the craft are actually wearing stay the single source of truth. A
+ * field format that has no grid YET answers with nothing rather than with a
+ * lone row: at boot the fleet does not exist, and a list that said "one craft"
+ * for a moment before saying "four" would be a second wrong answer rather than
+ * a fix. Empty means "leave the list alone", and the only way the list can be
+ * left saying something false is if it was never given anything true — which is
+ * why the markup now ships empty.
+ *
+ * @param {RaceMode} mode
+ * @param {readonly StartingGridRow[]} fieldGrid the fleet's rows, or empty
+ * @param {string} playerTeam the livery label the player is racing under
+ * @returns {readonly StartingGridRow[]} rows to paint, or empty to leave as-is
+ */
+export function startingGridRows(mode, fieldGrid, playerTeam) {
+  if (modeHasField(mode)) return fieldGrid;
+  return [{ position: 1, name: "TOTEM", team: playerTeam, player: true }];
 }
 
 /**

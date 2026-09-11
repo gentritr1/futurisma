@@ -1,0 +1,126 @@
+{
+  "script": "scripts/visual/paddock/paddock.mjs",
+  "map": "ascension",
+  "seed": "3868938316",
+  "viewport": {
+    "width": 1280,
+    "height": 1000
+  },
+  "scope": "The start screen only. No race is run, so nothing here is a performance measurement.",
+  "modes": [
+    {
+      "mode": "race",
+      "url": "http://127.0.0.1:5200/?map=ascension&seed=3868938316&tier=works&mode=race&demo=1&headless=1&diagnostics=1&start=manual&quality=high&music=0",
+      "errors": [],
+      "introDeck": "Launch day: trench shortcut or Deluge Road. crawler-cross-1: 15.44s · deluge-test: 35.09s · crawler-cross-2: 44.92s · launch: 68.78s · rocket-gone: 75.79s · steam-clear: 82.81s · trench-reopen: 88.78s. 3 laps.",
+      "introFooter": "WORKS 07 · ASCENSION PAD FIELD RACE",
+      "lapValue": "LAP 1 / 3",
+      "startingGrid": [
+        "P1 · YOUTOTEMWORKS 07",
+        "P2PRIVATEER 13FIELD TOTEM",
+        "P3NIGHTFORM 24FIELD TOTEM",
+        "P4NEEDLE 16FIELD TOTEM"
+      ],
+      "gridRowsVisible": true,
+      "formatChips": [
+        {
+          "value": "race",
+          "selected": true,
+          "label": "FIELD RACE",
+          "note": "5 LAPS · FULL FIELD",
+          "noteVisible": true
+        },
+        {
+          "value": "sprint",
+          "selected": false,
+          "label": "SPRINT",
+          "note": "2 LAPS · DEFEND",
+          "noteVisible": true
+        },
+        {
+          "value": "timeattack",
+          "selected": false,
+          "label": "TIME ATTACK",
+          "note": "5 LAPS · SOLO + GHOST",
+          "noteVisible": true
+        }
+      ]
+    },
+    {
+      "mode": "sprint",
+      "url": "http://127.0.0.1:5200/?map=ascension&seed=3868938316&tier=works&mode=sprint&demo=1&headless=1&diagnostics=1&start=manual&quality=high&music=0",
+      "errors": [],
+      "introDeck": "Launch day: trench shortcut or Deluge Road. crawler-cross-1: 15.44s · deluge-test: 35.09s · crawler-cross-2: 44.92s · launch: 68.78s · rocket-gone: 75.79s · steam-clear: 82.81s · trench-reopen: 88.78s. 2 laps.",
+      "introFooter": "WORKS 07 · ASCENSION PAD SPRINT",
+      "lapValue": "LAP 1 / 2",
+      "startingGrid": [
+        "P1 · YOUTOTEMWORKS 07",
+        "P2PRIVATEER 13FIELD TOTEM",
+        "P3NIGHTFORM 24FIELD TOTEM",
+        "P4NEEDLE 16FIELD TOTEM"
+      ],
+      "gridRowsVisible": true,
+      "formatChips": [
+        {
+          "value": "race",
+          "selected": false,
+          "label": "FIELD RACE",
+          "note": "5 LAPS · FULL FIELD",
+          "noteVisible": true
+        },
+        {
+          "value": "sprint",
+          "selected": true,
+          "label": "SPRINT",
+          "note": "2 LAPS · DEFEND",
+          "noteVisible": true
+        },
+        {
+          "value": "timeattack",
+          "selected": false,
+          "label": "TIME ATTACK",
+          "note": "5 LAPS · SOLO + GHOST",
+          "noteVisible": true
+        }
+      ]
+    },
+    {
+      "mode": "timeattack",
+      "url": "http://127.0.0.1:5200/?map=ascension&seed=3868938316&tier=works&mode=timeattack&demo=1&headless=1&diagnostics=1&start=manual&quality=high&music=0",
+      "errors": [],
+      "introDeck": "Launch day: trench shortcut or Deluge Road. crawler-cross-1: 15.44s · deluge-test: 35.09s · crawler-cross-2: 44.92s · launch: 68.78s · rocket-gone: 75.79s · steam-clear: 82.81s · trench-reopen: 88.78s. 3 laps.",
+      "introFooter": "WORKS 07 · ASCENSION PAD TIME ATTACK",
+      "lapValue": "LAP 1 / 3",
+      "startingGrid": [
+        "P1 · YOUTOTEMWORKS 07",
+        "P2TOTEMFIELD",
+        "P3TOTEMFIELD",
+        "P4TOTEMFIELD"
+      ],
+      "gridRowsVisible": true,
+      "formatChips": [
+        {
+          "value": "race",
+          "selected": false,
+          "label": "FIELD RACE",
+          "note": "5 LAPS · FULL FIELD",
+          "noteVisible": true
+        },
+        {
+          "value": "sprint",
+          "selected": false,
+          "label": "SPRINT",
+          "note": "2 LAPS · DEFEND",
+          "noteVisible": true
+        },
+        {
+          "value": "timeattack",
+          "selected": true,
+          "label": "TIME ATTACK",
+          "note": "5 LAPS · SOLO + GHOST",
+          "noteVisible": true
+        }
+      ]
+    }
+  ]
+}

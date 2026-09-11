@@ -9,7 +9,7 @@ import {
 } from "./hud-presentation.js";
 import { DRIFT_REWARD_MINIMUM_CHARGE, SLIPSTREAM_LOCK_THRESHOLD } from "./physics";
 import { publishRadioFrame } from "./pit-radio";
-import { resolveReducedMotion } from "./query-probes";
+import { resolveRaceMode, resolveReducedMotion } from "./query-probes";
 import { soundtrackChip } from "./soundtrack";
 import {
   RACE_MODE_LABELS,
@@ -17,6 +17,7 @@ import {
   SECTOR_DELTA_HOLD_MS,
   deltaTone,
   formatDeltaSeconds,
+  startingGridRows,
 } from "./race-modes-rules.js";
 import type { RaceResultSummary } from "./race-modes";
 
@@ -287,6 +288,8 @@ export class GameUi {
   /** P7 — the issue the player is racing under; drives every label that used
    * to read a hard-coded `WORKS 07`. */
   private playerLiveryLabel = "WORKS 07";
+  /** The format this page load is racing; fixed at load, like `raceModes.mode`. */
+  private readonly raceMode = resolveRaceMode();
   /** The course half of the intro footer, kept so a livery swap can rebuild it
    * without re-running `setRaceFormat`. */
   private courseFooterLabel = "GREENWATER FIELD RACE";
@@ -369,10 +372,7 @@ export class GameUi {
     this.finishValue.textContent = presentation.finishLabel;
     this.lastLapValue.hidden = true;
     this.progressFill.style.transform = "scaleX(0)";
-    if (grid.length > 0) {
-      this.updateGrid(grid);
-      this.updateFieldOrder(grid);
-    }
+    this.applyStartingGrid(grid);
   }
 
   /**
@@ -393,10 +393,7 @@ export class GameUi {
   setPlayerLivery(label: string, grid: readonly RaceGridEntry[]): void {
     this.playerLiveryLabel = label;
     this.introFooter.textContent = `${label} · ${this.courseFooterLabel}`;
-    if (grid.length > 0) {
-      this.updateGrid(grid);
-      this.updateFieldOrder(grid);
-    }
+    this.applyStartingGrid(grid);
   }
 
   /**
@@ -1059,6 +1056,28 @@ export class GameUi {
     this.lapEvent.dataset.active = "false";
     this.lapEvent.setAttribute("aria-hidden", "true");
     this.lapEventUntil = 0;
+  }
+
+  /**
+   * The starting-grid list, composed from what the format actually spawns.
+   *
+   * Both callers used to guard on `grid.length > 0` themselves, so in a
+   * fieldless format neither ever painted anything and `index.html`'s four
+   * placeholder rows were what the player read — three rivals a time attack
+   * does not spawn, on every circuit, invisible to the soak only because
+   * `style.css:2225` hides the list under 900 px. The guard now lives in
+   * `startingGridRows`, which answers "leave it" with an empty array and
+   * answers a solo format with the player's own row.
+   *
+   * The in-race position ladder still takes only a real field: a time attack
+   * has no ladder to keep, and handing it a one-row field would put a `P1 / 1`
+   * beside a clock that is already the only opponent.
+   */
+  private applyStartingGrid(grid: readonly RaceGridEntry[]): void {
+    const rows = startingGridRows(this.raceMode, grid, this.playerLiveryLabel);
+    if (rows.length === 0) return;
+    this.updateGrid(rows);
+    if (grid.length > 0) this.updateFieldOrder(grid);
   }
 
   private updateGrid(grid: readonly RaceGridEntry[]): void {

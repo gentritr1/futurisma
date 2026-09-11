@@ -321,12 +321,11 @@
             </p>
           </div>
 
-          <ol id="grid-order" class="result-laps" aria-label="Starting grid">
-            <li><span>P1 · YOU</span><span class="n">TOTEM</span><strong>WORKS 07</strong></li>
-            <li><span>P2</span><span class="n">TOTEM</span><strong>FIELD</strong></li>
-            <li><span>P3</span><span class="n">TOTEM</span><strong>FIELD</strong></li>
-            <li><span>P4</span><span class="n">TOTEM</span><strong>FIELD</strong></li>
-          </ol>
+          <!-- Empty on purpose. Every row is written by `GameUi.applyStartingGrid`
+               from the field the format actually spawns, so a fieldless one lists
+               the single craft it puts on track instead of inheriting a
+               four-row placeholder nothing replaced. -->
+          <ol id="grid-order" class="result-laps" aria-label="Starting grid"></ol>
 
           <button id="start-button" class="launch-button" type="button">
             <span>LAUNCH RACE</span>
