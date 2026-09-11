@@ -7,6 +7,8 @@ import {loadDreamIslandHeroes,type HeroBuild,type HeroPlacement} from './dreamis
 import {DreamIslandShoals} from './dreamisland-fish';
 import {DreamIslandSky} from './dreamisland-sky';
 import {DreamIslandWater} from './dreamisland-water';
+import {dreamIslandClockAngles} from './dreamisland-clock.js';
+import {DreamIslandHardware} from './dreamisland-hardware';
 
 /**
  * Phase B replaces the procedural blockout with the painted GLB.
@@ -49,6 +51,8 @@ export class DreamIslandPaintedEnvironment implements RaceEnvironment {
  /** What the hero merge actually did, so the phase report quotes a measurement
   * instead of restating the brief. Null until `attachHeroes` has run. */
  heroReport:HeroBuild['report']|null=null;
+ private clockHands:HeroBuild['clockHands']=[];
+ private readonly handRotation=new THREE.Matrix4();
  private readonly sky=new DreamIslandSky();
  private readonly water:DreamIslandWater;
  private readonly meshes:THREE.Mesh[]=[];
@@ -226,6 +230,7 @@ export class DreamIslandPaintedEnvironment implements RaceEnvironment {
    this.stats.materials+=1;
   });
   this.heroReport=built.report;
+  this.clockHands=built.clockHands;
   for(const mesh of built.meshes){this.root.add(mesh);this.meshes.push(mesh);}
   this.counters.heroPlacements=built.report.placements;
   this.counters.heroSourceMeshes=built.report.sourceMeshes;
@@ -301,11 +306,24 @@ export class DreamIslandPaintedEnvironment implements RaceEnvironment {
   await Promise.all([environment.sky.ready,environment.water.ready,
    environment.attachHeroes((manifest.placements??[]) as HeroPlacement[])]);
   environment.counters.skyPanoramas=environment.sky.loadedPanoramas;
+  course.hardware=await DreamIslandHardware.load(course,environment.byRole,environment.root);
+  environment.root.add(course.hardware.root);
+  course.group.userData.hardware=course.hardware.report;
+  course.hardware.root.traverse(object=>{if(object instanceof THREE.Mesh)environment.meshes.push(object);});
+  environment.stats.meshes+=course.hardware.report.meshes;
+  environment.stats.triangles+=course.hardware.report.triangles;
   return environment;
  }
  updateVisibility(camera:THREE.Camera){
   camera.updateMatrixWorld(true);
   const blend=this.course.nightBlend,reduced=this.course.reducedMotion;
+  const angles=dreamIslandClockAngles(this.course.schedule.tick,this.course.schedule.config?.strikeTick??null);
+  for(const hand of this.clockHands){
+   hand.mesh.matrix.multiplyMatrices(hand.base,this.handRotation.makeRotationZ(angles[hand.kind]));
+   hand.mesh.matrixWorldNeedsUpdate=true;
+   hand.mesh.userData.clockAngle=angles[hand.kind];
+  }
+  this.course.group.userData.clockHands=angles;
   this.kerbGlow.value=blend*.12; // BEACH calibration: the 0.6 trial outshone the foam.
   this.nightFill.intensity=blend*.5;
   const fog=this.root.parent instanceof THREE.Scene?this.root.parent.fog:undefined;
@@ -337,7 +355,8 @@ export class DreamIslandPaintedEnvironment implements RaceEnvironment {
   for(const mesh of this.meshes){
    if(!mesh.visible||!this.frustum.intersectsObject(mesh))continue;
    this.stats.visibleGroups++;
-   this.stats.visibleTriangles+=(mesh.geometry.index?.count??mesh.geometry.attributes.position.count)/3;
+   this.stats.visibleTriangles+=(mesh.geometry.index?.count??mesh.geometry.attributes.position.count)/3
+    *(mesh instanceof THREE.InstancedMesh?mesh.count:1);
   }
  }
 }

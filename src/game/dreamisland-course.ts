@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import type {DreamIslandHardware} from './dreamisland-hardware';
 import { resolveAbilitySeed } from "./ability-seed";
 import calibration from "./data/dreamisland/schedule.json";
 import { DreamIslandSchedule } from "./dreamisland-schedule.js";
@@ -184,6 +185,7 @@ export class DreamIslandCourse implements RaceCourse {
    * as ONE emissive instanced draw. Everything on this road that is a lit marker
    * shares a material, so the blockout spends three draws in total. */
   readonly markers: THREE.InstancedMesh;
+  hardware:DreamIslandHardware|null=null;
   readonly deviceMarkerOffset: number;
   private readonly turns: { from: number; to: number; radius: number; direction: "LEFT" | "RIGHT" }[] = [];
 

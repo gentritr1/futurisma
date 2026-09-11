@@ -364,6 +364,20 @@ export class EngineAudio {
   /** The live music duck, so `setMusicVolume` composes with it rather than
    * cancelling it mid-line. 1 whenever no line is playing. */
   private radioMusicScale = 1;
+  private radioAmbienceScale = 1;
+  private environmentDuck: [music:number,ambience:number] = [1,1];
+  /** Lazy circuit sounds join the existing buses; the radio and circuit cues
+   * share precedence (the stronger duck wins), never multiply two ducks. */
+  environmentAudio() {
+    return this.ambienceBus ? {
+      context:this.context!, effects:this.otherBus!, ambience:this.ambienceBus,
+      duck:(music:number,ambience:number)=>{
+        this.environmentDuck=[music,ambience];
+        this.applyRadioDuck(this.radioMusicScale,this.radioAmbienceScale);
+      },
+    } : null;
+  }
+  private get musicGain(){return this.musicVolume*Math.min(this.radioMusicScale,this.environmentDuck[0])*this.launchMusicScale;}
   private launchMusicScale = 1;
   private ascensionEnabled = false;
   ascensionSound: AscensionSoundGraph | null = null;
@@ -373,7 +387,7 @@ export class EngineAudio {
     if(!this.ascensionSound){const {AscensionSoundGraph}=await import('./ascension-sound-graph');
     if(!this.ascensionSound)this.ascensionSound=new AscensionSoundGraph(this.context,this.otherBus,scale=>{
       this.launchMusicScale=scale;
-      this.musicBus?.gain.setTargetAtTime(this.musicVolume*this.radioMusicScale*scale,this.context!.currentTime,.025);
+      this.musicBus?.gain.setTargetAtTime(this.musicGain,this.context!.currentTime,.025);
     },resolveVoiceEnabled);}
     await this.ascensionSound.ready;
   }
@@ -522,12 +536,13 @@ export class EngineAudio {
     if (!this.context) return;
     const now = this.context.currentTime;
     this.radioMusicScale = musicScale;
+    this.radioAmbienceScale = ambienceScale;
     this.musicBus?.gain.setTargetAtTime(
-      this.musicVolume * musicScale * this.launchMusicScale,
+      this.musicGain,
       now,
       RADIO_DUCK_SECONDS,
     );
-    this.ambienceBus?.gain.setTargetAtTime(ambienceScale, now, RADIO_DUCK_SECONDS);
+    this.ambienceBus?.gain.setTargetAtTime(Math.min(ambienceScale,this.environmentDuck[1]), now, RADIO_DUCK_SECONDS);
   };
 
   /**
@@ -963,7 +978,7 @@ export class EngineAudio {
     // H2b — the product, not the setting. Moving the slider while a radio line
     // is playing would otherwise undo the duck for the rest of the sentence.
     this.musicBus.gain.setTargetAtTime(
-      this.musicVolume * this.radioMusicScale * this.launchMusicScale,
+      this.musicGain,
       this.context.currentTime,
       0.045,
     );
@@ -1125,6 +1140,7 @@ export class EngineAudio {
 
   dispose(): void {
     this.ascensionSound?.dispose();this.ascensionSound=null;this.launchMusicScale=1;
+    this.environmentDuck=[1,1];
     for (const source of this.persistentSources) {
       try {
         source.stop();

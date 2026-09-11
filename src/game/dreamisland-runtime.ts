@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import {ABILITY_TICK_RATE} from './polarity-simulation.js';
 import {DreamIslandPowers} from './dreamisland-powers';
+import colors from './data/dreamisland/power-colors.json';
+import {DreamIslandAudio} from './dreamisland-audio';
 import type {EngineAudio} from './audio';
 import type {GameUi} from './ui';
 import type {CircuitRuntime} from './circuit-runtime';
@@ -17,12 +19,16 @@ export class DreamIslandRuntime implements CircuitRuntime {
  readonly boostRechargeScale=1;readonly powers:DreamIslandPowers;
  get surgeActive(){return this.powers.simulation.surgeActive;}
  get shieldActive(){return this.powers.simulation.shieldActive;}
+ private readonly powerColors={surge:new THREE.Color().fromArray(colors.effectSurge),shield:new THREE.Color().fromArray(colors.effectShield)};
  private tickRemainder=0;
  private lastSecond:number|null|undefined=undefined;
+ private readonly sound:DreamIslandAudio|null;
+ private calloutSequence=0;
  private readonly reducedMotion=new URLSearchParams(location.search).get('motion')==='reduce';
  private readonly output=document.createElement('output');
  constructor(readonly course:DreamIslandCourse,private readonly input:InputController,audio?:EngineAudio,private readonly ui?:GameUi){
   this.powers=new DreamIslandPowers(course,audio);
+  this.sound=audio?new DreamIslandAudio(audio,course):null;
   input.setPowerControls(true);document.getElementById('polarity-hud')!.hidden=false;
   this.output.id='dreamisland-diagnostics';this.output.hidden=true;document.body.append(this.output);
   this.ready=this.powers.ready;
@@ -46,7 +52,7 @@ export class DreamIslandRuntime implements CircuitRuntime {
  advanceClocks(delta:number){this.step(delta,0,0,this.course.tide.lap);}
  applySurge(previous:number,normal:number,input:InputFrame,delta:number){return this.powers.applySurge(previous,normal,input,delta);}
  present(_sample:CourseProjection,_position:THREE.Vector3,_forward:THREE.Vector3,state:TotemVisualState){
-  this.powers.present(state);state.gravitySign=1;state.gravityTransition=0;
+  this.powers.present(state);state.surgeColor=this.powerColors.surge;state.shieldColor=this.powerColors.shield;state.gravitySign=1;state.gravityTransition=0;
  }
  updateCamera(camera:THREE.PerspectiveCamera,_delta:number,position:THREE.Vector3,forward:THREE.Vector3,_speed:number){
   camera.position.copy(position).addScaledVector(forward,-11.5);camera.position.y+=4.8;
@@ -55,7 +61,14 @@ export class DreamIslandRuntime implements CircuitRuntime {
  }
  updateHud(progress:number){
   this.powers.update();
+  this.sound?.update(progress);
   const clock=this.course.schedule,config=clock.config;
+  for(const event of clock.events){
+   if(event.sequence<=this.calloutSequence)continue;
+   this.calloutSequence=event.sequence;
+   if(event.id==='chime-warning')this.ui?.flashHazard('THE CLOCK — ONE LAP',2200);
+   if(event.id==='strike')this.ui?.flashHazard('NIGHT — CAUSEWAY WET',2200);
+  }
   const seconds=config?Math.ceil((config.strikeTick-clock.tick)/ABILITY_TICK_RATE):null;
   if(seconds!==this.lastSecond){
    this.lastSecond=seconds;
@@ -63,7 +76,6 @@ export class DreamIslandRuntime implements CircuitRuntime {
     :seconds>0?`THE STRIKE IN ${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')}`
     :clock.state.nightSettled?'NIGHT · THE BASIN IS WET':'THE CLOCK HAS STRUCK';
    const line=document.getElementById('polarity-route');if(line)line.textContent=text;
-   if(config&&seconds===0)this.ui?.flashHazard('THE CLOCK STRIKES · BASIN GRIP DROPS',2200);
   }
   document.getElementById('polarity-deck')!.textContent='DREAM ISLAND / DAY INTO NIGHT';
   document.getElementById('polarity-flip')!.textContent='SPACE / SHIFT · NITRO';
@@ -71,12 +83,13 @@ export class DreamIslandRuntime implements CircuitRuntime {
   this.output.textContent=JSON.stringify({script:'src/game/dreamisland-runtime.ts',seed:clock.seed,tick:clock.tick,progress,
    sector:this.course.sectorLabelAt(progress),nightBlend:this.course.nightBlend,nightBlendPinned:this.course.nightBlendPinned,reducedMotion:this.reducedMotion,
    grip:this.course.surfaceGripAt(progress),powers:this.powers.simulation.state,schedule:config,state:clock.state,events:clock.events,
+   audio:this.sound?.diagnostics??null,clockHands:this.course.group.userData.clockHands??null,hardware:this.course.group.userData.hardware??null,
    // Phase B's painted world, water and sky publish their own counters here.
    // Every one of them reads zero if the module loaded and did nothing.
    painted:this.course.group.userData.paintedCounters??null});
  }
  onShieldImpact(progress:number,lateral:number){return this.powers.absorb(progress,lateral);}
  recover(progress:number){this.powers.simulation.recover(progress);}
- reset(){this.powers.reset();this.lastSecond=undefined;this.tickRemainder=0;this.course.resetSchedule();}
- dispose(){this.powers.dispose();this.output.remove();}
+ reset(){this.powers.reset();this.sound?.reset();this.calloutSequence=0;this.lastSecond=undefined;this.tickRemainder=0;this.course.resetSchedule();}
+ dispose(){this.powers.dispose();this.sound?.dispose();this.output.remove();}
 }

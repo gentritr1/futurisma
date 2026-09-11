@@ -36,6 +36,7 @@ export type HeroPlacement={
 };
 export type HeroBuild={
  meshes:THREE.Mesh[];
+ clockHands:{mesh:THREE.Mesh;base:THREE.Matrix4;kind:'hour'|'minute'}[];
  /** Everything the report has to quote, measured rather than asserted. */
  report:{glbs:string[];placements:number;sourceMeshes:number;mergedMeshes:number;
   triangles:number;perAsset:{asset:string;glb:string;placements:number;sourceMeshes:number;
@@ -51,7 +52,7 @@ const ROLE_TEXTURE=(name:string):string=>name==='DI_MAT_water-overlay'
  * anywhere on this map and pulling it in for four assets would cost bytes the
  * shell does not have; this is the same shape as the merge in
  * `dreamisland-water.ts`, with a matrix and the vertex colours added. */
-function mergeInto(parts:{geometry:THREE.BufferGeometry;matrix:THREE.Matrix4}[]):THREE.BufferGeometry{
+export function mergeInto(parts:{geometry:THREE.BufferGeometry;matrix:THREE.Matrix4}[]):THREE.BufferGeometry{
  const positions:number[]=[],normals:number[]=[],uvs:number[]=[],colors:number[]=[],indices:number[]=[];
  const point=new THREE.Vector3(),normalMatrix=new THREE.Matrix3();
  let tinted=false;
@@ -97,7 +98,7 @@ export async function loadDreamIslandHeroes(
  const heroes=placements.filter(placement=>placement.batch==='HERO'&&placement.hero?.glb);
  const report:HeroBuild['report']={glbs:[],placements:heroes.length,sourceMeshes:0,mergedMeshes:0,
   triangles:0,perAsset:[],materialsBoundFromPaintedWorld:[],materialsBuiltHere:[],missingChildren:[]};
- if(heroes.length===0)return {meshes:[],report};
+ if(heroes.length===0)return {meshes:[],clockHands:[],report};
  const files=[...new Set(heroes.map(placement=>placement.hero!.glb))];
  report.glbs=files;
  const loader=new GLTFLoader();
@@ -126,6 +127,7 @@ export async function loadDreamIslandHeroes(
   return built;
  };
  const meshes:THREE.Mesh[]=[];
+ const clockHands:HeroBuild['clockHands']=[];
  const byAsset=new Map<string,HeroPlacement[]>();
  for(const placement of heroes){
   const list=byAsset.get(placement.asset);
@@ -158,6 +160,21 @@ export async function loadDreamIslandHeroes(
     matrix.copy(object.matrixWorld);
     if(local)matrix.premultiply(local);
     matrix.premultiply(placementMatrix);
+    if(asset==='clock-tower'&&/^clock_(hour|minute)_hand$/.test(object.name)){
+     // Keep each authored pivot out of the static merge. Infer its rest angle
+     // from the beam's centroid, so an art rebuild cannot silently move 12:00.
+     const geometry=object.geometry.clone(),positions=geometry.attributes.position;
+     const centre=new THREE.Vector3(),point=new THREE.Vector3();
+     for(let i=0;i<positions.count;i++)centre.add(point.fromBufferAttribute(positions,i));
+     const restAngle=Math.atan2(-centre.x,centre.y);
+     geometry.rotateZ(-restAngle);
+     const mesh=new THREE.Mesh(geometry,materialFor(name));
+     mesh.name=object.name;mesh.matrixAutoUpdate=false;
+     mesh.matrix.copy(matrix);mesh.castShadow=true;mesh.receiveShadow=true;
+     meshes.push(mesh);
+     clockHands.push({mesh,base:matrix.clone(),kind:object.name==='clock_hour_hand'?'hour':'minute'});
+     return;
+    }
     const list_=parts.get(name);
     const entry={geometry:object.geometry,matrix:matrix.clone()};
     if(list_)list_.push(entry);else parts.set(name,[entry]);
@@ -165,6 +182,10 @@ export async function loadDreamIslandHeroes(
   }
   const perAsset={asset,glb:list[0].hero!.glb,placements:list.length,sourceMeshes,
    mergedMeshes:0,triangles:0,materials:[...parts.keys()].sort()};
+  if(asset==='clock-tower')for(const hand of clockHands){
+   perAsset.mergedMeshes++;
+   perAsset.triangles+=(hand.mesh.geometry.index?.count??hand.mesh.geometry.attributes.position.count)/3;
+  }
   for(const [name,entries] of parts){
    const geometry=mergeInto(entries);
    const mesh=new THREE.Mesh(geometry,materialFor(name));
@@ -177,7 +198,7 @@ export async function loadDreamIslandHeroes(
   report.sourceMeshes+=sourceMeshes;report.mergedMeshes+=perAsset.mergedMeshes;
   report.triangles+=perAsset.triangles;report.perAsset.push(perAsset);
  }
- return {meshes,report};
+ return {meshes,clockHands,report};
 }
 
 /** The set's children are named for their height; a prefix match keeps working

@@ -1,0 +1,69 @@
+{
+  "script": "scripts/visual/dreamisland/calibrate-sound-levels.py",
+  "reference": "Existing Works hum measured by scripts/visual/audio-probe.mjs; documented in audio-ambience.ts",
+  "referenceDb": -27.3,
+  "rows": [
+    {
+      "id": "surf",
+      "metric": "full-buffer RMS dBFS",
+      "measuredDb": -23.420617109871795,
+      "targetDb": -27.3,
+      "gain": 0.6397802885937713
+    },
+    {
+      "id": "night",
+      "metric": "full-buffer RMS dBFS",
+      "measuredDb": -16.10907432863223,
+      "targetDb": -27.3,
+      "gain": 0.27571076066177663
+    },
+    {
+      "id": "clock-quarter-chime",
+      "metric": "strongest 100 ms RMS dBFS",
+      "measuredDb": -18.306879060821753,
+      "targetDb": -18.3,
+      "gain": 1.0007922948449748,
+      "strongestWindowStartSeconds": 2.0
+    },
+    {
+      "id": "clock-strike-three-tolls",
+      "metric": "strongest 100 ms RMS dBFS",
+      "measuredDb": -22.463722735491555,
+      "targetDb": -18.3,
+      "gain": 1.6150506123583774,
+      "strongestWindowStartSeconds": 7.9
+    },
+    {
+      "id": "waterfall-loop",
+      "metric": "full-buffer RMS dBFS",
+      "measuredDb": -19.13989663432439,
+      "targetDb": -27.3,
+      "gain": 0.39083624465192607,
+      "strongestWindowStartSeconds": null
+    },
+    {
+      "id": "fish-rise",
+      "metric": "full-buffer RMS dBFS",
+      "measuredDb": -28.580485085008984,
+      "targetDb": -27.3,
+      "gain": 1.1588420727522766,
+      "strongestWindowStartSeconds": null
+    },
+    {
+      "id": "tunnel-pass",
+      "metric": "full-buffer RMS dBFS",
+      "measuredDb": -13.072344661172293,
+      "targetDb": -27.3,
+      "gain": 0.19436462871370458,
+      "strongestWindowStartSeconds": null
+    },
+    {
+      "id": "day-birds",
+      "metric": "full-buffer RMS dBFS",
+      "measuredDb": -30.92141057981578,
+      "targetDb": -33.3,
+      "gain": 0.7604497631961221,
+      "strongestWindowStartSeconds": null
+    }
+  ]
+}

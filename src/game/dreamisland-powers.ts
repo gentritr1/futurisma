@@ -1,7 +1,6 @@
 import {PolaritySimulation} from './polarity-simulation.js';
 import {integrateSurgeSpeed} from './polarity-rules.js';
 import {DREAMISLAND_ABILITY_CONFIG,DREAMISLAND_FIELDS,dreamislandFieldAt} from './dreamisland-powers-config.js';
-import {DEVICE_COLORS} from './dreamisland-course';
 import type {DreamIslandCourse} from './dreamisland-course';
 import type {InputFrame} from './input';
 import type {TotemVisualState} from './totem';
@@ -9,9 +8,8 @@ import type {EngineAudio} from './audio';
 
 /**
  * Dream Island placement on the existing fixed-tick Surge/Shield rules. Phase A
- * ships the rules and the HUD attributes the ability slots read; the authored
- * device hardware is a phase B asset, so this module owns no geometry at all —
- * it tints the course's shared marker draw.
+ * owns the rules and HUD attributes. The course's batched hardware and target
+ * plates receive the existing pickup charge/availability state.
  */
 export class DreamIslandPowers {
  readonly simulation:PolaritySimulation;
@@ -44,17 +42,14 @@ export class DreamIslandPowers {
   }
   const transfer=document.getElementById('polarity-flip');if(transfer)transfer.dataset.transfer='ready';
   const fill=document.getElementById('power-charge-fill');if(fill)fill.style.transform=`scaleX(${active?this.simulation.state.activeCharge:this.simulation.heldPowerCharge})`;
-  // The course owns every lit marker on the road, so a collected device goes
-  // dark in the shared instanced draw rather than costing one of its own.
-  const available=this.simulation.getPickupStates(),markers=this.course.markers;
-  for(let i=0;i<available.length;i++)markers.setColorAt(this.course.deviceMarkerOffset+i,DEVICE_COLORS[available[i].available?available[i].kind:'spent']);
-  if(markers.instanceColor)markers.instanceColor.needsUpdate=true;
+  // Charge and collection drive the existing instanced cores, plates and hinges.
+  this.course.hardware?.update(this.simulation.getPickupStates(),this.simulation.state.tick,this.course.nightBlend);
  }
  private use(progress:number){const result=this.simulation.requestPower(progress);if(!result.ok)this.audio?.playPowerDenied();this.dispatch();}
  private dispatch(){for(const e of this.simulation.state.events){if(e.sequence<=this.sequence)continue;this.sequence=e.sequence;
   if(e.type==='pickup'){this.audio?.playDeviceClunk();this.audio?.playPowerPickup();}
   if(e.type==='power'&&e.kind)this.audio?.playPowerActivate(e.kind);
  }}
- reset(){this.simulation.reset();this.sequence=0;}
- dispose(){}
+ reset(){this.simulation.reset();this.course.hardware?.reset();this.sequence=0;}
+ dispose(){this.course.hardware?.dispose();this.course.hardware=null;}
 }

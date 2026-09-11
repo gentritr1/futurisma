@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
 import * as THREE from 'three';
 import {DreamIslandSchedule} from '../src/game/dreamisland-schedule.js';
+import {dreamIslandClockAngles} from '../src/game/dreamisland-clock.js';
 import {RACE_MODES,SPRINT_LAP_COUNT,bestRecordKey,ghostRecordKey,resolveModeLapCount} from '../src/game/race-modes-rules.js';
 import {GhostRecorder,MAX_GHOST_CHARACTERS} from '../src/game/ghost.js';
 import {createSaveStore,parseSave} from '../src/game/save-schema.js';
@@ -225,6 +226,10 @@ const raceOut=(table,laps)=>{
 const modeReport={};
 for(const mode of RACE_MODES){
   const table=config.modes[mode];
+  assert.deepEqual(dreamIslandClockAngles(0,table.strikeTick),{minute:0,hour:-Math.PI/2});
+  assert.deepEqual(dreamIslandClockAngles(table.strikeTick,table.strikeTick),{minute:0,hour:0},
+    `${mode}: the clock must be exactly 12:00 on the strike tick.`);
+  assert.deepEqual(dreamIslandClockAngles(table.strikeTick+600,table.strikeTick),{minute:0,hour:0});
   assert.ok(table&&Number.isSafeInteger(table.strikeTick),`No ${mode} table in schedule.json.`);
   const run=raceOut(table,table.laps);
   const strikes=run.fired.filter(e=>e.id==='strike');
@@ -406,6 +411,9 @@ const out=outFlag?new URL(outFlag.replace(/\/?$/,'/'),new URL('../',import.meta.
  :new URL('../art/evidence/dreamisland-v1/phase-a/',import.meta.url);
 mkdirSync(out,{recursive:true});
 const report={script:'scripts/validate-dreamisland-runtime.mjs',config,
+  clockHands:Object.fromEntries(RACE_MODES.map(mode=>[mode,{
+    before:dreamIslandClockAngles(config.modes[mode].strikeTick-600,config.modes[mode].strikeTick),
+    strike:dreamIslandClockAngles(config.modes[mode].strikeTick,config.modes[mode].strikeTick)}])),
   determinism:{renderRates:[60,120,240],windowSeconds:WINDOW_SECONDS,tickRateHz:TICK_RATE,
     expectedTicks,ticks:ticksSeen,frames:framesSeen,
     expectedFrames:[60,120,240].map(hz=>hz*WINDOW_SECONDS),

@@ -1,0 +1,350 @@
+{
+  "script": "scripts/visual/dreamisland/feel.mjs",
+  "source": "art/evidence/dreamisland-v1/polish-3/width-grip-trial/race.json",
+  "physicsSamples": 11694,
+  "splitMethod": "Linear interpolation at authored district boundaries using actual 120 Hz driver input samples. Lap-one BEACH and the final CUT tail are incomplete and omitted. Progress is unwrapped at the geometric seam, independently of the lap UI which increments before progress wraps.",
+  "brakingMethod": "Primary: first nonzero brake during the actual turn-limited approach to the first CUT turn. Also report first brake at/after the district boundary (.85), where braking is already in progress. Positive shift means earlier at night. Older baseline captures have no decision samples and leave the primary result null.",
+  "splits": [
+    {
+      "lap": 1,
+      "sector": "GROVE",
+      "entryMs": 5144.17237699544,
+      "exitMs": 10748.701353351878,
+      "milliseconds": 5604.528976356439,
+      "entryBlend": 0,
+      "exitBlend": 0,
+      "maxBoundarySampleIntervalMs": 8.33333333333394
+    },
+    {
+      "lap": 1,
+      "sector": "POINT",
+      "entryMs": 10748.701353351878,
+      "exitMs": 14248.840782274321,
+      "milliseconds": 3500.1394289224427,
+      "entryBlend": 0,
+      "exitBlend": 0,
+      "maxBoundarySampleIntervalMs": 8.33333333333394
+    },
+    {
+      "lap": 1,
+      "sector": "BASIN",
+      "entryMs": 14248.840782274321,
+      "exitMs": 17710.37475325227,
+      "milliseconds": 3461.5339709779473,
+      "entryBlend": 0,
+      "exitBlend": 0,
+      "maxBoundarySampleIntervalMs": 8.33333333333394
+    },
+    {
+      "lap": 1,
+      "sector": "COURT",
+      "entryMs": 17710.37475325227,
+      "exitMs": 21910.695273116788,
+      "milliseconds": 4200.320519864519,
+      "entryBlend": 0,
+      "exitBlend": 0,
+      "maxBoundarySampleIntervalMs": 8.33333333333212
+    },
+    {
+      "lap": 1,
+      "sector": "REEF",
+      "entryMs": 21910.695273116788,
+      "exitMs": 27447.56355719055,
+      "milliseconds": 5536.868284073764,
+      "entryBlend": 0,
+      "exitBlend": 0,
+      "maxBoundarySampleIntervalMs": 8.33333333333212
+    },
+    {
+      "lap": 1,
+      "sector": "CUT",
+      "entryMs": 27447.56355719055,
+      "exitMs": 33236.50771020386,
+      "milliseconds": 5788.944153013312,
+      "entryBlend": 0,
+      "exitBlend": 0,
+      "maxBoundarySampleIntervalMs": 8.333333333335759
+    },
+    {
+      "lap": 2,
+      "sector": "BEACH",
+      "entryMs": 33236.50771020386,
+      "exitMs": 37284.73075388372,
+      "milliseconds": 4048.2230436798563,
+      "entryBlend": 0,
+      "exitBlend": 0,
+      "maxBoundarySampleIntervalMs": 8.333333333335759
+    },
+    {
+      "lap": 2,
+      "sector": "GROVE",
+      "entryMs": 37284.73075388372,
+      "exitMs": 42877.71534542503,
+      "milliseconds": 5592.98459154131,
+      "entryBlend": 0,
+      "exitBlend": 0,
+      "maxBoundarySampleIntervalMs": 8.333333333335759
+    },
+    {
+      "lap": 2,
+      "sector": "POINT",
+      "entryMs": 42877.71534542503,
+      "exitMs": 46377.66748175874,
+      "milliseconds": 3499.9521363337117,
+      "entryBlend": 0,
+      "exitBlend": 0,
+      "maxBoundarySampleIntervalMs": 8.333333333335759
+    },
+    {
+      "lap": 2,
+      "sector": "BASIN",
+      "entryMs": 46377.66748175874,
+      "exitMs": 49840.112356896585,
+      "milliseconds": 3462.444875137844,
+      "entryBlend": 0,
+      "exitBlend": 0,
+      "maxBoundarySampleIntervalMs": 8.333333333335759
+    },
+    {
+      "lap": 2,
+      "sector": "COURT",
+      "entryMs": 49840.112356896585,
+      "exitMs": 54040.18391046737,
+      "milliseconds": 4200.071553570786,
+      "entryBlend": 0,
+      "exitBlend": 0,
+      "maxBoundarySampleIntervalMs": 8.333333333335759
+    },
+    {
+      "lap": 2,
+      "sector": "REEF",
+      "entryMs": 54040.18391046737,
+      "exitMs": 59574.268542332095,
+      "milliseconds": 5534.084631864724,
+      "entryBlend": 0,
+      "exitBlend": 0,
+      "maxBoundarySampleIntervalMs": 8.333333333335759
+    },
+    {
+      "lap": 2,
+      "sector": "CUT",
+      "entryMs": 59574.268542332095,
+      "exitMs": 65359.461215361254,
+      "milliseconds": 5785.19267302916,
+      "entryBlend": 0,
+      "exitBlend": 0,
+      "maxBoundarySampleIntervalMs": 8.333333333335759
+    },
+    {
+      "lap": 3,
+      "sector": "BEACH",
+      "entryMs": 65359.461215361254,
+      "exitMs": 69229.83576237716,
+      "milliseconds": 3870.3745470159047,
+      "entryBlend": 0,
+      "exitBlend": 0.10803110532407408,
+      "maxBoundarySampleIntervalMs": 8.333333333335759
+    },
+    {
+      "lap": 3,
+      "sector": "GROVE",
+      "entryMs": 69229.83576237716,
+      "exitMs": 74823.11461679635,
+      "milliseconds": 5593.278854419186,
+      "entryBlend": 0.10803110532407408,
+      "exitBlend": 0.7453582303187156,
+      "maxBoundarySampleIntervalMs": 8.333333333328483
+    },
+    {
+      "lap": 3,
+      "sector": "POINT",
+      "entryMs": 74823.11461679635,
+      "exitMs": 78321.53762828848,
+      "milliseconds": 3498.4230114921374,
+      "entryBlend": 0.7453582303187156,
+      "exitBlend": 0.9957349905424812,
+      "maxBoundarySampleIntervalMs": 8.333333333328483
+    },
+    {
+      "lap": 3,
+      "sector": "BASIN",
+      "entryMs": 78321.53762828848,
+      "exitMs": 81996.05582973905,
+      "milliseconds": 3674.51820145057,
+      "entryBlend": 0.9957349905424812,
+      "exitBlend": 1,
+      "maxBoundarySampleIntervalMs": 8.333333333328483
+    },
+    {
+      "lap": 3,
+      "sector": "COURT",
+      "entryMs": 81996.05582973905,
+      "exitMs": 86180.1166504062,
+      "milliseconds": 4184.060820667146,
+      "entryBlend": 1,
+      "exitBlend": 1,
+      "maxBoundarySampleIntervalMs": 8.333333333328483
+    },
+    {
+      "lap": 3,
+      "sector": "REEF",
+      "entryMs": 86180.1166504062,
+      "exitMs": 91718.08266463374,
+      "milliseconds": 5537.966014227539,
+      "entryBlend": 1,
+      "exitBlend": 1,
+      "maxBoundarySampleIntervalMs": 8.333333333328483
+    }
+  ],
+  "basin": {
+    "dayMeanMs": 3461.9894230578957,
+    "nightMs": 3674.51820145057,
+    "deltaMs": 212.5287783926742,
+    "targetMs": [
+      250,
+      400
+    ],
+    "passed": false
+  },
+  "braking": [
+    {
+      "lap": 1,
+      "firstBrakeAfterCutBoundary": {
+        "progress": 0.8500678244459925,
+        "metres": 2040.1627786687225,
+        "tick": 3294,
+        "brake": 0.19139681821630278,
+        "speed": 66.99866636508472,
+        "fogDensity": 0.0016,
+        "nightBlend": 0,
+        "decision": {
+          "approachingTurnLimit": true,
+          "desiredSpeed": 64,
+          "brakingDistance": 44.02933195356906,
+          "turnCue": {
+            "direction": "LEFT",
+            "followingDirection": null,
+            "distance": 23.83722132959838,
+            "hard": true,
+            "radius": 75.20808206997987
+          }
+        }
+      },
+      "turnLimitedApproach": {
+        "progress": 0.7934338895446311,
+        "metres": 1904.2413349055657,
+        "tick": 3078,
+        "brake": 0.5,
+        "speed": 87.98821666453777,
+        "fogDensity": 0.0016,
+        "nightBlend": 0,
+        "decision": {
+          "approachingTurnLimit": true,
+          "desiredSpeed": 64,
+          "brakingDistance": 160.21165256448722,
+          "turnCue": {
+            "direction": "LEFT",
+            "followingDirection": null,
+            "distance": 159.75866509275556,
+            "hard": true,
+            "radius": 75.20808206997987
+          }
+        }
+      }
+    },
+    {
+      "lap": 2,
+      "firstBrakeAfterCutBoundary": {
+        "progress": 0.850020350001691,
+        "metres": 2040.048840002399,
+        "tick": 7149,
+        "brake": 0.19023989917034678,
+        "speed": 66.95007576515457,
+        "fogDensity": 0.0016,
+        "nightBlend": 0,
+        "decision": {
+          "approachingTurnLimit": true,
+          "desiredSpeed": 64,
+          "brakingDistance": 43.796880177140594,
+          "turnCue": {
+            "direction": "LEFT",
+            "followingDirection": null,
+            "distance": 23.9511599959219,
+            "hard": true,
+            "radius": 75.20808206997987
+          }
+        }
+      },
+      "turnLimitedApproach": {
+        "progress": 0.7933645698727889,
+        "metres": 1904.0749676931446,
+        "tick": 6933,
+        "brake": 0.5,
+        "speed": 88.02324686720335,
+        "fogDensity": 0.0016,
+        "nightBlend": 0,
+        "decision": {
+          "approachingTurnLimit": true,
+          "desiredSpeed": 64,
+          "brakingDistance": 160.43185675159376,
+          "turnCue": {
+            "direction": "LEFT",
+            "followingDirection": null,
+            "distance": 159.9250323051765,
+            "hard": true,
+            "radius": 75.20808206997987
+          }
+        }
+      }
+    },
+    {
+      "lap": 3,
+      "firstBrakeAfterCutBoundary": {
+        "progress": 0.8501923249446086,
+        "metres": 2040.4615798654008,
+        "tick": 11007,
+        "brake": 0.18907805360269425,
+        "speed": 66.90127825131316,
+        "fogDensity": 0.0034,
+        "nightBlend": 1,
+        "decision": {
+          "approachingTurnLimit": true,
+          "desiredSpeed": 64,
+          "brakingDistance": 43.5636082735581,
+          "turnCue": {
+            "direction": "LEFT",
+            "followingDirection": null,
+            "distance": 23.538420132920237,
+            "hard": true,
+            "radius": 75.20808206997987
+          }
+        }
+      },
+      "turnLimitedApproach": {
+        "progress": 0.7935503951624017,
+        "metres": 1904.5209483882147,
+        "tick": 10791,
+        "brake": 0.5,
+        "speed": 88.00479368773662,
+        "fogDensity": 0.0034,
+        "nightBlend": 1,
+        "decision": {
+          "approachingTurnLimit": true,
+          "desiredSpeed": 64,
+          "brakingDistance": 160.315846857896,
+          "turnCue": {
+            "direction": "LEFT",
+            "followingDirection": null,
+            "distance": 159.47905161010613,
+            "hard": true,
+            "radius": 75.20808206997987
+          }
+        }
+      }
+    }
+  ],
+  "firstBrakeAfterBoundaryShiftMetres": -0.3557705298401288,
+  "brakeShiftMetres": -0.36279708885945183,
+  "brakingTargetMetres": 8,
+  "brakingPassed": false
+}

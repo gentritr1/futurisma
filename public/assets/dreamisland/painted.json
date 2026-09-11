@@ -8259,5 +8259,87 @@
  },
  "maquettes": [],
  "maquettesRemovedBeforeWorldExport": true,
- "maquetteNote": "None lifted. DREAM-ISLAND-LEVEL.md section 7 supersedes the concept doc: the two orthographic sheets are the modelling reference."
+ "maquetteNote": "None lifted. DREAM-ISLAND-LEVEL.md section 7 supersedes the concept doc: the two orthographic sheets are the modelling reference.",
+ "audioSources": {
+  "script": "scripts/prepare-dreamisland-audio-positions.mjs",
+  "sources": [
+   {
+    "id": "clock",
+    "position": [
+     390.06837048918374,
+     23.930857142857143,
+     673.4902113836912
+    ],
+    "placement": 1,
+    "asset": "clock-tower",
+    "anchor": "clock_hand_pivot",
+    "local": [
+     -0.6499999761581421,
+     9.25,
+     -2.4749999046325684
+    ]
+   },
+   {
+    "id": "waterfall",
+    "position": [
+     506.49885446190893,
+     27,
+     623.0030089983889
+    ],
+    "placement": 2,
+    "asset": "waterfall-cliff",
+    "anchor": "waterfall_sheet_anchor",
+    "local": [
+     0,
+     16,
+     -3.5
+    ]
+   },
+   {
+    "id": "tunnel",
+    "placement": 0,
+    "position": [
+     655.853,
+     22,
+     299.184
+    ]
+   },
+   {
+    "id": "birds-GROVE",
+    "placement": 137,
+    "position": [
+     312.852,
+     3.536,
+     -14.145
+    ]
+   },
+   {
+    "id": "birds-CUT",
+    "placement": 294,
+    "position": [
+     56.844,
+     -0.2,
+     241.606
+    ]
+   },
+   {
+    "id": "fish-basin-eight",
+    "batch": "FISHBASIN",
+    "position": [
+     546.3195,
+     6.949999999999999,
+     559.72
+    ]
+   },
+   {
+    "id": "fish-reef-loop",
+    "batch": "FISHREEF",
+    "position": [
+     4.337500000000001,
+     -3.4000000000000004,
+     492.49025
+    ]
+   }
+  ]
+ }
 }

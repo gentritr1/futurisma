@@ -1,0 +1,60 @@
+{
+  "script": "/Users/gentlegen/Desktop/futurisma-race/polarity_work/art/blender/build_dreamisland_power_kit.py",
+  "devices": {
+    "PK_surge": {
+      "triangles": 832,
+      "nodes": [
+        "PK_surge_cage",
+        "PK_surge_capacitors",
+        "PK_surge_core",
+        "PK_surge_mount"
+      ]
+    },
+    "PK_shield": {
+      "triangles": 990,
+      "nodes": [
+        "PK_shield_core",
+        "PK_shield_housing",
+        "PK_shield_crown",
+        "PK_shield_moss",
+        "PK_shield_mount",
+        "PK_shield_lattice",
+        "PK_shield_petals",
+        "PK_shield_hinge_0",
+        "PK_shield_petal_0",
+        "PK_shield_hinge_1",
+        "PK_shield_petal_1",
+        "PK_shield_hinge_2",
+        "PK_shield_petal_2",
+        "PK_shield_hinge_3",
+        "PK_shield_petal_3"
+      ]
+    }
+  },
+  "triangles": 1822,
+  "bounds": {
+    "min": [
+      -0.47999998927116394,
+      0.0,
+      -0.4359999895095825
+    ],
+    "max": [
+      0.47999998927116394,
+      1.591679573059082,
+      0.4359999895095825
+    ],
+    "size": [
+      0.9599999785423279,
+      1.591679573059082,
+      0.871999979019165
+    ]
+  },
+  "bytes": 168012,
+  "sha256": "bad78568990a69ee1757a9153c0d5023f0b4f0369b97f0d1993c67c5d9ced5bd",
+  "materials": [
+    "DI_MAT_emissive",
+    "DI_MAT_metal",
+    "DI_MAT_concrete"
+  ],
+  "measurement": "Exported GLB index and position accessors, with node transforms, parsed by build_dreamisland_heroes.py; independently checked by GLTFLoader."
+}

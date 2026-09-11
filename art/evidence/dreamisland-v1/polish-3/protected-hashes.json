@@ -1,0 +1,73 @@
+{
+  "script": "scripts/visual/dreamisland/polish3-report.py",
+  "baseline": "7bf6dc2",
+  "observedHead": "872e9f8",
+  "files": [
+    {
+      "file": "src/game/game.ts",
+      "before": "0a791492018e6be71310580559ab37b79d6a1f23605ddc97db5347ef905bf20f",
+      "after": "0a791492018e6be71310580559ab37b79d6a1f23605ddc97db5347ef905bf20f",
+      "unchanged": true
+    },
+    {
+      "file": "src/game/autopilot.ts",
+      "before": "93a480602b877572ed92a231296313e713e4f41d7143b88f3693a82fa319cbd5",
+      "after": "93a480602b877572ed92a231296313e713e4f41d7143b88f3693a82fa319cbd5",
+      "unchanged": true
+    },
+    {
+      "file": "src/game/dreamisland-schedule.js",
+      "before": "1f225bb5e5f9e967da4c20883c00f68892aef91a51e6a5eeeea56b9e641be7fc",
+      "after": "1f225bb5e5f9e967da4c20883c00f68892aef91a51e6a5eeeea56b9e641be7fc",
+      "unchanged": true
+    },
+    {
+      "file": "src/game/dreamisland-powers-config.js",
+      "before": "679b27eac823403b3f03fab58c4b3a25e57a3fc9392838c693bb057dbc4ac351",
+      "after": "679b27eac823403b3f03fab58c4b3a25e57a3fc9392838c693bb057dbc4ac351",
+      "unchanged": true
+    },
+    {
+      "file": "src/game/data/dreamisland/route.json",
+      "before": "843494dc36353367249352ec9c4f398b7d2a3437389c443c658e1a9fcafb487f",
+      "after": "843494dc36353367249352ec9c4f398b7d2a3437389c443c658e1a9fcafb487f",
+      "unchanged": true
+    },
+    {
+      "file": "src/game/data/dreamisland/schedule.json",
+      "before": "a2abc0537a4c6743703c308a80ebacd45edd6f90224e0c2c86b53d37fd7accf7",
+      "after": "a2abc0537a4c6743703c308a80ebacd45edd6f90224e0c2c86b53d37fd7accf7",
+      "unchanged": true
+    },
+    {
+      "file": "src/game/data/dreamisland/rival-pace.json",
+      "before": "688491fbe4003654a162edfa8cba3d379889abffd2be0c75c78f67c842ab8183",
+      "after": "688491fbe4003654a162edfa8cba3d379889abffd2be0c75c78f67c842ab8183",
+      "unchanged": true
+    },
+    {
+      "file": "src/game/dreamisland-sky.ts",
+      "before": "d3eead0f16caa025465c13546113b7c95792e0deff96f82fac5fbeaf7abf7cb7",
+      "after": "d3eead0f16caa025465c13546113b7c95792e0deff96f82fac5fbeaf7abf7cb7",
+      "unchanged": true
+    },
+    {
+      "file": "src/game/dreamisland-water.ts",
+      "before": "288339c3ddb6b424c07d3ac60052f183e36a60bf0013dc271c868fb9956d6eab",
+      "after": "288339c3ddb6b424c07d3ac60052f183e36a60bf0013dc271c868fb9956d6eab",
+      "unchanged": true
+    },
+    {
+      "file": "src/game/dreamisland-materials.ts",
+      "before": "4c26fecfdd49947e2ab2c3a4031c114c91af911903645168e0952085ac621eba",
+      "after": "4c26fecfdd49947e2ab2c3a4031c114c91af911903645168e0952085ac621eba",
+      "unchanged": true
+    },
+    {
+      "file": "public/assets/dreamisland/painted.glb",
+      "before": "60e11543acce5c6a939fc715eae5aeccdded1a2efc177706ab04a3bdcdf12756",
+      "after": "60e11543acce5c6a939fc715eae5aeccdded1a2efc177706ab04a3bdcdf12756",
+      "unchanged": true
+    }
+  ]
+}

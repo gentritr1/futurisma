@@ -1,0 +1,257 @@
+{
+  "script": "scripts/visual/dreamisland/feel.mjs",
+  "source": "art/evidence/dreamisland-v1/polish-3/grip-trial-030/race.json",
+  "physicsSamples": 11665,
+  "splitMethod": "Linear interpolation at authored district boundaries using actual 120 Hz driver input samples. Lap-one BEACH and the final CUT tail are incomplete and omitted. Progress is unwrapped at the geometric seam, independently of the lap UI which increments before progress wraps.",
+  "brakingMethod": "Primary: first nonzero brake during the actual turn-limited approach to the first CUT turn. Also report first brake at/after the district boundary (.85), where braking is already in progress. Positive shift means earlier at night. Older baseline captures have no decision samples and leave the primary result null.",
+  "splits": [
+    {
+      "lap": 1,
+      "sector": "GROVE",
+      "entryMs": 5144.17237699544,
+      "exitMs": 10748.701353351878,
+      "milliseconds": 5604.528976356439,
+      "entryBlend": 0,
+      "exitBlend": 0,
+      "maxBoundarySampleIntervalMs": 8.33333333333394
+    },
+    {
+      "lap": 1,
+      "sector": "POINT",
+      "entryMs": 10748.701353351878,
+      "exitMs": 14248.840782274321,
+      "milliseconds": 3500.1394289224427,
+      "entryBlend": 0,
+      "exitBlend": 0,
+      "maxBoundarySampleIntervalMs": 8.33333333333394
+    },
+    {
+      "lap": 1,
+      "sector": "BASIN",
+      "entryMs": 14248.840782274321,
+      "exitMs": 17707.560755145136,
+      "milliseconds": 3458.7199728708147,
+      "entryBlend": 0,
+      "exitBlend": 0,
+      "maxBoundarySampleIntervalMs": 8.33333333333394
+    },
+    {
+      "lap": 1,
+      "sector": "COURT",
+      "entryMs": 17707.560755145136,
+      "exitMs": 21897.17457320328,
+      "milliseconds": 4189.613818058144,
+      "entryBlend": 0,
+      "exitBlend": 0,
+      "maxBoundarySampleIntervalMs": 8.33333333333212
+    },
+    {
+      "lap": 1,
+      "sector": "REEF",
+      "entryMs": 21897.17457320328,
+      "exitMs": 27434.63192945315,
+      "milliseconds": 5537.45735624987,
+      "entryBlend": 0,
+      "exitBlend": 0,
+      "maxBoundarySampleIntervalMs": 8.33333333333212
+    },
+    {
+      "lap": 1,
+      "sector": "CUT",
+      "entryMs": 27434.63192945315,
+      "exitMs": 33222.089232100974,
+      "milliseconds": 5787.457302647825,
+      "entryBlend": 0,
+      "exitBlend": 0,
+      "maxBoundarySampleIntervalMs": 8.333333333335759
+    },
+    {
+      "lap": 2,
+      "sector": "BEACH",
+      "entryMs": 33222.089232100974,
+      "exitMs": 37275.4064227313,
+      "milliseconds": 4053.317190630325,
+      "entryBlend": 0,
+      "exitBlend": 0,
+      "maxBoundarySampleIntervalMs": 8.333333333335759
+    },
+    {
+      "lap": 2,
+      "sector": "GROVE",
+      "entryMs": 37275.4064227313,
+      "exitMs": 42869.273683626256,
+      "milliseconds": 5593.867260894956,
+      "entryBlend": 0,
+      "exitBlend": 0,
+      "maxBoundarySampleIntervalMs": 8.333333333335759
+    },
+    {
+      "lap": 2,
+      "sector": "POINT",
+      "entryMs": 42869.273683626256,
+      "exitMs": 46370.28425673686,
+      "milliseconds": 3501.0105731106014,
+      "entryBlend": 0,
+      "exitBlend": 0,
+      "maxBoundarySampleIntervalMs": 8.333333333335759
+    },
+    {
+      "lap": 2,
+      "sector": "BASIN",
+      "entryMs": 46370.28425673686,
+      "exitMs": 49830.522226806635,
+      "milliseconds": 3460.2379700697784,
+      "entryBlend": 0,
+      "exitBlend": 0,
+      "maxBoundarySampleIntervalMs": 8.333333333335759
+    },
+    {
+      "lap": 2,
+      "sector": "COURT",
+      "entryMs": 49830.522226806635,
+      "exitMs": 54020.01160866893,
+      "milliseconds": 4189.489381862295,
+      "entryBlend": 0,
+      "exitBlend": 0,
+      "maxBoundarySampleIntervalMs": 8.333333333335759
+    },
+    {
+      "lap": 2,
+      "sector": "REEF",
+      "entryMs": 54020.01160866893,
+      "exitMs": 59554.83524554909,
+      "milliseconds": 5534.823636880159,
+      "entryBlend": 0,
+      "exitBlend": 0,
+      "maxBoundarySampleIntervalMs": 8.333333333335759
+    },
+    {
+      "lap": 2,
+      "sector": "CUT",
+      "entryMs": 59554.83524554909,
+      "exitMs": 65340.06748896116,
+      "milliseconds": 5785.232243412072,
+      "entryBlend": 0,
+      "exitBlend": 0,
+      "maxBoundarySampleIntervalMs": 8.333333333335759
+    },
+    {
+      "lap": 3,
+      "sector": "BEACH",
+      "entryMs": 65340.06748896116,
+      "exitMs": 69201.4925111475,
+      "milliseconds": 3861.4250221863404,
+      "entryBlend": 0,
+      "exitBlend": 0.10600779441550925,
+      "maxBoundarySampleIntervalMs": 8.333333333335759
+    },
+    {
+      "lap": 3,
+      "sector": "GROVE",
+      "entryMs": 69201.4925111475,
+      "exitMs": 74794.27041408616,
+      "milliseconds": 5592.777902938658,
+      "entryBlend": 0.10600779441550925,
+      "exitBlend": 0.7425906582218793,
+      "maxBoundarySampleIntervalMs": 8.333333333328483
+    },
+    {
+      "lap": 3,
+      "sector": "POINT",
+      "entryMs": 74794.27041408616,
+      "exitMs": 78294.25590553509,
+      "milliseconds": 3499.985491448926,
+      "entryBlend": 0.7425906582218793,
+      "exitBlend": 0.995263787079904,
+      "maxBoundarySampleIntervalMs": 8.333333333328483
+    },
+    {
+      "lap": 3,
+      "sector": "BASIN",
+      "entryMs": 78294.25590553509,
+      "exitMs": 81757.27551432923,
+      "milliseconds": 3463.019608794144,
+      "entryBlend": 0.995263787079904,
+      "exitBlend": 1,
+      "maxBoundarySampleIntervalMs": 8.333333333328483
+    },
+    {
+      "lap": 3,
+      "sector": "COURT",
+      "entryMs": 81757.27551432923,
+      "exitMs": 85948.75199515423,
+      "milliseconds": 4191.476480825004,
+      "entryBlend": 1,
+      "exitBlend": 1,
+      "maxBoundarySampleIntervalMs": 8.333333333328483
+    },
+    {
+      "lap": 3,
+      "sector": "REEF",
+      "entryMs": 85948.75199515423,
+      "exitMs": 91485.90790560732,
+      "milliseconds": 5537.15591045309,
+      "entryBlend": 1,
+      "exitBlend": 1,
+      "maxBoundarySampleIntervalMs": 8.333333333328483
+    }
+  ],
+  "basin": {
+    "dayMeanMs": 3459.4789714702965,
+    "nightMs": 3463.019608794144,
+    "deltaMs": 3.540637323847477,
+    "targetMs": [
+      250,
+      400
+    ],
+    "passed": false
+  },
+  "braking": [
+    {
+      "lap": 1,
+      "firstBrakeAfterCutBoundary": {
+        "progress": 0.8501956583337251,
+        "metres": 2040.4695799992805,
+        "tick": 3293,
+        "brake": 0.19002623656724132,
+        "speed": 66.94110193582414,
+        "fogDensity": 0.0016,
+        "nightBlend": 0,
+        "decision": null
+      },
+      "turnLimitedApproach": null
+    },
+    {
+      "lap": 2,
+      "firstBrakeAfterCutBoundary": {
+        "progress": 0.8500974091991682,
+        "metres": 2040.2337820763441,
+        "tick": 7147,
+        "brake": 0.19162004337975788,
+        "speed": 67.00804182194983,
+        "fogDensity": 0.0016,
+        "nightBlend": 0,
+        "decision": null
+      },
+      "turnLimitedApproach": null
+    },
+    {
+      "lap": 3,
+      "firstBrakeAfterCutBoundary": {
+        "progress": 0.8501601648594383,
+        "metres": 2040.3843956609924,
+        "tick": 10979,
+        "brake": 0.1891043466763762,
+        "speed": 66.9023825604078,
+        "fogDensity": 0.0034,
+        "nightBlend": 1,
+        "decision": null
+      },
+      "turnLimitedApproach": null
+    }
+  ],
+  "firstBrakeAfterBoundaryShiftMetres": -0.03271462318002705,
+  "brakeShiftMetres": null,
+  "brakingTargetMetres": 8,
+  "brakingPassed": false
+}

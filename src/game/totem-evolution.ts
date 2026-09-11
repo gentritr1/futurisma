@@ -228,6 +228,8 @@ export class TotemEvolution {
     const speed = THREE.MathUtils.clamp(state.speedRatio, 0, 1.5);
     const transition = THREE.MathUtils.clamp(state.gravityTransition ?? 0, 0, 1);
     const overdrive = state.overdriveActive === true;
+    const surgeColor = state.surgeColor ?? OVERDRIVE;
+    const shieldColor = state.shieldColor ?? SHIELD;
     const firing = state.boostActive || overdrive;
     const reserve = THREE.MathUtils.clamp(state.boostReserve ?? 1, 0, 1);
     const inverted = (state.gravitySign ?? 1) < 0;
@@ -241,13 +243,13 @@ export class TotemEvolution {
     }
     this.rotor.rotation.x = state.reducedMotion ? 0 : transition * 0.16;
 
-    this.lightColor.copy(firing ? (overdrive ? OVERDRIVE : BOOST) : reserve > 0.18 ? READY : RECHARGING);
+    this.lightColor.copy(firing ? (overdrive ? surgeColor : BOOST) : reserve > 0.18 ? READY : RECHARGING);
     this.setLamp(this.boostLamp, this.lightColor, firing ? 2.1 : 0.35 + reserve * 0.5, delta);
     this.setLamp(this.brakeLamp, BRAKE, 0.08 + THREE.MathUtils.clamp(state.brake, 0, 1) * 2.1, delta);
     this.setLamp(this.gravityLamp, transition > 0.02 ? RECHARGING : inverted ? CEILING : FLOOR, transition > 0.02 ? 1.8 : 0.8, delta);
     const powerColor = state.shieldActive
-      ? SHIELD
-      : overdrive ? OVERDRIVE : state.powerReady ? RECHARGING : POWER_IDLE;
+      ? shieldColor
+      : overdrive ? surgeColor : state.powerReady ? RECHARGING : POWER_IDLE;
     this.setLamp(this.powerLamp, powerColor, state.shieldActive || overdrive ? 1.7 : state.powerReady ? 0.85 : 0.18, delta);
 
     const throttle = THREE.MathUtils.clamp(state.throttle, 0, 1);
@@ -269,7 +271,7 @@ export class TotemEvolution {
     this.jets.instanceMatrix.needsUpdate = true;
     this.jetMaterial.uniforms.uTime.value = state.reducedMotion ? 0 : state.elapsed * 9;
     this.jetMaterial.uniforms.uStrength.value = this.engineStrength;
-    this.jetMaterial.uniforms.uColor.value.copy(overdrive ? OVERDRIVE : BOOST);
+    this.jetMaterial.uniforms.uColor.value.copy(overdrive ? surgeColor : BOOST);
     this.shield.visible = !this.pumpField && state.shieldActive === true;
     this.pumpField?.update(state.elapsed,state.reducedMotion,overdrive,state.shieldActive === true,state.shieldRefundWindow === true);
     const charge = THREE.MathUtils.clamp(state.powerCharge ?? 1, 0, 1);
@@ -312,6 +314,7 @@ export class TotemEvolution {
       }
       this.powerMounts.instanceMatrix.needsUpdate = true;
     }
+    this.shieldMaterial.uniforms.uColor.value.copy(shieldColor);
     this.shieldMaterial.uniforms.uOpacity.value = state.reducedMotion ? 0.5 : 0.65;
   }
 

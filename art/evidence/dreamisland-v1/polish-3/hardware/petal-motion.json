@@ -1,0 +1,38 @@
+{
+  "script": "scripts/visual/dreamisland/petal-measure.py",
+  "source": "frames-final/capture.json",
+  "method": "Relative rotation of actual float32 instance matrices; matrix trace gives angle.",
+  "rows": [
+    {
+      "tick": 0,
+      "milliseconds": 0.0,
+      "firstShieldPetalRotationRadians": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "tick": 15,
+      "milliseconds": 125.0,
+      "firstShieldPetalRotationRadians": [
+        0.612499951648637,
+        0.6125000177362956,
+        0.6125000042743646,
+        0.6125000131638679
+      ]
+    },
+    {
+      "tick": 30,
+      "milliseconds": 250.0,
+      "firstShieldPetalRotationRadians": [
+        0.6999999719889076,
+        0.7000000142617533,
+        0.7000000079176447,
+        0.700000010446359
+      ]
+    }
+  ],
+  "passed": true
+}

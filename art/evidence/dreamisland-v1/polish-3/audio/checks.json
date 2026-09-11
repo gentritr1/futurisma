@@ -1,0 +1,205 @@
+{
+  "script": "scripts/visual/dreamisland/audio-checks.mjs",
+  "spatial": [
+    {
+      "district": "BEACH",
+      "progress": 0.05,
+      "listener": [
+        119.99998474121094,
+        0.9599999785423279,
+        0
+      ],
+      "clock": [
+        390.06837048918374,
+        23.930857142857143,
+        673.4902113836912
+      ],
+      "rmsDb": -43.06478367879887,
+      "strongest100msDb": -29.018574846691774,
+      "peakDb": -11.779013685705188
+    },
+    {
+      "district": "REEF",
+      "progress": 0.75,
+      "listener": [
+        39.66401290893555,
+        0.9599999785423279,
+        495.34600830078125
+      ],
+      "clock": [
+        390.06837048918374,
+        23.930857142857143,
+        673.4902113836912
+      ],
+      "rmsDb": -42.019312835246154,
+      "strongest100msDb": -27.067672751377447,
+      "peakDb": -10.226378181214384
+    },
+    {
+      "district": "CUT",
+      "progress": 0.9,
+      "listener": [
+        20.344999313354492,
+        0.9599999785423279,
+        145.2432403564453
+      ],
+      "clock": [
+        390.06837048918374,
+        23.930857142857143,
+        673.4902113836912
+      ],
+      "rmsDb": -42.8499915365827,
+      "strongest100msDb": -28.583841363171103,
+      "peakDb": -13.481622901189308
+    }
+  ],
+  "waterfall": [
+    {
+      "nightBlend": 0,
+      "position": [
+        506.49885446190893,
+        27,
+        623.0030089983889
+      ],
+      "cutoffHz": 11000,
+      "rmsDb": -35.37046151283424,
+      "strongest100msDb": -33.66588719425893,
+      "peakDb": -20.08009094809006,
+      "differenceEnergyRatio": 1.0608310848510583
+    },
+    {
+      "nightBlend": 1,
+      "position": [
+        506.49885446190893,
+        27,
+        623.0030089983889
+      ],
+      "cutoffHz": 2600,
+      "rmsDb": -31.677664801605452,
+      "strongest100msDb": -28.672590660782454,
+      "peakDb": -13.544960824039645,
+      "differenceEnergyRatio": 0.22139464286604452
+    }
+  ],
+  "waterfallNightDeltaDb": 3.6927967112287874,
+  "duckTargets": {
+    "music": [
+      0.5,
+      0.25,
+      0.25,
+      0.35397289219206896,
+      0.5,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "ambience": [
+      0.6,
+      0.6,
+      0.7943282347242815,
+      1,
+      0.7943282347242815,
+      1,
+      0.7943282347242815,
+      1,
+      0.7943282347242815,
+      1,
+      0.7943282347242815,
+      1
+    ]
+  },
+  "semantics": {
+    "musicZero": true,
+    "voiceZero": true,
+    "precedence": true,
+    "radioReleaseKeepsClockDuck": true
+  },
+  "lifecycle": {
+    "before": {
+      "sources": 10,
+      "nodes": 38
+    },
+    "reset": {
+      "sources": 0,
+      "nodes": 0
+    },
+    "rearmedEvents": 5,
+    "disposed": {
+      "sources": 0,
+      "nodes": 0
+    }
+  },
+  "records": [
+    {
+      "id": "chime-warning",
+      "tick": 7233,
+      "when": 0,
+      "source": "clock",
+      "position": [
+        390.06837048918374,
+        23.930857142857143,
+        673.4902113836912
+      ],
+      "gain": 1.0007922948449748
+    },
+    {
+      "id": "strike",
+      "tick": 8014,
+      "when": 0,
+      "source": "clock",
+      "position": [
+        390.06837048918374,
+        23.930857142857143,
+        673.4902113836912
+      ],
+      "gain": 1.6150506123583774
+    },
+    {
+      "id": "fish-rise:fish-basin-eight",
+      "tick": 8494,
+      "when": 0,
+      "source": "fish-basin-eight",
+      "position": [
+        546.3195,
+        6.949999999999999,
+        559.72
+      ],
+      "gain": 1.1588420727522766
+    },
+    {
+      "id": "fish-rise:fish-reef-loop",
+      "tick": 8494,
+      "when": 0,
+      "source": "fish-reef-loop",
+      "position": [
+        4.337500000000001,
+        -3.4000000000000004,
+        492.49025
+      ],
+      "gain": 1.1588420727522766
+    },
+    {
+      "id": "tunnel-entry",
+      "tick": 8494,
+      "when": 0,
+      "source": "tunnel",
+      "position": [
+        655.853,
+        22,
+        299.184
+      ],
+      "gain": 0.19436462871370458
+    }
+  ],
+  "motion": {
+    "samplesPerMode": 1441,
+    "identical": true
+  },
+  "passed": true
+}

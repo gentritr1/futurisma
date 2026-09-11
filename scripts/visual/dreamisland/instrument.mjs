@@ -1,7 +1,8 @@
 /** Read-only render instrumentation. Each row is one completed renderer call. */
-export async function instrument(page){
+export async function instrument(page,{grip,basinWidth}={}){
  await page.evaluateOnNewDocument(()=>{
   window.__diFrames=[];
+  window.__diDriving=[];
   window.__diInstrument=renderer=>{
    let shadowCalls=0,shadowTriangles=0,last=performance.now();const tagged=new WeakSet();let draws=[];
    const shadowRender=renderer.shadowMap.render.bind(renderer.shadowMap);
@@ -40,7 +41,45 @@ export async function instrument(page){
   try{if(new URL(request.url()).pathname==='/src/game/game.ts'){
    const response=await fetch(request.url());let code=await response.text();const marker='this.renderer.outputColorSpace = THREE.SRGBColorSpace;';if(!code.includes(marker))throw Error('Missing renderer marker');
    code=code.replace(marker,marker+'\nwindow.__diInstrument(this.renderer);');await request.respond({status:response.status,contentType:'text/javascript',body:code});
-  }else await request.continue();}catch{await request.abort();}
+  }else if(new URL(request.url()).pathname==='/src/game/dreamisland-course.ts'){
+   const response=await fetch(request.url()),code=await response.text();
+   await request.respond({status:response.status,contentType:'text/javascript',body:code+`
+    const diBlend=Object.getOwnPropertyDescriptor(DreamIslandCourse.prototype,'nightBlend');
+    Object.defineProperty(DreamIslandCourse.prototype,'nightBlend',{...diBlend,get(){window.__diCourse=this;return diBlend.get.call(this);}});
+    ${basinWidth===undefined?'':`const diSample=DreamIslandCourse.prototype.sample;
+    DreamIslandCourse.prototype.sample=function(...args){const sample=diSample.apply(this,args);
+     if(sample.sector==='BASIN'){sample.width=${Number(basinWidth)};sample.halfWidth=sample.width/2;}return sample;};`}`});
+  }else if(grip!==undefined&&new URL(request.url()).pathname==='/src/game/dreamisland-schedule.js'){
+   const response=await fetch(request.url()),code=await response.text();
+   await request.respond({status:response.status,contentType:'text/javascript',body:code+`
+    const diOriginalGrip=DreamIslandSchedule.prototype.grip;
+    DreamIslandSchedule.prototype.grip=function(...args){const value=diOriginalGrip.apply(this,args);return value<1?${Number(grip)}:value;};`});
+  }else if(new URL(request.url()).pathname==='/src/game/totem-evolution.ts'){
+   const response=await fetch(request.url()),code=await response.text();
+   await request.respond({status:response.status,contentType:'text/javascript',body:code+`
+    const diEvolutionUpdate=TotemEvolution.prototype.update;
+    TotemEvolution.prototype.update=function(state){
+     window.__diEvolution=this;window.__diPowerState={...state};
+     return diEvolutionUpdate.call(this,window.__diPowerPose?{...state,...window.__diPowerPose}:state);
+    };`});
+  }else if(new URL(request.url()).pathname==='/src/game/autopilot.ts'){
+   const response=await fetch(request.url());
+   let code=await response.text();
+   const marker='this.input.throttle = speed > desiredSpeed + 3 ? .18 : 1;';
+   if(!code.includes(marker))throw Error('Missing braking instrument marker');
+   code=code.replace(marker, 'window.__diDecision={approachingTurnLimit,desiredSpeed,brakingDistance,turnCue:turnCue?{...turnCue}:null};'+marker);
+   await request.respond({status:response.status,contentType:'text/javascript',body:code+`
+    const diRead=DemoAutopilot.prototype.read;
+    DemoAutopilot.prototype.read=function(...args){
+     const input=diRead.apply(this,args),course=this.course;
+     if(course.kind==='dreamisland')window.__diDriving.push({
+      tick:course.schedule.tick,elapsedMs:args[7],lap:args[5],progress:args[3],speed:args[4],
+      sector:course.sectorLabelAt(args[3]),nightBlend:course.nightBlend,
+      grip:course.surfaceGripAt(args[3]),fogDensity:course.fogAt(args[3]).density,
+      brake:input.brake,throttle:input.throttle,boost:input.boost,lateral:this.projection.lateral,width:this.projection.width,decision:window.__diDecision});
+     return input;
+    };`});
+  }else await request.continue();}catch(error){console.error(new URL(request.url()).pathname,String(error));await request.abort();}
  });
 }
 /** Peaks split by lighting state. The key light is armed once in

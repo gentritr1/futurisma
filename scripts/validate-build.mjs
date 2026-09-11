@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { gzipSync } from "node:zlib";
-import { readFile, readdir } from "node:fs/promises";
+import { readFile, readdir, writeFile, mkdir } from "node:fs/promises";
 
 import { PIT_RADIO_IDS } from "../src/game/pit-radio-lines.js";
 
@@ -344,7 +344,7 @@ assert.ok(
 // number moves again here.
 assert.ok(
   shellGzip <= 277 * 1024,
-  `Initial app shell exceeds 277 KiB gzip (${(shellGzip / 1024).toFixed(1)} KiB).`,
+  `Initial app shell exceeds 277 KiB gzip (${(shellGzip / 1024).toFixed(3)} KiB; ${shellGzip} B).`,
 );
 
 // ---------------------------------------------------------------------------
@@ -395,6 +395,18 @@ assert.ok(
   `The served pit radio is ${(radioBytes / 1024).toFixed(1)} KiB; the ceiling is `
     + "192 KiB. Re-run scripts/prepare-pit-radio.mjs and record the measurement.",
 );
+// POLISH-3: six signature clips, measured by prepare-dreamisland-audio.py
+// at the radio bank's 24 kHz / 48 kbps mono format. The two bed references
+// remain evidence inputs; their procedural equivalents ship as lazy code.
+// 225,912 B measured; ceil(measured * 1.10) = 248,504 B. Independent of radio.
+const islandAudioDirectory=new URL('../dist/assets/dreamisland/audio/',import.meta.url);
+const islandAudioNames=(await readdir(islandAudioDirectory)).sort();
+assert.deepEqual(islandAudioNames,['clock-quarter-chime.mp3','clock-strike-three-tolls.mp3',
+  'day-birds.mp3','fish-rise.mp3','tunnel-pass.mp3','waterfall-loop.mp3']);
+let islandAudioBytes=0;
+for(const name of islandAudioNames)islandAudioBytes+=(await readFile(new URL(name,islandAudioDirectory))).length;
+assert.ok(islandAudioBytes<=248504,`Dream Island audio serves ${islandAudioBytes} B against 248504 B.`);
+console.log(`Dream Island audio: ${islandAudioBytes} B / 248504 B; ${islandAudioNames.length} clips.`);
 assert.ok(
   html.includes('rel="preload"')
     && html.includes('href="/assets/totem/models/totem_runtime.glb"')
@@ -478,3 +490,12 @@ console.log(
     javascriptNames.length
   } file(s).`,
 );
+
+const reportDirectory=process.argv.find(argument=>argument.startsWith('--out='))?.slice(6);
+if(reportDirectory){
+ await mkdir(reportDirectory,{recursive:true});
+ await writeFile(reportDirectory+'/build.json',JSON.stringify({script:'scripts/validate-build.mjs',
+  javascriptGzip,shellGzip,stylesheetGzip,htmlGzip:gzipSync(html).byteLength,
+  javascriptRaw:javascript.rawBytes,initialChunks:javascriptNames.length,radioBytes,islandAudioBytes,
+  ceilings:{javascriptGzip:266*1024,shellGzip:277*1024,dreamIslandAudio:248504},passed:true},null,2)+'\n');
+}

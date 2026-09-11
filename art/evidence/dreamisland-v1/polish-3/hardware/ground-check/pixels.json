@@ -1,0 +1,21 @@
+{
+  "script": "scripts/visual/dreamisland/hardware-pixels.py",
+  "mask": "full matches isolation within 2/255; isolation differs from blank by >5/255",
+  "rows": [
+    {
+      "id": "shield-day-8m",
+      "pixels": 1478,
+      "rgb": [
+        0.23455915519117046,
+        0.48243519329247375,
+        0.46028549444134736
+      ],
+      "linear": [
+        0.07393732453936548,
+        0.266772352654889,
+        0.24281579335855835
+      ],
+      "luma": 0.22404596209633384
+    }
+  ]
+}

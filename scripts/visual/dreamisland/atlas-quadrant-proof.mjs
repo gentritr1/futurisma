@@ -148,6 +148,7 @@ try{
    const m=target.material,saved={color:m.color.getHex(),emissive:m.emissive.getHex(),
     emissiveIntensity:m.emissiveIntensity,emissiveMap:m.emissiveMap,vertexColors:m.vertexColors,
     fog:m.fog,toneMapped:m.toneMapped};
+   if(target.instanceColor){saved.instanceColor=target.instanceColor.array.slice();target.instanceColor.array.fill(1);target.instanceColor.needsUpdate=true;}
    const cell=m.userData?.diUniforms?.diCell,glow=m.userData?.diUniforms?.diEmissiveCell;
    if(cell&&glow){saved.glow=glow.value.clone();glow.value.copy(cell.value);}
    m.color.setHex(0x000000);m.emissive.setHex(0xffffff);
@@ -157,6 +158,7 @@ try{
    Object.defineProperty(m,'emissiveIntensity',{get:()=>1,set:()=>{},configurable:true});
    m.emissiveMap=m.map;m.vertexColors=false;m.fog=false;m.toneMapped=false;m.needsUpdate=true;
    window.__diUnlitRestore=()=>{
+    if(saved.instanceColor){target.instanceColor.array.set(saved.instanceColor);target.instanceColor.needsUpdate=true;}
     m.color.setHex(saved.color);m.emissive.setHex(saved.emissive);
     delete m.emissiveIntensity;m.emissiveIntensity=saved.emissiveIntensity;
     m.emissiveMap=saved.emissiveMap;m.vertexColors=saved.vertexColors;
@@ -275,6 +277,7 @@ try{
   const census=await censusOf(claim,sampledRect(rect.uv));
   if(census.error){results.push({...claim,claimed,error:census.error});continue;}
   const framed=await page.evaluate(({centroid,radius,normal,samples})=>{
+   window.__diPoseRestore?.();
    const camera=window.__diCamera;if(!camera)return null;
    const V=camera.position.constructor;
    const target=new V(...centroid),points=samples.map(p=>new V(...p));
@@ -297,6 +300,10 @@ try{
     if(best&&points.length&&best.seen>=points.length*.7)break;
    }
    camera.position.set(...best.position);camera.lookAt(target);camera.updateMatrixWorld(true);
+   const lookAt=camera.lookAt,position=camera.position.toArray();
+   for(const [i,axis] of ['x','y','z'].entries())Object.defineProperty(camera.position,axis,{get:()=>position[i],set:()=>{},configurable:true});
+   camera.lookAt=()=>{};
+   window.__diPoseRestore=()=>{for(const [i,axis] of ['x','y','z'].entries()){delete camera.position[axis];camera.position[axis]=position[i];}camera.lookAt=lookAt;};
    return {...best,target:target.toArray(),samples:points.length};
   },{centroid:census.focus??[0,0,0],radius:Math.min(70,Math.max(4,census.localRadius??20)),
    normal:census.normal??[0,1,0],samples:census.samples??[]});
@@ -340,3 +347,4 @@ try{
  console.log(JSON.stringify({claims:results.length,decided,undecided:results.filter(r=>!r.decided).map(r=>r.id)}));
 }finally{await browser.close();}
 if(errors.length)throw new Error(errors.join('\n'));
+if(results.some(result=>!result.decided))throw new Error('Undecided atlas cells: '+results.filter(result=>!result.decided).map(result=>result.id).join(', '));

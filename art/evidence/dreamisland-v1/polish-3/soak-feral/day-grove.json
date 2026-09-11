@@ -1,0 +1,223 @@
+{
+  "script": "src/game/dreamisland-runtime.ts",
+  "seed": 3868938316,
+  "tick": 863,
+  "progress": 0.19097664623381028,
+  "sector": "PALM GROVE",
+  "nightBlend": 0,
+  "nightBlendPinned": null,
+  "reducedMotion": false,
+  "grip": 1,
+  "powers": {
+    "version": 1,
+    "configId": "dream-island-powers-v1",
+    "configHash": "bb830811",
+    "seed": 3868938316,
+    "tick": 863,
+    "lap": 1,
+    "progress": 0.19076372063434577,
+    "lateral": 8.898759707528097,
+    "lane": 0,
+    "fromLane": 0,
+    "flipStartTick": -126,
+    "nextFlipTick": 0,
+    "heldPower": null,
+    "heldCharge": 0,
+    "activePower": "surge",
+    "activeCharge": 1,
+    "powerStartTick": 436,
+    "powerUntilTick": 916,
+    "powerPerfect": true,
+    "collectedLaps": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "usedWindowLaps": [],
+    "shieldRewardLaps": {},
+    "flips": 0,
+    "pickups": 1,
+    "powersUsed": 1,
+    "perfectActivations": 1,
+    "shieldAbsorptions": 0,
+    "upperTicks": 0,
+    "eventSequence": 2,
+    "events": [
+      {
+        "id": "dream-island-powers-v1:e69b504c:1",
+        "sequence": 1,
+        "tick": 307,
+        "type": "pickup",
+        "lap": 1,
+        "lane": 0,
+        "index": 0,
+        "kind": "surge",
+        "perfect": false,
+        "refund": 0
+      },
+      {
+        "id": "dream-island-powers-v1:e69b504c:2",
+        "sequence": 2,
+        "tick": 436,
+        "type": "power",
+        "lap": 1,
+        "lane": 0,
+        "index": -1,
+        "kind": "surge",
+        "perfect": true,
+        "refund": 0
+      }
+    ]
+  },
+  "schedule": {
+    "laps": 3,
+    "honoursLapOverride": true,
+    "chimeFactor": 1.85,
+    "strikeFactor": 2.05,
+    "chimeTick": 7233,
+    "strikeTick": 8014,
+    "fishRiseTick": 8494,
+    "nightSettledTick": 9454,
+    "nightRampTicks": 1440,
+    "events": [
+      {
+        "id": "chime-warning",
+        "tick": 7233
+      },
+      {
+        "id": "strike",
+        "tick": 8014
+      },
+      {
+        "id": "fish-rise",
+        "tick": 8494
+      },
+      {
+        "id": "night-settled",
+        "tick": 9454
+      }
+    ]
+  },
+  "state": {
+    "chimed": false,
+    "struck": false,
+    "fishRisen": false,
+    "nightSettled": false
+  },
+  "events": [],
+  "audio": {
+    "loaded": true,
+    "error": null,
+    "records": [],
+    "levels": {
+      "surf": 0.12795605771875426,
+      "night": 0,
+      "waterfall": 0.39083624465192607,
+      "birds-GROVE": 0.7604497631961221,
+      "birds-CUT": 0.7604497631961221
+    }
+  },
+  "clockHands": {
+    "minute": 0.6758305134500627,
+    "hour": -1.4018386984323807
+  },
+  "hardware": {
+    "devices": 5,
+    "meshes": 7,
+    "triangles": 4744,
+    "petalOpeningTicks": 30,
+    "source": "/assets/dreamisland/power-kit.glb",
+    "placements": [
+      {
+        "id": "beach-turbine",
+        "position": [
+          107.99998270989519,
+          -0.16987578308644657,
+          15.5
+        ],
+        "height": 1.591679573059082,
+        "groundY": -0.16987578308644657,
+        "hardwareLateral": 15.5,
+        "triggerLateral": 0,
+        "lateralOffset": 15.5
+      },
+      {
+        "id": "grove-projector",
+        "position": [
+          476.3226916279588,
+          10.506487216395808,
+          61.53753034942906
+        ],
+        "height": 1.5800000429153442,
+        "groundY": 10.506487216395808,
+        "hardwareLateral": -14.4,
+        "triggerLateral": -4,
+        "lateralOffset": -10.4
+      },
+      {
+        "id": "court-turbine",
+        "position": [
+          319.6444168166157,
+          8.661288830070152,
+          729.9964698122604
+        ],
+        "height": 1.591679573059082,
+        "groundY": 8.661288830070152,
+        "hardwareLateral": 14.5,
+        "triggerLateral": 4,
+        "lateralOffset": 10.5
+      },
+      {
+        "id": "reef-projector",
+        "position": [
+          54.50455015209132,
+          0,
+          580.6700346492323
+        ],
+        "height": 1.5800000429153442,
+        "groundY": null,
+        "hardwareLateral": -15.5,
+        "triggerLateral": -5,
+        "lateralOffset": -10.5
+      },
+      {
+        "id": "cut-turbine",
+        "position": [
+          19.613524570348556,
+          -0.16987577727766023,
+          126.69850567747797
+        ],
+        "height": 1.591679573059082,
+        "groundY": -0.16987577727766023,
+        "hardwareLateral": 13.5,
+        "triggerLateral": 0,
+        "lateralOffset": 13.5
+      }
+    ]
+  },
+  "painted": {
+    "paintedMeshes": 10,
+    "paintedTriangles": 66694,
+    "manifestTriangles": 66694,
+    "emissiveMaterials": 2,
+    "cardMaterials": 1,
+    "fishMeshes": 4,
+    "fishVisible": 0,
+    "reskinnedCourseDraws": 2,
+    "waterSurfaces": 3,
+    "waterTriangles": 2238,
+    "skyPanoramas": 2,
+    "flowShaders": 5,
+    "waterfallFlowShaders": 2,
+    "heroPlacements": 9,
+    "heroSourceMeshes": 58,
+    "heroMeshes": 17,
+    "heroTriangles": 18024,
+    "fishShoals": 2,
+    "fishShoalMeshes": 4,
+    "fishDeckSamples": 0,
+    "fishMinimumDeckClearance": null
+  }
+}

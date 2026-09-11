@@ -1,0 +1,1029 @@
+{
+  "script": "scripts/visual/dreamisland/atlas-quadrant-proof.mjs",
+  "url": "http://127.0.0.1:5200/?map=dreamisland&seed=3868938316&tier=works&demo=1&headless=1&diagnostics=1&start=manual&quality=high&music=0",
+  "errors": [],
+  "atlasManifest": {
+    "file": "public/assets/dreamisland/atlas-manifest.json",
+    "sha256": "ef4e7750c089970df097358fb5575235a378ccc6dbdf91c3c0e496f2d7a46675"
+  },
+  "quadrantColours": {
+    "TL": [
+      255,
+      0,
+      0
+    ],
+    "TR": [
+      0,
+      255,
+      0
+    ],
+    "BL": [
+      0,
+      0,
+      255
+    ],
+    "BR": [
+      255,
+      255,
+      0
+    ]
+  },
+  "materialsSwapped": 22,
+  "method": "Every atlas map and emissiveMap in the live scene replaced by a 1024x1024 four-colour quadrant sheet with the sampler settings copied from the texture it replaced; the shipped mesh isolated over the longest contiguous run of its own index buffer inside the claimed rect and rendered unlit; the mean of the pixels that differ from a background frame taken from the same camera compared against the four colours.",
+  "convention": "Manifest rects are bottom-origin V; every sampler on this map runs flipY:false, so the rect a UV must land in is [u0, 1-v1, u1, 1-v0], and the manifest TL is the debug sheet top-left.",
+  "claims": 18,
+  "decided": 18,
+  "undecided": [],
+  "results": [
+    {
+      "id": "surge-core",
+      "mesh": "DI_POWER_core_surge",
+      "role": "emissive",
+      "cell": "lamp-disc",
+      "at": [
+        0.04,
+        0.05
+      ],
+      "is": "Warm pale-yellow lamp disc for the tunnel and gate lamps.",
+      "claimed": "BL",
+      "rect": [
+        0.004,
+        0.004,
+        0.496,
+        0.496
+      ],
+      "census": {
+        "matchedTriangles": 36,
+        "isolatedTriangles": 36,
+        "totalTriangles": 36
+      },
+      "drawn": true,
+      "framed": {
+        "seen": 24,
+        "position": [
+          108.12133728712797,
+          12.749999976158142,
+          15.588167786598206
+        ],
+        "distance": 9.6,
+        "target": [
+          108.12133728712797,
+          1.149999976158142,
+          15.588167786598206
+        ],
+        "samples": 24
+      },
+      "backgroundPixels": 921600,
+      "maskedPixels": 379,
+      "mean": [
+        45.184696569920845,
+        25.488126649076516,
+        242.88390501319262
+      ],
+      "distances": {
+        "TL": 321.9700257290935,
+        "TR": 337.2090570071091,
+        "BL": 53.273831868230765,
+        "BR": 394.57667553590153
+      },
+      "nearest": "BL",
+      "margin": 268.6961938608627,
+      "decided": true
+    },
+    {
+      "id": "shield-core",
+      "mesh": "DI_POWER_core_shield",
+      "role": "emissive",
+      "cell": "shallows-glow",
+      "at": [
+        0.2,
+        0.21
+      ],
+      "is": "Turquoise lit-from-within shallows glow.",
+      "claimed": "TR",
+      "rect": [
+        0.504,
+        0.504,
+        0.996,
+        0.996
+      ],
+      "census": {
+        "matchedTriangles": 44,
+        "isolatedTriangles": 44,
+        "totalTriangles": 44
+      },
+      "drawn": true,
+      "framed": {
+        "seen": 24,
+        "position": [
+          475.76214381111095,
+          19.76091345863793,
+          62.21163207170004
+        ],
+        "distance": 9.6,
+        "target": [
+          475.76214381111095,
+          8.160913458637928,
+          62.21163207170004
+        ],
+        "samples": 24
+      },
+      "backgroundPixels": 921600,
+      "maskedPixels": 683,
+      "mean": [
+        33.13323572474378,
+        249.72620790629574,
+        14.59882869692533
+      ],
+      "distances": {
+        "TL": 334.3668132523811,
+        "TR": 36.58893264309886,
+        "BL": 348.2150390042626,
+        "BR": 222.40908203655238
+      },
+      "nearest": "TR",
+      "margin": 185.8201493934535,
+      "decided": true
+    },
+    {
+      "id": "surge-plate",
+      "mesh": "DI_POWER_plate_surge",
+      "role": "concrete",
+      "cell": "road-sand",
+      "at": [
+        0.04,
+        0.05
+      ],
+      "is": "Pale sandy concrete road surface with tyre-polish lanes deskewed onto U.",
+      "claimed": "TL",
+      "rect": [
+        0.004,
+        0.504,
+        0.496,
+        0.996
+      ],
+      "census": {
+        "matchedTriangles": 12,
+        "isolatedTriangles": 12,
+        "totalTriangles": 12
+      },
+      "drawn": true,
+      "framed": {
+        "seen": 24,
+        "position": [
+          106.19998478889465,
+          13.141841184925026,
+          -1.399999976158142
+        ],
+        "distance": 10.947367651869014,
+        "target": [
+          106.19998478889465,
+          0.005000002682209015,
+          -1.399999976158142
+        ],
+        "samples": 24
+      },
+      "backgroundPixels": 921600,
+      "maskedPixels": 25060,
+      "mean": [
+        254.62857142857143,
+        1.1714285714285715,
+        1.2214285714285715
+      ],
+      "distances": {
+        "TL": 1.732654563591569,
+        "TR": 359.5360134242182,
+        "BL": 359.50054930275087,
+        "BR": 253.8317819352182
+      },
+      "nearest": "TL",
+      "margin": 252.09912737162662,
+      "decided": true
+    },
+    {
+      "id": "shield-plate",
+      "mesh": "DI_POWER_plate_shield",
+      "role": "concrete",
+      "cell": "road-sand",
+      "at": [
+        0.2,
+        0.21
+      ],
+      "is": "Pale sandy concrete road surface with tyre-polish lanes deskewed onto U.",
+      "claimed": "TL",
+      "rect": [
+        0.004,
+        0.504,
+        0.496,
+        0.996
+      ],
+      "census": {
+        "matchedTriangles": 12,
+        "isolatedTriangles": 12,
+        "totalTriangles": 12
+      },
+      "drawn": true,
+      "framed": {
+        "seen": 24,
+        "position": [
+          470.0961380546976,
+          20.038797989204618,
+          68.27986132813913
+        ],
+        "distance": 10.947367766703316,
+        "target": [
+          470.0961380546976,
+          6.901956669160642,
+          68.27986132813913
+        ],
+        "samples": 24
+      },
+      "backgroundPixels": 921600,
+      "maskedPixels": 25784,
+      "mean": [
+        254.32240924604406,
+        2.117126900403351,
+        2.204196400868756
+      ],
+      "distances": {
+        "TL": 3.1304691846208703,
+        "TR": 358.6565123256409,
+        "BL": 358.59460172784986,
+        "BR": 252.8933868611636
+      },
+      "nearest": "TL",
+      "margin": 249.76291767654274,
+      "decided": true
+    },
+    {
+      "id": "road-deck",
+      "mesh": "dreamisland_blockout_road",
+      "role": "concrete",
+      "cell": "road-sand",
+      "at": [
+        0.03,
+        0.06
+      ],
+      "is": "Pale sandy concrete road surface with tyre-polish lanes deskewed onto U.",
+      "claimed": "TL",
+      "rect": [
+        0.004,
+        0.504,
+        0.496,
+        0.996
+      ],
+      "census": {
+        "matchedTriangles": 1600,
+        "isolatedTriangles": 1600,
+        "totalTriangles": 9832
+      },
+      "drawn": true,
+      "framed": {
+        "seen": 24,
+        "position": [
+          459.37112792053694,
+          156.72360171075965,
+          631.8169741222625
+        ],
+        "distance": 118.94819604949419,
+        "target": [
+          461.0570983886719,
+          14,
+          632.5541381835938
+        ],
+        "samples": 24
+      },
+      "backgroundPixels": 921600,
+      "maskedPixels": 133685,
+      "mean": [
+        254.32826420316417,
+        1.8335938960990388,
+        2.4278490481355424
+      ],
+      "distances": {
+        "TL": 3.1157256870743586,
+        "TR": 358.86207601690137,
+        "BL": 358.4395618170819,
+        "BR": 253.17893842013513
+      },
+      "nearest": "TL",
+      "margin": 250.06321273306077,
+      "decided": true
+    },
+    {
+      "id": "kerb",
+      "mesh": "dreamisland_blockout_road",
+      "role": "concrete",
+      "cell": "kerb-cyan",
+      "at": [
+        0.06,
+        0.09
+      ],
+      "is": "White kerb stone with one cyan stripe; the stripe runs along V.",
+      "claimed": "BL",
+      "rect": [
+        0.004,
+        0.004,
+        0.496,
+        0.496
+      ],
+      "census": {
+        "matchedTriangles": 8232,
+        "isolatedTriangles": 8232,
+        "totalTriangles": 9832
+      },
+      "drawn": true,
+      "framed": {
+        "seen": 24,
+        "position": [
+          439.6802995818924,
+          86.31684321405513,
+          623.1312667522037
+        ],
+        "distance": 61.03494060689418,
+        "target": [
+          447.2958068847656,
+          13.904999732971191,
+          616.60107421875
+        ],
+        "samples": 24
+      },
+      "backgroundPixels": 921600,
+      "maskedPixels": 18883,
+      "mean": [
+        27.970661441508234,
+        28.039347561298523,
+        247.9653656728274
+      ],
+      "distances": {
+        "TL": 337.36530371576237,
+        "TR": 337.3133828209838,
+        "BL": 40.22497971728274,
+        "BR": 405.6356504240799
+      },
+      "nearest": "BL",
+      "margin": 297.08840310370107,
+      "decided": true
+    },
+    {
+      "id": "foam",
+      "mesh": "dreamisland_foam",
+      "role": "water",
+      "cell": "foam-gradient",
+      "uniform": true,
+      "at": [
+        0.09,
+        0.115
+      ],
+      "is": "Surf foam dissolving into cyan. V is distance from shore: tiles in U only.",
+      "claimed": "BL",
+      "rect": [
+        0.004,
+        0.004,
+        0.496,
+        0.496
+      ],
+      "census": {
+        "isolatedTriangles": 0,
+        "totalTriangles": 202
+      },
+      "drawn": true,
+      "framed": {
+        "seen": 19,
+        "position": [
+          374.59894111831716,
+          174.24767078498866,
+          375.85586166381836
+        ],
+        "distance": 270,
+        "target": [
+          133.10359954833984,
+          -0.5,
+          375.85586166381836
+        ],
+        "samples": 26
+      },
+      "backgroundPixels": 921600,
+      "maskedPixels": 13228,
+      "mean": [
+        34.51322951315392,
+        23.06289688539462,
+        251.07038100997883
+      ],
+      "distances": {
+        "TL": 334.9367841742101,
+        "TR": 343.54376581902727,
+        "BL": 41.69534901617587,
+        "BR": 406.75001165508303
+      },
+      "nearest": "BL",
+      "margin": 293.2414351580343,
+      "decided": true
+    },
+    {
+      "id": "sea",
+      "mesh": "dreamisland_sea",
+      "role": "water",
+      "cell": "cobalt-facets",
+      "uniform": true,
+      "at": [
+        0.13,
+        0.16
+      ],
+      "is": "Deep cobalt sea with low-poly wave facets. Verdict-mandated tiling fix.",
+      "claimed": "TR",
+      "rect": [
+        0.504,
+        0.504,
+        0.996,
+        0.996
+      ],
+      "census": {
+        "isolatedTriangles": 0,
+        "totalTriangles": 1802
+      },
+      "drawn": true,
+      "framed": {
+        "seen": 18,
+        "position": [
+          430.80425041557396,
+          208.68457263351527,
+          479.76152580619896
+        ],
+        "distance": 270,
+        "target": [
+          274.919677734375,
+          -1.2000000476837158,
+          323.876953125
+        ],
+        "samples": 25
+      },
+      "backgroundPixels": 921600,
+      "maskedPixels": 881920,
+      "mean": [
+        6.620756984760522,
+        254.98675390058054,
+        0.1428837082728592
+      ],
+      "distances": {
+        "TL": 355.96420247172705,
+        "TR": 6.622311851951317,
+        "BL": 360.57485881899953,
+        "BR": 248.37928446639148
+      },
+      "nearest": "TR",
+      "margin": 241.75697261444017,
+      "decided": true
+    },
+    {
+      "id": "palm-bark",
+      "mesh": "DI_STATIC_DI_MAT_jungle",
+      "role": "jungle",
+      "cell": "bark",
+      "at": [
+        0.17,
+        0.2
+      ],
+      "is": "Segmented palm-trunk bark, bands run along U, tiles up a trunk in V.",
+      "claimed": "TL",
+      "rect": [
+        0.004,
+        0.504,
+        0.496,
+        0.996
+      ],
+      "census": {
+        "matchedTriangles": 21472,
+        "isolatedTriangles": 21472,
+        "totalTriangles": 30632
+      },
+      "drawn": true,
+      "framed": {
+        "seen": 24,
+        "position": [
+          385.06604715703816,
+          9.539383868128901,
+          72.59661629579496
+        ],
+        "distance": 21.213110213829264,
+        "target": [
+          404.4203796386719,
+          13.91238784790039,
+          73.68144226074219
+        ],
+        "samples": 24
+      },
+      "backgroundPixels": 921600,
+      "maskedPixels": 63147,
+      "mean": [
+        251.51315185202782,
+        9.607376439102412,
+        11.401396740937813
+      ],
+      "distances": {
+        "TL": 15.311813729728577,
+        "TR": 351.57701446523185,
+        "BL": 350.2733885786212,
+        "BR": 245.682090628828
+      },
+      "nearest": "TL",
+      "margin": 230.37027689909942,
+      "decided": true
+    },
+    {
+      "id": "frond-card",
+      "mesh": "DI_STATIC_DI_MAT_jungle-card",
+      "role": "jungle-card",
+      "cell": "frond",
+      "at": [
+        0.21,
+        0.24
+      ],
+      "is": "Single drooping palm frond, the crown cards.",
+      "claimed": "TL",
+      "rect": [
+        0.03418,
+        0.573242,
+        0.44043,
+        0.918945
+      ],
+      "census": {
+        "matchedTriangles": 5238,
+        "isolatedTriangles": 4532,
+        "totalTriangles": 8294
+      },
+      "drawn": true,
+      "framed": {
+        "seen": 24,
+        "position": [
+          616.5676912238799,
+          40.90985288504967,
+          123.76486516651991
+        ],
+        "distance": 89.91960477253838,
+        "target": [
+          526.9472045898438,
+          22.925931930541992,
+          116.43658447265625
+        ],
+        "samples": 24
+      },
+      "backgroundPixels": 921600,
+      "maskedPixels": 56274,
+      "mean": [
+        251.9482887301418,
+        9.801027117318833,
+        8.887763443153144
+      ],
+      "distances": {
+        "TL": 13.578122596679119,
+        "TR": 351.6809190669721,
+        "BL": 352.3424943284796,
+        "BR": 245.37897543069548
+      },
+      "nearest": "TL",
+      "margin": 231.80085283401635,
+      "decided": true
+    },
+    {
+      "id": "sand-verge",
+      "mesh": "DI_STATIC_DI_MAT_jungle",
+      "role": "jungle",
+      "cell": "sand",
+      "at": [
+        0.25,
+        0.28
+      ],
+      "is": "Pale beach sand with ripples and shells; the verges.",
+      "claimed": "BR",
+      "rect": [
+        0.504,
+        0.004,
+        0.996,
+        0.496
+      ],
+      "census": {
+        "matchedTriangles": 1224,
+        "isolatedTriangles": 1224,
+        "totalTriangles": 30632
+      },
+      "drawn": true,
+      "framed": {
+        "seen": 24,
+        "position": [
+          624.9723184901678,
+          209.4459778471035,
+          215.79884069306098
+        ],
+        "distance": 157.87380269671277,
+        "target": [
+          628.4288330078125,
+          20.036474227905273,
+          216.41848754882812
+        ],
+        "samples": 24
+      },
+      "backgroundPixels": 921600,
+      "maskedPixels": 128926,
+      "mean": [
+        254.00332749018818,
+        254.50491754960208,
+        3.1356126770395423
+      ],
+      "distances": {
+        "TL": 254.52618427164225,
+        "TR": 254.02316341149066,
+        "BL": 439.00582346318345,
+        "BR": 3.3272405360775577
+      },
+      "nearest": "BR",
+      "margin": 250.6959228754131,
+      "decided": true
+    },
+    {
+      "id": "gate-markers",
+      "mesh": "dreamisland_blockout_markers",
+      "role": "metal",
+      "cell": "rail",
+      "at": [
+        0.36,
+        0.39
+      ],
+      "is": "Galvanised guard rail post and beam with rivets.",
+      "claimed": "TR",
+      "rect": [
+        0.504,
+        0.504,
+        0.996,
+        0.996
+      ],
+      "census": {
+        "matchedTriangles": 12,
+        "isolatedTriangles": 12,
+        "totalTriangles": 12
+      },
+      "drawn": true,
+      "framed": {
+        "seen": 24,
+        "position": [
+          -0.2845838518696837,
+          13.043697729508034,
+          -13.958531718468294
+        ],
+        "distance": 10.869748107923362,
+        "target": [
+          -0.2845838518696837,
+          0,
+          -13.958531718468294
+        ],
+        "samples": 24
+      },
+      "backgroundPixels": 921600,
+      "maskedPixels": 774,
+      "mean": [
+        13.249354005167959,
+        252.68733850129198,
+        10.242894056847545
+      ],
+      "distances": {
+        "TL": 349.8559457211567,
+        "TR": 16.905935745224795,
+        "BL": 352.04044842899566,
+        "BR": 241.9785943441816
+      },
+      "nearest": "TR",
+      "margin": 225.07265859895682,
+      "decided": true
+    },
+    {
+      "id": "causeway-paving",
+      "mesh": "DI_STATIC_DI_MAT_concrete",
+      "role": "concrete",
+      "cell": "causeway-paving",
+      "at": [
+        0.42,
+        0.47
+      ],
+      "is": "Dry limestone paving blocks with mossy joints, the causeway deck.",
+      "claimed": "TR",
+      "rect": [
+        0.504,
+        0.504,
+        0.996,
+        0.996
+      ],
+      "census": {
+        "matchedTriangles": 1736,
+        "isolatedTriangles": 124,
+        "totalTriangles": 23180
+      },
+      "drawn": true,
+      "framed": {
+        "seen": 24,
+        "position": [
+          516.151123046875,
+          55.775046948980325,
+          534.6900024414062
+        ],
+        "distance": 34.91253982351144,
+        "target": [
+          516.151123046875,
+          13.879999160766602,
+          534.6900024414062
+        ],
+        "samples": 24
+      },
+      "backgroundPixels": 921600,
+      "maskedPixels": 115870,
+      "mean": [
+        3.373289030810391,
+        254.6161215154915,
+        1.0275912660740485
+      ],
+      "distances": {
+        "TL": 357.975455796307,
+        "TR": 3.547165824480992,
+        "BL": 359.64250696016074,
+        "BR": 251.62910201261116
+      },
+      "nearest": "TR",
+      "margin": 248.08193618813016,
+      "decided": true
+    },
+    {
+      "id": "clock-face",
+      "mesh": "DI_HERO_clock-tower_DI_MAT_emissive",
+      "role": "emissive",
+      "cell": "clock-face",
+      "at": [
+        0.55,
+        0.6
+      ],
+      "is": "Glowing clock face. Face glow only: the hands are metal geometry.",
+      "claimed": "BR",
+      "rect": [
+        0.504,
+        0.004,
+        0.996,
+        0.496
+      ],
+      "census": {
+        "matchedTriangles": 48,
+        "isolatedTriangles": 48,
+        "totalTriangles": 48
+      },
+      "drawn": true,
+      "framed": {
+        "seen": 24,
+        "position": [
+          396.595536821139,
+          25.930856704711914,
+          666.6269677937726
+        ],
+        "distance": 9.6,
+        "target": [
+          389.9797668457031,
+          23.930856704711914,
+          673.5833740234375
+        ],
+        "samples": 24
+      },
+      "backgroundPixels": 921600,
+      "maskedPixels": 57378,
+      "mean": [
+        254.64078566698038,
+        254.81522534769425,
+        1.170239464603158
+      ],
+      "distances": {
+        "TL": 254.8181656874913,
+        "TR": 254.64354169539365,
+        "BL": 440.6838732328994,
+        "BR": 1.2379971783877892
+      },
+      "nearest": "BR",
+      "margin": 253.40554451700586,
+      "decided": true
+    },
+    {
+      "id": "shallows",
+      "mesh": "dreamisland_shallows",
+      "role": "water",
+      "cell": "caustic-shallows",
+      "uniform": true,
+      "at": [
+        0.7,
+        0.76
+      ],
+      "is": "Turquoise shallows with a white caustic web, seen straight down.",
+      "claimed": "TL",
+      "rect": [
+        0.004,
+        0.504,
+        0.496,
+        0.996
+      ],
+      "census": {
+        "isolatedTriangles": 0,
+        "totalTriangles": 234
+      },
+      "drawn": true,
+      "framed": {
+        "seen": 22,
+        "position": [
+          276.80557918548584,
+          581.2249999940395,
+          377.3878402709961
+        ],
+        "distance": 480,
+        "target": [
+          276.80557918548584,
+          5.2249999940395355,
+          377.3878402709961
+        ],
+        "samples": 26
+      },
+      "backgroundPixels": 921600,
+      "maskedPixels": 78558,
+      "mean": [
+        248.22263805086686,
+        16.685277120089616,
+        17.696950024185952
+      ],
+      "distances": {
+        "TL": 25.249022708260984,
+        "TR": 344.55996172280186,
+        "BL": 343.81043329330413,
+        "BR": 239.06698186172966
+      },
+      "nearest": "TL",
+      "margin": 213.81795915346868,
+      "decided": true
+    },
+    {
+      "id": "wall-block",
+      "mesh": "DI_STATIC_DI_MAT_concrete",
+      "role": "concrete",
+      "cell": "wall-block",
+      "at": [
+        0.88,
+        0.93
+      ],
+      "is": "Weathered limestone wall blocks, the cut walls and the sea stacks.",
+      "claimed": "BR",
+      "rect": [
+        0.504,
+        0.004,
+        0.996,
+        0.496
+      ],
+      "census": {
+        "matchedTriangles": 15360,
+        "isolatedTriangles": 8640,
+        "totalTriangles": 23180
+      },
+      "drawn": true,
+      "framed": {
+        "seen": 24,
+        "position": [
+          -76.87202027486283,
+          18.710098625640835,
+          209.11141915529572
+        ],
+        "distance": 93.55049312820417,
+        "target": [
+          -48.25404739379883,
+          0,
+          120.0456771850586
+        ],
+        "samples": 24
+      },
+      "backgroundPixels": 921600,
+      "maskedPixels": 69321,
+      "mean": [
+        250.3321215793194,
+        252.30337127277448,
+        11.171708428903218
+      ],
+      "distances": {
+        "TL": 252.59371986211013,
+        "TR": 250.59579000876306,
+        "BL": 431.01670271636857,
+        "BR": 12.404352649904016
+      },
+      "nearest": "BR",
+      "margin": 238.19143735885905,
+      "decided": true
+    },
+    {
+      "id": "signage-plate",
+      "mesh": "DI_STATIC_DI_MAT_signage",
+      "role": "signage",
+      "cell": "plate-dream-island",
+      "at": [
+        0.975,
+        0.995
+      ],
+      "is": "Enamel place plate reading DREAM ISLAND.",
+      "claimed": "TL",
+      "rect": [
+        0.033203,
+        0.6875,
+        0.470703,
+        0.847656
+      ],
+      "census": {
+        "matchedTriangles": 2,
+        "isolatedTriangles": 2,
+        "totalTriangles": 212
+      },
+      "drawn": true,
+      "framed": {
+        "seen": 6,
+        "position": [
+          2.109836953365973,
+          5.090000152587891,
+          -5.229704174878329
+        ],
+        "distance": 9.6,
+        "target": [
+          2.125196933746338,
+          3.0900001525878906,
+          -14.829691886901855
+        ],
+        "samples": 6
+      },
+      "backgroundPixels": 921600,
+      "maskedPixels": 4933,
+      "mean": [
+        254.29677680924388,
+        2.1712953577944454,
+        2.2531927832961687
+      ],
+      "distances": {
+        "TL": 3.2071676141877687,
+        "TR": 358.6004482210594,
+        "BL": 358.542206409983,
+        "BR": 252.83972253510788
+      },
+      "nearest": "TL",
+      "margin": 249.63255492092011,
+      "decided": true
+    },
+    {
+      "id": "watchtower-drum",
+      "mesh": "DI_HERO_watchtower-ruin_DI_MAT_concrete",
+      "role": "concrete",
+      "cell": "wall-block",
+      "at": [
+        0.32,
+        0.35
+      ],
+      "is": "Weathered limestone wall blocks, the cut walls and the sea stacks.",
+      "claimed": "BR",
+      "rect": [
+        0.504,
+        0.004,
+        0.996,
+        0.496
+      ],
+      "census": {
+        "matchedTriangles": 9022,
+        "isolatedTriangles": 9022,
+        "totalTriangles": 9278
+      },
+      "drawn": true,
+      "framed": {
+        "seen": 24,
+        "position": [
+          665.9342991165101,
+          19.39236880175835,
+          307.3411836079087
+        ],
+        "distance": 28.72455959292686,
+        "target": [
+          665.730712890625,
+          42.37126541137695,
+          307.3824157714844
+        ],
+        "samples": 24
+      },
+      "backgroundPixels": 921600,
+      "maskedPixels": 902772,
+      "mean": [
+        254.98635535882815,
+        254.99349005064403,
+        0.04122967925456261
+      ],
+      "distances": {
+        "TL": 254.99349374890053,
+        "TR": 254.98635877521858,
+        "BL": 441.6375164666755,
+        "BR": 0.04391403106935198
+      },
+      "nearest": "BR",
+      "margin": 254.9424447441492,
+      "decided": true
+    }
+  ]
+}

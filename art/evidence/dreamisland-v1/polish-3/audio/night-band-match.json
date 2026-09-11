@@ -1,0 +1,210 @@
+{
+  "script": "scripts/visual/dreamisland/bed-match.py",
+  "sampleRate": 24000,
+  "seconds": 8,
+  "reference": "art/references/dreamisland/phase-e/audio/night-bed.mp3",
+  "rendered": "art/evidence/dreamisland-v1/polish-3/audio/night-bed-offline.wav",
+  "bands": [
+    {
+      "hz": 19.68626640460739,
+      "referenceDb": -54.94895867252549,
+      "renderedDb": -54.927444432515045,
+      "deltaDb": 0.021514240010446883,
+      "passBand": true
+    },
+    {
+      "hz": 24.803141437003124,
+      "referenceDb": -52.779446102630665,
+      "renderedDb": -52.80337595476088,
+      "deltaDb": -0.023929852130216034,
+      "passBand": true
+    },
+    {
+      "hz": 31.25,
+      "referenceDb": -52.86914242289802,
+      "renderedDb": -52.86222163599112,
+      "deltaDb": 0.006920786906903231,
+      "passBand": true
+    },
+    {
+      "hz": 39.37253280921478,
+      "referenceDb": -48.22688928419241,
+      "renderedDb": -48.2321543689027,
+      "deltaDb": -0.005265084710288193,
+      "passBand": true
+    },
+    {
+      "hz": 49.60628287400625,
+      "referenceDb": -49.65886693363206,
+      "renderedDb": -49.65720491884454,
+      "deltaDb": 0.0016620147875201496,
+      "passBand": true
+    },
+    {
+      "hz": 62.5,
+      "referenceDb": -48.03346155244977,
+      "renderedDb": -48.03366776615146,
+      "deltaDb": -0.0002062137016878296,
+      "passBand": true
+    },
+    {
+      "hz": 78.74506561842958,
+      "referenceDb": -45.86533318113092,
+      "renderedDb": -45.865601731522325,
+      "deltaDb": -0.0002685503914037213,
+      "passBand": true
+    },
+    {
+      "hz": 99.21256574801247,
+      "referenceDb": -48.46594921859853,
+      "renderedDb": -48.464491557833156,
+      "deltaDb": 0.001457660765375124,
+      "passBand": true
+    },
+    {
+      "hz": 125.0,
+      "referenceDb": -50.47446949064629,
+      "renderedDb": -50.4745318997199,
+      "deltaDb": -6.240907360677284e-05,
+      "passBand": true
+    },
+    {
+      "hz": 157.49013123685916,
+      "referenceDb": -50.885514482452535,
+      "renderedDb": -50.889117527686565,
+      "deltaDb": -0.003603045234029878,
+      "passBand": true
+    },
+    {
+      "hz": 198.42513149602493,
+      "referenceDb": -53.34818466145489,
+      "renderedDb": -53.304101011275186,
+      "deltaDb": 0.04408365017970084,
+      "passBand": true
+    },
+    {
+      "hz": 250.0,
+      "referenceDb": -54.475809093273575,
+      "renderedDb": -54.47449955852751,
+      "deltaDb": 0.0013095347460634343,
+      "passBand": true
+    },
+    {
+      "hz": 314.9802624737183,
+      "referenceDb": -53.83519695393354,
+      "renderedDb": -53.79988672773787,
+      "deltaDb": 0.03531022619566926,
+      "passBand": true
+    },
+    {
+      "hz": 396.8502629920499,
+      "referenceDb": -54.31159681353365,
+      "renderedDb": -54.25927312204395,
+      "deltaDb": 0.052323691489696955,
+      "passBand": true
+    },
+    {
+      "hz": 500.0,
+      "referenceDb": -53.81495152001423,
+      "renderedDb": -53.71186173000049,
+      "deltaDb": 0.10308979001374041,
+      "passBand": true
+    },
+    {
+      "hz": 629.9605249474366,
+      "referenceDb": -54.71740778982906,
+      "renderedDb": -54.590088019290874,
+      "deltaDb": 0.1273197705381861,
+      "passBand": true
+    },
+    {
+      "hz": 793.7005259840998,
+      "referenceDb": -56.721545870062535,
+      "renderedDb": -56.52861064836226,
+      "deltaDb": 0.19293522170027444,
+      "passBand": true
+    },
+    {
+      "hz": 1000.0,
+      "referenceDb": -56.73386107077331,
+      "renderedDb": -56.47570362850324,
+      "deltaDb": 0.2581574422700683,
+      "passBand": true
+    },
+    {
+      "hz": 1259.9210498948732,
+      "referenceDb": -56.52320924113801,
+      "renderedDb": -56.204928416170205,
+      "deltaDb": 0.3182808249678075,
+      "passBand": true
+    },
+    {
+      "hz": 1587.4010519681995,
+      "referenceDb": -55.537194017514324,
+      "renderedDb": -55.182612940458206,
+      "deltaDb": 0.3545810770561175,
+      "passBand": true
+    },
+    {
+      "hz": 2000.0,
+      "referenceDb": -54.55527946321038,
+      "renderedDb": -54.234265825147716,
+      "deltaDb": 0.3210136380626665,
+      "passBand": true
+    },
+    {
+      "hz": 2519.8420997897465,
+      "referenceDb": -54.41241289036612,
+      "renderedDb": -54.15138471729176,
+      "deltaDb": 0.261028173074358,
+      "passBand": true
+    },
+    {
+      "hz": 3174.8021039363994,
+      "referenceDb": -32.72069356457668,
+      "renderedDb": -32.56497602056705,
+      "deltaDb": 0.1557175440096259,
+      "passBand": true
+    },
+    {
+      "hz": 4000.0,
+      "referenceDb": -44.09766833586987,
+      "renderedDb": -42.7120591521167,
+      "deltaDb": 1.3856091837531679,
+      "passBand": true
+    },
+    {
+      "hz": 5039.684199579493,
+      "referenceDb": -16.51179370964794,
+      "renderedDb": -17.582022399876735,
+      "deltaDb": -1.0702286902287952,
+      "passBand": true
+    },
+    {
+      "hz": 6349.604207872798,
+      "referenceDb": -24.542682404435894,
+      "renderedDb": -24.190469406262828,
+      "deltaDb": 0.35221299817306573,
+      "passBand": true
+    },
+    {
+      "hz": 8000.0,
+      "referenceDb": -35.130032829460916,
+      "renderedDb": -34.41236354678419,
+      "deltaDb": 0.7176692826767237,
+      "passBand": true
+    },
+    {
+      "hz": 10079.368399158986,
+      "referenceDb": -28.320839841281966,
+      "renderedDb": -27.864212982421684,
+      "deltaDb": 0.4566268588602824,
+      "passBand": true
+    }
+  ],
+  "passed": true,
+  "referenceRmsDb": -15.434591458474786,
+  "renderedRmsDb": -16.10907432863257,
+  "peak": 0.6942927241325378,
+  "bandwidthNote": "All complete 1/3-octave bands in the 24 kHz delivery format; both inputs resampled identically."
+}

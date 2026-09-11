@@ -1,0 +1,25 @@
+{
+  "script": "scripts/visual/dreamisland/effect-pixels.py",
+  "rows": [
+    {
+      "kind": "surge",
+      "pixels": 12065,
+      "meanPositiveSrgbContribution": [
+        0.5663014878559165,
+        0.5150916197395637,
+        0.44847825910303724
+      ],
+      "passed": true
+    },
+    {
+      "kind": "shield",
+      "pixels": 8541,
+      "meanPositiveSrgbContribution": [
+        0.0666978886156952,
+        0.07634730745126338,
+        0.07526831362448387
+      ],
+      "passed": true
+    }
+  ]
+}

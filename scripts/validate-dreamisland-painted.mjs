@@ -33,6 +33,8 @@ import {createHash} from 'node:crypto';
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {sourceModule} from './visual/dreamisland/modules.mjs';
+import {DREAMISLAND_ABILITY_CONFIG} from '../src/game/dreamisland-powers-config.js';
+import {dreamIslandHardwareLateral,dreamIslandHardwareYaw,dreamIslandHardwareFoot,dreamIslandHardwareSupport} from '../src/game/dreamisland-hardware-layout.js';
 
 const flag=name=>process.argv.find(a=>a.startsWith('--'+name+'='))?.slice(name.length+3);
 const read=name=>JSON.parse(readFileSync(name,'utf8'));
@@ -41,6 +43,8 @@ const painted=read('public/assets/dreamisland/painted.json');
 const atlas=read('public/assets/dreamisland/atlas-manifest.json');
 const signage=read('public/assets/dreamisland/signage-manifest.json');
 const {CELL,QUADRANT,sampled}=await import(await sourceModule('dreamisland-materials.ts'));
+const audioPositions=spawnSync(process.execPath,['scripts/prepare-dreamisland-audio-positions.mjs','--check'],{encoding:'utf8'});
+assert.equal(audioPositions.status,0,audioPositions.stderr||audioPositions.error?.message||'Dream Island audio anchors do not match painted geometry.');
 
 // --- 1. Five named silhouette features per asset, and the target metres.
 const FOCAL=['clock-tower','watchtower-ruin','waterfall-cliff','palm-upright','palm-lean','palm-tall',
@@ -161,6 +165,53 @@ for(const placement of painted.placements){
   position:placement.position,yaw:placement.yaw,scale});
 }
 assert.ok(heroPlacements.length>0,'painted.json records no HERO placements; the hero swap did not happen.');
+// POLISH-3: add the actual verge hardware, closed AND fully open, and the deck
+// plates to the same corridor scene before casting its unchanged rays.
+const {DreamIslandCourse}=await import(await sourceModule('dreamisland-course.ts'));
+const hardwareCourse=new DreamIslandCourse();
+const kit=await loadGeometry('public/assets/dreamisland/power-kit.glb');
+const hardwarePlacements=[];
+for(const pickup of DREAMISLAND_ABILITY_CONFIG.pickups){
+ const sample=hardwareCourse.sample(pickup.progress),lateral=dreamIslandHardwareLateral(sample.halfWidth,pickup.lateral??0,hardwareCourse.sectorLabelAt(pickup.progress));
+ const {position,groundY}=dreamIslandHardwareFoot(sample,lateral,scene);
+ const template=kit.getObjectByName('PK_'+pickup.kind);
+ assert.ok(template,'Power kit is missing PK_'+pickup.kind);
+ let triangles=0;
+ template.traverse(object=>{if(object.isMesh)triangles+=(object.geometry.index?.count??object.geometry.attributes.position.count)/3;});
+ assert.ok(triangles<=1200,`${pickup.kind} has ${triangles} triangles`);
+ for(const open of [false,true]){
+  const instance=template.clone(true),holder=new THREE.Group();
+  if(open)instance.traverse(object=>{if(object.name.startsWith('PK_shield_hinge_'))object.rotateZ(.70);});
+  holder.add(instance);
+  const core=template.getObjectByName('PK_'+pickup.kind+'_core');
+  assert.ok(core?.isMesh,'Power kit core is missing');
+  const lamp=new THREE.Mesh(core.geometry,core.material);
+  lamp.matrixAutoUpdate=false;lamp.matrix.makeTranslation(0,.30,-.43).multiply(new THREE.Matrix4().makeScale(.22,.22,.22));
+  holder.add(lamp);holder.matrixAutoUpdate=false;
+  holder.matrix.makeBasis(sample.right,sample.up,sample.tangent.clone().negate())
+   .multiply(new THREE.Matrix4().makeRotationY(dreamIslandHardwareYaw(lateral))).setPosition(position);
+  holder.name='POWER_'+pickup.id+(open?'_open':'_closed');scene.add(holder);
+ }
+ if(groundY===null){
+  const support=dreamIslandHardwareSupport(sample,lateral);
+  const mesh=new THREE.Mesh(support.geometry,new THREE.MeshBasicMaterial({side:THREE.DoubleSide}));
+  mesh.name='POWER_SUPPORT_'+pickup.id;mesh.matrixAutoUpdate=false;mesh.matrix.copy(support.matrix);scene.add(mesh);
+ }
+ const plate=new THREE.Mesh(new THREE.BoxGeometry(2.8,.08,3.6),new THREE.MeshBasicMaterial({side:THREE.DoubleSide}));
+ plate.matrixAutoUpdate=false;plate.matrix.makeBasis(sample.right,sample.up,sample.tangent.clone().negate())
+  .setPosition(sample.position.clone().addScaledVector(sample.right,pickup.lateral??0).addScaledVector(sample.up,.045));
+ plate.name='POWER_PLATE_'+pickup.id;scene.add(plate);
+ plate.updateMatrixWorld(true);
+ const vertices=plate.geometry.attributes.position,point=new THREE.Vector3();
+ let plateTopMetres=-Infinity;
+ for(let i=0;i<vertices.count;i++){
+  point.fromBufferAttribute(vertices,i).applyMatrix4(plate.matrixWorld).sub(sample.position);
+  plateTopMetres=Math.max(plateTopMetres,point.dot(sample.up));
+ }
+ assert.ok(plateTopMetres<=.3,'Pickup plate must remain below 0.3 m');
+ hardwarePlacements.push({id:pickup.id,progress:pickup.progress,triggerLateral:pickup.lateral,
+  position:position.toArray(),groundY,hardwareLateral:lateral,lateralOffset:lateral-pickup.lateral,triangles,plateTopMetres});
+}
 scene.updateMatrixWorld(true);
 const ray=new THREE.Raycaster(),up=new THREE.Vector3(0,1,0),hits=[];
 // The bore's lintel is at 8 m and the road runs under it, so the probe there is
@@ -281,6 +332,8 @@ const report={script:'scripts/validate-dreamisland-painted.mjs',
   sweptEdgeEnvelopeMetres:[boreMinX,boreMaxX],sweptEdgeWidthMetres:boreMaxX-boreMinX,
   lateralClearanceMetres:boreClearance,
   note:'Road edges in the bore local frame. This is the check the upward ray cannot make: a road buried in solid masonry has nothing above it to hit.'},
+ audioSources:{instrument:'scripts/prepare-dreamisland-audio-positions.mjs --check',anchors:painted.audioSources.sources.length,matched:true},
+ powerKit:{placements:hardwarePlacements,plateAtlasCell:'concrete/road-sand',hingeSweep:'closed and open at 0.70 rad, with matching lamps and deck plates included in corridor rays'},
  corridor:{samples,boreSamples,openClearanceMetres:OPEN_CLEARANCE,boreClearanceMetres:BORE_CLEARANCE,
   rideHeightMetres:RIDE_HEIGHT,intrusions:hits.length,heroPlacementsInScene:heroPlacements.length,
   note:'Spatial sweep: an upward ray at every station every 2 m across the road. Not a timed sample window, and not proof that anything rendered.'},

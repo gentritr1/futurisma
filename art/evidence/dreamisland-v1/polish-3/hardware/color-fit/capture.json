@@ -1,0 +1,1692 @@
+{
+  "script": "scripts/visual/dreamisland/polish3-frames.mjs",
+  "captures": [
+    {
+      "shot": {
+        "id": "surge-day-8m",
+        "kind": "surge",
+        "blend": 0,
+        "distance": 8
+      },
+      "position": [
+        105.42781752171729,
+        2.637260848698501,
+        6.750956605205994
+      ],
+      "target": [
+        107.99998270989519,
+        0.8,
+        14.1
+      ],
+      "distance": 8,
+      "tick": 0,
+      "strikeTick": 8014,
+      "hardware": {
+        "devices": 5,
+        "meshes": 7,
+        "triangles": 4636,
+        "petalOpeningTicks": 30,
+        "source": "/assets/dreamisland/power-kit.glb",
+        "placements": [
+          {
+            "id": "beach-turbine",
+            "position": [
+              107.99998270989519,
+              0,
+              14.1
+            ],
+            "height": 1.591679573059082,
+            "hardwareLateral": 14.1,
+            "triggerLateral": 0,
+            "lateralOffset": 14.1
+          },
+          {
+            "id": "grove-projector",
+            "position": [
+              475.1233021435955,
+              7.006487626748943,
+              63.50004528307892
+            ],
+            "height": 1.5800000429153442,
+            "hardwareLateral": -12.1,
+            "triggerLateral": -4,
+            "lateralOffset": -8.1
+          },
+          {
+            "id": "court-turbine",
+            "position": [
+              319.99677118135486,
+              8.142256047562153,
+              731.3493874602767
+            ],
+            "height": 1.591679573059082,
+            "hardwareLateral": 13.1,
+            "triggerLateral": 4,
+            "lateralOffset": 9.1
+          },
+          {
+            "id": "reef-projector",
+            "position": [
+              55.773191978095404,
+              0,
+              580.0779637773657
+            ],
+            "height": 1.5800000429153442,
+            "hardwareLateral": -14.1,
+            "triggerLateral": -5,
+            "lateralOffset": -9.1
+          },
+          {
+            "id": "cut-turbine",
+            "position": [
+              18.753169525587932,
+              0,
+              127.80294634901942
+            ],
+            "height": 1.591679573059082,
+            "hardwareLateral": 12.1,
+            "triggerLateral": 0,
+            "lateralOffset": 12.1
+          }
+        ]
+      },
+      "settle": {
+        "stable": 6,
+        "polls": 7
+      },
+      "applied": {
+        "angles": {
+          "minute": 0,
+          "hour": -1.5707963267948966
+        },
+        "hands": [
+          {
+            "kind": "hour",
+            "angle": -1.5707963267948966,
+            "matrix": [
+              5.704781630597833e-17,
+              -1.2857142857142858,
+              5.425434094741411e-17,
+              0,
+              0.9316615426700539,
+              7.872729423090129e-17,
+              0.8860406279620883,
+              0,
+              -0.8860406279620883,
+              0,
+              0.9316615426700539,
+              0,
+              390.06837048918374,
+              23.930857142857143,
+              673.4902113836912,
+              1
+            ]
+          },
+          {
+            "kind": "minute",
+            "angle": 0,
+            "matrix": [
+              0.9316615426700539,
+              0,
+              0.8860406279620883,
+              0,
+              0,
+              1.2857142857142858,
+              0,
+              0,
+              -0.8860406279620883,
+              0,
+              0.9316615426700539,
+              0,
+              390.06837048918374,
+              23.930857142857143,
+              673.4902113836912,
+              1
+            ]
+          }
+        ],
+        "plates": [
+          {
+            "kind": "surge",
+            "cell": "road-sand",
+            "height": 0.08,
+            "count": 3,
+            "emissive": 0.15
+          },
+          {
+            "kind": "shield",
+            "cell": "road-sand",
+            "height": 0.08,
+            "count": 2,
+            "emissive": 0.15
+          }
+        ]
+      },
+      "pixelRegion": {
+        "full": "surge-day-8m.png",
+        "isolation": "surge-day-8m-isolation.png",
+        "blank": "surge-day-8m-blank.png",
+        "mesh": "DI_POWER_core_surge"
+      }
+    },
+    {
+      "shot": {
+        "id": "surge-night-8m",
+        "kind": "surge",
+        "blend": 1,
+        "distance": 8
+      },
+      "position": [
+        105.42781752171729,
+        2.637260848698501,
+        6.750956605205994
+      ],
+      "target": [
+        107.99998270989519,
+        0.8,
+        14.1
+      ],
+      "distance": 8,
+      "tick": 0,
+      "strikeTick": 8014,
+      "hardware": {
+        "devices": 5,
+        "meshes": 7,
+        "triangles": 4636,
+        "petalOpeningTicks": 30,
+        "source": "/assets/dreamisland/power-kit.glb",
+        "placements": [
+          {
+            "id": "beach-turbine",
+            "position": [
+              107.99998270989519,
+              0,
+              14.1
+            ],
+            "height": 1.591679573059082,
+            "hardwareLateral": 14.1,
+            "triggerLateral": 0,
+            "lateralOffset": 14.1
+          },
+          {
+            "id": "grove-projector",
+            "position": [
+              475.1233021435955,
+              7.006487626748943,
+              63.50004528307892
+            ],
+            "height": 1.5800000429153442,
+            "hardwareLateral": -12.1,
+            "triggerLateral": -4,
+            "lateralOffset": -8.1
+          },
+          {
+            "id": "court-turbine",
+            "position": [
+              319.99677118135486,
+              8.142256047562153,
+              731.3493874602767
+            ],
+            "height": 1.591679573059082,
+            "hardwareLateral": 13.1,
+            "triggerLateral": 4,
+            "lateralOffset": 9.1
+          },
+          {
+            "id": "reef-projector",
+            "position": [
+              55.773191978095404,
+              0,
+              580.0779637773657
+            ],
+            "height": 1.5800000429153442,
+            "hardwareLateral": -14.1,
+            "triggerLateral": -5,
+            "lateralOffset": -9.1
+          },
+          {
+            "id": "cut-turbine",
+            "position": [
+              18.753169525587932,
+              0,
+              127.80294634901942
+            ],
+            "height": 1.591679573059082,
+            "hardwareLateral": 12.1,
+            "triggerLateral": 0,
+            "lateralOffset": 12.1
+          }
+        ]
+      },
+      "settle": {
+        "stable": 6,
+        "polls": 7
+      },
+      "applied": {
+        "angles": {
+          "minute": 0,
+          "hour": -1.5707963267948966
+        },
+        "hands": [
+          {
+            "kind": "hour",
+            "angle": -1.5707963267948966,
+            "matrix": [
+              5.704781630597833e-17,
+              -1.2857142857142858,
+              5.425434094741411e-17,
+              0,
+              0.9316615426700539,
+              7.872729423090129e-17,
+              0.8860406279620883,
+              0,
+              -0.8860406279620883,
+              0,
+              0.9316615426700539,
+              0,
+              390.06837048918374,
+              23.930857142857143,
+              673.4902113836912,
+              1
+            ]
+          },
+          {
+            "kind": "minute",
+            "angle": 0,
+            "matrix": [
+              0.9316615426700539,
+              0,
+              0.8860406279620883,
+              0,
+              0,
+              1.2857142857142858,
+              0,
+              0,
+              -0.8860406279620883,
+              0,
+              0.9316615426700539,
+              0,
+              390.06837048918374,
+              23.930857142857143,
+              673.4902113836912,
+              1
+            ]
+          }
+        ],
+        "plates": [
+          {
+            "kind": "surge",
+            "cell": "road-sand",
+            "height": 0.08,
+            "count": 3,
+            "emissive": 0.8
+          },
+          {
+            "kind": "shield",
+            "cell": "road-sand",
+            "height": 0.08,
+            "count": 2,
+            "emissive": 0.8
+          }
+        ]
+      },
+      "pixelRegion": {
+        "full": "surge-night-8m.png",
+        "isolation": "surge-night-8m-isolation.png",
+        "blank": "surge-night-8m-blank.png",
+        "mesh": "DI_POWER_core_surge"
+      }
+    },
+    {
+      "shot": {
+        "id": "shield-day-8m",
+        "kind": "shield",
+        "blend": 0,
+        "distance": 8
+      },
+      "position": [
+        469.004905229868,
+        9.483839680009298,
+        68.37361782234753
+      ],
+      "target": [
+        475.1233021435955,
+        7.806487626748943,
+        63.50004528307892
+      ],
+      "distance": 8.000000000000005,
+      "tick": 0,
+      "strikeTick": 8014,
+      "hardware": {
+        "devices": 5,
+        "meshes": 7,
+        "triangles": 4636,
+        "petalOpeningTicks": 30,
+        "source": "/assets/dreamisland/power-kit.glb",
+        "placements": [
+          {
+            "id": "beach-turbine",
+            "position": [
+              107.99998270989519,
+              0,
+              14.1
+            ],
+            "height": 1.591679573059082,
+            "hardwareLateral": 14.1,
+            "triggerLateral": 0,
+            "lateralOffset": 14.1
+          },
+          {
+            "id": "grove-projector",
+            "position": [
+              475.1233021435955,
+              7.006487626748943,
+              63.50004528307892
+            ],
+            "height": 1.5800000429153442,
+            "hardwareLateral": -12.1,
+            "triggerLateral": -4,
+            "lateralOffset": -8.1
+          },
+          {
+            "id": "court-turbine",
+            "position": [
+              319.99677118135486,
+              8.142256047562153,
+              731.3493874602767
+            ],
+            "height": 1.591679573059082,
+            "hardwareLateral": 13.1,
+            "triggerLateral": 4,
+            "lateralOffset": 9.1
+          },
+          {
+            "id": "reef-projector",
+            "position": [
+              55.773191978095404,
+              0,
+              580.0779637773657
+            ],
+            "height": 1.5800000429153442,
+            "hardwareLateral": -14.1,
+            "triggerLateral": -5,
+            "lateralOffset": -9.1
+          },
+          {
+            "id": "cut-turbine",
+            "position": [
+              18.753169525587932,
+              0,
+              127.80294634901942
+            ],
+            "height": 1.591679573059082,
+            "hardwareLateral": 12.1,
+            "triggerLateral": 0,
+            "lateralOffset": 12.1
+          }
+        ]
+      },
+      "settle": {
+        "stable": 6,
+        "polls": 7
+      },
+      "applied": {
+        "angles": {
+          "minute": 0,
+          "hour": -1.5707963267948966
+        },
+        "hands": [
+          {
+            "kind": "hour",
+            "angle": -1.5707963267948966,
+            "matrix": [
+              5.704781630597833e-17,
+              -1.2857142857142858,
+              5.425434094741411e-17,
+              0,
+              0.9316615426700539,
+              7.872729423090129e-17,
+              0.8860406279620883,
+              0,
+              -0.8860406279620883,
+              0,
+              0.9316615426700539,
+              0,
+              390.06837048918374,
+              23.930857142857143,
+              673.4902113836912,
+              1
+            ]
+          },
+          {
+            "kind": "minute",
+            "angle": 0,
+            "matrix": [
+              0.9316615426700539,
+              0,
+              0.8860406279620883,
+              0,
+              0,
+              1.2857142857142858,
+              0,
+              0,
+              -0.8860406279620883,
+              0,
+              0.9316615426700539,
+              0,
+              390.06837048918374,
+              23.930857142857143,
+              673.4902113836912,
+              1
+            ]
+          }
+        ],
+        "plates": [
+          {
+            "kind": "surge",
+            "cell": "road-sand",
+            "height": 0.08,
+            "count": 3,
+            "emissive": 0.15
+          },
+          {
+            "kind": "shield",
+            "cell": "road-sand",
+            "height": 0.08,
+            "count": 2,
+            "emissive": 0.15
+          }
+        ]
+      },
+      "pixelRegion": {
+        "full": "shield-day-8m.png",
+        "isolation": "shield-day-8m-isolation.png",
+        "blank": "shield-day-8m-blank.png",
+        "mesh": "DI_POWER_core_shield"
+      }
+    },
+    {
+      "shot": {
+        "id": "shield-night-8m",
+        "kind": "shield",
+        "blend": 1,
+        "distance": 8
+      },
+      "position": [
+        469.004905229868,
+        9.483839680009298,
+        68.37361782234753
+      ],
+      "target": [
+        475.1233021435955,
+        7.806487626748943,
+        63.50004528307892
+      ],
+      "distance": 8.000000000000005,
+      "tick": 0,
+      "strikeTick": 8014,
+      "hardware": {
+        "devices": 5,
+        "meshes": 7,
+        "triangles": 4636,
+        "petalOpeningTicks": 30,
+        "source": "/assets/dreamisland/power-kit.glb",
+        "placements": [
+          {
+            "id": "beach-turbine",
+            "position": [
+              107.99998270989519,
+              0,
+              14.1
+            ],
+            "height": 1.591679573059082,
+            "hardwareLateral": 14.1,
+            "triggerLateral": 0,
+            "lateralOffset": 14.1
+          },
+          {
+            "id": "grove-projector",
+            "position": [
+              475.1233021435955,
+              7.006487626748943,
+              63.50004528307892
+            ],
+            "height": 1.5800000429153442,
+            "hardwareLateral": -12.1,
+            "triggerLateral": -4,
+            "lateralOffset": -8.1
+          },
+          {
+            "id": "court-turbine",
+            "position": [
+              319.99677118135486,
+              8.142256047562153,
+              731.3493874602767
+            ],
+            "height": 1.591679573059082,
+            "hardwareLateral": 13.1,
+            "triggerLateral": 4,
+            "lateralOffset": 9.1
+          },
+          {
+            "id": "reef-projector",
+            "position": [
+              55.773191978095404,
+              0,
+              580.0779637773657
+            ],
+            "height": 1.5800000429153442,
+            "hardwareLateral": -14.1,
+            "triggerLateral": -5,
+            "lateralOffset": -9.1
+          },
+          {
+            "id": "cut-turbine",
+            "position": [
+              18.753169525587932,
+              0,
+              127.80294634901942
+            ],
+            "height": 1.591679573059082,
+            "hardwareLateral": 12.1,
+            "triggerLateral": 0,
+            "lateralOffset": 12.1
+          }
+        ]
+      },
+      "settle": {
+        "stable": 6,
+        "polls": 7
+      },
+      "applied": {
+        "angles": {
+          "minute": 0,
+          "hour": -1.5707963267948966
+        },
+        "hands": [
+          {
+            "kind": "hour",
+            "angle": -1.5707963267948966,
+            "matrix": [
+              5.704781630597833e-17,
+              -1.2857142857142858,
+              5.425434094741411e-17,
+              0,
+              0.9316615426700539,
+              7.872729423090129e-17,
+              0.8860406279620883,
+              0,
+              -0.8860406279620883,
+              0,
+              0.9316615426700539,
+              0,
+              390.06837048918374,
+              23.930857142857143,
+              673.4902113836912,
+              1
+            ]
+          },
+          {
+            "kind": "minute",
+            "angle": 0,
+            "matrix": [
+              0.9316615426700539,
+              0,
+              0.8860406279620883,
+              0,
+              0,
+              1.2857142857142858,
+              0,
+              0,
+              -0.8860406279620883,
+              0,
+              0.9316615426700539,
+              0,
+              390.06837048918374,
+              23.930857142857143,
+              673.4902113836912,
+              1
+            ]
+          }
+        ],
+        "plates": [
+          {
+            "kind": "surge",
+            "cell": "road-sand",
+            "height": 0.08,
+            "count": 3,
+            "emissive": 0.8
+          },
+          {
+            "kind": "shield",
+            "cell": "road-sand",
+            "height": 0.08,
+            "count": 2,
+            "emissive": 0.8
+          }
+        ]
+      },
+      "pixelRegion": {
+        "full": "shield-night-8m.png",
+        "isolation": "shield-night-8m-isolation.png",
+        "blank": "shield-night-8m-blank.png",
+        "mesh": "DI_POWER_core_shield"
+      }
+    },
+    {
+      "shot": {
+        "id": "shield-metal-day",
+        "kind": "shield",
+        "blend": 0,
+        "distance": 8,
+        "body": true
+      },
+      "position": [
+        469.004905229868,
+        9.483839680009298,
+        68.37361782234753
+      ],
+      "target": [
+        475.1233021435955,
+        7.806487626748943,
+        63.50004528307892
+      ],
+      "distance": 8.000000000000005,
+      "tick": 0,
+      "strikeTick": 8014,
+      "hardware": {
+        "devices": 5,
+        "meshes": 7,
+        "triangles": 4636,
+        "petalOpeningTicks": 30,
+        "source": "/assets/dreamisland/power-kit.glb",
+        "placements": [
+          {
+            "id": "beach-turbine",
+            "position": [
+              107.99998270989519,
+              0,
+              14.1
+            ],
+            "height": 1.591679573059082,
+            "hardwareLateral": 14.1,
+            "triggerLateral": 0,
+            "lateralOffset": 14.1
+          },
+          {
+            "id": "grove-projector",
+            "position": [
+              475.1233021435955,
+              7.006487626748943,
+              63.50004528307892
+            ],
+            "height": 1.5800000429153442,
+            "hardwareLateral": -12.1,
+            "triggerLateral": -4,
+            "lateralOffset": -8.1
+          },
+          {
+            "id": "court-turbine",
+            "position": [
+              319.99677118135486,
+              8.142256047562153,
+              731.3493874602767
+            ],
+            "height": 1.591679573059082,
+            "hardwareLateral": 13.1,
+            "triggerLateral": 4,
+            "lateralOffset": 9.1
+          },
+          {
+            "id": "reef-projector",
+            "position": [
+              55.773191978095404,
+              0,
+              580.0779637773657
+            ],
+            "height": 1.5800000429153442,
+            "hardwareLateral": -14.1,
+            "triggerLateral": -5,
+            "lateralOffset": -9.1
+          },
+          {
+            "id": "cut-turbine",
+            "position": [
+              18.753169525587932,
+              0,
+              127.80294634901942
+            ],
+            "height": 1.591679573059082,
+            "hardwareLateral": 12.1,
+            "triggerLateral": 0,
+            "lateralOffset": 12.1
+          }
+        ]
+      },
+      "settle": {
+        "stable": 6,
+        "polls": 7
+      },
+      "applied": {
+        "angles": {
+          "minute": 0,
+          "hour": -1.5707963267948966
+        },
+        "hands": [
+          {
+            "kind": "hour",
+            "angle": -1.5707963267948966,
+            "matrix": [
+              5.704781630597833e-17,
+              -1.2857142857142858,
+              5.425434094741411e-17,
+              0,
+              0.9316615426700539,
+              7.872729423090129e-17,
+              0.8860406279620883,
+              0,
+              -0.8860406279620883,
+              0,
+              0.9316615426700539,
+              0,
+              390.06837048918374,
+              23.930857142857143,
+              673.4902113836912,
+              1
+            ]
+          },
+          {
+            "kind": "minute",
+            "angle": 0,
+            "matrix": [
+              0.9316615426700539,
+              0,
+              0.8860406279620883,
+              0,
+              0,
+              1.2857142857142858,
+              0,
+              0,
+              -0.8860406279620883,
+              0,
+              0.9316615426700539,
+              0,
+              390.06837048918374,
+              23.930857142857143,
+              673.4902113836912,
+              1
+            ]
+          }
+        ],
+        "plates": [
+          {
+            "kind": "surge",
+            "cell": "road-sand",
+            "height": 0.08,
+            "count": 3,
+            "emissive": 0.15
+          },
+          {
+            "kind": "shield",
+            "cell": "road-sand",
+            "height": 0.08,
+            "count": 2,
+            "emissive": 0.15
+          }
+        ]
+      },
+      "pixelRegion": {
+        "full": "shield-metal-day.png",
+        "isolation": "shield-metal-day-isolation.png",
+        "blank": "shield-metal-day-blank.png",
+        "mesh": "DI_POWER_petals"
+      }
+    },
+    {
+      "shot": {
+        "id": "shield-metal-night",
+        "kind": "shield",
+        "blend": 1,
+        "distance": 8,
+        "body": true
+      },
+      "position": [
+        469.004905229868,
+        9.483839680009298,
+        68.37361782234753
+      ],
+      "target": [
+        475.1233021435955,
+        7.806487626748943,
+        63.50004528307892
+      ],
+      "distance": 8.000000000000005,
+      "tick": 0,
+      "strikeTick": 8014,
+      "hardware": {
+        "devices": 5,
+        "meshes": 7,
+        "triangles": 4636,
+        "petalOpeningTicks": 30,
+        "source": "/assets/dreamisland/power-kit.glb",
+        "placements": [
+          {
+            "id": "beach-turbine",
+            "position": [
+              107.99998270989519,
+              0,
+              14.1
+            ],
+            "height": 1.591679573059082,
+            "hardwareLateral": 14.1,
+            "triggerLateral": 0,
+            "lateralOffset": 14.1
+          },
+          {
+            "id": "grove-projector",
+            "position": [
+              475.1233021435955,
+              7.006487626748943,
+              63.50004528307892
+            ],
+            "height": 1.5800000429153442,
+            "hardwareLateral": -12.1,
+            "triggerLateral": -4,
+            "lateralOffset": -8.1
+          },
+          {
+            "id": "court-turbine",
+            "position": [
+              319.99677118135486,
+              8.142256047562153,
+              731.3493874602767
+            ],
+            "height": 1.591679573059082,
+            "hardwareLateral": 13.1,
+            "triggerLateral": 4,
+            "lateralOffset": 9.1
+          },
+          {
+            "id": "reef-projector",
+            "position": [
+              55.773191978095404,
+              0,
+              580.0779637773657
+            ],
+            "height": 1.5800000429153442,
+            "hardwareLateral": -14.1,
+            "triggerLateral": -5,
+            "lateralOffset": -9.1
+          },
+          {
+            "id": "cut-turbine",
+            "position": [
+              18.753169525587932,
+              0,
+              127.80294634901942
+            ],
+            "height": 1.591679573059082,
+            "hardwareLateral": 12.1,
+            "triggerLateral": 0,
+            "lateralOffset": 12.1
+          }
+        ]
+      },
+      "settle": {
+        "stable": 6,
+        "polls": 7
+      },
+      "applied": {
+        "angles": {
+          "minute": 0,
+          "hour": -1.5707963267948966
+        },
+        "hands": [
+          {
+            "kind": "hour",
+            "angle": -1.5707963267948966,
+            "matrix": [
+              5.704781630597833e-17,
+              -1.2857142857142858,
+              5.425434094741411e-17,
+              0,
+              0.9316615426700539,
+              7.872729423090129e-17,
+              0.8860406279620883,
+              0,
+              -0.8860406279620883,
+              0,
+              0.9316615426700539,
+              0,
+              390.06837048918374,
+              23.930857142857143,
+              673.4902113836912,
+              1
+            ]
+          },
+          {
+            "kind": "minute",
+            "angle": 0,
+            "matrix": [
+              0.9316615426700539,
+              0,
+              0.8860406279620883,
+              0,
+              0,
+              1.2857142857142858,
+              0,
+              0,
+              -0.8860406279620883,
+              0,
+              0.9316615426700539,
+              0,
+              390.06837048918374,
+              23.930857142857143,
+              673.4902113836912,
+              1
+            ]
+          }
+        ],
+        "plates": [
+          {
+            "kind": "surge",
+            "cell": "road-sand",
+            "height": 0.08,
+            "count": 3,
+            "emissive": 0.8
+          },
+          {
+            "kind": "shield",
+            "cell": "road-sand",
+            "height": 0.08,
+            "count": 2,
+            "emissive": 0.8
+          }
+        ]
+      },
+      "pixelRegion": {
+        "full": "shield-metal-night.png",
+        "isolation": "shield-metal-night-isolation.png",
+        "blank": "shield-metal-night-blank.png",
+        "mesh": "DI_POWER_petals"
+      }
+    },
+    {
+      "shot": {
+        "id": "surge-plate-day",
+        "kind": "surge",
+        "blend": 0,
+        "distance": 8,
+        "plate": true
+      },
+      "position": [
+        101.75303223435095,
+        5.082560380435394,
+        0
+      ],
+      "target": [
+        107.99998270989519,
+        0.085,
+        0
+      ],
+      "distance": 7.9999999999999964,
+      "tick": 0,
+      "strikeTick": 8014,
+      "hardware": {
+        "devices": 5,
+        "meshes": 7,
+        "triangles": 4636,
+        "petalOpeningTicks": 30,
+        "source": "/assets/dreamisland/power-kit.glb",
+        "placements": [
+          {
+            "id": "beach-turbine",
+            "position": [
+              107.99998270989519,
+              0,
+              14.1
+            ],
+            "height": 1.591679573059082,
+            "hardwareLateral": 14.1,
+            "triggerLateral": 0,
+            "lateralOffset": 14.1
+          },
+          {
+            "id": "grove-projector",
+            "position": [
+              475.1233021435955,
+              7.006487626748943,
+              63.50004528307892
+            ],
+            "height": 1.5800000429153442,
+            "hardwareLateral": -12.1,
+            "triggerLateral": -4,
+            "lateralOffset": -8.1
+          },
+          {
+            "id": "court-turbine",
+            "position": [
+              319.99677118135486,
+              8.142256047562153,
+              731.3493874602767
+            ],
+            "height": 1.591679573059082,
+            "hardwareLateral": 13.1,
+            "triggerLateral": 4,
+            "lateralOffset": 9.1
+          },
+          {
+            "id": "reef-projector",
+            "position": [
+              55.773191978095404,
+              0,
+              580.0779637773657
+            ],
+            "height": 1.5800000429153442,
+            "hardwareLateral": -14.1,
+            "triggerLateral": -5,
+            "lateralOffset": -9.1
+          },
+          {
+            "id": "cut-turbine",
+            "position": [
+              18.753169525587932,
+              0,
+              127.80294634901942
+            ],
+            "height": 1.591679573059082,
+            "hardwareLateral": 12.1,
+            "triggerLateral": 0,
+            "lateralOffset": 12.1
+          }
+        ]
+      },
+      "settle": {
+        "stable": 6,
+        "polls": 7
+      },
+      "applied": {
+        "angles": {
+          "minute": 0,
+          "hour": -1.5707963267948966
+        },
+        "hands": [
+          {
+            "kind": "hour",
+            "angle": -1.5707963267948966,
+            "matrix": [
+              5.704781630597833e-17,
+              -1.2857142857142858,
+              5.425434094741411e-17,
+              0,
+              0.9316615426700539,
+              7.872729423090129e-17,
+              0.8860406279620883,
+              0,
+              -0.8860406279620883,
+              0,
+              0.9316615426700539,
+              0,
+              390.06837048918374,
+              23.930857142857143,
+              673.4902113836912,
+              1
+            ]
+          },
+          {
+            "kind": "minute",
+            "angle": 0,
+            "matrix": [
+              0.9316615426700539,
+              0,
+              0.8860406279620883,
+              0,
+              0,
+              1.2857142857142858,
+              0,
+              0,
+              -0.8860406279620883,
+              0,
+              0.9316615426700539,
+              0,
+              390.06837048918374,
+              23.930857142857143,
+              673.4902113836912,
+              1
+            ]
+          }
+        ],
+        "plates": [
+          {
+            "kind": "surge",
+            "cell": "road-sand",
+            "height": 0.08,
+            "count": 3,
+            "emissive": 0.15
+          },
+          {
+            "kind": "shield",
+            "cell": "road-sand",
+            "height": 0.08,
+            "count": 2,
+            "emissive": 0.15
+          }
+        ]
+      },
+      "pixelRegion": {
+        "full": "surge-plate-day.png",
+        "isolation": "surge-plate-day-isolation.png",
+        "blank": "surge-plate-day-blank.png",
+        "mesh": "DI_POWER_plate_surge"
+      }
+    },
+    {
+      "shot": {
+        "id": "surge-plate-night",
+        "kind": "surge",
+        "blend": 1,
+        "distance": 8,
+        "plate": true
+      },
+      "position": [
+        101.75303223435095,
+        5.082560380435394,
+        0
+      ],
+      "target": [
+        107.99998270989519,
+        0.085,
+        0
+      ],
+      "distance": 7.9999999999999964,
+      "tick": 0,
+      "strikeTick": 8014,
+      "hardware": {
+        "devices": 5,
+        "meshes": 7,
+        "triangles": 4636,
+        "petalOpeningTicks": 30,
+        "source": "/assets/dreamisland/power-kit.glb",
+        "placements": [
+          {
+            "id": "beach-turbine",
+            "position": [
+              107.99998270989519,
+              0,
+              14.1
+            ],
+            "height": 1.591679573059082,
+            "hardwareLateral": 14.1,
+            "triggerLateral": 0,
+            "lateralOffset": 14.1
+          },
+          {
+            "id": "grove-projector",
+            "position": [
+              475.1233021435955,
+              7.006487626748943,
+              63.50004528307892
+            ],
+            "height": 1.5800000429153442,
+            "hardwareLateral": -12.1,
+            "triggerLateral": -4,
+            "lateralOffset": -8.1
+          },
+          {
+            "id": "court-turbine",
+            "position": [
+              319.99677118135486,
+              8.142256047562153,
+              731.3493874602767
+            ],
+            "height": 1.591679573059082,
+            "hardwareLateral": 13.1,
+            "triggerLateral": 4,
+            "lateralOffset": 9.1
+          },
+          {
+            "id": "reef-projector",
+            "position": [
+              55.773191978095404,
+              0,
+              580.0779637773657
+            ],
+            "height": 1.5800000429153442,
+            "hardwareLateral": -14.1,
+            "triggerLateral": -5,
+            "lateralOffset": -9.1
+          },
+          {
+            "id": "cut-turbine",
+            "position": [
+              18.753169525587932,
+              0,
+              127.80294634901942
+            ],
+            "height": 1.591679573059082,
+            "hardwareLateral": 12.1,
+            "triggerLateral": 0,
+            "lateralOffset": 12.1
+          }
+        ]
+      },
+      "settle": {
+        "stable": 6,
+        "polls": 7
+      },
+      "applied": {
+        "angles": {
+          "minute": 0,
+          "hour": -1.5707963267948966
+        },
+        "hands": [
+          {
+            "kind": "hour",
+            "angle": -1.5707963267948966,
+            "matrix": [
+              5.704781630597833e-17,
+              -1.2857142857142858,
+              5.425434094741411e-17,
+              0,
+              0.9316615426700539,
+              7.872729423090129e-17,
+              0.8860406279620883,
+              0,
+              -0.8860406279620883,
+              0,
+              0.9316615426700539,
+              0,
+              390.06837048918374,
+              23.930857142857143,
+              673.4902113836912,
+              1
+            ]
+          },
+          {
+            "kind": "minute",
+            "angle": 0,
+            "matrix": [
+              0.9316615426700539,
+              0,
+              0.8860406279620883,
+              0,
+              0,
+              1.2857142857142858,
+              0,
+              0,
+              -0.8860406279620883,
+              0,
+              0.9316615426700539,
+              0,
+              390.06837048918374,
+              23.930857142857143,
+              673.4902113836912,
+              1
+            ]
+          }
+        ],
+        "plates": [
+          {
+            "kind": "surge",
+            "cell": "road-sand",
+            "height": 0.08,
+            "count": 3,
+            "emissive": 0.8
+          },
+          {
+            "kind": "shield",
+            "cell": "road-sand",
+            "height": 0.08,
+            "count": 2,
+            "emissive": 0.8
+          }
+        ]
+      },
+      "pixelRegion": {
+        "full": "surge-plate-night.png",
+        "isolation": "surge-plate-night-isolation.png",
+        "blank": "surge-plate-night-blank.png",
+        "mesh": "DI_POWER_plate_surge"
+      }
+    },
+    {
+      "shot": {
+        "id": "shield-plate-day",
+        "kind": "shield",
+        "blend": 0,
+        "distance": 8,
+        "plate": true
+      },
+      "position": [
+        465.31504856898243,
+        11.699532110275943,
+        66.9986600884556
+      ],
+      "target": [
+        470.8949522772094,
+        7.091330138352945,
+        70.40881392558371
+      ],
+      "distance": 8,
+      "tick": 0,
+      "strikeTick": 8014,
+      "hardware": {
+        "devices": 5,
+        "meshes": 7,
+        "triangles": 4636,
+        "petalOpeningTicks": 30,
+        "source": "/assets/dreamisland/power-kit.glb",
+        "placements": [
+          {
+            "id": "beach-turbine",
+            "position": [
+              107.99998270989519,
+              0,
+              14.1
+            ],
+            "height": 1.591679573059082,
+            "hardwareLateral": 14.1,
+            "triggerLateral": 0,
+            "lateralOffset": 14.1
+          },
+          {
+            "id": "grove-projector",
+            "position": [
+              475.1233021435955,
+              7.006487626748943,
+              63.50004528307892
+            ],
+            "height": 1.5800000429153442,
+            "hardwareLateral": -12.1,
+            "triggerLateral": -4,
+            "lateralOffset": -8.1
+          },
+          {
+            "id": "court-turbine",
+            "position": [
+              319.99677118135486,
+              8.142256047562153,
+              731.3493874602767
+            ],
+            "height": 1.591679573059082,
+            "hardwareLateral": 13.1,
+            "triggerLateral": 4,
+            "lateralOffset": 9.1
+          },
+          {
+            "id": "reef-projector",
+            "position": [
+              55.773191978095404,
+              0,
+              580.0779637773657
+            ],
+            "height": 1.5800000429153442,
+            "hardwareLateral": -14.1,
+            "triggerLateral": -5,
+            "lateralOffset": -9.1
+          },
+          {
+            "id": "cut-turbine",
+            "position": [
+              18.753169525587932,
+              0,
+              127.80294634901942
+            ],
+            "height": 1.591679573059082,
+            "hardwareLateral": 12.1,
+            "triggerLateral": 0,
+            "lateralOffset": 12.1
+          }
+        ]
+      },
+      "settle": {
+        "stable": 6,
+        "polls": 7
+      },
+      "applied": {
+        "angles": {
+          "minute": 0,
+          "hour": -1.5707963267948966
+        },
+        "hands": [
+          {
+            "kind": "hour",
+            "angle": -1.5707963267948966,
+            "matrix": [
+              5.704781630597833e-17,
+              -1.2857142857142858,
+              5.425434094741411e-17,
+              0,
+              0.9316615426700539,
+              7.872729423090129e-17,
+              0.8860406279620883,
+              0,
+              -0.8860406279620883,
+              0,
+              0.9316615426700539,
+              0,
+              390.06837048918374,
+              23.930857142857143,
+              673.4902113836912,
+              1
+            ]
+          },
+          {
+            "kind": "minute",
+            "angle": 0,
+            "matrix": [
+              0.9316615426700539,
+              0,
+              0.8860406279620883,
+              0,
+              0,
+              1.2857142857142858,
+              0,
+              0,
+              -0.8860406279620883,
+              0,
+              0.9316615426700539,
+              0,
+              390.06837048918374,
+              23.930857142857143,
+              673.4902113836912,
+              1
+            ]
+          }
+        ],
+        "plates": [
+          {
+            "kind": "surge",
+            "cell": "road-sand",
+            "height": 0.08,
+            "count": 3,
+            "emissive": 0.15
+          },
+          {
+            "kind": "shield",
+            "cell": "road-sand",
+            "height": 0.08,
+            "count": 2,
+            "emissive": 0.15
+          }
+        ]
+      },
+      "pixelRegion": {
+        "full": "shield-plate-day.png",
+        "isolation": "shield-plate-day-isolation.png",
+        "blank": "shield-plate-day-blank.png",
+        "mesh": "DI_POWER_plate_shield"
+      }
+    },
+    {
+      "shot": {
+        "id": "shield-plate-night",
+        "kind": "shield",
+        "blend": 1,
+        "distance": 8,
+        "plate": true
+      },
+      "position": [
+        465.31504856898243,
+        11.699532110275943,
+        66.9986600884556
+      ],
+      "target": [
+        470.8949522772094,
+        7.091330138352945,
+        70.40881392558371
+      ],
+      "distance": 8,
+      "tick": 0,
+      "strikeTick": 8014,
+      "hardware": {
+        "devices": 5,
+        "meshes": 7,
+        "triangles": 4636,
+        "petalOpeningTicks": 30,
+        "source": "/assets/dreamisland/power-kit.glb",
+        "placements": [
+          {
+            "id": "beach-turbine",
+            "position": [
+              107.99998270989519,
+              0,
+              14.1
+            ],
+            "height": 1.591679573059082,
+            "hardwareLateral": 14.1,
+            "triggerLateral": 0,
+            "lateralOffset": 14.1
+          },
+          {
+            "id": "grove-projector",
+            "position": [
+              475.1233021435955,
+              7.006487626748943,
+              63.50004528307892
+            ],
+            "height": 1.5800000429153442,
+            "hardwareLateral": -12.1,
+            "triggerLateral": -4,
+            "lateralOffset": -8.1
+          },
+          {
+            "id": "court-turbine",
+            "position": [
+              319.99677118135486,
+              8.142256047562153,
+              731.3493874602767
+            ],
+            "height": 1.591679573059082,
+            "hardwareLateral": 13.1,
+            "triggerLateral": 4,
+            "lateralOffset": 9.1
+          },
+          {
+            "id": "reef-projector",
+            "position": [
+              55.773191978095404,
+              0,
+              580.0779637773657
+            ],
+            "height": 1.5800000429153442,
+            "hardwareLateral": -14.1,
+            "triggerLateral": -5,
+            "lateralOffset": -9.1
+          },
+          {
+            "id": "cut-turbine",
+            "position": [
+              18.753169525587932,
+              0,
+              127.80294634901942
+            ],
+            "height": 1.591679573059082,
+            "hardwareLateral": 12.1,
+            "triggerLateral": 0,
+            "lateralOffset": 12.1
+          }
+        ]
+      },
+      "settle": {
+        "stable": 6,
+        "polls": 7
+      },
+      "applied": {
+        "angles": {
+          "minute": 0,
+          "hour": -1.5707963267948966
+        },
+        "hands": [
+          {
+            "kind": "hour",
+            "angle": -1.5707963267948966,
+            "matrix": [
+              5.704781630597833e-17,
+              -1.2857142857142858,
+              5.425434094741411e-17,
+              0,
+              0.9316615426700539,
+              7.872729423090129e-17,
+              0.8860406279620883,
+              0,
+              -0.8860406279620883,
+              0,
+              0.9316615426700539,
+              0,
+              390.06837048918374,
+              23.930857142857143,
+              673.4902113836912,
+              1
+            ]
+          },
+          {
+            "kind": "minute",
+            "angle": 0,
+            "matrix": [
+              0.9316615426700539,
+              0,
+              0.8860406279620883,
+              0,
+              0,
+              1.2857142857142858,
+              0,
+              0,
+              -0.8860406279620883,
+              0,
+              0.9316615426700539,
+              0,
+              390.06837048918374,
+              23.930857142857143,
+              673.4902113836912,
+              1
+            ]
+          }
+        ],
+        "plates": [
+          {
+            "kind": "surge",
+            "cell": "road-sand",
+            "height": 0.08,
+            "count": 3,
+            "emissive": 0.8
+          },
+          {
+            "kind": "shield",
+            "cell": "road-sand",
+            "height": 0.08,
+            "count": 2,
+            "emissive": 0.8
+          }
+        ]
+      },
+      "pixelRegion": {
+        "full": "shield-plate-night.png",
+        "isolation": "shield-plate-night-isolation.png",
+        "blank": "shield-plate-night-blank.png",
+        "mesh": "DI_POWER_plate_shield"
+      }
+    }
+  ],
+  "errors": []
+}

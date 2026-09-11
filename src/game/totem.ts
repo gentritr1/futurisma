@@ -33,6 +33,8 @@ export interface TotemVisualState extends RacePresenceVisualState {
   shieldRefundWindow?: boolean;
   powerReady?: boolean;
   heldPowerKind?: "surge" | "shield" | null;
+  surgeColor?: THREE.Color;
+  shieldColor?: THREE.Color;
   powerCharge?: number;
   powerActivation?: number;
   boostReserve?: number;

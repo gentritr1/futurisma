@@ -1,0 +1,193 @@
+{
+  "script": "scripts/visual/dreamisland/audio-capture.mjs",
+  "seconds": 30,
+  "sampleRate": 24000,
+  "channels": 2,
+  "pose": {
+    "district": "BEACH",
+    "progress": 0.05,
+    "position": [
+      108.49998270988567,
+      4.8,
+      0
+    ],
+    "forward": [
+      1,
+      0,
+      0
+    ]
+  },
+  "scope": "Shipped EngineAudio master, compressor, idle engine and shared buses; DreamIslandSoundGraph is the live circuit graph. Stationary BEACH chase pose, music=0, voice=0. No alternative audio renderer or post-normalization.",
+  "startTick": 6814,
+  "strikeTick": 8014,
+  "records": [
+    {
+      "id": "chime-warning",
+      "tick": 7233,
+      "when": 3.4916666666666667,
+      "source": "clock",
+      "position": [
+        390.06837048918374,
+        23.930857142857143,
+        673.4902113836912
+      ],
+      "gain": 1.0007922948449748
+    },
+    {
+      "id": "strike",
+      "tick": 8014,
+      "when": 10,
+      "source": "clock",
+      "position": [
+        390.06837048918374,
+        23.930857142857143,
+        673.4902113836912
+      ],
+      "gain": 1.6150506123583774
+    },
+    {
+      "id": "fish-rise:fish-basin-eight",
+      "tick": 8494,
+      "when": 14,
+      "source": "fish-basin-eight",
+      "position": [
+        546.3195,
+        6.949999999999999,
+        559.72
+      ],
+      "gain": 1.1588420727522766
+    },
+    {
+      "id": "fish-rise:fish-reef-loop",
+      "tick": 8494,
+      "when": 14,
+      "source": "fish-reef-loop",
+      "position": [
+        4.337500000000001,
+        -3.4000000000000004,
+        492.49025
+      ],
+      "gain": 1.1588420727522766
+    }
+  ],
+  "duckEvents": [
+    {
+      "when": 3.4916666666666667,
+      "music": 0.7079457843841379,
+      "ambience": 0.7943282347242815
+    },
+    {
+      "when": 8.508333333333333,
+      "music": 1,
+      "ambience": 1
+    },
+    {
+      "when": 10,
+      "music": 0.7079457843841379,
+      "ambience": 0.7943282347242815
+    },
+    {
+      "when": 18.016666666666666,
+      "music": 1,
+      "ambience": 1
+    }
+  ],
+  "decoded": {
+    "clock-quarter-chime": {
+      "seconds": 5.0155,
+      "rms": 0.021883592959214607,
+      "peak": 0.6005538105964661
+    },
+    "clock-strike-three-tolls": {
+      "seconds": 8.010875,
+      "rms": 0.012871918908051472,
+      "peak": 0.19671642780303955
+    },
+    "fish-rise": {
+      "seconds": 4.017041666666667,
+      "rms": 0.03723709434318008,
+      "peak": 0.6656458377838135
+    },
+    "waterfall-loop": {
+      "seconds": 8.010875,
+      "rms": 0.11040917608630108,
+      "peak": 0.6575825810432434
+    },
+    "tunnel-pass": {
+      "seconds": 4.017041666666667,
+      "rms": 0.22201525274988215,
+      "peak": 0.9456700086593628
+    },
+    "day-birds": {
+      "seconds": 8.010875,
+      "rms": 0.028439992221932595,
+      "peak": 0.23825488984584808
+    }
+  },
+  "levels": {
+    "surf": 0,
+    "night": 0.27571076066177663,
+    "waterfall": 0.7816724893038521,
+    "birds-GROVE": 0,
+    "birds-CUT": 0
+  },
+  "mix": {
+    "rmsDb": -33.37705911161215,
+    "peak": 0.2687092125415802,
+    "peakDb": -11.414348875476074,
+    "samples": 1440000
+  },
+  "windows": {
+    "day": {
+      "rmsDb": -33.52468155569139,
+      "peak": 0.18096444010734558,
+      "peakDb": -14.848135130505169,
+      "samples": 144000
+    },
+    "strike": {
+      "rmsDb": -35.077263344804344,
+      "peak": 0.14101532101631165,
+      "peakDb": -17.014673992088746,
+      "samples": 384000
+    },
+    "night": {
+      "rmsDb": -32.27956288362443,
+      "peak": 0.11112679541110992,
+      "peakDb": -19.083624186425354,
+      "samples": 336000
+    }
+  },
+  "files": {
+    "strike-beach-30s": {
+      "channels": 2,
+      "frames": 720000,
+      "rmsDb": -33.37705911161215,
+      "peak": 0.2687092125415802,
+      "peakDb": -11.414348875476074,
+      "samples": 1440000
+    },
+    "surf-bed-offline": {
+      "channels": 1,
+      "frames": 192000,
+      "rmsDb": -23.420617109871795,
+      "peak": 0.5369341969490051,
+      "peakDb": -5.401578705115996,
+      "samples": 192000
+    },
+    "night-bed-offline": {
+      "channels": 1,
+      "frames": 192000,
+      "rmsDb": -16.10907432863223,
+      "peak": 0.6942927241325378,
+      "peakDb": -3.1691477185084787,
+      "samples": 192000
+    }
+  },
+  "hashes": {
+    "src/game/audio.ts": "03d377bfe6d79e8f2ee1aa3d5f8ccac58cf4ef28244cf4c6e3c1f30da929bec8",
+    "src/game/dreamisland-sound-graph.ts": "3953e27b6501a00ec7fa9bc50a0a0cd22a91f9213168886c49b8eb9102b41554",
+    "src/game/dreamisland-beds.js": "688b4ac553af1c13a6a56ab94a5547712ea62368158d90f15ec2dff060e367fb",
+    "src/game/data/dreamisland/bed-profile.json": "a71770563be9814073332655b9224570555dfbf4f0ae9d6a0d5ab1b3a8158ee1",
+    "public/assets/dreamisland/painted.json": "17753dc2f7deaede4cfdf3ea21148eefdd5c339655fc73546335241767700f66"
+  }
+}

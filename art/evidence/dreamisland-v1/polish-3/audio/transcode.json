@@ -1,0 +1,97 @@
+{
+  "script": "scripts/prepare-dreamisland-audio.py",
+  "files": [
+    {
+      "file": "clock-quarter-chime.mp3",
+      "sourceBytes": 40560,
+      "bytes": 30620,
+      "served": true,
+      "sampleRate": 24000,
+      "channels": 1,
+      "bitRate": 48000,
+      "durationSeconds": 5.0155,
+      "sha256": "257f8a999d1d93fb85dfbf4e71ab4e63d0a6a1ac37afabfc03daa0b91a2567c5"
+    },
+    {
+      "file": "clock-strike-three-tolls.mp3",
+      "sourceBytes": 64592,
+      "bytes": 48620,
+      "served": true,
+      "sampleRate": 24000,
+      "channels": 1,
+      "bitRate": 48000,
+      "durationSeconds": 8.010875,
+      "sha256": "b10df310857c290803ad101720ce25e2b258c96ccb95ac160a468ece1222696c"
+    },
+    {
+      "file": "day-birds.mp3",
+      "sourceBytes": 64592,
+      "bytes": 48620,
+      "served": true,
+      "sampleRate": 24000,
+      "channels": 1,
+      "bitRate": 48000,
+      "durationSeconds": 8.010875,
+      "sha256": "b1cdd1a7900c764ff30b23c7512c6510ed0399542d761a85b2167ae97194ce96"
+    },
+    {
+      "file": "fish-rise.mp3",
+      "sourceBytes": 32618,
+      "bytes": 24716,
+      "served": true,
+      "sampleRate": 24000,
+      "channels": 1,
+      "bitRate": 48000,
+      "durationSeconds": 4.017042,
+      "sha256": "54666a3e9b03bcdea5899a0901a29942a479d135246a3fcbecad7212a3f6c07d"
+    },
+    {
+      "file": "night-bed.mp3",
+      "sourceBytes": 64592,
+      "bytes": 48620,
+      "served": false,
+      "sampleRate": 24000,
+      "channels": 1,
+      "bitRate": 48000,
+      "durationSeconds": 8.010875,
+      "sha256": "7bdd58304189a38db749e0cf82449f56a9aaae602ec2cf957b797cf038e2b09b"
+    },
+    {
+      "file": "surf-bed-day.mp3",
+      "sourceBytes": 64592,
+      "bytes": 48620,
+      "served": false,
+      "sampleRate": 24000,
+      "channels": 1,
+      "bitRate": 48000,
+      "durationSeconds": 8.010875,
+      "sha256": "b2ade73b637092860e84ac05235e8165b2a934f996cf60b8d5d65747cc7a26d1"
+    },
+    {
+      "file": "tunnel-pass.mp3",
+      "sourceBytes": 32618,
+      "bytes": 24716,
+      "served": true,
+      "sampleRate": 24000,
+      "channels": 1,
+      "bitRate": 48000,
+      "durationSeconds": 4.017042,
+      "sha256": "4973e92feb856a616df1d7716d2c6ee42532b0577f4ec1ae62a04453cc67c8f7"
+    },
+    {
+      "file": "waterfall-loop.mp3",
+      "sourceBytes": 64592,
+      "bytes": 48620,
+      "served": true,
+      "sampleRate": 24000,
+      "channels": 1,
+      "bitRate": 48000,
+      "durationSeconds": 8.010875,
+      "sha256": "db3e3e9654d0c30d94b06b8245a993000be0a235c198315066608b7222430535"
+    }
+  ],
+  "sourceBytes": 428756,
+  "transcodedBytes": 323152,
+  "servedBytes": 225912,
+  "ceilingBytes": 248504
+}

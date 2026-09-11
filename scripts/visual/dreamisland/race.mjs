@@ -20,7 +20,12 @@ const inputFiles=['src/game/dreamisland-course.ts','src/game/dreamisland-runtime
  'src/game/dreamisland-powers.ts','src/game/dreamisland-powers-config.js',
  'src/game/dreamisland-painted-environment.ts','src/game/dreamisland-materials.ts',
  'src/game/dreamisland-sky.ts','src/game/dreamisland-water.ts',
- 'src/game/data/dreamisland/route.json','src/game/data/dreamisland/schedule.json','src/game/data/dreamisland/rival-pace.json'];
+ 'src/game/data/dreamisland/route.json','src/game/data/dreamisland/schedule.json','src/game/data/dreamisland/rival-pace.json',
+ 'src/game/dreamisland-clock.js','src/game/dreamisland-hardware.ts','src/game/dreamisland-hardware-layout.js',
+ 'src/game/dreamisland-audio.ts','src/game/dreamisland-sound-graph.ts','src/game/dreamisland-audio-plan.js',
+ 'src/game/dreamisland-beds.js','src/game/data/dreamisland/bed-profile.json','src/game/data/dreamisland/sound-levels.json',
+ 'src/game/data/dreamisland/power-colors.json','src/game/audio.ts','src/game/totem-evolution.ts',
+ 'public/assets/dreamisland/power-kit.glb','public/assets/dreamisland/painted.json'];
 const inputHashes=Object.fromEntries(inputFiles.map(file=>[file,createHash('sha256').update(readFileSync(file)).digest('hex')]));
 // The flag wait is a single CDP call, so puppeteer's 180 s protocol timeout —
 // not the wait's own timeout — is what killed `?laps=9` before this. Both are
@@ -31,7 +36,11 @@ try{
  const page=await browser.newPage(),errors=[];
  page.on('pageerror',e=>{errors.push(String(e));console.log(String(e));});
  page.on('console',m=>{if(m.type()==='error'){errors.push(m.text());console.log(m.text());}});
- await instrument(page);
+ const grip=flag('grip');
+ if(grip!==undefined&&!(Number(grip)>=.2&&Number(grip)<=1))throw Error('--grip= must be within the physics grip range');
+ const basinWidth=flag('basin-width');
+ if(basinWidth!==undefined&&!(Number(basinWidth)>=13.9&&Number(basinWidth)<=20))throw Error('--basin-width= must stay inside the validator width range and existing BASIN width');
+ await instrument(page,{...(grip!==undefined?{grip:Number(grip)}:{}),...(basinWidth!==undefined?{basinWidth:Number(basinWidth)}:{})});
  // `?autostart=1` does not exist. `demo=1` autostarts UNLESS diagnostics and
  // start=manual are both present, which they are here, so the harness clicks.
  const url='http://127.0.0.1:5200/?map=dreamisland&seed='+seed+'&tier='+tier+'&mode='+mode
@@ -137,7 +146,7 @@ try{
   {timeout:flagTimeoutMs});
  const materialWalk=await page.evaluate(()=>{const rows=[];window.__diScene.traverse(o=>{if(!o.isMesh&&!o.isPoints)return;for(const m of Array.isArray(o.material)?o.material:[o.material])rows.push({object:o.name,material:m.name,type:m.type,toneMapped:m.toneMapped,fog:m.fog,visible:o.visible});});return rows;});
  await writeFile(out+'/material-walk.json',JSON.stringify({script:'scripts/visual/dreamisland/race.mjs',scope:'Live scene at race finish, hidden objects included. Two names are exempt from the fog rule: the shared sky_backdrop and dreamisland_panorama, both ShaderMaterials, for which three defaults fog to false; each mixes the fog colour itself as a haze term.',rows:materialWalk,violations:materialWalk.filter(r=>r.toneMapped===false||(r.fog===false&&!['sky_backdrop','dreamisland_panorama'].includes(r.object)))},null,2));
- const capture=await page.evaluate(()=>({frames:window.__diFrames,draws:window.__diDraws,
+ const capture=await page.evaluate(()=>({frames:window.__diFrames,draws:window.__diDraws,driving:window.__diDriving,
   diagnostics:JSON.parse(document.getElementById('futurisma-diagnostics').textContent),
   dreamisland:JSON.parse(document.getElementById('dreamisland-diagnostics').textContent),
   atFlag:window.__diFlag,
@@ -162,7 +171,7 @@ try{
   }catch(error){return {present:false,error:String(error)};}})()}));
  await writeFile(out+'/metrics.json',JSON.stringify(metrics(capture.frames,calibration),null,2));
  await page.screenshot({path:out+'/finish.png'});
- await writeFile(out+'/race.json',JSON.stringify({script:'scripts/visual/dreamisland/race.mjs',url,inputHashes,calibration,errors,...capture},null,2));
+ await writeFile(out+'/race.json',JSON.stringify({script:'scripts/visual/dreamisland/race.mjs',url,trialGrip:grip??null,trialBasinWidth:basinWidth??null,inputHashes,calibration,errors,...capture},null,2));
  console.log(JSON.stringify({mode,tier,lapsFlag:laps??null,laps:capture.diagnostics.current.lapTimesMs,
   missedGates:capture.diagnostics.current.missedGates,recoveries:capture.diagnostics.current.recoveries,
   raceMode:capture.diagnostics.current.raceMode,ghostActive:capture.diagnostics.current.ghostActive,
