@@ -20,7 +20,7 @@ for frame in capture['frames']:
   cyan=(pixels[:,1]-pixels[:,0]>.025)&(pixels[:,2]-pixels[:,0]>.025)
   longest=run=0
   for yes in cyan:run=run+1 if yes else 0;longest=max(longest,run)
-  probes.append({**probe,'stripeProjectedWidthPixels':float(length),'scanPixels':count,'cyanWidthPixels':longest,'samplesRGB':pixels.tolist()})
+  probes.append({**probe,'stripeProjectedWidthPixels':float(length),'scanPixels':count,'cyanWidthPixels':longest,'meanLuma':float((pixels@np.array([.2126,.7152,.0722])).mean()),'samplesRGB':pixels.tolist()})
  results.append({'blend':frame['blend'],'probes':probes})
 report={'instrument':__file__,'atlasStripeURange':stripe,'method':'Cyan U interval measured from the kerb atlas centre row (green and blue each exceed red by .1). Project that interval on the live top face at exactly 40 m, then count visible cyan samples (green and blue above red by .025). No broad night tint outside that source interval is counted.','results':results}
 (out/'kerb-profile.json').write_text(json.dumps(report,indent=2)+'\n');print([(r['blend'],[(p['distance'],p['cyanWidthPixels']) for p in r['probes']]) for r in results])

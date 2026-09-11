@@ -42,7 +42,8 @@ export type HeroBuild={
    mergedMeshes:number;triangles:number;materials:string[]}[];
   materialsBoundFromPaintedWorld:string[];materialsBuiltHere:string[];missingChildren:string[]};
 };
-const ROLE_TEXTURE=(name:string):string=>name==='DI_MAT_jungle-card'
+const ROLE_TEXTURE=(name:string):string=>name==='DI_MAT_water-overlay'
+ ? '/assets/dreamisland/textures/water.jpg':name==='DI_MAT_jungle-card'
  ? '/assets/dreamisland/jungle-card.png'
  : '/assets/dreamisland/textures/'+name.replace('DI_MAT_','')+'.jpg';
 
@@ -68,7 +69,8 @@ function mergeInto(parts:{geometry:THREE.BufferGeometry;matrix:THREE.Matrix4}[])
    uvs.push(uv?uv.getX(i):0,uv?uv.getY(i):0);
    // A part without vertex colours joining a merge that has them must
    // contribute white, or its share of the mesh would draw black.
-   if(tinted)colors.push(color?color.getX(i):1,color?color.getY(i):1,color?color.getZ(i):1);
+   if(tinted)colors.push(color?color.getX(i):1,color?color.getY(i):1,color?color.getZ(i):1,
+    color?.itemSize===4?color.getW(i):1);
   }
   const index=geometry.index;
   if(index)for(let i=0;i<index.count;i++)indices.push(base+index.getX(i));
@@ -78,7 +80,7 @@ function mergeInto(parts:{geometry:THREE.BufferGeometry;matrix:THREE.Matrix4}[])
  merged.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));
  merged.setAttribute('normal',new THREE.Float32BufferAttribute(normals,3));
  merged.setAttribute('uv',new THREE.Float32BufferAttribute(uvs,2));
- if(tinted)merged.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));
+ if(tinted)merged.setAttribute('color',new THREE.Float32BufferAttribute(colors,4));
  merged.setIndex(indices);
  merged.computeBoundingSphere();
  return merged;
@@ -167,7 +169,7 @@ export async function loadDreamIslandHeroes(
    const geometry=mergeInto(entries);
    const mesh=new THREE.Mesh(geometry,materialFor(name));
    mesh.name='DI_HERO_'+asset+'_'+name;
-   mesh.castShadow=false;mesh.receiveShadow=false;mesh.frustumCulled=true;
+   mesh.castShadow=asset==='clock-tower';mesh.receiveShadow=asset==='clock-tower';mesh.frustumCulled=true;
    meshes.push(mesh);
    perAsset.mergedMeshes+=1;
    perAsset.triangles+=(geometry.index?.count??geometry.attributes.position.count)/3;

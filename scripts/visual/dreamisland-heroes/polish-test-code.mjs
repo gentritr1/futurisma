@@ -6,7 +6,7 @@ import {mkdtemp,mkdir,copyFile,symlink,readFile,writeFile,cp,stat} from 'node:fs
 import {createHash} from 'node:crypto';
 import path from 'node:path';
 import os from 'node:os';
-const root=process.cwd(),out=path.join(root,'art/evidence/dreamisland-v1/polish/test-code');await mkdir(out,{recursive:true});
+const root=process.cwd(),out=path.resolve(process.argv.find(a=>a.startsWith('--out='))?.slice(6)??'art/evidence/dreamisland-v1/polish/test-code');await mkdir(out,{recursive:true});
 const reuse=process.argv.find(a=>a.startsWith('--snapshot='))?.slice(11);
 const snapshot=reuse??await mkdtemp(path.join(os.tmpdir(),'dream-island-polish-tests-'));
 const gitDirectory=execFileSync('git',['rev-parse','--absolute-git-dir'],{cwd:root,encoding:'utf8'}).trim();

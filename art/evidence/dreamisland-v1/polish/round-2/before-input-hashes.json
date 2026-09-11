@@ -1,0 +1,22 @@
+{
+  "art/blender/build_dreamisland_heroes.py": "06dabcdaad71d9cd752db39b73247381a5c8ace559cd435e0f1b416e067995ba",
+  "art/blender/build_dreamisland_painted.py": "1d3c234c653f4751768b6de34e8b9b1a7b89d944b6d013dd7af2b0c438787e08",
+  "art/blender/dreamisland_mesh.py": "199c069135680659a398e0018affd1ef0e5d4c785f47f83f2faf5a7e8a4b4005",
+  "public/assets/dreamisland/painted.glb": "71f18233dd571120dbe3a6a95cf5fdaa1211a728d718b5bd6127b2045d77689d",
+  "public/assets/dreamisland/painted.json": "924dd4510875b0d93c107f9e387e9f338677e788d112ffe06b9ef3ef4c9f6277",
+  "public/assets/dreamisland/signage-manifest.json": "d05945b1da158936b60f14352e5c080a2d991fc9ce9c43a46ba387cd69b5dae1",
+  "public/assets/dreamisland/heroes/heroes.json": "0f46efa50dcc482785f1641313e2c3c28b3abc7d1c632bfec0193a0d44d24612",
+  "public/assets/dreamisland/heroes/sea-stack-set.glb": "ea0b0e20af2a856009168e695a156e856f25b64a97fa9ad837eddd91651949d4",
+  "public/assets/dreamisland/heroes/waterfall-cliff.glb": "12f39fa91bd54d1ba7436c7df2d2f330a2811ea30f79ce4bf62b1662ebeda418",
+  "public/assets/dreamisland/heroes/watchtower.glb": "293112f84da3246713c64c817c73cfcf6122866738e3fee2429b976a53bfddd7",
+  "public/assets/dreamisland/heroes/clock-tower.glb": "bf51f9c27d120e7b6969c6e22958a6d69d32146bf2c8686d3bc8c6817e992339",
+  "src/game/dreamisland-course.ts": "1d7e5d610a3ad966003746fba067993468867484944d07036d4f31bf913d816d",
+  "src/game/dreamisland-materials.ts": "4c26fecfdd49947e2ab2c3a4031c114c91af911903645168e0952085ac621eba",
+  "src/game/dreamisland-powers.ts": "f501084e7df012c0453a8f0474664845b31b7a921a39c697bd3f573aa78b0fe9",
+  "src/game/dreamisland-runtime.ts": "b98e9bf4366673a2ee8d0944429b32fad9aebc32d490d3cb8386aa8ff133997a",
+  "src/game/dreamisland-sky.ts": "d6b55f22972dbb70d5a0d8d9a09bc1468d4716d118859569b295c9534b05ddb5",
+  "src/game/dreamisland-water.ts": "697f3c0ae0c5281108bb85d7a13ff06faecb21015079225c278a31ad0faddc2e",
+  "src/game/dreamisland-fish.ts": "72a455956c662f5b338471786ac58142e7b5b63f21132b1c03c62007737c8ffc",
+  "src/game/dreamisland-heroes.ts": "7d036bbd4fbb0edb6c030bc6560726e6a416f0dbd5a7b5a44129a518444bc8b1",
+  "src/game/dreamisland-painted-environment.ts": "572bd6f07ebab437d15a947cf683a6bdf11c576840ed3a6967fddf03e22395c1"
+}

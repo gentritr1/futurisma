@@ -1,0 +1,77 @@
+{
+  "instrument": "/Users/gentlegen/Desktop/futurisma-race/polarity_work/scripts/visual/dreamisland-heroes/polish-regions.py",
+  "capture": "art/evidence/dreamisland-v1/polish/round-2/before-beach/pose-capture.json",
+  "method": "Full/isolated render equality at 2/255; isolated/blank difference above 6/255; display luma .2126/.7152/.0722",
+  "results": [
+    {
+      "blend": 1,
+      "metrics": {
+        "lamps": {
+          "pixels": 0,
+          "meanLuma": null,
+          "meanChroma": null,
+          "widthPixels": 0,
+          "heightPixels": 0
+        },
+        "mouth": {
+          "pixels": 415,
+          "meanLuma": 0.16823674935034252,
+          "lumaStd": 0.003975703066011285,
+          "meanChroma": 0.19789274746042995,
+          "visibleBoundsPixels": [
+            952,
+            257,
+            991,
+            269
+          ],
+          "widthPixels": 39,
+          "heightPixels": 12
+        },
+        "drum": {
+          "pixels": 576,
+          "meanLuma": 0.1680163534858388,
+          "lumaStd": 0.003437213024096499,
+          "meanChroma": 0.19854302832244006,
+          "visibleBoundsPixels": [
+            952,
+            250,
+            991,
+            269
+          ],
+          "widthPixels": 39,
+          "heightPixels": 19
+        },
+        "kerb": {
+          "pixels": 431135,
+          "meanLuma": 0.13750010561907158,
+          "lumaStd": 0.029560986540741453,
+          "meanChroma": 0.027588274179167305,
+          "visibleBoundsPixels": [
+            0,
+            269,
+            1280,
+            720
+          ],
+          "widthPixels": 1280,
+          "heightPixels": 451
+        },
+        "foam": {
+          "pixels": 3208,
+          "meanLuma": 0.37302328027969284,
+          "lumaStd": 0.18911316696120395,
+          "meanChroma": 0.373067331670823,
+          "visibleBoundsPixels": [
+            741,
+            305,
+            1280,
+            395
+          ],
+          "widthPixels": 539,
+          "heightPixels": 90
+        },
+        "mouthToDrum": 1.001311752457015,
+        "lampsToDrum": null
+      }
+    }
+  ]
+}

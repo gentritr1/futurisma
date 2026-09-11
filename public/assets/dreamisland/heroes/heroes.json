@@ -118,7 +118,7 @@
         "sheets/s5_clock_tower_ortho.png",
         "heroes/05d_clock_court_day.png"
       ],
-      "triangles": 4804,
+      "triangles": 5248,
       "bounds": {
         "min": [
           -4.0,
@@ -136,8 +136,8 @@
           8.0
         ]
       },
-      "bytes": 426040,
-      "sha256": "bf51f9c27d120e7b6969c6e22958a6d69d32146bf2c8686d3bc8c6817e992339",
+      "bytes": 467260,
+      "sha256": "c9018befb2119448c5012e37b36dce53f9733e87362ad3af2d127c008f2311f6",
       "materials": [
         "DI_MAT_metal",
         "DI_MAT_concrete",
@@ -200,7 +200,7 @@
         "sheets/s6_watchtower_ortho.png",
         "heroes/03_watchtower_point_day.png"
       ],
-      "triangles": 9438,
+      "triangles": 9578,
       "bounds": {
         "min": [
           -14.0,
@@ -209,22 +209,22 @@
         ],
         "max": [
           14.0,
-          30.0,
+          30.00200080871582,
           14.251358985900879
         ],
         "size": [
           28.0,
-          30.0,
+          30.00200080871582,
           28.502717971801758
         ]
       },
-      "bytes": 821896,
-      "sha256": "293112f84da3246713c64c817c73cfcf6122866738e3fee2429b976a53bfddd7",
+      "bytes": 837288,
+      "sha256": "c12978173e1c5b08afbd02bc201a066a517ecacc5781de600f5d27fea2702421",
       "materials": [
         "DI_MAT_concrete",
+        "DI_MAT_emissive",
         "DI_MAT_jungle-card",
-        "DI_MAT_jungle",
-        "DI_MAT_emissive"
+        "DI_MAT_jungle"
       ],
       "measurement": "Exported GLB index and position accessors, with node transforms, parsed by build_dreamisland_heroes.py; independently checked by GLTFLoader.",
       "file": "watchtower.glb"
@@ -272,7 +272,7 @@
         "heroes/04_basin_causeway_night.png",
         "heroes/05d_clock_court_day.png"
       ],
-      "triangles": 1218,
+      "triangles": 1226,
       "bounds": {
         "min": [
           -10.97249984741211,
@@ -290,10 +290,11 @@
           12.209999561309814
         ]
       },
-      "bytes": 112828,
-      "sha256": "12f39fa91bd54d1ba7436c7df2d2f330a2811ea30f79ce4bf62b1662ebeda418",
+      "bytes": 114668,
+      "sha256": "b8f43095b1eb3ec9171faa88fe1ae7c6dc34bda0857fb28d2c50b1d86e9ba218",
       "materials": [
         "DI_MAT_jungle-card",
+        "DI_MAT_water-overlay",
         "DI_MAT_jungle",
         "DI_MAT_water",
         "DI_MAT_concrete"
@@ -351,12 +352,12 @@
         "heroes/06_reef_shallows_day.png",
         "heroes/06n_reef_shallows_night.png"
       ],
-      "triangles": 1304,
+      "triangles": 1364,
       "bounds": {
         "min": [
           -32.800384521484375,
           0.0,
-          -5.829975605010986
+          -5.849165439605713
         ],
         "max": [
           35.727272033691406,
@@ -366,11 +367,11 @@
         "size": [
           68.52765655517578,
           40.0,
-          11.642871856689453
+          11.66206169128418
         ]
       },
-      "bytes": 112724,
-      "sha256": "ea0b0e20af2a856009168e695a156e856f25b64a97fa9ad837eddd91651949d4",
+      "bytes": 122220,
+      "sha256": "9223e2381d6c8d7bb2e28932f938df6d42eddae6bdd009079e2f0b74c9f13213",
       "materials": [
         "DI_MAT_jungle",
         "DI_MAT_concrete"

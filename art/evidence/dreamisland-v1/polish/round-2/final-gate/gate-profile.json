@@ -1,0 +1,45 @@
+{
+  "instrument": "/Users/gentlegen/Desktop/futurisma-race/polarity_work/scripts/visual/dreamisland-heroes/polish2-gate-profile.py",
+  "manifest": "public/assets/dreamisland/signage-manifest.json",
+  "capture": "art/evidence/dreamisland-v1/polish/round-2/final-gate/pose-capture.json",
+  "thresholds": {
+    "digitDisplayLumaAbove": 0.4,
+    "plateDisplayLumaBelow": 0.2
+  },
+  "results": [
+    {
+      "blend": 0,
+      "plateProjection": [
+        [
+          905.5794404301328,
+          321.4026623924507
+        ],
+        [
+          921.0361494958017,
+          321.6053832098031
+        ],
+        [
+          921.8363137761677,
+          307.24154266519025
+        ],
+        [
+          906.3309809894407,
+          307.12592324429966
+        ]
+      ],
+      "cropXYXY": [
+        903,
+        305,
+        925,
+        325
+      ],
+      "visiblePixels": 171,
+      "digitPixels": 101,
+      "platePixels": 43,
+      "digitHeightPixels": 12,
+      "digitMeanLuma": 0.4590501650165016,
+      "plateMeanLuma": 0.04430949384404925,
+      "contrast": 0.41474067117245234
+    }
+  ]
+}

@@ -5,7 +5,7 @@ crossfade-profile.py instrument, using its existing exact masks and assertions.
 """
 import json,sys,hashlib
 from pathlib import Path
-baseline,repeat=map(Path,sys.argv[1:3]);before=Path('art/evidence/dreamisland-v1/phase-c/crossfade-shipped')
+baseline,repeat=map(Path,sys.argv[1:3]);before=Path(sys.argv[3]) if len(sys.argv)>3 else Path('art/evidence/dreamisland-v1/phase-c/crossfade-shipped')
 def read(folder):return json.loads((folder/'crossfade-profile.json').read_text())
 a,b,c=read(before),read(baseline),read(repeat)
 assert a['pose']['camera']==b['pose']['camera']==c['pose']['camera']
@@ -22,7 +22,7 @@ for region in ['sky','road']:
  for i in range(5):rows.append({'region':region,'blend':b['blends'][i]['blend'],'phaseCBefore':a['blends'][i][region]['meanLuma'],'polishBaseline':new[i],'polishRepeat':c['blends'][i][region]['meanLuma'],'repeatDelta':deltas[i]})
 report={'instrument':__file__,'before':str(before),'baseline':str(baseline),'repeat':str(repeat),'checks':checks,'tenMeans':rows,'profileSha256':{str(p):hashlib.sha256((p/'crossfade-profile.json').read_bytes()).hexdigest() for p in [before,baseline,repeat]}}
 (baseline/'crossfade-acceptance.json').write_text(json.dumps(report,indent=2)+'\n')
-lines=['| Region | Blend | Phase C BEFORE | Polish baseline | Polish repeat | Repeat delta |','|---|---:|---:|---:|---:|---:|']
+lines=['| Region | Blend | BEFORE | New baseline | New repeat | Repeat delta |','|---|---:|---:|---:|---:|---:|']
 for r in rows:lines.append('| '+r['region']+' | '+' | '.join(f"{r[k]:.6f}" for k in ['blend','phaseCBefore','polishBaseline','polishRepeat','repeatDelta'])+' |')
 (baseline/'ten-means.md').write_text('\n'.join(lines)+'\n');print(json.dumps(checks,indent=2))
 assert checks['road']['T1pass']  # Original T1_midpointRoadLumaAgainstLinear.

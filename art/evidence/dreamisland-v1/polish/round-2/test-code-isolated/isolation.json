@@ -1,0 +1,32 @@
+{
+  "command": "npm run test:code",
+  "snapshot": "/private/var/folders/qy/z0zwmvms3js2v8ds4pyn3djh0000gn/T/dream-island-polish-tests-LqrYXE",
+  "excludedConcurrentEdit": "scripts/validate-race-modes.mjs",
+  "replacement": "git show HEAD:scripts/validate-race-modes.mjs",
+  "reason": "Only the concurrent validator imports missing startingGridRows; the production race rules and UI match HEAD. No shared-worktree file modified.",
+  "previousValidatorSha256": "48c68093b4d1850946d1e355427ece650e0742416247dd2cba372a0661500d88",
+  "committedValidatorSha256": "fae4608b20544b3e74137f71e93146e3d10f61d4d2b0e9cf5ae07d45eb66e3b5",
+  "verifiedPolishInputHashes": {
+    "src/game/dreamisland-course.ts": "1d7e5d610a3ad966003746fba067993468867484944d07036d4f31bf913d816d",
+    "src/game/dreamisland-materials.ts": "4c26fecfdd49947e2ab2c3a4031c114c91af911903645168e0952085ac621eba",
+    "src/game/dreamisland-powers.ts": "f501084e7df012c0453a8f0474664845b31b7a921a39c697bd3f573aa78b0fe9",
+    "src/game/dreamisland-runtime.ts": "b98e9bf4366673a2ee8d0944429b32fad9aebc32d490d3cb8386aa8ff133997a",
+    "src/game/dreamisland-sky.ts": "d3eead0f16caa025465c13546113b7c95792e0deff96f82fac5fbeaf7abf7cb7",
+    "src/game/dreamisland-water.ts": "288339c3ddb6b424c07d3ac60052f183e36a60bf0013dc271c868fb9956d6eab",
+    "src/game/dreamisland-schedule.js": "1f225bb5e5f9e967da4c20883c00f68892aef91a51e6a5eeeea56b9e641be7fc",
+    "src/game/dreamisland-fish.ts": "72a455956c662f5b338471786ac58142e7b5b63f21132b1c03c62007737c8ffc",
+    "src/game/dreamisland-heroes.ts": "55cf29835ff57107d713777162b24c9ed2f868ef7078049520ffb0627f6c711c",
+    "src/game/dreamisland-painted-environment.ts": "5baf9d1fc5d2e7ff7977ee2cdbd1bef16dd9495610a8c076ec67d5a5596e3dc8",
+    "src/game/dreamisland-powers-config.js": "679b27eac823403b3f03fab58c4b3a25e57a3fc9392838c693bb057dbc4ac351",
+    "public/assets/dreamisland/heroes/heroes.json": "b1ea63e5243baf52500bc61f6d22a365e2924ff8197e44cc44a53d49fecf45dd",
+    "public/assets/dreamisland/heroes/sea-stack-set.glb": "9223e2381d6c8d7bb2e28932f938df6d42eddae6bdd009079e2f0b74c9f13213",
+    "public/assets/dreamisland/heroes/waterfall-cliff.glb": "b8f43095b1eb3ec9171faa88fe1ae7c6dc34bda0857fb28d2c50b1d86e9ba218",
+    "public/assets/dreamisland/heroes/watchtower.glb": "c12978173e1c5b08afbd02bc201a066a517ecacc5781de600f5d27fea2702421",
+    "public/assets/dreamisland/heroes/clock-tower.glb": "c9018befb2119448c5012e37b36dce53f9733e87362ad3af2d127c008f2311f6",
+    "public/assets/dreamisland/painted.glb": "60e11543acce5c6a939fc715eae5aeccdded1a2efc177706ab04a3bdcdf12756",
+    "public/assets/dreamisland/painted.json": "aa3e75979d9e705eb59545fc762624e82961575fa7d1b0c5036b18d45b000eaf",
+    "public/assets/dreamisland/signage-manifest.json": "1ffe5b115d812570a15ac459ea6d8737b0b34f878cde1f6a0c1737ba49c38fd6"
+  },
+  "exitCode": 0,
+  "status": "VERIFIED isolated polish scope PASS; shared tree blocked by concurrent validator"
+}

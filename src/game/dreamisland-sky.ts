@@ -23,6 +23,7 @@ export class DreamIslandSky {
  /** Reads zero if neither panorama ever arrived, so a silent no-op is visible. */
  loadedPanoramas=0;
  private readonly night={value:0};
+ private readonly stars={value:0};
  private readonly haze={value:new THREE.Color(0xb9dbe4)};
  constructor(){
   const day={value:null as THREE.Texture|null},night={value:null as THREE.Texture|null};
@@ -33,13 +34,16 @@ export class DreamIslandSky {
    load('/assets/dreamisland/sky-day.jpg',day),load('/assets/dreamisland/sky-night.jpg',night),
   ]).then(()=>undefined);
   this.root=new THREE.Mesh(new THREE.SphereGeometry(560,40,20),new THREE.ShaderMaterial({
-   uniforms:{dayPanorama:day,nightPanorama:night,haze:this.haze,nightBlend:this.night},
+   uniforms:{dayPanorama:day,nightPanorama:night,haze:this.haze,nightBlend:this.night,starReveal:this.stars},
    side:THREE.BackSide,depthWrite:false,depthTest:false,
    vertexShader:'varying vec3 direction; void main(){direction=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
-   fragmentShader:`uniform sampler2D dayPanorama;uniform sampler2D nightPanorama;uniform vec3 haze;uniform float nightBlend;varying vec3 direction;
+   fragmentShader:`uniform sampler2D dayPanorama;uniform sampler2D nightPanorama;uniform vec3 haze;uniform float nightBlend;uniform float starReveal;varying vec3 direction;
     // Perceptual pacing applies only to the panorama mix. The course still
     // owns the unmodified clock, light/fog ramp, grip and reduced-motion jump.
-    vec4 panorama(vec2 uv){float mixWeight=1.-pow(1.-nightBlend,2.8);return mix(texture2D(dayPanorama,uv),texture2D(nightPanorama,uv),mixWeight);}
+    vec4 panorama(vec2 uv){float mixWeight=1.-pow(1.-nightBlend,2.8);
+      vec4 nightColor=texture2D(nightPanorama,uv);
+      nightColor.rgb*=mix(1.,starReveal,step(0.,direction.y));
+      return mix(texture2D(dayPanorama,uv),nightColor,mixWeight);}
     void main(){vec3 d=normalize(direction);float u=fract(atan(d.z,d.x)/6.283185+.42);float v=clamp(.30+max(d.y,0.)*.69,.30,.99);
     // Source row-profile places the painted day shoreline at v=.268.
     // The .30 lower bound samples sky above it throughout the dome.
@@ -57,6 +61,7 @@ export class DreamIslandSky {
  /** `nightBlend` comes from the course every frame; the dome never owns a clock. */
  update(camera:THREE.Camera,fog=new THREE.Color(0xb9dbe4),nightBlend=0){
   this.night.value=nightBlend;this.root.position.copy(camera.position);
+  this.stars.value=THREE.MathUtils.smoothstep(nightBlend,.6,1);
   fog.getRGB(this.haze.value,THREE.SRGBColorSpace);
  }
 }

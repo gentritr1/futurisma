@@ -3,7 +3,7 @@ import {mkdir,readFile,writeFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';
 import {launchReviewBrowser} from '../tideline-v4/browser.mjs';
 import {instrument} from '../dreamisland/instrument.mjs';
-const out='art/evidence/dreamisland-v1/polish/strike',base='http://127.0.0.1:5217';
+const out=process.argv.find(a=>a.startsWith('--out='))?.slice(6)??'art/evidence/dreamisland-v1/polish/strike',base=process.argv.find(a=>a.startsWith('--base='))?.slice(7)??'http://127.0.0.1:5217';
 await mkdir(out,{recursive:true});
 const schedule=JSON.parse(await readFile('src/game/data/dreamisland/schedule.json','utf8'));
 const route=JSON.parse(await readFile('src/game/data/dreamisland/route.json','utf8')),station=route.stations[Math.round(.05*route.count)];

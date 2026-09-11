@@ -58,7 +58,9 @@ export class DreamIslandPaintedEnvironment implements RaceEnvironment {
   new THREE.Color().setRGB(.3,.18,.035),new THREE.Color().setRGB(.15,.09,.0175),0);
  private readonly nightFogLift=new THREE.Color(0x152e4a).sub(new THREE.Color(0x0b1524));
  private readonly waterfallTime={value:0};
+ private readonly kerbGlow={value:0};
  private waterfallMaterial:THREE.MeshLambertMaterial|null=null;
+ private waterfallOverlay:THREE.MeshLambertMaterial|null=null;
  private readonly fish:THREE.Mesh[]=[];
  private shoals:DreamIslandShoals|null=null;
  private readonly byRole=new Map<string,THREE.MeshLambertMaterial>();
@@ -77,6 +79,19 @@ export class DreamIslandPaintedEnvironment implements RaceEnvironment {
      emissive:source.emissive,emissiveMap:source.emissiveMap,emissiveIntensity:source.emissiveIntensity,
      vertexColors:!!object.geometry.attributes.color,side:THREE.DoubleSide});
     applyDreamIslandCardCutout(material);
+    if(material.name.endsWith('jungle-card')){
+     // Opaque keyed fronds and the low-alpha road shade share one draw. The
+     // decal's alpha is authored per vertex; depth writes retain solid leaves.
+     material.transparent=true;material.forceSinglePass=true;
+    }
+    if(material.name==='DI_MAT_signage'){
+     material.onBeforeCompile=shader=>{
+      shader.fragmentShader=shader.fragmentShader.replace('#include <map_fragment>',`#include <map_fragment>
+       float diInk=smoothstep(.10,.45,dot(sampledDiffuseColor.rgb,vec3(.2126,.7152,.0722)));
+       diffuseColor.rgb*=mix(.10,1.80,diInk);`);
+     };
+     material.customProgramCacheKey=()=> 'dreamisland-signage-contrast-v2';
+    }
     converted.set(source,material);this.byRole.set(source.name,material);
     // An atlas plus mipmaps is a trap: past mip level 8 a 1024 sheet's levels
     // average ACROSS the quadrant boundaries, so at a grazing angle the sand
@@ -173,6 +188,18 @@ export class DreamIslandPaintedEnvironment implements RaceEnvironment {
   }
   p.needsUpdate=true;uv.needsUpdate=true;geometry.index!.needsUpdate=true;geometry.computeVertexNormals();geometry.computeBoundingSphere();
   road.userData.polishKerb={boxes:(p.count-first)/24,widthMetres:1.2,heightMetres:.72,innerEdgePreserved:true};
+  const material=road.material as THREE.MeshLambertMaterial;
+  material.onBeforeCompile=shader=>{
+   shader.uniforms.diKerbGlow=this.kerbGlow;
+   shader.fragmentShader='uniform float diKerbGlow;\n'+shader.fragmentShader
+    .replace('#include <emissivemap_fragment>',`#include <emissivemap_fragment>
+     // Restrict the cue to the cyan texels of the kerb quadrant. Stone lips
+     // and road pavement retain their ordinary shared lighting.
+     float diStripe=step(.504,vMapUv.y)*step(vMapUv.x,.496)
+       *smoothstep(.02,.08,min(sampledDiffuseColor.g,sampledDiffuseColor.b)-sampledDiffuseColor.r);
+     totalEmissiveRadiance+=diStripe*diKerbGlow*sampledDiffuseColor.rgb;`);
+  };
+  material.customProgramCacheKey=()=> 'dreamisland-kerb-glow-v2';material.needsUpdate=true;
  }
  /** The shoals need the fish meshes converted and hidden first, which the
   * constructor has just done, and they re-origin those meshes' buffers, which
@@ -225,6 +252,29 @@ export class DreamIslandPaintedEnvironment implements RaceEnvironment {
    this.waterfallMaterial=material;
    this.counters.emissiveMaterials++;
   }
+  const overlay=built.meshes.find(m=>m.name==='DI_HERO_waterfall-cliff_DI_MAT_water-overlay');
+  if(overlay){
+   const material=overlay.material as THREE.MeshLambertMaterial;
+   material.transparent=true;material.forceSinglePass=true;material.depthWrite=false;
+   material.emissive.setRGB(.25,.65,.75);
+   material.emissiveMap=this.byRole.get('DI_MAT_emissive')!.map;
+   material.onBeforeCompile=shader=>{
+    shader.uniforms.diFallTime=this.waterfallTime;
+    shader.fragmentShader='uniform float diFallTime;\n'+shader.fragmentShader
+     .replace('#include <map_fragment>',`vec2 diFastUv=vMapUv;
+      bool diMist=vMapUv.x<.5;
+      if(!diMist)diFastUv.y=.504+.492*fract((diFastUv.y-.504)/.492+diFallTime*.37);
+      vec4 sampledDiffuseColor=diMist?texture2D(emissiveMap,diFastUv):texture2D(map,diFastUv);
+      if(diMist){float lamp=dot(sampledDiffuseColor.rgb,vec3(.2126,.7152,.0722));
+       sampledDiffuseColor.rgb=vec3(lamp);diffuseColor.a*=smoothstep(.05,.7,lamp);}
+      diffuseColor*=sampledDiffuseColor;`)
+     .replace('#include <emissivemap_fragment>',`totalEmissiveRadiance*=sampledDiffuseColor.rgb;`);
+    this.counters.waterfallFlowShaders++;
+   };
+   material.customProgramCacheKey=()=> 'dreamisland-waterfall-overlay-v1';
+   material.userData.diFallTime=this.waterfallTime;
+   material.needsUpdate=true;this.waterfallOverlay=material;
+  }
   const tower=placements.find(p=>p.asset==='watchtower-ruin');
   if(tower){
    const scale=tower.hero?.heroScale??tower.scale;
@@ -256,6 +306,7 @@ export class DreamIslandPaintedEnvironment implements RaceEnvironment {
  updateVisibility(camera:THREE.Camera){
   camera.updateMatrixWorld(true);
   const blend=this.course.nightBlend,reduced=this.course.reducedMotion;
+  this.kerbGlow.value=blend*.12; // BEACH calibration: the 0.6 trial outshone the foam.
   this.nightFill.intensity=blend*.5;
   const fog=this.root.parent instanceof THREE.Scene?this.root.parent.fog:undefined;
   if(fog){
@@ -272,6 +323,7 @@ export class DreamIslandPaintedEnvironment implements RaceEnvironment {
   for(const light of this.tunnelLights)light.intensity=blend*1100;
   this.waterfallTime.value=reduced?0:this.course.tide.elapsed;
   if(this.waterfallMaterial)this.waterfallMaterial.emissiveIntensity=blend*.7;
+  if(this.waterfallOverlay)this.waterfallOverlay.emissiveIntensity=blend*.7;
   // Decision 3 and decision 6 both live here: the shoals drift on authored
   // closed paths from `fish-rise`, and under reduced motion they never spawn.
   this.shoals?.update(this.course.schedule.tick,this.course.schedule.config?.fishRiseTick??null,reduced);

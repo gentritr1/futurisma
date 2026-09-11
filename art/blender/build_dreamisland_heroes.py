@@ -19,7 +19,7 @@ from mathutils import Matrix, Quaternion, Vector
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / 'public/assets/dreamisland/heroes'
-EVIDENCE = ROOT / 'art/evidence/dreamisland-v1/polish/build-heroes'
+EVIDENCE = ROOT / 'art/evidence/dreamisland-v1/polish/round-2/build-heroes'
 ATLAS_PATH = ROOT / 'public/assets/dreamisland/atlas-manifest.json'
 ATLAS = json.loads(ATLAS_PATH.read_text())
 ROLES = ['concrete', 'metal', 'jungle', 'water', 'signage', 'emissive']
@@ -49,7 +49,7 @@ def empty(name, position=(0, 0, 0), parent=None):
 
 def make_materials():
     result = {}
-    for role in ROLES + ['jungle-card']:
+    for role in ROLES + ['jungle-card','water-overlay']:
         material = bpy.data.materials.new('DI_MAT_' + role)
         material.use_nodes = True
         bsdf = material.node_tree.nodes.get('Principled BSDF')
@@ -246,9 +246,15 @@ def clock_tower():
     bezel = Mesh('clock_bezel','metal','clock-ring-hands')
     for i in range(n):
         a,b = i*TAU/n,(i+1)*TAU/n
-        pts = [(cx+r*math.cos(t),cy+r*math.sin(t),cz+z) for z in [-.03,.07] for r,t in [(1.6,a),(1.77,a),(1.77,b),(1.6,b)]]
+        pts = [(cx+r*math.cos(t),cy+r*math.sin(t),cz+z) for z in [-.25,.07] for r,t in [(1.6,a),(1.77,a),(1.77,b),(1.6,b)]]
         bezel.geometry(pts,[(3,2,1,0),(1,5,4,0),(2,6,5,1),(3,7,6,2),(0,4,7,3)],(.65,.67,.53,1))
     bezel.finish(root)
+    ticks=Mesh('clock_twelve_hour_ticks','metal','clock-ring-hands')
+    for i in range(12):
+        a=i*TAU/12
+        ticks.beam((cx+1.30*math.sin(a),cy+1.30*math.cos(a),cz-.035),
+                   (cx+1.50*math.sin(a),cy+1.50*math.cos(a),cz-.035),.065,.035,(.025,.028,.023,1))
+    ticks.finish(root,{'hourTicks':12,'numerals':False})
     pivot = empty('clock_hand_pivot',(cx,cy,cz-.1),root)
     for name,end,width in [('clock_minute_hand',(0,1.28,0),.095),('clock_hour_hand',(.92,-.65,0),.13)]:
         hand = Mesh(name,'metal','clock-ring-hands')
@@ -263,6 +269,8 @@ def clock_tower():
     for i,(x,z,yaw) in enumerate(path):
         top = 1.2+(i+1)*.23
         steps.box((x,top-.16,z),(1.24,.32,.48),(.8,.85,.74,1),yaw)
+        steps.box((x+.23*math.sin(yaw),top-.015,z-.23*math.cos(yaw)),
+                  (1.30,.09,.13),(.94,.96,.87,1),yaw)
         # Short solid panels retain a readable stepped top edge.
         px,pz = x+.72*math.cos(yaw),z+.72*math.sin(yaw)
         parapet.box((px,top+.34,pz),(.22,.68,.49),(.79,.85,.72,1),yaw)
@@ -377,6 +385,18 @@ def watchtower():
             lamps.geometry([(side*7.025,6,0),(side*7.025,6+.7*math.cos(a),.7*math.sin(a)),
                             (side*7.025,6+.7*math.cos(b),.7*math.sin(b))],[(0,1,2)])
     lamps.finish(root,{'lampCount':2,'flushWithBoreWall':True})
+    # The exterior arch repeats the two bore lamps' atlas cell. It exposes the
+    # light at the mouth without placing a luminous card across the passage.
+    beacon=Mesh('watchtower_portal_lamp_arches','emissive','lamp-disc')
+    for side in (-1,1):
+        for i in range(24):
+            a,b=i*math.pi/24,(i+1)*math.pi/24
+            points=[]
+            for r,t in [(7.06,a),(7.65,a),(7.65,b),(7.06,b)]:
+                x=r*math.cos(t);y=8+(2.03 if r<7.1 else 2.88)*math.sin(t)
+                points.append((x,y,side*(math.sqrt(max(.1,radius(y)**2-x*x))+.23)))
+            beacon.geometry(points,[(0,1,2,3)])
+    beacon.finish(root,{'exteriorLampArch':True,'keepsBoreOpen':True})
     crown=Mesh('watchtower_crown_cornice')
     for i in range(48):
         crown.wedge(27.65,28.5,8.1,9.95,8.1,10,i*TAU/48,(i+1)*TAU/48,(.85,.88,.79,1))
@@ -391,6 +411,13 @@ def watchtower():
             merlons.wedge(28.5+row*.75,29.25+row*.75,8.35,10,8.35,10,
                          a-.16,a+.16,(.86,.89,.79,1))
     merlons.finish(root,{'nominalSlots':12,'missingSlots':missing,'existingMerlons':9})
+    caps=Mesh('watchtower_merlon_moss_tops','jungle','moss-blossom')
+    for i in range(12):
+        if i in missing:continue
+        a=i*TAU/12
+        caps.geometry([(r*math.cos(t),30.002,r*math.sin(t)) for r,t in
+                       [(8.35,a-.16),(10,a-.16),(10,a+.16),(8.35,a+.16)]],[(0,1,2,3)],(.59,.75,.47,1))
+    caps.finish(root,{'mossTopFaces':9})
     for slot in missing:
         empty('missing_merlon_%02d'%slot,(9.1*math.cos(slot*TAU/12),28.5,9.1*math.sin(slot*TAU/12)),root)
     # Both portals conform to the curved masonry; their inner edges follow
@@ -434,6 +461,11 @@ def watchtower():
         dark=Mesh('watchtower_'+label+'_window_recess')
         dark.box((0,21.1,side*9.35),(1.4,2.7,.08),(.055,.07,.05,1))
         dark.finish(root)
+        window=Mesh('watchtower_'+label+'_window_lamp','emissive','lamp-disc')
+        outline=arch_outline(.68,1.8,.72,bottom=0,segments=12)
+        points=[(x,y+20,side*9.41) for x,y in outline]
+        window.geometry(points,[tuple(range(len(points)))])
+        window.finish(root,{'nightWindowLamp':True})
     floor=Mesh('watchtower_upper_chamber_floor','concrete','causeway-paving')
     for i in range(32):
         floor.wedge(17,17.12,0,8.11,0,8.11,i*TAU/32,(i+1)*TAU/32)
@@ -475,6 +507,18 @@ def waterfall_cliff():
         left=u0+(u1-u0)*face.index/3;right=u0+(u1-u0)*(face.index+1)/3
         for loop,uv in zip(face.loop_indices,[(left,v0),(right,v0),(right,v1),(left,v1)]):
             sheet_obj.data.uv_layers.active.data[loop].uv=uv
+    # One additional draw holds the faster sheet and pool mist. Alpha is
+    # retained through hero merging; the runtime chooses the matching sampler.
+    overlay=Mesh('waterfall_fast_sheet_and_mist','water','waterfall')
+    for x,z in [(-3,-3.84),(0,-3.92),(3,-3.84)]:
+        overlay.geometry([(x-1.65,0,z),(x+1.65,0,z),(x+1.65,16,z),(x-1.65,16,z)],[(0,1,2,3)],(1,1,1,.6))
+    overlay.geometry([(-6.5,.15,-5.0),(6.5,.15,-5.0),(6.5,3.2,-5.0),(-6.5,3.2,-5.0)],
+                     [(0,1,2,3)],(1,1,1,.24),uv_rect=rect('emissive','lamp-disc'))
+    overlay_obj=overlay.finish(root,{'fastSheetAlpha':.6,'mistAlpha':.24,'mistCell':'emissive/lamp-disc'})
+    overlay_obj.data.materials[0]=MATERIALS['water-overlay']
+    u0,v0,u1,v1=rect('emissive','lamp-disc')
+    for loop,uv in zip(overlay_obj.data.polygons[-1].loop_indices,[(u0,v0),(u1,v0),(u1,v1),(u0,v1)]):
+        overlay_obj.data.uv_layers.active.data[loop].uv=uv
     foam=Mesh('waterfall_plunge_pool_foam_ring','water','foam-gradient')
     n=48
     for i in range(n):
@@ -540,6 +584,21 @@ def sea_stacks():
             subtract(obj,cutter)
             project_uvs(obj,'concrete','wall-block',[(.28,.34,.37,1)]*len(obj.data.polygons))
             obj['naturalArch']=True
+        notch=Mesh('stack_'+label+'_wave_cut_notch')
+        # A narrow recessed contour with a darker tint seats each silhouette
+        # into the water; its own bounds remain the authored stack's bounds.
+        for i in range(sides):
+            points=[]
+            for y,angle in [(1.5,i*TAU/sides),(2.5,i*TAU/sides),
+                            (2.5,(i+1)*TAU/sides),(1.5,(i+1)*TAU/sides)]:
+                t=y/height;r=radius*profile(t)+.018
+                points.append((lean*t+r*math.cos(angle),y,zlean*t+r*math.sin(angle)))
+            notch.geometry(points,[(0,1,2,3)],(.10,.14,.17,1))
+        notch_obj=notch.finish(part,{'waveCutHeightMetres':[1.5,2.5]})
+        if label=='32':
+            cutter=prism('temporary_notch_arch',[(px-1.4,py) for px,py in arch_outline(2.25,8,4.5,segments=9)],-15,15,parent=part)
+            subtract(notch_obj,cutter)
+            project_uvs(notch_obj,'concrete','wall-block',[(.10,.14,.17,1)]*len(notch_obj.data.polygons))
         rtop=radius*profile(1)
         for i in range(sides):
             cap.wedge(height-.32,height,0,rtop+.15,0,rtop*.93,i*TAU/sides,(i+1)*TAU/sides,

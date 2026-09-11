@@ -32,7 +32,7 @@ export function prepare(scene,camera,renderer){
   let triangles=0,meshes=0;const materials=new Set();
   focal.traverse(o=>{if(!o.isMesh)return;const role=o.material.name;
    const shared=byRole.get(role);if(!shared)throw Error('No shared material for '+role);
-   o.material=shared;o.castShadow=false;o.receiveShadow=false;meshes++;
+   o.material=shared;o.castShadow=name==='clock-tower';o.receiveShadow=name==='clock-tower';meshes++;
    materials.add(role);triangles+=(o.geometry.index?.count??o.geometry.attributes.position.count)/3;
   });
   scene.add(focal);focal.updateMatrixWorld(true);hideWorld();
@@ -41,7 +41,7 @@ export function prepare(scene,camera,renderer){
  }
  function focalPose(name,distance){
   const box=new THREE.Box3().setFromObject(focal,true),center=box.getCenter(new THREE.Vector3());
-  const direction=new THREE.Vector3(...(name==='sea-stack-set'?[0,.12,-1]:[.35,.15,-1])).normalize();
+  const direction=new THREE.Vector3(...(name==='sea-stack-set'?[0,.12,-1]:name==='watchtower'?[.35,.60,-1]:[.35,.15,-1])).normalize();
   return pin(center.clone().addScaledVector(direction,distance).toArray(),center.toArray(),70);
  }
  let bandSaved=[];
@@ -140,6 +140,40 @@ export function prepare(scene,camera,renderer){
    return {triangles:indices.length/3};
   }
   if(mode==='kerb')for(const {object} of saved)object.visible=object.name==='dreamisland_blockout_road';
+  const roundTwoNames={road:'dreamisland_blockout_road',sea:'dreamisland_sea',
+   foam:'dreamisland_foam',shallows:'dreamisland_shallows',
+   lamps:'DI_HERO_watchtower-ruin_DI_MAT_emissive',signage:'DI_STATIC_DI_MAT_signage'};
+  if(roundTwoNames[mode])for(const {object} of saved)object.visible=object.name===roundTwoNames[mode];
+  if(mode==='lamps'){
+   const lamps=saved.find(s=>s.object.name===roundTwoNames.lamps)?.object;
+   if(lamps){
+    lamps.visible=false;const geometry=lamps.geometry.clone(),p=geometry.attributes.position,index=geometry.index,indices=[];
+    // Placed upper-window lamps start above world Y=44. The mouth mask must
+    // contain only the bore discs and exterior arch lamps, not those windows.
+    for(let i=0;i<index.count;i+=3)if([0,1,2].every(k=>p.getY(index.getX(i+k))<38))for(let k=0;k<3;k++)indices.push(index.getX(i+k));
+    geometry.setIndex(indices);regionMesh=new THREE.Mesh(geometry,lamps.material);scene.add(regionMesh);
+   }
+  }
+  if(mode==='stripe'){
+   const road=saved.find(s=>s.object.name==='dreamisland_blockout_road').object;
+   const material=road.material.clone(),compile=road.material.onBeforeCompile;
+   material.onBeforeCompile=shader=>{
+    compile(shader,renderer);
+    shader.fragmentShader=shader.fragmentShader.replace('#include <color_fragment>',`#include <color_fragment>
+     if(vMapUv.y<.504||vMapUv.x>.496||min(sampledDiffuseColor.g,sampledDiffuseColor.b)-sampledDiffuseColor.r<.025)discard;`);
+   };
+   material.customProgramCacheKey=()=> 'review-kerb-stripe-mask';
+   regionMesh=new THREE.Mesh(road.geometry.clone(),material);regionMesh.receiveShadow=road.receiveShadow;scene.add(regionMesh);
+  }
+  if(mode==='road'){
+   const cards=saved.find(s=>s.object.name==='DI_STATIC_DI_MAT_jungle-card')?.object;
+   const colors=cards?.geometry.attributes.color;
+   if(colors?.itemSize===4){
+    const geometry=cards.geometry.clone(),index=geometry.index,indices=[];
+    for(let i=0;i<index.count;i+=3)if([0,1,2].every(k=>colors.getW(index.getX(i+k))<.5))for(let k=0;k<3;k++)indices.push(index.getX(i+k));
+    geometry.setIndex(indices);regionMesh=new THREE.Mesh(geometry,cards.material);scene.add(regionMesh);
+   }
+  }
   if(mode==='mouth'||mode==='drum'){
    const mesh=saved.find(s=>s.object.name==='DI_HERO_watchtower-ruin_DI_MAT_concrete')?.object;
    if(!mesh)throw Error('Tower concrete batch missing');

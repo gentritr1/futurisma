@@ -1,0 +1,158 @@
+{
+  "instrument": "/Users/gentlegen/Desktop/futurisma-race/polarity_work/scripts/visual/dreamisland-heroes/polish2-verify.py",
+  "status": "VERIFIED: validation complete; residual 3 remains FAIL",
+  "startingHead": "40e5856",
+  "endingHead": "23e6d8f11e084a657ab604151b992452f89e2e02",
+  "concurrentCommit": "23e6d8f: paddock starting-grid fix; no commit made by this pass",
+  "testCodeExit": 0,
+  "testedInputHashes": {
+    "index.html": "6575ae043be6c9081a0494cc741c8c51733472e4160d43468a084c1de9b4662d",
+    "public/assets/dreamisland/heroes/clock-tower.glb": "c9018befb2119448c5012e37b36dce53f9733e87362ad3af2d127c008f2311f6",
+    "public/assets/dreamisland/heroes/heroes.json": "b1ea63e5243baf52500bc61f6d22a365e2924ff8197e44cc44a53d49fecf45dd",
+    "public/assets/dreamisland/heroes/sea-stack-set.glb": "9223e2381d6c8d7bb2e28932f938df6d42eddae6bdd009079e2f0b74c9f13213",
+    "public/assets/dreamisland/heroes/watchtower.glb": "c12978173e1c5b08afbd02bc201a066a517ecacc5781de600f5d27fea2702421",
+    "public/assets/dreamisland/heroes/waterfall-cliff.glb": "b8f43095b1eb3ec9171faa88fe1ae7c6dc34bda0857fb28d2c50b1d86e9ba218",
+    "public/assets/dreamisland/painted.glb": "60e11543acce5c6a939fc715eae5aeccdded1a2efc177706ab04a3bdcdf12756",
+    "public/assets/dreamisland/painted.json": "aa3e75979d9e705eb59545fc762624e82961575fa7d1b0c5036b18d45b000eaf",
+    "public/assets/dreamisland/signage-manifest.json": "1ffe5b115d812570a15ac459ea6d8737b0b34f878cde1f6a0c1737ba49c38fd6",
+    "scripts/validate-race-modes.mjs": "48c68093b4d1850946d1e355427ece650e0742416247dd2cba372a0661500d88",
+    "src/game/dreamisland-heroes.ts": "55cf29835ff57107d713777162b24c9ed2f868ef7078049520ffb0627f6c711c",
+    "src/game/dreamisland-painted-environment.ts": "5baf9d1fc5d2e7ff7977ee2cdbd1bef16dd9495610a8c076ec67d5a5596e3dc8",
+    "src/game/dreamisland-sky.ts": "d3eead0f16caa025465c13546113b7c95792e0deff96f82fac5fbeaf7abf7cb7",
+    "src/game/dreamisland-water.ts": "288339c3ddb6b424c07d3ac60052f183e36a60bf0013dc271c868fb9956d6eab",
+    "src/game/race-modes-rules.js": "32d84e90b8cda4e02da0d2477e19f03b32c50bed06415bb12bc5a0678ba183e2",
+    "src/game/ui.ts": "b972f3e9e7d16d36c31b4b5025a2df940e3c17e81c8dd020bc23bab280e1a142"
+  },
+  "inputMismatches": [],
+  "frozenInputMismatches": [],
+  "protectedUnchangedFromStart": {
+    "src/game/game.ts": true,
+    "src/game/dreamisland-course.ts": true,
+    "src/game/dreamisland-runtime.ts": true,
+    "src/game/dreamisland-schedule.js": true,
+    "src/game/dreamisland-powers.ts": true,
+    "src/game/dreamisland-powers-config.js": true,
+    "src/game/data/dreamisland/route.json": true,
+    "src/game/data/dreamisland/schedule.json": true,
+    "src/game/data/dreamisland/rival-pace.json": true
+  },
+  "excludedFilesNotEditedByThisPass": [
+    "index.html",
+    "src/game/ui.ts",
+    "src/game/meta-ui.ts",
+    "src/game/race-modes.ts",
+    "src/game/race-modes-rules.js",
+    "scripts/validate-race-modes.mjs"
+  ],
+  "otherWorktreeChanges": [
+    "art/evidence/dreamisland-v1/phase-c/validators/painted-validation.json"
+  ],
+  "ownedSourceAndInstrumentFiles": [
+    "art/blender/build_dreamisland_heroes.py",
+    "art/blender/build_dreamisland_painted.py",
+    "public/assets/dreamisland/heroes/clock-tower.glb",
+    "public/assets/dreamisland/heroes/heroes.json",
+    "public/assets/dreamisland/heroes/sea-stack-set.glb",
+    "public/assets/dreamisland/heroes/watchtower.glb",
+    "public/assets/dreamisland/heroes/waterfall-cliff.glb",
+    "public/assets/dreamisland/painted.glb",
+    "public/assets/dreamisland/painted.json",
+    "public/assets/dreamisland/signage-manifest.json",
+    "scripts/visual/dreamisland-heroes/polish-atlas-quadrant-proof.mjs",
+    "scripts/visual/dreamisland-heroes/polish-canopy.mjs",
+    "scripts/visual/dreamisland-heroes/polish-crossfade-check.py",
+    "scripts/visual/dreamisland-heroes/polish-focals.mjs",
+    "scripts/visual/dreamisland-heroes/polish-kerb.py",
+    "scripts/visual/dreamisland-heroes/polish-regions.py",
+    "scripts/visual/dreamisland-heroes/polish-scene.mjs",
+    "scripts/visual/dreamisland-heroes/polish-strike.mjs",
+    "scripts/visual/dreamisland-heroes/polish-test-code.mjs",
+    "scripts/visual/dreamisland-heroes/polish-transport.mjs",
+    "scripts/visual/dreamisland-heroes/polish2-atlas-claims.mjs",
+    "scripts/visual/dreamisland-heroes/polish2-compose.py",
+    "scripts/visual/dreamisland-heroes/polish2-feature-profile.py",
+    "scripts/visual/dreamisland-heroes/polish2-gate-profile.py",
+    "scripts/visual/dreamisland-heroes/polish2-report.py",
+    "scripts/visual/dreamisland-heroes/polish2-verify.py",
+    "src/game/dreamisland-heroes.ts",
+    "src/game/dreamisland-painted-environment.ts",
+    "src/game/dreamisland-sky.ts",
+    "src/game/dreamisland-water.ts"
+  ],
+  "evidenceRoot": "art/evidence/dreamisland-v1/polish/round-2",
+  "soaks": {
+    "feral": {
+      "lapsMs": [
+        33158,
+        32067,
+        31900
+      ],
+      "errors": 0,
+      "missedGates": 0,
+      "recoveries": 0,
+      "p95Ms": 8.399999856948853,
+      "sampleResidual": -2.560861955763471,
+      "draws": 94,
+      "triangles": 157650,
+      "materialViolations": 0
+    },
+    "works": {
+      "lapsMs": [
+        33158,
+        32125,
+        31925
+      ],
+      "errors": 0,
+      "missedGates": 0,
+      "recoveries": 0,
+      "p95Ms": 8.400000095367432,
+      "sampleResidual": -0.35965264257106355,
+      "draws": 94,
+      "triangles": 157558,
+      "materialViolations": 0
+    },
+    "rookie": {
+      "lapsMs": [
+        33158,
+        32125,
+        31925
+      ],
+      "errors": 0,
+      "missedGates": 0,
+      "recoveries": 0,
+      "p95Ms": 8.400000095367432,
+      "sampleResidual": -1.699049081271255,
+      "draws": 94,
+      "triangles": 157558,
+      "materialViolations": 0
+    },
+    "works-reduced": {
+      "lapsMs": [
+        33158,
+        32125,
+        31925
+      ],
+      "errors": 0,
+      "missedGates": 0,
+      "recoveries": 0,
+      "p95Ms": 8.400000095367432,
+      "sampleResidual": -1.8471074498388589,
+      "draws": 94,
+      "triangles": 157124,
+      "materialViolations": 0
+    }
+  },
+  "build": {
+    "instrument": "scripts/validate-build.mjs",
+    "shellGzipKiB": 276.8,
+    "initialJsGzipKiB": 264.9
+  },
+  "artifacts": {
+    "chaseFrames": 14,
+    "beforeAfterPairs": 17,
+    "hero40mFrames": 8,
+    "strikeFrames": 10,
+    "newAtlasConsumersDecided": 11
+  },
+  "visualInspection": "Inspected the full 17-pair sheet, eight hero views, strike contact sheet, and pinned grove, water, beacon and gate renders."
+}

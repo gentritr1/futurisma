@@ -38,9 +38,10 @@ import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {launchReviewBrowser} from '../tideline-v4/browser.mjs';
 import {instrument} from '../dreamisland/instrument.mjs';
-import {CLAIMS} from './polish-atlas-claims.mjs';
+import {CLAIMS as ORIGINAL_CLAIMS} from './polish-atlas-claims.mjs';
 
 const flag=name=>process.argv.find(a=>a.startsWith('--'+name+'='))?.slice(name.length+3);
+const CLAIMS=flag('claims')?(await import('./'+flag('claims'))).CLAIMS:ORIGINAL_CLAIMS;
 const out=flag('out')??'art/evidence/dreamisland-v1/polish/atlas-added-quadrant';
 const base=flag('base')??'http://127.0.0.1:5200';
 await mkdir(out,{recursive:true});
@@ -146,8 +147,15 @@ try{
   window.__diUnlit=name=>{
    const target=window.__diMeshes.find(o=>o.name===name);if(!target)return null;
    const m=target.material,saved={color:m.color.getHex(),emissive:m.emissive.getHex(),
-    emissiveIntensity:m.emissiveIntensity,emissiveMap:m.emissiveMap,vertexColors:m.vertexColors,
-    fog:m.fog,toneMapped:m.toneMapped};
+   emissiveIntensity:m.emissiveIntensity,emissiveMap:m.emissiveMap,vertexColors:m.vertexColors,
+    fog:m.fog,toneMapped:m.toneMapped,onBeforeCompile:m.onBeforeCompile,cacheKey:m.customProgramCacheKey};
+   // A coloured quadrant ID has arbitrary brightness. Disable only the
+   // luminance-derived mist opacity while proving its sampler/UV identity;
+   // otherwise the blue BL ID is discarded as though it were dark artwork.
+   if(name==='DI_HERO_waterfall-cliff_DI_MAT_water-overlay'){
+    m.onBeforeCompile=shader=>{saved.onBeforeCompile(shader);shader.fragmentShader=shader.fragmentShader.replace('diffuseColor.a*=smoothstep(.05,.7,lamp);','diffuseColor.a=1.;');};
+    m.customProgramCacheKey=()=> 'review-water-overlay-quadrant';
+   }
    const cell=m.userData?.diUniforms?.diCell,glow=m.userData?.diUniforms?.diEmissiveCell;
    if(cell&&glow){saved.glow=glow.value.clone();glow.value.copy(cell.value);}
    m.color.setHex(0x000000);m.emissive.setHex(0xffffff);
@@ -161,6 +169,7 @@ try{
     delete m.emissiveIntensity;m.emissiveIntensity=saved.emissiveIntensity;
     m.emissiveMap=saved.emissiveMap;m.vertexColors=saved.vertexColors;
     m.fog=saved.fog;m.toneMapped=saved.toneMapped;m.needsUpdate=true;
+    m.onBeforeCompile=saved.onBeforeCompile;m.customProgramCacheKey=saved.cacheKey;
     if(saved.glow)glow.value.copy(saved.glow);
    };
    return saved;
@@ -206,7 +215,7 @@ try{
  // The census: the longest contiguous run of the shipped index buffer whose UVs
  // fall inside the claimed rect, and where that run stands, so the camera can be
  // aimed at geometry rather than at an empty sky.
- const censusOf=(claim,sampler)=>page.evaluate(({name,sampler,uniform})=>{
+ const censusOf=(claim,sampler)=>page.evaluate(({name,sampler,uniform,filter})=>{
   const mesh=window.__diMeshes.find(o=>o.name===name);
   if(!mesh)return {error:'no mesh named '+name};
   const V=mesh.position.constructor;
@@ -236,8 +245,17 @@ try{
   }
   const uv=mesh.geometry.attributes.uv,index=mesh.geometry.index;
   const count=index?index.count:mesh.geometry.attributes.position.count;
-  const inside=i=>{const u=uv.getX(i),v=uv.getY(i);
-   return u>=sampler[0]-1e-4&&u<=sampler[2]+1e-4&&v>=sampler[1]-1e-4&&v<=sampler[3]+1e-4;};
+  const inside=i=>{const u=uv.getX(i),v=uv.getY(i),color=mesh.geometry.attributes.color;
+   const alpha=color?.itemSize===4?color.getW(i):1,red=color?color.getX(i):1;
+   const y=mesh.geometry.attributes.position.getY(i),normalY=Math.abs(mesh.geometry.attributes.normal.getY(i));
+   return u>=sampler[0]-1e-4&&u<=sampler[2]+1e-4&&v>=sampler[1]-1e-4&&v<=sampler[3]+1e-4
+    &&(filter.minimumAlpha===undefined||alpha>=filter.minimumAlpha)
+    &&(filter.maximumAlpha===undefined||alpha<=filter.maximumAlpha)
+    &&(filter.minimumRedTint===undefined||red>=filter.minimumRedTint)
+    &&(filter.maximumRedTint===undefined||red<=filter.maximumRedTint)
+    &&(filter.minimumWorldY===undefined||y>=filter.minimumWorldY)
+    &&(filter.maximumWorldY===undefined||y<=filter.maximumWorldY)
+    &&(filter.minimumAbsNormalY===undefined||normalY>=filter.minimumAbsNormalY);};
   let best={start:0,count:0},run={start:0,count:0},matched=0;
   for(let t=0;t<count;t+=3){
    const a=index?index.getX(t):t,b=index?index.getX(t+1):t+1,c=index?index.getX(t+2):t+2;
@@ -267,7 +285,7 @@ try{
   }
   return {triangles:count/3,matchedTriangles:matched,start:best.start,count:best.count,
    focus:focus.toArray(),localRadius:radius,normal:[facing[0]/length,facing[1]/length,facing[2]/length],samples};
- },{name:claim.mesh,sampler,uniform:!!claim.uniform});
+ },{name:claim.mesh,sampler,uniform:!!claim.uniform,filter:claim});
 
  for(const claim of CLAIMS){
   const rect=rectOf(claim.role,claim.cell);

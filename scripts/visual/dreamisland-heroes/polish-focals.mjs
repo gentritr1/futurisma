@@ -45,6 +45,33 @@ try{
     await draw();
     const prefix=name+'-'+distance+'m-'+(blend?'night':'day'),frames={full:prefix+'.png'};
     await page.screenshot({path:out+'/'+frames.full});
+    const featureFrames={};
+    if(process.argv.includes('--features')&&distance===40){
+     const features={'clock-tower':['bezel','ticks','nosings'],watchtower:['moss-tops','windows','portal-lamps'],
+      'waterfall-cliff':['fast-sheet','mist'],'sea-stack-set':['notches']}[name];
+     for(const feature of features){
+      const removed=await page.evaluate((name,feature)=>{
+       const root=window.__diScene.getObjectByName('review_focal_'+name),saved=[];
+       const names={bezel:'clock_bezel',ticks:'clock_twelve_hour_ticks',nosings:'clock_winding_stair_treads',
+        'moss-tops':'watchtower_merlon_moss_tops','portal-lamps':'watchtower_portal_lamp_arches',
+        'fast-sheet':'waterfall_fast_sheet_and_mist',mist:'waterfall_fast_sheet_and_mist'};
+       root.traverse(o=>{
+        if(!o.isMesh)return;
+        const wanted=feature==='windows'?o.name.endsWith('_window_lamp'):feature==='notches'?o.name.endsWith('_wave_cut_notch'):o.name===names[feature];
+        if(!wanted)return;saved.push({o,geometry:o.geometry,visible:o.visible});
+        if(['nosings','fast-sheet','mist'].includes(feature)){
+         const g=o.geometry.clone(),index=g.index,color=g.attributes.color,uv=g.attributes.uv,keep=[];
+         for(let i=0;i<index.count;i+=3){const selected=[0,1,2].every(k=>{const j=index.getX(i+k);return feature==='nosings'?color.getX(j)>.9:feature==='mist'?uv.getX(j)<.5:uv.getX(j)>.5;});if(!selected)for(let k=0;k<3;k++)keep.push(index.getX(i+k));}
+         g.setIndex(keep);o.geometry=g;
+        }else o.visible=false;
+       });
+       window.__restoreHeroFeature=()=>{for(const s of saved){if(s.o.geometry!==s.geometry)s.o.geometry.dispose();s.o.geometry=s.geometry;s.o.visible=s.visible;}};
+       return saved.length;
+      },name,feature);
+      await draw();const file=prefix+'-without-'+feature+'.png';await page.screenshot({path:out+'/'+file});
+      featureFrames[feature]={without:file,sourceMeshes:removed};await page.evaluate(()=>window.__restoreHeroFeature());
+     }
+    }
     if(name==='watchtower'&&distance===40){
      for(const [mode,stone] of [['lower',false],['stone',true]]){
       await page.evaluate(stone=>window.__polish.lowerBand(stone),stone);await draw();
@@ -54,7 +81,7 @@ try{
      frames.blank=prefix+'-blank.png';await page.screenshot({path:out+'/'+frames.blank});
      await page.evaluate(()=>window.__polish.restoreFocal());
     }
-    report.frames.push({asset:name,distance,blend,source,sourceSha256:createHash('sha256').update(bytes).digest('hex'),geometry,pose,settle,frames});
+    report.frames.push({asset:name,distance,blend,source,sourceSha256:createHash('sha256').update(bytes).digest('hex'),geometry,pose,settle,frames,featureFrames});
    }
   }
  }

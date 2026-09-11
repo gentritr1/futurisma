@@ -40,7 +40,7 @@ OUT=ROOT/'public/assets/dreamisland'
 # Polish writes its own build record; earlier phase evidence remains untouched,
 # because a later revision overwriting an earlier phase's evidence is the
 # residual this directory split exists to close.
-EVIDENCE=ROOT/'art/evidence/dreamisland-v1/polish/build'
+EVIDENCE=ROOT/'art/evidence/dreamisland-v1/polish/round-2/build'
 EVIDENCE.mkdir(parents=True,exist_ok=True)
 route=json.loads((ROOT/'src/game/data/dreamisland/route.json').read_text())
 atlas=json.loads((OUT/'atlas-manifest.json').read_text())
@@ -448,6 +448,30 @@ for index,distance in enumerate(range(6,2400,17)):
     offset=side*(half_width(u)+5.5+slot*6.2+(index%3)*1.7)
     place(PALM_NAMES[(index+slot+(0 if side<0 else 1))%3],beside(u,offset,-.2),
      (index*1.7+slot)%math.tau,sector=sector)
+# Long crossed fronds bridge the grove from both banks. Their lowest vertex
+# is 11.6 m above the local deck; the exported-vertex clearance instrument
+# checks the curved route, not just this authoring datum.
+canopy=Asset('grove-canopy-and-shade',materials,rects);canopy.metric=False
+for distance in range(323,674,17):
+ u=distance/LENGTH;p,t,right,s=frame(u)
+ for side in (-1,1):
+  for crossed in (0,1):
+   root=p+right*(side*(half_width(u)+1.4))+UP*12.2
+   tip=p+right*(-side*1.4)+t*(2.5 if crossed else -2.5)+UP*(11.6+crossed*1.2)
+   canopy.geometry([root-t*2.6,tip-t*2.0,tip+t*2.0,root+t*2.6],[(0,1,2,3)],'jungle-card','frond')
+# One continuous road decal strip in the existing keyed jungle-card batch.
+# Subdivision follows the real deck; its vertices sit below the corridor-ray
+# origin. Vertex alpha blends a dark projection of the existing frond cell.
+canopy.tint=(.035,.045,.035,.15)
+for distance in range(310,674,10):
+ points=[]
+ for d in (distance,min(distance+10,678)):
+  p,t,right,s=frame(d/LENGTH)
+  for side in (-1,1):points.append(p+right*(side*(s['width']/2-1.3))+UP*.045)
+ canopy.geometry(points,[(0,1,3,2)],'jungle-card','frond')
+canopy_root=canopy.finish();library['grove-canopy-and-shade']=canopy_root
+place('grove-canopy-and-shade',(0,0,0),0,sector='GROVE')
+
 # Understory along every verge, always outside the kerb.
 for index,distance in enumerate(range(12,2400,23)):
  u=distance/LENGTH;sector=sector_at(u)
@@ -546,30 +570,40 @@ SIGN_PLAN=[(.002,-1,'plate-dream-island','BEACH'),(.002,1,'plate-07','BEACH'),
  (.750,-1,'plate-gate-6','REEF'),(.850,1,'plate-beach','CUT')]
 signage=Asset('signage-plates',materials,rects);signage.metric=False
 for progress,side,cell,sector in SIGN_PLAN:
+ gate=cell.startswith('plate-gate-')
+ if gate:
+  _,t,right,_=frame(progress)
+  turn=frame(min(progress+.0125,.999))[1].dot(right)
+  if abs(turn)>.001:side=1 if turn>0 else -1
+  progress-=.001
  plate=LETTERING['plate-gate-numbers']['plate'] if cell.startswith('plate-gate-') else LETTERING[cell]['plate']
  lettering=plate['lettering']
  fraction=lettering['glyphFractionOfPlate']
  # A gate digit is one sixth of the strip wide but the full strip tall, so the
  # glyph fraction of the plate it is cut from is the number that governs it.
- letters=PLATE_HEIGHT*fraction
+ height=.774 if gate else PLATE_HEIGHT
+ letters=height*fraction
  assert letters<=.59+1e-9,cell+' would ship %.3f m letters'%letters
  p,t,right,s=frame(progress)
  lateral=side*(s['width']/2+2.6)
  position=p+right*lateral+UP*3.4
- width=PLATE_HEIGHT*(2.9 if cell=='plate-dream-island' else 1.0 if cell=='plate-07'
+ width=height*(2.9 if cell=='plate-dream-island' else 1.0 if cell=='plate-07'
   else 1.0 if cell.startswith('plate-gate-') else 2.15)
- # The plate's width runs ALONG the road so its face looks across it.
- signage.card((position.x,position.y,position.z),width,PLATE_HEIGHT,
-  'signage',cell,yaw=math.atan2(t.z,t.x),anchor='centre')
+ yaw=math.atan2(right.z,right.x)+side*math.radians(15) if gate else math.atan2(t.z,t.x)
+ signage.card((position.x,position.y,position.z),width,height,
+  'signage',cell,yaw=yaw,anchor='centre')
+ if gate:
+  signage.beam(position-UP*3.35,position,.10,'metal','gate-lamp-post')
  signs.append({'id':cell+'@'+format(progress,'.3f'),'tile':cell,'progress':progress,
   'side':'left' if side<0 else 'right','sector':sector,
   'position':[round(v,3) for v in position],
-  'plateHeightMetres':PLATE_HEIGHT,'plateWidthMetres':round(width,3),
+  'plateHeightMetres':height,'plateWidthMetres':round(width,3),'yawRadians':yaw,
+  'approachAngleDegrees':15 if gate else None,
   'letterHeightMetres':round(letters,4),
   'letterCapMetres':.59,'gameplaySizeException':False,
   'roadHalfWidthMetres':round(s['width']/2,3),
-  'roadFaceClearanceMetres':round(abs(lateral)-s['width']/2-width/2*0,3),
-  'deckClearanceMetres':round(abs(lateral)-(s['width']/2-2.05),3),
+  'roadFaceClearanceMetres':round(abs(lateral)-s['width']/2-(width/2*math.cos(math.radians(15)) if gate else 0),3),
+  'deckClearanceMetres':round(abs(lateral)-(s['width']/2-2.05)-(width/2*math.cos(math.radians(15)) if gate else 0),3),
   'heightAboveDeckMetres':3.4})
 save(signage,['DREAM ISLAND place plate','07 map number','six gate number plates',
  'BEACH district plate','every letter under the 0.59 m environmental cap'])

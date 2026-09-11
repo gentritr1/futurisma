@@ -2,7 +2,7 @@ import {readFileSync,writeFileSync} from 'node:fs';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
-const out='art/evidence/dreamisland-v1/polish/canopy-clearance.json';
+const out=process.argv.find(a=>a.startsWith('--out='))?.slice(6)??'art/evidence/dreamisland-v1/polish/canopy-clearance.json';
 const route=JSON.parse(readFileSync('src/game/data/dreamisland/route.json'));
 const data=readFileSync('public/assets/dreamisland/painted.glb'),length=data.readUInt32LE(12),doc=JSON.parse(data.subarray(20,20+length));
 doc.buffers[0].uri='data:application/octet-stream;base64,'+data.subarray(28+length).toString('base64');
@@ -15,6 +15,8 @@ scene.traverse(mesh=>{
  if(!mesh.isMesh||!mesh.material.name.endsWith('jungle-card'))return;
  const p=mesh.geometry.attributes.position,point=new THREE.Vector3(),offset=new THREE.Vector3();
  for(let i=0;i<p.count;i++){
+  const color=mesh.geometry.attributes.color;
+  if(color?.itemSize===4&&color.getW(i)<.5)continue; // Ground decal, not an overhead frond.
   point.fromBufferAttribute(p,i).applyMatrix4(mesh.matrixWorld);
   let nearest=null,distance=Infinity;
   for(const s of stations){const d=(s.p.x-point.x)**2+(s.p.z-point.z)**2;if(d<distance){distance=d;nearest=s;}}

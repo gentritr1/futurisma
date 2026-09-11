@@ -1,0 +1,382 @@
+{
+  "script": "art/blender/build_dreamisland_heroes.py",
+  "roles": [
+    "concrete",
+    "metal",
+    "jungle",
+    "water",
+    "signage",
+    "emissive"
+  ],
+  "units": "metres",
+  "coordinates": "Y up, -Z front",
+  "textureBinding": "DI_MAT_<role> -> ../textures/<role>.jpg; DI_MAT_jungle-card -> ../jungle-card.png with magenta discard",
+  "atlasManifestSha256": "ef4e7750c089970df097358fb5575235a378ccc6dbdf91c3c0e496f2d7a46675",
+  "atlasFiles": {
+    "public/assets/dreamisland/textures/concrete.jpg": {
+      "bytes": 447259,
+      "sha256": "1fa66bf620bd081fae2809c79e704dd1403f92f1b90e76a2f0a9284fe3db1b67",
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    "public/assets/dreamisland/textures/metal.jpg": {
+      "bytes": 288674,
+      "sha256": "ae8c28ae95073d0c2acee9c16ab13e6ddb1c30f4906ad41b1a9e049b69f3943a",
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    "public/assets/dreamisland/textures/jungle.jpg": {
+      "bytes": 419291,
+      "sha256": "66dd4473ab6ee37e219d2c9c47fcce88a8d7b05777dd7a784d102a1a2dc1f7bb",
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    "public/assets/dreamisland/textures/water.jpg": {
+      "bytes": 401980,
+      "sha256": "de31e9f54dc8eeea23cd6fc5ce269e21273b81a482667a0a9ed74930ececa607",
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    "public/assets/dreamisland/textures/signage.jpg": {
+      "bytes": 308934,
+      "sha256": "e360e9cda4171a8f657de4df703117d0b887c545a3a76d43c46abb8a13e0831d",
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    "public/assets/dreamisland/textures/emissive.jpg": {
+      "bytes": 121236,
+      "sha256": "b1464210c8b7f4513497a06c313ba65ba2a2354d2358d9f8eacd80735d5e1d79",
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    "public/assets/dreamisland/jungle-card.png": {
+      "bytes": 937299,
+      "sha256": "829f518b7b2597b55824e70f09fbd7b008eb706cb49880535145d24cb799bb42",
+      "size": [
+        1024,
+        1024
+      ]
+    }
+  },
+  "assets": {
+    "clock-tower": {
+      "budget": 6000,
+      "targetMetres": {
+        "height": 14,
+        "plinthWidth": 8,
+        "plinthDepth": 8,
+        "faceDiameter": 3.2
+      },
+      "calibration": "Metres override sheet proportions: plinth 8 x 8, three 0.4 m tiers; 4.68 m square shaft offset X=-0.65; face diameter 3.2; eaves at 11.37; finial apex Y=14. Winding side stair has 25 individual 0.23 m risers.",
+      "features": [
+        "stepped three-tier plinth",
+        "square mossy shaft with visible block courses",
+        "round white 3.2 m face with two plain metal hands",
+        "pitched hip roof with finial",
+        "winding side stair with stepped stone parapet"
+      ],
+      "featureFrames": [
+        [
+          "front",
+          "three-quarter"
+        ],
+        [
+          "front",
+          "back"
+        ],
+        [
+          "front",
+          "three-quarter"
+        ],
+        [
+          "front",
+          "side"
+        ],
+        [
+          "side",
+          "back",
+          "three-quarter"
+        ]
+      ],
+      "anchors": [
+        "clock_hand_pivot",
+        "clock_stair_landing"
+      ],
+      "references": [
+        "sheets/s5_clock_tower_ortho.png",
+        "heroes/05d_clock_court_day.png"
+      ],
+      "triangles": 4804,
+      "bounds": {
+        "min": [
+          -4.0,
+          0.0,
+          -4.0
+        ],
+        "max": [
+          4.0,
+          14.0,
+          4.0
+        ],
+        "size": [
+          8.0,
+          14.0,
+          8.0
+        ]
+      },
+      "bytes": 426040,
+      "sha256": "bf51f9c27d120e7b6969c6e22958a6d69d32146bf2c8686d3bc8c6817e992339",
+      "materials": [
+        "DI_MAT_metal",
+        "DI_MAT_concrete",
+        "DI_MAT_emissive",
+        "DI_MAT_jungle"
+      ],
+      "measurement": "Exported GLB index and position accessors, with node transforms, parsed by build_dreamisland_heroes.py; independently checked by GLTFLoader.",
+      "file": "clock-tower.glb"
+    },
+    "watchtower": {
+      "budget": 10000,
+      "targetMetres": {
+        "height": 30,
+        "width": 28,
+        "depth": 28,
+        "crownWidth": 20,
+        "boreWidth": 14,
+        "boreSpringHeight": 8,
+        "boreCrownHeight": 10,
+        "minimumFlank": 7,
+        "minimumOverburden": 6
+      },
+      "calibration": "REVISED 2026-09-10: 28 m base drum stays full width through Y=10 to retain 7 m flanks, then tapers to a 19.6 m body and 20 m crown. Merlon tops Y=30. The full-depth elliptical bore is 14 m wide, spring Y=8, crown Y=10, tessellated into 32 arch segments. The solid drum reaches the upper chamber floor at Y=17, giving 7 m of masonry above the arch. A 14 x 10 rectangle is the arch envelope, not a clear rectangular volume. Stone-cell vertex tint fades the lower moss by Y=10; narrow keyed ivy strands and moss-filled course joints retain sparse accents. Two flush emissive discs light the bore. Projecting portal trim is included in overall depth.",
+      "features": [
+        "tapered drum with individual block courses",
+        "twelve crenellation slots with exactly three missing merlons",
+        "two recessed arched windows on opposite faces",
+        "full-depth arched tunnel with a keystone at both mouths",
+        "stone-cell moss tint, narrow ivy strands and two tunnel lamps"
+      ],
+      "featureFrames": [
+        [
+          "side",
+          "three-quarter"
+        ],
+        [
+          "three-quarter",
+          "back"
+        ],
+        [
+          "front",
+          "back"
+        ],
+        [
+          "front",
+          "back"
+        ],
+        [
+          "front",
+          "side"
+        ]
+      ],
+      "anchors": [
+        "watchtower_tunnel_axis",
+        "missing_merlon_01",
+        "missing_merlon_05",
+        "missing_merlon_08"
+      ],
+      "references": [
+        "sheets/s6_watchtower_ortho.png",
+        "heroes/03_watchtower_point_day.png"
+      ],
+      "triangles": 9438,
+      "bounds": {
+        "min": [
+          -14.0,
+          0.0,
+          -14.251358985900879
+        ],
+        "max": [
+          14.0,
+          30.0,
+          14.251358985900879
+        ],
+        "size": [
+          28.0,
+          30.0,
+          28.502717971801758
+        ]
+      },
+      "bytes": 821896,
+      "sha256": "293112f84da3246713c64c817c73cfcf6122866738e3fee2429b976a53bfddd7",
+      "materials": [
+        "DI_MAT_concrete",
+        "DI_MAT_jungle-card",
+        "DI_MAT_jungle",
+        "DI_MAT_emissive"
+      ],
+      "measurement": "Exported GLB index and position accessors, with node transforms, parsed by build_dreamisland_heroes.py; independently checked by GLTFLoader.",
+      "file": "watchtower.glb"
+    },
+    "waterfall-cliff": {
+      "budget": 5000,
+      "targetMetres": {
+        "drop": 16,
+        "width": 22
+      },
+      "calibration": "Cliff horizontal envelope X=+/-11; the named sheet lip is Y=16 and pool datum Y=0. Three scrolling sheet cards span that exact 16 m drop; the runtime wraps their UVs inside the waterfall cell. Stone/moss cap upper surface may sit slightly above the lip.",
+      "features": [
+        "stacked mossy stone block cliff with ledges",
+        "elliptical plunge-pool foam ring mesh",
+        "two blossom clumps on the existing jungle-card sheet",
+        "projecting block ledges that cast distinct shadows",
+        "overhanging top lip, waterfall_sheet_anchor and full-drop scrolling sheets"
+      ],
+      "featureFrames": [
+        [
+          "front",
+          "three-quarter"
+        ],
+        [
+          "three-quarter"
+        ],
+        [
+          "front",
+          "three-quarter"
+        ],
+        [
+          "side",
+          "three-quarter"
+        ],
+        [
+          "side",
+          "three-quarter"
+        ]
+      ],
+      "anchors": [
+        "waterfall_sheet_anchor",
+        "waterfall_pool_datum"
+      ],
+      "references": [
+        "heroes/04_basin_causeway_night.png",
+        "heroes/05d_clock_court_day.png"
+      ],
+      "triangles": 1218,
+      "bounds": {
+        "min": [
+          -10.97249984741211,
+          0.0,
+          -8.899999618530273
+        ],
+        "max": [
+          10.97249984741211,
+          16.045000076293945,
+          3.309999942779541
+        ],
+        "size": [
+          21.94499969482422,
+          16.045000076293945,
+          12.209999561309814
+        ]
+      },
+      "bytes": 112828,
+      "sha256": "12f39fa91bd54d1ba7436c7df2d2f330a2811ea30f79ce4bf62b1662ebeda418",
+      "materials": [
+        "DI_MAT_jungle-card",
+        "DI_MAT_jungle",
+        "DI_MAT_water",
+        "DI_MAT_concrete"
+      ],
+      "measurement": "Exported GLB index and position accessors, with node transforms, parsed by build_dreamisland_heroes.py; independently checked by GLTFLoader.",
+      "file": "waterfall-cliff.glb"
+    },
+    "sea-stack-set": {
+      "budget": 6000,
+      "perStackBudget": 1500,
+      "targetMetres": {
+        "stackHeights": [
+          18,
+          26,
+          32,
+          40
+        ]
+      },
+      "calibration": "Each named child is authored from local Y=0 to its exact 18/26/32/40 m moss-cap top. Display translations X=-27/-9/10/29 are separable placement defaults. Lean is baked into the course centres without rotating the vertical height datum.",
+      "features": [
+        "four tapered block silhouettes",
+        "individual moss caps",
+        "one natural through-arch in the 32 m stack",
+        "four different lean/profile combinations",
+        "distinct buttress, needle, arch and overhanging tall silhouettes"
+      ],
+      "featureFrames": [
+        [
+          "front",
+          "three-quarter"
+        ],
+        [
+          "three-quarter"
+        ],
+        [
+          "front",
+          "back"
+        ],
+        [
+          "front",
+          "three-quarter"
+        ],
+        [
+          "front",
+          "three-quarter"
+        ]
+      ],
+      "anchors": [
+        "sea_stack_18m",
+        "sea_stack_26m",
+        "sea_stack_32m",
+        "sea_stack_40m"
+      ],
+      "references": [
+        "heroes/06_reef_shallows_day.png",
+        "heroes/06n_reef_shallows_night.png"
+      ],
+      "triangles": 1304,
+      "bounds": {
+        "min": [
+          -32.800384521484375,
+          0.0,
+          -5.829975605010986
+        ],
+        "max": [
+          35.727272033691406,
+          40.0,
+          5.812896251678467
+        ],
+        "size": [
+          68.52765655517578,
+          40.0,
+          11.642871856689453
+        ]
+      },
+      "bytes": 112724,
+      "sha256": "ea0b0e20af2a856009168e695a156e856f25b64a97fa9ad837eddd91651949d4",
+      "materials": [
+        "DI_MAT_jungle",
+        "DI_MAT_concrete"
+      ],
+      "measurement": "Exported GLB index and position accessors, with node transforms, parsed by build_dreamisland_heroes.py; independently checked by GLTFLoader.",
+      "file": "sea-stack-set.glb"
+    }
+  }
+}

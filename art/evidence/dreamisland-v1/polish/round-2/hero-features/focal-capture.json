@@ -1,0 +1,1627 @@
+{
+  "status": "VERIFIED",
+  "script": "scripts/visual/dreamisland-heroes/polish-focals.mjs",
+  "frames": [
+    {
+      "asset": "clock-tower",
+      "distance": 40,
+      "blend": 0,
+      "source": "public/assets/dreamisland/heroes/clock-tower.glb",
+      "sourceSha256": "c9018befb2119448c5012e37b36dce53f9733e87362ad3af2d127c008f2311f6",
+      "geometry": {
+        "scale": 1.2857142857142858,
+        "triangles": 5248,
+        "meshes": 12,
+        "materials": [
+          "DI_MAT_metal",
+          "DI_MAT_concrete",
+          "DI_MAT_emissive",
+          "DI_MAT_jungle"
+        ],
+        "bounds": {
+          "min": [
+            -5.142857142857143,
+            0,
+            -5.142857142857143
+          ],
+          "max": [
+            5.142857142857143,
+            18,
+            5.142857142857143
+          ],
+          "size": [
+            10.285714285714286,
+            18,
+            10.285714285714286
+          ]
+        }
+      },
+      "pose": {
+        "position": [
+          13.083540778447937,
+          14.607231762191972,
+          -37.381545081279825
+        ],
+        "target": [
+          0,
+          9,
+          0
+        ],
+        "fov": 70,
+        "far": 650,
+        "quaternion": [
+          -0.011772285964394962,
+          0.9834280486132019,
+          0.06927085522670014,
+          0.16712939627774578
+        ],
+        "horizonRow": 287.20965076428513
+      },
+      "settle": {
+        "stable": 6,
+        "polls": 7,
+        "state": {
+          "lights": [
+            {
+              "name": "",
+              "type": "PointLight",
+              "intensity": 0,
+              "color": [
+                1,
+                1,
+                1
+              ],
+              "position": [
+                0,
+                2.3,
+                0.9
+              ]
+            },
+            {
+              "name": "",
+              "type": "HemisphereLight",
+              "intensity": 1.056,
+              "color": [
+                0.5209955731953768,
+                0.775822218312646,
+                0.8631572134510892
+              ],
+              "position": [
+                0,
+                1,
+                0
+              ],
+              "groundColor": [
+                0.158960835050774,
+                0.2541520943200296,
+                0.08437621153575764
+              ]
+            },
+            {
+              "name": "",
+              "type": "DirectionalLight",
+              "intensity": 1.35,
+              "color": [
+                1,
+                0.8713671191959567,
+                0.623960391667596
+              ],
+              "position": [
+                88.47014093965007,
+                99.72997705924188,
+                -88.47014093965007
+              ]
+            },
+            {
+              "name": "",
+              "type": "DirectionalLight",
+              "intensity": 0.405,
+              "color": [
+                0.3915724777393922,
+                0.6866853124288864,
+                0.8069522576650873
+              ],
+              "position": [
+                -100,
+                25,
+                -80
+              ]
+            },
+            {
+              "name": "dreamisland_night_ground_fill",
+              "type": "HemisphereLight",
+              "intensity": 0,
+              "color": [
+                0.3,
+                0.18,
+                0.035
+              ],
+              "position": [
+                0,
+                1,
+                0
+              ],
+              "groundColor": [
+                0.15,
+                0.09,
+                0.0175
+              ]
+            },
+            {
+              "name": "dreamisland_tunnel_lamp_-1",
+              "type": "PointLight",
+              "intensity": 0,
+              "color": [
+                1,
+                0.8069522576650873,
+                0.407240211891531
+              ],
+              "position": [
+                663.0990765335861,
+                28.6,
+                299.6334161428029
+              ]
+            },
+            {
+              "name": "dreamisland_tunnel_lamp_1",
+              "type": "PointLight",
+              "intensity": 0,
+              "color": [
+                1,
+                0.8069522576650873,
+                0.407240211891531
+              ],
+              "position": [
+                648.6069234664138,
+                28.6,
+                298.73458385719715
+              ]
+            }
+          ],
+          "fog": {
+            "color": [
+              0.48514994004665124,
+              0.7083757798856457,
+              0.775822218312646
+            ],
+            "density": 0.0016
+          },
+          "skyBlend": 0
+        }
+      },
+      "frames": {
+        "full": "clock-tower-40m-day.png"
+      },
+      "featureFrames": {
+        "bezel": {
+          "without": "clock-tower-40m-day-without-bezel.png",
+          "sourceMeshes": 1
+        },
+        "ticks": {
+          "without": "clock-tower-40m-day-without-ticks.png",
+          "sourceMeshes": 1
+        },
+        "nosings": {
+          "without": "clock-tower-40m-day-without-nosings.png",
+          "sourceMeshes": 1
+        }
+      }
+    },
+    {
+      "asset": "watchtower",
+      "distance": 40,
+      "blend": 0,
+      "source": "public/assets/dreamisland/heroes/watchtower.glb",
+      "sourceSha256": "c12978173e1c5b08afbd02bc201a066a517ecacc5781de600f5d27fea2702421",
+      "geometry": {
+        "scale": 1,
+        "triangles": 9578,
+        "meshes": 20,
+        "materials": [
+          "DI_MAT_concrete",
+          "DI_MAT_emissive",
+          "DI_MAT_jungle-card",
+          "DI_MAT_jungle"
+        ],
+        "bounds": {
+          "min": [
+            -14,
+            0,
+            -14.251358985900879
+          ],
+          "max": [
+            14,
+            30.00200080871582,
+            14.251358985900879
+          ],
+          "size": [
+            28,
+            30.00200080871582,
+            28.502717971801758
+          ]
+        }
+      },
+      "pose": {
+        "position": [
+          11.498221872944544,
+          34.712237900834275,
+          -32.852062494127274
+        ],
+        "target": [
+          0,
+          15.00100040435791,
+          0
+        ],
+        "fov": 70,
+        "far": 650,
+        "quaternion": [
+          -0.04269016654926902,
+          0.9533248821134308,
+          0.25119882031256063,
+          0.1620134917128415
+        ],
+        "horizonRow": 68.83860305714047
+      },
+      "settle": {
+        "stable": 6,
+        "polls": 7,
+        "state": {
+          "lights": [
+            {
+              "name": "",
+              "type": "PointLight",
+              "intensity": 0,
+              "color": [
+                1,
+                1,
+                1
+              ],
+              "position": [
+                0,
+                2.3,
+                0.9
+              ]
+            },
+            {
+              "name": "",
+              "type": "HemisphereLight",
+              "intensity": 1.056,
+              "color": [
+                0.5209955731953768,
+                0.775822218312646,
+                0.8631572134510892
+              ],
+              "position": [
+                0,
+                1,
+                0
+              ],
+              "groundColor": [
+                0.158960835050774,
+                0.2541520943200296,
+                0.08437621153575764
+              ]
+            },
+            {
+              "name": "",
+              "type": "DirectionalLight",
+              "intensity": 1.35,
+              "color": [
+                1,
+                0.8713671191959567,
+                0.623960391667596
+              ],
+              "position": [
+                88.47014093965007,
+                99.72997705924188,
+                -88.47014093965007
+              ]
+            },
+            {
+              "name": "",
+              "type": "DirectionalLight",
+              "intensity": 0.405,
+              "color": [
+                0.3915724777393922,
+                0.6866853124288864,
+                0.8069522576650873
+              ],
+              "position": [
+                -100,
+                25,
+                -80
+              ]
+            },
+            {
+              "name": "dreamisland_night_ground_fill",
+              "type": "HemisphereLight",
+              "intensity": 0,
+              "color": [
+                0.3,
+                0.18,
+                0.035
+              ],
+              "position": [
+                0,
+                1,
+                0
+              ],
+              "groundColor": [
+                0.15,
+                0.09,
+                0.0175
+              ]
+            },
+            {
+              "name": "dreamisland_tunnel_lamp_-1",
+              "type": "PointLight",
+              "intensity": 0,
+              "color": [
+                1,
+                0.8069522576650873,
+                0.407240211891531
+              ],
+              "position": [
+                663.0990765335861,
+                28.6,
+                299.6334161428029
+              ]
+            },
+            {
+              "name": "dreamisland_tunnel_lamp_1",
+              "type": "PointLight",
+              "intensity": 0,
+              "color": [
+                1,
+                0.8069522576650873,
+                0.407240211891531
+              ],
+              "position": [
+                648.6069234664138,
+                28.6,
+                298.73458385719715
+              ]
+            }
+          ],
+          "fog": {
+            "color": [
+              0.48514994004665124,
+              0.7083757798856457,
+              0.775822218312646
+            ],
+            "density": 0.0016
+          },
+          "skyBlend": 0
+        }
+      },
+      "frames": {
+        "full": "watchtower-40m-day.png",
+        "lower": "watchtower-40m-day-lower.png",
+        "stone": "watchtower-40m-day-stone.png",
+        "blank": "watchtower-40m-day-blank.png"
+      },
+      "featureFrames": {
+        "moss-tops": {
+          "without": "watchtower-40m-day-without-moss-tops.png",
+          "sourceMeshes": 1
+        },
+        "windows": {
+          "without": "watchtower-40m-day-without-windows.png",
+          "sourceMeshes": 2
+        },
+        "portal-lamps": {
+          "without": "watchtower-40m-day-without-portal-lamps.png",
+          "sourceMeshes": 1
+        }
+      }
+    },
+    {
+      "asset": "waterfall-cliff",
+      "distance": 40,
+      "blend": 0,
+      "source": "public/assets/dreamisland/heroes/waterfall-cliff.glb",
+      "sourceSha256": "b8f43095b1eb3ec9171faa88fe1ae7c6dc34bda0857fb28d2c50b1d86e9ba218",
+      "geometry": {
+        "scale": 1,
+        "triangles": 1226,
+        "meshes": 8,
+        "materials": [
+          "DI_MAT_jungle-card",
+          "DI_MAT_water-overlay",
+          "DI_MAT_jungle",
+          "DI_MAT_water",
+          "DI_MAT_concrete"
+        ],
+        "bounds": {
+          "min": [
+            -10.97249984741211,
+            0,
+            -8.899999618530273
+          ],
+          "max": [
+            10.97249984741211,
+            16.045000076293945,
+            3.309999942779541
+          ],
+          "size": [
+            21.94499969482422,
+            16.045000076293945,
+            12.209999561309814
+          ]
+        }
+      },
+      "pose": {
+        "position": [
+          13.083540778447937,
+          13.629731800338945,
+          -40.17654491915519
+        ],
+        "target": [
+          0,
+          8.022500038146973,
+          -2.794999837875366
+        ],
+        "fov": 70,
+        "far": 650,
+        "quaternion": [
+          -0.011772285964394962,
+          0.9834280486132019,
+          0.06927085522670014,
+          0.16712939627774578
+        ],
+        "horizonRow": 287.20965076428513
+      },
+      "settle": {
+        "stable": 6,
+        "polls": 7,
+        "state": {
+          "lights": [
+            {
+              "name": "",
+              "type": "PointLight",
+              "intensity": 0,
+              "color": [
+                1,
+                1,
+                1
+              ],
+              "position": [
+                0,
+                2.3,
+                0.9
+              ]
+            },
+            {
+              "name": "",
+              "type": "HemisphereLight",
+              "intensity": 1.056,
+              "color": [
+                0.5209955731953768,
+                0.775822218312646,
+                0.8631572134510892
+              ],
+              "position": [
+                0,
+                1,
+                0
+              ],
+              "groundColor": [
+                0.158960835050774,
+                0.2541520943200296,
+                0.08437621153575764
+              ]
+            },
+            {
+              "name": "",
+              "type": "DirectionalLight",
+              "intensity": 1.35,
+              "color": [
+                1,
+                0.8713671191959567,
+                0.623960391667596
+              ],
+              "position": [
+                88.47014093965007,
+                99.72997705924188,
+                -88.47014093965007
+              ]
+            },
+            {
+              "name": "",
+              "type": "DirectionalLight",
+              "intensity": 0.405,
+              "color": [
+                0.3915724777393922,
+                0.6866853124288864,
+                0.8069522576650873
+              ],
+              "position": [
+                -100,
+                25,
+                -80
+              ]
+            },
+            {
+              "name": "dreamisland_night_ground_fill",
+              "type": "HemisphereLight",
+              "intensity": 0,
+              "color": [
+                0.3,
+                0.18,
+                0.035
+              ],
+              "position": [
+                0,
+                1,
+                0
+              ],
+              "groundColor": [
+                0.15,
+                0.09,
+                0.0175
+              ]
+            },
+            {
+              "name": "dreamisland_tunnel_lamp_-1",
+              "type": "PointLight",
+              "intensity": 0,
+              "color": [
+                1,
+                0.8069522576650873,
+                0.407240211891531
+              ],
+              "position": [
+                663.0990765335861,
+                28.6,
+                299.6334161428029
+              ]
+            },
+            {
+              "name": "dreamisland_tunnel_lamp_1",
+              "type": "PointLight",
+              "intensity": 0,
+              "color": [
+                1,
+                0.8069522576650873,
+                0.407240211891531
+              ],
+              "position": [
+                648.6069234664138,
+                28.6,
+                298.73458385719715
+              ]
+            }
+          ],
+          "fog": {
+            "color": [
+              0.48514994004665124,
+              0.7083757798856457,
+              0.775822218312646
+            ],
+            "density": 0.0016
+          },
+          "skyBlend": 0
+        }
+      },
+      "frames": {
+        "full": "waterfall-cliff-40m-day.png"
+      },
+      "featureFrames": {
+        "fast-sheet": {
+          "without": "waterfall-cliff-40m-day-without-fast-sheet.png",
+          "sourceMeshes": 1
+        },
+        "mist": {
+          "without": "waterfall-cliff-40m-day-without-mist.png",
+          "sourceMeshes": 1
+        }
+      }
+    },
+    {
+      "asset": "sea-stack-set",
+      "distance": 40,
+      "blend": 0,
+      "source": "public/assets/dreamisland/heroes/sea-stack-set.glb",
+      "sourceSha256": "9223e2381d6c8d7bb2e28932f938df6d42eddae6bdd009079e2f0b74c9f13213",
+      "geometry": {
+        "scale": 1,
+        "triangles": 1364,
+        "meshes": 12,
+        "materials": [
+          "DI_MAT_jungle",
+          "DI_MAT_concrete"
+        ],
+        "bounds": {
+          "min": [
+            -32.80038547515869,
+            0,
+            -5.849165439605713
+          ],
+          "max": [
+            35.727272510528564,
+            40,
+            5.812896251678467
+          ],
+          "size": [
+            68.52765798568726,
+            40,
+            11.66206169128418
+          ]
+        }
+      },
+      "pose": {
+        "position": [
+          1.4634435176849365,
+          24.765808824737228,
+          -39.733208133440506
+        ],
+        "target": [
+          1.4634435176849365,
+          20,
+          -0.018134593963623047
+        ],
+        "fov": 70,
+        "far": 650,
+        "quaternion": [
+          0,
+          0.9982176211846098,
+          0.05967898086042504,
+          0
+        ],
+        "horizonRow": 298.3040061087406
+      },
+      "settle": {
+        "stable": 6,
+        "polls": 7,
+        "state": {
+          "lights": [
+            {
+              "name": "",
+              "type": "PointLight",
+              "intensity": 0,
+              "color": [
+                1,
+                1,
+                1
+              ],
+              "position": [
+                0,
+                2.3,
+                0.9
+              ]
+            },
+            {
+              "name": "",
+              "type": "HemisphereLight",
+              "intensity": 1.056,
+              "color": [
+                0.5209955731953768,
+                0.775822218312646,
+                0.8631572134510892
+              ],
+              "position": [
+                0,
+                1,
+                0
+              ],
+              "groundColor": [
+                0.158960835050774,
+                0.2541520943200296,
+                0.08437621153575764
+              ]
+            },
+            {
+              "name": "",
+              "type": "DirectionalLight",
+              "intensity": 1.35,
+              "color": [
+                1,
+                0.8713671191959567,
+                0.623960391667596
+              ],
+              "position": [
+                88.47014093965007,
+                99.72997705924188,
+                -88.47014093965007
+              ]
+            },
+            {
+              "name": "",
+              "type": "DirectionalLight",
+              "intensity": 0.405,
+              "color": [
+                0.3915724777393922,
+                0.6866853124288864,
+                0.8069522576650873
+              ],
+              "position": [
+                -100,
+                25,
+                -80
+              ]
+            },
+            {
+              "name": "dreamisland_night_ground_fill",
+              "type": "HemisphereLight",
+              "intensity": 0,
+              "color": [
+                0.3,
+                0.18,
+                0.035
+              ],
+              "position": [
+                0,
+                1,
+                0
+              ],
+              "groundColor": [
+                0.15,
+                0.09,
+                0.0175
+              ]
+            },
+            {
+              "name": "dreamisland_tunnel_lamp_-1",
+              "type": "PointLight",
+              "intensity": 0,
+              "color": [
+                1,
+                0.8069522576650873,
+                0.407240211891531
+              ],
+              "position": [
+                663.0990765335861,
+                28.6,
+                299.6334161428029
+              ]
+            },
+            {
+              "name": "dreamisland_tunnel_lamp_1",
+              "type": "PointLight",
+              "intensity": 0,
+              "color": [
+                1,
+                0.8069522576650873,
+                0.407240211891531
+              ],
+              "position": [
+                648.6069234664138,
+                28.6,
+                298.73458385719715
+              ]
+            }
+          ],
+          "fog": {
+            "color": [
+              0.48514994004665124,
+              0.7083757798856457,
+              0.775822218312646
+            ],
+            "density": 0.0016
+          },
+          "skyBlend": 0
+        }
+      },
+      "frames": {
+        "full": "sea-stack-set-40m-day.png"
+      },
+      "featureFrames": {
+        "notches": {
+          "without": "sea-stack-set-40m-day-without-notches.png",
+          "sourceMeshes": 4
+        }
+      }
+    },
+    {
+      "asset": "clock-tower",
+      "distance": 40,
+      "blend": 1,
+      "source": "public/assets/dreamisland/heroes/clock-tower.glb",
+      "sourceSha256": "c9018befb2119448c5012e37b36dce53f9733e87362ad3af2d127c008f2311f6",
+      "geometry": {
+        "scale": 1.2857142857142858,
+        "triangles": 5248,
+        "meshes": 12,
+        "materials": [
+          "DI_MAT_metal",
+          "DI_MAT_concrete",
+          "DI_MAT_emissive",
+          "DI_MAT_jungle"
+        ],
+        "bounds": {
+          "min": [
+            -5.142857142857143,
+            0,
+            -5.142857142857143
+          ],
+          "max": [
+            5.142857142857143,
+            18,
+            5.142857142857143
+          ],
+          "size": [
+            10.285714285714286,
+            18,
+            10.285714285714286
+          ]
+        }
+      },
+      "pose": {
+        "position": [
+          13.083540778447937,
+          14.607231762191972,
+          -37.381545081279825
+        ],
+        "target": [
+          0,
+          9,
+          0
+        ],
+        "fov": 70,
+        "far": 650,
+        "quaternion": [
+          -0.011772285964394962,
+          0.9834280486132019,
+          0.06927085522670014,
+          0.16712939627774578
+        ],
+        "horizonRow": 287.20965076428513
+      },
+      "settle": {
+        "stable": 6,
+        "polls": 7,
+        "state": {
+          "lights": [
+            {
+              "name": "",
+              "type": "PointLight",
+              "intensity": 0,
+              "color": [
+                1,
+                1,
+                1
+              ],
+              "position": [
+                0,
+                2.3,
+                0.9
+              ]
+            },
+            {
+              "name": "",
+              "type": "HemisphereLight",
+              "intensity": 0.35200000000000004,
+              "color": [
+                0.008023192982520522,
+                0.01680737574872404,
+                0.04518620437910503
+              ],
+              "position": [
+                0,
+                1,
+                0
+              ],
+              "groundColor": [
+                0.0024282158682353006,
+                0.005605391621829103,
+                0.01161224517628151
+              ]
+            },
+            {
+              "name": "",
+              "type": "DirectionalLight",
+              "intensity": 0.3,
+              "color": [
+                0.34670405634441115,
+                0.5775804404214573,
+                1
+              ],
+              "position": [
+                88.47014093965007,
+                99.72997705924188,
+                -88.47014093965007
+              ]
+            },
+            {
+              "name": "",
+              "type": "DirectionalLight",
+              "intensity": 0.513,
+              "color": [
+                0.023153366173251366,
+                0.6938717612856897,
+                0.6444796819634361
+              ],
+              "position": [
+                -100,
+                25,
+                -80
+              ]
+            },
+            {
+              "name": "dreamisland_night_ground_fill",
+              "type": "HemisphereLight",
+              "intensity": 0.5,
+              "color": [
+                0.3,
+                0.18,
+                0.035
+              ],
+              "position": [
+                0,
+                1,
+                0
+              ],
+              "groundColor": [
+                0.15,
+                0.09,
+                0.0175
+              ]
+            },
+            {
+              "name": "dreamisland_tunnel_lamp_-1",
+              "type": "PointLight",
+              "intensity": 1100,
+              "color": [
+                1,
+                0.8069522576650873,
+                0.407240211891531
+              ],
+              "position": [
+                663.0990765335861,
+                28.6,
+                299.6334161428029
+              ]
+            },
+            {
+              "name": "dreamisland_tunnel_lamp_1",
+              "type": "PointLight",
+              "intensity": 1100,
+              "color": [
+                1,
+                0.8069522576650873,
+                0.407240211891531
+              ],
+              "position": [
+                648.6069234664138,
+                28.6,
+                298.73458385719715
+              ]
+            }
+          ],
+          "fog": {
+            "color": [
+              0.00749903204046059,
+              0.027320891633823854,
+              0.06847816983662756
+            ],
+            "density": 0.0034
+          },
+          "skyBlend": 1
+        }
+      },
+      "frames": {
+        "full": "clock-tower-40m-night.png"
+      },
+      "featureFrames": {
+        "bezel": {
+          "without": "clock-tower-40m-night-without-bezel.png",
+          "sourceMeshes": 1
+        },
+        "ticks": {
+          "without": "clock-tower-40m-night-without-ticks.png",
+          "sourceMeshes": 1
+        },
+        "nosings": {
+          "without": "clock-tower-40m-night-without-nosings.png",
+          "sourceMeshes": 1
+        }
+      }
+    },
+    {
+      "asset": "watchtower",
+      "distance": 40,
+      "blend": 1,
+      "source": "public/assets/dreamisland/heroes/watchtower.glb",
+      "sourceSha256": "c12978173e1c5b08afbd02bc201a066a517ecacc5781de600f5d27fea2702421",
+      "geometry": {
+        "scale": 1,
+        "triangles": 9578,
+        "meshes": 20,
+        "materials": [
+          "DI_MAT_concrete",
+          "DI_MAT_emissive",
+          "DI_MAT_jungle-card",
+          "DI_MAT_jungle"
+        ],
+        "bounds": {
+          "min": [
+            -14,
+            0,
+            -14.251358985900879
+          ],
+          "max": [
+            14,
+            30.00200080871582,
+            14.251358985900879
+          ],
+          "size": [
+            28,
+            30.00200080871582,
+            28.502717971801758
+          ]
+        }
+      },
+      "pose": {
+        "position": [
+          11.498221872944544,
+          34.712237900834275,
+          -32.852062494127274
+        ],
+        "target": [
+          0,
+          15.00100040435791,
+          0
+        ],
+        "fov": 70,
+        "far": 650,
+        "quaternion": [
+          -0.04269016654926902,
+          0.9533248821134308,
+          0.25119882031256063,
+          0.1620134917128415
+        ],
+        "horizonRow": 68.83860305714047
+      },
+      "settle": {
+        "stable": 6,
+        "polls": 7,
+        "state": {
+          "lights": [
+            {
+              "name": "",
+              "type": "PointLight",
+              "intensity": 0,
+              "color": [
+                1,
+                1,
+                1
+              ],
+              "position": [
+                0,
+                2.3,
+                0.9
+              ]
+            },
+            {
+              "name": "",
+              "type": "HemisphereLight",
+              "intensity": 0.35200000000000004,
+              "color": [
+                0.008023192982520522,
+                0.01680737574872404,
+                0.04518620437910503
+              ],
+              "position": [
+                0,
+                1,
+                0
+              ],
+              "groundColor": [
+                0.0024282158682353006,
+                0.005605391621829103,
+                0.01161224517628151
+              ]
+            },
+            {
+              "name": "",
+              "type": "DirectionalLight",
+              "intensity": 0.3,
+              "color": [
+                0.34670405634441115,
+                0.5775804404214573,
+                1
+              ],
+              "position": [
+                88.47014093965007,
+                99.72997705924188,
+                -88.47014093965007
+              ]
+            },
+            {
+              "name": "",
+              "type": "DirectionalLight",
+              "intensity": 0.513,
+              "color": [
+                0.023153366173251366,
+                0.6938717612856897,
+                0.6444796819634361
+              ],
+              "position": [
+                -100,
+                25,
+                -80
+              ]
+            },
+            {
+              "name": "dreamisland_night_ground_fill",
+              "type": "HemisphereLight",
+              "intensity": 0.5,
+              "color": [
+                0.3,
+                0.18,
+                0.035
+              ],
+              "position": [
+                0,
+                1,
+                0
+              ],
+              "groundColor": [
+                0.15,
+                0.09,
+                0.0175
+              ]
+            },
+            {
+              "name": "dreamisland_tunnel_lamp_-1",
+              "type": "PointLight",
+              "intensity": 1100,
+              "color": [
+                1,
+                0.8069522576650873,
+                0.407240211891531
+              ],
+              "position": [
+                663.0990765335861,
+                28.6,
+                299.6334161428029
+              ]
+            },
+            {
+              "name": "dreamisland_tunnel_lamp_1",
+              "type": "PointLight",
+              "intensity": 1100,
+              "color": [
+                1,
+                0.8069522576650873,
+                0.407240211891531
+              ],
+              "position": [
+                648.6069234664138,
+                28.6,
+                298.73458385719715
+              ]
+            }
+          ],
+          "fog": {
+            "color": [
+              0.00749903204046059,
+              0.027320891633823854,
+              0.06847816983662756
+            ],
+            "density": 0.0034
+          },
+          "skyBlend": 1
+        }
+      },
+      "frames": {
+        "full": "watchtower-40m-night.png",
+        "lower": "watchtower-40m-night-lower.png",
+        "stone": "watchtower-40m-night-stone.png",
+        "blank": "watchtower-40m-night-blank.png"
+      },
+      "featureFrames": {
+        "moss-tops": {
+          "without": "watchtower-40m-night-without-moss-tops.png",
+          "sourceMeshes": 1
+        },
+        "windows": {
+          "without": "watchtower-40m-night-without-windows.png",
+          "sourceMeshes": 2
+        },
+        "portal-lamps": {
+          "without": "watchtower-40m-night-without-portal-lamps.png",
+          "sourceMeshes": 1
+        }
+      }
+    },
+    {
+      "asset": "waterfall-cliff",
+      "distance": 40,
+      "blend": 1,
+      "source": "public/assets/dreamisland/heroes/waterfall-cliff.glb",
+      "sourceSha256": "b8f43095b1eb3ec9171faa88fe1ae7c6dc34bda0857fb28d2c50b1d86e9ba218",
+      "geometry": {
+        "scale": 1,
+        "triangles": 1226,
+        "meshes": 8,
+        "materials": [
+          "DI_MAT_jungle-card",
+          "DI_MAT_water-overlay",
+          "DI_MAT_jungle",
+          "DI_MAT_water",
+          "DI_MAT_concrete"
+        ],
+        "bounds": {
+          "min": [
+            -10.97249984741211,
+            0,
+            -8.899999618530273
+          ],
+          "max": [
+            10.97249984741211,
+            16.045000076293945,
+            3.309999942779541
+          ],
+          "size": [
+            21.94499969482422,
+            16.045000076293945,
+            12.209999561309814
+          ]
+        }
+      },
+      "pose": {
+        "position": [
+          13.083540778447937,
+          13.629731800338945,
+          -40.17654491915519
+        ],
+        "target": [
+          0,
+          8.022500038146973,
+          -2.794999837875366
+        ],
+        "fov": 70,
+        "far": 650,
+        "quaternion": [
+          -0.011772285964394962,
+          0.9834280486132019,
+          0.06927085522670014,
+          0.16712939627774578
+        ],
+        "horizonRow": 287.20965076428513
+      },
+      "settle": {
+        "stable": 6,
+        "polls": 7,
+        "state": {
+          "lights": [
+            {
+              "name": "",
+              "type": "PointLight",
+              "intensity": 0,
+              "color": [
+                1,
+                1,
+                1
+              ],
+              "position": [
+                0,
+                2.3,
+                0.9
+              ]
+            },
+            {
+              "name": "",
+              "type": "HemisphereLight",
+              "intensity": 0.35200000000000004,
+              "color": [
+                0.008023192982520522,
+                0.01680737574872404,
+                0.04518620437910503
+              ],
+              "position": [
+                0,
+                1,
+                0
+              ],
+              "groundColor": [
+                0.0024282158682353006,
+                0.005605391621829103,
+                0.01161224517628151
+              ]
+            },
+            {
+              "name": "",
+              "type": "DirectionalLight",
+              "intensity": 0.3,
+              "color": [
+                0.34670405634441115,
+                0.5775804404214573,
+                1
+              ],
+              "position": [
+                88.47014093965007,
+                99.72997705924188,
+                -88.47014093965007
+              ]
+            },
+            {
+              "name": "",
+              "type": "DirectionalLight",
+              "intensity": 0.513,
+              "color": [
+                0.023153366173251366,
+                0.6938717612856897,
+                0.6444796819634361
+              ],
+              "position": [
+                -100,
+                25,
+                -80
+              ]
+            },
+            {
+              "name": "dreamisland_night_ground_fill",
+              "type": "HemisphereLight",
+              "intensity": 0.5,
+              "color": [
+                0.3,
+                0.18,
+                0.035
+              ],
+              "position": [
+                0,
+                1,
+                0
+              ],
+              "groundColor": [
+                0.15,
+                0.09,
+                0.0175
+              ]
+            },
+            {
+              "name": "dreamisland_tunnel_lamp_-1",
+              "type": "PointLight",
+              "intensity": 1100,
+              "color": [
+                1,
+                0.8069522576650873,
+                0.407240211891531
+              ],
+              "position": [
+                663.0990765335861,
+                28.6,
+                299.6334161428029
+              ]
+            },
+            {
+              "name": "dreamisland_tunnel_lamp_1",
+              "type": "PointLight",
+              "intensity": 1100,
+              "color": [
+                1,
+                0.8069522576650873,
+                0.407240211891531
+              ],
+              "position": [
+                648.6069234664138,
+                28.6,
+                298.73458385719715
+              ]
+            }
+          ],
+          "fog": {
+            "color": [
+              0.00749903204046059,
+              0.027320891633823854,
+              0.06847816983662756
+            ],
+            "density": 0.0034
+          },
+          "skyBlend": 1
+        }
+      },
+      "frames": {
+        "full": "waterfall-cliff-40m-night.png"
+      },
+      "featureFrames": {
+        "fast-sheet": {
+          "without": "waterfall-cliff-40m-night-without-fast-sheet.png",
+          "sourceMeshes": 1
+        },
+        "mist": {
+          "without": "waterfall-cliff-40m-night-without-mist.png",
+          "sourceMeshes": 1
+        }
+      }
+    },
+    {
+      "asset": "sea-stack-set",
+      "distance": 40,
+      "blend": 1,
+      "source": "public/assets/dreamisland/heroes/sea-stack-set.glb",
+      "sourceSha256": "9223e2381d6c8d7bb2e28932f938df6d42eddae6bdd009079e2f0b74c9f13213",
+      "geometry": {
+        "scale": 1,
+        "triangles": 1364,
+        "meshes": 12,
+        "materials": [
+          "DI_MAT_jungle",
+          "DI_MAT_concrete"
+        ],
+        "bounds": {
+          "min": [
+            -32.80038547515869,
+            0,
+            -5.849165439605713
+          ],
+          "max": [
+            35.727272510528564,
+            40,
+            5.812896251678467
+          ],
+          "size": [
+            68.52765798568726,
+            40,
+            11.66206169128418
+          ]
+        }
+      },
+      "pose": {
+        "position": [
+          1.4634435176849365,
+          24.765808824737228,
+          -39.733208133440506
+        ],
+        "target": [
+          1.4634435176849365,
+          20,
+          -0.018134593963623047
+        ],
+        "fov": 70,
+        "far": 650,
+        "quaternion": [
+          0,
+          0.9982176211846098,
+          0.05967898086042504,
+          0
+        ],
+        "horizonRow": 298.3040061087406
+      },
+      "settle": {
+        "stable": 6,
+        "polls": 7,
+        "state": {
+          "lights": [
+            {
+              "name": "",
+              "type": "PointLight",
+              "intensity": 0,
+              "color": [
+                1,
+                1,
+                1
+              ],
+              "position": [
+                0,
+                2.3,
+                0.9
+              ]
+            },
+            {
+              "name": "",
+              "type": "HemisphereLight",
+              "intensity": 0.35200000000000004,
+              "color": [
+                0.008023192982520522,
+                0.01680737574872404,
+                0.04518620437910503
+              ],
+              "position": [
+                0,
+                1,
+                0
+              ],
+              "groundColor": [
+                0.0024282158682353006,
+                0.005605391621829103,
+                0.01161224517628151
+              ]
+            },
+            {
+              "name": "",
+              "type": "DirectionalLight",
+              "intensity": 0.3,
+              "color": [
+                0.34670405634441115,
+                0.5775804404214573,
+                1
+              ],
+              "position": [
+                88.47014093965007,
+                99.72997705924188,
+                -88.47014093965007
+              ]
+            },
+            {
+              "name": "",
+              "type": "DirectionalLight",
+              "intensity": 0.513,
+              "color": [
+                0.023153366173251366,
+                0.6938717612856897,
+                0.6444796819634361
+              ],
+              "position": [
+                -100,
+                25,
+                -80
+              ]
+            },
+            {
+              "name": "dreamisland_night_ground_fill",
+              "type": "HemisphereLight",
+              "intensity": 0.5,
+              "color": [
+                0.3,
+                0.18,
+                0.035
+              ],
+              "position": [
+                0,
+                1,
+                0
+              ],
+              "groundColor": [
+                0.15,
+                0.09,
+                0.0175
+              ]
+            },
+            {
+              "name": "dreamisland_tunnel_lamp_-1",
+              "type": "PointLight",
+              "intensity": 1100,
+              "color": [
+                1,
+                0.8069522576650873,
+                0.407240211891531
+              ],
+              "position": [
+                663.0990765335861,
+                28.6,
+                299.6334161428029
+              ]
+            },
+            {
+              "name": "dreamisland_tunnel_lamp_1",
+              "type": "PointLight",
+              "intensity": 1100,
+              "color": [
+                1,
+                0.8069522576650873,
+                0.407240211891531
+              ],
+              "position": [
+                648.6069234664138,
+                28.6,
+                298.73458385719715
+              ]
+            }
+          ],
+          "fog": {
+            "color": [
+              0.00749903204046059,
+              0.027320891633823854,
+              0.06847816983662756
+            ],
+            "density": 0.0034
+          },
+          "skyBlend": 1
+        }
+      },
+      "frames": {
+        "full": "sea-stack-set-40m-night.png"
+      },
+      "featureFrames": {
+        "notches": {
+          "without": "sea-stack-set-40m-night-without-notches.png",
+          "sourceMeshes": 4
+        }
+      }
+    }
+  ],
+  "errors": []
+}

@@ -30,8 +30,11 @@ export class DreamIslandWater {
  private readonly sea:THREE.Mesh;
  private readonly shallows:THREE.Mesh;
  private readonly foam:THREE.Mesh;
- private readonly seaDay=new THREE.Color(0xffffff);
+ private readonly seaDay=new THREE.Color().setRGB(.65,.85,1);
  private readonly seaNight=new THREE.Color(0x1a2230);
+ private readonly shallowsDay=new THREE.Color().setRGB(.18,1,1);
+ private readonly foamDay=new THREE.Color().setRGB(.04,1,1);
+ private readonly edgeNight=new THREE.Color(0xffffff);
  constructor(course:DreamIslandCourse){
   this.root.name='dreamisland_water';
   const centre=new THREE.Vector3();
@@ -94,7 +97,7 @@ export class DreamIslandWater {
    ribbon(course,.0,.125,34,96,-.55,TILES.shallows),
    pool(course,.4725,-46,110,150,TILES.shallows),
   ];
-  const shallowsMaterial=new THREE.MeshLambertMaterial({name:'dreamisland_shallows',
+  const shallowsMaterial=new THREE.MeshLambertMaterial({name:'dreamisland_shallows',color:this.shallowsDay,
    emissive:0x8ff4ec,emissiveIntensity:0});
   applyDreamIslandAtlasFlow(shallowsMaterial,{cell:CELL.causticShallows,tile:new THREE.Vector2(1,1),
    scroll:new THREE.Vector2(.0018,.0012),time:this.time,emissiveCell:CELL.shallowsGlow,key:'shallows'});
@@ -109,7 +112,7 @@ export class DreamIslandWater {
    ribbon(course,.6583,.85,48,56,-.5,TILES.foam,true),
    ribbon(course,.6583,.85,-48,-56,-.5,TILES.foam,true),
   ];
-  const foamMaterial=new THREE.MeshLambertMaterial({name:'dreamisland_foam',
+  const foamMaterial=new THREE.MeshLambertMaterial({name:'dreamisland_foam',color:this.foamDay,
    emissive:0x7ef0ff,emissiveIntensity:0});
   applyDreamIslandAtlasFlow(foamMaterial,{cell:CELL.foamGradient,tile:new THREE.Vector2(1,1),
    scroll:new THREE.Vector2(.006,0),time:this.time,emissiveCell:CELL.foamGlow,key:'foam'});
@@ -127,6 +130,10 @@ export class DreamIslandWater {
   this.time.value=reducedMotion?0:elapsed;
   this.seaBlend.value=nightBlend;
   (this.sea.material as THREE.MeshLambertMaterial).color.lerpColors(this.seaDay,this.seaNight,nightBlend);
+  // REEF day isolation calibrates these tints. At night retain the measured
+  // round-1 edge colours so the stronger daytime cyan does not dim the cue.
+  (this.shallows.material as THREE.MeshLambertMaterial).color.lerpColors(this.shallowsDay,this.edgeNight,nightBlend);
+  (this.foam.material as THREE.MeshLambertMaterial).color.lerpColors(this.foamDay,this.edgeNight,nightBlend);
   (this.shallows.material as THREE.MeshLambertMaterial).emissiveIntensity=nightBlend*1.20;
   (this.foam.material as THREE.MeshLambertMaterial).emissiveIntensity=nightBlend*1.50;
  }

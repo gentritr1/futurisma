@@ -1,0 +1,56 @@
+{
+  "instrument": "/Users/gentlegen/Desktop/futurisma-race/polarity_work/scripts/visual/dreamisland-heroes/polish-regions.py",
+  "capture": "art/evidence/dreamisland-v1/polish/round-2/r3-beach/pose-capture.json",
+  "method": "Full/isolated render equality at 2/255; isolated/blank difference above 6/255; display luma .2126/.7152/.0722",
+  "results": [
+    {
+      "blend": 1,
+      "metrics": {
+        "lamps": {
+          "pixels": 2,
+          "meanLuma": 0.17754823529411765,
+          "lumaStd": 0.001960784313725511,
+          "meanChroma": 0.19607843137254904,
+          "visibleBoundsPixels": [
+            953,
+            256,
+            957,
+            257
+          ],
+          "widthPixels": 4,
+          "heightPixels": 1
+        },
+        "mouth": {
+          "pixels": 415,
+          "meanLuma": 0.1682414495629577,
+          "lumaStd": 0.003985628039914653,
+          "meanChroma": 0.19788329789747225,
+          "visibleBoundsPixels": [
+            952,
+            257,
+            991,
+            269
+          ],
+          "widthPixels": 39,
+          "heightPixels": 12
+        },
+        "drum": {
+          "pixels": 576,
+          "meanLuma": 0.16803529547930285,
+          "lumaStd": 0.0034788382831837583,
+          "meanChroma": 0.19853622004357296,
+          "visibleBoundsPixels": [
+            952,
+            250,
+            991,
+            269
+          ],
+          "widthPixels": 39,
+          "heightPixels": 19
+        },
+        "mouthToDrum": 1.0012268498892856,
+        "lampsToDrum": 1.0566127478615737
+      }
+    }
+  ]
+}
