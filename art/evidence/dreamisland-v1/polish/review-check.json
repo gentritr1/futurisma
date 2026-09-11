@@ -1,0 +1,9 @@
+{
+  "script": "scripts/visual/dreamisland-heroes/polish-review-check.mjs",
+  "url": "http://127.0.0.1:5217/art/evidence/dreamisland-v1/polish/index.html",
+  "first": "0.000 s after strike · blend 0.0000 · tick 8014",
+  "last": "12.000 s after strike · blend 1.0000 · tick 9454",
+  "allImagesLoaded": true,
+  "playPauseWorks": true,
+  "errors": []
+}

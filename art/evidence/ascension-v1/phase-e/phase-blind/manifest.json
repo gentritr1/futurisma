@@ -1,0 +1,9 @@
+{
+  "script": "scripts/visual/ascension/phase-e-packs.mjs",
+  "frames": 10,
+  "states": 2,
+  "framesPerState": 5,
+  "keySha256": "e08eb3e09b197dc6d4245819372d0da1fea11822a59d2afcd82047f2ed05e8d6",
+  "status": "Key withheld until user classification",
+  "errors": []
+}

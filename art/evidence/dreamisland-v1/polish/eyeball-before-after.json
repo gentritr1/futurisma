@@ -1,0 +1,161 @@
+{
+  "instrument": "/Users/gentlegen/Desktop/futurisma-race/polarity_work/scripts/visual/dreamisland-heroes/polish-compose.py",
+  "pairs": [
+    {
+      "row": 0,
+      "column": 0,
+      "label": "BEACH day",
+      "source": "art/evidence/dreamisland-v1/phase-c/frames/day-beach.png",
+      "nightBlend": 0,
+      "before": "art/evidence/dreamisland-v1/phase-c/frames/day-beach.png",
+      "after": "art/evidence/dreamisland-v1/polish/frames/day-beach.png"
+    },
+    {
+      "row": 0,
+      "column": 1,
+      "label": "POINT day",
+      "source": "art/evidence/dreamisland-v1/phase-c/frames/day-point.png",
+      "nightBlend": 0,
+      "before": "art/evidence/dreamisland-v1/phase-c/frames/day-point.png",
+      "after": "art/evidence/dreamisland-v1/polish/frames/day-point.png"
+    },
+    {
+      "row": 0,
+      "column": 2,
+      "label": "BASIN day",
+      "source": "art/evidence/dreamisland-v1/phase-c/frames/day-basin.png",
+      "nightBlend": 0,
+      "before": "art/evidence/dreamisland-v1/phase-c/frames/day-basin.png",
+      "after": "art/evidence/dreamisland-v1/polish/frames/day-basin.png"
+    },
+    {
+      "row": 0,
+      "column": 3,
+      "label": "REEF day",
+      "source": "art/evidence/dreamisland-v1/phase-c/frames/day-reef.png",
+      "nightBlend": 0,
+      "before": "art/evidence/dreamisland-v1/phase-c/frames/day-reef.png",
+      "after": "art/evidence/dreamisland-v1/polish/frames/day-reef.png"
+    },
+    {
+      "row": 1,
+      "column": 0,
+      "label": "BEACH night",
+      "source": "art/evidence/dreamisland-v1/phase-c/frames/night-beach.png",
+      "nightBlend": 1,
+      "before": "art/evidence/dreamisland-v1/phase-c/frames/night-beach.png",
+      "after": "art/evidence/dreamisland-v1/polish/frames/night-beach.png"
+    },
+    {
+      "row": 1,
+      "column": 1,
+      "label": "POINT night",
+      "source": "art/evidence/dreamisland-v1/phase-c/frames/night-point.png",
+      "nightBlend": 1,
+      "before": "art/evidence/dreamisland-v1/phase-c/frames/night-point.png",
+      "after": "art/evidence/dreamisland-v1/polish/frames/night-point.png"
+    },
+    {
+      "row": 1,
+      "column": 2,
+      "label": "BASIN night",
+      "source": "art/evidence/dreamisland-v1/phase-c/frames/night-basin.png",
+      "nightBlend": 1,
+      "before": "art/evidence/dreamisland-v1/phase-c/frames/night-basin.png",
+      "after": "art/evidence/dreamisland-v1/polish/frames/night-basin.png"
+    },
+    {
+      "row": 1,
+      "column": 3,
+      "label": "REEF night",
+      "source": "art/evidence/dreamisland-v1/phase-c/frames/night-reef.png",
+      "nightBlend": 1,
+      "before": "art/evidence/dreamisland-v1/phase-c/frames/night-reef.png",
+      "after": "art/evidence/dreamisland-v1/polish/frames/night-reef.png"
+    },
+    {
+      "row": 2,
+      "column": 0,
+      "label": "crossfade 0.00",
+      "source": "art/evidence/dreamisland-v1/phase-c/crossfade-shipped/blend-000.png",
+      "nightBlend": 0,
+      "before": "art/evidence/dreamisland-v1/phase-c/crossfade-shipped/blend-000.png",
+      "after": "art/evidence/dreamisland-v1/polish/crossfade-baseline/blend-000.png"
+    },
+    {
+      "row": 2,
+      "column": 1,
+      "label": "crossfade 0.25",
+      "source": "art/evidence/dreamisland-v1/phase-c/crossfade-shipped/blend-025.png",
+      "nightBlend": 0.25,
+      "before": "art/evidence/dreamisland-v1/phase-c/crossfade-shipped/blend-025.png",
+      "after": "art/evidence/dreamisland-v1/polish/crossfade-baseline/blend-025.png"
+    },
+    {
+      "row": 2,
+      "column": 2,
+      "label": "crossfade 0.50",
+      "source": "art/evidence/dreamisland-v1/phase-c/crossfade-shipped/blend-050.png",
+      "nightBlend": 0.5,
+      "before": "art/evidence/dreamisland-v1/phase-c/crossfade-shipped/blend-050.png",
+      "after": "art/evidence/dreamisland-v1/polish/crossfade-baseline/blend-050.png"
+    },
+    {
+      "row": 2,
+      "column": 3,
+      "label": "crossfade 0.75",
+      "source": "art/evidence/dreamisland-v1/phase-c/crossfade-shipped/blend-075.png",
+      "nightBlend": 0.75,
+      "before": "art/evidence/dreamisland-v1/phase-c/crossfade-shipped/blend-075.png",
+      "after": "art/evidence/dreamisland-v1/polish/crossfade-baseline/blend-075.png"
+    },
+    {
+      "row": 2,
+      "column": 4,
+      "label": "crossfade 1.00",
+      "source": "art/evidence/dreamisland-v1/phase-c/crossfade-shipped/blend-100.png",
+      "nightBlend": 1,
+      "before": "art/evidence/dreamisland-v1/phase-c/crossfade-shipped/blend-100.png",
+      "after": "art/evidence/dreamisland-v1/polish/crossfade-baseline/blend-100.png"
+    },
+    {
+      "row": 3,
+      "column": 0,
+      "label": "REEF night BEFORE the water fixes",
+      "source": "art/evidence/dreamisland-v1/phase-c/pier-edge/before/blend-100.png",
+      "nightBlend": 1,
+      "before": "art/evidence/dreamisland-v1/phase-c/pier-edge/before/blend-100.png",
+      "after": "art/evidence/dreamisland-v1/polish/pier-edge/blend-100.png"
+    },
+    {
+      "row": 3,
+      "column": 1,
+      "label": "REEF night AFTER",
+      "source": "art/evidence/dreamisland-v1/phase-c/pier-edge/after/blend-100.png",
+      "nightBlend": 1,
+      "before": "art/evidence/dreamisland-v1/phase-c/pier-edge/after/blend-100.png",
+      "after": "art/evidence/dreamisland-v1/polish/pier-edge/blend-100.png"
+    },
+    {
+      "row": 3,
+      "column": 2,
+      "label": "BEACH night BEFORE",
+      "source": "art/evidence/dreamisland-v1/phase-c/crossfade/blend-100.png",
+      "nightBlend": 1,
+      "before": "art/evidence/dreamisland-v1/phase-c/crossfade/blend-100.png",
+      "after": "art/evidence/dreamisland-v1/polish/crossfade-baseline/blend-100.png"
+    },
+    {
+      "row": 3,
+      "column": 3,
+      "label": "BEACH night AFTER",
+      "source": "art/evidence/dreamisland-v1/phase-c/crossfade-shipped/blend-100.png",
+      "nightBlend": 1,
+      "before": "art/evidence/dreamisland-v1/phase-c/crossfade-shipped/blend-100.png",
+      "after": "art/evidence/dreamisland-v1/polish/crossfade-baseline/blend-100.png"
+    }
+  ],
+  "beforeSlots": 17,
+  "afterSlots": 17,
+  "note": "The last four Phase C slots contain historical before/after edge pairs. Each pair used an identical camera, so the two corresponding AFTER slots reuse the same fresh endpoint capture. The old defects are preserved only in the BEFORE rows, never recreated or relabelled as new renders."
+}

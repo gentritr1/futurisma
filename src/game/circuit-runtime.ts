@@ -19,6 +19,12 @@ export async function createCircuitRuntime(course: RaceCourse, input: InputContr
     const { TidelineRuntime } = await import("./tideline-runtime");
     if (cancelled()) return null;
     runtime = new TidelineRuntime(course as TidelineCourse, input, audio, ui, reducedMotion);
+  } else if(course.kind === "dreamisland") {
+    const {DreamIslandRuntime}=await import("./dreamisland-runtime");if(cancelled())return null;
+    runtime=new DreamIslandRuntime(course as import("./dreamisland-course").DreamIslandCourse,input,audio,ui);
+  } else if(course.kind === "ascension") {
+    const {AscensionRuntime}=await import("./ascension-runtime");if(cancelled())return null;
+    runtime=new AscensionRuntime(course as import("./ascension-course").AscensionCourse,input,audio,ui);
   } else return null;
   await runtime.ready;
   if (cancelled()) { runtime.dispose(); return null; }

@@ -396,9 +396,18 @@ export class SceneAssets {
   async loadAuthoredEnvironment(): Promise<void> {
     const environmentLoadStartedAt = performance.now();
     try {
+      // Both painted circuits add their authored root straight to the scene:
+      // they do their own batching and neither needs the culling wrapper.
+      if (this.course.kind === "ascension" || this.course.kind === "dreamisland") {
+        const environment=this.course.kind === "ascension"
+          ? await (await import("./ascension-painted-environment")).AscensionPaintedEnvironment.load(this.course as import("./ascension-course").AscensionCourse)
+          : await (await import("./dreamisland-painted-environment")).DreamIslandPaintedEnvironment.load(this.course as import("./dreamisland-course").DreamIslandCourse);
+        if(this.isDisposed()){disposeObject3DResources(environment.root);return;}
+        this.authoredEnvironment=environment;this.scene.add(environment.root);this.environmentReady=true;this.requestRender();return;
+      }
       if (this.course.kind === "nightshift" || this.course.kind === "polarity" || this.course.kind === "tideline") {
         const environment = this.course.kind === "tideline"
-          ? await (await import("./tideline-environment")).TidelineEnvironment.load()
+          ? await (await import("./tideline-environment")).TidelineEnvironment.load(this.course as import("./tideline-course").TidelineCourse)
           : this.course.kind === "polarity"
           ? await (await import("./polarity-environment")).PolarityEnvironment.load()
           : await (await import("./nightshift-environment")).NightshiftEnvironment.load();

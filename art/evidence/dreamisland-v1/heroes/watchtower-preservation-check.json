@@ -1,0 +1,26 @@
+{
+  "status": "VERIFIED",
+  "method": "SHA-256 and full manifest-entry equality against the pre-rebuild snapshot",
+  "approvedAssets": {
+    "clock-tower": {
+      "sha256": "bf51f9c27d120e7b6969c6e22958a6d69d32146bf2c8686d3bc8c6817e992339",
+      "glbUnchanged": true,
+      "manifestEntryUnchanged": true
+    },
+    "waterfall-cliff": {
+      "sha256": "cd530cf9015421ae243a2536369725ee1033172fe221fcf3666de4e317772f28",
+      "glbUnchanged": true,
+      "manifestEntryUnchanged": true
+    },
+    "sea-stack-set": {
+      "sha256": "ef8183ae3c7c790d7685febd13e0874bd15566f02800feb40f8a0f00b70f756f",
+      "glbUnchanged": true,
+      "manifestEntryUnchanged": true
+    }
+  },
+  "headBefore": "9109b6f5dda31d4d88c53bb968c7dcb6084a056b",
+  "headAfter": "e45875030d00a6f04e50d765f8fecab6c2846c7b",
+  "headUnchanged": false,
+  "branch": "work/dream-island",
+  "headObservation": "Shared branch advanced during the rebuild; this task issued no commit command."
+}

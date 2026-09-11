@@ -1,0 +1,16 @@
+{
+  "phase": "A",
+  "pad": [
+    231.0088653564453,
+    20.0,
+    -125.9814453125
+  ],
+  "crawlerOrigin": [
+    56.68171310424805,
+    16.0,
+    330.3438720703125
+  ],
+  "crawlerRoadHeight": 4,
+  "crawlerBridgeBottom": 15.0,
+  "noMaquettes": true
+}

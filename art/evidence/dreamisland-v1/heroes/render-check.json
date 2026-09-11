@@ -1,0 +1,5052 @@
+{
+  "status": "VERIFIED",
+  "renderer": "three r184 WebGLRenderer, loaded exported GLBs, shared atlas files",
+  "frames": [
+    {
+      "name": "clock-tower",
+      "view": "front",
+      "camera": "orthographic",
+      "cameraPosition": [
+        0,
+        13.46774173636493,
+        -64.6774173636493
+      ],
+      "target": [
+        0,
+        7,
+        0
+      ],
+      "verticalSpanMetres": 18.408188018884804,
+      "scaleBarMetres": 2,
+      "scaleBarPixels": 104.301411851633,
+      "bounds": {
+        "min": [
+          -4,
+          0,
+          -4
+        ],
+        "max": [
+          4,
+          14,
+          4
+        ]
+      },
+      "draws": 12,
+      "triangles": 4806,
+      "file": "webgl-clock-tower-front.png"
+    },
+    {
+      "name": "clock-tower",
+      "view": "side",
+      "camera": "orthographic",
+      "cameraPosition": [
+        64.18364107458585,
+        17.269382571933733,
+        0
+      ],
+      "target": [
+        0,
+        7,
+        0
+      ],
+      "verticalSpanMetres": 18.860116069609074,
+      "scaleBarMetres": 2,
+      "scaleBarPixels": 101.80213063979288,
+      "bounds": {
+        "min": [
+          -4,
+          0,
+          -4
+        ],
+        "max": [
+          4,
+          14,
+          4
+        ]
+      },
+      "draws": 12,
+      "triangles": 4806,
+      "file": "webgl-clock-tower-side.png"
+    },
+    {
+      "name": "clock-tower",
+      "view": "back",
+      "camera": "orthographic",
+      "cameraPosition": [
+        0,
+        16.012109894736405,
+        64.37221353383146
+      ],
+      "target": [
+        0,
+        7,
+        0
+      ],
+      "verticalSpanMetres": 18.71745901214484,
+      "scaleBarMetres": 2,
+      "scaleBarPixels": 102.57802614950066,
+      "bounds": {
+        "min": [
+          -4,
+          0,
+          -4
+        ],
+        "max": [
+          4,
+          14,
+          4
+        ]
+      },
+      "draws": 12,
+      "triangles": 4806,
+      "file": "webgl-clock-tower-back.png"
+    },
+    {
+      "name": "clock-tower",
+      "view": "three-quarter",
+      "camera": "orthographic",
+      "cameraPosition": [
+        38.401752432380434,
+        28.120963837809235,
+        -48.00219054047553
+      ],
+      "target": [
+        0,
+        7,
+        0
+      ],
+      "verticalSpanMetres": 21.117578429266295,
+      "scaleBarMetres": 2,
+      "scaleBarPixels": 90.9195155320992,
+      "bounds": {
+        "min": [
+          -4,
+          0,
+          -4
+        ],
+        "max": [
+          4,
+          14,
+          4
+        ]
+      },
+      "draws": 12,
+      "triangles": 4806,
+      "file": "webgl-clock-tower-three-quarter.png"
+    },
+    {
+      "name": "waterfall-cliff",
+      "view": "front",
+      "camera": "orthographic",
+      "cameraPosition": [
+        0,
+        14.512741775405972,
+        -67.0304172892627
+      ],
+      "target": [
+        0,
+        8.045000039041042,
+        -2.3529999256134033
+      ],
+      "verticalSpanMetres": 21.309467766171156,
+      "scaleBarMetres": 2,
+      "scaleBarPixels": 90.1007956213719,
+      "bounds": {
+        "min": [
+          -10.97249984741211,
+          0.04500000178813934,
+          -8.015999794006348
+        ],
+        "max": [
+          10.97249984741211,
+          16.045000076293945,
+          3.309999942779541
+        ]
+      },
+      "draws": 7,
+      "triangles": 1214,
+      "file": "webgl-waterfall-cliff-front.png"
+    },
+    {
+      "name": "waterfall-cliff",
+      "view": "side",
+      "camera": "orthographic",
+      "cameraPosition": [
+        64.18364107458585,
+        18.314382610974775,
+        -2.3529999256134033
+      ],
+      "target": [
+        0,
+        8.045000039041042,
+        -2.3529999256134033
+      ],
+      "verticalSpanMetres": 24.08268960351051,
+      "scaleBarMetres": 2,
+      "scaleBarPixels": 79.7253143901387,
+      "bounds": {
+        "min": [
+          -10.97249984741211,
+          0.04500000178813934,
+          -8.015999794006348
+        ],
+        "max": [
+          10.97249984741211,
+          16.045000076293945,
+          3.309999942779541
+        ]
+      },
+      "draws": 7,
+      "triangles": 1214,
+      "file": "webgl-waterfall-cliff-side.png"
+    },
+    {
+      "name": "waterfall-cliff",
+      "view": "back",
+      "camera": "orthographic",
+      "cameraPosition": [
+        0,
+        17.057109933777447,
+        62.01921360821805
+      ],
+      "target": [
+        0,
+        8.045000039041042,
+        -2.3529999256134033
+      ],
+      "verticalSpanMetres": 21.769741839097634,
+      "scaleBarMetres": 2,
+      "scaleBarPixels": 88.19580931142475,
+      "bounds": {
+        "min": [
+          -10.97249984741211,
+          0.04500000178813934,
+          -8.015999794006348
+        ],
+        "max": [
+          10.97249984741211,
+          16.045000076293945,
+          3.309999942779541
+        ]
+      },
+      "draws": 7,
+      "triangles": 1214,
+      "file": "webgl-waterfall-cliff-back.png"
+    },
+    {
+      "name": "waterfall-cliff",
+      "view": "three-quarter",
+      "camera": "orthographic",
+      "cameraPosition": [
+        38.401752432380434,
+        29.165963876850277,
+        -50.355190466088935
+      ],
+      "target": [
+        0,
+        8.045000039041042,
+        -2.3529999256134033
+      ],
+      "verticalSpanMetres": 28.075134214072893,
+      "scaleBarMetres": 2,
+      "scaleBarPixels": 68.38791883807217,
+      "bounds": {
+        "min": [
+          -10.97249984741211,
+          0.04500000178813934,
+          -8.015999794006348
+        ],
+        "max": [
+          10.97249984741211,
+          16.045000076293945,
+          3.309999942779541
+        ]
+      },
+      "draws": 7,
+      "triangles": 1214,
+      "file": "webgl-waterfall-cliff-three-quarter.png"
+    },
+    {
+      "name": "sea-stack-set",
+      "view": "front",
+      "camera": "orthographic",
+      "cameraPosition": [
+        1.4634435176849365,
+        31.9698845878403,
+        -119.70738555506928
+      ],
+      "target": [
+        1.4634435176849365,
+        20,
+        -0.008539676666259766
+      ],
+      "verticalSpanMetres": 65.78655166625977,
+      "scaleBarMetres": 2,
+      "scaleBarPixels": 29.185296255385257,
+      "bounds": {
+        "min": [
+          -32.80038547515869,
+          0,
+          -5.829975605010986
+        ],
+        "max": [
+          35.727272510528564,
+          40,
+          5.812896251678467
+        ]
+      },
+      "draws": 9,
+      "triangles": 1306,
+      "file": "webgl-sea-stack-set-front.png"
+    },
+    {
+      "name": "sea-stack-set",
+      "view": "side",
+      "camera": "orthographic",
+      "cameraPosition": [
+        120.24845494919435,
+        39.00560182904151,
+        -0.008539676666259766
+      ],
+      "target": [
+        1.4634435176849365,
+        20,
+        -0.008539676666259766
+      ],
+      "verticalSpanMetres": 62.90543037686703,
+      "scaleBarMetres": 2,
+      "scaleBarPixels": 30.522007217775347,
+      "bounds": {
+        "min": [
+          -32.80038547515869,
+          0,
+          -5.829975605010986
+        ],
+        "max": [
+          35.727272510528564,
+          40,
+          5.812896251678467
+        ]
+      },
+      "draws": 9,
+      "triangles": 1306,
+      "file": "webgl-sea-stack-set-side.png"
+    },
+    {
+      "name": "sea-stack-set",
+      "view": "back",
+      "camera": "orthographic",
+      "cameraPosition": [
+        1.4634435176849365,
+        36.678760490142395,
+        119.12546382435086
+      ],
+      "target": [
+        1.4634435176849365,
+        20,
+        -0.008539676666259766
+      ],
+      "verticalSpanMetres": 65.78655166625977,
+      "scaleBarMetres": 2,
+      "scaleBarPixels": 29.185296255385257,
+      "bounds": {
+        "min": [
+          -32.80038547515869,
+          0,
+          -5.829975605010986
+        ],
+        "max": [
+          35.727272510528564,
+          40,
+          5.812896251678467
+        ]
+      },
+      "draws": 9,
+      "triangles": 1306,
+      "file": "webgl-sea-stack-set-back.png"
+    },
+    {
+      "name": "sea-stack-set",
+      "view": "three-quarter",
+      "camera": "orthographic",
+      "cameraPosition": [
+        72.53377429510941,
+        59.08868192758346,
+        -88.84645314844686
+      ],
+      "target": [
+        1.4634435176849365,
+        20,
+        -0.008539676666259766
+      ],
+      "verticalSpanMetres": 68.36729460634966,
+      "scaleBarMetres": 2,
+      "scaleBarPixels": 28.083603586409556,
+      "bounds": {
+        "min": [
+          -32.80038547515869,
+          0,
+          -5.829975605010986
+        ],
+        "max": [
+          35.727272510528564,
+          40,
+          5.812896251678467
+        ]
+      },
+      "draws": 9,
+      "triangles": 1306,
+      "file": "webgl-sea-stack-set-three-quarter.png"
+    },
+    {
+      "name": "clock-tower",
+      "distanceMetres": 40,
+      "verticalFovDegrees": 50,
+      "cameraPosition": [
+        0,
+        7,
+        -40
+      ],
+      "target": [
+        0,
+        7,
+        0
+      ],
+      "file": "webgl-clock-tower-40m.png"
+    },
+    {
+      "name": "sea-stack-set",
+      "distanceMetres": 300,
+      "verticalFovDegrees": 50,
+      "cameraPosition": [
+        1.4634435176849365,
+        20,
+        -300.00853967666626
+      ],
+      "target": [
+        1.4634435176849365,
+        20,
+        -0.008539676666259766
+      ],
+      "file": "webgl-sea-stack-set-300m.png"
+    },
+    {
+      "name": "watchtower",
+      "view": "front",
+      "camera": "orthographic",
+      "cameraPosition": [
+        0,
+        22.457411156260356,
+        -74.57411156260358
+      ],
+      "target": [
+        0,
+        15,
+        0
+      ],
+      "verticalSpanMetres": 40.859052683375765,
+      "scaleBarMetres": 2,
+      "scaleBarPixels": 46.99081045462384,
+      "bounds": {
+        "min": [
+          -14,
+          0,
+          -14.251358985900879
+        ],
+        "max": [
+          14,
+          30,
+          14.251358985900879
+        ]
+      },
+      "draws": 14,
+      "triangles": 9280,
+      "file": "webgl-watchtower-front.png"
+    },
+    {
+      "name": "watchtower",
+      "view": "side",
+      "camera": "orthographic",
+      "cameraPosition": [
+        74.00477949016553,
+        26.840764718426485,
+        0
+      ],
+      "target": [
+        0,
+        15,
+        0
+      ],
+      "verticalSpanMetres": 42.55869123561,
+      "scaleBarMetres": 2,
+      "scaleBarPixels": 45.11416926264604,
+      "bounds": {
+        "min": [
+          -14,
+          0,
+          -14.251358985900879
+        ],
+        "max": [
+          14,
+          30,
+          14.251358985900879
+        ]
+      },
+      "draws": 14,
+      "triangles": 9280,
+      "file": "webgl-watchtower-side.png"
+    },
+    {
+      "name": "watchtower",
+      "view": "back",
+      "camera": "orthographic",
+      "cameraPosition": [
+        0,
+        25.391108923317034,
+        74.22220659512166
+      ],
+      "target": [
+        0,
+        15,
+        0
+      ],
+      "verticalSpanMetres": 42.077616012990376,
+      "scaleBarMetres": 2,
+      "scaleBarPixels": 45.629961531262836,
+      "bounds": {
+        "min": [
+          -14,
+          0,
+          -14.251358985900879
+        ],
+        "max": [
+          14,
+          30,
+          14.251358985900879
+        ]
+      },
+      "draws": 14,
+      "triangles": 9280,
+      "file": "webgl-watchtower-back.png"
+    },
+    {
+      "name": "watchtower",
+      "view": "three-quarter",
+      "camera": "orthographic",
+      "cameraPosition": [
+        44.27784359400461,
+        39.352813976702535,
+        -55.34730449250575
+      ],
+      "target": [
+        0,
+        15,
+        0
+      ],
+      "verticalSpanMetres": 51.60975559442022,
+      "scaleBarMetres": 2,
+      "scaleBarPixels": 37.20226879368482,
+      "bounds": {
+        "min": [
+          -14,
+          0,
+          -14.251358985900879
+        ],
+        "max": [
+          14,
+          30,
+          14.251358985900879
+        ]
+      },
+      "draws": 14,
+      "triangles": 9280,
+      "file": "webgl-watchtower-three-quarter.png"
+    },
+    {
+      "name": "watchtower",
+      "distanceMetres": 40,
+      "verticalFovDegrees": 65,
+      "cameraPosition": [
+        13.083540778447937,
+        20.607231762191972,
+        -37.381545081279825
+      ],
+      "target": [
+        0,
+        15,
+        0
+      ],
+      "file": "webgl-watchtower-40m.png"
+    }
+  ],
+  "atlasPixelProof": [
+    {
+      "asset": "clock-tower",
+      "node": "clock_face_3_2m",
+      "role": "emissive",
+      "cell": "clock-face",
+      "exportedUv": [
+        0.8202289541562399,
+        0.7877604166666666
+      ],
+      "sourcePixel": [
+        839,
+        806
+      ],
+      "rendered": [
+        253,
+        253,
+        253,
+        255
+      ],
+      "expected": [
+        253,
+        253,
+        253,
+        255
+      ],
+      "maxChannelError": 0,
+      "uvExtent": [
+        0.80078125,
+        0.765625,
+        0.830078125,
+        0.798828125
+      ],
+      "grid": [
+        {
+          "sample": [
+            0,
+            0
+          ],
+          "sourcePixel": [
+            823,
+            814
+          ],
+          "rendered": [
+            254,
+            254,
+            254,
+            255
+          ],
+          "expected": [
+            254,
+            254,
+            254,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            1,
+            0
+          ],
+          "sourcePixel": [
+            829,
+            814
+          ],
+          "rendered": [
+            254,
+            254,
+            254,
+            255
+          ],
+          "expected": [
+            254,
+            254,
+            254,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            2,
+            0
+          ],
+          "sourcePixel": [
+            835,
+            814
+          ],
+          "rendered": [
+            253,
+            253,
+            253,
+            255
+          ],
+          "expected": [
+            253,
+            253,
+            253,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            3,
+            0
+          ],
+          "sourcePixel": [
+            841,
+            814
+          ],
+          "rendered": [
+            253,
+            253,
+            253,
+            255
+          ],
+          "expected": [
+            253,
+            253,
+            253,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            4,
+            0
+          ],
+          "sourcePixel": [
+            847,
+            814
+          ],
+          "rendered": [
+            253,
+            253,
+            253,
+            255
+          ],
+          "expected": [
+            253,
+            253,
+            253,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            0,
+            1
+          ],
+          "sourcePixel": [
+            823,
+            807
+          ],
+          "rendered": [
+            253,
+            253,
+            253,
+            255
+          ],
+          "expected": [
+            253,
+            253,
+            253,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            1,
+            1
+          ],
+          "sourcePixel": [
+            829,
+            807
+          ],
+          "rendered": [
+            253,
+            253,
+            253,
+            255
+          ],
+          "expected": [
+            253,
+            253,
+            253,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            2,
+            1
+          ],
+          "sourcePixel": [
+            835,
+            807
+          ],
+          "rendered": [
+            254,
+            254,
+            254,
+            255
+          ],
+          "expected": [
+            254,
+            254,
+            254,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            3,
+            1
+          ],
+          "sourcePixel": [
+            841,
+            807
+          ],
+          "rendered": [
+            253,
+            253,
+            253,
+            255
+          ],
+          "expected": [
+            253,
+            253,
+            253,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            4,
+            1
+          ],
+          "sourcePixel": [
+            847,
+            807
+          ],
+          "rendered": [
+            253,
+            253,
+            253,
+            255
+          ],
+          "expected": [
+            253,
+            253,
+            253,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            0,
+            2
+          ],
+          "sourcePixel": [
+            823,
+            800
+          ],
+          "rendered": [
+            253,
+            253,
+            253,
+            255
+          ],
+          "expected": [
+            253,
+            253,
+            253,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            1,
+            2
+          ],
+          "sourcePixel": [
+            829,
+            800
+          ],
+          "rendered": [
+            254,
+            254,
+            254,
+            255
+          ],
+          "expected": [
+            254,
+            254,
+            254,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            2,
+            2
+          ],
+          "sourcePixel": [
+            835,
+            800
+          ],
+          "rendered": [
+            253,
+            253,
+            253,
+            255
+          ],
+          "expected": [
+            253,
+            253,
+            253,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            3,
+            2
+          ],
+          "sourcePixel": [
+            841,
+            800
+          ],
+          "rendered": [
+            253,
+            253,
+            253,
+            255
+          ],
+          "expected": [
+            253,
+            253,
+            253,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            4,
+            2
+          ],
+          "sourcePixel": [
+            847,
+            800
+          ],
+          "rendered": [
+            253,
+            253,
+            253,
+            255
+          ],
+          "expected": [
+            253,
+            253,
+            253,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            0,
+            3
+          ],
+          "sourcePixel": [
+            823,
+            794
+          ],
+          "rendered": [
+            253,
+            253,
+            253,
+            255
+          ],
+          "expected": [
+            253,
+            253,
+            253,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            1,
+            3
+          ],
+          "sourcePixel": [
+            829,
+            794
+          ],
+          "rendered": [
+            254,
+            254,
+            254,
+            255
+          ],
+          "expected": [
+            254,
+            254,
+            254,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            2,
+            3
+          ],
+          "sourcePixel": [
+            835,
+            794
+          ],
+          "rendered": [
+            253,
+            253,
+            253,
+            255
+          ],
+          "expected": [
+            253,
+            253,
+            253,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            3,
+            3
+          ],
+          "sourcePixel": [
+            841,
+            794
+          ],
+          "rendered": [
+            253,
+            253,
+            253,
+            255
+          ],
+          "expected": [
+            253,
+            253,
+            253,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            4,
+            3
+          ],
+          "sourcePixel": [
+            847,
+            794
+          ],
+          "rendered": [
+            253,
+            253,
+            251,
+            255
+          ],
+          "expected": [
+            253,
+            253,
+            251,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            0,
+            4
+          ],
+          "sourcePixel": [
+            823,
+            787
+          ],
+          "rendered": [
+            253,
+            253,
+            253,
+            255
+          ],
+          "expected": [
+            253,
+            253,
+            253,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            1,
+            4
+          ],
+          "sourcePixel": [
+            829,
+            787
+          ],
+          "rendered": [
+            254,
+            254,
+            254,
+            255
+          ],
+          "expected": [
+            254,
+            254,
+            254,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            2,
+            4
+          ],
+          "sourcePixel": [
+            835,
+            787
+          ],
+          "rendered": [
+            253,
+            253,
+            253,
+            255
+          ],
+          "expected": [
+            253,
+            253,
+            253,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            3,
+            4
+          ],
+          "sourcePixel": [
+            841,
+            787
+          ],
+          "rendered": [
+            253,
+            253,
+            253,
+            255
+          ],
+          "expected": [
+            253,
+            253,
+            253,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            4,
+            4
+          ],
+          "sourcePixel": [
+            847,
+            787
+          ],
+          "rendered": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "expected": [
+            252,
+            252,
+            252,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        }
+      ],
+      "file": "atlas-pixel-0-emissive.png"
+    },
+    {
+      "asset": "clock-tower",
+      "node": "clock_square_block_courses",
+      "role": "concrete",
+      "cell": "wall-block",
+      "exportedUv": [
+        0.7146323323249817,
+        0.6680000027020773
+      ],
+      "sourcePixel": [
+        731,
+        684
+      ],
+      "rendered": [
+        161,
+        146,
+        117,
+        255
+      ],
+      "expected": [
+        161,
+        146,
+        117,
+        255
+      ],
+      "maxChannelError": 0,
+      "uvExtent": [
+        0.5040000081062317,
+        0.5040000081062317,
+        0.9959999918937683,
+        0.9959999918937683
+      ],
+      "grid": [
+        {
+          "sample": [
+            0,
+            0
+          ],
+          "sourcePixel": [
+            566,
+            969
+          ],
+          "rendered": [
+            143,
+            138,
+            109,
+            255
+          ],
+          "expected": [
+            143,
+            138,
+            109,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            1,
+            0
+          ],
+          "sourcePixel": [
+            667,
+            969
+          ],
+          "rendered": [
+            187,
+            173,
+            144,
+            255
+          ],
+          "expected": [
+            187,
+            173,
+            144,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            2,
+            0
+          ],
+          "sourcePixel": [
+            768,
+            969
+          ],
+          "rendered": [
+            162,
+            147,
+            116,
+            255
+          ],
+          "expected": [
+            162,
+            147,
+            116,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            3,
+            0
+          ],
+          "sourcePixel": [
+            868,
+            969
+          ],
+          "rendered": [
+            162,
+            144,
+            104,
+            255
+          ],
+          "expected": [
+            162,
+            144,
+            104,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            4,
+            0
+          ],
+          "sourcePixel": [
+            969,
+            969
+          ],
+          "rendered": [
+            143,
+            135,
+            112,
+            255
+          ],
+          "expected": [
+            143,
+            135,
+            112,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            0,
+            1
+          ],
+          "sourcePixel": [
+            566,
+            868
+          ],
+          "rendered": [
+            143,
+            128,
+            89,
+            255
+          ],
+          "expected": [
+            143,
+            128,
+            89,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            1,
+            1
+          ],
+          "sourcePixel": [
+            667,
+            868
+          ],
+          "rendered": [
+            163,
+            147,
+            111,
+            255
+          ],
+          "expected": [
+            163,
+            147,
+            111,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            2,
+            1
+          ],
+          "sourcePixel": [
+            768,
+            868
+          ],
+          "rendered": [
+            166,
+            149,
+            119,
+            255
+          ],
+          "expected": [
+            166,
+            149,
+            119,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            3,
+            1
+          ],
+          "sourcePixel": [
+            868,
+            868
+          ],
+          "rendered": [
+            140,
+            122,
+            84,
+            255
+          ],
+          "expected": [
+            140,
+            122,
+            84,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            4,
+            1
+          ],
+          "sourcePixel": [
+            969,
+            868
+          ],
+          "rendered": [
+            164,
+            143,
+            96,
+            255
+          ],
+          "expected": [
+            164,
+            143,
+            96,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            0,
+            2
+          ],
+          "sourcePixel": [
+            566,
+            767
+          ],
+          "rendered": [
+            150,
+            132,
+            96,
+            255
+          ],
+          "expected": [
+            150,
+            132,
+            96,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            1,
+            2
+          ],
+          "sourcePixel": [
+            667,
+            767
+          ],
+          "rendered": [
+            166,
+            147,
+            104,
+            255
+          ],
+          "expected": [
+            166,
+            147,
+            104,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            2,
+            2
+          ],
+          "sourcePixel": [
+            768,
+            767
+          ],
+          "rendered": [
+            182,
+            166,
+            130,
+            255
+          ],
+          "expected": [
+            182,
+            166,
+            130,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            3,
+            2
+          ],
+          "sourcePixel": [
+            868,
+            767
+          ],
+          "rendered": [
+            164,
+            146,
+            106,
+            255
+          ],
+          "expected": [
+            164,
+            146,
+            106,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            4,
+            2
+          ],
+          "sourcePixel": [
+            969,
+            767
+          ],
+          "rendered": [
+            142,
+            128,
+            93,
+            255
+          ],
+          "expected": [
+            142,
+            128,
+            93,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            0,
+            3
+          ],
+          "sourcePixel": [
+            566,
+            666
+          ],
+          "rendered": [
+            168,
+            150,
+            104,
+            255
+          ],
+          "expected": [
+            168,
+            150,
+            104,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            1,
+            3
+          ],
+          "sourcePixel": [
+            667,
+            666
+          ],
+          "rendered": [
+            139,
+            133,
+            109,
+            255
+          ],
+          "expected": [
+            139,
+            133,
+            109,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            2,
+            3
+          ],
+          "sourcePixel": [
+            768,
+            666
+          ],
+          "rendered": [
+            156,
+            143,
+            111,
+            255
+          ],
+          "expected": [
+            156,
+            143,
+            111,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            3,
+            3
+          ],
+          "sourcePixel": [
+            868,
+            666
+          ],
+          "rendered": [
+            177,
+            167,
+            132,
+            255
+          ],
+          "expected": [
+            177,
+            167,
+            132,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            4,
+            3
+          ],
+          "sourcePixel": [
+            969,
+            666
+          ],
+          "rendered": [
+            117,
+            101,
+            52,
+            255
+          ],
+          "expected": [
+            117,
+            101,
+            52,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            0,
+            4
+          ],
+          "sourcePixel": [
+            566,
+            566
+          ],
+          "rendered": [
+            153,
+            139,
+            110,
+            255
+          ],
+          "expected": [
+            153,
+            139,
+            110,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            1,
+            4
+          ],
+          "sourcePixel": [
+            667,
+            566
+          ],
+          "rendered": [
+            203,
+            184,
+            142,
+            255
+          ],
+          "expected": [
+            203,
+            184,
+            142,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            2,
+            4
+          ],
+          "sourcePixel": [
+            768,
+            566
+          ],
+          "rendered": [
+            168,
+            154,
+            117,
+            255
+          ],
+          "expected": [
+            168,
+            154,
+            117,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            3,
+            4
+          ],
+          "sourcePixel": [
+            868,
+            566
+          ],
+          "rendered": [
+            188,
+            174,
+            139,
+            255
+          ],
+          "expected": [
+            188,
+            174,
+            139,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            4,
+            4
+          ],
+          "sourcePixel": [
+            969,
+            566
+          ],
+          "rendered": [
+            163,
+            151,
+            125,
+            255
+          ],
+          "expected": [
+            163,
+            151,
+            125,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        }
+      ],
+      "file": "atlas-pixel-1-concrete.png"
+    },
+    {
+      "asset": "clock-tower",
+      "node": "clock_plinth_three_tiers",
+      "role": "concrete",
+      "cell": "causeway-paving",
+      "exportedUv": [
+        0.6680000027020773,
+        0.24589999516805014
+      ],
+      "sourcePixel": [
+        684,
+        251
+      ],
+      "rendered": [
+        206,
+        194,
+        154,
+        255
+      ],
+      "expected": [
+        206,
+        194,
+        154,
+        255
+      ],
+      "maxChannelError": 0,
+      "uvExtent": [
+        0.5040000081062317,
+        0.0040000081062316895,
+        0.9959999918937683,
+        0.4959999918937683
+      ],
+      "grid": [
+        {
+          "sample": [
+            0,
+            0
+          ],
+          "sourcePixel": [
+            566,
+            457
+          ],
+          "rendered": [
+            135,
+            122,
+            70,
+            255
+          ],
+          "expected": [
+            135,
+            122,
+            70,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            1,
+            0
+          ],
+          "sourcePixel": [
+            667,
+            457
+          ],
+          "rendered": [
+            199,
+            192,
+            150,
+            255
+          ],
+          "expected": [
+            199,
+            192,
+            150,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            2,
+            0
+          ],
+          "sourcePixel": [
+            768,
+            457
+          ],
+          "rendered": [
+            199,
+            186,
+            144,
+            255
+          ],
+          "expected": [
+            199,
+            186,
+            144,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            3,
+            0
+          ],
+          "sourcePixel": [
+            868,
+            457
+          ],
+          "rendered": [
+            114,
+            109,
+            45,
+            255
+          ],
+          "expected": [
+            114,
+            109,
+            45,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            4,
+            0
+          ],
+          "sourcePixel": [
+            969,
+            457
+          ],
+          "rendered": [
+            209,
+            195,
+            158,
+            255
+          ],
+          "expected": [
+            209,
+            195,
+            158,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            0,
+            1
+          ],
+          "sourcePixel": [
+            566,
+            356
+          ],
+          "rendered": [
+            175,
+            172,
+            117,
+            255
+          ],
+          "expected": [
+            175,
+            172,
+            117,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            1,
+            1
+          ],
+          "sourcePixel": [
+            667,
+            356
+          ],
+          "rendered": [
+            203,
+            192,
+            147,
+            255
+          ],
+          "expected": [
+            203,
+            192,
+            147,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            2,
+            1
+          ],
+          "sourcePixel": [
+            768,
+            356
+          ],
+          "rendered": [
+            187,
+            174,
+            119,
+            255
+          ],
+          "expected": [
+            187,
+            174,
+            119,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            3,
+            1
+          ],
+          "sourcePixel": [
+            868,
+            356
+          ],
+          "rendered": [
+            99,
+            100,
+            20,
+            255
+          ],
+          "expected": [
+            99,
+            100,
+            20,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            4,
+            1
+          ],
+          "sourcePixel": [
+            969,
+            356
+          ],
+          "rendered": [
+            203,
+            189,
+            154,
+            255
+          ],
+          "expected": [
+            203,
+            189,
+            154,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            0,
+            2
+          ],
+          "sourcePixel": [
+            566,
+            255
+          ],
+          "rendered": [
+            174,
+            163,
+            109,
+            255
+          ],
+          "expected": [
+            174,
+            163,
+            109,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            1,
+            2
+          ],
+          "sourcePixel": [
+            667,
+            255
+          ],
+          "rendered": [
+            184,
+            167,
+            123,
+            255
+          ],
+          "expected": [
+            184,
+            167,
+            123,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            2,
+            2
+          ],
+          "sourcePixel": [
+            768,
+            255
+          ],
+          "rendered": [
+            193,
+            176,
+            130,
+            255
+          ],
+          "expected": [
+            193,
+            176,
+            130,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            3,
+            2
+          ],
+          "sourcePixel": [
+            868,
+            255
+          ],
+          "rendered": [
+            127,
+            125,
+            40,
+            255
+          ],
+          "expected": [
+            127,
+            125,
+            40,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            4,
+            2
+          ],
+          "sourcePixel": [
+            969,
+            255
+          ],
+          "rendered": [
+            173,
+            156,
+            102,
+            255
+          ],
+          "expected": [
+            173,
+            156,
+            102,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            0,
+            3
+          ],
+          "sourcePixel": [
+            566,
+            154
+          ],
+          "rendered": [
+            205,
+            195,
+            159,
+            255
+          ],
+          "expected": [
+            205,
+            195,
+            159,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            1,
+            3
+          ],
+          "sourcePixel": [
+            667,
+            154
+          ],
+          "rendered": [
+            192,
+            181,
+            135,
+            255
+          ],
+          "expected": [
+            192,
+            181,
+            135,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            2,
+            3
+          ],
+          "sourcePixel": [
+            768,
+            154
+          ],
+          "rendered": [
+            198,
+            185,
+            151,
+            255
+          ],
+          "expected": [
+            198,
+            185,
+            151,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            3,
+            3
+          ],
+          "sourcePixel": [
+            868,
+            154
+          ],
+          "rendered": [
+            184,
+            178,
+            144,
+            255
+          ],
+          "expected": [
+            184,
+            178,
+            144,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            4,
+            3
+          ],
+          "sourcePixel": [
+            969,
+            154
+          ],
+          "rendered": [
+            199,
+            185,
+            146,
+            255
+          ],
+          "expected": [
+            199,
+            185,
+            146,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            0,
+            4
+          ],
+          "sourcePixel": [
+            566,
+            54
+          ],
+          "rendered": [
+            191,
+            176,
+            133,
+            255
+          ],
+          "expected": [
+            191,
+            176,
+            133,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            1,
+            4
+          ],
+          "sourcePixel": [
+            667,
+            54
+          ],
+          "rendered": [
+            101,
+            93,
+            46,
+            255
+          ],
+          "expected": [
+            101,
+            93,
+            46,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            2,
+            4
+          ],
+          "sourcePixel": [
+            768,
+            54
+          ],
+          "rendered": [
+            198,
+            183,
+            140,
+            255
+          ],
+          "expected": [
+            198,
+            183,
+            140,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            3,
+            4
+          ],
+          "sourcePixel": [
+            868,
+            54
+          ],
+          "rendered": [
+            190,
+            178,
+            130,
+            255
+          ],
+          "expected": [
+            190,
+            178,
+            130,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            4,
+            4
+          ],
+          "sourcePixel": [
+            969,
+            54
+          ],
+          "rendered": [
+            162,
+            146,
+            94,
+            255
+          ],
+          "expected": [
+            162,
+            146,
+            94,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        }
+      ],
+      "file": "atlas-pixel-2-concrete.png"
+    },
+    {
+      "asset": "clock-tower",
+      "node": "clock_bezel",
+      "role": "metal",
+      "cell": "clock-ring-hands",
+      "exportedUv": [
+        0.30444737151265144,
+        0.6837511857350668
+      ],
+      "sourcePixel": [
+        311,
+        700
+      ],
+      "rendered": [
+        112,
+        103,
+        104,
+        255
+      ],
+      "expected": [
+        112,
+        103,
+        104,
+        255
+      ],
+      "maxChannelError": 0,
+      "uvExtent": [
+        0.004000000189989805,
+        0.5040000081062317,
+        0.4959999918937683,
+        0.9959999918937683
+      ],
+      "grid": [
+        {
+          "sample": [
+            0,
+            0
+          ],
+          "sourcePixel": [
+            54,
+            969
+          ],
+          "rendered": [
+            112,
+            103,
+            104,
+            255
+          ],
+          "expected": [
+            112,
+            103,
+            104,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            1,
+            0
+          ],
+          "sourcePixel": [
+            155,
+            969
+          ],
+          "rendered": [
+            96,
+            66,
+            38,
+            255
+          ],
+          "expected": [
+            96,
+            66,
+            38,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            2,
+            0
+          ],
+          "sourcePixel": [
+            256,
+            969
+          ],
+          "rendered": [
+            91,
+            73,
+            51,
+            255
+          ],
+          "expected": [
+            91,
+            73,
+            51,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            3,
+            0
+          ],
+          "sourcePixel": [
+            356,
+            969
+          ],
+          "rendered": [
+            84,
+            64,
+            39,
+            255
+          ],
+          "expected": [
+            84,
+            64,
+            39,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            4,
+            0
+          ],
+          "sourcePixel": [
+            457,
+            969
+          ],
+          "rendered": [
+            104,
+            104,
+            102,
+            255
+          ],
+          "expected": [
+            104,
+            104,
+            102,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            0,
+            1
+          ],
+          "sourcePixel": [
+            54,
+            868
+          ],
+          "rendered": [
+            68,
+            56,
+            40,
+            255
+          ],
+          "expected": [
+            68,
+            56,
+            40,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            1,
+            1
+          ],
+          "sourcePixel": [
+            155,
+            868
+          ],
+          "rendered": [
+            112,
+            103,
+            104,
+            255
+          ],
+          "expected": [
+            112,
+            103,
+            104,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            2,
+            1
+          ],
+          "sourcePixel": [
+            256,
+            868
+          ],
+          "rendered": [
+            105,
+            103,
+            104,
+            255
+          ],
+          "expected": [
+            105,
+            103,
+            104,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            3,
+            1
+          ],
+          "sourcePixel": [
+            356,
+            868
+          ],
+          "rendered": [
+            103,
+            105,
+            104,
+            255
+          ],
+          "expected": [
+            103,
+            105,
+            104,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            4,
+            1
+          ],
+          "sourcePixel": [
+            457,
+            868
+          ],
+          "rendered": [
+            74,
+            57,
+            41,
+            255
+          ],
+          "expected": [
+            74,
+            57,
+            41,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            0,
+            2
+          ],
+          "sourcePixel": [
+            54,
+            767
+          ],
+          "rendered": [
+            105,
+            80,
+            49,
+            255
+          ],
+          "expected": [
+            105,
+            80,
+            49,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            1,
+            2
+          ],
+          "sourcePixel": [
+            155,
+            767
+          ],
+          "rendered": [
+            112,
+            107,
+            104,
+            255
+          ],
+          "expected": [
+            112,
+            107,
+            104,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            2,
+            2
+          ],
+          "sourcePixel": [
+            256,
+            767
+          ],
+          "rendered": [
+            42,
+            38,
+            35,
+            255
+          ],
+          "expected": [
+            42,
+            38,
+            35,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            3,
+            2
+          ],
+          "sourcePixel": [
+            356,
+            767
+          ],
+          "rendered": [
+            104,
+            104,
+            102,
+            255
+          ],
+          "expected": [
+            104,
+            104,
+            102,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            4,
+            2
+          ],
+          "sourcePixel": [
+            457,
+            767
+          ],
+          "rendered": [
+            100,
+            80,
+            55,
+            255
+          ],
+          "expected": [
+            100,
+            80,
+            55,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            0,
+            3
+          ],
+          "sourcePixel": [
+            54,
+            666
+          ],
+          "rendered": [
+            91,
+            73,
+            51,
+            255
+          ],
+          "expected": [
+            91,
+            73,
+            51,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            1,
+            3
+          ],
+          "sourcePixel": [
+            155,
+            666
+          ],
+          "rendered": [
+            45,
+            43,
+            46,
+            255
+          ],
+          "expected": [
+            45,
+            43,
+            46,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            2,
+            3
+          ],
+          "sourcePixel": [
+            256,
+            666
+          ],
+          "rendered": [
+            112,
+            103,
+            104,
+            255
+          ],
+          "expected": [
+            112,
+            103,
+            104,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            3,
+            3
+          ],
+          "sourcePixel": [
+            356,
+            666
+          ],
+          "rendered": [
+            112,
+            103,
+            104,
+            255
+          ],
+          "expected": [
+            112,
+            103,
+            104,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            4,
+            3
+          ],
+          "sourcePixel": [
+            457,
+            666
+          ],
+          "rendered": [
+            85,
+            64,
+            43,
+            255
+          ],
+          "expected": [
+            85,
+            64,
+            43,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            0,
+            4
+          ],
+          "sourcePixel": [
+            54,
+            566
+          ],
+          "rendered": [
+            113,
+            104,
+            105,
+            255
+          ],
+          "expected": [
+            113,
+            104,
+            105,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            1,
+            4
+          ],
+          "sourcePixel": [
+            155,
+            566
+          ],
+          "rendered": [
+            72,
+            56,
+            41,
+            255
+          ],
+          "expected": [
+            72,
+            56,
+            41,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            2,
+            4
+          ],
+          "sourcePixel": [
+            256,
+            566
+          ],
+          "rendered": [
+            102,
+            85,
+            59,
+            255
+          ],
+          "expected": [
+            102,
+            85,
+            59,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            3,
+            4
+          ],
+          "sourcePixel": [
+            356,
+            566
+          ],
+          "rendered": [
+            99,
+            82,
+            56,
+            255
+          ],
+          "expected": [
+            99,
+            82,
+            56,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            4,
+            4
+          ],
+          "sourcePixel": [
+            457,
+            566
+          ],
+          "rendered": [
+            109,
+            103,
+            103,
+            255
+          ],
+          "expected": [
+            109,
+            103,
+            103,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        }
+      ],
+      "file": "atlas-pixel-3-metal.png"
+    },
+    {
+      "asset": "watchtower",
+      "node": "watchtower_tapered_block_drum",
+      "role": "jungle",
+      "cell": "moss-blossom",
+      "exportedUv": [
+        0.8233868877092997,
+        0.27102404832839966
+      ],
+      "sourcePixel": [
+        843,
+        277
+      ],
+      "rendered": [
+        108,
+        163,
+        0,
+        255
+      ],
+      "expected": [
+        108,
+        163,
+        0,
+        255
+      ],
+      "maxChannelError": 0,
+      "uvExtent": [
+        0.5040000081062317,
+        0.0040000081062316895,
+        0.9959999918937683,
+        0.4959999918937683
+      ],
+      "grid": [
+        {
+          "sample": [
+            0,
+            0
+          ],
+          "sourcePixel": [
+            566,
+            457
+          ],
+          "rendered": [
+            59,
+            109,
+            0,
+            255
+          ],
+          "expected": [
+            59,
+            109,
+            0,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            1,
+            0
+          ],
+          "sourcePixel": [
+            667,
+            457
+          ],
+          "rendered": [
+            101,
+            124,
+            34,
+            255
+          ],
+          "expected": [
+            101,
+            124,
+            34,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            2,
+            0
+          ],
+          "sourcePixel": [
+            768,
+            457
+          ],
+          "rendered": [
+            89,
+            129,
+            14,
+            255
+          ],
+          "expected": [
+            89,
+            129,
+            14,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            3,
+            0
+          ],
+          "sourcePixel": [
+            868,
+            457
+          ],
+          "rendered": [
+            79,
+            127,
+            0,
+            255
+          ],
+          "expected": [
+            79,
+            127,
+            0,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            4,
+            0
+          ],
+          "sourcePixel": [
+            969,
+            457
+          ],
+          "rendered": [
+            78,
+            131,
+            0,
+            255
+          ],
+          "expected": [
+            78,
+            131,
+            0,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            0,
+            1
+          ],
+          "sourcePixel": [
+            566,
+            356
+          ],
+          "rendered": [
+            58,
+            105,
+            1,
+            255
+          ],
+          "expected": [
+            58,
+            105,
+            1,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            1,
+            1
+          ],
+          "sourcePixel": [
+            667,
+            356
+          ],
+          "rendered": [
+            48,
+            119,
+            0,
+            255
+          ],
+          "expected": [
+            48,
+            119,
+            0,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            2,
+            1
+          ],
+          "sourcePixel": [
+            768,
+            356
+          ],
+          "rendered": [
+            36,
+            125,
+            0,
+            255
+          ],
+          "expected": [
+            36,
+            125,
+            0,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            3,
+            1
+          ],
+          "sourcePixel": [
+            868,
+            356
+          ],
+          "rendered": [
+            207,
+            217,
+            209,
+            255
+          ],
+          "expected": [
+            207,
+            217,
+            209,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            4,
+            1
+          ],
+          "sourcePixel": [
+            969,
+            356
+          ],
+          "rendered": [
+            67,
+            87,
+            2,
+            255
+          ],
+          "expected": [
+            67,
+            87,
+            2,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            0,
+            2
+          ],
+          "sourcePixel": [
+            566,
+            255
+          ],
+          "rendered": [
+            39,
+            96,
+            2,
+            255
+          ],
+          "expected": [
+            39,
+            96,
+            2,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            1,
+            2
+          ],
+          "sourcePixel": [
+            667,
+            255
+          ],
+          "rendered": [
+            33,
+            87,
+            1,
+            255
+          ],
+          "expected": [
+            33,
+            87,
+            1,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            2,
+            2
+          ],
+          "sourcePixel": [
+            768,
+            255
+          ],
+          "rendered": [
+            162,
+            157,
+            91,
+            255
+          ],
+          "expected": [
+            162,
+            157,
+            91,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            3,
+            2
+          ],
+          "sourcePixel": [
+            868,
+            255
+          ],
+          "rendered": [
+            27,
+            87,
+            1,
+            255
+          ],
+          "expected": [
+            27,
+            87,
+            1,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            4,
+            2
+          ],
+          "sourcePixel": [
+            969,
+            255
+          ],
+          "rendered": [
+            73,
+            127,
+            7,
+            255
+          ],
+          "expected": [
+            73,
+            127,
+            7,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            0,
+            3
+          ],
+          "sourcePixel": [
+            566,
+            154
+          ],
+          "rendered": [
+            68,
+            135,
+            3,
+            255
+          ],
+          "expected": [
+            68,
+            135,
+            3,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            1,
+            3
+          ],
+          "sourcePixel": [
+            667,
+            154
+          ],
+          "rendered": [
+            45,
+            103,
+            0,
+            255
+          ],
+          "expected": [
+            45,
+            103,
+            0,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            2,
+            3
+          ],
+          "sourcePixel": [
+            768,
+            154
+          ],
+          "rendered": [
+            64,
+            133,
+            4,
+            255
+          ],
+          "expected": [
+            64,
+            133,
+            4,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            3,
+            3
+          ],
+          "sourcePixel": [
+            868,
+            154
+          ],
+          "rendered": [
+            49,
+            102,
+            0,
+            255
+          ],
+          "expected": [
+            49,
+            102,
+            0,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            4,
+            3
+          ],
+          "sourcePixel": [
+            969,
+            154
+          ],
+          "rendered": [
+            24,
+            75,
+            0,
+            255
+          ],
+          "expected": [
+            24,
+            75,
+            0,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            0,
+            4
+          ],
+          "sourcePixel": [
+            566,
+            54
+          ],
+          "rendered": [
+            49,
+            80,
+            2,
+            255
+          ],
+          "expected": [
+            49,
+            80,
+            2,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            1,
+            4
+          ],
+          "sourcePixel": [
+            667,
+            54
+          ],
+          "rendered": [
+            71,
+            116,
+            0,
+            255
+          ],
+          "expected": [
+            71,
+            116,
+            0,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            2,
+            4
+          ],
+          "sourcePixel": [
+            768,
+            54
+          ],
+          "rendered": [
+            72,
+            128,
+            0,
+            255
+          ],
+          "expected": [
+            72,
+            128,
+            0,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            3,
+            4
+          ],
+          "sourcePixel": [
+            868,
+            54
+          ],
+          "rendered": [
+            43,
+            96,
+            4,
+            255
+          ],
+          "expected": [
+            43,
+            96,
+            4,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            4,
+            4
+          ],
+          "sourcePixel": [
+            969,
+            54
+          ],
+          "rendered": [
+            81,
+            115,
+            3,
+            255
+          ],
+          "expected": [
+            81,
+            115,
+            3,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        }
+      ],
+      "file": "atlas-pixel-4-jungle.png"
+    },
+    {
+      "asset": "waterfall-cliff",
+      "node": "waterfall_plunge_pool_foam_ring",
+      "role": "water",
+      "cell": "foam-gradient",
+      "exportedUv": [
+        0.3306680799772342,
+        0.7808894316355387
+      ],
+      "sourcePixel": [
+        338,
+        799
+      ],
+      "rendered": [
+        0,
+        213,
+        241,
+        255
+      ],
+      "expected": [
+        0,
+        213,
+        241,
+        255
+      ],
+      "maxChannelError": 0,
+      "uvExtent": [
+        0.004000000189989805,
+        0.6351573467254639,
+        0.4959999918937683,
+        0.8648426532745361
+      ],
+      "grid": [
+        {
+          "sample": [
+            0,
+            0
+          ],
+          "sourcePixel": [
+            54,
+            861
+          ],
+          "rendered": [
+            0,
+            175,
+            222,
+            255
+          ],
+          "expected": [
+            0,
+            175,
+            222,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            1,
+            0
+          ],
+          "sourcePixel": [
+            155,
+            861
+          ],
+          "rendered": [
+            0,
+            183,
+            235,
+            255
+          ],
+          "expected": [
+            0,
+            183,
+            235,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            2,
+            0
+          ],
+          "sourcePixel": [
+            256,
+            861
+          ],
+          "rendered": [
+            3,
+            186,
+            230,
+            255
+          ],
+          "expected": [
+            3,
+            186,
+            230,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            3,
+            0
+          ],
+          "sourcePixel": [
+            356,
+            861
+          ],
+          "rendered": [
+            0,
+            198,
+            232,
+            255
+          ],
+          "expected": [
+            0,
+            198,
+            232,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            4,
+            0
+          ],
+          "sourcePixel": [
+            457,
+            861
+          ],
+          "rendered": [
+            0,
+            196,
+            238,
+            255
+          ],
+          "expected": [
+            0,
+            196,
+            238,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            0,
+            1
+          ],
+          "sourcePixel": [
+            54,
+            814
+          ],
+          "rendered": [
+            0,
+            184,
+            223,
+            255
+          ],
+          "expected": [
+            0,
+            184,
+            223,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            1,
+            1
+          ],
+          "sourcePixel": [
+            155,
+            814
+          ],
+          "rendered": [
+            0,
+            210,
+            245,
+            255
+          ],
+          "expected": [
+            0,
+            210,
+            245,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            2,
+            1
+          ],
+          "sourcePixel": [
+            256,
+            814
+          ],
+          "rendered": [
+            0,
+            186,
+            227,
+            255
+          ],
+          "expected": [
+            0,
+            186,
+            227,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            3,
+            1
+          ],
+          "sourcePixel": [
+            356,
+            814
+          ],
+          "rendered": [
+            0,
+            192,
+            229,
+            255
+          ],
+          "expected": [
+            0,
+            192,
+            229,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            4,
+            1
+          ],
+          "sourcePixel": [
+            457,
+            814
+          ],
+          "rendered": [
+            0,
+            187,
+            224,
+            255
+          ],
+          "expected": [
+            0,
+            187,
+            224,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            0,
+            2
+          ],
+          "sourcePixel": [
+            54,
+            767
+          ],
+          "rendered": [
+            0,
+            195,
+            222,
+            255
+          ],
+          "expected": [
+            0,
+            195,
+            222,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            1,
+            2
+          ],
+          "sourcePixel": [
+            155,
+            767
+          ],
+          "rendered": [
+            2,
+            201,
+            232,
+            255
+          ],
+          "expected": [
+            2,
+            201,
+            232,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            2,
+            2
+          ],
+          "sourcePixel": [
+            256,
+            767
+          ],
+          "rendered": [
+            72,
+            227,
+            229,
+            255
+          ],
+          "expected": [
+            72,
+            227,
+            229,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            3,
+            2
+          ],
+          "sourcePixel": [
+            356,
+            767
+          ],
+          "rendered": [
+            0,
+            191,
+            218,
+            255
+          ],
+          "expected": [
+            0,
+            191,
+            218,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            4,
+            2
+          ],
+          "sourcePixel": [
+            457,
+            767
+          ],
+          "rendered": [
+            1,
+            207,
+            230,
+            255
+          ],
+          "expected": [
+            1,
+            207,
+            230,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            0,
+            3
+          ],
+          "sourcePixel": [
+            54,
+            720
+          ],
+          "rendered": [
+            6,
+            201,
+            223,
+            255
+          ],
+          "expected": [
+            6,
+            201,
+            223,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            1,
+            3
+          ],
+          "sourcePixel": [
+            155,
+            720
+          ],
+          "rendered": [
+            14,
+            200,
+            223,
+            255
+          ],
+          "expected": [
+            14,
+            200,
+            223,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            2,
+            3
+          ],
+          "sourcePixel": [
+            256,
+            720
+          ],
+          "rendered": [
+            2,
+            198,
+            224,
+            255
+          ],
+          "expected": [
+            2,
+            198,
+            224,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            3,
+            3
+          ],
+          "sourcePixel": [
+            356,
+            720
+          ],
+          "rendered": [
+            28,
+            205,
+            225,
+            255
+          ],
+          "expected": [
+            28,
+            205,
+            225,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            4,
+            3
+          ],
+          "sourcePixel": [
+            457,
+            720
+          ],
+          "rendered": [
+            0,
+            201,
+            225,
+            255
+          ],
+          "expected": [
+            0,
+            201,
+            225,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            0,
+            4
+          ],
+          "sourcePixel": [
+            54,
+            673
+          ],
+          "rendered": [
+            127,
+            209,
+            221,
+            255
+          ],
+          "expected": [
+            127,
+            209,
+            221,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            1,
+            4
+          ],
+          "sourcePixel": [
+            155,
+            673
+          ],
+          "rendered": [
+            101,
+            219,
+            229,
+            255
+          ],
+          "expected": [
+            101,
+            219,
+            229,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            2,
+            4
+          ],
+          "sourcePixel": [
+            256,
+            673
+          ],
+          "rendered": [
+            251,
+            240,
+            238,
+            255
+          ],
+          "expected": [
+            251,
+            240,
+            238,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            3,
+            4
+          ],
+          "sourcePixel": [
+            356,
+            673
+          ],
+          "rendered": [
+            213,
+            234,
+            235,
+            255
+          ],
+          "expected": [
+            213,
+            234,
+            235,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            4,
+            4
+          ],
+          "sourcePixel": [
+            457,
+            673
+          ],
+          "rendered": [
+            31,
+            208,
+            228,
+            255
+          ],
+          "expected": [
+            31,
+            208,
+            228,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        }
+      ],
+      "file": "atlas-pixel-5-water.png"
+    },
+    {
+      "asset": "waterfall-cliff",
+      "node": "waterfall_blossom_clump_left",
+      "role": "jungle-card",
+      "cell": "blossom-shrub",
+      "exportedUv": [
+        0.3024086728692055,
+        0.8020830154418945
+      ],
+      "sourcePixel": [
+        309,
+        821
+      ],
+      "rendered": [
+        84,
+        145,
+        9,
+        255
+      ],
+      "expected": [
+        84,
+        145,
+        9,
+        255
+      ],
+      "maxChannelError": 0,
+      "uvExtent": [
+        0.04199200123548508,
+        0.5820310115814209,
+        0.4326170086860657,
+        0.9121090173721313
+      ],
+      "grid": [
+        {
+          "sample": [
+            0,
+            0
+          ],
+          "sourcePixel": [
+            83,
+            900
+          ],
+          "rendered": [
+            46,
+            103,
+            8,
+            255
+          ],
+          "expected": [
+            46,
+            103,
+            8,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            1,
+            0
+          ],
+          "sourcePixel": [
+            163,
+            900
+          ],
+          "rendered": [
+            77,
+            136,
+            10,
+            255
+          ],
+          "expected": [
+            77,
+            136,
+            10,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            2,
+            0
+          ],
+          "sourcePixel": [
+            243,
+            900
+          ],
+          "rendered": [
+            47,
+            98,
+            11,
+            255
+          ],
+          "expected": [
+            47,
+            98,
+            11,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            3,
+            0
+          ],
+          "sourcePixel": [
+            323,
+            900
+          ],
+          "rendered": [
+            63,
+            117,
+            10,
+            255
+          ],
+          "expected": [
+            63,
+            117,
+            10,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            4,
+            0
+          ],
+          "sourcePixel": [
+            403,
+            900
+          ],
+          "rendered": [
+            38,
+            50,
+            56,
+            255
+          ],
+          "expected": [
+            38,
+            50,
+            56,
+            255
+          ],
+          "discarded": true,
+          "error": 0
+        },
+        {
+          "sample": [
+            0,
+            1
+          ],
+          "sourcePixel": [
+            83,
+            832
+          ],
+          "rendered": [
+            97,
+            150,
+            4,
+            255
+          ],
+          "expected": [
+            97,
+            150,
+            4,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            1,
+            1
+          ],
+          "sourcePixel": [
+            163,
+            832
+          ],
+          "rendered": [
+            55,
+            109,
+            7,
+            255
+          ],
+          "expected": [
+            55,
+            109,
+            7,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            2,
+            1
+          ],
+          "sourcePixel": [
+            243,
+            832
+          ],
+          "rendered": [
+            234,
+            230,
+            209,
+            255
+          ],
+          "expected": [
+            234,
+            230,
+            209,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            3,
+            1
+          ],
+          "sourcePixel": [
+            323,
+            832
+          ],
+          "rendered": [
+            114,
+            155,
+            5,
+            255
+          ],
+          "expected": [
+            114,
+            155,
+            5,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            4,
+            1
+          ],
+          "sourcePixel": [
+            403,
+            832
+          ],
+          "rendered": [
+            51,
+            101,
+            10,
+            255
+          ],
+          "expected": [
+            51,
+            101,
+            10,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            0,
+            2
+          ],
+          "sourcePixel": [
+            83,
+            764
+          ],
+          "rendered": [
+            79,
+            130,
+            10,
+            255
+          ],
+          "expected": [
+            79,
+            130,
+            10,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            1,
+            2
+          ],
+          "sourcePixel": [
+            163,
+            764
+          ],
+          "rendered": [
+            126,
+            165,
+            3,
+            255
+          ],
+          "expected": [
+            126,
+            165,
+            3,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            2,
+            2
+          ],
+          "sourcePixel": [
+            243,
+            764
+          ],
+          "rendered": [
+            44,
+            96,
+            4,
+            255
+          ],
+          "expected": [
+            44,
+            96,
+            4,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            3,
+            2
+          ],
+          "sourcePixel": [
+            323,
+            764
+          ],
+          "rendered": [
+            229,
+            162,
+            10,
+            255
+          ],
+          "expected": [
+            229,
+            162,
+            10,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            4,
+            2
+          ],
+          "sourcePixel": [
+            403,
+            764
+          ],
+          "rendered": [
+            184,
+            186,
+            149,
+            255
+          ],
+          "expected": [
+            184,
+            186,
+            149,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            0,
+            3
+          ],
+          "sourcePixel": [
+            83,
+            697
+          ],
+          "rendered": [
+            38,
+            50,
+            56,
+            255
+          ],
+          "expected": [
+            38,
+            50,
+            56,
+            255
+          ],
+          "discarded": true,
+          "error": 0
+        },
+        {
+          "sample": [
+            1,
+            3
+          ],
+          "sourcePixel": [
+            163,
+            697
+          ],
+          "rendered": [
+            39,
+            98,
+            5,
+            255
+          ],
+          "expected": [
+            39,
+            98,
+            5,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            2,
+            3
+          ],
+          "sourcePixel": [
+            243,
+            697
+          ],
+          "rendered": [
+            213,
+            149,
+            6,
+            255
+          ],
+          "expected": [
+            213,
+            149,
+            6,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            3,
+            3
+          ],
+          "sourcePixel": [
+            323,
+            697
+          ],
+          "rendered": [
+            50,
+            104,
+            9,
+            255
+          ],
+          "expected": [
+            50,
+            104,
+            9,
+            255
+          ],
+          "discarded": false,
+          "error": 0
+        },
+        {
+          "sample": [
+            4,
+            3
+          ],
+          "sourcePixel": [
+            403,
+            697
+          ],
+          "rendered": [
+            38,
+            50,
+            56,
+            255
+          ],
+          "expected": [
+            38,
+            50,
+            56,
+            255
+          ],
+          "discarded": true,
+          "error": 0
+        },
+        {
+          "sample": [
+            0,
+            4
+          ],
+          "sourcePixel": [
+            83,
+            629
+          ],
+          "rendered": [
+            38,
+            50,
+            56,
+            255
+          ],
+          "expected": [
+            38,
+            50,
+            56,
+            255
+          ],
+          "discarded": true,
+          "error": 0
+        },
+        {
+          "sample": [
+            1,
+            4
+          ],
+          "sourcePixel": [
+            163,
+            629
+          ],
+          "rendered": [
+            38,
+            50,
+            56,
+            255
+          ],
+          "expected": [
+            38,
+            50,
+            56,
+            255
+          ],
+          "discarded": true,
+          "error": 0
+        },
+        {
+          "sample": [
+            2,
+            4
+          ],
+          "sourcePixel": [
+            243,
+            629
+          ],
+          "rendered": [
+            38,
+            50,
+            56,
+            255
+          ],
+          "expected": [
+            38,
+            50,
+            56,
+            255
+          ],
+          "discarded": true,
+          "error": 0
+        },
+        {
+          "sample": [
+            3,
+            4
+          ],
+          "sourcePixel": [
+            323,
+            629
+          ],
+          "rendered": [
+            38,
+            50,
+            56,
+            255
+          ],
+          "expected": [
+            38,
+            50,
+            56,
+            255
+          ],
+          "discarded": true,
+          "error": 0
+        },
+        {
+          "sample": [
+            4,
+            4
+          ],
+          "sourcePixel": [
+            403,
+            629
+          ],
+          "rendered": [
+            38,
+            50,
+            56,
+            255
+          ],
+          "expected": [
+            38,
+            50,
+            56,
+            255
+          ],
+          "discarded": true,
+          "error": 0
+        }
+      ],
+      "file": "atlas-pixel-6-jungle-card.png"
+    },
+    {
+      "role": "jungle-card",
+      "check": "magenta discard before lighting",
+      "rendered": [
+        38,
+        50,
+        56,
+        255
+      ],
+      "expected": [
+        38,
+        50,
+        56
+      ],
+      "file": "atlas-pixel-7-jungle-card.png"
+    }
+  ]
+}

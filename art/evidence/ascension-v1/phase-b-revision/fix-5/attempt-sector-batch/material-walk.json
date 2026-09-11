@@ -1,0 +1,2263 @@
+{
+  "script": "scripts/visual/ascension/race.mjs",
+  "scope": "Live scene at race finish, includes currently hidden objects; sky uses its own haze shader.",
+  "rows": [
+    {
+      "object": "ascension_solid_road_kerbs",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "ascension_recessed_deck_lamp_housings",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "ascension_recessed_deck_lamp_glass",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "ascension_painted_concrete_road",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "ascension_trench_road",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "launch_worn_chevron_paint",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "launch_recessed_lit_lenses",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "launch_recessed_metal_housings_and_rivets",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "launch_faded_SURGE_stencil",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "launch_worn_chevron_paint",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "launch_recessed_lit_lenses",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "launch_recessed_metal_housings_and_rivets",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "launch_faded_SURGE_stencil",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "ascension_entry_only_rail",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "ascension_board_masts",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "ascension_board_displays",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "ascension_authored_board_countdown-board_concrete",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "ascension_authored_board_countdown-board_emissive",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "ascension_authored_board_countdown-board_metal",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "ascension_authored_board_countdown-board_signage",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "body_static",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "emissive_static",
+      "material": "TOTEM_emissive",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "canopy_body",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "canopy_glass",
+      "material": "TOTEM_glass",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "steering_fin_L_body",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "steering_fin_R_body",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "engine_flap_L_0_body",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "engine_flap_L_1_body",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "engine_flap_R_0_body",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "engine_flap_R_1_body",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "stabiliser_ring_body",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "stabiliser_ring_emissive",
+      "material": "TOTEM_emissive",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "airbrake_L_body",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "airbrake_R_body",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "elevon_L_body",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "elevon_R_body",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "skids_body",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "totem_race_presence_masked_alpha",
+      "material": "TOTEM_race_presence_masked_alpha",
+      "type": "ShaderMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": false
+    },
+    {
+      "object": "totem_race_presence_alpha",
+      "material": "TOTEM_race_presence_alpha",
+      "type": "ShaderMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "totem_race_presence_additive",
+      "material": "TOTEM_race_presence_additive",
+      "type": "ShaderMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": false
+    },
+    {
+      "object": "tideline_refund_hex_dome",
+      "material": "sodium_hex_refund_dome",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": false
+    },
+    {
+      "object": "surge_trailing_heat_cone",
+      "material": "surge_heat_refraction",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": false
+    },
+    {
+      "object": "TE_boost_meter",
+      "material": "TE_boost",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "TE_brake_lamps",
+      "material": "TE_brake",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "TE_gyro_alloy",
+      "material": "TE_alloy",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "TE_gyro_instruments",
+      "material": "TE_gravity",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "TE_instrument_housing",
+      "material": "TE_alloy",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "TE_power_lamps",
+      "material": "TE_power",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "TE_service_markings",
+      "material": "TE_ceramic",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "TE_twin_layered_exhaust",
+      "material": "TE_layered_engine_jets",
+      "type": "ShaderMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "TE_power_shield",
+      "material": "TE_shield_field",
+      "type": "ShaderMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": false
+    },
+    {
+      "object": "TE_telescopic_power_mounts",
+      "material": "",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "TE_surge_feed_conduit",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": false
+    },
+    {
+      "object": "PK_surge_cage",
+      "material": "AP_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": false
+    },
+    {
+      "object": "PK_surge_capacitors",
+      "material": "AP_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": false
+    },
+    {
+      "object": "PK_surge_core",
+      "material": "AP_MAT_emissive",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "PK_surge_flange_bolts",
+      "material": "AP_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": false
+    },
+    {
+      "object": "PK_surge_gauge_needle",
+      "material": "AP_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": false
+    },
+    {
+      "object": "PK_surge_mount",
+      "material": "AP_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": false
+    },
+    {
+      "object": "PK_surge_plinth",
+      "material": "AP_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": false
+    },
+    {
+      "object": "PK_surge_stencil",
+      "material": "AP_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": false
+    },
+    {
+      "object": "pump_device_batched_AP_MAT_metal",
+      "material": "AP_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "pump_device_batched_AP_MAT_signage",
+      "material": "AP_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "PK_shield_core",
+      "material": "AP_MAT_emissive",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "PK_shield_flange_bolts",
+      "material": "AP_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": false
+    },
+    {
+      "object": "PK_shield_housing",
+      "material": "AP_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": false
+    },
+    {
+      "object": "PK_shield_iris_blade_0",
+      "material": "AP_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": false
+    },
+    {
+      "object": "PK_shield_iris_blade_1",
+      "material": "AP_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": false
+    },
+    {
+      "object": "PK_shield_iris_blade_2",
+      "material": "AP_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": false
+    },
+    {
+      "object": "PK_shield_iris_blade_3",
+      "material": "AP_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": false
+    },
+    {
+      "object": "PK_shield_iris_blade_4",
+      "material": "AP_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": false
+    },
+    {
+      "object": "PK_shield_iris_blade_5",
+      "material": "AP_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": false
+    },
+    {
+      "object": "PK_shield_plinth",
+      "material": "AP_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": false
+    },
+    {
+      "object": "PK_shield_stencil",
+      "material": "AP_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": false
+    },
+    {
+      "object": "pump_device_batched_AP_MAT_metal",
+      "material": "AP_MAT_metal",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "pump_device_batched_AP_MAT_signage",
+      "material": "AP_MAT_signage",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "totem_impact_sparks",
+      "material": "",
+      "type": "PointsMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": false
+    },
+    {
+      "object": "sky_backdrop",
+      "material": "",
+      "type": "ShaderMaterial",
+      "toneMapped": true,
+      "fog": false,
+      "visible": true
+    },
+    {
+      "object": "totem_ghost_hull",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": false
+    },
+    {
+      "object": "rival_totem_body_steering_fins",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "rival_totem_body_airbrakes",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "rival_totem_body_hull",
+      "material": "TOTEM_body",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "rival_totem_emissive_hull",
+      "material": "TOTEM_emissive",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "rival_totem_glass_hull",
+      "material": "TOTEM_glass",
+      "type": "MeshStandardMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "rival_engine_glow",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "totem_shadow_blobs",
+      "material": "TOTEM_shadow_blob",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "tideline_refund_hex_dome",
+      "material": "sodium_hex_refund_dome",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": false
+    },
+    {
+      "object": "surge_trailing_heat_cone",
+      "material": "surge_heat_refraction",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": false
+    },
+    {
+      "object": "tideline_refund_hex_dome",
+      "material": "sodium_hex_refund_dome",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": false
+    },
+    {
+      "object": "surge_trailing_heat_cone",
+      "material": "surge_heat_refraction",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": false
+    },
+    {
+      "object": "tideline_refund_hex_dome",
+      "material": "sodium_hex_refund_dome",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": false
+    },
+    {
+      "object": "surge_trailing_heat_cone",
+      "material": "surge_heat_refraction",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": false
+    },
+    {
+      "object": "AP_CAUSEWAY_AP_MAT_concrete",
+      "material": "AP_MAT_concrete",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "AP_CAUSEWAY_AP_MAT_emissive",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "AP_CAUSEWAY_AP_MAT_metal",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "AP_CRAWLERWAY_AP_MAT_concrete",
+      "material": "AP_MAT_concrete",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "AP_CRAWLERWAY_AP_MAT_emissive",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "AP_CRAWLERWAY_AP_MAT_metal",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "AP_DELUGE_ROAD_AP_MAT_concrete",
+      "material": "AP_MAT_concrete",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "AP_DELUGE_ROAD_AP_MAT_emissive",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "AP_DELUGE_ROAD_AP_MAT_metal",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "AP_MANGROVE_CUT_AP_MAT_concrete",
+      "material": "AP_MAT_concrete",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "AP_MANGROVE_CUT_AP_MAT_emissive",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "AP_MANGROVE_CUT_AP_MAT_jungle",
+      "material": "AP_MAT_jungle",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "AP_MANGROVE_CUT_AP_MAT_metal",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "AP_TANK_FARM_AP_MAT_concrete",
+      "material": "AP_MAT_concrete",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "AP_TANK_FARM_AP_MAT_emissive",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "AP_TANK_FARM_AP_MAT_metal",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "AP_TRENCH_AP_MAT_concrete",
+      "material": "AP_MAT_concrete",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "AP_TRENCH_AP_MAT_emissive",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "AP_TRENCH_AP_MAT_metal",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "AP_TRENCH_AP_MAT_signage",
+      "material": "AP_MAT_signage",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "crawler-transporter_emissive001",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "crawler-transporter_metal001",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "crawler-transporter_signage001",
+      "material": "AP_MAT_signage",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "crawler-tread-0_metal001",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "crawler-tread-1_metal001",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "crawler-tread-2_metal001",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "crawler-tread-3_metal001",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "rocket-ascent_concrete001",
+      "material": "AP_MAT_concrete",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "rocket-ascent_metal001",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "rocket-ascent_signage001",
+      "material": "AP_MAT_signage",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "rocket-platform_concrete001",
+      "material": "AP_MAT_concrete",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "rocket-platform_emissive001",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "rocket-platform_metal001",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "rocket-platform_signage001",
+      "material": "AP_MAT_signage",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "service-tower-swing-arm_emissive004",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "service-tower-swing-arm_metal004",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "service-tower-swing-arm_emissive005",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "service-tower-swing-arm_metal005",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "service-tower-swing-arm_emissive006",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "service-tower-swing-arm_metal006",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive001",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal001",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive002",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal002",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive003",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal003",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive004",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal004",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive005",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal005",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive006",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal006",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive007",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal007",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive008",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal008",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive009",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal009",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive010",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal010",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive011",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal011",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive012",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal012",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive013",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal013",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive014",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal014",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive015",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal015",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive016",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal016",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive017",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal017",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive018",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal018",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive019",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal019",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive020",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal020",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive021",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal021",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive022",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal022",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive023",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal023",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive024",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal024",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive025",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal025",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive026",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal026",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive027",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal027",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive028",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal028",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive029",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal029",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive030",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal030",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive031",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal031",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive032",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal032",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive033",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal033",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive034",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal034",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive035",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal035",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive036",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal036",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive037",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal037",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive038",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal038",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive039",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal039",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive040",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal040",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive041",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal041",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive042",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal042",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive043",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal043",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive044",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal044",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive045",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal045",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive046",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal046",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive047",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal047",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive048",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal048",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive049",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal049",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive050",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal050",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive051",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal051",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive052",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal052",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive053",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal053",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive054",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal054",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive055",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal055",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive056",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal056",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive057",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal057",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive058",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal058",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive059",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal059",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive060",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal060",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive061",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal061",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive062",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal062",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive063",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal063",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive064",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal064",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive065",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal065",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive066",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal066",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive067",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal067",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive068",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal068",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive069",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal069",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive070",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal070",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive071",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal071",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_emissive072",
+      "material": "AP_MAT_emissive",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "street-lamp_metal072",
+      "material": "AP_MAT_metal",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "ascension_dawn_panorama",
+      "material": "",
+      "type": "ShaderMaterial",
+      "toneMapped": true,
+      "fog": false,
+      "visible": true
+    },
+    {
+      "object": "mangrove_thin_trunks_and_root_fans",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "mangrove_camera_facing_canopy_cards",
+      "material": "",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "ascension_mud_grass_gravel_apron",
+      "material": "AP_terrain_water_atlas",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    },
+    {
+      "object": "ascension_tideline_water_horizon",
+      "material": "AP_tideline_estuary_water",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "visible": true
+    }
+  ],
+  "violations": []
+}

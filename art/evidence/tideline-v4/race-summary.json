@@ -1,0 +1,218 @@
+{
+  "script": "scripts/visual/tideline-v4/summarize-races.py",
+  "sourceScript": "scripts/visual/tideline-v4/race.mjs",
+  "drawCeiling": 145,
+  "triangleCeiling": 220000,
+  "runs": [
+    {
+      "run": "baseline",
+      "metrics": {
+        "script": "scripts/visual/tideline-v4/race.mjs",
+        "url": "http://127.0.0.1:5214/?map=tideline&seed=3868938316&demo=1&headless=1&diagnostics=1&start=manual&quality=high&music=0",
+        "calibration": {
+          "samples": 120,
+          "windowMs": 969.3999999761581,
+          "hz": 123.78791005049652
+        },
+        "frames": 9645,
+        "windowSamples": 720,
+        "sampleWindowMs": 5799.5,
+        "expectedSamples": 717.9079843378546,
+        "observedRate": 124.14863350288819,
+        "p95Ms": 8.5,
+        "peakMainCalls": 112,
+        "peakShadowCalls": 22,
+        "peakMainTriangles": 123242,
+        "peakShadowTriangles": 24456,
+        "internalSizes": [
+          "1280x720"
+        ],
+        "errors": []
+      },
+      "totalDrawPeak": 134,
+      "totalTrianglePeak": 147698,
+      "sampleDifference": 2.0920156621454,
+      "lapTimesMs": [
+        27492,
+        25117,
+        25867
+      ],
+      "classification": [
+        {
+          "position": 1,
+          "name": "PRIVATEER 13",
+          "player": false,
+          "finishTimeMs": 73411,
+          "gapMs": 0
+        },
+        {
+          "position": 2,
+          "name": "NIGHTFORM 24",
+          "player": false,
+          "finishTimeMs": 75024,
+          "gapMs": 1614
+        },
+        {
+          "position": 3,
+          "name": "NEEDLE 16",
+          "player": false,
+          "finishTimeMs": 76559,
+          "gapMs": 3148
+        },
+        {
+          "position": 4,
+          "name": "TOTEM",
+          "player": true,
+          "finishTimeMs": 78475,
+          "gapMs": 5064
+        }
+      ],
+      "materialBindings": null,
+      "materialWalkAccepted": null,
+      "rivalPowerEventCount": 0,
+      "chainCount": 0,
+      "warningCount": 0,
+      "minimumWarningLeadSeconds": null
+    },
+    {
+      "run": "final-race",
+      "metrics": {
+        "script": "scripts/visual/tideline-v4/race.mjs",
+        "url": "http://127.0.0.1:5215/?map=tideline&seed=3868938316&demo=1&headless=1&diagnostics=1&start=manual&quality=high&music=0",
+        "calibration": {
+          "samples": 120,
+          "windowMs": 961.1999999284744,
+          "hz": 124.84394507795416
+        },
+        "frames": 9673,
+        "windowSamples": 720,
+        "sampleWindowMs": 5812.299999952316,
+        "expectedSamples": 725.6304619706399,
+        "observedRate": 123.8752301164611,
+        "p95Ms": 8.600000023841858,
+        "peakMainCalls": 121,
+        "peakShadowCalls": 22,
+        "peakMainTriangles": 141816,
+        "peakShadowTriangles": 24456,
+        "internalSizes": [
+          "1280x720"
+        ],
+        "errors": []
+      },
+      "totalDrawPeak": 143,
+      "totalTrianglePeak": 166272,
+      "sampleDifference": -5.630461970639885,
+      "lapTimesMs": [
+        27492,
+        25117,
+        25867
+      ],
+      "classification": [
+        {
+          "position": 1,
+          "name": "PRIVATEER 13",
+          "player": false,
+          "finishTimeMs": 73411,
+          "gapMs": 0
+        },
+        {
+          "position": 2,
+          "name": "NIGHTFORM 24",
+          "player": false,
+          "finishTimeMs": 75024,
+          "gapMs": 1614
+        },
+        {
+          "position": 3,
+          "name": "NEEDLE 16",
+          "player": false,
+          "finishTimeMs": 76559,
+          "gapMs": 3148
+        },
+        {
+          "position": 4,
+          "name": "TOTEM",
+          "player": true,
+          "finishTimeMs": 78475,
+          "gapMs": 5064
+        }
+      ],
+      "materialBindings": 418,
+      "materialWalkAccepted": true,
+      "rivalPowerEventCount": 18,
+      "chainCount": 0,
+      "warningCount": 9,
+      "minimumWarningLeadSeconds": 2.3947543014868886
+    },
+    {
+      "run": "reduced-race",
+      "metrics": {
+        "script": "scripts/visual/tideline-v4/race.mjs",
+        "url": "http://127.0.0.1:5215/?map=tideline&seed=3868938316&demo=1&headless=1&diagnostics=1&start=manual&quality=high&music=0&motion=reduce",
+        "calibration": {
+          "samples": 120,
+          "windowMs": 962.5,
+          "hz": 124.67532467532467
+        },
+        "frames": 9679,
+        "windowSamples": 720,
+        "sampleWindowMs": 5818.799999952316,
+        "expectedSamples": 725.4607792148341,
+        "observedRate": 123.73685296038705,
+        "p95Ms": 8.600000023841858,
+        "peakMainCalls": 120,
+        "peakShadowCalls": 22,
+        "peakMainTriangles": 138496,
+        "peakShadowTriangles": 24456,
+        "internalSizes": [
+          "1280x720"
+        ],
+        "errors": []
+      },
+      "totalDrawPeak": 142,
+      "totalTrianglePeak": 162952,
+      "sampleDifference": -5.460779214834133,
+      "lapTimesMs": [
+        27492,
+        25117,
+        25867
+      ],
+      "classification": [
+        {
+          "position": 1,
+          "name": "PRIVATEER 13",
+          "player": false,
+          "finishTimeMs": 73411,
+          "gapMs": 0
+        },
+        {
+          "position": 2,
+          "name": "NIGHTFORM 24",
+          "player": false,
+          "finishTimeMs": 75024,
+          "gapMs": 1614
+        },
+        {
+          "position": 3,
+          "name": "NEEDLE 16",
+          "player": false,
+          "finishTimeMs": 76559,
+          "gapMs": 3148
+        },
+        {
+          "position": 4,
+          "name": "TOTEM",
+          "player": true,
+          "finishTimeMs": 78475,
+          "gapMs": 5064
+        }
+      ],
+      "materialBindings": 418,
+      "materialWalkAccepted": true,
+      "rivalPowerEventCount": 18,
+      "chainCount": 0,
+      "warningCount": 9,
+      "minimumWarningLeadSeconds": 2.3947543014868886
+    }
+  ]
+}

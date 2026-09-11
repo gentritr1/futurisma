@@ -1,0 +1,48 @@
+{
+  "script": "scripts/visual/ascension/instrument.mjs",
+  "attempts": [
+    {
+      "directory": "attempt-sector-batch",
+      "status": "Rejected",
+      "peakTotalDraws": 174,
+      "peakMainTriangles": 323354,
+      "finding": "Lamp collector inspected scene children instead of nested world children; lamp meshes remained separate. Whole-trench merge retained too much off-screen geometry.",
+      "correction": "Traverse tagged props recursively and retain 180m trench cells; other sectors merge by material."
+    },
+    {
+      "directory": "attempt-trench-cells",
+      "status": "Rejected",
+      "peakTotalDraws": 135,
+      "peakMainTriangles": 280636,
+      "finding": "Correct lamp instancing reduced draws, but 180m wall cells and sector batches still exceeded both complete-scene gates."
+    },
+    {
+      "directory": "attempt-wall-instances",
+      "status": "Rejected",
+      "peakTotalDraws": 120,
+      "peakMainTriangles": 285512,
+      "finding": "Individual wall culling and static merging reduced draws again, but all far pipe/valve detail remained expensive."
+    },
+    {
+      "directory": "attempt-distant-wall-lod",
+      "status": "Superseded",
+      "peakTotalDraws": 112,
+      "peakMainTriangles": 218084,
+      "finding": "Retained evidence from the budget iterations; final candidate removes hidden branch caps and batches board housings."
+    },
+    {
+      "directory": "attempt-before-hidden-caps",
+      "status": "Superseded",
+      "peakTotalDraws": 110,
+      "peakMainTriangles": 218140,
+      "finding": "Retained evidence from the budget iterations; final candidate removes hidden branch caps and batches board housings."
+    },
+    {
+      "directory": "attempt-deluge-before-hidden-caps",
+      "status": "Superseded",
+      "peakTotalDraws": 101,
+      "peakMainTriangles": 229366,
+      "finding": "Retained evidence from the budget iterations; final candidate removes hidden branch caps and batches board housings."
+    }
+  ]
+}

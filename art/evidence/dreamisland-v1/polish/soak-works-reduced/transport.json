@@ -1,0 +1,7 @@
+{
+  "adapter": "scripts/visual/dreamisland-heroes/polish-transport.mjs",
+  "instrument": "scripts/visual/dreamisland/race.mjs",
+  "requestedUrl": "http://127.0.0.1:5200/?map=dreamisland&seed=3868938316&tier=works&demo=1&headless=1&diagnostics=1&start=manual&quality=high&music=0&motion=reduce",
+  "effectiveUrl": "http://127.0.0.1:5217/?map=dreamisland&seed=3868938316&tier=works&demo=1&headless=1&diagnostics=1&start=manual&quality=high&music=0&motion=reduce",
+  "reason": "Port 5200 was already occupied. Only page navigation is redirected to this task’s private server."
+}

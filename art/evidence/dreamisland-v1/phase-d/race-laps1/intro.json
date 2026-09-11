@@ -1,0 +1,29 @@
+{
+  "introCode": "DREAM ISLAND · DAY INTO NIGHT",
+  "introDeck": "The clock strikes: day turns to night and the causeway goes wet. THE STRIKE IN 1:07 — after this race ends, so it stays day, night settled by 1:19. 1 lap.",
+  "introFooter": "WORKS 07 · DREAM ISLAND FIELD RACE",
+  "lapValue": "LAP 1 / 1",
+  "startingGrid": [
+    "P1 · YOUTOTEMWORKS 07",
+    "P2PRIVATEER 13FIELD TOTEM",
+    "P3NIGHTFORM 24FIELD TOTEM",
+    "P4NEEDLE 16FIELD TOTEM"
+  ],
+  "formatChips": [
+    {
+      "value": "race",
+      "selected": true,
+      "text": "FIELD RACE3 LAPS · FULL FIELD · NIGHT LAP"
+    },
+    {
+      "value": "sprint",
+      "selected": false,
+      "text": "SPRINT2 LAPS · DEFEND · NIGHT ON LAP 2"
+    },
+    {
+      "value": "timeattack",
+      "selected": false,
+      "text": "TIME ATTACK3 LAPS · SOLO + GHOST · NIGHT LAP"
+    }
+  ]
+}

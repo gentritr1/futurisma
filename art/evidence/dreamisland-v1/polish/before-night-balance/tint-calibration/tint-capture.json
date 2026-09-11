@@ -1,0 +1,156 @@
+{
+  "script": "scripts/visual/dreamisland-heroes/polish-tint-capture.mjs",
+  "captures": [
+    {
+      "name": "stacks-before",
+      "source": "art/evidence/dreamisland-v1/polish/before/heroes/sea-stack-set.glb",
+      "sha256": "ef8183ae3c7c790d7685febd13e0874bd15566f02800feb40f8a0f00b70f756f",
+      "geometry": {
+        "scale": 1,
+        "triangles": 1304,
+        "meshes": 8,
+        "materials": [
+          "DI_MAT_jungle",
+          "DI_MAT_concrete"
+        ],
+        "bounds": {
+          "min": [
+            -32.80038547515869,
+            0,
+            -5.829975605010986
+          ],
+          "max": [
+            35.727272510528564,
+            40,
+            5.812896251678467
+          ],
+          "size": [
+            68.52765798568726,
+            40,
+            11.642871856689453
+          ]
+        }
+      },
+      "pose": {
+        "position": [
+          1.4634435176849365,
+          24.765808824737228,
+          -39.72361321614314
+        ],
+        "target": [
+          1.4634435176849365,
+          20,
+          -0.008539676666259766
+        ],
+        "fov": 70,
+        "far": 650,
+        "quaternion": [
+          0,
+          0.9982176211846098,
+          0.05967898086042504,
+          0
+        ],
+        "horizonRow": 298.3040061087406
+      },
+      "frames": {
+        "full": "stacks-before-full.png",
+        "stone": "stacks-before-stone.png",
+        "cap": "stacks-before-cap.png",
+        "blank": "stacks-before-blank.png"
+      }
+    },
+    {
+      "name": "stacks-after",
+      "source": "public/assets/dreamisland/heroes/sea-stack-set.glb",
+      "sha256": "ea0b0e20af2a856009168e695a156e856f25b64a97fa9ad837eddd91651949d4",
+      "geometry": {
+        "scale": 1,
+        "triangles": 1304,
+        "meshes": 8,
+        "materials": [
+          "DI_MAT_jungle",
+          "DI_MAT_concrete"
+        ],
+        "bounds": {
+          "min": [
+            -32.80038547515869,
+            0,
+            -5.829975605010986
+          ],
+          "max": [
+            35.727272510528564,
+            40,
+            5.812896251678467
+          ],
+          "size": [
+            68.52765798568726,
+            40,
+            11.642871856689453
+          ]
+        }
+      },
+      "pose": {
+        "position": [
+          1.4634435176849365,
+          24.765808824737228,
+          -39.72361321614314
+        ],
+        "target": [
+          1.4634435176849365,
+          20,
+          -0.008539676666259766
+        ],
+        "fov": 70,
+        "far": 650,
+        "quaternion": [
+          0,
+          0.9982176211846098,
+          0.05967898086042504,
+          0
+        ],
+        "horizonRow": 298.3040061087406
+      },
+      "frames": {
+        "full": "stacks-after-full.png",
+        "stone": "stacks-after-stone.png",
+        "cap": "stacks-after-cap.png",
+        "blank": "stacks-after-blank.png"
+      }
+    },
+    {
+      "name": "shoulder",
+      "pose": {
+        "position": [
+          108.49998270988567,
+          4.8,
+          0
+        ],
+        "target": [
+          138.99998270988567,
+          1.15,
+          0
+        ],
+        "fov": 62,
+        "far": 650,
+        "quaternion": [
+          -0.04208533716391777,
+          -0.7058532598180726,
+          -0.04208533716391776,
+          0.7058532598180725
+        ],
+        "horizonRow": 288.29956590791534
+      },
+      "geometry": {
+        "triangles": 2436,
+        "cell": "road-sand",
+        "role": "DI_MAT_concrete"
+      },
+      "frames": {
+        "full": "shoulder-full.png",
+        "shoulder": "shoulder-isolated.png",
+        "blank": "shoulder-blank.png"
+      }
+    }
+  ],
+  "errors": []
+}

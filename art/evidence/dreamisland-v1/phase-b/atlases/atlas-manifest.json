@@ -1,0 +1,1182 @@
+{
+ "script": "scripts/prepare-dreamisland-atlases.py",
+ "source": "art/references/dreamisland/phase-b",
+ "resolution": [
+  1024,
+  1024
+ ],
+ "resolutionNote": "One resolution for all six roles, as the phase-B kit README chose. Tideline precedent; Ascension's 1254 + 1024 mismatch is not inherited.",
+ "uvConvention": {
+  "layout": "2x2 quadrants",
+  "vOrigin": "bottom (GL)",
+  "inset": 0.004,
+  "rects": {
+   "TL": [
+    0.004,
+    0.504,
+    0.496,
+    0.996
+   ],
+   "TR": [
+    0.504,
+    0.504,
+    0.996,
+    0.996
+   ],
+   "BL": [
+    0.004,
+    0.004,
+    0.496,
+    0.496
+   ],
+   "BR": [
+    0.504,
+    0.004,
+    0.996,
+    0.496
+   ]
+  }
+ },
+ "posterise": {
+  "appliedTo": [
+   "concrete",
+   "metal",
+   "jungle",
+   "water"
+  ],
+  "notAppliedTo": {
+   "signage": "lettering must stay legible at 0.59 m",
+   "emissive": "smooth glow gradients band into visible rings",
+   "jungle-card": "the magenta key has to stay exact for the runtime discard"
+  },
+  "medianFilter": 3,
+  "saturation": 1.12,
+  "posterizeBits": 5
+ },
+ "seamBlend": {
+  "method": "offset by half in both axes, cross-fade the old seams, offset back",
+  "blendPixels": 64
+ },
+ "jpegQuality": 92,
+ "jpegSubsampling": "4:4:4",
+ "roles": {
+  "concrete": {
+   "road-sand": {
+    "cell": "road-sand",
+    "quadrant": "TL",
+    "is": "Pale sandy concrete road surface with tyre-polish lanes deskewed onto U.",
+    "uv": [
+     0.004,
+     0.504,
+     0.496,
+     0.996
+    ],
+    "pixels": [
+     4,
+     4,
+     508,
+     508
+    ],
+    "gutterTrimPixels": 8,
+    "wrapErrorBefore": {
+     "uSeamMeanAbs": 19.916015625,
+     "vSeamMeanAbs": 17.42578125
+    },
+    "deskew": {
+     "measure": "scripts/prepare-dreamisland-atlases.py lane_alignment: var(row means)/var(all) on a high-passed quadrant",
+     "sweepDegrees": [
+      -45,
+      45
+     ],
+     "stepDegrees": 0.5,
+     "deskewDegrees": -41.5,
+     "alignmentAtZero": 0.010399311396235102,
+     "alignmentAtDeskew": 0.01849613824160843,
+     "worstAlignment": 0.0053128590047114965,
+     "worstAlignmentDegrees": -17.0,
+     "inscribedPixels": 362,
+     "upscale": 1.4143646408839778,
+     "note": "Higher alignment means more of the variance runs along U, i.e. the lanes lie along the road."
+    },
+    "seamBlend": true,
+    "posterised": true,
+    "wrapErrorAfter": {
+     "uSeamMeanAbs": 8.34375,
+     "vSeamMeanAbs": 8.484375
+    }
+   },
+   "causeway-paving": {
+    "cell": "causeway-paving",
+    "quadrant": "TR",
+    "is": "Dry limestone paving blocks with mossy joints, the causeway deck.",
+    "uv": [
+     0.504,
+     0.504,
+     0.996,
+     0.996
+    ],
+    "pixels": [
+     516,
+     4,
+     1020,
+     508
+    ],
+    "gutterTrimPixels": 8,
+    "wrapErrorBefore": {
+     "uSeamMeanAbs": 16.245442708333332,
+     "vSeamMeanAbs": 14.948567708333334
+    },
+    "seamBlend": false,
+    "wrapErrorNote": "Not blended: regular or centred art that a cross-fade would ghost.",
+    "posterised": true,
+    "wrapErrorAfter": {
+     "uSeamMeanAbs": 12.515625,
+     "vSeamMeanAbs": 11.921875
+    }
+   },
+   "kerb-cyan": {
+    "cell": "kerb-cyan",
+    "quadrant": "BL",
+    "is": "White kerb stone with one cyan stripe; the stripe runs along V.",
+    "uv": [
+     0.004,
+     0.004,
+     0.496,
+     0.496
+    ],
+    "pixels": [
+     4,
+     516,
+     508,
+     1020
+    ],
+    "gutterTrimPixels": 8,
+    "wrapErrorBefore": {
+     "uSeamMeanAbs": 32.624348958333336,
+     "vSeamMeanAbs": 23.509114583333332
+    },
+    "seamBlend": false,
+    "wrapErrorNote": "Not blended: regular or centred art that a cross-fade would ghost.",
+    "posterised": true,
+    "wrapErrorAfter": {
+     "uSeamMeanAbs": 30.692708333333332,
+     "vSeamMeanAbs": 19.994791666666668
+    }
+   },
+   "wall-block": {
+    "cell": "wall-block",
+    "quadrant": "BR",
+    "is": "Weathered limestone wall blocks, the cut walls and the sea stacks.",
+    "uv": [
+     0.504,
+     0.004,
+     0.996,
+     0.496
+    ],
+    "pixels": [
+     516,
+     516,
+     1020,
+     1020
+    ],
+    "gutterTrimPixels": 8,
+    "wrapErrorBefore": {
+     "uSeamMeanAbs": 20.065104166666668,
+     "vSeamMeanAbs": 69.033203125
+    },
+    "seamBlend": false,
+    "wrapErrorNote": "Not blended: regular or centred art that a cross-fade would ghost.",
+    "posterised": true,
+    "wrapErrorAfter": {
+     "uSeamMeanAbs": 15.203125,
+     "vSeamMeanAbs": 66.625
+    }
+   }
+  },
+  "metal": {
+   "chevron-strip": {
+    "cell": "chevron-strip",
+    "quadrant": "TL",
+    "is": "Brushed steel plate with cyan launch-strip chevrons pointing along +V.",
+    "uv": [
+     0.004,
+     0.504,
+     0.496,
+     0.996
+    ],
+    "pixels": [
+     4,
+     4,
+     508,
+     508
+    ],
+    "gutterTrimPixels": 8,
+    "wrapErrorBefore": {
+     "uSeamMeanAbs": 15.44140625,
+     "vSeamMeanAbs": 39.195963541666664
+    },
+    "seamBlend": false,
+    "wrapErrorNote": "Not blended: regular or centred art that a cross-fade would ghost.",
+    "posterised": true,
+    "wrapErrorAfter": {
+     "uSeamMeanAbs": 12.739583333333334,
+     "vSeamMeanAbs": 37.744791666666664
+    }
+   },
+   "rail": {
+    "cell": "rail",
+    "quadrant": "TR",
+    "is": "Galvanised guard rail post and beam with rivets.",
+    "uv": [
+     0.504,
+     0.504,
+     0.996,
+     0.996
+    ],
+    "pixels": [
+     516,
+     4,
+     1020,
+     508
+    ],
+    "gutterTrimPixels": 8,
+    "wrapErrorBefore": {
+     "uSeamMeanAbs": 27.112630208333332,
+     "vSeamMeanAbs": 15.087239583333334
+    },
+    "seamBlend": false,
+    "wrapErrorNote": "Not blended: regular or centred art that a cross-fade would ghost.",
+    "posterised": true,
+    "wrapErrorAfter": {
+     "uSeamMeanAbs": 26.697916666666668,
+     "vSeamMeanAbs": 15.729166666666666
+    }
+   },
+   "clock-ring-hands": {
+    "cell": "clock-ring-hands",
+    "quadrant": "BL",
+    "is": "Aged bronze clock ring and two plain hands on neutral grey.",
+    "uv": [
+     0.004,
+     0.004,
+     0.496,
+     0.496
+    ],
+    "pixels": [
+     4,
+     516,
+     508,
+     1020
+    ],
+    "gutterTrimPixels": 8,
+    "wrapErrorBefore": {
+     "uSeamMeanAbs": 4.393880208333333,
+     "vSeamMeanAbs": 4.53125
+    },
+    "seamBlend": false,
+    "wrapErrorNote": "Not blended: regular or centred art that a cross-fade would ghost.",
+    "posterised": true,
+    "wrapErrorAfter": {
+     "uSeamMeanAbs": 4.177083333333333,
+     "vSeamMeanAbs": 4.630208333333333
+    }
+   },
+   "gate-lamp-post": {
+    "cell": "gate-lamp-post",
+    "quadrant": "BR",
+    "is": "Dark iron gate post with a white lamp housing.",
+    "uv": [
+     0.504,
+     0.004,
+     0.996,
+     0.496
+    ],
+    "pixels": [
+     516,
+     516,
+     1020,
+     1020
+    ],
+    "gutterTrimPixels": 8,
+    "wrapErrorBefore": {
+     "uSeamMeanAbs": 6.502604166666667,
+     "vSeamMeanAbs": 13.16015625
+    },
+    "seamBlend": false,
+    "wrapErrorNote": "Not blended: regular or centred art that a cross-fade would ghost.",
+    "posterised": true,
+    "wrapErrorAfter": {
+     "uSeamMeanAbs": 4.453125,
+     "vSeamMeanAbs": 11.619791666666666
+    }
+   }
+  },
+  "jungle": {
+   "bark": {
+    "cell": "bark",
+    "quadrant": "TL",
+    "is": "Segmented palm-trunk bark, bands run along U, tiles up a trunk in V.",
+    "uv": [
+     0.004,
+     0.504,
+     0.496,
+     0.996
+    ],
+    "pixels": [
+     4,
+     4,
+     508,
+     508
+    ],
+    "gutterTrimPixels": 8,
+    "wrapErrorBefore": {
+     "uSeamMeanAbs": 14.733072916666666,
+     "vSeamMeanAbs": 17.270833333333332
+    },
+    "seamBlend": false,
+    "wrapErrorNote": "Not blended: regular or centred art that a cross-fade would ghost.",
+    "posterised": true,
+    "wrapErrorAfter": {
+     "uSeamMeanAbs": 12.869791666666666,
+     "vSeamMeanAbs": 16.328125
+    }
+   },
+   "moss-blossom": {
+    "cell": "moss-blossom",
+    "quadrant": "TR",
+    "is": "Moss over stone with small white blossoms; the mossy tops.",
+    "uv": [
+     0.504,
+     0.504,
+     0.996,
+     0.996
+    ],
+    "pixels": [
+     516,
+     4,
+     1020,
+     508
+    ],
+    "gutterTrimPixels": 8,
+    "wrapErrorBefore": {
+     "uSeamMeanAbs": 25.119140625,
+     "vSeamMeanAbs": 24.671223958333332
+    },
+    "seamBlend": true,
+    "posterised": true,
+    "wrapErrorAfter": {
+     "uSeamMeanAbs": 10.088541666666666,
+     "vSeamMeanAbs": 8.03125
+    }
+   },
+   "leaf-fill": {
+    "cell": "leaf-fill",
+    "quadrant": "BL",
+    "is": "Layered broadleaf fill; the broadleaf cards and canopy.",
+    "uv": [
+     0.004,
+     0.004,
+     0.496,
+     0.496
+    ],
+    "pixels": [
+     4,
+     516,
+     508,
+     1020
+    ],
+    "gutterTrimPixels": 8,
+    "wrapErrorBefore": {
+     "uSeamMeanAbs": 17.067708333333332,
+     "vSeamMeanAbs": 15.759114583333334
+    },
+    "seamBlend": true,
+    "posterised": true,
+    "wrapErrorAfter": {
+     "uSeamMeanAbs": 5.625,
+     "vSeamMeanAbs": 4.427083333333333
+    }
+   },
+   "sand": {
+    "cell": "sand",
+    "quadrant": "BR",
+    "is": "Pale beach sand with ripples and shells; the verges.",
+    "uv": [
+     0.504,
+     0.004,
+     0.996,
+     0.496
+    ],
+    "pixels": [
+     516,
+     516,
+     1020,
+     1020
+    ],
+    "gutterTrimPixels": 8,
+    "wrapErrorBefore": {
+     "uSeamMeanAbs": 8.544270833333334,
+     "vSeamMeanAbs": 6.286458333333333
+    },
+    "seamBlend": true,
+    "posterised": true,
+    "wrapErrorAfter": {
+     "uSeamMeanAbs": 2.3177083333333335,
+     "vSeamMeanAbs": 3.515625
+    }
+   }
+  },
+  "water": {
+   "caustic-shallows": {
+    "cell": "caustic-shallows",
+    "quadrant": "TL",
+    "is": "Turquoise shallows with a white caustic web, seen straight down.",
+    "uv": [
+     0.004,
+     0.504,
+     0.496,
+     0.996
+    ],
+    "pixels": [
+     4,
+     4,
+     508,
+     508
+    ],
+    "gutterTrimPixels": 8,
+    "wrapErrorBefore": {
+     "uSeamMeanAbs": 20.344401041666668,
+     "vSeamMeanAbs": 45.405598958333336
+    },
+    "seamBlend": true,
+    "posterised": true,
+    "wrapErrorAfter": {
+     "uSeamMeanAbs": 3.8697916666666665,
+     "vSeamMeanAbs": 4.473958333333333
+    }
+   },
+   "cobalt-facets": {
+    "cell": "cobalt-facets",
+    "quadrant": "TR",
+    "is": "Deep cobalt sea with low-poly wave facets. Verdict-mandated tiling fix.",
+    "uv": [
+     0.504,
+     0.504,
+     0.996,
+     0.996
+    ],
+    "pixels": [
+     516,
+     4,
+     1020,
+     508
+    ],
+    "gutterTrimPixels": 8,
+    "wrapErrorBefore": {
+     "uSeamMeanAbs": 11.077473958333334,
+     "vSeamMeanAbs": 10.916015625
+    },
+    "seamBlend": true,
+    "posterised": true,
+    "wrapErrorAfter": {
+     "uSeamMeanAbs": 1.3125,
+     "vSeamMeanAbs": 3.2552083333333335
+    }
+   },
+   "foam-gradient": {
+    "cell": "foam-gradient",
+    "quadrant": "BL",
+    "is": "Surf foam dissolving into cyan. V is distance from shore: tiles in U only.",
+    "uv": [
+     0.004,
+     0.004,
+     0.496,
+     0.496
+    ],
+    "pixels": [
+     4,
+     516,
+     508,
+     1020
+    ],
+    "gutterTrimPixels": 8,
+    "wrapErrorBefore": {
+     "uSeamMeanAbs": 20.926432291666668,
+     "vSeamMeanAbs": 105.82161458333333
+    },
+    "seamBlend": false,
+    "wrapErrorNote": "Not blended: regular or centred art that a cross-fade would ghost.",
+    "posterised": true,
+    "wrapErrorAfter": {
+     "uSeamMeanAbs": 19.333333333333332,
+     "vSeamMeanAbs": 103.55729166666667
+    }
+   },
+   "waterfall": {
+    "cell": "waterfall",
+    "quadrant": "BR",
+    "is": "Vertical white and pale-blue streaks on dark stone; V scrolls with time.",
+    "uv": [
+     0.504,
+     0.004,
+     0.996,
+     0.496
+    ],
+    "pixels": [
+     516,
+     516,
+     1020,
+     1020
+    ],
+    "gutterTrimPixels": 8,
+    "wrapErrorBefore": {
+     "uSeamMeanAbs": 16.321614583333332,
+     "vSeamMeanAbs": 22.422526041666668
+    },
+    "seamBlend": false,
+    "wrapErrorNote": "Not blended: regular or centred art that a cross-fade would ghost.",
+    "posterised": true,
+    "wrapErrorAfter": {
+     "uSeamMeanAbs": 16.463541666666668,
+     "vSeamMeanAbs": 20.786458333333332
+    }
+   }
+  },
+  "signage": {
+   "plate-dream-island": {
+    "cell": "plate-dream-island",
+    "quadrant": "TL",
+    "is": "Enamel place plate reading DREAM ISLAND.",
+    "uv": [
+     0.004,
+     0.504,
+     0.496,
+     0.996
+    ],
+    "pixels": [
+     4,
+     4,
+     508,
+     508
+    ],
+    "gutterTrimPixels": 8,
+    "wrapErrorBefore": {
+     "uSeamMeanAbs": 7.372395833333333,
+     "vSeamMeanAbs": 6.326171875
+    },
+    "seamBlend": false,
+    "wrapErrorNote": "Not blended: regular or centred art that a cross-fade would ghost.",
+    "posterised": false,
+    "wrapErrorAfter": {
+     "uSeamMeanAbs": 7.372395833333333,
+     "vSeamMeanAbs": 6.326171875
+    },
+    "plate": {
+     "pixels": [
+      34,
+      156,
+      482,
+      320
+     ],
+     "uv": [
+      0.033203,
+      0.6875,
+      0.470703,
+      0.847656
+     ],
+     "note": "The dark green field is not a material; UV the plate rect only.",
+     "lettering": {
+      "measuredInside": [
+       88,
+       176,
+       428,
+       300
+      ],
+      "glyphRows": [
+       52,
+       98
+      ],
+      "glyphHeightPixels": 46,
+      "plateHeightPixels": 164,
+      "glyphFractionOfPlate": 0.2804878048780488,
+      "maximumPlateHeightMetres": 2.103478260869565,
+      "note": "A plate taller than maximumPlateHeightMetres would ship letters over the 0.59 m environmental cap."
+     }
+    }
+   },
+   "plate-07": {
+    "cell": "plate-07",
+    "quadrant": "TR",
+    "is": "Square plate reading 07.",
+    "uv": [
+     0.504,
+     0.504,
+     0.996,
+     0.996
+    ],
+    "pixels": [
+     516,
+     4,
+     1020,
+     508
+    ],
+    "gutterTrimPixels": 8,
+    "wrapErrorBefore": {
+     "uSeamMeanAbs": 4.641276041666667,
+     "vSeamMeanAbs": 5.018229166666667
+    },
+    "seamBlend": false,
+    "wrapErrorNote": "Not blended: regular or centred art that a cross-fade would ghost.",
+    "posterised": false,
+    "wrapErrorAfter": {
+     "uSeamMeanAbs": 4.641276041666667,
+     "vSeamMeanAbs": 5.018229166666667
+    },
+    "plate": {
+     "pixels": [
+      644,
+      59,
+      889,
+      384
+     ],
+     "uv": [
+      0.628906,
+      0.625,
+      0.868164,
+      0.942383
+     ],
+     "note": "The dark green field is not a material; UV the plate rect only.",
+     "lettering": {
+      "measuredInside": [
+       673,
+       98,
+       860,
+       345
+      ],
+      "glyphRows": [
+       88,
+       226
+      ],
+      "glyphHeightPixels": 138,
+      "plateHeightPixels": 325,
+      "glyphFractionOfPlate": 0.4246153846153846,
+      "maximumPlateHeightMetres": 1.3894927536231885,
+      "note": "A plate taller than maximumPlateHeightMetres would ship letters over the 0.59 m environmental cap."
+     }
+    }
+   },
+   "plate-gate-numbers": {
+    "cell": "plate-gate-numbers",
+    "quadrant": "BL",
+    "is": "Strip of six gate number plates, 1 to 6.",
+    "uv": [
+     0.004,
+     0.004,
+     0.496,
+     0.496
+    ],
+    "pixels": [
+     4,
+     516,
+     508,
+     1020
+    ],
+    "gutterTrimPixels": 8,
+    "wrapErrorBefore": {
+     "uSeamMeanAbs": 6.932942708333333,
+     "vSeamMeanAbs": 7.026692708333333
+    },
+    "seamBlend": false,
+    "wrapErrorNote": "Not blended: regular or centred art that a cross-fade would ghost.",
+    "posterised": false,
+    "wrapErrorAfter": {
+     "uSeamMeanAbs": 6.932942708333333,
+     "vSeamMeanAbs": 7.026692708333333
+    },
+    "plate": {
+     "pixels": [
+      9,
+      668,
+      507,
+      777
+     ],
+     "uv": [
+      0.008789,
+      0.241211,
+      0.495117,
+      0.347656
+     ],
+     "note": "The dark green field is not a material; UV the plate rect only.",
+     "lettering": {
+      "measuredInside": [
+       69,
+       681,
+       447,
+       764
+      ],
+      "glyphRows": [
+       0,
+       83
+      ],
+      "glyphHeightPixels": 83,
+      "plateHeightPixels": 109,
+      "glyphFractionOfPlate": 0.7614678899082569,
+      "maximumPlateHeightMetres": 0.7748192771084338,
+      "note": "A plate taller than maximumPlateHeightMetres would ship letters over the 0.59 m environmental cap."
+     },
+     "digits": [
+      {
+       "digit": 1,
+       "pixels": [
+        9,
+        668,
+        92,
+        777
+       ],
+       "uv": [
+        0.008789,
+        0.241211,
+        0.089844,
+        0.347656
+       ]
+      },
+      {
+       "digit": 2,
+       "pixels": [
+        92,
+        668,
+        175,
+        777
+       ],
+       "uv": [
+        0.089844,
+        0.241211,
+        0.170898,
+        0.347656
+       ]
+      },
+      {
+       "digit": 3,
+       "pixels": [
+        175,
+        668,
+        258,
+        777
+       ],
+       "uv": [
+        0.170898,
+        0.241211,
+        0.251953,
+        0.347656
+       ]
+      },
+      {
+       "digit": 4,
+       "pixels": [
+        258,
+        668,
+        341,
+        777
+       ],
+       "uv": [
+        0.251953,
+        0.241211,
+        0.333008,
+        0.347656
+       ]
+      },
+      {
+       "digit": 5,
+       "pixels": [
+        341,
+        668,
+        424,
+        777
+       ],
+       "uv": [
+        0.333008,
+        0.241211,
+        0.414062,
+        0.347656
+       ]
+      },
+      {
+       "digit": 6,
+       "pixels": [
+        424,
+        668,
+        507,
+        777
+       ],
+       "uv": [
+        0.414062,
+        0.241211,
+        0.495117,
+        0.347656
+       ]
+      }
+     ]
+    }
+   },
+   "plate-beach": {
+    "cell": "plate-beach",
+    "quadrant": "BR",
+    "is": "Plate reading BEACH over a faded cyan wave mark.",
+    "uv": [
+     0.504,
+     0.004,
+     0.996,
+     0.496
+    ],
+    "pixels": [
+     516,
+     516,
+     1020,
+     1020
+    ],
+    "gutterTrimPixels": 8,
+    "wrapErrorBefore": {
+     "uSeamMeanAbs": 4.887369791666667,
+     "vSeamMeanAbs": 5.278645833333333
+    },
+    "seamBlend": false,
+    "wrapErrorNote": "Not blended: regular or centred art that a cross-fade would ghost.",
+    "posterised": false,
+    "wrapErrorAfter": {
+     "uSeamMeanAbs": 4.887369791666667,
+     "vSeamMeanAbs": 5.278645833333333
+    },
+    "plate": {
+     "pixels": [
+      546,
+      655,
+      990,
+      861
+     ],
+     "uv": [
+      0.533203,
+      0.15918,
+      0.966797,
+      0.360352
+     ],
+     "note": "The dark green field is not a material; UV the plate rect only.",
+     "lettering": {
+      "measuredInside": [
+       599,
+       680,
+       937,
+       836
+      ],
+      "glyphRows": [
+       10,
+       83
+      ],
+      "glyphHeightPixels": 73,
+      "plateHeightPixels": 206,
+      "glyphFractionOfPlate": 0.35436893203883496,
+      "maximumPlateHeightMetres": 1.664931506849315,
+      "note": "A plate taller than maximumPlateHeightMetres would ship letters over the 0.59 m environmental cap."
+     }
+    }
+   }
+  },
+  "emissive": {
+   "foam-glow": {
+    "cell": "foam-glow",
+    "quadrant": "TL",
+    "is": "Cyan foam-line glow band; the night shore rail. Tiles in U.",
+    "uv": [
+     0.004,
+     0.504,
+     0.496,
+     0.996
+    ],
+    "pixels": [
+     4,
+     4,
+     508,
+     508
+    ],
+    "gutterTrimPixels": 8,
+    "wrapErrorBefore": {
+     "uSeamMeanAbs": 3.615234375,
+     "vSeamMeanAbs": 0.14322916666666666
+    },
+    "seamBlend": false,
+    "wrapErrorNote": "Not blended: regular or centred art that a cross-fade would ghost.",
+    "posterised": false,
+    "wrapErrorAfter": {
+     "uSeamMeanAbs": 3.615234375,
+     "vSeamMeanAbs": 0.14322916666666666
+    }
+   },
+   "shallows-glow": {
+    "cell": "shallows-glow",
+    "quadrant": "TR",
+    "is": "Turquoise lit-from-within shallows glow.",
+    "uv": [
+     0.504,
+     0.504,
+     0.996,
+     0.996
+    ],
+    "pixels": [
+     516,
+     4,
+     1020,
+     508
+    ],
+    "gutterTrimPixels": 8,
+    "wrapErrorBefore": {
+     "uSeamMeanAbs": 4.209635416666667,
+     "vSeamMeanAbs": 1.7291666666666667
+    },
+    "seamBlend": false,
+    "wrapErrorNote": "Not blended: regular or centred art that a cross-fade would ghost.",
+    "posterised": false,
+    "wrapErrorAfter": {
+     "uSeamMeanAbs": 4.209635416666667,
+     "vSeamMeanAbs": 1.7291666666666667
+    }
+   },
+   "lamp-disc": {
+    "cell": "lamp-disc",
+    "quadrant": "BL",
+    "is": "Warm pale-yellow lamp disc for the tunnel and gate lamps.",
+    "uv": [
+     0.004,
+     0.004,
+     0.496,
+     0.496
+    ],
+    "pixels": [
+     4,
+     516,
+     508,
+     1020
+    ],
+    "gutterTrimPixels": 8,
+    "wrapErrorBefore": {
+     "uSeamMeanAbs": 0.767578125,
+     "vSeamMeanAbs": 0.5397135416666666
+    },
+    "seamBlend": false,
+    "wrapErrorNote": "Not blended: regular or centred art that a cross-fade would ghost.",
+    "posterised": false,
+    "wrapErrorAfter": {
+     "uSeamMeanAbs": 0.767578125,
+     "vSeamMeanAbs": 0.5397135416666666
+    }
+   },
+   "clock-face": {
+    "cell": "clock-face",
+    "quadrant": "BR",
+    "is": "Glowing clock face. Face glow only: the hands are metal geometry.",
+    "uv": [
+     0.504,
+     0.004,
+     0.996,
+     0.496
+    ],
+    "pixels": [
+     516,
+     516,
+     1020,
+     1020
+    ],
+    "gutterTrimPixels": 8,
+    "wrapErrorBefore": {
+     "uSeamMeanAbs": 0.51171875,
+     "vSeamMeanAbs": 1.7350260416666667
+    },
+    "seamBlend": false,
+    "wrapErrorNote": "Not blended: regular or centred art that a cross-fade would ghost.",
+    "posterised": false,
+    "wrapErrorAfter": {
+     "uSeamMeanAbs": 0.51171875,
+     "vSeamMeanAbs": 1.7350260416666667
+    }
+   }
+  },
+  "jungle-card": {
+   "frond": {
+    "cell": "frond",
+    "quadrant": "TL",
+    "is": "Single drooping palm frond, the crown cards.",
+    "uv": [
+     0.004,
+     0.504,
+     0.496,
+     0.996
+    ],
+    "sprite": {
+     "pixels": [
+      35,
+      83,
+      451,
+      437
+     ],
+     "uv": [
+      0.03418,
+      0.573242,
+      0.44043,
+      0.918945
+     ]
+    },
+    "posterised": false,
+    "seamBlend": false
+   },
+   "fern": {
+    "cell": "fern",
+    "quadrant": "TR",
+    "is": "Tropical fern clump, the verge and joint cards.",
+    "uv": [
+     0.504,
+     0.504,
+     0.996,
+     0.996
+    ],
+    "sprite": {
+     "pixels": [
+      542,
+      106,
+      994,
+      449
+     ],
+     "uv": [
+      0.529297,
+      0.561523,
+      0.970703,
+      0.896484
+     ]
+    },
+    "posterised": false,
+    "seamBlend": false
+   },
+   "blossom-shrub": {
+    "cell": "blossom-shrub",
+    "quadrant": "BL",
+    "is": "Flowering shrub with white blossoms.",
+    "uv": [
+     0.004,
+     0.004,
+     0.496,
+     0.496
+    ],
+    "sprite": {
+     "pixels": [
+      43,
+      596,
+      443,
+      934
+     ],
+     "uv": [
+      0.041992,
+      0.087891,
+      0.432617,
+      0.417969
+     ]
+    },
+    "posterised": false,
+    "seamBlend": false
+   },
+   "goldfish": {
+    "cell": "goldfish",
+    "quadrant": "BR",
+    "is": "Flat-shaded low-poly goldfish in side view.",
+    "uv": [
+     0.504,
+     0.004,
+     0.996,
+     0.496
+    ],
+    "sprite": {
+     "pixels": [
+      542,
+      646,
+      990,
+      922
+     ],
+     "uv": [
+      0.529297,
+      0.099609,
+      0.966797,
+      0.369141
+     ]
+    },
+    "posterised": false,
+    "seamBlend": false
+   }
+  }
+ },
+ "files": {
+  "public/assets/dreamisland/textures/concrete.jpg": {
+   "bytes": 447259,
+   "sha256": "1fa66bf620bd081fae2809c79e704dd1403f92f1b90e76a2f0a9284fe3db1b67",
+   "size": [
+    1024,
+    1024
+   ]
+  },
+  "public/assets/dreamisland/textures/metal.jpg": {
+   "bytes": 288674,
+   "sha256": "ae8c28ae95073d0c2acee9c16ab13e6ddb1c30f4906ad41b1a9e049b69f3943a",
+   "size": [
+    1024,
+    1024
+   ]
+  },
+  "public/assets/dreamisland/textures/jungle.jpg": {
+   "bytes": 419291,
+   "sha256": "66dd4473ab6ee37e219d2c9c47fcce88a8d7b05777dd7a784d102a1a2dc1f7bb",
+   "size": [
+    1024,
+    1024
+   ]
+  },
+  "public/assets/dreamisland/textures/water.jpg": {
+   "bytes": 401980,
+   "sha256": "de31e9f54dc8eeea23cd6fc5ce269e21273b81a482667a0a9ed74930ececa607",
+   "size": [
+    1024,
+    1024
+   ]
+  },
+  "public/assets/dreamisland/textures/signage.jpg": {
+   "bytes": 308934,
+   "sha256": "e360e9cda4171a8f657de4df703117d0b887c545a3a76d43c46abb8a13e0831d",
+   "size": [
+    1024,
+    1024
+   ]
+  },
+  "public/assets/dreamisland/textures/emissive.jpg": {
+   "bytes": 121236,
+   "sha256": "b1464210c8b7f4513497a06c313ba65ba2a2354d2358d9f8eacd80735d5e1d79",
+   "size": [
+    1024,
+    1024
+   ]
+  },
+  "public/assets/dreamisland/jungle-card.png": {
+   "bytes": 937299,
+   "sha256": "829f518b7b2597b55824e70f09fbd7b008eb706cb49880535145d24cb799bb42",
+   "size": [
+    1024,
+    1024
+   ]
+  }
+ },
+ "jungleCard": {
+  "file": "jungle-card.png",
+  "format": "PNG RGB",
+  "keyColour": [
+   255,
+   0,
+   255
+  ],
+  "discard": "min(r,b)-g > .025 in onBeforeCompile, before shared lighting/fog/tonemapping, exactly as src/game/ascension-materials.ts:7-8 does.",
+  "keyedPixelFraction": 0.7499227523803711,
+  "note": "No alpha channel. The Ascension attempt at exporting real alpha failed; the key is discarded in the shader instead."
+ }
+}

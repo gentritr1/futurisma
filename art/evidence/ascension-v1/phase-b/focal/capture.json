@@ -1,0 +1,586 @@
+{
+  "script": "scripts/visual/ascension/assets.mjs",
+  "records": [
+    {
+      "script": "scripts/visual/ascension/assets.ts",
+      "asset": "rocket-platform",
+      "camera": [
+        9.988000335693359,
+        2.4,
+        102.76285552978516
+      ],
+      "dimensions": [
+        45.400001525878906,
+        85.85563659667969,
+        42.400001525878906
+      ],
+      "materials": [
+        {
+          "name": "AP_MAT_concrete",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_metal",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_concrete",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_emissive",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_metal",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_signage",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_emissive",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_metal",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_emissive",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_metal",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_emissive",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_metal",
+          "toneMapped": true,
+          "fog": true
+        }
+      ],
+      "render": {
+        "calls": 14,
+        "triangles": 5498
+      }
+    },
+    {
+      "script": "scripts/visual/ascension/assets.ts",
+      "asset": "crawler-transporter",
+      "camera": [
+        7.744000115394592,
+        2.4,
+        36.22400078392029
+      ],
+      "dimensions": [
+        35.200000524520874,
+        11.516800098371505,
+        26.688000885963447
+      ],
+      "materials": [
+        {
+          "name": "AP_MAT_emissive",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_metal",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_signage",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_metal",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_metal",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_metal",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_metal",
+          "toneMapped": true,
+          "fog": true
+        }
+      ],
+      "render": {
+        "calls": 9,
+        "triangles": 7046
+      }
+    },
+    {
+      "script": "scripts/visual/ascension/assets.ts",
+      "asset": "countdown-board",
+      "camera": [
+        1.92,
+        2.4,
+        12.825249528884887
+      ],
+      "dimensions": [
+        11,
+        11.394999504089355,
+        4
+      ],
+      "materials": [
+        {
+          "name": "AP_MAT_concrete",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_emissive",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_metal",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_signage",
+          "toneMapped": true,
+          "fog": true
+        }
+      ],
+      "render": {
+        "calls": 7,
+        "triangles": 1984
+      }
+    },
+    {
+      "script": "scripts/visual/ascension/assets.ts",
+      "asset": "trench-wall-module",
+      "camera": [
+        5.28,
+        2.4,
+        18.57794246673584
+      ],
+      "dimensions": [
+        24,
+        14,
+        4.47794246673584
+      ],
+      "materials": [
+        {
+          "name": "AP_MAT_concrete",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_emissive",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_metal",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_signage",
+          "toneMapped": true,
+          "fog": true
+        }
+      ],
+      "render": {
+        "calls": 6,
+        "triangles": 3470
+      }
+    },
+    {
+      "script": "scripts/visual/ascension/assets.ts",
+      "asset": "deluge-water-tower",
+      "camera": [
+        5.28,
+        2.4,
+        41.29697833266109
+      ],
+      "dimensions": [
+        24,
+        30.838924560695887,
+        24
+      ],
+      "materials": [
+        {
+          "name": "AP_MAT_concrete",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_emissive",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_metal",
+          "toneMapped": true,
+          "fog": true
+        }
+      ],
+      "render": {
+        "calls": 5,
+        "triangles": 2930
+      }
+    },
+    {
+      "script": "scripts/visual/ascension/assets.ts",
+      "asset": "propellant-tank",
+      "camera": [
+        4.4659998321533205,
+        2.4,
+        32.97324986662716
+      ],
+      "dimensions": [
+        20.299999237060547,
+        23.635000381618738,
+        20.66999912261963
+      ],
+      "materials": [
+        {
+          "name": "AP_MAT_concrete",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_emissive",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_metal",
+          "toneMapped": true,
+          "fog": true
+        }
+      ],
+      "render": {
+        "calls": 5,
+        "triangles": 2886
+      }
+    },
+    {
+      "script": "scripts/visual/ascension/assets.ts",
+      "asset": "vent-stack",
+      "camera": [
+        2.3319999313354494,
+        2.4,
+        29.720000362396238
+      ],
+      "dimensions": [
+        8.099999904632568,
+        27.600000381469727,
+        7
+      ],
+      "materials": [
+        {
+          "name": "AP_MAT_concrete",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_emissive",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_metal",
+          "toneMapped": true,
+          "fog": true
+        }
+      ],
+      "render": {
+        "calls": 5,
+        "triangles": 2514
+      }
+    },
+    {
+      "script": "scripts/visual/ascension/assets.ts",
+      "asset": "crawlerway-gravel-bed",
+      "camera": [
+        8.36,
+        2.4,
+        40.82750053405762
+      ],
+      "dimensions": [
+        38,
+        3.5950000286102295,
+        32.12750053405762
+      ],
+      "materials": [
+        {
+          "name": "AP_MAT_concrete",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_emissive",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_metal",
+          "toneMapped": true,
+          "fog": true
+        }
+      ],
+      "render": {
+        "calls": 5,
+        "triangles": 2554
+      }
+    },
+    {
+      "script": "scripts/visual/ascension/assets.ts",
+      "asset": "mangrove-pier",
+      "camera": [
+        5.537999839782715,
+        2.4,
+        29.449999952316286
+      ],
+      "dimensions": [
+        26.65000057220459,
+        10.295000076293945,
+        24.202499389648438
+      ],
+      "materials": [
+        {
+          "name": "AP_MAT_concrete",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_emissive",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_metal",
+          "toneMapped": true,
+          "fog": true
+        }
+      ],
+      "render": {
+        "calls": 5,
+        "triangles": 2570
+      }
+    },
+    {
+      "script": "scripts/visual/ascension/assets.ts",
+      "asset": "egret-card-set",
+      "camera": [
+        0.3740000104904175,
+        2.4,
+        1.61500004529953
+      ],
+      "dimensions": [
+        1.7000000476837158,
+        1.7000000476837158,
+        0
+      ],
+      "materials": [
+        {
+          "name": "AP_MAT_jungle",
+          "toneMapped": true,
+          "fog": true
+        }
+      ],
+      "render": {
+        "calls": 3,
+        "triangles": 1524
+      }
+    },
+    {
+      "script": "scripts/visual/ascension/assets.ts",
+      "asset": "service-tower-swing-arm",
+      "camera": [
+        13.538798458576203,
+        2.4,
+        14.642248609662056
+      ],
+      "dimensions": [
+        19.91499787569046,
+        6.198786973953247,
+        3.322499990463257
+      ],
+      "materials": [
+        {
+          "name": "AP_MAT_emissive",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_metal",
+          "toneMapped": true,
+          "fog": true
+        }
+      ],
+      "render": {
+        "calls": 4,
+        "triangles": 2214
+      }
+    },
+    {
+      "script": "scripts/visual/ascension/assets.ts",
+      "asset": "surge",
+      "camera": [
+        0.3388000178337097,
+        2.4,
+        2.288500052690506
+      ],
+      "dimensions": [
+        1.540000081062317,
+        1.8300000429153442,
+        1.100000023841858
+      ],
+      "materials": [
+        {
+          "name": "AP_MAT_metal",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_metal",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_emissive",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_metal",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_metal",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_metal",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_metal",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_signage",
+          "toneMapped": true,
+          "fog": true
+        }
+      ],
+      "render": {
+        "calls": 10,
+        "triangles": 3494
+      }
+    },
+    {
+      "script": "scripts/visual/ascension/assets.ts",
+      "asset": "shield",
+      "camera": [
+        0.3365999937057495,
+        2.4,
+        2.288500052690506
+      ],
+      "dimensions": [
+        1.5299999713897705,
+        1.8300000429153442,
+        1.100000023841858
+      ],
+      "materials": [
+        {
+          "name": "AP_MAT_emissive",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_metal",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_metal",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_metal",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_metal",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_metal",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_metal",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_metal",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_metal",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_metal",
+          "toneMapped": true,
+          "fog": true
+        },
+        {
+          "name": "AP_MAT_signage",
+          "toneMapped": true,
+          "fog": true
+        }
+      ],
+      "render": {
+        "calls": 13,
+        "triangles": 3338
+      }
+    }
+  ],
+  "errors": []
+}

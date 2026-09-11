@@ -1,0 +1,170 @@
+{
+  "instrument": "scripts/visual/dreamisland-heroes/polish-canopy.mjs",
+  "testedOverhangingCardVertices": 432,
+  "minimumHeightAboveDeck": 10.95642876881584,
+  "openCorridorCeiling": 8.85,
+  "additionalClearance": 2.1064287688158405,
+  "samples": [
+    {
+      "station": 105,
+      "lateral": 1.2867861199334516,
+      "rise": 11.606871933564308
+    },
+    {
+      "station": 107,
+      "lateral": 1.3999966102082175,
+      "rise": 11.59489137654628
+    },
+    {
+      "station": 107,
+      "lateral": 1.400001042606816,
+      "rise": 12.80510980611171
+    },
+    {
+      "station": 109,
+      "lateral": 1.260322176766115,
+      "rise": 12.776362037826999
+    },
+    {
+      "station": 106,
+      "lateral": -1.5053996678558457,
+      "rise": 11.582562522425338
+    },
+    {
+      "station": 107,
+      "lateral": -1.4000053804659045,
+      "rise": 11.59489137654628
+    },
+    {
+      "station": 107,
+      "lateral": -1.400001095262636,
+      "rise": 12.80510980611171
+    },
+    {
+      "station": 108,
+      "lateral": -1.5344510748632298,
+      "rise": 12.813236772022035
+    },
+    {
+      "station": 111,
+      "lateral": 1.2334684814721513,
+      "rise": 11.61966010278605
+    },
+    {
+      "station": 113,
+      "lateral": 1.399997506755701,
+      "rise": 11.590866167832186
+    },
+    {
+      "station": 113,
+      "lateral": 1.399996167677236,
+      "rise": 12.8091345623024
+    },
+    {
+      "station": 115,
+      "lateral": 1.2351303849963207,
+      "rise": 12.764863580543873
+    },
+    {
+      "station": 112,
+      "lateral": -1.5561063553720138,
+      "rise": 11.570686144544267
+    },
+    {
+      "station": 113,
+      "lateral": -1.399990438444628,
+      "rise": 11.590866167832186
+    },
+    {
+      "station": 113,
+      "lateral": -1.399991777523093,
+      "rise": 12.8091345623024
+    },
+    {
+      "station": 114,
+      "lateral": -1.5543146686685423,
+      "rise": 12.825447200144279
+    },
+    {
+      "station": 117,
+      "lateral": 1.2681833815992354,
+      "rise": 11.631407551951154
+    },
+    {
+      "station": 119,
+      "lateral": 1.4000094967544294,
+      "rise": 11.587155750988293
+    },
+    {
+      "station": 119,
+      "lateral": 1.4000072213000156,
+      "rise": 12.812844685314465
+    },
+    {
+      "station": 121,
+      "lateral": 1.2969204188968235,
+      "rise": 12.75441046583955
+    },
+    {
+      "station": 118,
+      "lateral": -1.5275839495943648,
+      "rise": 11.559717377160622
+    },
+    {
+      "station": 119,
+      "lateral": -1.399987014437824,
+      "rise": 11.587155750988293
+    },
+    {
+      "station": 119,
+      "lateral": -1.3999892898922375,
+      "rise": 12.812844685314465
+    },
+    {
+      "station": 120,
+      "lateral": -1.4958286160502428,
+      "rise": 12.83676346259302
+    },
+    {
+      "station": 122,
+      "lateral": 1.3846104482355197,
+      "rise": 11.640483633911842
+    },
+    {
+      "station": 124,
+      "lateral": 1.39999681170184,
+      "rise": 11.584314332500362
+    },
+    {
+      "station": 124,
+      "lateral": 1.3999926101332625,
+      "rise": 12.815686212077999
+    },
+    {
+      "station": 126,
+      "lateral": 1.3536539103458318,
+      "rise": 12.746405890617032
+    },
+    {
+      "station": 123,
+      "lateral": -1.4185752374140381,
+      "rise": 11.551310446503498
+    },
+    {
+      "station": 124,
+      "lateral": -1.4000106463211437,
+      "rise": 11.584314332500362
+    },
+    {
+      "station": 124,
+      "lateral": -1.4000148478897212,
+      "rise": 12.815686212077999
+    },
+    {
+      "station": 125,
+      "lateral": -1.4421384781182744,
+      "rise": 12.84540083749183
+    }
+  ],
+  "method": "Exported card vertices, world transforms, nearest route station in XZ, inside the full road half-width; opaque card rectangles are conservative for keyed fronds."
+}

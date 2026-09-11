@@ -1,0 +1,36 @@
+[
+ {
+  "file": "lamp.png",
+  "flat_pct": 19.0,
+  "hsplit": -15.5,
+  "skysat": 64.2,
+  "edges_pct": 4.92,
+  "midtone_pct": 32.8,
+  "horizon_row": 412,
+  "mode_rgb": [
+   46,
+   42,
+   22
+  ],
+  "lamp_luma_under": 108.18373368055555,
+  "lamp_luma_between": 103.85570729166666,
+  "lamp_ratio": 1.041673457354964
+ },
+ {
+  "file": "lamp.png",
+  "flat_pct": 39.4,
+  "hsplit": -10.1,
+  "skysat": 83.9,
+  "edges_pct": 2.42,
+  "midtone_pct": 10.9,
+  "horizon_row": 416,
+  "mode_rgb": [
+   14,
+   6,
+   2
+  ],
+  "lamp_luma_under": 60.53425902777778,
+  "lamp_luma_between": 29.576994791666664,
+  "lamp_ratio": 2.0466669942016336
+ }
+]

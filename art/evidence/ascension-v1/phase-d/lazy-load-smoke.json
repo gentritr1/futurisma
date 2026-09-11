@@ -1,0 +1,18 @@
+{
+  "scope": "Private Chrome live startup after lazy-load adjustment; real first trench drip record, no page errors.",
+  "audio": {
+    "script": "src/game/ascension-audio.ts",
+    "ducked": false,
+    "duckEvents": [],
+    "records": [
+      {
+        "id": "drip-861",
+        "cue": "drip",
+        "tick": 861,
+        "contextTime": 11.08172335600907,
+        "distance": 0
+      }
+    ]
+  },
+  "errors": []
+}

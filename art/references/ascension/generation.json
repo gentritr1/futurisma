@@ -1,0 +1,468 @@
+{
+  "generated": "2026-09-05",
+  "tool": "Higgsfield MCP",
+  "routing": "gpt_image_2 (quality medium, 1k, 16:9) for count-heavy orthographic sheets; flux_2 pro (1k, 16:9) for mood/hero frames; tripo_h3_1_image_to_3d (texture on, pbr off, face_limit 20000, orientation align_image) for proportion maquettes",
+  "jobs": {
+    "sky-dawn-gptimage2.png": {
+      "model": "GPT Image 2 (built-in imagegen)",
+      "job_id": null,
+      "output_id": "exec-0a56cd92-65e5-4e27-b24b-6fdcdee19540",
+      "prompt": "Create exactly one seamless panoramic SKY TEXTURE, 4096 pixels wide by 1024 pixels high, extreme 4:1 horizontal panorama for a 360 degree game sky. No panels, borders or lettering. Ascension Pad dawn over a humid jungle estuary: one consistent tropical overcast dawn lighting state everywhere, soft layered grey sage clouds with a broad subtle warm pale ochre break across the left-middle third. No sun disc, no moon, no stars, no bright flare, no black clouds. Restrained low-contrast hand-painted texture language for a beautifully remembered early-2000s console racer. Broad soft brushwork, atmospheric depth. The bottom quarter contains a continuous misty low mangrove horizon, tiny distant gantry/tank silhouettes, no rocket silhouettes. Upper three quarters clouds. Sky-band brightness variation across the whole width must be less than 2:1; smooth warmth transitions over at least 140 degrees, no abrupt transitions. Left and right edges must match continuously in colour and cloud height. Whole image is one long painting with a low horizon. Output 4096x1024.",
+      "review": "Pending dimensions and sky profile"
+    },
+    "material-id-service-tower-swing-arm-gptimage2.png": {
+      "model": "GPT Image 2 (built-in imagegen)",
+      "job_id": null,
+      "output_id": "exec-868486c8-75fa-4bbb-8913-e7c6504ad123",
+      "prompt": "Precise material-ID diagram correction. Keep the attached material-ID image's existing three-view layout, all silhouettes, every component and label position unchanged. Correct only the categorical flat fills: Every truss, pivot cylinder, hose, umbilical loop, repair plate, bolt and protective cage is METAL #ff0000. There is NO concrete. Only actual lamp glass is EMISSIVE magenta. Background #202020. Preserve legible view labels in white. No shading, texture, gradients or new components. Do not change pose or crop.",
+      "review": "Corrected material-role pass; prior categorical errors retained as rejected-v1."
+    },
+    "material-id-egret-card-set-gptimage2.png": {
+      "model": "GPT Image 2 (built-in imagegen)",
+      "job_id": null,
+      "output_id": "exec-23a82ab4-33c3-4f7d-a8ed-ac6d3dc8ff04",
+      "prompt": "Precise material-ID diagram correction. Keep the attached material-ID image's existing three-view layout, all silhouettes, every component and label position unchanged. Correct only the categorical flat fills: The entire bird, including beak and legs and feathers, is organic JUNGLE #00ff00. There is no metal, concrete, signage or emissive material on a bird. Background #202020. Preserve legible view labels in white. No shading, texture, gradients or new components. Do not change pose or crop.",
+      "review": "Corrected material-role pass; prior categorical errors retained as rejected-v1."
+    },
+    "material-id-mangrove-pier-gptimage2.png": {
+      "model": "GPT Image 2 (built-in imagegen)",
+      "job_id": null,
+      "output_id": "exec-7428607c-dd28-4c25-8eab-9244c1fba245",
+      "prompt": "Use case: precise-object-edit. Create the MATERIAL-ID PASS of the attached Ascension Pad asset sheet. Preserve its entire three-view layout, silhouettes, component counts, spatial positions, view labels and dimensions exactly. Change only surface appearance into flat unshaded categorical material fills: CONCRETE #808080 on concrete and ceramic; METAL #ff0000 on steel, pipes, rivets and structural hardware; JUNGLE #00ff00 on organic matter including the egret plumage; WATER #0000ff only if water is present; SIGNAGE #ffff00 on painted letters and hazard markings; EMISSIVE #ff00ff only on actual lamp glass or countdown light segments. Background #202020. No texture, weathering, lighting, shadow, gradients, new components or new text. Keep holes and negative space open. This is an asset material assignment diagram, not a new design.",
+      "source": "sheet-mangrove-pier-gptimage2.png",
+      "metadata_note": "No service job ID returned.",
+      "review": "Pending material assignment review"
+    },
+    "material-id-crawlerway-gravel-bed-gptimage2.png": {
+      "model": "GPT Image 2 (built-in imagegen)",
+      "job_id": null,
+      "output_id": "exec-de22207f-b073-47c0-a89a-7206e6eb9057",
+      "prompt": "Use case: precise-object-edit. Create the MATERIAL-ID PASS of the attached Ascension Pad asset sheet. Preserve its entire three-view layout, silhouettes, component counts, spatial positions, view labels and dimensions exactly. Change only surface appearance into flat unshaded categorical material fills: CONCRETE #808080 on concrete and ceramic; METAL #ff0000 on steel, pipes, rivets and structural hardware; JUNGLE #00ff00 on organic matter including the egret plumage; WATER #0000ff only if water is present; SIGNAGE #ffff00 on painted letters and hazard markings; EMISSIVE #ff00ff only on actual lamp glass or countdown light segments. Background #202020. No texture, weathering, lighting, shadow, gradients, new components or new text. Keep holes and negative space open. This is an asset material assignment diagram, not a new design.",
+      "source": "sheet-crawlerway-gravel-bed-gptimage2.png",
+      "metadata_note": "No service job ID returned.",
+      "review": "Pending material assignment review"
+    },
+    "material-id-vent-stack-gptimage2.png": {
+      "model": "GPT Image 2 (built-in imagegen)",
+      "job_id": null,
+      "output_id": "exec-0e381b04-9021-45de-bdae-1db8ba54e67f",
+      "prompt": "Use case: precise-object-edit. Create the MATERIAL-ID PASS of the attached Ascension Pad asset sheet. Preserve its entire three-view layout, silhouettes, component counts, spatial positions, view labels and dimensions exactly. Change only surface appearance into flat unshaded categorical material fills: CONCRETE #808080 on concrete and ceramic; METAL #ff0000 on steel, pipes, rivets and structural hardware; JUNGLE #00ff00 on organic matter including the egret plumage; WATER #0000ff only if water is present; SIGNAGE #ffff00 on painted letters and hazard markings; EMISSIVE #ff00ff only on actual lamp glass or countdown light segments. Background #202020. No texture, weathering, lighting, shadow, gradients, new components or new text. Keep holes and negative space open. This is an asset material assignment diagram, not a new design.",
+      "source": "sheet-vent-stack-gptimage2.png",
+      "metadata_note": "No service job ID returned.",
+      "review": "Pending material assignment review"
+    },
+    "material-id-propellant-tank-gptimage2.png": {
+      "model": "GPT Image 2 (built-in imagegen)",
+      "job_id": null,
+      "output_id": "exec-8489d4cf-3633-43ce-a62b-c8c6a2ca6c3d",
+      "prompt": "Use case: precise-object-edit. Create the MATERIAL-ID PASS of the attached Ascension Pad asset sheet. Preserve its entire three-view layout, silhouettes, component counts, spatial positions, view labels and dimensions exactly. Change only surface appearance into flat unshaded categorical material fills: CONCRETE #808080 on concrete and ceramic; METAL #ff0000 on steel, pipes, rivets and structural hardware; JUNGLE #00ff00 on organic matter including the egret plumage; WATER #0000ff only if water is present; SIGNAGE #ffff00 on painted letters and hazard markings; EMISSIVE #ff00ff only on actual lamp glass or countdown light segments. Background #202020. No texture, weathering, lighting, shadow, gradients, new components or new text. Keep holes and negative space open. This is an asset material assignment diagram, not a new design.",
+      "source": "sheet-propellant-tank-gptimage2.png",
+      "metadata_note": "No service job ID returned.",
+      "review": "Pending material assignment review"
+    },
+    "material-id-deluge-water-tower-gptimage2.png": {
+      "model": "GPT Image 2 (built-in imagegen)",
+      "job_id": null,
+      "output_id": "exec-b9f351c2-8c75-4cdc-bcd9-68981c3234f4",
+      "prompt": "Use case: precise-object-edit. Create the MATERIAL-ID PASS of the attached Ascension Pad asset sheet. Preserve its entire three-view layout, silhouettes, component counts, spatial positions, view labels and dimensions exactly. Change only surface appearance into flat unshaded categorical material fills: CONCRETE #808080 on concrete and ceramic; METAL #ff0000 on steel, pipes, rivets and structural hardware; JUNGLE #00ff00 on organic matter including the egret plumage; WATER #0000ff only if water is present; SIGNAGE #ffff00 on painted letters and hazard markings; EMISSIVE #ff00ff only on actual lamp glass or countdown light segments. Background #202020. No texture, weathering, lighting, shadow, gradients, new components or new text. Keep holes and negative space open. This is an asset material assignment diagram, not a new design.",
+      "source": "sheet-deluge-water-tower-gptimage2.png",
+      "metadata_note": "No service job ID returned.",
+      "review": "Pending material assignment review"
+    },
+    "material-id-trench-wall-module-gptimage2.png": {
+      "model": "GPT Image 2 (built-in imagegen)",
+      "job_id": null,
+      "output_id": "exec-643e715b-26a3-4e27-8e4b-18015c57d701",
+      "prompt": "Use case: precise-object-edit. Create the MATERIAL-ID PASS of the attached Ascension Pad asset sheet. Preserve its entire three-view layout, silhouettes, component counts, spatial positions, view labels and dimensions exactly. Change only surface appearance into flat unshaded categorical material fills: CONCRETE #808080 on concrete and ceramic; METAL #ff0000 on steel, pipes, rivets and structural hardware; JUNGLE #00ff00 on organic matter including the egret plumage; WATER #0000ff only if water is present; SIGNAGE #ffff00 on painted letters and hazard markings; EMISSIVE #ff00ff only on actual lamp glass or countdown light segments. Background #202020. No texture, weathering, lighting, shadow, gradients, new components or new text. Keep holes and negative space open. This is an asset material assignment diagram, not a new design.",
+      "source": "sheet-trench-wall-module-gptimage2.png",
+      "metadata_note": "No service job ID returned.",
+      "review": "Pending material assignment review"
+    },
+    "material-id-countdown-board-gptimage2.png": {
+      "model": "GPT Image 2 (built-in imagegen)",
+      "job_id": null,
+      "output_id": "exec-8f0e065a-f639-4977-9910-5a03e8ec6af3",
+      "prompt": "Precise material-ID diagram correction. Keep the attached material-ID image's existing three-view layout, all silhouettes, every component and label position unchanged. Correct only the categorical flat fills: All masts, A-frame members, housings, horns, bolts, cages and repair plates are METAL #ff0000. Only the foundation plinth is CONCRETE #808080. Actual countdown light segments and lamp glass magenta; hazard painted bands yellow. Background #202020. Preserve legible view labels in white. No shading, texture, gradients or new components. Do not change pose or crop.",
+      "review": "Corrected material-role pass; prior categorical errors retained as rejected-v1."
+    },
+    "material-id-crawler-transporter-gptimage2.png": {
+      "model": "GPT Image 2 (built-in imagegen)",
+      "job_id": null,
+      "output_id": "exec-a7965da3-8e55-4065-87b5-ae70298baa92",
+      "prompt": "Precise material-ID diagram correction. Keep the attached material-ID image's existing three-view layout, all silhouettes, every component and label position unchanged. Correct only the categorical flat fills: All deck plates, treads, wheels, support legs, cab housings, horn, protective cages and repair plates are METAL #ff0000. There is NO concrete on this machine. Windows and lamp glass magenta; hazard painted bands yellow. Background #202020. Preserve legible view labels in white. No shading, texture, gradients or new components. Do not change pose or crop.",
+      "review": "Corrected material-role pass; prior categorical errors retained as rejected-v1."
+    },
+    "material-id-rocket-platform-gptimage2.png": {
+      "model": "GPT Image 2 (built-in imagegen)",
+      "job_id": null,
+      "output_id": "exec-4a9cf7a2-9fff-4e82-9285-f55104c023c4",
+      "prompt": "Use case: precise-object-edit. Create the MATERIAL-ID PASS of the attached Ascension Pad asset sheet. Preserve its entire three-view layout, silhouettes, component counts, spatial positions, view labels and dimensions exactly. Change only surface appearance into flat unshaded categorical material fills: CONCRETE #808080 on concrete and ceramic; METAL #ff0000 on steel, pipes, rivets and structural hardware; JUNGLE #00ff00 on organic matter including the egret plumage; WATER #0000ff only if water is present; SIGNAGE #ffff00 on painted letters and hazard markings; EMISSIVE #ff00ff only on actual lamp glass or countdown light segments. Background #202020. No texture, weathering, lighting, shadow, gradients, new components or new text. Keep holes and negative space open. This is an asset material assignment diagram, not a new design.",
+      "source": "sheet-rocket-platform-gptimage2.png",
+      "metadata_note": "No service job ID returned.",
+      "review": "Pending material assignment review"
+    },
+    "hero-service-tower-swing-arm-gptimage2.png": {
+      "model": "GPT Image 2 (built-in imagegen)",
+      "job_id": null,
+      "output_id": "exec-335f5e69-e1b5-4390-835b-c11ec9916dd4",
+      "prompt": "Ascension Pad, a racing circuit through a working rocket launch complex in a humid jungle estuary, for a remembered early-2000s console anti-gravity racer. Chase-camera view 2.4 m above a 24 m wide concrete racing road high above the launch apron joining service tower to rocket, Service-tower swing arm, 18 m long, 3 m wide and 4 m tall: ONE olive rectangular truss bridge, THREE triangular brace bays along each side, ONE cylindrical vertical hinge at the tower end, ONE off-white flexible umbilical hose loop hanging from the rocket end, ONE rust-red repair plate at the central bay, ONE amber caged glass lamp with metal base at the rocket end, round rivet-scale bolts. No tower or rocket; the pivot must be isolated and visible for animation., sodium lamps, mist, tropical overcast dawn with one warm break. Yellow-black hazard kerbs, painted worn lane markings, damp stained concrete. Painted hand-textured surfaces, honest low-poly geometry, restrained palette of grey concrete, rust steel, sodium amber, swamp green and mist, fog for depth, no bloom, no lens flare, no neon, no photoreal PBR, no vehicles.\nUse the attached sheet as the asset identity reference, not the camera view. The single asset must fill most of the frame with all defining parts visible. No invented logos. Keep the camera at road height. Include the asset's full silhouette without cropping.",
+      "source": "sheet-service-tower-swing-arm-gptimage2.png",
+      "metadata_note": "No service job ID returned.",
+      "review": "Pending hero versus model acceptance"
+    },
+    "hero-egret-card-set-gptimage2.png": {
+      "model": "GPT Image 2 (built-in imagegen)",
+      "job_id": null,
+      "output_id": "exec-59a05a2f-c95c-4887-8db5-97e6e3f81231",
+      "prompt": "Ascension Pad, a racing circuit through a working rocket launch complex in a humid jungle estuary, for a remembered early-2000s console anti-gravity racer. Chase-camera view 2.4 m above a 24 m wide concrete racing road at the Mangrove Cut, ONE single egret flying beside the low concrete pier: slender white body, folded S-curved white neck, long tapered yellow beak, two thin black legs trailing behind, two broad white wings held horizontally in one consistent gliding pose, wingspan 1.5 m. Show this single bird clearly in the foreground at three-quarter side angle with feather shapes readable. Sodium lamps, mist, tropical overcast dawn with one warm break. Yellow-black hazard kerbs, painted worn lane markings, damp stained concrete. Painted hand-textured surfaces, honest low-poly geometry, restrained palette of grey concrete, rust steel, sodium amber, swamp green and mist, fog for depth, no bloom, no lens flare, no neon, no photoreal PBR, no vehicles. This is a single cinematic game hero frame, NOT a sheet: no panels, no labels, no text, no diagrams, no scale bars, no duplicated views. No rocket in background.",
+      "review": "Single-view hero replacement; previous sheet-like hero retained as rejected-v1."
+    },
+    "hero-mangrove-pier-gptimage2.png": {
+      "model": "GPT Image 2 (built-in imagegen)",
+      "job_id": null,
+      "output_id": "exec-99060d09-3969-459c-aa48-16729fb91240",
+      "prompt": "Ascension Pad, a racing circuit through a working rocket launch complex in a humid jungle estuary, for a remembered early-2000s console anti-gravity racer. Chase-camera view 2.4 m above a 24 m wide concrete racing road on the low estuary causeway through the Mangrove Cut, Mangrove pier module, 24 m long, 26 m wide and 8 m high: ONE low stained concrete deck on FOUR square concrete piles, TWO low olive safety rails on its outer edges, ONE narrow maintenance ladder down the outside of the left rail, TWO amber cage lamps on short metal posts, ONE rust-red bolted repair plate on the side fascia. Swamp-green algae waterline around all piles. No trees attached; the pier is a standalone authored module., sodium lamps, mist, tropical overcast dawn with one warm break. Yellow-black hazard kerbs, painted worn lane markings, damp stained concrete. Painted hand-textured surfaces, honest low-poly geometry, restrained palette of grey concrete, rust steel, sodium amber, swamp green and mist, fog for depth, no bloom, no lens flare, no neon, no photoreal PBR, no vehicles.\nUse the attached sheet as the asset identity reference, not the camera view. The single asset must fill most of the frame with all defining parts visible. No invented logos. Keep the camera at road height. Include the asset's full silhouette without cropping.",
+      "source": "sheet-mangrove-pier-gptimage2.png",
+      "metadata_note": "No service job ID returned.",
+      "review": "Pending hero versus model acceptance"
+    },
+    "hero-crawlerway-gravel-bed-gptimage2.png": {
+      "model": "GPT Image 2 (built-in imagegen)",
+      "job_id": null,
+      "output_id": "exec-220602cf-504b-43ab-9b2d-dd351747ad79",
+      "prompt": "Ascension Pad, a racing circuit through a working rocket launch complex in a humid jungle estuary, for a remembered early-2000s console anti-gravity racer. Chase-camera view 2.4 m above a 24 m wide concrete racing road on the raised crawler viaduct above the racing road, Crawlerway gravel bed module 32 m long, 38 m wide, 2 m deep: ONE rectangular concrete viaduct deck, TWO parallel olive steel tread strips along its length separated by a broad gravel median, TWO raised concrete edge curbs, FOUR amber cage lamps with glass and metal bases along the curbs, ONE rust-red rectangular repair plate at one corner. The top is compacted pale grey gravel with darker shed stones along both strips. Structural deck only, no crawler and no support columns., sodium lamps, mist, tropical overcast dawn with one warm break. Yellow-black hazard kerbs, painted worn lane markings, damp stained concrete. Painted hand-textured surfaces, honest low-poly geometry, restrained palette of grey concrete, rust steel, sodium amber, swamp green and mist, fog for depth, no bloom, no lens flare, no neon, no photoreal PBR, no vehicles.\nUse the attached sheet as the asset identity reference, not the camera view. The single asset must fill most of the frame with all defining parts visible. No invented logos. Keep the camera at road height. Include the asset's full silhouette without cropping.",
+      "source": "sheet-crawlerway-gravel-bed-gptimage2.png",
+      "metadata_note": "No service job ID returned.",
+      "review": "Pending hero versus model acceptance"
+    },
+    "hero-vent-stack-gptimage2.png": {
+      "model": "GPT Image 2 (built-in imagegen)",
+      "job_id": null,
+      "output_id": "exec-3fc90c2b-5ae3-4c39-9c1c-826965b0b473",
+      "prompt": "Ascension Pad, a racing circuit through a working rocket launch complex in a humid jungle estuary, for a remembered early-2000s console anti-gravity racer. Chase-camera view 2.4 m above a 24 m wide concrete racing road beside the propellant tanks, Vent stack, 6 m wide and 26 m tall: ONE faceted rust-red exhaust pipe with a bent downwind elbow at the top, ONE square concrete plinth, TWO olive steel support collars, ONE ladder, ONE square mesh maintenance platform at 16 m with a low rail, ONE amber cage lamp with a glass lens and metal base on the platform. Small round rivets, no flames., sodium lamps, mist, tropical overcast dawn with one warm break. Yellow-black hazard kerbs, painted worn lane markings, damp stained concrete. Painted hand-textured surfaces, honest low-poly geometry, restrained palette of grey concrete, rust steel, sodium amber, swamp green and mist, fog for depth, no bloom, no lens flare, no neon, no photoreal PBR, no vehicles.\nUse the attached sheet as the asset identity reference, not the camera view. The single asset must fill most of the frame with all defining parts visible. No invented logos. Keep the camera at road height. Include the asset's full silhouette without cropping.",
+      "source": "sheet-vent-stack-gptimage2.png",
+      "metadata_note": "No service job ID returned.",
+      "review": "Pending hero versus model acceptance"
+    },
+    "hero-propellant-tank-gptimage2.png": {
+      "model": "GPT Image 2 (built-in imagegen)",
+      "job_id": null,
+      "output_id": "exec-e4547433-4cc5-4cff-ab5d-c843491b4134",
+      "prompt": "Ascension Pad, a racing circuit through a working rocket launch complex in a humid jungle estuary, for a remembered early-2000s console anti-gravity racer. Chase-camera view 2.4 m above a 24 m wide concrete racing road outside the Tank Farm left-right, Propellant tank, 20 m diameter and 22 m tall: ONE off-white cylindrical tank with a shallow domed roof, TWO rust-red circumferential reinforcement bands, ONE olive vertical access ladder, ONE short bent vent at the roof, ONE rectangular olive repair plate, ONE amber caged glass lamp on a metal base at the ladder foot; round rivet-scale bolts, no other tanks., sodium lamps, mist, tropical overcast dawn with one warm break. Yellow-black hazard kerbs, painted worn lane markings, damp stained concrete. Painted hand-textured surfaces, honest low-poly geometry, restrained palette of grey concrete, rust steel, sodium amber, swamp green and mist, fog for depth, no bloom, no lens flare, no neon, no photoreal PBR, no vehicles.\nUse the attached sheet as the asset identity reference, not the camera view. The single asset must fill most of the frame with all defining parts visible. No invented logos. Keep the camera at road height. Include the asset's full silhouette without cropping.",
+      "source": "sheet-propellant-tank-gptimage2.png",
+      "metadata_note": "No service job ID returned.",
+      "review": "Pending hero versus model acceptance"
+    },
+    "hero-deluge-water-tower-gptimage2.png": {
+      "model": "GPT Image 2 (built-in imagegen)",
+      "job_id": null,
+      "output_id": "exec-b0e7dfa3-9a30-4809-b3eb-ef9042fc1ed4",
+      "prompt": "Ascension Pad, a racing circuit through a working rocket launch complex in a humid jungle estuary, for a remembered early-2000s console anti-gravity racer. Chase-camera view 2.4 m above a 24 m wide concrete racing road beside Deluge Road, Ascension Pad deluge water tower, overall 24 m wide, 24 m deep and 30 m high. ONE squat cylindrical concrete reservoir 24 m diameter and 14 m high on FOUR square olive-steel legs 16 m high; ONE thick rust-red vertical outlet pipe on the front-right leg, ONE red valve wheel 2 m diameter near its foot, ONE ladder on the front-left leg, ONE amber caged lamp with glass lens on a metal base above the valve, ONE welded repair plate on the tank wall. Rivet-scale fasteners. Flat reservoir roof with a low circular guardrail, no extra tanks., sodium lamps, mist, tropical overcast dawn with one warm break. Yellow-black hazard kerbs, painted worn lane markings, damp stained concrete. Painted hand-textured surfaces, honest low-poly geometry, restrained palette of grey concrete, rust steel, sodium amber, swamp green and mist, fog for depth, no bloom, no lens flare, no neon, no photoreal PBR, no vehicles.\nUse the attached sheet as the asset identity reference, not the camera view. The single asset must fill most of the frame with all defining parts visible. No invented logos. Keep the camera at road height. Include the asset's full silhouette without cropping.",
+      "source": "sheet-deluge-water-tower-gptimage2.png",
+      "metadata_note": "No service job ID returned.",
+      "review": "Pending hero versus model acceptance"
+    },
+    "sheet-service-tower-swing-arm-gptimage2.png": {
+      "model": "GPT Image 2 (built-in imagegen)",
+      "job_id": null,
+      "output_id": "exec-b55183e3-1fb6-46af-9f41-eb71abbd741d",
+      "prompt": "Production turnaround sheet for a low-poly racing game asset, three true orthographic views on one wide image: FRONT (left), SIDE (centre), TOP (right), exactly the same metre scale, front and side on a shared ground baseline. Flat neutral grey background, soft even studio lighting, no perspective, no ground shadow, no text except the small view labels and a 1 m scale bar. Complete asset in every view with enough spacing and no cropping.\nASSET: Service-tower swing arm, 18 m long, 3 m wide and 4 m tall: ONE olive rectangular truss bridge, THREE triangular brace bays along each side, ONE cylindrical vertical hinge at the tower end, ONE off-white flexible umbilical hose loop hanging from the rocket end, ONE rust-red repair plate at the central bay, ONE amber caged glass lamp with metal base at the rocket end, round rivet-scale bolts. No tower or rocket; the pivot must be isolated and visible for animation.\nROLE IN THE RACE: Recognizable at chase height from 120 m high above the launch apron joining service tower to rocket. Preserve these defining details: three truss bays, cylindrical pivot, umbilical hose loop, repair plate, cage lamp\nSTORY WEAR: Twenty years of humid wear: rust streaks, sun-bleached top faces, algae at bases, one welded repair plate. For the egret, clean white plumage instead of industrial wear.\nSTYLE: remembered early-2000s console racer, original design, honest low-poly geometry, hand-painted texture language readable at 256-512 px, painted ambient occlusion, restrained palette of grey concrete, rust red, off-white, olive steel, sodium amber, swamp green.\nAVOID: any real space-agency vehicle, any real logo, neon, photoreal PBR, bloom, tiny greebles, new details invented between views. Counts and proportions agree in every view.",
+      "metadata_note": "Tool exposes a saved output ID, no service job ID.",
+      "review": "Pending visual count/proportion review"
+    },
+    "sheet-egret-card-set-gptimage2.png": {
+      "model": "GPT Image 2 (built-in imagegen)",
+      "job_id": null,
+      "output_id": "exec-8aec4d97-c575-4257-821c-d64a0d3f355b",
+      "prompt": "Production turnaround sheet for a low-poly racing game asset, three true orthographic views on one wide image: FRONT (left), SIDE (centre), TOP (right), exactly the same metre scale, front and side on a shared ground baseline. Flat neutral grey background, soft even studio lighting, no perspective, no ground shadow, no text except the small view labels and a 1 m scale bar. Complete asset in every view with enough spacing and no cropping.\nASSET: Egret card set for an animated game bird, one original white egret 1 m tall with 1.5 m wingspan. Three consistent anatomical orthographic views FRONT SIDE TOP. ONE slender white body, ONE S-curved long neck, ONE yellow tapered beak, TWO thin black legs trailing, TWO white wings outstretched. Show the same single flying pose in all three views, no extra birds, no scenery, no labels beyond view labels and a correctly scaled one-metre bar. Keep feather shapes broad and readable as painted low-poly geometry.\nROLE IN THE RACE: Recognizable at chase height from 120 m above the mangrove estuary beyond the racing corridor. Preserve these defining details: S-curved neck, yellow beak, black trailing legs, broad white wings, slim body\nSTORY WEAR: Twenty years of humid wear: rust streaks, sun-bleached top faces, algae at bases, one welded repair plate. For the egret, clean white plumage instead of industrial wear.\nSTYLE: remembered early-2000s console racer, original design, honest low-poly geometry, hand-painted texture language readable at 256-512 px, painted ambient occlusion, restrained palette of grey concrete, rust red, off-white, olive steel, sodium amber, swamp green.\nAVOID: any real space-agency vehicle, any real logo, neon, photoreal PBR, bloom, tiny greebles, new details invented between views. Counts and proportions agree in every view.",
+      "metadata_note": "Tool exposes a saved output ID, no service job ID.",
+      "review": "Pending visual count/proportion review"
+    },
+    "sheet-mangrove-pier-gptimage2.png": {
+      "model": "GPT Image 2 (built-in imagegen)",
+      "job_id": null,
+      "output_id": "exec-8a09dd02-5efb-4ec3-9bc1-9ee5fcf2e56e",
+      "prompt": "Production turnaround sheet for a low-poly racing game asset, three true orthographic views on one wide image: FRONT (left), SIDE (centre), TOP (right), exactly the same metre scale, front and side on a shared ground baseline. Flat neutral grey background, soft even studio lighting, no perspective, no ground shadow, no text except the small view labels and a 1 m scale bar. Complete asset in every view with enough spacing and no cropping.\nASSET: Mangrove pier module, 24 m long, 26 m wide and 8 m high: ONE low stained concrete deck on FOUR square concrete piles, TWO low olive safety rails on its outer edges, ONE narrow maintenance ladder down the outside of the left rail, TWO amber cage lamps on short metal posts, ONE rust-red bolted repair plate on the side fascia. Swamp-green algae waterline around all piles. No trees attached; the pier is a standalone authored module.\nROLE IN THE RACE: Recognizable at chase height from 120 m on the low estuary causeway through the Mangrove Cut. Preserve these defining details: four algae piles, low rails, ladder, two cage lamps, repair plate\nSTORY WEAR: Twenty years of humid wear: rust streaks, sun-bleached top faces, algae at bases, one welded repair plate. For the egret, clean white plumage instead of industrial wear.\nSTYLE: remembered early-2000s console racer, original design, honest low-poly geometry, hand-painted texture language readable at 256-512 px, painted ambient occlusion, restrained palette of grey concrete, rust red, off-white, olive steel, sodium amber, swamp green.\nAVOID: any real space-agency vehicle, any real logo, neon, photoreal PBR, bloom, tiny greebles, new details invented between views. Counts and proportions agree in every view.",
+      "metadata_note": "Tool exposes a saved output ID, no service job ID.",
+      "review": "Pending visual count/proportion review"
+    },
+    "sheet-crawlerway-gravel-bed-gptimage2.png": {
+      "model": "GPT Image 2 (built-in imagegen)",
+      "job_id": null,
+      "output_id": "exec-b3af5c89-880a-4170-a974-088d85a85065",
+      "prompt": "Production turnaround sheet for a low-poly racing game asset, three true orthographic views on one wide image: FRONT (left), SIDE (centre), TOP (right), exactly the same metre scale, front and side on a shared ground baseline. Flat neutral grey background, soft even studio lighting, no perspective, no ground shadow, no text except the small view labels and a 1 m scale bar. Complete asset in every view with enough spacing and no cropping.\nASSET: Crawlerway gravel bed module 32 m long, 38 m wide, 2 m deep: ONE rectangular concrete viaduct deck, TWO parallel olive steel tread strips along its length separated by a broad gravel median, TWO raised concrete edge curbs, FOUR amber cage lamps with glass and metal bases along the curbs, ONE rust-red rectangular repair plate at one corner. The top is compacted pale grey gravel with darker shed stones along both strips. Structural deck only, no crawler and no support columns.\nROLE IN THE RACE: Recognizable at chase height from 120 m on the raised crawler viaduct above the racing road. Preserve these defining details: two tread strips, gravel median, raised curbs, four cage lamps, repair plate\nSTORY WEAR: Twenty years of humid wear: rust streaks, sun-bleached top faces, algae at bases, one welded repair plate. For the egret, clean white plumage instead of industrial wear.\nSTYLE: remembered early-2000s console racer, original design, honest low-poly geometry, hand-painted texture language readable at 256-512 px, painted ambient occlusion, restrained palette of grey concrete, rust red, off-white, olive steel, sodium amber, swamp green.\nAVOID: any real space-agency vehicle, any real logo, neon, photoreal PBR, bloom, tiny greebles, new details invented between views. Counts and proportions agree in every view.",
+      "metadata_note": "Tool exposes a saved output ID, no service job ID.",
+      "review": "Pending visual count/proportion review"
+    },
+    "sheet-vent-stack-gptimage2.png": {
+      "model": "GPT Image 2 (built-in imagegen)",
+      "job_id": null,
+      "output_id": "exec-3b084e35-5eff-4122-ae52-ff88de8b749f",
+      "prompt": "Production turnaround sheet for a low-poly racing game asset, three true orthographic views on one wide image: FRONT (left), SIDE (centre), TOP (right), exactly the same metre scale, front and side on a shared ground baseline. Flat neutral grey background, soft even studio lighting, no perspective, no ground shadow, no text except the small view labels and a 1 m scale bar. Complete asset in every view with enough spacing and no cropping.\nASSET: Vent stack, 6 m wide and 26 m tall: ONE faceted rust-red exhaust pipe with a bent downwind elbow at the top, ONE square concrete plinth, TWO olive steel support collars, ONE ladder, ONE square mesh maintenance platform at 16 m with a low rail, ONE amber cage lamp with a glass lens and metal base on the platform. Small round rivets, no flames.\nROLE IN THE RACE: Recognizable at chase height from 120 m beside the propellant tanks. Preserve these defining details: bent elbow, two collars, plinth, maintenance platform, ladder\nSTORY WEAR: Twenty years of humid wear: rust streaks, sun-bleached top faces, algae at bases, one welded repair plate. For the egret, clean white plumage instead of industrial wear.\nSTYLE: remembered early-2000s console racer, original design, honest low-poly geometry, hand-painted texture language readable at 256-512 px, painted ambient occlusion, restrained palette of grey concrete, rust red, off-white, olive steel, sodium amber, swamp green.\nAVOID: any real space-agency vehicle, any real logo, neon, photoreal PBR, bloom, tiny greebles, new details invented between views. Counts and proportions agree in every view.",
+      "metadata_note": "Tool exposes a saved output ID, no service job ID.",
+      "review": "Pending visual count/proportion review"
+    },
+    "sheet-propellant-tank-gptimage2.png": {
+      "model": "GPT Image 2 (built-in imagegen)",
+      "job_id": null,
+      "output_id": "exec-7678e877-21ea-4ab6-81e1-7ed09370d291",
+      "prompt": "Production turnaround sheet for a low-poly racing game asset, three true orthographic views on one wide image: FRONT (left), SIDE (centre), TOP (right), exactly the same metre scale, front and side on a shared ground baseline. Flat neutral grey background, soft even studio lighting, no perspective, no ground shadow, no text except the small view labels and a 1 m scale bar. Complete asset in every view with enough spacing and no cropping.\nASSET: Propellant tank, 20 m diameter and 22 m tall: ONE off-white cylindrical tank with a shallow domed roof, TWO rust-red circumferential reinforcement bands, ONE olive vertical access ladder, ONE short bent vent at the roof, ONE rectangular olive repair plate, ONE amber caged glass lamp on a metal base at the ladder foot; round rivet-scale bolts, no other tanks.\nROLE IN THE RACE: Recognizable at chase height from 120 m outside the Tank Farm left-right. Preserve these defining details: two rust-red bands, roof vent, ladder, repair plate, caged lamp\nSTORY WEAR: Twenty years of humid wear: rust streaks, sun-bleached top faces, algae at bases, one welded repair plate. For the egret, clean white plumage instead of industrial wear.\nSTYLE: remembered early-2000s console racer, original design, honest low-poly geometry, hand-painted texture language readable at 256-512 px, painted ambient occlusion, restrained palette of grey concrete, rust red, off-white, olive steel, sodium amber, swamp green.\nAVOID: any real space-agency vehicle, any real logo, neon, photoreal PBR, bloom, tiny greebles, new details invented between views. Counts and proportions agree in every view.",
+      "metadata_note": "Tool exposes a saved output ID, no service job ID.",
+      "review": "Pending visual count/proportion review"
+    },
+    "sheet-deluge-water-tower-gptimage2.png": {
+      "model": "GPT Image 2 (built-in imagegen)",
+      "job_id": null,
+      "output_id": "exec-345a7c33-f323-4206-b0ac-9c4c50dcf672",
+      "prompt": "Production turnaround sheet for a low-poly racing game asset, three true orthographic views on one wide image: FRONT (left), SIDE (centre), TOP (right), exactly the same metre scale, front and side on a shared ground baseline. Flat neutral grey background, soft even studio lighting, no perspective, no ground shadow, no text except the small view labels and a 1 m scale bar. Complete asset in every view with enough spacing and no cropping.\nASSET: Ascension Pad deluge water tower, overall 24 m wide, 24 m deep and 30 m high. ONE squat cylindrical concrete reservoir 24 m diameter and 14 m high on FOUR square olive-steel legs 16 m high; ONE thick rust-red vertical outlet pipe on the front-right leg, ONE red valve wheel 2 m diameter near its foot, ONE ladder on the front-left leg, ONE amber caged lamp with glass lens on a metal base above the valve, ONE welded repair plate on the tank wall. Rivet-scale fasteners. Flat reservoir roof with a low circular guardrail, no extra tanks.\nROLE IN THE RACE: monumental water reserve beside Deluge Road, recognizable from 150 m; pipe and valve tell the driver the trench can flood.\nSTORY WEAR: twenty years of humid weathering: rust streaks under bolts, sun-bleached top faces, algae at the base, one welded repair plate, faded paint.\nSTYLE: remembered early-2000s console racer, original design, honest low-poly geometry, hand-painted texture language readable at 256-512 px, painted ambient occlusion, restrained palette of grey concrete, rust red, off-white, olive steel, sodium amber, swamp green.\nAVOID: any real space-agency vehicle, any real logo, neon, photoreal PBR, bloom, tiny greebles, new details invented between views. Counts and proportions agree in every view.",
+      "metadata_note": "Built-in tool exposes output filename but no service job ID.",
+      "review": "Draft: front and side repeat outlet placement; scale bar inaccurate. Model metre dimensions and counts governed by prompt."
+    },
+    "ascension-01-apron.png": {
+      "model": "flux_2",
+      "job_id": "a0f60430-b97e-42bf-b979-92b670eb1c01"
+    },
+    "ascension-02-flame-trench.png": {
+      "model": "flux_2",
+      "job_id": "174db970-09cb-442a-aa80-15a880655e11"
+    },
+    "ascension-03-crawler.png": {
+      "model": "flux_2",
+      "job_id": "ae504a62-4c41-493e-9071-151794707733"
+    },
+    "ascension-04-launch.png": {
+      "model": "flux_2",
+      "job_id": "9e58084f-fecf-4f1d-a9bc-8e9e9fc29d96"
+    },
+    "sheet-rocket-platform-gptimage2.png": {
+      "model": "gpt_image_2",
+      "job_id": "e1ed39fb-0c29-484b-b787-685c2b5ffeb7"
+    },
+    "sheet-crawler-transporter-gptimage2.png": {
+      "model": "gpt_image_2",
+      "job_id": "9b0622ad-0978-409a-ab4f-c38acb3f53db"
+    },
+    "sheet-countdown-board-gptimage2.png": {
+      "model": "gpt_image_2",
+      "job_id": "7a2521ff-b4ce-48ed-b1ad-e371c8a032a2"
+    },
+    "sheet-trench-wall-module-gptimage2.png": {
+      "model": "gpt_image_2",
+      "job_id": "4d34d854-bd91-4a46-afff-530cedf0a75b"
+    },
+    "crawler-maquette-tripo.glb": {
+      "model": "tripo_h3_1_image_to_3d",
+      "job_id": "5bc5eddd-27bb-4609-90e2-ea5a0e02bdda",
+      "source": "crawler-front-crop.png"
+    },
+    "hero-rocket-platform-flux2.png": {
+      "model": "flux_2",
+      "job_id": "e2587115-9717-4692-a0df-01414983950b"
+    },
+    "hero-crawler-transporter-flux2.png": {
+      "model": "flux_2",
+      "job_id": "772316aa-19bc-4235-a09d-6fd5bbcc8178"
+    },
+    "hero-countdown-board-flux2.png": {
+      "model": "flux_2",
+      "job_id": "7893c9ae-caf5-4224-8f4b-30b08d441217"
+    },
+    "hero-trench-wall-module-flux2.png": {
+      "model": "flux_2",
+      "job_id": "f5b2791c-ba5d-4cab-921e-dfddd4d25613"
+    },
+    "rocket-platform-maquette-tripo.glb": {
+      "model": "tripo_h3_1_image_to_3d",
+      "job_id": "a419075e-ae35-4806-ac43-8b136ece84f1",
+      "source": "rocket-platform-front-crop.png"
+    },
+    "hero-egret-card-set-rejected-v1.png": {
+      "model": "GPT Image 2 (built-in imagegen)",
+      "job_id": null,
+      "output_id": "exec-939f005d-a416-4f31-8d69-bc7fcb32faee",
+      "prompt": "Ascension Pad, a racing circuit through a working rocket launch complex in a humid jungle estuary, for a remembered early-2000s console anti-gravity racer. Chase-camera view 2.4 m above a 24 m wide concrete racing road above the mangrove estuary beyond the racing corridor, Egret card set for an animated game bird, one original white egret 1 m tall with 1.5 m wingspan. Three consistent anatomical orthographic views FRONT SIDE TOP. ONE slender white body, ONE S-curved long neck, ONE yellow tapered beak, TWO thin black legs trailing, TWO white wings outstretched. Show the same single flying pose in all three views, no extra birds, no scenery, no labels beyond view labels and a correctly scaled one-metre bar. Keep feather shapes broad and readable as painted low-poly geometry., sodium lamps, mist, tropical overcast dawn with one warm break. Yellow-black hazard kerbs, painted worn lane markings, damp stained concrete. Painted hand-textured surfaces, honest low-poly geometry, restrained palette of grey concrete, rust steel, sodium amber, swamp green and mist, fog for depth, no bloom, no lens flare, no neon, no photoreal PBR, no vehicles.\nUse the attached sheet as the asset identity reference, not the camera view. The single asset must fill most of the frame with all defining parts visible. No invented logos. Keep the camera at road height. Include the asset's full silhouette without cropping.",
+      "source": "sheet-egret-card-set-gptimage2.png",
+      "metadata_note": "No service job ID returned.",
+      "review": "Pending hero versus model acceptance"
+    },
+    "atlas-concrete-gptimage2.png": {
+      "model": "GPT Image 2 (built-in imagegen)",
+      "job_id": null,
+      "output_id": "exec-92187df1-1005-4eed-8f78-99e0e9a3c9ea",
+      "prompt": "Create a square 2048x2048 GAME TEXTURE ATLAS, exactly four equally sized square tiles in a 2x2 grid filling the canvas with no gutter, no labels, no borders, no text anywhere. Hand-painted restrained early-2000s console industrial jungle launch complex materials. All tiles are flat orthographic surface scans, neutral diffuse illumination, no baked directional shadow, no perspective, no scene, no objects. TOP LEFT: warm GREY poured concrete wall, pale dry upper part and subtle olive algae along bottom 15%, scattered small cracks and drip stains, concrete visibly grey not brown. TOP RIGHT: pale off-white ceramic with small repairs and rivet marks, mostly off-white for rocket ceramic panels. BOTTOM LEFT: grey compacted coarse gravel with irregular small dark pebbles, no vegetation. BOTTOM RIGHT: medium LIGHT GREY worn concrete racing road, mostly unobstructed grey road surface with subtle irregular cracks and tyre scuffs, a narrow worn broken off-white centre line vertically centered horizontally in the tile, no grass no moss no dirt. All four tile edges repeat seamlessly in both directions except wall algae. Painted tactile detail at human scale, broad readable values, no shiny PBR, no bloom. Keep road average luminance about 0.5 and wall around 0.55 on a 0-1 display scale. No symbols or typography.",
+      "review": "Grey concrete / ceramic / gravel / road quadrants. Native source retained; runtime JPEG converted with sips."
+    },
+    "atlas-signage-gptimage2.png": {
+      "model": "GPT Image 2 (built-in imagegen)",
+      "job_id": null,
+      "output_id": "exec-8baa42fe-e084-42f0-94cd-291aaeab0af1",
+      "prompt": "Square 2048x2048 diffuse GAME SIGNAGE TEXTURE ATLAS, four equal square tiles in a precise 2x2 grid, no gutters no external labels, flat orthographic scan, no perspective. Hand-painted weathered industrial launch pad, restrained grey olive steel, off-white worn stencils, yellow ochre hazard paint, charcoal. TOP LEFT tile: dark olive painted plate with a single large exact off-white stencil '09' centered. TOP RIGHT tile: dark olive painted steel plate with exact text 'CT-2' in clear worn off-white stencil, centered, no other text. BOTTOM LEFT tile: grey concrete painted sign panel with exact text 'TRENCH 2' on two lines, off-white clearly legible, tiny yellow downward arrow below. BOTTOM RIGHT tile: repeating diagonal 45-degree yellow ochre and charcoal hazard stripes edge to edge, no text. Scratches chips and a few tiny rivet marks, neutral diffuse lighting, strong readable shapes. No PBR highlights, no directional light or baked shadows, no extra logos, no real space agency insignia. Tiles must meet exactly at center horizontally and vertically.",
+      "review": "Exact 09, CT-2 and TRENCH 2 lettering verified; four quadrants. Native source retained."
+    },
+    "material-id-crawler-transporter-rejected-v1.png": {
+      "model": "GPT Image 2 (built-in imagegen)",
+      "job_id": null,
+      "output_id": "exec-21c7e1c4-8307-4fa2-8d0f-80efdf709afa",
+      "prompt": "Use case: precise-object-edit. Create the MATERIAL-ID PASS of the attached Ascension Pad asset sheet. Preserve its entire three-view layout, silhouettes, component counts, spatial positions, view labels and dimensions exactly. Change only surface appearance into flat unshaded categorical material fills: CONCRETE #808080 on concrete and ceramic; METAL #ff0000 on steel, pipes, rivets and structural hardware; JUNGLE #00ff00 on organic matter including the egret plumage; WATER #0000ff only if water is present; SIGNAGE #ffff00 on painted letters and hazard markings; EMISSIVE #ff00ff only on actual lamp glass or countdown light segments. Background #202020. No texture, weathering, lighting, shadow, gradients, new components or new text. Keep holes and negative space open. This is an asset material assignment diagram, not a new design.",
+      "source": "sheet-crawler-transporter-gptimage2.png",
+      "metadata_note": "No service job ID returned.",
+      "review": "Pending material assignment review"
+    },
+    "material-id-countdown-board-rejected-v1.png": {
+      "model": "GPT Image 2 (built-in imagegen)",
+      "job_id": null,
+      "output_id": "exec-c886b264-3c77-4066-a045-b9817c85a44d",
+      "prompt": "Use case: precise-object-edit. Create the MATERIAL-ID PASS of the attached Ascension Pad asset sheet. Preserve its entire three-view layout, silhouettes, component counts, spatial positions, view labels and dimensions exactly. Change only surface appearance into flat unshaded categorical material fills: CONCRETE #808080 on concrete and ceramic; METAL #ff0000 on steel, pipes, rivets and structural hardware; JUNGLE #00ff00 on organic matter including the egret plumage; WATER #0000ff only if water is present; SIGNAGE #ffff00 on painted letters and hazard markings; EMISSIVE #ff00ff only on actual lamp glass or countdown light segments. Background #202020. No texture, weathering, lighting, shadow, gradients, new components or new text. Keep holes and negative space open. This is an asset material assignment diagram, not a new design.",
+      "source": "sheet-countdown-board-gptimage2.png",
+      "metadata_note": "No service job ID returned.",
+      "review": "Pending material assignment review"
+    },
+    "material-id-service-tower-swing-arm-rejected-v1.png": {
+      "model": "GPT Image 2 (built-in imagegen)",
+      "job_id": null,
+      "output_id": "exec-ab08d2ea-73fa-4de1-bfd1-8030500c72ed",
+      "prompt": "Use case: precise-object-edit. Create the MATERIAL-ID PASS of the attached Ascension Pad asset sheet. Preserve its entire three-view layout, silhouettes, component counts, spatial positions, view labels and dimensions exactly. Change only surface appearance into flat unshaded categorical material fills: CONCRETE #808080 on concrete and ceramic; METAL #ff0000 on steel, pipes, rivets and structural hardware; JUNGLE #00ff00 on organic matter including the egret plumage; WATER #0000ff only if water is present; SIGNAGE #ffff00 on painted letters and hazard markings; EMISSIVE #ff00ff only on actual lamp glass or countdown light segments. Background #202020. No texture, weathering, lighting, shadow, gradients, new components or new text. Keep holes and negative space open. This is an asset material assignment diagram, not a new design.",
+      "source": "sheet-service-tower-swing-arm-gptimage2.png",
+      "metadata_note": "No service job ID returned.",
+      "review": "Pending material assignment review"
+    },
+    "material-id-egret-card-set-rejected-v1.png": {
+      "model": "GPT Image 2 (built-in imagegen)",
+      "job_id": null,
+      "output_id": "exec-d6aa9ca2-ecab-4e9f-8f78-452b4292b143",
+      "prompt": "Use case: precise-object-edit. Create the MATERIAL-ID PASS of the attached Ascension Pad asset sheet. Preserve its entire three-view layout, silhouettes, component counts, spatial positions, view labels and dimensions exactly. Change only surface appearance into flat unshaded categorical material fills: CONCRETE #808080 on concrete and ceramic; METAL #ff0000 on steel, pipes, rivets and structural hardware; JUNGLE #00ff00 on organic matter including the egret plumage; WATER #0000ff only if water is present; SIGNAGE #ffff00 on painted letters and hazard markings; EMISSIVE #ff00ff only on actual lamp glass or countdown light segments. Background #202020. No texture, weathering, lighting, shadow, gradients, new components or new text. Keep holes and negative space open. This is an asset material assignment diagram, not a new design.",
+      "source": "sheet-egret-card-set-gptimage2.png",
+      "metadata_note": "No service job ID returned.",
+      "review": "Pending material assignment review"
+    },
+    "atlas-metal-gptimage2.png": {
+      "model": "GPT Image 2 (built-in imagegen)",
+      "job_id": null,
+      "output_id": "exec-4f584805-0b77-4d15-a273-78b8e1cac9df",
+      "prompt": "Square diffuse 2048x2048 GAME METAL TEXTURE ATLAS, exactly four equal square tiles in a 2x2 grid, no gutters no labels no lettering. Flat orthographic surface scans of hand-painted industrial launch pad hardware for a remembered early-2000s console racer. TOP LEFT: worn pale grey-olive painted steel, simple rectangular panel seams and small-scale chips, predominantly medium light grey olive with average display luminance about 0.5, not dark brown. TOP RIGHT: grey repair patch plate with four tiny round rivet heads near corners, a few streaks of rust, mostly pale grey metal. BOTTOM LEFT: dull rust-red tread steel, small scraped silver edges, coarse painted texture, medium brightness. BOTTOM RIGHT: grey olive grille and ribbed machinery strip surface, dark narrow grooves, neutral grey raised ridges. All four tiles have neutral diffuse illumination, no highlights, no directional shadow, no scene, no perspective. Restrained concrete grey, olive and rust palette, painterly imperfections at realistic scale, no neon no PBR shine no bloom. Do not put symbols or logos anywhere.",
+      "review": "Neutral grey olive / repair plate / rust tread / grille quadrants."
+    },
+    "atlas-jungle-gptimage2.png": {
+      "model": "GPT Image 2 (built-in imagegen)",
+      "job_id": null,
+      "output_id": "exec-8bf18b4c-dfa1-4ce0-b151-1c6ed83e1780",
+      "prompt": "Square 2048x2048 diffuse GAME ORGANIC TEXTURE ATLAS, exactly four equal square tiles in a 2x2 grid, no labels no gutters. Flat orthographic hand-painted surfaces for a remembered early-2000s console jungle estuary racer. TOP LEFT: dense overlapping small mangrove leaves in light desaturated olive and sage green, clearly separated leaf shapes, broad clustered canopies, average medium brightness, no black voids. TOP RIGHT: grey brown mangrove bark with thin pale cracks and moist algae near bottom edge, mostly grey wood. BOTTOM LEFT: layered white egret feathers, subtle off-white feather separations with very pale grey fine strokes, predominantly white, no shadows stronger than light grey. BOTTOM RIGHT: second dense mangrove leaf cluster pattern, slightly darker swamp green with varied small leathery leaves. No trees or birds as objects, just seamless close-up materials to map onto geometry. Neutral diffuse light, no perspective, no directional shadow, no scene, no real logos, no photoreal PBR shine. Painted texture detail, restrained natural colours.",
+      "review": "Leaf, bark, white feather and secondary leaf quadrants; organic-only atlas."
+    },
+    "atlas-jungle-card-rejected-alpha.png": {
+      "model": "GPT Image 2 (built-in imagegen)",
+      "job_id": null,
+      "output_id": "exec-f8e01980-a1a4-476a-b277-98af27a456be",
+      "prompt": "Precise game texture atlas edit. Preserve the attached four-quadrant atlas and all pixels in the TOP LEFT leafy tile, TOP RIGHT bark tile, and BOTTOM RIGHT leafy tile. Replace ONLY the BOTTOM LEFT white-feather tile with ONE complete flying egret cutout on a genuinely TRANSPARENT background (alpha 0). The egret is viewed from a three-quarter side angle in a horizontal glide: slender white feathered body, folded S-curved white neck, long yellow tapered beak pointing right, two thin black legs trailing left, two wide white wings held partly spread with readable layered primary feathers. Bird fills 90% of the tile width, with space around wing tips. Painted low-poly game sprite, soft neutral diffuse illumination, no cast shadow, no glow. The bird must look like an egret in flight, not a plane, stick figure or sculpture. Background within that bottom-left quadrant is fully transparent; preserve opaque backgrounds of the other three quadrants. No labels, borders, text or scale bars. Output PNG with alpha channel.",
+      "review": "Rejected alpha export: tool returned RGB with painted checkerboard, not transparency."
+    },
+    "atlas-jungle-card-gptimage2.png": {
+      "model": "GPT Image 2 (built-in imagegen)",
+      "job_id": null,
+      "output_id": "exec-c94ef04d-f029-4ad6-9e18-71ca0e72f594",
+      "prompt": "Precise texture atlas correction: keep the attached full four-quadrant image and all painted details exactly unchanged, including the egret and every feather. Replace ONLY the grey-and-white checkerboard behind the egret in the bottom-left tile with a perfectly flat solid vivid chroma-key MAGENTA colour RGB(255,0,255), hex #ff00ff. No transparency, no checkerboard, no gradient, no shadow in that background. The magenta background must extend cleanly to every edge of the bird silhouette and between legs and wings. Preserve the white bird, yellow beak and black legs, and preserve the other three atlas tiles unchanged. This is a chroma-key game sprite atlas, use perfectly pure #ff00ff outside the bird.",
+      "review": "Magenta-key egret tile. Runtime discards the key before shared lighting, fog and tone mapping."
+    },
+    "atlas-signage-devices-gptimage2.png": {
+      "model": "GPT Image 2 (built-in imagegen)",
+      "job_id": null,
+      "output_id": "exec-05795f31-6a2e-4941-a0a1-c7e1782d033f",
+      "prompt": "Precise game signage atlas edit. Preserve the four-tile layout and the existing 09, CT-2, TRENCH 2 and diagonal hazard artwork. Add a narrow horizontal olive label strip within the BOTTOM 15 PERCENT of the TOP LEFT tile only, with exact off-white stencil text S-07 centered, fully within that strip. Add a matching label strip within the BOTTOM 15 PERCENT of the TOP RIGHT tile only, with exact off-white stencil text P-12 centered. The two small strips must be clear and legible with no extra lettering. Keep the large 09 and CT-2 markings above the strips, without overlap. Preserve the bottom two tiles unchanged. Flat neutral diffuse hand-painted worn labels, no perspective, no new logos, no extra grid or border.",
+      "review": "Ascension device repair reference / labels."
+    },
+    "material-id-power-kit-gptimage2.png": {
+      "model": "GPT Image 2 (built-in imagegen)",
+      "job_id": null,
+      "output_id": "exec-1933db6b-d0bd-4785-a628-8f331f6f6971",
+      "prompt": "Create the Ascension material-ID version of this exact two-device orthographic sheet. Preserve all six views, every silhouette and component, all view labels, dimension labels, and S-07 / P-12 markings. Use the Ascension flat material-ID palette: all steel housings, fans, iris blades, pipes, protective lamp cages, bolts AND BOTH LOW BASE PLINTHS are METAL pure red #ff0000. Only the actual lamp GLASS is EMISSIVE magenta #ff00ff. Stencilled labels are SIGNAGE yellow #ffff00. No concrete is present after the metal-base repair. Background #202020; labels and measurements white. No texture, shading or gradients. Update legend accordingly. Both devices use small round rivet heads, not large hexagonal nuts. Do not alter proportions or component counts.",
+      "review": "Ascension device repair reference / labels."
+    },
+    "ground-water-atlas-v2": {
+      "tool": "built-in image_gen (GPT Image 2 requested)",
+      "prompt": "Use case: stylized-concept. Create an Ascension Pad production material atlas for a remembered early-2000s console jungle estuary racer. Square image, exactly four equal square tiles in a 2 by 2 grid, no gutters, no text, no labels. TOP LEFT: dark green estuary water with restrained painted ripples matching the supplied reference. TOP RIGHT: dense low tropical grass seen straight down, olive and swamp green fine short blades, no leaves from trees. BOTTOM LEFT: damp brown tidal mud with shallow irregular impressions and scattered tiny pebbles. BOTTOM RIGHT: crushed grey-brown gravel with small angular stones. All four are flat top-down hand-painted diffuse material textures, even neutral light, no perspective, no cast shadows, no specular PBR. Each tile represents a 4 metre patch and tiles seamlessly by itself. Restrained swamp green, grey and brown palette, readable painted texture at 256-512px. Preserve the water reference's painted language. No objects, logos, vehicles, neon, bloom or typography. This replaces the water atlas with water and three terrain regions while keeping the six material-atlas roles.",
+      "job_id": null,
+      "artifact_id": "exec-ba43583c-2cf2-4426-ad8b-08e055846589",
+      "output": "ground-water-atlas-v2.png",
+      "note": "Service job ID not exposed by built-in tool. Water role packs water, grass, mud and gravel; original source retained in git."
+    },
+    "steam-vfx": {
+      "tool": "built-in GPT Image 2",
+      "prompt": "Create a single game VFX texture sprite, square 1024x1024, transparent background. A softly hand-painted cloud of pale warm grey launch-pad steam, billowing irregular cauliflower lobes merging into delicate wispy feathered edges. The steam is dense in the central third and fades smoothly to full transparency before every edge; ample transparent margin on all four sides. Neutral diffuse painting only, no baked directional light, no scene, no ground, no machinery, no text, no borders, no checkerboard. Restrained remembered early-2000s console racer art, broad soft painted shapes, no photoreal photograph, no neon or bloom. This one texture will be tinted as steam and smoke and rendered on camera-facing volumetric cards under shared Lambert lighting, fog and tone mapping; all lighting comes from the game. No hard rectangular silhouette, no surface cracks, no algae, no architectural details. Deliver actual alpha transparency.",
+      "job_id": null,
+      "artifact_id": "exec-2899ed5a-be49-4cd9-9205-6417be8d81dd",
+      "output": "public/assets/ascension/textures/steam.png",
+      "note": "Service job ID was not exposed. Dedicated transparent VFX card; six solid-surface atlases unchanged."
+    }
+  },
+  "sheet_prompt_template": "Production turnaround sheet for a low-poly racing game asset, three true orthographic views on one wide image: FRONT (left), SIDE (centre), TOP (right), exactly the same metre scale, front and side on a shared ground baseline. Flat neutral grey background, soft even studio lighting, no perspective, no ground shadow, no text except the small view labels and a 1 m scale bar. Complete asset in every view with enough spacing and no cropping.\nASSET: <name, overall metres, EXACT counts of every part, placement of each part>\nROLE IN THE RACE: <what the driver must read from it and at what distance>\nSTORY WEAR: <twenty years of humid weathering: rust streaks under bolts, sun-bleached top faces, algae at the base, one welded repair plate, faded stencil>\nSTYLE: remembered early-2000s console racer, original design, honest low-poly geometry, hand-painted texture language readable at 256-512 px, painted ambient occlusion, restrained palette of grey concrete, rust red, off-white, olive steel, sodium amber, swamp green.\nAVOID: any real space-agency vehicle, any real logo, neon, photoreal PBR, bloom, tiny greebles, new details invented between views. Counts and proportions agree in every view.",
+  "hero_prompt_template": "Ascension Pad, a racing circuit through a working rocket launch complex in a humid jungle estuary, for a remembered early-2000s console anti-gravity racer. Chase-camera view 2.4 m above a 24 m wide concrete racing road <where>, <the asset described exactly as in its sheet>, sodium lamps, mist, tropical overcast dawn with one warm break. Yellow-black hazard kerbs, painted worn lane markings, damp stained concrete. Painted hand-textured surfaces, honest low-poly geometry, restrained palette of grey concrete, rust steel, sodium amber, swamp green and mist, fog for depth, no bloom, no lens flare, no neon, no photoreal PBR, no vehicles.",
+  "division_of_labour": "Higgsfield (FLUX.2 heroes, Tripo maquettes) is run by the orchestrator, not Codex. Codex has GPT Image 2 only and uses it for every remaining sheet and material-ID pass. Where no hero exists for a secondary asset, Codex makes it with GPT Image 2 using hero_prompt_template.",
+  "phase_b_metadata": {
+    "status": "working art; focal acceptance not granted",
+    "generator": "GPT Image 2 built-in imagegen; no Higgsfield connection",
+    "service_job_ids": "Not returned by the built-in tool. job_id is null; output_id identifies the returned exec artifact.",
+    "sky_resolution": "Generated source 1774x887; sips resampled to runtime 4096x1024. Not a native 4096x1024 generation.",
+    "assessment": "../../evidence/ascension-v1/phase-b/focal/assessment.json"
+  },
+  "audio_generation": {
+    "script": "scripts/build-ascension-radio.py",
+    "records": [
+      {
+        "id": "minus-sixty",
+        "prompt": "T minus sixty. Launch day.",
+        "engine": "macOS say / Samantha / 165 words per minute",
+        "job_id": null,
+        "job_id_note": "Offline local synthesis has no service job ID.",
+        "file": "public/assets/ascension/audio/minus-sixty.wav",
+        "sha256": "1542222a7dc9c8b2a503b6105436d1129866935fee22f887228d9a65c5225268",
+        "sampleRate": 48000,
+        "sampleFrames": 96965,
+        "seconds": 2.0201041666666666
+      },
+      {
+        "id": "deluge-armed",
+        "prompt": "Deluge armed.",
+        "engine": "macOS say / Samantha / 165 words per minute",
+        "job_id": null,
+        "job_id_note": "Offline local synthesis has no service job ID.",
+        "file": "public/assets/ascension/audio/deluge-armed.wav",
+        "sha256": "cd776fe5c81addb3feb146572b32bb21d67ab7ec3c00d0a885afe8d8f8307e6d",
+        "sampleRate": 48000,
+        "sampleFrames": 39918,
+        "seconds": 0.831625
+      },
+      {
+        "id": "clear-trench",
+        "prompt": "Clear the trench. Take Deluge Road.",
+        "engine": "macOS say / Samantha / 165 words per minute",
+        "job_id": null,
+        "job_id_note": "Offline local synthesis has no service job ID.",
+        "file": "public/assets/ascension/audio/clear-trench.wav",
+        "sha256": "316cbe4c70077406c6576a76c0c3caf5d49c0bbd8f1732343c1fc20b085c8bdb",
+        "sampleRate": 48000,
+        "sampleFrames": 107464,
+        "seconds": 2.2388333333333335
+      }
+    ]
+  },
+  "shield_hero_proposal": {
+    "tool": "built-in image_gen (GPT Image 2 requested)",
+    "template": "hero_prompt_template",
+    "status": "Proposal only; runtime unchanged; review pending",
+    "jobs": [
+      {
+        "artifact_id": "exec-ef606d4a-cb66-42fa-b8bf-031173d23327",
+        "job_id": null,
+        "prompt": "Use case: stylized-concept. Ascension Pad, a racing circuit through a working rocket launch complex in a humid jungle estuary, for a remembered early-2000s console anti-gravity racer. Chase-camera view 2.4 m above a 24 m wide concrete racing road beside the Tank Farm service apron. One original P-12 Phase Shield pressure-bulkhead projector standing on the roadside: 1.4 m wide, 1.75 m tall, 1.1 m deep. A compact rectangular olive steel pressure case, six overlapping off-white ceramic-faced iris blades inside a bolted circular steel flange, two vertical side hydraulic barrels, one small caged sodium-amber emissive GLASS lamp mounted at the upper right, tiny round rivet-scale bolts, a low METAL skid base with two bolted feet, a faded exact P-12 stencil upper left. Humid service wear: rust streaks below small bolts, sun-bleached top, one welded repair patch. The iris and protective construction must read as launch-complex blast equipment, not a turbine or washing machine. Full device visible at close three-quarter chase height, occupying the middle half of a 16:9 landscape frame including all base feet. Sodium lamps, mist, tropical overcast dawn with one warm break. Yellow-black hazard kerbs, painted worn lane markings, damp stained concrete. Painted hand-textured surfaces, honest low-poly geometry, restrained palette of grey concrete, rust steel, off-white, olive, sodium amber, swamp green and mist, fog for depth. No cyan glass or cyan decorative light. No bloom, no lens flare, no neon, no photoreal PBR, no vehicles, no real logos, no text other than P-12. This is a proposed native device hero, not a production screenshot.",
+        "status": "Superseded: photoreal treatment"
+      },
+      {
+        "artifact_id": "exec-8822d7f7-3d21-4499-9070-dcfd21f9afa3",
+        "job_id": null,
+        "prompt": "Precise style-transfer correction of the attached P-12 hero. Keep composition, road, full device silhouette, six overlapping iris blades, two hydraulic cylinders, caged amber GLASS lamp, P-12 stencil and metal feet unchanged. Render the ENTIRE image as a remembered early-2000s console game: clearly faceted low-poly forms, broad hand-painted diffuse texture strokes readable at 256-512 px, simple painted ambient occlusion, matte surfaces, simplified vegetation cards, diffuse atmospheric fog. Remove photoreal microdetail, realistic specular reflections, glossy wet-road reflections and tiny noisy scratches. The concrete is matte stained painted grey, steel is worn matte olive, iris blades matte off-white ceramic, lamp restrained sodium amber. Change the oversized front-foot hex nuts into small round rivet-scale bolt heads. No cyan, no bloom, no lens flare, no photoreal PBR. This is an art proposal, not a runtime screenshot.",
+        "status": "Current proposal"
+      }
+    ],
+    "note": "Service job IDs not exposed. Pair mapping withheld outside checkout; generation previews have been visible, so no claim of independent source blindness."
+  }
+}

@@ -1,0 +1,123 @@
+{
+ "generated": "2026-09-09",
+ "tool": "Higgsfield MCP (orchestrator session)",
+ "balance_before": 57.98,
+ "balance_after": 51.98,
+ "routing": "gpt_image_2 at server defaults (1k, quality low, 0.5 cr) for every quadrant atlas, the magenta-key card sheet and both 21:9 sky sources; flux_2 pro (1.0 cr) for the hero frames in ../heroes; no maquettes (the ../sheets ortho model sheets supersede them).",
+ "convention": "Every atlas is a 2x2 quadrant sheet at 1024x1024: quadrant UV rects are TL (0,0.5)-(0.5,1), TR (0.5,0.5)-(1,1), BL (0,0)-(0.5,0.5), BR (0.5,0)-(1,0.5) in GL (bottom-origin) V; thin gutter lines must be inset (0.004) so bilinear sampling never bleeds a neighbour.",
+ "division_of_labour": "Orchestrator generates and eyeballs every image and records the verdict here; the implementer converts, crops, posterises, UV-maps and integrates, and may NOT generate new images - it reports what is missing and why.",
+ "jobs": {
+  "atlas-concrete-gptimage2.png": {
+   "model": "gpt_image_2",
+   "job_id": "0b6456b0-a0fc-423e-8d25-196c72bb88e1",
+   "aspect": "1:1",
+   "cost_credits": 0.5,
+   "prompt": "Game texture atlas, one square image divided into exactly FOUR equal quadrants by thin dark gutter lines, each quadrant a flat-on seamless-style material swatch, camera pointing exactly perpendicular at the surface, absolutely zero perspective, no vanishing point, flat even lighting, no baked shadows. CONCRETE ROLE for a tropical island racing circuit. Top-left: pale sandy concrete racing-road surface with faint tyre-polish lanes and fine sand drift. Top-right: dry pale limestone paving blocks of a stone causeway, tight joints, light moss in the seams. Bottom-left: white concrete kerb stone with a single bright cyan painted stripe along its length, small chips at the edges. Bottom-right: weathered grey-tan limestone wall blocks with cracks and pale sand in the joints. Early-2000s PS2 painted game texture style, slightly soft, saturated but not photoreal, no text, no labels, no numbers.",
+   "review": "KEEP. Quadrants exactly as authored: TL sand road (arc-shaped polish lanes - rotate or crop so lanes run along U), TR causeway paving, BL cyan-stripe kerb, BR wall blocks. Flat-on, no perspective."
+  },
+  "atlas-metal-gptimage2.png": {
+   "model": "gpt_image_2",
+   "job_id": "d9bad5d2-568e-4c8a-9305-44fce3050d42",
+   "aspect": "1:1",
+   "cost_credits": 0.5,
+   "prompt": "Game texture atlas, one square image divided into exactly FOUR equal quadrants by thin dark gutter lines, each quadrant a flat-on material swatch, camera pointing exactly perpendicular at the surface, absolutely zero perspective, no vanishing point, flat even lighting, no baked shadows. METAL ROLE for a tropical island racing circuit. Top-left: brushed pale steel plate with cyan-painted chevrons of a launch strip, light wear. Top-right: galvanised grey guard-rail post and beam with rivets, salt staining. Bottom-left: aged bronze clock-face ring and two plain black clock hands laid flat on neutral grey. Bottom-right: dark iron gate post with a small white lamp housing. Early-2000s PS2 painted game texture style, saturated but not photoreal, no text, no labels, no numbers.",
+   "review": "KEEP. TL chevron strip, TR rail post+beam, BL bronze ring + two hands on neutral grey (key the grey out or UV the ring/hands as separate rects), BR gate post with caged lamp."
+  },
+  "atlas-jungle-gptimage2.png": {
+   "model": "gpt_image_2",
+   "job_id": "5b9ba001-582e-4a5b-a5be-98d9b5c67ca2",
+   "aspect": "1:1",
+   "cost_credits": 0.5,
+   "prompt": "Game texture atlas, one square image divided into exactly FOUR equal quadrants by thin dark gutter lines, each quadrant a flat-on material swatch, camera pointing exactly perpendicular at the surface, absolutely zero perspective, no vanishing point, flat even lighting, no baked shadows. JUNGLE ROLE, organic surfaces only, for a tropical island racing circuit. Top-left: segmented brown palm-trunk bark, horizontal banded rings, flat-on. Top-right: dense green moss over stone with tiny white five-petal blossoms, flat-on. Bottom-left: layered broad tropical leaves in saturated green with yellow-green ribs, flat-on fill. Bottom-right: pale beach sand with faint ripples and a few small shells, flat-on. Early-2000s PS2 painted game texture style, saturated naive colour, not photoreal, no text, no labels, no numbers.",
+   "review": "KEEP. TL bark (slight barrel curvature baked in - acceptable on a cylinder), TR moss+blossoms over stones, BL leaf fill, BR sand with shells."
+  },
+  "atlas-water-gptimage2.png": {
+   "model": "gpt_image_2",
+   "job_id": "b8fbfc10-218e-4cfc-b3c1-4277cf8c02ff",
+   "aspect": "1:1",
+   "cost_credits": 0.5,
+   "prompt": "Game texture atlas, one square image divided into exactly FOUR equal quadrants by thin dark gutter lines, each quadrant a flat-on water surface swatch, camera pointing exactly perpendicular DOWN at the water, absolutely zero perspective, no vanishing point, no horizon, flat even lighting. WATER ROLE for a tropical island racing circuit. Top-left: bright turquoise shallow water with soft white caustic light-web over pale sand, seen straight down. Top-right: deep ultra-saturated cobalt blue open sea with a small regular low-poly wave-facet pattern, straight down. Bottom-left: white surf foam line dissolving into cyan water, straight down, foam as soft flat blobs. Bottom-right: a vertical waterfall sheet of white and pale blue streaks on a dark stone background, straight on, tileable top to bottom. Early-2000s PS2 painted game texture style, naive saturated colour, not photoreal, no text, no labels, no numbers.",
+   "review": "KEEP - the water shader's whole vocabulary. TL caustic shallows, TR cobalt facet swell, BL foam-to-cyan gradient (V axis = shore distance), BR waterfall streaks on dark stone (scroll V). Check TR tiles before use."
+  },
+  "atlas-signage-gptimage2.png": {
+   "model": "gpt_image_2",
+   "job_id": "b9c38095-3ee0-4275-abb4-6eddd7f7260c",
+   "aspect": "1:1",
+   "cost_credits": 0.5,
+   "prompt": "Game texture atlas, one square image divided into exactly FOUR equal quadrants by thin dark gutter lines, flat-on, camera pointing exactly perpendicular at the surface, zero perspective, flat even lighting. SIGNAGE ROLE for a tropical island racing circuit named DREAM ISLAND. Top-left: a small rectangular enamel place plate, cream background with a thin cyan border, reading exactly DREAM ISLAND in plain black block capitals. Top-right: a small square plate reading exactly 07 in large black block numerals on cream. Bottom-left: a narrow strip of six small square gate number plates reading exactly 1 2 3 4 5 6 in black numerals on white. Bottom-right: a small rectangular plate reading exactly BEACH in black block capitals on cream with a faded cyan wave mark beneath. Early-2000s PS2 painted game texture style, slightly worn enamel, no other text anywhere, no logos.",
+   "review": "KEEP. All four texts exact (DREAM ISLAND / 07 / 1-6 / BEACH). Plates sit on a dark green field - UV rects must be the plates only, the field is not a material. Letters must be placed at <= 0.59 m in world."
+  },
+  "atlas-emissive-gptimage2.png": {
+   "model": "gpt_image_2",
+   "job_id": "a55b7954-f2fa-4873-8063-82c4e217a036",
+   "aspect": "1:1",
+   "cost_credits": 0.5,
+   "prompt": "Game texture atlas, one square image divided into exactly FOUR equal quadrants by thin dark gutter lines, each quadrant a flat-on glow swatch on a pure black background, camera pointing exactly perpendicular at the surface, zero perspective, no scene. EMISSIVE ROLE for a tropical island racing circuit at night. Top-left: a soft bright cyan foam-line glow, a horizontal band of luminous cyan fading to black above and below. Top-right: a luminous turquoise shallow-water glow with a faint pale caustic web, uniform, fading to black at the edges. Bottom-left: a warm pale-yellow round lamp glow disc with a soft falloff, for a tunnel lamp. Bottom-right: a glowing white clock face with two plain black hands and no numerals, soft white halo. Early-2000s PS2 painted game texture style, no text, no labels, no numbers except none.",
+   "review": "KEEP. TL foam glow band, TR shallows glow, BL lamp disc, BR lit clock face (the two hands drew as one line through the centre - use the metal atlas hands for geometry, this quadrant is the face glow only). Emission strength is driven by nightBlend, never toneMapped:false."
+  },
+  "atlas-jungle-card-gptimage2.png": {
+   "model": "gpt_image_2",
+   "job_id": "ced930e8-3400-49bf-83bc-4511eff71391",
+   "aspect": "1:1",
+   "cost_credits": 0.5,
+   "prompt": "Game sprite card sheet on a solid flat PURE MAGENTA background (RGB 255, 0, 255) used as a colour key, one square image divided into exactly FOUR equal quadrants, each quadrant holding ONE isolated sprite centred with magenta space around it, flat-on side elevation, zero perspective, flat even lighting, no drop shadows, no ground. JUNGLE CARD ROLE for a tropical island racing circuit. Top-left: a single drooping low-poly palm frond, saturated green with a yellow-green rib. Top-right: a tropical fern clump. Bottom-left: a flowering shrub with small white five-petal blossoms. Bottom-right: a flat-shaded low-poly orange goldfish in side view with a painted round eye. Early-2000s PS2 painted game sprite style, hard clean edges against the magenta, no anti-aliasing halo, no text, no labels.",
+   "review": "KEEP. Clean magenta key, four isolated cards (frond, fern, blossom shrub, goldfish side). Discard the key in onBeforeCompile before shared lighting/fog/tonemap exactly as src/game/ascension-materials.ts:2-10 does (min(r,b)-g > .025)."
+  },
+  "sky-day-gptimage2.png": {
+   "model": "gpt_image_2",
+   "job_id": "4bd3466a-7dd4-46c2-91ca-1fbbd4f15f92",
+   "aspect": "21:9",
+   "cost_credits": 0.5,
+   "native_size": "1344x576",
+   "prompt": "Create exactly one seamless panoramic SKY TEXTURE, an extreme horizontal panorama for a 360 degree game sky, meant to be wrapped on a sphere. No panels, borders or lettering. DREAM ISLAND, tropical noon, one consistent lighting state across the whole width: a hard saturated cobalt-to-azure blue sky with small scattered puffy white cumulus clouds in the naive early-2000s screensaver style, clouds flat-bottomed and evenly spread, no sun disc, no moon, no stars, no lens flare, no dark storm clouds. Sky-band brightness variation across the whole width must be less than 2:1; no abrupt warmth changes anywhere. The bottom quarter is a continuous calm sea horizon in deep cobalt with a thin pale haze line and a few tiny distant sea-stack silhouettes, no islands, no buildings. Left and right edges must match continuously in colour and cloud height so the image tiles horizontally. Whole image is one long painting with a low horizon. Hand-painted, slightly soft.",
+   "review": "KEEP as the day source. Even cloud field, no sun disc, low horizon with sea-stack silhouettes. Native 1344x576 - resample to 4096x1024 (Lanczos) and run scripts/visual/tideline-v4/sky-profile.py (4096x1024, warm_step<=.05, ratio<=2) before acceptance; the edge blend in the shader covers any residual seam."
+  },
+  "sky-night-gptimage2.png": {
+   "model": "gpt_image_2",
+   "job_id": "1a7cf519-a822-4f9d-8643-a4d24c092282",
+   "aspect": "21:9",
+   "cost_credits": 0.5,
+   "native_size": "1344x576",
+   "prompt": "Create exactly one seamless panoramic SKY TEXTURE, an extreme horizontal panorama for a 360 degree game sky, meant to be wrapped on a sphere. No panels, borders or lettering. DREAM ISLAND at night after a magical transition: a pure near-black sky filled with thousands of tiny sharp white stars of varied brightness, evenly distributed, no clouds at all, no moon, no milky way band, no nebula colours, no lens flare. Uniform darkness across the whole width, brightness variation less than 2:1. The bottom quarter is a continuous calm black sea horizon with one very thin faint cyan haze line at the horizon and a few tiny distant sea-stack silhouettes, no islands, no buildings. Left and right edges must match continuously so the image tiles horizontally. Whole image is one long painting with a low horizon. Hand-painted, slightly soft, early-2000s screensaver style.",
+   "review": "KEEP as the night source. Clear starfield (the cloud band in atmosphere.ts can only ADD light, so a clear night sky is the only kind this shader can carry), cyan haze line, silhouettes. Same resample + sky-profile gate as the day sky. Stars will soften at 3x upscale - acceptable for the register; revisit only on eyeball."
+  },
+  "sky-day-v2-gptimage2.png": {
+   "model": "gpt_image_2",
+   "job_id": "f1b36fd7-ea0b-4d47-896a-6df1ba34bfd4",
+   "aspect": "21:9",
+   "cost_credits": 0.5,
+   "native_size": "1344x576",
+   "prompt": "Create exactly one seamless panoramic SKY TEXTURE, an extreme horizontal panorama for a 360 degree game sky, meant to be wrapped on a sphere. No panels, borders or lettering. DREAM ISLAND, tropical noon, ONE perfectly uniform lighting state across the entire width. A hard saturated azure blue sky with only a very sparse, perfectly even sprinkle of tiny puffy white clouds, all identical in size, placed on a regular even grid across the whole sky band so every ten-degree slice has exactly the same amount of cloud; mostly clear blue. No sun disc, no moon, no stars, no lens flare, no dark clouds, no warm tint anywhere. The bottom quarter is a continuous calm deep-cobalt sea horizon with a thin pale haze line, no islands, no buildings, no silhouettes. Left and right edges match continuously. Whole image is one long painting with a low horizon. Hand-painted, slightly soft.",
+   "review": "KEEP — REPLACES sky-day-gptimage2.png as the day source. v1 failed the still gate on its own uneven cloud field (warm-step .126 native, .1255 resampled). v2 is a regular grid of identical puffs (the Y2K wallpaper sky) and measures warm-step .062 raw at 4096x1024; with cloud contrast softened 25% toward the per-row median sky colour (a texture edit, not generation: excess = pixel - row median, scaled 0.75, sky rows only) it measures .0466 / ratio 1.077 and PASSES. Use the softened 4096x1024 build; keep the native here. Sibling sky-day-v2a-rejected.png (denser grid) measured .107 and was rejected."
+  },
+  "sky-day-v3-gptimage2.png": {
+   "model": "gpt_image_2",
+   "job_id": "90cd1352-3c93-4c49-8848-5b69dd1c3d8d",
+   "aspect": "21:9",
+   "cost_credits": 0.5,
+   "native_size": "1344x576",
+   "prompt": "Create exactly one seamless panoramic SKY TEXTURE, an extreme horizontal panorama for a 360 degree game sky, meant to be wrapped on a sphere. No panels, borders or lettering. DREAM ISLAND, tropical noon, ONE perfectly uniform lighting state across the entire width: a hard saturated azure blue sky, almost entirely clear, with only a faint, very sparse, perfectly even scatter of very small soft pale-blue-white cloud puffs of LOW contrast against the blue (never bright white), all identical in size and spaced on a regular grid so every ten-degree slice looks the same. No sun disc, no moon, no stars, no lens flare, no dark clouds, no warm tint anywhere. The bottom quarter is a continuous calm deep-cobalt sea horizon with a thin pale haze line, no islands, no buildings, no silhouettes. Left and right edges match continuously. Whole image is one long painting with a low horizon. Hand-painted, slightly soft.",
+   "review": "PASSES THE GATE UNTOUCHED (warm .0194, ratio 1.053) but FAILS THE EYEBALL: the clouds are faint smudges, the naive puffy-cloud identity is gone. FALLBACK ONLY — use if the user rejects softened clouds on v2."
+  }
+ },
+ "sky_day_revision": {
+  "date": "2026-09-10",
+  "reason": "sky-profile.py warm-step gate",
+  "chosen": "sky-day-v2-gptimage2.png softened 0.25 -> sky-day-v2-soft25-4096x1024.jpg (passes .0466 / 1.077, wallpaper-grid puffs intact). Fallback: sky-day-v3-4096x1024.jpg (passes raw, reads flat).",
+  "measured": {
+   "raw": {
+    "warm": 0.0621,
+    "ratio": 1.103
+   },
+   "soft25": {
+    "warm": 0.0466,
+    "ratio": 1.077
+   },
+   "soft40": {
+    "warm": 0.0376,
+    "ratio": 1.062
+   }
+  },
+  "eyeball": "orchestrator, 2026-09-10; user eyeball still owed"
+ }
+}

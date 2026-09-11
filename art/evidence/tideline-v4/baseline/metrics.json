@@ -1,0 +1,23 @@
+{
+  "script": "scripts/visual/tideline-v4/race.mjs",
+  "url": "http://127.0.0.1:5214/?map=tideline&seed=3868938316&demo=1&headless=1&diagnostics=1&start=manual&quality=high&music=0",
+  "calibration": {
+    "samples": 120,
+    "windowMs": 969.3999999761581,
+    "hz": 123.78791005049652
+  },
+  "frames": 9645,
+  "windowSamples": 720,
+  "sampleWindowMs": 5799.5,
+  "expectedSamples": 717.9079843378546,
+  "observedRate": 124.14863350288819,
+  "p95Ms": 8.5,
+  "peakMainCalls": 112,
+  "peakShadowCalls": 22,
+  "peakMainTriangles": 123242,
+  "peakShadowTriangles": 24456,
+  "internalSizes": [
+    "1280x720"
+  ],
+  "errors": []
+}

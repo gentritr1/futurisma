@@ -1,0 +1,12 @@
+{
+  "branch": "work/dream-island",
+  "head": "9109b6f5dda31d4d88c53bb968c7dcb6084a056b",
+  "initialStatus": " M PRODUCT.md\n M art/evidence/dreamisland-v1/phase-a/route-validation.json\n M art/evidence/dreamisland-v1/phase-a/runtime-validation.json\n M package.json\n M scripts/build-dreamisland-route.mjs\n M scripts/solve-dreamisland-pace.mjs\n M scripts/validate-dreamisland.mjs\n M scripts/visual/dreamisland/race.mjs\n M src/game/data/dreamisland/rival-pace.json\n M src/game/data/dreamisland/route.json\n M src/game/data/dreamisland/schedule.json\n M src/game/dreamisland-course.ts\n D src/game/dreamisland-environment.ts\n M src/game/dreamisland-runtime.ts\n M src/game/scene-assets.ts\n?? art/blender/build_dreamisland_painted.py\n?? art/blender/dreamisland_mesh.py\n?? art/blender/dreamisland_painted.blend\n?? art/evidence/dreamisland-v1/phase-b/\n?? art/references/dreamisland/phase-b/\n?? docs/briefs/DREAM-ISLAND-CODEX-3D.md\n?? docs/briefs/DREAM-ISLAND-HANDOFF.md\n?? public/assets/dreamisland/\n?? scripts/design/solve-dreamisland-closure.mjs\n?? scripts/measure-dreamisland-route.mjs\n?? scripts/prepare-dreamisland-atlases.py\n?? scripts/prepare-dreamisland-skies.py\n?? scripts/validate-dreamisland-painted.mjs\n?? scripts/visual/dreamisland/atlas-proof.mjs\n?? scripts/visual/dreamisland/atlas-proof.py\n?? scripts/visual/dreamisland/frames.mjs\n?? src/game/dreamisland-materials.ts\n?? src/game/dreamisland-painted-environment.ts\n?? src/game/dreamisland-sky.ts\n?? src/game/dreamisland-water.ts\n",
+  "readOnlyInputs": {
+    "docs/briefs/DREAM-ISLAND-CODEX-3D.md": "d5e284b49cf7b9289d1906e461b02a1a96c3e43791e7079549c147b6f96f6cd9",
+    "docs/briefs/DREAM-ISLAND-HANDOFF.md": "81a7bcdf5c0c18956422c2d9935ea364f4d7e7af62f1a1d14a4c3f9eb9674d1f",
+    "public/assets/dreamisland/atlas-manifest.json": "ef4e7750c089970df097358fb5575235a378ccc6dbdf91c3c0e496f2d7a46675",
+    "src/game/dreamisland-painted-environment.ts": "e40587ae82b0c1d864a01a2e9769063a293872c4f1859eaa96d830458521fc5e"
+  },
+  "scope": "Only build_dreamisland_heroes.py, heroes assets, heroes evidence, scripts/visual/dreamisland-heroes. No blend saved outside these paths."
+}

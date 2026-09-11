@@ -1,0 +1,195 @@
+{
+  "script": "scripts/visual/ascension/reconcile-phase-b.py",
+  "interpretation": "Render sampling uses measured pre-start requestAnimationFrame rate, not the 120 Hz physics rate. Differences are missed or extra presentation intervals relative to calibration; they are not dropped physics ticks. Host scheduling is not isolated. Draft runs are retained separately.",
+  "runs": [
+    {
+      "run": "deluge",
+      "measurementScript": "scripts/visual/ascension/instrument.mjs",
+      "calibration": {
+        "samples": 120,
+        "windowMs": 964.8999999761581,
+        "hz": 124.36521919677179
+      },
+      "windows": [
+        {
+          "name": "active",
+          "seconds": 95.78179999995231,
+          "expectedRateHz": 124.36521919677179,
+          "expectedSamples": 11911.924552055425,
+          "observedSamples": 11877,
+          "residual": -34.92455205542501
+        },
+        {
+          "name": "p95",
+          "seconds": 5.796600000023842,
+          "expectedRateHz": 124.36521919677179,
+          "expectedSamples": 720.8954295989724,
+          "observedSamples": 720,
+          "residual": -0.8954295989724415
+        }
+      ]
+    },
+    {
+      "run": "draft-01-trench",
+      "measurementScript": "scripts/visual/ascension/instrument.mjs",
+      "calibration": {
+        "samples": 120,
+        "windowMs": 964.5,
+        "hz": 124.41679626749611
+      },
+      "windows": [
+        {
+          "name": "active",
+          "seconds": 86.12,
+          "expectedRateHz": 124.41679626749611,
+          "expectedSamples": 10714.774494556765,
+          "observedSamples": 10661,
+          "residual": -53.774494556764694
+        },
+        {
+          "name": "p95",
+          "seconds": 5.8145,
+          "expectedRateHz": 124.41679626749611,
+          "expectedSamples": 723.4214618973562,
+          "observedSamples": 720,
+          "residual": -3.421461897356153
+        }
+      ]
+    },
+    {
+      "run": "draft-02-trench",
+      "measurementScript": "scripts/visual/ascension/instrument.mjs",
+      "calibration": {
+        "samples": 120,
+        "windowMs": 962.7000000476837,
+        "hz": 124.64942349024228
+      },
+      "windows": [
+        {
+          "name": "active",
+          "seconds": 86.21989999997616,
+          "expectedRateHz": 124.64942349024228,
+          "expectedSamples": 10747.260828383369,
+          "observedSamples": 10669,
+          "residual": -78.26082838336879
+        },
+        {
+          "name": "p95",
+          "seconds": 5.807699999928475,
+          "expectedRateHz": 124.64942349024228,
+          "expectedSamples": 723.9264567953645,
+          "observedSamples": 720,
+          "residual": -3.9264567953645155
+        }
+      ]
+    },
+    {
+      "run": "draft-03-deluge",
+      "measurementScript": "scripts/visual/ascension/instrument.mjs",
+      "calibration": {
+        "samples": 120,
+        "windowMs": 969.5,
+        "hz": 123.77514182568335
+      },
+      "windows": [
+        {
+          "name": "active",
+          "seconds": 95.77539999997616,
+          "expectedRateHz": 123.77514182568335,
+          "expectedSamples": 11854.613718408602,
+          "observedSamples": 11879,
+          "residual": 24.386281591398074
+        },
+        {
+          "name": "p95",
+          "seconds": 5.801100000023842,
+          "expectedRateHz": 123.77514182568335,
+          "expectedSamples": 718.0319752479228,
+          "observedSamples": 720,
+          "residual": 1.9680247520772127
+        }
+      ]
+    },
+    {
+      "run": "draft-03-trench",
+      "measurementScript": "scripts/visual/ascension/instrument.mjs",
+      "calibration": {
+        "samples": 120,
+        "windowMs": 969.1000000238419,
+        "hz": 123.82623052011944
+      },
+      "windows": [
+        {
+          "name": "active",
+          "seconds": 86.28,
+          "expectedRateHz": 123.82623052011944,
+          "expectedSamples": 10683.727169275906,
+          "observedSamples": 10669,
+          "residual": -14.727169275905908
+        },
+        {
+          "name": "p95",
+          "seconds": 5.8111999999284745,
+          "expectedRateHz": 123.82623052011944,
+          "expectedSamples": 719.5789907896614,
+          "observedSamples": 720,
+          "residual": 0.4210092103386387
+        }
+      ]
+    },
+    {
+      "run": "trench",
+      "measurementScript": "scripts/visual/ascension/instrument.mjs",
+      "calibration": {
+        "samples": 120,
+        "windowMs": 963.1999999284744,
+        "hz": 124.58471761722487
+      },
+      "windows": [
+        {
+          "name": "active",
+          "seconds": 86.19339999997615,
+          "expectedRateHz": 124.58471761722487,
+          "expectedSamples": 10738.380399465539,
+          "observedSamples": 10683,
+          "residual": -55.380399465539085
+        },
+        {
+          "name": "p95",
+          "seconds": 5.8105,
+          "expectedRateHz": 124.58471761722487,
+          "expectedSamples": 723.8995017148851,
+          "observedSamples": 720,
+          "residual": -3.8995017148851048
+        }
+      ]
+    },
+    {
+      "run": "trench-reduced",
+      "measurementScript": "scripts/visual/ascension/instrument.mjs",
+      "calibration": {
+        "samples": 120,
+        "windowMs": 965.7999999523163,
+        "hz": 124.24932698894665
+      },
+      "windows": [
+        {
+          "name": "active",
+          "seconds": 86.17710000002384,
+          "expectedRateHz": 124.24932698894665,
+          "expectedSamples": 10707.446676862117,
+          "observedSamples": 10679,
+          "residual": -28.446676862116874
+        },
+        {
+          "name": "p95",
+          "seconds": 5.806,
+          "expectedRateHz": 124.24932698894665,
+          "expectedSamples": 721.3915924978243,
+          "observedSamples": 720,
+          "residual": -1.3915924978242629
+        }
+      ]
+    }
+  ]
+}

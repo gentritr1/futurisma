@@ -1,0 +1,7 @@
+{
+  "script": "scripts/visual/tideline-v4/race.mjs",
+  "cadence": "One read-only scene walk every 120 rendered frames.",
+  "samples": 80,
+  "issues": [],
+  "accepted": true
+}

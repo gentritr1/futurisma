@@ -36,6 +36,7 @@ import {
   searchParam,
 } from "./query-probes";
 import { InputController } from "./input";
+import { PauseMenu } from "./pause-menu";
 import {
   BOOST_MAX_SPEED,
   calculateDriftIntent,
@@ -94,7 +95,7 @@ import { applyRaceLivery, recordFinishedRace } from "./meta-runtime";
 import { raceModes } from "./race-modes";
 import { save } from "./persistence";
 import { playerRaceDistanceMeters as calculatePlayerRaceDistance } from "./rival-race.js";
-import { RacingContact } from "./racing-contact";
+import { RacingContact, rivalLateralFor } from "./racing-contact";
 import { TrackEvents } from "./track-events";
 import {
   RivalFleet,
@@ -111,8 +112,6 @@ import {
 import { GameUi, type RaceStandingEntry } from "./ui";
 import { createCircuitRuntime, type CircuitRuntime } from "./circuit-runtime";
 
-const VEHICLE_MODEL_URL = "/assets/totem/models/totem_runtime.glb";
-const RACE_PRESENCE_FX_ATLAS_URL = "/assets/totem/textures/totem_race_presence_fx_256.png";
 
 type RacePhase = "standby" | "countdown" | "running" | "paused" | "resuming" | "finished";
 
@@ -444,6 +443,7 @@ export class FuturismaGame {
   private readonly contextLossProbe = probeSelected("context");
   private readonly focusLossProbe = probeSelected("focus");
   private readonly reducedMotion = resolveReducedMotion();
+  private readonly pauseMenu: PauseMenu;
 
   constructor(
     canvas: HTMLCanvasElement,
@@ -453,6 +453,7 @@ export class FuturismaGame {
     courseAssemblyMs = 0,
   ) {
     this.course = course;
+    this.pauseMenu = new PauseMenu(input, () => this.togglePause());
     this.minimap = new Minimap(ui.minimapCanvas, course, this.reducedMotion);
     this.camera = new THREE.PerspectiveCamera(
       58,
@@ -472,6 +473,8 @@ export class FuturismaGame {
     this.cameraSurfaceProjection = this.course.createProjectionScratch();
     this.cameraLookAhead = this.course.createSampleScratch();
     this.totalLaps = resolveLapCount(this.course);
+    // Before `setRaceFormat` composes the panel below. See `RaceCourse`.
+    this.course.selectRaceFormat?.(raceModes.mode, this.totalLaps);
     this.progress = this.course.startProgress;
     this.lateral = this.course.startLateral;
     this.renderer = new THREE.WebGLRenderer({
@@ -487,13 +490,7 @@ export class FuturismaGame {
       this.totalLaps,
       this.course.length,
       [],
-      {
-        mapName: this.course.mapName,
-        mapCode: this.course.mapCode,
-        checkpointCount: this.course.checkpointCount,
-        finishName: this.course.finishName,
-        startLabel: this.course.startLabel,
-      },
+      this.course,
     );
     this.ui.setDemoAutopilot(this.demoAutopilot);
     this.ui.setGraphicsContextLost(false);
@@ -550,16 +547,15 @@ export class FuturismaGame {
     this.renderRequested = true;
   };
 
+  private updateTidelineMaterials: (() => void) | null = null;
+
   async initialize(): Promise<boolean> {
-    const vehicleLoadStartedAt = performance.now();
-    this.diagnosticVehicleLoadStartedMs = vehicleLoadStartedAt;
-    await this.vehicle.load(VEHICLE_MODEL_URL, RACE_PRESENCE_FX_ATLAS_URL);
-    this.diagnosticVehicleLoadMs = performance.now() - vehicleLoadStartedAt;
-    const vehicleResourceUrl = new URL(VEHICLE_MODEL_URL, window.location.href).href;
-    const vehicleResources = performance.getEntriesByName(vehicleResourceUrl, "resource");
-    const vehicleResource = vehicleResources[0];
-    this.diagnosticVehicleResourceRequests = vehicleResources.length;
-    this.diagnosticVehicleRequestStartMs = vehicleResource?.startTime ?? null;
+    const {loadVehicleForRace,prepareTidelinePresentation}=await import("./race-presentation-setup");
+    const vehicleTiming = await loadVehicleForRace(this.vehicle, this.course.kind);
+    this.diagnosticVehicleLoadStartedMs = vehicleTiming.startedAt;
+    this.diagnosticVehicleLoadMs = vehicleTiming.elapsed;
+    this.diagnosticVehicleResourceRequests = vehicleTiming.requests;
+    this.diagnosticVehicleRequestStartMs = vehicleTiming.requestStart;
     if (this.disposed) {
       disposeObject3DResources(this.vehicle.root);
       this.vehicle.root.clear();
@@ -593,13 +589,7 @@ export class FuturismaGame {
       this.totalLaps,
       this.course.length,
       this.rivalFleet?.gridEntries ?? [],
-      {
-        mapName: this.course.mapName,
-        mapCode: this.course.mapCode,
-        checkpointCount: this.course.checkpointCount,
-        finishName: this.course.finishName,
-        startLabel: this.course.startLabel,
-      },
+      this.course,
     );
     this.resetRaceState();
     this.updatePose(ZERO_INPUT, 0);
@@ -608,6 +598,7 @@ export class FuturismaGame {
       await this.sceneAssets.loadAuthoredEnvironment();
       if (this.disposed) return false;
     }
+    this.updateTidelineMaterials = await prepareTidelinePresentation(this.course.kind, this.reducedMotion, this.scene, this.rivalFleet, this.vehicle.root, this.course.group, this.effects.speedLines, this.effects.sparkPoints);
     this.running = true;
     this.animationFrame = requestAnimationFrame(this.frame);
     if (this.course.kind === "greenwater") void this.sceneAssets.loadAuthoredEnvironment();
@@ -690,7 +681,7 @@ export class FuturismaGame {
   };
 
   private readDemoInput(): InputFrame {
-    this.autopilot.setDraft(this.rivalFleet, this.slipstream, FIXED_STEP);
+    this.autopilot.setDraft(this.afterMoveProjection.alternateRoad ? null : this.rivalFleet, this.slipstream, FIXED_STEP);
     return this.autopilot.read(
       this.position,
       this.forward,
@@ -704,6 +695,11 @@ export class FuturismaGame {
   }
 
   private update(delta: number, input: InputFrame): void {
+    // The quit hold is polled here, ahead of the early return: `paused` is one
+    // of the phases that does not run the physics loop, so the loop below can
+    // never host it. Poll-based means it is re-tested from the inputs that are
+    // true this frame, and dies the moment one stops being true.
+    this.pauseMenu.step(delta, this.phase === "paused");
     if (!phaseRunsContinuousPresentation(this.phase, this.speed)) {
       this.physicsAccumulator = 0;
       return;
@@ -719,10 +715,10 @@ export class FuturismaGame {
       if (this.phase === "resuming") this.updateResumeCountdown(FIXED_STEP);
       if (this.phase === "running") {
         // Fleet first: `updateRace` reads the tow it measured for this step.
-        this.rivalFleet?.step(FIXED_STEP, this.playerRaceDistance(), this.lateral, this.speed);
+        this.rivalFleet?.step(FIXED_STEP, this.playerRaceDistance(), rivalLateralFor(this.course, this.position, this.progress, this.lateral), this.speed);
         this.updateRace(FIXED_STEP, this.resolveRaceInput(input));
       } else if (this.phase === "finished") {
-        this.rivalFleet?.step(FIXED_STEP, this.playerRaceDistance(), this.lateral, this.speed);
+        this.rivalFleet?.step(FIXED_STEP, this.playerRaceDistance(), rivalLateralFor(this.course, this.position, this.progress, this.lateral), this.speed);
         this.updateCoast(FIXED_STEP);
       }
       this.physicsAccumulator -= FIXED_STEP;
@@ -757,6 +753,7 @@ export class FuturismaGame {
       this.boostActive,
     );
     this.effects.updateImpactSparks(delta);
+    this.updateTidelineMaterials?.();
     this.atmosphere.updateFog(delta, this.progress, this.lap, this.totalLaps, this.phase);
     // Reduced motion freezes the effect clock, but the cards still need to face
     // the moving chase camera so the approved still frame remains visible.
@@ -784,10 +781,10 @@ export class FuturismaGame {
       this.updateHud(presentationInput);
       this.minimap.update(
         this.playerRaceDistance(),
-        this.lateral,
+        rivalLateralFor(this.course, this.position, this.progress, this.lateral),
         this.progress,
         this.rivalFleet?.readRadarContacts(this.minimap.contacts) ?? 0,
-        now,
+        now, this.afterMoveProjection.alternateRoad,
       );
       if (now >= this.nextFieldOrderAt) {
         this.nextFieldOrderAt = now + 0.25;
@@ -945,8 +942,8 @@ export class FuturismaGame {
       );
       this.input.pulse(0.24, 0.12, 90);
     }
-    const slipstream = this.circuitRuntime?.ceiling ? 0 : this.rivalFleet?.slipstreamStrength ?? 0;
-    if (this.rivalFleet?.slipstreamLocked) this.audio.playSlipstreamLock();
+    const slipstream = this.circuitRuntime?.ceiling || beforeMove.alternateRoad ? 0 : this.rivalFleet?.slipstreamStrength ?? 0;
+    if (slipstream > 0 && this.rivalFleet?.slipstreamLocked) this.audio.playSlipstreamLock();
     this.slipstream = slipstream;
     const speedBeforeStep = this.speed;
     this.speed = integrateSpeed(
@@ -1050,7 +1047,7 @@ export class FuturismaGame {
       delta, this.playerRaceDistance(), this.progress * this.course.length,
       this.lap, this.contactPose, this.diagnosticsMode,
     );
-    if ((!this.circuitRuntime?.ceiling && this.contact.stepCushion(
+    if ((!this.circuitRuntime?.ceiling && !afterMove.alternateRoad && this.contact.stepCushion(
       this.rivalFleet, this.contactPose, this.playerRaceDistance(),
       delta, this.elapsedMs, afterMove, this.position,
       this.course.apronAt(afterMove, this.lateral, this.afterMoveApron).lateralLimit,
@@ -1060,7 +1057,7 @@ export class FuturismaGame {
       this.position.y = afterMove.position.y;
     }
     this.speed = this.contactPose.speedMetersPerSecond;
-    const reward = this.circuitRuntime?.ceiling ? 0 : this.contact.scorePasses(
+    const reward = this.circuitRuntime?.ceiling || afterMove.alternateRoad ? 0 : this.contact.scorePasses(
       this.rivalFleet, this.course, previousProgress, this.progress,
       this.contactPose, this.lap, this.hazardTripCooldown <= 0, this.diagnosticsMode,
     );
@@ -1215,7 +1212,7 @@ export class FuturismaGame {
 
     this.elapsedMs += delta * 1000;
     // G2 - sampled where the lateral has been through cushion AND apron clamp.
-    this.rivalFleet?.measurePlayerSeparation(this.playerRaceDistance(), this.lateral);
+    this.rivalFleet?.measurePlayerSeparation(this.playerRaceDistance(), rivalLateralFor(this.course, this.position, this.progress, this.lateral));
     ghostRuntime.step(this.lap, this.progress, this.lateral, this.speed, this.steerAmount);
     this.updateCheckpointProgress(previousProgress, afterMove.tangent);
   }
@@ -2225,6 +2222,7 @@ export class FuturismaGame {
     if (this.phase === "paused") {
       if (this.pausedBeforeStart) {
         this.pausedBeforeStart = false;
+        this.pauseMenu.setPaused(false);
         this.phase = "countdown";
         this.countdown = 3.7;
         this.countdownStage = "";
@@ -2238,6 +2236,7 @@ export class FuturismaGame {
       this.countdownStage = "";
       this.physicsAccumulator = 0;
       this.audio.setPaused(false);
+      this.pauseMenu.setPaused(false);
       this.ui.setResuming();
     }
   }
@@ -2257,6 +2256,7 @@ export class FuturismaGame {
     this.physicsAccumulator = 0;
     this.audio.setPaused(true);
     this.ui.setPaused(true, reason);
+    this.pauseMenu.setPaused(true, reason);
     this.renderRequested = true;
   }
 

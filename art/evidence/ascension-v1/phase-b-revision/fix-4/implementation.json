@@ -1,0 +1,17 @@
+{
+  "scripts": [
+    "src/game/ascension-terrain.ts",
+    "scripts/visual/ascension/stations.mjs"
+  ],
+  "atlas": "public/assets/ascension/textures/water.jpg",
+  "regions": [
+    "grass (top right)",
+    "mud (bottom left)",
+    "gravel (bottom right)"
+  ],
+  "water": "Tideline wave displacement, flow frequencies and ripple highlight shape; highlight strength reduced to 18 percent under shared Lambert lighting. Water tile is top-left. Shared fog and tone mapping retained. Trench mask prevents baseline sea ingress.",
+  "coverage": "Continuous shaped land plus sloping road shoulders; baseline station captures. No source-blind landscape acceptance claimed.",
+  "generatedArtifact": "exec-ba43583c-2cf2-4426-ad8b-08e055846589",
+  "serviceJobId": null,
+  "sampling": "Discrete station images, not a timed window."
+}

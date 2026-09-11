@@ -1,0 +1,10 @@
+{
+  "script": "scripts/validate-ascension-powers.mjs",
+  "branchPickupGating": true,
+  "fields": 2,
+  "oneRefundPerLap": true,
+  "chainRewardTicks": 60,
+  "chainRewardSeconds": 0.5,
+  "gravity": false,
+  "note": "Discrete rule assertions, not sampled time windows. Live E and CHAIN evidence is separate."
+}

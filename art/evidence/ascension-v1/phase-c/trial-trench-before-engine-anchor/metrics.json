@@ -1,0 +1,28 @@
+{
+  "script": "scripts/visual/ascension/instrument.mjs",
+  "samples": 10646,
+  "activeWindowMs": 86988.69999992847,
+  "activeExpectedSamples": 10752.620519678761,
+  "activeSampleResidual": -106.62051967876141,
+  "windowSamples": 720,
+  "windowMs": 5805.5,
+  "calibration": {
+    "samples": 120,
+    "windowMs": 970.7999999523163,
+    "hz": 123.6093943200393
+  },
+  "expectedRateHz": 123.6093943200393,
+  "expectedSamples": 717.6143387249882,
+  "sampleResidual": 2.3856612750117847,
+  "observedRateHz": 124.02032555335457,
+  "p95Ms": 8.600000023841858,
+  "peakMainCalls": 102,
+  "peakShadowCalls": 17,
+  "peakTotalCalls": 119,
+  "peakTriangles": 213448,
+  "peakShadowTriangles": 23624,
+  "sizes": [
+    "1280x720"
+  ],
+  "note": "Expected rendering rate comes from a separate pre-start requestAnimationFrame calibration. Physics remains 120 Hz. Each sampled delta covers one render interval, including any stalls."
+}

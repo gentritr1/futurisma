@@ -1,0 +1,25 @@
+{
+  "tool": "native image_gen",
+  "assets": [
+    {
+      "name": "waterlight",
+      "prompt": "Generate a 1024 x 1024 game VFX texture atlas for a beautifully remembered PS2 industrial underwater racer. Pure black background, no labels or text. Four equal square quadrants with a black 20-pixel gutter around each. TOP LEFT: seamless hand-painted ivory cyan water-caustic network, irregular thin honeycomb light ribbons and soft secondary lines, sparse black negative space. TOP RIGHT: sodium amber painted oval pool of light viewed straight down, elongated 3:2, brightest softly mottled center, irregular feathered black edges, faint lamp cage shadows, fully contained. BOTTOM LEFT: sodium amber wall light cone, narrow at top center and spreading into a weathered broad cone toward bottom, soft irregular brushwork, fading fully to black at edges. BOTTOM RIGHT: irregular silver-teal standing puddle with warm amber lamp streak reflected vertically, muddy uneven edges fading completely into black, top down. It is a technical painterly game texture, not a scene, no framing or surface behind the four effects. Restrained old-console palette, no bloom around sheet.",
+      "source": "/Users/gentlegen/.codex/generated_images/01a06de0-a82b-74d3-9aae-cf6dcac416a7/exec-9abe8b5c-73ea-48a6-9aae-8a6ead2e5cd9.png"
+    },
+    {
+      "name": "horizon",
+      "prompt": "A seamless horizontal painted environment panorama texture for a beautifully remembered PS2 industrial racer, wide 3:1 composition. Working coastal refinery at late blue hour under layered storm clouds. Across the lower quarter only: readable black silhouettes of tall thin chimneys, dense pipe gantries, storage tanks, one skeletal dock crane; taller landmark structures clustered toward the right quarter. One small orange refinery flare burns on the far right; its warm amber light illuminates an uneven cloud bank there, giving a clear directional low light source. Upper three quarters: deep desaturated petrol blue charcoal sky with broad hand-painted cloud bands, strong dark-to-light separation, quiet negative space, a dim cold cloud opening on left. Bottom edge almost black olive. Left and right edges should connect with similar tones and skyline height. Actual low-resolution painted background artwork, textured brushwork, no photographic bloom, no stars, no text, no watermarks, no road, no vehicles.",
+      "source": "/Users/gentlegen/.codex/generated_images/01a06de0-a82b-74d3-9aae-cf6dcac416a7/exec-08e06bb3-52e9-4c59-bbf7-4c47fb344e5f.png"
+    },
+    {
+      "name": "basin",
+      "prompt": "1024 x 1024 seamlessly tileable hand-painted PS2-era drained industrial reservoir floor texture, seen orthographically directly from above. Dense dark umber waterlogged silt, winding shallow drainage runnels, flattened swamp-green strands of weed, subtle boot-sized pebbles, rusty sediment, wet rippled mud and broken silvery shallow puddles. Broad irregular regions of darker damp mud and lighter olive sediment. No sand, no desert, no beige concrete, no legible writing, no perspective, no single centered object, no borders, no huge cracks. Beautifully remembered early-2000s painted game diffuse atlas with baked soft crevice shading, limited muted brown green palette, crafted mottled detail. Not photoreal PBR.",
+      "source": "/Users/gentlegen/.codex/generated_images/01a06de0-a82b-74d3-9aae-cf6dcac416a7/exec-6a147bc0-f790-4562-939b-202040219b17.png"
+    }
+  ],
+  "deliveryHashes": {
+    "public/assets/tideline-v3/basin.jpg": "aad1cc5065fede2f0c31b0f4f9bd8c7cef328398da65f471f56beb5814410730",
+    "public/assets/tideline-v3/horizon.jpg": "25e2d775d5db8fa33453fbdf2ba74d86421ba3fa93297dffb118b3e221181f38",
+    "public/assets/tideline-v3/waterlight.jpg": "b16a603da53943341915dc4d5b73bcfc2abd5eee0972e5988cdf3f2c6fbeff34"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "phase": "standby",
+  "elapsedMs": null,
+  "playerDistanceMeters": 5,
+  "rivals": [
+    {
+      "id": "rival-privateer",
+      "name": "PRIVATEER 13",
+      "raceDistanceMeters": -36,
+      "lateralMeters": -6.4
+    },
+    {
+      "id": "rival-nightform",
+      "name": "NIGHTFORM 24",
+      "raceDistanceMeters": -24,
+      "lateralMeters": 3.2
+    },
+    {
+      "id": "rival-needle",
+      "name": "NEEDLE 16",
+      "raceDistanceMeters": -12,
+      "lateralMeters": -3.2
+    }
+  ]
+}

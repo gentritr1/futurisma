@@ -1,0 +1,152 @@
+{
+ "script": "written by hand from art/evidence/dreamisland-v1/phase-c/crossfade/crossfade-profile.json",
+ "writtenAfter": "the five-point capture, which is the only measurement of a crossfade in this repo",
+ "producedBy": [
+  "scripts/visual/dreamisland/crossfade-profile.mjs",
+  "scripts/visual/dreamisland/crossfade-profile.py"
+ ],
+ "pose": {
+  "progress": 0.05,
+  "station": 40,
+  "sector": "BEACH",
+  "roadPoint": [
+   119.99998270988567,
+   0,
+   0
+  ],
+  "tangent": [
+   1,
+   0,
+   0
+  ],
+  "camera": [
+   108.49998270988567,
+   4.8,
+   0
+  ],
+  "lookAt": [
+   138.99998270988567,
+   1.15,
+   0
+  ],
+  "fov": 62,
+  "viewport": [
+   1280,
+   720
+  ],
+  "chase": {
+   "back": 11.5,
+   "rise": 4.8,
+   "lookAhead": 19,
+   "lookRise": 1.15,
+   "fov": 62
+  },
+  "watchtower": {
+   "placement": [
+    656.232,
+    22,
+    299.208
+   ],
+   "metres": 624.364981424085,
+   "offAxisDegrees": 28.646329664446395,
+   "halfHorizontalDegrees": 46.88858508098213,
+   "inFrame": true
+  }
+ },
+ "instrument": {
+  "repeatability": "An independent second five-point run (art/evidence/dreamisland-v1/phase-c/crossfade-repeat/) reproduced every mean in this capture to all quoted digits: worst absolute difference 0.000000 on all ten quantities, and identical sky and road pixel counts. The instrument therefore contributes no measurable noise.",
+  "resolutionMetres": null,
+  "resolutionDisplayLevels": 1,
+  "oneDisplayLevel": 0.00392156862745098,
+  "note": "With a zero measured noise floor the only remaining resolution is the 8-bit frame buffer, so no bound below one display level (0.003922) is reportable."
+ },
+ "base": {
+  "blends": [
+   0,
+   0.25,
+   0.5,
+   0.75,
+   1
+  ],
+  "skyMeanLuma": [
+   0.7098356515303625,
+   0.6483829163374418,
+   0.5639187540262868,
+   0.4273544623915946,
+   0.02354457377612406
+  ],
+  "skyMeanWarmth": [
+   -0.27380223837930917,
+   -0.28250586910802467,
+   -0.2907541234674151,
+   -0.29597750823348645,
+   -0.034298722380342914
+  ],
+  "roadMeanLuma": [
+   0.42378923126662116,
+   0.3573601539130726,
+   0.27999742444870457,
+   0.18966577180680969,
+   0.08539193727605447
+  ],
+  "skyPixels": [
+   350916,
+   350916,
+   351264,
+   350932,
+   355499
+  ],
+  "roadPixels": [
+   418413,
+   418418,
+   418412,
+   418443,
+   418251
+  ]
+ },
+ "targets": {
+  "T1_midpointRoadLumaAgainstLinear": {
+   "statement": "At nightBlend 0.50 the road region mean luma must fall within +/- X of the linear interpolation of the blend-0 and blend-1 captures.",
+   "linearInterpolation": 0.25459058427133785,
+   "measuredMidpoint": 0.27999742444870457,
+   "measuredDeviation": 0.02540684017736672,
+   "X": 0.03,
+   "window": [
+    0.22459058427133785,
+    0.2845905842713379
+   ],
+   "holdsForThisCapture": true,
+   "howXWasChosen": "X = |measured midpoint deviation from linear| + one display level, rounded up to the nearest 0.001. The instrument has no measurable noise, so X cannot be derived from scatter; it is derived from the deviation this accepted capture already carries plus the frame buffer resolution. The target therefore reads: the midpoint may not drift FURTHER off the straight line between the endpoints than it is today.",
+   "whyNotZero": "The dome mixes the two panoramas in linear light before tone mapping and the sRGB encode, so a perfectly linear mix is convex in display luma by construction. A midpoint sitting exactly on the linear interpolation of two DISPLAY lumas would mean the mix was happening after grading, which is the thing dreamisland-sky.ts was written to avoid."
+  },
+  "T2_noDeadStepInTheRamp": {
+   "statement": "Sky and road mean luma must fall monotonically across 0, .25, .5, .75, 1, and every consecutive step must exceed 0.02 (five display levels), so no quarter of the crossfade is visually inert.",
+   "measuredSkySteps": [
+    0.061452735192920716,
+    0.08446416231115506,
+    0.1365642916346922,
+    0.4038098886154705
+   ],
+   "measuredRoadSteps": [
+    0.06642907735354858,
+    0.07736272946436801,
+    0.09033165264189488,
+    0.10427383453075521
+   ],
+   "limit": 0.02,
+   "howChosen": "Five 8-bit display levels: the smallest luma change this instrument can resolve at all is one level, and five is the smallest step that is visible rather than merely measurable.",
+   "holdsForThisCapture": true
+  },
+  "T3_regression": {
+   "statement": "A re-run of the capture must reproduce each of the ten means in `base` within +/- 0.004.",
+   "howChosen": "One display level (0.003922) rounded up. The capture is bit-exact today, so anything larger than the frame buffer resolution is a real change in the map, not in the instrument."
+  }
+ },
+ "findingThatDrivesC5": {
+  "statement": "The sky is heavily back-loaded and the road is not. At nightBlend .75 the sky still holds 60.2% of its blend-0 luma while the road holds 44.8%, and 58.8% of the whole sky luma fall happens in the last quarter of the ramp.",
+  "skyShareOfFallInLastQuarter": 0.5883944898961301,
+  "roadShareOfFallInLastQuarter": 0.30814027293510804,
+  "consequenceForTuning": "The night edge cues (foam and shallows emissive) have to be readable before the sky collapses, not after it, because the driver loses long-range reference in the last three seconds of a twelve second ramp rather than evenly across it."
+ },
+ "scope": "Numbers from ONE pose (BEACH straight, progress .05) at 1280x720 in headless Chrome on ANGLE/Metal. Nothing here is a device measurement and nothing here is a user eyeball."
+}

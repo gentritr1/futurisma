@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import type { TidelineRivalPowers, RivalPowerEvent } from "./tideline-rival-powers";
 import type { RaceCourse } from "./course";
 import { groundBlobVisible } from "./presentation.js";
 import {
@@ -315,6 +316,7 @@ export function openingRaceStatus(
 }
 
 export interface RivalFleetDiagnostics {
+  powerEvents?: RivalPowerEvent[];
   drawCalls: number;
   triangles: number;
   updateSteps: number;
@@ -405,6 +407,14 @@ interface RivalVisual {
 
 export class RivalFleet {
   readonly root = new THREE.Group();
+  private tidelinePowers: TidelineRivalPowers | null = null;
+
+  async enableTidelinePowers(seed:number,reduced:boolean):Promise<void> {
+    if(this.tidelinePowers)return;
+    const {TidelineRivalPowers}=await import("./tideline-rival-powers");
+    this.tidelinePowers=new TidelineRivalPowers(seed,this.course.length,this.states.length,reduced);
+    this.root.add(this.tidelinePowers.root);
+  }
   /** Rebuilt by {@link setPlayerLivery}, so the grid list follows the choice. */
   gridEntries: readonly RaceGridEntry[] = [];
   /** Livery code per rival slot, in `RIVAL_PROFILES` order. */
@@ -871,6 +881,7 @@ export class RivalFleet {
   }
 
   reset(): void {
+    this.tidelinePowers?.reset();
     // The grid is fanned once, here, before anyone moves: the authored slots on
     // both maps put two craft closer than a field can hold station in, and the
     // launch now depends on every craft keeping the slot it was given.
@@ -1411,6 +1422,7 @@ export class RivalFleet {
 
     for (let index = 0; index < this.states.length; index += 1) {
       const state = this.states[index];
+      this.tidelinePowers?.step(index,state);
       if (state.finished) {
         if (!wasFinished[index]) {
           this.finishVisualAges[index] = 0;
@@ -1676,6 +1688,7 @@ export class RivalFleet {
       this.poseQuaternion.multiply(this.bankQuaternion);
       this.poseScale.setScalar(visible ? 1 : 0.00001);
       this.poseMatrix.compose(this.posePosition, this.poseQuaternion, this.poseScale);
+      this.tidelinePowers?.pose(index,this.poseMatrix);
 
       this.worldPositions[index].copy(this.posePosition);
       this.worldVelocities[index]
@@ -1877,12 +1890,28 @@ export class RivalFleet {
       },
       ...this.states,
     ], PLAYER_ID);
+    // The ladder's gap column, signed against the player. Deliberately the same
+    // distance-over-speed model `calculateRaceGaps` uses for the gap line above
+    // the ladder: two different models would eventually disagree on screen, and
+    // the driver would have no way to tell which one was lying.
+    const player = ordered.find((entry) => entry.id === PLAYER_ID)!;
+    const gapTo = (entry: (typeof ordered)[number]): number | null => {
+      if (entry.id === PLAYER_ID) return null;
+      const speed = Math.max(
+        12,
+        player.speedMetersPerSecond ?? 0,
+        entry.speedMetersPerSecond ?? 0,
+      );
+      const ahead = entry.raceDistanceMeters - player.raceDistanceMeters;
+      return (Math.abs(ahead) / speed) * 1000 * (ahead > 0 ? -1 : 1);
+    };
     return ordered.map((entry, index) => ({
       position: index + 1,
       name: entry.id === PLAYER_ID
         ? "TOTEM"
         : RIVAL_PROFILES.find((profile) => profile.id === entry.id)?.name ?? entry.id,
       player: entry.id === PLAYER_ID,
+      gapMs: gapTo(entry),
     }));
   }
 
@@ -1964,6 +1993,7 @@ export class RivalFleet {
 
   diagnostics(): RivalFleetDiagnostics {
     return {
+      ...(this.tidelinePowers ? {powerEvents: this.tidelinePowers.events} : {}),
       drawCalls: this.stats.drawCalls,
       triangles: this.stats.triangles,
       updateSteps: this.updateSteps,

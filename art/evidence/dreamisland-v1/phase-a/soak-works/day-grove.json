@@ -1,0 +1,110 @@
+{
+  "script": "src/game/dreamisland-runtime.ts",
+  "seed": 3868938316,
+  "tick": 828,
+  "progress": 0.19107625266803208,
+  "sector": "PALM GROVE",
+  "nightBlend": 0,
+  "reducedMotion": false,
+  "grip": 1,
+  "powers": {
+    "version": 1,
+    "configId": "dream-island-powers-v1",
+    "configHash": "bb830811",
+    "seed": 3868938316,
+    "tick": 828,
+    "lap": 1,
+    "progress": 0.19077525792252525,
+    "lateral": -0.3044194926903363,
+    "lane": 0,
+    "fromLane": 0,
+    "flipStartTick": -126,
+    "nextFlipTick": 0,
+    "heldPower": null,
+    "heldCharge": 0,
+    "activePower": "surge",
+    "activeCharge": 1,
+    "powerStartTick": 436,
+    "powerUntilTick": 916,
+    "powerPerfect": true,
+    "collectedLaps": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "usedWindowLaps": [],
+    "shieldRewardLaps": {},
+    "flips": 0,
+    "pickups": 1,
+    "powersUsed": 1,
+    "perfectActivations": 1,
+    "shieldAbsorptions": 0,
+    "upperTicks": 0,
+    "eventSequence": 2,
+    "events": [
+      {
+        "id": "dream-island-powers-v1:e69b504c:1",
+        "sequence": 1,
+        "tick": 307,
+        "type": "pickup",
+        "lap": 1,
+        "lane": 0,
+        "index": 0,
+        "kind": "surge",
+        "perfect": false,
+        "refund": 0
+      },
+      {
+        "id": "dream-island-powers-v1:e69b504c:2",
+        "sequence": 2,
+        "tick": 436,
+        "type": "power",
+        "lap": 1,
+        "lane": 0,
+        "index": -1,
+        "kind": "surge",
+        "perfect": true,
+        "refund": 0
+      }
+    ]
+  },
+  "schedule": {
+    "script": "scripts/build-dreamisland-route.mjs",
+    "measurementScript": "scripts/visual/dreamisland/race.mjs",
+    "measurement": "art/evidence/dreamisland-v1/phase-a/calibration/works-calibration.json",
+    "worksLapSeconds": 31.254,
+    "definition": "Mean of flying laps two and three in the full Works demo with the schedule inert",
+    "chimeTick": 6938,
+    "strikeTick": 7688,
+    "fishRiseTick": 8168,
+    "nightSettledTick": 9128,
+    "nightRampTicks": 1440,
+    "events": [
+      {
+        "id": "chime-warning",
+        "tick": 6938
+      },
+      {
+        "id": "strike",
+        "tick": 7688
+      },
+      {
+        "id": "fish-rise",
+        "tick": 8168
+      },
+      {
+        "id": "night-settled",
+        "tick": 9128
+      }
+    ]
+  },
+  "state": {
+    "chimed": false,
+    "struck": false,
+    "fishRisen": false,
+    "nightSettled": false
+  },
+  "events": []
+}

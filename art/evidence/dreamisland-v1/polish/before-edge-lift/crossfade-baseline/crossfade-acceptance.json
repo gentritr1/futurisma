@@ -1,0 +1,135 @@
+{
+  "instrument": "/Users/gentlegen/Desktop/futurisma-race/polarity_work/scripts/visual/dreamisland-heroes/polish-crossfade-check.py",
+  "before": "art/evidence/dreamisland-v1/phase-c/crossfade-shipped",
+  "baseline": "art/evidence/dreamisland-v1/polish/crossfade-baseline",
+  "repeat": "art/evidence/dreamisland-v1/polish/crossfade-repeat",
+  "checks": {
+    "sky": {
+      "T1midpointDeviation": 0.00015103250755360564,
+      "T1pass": null,
+      "steps": [
+        0.13621447677479614,
+        0.190004467748353,
+        0.2065009176442192,
+        0.11941596186382276
+      ],
+      "T2pass": true,
+      "T3repeatDeltas": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "T3pass": true,
+      "stepRatio": 1.7292572485385553,
+      "withinTwoTimes": true
+    },
+    "road": {
+      "T1midpointDeviation": 0.008706270253544257,
+      "T1pass": true,
+      "steps": [
+        0.060609835052065075,
+        0.06739285665071049,
+        0.07279796808777578,
+        0.07261726412208827
+      ],
+      "T2pass": true,
+      "T3repeatDeltas": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "T3pass": true
+    }
+  },
+  "tenMeans": [
+    {
+      "region": "sky",
+      "blend": 0,
+      "phaseCBefore": 0.7097300642875801,
+      "polishBaseline": 0.6918537575823821,
+      "polishRepeat": 0.6918537575823821,
+      "repeatDelta": 0.0
+    },
+    {
+      "region": "sky",
+      "blend": 0.25,
+      "phaseCBefore": 0.6483251006851674,
+      "polishBaseline": 0.555639280807586,
+      "polishRepeat": 0.555639280807586,
+      "repeatDelta": 0.0
+    },
+    {
+      "region": "sky",
+      "blend": 0.5,
+      "phaseCBefore": 0.5639063770332523,
+      "polishBaseline": 0.36563481305923295,
+      "polishRepeat": 0.36563481305923295,
+      "repeatDelta": 0.0
+    },
+    {
+      "region": "sky",
+      "blend": 0.75,
+      "phaseCBefore": 0.4273733348508541,
+      "polishBaseline": 0.15913389541501374,
+      "polishRepeat": 0.15913389541501374,
+      "repeatDelta": 0.0
+    },
+    {
+      "region": "sky",
+      "blend": 1,
+      "phaseCBefore": 0.023456344973585716,
+      "polishBaseline": 0.03971793355119098,
+      "polishRepeat": 0.03971793355119098,
+      "repeatDelta": 0.0
+    },
+    {
+      "region": "road",
+      "blend": 0,
+      "phaseCBefore": 0.42378923126662116,
+      "polishBaseline": 0.4109180295317112,
+      "polishRepeat": 0.4109180295317112,
+      "repeatDelta": 0.0
+    },
+    {
+      "region": "road",
+      "blend": 0.25,
+      "phaseCBefore": 0.3573601539130726,
+      "polishBaseline": 0.3503081944796461,
+      "polishRepeat": 0.3503081944796461,
+      "repeatDelta": 0.0
+    },
+    {
+      "region": "road",
+      "blend": 0.5,
+      "phaseCBefore": 0.27999742444870457,
+      "polishBaseline": 0.28291533782893563,
+      "polishRepeat": 0.28291533782893563,
+      "repeatDelta": 0.0
+    },
+    {
+      "region": "road",
+      "blend": 0.75,
+      "phaseCBefore": 0.18966526880151405,
+      "polishBaseline": 0.21011736974115985,
+      "polishRepeat": 0.21011736974115985,
+      "repeatDelta": 0.0
+    },
+    {
+      "region": "road",
+      "blend": 1,
+      "phaseCBefore": 0.08539193727605447,
+      "polishBaseline": 0.13750010561907158,
+      "polishRepeat": 0.13750010561907158,
+      "repeatDelta": 0.0
+    }
+  ],
+  "profileSha256": {
+    "art/evidence/dreamisland-v1/phase-c/crossfade-shipped": "2b3a101884ebdd5cae5fdb479aa7218fdbfc31f55b7b5bb4475c7f1fdaa13490",
+    "art/evidence/dreamisland-v1/polish/crossfade-baseline": "fc477a3da406a5974e47060093071b36fa6bc30988e4e2550fa739ee945c982b",
+    "art/evidence/dreamisland-v1/polish/crossfade-repeat": "fc477a3da406a5974e47060093071b36fa6bc30988e4e2550fa739ee945c982b"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "script": "scripts/visual/ascension/strip-closeup.mjs",
+  "scope": "Production launch strip geometry and materials in the static course review. Harness changes only camera position and field of view for a physical housing close-up.",
+  "errors": [],
+  "state": {
+    "script": "scripts/visual/ascension/review.ts",
+    "scope": "Static painted evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+    "progress": 0.083,
+    "tick": 0,
+    "sector": "APRON SWEEP",
+    "trench": false,
+    "board": null,
+    "boardDistance": null,
+    "camera": [
+      -186.59547119140626,
+      4.765000057220459,
+      -367.90704956054685
+    ],
+    "schedule": {
+      "trenchOpen": true,
+      "steam": false,
+      "launched": false,
+      "rocketGone": false,
+      "deluge": false
+    },
+    "render": {
+      "calls": 15,
+      "triangles": 39142
+    }
+  }
+}

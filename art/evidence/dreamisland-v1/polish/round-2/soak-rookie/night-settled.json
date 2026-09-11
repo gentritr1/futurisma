@@ -1,0 +1,202 @@
+{
+  "script": "src/game/dreamisland-runtime.ts",
+  "seed": 3868938316,
+  "tick": 10012,
+  "progress": 0.5736474116773804,
+  "sector": "CLOCK COURT",
+  "nightBlend": 1,
+  "nightBlendPinned": null,
+  "reducedMotion": false,
+  "grip": 1,
+  "powers": {
+    "version": 1,
+    "configId": "dream-island-powers-v1",
+    "configHash": "bb830811",
+    "seed": 3868938316,
+    "tick": 10012,
+    "lap": 3,
+    "progress": 0.5733622422302092,
+    "lateral": -4.552488699490862,
+    "lane": 0,
+    "fromLane": 0,
+    "flipStartTick": -126,
+    "nextFlipTick": 0,
+    "heldPower": null,
+    "heldCharge": 0,
+    "activePower": null,
+    "activeCharge": 0,
+    "powerStartTick": 8126,
+    "powerUntilTick": 8606,
+    "powerPerfect": false,
+    "collectedLaps": [
+      1,
+      0,
+      0,
+      0,
+      2
+    ],
+    "usedWindowLaps": [],
+    "shieldRewardLaps": {},
+    "flips": 0,
+    "pickups": 3,
+    "powersUsed": 3,
+    "perfectActivations": 3,
+    "shieldAbsorptions": 0,
+    "upperTicks": 0,
+    "eventSequence": 6,
+    "events": [
+      {
+        "id": "dream-island-powers-v1:e69b504c:1",
+        "sequence": 1,
+        "tick": 307,
+        "type": "pickup",
+        "lap": 1,
+        "lane": 0,
+        "index": 0,
+        "kind": "surge",
+        "perfect": false,
+        "refund": 0
+      },
+      {
+        "id": "dream-island-powers-v1:e69b504c:2",
+        "sequence": 2,
+        "tick": 436,
+        "type": "power",
+        "lap": 1,
+        "lane": 0,
+        "index": -1,
+        "kind": "surge",
+        "perfect": true,
+        "refund": 0
+      },
+      {
+        "id": "dream-island-powers-v1:e69b504c:3",
+        "sequence": 3,
+        "tick": 3529,
+        "type": "pickup",
+        "lap": 1,
+        "lane": 0,
+        "index": 4,
+        "kind": "surge",
+        "perfect": false,
+        "refund": 0
+      },
+      {
+        "id": "dream-island-powers-v1:e69b504c:4",
+        "sequence": 4,
+        "tick": 4295,
+        "type": "power",
+        "lap": 2,
+        "lane": 0,
+        "index": -1,
+        "kind": "surge",
+        "perfect": true,
+        "refund": 0
+      },
+      {
+        "id": "dream-island-powers-v1:e69b504c:5",
+        "sequence": 5,
+        "tick": 7384,
+        "type": "pickup",
+        "lap": 2,
+        "lane": 0,
+        "index": 4,
+        "kind": "surge",
+        "perfect": false,
+        "refund": 0
+      },
+      {
+        "id": "dream-island-powers-v1:e69b504c:6",
+        "sequence": 6,
+        "tick": 8126,
+        "type": "power",
+        "lap": 3,
+        "lane": 0,
+        "index": -1,
+        "kind": "surge",
+        "perfect": true,
+        "refund": 0
+      }
+    ]
+  },
+  "schedule": {
+    "laps": 3,
+    "honoursLapOverride": true,
+    "chimeFactor": 1.85,
+    "strikeFactor": 2.05,
+    "chimeTick": 7233,
+    "strikeTick": 8014,
+    "fishRiseTick": 8494,
+    "nightSettledTick": 9454,
+    "nightRampTicks": 1440,
+    "events": [
+      {
+        "id": "chime-warning",
+        "tick": 7233
+      },
+      {
+        "id": "strike",
+        "tick": 8014
+      },
+      {
+        "id": "fish-rise",
+        "tick": 8494
+      },
+      {
+        "id": "night-settled",
+        "tick": 9454
+      }
+    ]
+  },
+  "state": {
+    "chimed": true,
+    "struck": true,
+    "fishRisen": true,
+    "nightSettled": true
+  },
+  "events": [
+    {
+      "id": "chime-warning",
+      "tick": 7233,
+      "sequence": 1
+    },
+    {
+      "id": "strike",
+      "tick": 8014,
+      "sequence": 2
+    },
+    {
+      "id": "fish-rise",
+      "tick": 8494,
+      "sequence": 3
+    },
+    {
+      "id": "night-settled",
+      "tick": 9454,
+      "sequence": 4
+    }
+  ],
+  "painted": {
+    "paintedMeshes": 10,
+    "paintedTriangles": 66694,
+    "manifestTriangles": 66694,
+    "emissiveMaterials": 2,
+    "cardMaterials": 1,
+    "fishMeshes": 4,
+    "fishVisible": 4,
+    "reskinnedCourseDraws": 2,
+    "waterSurfaces": 3,
+    "waterTriangles": 2238,
+    "skyPanoramas": 2,
+    "flowShaders": 5,
+    "waterfallFlowShaders": 2,
+    "heroPlacements": 9,
+    "heroSourceMeshes": 58,
+    "heroMeshes": 15,
+    "heroTriangles": 18024,
+    "fishShoals": 2,
+    "fishShoalMeshes": 4,
+    "fishDeckSamples": 4120,
+    "fishMinimumDeckClearance": 8.442
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "command": "npm run test:code",
+  "exitCode": 0,
+  "snapshot": "/private/var/folders/qy/z0zwmvms3js2v8ds4pyn3djh0000gn/T/dream-island-polish-tests-LqrYXE",
+  "status": "VERIFIED PASS with refreshed concurrent paddock changes included",
+  "worktreeInputMismatches": [],
+  "hashes": {
+    "index.html": "6575ae043be6c9081a0494cc741c8c51733472e4160d43468a084c1de9b4662d",
+    "public/assets/dreamisland/heroes/clock-tower.glb": "c9018befb2119448c5012e37b36dce53f9733e87362ad3af2d127c008f2311f6",
+    "public/assets/dreamisland/heroes/heroes.json": "b1ea63e5243baf52500bc61f6d22a365e2924ff8197e44cc44a53d49fecf45dd",
+    "public/assets/dreamisland/heroes/sea-stack-set.glb": "9223e2381d6c8d7bb2e28932f938df6d42eddae6bdd009079e2f0b74c9f13213",
+    "public/assets/dreamisland/heroes/watchtower.glb": "c12978173e1c5b08afbd02bc201a066a517ecacc5781de600f5d27fea2702421",
+    "public/assets/dreamisland/heroes/waterfall-cliff.glb": "b8f43095b1eb3ec9171faa88fe1ae7c6dc34bda0857fb28d2c50b1d86e9ba218",
+    "public/assets/dreamisland/painted.glb": "60e11543acce5c6a939fc715eae5aeccdded1a2efc177706ab04a3bdcdf12756",
+    "public/assets/dreamisland/painted.json": "aa3e75979d9e705eb59545fc762624e82961575fa7d1b0c5036b18d45b000eaf",
+    "public/assets/dreamisland/signage-manifest.json": "1ffe5b115d812570a15ac459ea6d8737b0b34f878cde1f6a0c1737ba49c38fd6",
+    "scripts/validate-race-modes.mjs": "48c68093b4d1850946d1e355427ece650e0742416247dd2cba372a0661500d88",
+    "src/game/dreamisland-heroes.ts": "55cf29835ff57107d713777162b24c9ed2f868ef7078049520ffb0627f6c711c",
+    "src/game/dreamisland-painted-environment.ts": "5baf9d1fc5d2e7ff7977ee2cdbd1bef16dd9495610a8c076ec67d5a5596e3dc8",
+    "src/game/dreamisland-sky.ts": "d3eead0f16caa025465c13546113b7c95792e0deff96f82fac5fbeaf7abf7cb7",
+    "src/game/dreamisland-water.ts": "288339c3ddb6b424c07d3ac60052f183e36a60bf0013dc271c868fb9956d6eab",
+    "src/game/race-modes-rules.js": "32d84e90b8cda4e02da0d2477e19f03b32c50bed06415bb12bc5a0678ba183e2",
+    "src/game/ui.ts": "b972f3e9e7d16d36c31b4b5025a2df940e3c17e81c8dd020bc23bab280e1a142"
+  },
+  "initialSharedFailure": "Earlier capture preceded startingGridRows export; preserved in ../test-code/. Isolated HEAD-paddock pass is in ../test-code-isolated/. This final run includes the current validator and implementation together."
+}

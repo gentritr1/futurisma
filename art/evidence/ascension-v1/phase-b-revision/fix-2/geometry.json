@@ -1,0 +1,57 @@
+{
+  "script": "scripts/validate-ascension-heroes.mjs",
+  "crawlerSha256": "eb04a7f1437b35d9eb2519fb39be19c0a55c39e4f3d5c4a0b6667ff8f57d49e0",
+  "platformSha256": "75b6eb1ef5df3f111bb0dc74f0905b94aa2228fc3dfcd12e0328ee9d8aefe873",
+  "tracks": [
+    {
+      "name": "crawler-tread-0",
+      "size": [
+        5.939998626708984,
+        4,
+        12.000000953674316
+      ]
+    },
+    {
+      "name": "crawler-tread-1",
+      "size": [
+        5.939998626708984,
+        4,
+        12.000000953674316
+      ]
+    },
+    {
+      "name": "crawler-tread-2",
+      "size": [
+        5.939998626708984,
+        4,
+        12.000000953674316
+      ]
+    },
+    {
+      "name": "crawler-tread-3",
+      "size": [
+        5.939998626708984,
+        4,
+        12.000000953674316
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "name": "swing-arm-pivot-0",
+      "contactX": -4.3,
+      "maximumX": -3.482335994799996
+    },
+    {
+      "name": "swing-arm-pivot-1",
+      "contactX": -4.3,
+      "maximumX": -3.482335994799996
+    },
+    {
+      "name": "swing-arm-pivot-2",
+      "contactX": -4.3,
+      "maximumX": -3.482335994799996
+    }
+  ],
+  "scope": "Exported track bounds and named arm contacts; visual acceptance is a separate image review."
+}

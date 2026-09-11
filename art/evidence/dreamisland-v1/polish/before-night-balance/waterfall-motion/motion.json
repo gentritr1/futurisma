@@ -1,0 +1,82 @@
+{
+  "script": "scripts/visual/dreamisland-heroes/polish-motion.mjs",
+  "results": [
+    {
+      "reduced": false,
+      "pose": {
+        "position": [
+          517.6556171232545,
+          18.8,
+          527.1518577692611
+        ],
+        "target": [
+          500.4719381508793,
+          15.15,
+          552.3504921960382
+        ],
+        "fov": 62,
+        "far": 650,
+        "quaternion": [
+          -0.017545864369330443,
+          0.9538647041379337,
+          0.05687261073605043,
+          0.2942783970859075
+        ],
+        "horizonRow": 288.29956590791556
+      },
+      "samples": [
+        {
+          "tick": 242,
+          "time": 2.025,
+          "emissiveIntensity": 0.7,
+          "file": "normal-240.png"
+        },
+        {
+          "tick": 360,
+          "time": 3.0166666666666666,
+          "emissiveIntensity": 0.7,
+          "file": "normal-360.png"
+        }
+      ]
+    },
+    {
+      "reduced": true,
+      "pose": {
+        "position": [
+          517.6556171232545,
+          18.8,
+          527.1518577692611
+        ],
+        "target": [
+          500.4719381508793,
+          15.15,
+          552.3504921960382
+        ],
+        "fov": 62,
+        "far": 650,
+        "quaternion": [
+          -0.017545864369330443,
+          0.9538647041379337,
+          0.05687261073605043,
+          0.2942783970859075
+        ],
+        "horizonRow": 288.29956590791556
+      },
+      "samples": [
+        {
+          "tick": 243,
+          "time": 0,
+          "emissiveIntensity": 0.7,
+          "file": "reduced-240.png"
+        },
+        {
+          "tick": 363,
+          "time": 0,
+          "emissiveIntensity": 0.7,
+          "file": "reduced-360.png"
+        }
+      ]
+    }
+  ],
+  "errors": []
+}

@@ -103,6 +103,7 @@ export const AMBIENCE_LOOP_SECONDS = {
   canopy_chirp: 11.3,
   pump_thrum: 3.1,
   rain_patter: 5.9,
+  hull_creak: 13.7,
 };
 
 /**
@@ -370,6 +371,7 @@ export const AMBIENCE_LOOP_SEEDS = {
   canopy_chirp: 8_017,
   pump_thrum: 2_663,
   rain_patter: 3_449,
+  hull_creak: 5_817,
 };
 
 /** @param {number} value @param {number} lap */
@@ -563,6 +565,20 @@ export function renderAmbienceLoop(id, sampleRate) {
   if (id === "noise") {
     for (let index = 0; index < length; index += 1) channel[index] = noise();
     return normalisePeak(crossfadeTail(channel, rate), 0.9);
+  }
+
+  if (id === "hull_creak") {
+    // Three slow, inharmonic flexes with silence between them; no repeating beat.
+    for (const [start, duration, frequency] of [[.8, 1.9, 86], [5.2, 2.6, 113], [10.5, 1.4, 71]]) {
+      let phase = 0;
+      for (let i = 0; i < duration * rate; i++) {
+        const t = i / rate, envelope = Math.sin(Math.PI * t / duration) ** 2;
+        phase += 2 * Math.PI * frequency * (1 + .08 * Math.sin(t * 2.1)) / rate;
+        const sample = Math.sin(phase) + .38 * Math.sin(phase * 1.71) + .12 * noise();
+        channel[Math.floor(start * rate) + i] += sample * envelope;
+      }
+    }
+    return normalisePeak(crossfadeTail(channel, rate), .9);
   }
 
   if (id === "works_hum") {
@@ -789,7 +805,8 @@ export function ambienceBedIds() {
 export function tidelineAmbienceBeds(lapLength) {
   const base = cityAmbienceBeds("polarity", lapLength);
   const lap = Math.max(1, lapLength);
-  return base.map((bed, index) => {
+  /** @type {AmbienceBed[]} */
+  const beds = base.map((bed, index) => {
     if (index === 0) return { ...bed, id: "pelagic_wind", level: .18,
       window: { startDistance: lap * .26, endDistance: lap * .93, fadeMeters: 70 } };
     if (index === 1) return { ...bed, level: .10,
@@ -800,4 +817,7 @@ export function tidelineAmbienceBeds(lapLength) {
       window: { startDistance: lap * .2, endDistance: lap * .44, fadeMeters: 70 } };
     return { ...bed, level: .08, window: null };
   });
+  beds.push({ ...base[1], id: "hull_creak", level: .055, zoneGain: 1.4,
+    note: "Slow steel flexes in the drowned reactor, fading as the hall drains.", reverbSend: .28 });
+  return beds;
 }

@@ -1,0 +1,1346 @@
+{
+  "ascension": {
+    "script": "src/game/ascension-runtime.ts",
+    "audio": {
+      "script": "src/game/ascension-audio.ts",
+      "ducked": true,
+      "duckEvents": [
+        {
+          "tick": 8253,
+          "scale": 0.25
+        }
+      ],
+      "records": [
+        {
+          "id": "drip-918",
+          "cue": "drip",
+          "tick": 918,
+          "contextTime": 11.34875283446712,
+          "distance": 0
+        },
+        {
+          "id": "drip-1002",
+          "cue": "drip",
+          "tick": 1002,
+          "contextTime": 12.051156462585034,
+          "distance": 0
+        },
+        {
+          "id": "radio-sixty",
+          "cue": "minus-sixty",
+          "tick": 1053,
+          "contextTime": 12.474920634920634,
+          "distance": 0
+        },
+        {
+          "id": "drip-1086",
+          "cue": "drip",
+          "tick": 1086,
+          "contextTime": 12.747755102040816,
+          "distance": 0
+        },
+        {
+          "id": "drip-1170",
+          "cue": "drip",
+          "tick": 1170,
+          "contextTime": 13.45015873015873,
+          "distance": 0
+        },
+        {
+          "id": "drip-1254",
+          "cue": "drip",
+          "tick": 1254,
+          "contextTime": 14.152562358276644,
+          "distance": 0
+        },
+        {
+          "id": "drip-1338",
+          "cue": "drip",
+          "tick": 1338,
+          "contextTime": 14.854965986394557,
+          "distance": 0
+        },
+        {
+          "id": "drip-1422",
+          "cue": "drip",
+          "tick": 1422,
+          "contextTime": 15.55156462585034,
+          "distance": 0
+        },
+        {
+          "id": "crawler-klaxon-1",
+          "cue": "klaxon",
+          "tick": 1493,
+          "contextTime": 16.143673469387757,
+          "distance": 0
+        },
+        {
+          "id": "drip-1506",
+          "cue": "drip",
+          "tick": 1506,
+          "contextTime": 16.248163265306122,
+          "distance": 0
+        },
+        {
+          "id": "drip-1590",
+          "cue": "drip",
+          "tick": 1590,
+          "contextTime": 16.950566893424035,
+          "distance": 0
+        },
+        {
+          "id": "drip-1674",
+          "cue": "drip",
+          "tick": 1674,
+          "contextTime": 17.650068027210885,
+          "distance": 0
+        },
+        {
+          "id": "drip-1758",
+          "cue": "drip",
+          "tick": 1758,
+          "contextTime": 18.355374149659863,
+          "distance": 0
+        },
+        {
+          "id": "drip-1842",
+          "cue": "drip",
+          "tick": 1842,
+          "contextTime": 19.051972789115645,
+          "distance": 0
+        },
+        {
+          "id": "drip-1926",
+          "cue": "drip",
+          "tick": 1926,
+          "contextTime": 19.75437641723356,
+          "distance": 0
+        },
+        {
+          "id": "drip-2010",
+          "cue": "drip",
+          "tick": 2010,
+          "contextTime": 20.456780045351476,
+          "distance": 0
+        },
+        {
+          "id": "drip-2094",
+          "cue": "drip",
+          "tick": 2094,
+          "contextTime": 21.153378684807254,
+          "distance": 0
+        },
+        {
+          "id": "drip-2203",
+          "cue": "drip",
+          "tick": 2203,
+          "contextTime": 22.064761904761905,
+          "distance": 0
+        },
+        {
+          "id": "bird-lap-1",
+          "cue": "egrets",
+          "tick": 2389,
+          "contextTime": 23.62049886621315,
+          "distance": 0
+        },
+        {
+          "id": "radio-deluge",
+          "cue": "deluge-armed",
+          "tick": 3971,
+          "contextTime": 36.797823129251704,
+          "distance": 0
+        },
+        {
+          "id": "rehearsal",
+          "cue": "deluge",
+          "tick": 4211,
+          "contextTime": 38.800544217687076,
+          "distance": 0
+        },
+        {
+          "id": "drip-4260",
+          "cue": "drip",
+          "tick": 4260,
+          "contextTime": 39.20689342403628,
+          "distance": 0
+        },
+        {
+          "id": "drip-4344",
+          "cue": "drip",
+          "tick": 4344,
+          "contextTime": 39.90349206349207,
+          "distance": 0
+        },
+        {
+          "id": "drip-4428",
+          "cue": "drip",
+          "tick": 4428,
+          "contextTime": 40.60589569160998,
+          "distance": 0
+        },
+        {
+          "id": "drip-4512",
+          "cue": "drip",
+          "tick": 4512,
+          "contextTime": 41.308299319727894,
+          "distance": 0
+        },
+        {
+          "id": "drip-4596",
+          "cue": "drip",
+          "tick": 4596,
+          "contextTime": 42.01070294784581,
+          "distance": 0
+        },
+        {
+          "id": "drip-4680",
+          "cue": "drip",
+          "tick": 4680,
+          "contextTime": 42.707301587301586,
+          "distance": 0
+        },
+        {
+          "id": "drip-4764",
+          "cue": "drip",
+          "tick": 4764,
+          "contextTime": 43.40390022675737,
+          "distance": 0
+        },
+        {
+          "id": "drip-4848",
+          "cue": "drip",
+          "tick": 4848,
+          "contextTime": 44.106303854875286,
+          "distance": 0
+        },
+        {
+          "id": "drip-4932",
+          "cue": "drip",
+          "tick": 4932,
+          "contextTime": 44.8087074829932,
+          "distance": 0
+        },
+        {
+          "id": "drip-5016",
+          "cue": "drip",
+          "tick": 5016,
+          "contextTime": 45.50530612244898,
+          "distance": 0
+        },
+        {
+          "id": "crawler-klaxon-2",
+          "cue": "klaxon",
+          "tick": 5030,
+          "contextTime": 45.62140589569161,
+          "distance": 0
+        },
+        {
+          "id": "drip-5100",
+          "cue": "drip",
+          "tick": 5100,
+          "contextTime": 46.204807256235824,
+          "distance": 0
+        },
+        {
+          "id": "drip-5184",
+          "cue": "drip",
+          "tick": 5184,
+          "contextTime": 46.90430839002268,
+          "distance": 0
+        },
+        {
+          "id": "drip-5268",
+          "cue": "drip",
+          "tick": 5268,
+          "contextTime": 47.60671201814059,
+          "distance": 0
+        },
+        {
+          "id": "drip-5352",
+          "cue": "drip",
+          "tick": 5352,
+          "contextTime": 48.309115646258505,
+          "distance": 0
+        },
+        {
+          "id": "drip-5436",
+          "cue": "drip",
+          "tick": 5436,
+          "contextTime": 49.01151927437642,
+          "distance": 0
+        },
+        {
+          "id": "drip-5520",
+          "cue": "drip",
+          "tick": 5520,
+          "contextTime": 49.7081179138322,
+          "distance": 0
+        },
+        {
+          "id": "bird-lap-2",
+          "cue": "egrets",
+          "tick": 5759,
+          "contextTime": 51.69342403628118,
+          "distance": 0
+        },
+        {
+          "id": "drip-7644",
+          "cue": "drip",
+          "tick": 7644,
+          "contextTime": 67.4075283446712,
+          "distance": 0
+        },
+        {
+          "id": "radio-clear",
+          "cue": "clear-trench",
+          "tick": 7653,
+          "contextTime": 67.47718820861678,
+          "distance": 0
+        },
+        {
+          "id": "drip-7728",
+          "cue": "drip",
+          "tick": 7728,
+          "contextTime": 68.10412698412698,
+          "distance": 0
+        },
+        {
+          "id": "drip-7812",
+          "cue": "drip",
+          "tick": 7812,
+          "contextTime": 68.8065306122449,
+          "distance": 0
+        },
+        {
+          "id": "drip-7896",
+          "cue": "drip",
+          "tick": 7896,
+          "contextTime": 69.5089342403628,
+          "distance": 0
+        },
+        {
+          "id": "drip-7980",
+          "cue": "drip",
+          "tick": 7980,
+          "contextTime": 70.20553287981859,
+          "distance": 0
+        },
+        {
+          "id": "drip-8064",
+          "cue": "drip",
+          "tick": 8064,
+          "contextTime": 70.90213151927438,
+          "distance": 0
+        },
+        {
+          "id": "drip-8148",
+          "cue": "drip",
+          "tick": 8148,
+          "contextTime": 71.60453514739228,
+          "distance": 0
+        },
+        {
+          "id": "drip-8232",
+          "cue": "drip",
+          "tick": 8232,
+          "contextTime": 72.30113378684807,
+          "distance": 0
+        },
+        {
+          "id": "launch-deluge",
+          "cue": "deluge",
+          "tick": 8253,
+          "contextTime": 72.48108843537415,
+          "distance": 0
+        },
+        {
+          "id": "pressure-arrival",
+          "cue": "launch",
+          "tick": 8295,
+          "contextTime": 72.82938775510205,
+          "distance": 117.4356676663907,
+          "delaySeconds": 0.35,
+          "expectedDelaySeconds": 0.3423780398437047,
+          "residualSeconds": 0.007621960156295293
+        },
+        {
+          "id": "launch-birds",
+          "cue": "egrets",
+          "tick": 8295,
+          "contextTime": 72.82938775510205,
+          "distance": 0
+        },
+        {
+          "id": "drip-8316",
+          "cue": "drip",
+          "tick": 8316,
+          "contextTime": 73.00353741496599,
+          "distance": 0
+        },
+        {
+          "id": "drip-8400",
+          "cue": "drip",
+          "tick": 8400,
+          "contextTime": 73.71174603174603,
+          "distance": 0
+        }
+      ]
+    },
+    "egrets": {
+      "tick": 8441,
+      "risenLap": 2,
+      "riseTick": 5758,
+      "launched": true,
+      "launchAge": 1.5666666666666667,
+      "firstBirdPosition": [
+        -88.35955047607422,
+        25.25,
+        277.7879638671875
+      ]
+    },
+    "powers": {
+      "version": 1,
+      "configId": "ascension-pad-powers-v1",
+      "configHash": "d4c0eb88",
+      "seed": 3868938316,
+      "tick": 8442,
+      "lap": 3,
+      "progress": 0.4714315632483892,
+      "lateral": -1.769240051224477,
+      "lane": 0,
+      "fromLane": 0,
+      "flipStartTick": -126,
+      "nextFlipTick": 0,
+      "heldPower": null,
+      "heldCharge": 0,
+      "activePower": null,
+      "activeCharge": 0,
+      "powerStartTick": 6300,
+      "powerUntilTick": 6780,
+      "powerPerfect": false,
+      "collectedLaps": [
+        2,
+        0,
+        0,
+        0
+      ],
+      "usedWindowLaps": [],
+      "shieldRewardLaps": {},
+      "flips": 0,
+      "pickups": 2,
+      "powersUsed": 2,
+      "perfectActivations": 2,
+      "shieldAbsorptions": 0,
+      "upperTicks": 0,
+      "eventSequence": 4,
+      "events": [
+        {
+          "id": "ascension-pad-powers-v1:e69b504c:1",
+          "sequence": 1,
+          "tick": 374,
+          "type": "pickup",
+          "lap": 1,
+          "lane": 0,
+          "index": 0,
+          "kind": "surge",
+          "perfect": false,
+          "refund": 0
+        },
+        {
+          "id": "ascension-pad-powers-v1:e69b504c:2",
+          "sequence": 2,
+          "tick": 2928,
+          "type": "power",
+          "lap": 1,
+          "lane": 0,
+          "index": -1,
+          "kind": "surge",
+          "perfect": true,
+          "refund": 0
+        },
+        {
+          "id": "ascension-pad-powers-v1:e69b504c:3",
+          "sequence": 3,
+          "tick": 3749,
+          "type": "pickup",
+          "lap": 2,
+          "lane": 0,
+          "index": 0,
+          "kind": "surge",
+          "perfect": false,
+          "refund": 0
+        },
+        {
+          "id": "ascension-pad-powers-v1:e69b504c:4",
+          "sequence": 4,
+          "tick": 6300,
+          "type": "power",
+          "lap": 2,
+          "lane": 0,
+          "index": -1,
+          "kind": "surge",
+          "perfect": true,
+          "refund": 0
+        }
+      ]
+    },
+    "chains": [],
+    "seed": 3868938316,
+    "tick": 8442,
+    "progress": 0.47178945425446683,
+    "sector": "TRENCH",
+    "effects": {
+      "launchAge": 1.5666666666666667,
+      "pad": [
+        231.0088653564453,
+        4,
+        -125.9814453125
+      ],
+      "smokeTop": 486.11415089163245,
+      "cloudGlow": 1,
+      "tick": 8441,
+      "reducedMotion": true,
+      "crawlerPosition": [
+        6.681713104248047,
+        17,
+        330.3438720703125
+      ],
+      "treadTravel": 0,
+      "rocketHeight": 59.82362997274897,
+      "rocketVisible": true,
+      "steamVisible": true,
+      "smokeVisible": true,
+      "delugeVisible": true,
+      "floodVisible": true,
+      "lampScale": 1,
+      "klaxon": false
+    },
+    "trenchOccupied": true,
+    "schedule": {
+      "script": "scripts/build-ascension-route.mjs",
+      "measurementScript": "scripts/visual/ascension/race.mjs",
+      "measurement": "art/evidence/ascension-v1/phase-a/calibration/works-trench.json",
+      "worksLapSeconds": 28.0705,
+      "definition": "Mean of flying laps two and three in the full Works demo before schedule activation",
+      "launchTick": 8253,
+      "reopenTick": 10653,
+      "steamEndTick": 9937,
+      "rocketGoneTick": 9095,
+      "testTick": 4211,
+      "events": [
+        {
+          "id": "crawler-klaxon-1",
+          "tick": 1493
+        },
+        {
+          "id": "crawler-cross-1",
+          "tick": 1853
+        },
+        {
+          "id": "deluge-test",
+          "tick": 4211
+        },
+        {
+          "id": "crawler-klaxon-2",
+          "tick": 5030
+        },
+        {
+          "id": "crawler-cross-2",
+          "tick": 5390
+        },
+        {
+          "id": "launch",
+          "tick": 8253
+        },
+        {
+          "id": "rocket-gone",
+          "tick": 9095
+        },
+        {
+          "id": "steam-clear",
+          "tick": 9937
+        },
+        {
+          "id": "trench-reopen",
+          "tick": 10653
+        }
+      ]
+    },
+    "state": {
+      "trenchOpen": false,
+      "steam": true,
+      "launched": true,
+      "rocketGone": false,
+      "deluge": true
+    },
+    "events": [
+      {
+        "id": "crawler-klaxon-1",
+        "tick": 1493,
+        "sequence": 1
+      },
+      {
+        "id": "crawler-cross-1",
+        "tick": 1853,
+        "sequence": 2
+      },
+      {
+        "id": "deluge-test",
+        "tick": 4211,
+        "sequence": 3
+      },
+      {
+        "id": "crawler-klaxon-2",
+        "tick": 5030,
+        "sequence": 4
+      },
+      {
+        "id": "crawler-cross-2",
+        "tick": 5390,
+        "sequence": 5
+      },
+      {
+        "id": "launch",
+        "tick": 8253,
+        "sequence": 6
+      }
+    ]
+  },
+  "race": {
+    "current": {
+      "mapCode": "MAP 06",
+      "mapName": "Ascension Pad",
+      "mapKind": "ascension",
+      "finalMap02NativeBlockoutFreeze": false,
+      "orderedCheckpointCount": 8,
+      "calls": 91,
+      "triangles": 186822,
+      "points": 0,
+      "lines": 96,
+      "geometries": 184,
+      "textures": 45,
+      "frameMs": 8.03,
+      "p95FrameMs": 8,
+      "maxFrameMs": 50,
+      "phase": "running",
+      "controlMode": "autopilot",
+      "sector": "TRENCH",
+      "distanceMeters": 1130,
+      "speedKph": 304.7,
+      "lateralMeters": -1.22,
+      "steer": 0.166,
+      "drifting": false,
+      "driftIntensity": 0.03,
+      "surfaceGrip": 1,
+      "boostActive": false,
+      "boostLocked": false,
+      "wrongWay": false,
+      "courseAlignment": 1,
+      "nextCheckpoint": 3,
+      "raceSeed": 714,
+      "fieldSize": 4,
+      "playerPosition": 1,
+      "positionChanges": 2,
+      "positionsGained": 1,
+      "positionsLost": 1,
+      "finalClassification": [],
+      "rivalDrawCalls": 7,
+      "rivalTriangles": 18356,
+      "rivalUpdateSteps": 8340,
+      "rivalUpdateHz": 120,
+      "rivalMinimumSeparationMeters": 3.6,
+      "rivalMinimumRivalSeparationMeters": 13.6,
+      "playerRivalMinimumSeparationMeters": 3.6,
+      "cushionSeconds": 0,
+      "cushionPushNow": 0,
+      "cushionGapNow": 0,
+      "cushionSeparationNow": 0,
+      "cushionYieldNow": 0,
+      "cushionPeakClearPush": 0,
+      "cushionSeparationAtPeakClearPush": 0,
+      "closestPlayerContact": {
+        "id": "rival-privateer",
+        "longitudinalMeters": -0.04,
+        "lateralMeters": -3.6,
+        "lap": 2,
+        "courseDistanceMeters": 2575,
+        "cushionActive": false,
+        "cushionPush": 2.79,
+        "towLocked": false
+      },
+      "cushionPeakPush": 0,
+      "cushionContacts": 0,
+      "rivalClosestApproach": {
+        "id": "rival-privateer",
+        "longitudinalMeters": -0.05,
+        "lateralMeters": -3.6,
+        "courseDistanceMeters": 2571,
+        "lap": 2,
+        "targetLateralMeters": -6.14,
+        "rivalLateralMeters": -6.14,
+        "playerLateralMeters": -2.54
+      },
+      "rivalCatchUpMultiplier": 1,
+      "rivalMinimumFreeDeckFraction": 0.5565,
+      "rivalMinimumClearFreeDeckFraction": 0.5565,
+      "rivalMinimumFreeDeckTargetFraction": 0.4,
+      "rivalFreeDeckSamples": 196,
+      "rivalFreeDeckAlongsideSamples": 89,
+      "rivalLeadChanges": 0,
+      "slipstream": 0,
+      "slipstreamRival": "",
+      "slipstreamAheadMeters": 25.96,
+      "slipstreamLateralMeters": 1.91,
+      "slipstreamWorldMeters": 25.63,
+      "slipstreamMaxPositionMismatchMeters": 0.46,
+      "slipstreamSeconds": 0.14,
+      "slipstreamPeak": 0.137,
+      "slipstreamLocks": 0,
+      "rivalArticulatedGroups": [
+        "steering_fins",
+        "airbrakes"
+      ],
+      "rivalMaximumSteerRadians": 0.3491,
+      "rivalArticulation": [
+        {
+          "id": "rival-privateer",
+          "steerRadians": 0.0147,
+          "brakeRadians": 0,
+          "driftSignal": 0
+        },
+        {
+          "id": "rival-nightform",
+          "steerRadians": 0.0493,
+          "brakeRadians": 0.0088,
+          "driftSignal": 0
+        },
+        {
+          "id": "rival-needle",
+          "steerRadians": 0.0299,
+          "brakeRadians": 0.0077,
+          "driftSignal": 0
+        }
+      ],
+      "rivalPowerEvents": [
+        {
+          "rival": "rival-privateer",
+          "lap": 1,
+          "kind": "surge",
+          "tick": 1,
+          "scheduledProgress": 0.40662499999999996
+        },
+        {
+          "rival": "rival-privateer",
+          "lap": 1,
+          "kind": "shield",
+          "tick": 1,
+          "scheduledProgress": 0.666625
+        },
+        {
+          "rival": "rival-nightform",
+          "lap": 1,
+          "kind": "surge",
+          "tick": 1,
+          "scheduledProgress": 0.380675
+        },
+        {
+          "rival": "rival-nightform",
+          "lap": 1,
+          "kind": "shield",
+          "tick": 1,
+          "scheduledProgress": 0.640675
+        },
+        {
+          "rival": "rival-needle",
+          "lap": 1,
+          "kind": "surge",
+          "tick": 1,
+          "scheduledProgress": 0.41855
+        },
+        {
+          "rival": "rival-needle",
+          "lap": 1,
+          "kind": "shield",
+          "tick": 1,
+          "scheduledProgress": 0.67855
+        },
+        {
+          "rival": "rival-privateer",
+          "lap": 2,
+          "kind": "surge",
+          "tick": 4988,
+          "scheduledProgress": 0.3992
+        },
+        {
+          "rival": "rival-nightform",
+          "lap": 2,
+          "kind": "surge",
+          "tick": 5030,
+          "scheduledProgress": 0.37024999999999997
+        },
+        {
+          "rival": "rival-needle",
+          "lap": 2,
+          "kind": "surge",
+          "tick": 5168,
+          "scheduledProgress": 0.37797499999999995
+        },
+        {
+          "rival": "rival-privateer",
+          "lap": 2,
+          "kind": "shield",
+          "tick": 5835,
+          "scheduledProgress": 0.6592
+        },
+        {
+          "rival": "rival-nightform",
+          "lap": 2,
+          "kind": "shield",
+          "tick": 5887,
+          "scheduledProgress": 0.63025
+        },
+        {
+          "rival": "rival-needle",
+          "lap": 2,
+          "kind": "shield",
+          "tick": 6037,
+          "scheduledProgress": 0.637975
+        },
+        {
+          "rival": "rival-privateer",
+          "lap": 3,
+          "kind": "surge",
+          "tick": 8296,
+          "scheduledProgress": 0.41367499999999996
+        }
+      ],
+      "rivals": [
+        {
+          "id": "rival-privateer",
+          "name": "PRIVATEER 13",
+          "lap": 3,
+          "raceDistanceMeters": 6312.12,
+          "speedKph": 355.5,
+          "lateralMeters": -3.57,
+          "finishTimeMs": null,
+          "recoveries": 0,
+          "lapTimesMs": [
+            31042,
+            27023
+          ],
+          "boostSeconds": 0,
+          "boostReserve": 1,
+          "padHits": 0,
+          "driftEntries": 14,
+          "driftSeconds": 4.53
+        },
+        {
+          "id": "rival-nightform",
+          "name": "NIGHTFORM 24",
+          "lap": 3,
+          "raceDistanceMeters": 6157.19,
+          "speedKph": 331.8,
+          "lateralMeters": 3.63,
+          "finishTimeMs": null,
+          "recoveries": 0,
+          "lapTimesMs": [
+            31848,
+            27750
+          ],
+          "boostSeconds": 0,
+          "boostReserve": 1,
+          "padHits": 0,
+          "driftEntries": 14,
+          "driftSeconds": 4.66
+        },
+        {
+          "id": "rival-needle",
+          "name": "NEEDLE 16",
+          "lap": 3,
+          "raceDistanceMeters": 6009.8,
+          "speedKph": 332.5,
+          "lateralMeters": 0.51,
+          "finishTimeMs": null,
+          "recoveries": 0,
+          "lapTimesMs": [
+            32513,
+            28384
+          ],
+          "boostSeconds": 0,
+          "boostReserve": 1,
+          "padHits": 0,
+          "driftEntries": 14,
+          "driftSeconds": 4.76
+        }
+      ],
+      "onApron": false,
+      "apronSeconds": 0,
+      "apronEntries": 0,
+      "maxApronDepthMeters": 0,
+      "minimumApronGrip": 1,
+      "averageSpeedKph": 285.7,
+      "topSpeedKph": 378.4,
+      "lapTimesMs": [
+        29975,
+        28100
+      ],
+      "boostSeconds": 8.73,
+      "driftSeconds": 1.75,
+      "driftEntries": 4,
+      "driftCharge": 0,
+      "driftRewards": 0,
+      "driftRewardTotal": 0,
+      "maxDriftIntensity": 0.3,
+      "minimumSurfaceGrip": 0.8,
+      "hullClearanceMeters": 0,
+      "minimumHullClearanceMeters": null,
+      "maximumHullClearanceMeters": null,
+      "hoverHeightMeters": 0.96,
+      "cameraSurfaceClearanceMeters": 0,
+      "minimumCameraSurfaceClearanceMeters": null,
+      "chaseMeters": 0,
+      "minimumChaseMeters": null,
+      "desiredChaseMeters": 0,
+      "cameraLateralMeters": 0,
+      "cameraOcclusionPullMeters": 0,
+      "maximumCameraOcclusionPullMeters": 0,
+      "sightCastMicroseconds": 0,
+      "sightCasts": 0,
+      "cameraLateralLagMeters": 0,
+      "maximumCameraLateralLagMeters": 0,
+      "hullNdcX": 0,
+      "hullNdcY": 0,
+      "minimumHullNdcY": null,
+      "maximumHullNdcY": null,
+      "edgeSeconds": 0.16,
+      "wrongWaySeconds": 0,
+      "wrongWayEntries": 0,
+      "minimumCameraFov": 62,
+      "maximumCameraFov": 62,
+      "maximumBrakeFovCompression": 0,
+      "impacts": 8,
+      "impactSparkBursts": 4,
+      "missedGates": 0,
+      "impactLocations": [
+        "CABLE STRIKE@1493m",
+        "TANK FARM@2355m",
+        "CABLE STRIKE@2429m",
+        "TRENCH@548m",
+        "CABLE STRIKE@1493m",
+        "TANK FARM@2355m",
+        "CABLE STRIKE@2429m",
+        "PAD ROAD@135m"
+      ],
+      "cushionTravelMeters": 1.567,
+      "cushionLongestContactSeconds": 0,
+      "nearMisses": 0,
+      "hazardNearMisses": 0,
+      "nearMissReward": 0,
+      "cushionRewardBlocked": 0,
+      "nearMissLocations": [],
+      "peakCleanGateChain": 18,
+      "cleanGateChain": 18,
+      "recoveries": 0,
+      "gateMissRecoveries": 0,
+      "contextLost": false,
+      "contextLosses": 0,
+      "contextRestores": 0,
+      "renderedFrames": 8583,
+      "idleFramesSkipped": 0,
+      "presentationProjectionQueries": 8583,
+      "atmosphereUpdates": 0,
+      "atmosphereHz": 0,
+      "recoveryLocations": [],
+      "maxLateralRatio": 0.83,
+      "physicsSteps": 8340,
+      "audioContextState": "running",
+      "audioControlUpdates": 2083,
+      "audioControlHz": 30,
+      "audioControlTargetHz": 30,
+      "musicTransitions": 14,
+      "musicProfileKey": 104,
+      "musicLoopBeats": 16,
+      "musicLoopSeconds": 5.517,
+      "musicSampleRate": 24000,
+      "musicKey": "F minor",
+      "maxMusicLowpassHz": 6200,
+      "maxMusicHighShelfDb": 4.5,
+      "activeAudioOneShots": 0,
+      "peakAudioOneShots": 6,
+      "skippedAudioOneShots": 0,
+      "raceEventAudioCues": 3,
+      "audioPreparationMs": 28.8,
+      "audioInitializationMs": 254.2,
+      "rivalPanners": 3,
+      "rivalPanX": [
+        -0.998,
+        -0.816,
+        -0.418
+      ],
+      "reverbZone": "underpass",
+      "reverbWet": 0.2,
+      "reverbZoneTransitions": 5,
+      "masterVolume": 1,
+      "musicVolume": 1,
+      "musicStemGains": {
+        "trance": 0,
+        "jungle": 0,
+        "deep_dnb": 0,
+        "techstep": 0
+      },
+      "audio": {
+        "map": "",
+        "bedZone": "underpass",
+        "beds": 0,
+        "bedLevels": {},
+        "eventLevels": {
+          "windGust": 0,
+          "squall": 0,
+          "saltDrop": 0
+        },
+        "ambiencePreparationMs": 0,
+        "passByWhooshes": 1,
+        "nearestRivalMeters": 226.58,
+        "spatialSources": [
+          {
+            "x": -226.1305,
+            "y": 12.0587,
+            "z": 7.7624,
+            "speed": 98.7542,
+            "doppler": 1.0363,
+            "boost": 0,
+            "brake": 0
+          },
+          {
+            "x": -201.7509,
+            "y": -3.1401,
+            "z": -143.0842,
+            "speed": 92.185,
+            "doppler": 0.94,
+            "boost": 0,
+            "brake": 0
+          },
+          {
+            "x": -121.3348,
+            "y": -15.2962,
+            "z": -263.5882,
+            "speed": 92.3753,
+            "doppler": 0.94,
+            "boost": 0,
+            "brake": 0
+          }
+        ],
+        "panners": [
+          {
+            "x": -226.127,
+            "y": 11.9937,
+            "z": 7.1412,
+            "gain": 0.0485
+          },
+          {
+            "x": -201.6596,
+            "y": -3.1869,
+            "z": -143.5953,
+            "gain": 0.0485
+          },
+          {
+            "x": -121.1007,
+            "y": -15.3464,
+            "z": -264.0823,
+            "gain": 0.0485
+          }
+        ],
+        "listenerPose": {
+          "x": 255.608,
+          "y": -6.367,
+          "z": 32.258,
+          "forwardX": 0.032,
+          "forwardY": -0.101,
+          "forwardZ": 0.994,
+          "upX": 0.003,
+          "upY": 0.995,
+          "upZ": 0.101
+        }
+      },
+      "pitRadio": {
+        "linesPlayed": 7,
+        "linesDropped": 14,
+        "lastLine": "new_best_lap",
+        "queueDepth": 0,
+        "loaded": 17
+      },
+      "soundtrack": {
+        "source": "off",
+        "title": "",
+        "currentTime": 0,
+        "state": "idle",
+        "trackGain": 0.4
+      },
+      "busMeters": {
+        "musicDb": -120,
+        "otherDb": -25.79
+      },
+      "startupReadyMs": 790.6,
+      "courseAssemblyMs": 53.1,
+      "vehicleLoadStartedMs": 318.7,
+      "vehicleLoadMs": 59.3,
+      "vehicleRequestStartMs": 19.5,
+      "vehicleResourceRequests": 1,
+      "assetKitLoadMs": null,
+      "assetKitReady": false,
+      "environmentLoadMs": 302.6,
+      "environmentReady": true,
+      "environmentError": null,
+      "environmentMeshes": 37,
+      "environmentTriangles": 56250,
+      "environmentMaterials": 5,
+      "environmentTextures": 5,
+      "environmentVisibleGroups": 8,
+      "environmentVisibleTriangles": 45428,
+      "environmentShaderModel": "lambert",
+      "environmentSignageSource": "baked",
+      "environmentContractDrift": [],
+      "corridorSweepRan": false,
+      "corridorIntrusions": 0,
+      "corridorFlush": 0,
+      "corridorOverhead": 0,
+      "corridorBoundary": 0,
+      "corridorVfx": 0,
+      "corridorHiddenIntrusions": 0,
+      "corridorHiddenByBand": {
+        "flush": 0,
+        "obstacle": 0,
+        "overhead": 0,
+        "boundary": 0,
+        "vfx": 0
+      },
+      "corridorSweepMeshes": 0,
+      "corridorSweepInstances": 0,
+      "corridorSweepVertices": 0,
+      "corridorSweepVerticesTested": 0,
+      "corridorSweepMs": 0,
+      "corridorGate": "deck",
+      "corridorIntrusionList": [],
+      "corridorDump": [],
+      "corridorSpans": [],
+      "corridorRelocated": 0,
+      "corridorRelocationMaxShift": 0,
+      "corridorRelocationList": [],
+      "midgroundLoadMs": null,
+      "midgroundReady": false,
+      "midgroundError": null,
+      "midground": {
+        "drawCalls": 0,
+        "instances": 0,
+        "triangles": 0,
+        "families": 0,
+        "visibleInstances": 0
+      },
+      "trimLayersLoadMs": null,
+      "trimLayersReady": false,
+      "trimLayersError": null,
+      "facadeAssignments": 0,
+      "facadeMaterials": 0,
+      "facadeFamilies": 0,
+      "facadeAlphaTestedFamilies": 0,
+      "facadeSkirtedPlacements": 0,
+      "facadePlinthedPlacements": 0,
+      "facadeWindowedPlacements": 0,
+      "facadeTriangles": 0,
+      "facadeSkirtTriangles": 0,
+      "facadeElements": 0,
+      "facadeSheetsSampled": 0,
+      "facadeWindowDuskBlend": 0,
+      "backPanelDrawCalls": 0,
+      "backPanels": 0,
+      "backPanelsTagged": 0,
+      "backPanelsBlank": 0,
+      "backPanelWallPlaqueSkips": 0,
+      "backPanelTriangles": 0,
+      "edgeBandDrawCalls": 0,
+      "edgeStrips": 0,
+      "edgeTicks": 0,
+      "cyanTicks": 0,
+      "cyanTicksInSpan": 0,
+      "chevronTicks": 0,
+      "wearCapTicks": 0,
+      "edgeBlankStrips": 0,
+      "edgeDeckStrips": 0,
+      "edgePanStrips": 0,
+      "edgeBermStrips": 0,
+      "edgeBandQuads": 0,
+      "edgeBandTriangles": 0,
+      "edgeBandMaxLiftMetres": 0,
+      "blockoutRoadHidden": null,
+      "bitterpanSurfaceLoadMs": null,
+      "bitterpanSurfaceReady": false,
+      "bitterpanSurfaceError": null,
+      "bitterpanSurfaceDrawCalls": 0,
+      "bpCrustDecals": 0,
+      "bpCrustOnlyDecals": 0,
+      "bpDressingItems": 0,
+      "bpCrustTriangles": 0,
+      "bpGroundMetresPerTile": 0,
+      "bpGroundAnisotropy": 0,
+      "panFloor": {
+        "segments": 0,
+        "macroSeed": 0,
+        "secondaryScale": 0,
+        "vertices": 0,
+        "meanLuma": 0,
+        "peakBrightness": 0,
+        "peakHue": 0,
+        "windDegrees": 0,
+        "streakBands": 0,
+        "brineWeightMean": 0,
+        "fix": "off",
+        "coveredSides": 0,
+        "coveredWorstMetres": 0,
+        "reliefVertices": 0,
+        "reliefMaxDropMetres": 0,
+        "probe": false
+      },
+      "plaqueBackingLoadMs": null,
+      "plaqueBackingReady": false,
+      "plaqueBackingError": null,
+      "plaqueBackingDrawCalls": 0,
+      "plaqueBackings": 0,
+      "plaqueBackingChevrons": 0,
+      "plaqueBackingBoards": 0,
+      "plaqueBackingTriangles": 0,
+      "openingSurfaceLoadMs": null,
+      "openingSurfaceReady": false,
+      "openingSurfaceError": null,
+      "openingSurfaceDrawCalls": 0,
+      "openingSurfaceDecals": 0,
+      "openingSurfaceTriangles": 0,
+      "signageLoadMs": null,
+      "signageReady": false,
+      "signageError": null,
+      "signageDrawCalls": 0,
+      "signageBoards": 0,
+      "signageQuads": 0,
+      "signageTriangles": 0,
+      "signagePosts": 0,
+      "signagePostTriangles": 0,
+      "livingWorldLoadMs": null,
+      "livingWorldReady": false,
+      "livingWorldError": null,
+      "livingWorldDrawCalls": 0,
+      "livingWorldCards": 0,
+      "livingWorldVisibleCards": 0,
+      "livingWorldTriangles": 0,
+      "livingWorldUpdateHz": 0,
+      "livingWorldUpdateSteps": 0,
+      "surfaceCharacterLoadMs": null,
+      "surfaceCharacterReady": false,
+      "surfaceCharacterReseated": 0,
+      "surfaceCharacterMaxLiftFix": 0,
+      "surfaceCharacterError": null,
+      "surfaceCharacterDrawCalls": 0,
+      "surfaceCharacterMeshes": 0,
+      "surfaceCharacterTriangles": 0,
+      "surfaceCharacterMaterials": 0,
+      "surfaceCharacterTextures": 0,
+      "surfaceCharacterShaderModel": null,
+      "surfaceCharacterAnimated": false,
+      "minimapAnimated": false,
+      "minimapStations": 128,
+      "minimapContacts": 3,
+      "minimapNearestRivalMeters": 226,
+      "minimapAlert": false,
+      "minimapDrawOps": 12,
+      "minimapShortcutPaths": 0,
+      "keyDirection": [
+        0.675,
+        0.4963,
+        -0.5459
+      ],
+      "shadows": {
+        "enabled": true,
+        "mapSize": 2048,
+        "casters": 17,
+        "promotedReceivers": 0,
+        "p95FrameMs": 8
+      },
+      "hangarFlickerActive": false,
+      "hangarLampIntensity": 0,
+      "timeOfDayDrift": 0,
+      "sky": {
+        "horizonHex": "#5c7e79",
+        "zenithHex": "#142624",
+        "cloudCoverage": 0.5,
+        "sunOccluded": true
+      },
+      "ghostActive": false,
+      "ghostDrawCalls": 0,
+      "ghostFrames": 0,
+      "ghostRecordedFrames": 229,
+      "ghostLapMs": null,
+      "ghostTriangles": 6114,
+      "renderMode": "agx",
+      "ps2SnapMaterials": 0,
+      "ps2DitherMaterials": 0,
+      "wearActive": true,
+      "wearMaterials": 3,
+      "wearScale": 1,
+      "appliedWearSlots": 12,
+      "trackEventsEnabled": true,
+      "gusts": 0,
+      "gustSeconds": 0,
+      "gustPeakPush": 0,
+      "gustLateralMetres": 0,
+      "gustTelegraphLeads": [],
+      "gustNow": 0,
+      "saltDrops": 0,
+      "saltPatchSeconds": 0,
+      "saltWarningLeads": [],
+      "saltNow": 0,
+      "squalls": 0,
+      "squallSeconds": 0,
+      "squallStartLap": 0,
+      "squallStartMs": 0,
+      "squallNow": 0,
+      "trackEventChip": "",
+      "trackEventSchedule": "{\"gusts\":[],\"salt\":[],\"squall\":null}",
+      "pixelRatio": 1,
+      "preferredPixelRatio": 1,
+      "minimumPixelRatio": 1,
+      "internalWidth": 1280,
+      "internalHeight": 720,
+      "qualityMode": "high",
+      "reducedMotion": true,
+      "persistenceMode": "storage",
+      "schemaVersion": 4,
+      "storedLivery": "works",
+      "storedTrack": "greenwater",
+      "storedFormat": "race",
+      "storedTier": "works",
+      "raceMode": "race",
+      "rivalTier": "works",
+      "raceModeBestLapMs": null,
+      "raceModeGateSplitsMs": [],
+      "sectorDeltas": [],
+      "liveDelta": "",
+      "ps2CourseMaterials": 6,
+      "ps2CourseTextures": 3,
+      "heapMb": 67.1,
+      "maxHeapMb": 89.9,
+      "heapGrowthMb": 9.9
+    },
+    "peak": {
+      "calls": 103,
+      "triangles": 210010,
+      "geometries": 184,
+      "textures": 45,
+      "environmentGroups": 28,
+      "environmentTriangles": 51858,
+      "frameMs": 8.9,
+      "phase": "running",
+      "sector": "TRENCH",
+      "distanceMeters": 578
+    }
+  },
+  "hud": "FUTURISMA\nASCENSION PAD / MAP 06\nPOSITION GAINED · P1 · AUTOPILOT\nPAD 09 / LAUNCH DAY\nSPACE / SHIFT · NITRO\nCOLLECT A DEVICE\nT+00:01 / TAKE DELUGE ROAD\nVELOCITY\n298\nKM/H\nAIRBRAKES\nRACE TIME\n01:10.350\nLAP 3 / 3 · LAST 00:28.100\nP1 / 4 · 0.32 CLEAR\nNEXT GATE 03 / 07\nCLEAN ×18\n1.4 KM TO FINISH\nTRENCH\nFINISH\nPLASMA RESERVE\n100%\nSLIPSTREAM\n→\nTURN RIGHT\nNOW\nP1 · YOU\nTOTEM\nP2\nPRIVATEER 13\nP3\nNIGHTFORM 24\nP4\nNEEDLE 16"
+}

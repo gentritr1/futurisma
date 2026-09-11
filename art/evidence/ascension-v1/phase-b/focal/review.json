@@ -1,0 +1,291 @@
+{
+  "script": "scripts/visual/ascension/focal-review.py",
+  "records": [
+    {
+      "asset": "rocket-platform",
+      "hero": "art/references/ascension/hero-rocket-platform-flux2.png",
+      "model": "art/evidence/ascension-v1/phase-b/focal/rocket-platform.png",
+      "heroSha256": "645bce0b5032ce8cca74342dc6e19cc0cc0bc1bf237c68c54a4729d8f7960335",
+      "modelSha256": "e7af3bfd4a8fa5fe6d51b8f17c8dff6802290ceb3b9de43f6194b5d7c984bfcb",
+      "authoredDetailsToReview": [
+        "four piers and open exhaust hole",
+        "hazard deck rim",
+        "open service tower",
+        "repair plate",
+        "caged lamps and beacon"
+      ],
+      "assessment": {
+        "asset": "rocket-platform",
+        "sharedVisibleDetails": [
+          "four concrete piers",
+          "open service tower",
+          "paired side boosters",
+          "hazard deck edge",
+          "deck lamps"
+        ],
+        "status": "needs revision",
+        "gap": "Core colour breakup and service-arm silhouette are much weaker than the hero; the platform reads too sparse. No shuttle wings or copied real logo observed, but original-vehicle acceptance is not established by that alone."
+      }
+    },
+    {
+      "asset": "crawler-transporter",
+      "hero": "art/references/ascension/hero-crawler-transporter-flux2.png",
+      "model": "art/evidence/ascension-v1/phase-b/focal/crawler-transporter.png",
+      "heroSha256": "762f0807a416c8f5d8096343fce0f47ac43d4b466e765d5f952a47194c942b36",
+      "modelSha256": "f42eab51cce0604eda7e072f30d8ce4e5d0b55989ce974689ef28a6e494ca455",
+      "authoredDetailsToReview": [
+        "four tread assemblies",
+        "four support legs",
+        "two corner cabs",
+        "hazard deck band and repair plate",
+        "beacon and horn"
+      ],
+      "assessment": {
+        "asset": "crawler-transporter",
+        "sharedVisibleDetails": [
+          "four tread groups",
+          "open space beneath deck",
+          "corner cabs",
+          "hazard deck rim",
+          "beacon and horn"
+        ],
+        "status": "needs revision",
+        "gap": "Cab mass and tread profiles are too small and simplified against the hero. Component presence does not meet focal fidelity."
+      }
+    },
+    {
+      "asset": "countdown-board",
+      "hero": "art/references/ascension/hero-countdown-board-flux2.png",
+      "model": "art/evidence/ascension-v1/phase-b/focal/countdown-board.png",
+      "heroSha256": "d9f9ee89b78f003bad68522ae3c4bdd55adbac9446a4095482bde696e10c425f",
+      "modelSha256": "246bccb7ec427b4105532c89bac9dc261fdab40faf45dad62b1d164a432b3373",
+      "authoredDetailsToReview": [
+        "A-frame mast",
+        "deep countdown housing",
+        "hazard border",
+        "beacon and horn",
+        "repair plate and cage lamp"
+      ],
+      "assessment": {
+        "asset": "countdown-board",
+        "sharedVisibleDetails": [
+          "deep housing",
+          "countdown and route status",
+          "hazard frame",
+          "horn",
+          "top lamp"
+        ],
+        "status": "needs revision",
+        "gap": "Single A mast differs from the hero's paired supports. The runtime overhead adaptation is documented separately; repair plate is not clearly visible from this angle."
+      }
+    },
+    {
+      "asset": "trench-wall-module",
+      "hero": "art/references/ascension/hero-trench-wall-module-flux2.png",
+      "model": "art/evidence/ascension-v1/phase-b/focal/trench-wall-module.png",
+      "heroSha256": "56ad949b56a495049d9fae692f08025ba472662991d520b1fc04c79b78171e5e",
+      "modelSha256": "e33a9e4546f0cdf48444bfd460fcccbaeee0d3e674d0bb908b5dd459f7490294",
+      "authoredDetailsToReview": [
+        "two continuous pipes",
+        "four red valve wheels",
+        "full-height ladder",
+        "caged glass lamps",
+        "hazard band repair plate and drain grate"
+      ],
+      "assessment": {
+        "asset": "trench-wall-module",
+        "sharedVisibleDetails": [
+          "paired pipes",
+          "red valve wheels",
+          "ladder",
+          "caged sodium lamps",
+          "repair plate and drain"
+        ],
+        "status": "module details visible; corridor acceptance withheld",
+        "gap": "Repeated bays dominate the long corridor. Hazard band and surface wear are more uniform than the hero."
+      }
+    },
+    {
+      "asset": "deluge-water-tower",
+      "hero": "art/references/ascension/hero-deluge-water-tower-gptimage2.png",
+      "model": "art/evidence/ascension-v1/phase-b/focal/deluge-water-tower.png",
+      "heroSha256": "e6633adce33dbe4909da3902d61dd8f19448d5602e824741fdbdd85e0fdd869c",
+      "modelSha256": "0344ccb3ab0bd154ddf81e6a6b22553a7d1ecce3afa8302c28f34ab08380a58e",
+      "authoredDetailsToReview": [
+        "single squat reservoir",
+        "four olive legs",
+        "outlet with red valve",
+        "ladder",
+        "repair plate and caged lamp"
+      ],
+      "assessment": {
+        "asset": "deluge-water-tower",
+        "sharedVisibleDetails": [
+          "cylindrical reservoir",
+          "four legs",
+          "outlet valve",
+          "ladder",
+          "lamp and repair plate"
+        ],
+        "status": "needs revision",
+        "gap": "Leg bracing and material weathering are weaker than the hero. Reservoir is too vertically streaked."
+      }
+    },
+    {
+      "asset": "propellant-tank",
+      "hero": "art/references/ascension/hero-propellant-tank-gptimage2.png",
+      "model": "art/evidence/ascension-v1/phase-b/focal/propellant-tank.png",
+      "heroSha256": "3bc6b30515afb2a0260a4ad69fb491c5b0d6372b4f9710673edc588e02a1681e",
+      "modelSha256": "2fd2e6f96d555f9e477d3bc9eaa7989f532f88ed84f0b82ab45045a793d6114f",
+      "authoredDetailsToReview": [
+        "two rust bands",
+        "shallow roof",
+        "bent roof vent",
+        "ladder",
+        "repair plate and caged lamp"
+      ],
+      "assessment": {
+        "asset": "propellant-tank",
+        "sharedVisibleDetails": [
+          "cylindrical tank",
+          "two rust bands",
+          "ladder",
+          "repair plate",
+          "caged lamp"
+        ],
+        "status": "needs revision",
+        "gap": "Roof and bent vent are not legible from this capture; atlas mapping stretches vertically."
+      }
+    },
+    {
+      "asset": "vent-stack",
+      "hero": "art/references/ascension/hero-vent-stack-gptimage2.png",
+      "model": "art/evidence/ascension-v1/phase-b/focal/vent-stack.png",
+      "heroSha256": "ff3e947c1642c92f227ceb9131a04261a7151a7998faccf64911989feefe10ad",
+      "modelSha256": "c14738cc20c995bcf346e8e1c734c741c0a282da13eb03b46ff6b4303345522c",
+      "authoredDetailsToReview": [
+        "bent exhaust elbow",
+        "two collars",
+        "concrete plinth",
+        "maintenance platform",
+        "ladder and cage lamp"
+      ],
+      "assessment": {
+        "asset": "vent-stack",
+        "sharedVisibleDetails": [
+          "bent elbow",
+          "collars",
+          "concrete plinth",
+          "maintenance platform",
+          "ladder and lamp"
+        ],
+        "status": "needs revision",
+        "gap": "Repair wear is weak and the elbow's open mouth is not legible from this angle."
+      }
+    },
+    {
+      "asset": "crawlerway-gravel-bed",
+      "hero": "art/references/ascension/hero-crawlerway-gravel-bed-gptimage2.png",
+      "model": "art/evidence/ascension-v1/phase-b/focal/crawlerway-gravel-bed.png",
+      "heroSha256": "9292cd182bb32223c122fdfb047610db53346480b4f4619227e435c547cba9c1",
+      "modelSha256": "f585267e248403ee6bcc7eef6ea7f18ba09f620d9987479e42878a827d4d8756",
+      "authoredDetailsToReview": [
+        "two steel tread strips",
+        "rough concrete gravel median",
+        "two raised curbs",
+        "four cage lamps",
+        "corner repair plate"
+      ],
+      "assessment": {
+        "asset": "crawlerway-gravel-bed",
+        "sharedVisibleDetails": [
+          "two tread strips",
+          "central gravel surface",
+          "side curbs",
+          "four lamps",
+          "corner plate"
+        ],
+        "status": "needs revision",
+        "gap": "Chase-height capture makes the bed too thin and does not establish gravel detail fidelity."
+      }
+    },
+    {
+      "asset": "mangrove-pier",
+      "hero": "art/references/ascension/hero-mangrove-pier-gptimage2.png",
+      "model": "art/evidence/ascension-v1/phase-b/focal/mangrove-pier.png",
+      "heroSha256": "7f586aed0c075e045e7c1e6aafb18463b7063fbaf290129b7bd8c3c0df15e384",
+      "modelSha256": "6d0c908c8a436298a0925dcff7560a33442fb6b151ff67f9d6eea5eb6eec9dac",
+      "authoredDetailsToReview": [
+        "four algae-stained piles",
+        "low deck",
+        "two safety rails",
+        "maintenance ladder",
+        "two cage lamps and repair plate"
+      ],
+      "assessment": {
+        "asset": "mangrove-pier",
+        "sharedVisibleDetails": [
+          "concrete deck",
+          "algae-stained piles",
+          "safety rails",
+          "lamps",
+          "repair plate"
+        ],
+        "status": "needs revision",
+        "gap": "Maintenance ladder is hidden from this angle; source hero puts the pier overhead while its intended use is a road deck. Placement and silhouette acceptance remain separate."
+      }
+    },
+    {
+      "asset": "egret-card-set",
+      "hero": "art/references/ascension/hero-egret-card-set-gptimage2.png",
+      "model": "art/evidence/ascension-v1/phase-b/focal/egret-card-set.png",
+      "heroSha256": "d78adbce351aea805021a7d9f5758e6dfd7889eada78d9d7a71a53516929f838",
+      "modelSha256": "87a03bd4e822c5ed66bb63585a1c194f944c6a1e5725aefdd9cdc21e7704666a",
+      "authoredDetailsToReview": [
+        "folded S-curved neck",
+        "yellow tapered beak",
+        "two black trailing legs",
+        "white feathered wings",
+        "slender white body"
+      ],
+      "assessment": {
+        "asset": "egret-card-set",
+        "sharedVisibleDetails": [
+          "folded neck",
+          "yellow tapered beak",
+          "two black trailing legs",
+          "white feathered wings",
+          "slender white body"
+        ],
+        "status": "five details observed; motion acceptance pending",
+        "gap": "One static keyed card pose; rising and scattering animation belongs to the event phase. No independent reviewer."
+      }
+    },
+    {
+      "asset": "service-tower-swing-arm",
+      "hero": "art/references/ascension/hero-service-tower-swing-arm-gptimage2.png",
+      "model": "art/evidence/ascension-v1/phase-b/focal/service-tower-swing-arm.png",
+      "heroSha256": "65bdc571e94e30cc589bc9daac81b6c5eade80df88cd9ef1ceea7027c9bfd5ed",
+      "modelSha256": "34b61f45bd8e6dbdf2e15cb68ab1f6093c8c990ce86496c7c5b9d7e675bd5acb",
+      "authoredDetailsToReview": [
+        "three truss bays per side",
+        "hinge cylinder",
+        "umbilical loop",
+        "central repair plate",
+        "caged glass lamp"
+      ],
+      "assessment": {
+        "asset": "service-tower-swing-arm",
+        "sharedVisibleDetails": [
+          "open truss",
+          "hinge cylinder",
+          "umbilical loop",
+          "central plate",
+          "caged lamp"
+        ],
+        "status": "needs revision",
+        "gap": "Loop reads angular and thin; central plate and truss proportions differ from the hero."
+      }
+    }
+  ]
+}

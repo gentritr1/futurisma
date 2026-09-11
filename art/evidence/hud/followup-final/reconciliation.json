@@ -1,0 +1,56 @@
+{
+  "script": "scripts/visual/hud/report-followup.mjs",
+  "testCodeExit": 0,
+  "captureReconciliation": {
+    "viewports": 2,
+    "scales": 2,
+    "cases": 6,
+    "expected": 24,
+    "observed": 24,
+    "residual": 0
+  },
+  "slotReconciliation": {
+    "deviceCircuits": 3,
+    "viewportScalePairs": 4,
+    "expected": 12,
+    "observed": 12,
+    "residual": 0
+  },
+  "layoutDifferences": [],
+  "slotDifferences": [],
+  "captureErrors": [],
+  "baselineLimitation": "capture-merged.json contains no slot states. Exact state parity is checked against the 2862475 parser at each new sampled frame; baseline layout fields are compared directly. No claim of matching unrecorded historical states.",
+  "sampling": "Discrete scenario captures, not a regularly sampled time series. No FPS or p95 comparison.",
+  "scenarioReconciliation": [
+    {
+      "name": "menu path observations",
+      "expected": 8,
+      "observed": 8,
+      "residual": 0
+    },
+    {
+      "name": "pause and quit observations",
+      "expected": 9,
+      "observed": 9,
+      "residual": 0
+    },
+    {
+      "name": "all prompt nodes across keyboard, pad, disconnect",
+      "expected": 33,
+      "observed": 33,
+      "residual": 0
+    },
+    {
+      "name": "real finishes: three formats plus previous-record setup",
+      "expected": 4,
+      "observed": 4,
+      "residual": 0
+    }
+  ],
+  "scenarioErrors": {
+    "menus": [],
+    "gamepad": [],
+    "pause": [],
+    "finishes": []
+  }
+}

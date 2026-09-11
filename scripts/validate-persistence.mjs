@@ -268,6 +268,11 @@ const authored = {
     // `true` would pass identically against a normalizer that dropped the field
     // and let the default fill it back in.
     voice: false,
+    // UI pass, v5. Non-default for the same reason: "m" is what a missing key
+    // normalizes to, so a fixture written at "m" could not tell a stored value
+    // from a dropped one.
+    hudScale: "l",
+    menuScale: "s",
   },
   records: {
     // One course with a stored replay, one without — the mixed case is the one
@@ -1677,8 +1682,8 @@ assert.match(
 }
 
 console.log(
-  `Persistence PASS: v4 round trip with per-mode ghosts and mode/tier best laps, `
-    + `v1 -> v4, v2 -> v4 and v3 -> v4 migrated field by field (the v2 ghost RELOCATED into `
+  `Persistence PASS: v${SCHEMA_VERSION} round trip with per-mode ghosts and mode/tier best laps, `
+    + `v1, v2 and v3 migrated field by field (the v2 ghost RELOCATED into `
     + `ghosts.race, not dropped), the global two-replay budget held across `
     + `${RACE_MODES.length} formats on one circuit with every lap time and split `
     + `surviving; ${hostile.length} hostile payloads `

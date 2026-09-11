@@ -170,6 +170,8 @@ interface RawAudioZone {
 export type { ApronResolution } from "./apron.js";
 
 export interface CourseSample {
+  /** A physical branch separated from the AI fleet’s main road. */
+  alternateRoad?: boolean;
   position: THREE.Vector3;
   tangent: THREE.Vector3;
   right: THREE.Vector3;
@@ -268,7 +270,7 @@ export interface TimeOfDayStop {
   keyScale: number;
 }
 
-export type CourseKind = "greenwater" | "bitterpan" | "nightshift" | "polarity" | "tideline";
+export type CourseKind = "greenwater" | "bitterpan" | "nightshift" | "polarity" | "tideline" | "ascension" | "dreamisland";
 
 export interface RivalGridStart {
   raceDistanceMeters: number;
@@ -299,6 +301,7 @@ export interface RivalPaceTable {
 }
 
 export interface RaceCourse {
+  readonly scheduleLabel?: string;
   readonly kind: CourseKind;
   readonly group: THREE.Group;
   readonly length: number;
@@ -333,6 +336,8 @@ export interface RaceCourse {
   createSampleScratch(): CourseSample;
   createProjectionScratch(): CourseProjection;
   sample(progress: number, target?: CourseSample): CourseSample;
+  demoSample?(progress: number, target?: CourseSample): CourseSample;
+  rivalLateralAt?(position: THREE.Vector3, progress: number): number;
   sampleAtDistance(distance: number): CourseSample;
   checkpointProgress(index: number): number;
   checkpointHalfWidth(index: number): number;
@@ -383,6 +388,20 @@ export interface RaceCourse {
   vehicleHoverHeight(speedMetersPerSecond: number, boostActive: boolean): number;
   setCheckpointProgress(nextCheckpointIndex: number): void;
   setLapBoard(current: number, total: number): void;
+  /**
+   * Optional: the race FORMAT and the lap count it resolved to, handed down
+   * once at load.
+   *
+   * A course that publishes a scheduled world change needs to know which of
+   * them it is racing, because a schedule authored in laps of a three-lap race
+   * simply never arrives inside a two-lap sprint. It is handed DOWN rather than
+   * read off the query string here for the rule `race-modes-rules.js` states at
+   * the top of the file: the format is resolved once and every consumer reads
+   * that answer instead of re-deriving it, so a course and a lap counter can
+   * never disagree about which race is being run. Dream Island is the only
+   * implementer today; every other course ignores the format entirely.
+   */
+  selectRaceFormat?(mode: string, totalLaps: number): void;
   recoveryProgressFor(progress: number, previousCheckpointIndex: number): number;
   rivalGridStart(identity: string): RivalGridStart | null;
   /** The authored rival pace for this map, or null if it authors none. */

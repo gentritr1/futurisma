@@ -1,0 +1,1452 @@
+{
+  "script": "scripts/visual/ascension/live-feature-bursts.mjs",
+  "scope": "Unmodified live Works demos on both branches, normal chase camera. Sampled at 10 Hz on the 120 Hz schedule clock; actual speed is recorded, not forced to 300 km/h. This supplements the exact-speed camera recognition fixture. Capture overhead means these are not performance benchmarks.",
+  "keySha256": "992190eb83a675e076d6545cdbe4349c11c77bea587c46d57956fbf61baeb030",
+  "records": [
+    {
+      "folder": "burst-06",
+      "file": "burst-06/000.png",
+      "tick": 3863,
+      "seconds": 0,
+      "wall": 60003.299999952316,
+      "speedKph": 177.6,
+      "worldCameraToObjectMetres": 198.82922291405097
+    },
+    {
+      "folder": "burst-06",
+      "file": "burst-06/001.png",
+      "tick": 3879,
+      "seconds": 0.13333333333333333,
+      "wall": 60135.299999952316,
+      "speedKph": 177.6,
+      "worldCameraToObjectMetres": 191.37815381957446
+    },
+    {
+      "folder": "burst-06",
+      "file": "burst-06/002.png",
+      "tick": 3889,
+      "seconds": 0.21666666666666667,
+      "wall": 60220.09999990463,
+      "speedKph": 223.9,
+      "worldCameraToObjectMetres": 186.35329963095208
+    },
+    {
+      "folder": "burst-06",
+      "file": "burst-06/003.png",
+      "tick": 3899,
+      "seconds": 0.3,
+      "wall": 60300.799999952316,
+      "speedKph": 223.9,
+      "worldCameraToObjectMetres": 181.49653998959053
+    },
+    {
+      "folder": "burst-06",
+      "file": "burst-06/004.png",
+      "tick": 3913,
+      "seconds": 0.4166666666666667,
+      "wall": 60422.799999952316,
+      "speedKph": 223.9,
+      "worldCameraToObjectMetres": 174.02572802088514
+    },
+    {
+      "folder": "burst-06",
+      "file": "burst-06/005.png",
+      "tick": 3923,
+      "seconds": 0.5,
+      "wall": 60502.199999928474,
+      "speedKph": 223.9,
+      "worldCameraToObjectMetres": 169.03947356419013
+    },
+    {
+      "folder": "burst-06",
+      "file": "burst-06/006.png",
+      "tick": 3938,
+      "seconds": 0.625,
+      "wall": 60631.09999990463,
+      "speedKph": 223.9,
+      "worldCameraToObjectMetres": 160.79754820292425
+    },
+    {
+      "folder": "burst-06",
+      "file": "burst-06/007.png",
+      "tick": 3948,
+      "seconds": 0.7083333333333334,
+      "wall": 60714.299999952316,
+      "speedKph": 223.9,
+      "worldCameraToObjectMetres": 155.35509526413963
+    },
+    {
+      "folder": "burst-06",
+      "file": "burst-06/008.png",
+      "tick": 3963,
+      "seconds": 0.8333333333333334,
+      "wall": 60834.39999997616,
+      "speedKph": 223.9,
+      "worldCameraToObjectMetres": 147.34811950440698
+    },
+    {
+      "folder": "burst-06",
+      "file": "burst-06/009.png",
+      "tick": 3973,
+      "seconds": 0.9166666666666666,
+      "wall": 60920.299999952316,
+      "speedKph": 223.9,
+      "worldCameraToObjectMetres": 141.51038931228874
+    },
+    {
+      "folder": "burst-06",
+      "file": "burst-06/010.png",
+      "tick": 3983,
+      "seconds": 1,
+      "wall": 61006.199999928474,
+      "speedKph": 223.9,
+      "worldCameraToObjectMetres": 135.58929085926027
+    },
+    {
+      "folder": "burst-06",
+      "file": "burst-06/011.png",
+      "tick": 3998,
+      "seconds": 1.125,
+      "wall": 61126.59999990463,
+      "speedKph": 223.9,
+      "worldCameraToObjectMetres": 127.17436175495106
+    },
+    {
+      "folder": "burst-06",
+      "file": "burst-06/012.png",
+      "tick": 4008,
+      "seconds": 1.2083333333333333,
+      "wall": 61211.199999928474,
+      "speedKph": 259.1,
+      "worldCameraToObjectMetres": 121.16344196001518
+    },
+    {
+      "folder": "burst-06",
+      "file": "burst-06/013.png",
+      "tick": 4023,
+      "seconds": 1.3333333333333333,
+      "wall": 61336.5,
+      "speedKph": 259.1,
+      "worldCameraToObjectMetres": 112.1408029286352
+    },
+    {
+      "folder": "burst-06",
+      "file": "burst-06/014.png",
+      "tick": 4032,
+      "seconds": 1.4083333333333334,
+      "wall": 61416.59999990463,
+      "speedKph": 259.1,
+      "worldCameraToObjectMetres": 106.28979191541066
+    },
+    {
+      "folder": "burst-06",
+      "file": "burst-06/015.png",
+      "tick": 4046,
+      "seconds": 1.525,
+      "wall": 61530.799999952316,
+      "speedKph": 259.1,
+      "worldCameraToObjectMetres": 97.89746273109785
+    },
+    {
+      "folder": "burst-06",
+      "file": "burst-06/016.png",
+      "tick": 4056,
+      "seconds": 1.6083333333333334,
+      "wall": 61617.199999928474,
+      "speedKph": 259.1,
+      "worldCameraToObjectMetres": 91.4761752423336
+    },
+    {
+      "folder": "burst-06",
+      "file": "burst-06/017.png",
+      "tick": 4071,
+      "seconds": 1.7333333333333334,
+      "wall": 61737.199999928474,
+      "speedKph": 259.1,
+      "worldCameraToObjectMetres": 82.41883453967152
+    },
+    {
+      "folder": "burst-06",
+      "file": "burst-06/018.png",
+      "tick": 4082,
+      "seconds": 1.825,
+      "wall": 61826.89999997616,
+      "speedKph": 259.1,
+      "worldCameraToObjectMetres": 75.61150775269937
+    },
+    {
+      "folder": "burst-06",
+      "file": "burst-06/019.png",
+      "tick": 4092,
+      "seconds": 1.9083333333333334,
+      "wall": 61912.699999928474,
+      "speedKph": 259.1,
+      "worldCameraToObjectMetres": 69.02514778577265
+    },
+    {
+      "folder": "burst-04",
+      "file": "burst-04/000.png",
+      "tick": 4126,
+      "seconds": 0,
+      "wall": 62200.59999990463,
+      "speedKph": 285.5,
+      "worldCameraToObjectMetres": 136.2079153683336
+    },
+    {
+      "folder": "burst-04",
+      "file": "burst-04/001.png",
+      "tick": 4141,
+      "seconds": 0.125,
+      "wall": 62322.699999928474,
+      "speedKph": 285.5,
+      "worldCameraToObjectMetres": 126.48320629342295
+    },
+    {
+      "folder": "burst-04",
+      "file": "burst-04/002.png",
+      "tick": 4152,
+      "seconds": 0.21666666666666667,
+      "wall": 62409.09999990463,
+      "speedKph": 285.5,
+      "worldCameraToObjectMetres": 119.56662678815071
+    },
+    {
+      "folder": "burst-04",
+      "file": "burst-04/003.png",
+      "tick": 4166,
+      "seconds": 0.3333333333333333,
+      "wall": 62530.299999952316,
+      "speedKph": 285.5,
+      "worldCameraToObjectMetres": 109.85453133526475
+    },
+    {
+      "folder": "burst-04",
+      "file": "burst-04/004.png",
+      "tick": 4176,
+      "seconds": 0.4166666666666667,
+      "wall": 62616.39999997616,
+      "speedKph": 285.5,
+      "worldCameraToObjectMetres": 102.87523541918033
+    },
+    {
+      "folder": "burst-04",
+      "file": "burst-04/005.png",
+      "tick": 4187,
+      "seconds": 0.5083333333333333,
+      "wall": 62702.199999928474,
+      "speedKph": 285.5,
+      "worldCameraToObjectMetres": 95.89581029606141
+    },
+    {
+      "folder": "burst-04",
+      "file": "burst-04/006.png",
+      "tick": 4201,
+      "seconds": 0.625,
+      "wall": 62824.699999928474,
+      "speedKph": 285.5,
+      "worldCameraToObjectMetres": 85.81815164580915
+    },
+    {
+      "folder": "burst-04",
+      "file": "burst-04/007.png",
+      "tick": 4211,
+      "seconds": 0.7083333333333334,
+      "wall": 62956.59999990463,
+      "speedKph": 285.5,
+      "worldCameraToObjectMetres": 79.09037666398716
+    },
+    {
+      "folder": "burst-04",
+      "file": "burst-04/008.png",
+      "tick": 4222,
+      "seconds": 0.8,
+      "wall": 63041.39999997616,
+      "speedKph": 285.5,
+      "worldCameraToObjectMetres": 71.23071615340247
+    },
+    {
+      "folder": "burst-04",
+      "file": "burst-04/009.png",
+      "tick": 4237,
+      "seconds": 0.925,
+      "wall": 63169.59999990463,
+      "speedKph": 285.5,
+      "worldCameraToObjectMetres": 60.041871948952775
+    },
+    {
+      "folder": "burst-04",
+      "file": "burst-04/010.png",
+      "tick": 4248,
+      "seconds": 1.0166666666666666,
+      "wall": 63257.799999952316,
+      "speedKph": 317.5,
+      "worldCameraToObjectMetres": 52.297161509958606
+    },
+    {
+      "folder": "burst-04",
+      "file": "burst-04/011.png",
+      "tick": 4262,
+      "seconds": 1.1333333333333333,
+      "wall": 63374.299999952316,
+      "speedKph": 317.5,
+      "worldCameraToObjectMetres": 42.17102909280424
+    },
+    {
+      "folder": "burst-04",
+      "file": "burst-04/012.png",
+      "tick": 4272,
+      "seconds": 1.2166666666666666,
+      "wall": 63463.799999952316,
+      "speedKph": 317.5,
+      "worldCameraToObjectMetres": 34.39640020532123
+    },
+    {
+      "folder": "burst-04",
+      "file": "burst-04/013.png",
+      "tick": 4283,
+      "seconds": 1.3083333333333333,
+      "wall": 63552.59999990463,
+      "speedKph": 317.5,
+      "worldCameraToObjectMetres": 26.747360374078234
+    },
+    {
+      "folder": "burst-04",
+      "file": "burst-04/014.png",
+      "tick": 4298,
+      "seconds": 1.4333333333333333,
+      "wall": 63678.5,
+      "speedKph": 317.5,
+      "worldCameraToObjectMetres": 16.178166955677217
+    },
+    {
+      "folder": "burst-04",
+      "file": "burst-04/015.png",
+      "tick": 4309,
+      "seconds": 1.525,
+      "wall": 63767.699999928474,
+      "speedKph": 317.5,
+      "worldCameraToObjectMetres": 9.56383525277931
+    },
+    {
+      "folder": "burst-04",
+      "file": "burst-04/016.png",
+      "tick": 4319,
+      "seconds": 1.6083333333333334,
+      "wall": 63851.5,
+      "speedKph": 317.5,
+      "worldCameraToObjectMetres": 6.474197974785982
+    },
+    {
+      "folder": "burst-04",
+      "file": "burst-04/017.png",
+      "tick": 4334,
+      "seconds": 1.7333333333333334,
+      "wall": 63976.5,
+      "speedKph": 317.5,
+      "worldCameraToObjectMetres": 13.718393053732385
+    },
+    {
+      "folder": "burst-04",
+      "file": "burst-04/018.png",
+      "tick": 4344,
+      "seconds": 1.8166666666666667,
+      "wall": 64060.799999952316,
+      "speedKph": 317.5,
+      "worldCameraToObjectMetres": 21.007886084100274
+    },
+    {
+      "folder": "burst-04",
+      "file": "burst-04/019.png",
+      "tick": 4355,
+      "seconds": 1.9083333333333334,
+      "wall": 64149.199999928474,
+      "speedKph": 317.5,
+      "worldCameraToObjectMetres": 29.174992867511744
+    },
+    {
+      "folder": "burst-07",
+      "file": "burst-07/000.png",
+      "tick": 6570,
+      "seconds": 0,
+      "wall": 82607.39999997616,
+      "speedKph": 252.3,
+      "worldCameraToObjectMetres": 197.4070468064902
+    },
+    {
+      "folder": "burst-07",
+      "file": "burst-07/001.png",
+      "tick": 6585,
+      "seconds": 0.125,
+      "wall": 82737,
+      "speedKph": 252.3,
+      "worldCameraToObjectMetres": 188.72426899324842
+    },
+    {
+      "folder": "burst-07",
+      "file": "burst-07/002.png",
+      "tick": 6595,
+      "seconds": 0.20833333333333334,
+      "wall": 82820.89999997616,
+      "speedKph": 252.3,
+      "worldCameraToObjectMetres": 183.04212527681054
+    },
+    {
+      "folder": "burst-07",
+      "file": "burst-07/003.png",
+      "tick": 6606,
+      "seconds": 0.3,
+      "wall": 82912.39999997616,
+      "speedKph": 252.3,
+      "worldCameraToObjectMetres": 176.85638791718245
+    },
+    {
+      "folder": "burst-07",
+      "file": "burst-07/004.png",
+      "tick": 6622,
+      "seconds": 0.43333333333333335,
+      "wall": 83045.79999995232,
+      "speedKph": 252.3,
+      "worldCameraToObjectMetres": 167.81856480187366
+    },
+    {
+      "folder": "burst-07",
+      "file": "burst-07/005.png",
+      "tick": 6632,
+      "seconds": 0.5166666666666667,
+      "wall": 83129.39999997616,
+      "speedKph": 252.3,
+      "worldCameraToObjectMetres": 161.6549216365276
+    },
+    {
+      "folder": "burst-07",
+      "file": "burst-07/006.png",
+      "tick": 6642,
+      "seconds": 0.6,
+      "wall": 83209.39999997616,
+      "speedKph": 252.3,
+      "worldCameraToObjectMetres": 156.00084275631716
+    },
+    {
+      "folder": "burst-01",
+      "file": "burst-01/000.png",
+      "tick": 6657,
+      "seconds": 0,
+      "wall": 83333.19999992847,
+      "speedKph": 260.1,
+      "worldCameraToObjectMetres": 200.47957370564376
+    },
+    {
+      "folder": "burst-07",
+      "file": "burst-07/007.png",
+      "tick": 6657,
+      "seconds": 0.725,
+      "wall": 83375.5,
+      "speedKph": 260.1,
+      "worldCameraToObjectMetres": 147.11024924581903
+    },
+    {
+      "folder": "burst-07",
+      "file": "burst-07/008.png",
+      "tick": 6667,
+      "seconds": 0.8083333333333333,
+      "wall": 83448.5,
+      "speedKph": 260.1,
+      "worldCameraToObjectMetres": 140.85180375291753
+    },
+    {
+      "folder": "burst-01",
+      "file": "burst-01/001.png",
+      "tick": 6672,
+      "seconds": 0.125,
+      "wall": 83491.89999997616,
+      "speedKph": 260.1,
+      "worldCameraToObjectMetres": 191.09842905938848
+    },
+    {
+      "folder": "burst-01",
+      "file": "burst-01/002.png",
+      "tick": 6681,
+      "seconds": 0.2,
+      "wall": 83568.5,
+      "speedKph": 260.1,
+      "worldCameraToObjectMetres": 185.485567585416
+    },
+    {
+      "folder": "burst-07",
+      "file": "burst-07/009.png",
+      "tick": 6681,
+      "seconds": 0.925,
+      "wall": 83613.19999992847,
+      "speedKph": 260.1,
+      "worldCameraToObjectMetres": 132.05404456079293
+    },
+    {
+      "folder": "burst-07",
+      "file": "burst-07/010.png",
+      "tick": 6692,
+      "seconds": 1.0166666666666666,
+      "wall": 83682.39999997616,
+      "speedKph": 260.1,
+      "worldCameraToObjectMetres": 125.80479668110883
+    },
+    {
+      "folder": "burst-01",
+      "file": "burst-01/003.png",
+      "tick": 6697,
+      "seconds": 0.3333333333333333,
+      "wall": 83728.89999997616,
+      "speedKph": 260.1,
+      "worldCameraToObjectMetres": 175.85703661185235
+    },
+    {
+      "folder": "burst-07",
+      "file": "burst-07/011.png",
+      "tick": 6702,
+      "seconds": 1.1,
+      "wall": 83766.79999995232,
+      "speedKph": 260.1,
+      "worldCameraToObjectMetres": 119.5536839168489
+    },
+    {
+      "folder": "burst-01",
+      "file": "burst-01/004.png",
+      "tick": 6706,
+      "seconds": 0.4083333333333333,
+      "wall": 83804.29999995232,
+      "speedKph": 260.1,
+      "worldCameraToObjectMetres": 170.24599130138222
+    },
+    {
+      "folder": "burst-07",
+      "file": "burst-07/012.png",
+      "tick": 6716,
+      "seconds": 1.2166666666666666,
+      "wall": 83883.59999990463,
+      "speedKph": 260.1,
+      "worldCameraToObjectMetres": 110.72905109742624
+    },
+    {
+      "folder": "burst-01",
+      "file": "burst-01/005.png",
+      "tick": 6720,
+      "seconds": 0.525,
+      "wall": 83923.39999997616,
+      "speedKph": 260.1,
+      "worldCameraToObjectMetres": 161.31949087872457
+    },
+    {
+      "folder": "burst-01",
+      "file": "burst-01/006.png",
+      "tick": 6729,
+      "seconds": 0.6,
+      "wall": 83995.89999997616,
+      "speedKph": 260.1,
+      "worldCameraToObjectMetres": 155.7865925877112
+    },
+    {
+      "folder": "burst-07",
+      "file": "burst-07/013.png",
+      "tick": 6729,
+      "seconds": 1.325,
+      "wall": 84038.29999995232,
+      "speedKph": 260.1,
+      "worldCameraToObjectMetres": 102.20990555885116
+    },
+    {
+      "folder": "burst-07",
+      "file": "burst-07/014.png",
+      "tick": 6740,
+      "seconds": 1.4166666666666667,
+      "wall": 84113.69999992847,
+      "speedKph": 260.1,
+      "worldCameraToObjectMetres": 95.3008512254598
+    },
+    {
+      "folder": "burst-01",
+      "file": "burst-01/007.png",
+      "tick": 6746,
+      "seconds": 0.7416666666666667,
+      "wall": 84162.39999997616,
+      "speedKph": 260.1,
+      "worldCameraToObjectMetres": 145.1948675620717
+    },
+    {
+      "folder": "burst-07",
+      "file": "burst-07/015.png",
+      "tick": 6751,
+      "seconds": 1.5083333333333333,
+      "wall": 84203.59999990463,
+      "speedKph": 260.1,
+      "worldCameraToObjectMetres": 88.3923575023626
+    },
+    {
+      "folder": "burst-01",
+      "file": "burst-01/008.png",
+      "tick": 6755,
+      "seconds": 0.8166666666666667,
+      "wall": 84240.79999995232,
+      "speedKph": 260.1,
+      "worldCameraToObjectMetres": 139.17570485762684
+    },
+    {
+      "folder": "burst-07",
+      "file": "burst-07/016.png",
+      "tick": 6764,
+      "seconds": 1.6166666666666667,
+      "wall": 84316.19999992847,
+      "speedKph": 283.5,
+      "worldCameraToObjectMetres": 79.64648191935319
+    },
+    {
+      "folder": "burst-01",
+      "file": "burst-01/009.png",
+      "tick": 6769,
+      "seconds": 0.9333333333333333,
+      "wall": 84356.29999995232,
+      "speedKph": 283.5,
+      "worldCameraToObjectMetres": 130.2150487742827
+    },
+    {
+      "folder": "burst-07",
+      "file": "burst-07/017.png",
+      "tick": 6774,
+      "seconds": 1.7,
+      "wall": 84396.69999992847,
+      "speedKph": 283.5,
+      "worldCameraToObjectMetres": 73.35441324266819
+    },
+    {
+      "folder": "burst-01",
+      "file": "burst-01/010.png",
+      "tick": 6779,
+      "seconds": 1.0166666666666666,
+      "wall": 84438.5,
+      "speedKph": 283.5,
+      "worldCameraToObjectMetres": 123.79094915840479
+    },
+    {
+      "folder": "burst-01",
+      "file": "burst-01/011.png",
+      "tick": 6789,
+      "seconds": 1.1,
+      "wall": 84519.09999990463,
+      "speedKph": 283.5,
+      "worldCameraToObjectMetres": 117.4332430554273
+    },
+    {
+      "folder": "burst-07",
+      "file": "burst-07/018.png",
+      "tick": 6789,
+      "seconds": 1.825,
+      "wall": 84562.5,
+      "speedKph": 283.5,
+      "worldCameraToObjectMetres": 63.673516171399854
+    },
+    {
+      "folder": "burst-07",
+      "file": "burst-07/019.png",
+      "tick": 6799,
+      "seconds": 1.9083333333333334,
+      "wall": 84639.5,
+      "speedKph": 283.5,
+      "worldCameraToObjectMetres": 56.50920572885687
+    },
+    {
+      "folder": "burst-01",
+      "file": "burst-01/012.png",
+      "tick": 6805,
+      "seconds": 1.2333333333333334,
+      "wall": 84689.09999990463,
+      "speedKph": 283.5,
+      "worldCameraToObjectMetres": 106.39745744419125
+    },
+    {
+      "folder": "burst-01",
+      "file": "burst-01/013.png",
+      "tick": 6816,
+      "seconds": 1.325,
+      "wall": 84796.5,
+      "speedKph": 283.5,
+      "worldCameraToObjectMetres": 99.16669877078245
+    },
+    {
+      "folder": "burst-01",
+      "file": "burst-01/014.png",
+      "tick": 6827,
+      "seconds": 1.4166666666666667,
+      "wall": 84884.89999997616,
+      "speedKph": 283.5,
+      "worldCameraToObjectMetres": 91.99673547366076
+    },
+    {
+      "folder": "burst-01",
+      "file": "burst-01/015.png",
+      "tick": 6837,
+      "seconds": 1.5,
+      "wall": 84971.5,
+      "speedKph": 283.5,
+      "worldCameraToObjectMetres": 84.94168428671964
+    },
+    {
+      "folder": "burst-01",
+      "file": "burst-01/016.png",
+      "tick": 6852,
+      "seconds": 1.625,
+      "wall": 85092,
+      "speedKph": 283.5,
+      "worldCameraToObjectMetres": 75.01813384341632
+    },
+    {
+      "folder": "burst-01",
+      "file": "burst-01/017.png",
+      "tick": 6861,
+      "seconds": 1.7,
+      "wall": 85174.29999995232,
+      "speedKph": 283.5,
+      "worldCameraToObjectMetres": 68.23804773799021
+    },
+    {
+      "folder": "burst-01",
+      "file": "burst-01/018.png",
+      "tick": 6876,
+      "seconds": 1.825,
+      "wall": 85293.39999997616,
+      "speedKph": 283.5,
+      "worldCameraToObjectMetres": 58.316460654378965
+    },
+    {
+      "folder": "burst-01",
+      "file": "burst-01/019.png",
+      "tick": 6886,
+      "seconds": 1.9083333333333334,
+      "wall": 85377.89999997616,
+      "speedKph": 303.5,
+      "worldCameraToObjectMetres": 51.214409462914
+    },
+    {
+      "folder": "burst-08",
+      "file": "burst-08/000.png",
+      "tick": 7016,
+      "seconds": 0,
+      "wall": 86463,
+      "speedKph": 347.8,
+      "worldCameraToObjectMetres": 195.10637681267178
+    },
+    {
+      "folder": "burst-08",
+      "file": "burst-08/001.png",
+      "tick": 7031,
+      "seconds": 0.125,
+      "wall": 86588.09999990463,
+      "speedKph": 347.8,
+      "worldCameraToObjectMetres": 183.50198567032405
+    },
+    {
+      "folder": "burst-08",
+      "file": "burst-08/002.png",
+      "tick": 7042,
+      "seconds": 0.21666666666666667,
+      "wall": 86678.69999992847,
+      "speedKph": 347.8,
+      "worldCameraToObjectMetres": 175.0935661844194
+    },
+    {
+      "folder": "burst-08",
+      "file": "burst-08/003.png",
+      "tick": 7052,
+      "seconds": 0.3,
+      "wall": 86762.09999990463,
+      "speedKph": 347.8,
+      "worldCameraToObjectMetres": 167.2703127598206
+    },
+    {
+      "folder": "burst-08",
+      "file": "burst-08/004.png",
+      "tick": 7067,
+      "seconds": 0.425,
+      "wall": 86888.39999997616,
+      "speedKph": 347.8,
+      "worldCameraToObjectMetres": 155.3739617652793
+    },
+    {
+      "folder": "burst-08",
+      "file": "burst-08/005.png",
+      "tick": 7077,
+      "seconds": 0.5083333333333333,
+      "wall": 86971.09999990463,
+      "speedKph": 347.8,
+      "worldCameraToObjectMetres": 147.56940218440747
+    },
+    {
+      "folder": "burst-08",
+      "file": "burst-08/006.png",
+      "tick": 7091,
+      "seconds": 0.625,
+      "wall": 87089.79999995232,
+      "speedKph": 347.8,
+      "worldCameraToObjectMetres": 136.2325951392627
+    },
+    {
+      "folder": "burst-05",
+      "file": "burst-05/000.png",
+      "tick": 7096,
+      "seconds": 0,
+      "wall": 87131.79999995232,
+      "speedKph": 347.8,
+      "worldCameraToObjectMetres": 191.71246715031836
+    },
+    {
+      "folder": "burst-08",
+      "file": "burst-08/007.png",
+      "tick": 7102,
+      "seconds": 0.7166666666666667,
+      "wall": 87177.39999997616,
+      "speedKph": 347.8,
+      "worldCameraToObjectMetres": 127.90061858239633
+    },
+    {
+      "folder": "burst-05",
+      "file": "burst-05/001.png",
+      "tick": 7111,
+      "seconds": 0.125,
+      "wall": 87254.89999997616,
+      "speedKph": 347.8,
+      "worldCameraToObjectMetres": 180.6824867285465
+    },
+    {
+      "folder": "burst-08",
+      "file": "burst-08/008.png",
+      "tick": 7116,
+      "seconds": 0.8333333333333334,
+      "wall": 87297.69999992847,
+      "speedKph": 347.8,
+      "worldCameraToObjectMetres": 116.34892035406737
+    },
+    {
+      "folder": "burst-05",
+      "file": "burst-05/002.png",
+      "tick": 7121,
+      "seconds": 0.20833333333333334,
+      "wall": 87341,
+      "speedKph": 347.8,
+      "worldCameraToObjectMetres": 172.86511926710835
+    },
+    {
+      "folder": "burst-08",
+      "file": "burst-08/009.png",
+      "tick": 7126,
+      "seconds": 0.9166666666666666,
+      "wall": 87382.69999992847,
+      "speedKph": 347.8,
+      "worldCameraToObjectMetres": 108.16467690425596
+    },
+    {
+      "folder": "burst-05",
+      "file": "burst-05/003.png",
+      "tick": 7132,
+      "seconds": 0.3,
+      "wall": 87425.69999992847,
+      "speedKph": 363.6,
+      "worldCameraToObjectMetres": 165.159758100908
+    },
+    {
+      "folder": "burst-08",
+      "file": "burst-08/010.png",
+      "tick": 7136,
+      "seconds": 1,
+      "wall": 87466.89999997616,
+      "speedKph": 363.6,
+      "worldCameraToObjectMetres": 100.02643962602697
+    },
+    {
+      "folder": "burst-05",
+      "file": "burst-05/004.png",
+      "tick": 7146,
+      "seconds": 0.4166666666666667,
+      "wall": 87549.59999990463,
+      "speedKph": 363.6,
+      "worldCameraToObjectMetres": 153.87989586262623
+    },
+    {
+      "folder": "burst-08",
+      "file": "burst-08/011.png",
+      "tick": 7151,
+      "seconds": 1.125,
+      "wall": 87592.09999990463,
+      "speedKph": 363.6,
+      "worldCameraToObjectMetres": 87.8958658401521
+    },
+    {
+      "folder": "burst-05",
+      "file": "burst-05/005.png",
+      "tick": 7156,
+      "seconds": 0.5,
+      "wall": 87633.69999992847,
+      "speedKph": 363.6,
+      "worldCameraToObjectMetres": 146.19940734750125
+    },
+    {
+      "folder": "burst-08",
+      "file": "burst-08/012.png",
+      "tick": 7162,
+      "seconds": 1.2166666666666666,
+      "wall": 87676.69999992847,
+      "speedKph": 363.6,
+      "worldCameraToObjectMetres": 79.6918350700167
+    },
+    {
+      "folder": "burst-05",
+      "file": "burst-05/006.png",
+      "tick": 7171,
+      "seconds": 0.625,
+      "wall": 87758.59999990463,
+      "speedKph": 363.6,
+      "worldCameraToObjectMetres": 134.68996053388466
+    },
+    {
+      "folder": "burst-08",
+      "file": "burst-08/013.png",
+      "tick": 7177,
+      "seconds": 1.3416666666666666,
+      "wall": 87801.89999997616,
+      "speedKph": 363.6,
+      "worldCameraToObjectMetres": 67.50191873792112
+    },
+    {
+      "folder": "burst-05",
+      "file": "burst-05/007.png",
+      "tick": 7182,
+      "seconds": 0.7166666666666667,
+      "wall": 87842.89999997616,
+      "speedKph": 363.6,
+      "worldCameraToObjectMetres": 126.91391926740015
+    },
+    {
+      "folder": "burst-08",
+      "file": "burst-08/014.png",
+      "tick": 7187,
+      "seconds": 1.425,
+      "wall": 87884.09999990463,
+      "speedKph": 363.6,
+      "worldCameraToObjectMetres": 59.50702148834388
+    },
+    {
+      "folder": "burst-05",
+      "file": "burst-05/008.png",
+      "tick": 7192,
+      "seconds": 0.8,
+      "wall": 87926.09999990463,
+      "speedKph": 363.6,
+      "worldCameraToObjectMetres": 119.04842773007624
+    },
+    {
+      "folder": "burst-08",
+      "file": "burst-08/015.png",
+      "tick": 7198,
+      "seconds": 1.5166666666666666,
+      "wall": 87977.5,
+      "speedKph": 363.6,
+      "worldCameraToObjectMetres": 50.55425105323973
+    },
+    {
+      "folder": "burst-05",
+      "file": "burst-05/009.png",
+      "tick": 7204,
+      "seconds": 0.9,
+      "wall": 88056.5,
+      "speedKph": 363.6,
+      "worldCameraToObjectMetres": 109.63213332227527
+    },
+    {
+      "folder": "burst-08",
+      "file": "burst-08/016.png",
+      "tick": 7210,
+      "seconds": 1.6166666666666667,
+      "wall": 88118.19999992847,
+      "speedKph": 363.6,
+      "worldCameraToObjectMetres": 40.87798389410579
+    },
+    {
+      "folder": "burst-05",
+      "file": "burst-05/010.png",
+      "tick": 7216,
+      "seconds": 1,
+      "wall": 88180.09999990463,
+      "speedKph": 363.6,
+      "worldCameraToObjectMetres": 100.09986630777409
+    },
+    {
+      "folder": "burst-08",
+      "file": "burst-08/017.png",
+      "tick": 7222,
+      "seconds": 1.7166666666666666,
+      "wall": 88266.09999990463,
+      "speedKph": 363.6,
+      "worldCameraToObjectMetres": 31.454566068540544
+    },
+    {
+      "folder": "burst-05",
+      "file": "burst-05/011.png",
+      "tick": 7228,
+      "seconds": 1.1,
+      "wall": 88336.89999997616,
+      "speedKph": 363.6,
+      "worldCameraToObjectMetres": 90.45945066467195
+    },
+    {
+      "folder": "burst-08",
+      "file": "burst-08/018.png",
+      "tick": 7234,
+      "seconds": 1.8166666666666667,
+      "wall": 88414.5,
+      "speedKph": 363.6,
+      "worldCameraToObjectMetres": 23.116030940482393
+    },
+    {
+      "folder": "burst-05",
+      "file": "burst-05/012.png",
+      "tick": 7240,
+      "seconds": 1.2,
+      "wall": 88488.5,
+      "speedKph": 289.1,
+      "worldCameraToObjectMetres": 82.27295373156511
+    },
+    {
+      "folder": "burst-08",
+      "file": "burst-08/019.png",
+      "tick": 7246,
+      "seconds": 1.9166666666666667,
+      "wall": 88541.19999992847,
+      "speedKph": 289.1,
+      "worldCameraToObjectMetres": 16.82587344901756
+    },
+    {
+      "folder": "burst-05",
+      "file": "burst-05/013.png",
+      "tick": 7252,
+      "seconds": 1.3,
+      "wall": 88592.19999992847,
+      "speedKph": 289.1,
+      "worldCameraToObjectMetres": 74.33198809378209
+    },
+    {
+      "folder": "burst-05",
+      "file": "burst-05/014.png",
+      "tick": 7266,
+      "seconds": 1.4166666666666667,
+      "wall": 88724.89999997616,
+      "speedKph": 289.1,
+      "worldCameraToObjectMetres": 64.20384449929198
+    },
+    {
+      "folder": "burst-05",
+      "file": "burst-05/015.png",
+      "tick": 7276,
+      "seconds": 1.5,
+      "wall": 88808.59999990463,
+      "speedKph": 289.1,
+      "worldCameraToObjectMetres": 57.19305767635098
+    },
+    {
+      "folder": "burst-05",
+      "file": "burst-05/016.png",
+      "tick": 7292,
+      "seconds": 1.6333333333333333,
+      "wall": 88935.79999995232,
+      "speedKph": 289.1,
+      "worldCameraToObjectMetres": 46.49238079043094
+    },
+    {
+      "folder": "burst-05",
+      "file": "burst-05/017.png",
+      "tick": 7302,
+      "seconds": 1.7166666666666666,
+      "wall": 89021.29999995232,
+      "speedKph": 289.1,
+      "worldCameraToObjectMetres": 39.12263983711529
+    },
+    {
+      "folder": "burst-05",
+      "file": "burst-05/018.png",
+      "tick": 7312,
+      "seconds": 1.8,
+      "wall": 89105.89999997616,
+      "speedKph": 289.1,
+      "worldCameraToObjectMetres": 31.96500070029221
+    },
+    {
+      "folder": "burst-05",
+      "file": "burst-05/019.png",
+      "tick": 7326,
+      "seconds": 1.9166666666666667,
+      "wall": 89230.09999990463,
+      "speedKph": 289.1,
+      "worldCameraToObjectMetres": 21.767077060571424
+    },
+    {
+      "folder": "burst-03",
+      "file": "burst-03/000.png",
+      "tick": 4994,
+      "seconds": 0,
+      "wall": 67552.79999995232,
+      "speedKph": 316.8,
+      "worldCameraToObjectMetres": 199.31335274570588
+    },
+    {
+      "folder": "burst-03",
+      "file": "burst-03/001.png",
+      "tick": 5010,
+      "seconds": 0.13333333333333333,
+      "wall": 67690.19999992847,
+      "speedKph": 316.8,
+      "worldCameraToObjectMetres": 188.5736495668712
+    },
+    {
+      "folder": "burst-03",
+      "file": "burst-03/002.png",
+      "tick": 5019,
+      "seconds": 0.20833333333333334,
+      "wall": 67768.79999995232,
+      "speedKph": 316.8,
+      "worldCameraToObjectMetres": 182.12189552289263
+    },
+    {
+      "folder": "burst-03",
+      "file": "burst-03/003.png",
+      "tick": 5030,
+      "seconds": 0.3,
+      "wall": 67861.5,
+      "speedKph": 316.8,
+      "worldCameraToObjectMetres": 174.7279484401241
+    },
+    {
+      "folder": "burst-03",
+      "file": "burst-03/004.png",
+      "tick": 5045,
+      "seconds": 0.425,
+      "wall": 67984.10000002384,
+      "speedKph": 316.8,
+      "worldCameraToObjectMetres": 164.67736750385984
+    },
+    {
+      "folder": "burst-03",
+      "file": "burst-03/005.png",
+      "tick": 5055,
+      "seconds": 0.5083333333333333,
+      "wall": 68071.5,
+      "speedKph": 298.7,
+      "worldCameraToObjectMetres": 157.63596346318454
+    },
+    {
+      "folder": "burst-03",
+      "file": "burst-03/006.png",
+      "tick": 5066,
+      "seconds": 0.6,
+      "wall": 68164.19999992847,
+      "speedKph": 298.7,
+      "worldCameraToObjectMetres": 150.2290629722757
+    },
+    {
+      "folder": "burst-02",
+      "file": "burst-02/000.png",
+      "tick": 5076,
+      "seconds": 0,
+      "wall": 68245.69999992847,
+      "speedKph": 298.7,
+      "worldCameraToObjectMetres": 198.77663538475826
+    },
+    {
+      "folder": "burst-03",
+      "file": "burst-03/007.png",
+      "tick": 5082,
+      "seconds": 0.7333333333333333,
+      "wall": 68294.19999992847,
+      "speedKph": 298.7,
+      "worldCameraToObjectMetres": 139.6143761069398
+    },
+    {
+      "folder": "burst-02",
+      "file": "burst-02/001.png",
+      "tick": 5091,
+      "seconds": 0.125,
+      "wall": 68375.89999997616,
+      "speedKph": 298.7,
+      "worldCameraToObjectMetres": 188.26365032343716
+    },
+    {
+      "folder": "burst-03",
+      "file": "burst-03/008.png",
+      "tick": 5091,
+      "seconds": 0.8083333333333333,
+      "wall": 68418.79999995232,
+      "speedKph": 298.7,
+      "worldCameraToObjectMetres": 132.89003829499882
+    },
+    {
+      "folder": "burst-02",
+      "file": "burst-02/002.png",
+      "tick": 5102,
+      "seconds": 0.21666666666666667,
+      "wall": 68498.19999992847,
+      "speedKph": 298.7,
+      "worldCameraToObjectMetres": 181.01402233023262
+    },
+    {
+      "folder": "burst-03",
+      "file": "burst-03/009.png",
+      "tick": 5102,
+      "seconds": 0.9,
+      "wall": 68539.89999997616,
+      "speedKph": 298.7,
+      "worldCameraToObjectMetres": 125.52364017326137
+    },
+    {
+      "folder": "burst-02",
+      "file": "burst-02/003.png",
+      "tick": 5113,
+      "seconds": 0.30833333333333335,
+      "wall": 68618.60000002384,
+      "speedKph": 298.7,
+      "worldCameraToObjectMetres": 173.77080893636852
+    },
+    {
+      "folder": "burst-03",
+      "file": "burst-03/010.png",
+      "tick": 5118,
+      "seconds": 1.0333333333333334,
+      "wall": 68662.60000002384,
+      "speedKph": 298.7,
+      "worldCameraToObjectMetres": 114.59896852044629
+    },
+    {
+      "folder": "burst-02",
+      "file": "burst-02/004.png",
+      "tick": 5124,
+      "seconds": 0.4,
+      "wall": 68709.60000002384,
+      "speedKph": 298.7,
+      "worldCameraToObjectMetres": 166.4867085837703
+    },
+    {
+      "folder": "burst-03",
+      "file": "burst-03/011.png",
+      "tick": 5129,
+      "seconds": 1.125,
+      "wall": 68754.69999992847,
+      "speedKph": 298.7,
+      "worldCameraToObjectMetres": 107.05911898904748
+    },
+    {
+      "folder": "burst-02",
+      "file": "burst-02/005.png",
+      "tick": 5139,
+      "seconds": 0.525,
+      "wall": 68838.5,
+      "speedKph": 298.7,
+      "worldCameraToObjectMetres": 156.1053269364254
+    },
+    {
+      "folder": "burst-03",
+      "file": "burst-03/012.png",
+      "tick": 5139,
+      "seconds": 1.2083333333333333,
+      "wall": 68882.5,
+      "speedKph": 298.7,
+      "worldCameraToObjectMetres": 100.20298077394436
+    },
+    {
+      "folder": "burst-02",
+      "file": "burst-02/006.png",
+      "tick": 5150,
+      "seconds": 0.6166666666666667,
+      "wall": 68960.5,
+      "speedKph": 298.7,
+      "worldCameraToObjectMetres": 148.88951548128728
+    },
+    {
+      "folder": "burst-03",
+      "file": "burst-03/013.png",
+      "tick": 5150,
+      "seconds": 1.3,
+      "wall": 69001.79999995232,
+      "speedKph": 298.7,
+      "worldCameraToObjectMetres": 92.86334383564109
+    },
+    {
+      "folder": "burst-02",
+      "file": "burst-02/007.png",
+      "tick": 5161,
+      "seconds": 0.7083333333333334,
+      "wall": 69081.69999992847,
+      "speedKph": 296.3,
+      "worldCameraToObjectMetres": 141.6819885400058
+    },
+    {
+      "folder": "burst-03",
+      "file": "burst-03/014.png",
+      "tick": 5167,
+      "seconds": 1.4416666666666667,
+      "wall": 69131.5,
+      "speedKph": 296.3,
+      "worldCameraToObjectMetres": 81.50836235243372
+    },
+    {
+      "folder": "burst-02",
+      "file": "burst-02/008.png",
+      "tick": 5172,
+      "seconds": 0.8,
+      "wall": 69173,
+      "speedKph": 296.3,
+      "worldCameraToObjectMetres": 134.4182945746336
+    },
+    {
+      "folder": "burst-03",
+      "file": "burst-03/015.png",
+      "tick": 5177,
+      "seconds": 1.525,
+      "wall": 69215.19999992847,
+      "speedKph": 296.3,
+      "worldCameraToObjectMetres": 74.69069139357164
+    },
+    {
+      "folder": "burst-02",
+      "file": "burst-02/009.png",
+      "tick": 5187,
+      "seconds": 0.925,
+      "wall": 69296.89999997616,
+      "speedKph": 296.3,
+      "worldCameraToObjectMetres": 124.47332223468764
+    },
+    {
+      "folder": "burst-03",
+      "file": "burst-03/016.png",
+      "tick": 5187,
+      "seconds": 1.6083333333333334,
+      "wall": 69339,
+      "speedKph": 296.3,
+      "worldCameraToObjectMetres": 68.02167062212285
+    },
+    {
+      "folder": "burst-02",
+      "file": "burst-02/010.png",
+      "tick": 5198,
+      "seconds": 1.0166666666666666,
+      "wall": 69418.10000002384,
+      "speedKph": 296.3,
+      "worldCameraToObjectMetres": 117.24691767783061
+    },
+    {
+      "folder": "burst-03",
+      "file": "burst-03/017.png",
+      "tick": 5198,
+      "seconds": 1.7,
+      "wall": 69464.10000002384,
+      "speedKph": 296.3,
+      "worldCameraToObjectMetres": 60.67426625121844
+    },
+    {
+      "folder": "burst-02",
+      "file": "burst-02/011.png",
+      "tick": 5209,
+      "seconds": 1.1083333333333334,
+      "wall": 69546.60000002384,
+      "speedKph": 296.3,
+      "worldCameraToObjectMetres": 109.92678590961995
+    },
+    {
+      "folder": "burst-03",
+      "file": "burst-03/018.png",
+      "tick": 5214,
+      "seconds": 1.8333333333333333,
+      "wall": 69592,
+      "speedKph": 296.3,
+      "worldCameraToObjectMetres": 49.57576717937192
+    },
+    {
+      "folder": "burst-02",
+      "file": "burst-02/012.png",
+      "tick": 5224,
+      "seconds": 1.2333333333333334,
+      "wall": 69676.19999992847,
+      "speedKph": 296.3,
+      "worldCameraToObjectMetres": 99.3786794878501
+    },
+    {
+      "folder": "burst-03",
+      "file": "burst-03/019.png",
+      "tick": 5224,
+      "seconds": 1.9166666666666667,
+      "wall": 69724.29999995232,
+      "speedKph": 296.3,
+      "worldCameraToObjectMetres": 42.558985303257785
+    },
+    {
+      "folder": "burst-02",
+      "file": "burst-02/013.png",
+      "tick": 5235,
+      "seconds": 1.325,
+      "wall": 69808.29999995232,
+      "speedKph": 296.3,
+      "worldCameraToObjectMetres": 92.02745512020796
+    },
+    {
+      "folder": "burst-02",
+      "file": "burst-02/014.png",
+      "tick": 5246,
+      "seconds": 1.4166666666666667,
+      "wall": 69903.39999997616,
+      "speedKph": 296.3,
+      "worldCameraToObjectMetres": 84.642452198328
+    },
+    {
+      "folder": "burst-02",
+      "file": "burst-02/015.png",
+      "tick": 5256,
+      "seconds": 1.5,
+      "wall": 69986.69999992847,
+      "speedKph": 296.3,
+      "worldCameraToObjectMetres": 77.76238219227501
+    },
+    {
+      "folder": "burst-02",
+      "file": "burst-02/016.png",
+      "tick": 5271,
+      "seconds": 1.625,
+      "wall": 70118.29999995232,
+      "speedKph": 308.1,
+      "worldCameraToObjectMetres": 66.94556493137361
+    },
+    {
+      "folder": "burst-02",
+      "file": "burst-02/017.png",
+      "tick": 5282,
+      "seconds": 1.7166666666666666,
+      "wall": 70211.60000002384,
+      "speedKph": 308.1,
+      "worldCameraToObjectMetres": 59.47192213694137
+    },
+    {
+      "folder": "burst-02",
+      "file": "burst-02/018.png",
+      "tick": 5293,
+      "seconds": 1.8083333333333333,
+      "wall": 70298.79999995232,
+      "speedKph": 308.1,
+      "worldCameraToObjectMetres": 52.241002743790354
+    },
+    {
+      "folder": "burst-02",
+      "file": "burst-02/019.png",
+      "tick": 5308,
+      "seconds": 1.9333333333333333,
+      "wall": 70430.69999992847,
+      "speedKph": 308.1,
+      "worldCameraToObjectMetres": 41.469435348335885
+    }
+  ],
+  "errors": [],
+  "windowSeconds": 2,
+  "expectedRateHz": 10,
+  "endpointSamples": 0,
+  "samplingWindow": "[0,2) seconds"
+}

@@ -1,0 +1,126 @@
+{
+  "script": "scripts/visual/paddock/paddock.mjs",
+  "map": "dreamisland",
+  "seed": "3868938316",
+  "viewport": {
+    "width": 1280,
+    "height": 1000
+  },
+  "scope": "The start screen only. No race is run, so nothing here is a performance measurement.",
+  "modes": [
+    {
+      "mode": "race",
+      "url": "http://127.0.0.1:5200/?map=dreamisland&seed=3868938316&tier=works&mode=race&demo=1&headless=1&diagnostics=1&start=manual&quality=high&music=0",
+      "errors": [],
+      "introDeck": "The clock strikes: day turns to night and the causeway goes wet. THE STRIKE IN 1:07 on lap 3, night settled by 1:19. 3 laps.",
+      "introFooter": "WORKS 07 · DREAM ISLAND FIELD RACE",
+      "lapValue": "LAP 1 / 3",
+      "startingGrid": [
+        "P1 · YOUTOTEMWORKS 07",
+        "P2PRIVATEER 13FIELD TOTEM",
+        "P3NIGHTFORM 24FIELD TOTEM",
+        "P4NEEDLE 16FIELD TOTEM"
+      ],
+      "gridRowsVisible": true,
+      "formatChips": [
+        {
+          "value": "race",
+          "selected": true,
+          "label": "FIELD RACE",
+          "note": "3 LAPS · FULL FIELD · NIGHT LAP",
+          "noteVisible": true
+        },
+        {
+          "value": "sprint",
+          "selected": false,
+          "label": "SPRINT",
+          "note": "2 LAPS · DEFEND · NIGHT ON LAP 2",
+          "noteVisible": true
+        },
+        {
+          "value": "timeattack",
+          "selected": false,
+          "label": "TIME ATTACK",
+          "note": "3 LAPS · SOLO + GHOST · NIGHT LAP",
+          "noteVisible": true
+        }
+      ]
+    },
+    {
+      "mode": "sprint",
+      "url": "http://127.0.0.1:5200/?map=dreamisland&seed=3868938316&tier=works&mode=sprint&demo=1&headless=1&diagnostics=1&start=manual&quality=high&music=0",
+      "errors": [],
+      "introDeck": "The clock strikes: day turns to night and the causeway goes wet. SPRINT · THE STRIKE IN 0:45 on lap 2, night settled by 0:57. 2 laps.",
+      "introFooter": "WORKS 07 · DREAM ISLAND SPRINT",
+      "lapValue": "LAP 1 / 2",
+      "startingGrid": [
+        "P1 · YOUTOTEMWORKS 07",
+        "P2PRIVATEER 13FIELD TOTEM",
+        "P3NIGHTFORM 24FIELD TOTEM",
+        "P4NEEDLE 16FIELD TOTEM"
+      ],
+      "gridRowsVisible": true,
+      "formatChips": [
+        {
+          "value": "race",
+          "selected": false,
+          "label": "FIELD RACE",
+          "note": "3 LAPS · FULL FIELD · NIGHT LAP",
+          "noteVisible": true
+        },
+        {
+          "value": "sprint",
+          "selected": true,
+          "label": "SPRINT",
+          "note": "2 LAPS · DEFEND · NIGHT ON LAP 2",
+          "noteVisible": true
+        },
+        {
+          "value": "timeattack",
+          "selected": false,
+          "label": "TIME ATTACK",
+          "note": "3 LAPS · SOLO + GHOST · NIGHT LAP",
+          "noteVisible": true
+        }
+      ]
+    },
+    {
+      "mode": "timeattack",
+      "url": "http://127.0.0.1:5200/?map=dreamisland&seed=3868938316&tier=works&mode=timeattack&demo=1&headless=1&diagnostics=1&start=manual&quality=high&music=0",
+      "errors": [],
+      "introDeck": "The clock strikes: day turns to night and the causeway goes wet. THE STRIKE IN 1:07 on lap 3, night settled by 1:19. 3 laps.",
+      "introFooter": "WORKS 07 · DREAM ISLAND TIME ATTACK",
+      "lapValue": "LAP 1 / 3",
+      "startingGrid": [
+        "P1 · YOUTOTEMWORKS 07",
+        "P2TOTEMFIELD",
+        "P3TOTEMFIELD",
+        "P4TOTEMFIELD"
+      ],
+      "gridRowsVisible": true,
+      "formatChips": [
+        {
+          "value": "race",
+          "selected": false,
+          "label": "FIELD RACE",
+          "note": "3 LAPS · FULL FIELD · NIGHT LAP",
+          "noteVisible": true
+        },
+        {
+          "value": "sprint",
+          "selected": false,
+          "label": "SPRINT",
+          "note": "2 LAPS · DEFEND · NIGHT ON LAP 2",
+          "noteVisible": true
+        },
+        {
+          "value": "timeattack",
+          "selected": true,
+          "label": "TIME ATTACK",
+          "note": "3 LAPS · SOLO + GHOST · NIGHT LAP",
+          "noteVisible": true
+        }
+      ]
+    }
+  ]
+}

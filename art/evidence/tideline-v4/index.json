@@ -1,0 +1,1553 @@
+{
+  "script": "scripts/visual/tideline-v4/evidence-index.py",
+  "implementationRevision": "781bf4fca077e6567484d3b1cbfbdcecf5bcd4b2",
+  "baseRevision": "054d013",
+  "selfExclusion": "INDEX.md and index.json are excluded to avoid recursive hashes. Git records their final contents.",
+  "files": [
+    {
+      "file": "README.md",
+      "bytes": 12544,
+      "sha256": "0fdd8410d8aa1f7f0cde7df0a28e2ecd91464e70fb47187f50b3b2d9813a79f6"
+    },
+    {
+      "file": "art/blender/build_power_kit_v2.py",
+      "bytes": 15352,
+      "sha256": "3c05b5ef25d5cbadb784c28b3106c051216314f9befd25a02c317e97f74293bb"
+    },
+    {
+      "file": "art/blender/build_tideline.py",
+      "bytes": 28003,
+      "sha256": "041acf13a3f0fd48a8ec2ab6b9dd37bdf0b790ffcb5bd72a6f3a107179100a18"
+    },
+    {
+      "file": "art/blender/power_kit_v2.blend",
+      "bytes": 2032719,
+      "sha256": "2a2d282eb59e8b8d7b2f51d6ac3f1bcf333b0bc04898b9aa30e17d79b5733a58"
+    },
+    {
+      "file": "art/blender/tideline_foundry.blend",
+      "bytes": 5751930,
+      "sha256": "0872d95e2fa779c0558423a4d1b09293afd2fa72cf17aece1feba20f3ced9725"
+    },
+    {
+      "file": "art/evidence/tideline-v4/D1.md",
+      "bytes": 2406,
+      "sha256": "35c4b4aefeccb024b7f7d4055a7294811a7774a7dc792d23bdc2218489f77156"
+    },
+    {
+      "file": "art/evidence/tideline-v4/D2.md",
+      "bytes": 2361,
+      "sha256": "8e1ab68c22b13e1f54e34e92c914391132ab3c94928f4c42baebdc2dd89a32b1"
+    },
+    {
+      "file": "art/evidence/tideline-v4/D3-race/capture.json",
+      "bytes": 1721236,
+      "sha256": "3b9e22aecf2c896c9a6458f2a0ee3f8a1b0f7712e1caacf0665a5d9a775f1ec9"
+    },
+    {
+      "file": "art/evidence/tideline-v4/D3-race/finish.png",
+      "bytes": 401165,
+      "sha256": "dd7fd6dd0b286acde2970713aeb7d6e50fcca8cf396fa5b0c56f7104535db6e8"
+    },
+    {
+      "file": "art/evidence/tideline-v4/D3-race/material-walk.json",
+      "bytes": 51401,
+      "sha256": "794d054ce228b9310341f2e6374006fdd93201dd113673c77a57951e85fe97d7"
+    },
+    {
+      "file": "art/evidence/tideline-v4/D3-race/metrics.json",
+      "bytes": 648,
+      "sha256": "e95e78914e63eee54bac08b906db271eca3ef43c4906dd2a8660f2c320796b97"
+    },
+    {
+      "file": "art/evidence/tideline-v4/D3.md",
+      "bytes": 4268,
+      "sha256": "4bc7e65167c8583585b3341bcf2f4fb173edb1d6a209bda28f424618288cae3a"
+    },
+    {
+      "file": "art/evidence/tideline-v4/D4.md",
+      "bytes": 1673,
+      "sha256": "a813b84599433c20d163ebe12bf0d29577a15e38c99785e0dd0aa4097e8d003f"
+    },
+    {
+      "file": "art/evidence/tideline-v4/D5.md",
+      "bytes": 1327,
+      "sha256": "c3c45a1df449e3af94f3ff35de1bed6e10fb9a6c69d68bd16a31345876537334"
+    },
+    {
+      "file": "art/evidence/tideline-v4/D6.md",
+      "bytes": 1291,
+      "sha256": "ea3310d3598a4b9699593c96ac8a9d9eee00cfd267fd6fd1d4f66f89aa069c54"
+    },
+    {
+      "file": "art/evidence/tideline-v4/README.md",
+      "bytes": 19520,
+      "sha256": "142e31a7eaa707aabd66f3baca42a7aeba12c084752a6d8591a2df7f92daabe2"
+    },
+    {
+      "file": "art/evidence/tideline-v4/approaches/A.mp4",
+      "bytes": 1984178,
+      "sha256": "fa5ae11c7f732652058a9ee647050916f9d31d0374085fd7a858bedc5e7f6152"
+    },
+    {
+      "file": "art/evidence/tideline-v4/approaches/A.png",
+      "bytes": 890246,
+      "sha256": "21cfb63a424668fd9b11957aa425b7202137fc1db32723c8a660d198ae1b7480"
+    },
+    {
+      "file": "art/evidence/tideline-v4/approaches/B.mp4",
+      "bytes": 2125957,
+      "sha256": "f802b672a1b9b9ec0109a78b45e8ac1aea452d611870ce6543d081611e3e4e8e"
+    },
+    {
+      "file": "art/evidence/tideline-v4/approaches/B.png",
+      "bytes": 827426,
+      "sha256": "48e53506b1a53a86895a290d75092b7b20bab8ff4341df072bbba7ac1cd678c8"
+    },
+    {
+      "file": "art/evidence/tideline-v4/approaches/C.mp4",
+      "bytes": 2069282,
+      "sha256": "d9fc48fdc06d20eb282159f05913f5c4a62353d3cf59a4ba9feda54e3f5d90ce"
+    },
+    {
+      "file": "art/evidence/tideline-v4/approaches/C.png",
+      "bytes": 927431,
+      "sha256": "092c2bb676eb9533ad9d836e4e8f5a187d34b39d41c474e8cb08230d25bb565a"
+    },
+    {
+      "file": "art/evidence/tideline-v4/approaches/D.mp4",
+      "bytes": 3562589,
+      "sha256": "2c8533239edaee1ddfa28ee0c253bc716ddc14b9acc84ba018b0cff84d21d3d2"
+    },
+    {
+      "file": "art/evidence/tideline-v4/approaches/D.png",
+      "bytes": 1082405,
+      "sha256": "63cb38c472a0f8f0c03494740afcdaee8be0c1cc94fb2a2fdb377b9715339c3d"
+    },
+    {
+      "file": "art/evidence/tideline-v4/approaches/capture.json",
+      "bytes": 79867,
+      "sha256": "4801681316d976e3f7a6d59ed6136fb58cf9e889065181977e1964751c52cc66"
+    },
+    {
+      "file": "art/evidence/tideline-v4/approaches/final-category-review.md",
+      "bytes": 2685,
+      "sha256": "1c3b0effbd30c5e8ec3358d4c752f5080de8e62dc3a79eb64b3bd34d2edd2176"
+    },
+    {
+      "file": "art/evidence/tideline-v4/approaches/focused-review.md",
+      "bytes": 2143,
+      "sha256": "9e977c721cb51440471fc1ee051ceaa2a171c0e594786d69a13969e28e2f8095"
+    },
+    {
+      "file": "art/evidence/tideline-v4/approaches/independent-review-final.md",
+      "bytes": 2461,
+      "sha256": "02775e520558428bd61ab92c36493cd5d275fa73525346fc03a7454de9aa7665"
+    },
+    {
+      "file": "art/evidence/tideline-v4/approaches/independent-review.md",
+      "bytes": 3154,
+      "sha256": "82c32d55bab3b552ffd55cb3c372aed9aba2c0e70181a66b66034ae960530795"
+    },
+    {
+      "file": "art/evidence/tideline-v4/approaches/marker-review.md",
+      "bytes": 2786,
+      "sha256": "c8621b3806eb5b8d5506c65cc9b7737509bf79c76b7d0b76cb77f95b0180b56a"
+    },
+    {
+      "file": "art/evidence/tideline-v4/approaches/round1/A.mp4",
+      "bytes": 2790970,
+      "sha256": "cbb22438faa76c25b84e6ab8434b2d427095f3764d09aba6c8dfb4a153b95daf"
+    },
+    {
+      "file": "art/evidence/tideline-v4/approaches/round1/A.png",
+      "bytes": 918014,
+      "sha256": "cfe2d62b7e44fa896c900ff361260c3d18af739473998803b01b693201dcdd0c"
+    },
+    {
+      "file": "art/evidence/tideline-v4/approaches/round1/B.mp4",
+      "bytes": 2119055,
+      "sha256": "9b9bf64ea8cd0c3b31c8a4ec29e8d39592c47a1829da625f14c977f6277d99de"
+    },
+    {
+      "file": "art/evidence/tideline-v4/approaches/round1/B.png",
+      "bytes": 827374,
+      "sha256": "878d5948a74b5e9eca1165e1a2af6a5701b278d39a4a817e0f3dc0781fcfe0ff"
+    },
+    {
+      "file": "art/evidence/tideline-v4/approaches/round1/C.mp4",
+      "bytes": 2043428,
+      "sha256": "bcc5b0909c17cd9b475f1dcb35db3f7f42a2773baf0f34313426ebead731377b"
+    },
+    {
+      "file": "art/evidence/tideline-v4/approaches/round1/C.png",
+      "bytes": 924030,
+      "sha256": "66539d369ec811f463c0ee98f79bdfb3b46fee06b1f1126e43e4f9a7b465a710"
+    },
+    {
+      "file": "art/evidence/tideline-v4/approaches/round1/D.mp4",
+      "bytes": 3400823,
+      "sha256": "ba1bcbf52d1c79258f10254a94cdc0e4bb850ccf5b4391106bf9182ba11d6f87"
+    },
+    {
+      "file": "art/evidence/tideline-v4/approaches/round1/D.png",
+      "bytes": 937196,
+      "sha256": "fbb44ac01fa33d2340004e54ad1c383482a3194d80620b2cf767118ee355435b"
+    },
+    {
+      "file": "art/evidence/tideline-v4/approaches/round1/capture.json",
+      "bytes": 54225,
+      "sha256": "bd952b05d1143d1e86fb980e73cda5a0b29a24cdb63ee2e7c040c17ed59cdec0"
+    },
+    {
+      "file": "art/evidence/tideline-v4/approaches/round1/independent-review.md",
+      "bytes": 3154,
+      "sha256": "82c32d55bab3b552ffd55cb3c372aed9aba2c0e70181a66b66034ae960530795"
+    },
+    {
+      "file": "art/evidence/tideline-v4/audio/capture.json",
+      "bytes": 465,
+      "sha256": "3adf35153ef5b92210dd5445bc3feea0ffa82d28057efe60b4e18965e3aafe74"
+    },
+    {
+      "file": "art/evidence/tideline-v4/audio/drain-transition.wav",
+      "bytes": 3840078,
+      "sha256": "7c289d7861dd00e4807d31608d242b842dc0dffb42c361a6fcfee84a86f12057"
+    },
+    {
+      "file": "art/evidence/tideline-v4/audio/drain-transition.webm",
+      "bytes": 484706,
+      "sha256": "a503164c579e4db310c59232208f5936f2432e7b0b326d33dd8c98cc0d5738bc"
+    },
+    {
+      "file": "art/evidence/tideline-v4/audio/metrics.json",
+      "bytes": 657,
+      "sha256": "59eb0dfa8648fc19607456e596a48d977245caf214e6c6f5ccc7230b29a9d7b6"
+    },
+    {
+      "file": "art/evidence/tideline-v4/audio/pump-hall-stationary.wav",
+      "bytes": 1920078,
+      "sha256": "a47b4268d69cb0d88a36bd95ef59d4fe22894489bdca3c2a51fae494d9f662ee"
+    },
+    {
+      "file": "art/evidence/tideline-v4/audio/pump-hall-stationary.webm",
+      "bytes": 244670,
+      "sha256": "83be23f8aee0eb57acd54547e26bfda73e65909f5b6bf423c0ff6bd5bd3341fa"
+    },
+    {
+      "file": "art/evidence/tideline-v4/baseline/capture.json",
+      "bytes": 1697303,
+      "sha256": "4caeaf6436acb46e6ca8ef224161d142944e0db3bd8044f3944465c5c2f21b1a"
+    },
+    {
+      "file": "art/evidence/tideline-v4/baseline/finish.png",
+      "bytes": 409422,
+      "sha256": "4808fcc72427e7792dc5b72176f56d6c6c7c76e6f8e34c4c601d1cf6f8c9cf2a"
+    },
+    {
+      "file": "art/evidence/tideline-v4/baseline/metrics.json",
+      "bytes": 624,
+      "sha256": "325e65adbf8dcb03235ea69f8b01d138ae1c4f909d6794b9551c7705e6416ba9"
+    },
+    {
+      "file": "art/evidence/tideline-v4/devices/batch-refresh-review.md",
+      "bytes": 3090,
+      "sha256": "e009640bb270c7eeb0e2da3cf9420047691b01afdaf98417ae75fa35dce28ecd"
+    },
+    {
+      "file": "art/evidence/tideline-v4/devices/capture.json",
+      "bytes": 4492,
+      "sha256": "bbeb55e8fad400e6719db3d17b9cd8d45b2f208ccf536ad03132d142c08f23a8"
+    },
+    {
+      "file": "art/evidence/tideline-v4/devices/independent-review.md",
+      "bytes": 5090,
+      "sha256": "402ea8c5a08ceca507d8c5a3fd9b8fae7a758ec532b8128ea5d1e58a5cc1c903"
+    },
+    {
+      "file": "art/evidence/tideline-v4/devices/shield-active.png",
+      "bytes": 567892,
+      "sha256": "188eef8811cdb1d4328335d0d9f38b01f5a23c96078e1bc57d910b5b41c14109"
+    },
+    {
+      "file": "art/evidence/tideline-v4/devices/shield-hero-versus-model.png",
+      "bytes": 1806147,
+      "sha256": "08a8c8000a24d0cac664e0592365c4704530061a31e7268a080bded5f8770e3c"
+    },
+    {
+      "file": "art/evidence/tideline-v4/devices/shield-idle.png",
+      "bytes": 564186,
+      "sha256": "0b5819abcaf4bd91d705759fe7ded112cfe5681108d418dc79768b672cf33692"
+    },
+    {
+      "file": "art/evidence/tideline-v4/devices/surge-active.png",
+      "bytes": 522866,
+      "sha256": "64819b485727ef7e16c0ee3da61db5d95cde605089ca45fa337564ae7ede085b"
+    },
+    {
+      "file": "art/evidence/tideline-v4/devices/surge-hero-versus-model.png",
+      "bytes": 1740422,
+      "sha256": "c402cc71ba51e1b5a6bbd2faf1cdfb873f215f0c529f3a6d17ed20ec5d51273e"
+    },
+    {
+      "file": "art/evidence/tideline-v4/devices/surge-idle.png",
+      "bytes": 522978,
+      "sha256": "e7ba3fbab1a7fa8a3a7ee6bb986fa0f496cb64bec0160238993b100a1efcf452"
+    },
+    {
+      "file": "art/evidence/tideline-v4/final-race/capture.json",
+      "bytes": 1762276,
+      "sha256": "6490157d31f33e0a4c7380b610d90af9a409c44963755fe4f67157cf6981a8f6"
+    },
+    {
+      "file": "art/evidence/tideline-v4/final-race/finish.png",
+      "bytes": 395862,
+      "sha256": "c037f9d12f8dff7564ebfa000d00c2bea5ec6d9becd66cddd6662a0eaa3ce123"
+    },
+    {
+      "file": "art/evidence/tideline-v4/final-race/material-walk.json",
+      "bytes": 69045,
+      "sha256": "7a81e72f3edb006c464ceee36c8098109ea73705ceff8b99e050c1ed55d73294"
+    },
+    {
+      "file": "art/evidence/tideline-v4/final-race/metrics.json",
+      "bytes": 648,
+      "sha256": "c42c3c30e3b956ecd8c451f0c407f7148382d1e8e73366a62d6305e0392239eb"
+    },
+    {
+      "file": "art/evidence/tideline-v4/fog-distance/0-100.png",
+      "bytes": 125566,
+      "sha256": "df996ee4ed8245cd87f7ab70620e0a149e6069f10a8bed9a0fb8eb96377a6911"
+    },
+    {
+      "file": "art/evidence/tideline-v4/fog-distance/0-180.png",
+      "bytes": 71760,
+      "sha256": "a21434ef24a27ed08ceee45dbd97bf1fa0be560a6fb228831ac0909868d3b446"
+    },
+    {
+      "file": "art/evidence/tideline-v4/fog-distance/0-45.png",
+      "bytes": 282317,
+      "sha256": "915dd5c92a37144fa3298bc25cbe6eeba363fe82cd0751a3dc9438a347a34d03"
+    },
+    {
+      "file": "art/evidence/tideline-v4/fog-distance/1-100.png",
+      "bytes": 108994,
+      "sha256": "84fc8c49a14d7c0b213eea04541f5397ef3bc001361c2d931e47af8dc4546c67"
+    },
+    {
+      "file": "art/evidence/tideline-v4/fog-distance/1-180.png",
+      "bytes": 66262,
+      "sha256": "b84f59ef89c942227f03e980de30dbf1e52c91b683184deec444b2c11ddaed0a"
+    },
+    {
+      "file": "art/evidence/tideline-v4/fog-distance/1-45.png",
+      "bytes": 210408,
+      "sha256": "b63c46200ae04f06ec97426886e302a17a54216691a6f1875a086b6988b380cb"
+    },
+    {
+      "file": "art/evidence/tideline-v4/fog-distance/2-100.png",
+      "bytes": 108928,
+      "sha256": "ff868fb6b221c8ba039ea8cc6677aee29d1763cc9d0af54df88d9010456ab18e"
+    },
+    {
+      "file": "art/evidence/tideline-v4/fog-distance/2-180.png",
+      "bytes": 66266,
+      "sha256": "8bcc95ca62802ff20529f242a8fac536c6ec945452faf85579a918fa4f250601"
+    },
+    {
+      "file": "art/evidence/tideline-v4/fog-distance/2-45.png",
+      "bytes": 210293,
+      "sha256": "98885e723b569252dfaa36ab2eab06fa1d89f664e088abf290fa5d66f9486c11"
+    },
+    {
+      "file": "art/evidence/tideline-v4/fog-distance/3-100.png",
+      "bytes": 111583,
+      "sha256": "1a9b0b70c1c0c436c9f0f7253d994e49d8c3e453141083fc44a34fb87b7f5754"
+    },
+    {
+      "file": "art/evidence/tideline-v4/fog-distance/3-180.png",
+      "bytes": 67247,
+      "sha256": "83a0d7978657df2e32c3dc5ebdd08613be81a4419e272e10e0ebd034b13a3391"
+    },
+    {
+      "file": "art/evidence/tideline-v4/fog-distance/3-45.png",
+      "bytes": 223488,
+      "sha256": "531b9abd387a5a90fc753abc7a60786340ac9f77563836c364a5f7b17317468d"
+    },
+    {
+      "file": "art/evidence/tideline-v4/fog-distance/4-100-confounded-round1.png",
+      "bytes": 39544,
+      "sha256": "aa8bf3c72780e6ed3d113009941cf67b7f8b30b34d42466140af3ece8b738798"
+    },
+    {
+      "file": "art/evidence/tideline-v4/fog-distance/4-100.png",
+      "bytes": 108527,
+      "sha256": "aee1245bef40fb9517044774d68aec926e4f567ba107679daa2779f51ba4127e"
+    },
+    {
+      "file": "art/evidence/tideline-v4/fog-distance/4-180.png",
+      "bytes": 65958,
+      "sha256": "69c3ee63aaf7fe1ed1bd8fed38ae35284f10dcc269ee0410c4a246966eac7393"
+    },
+    {
+      "file": "art/evidence/tideline-v4/fog-distance/4-45.png",
+      "bytes": 210804,
+      "sha256": "e4499b04bb54fe087efbafaf1f12c6320122431948770734e5f9a6d2ef5edfa6"
+    },
+    {
+      "file": "art/evidence/tideline-v4/fog-distance/5-100.png",
+      "bytes": 115837,
+      "sha256": "b21d9e69a6959a0750de834fb40aba88ebd4fcf8a07a9afffd625cf2ff9d8418"
+    },
+    {
+      "file": "art/evidence/tideline-v4/fog-distance/5-180.png",
+      "bytes": 68780,
+      "sha256": "6055844653c28abcc7579d2c6db824893d2fcbfdd69485d6694cfc77f203ec73"
+    },
+    {
+      "file": "art/evidence/tideline-v4/fog-distance/5-45.png",
+      "bytes": 234342,
+      "sha256": "19eed424533c60b40288917983ec442c37a91cc8e0a4cf720300bb18f500faa7"
+    },
+    {
+      "file": "art/evidence/tideline-v4/fog-distance/6-100.png",
+      "bytes": 109336,
+      "sha256": "72d4f19b717fe6efed5ac40414c952e6994f2acd4f5b03531923981cc543c7be"
+    },
+    {
+      "file": "art/evidence/tideline-v4/fog-distance/6-180-confounded-round1.png",
+      "bytes": 12114,
+      "sha256": "6ca6f9c04a43a0a805e4d1d5106880965fd44ba7c9af6df3e90b5293300d7d13"
+    },
+    {
+      "file": "art/evidence/tideline-v4/fog-distance/6-180.png",
+      "bytes": 66539,
+      "sha256": "2a863738c2667997c88dbfd3c90c8c96b92a49b22db908cec013668f8a057c41"
+    },
+    {
+      "file": "art/evidence/tideline-v4/fog-distance/6-45.png",
+      "bytes": 208437,
+      "sha256": "654770e1b4a0eca7ad1665aec14762cd7fef73849c049fe6152943b55b96eb7e"
+    },
+    {
+      "file": "art/evidence/tideline-v4/fog-distance/7-100.png",
+      "bytes": 112539,
+      "sha256": "02723f64d91d272f011de75f159bb7837ec60cf3b6a73dfd45eb427fdf375ea2"
+    },
+    {
+      "file": "art/evidence/tideline-v4/fog-distance/7-180.png",
+      "bytes": 67245,
+      "sha256": "8590193885059f403bb6c3f94c5f38dab3543da38fb399cc441661daf1d0693f"
+    },
+    {
+      "file": "art/evidence/tideline-v4/fog-distance/7-45.png",
+      "bytes": 222849,
+      "sha256": "af10eaa9b2f464bf25c0dedc5fdc1c572df3bcd79d5b04b8194df8c934e60fa9"
+    },
+    {
+      "file": "art/evidence/tideline-v4/fog-distance/8-100.png",
+      "bytes": 120873,
+      "sha256": "fd1e9571a2810b74b80ce04bc191fd3ac8fbfc41fad258489fc0ca5beb2b46bd"
+    },
+    {
+      "file": "art/evidence/tideline-v4/fog-distance/8-180.png",
+      "bytes": 70917,
+      "sha256": "efb1817cb9a2c92737194835910df4ef4f419b0c63184b2c0a38463e4569b6bd"
+    },
+    {
+      "file": "art/evidence/tideline-v4/fog-distance/8-45.png",
+      "bytes": 244645,
+      "sha256": "ead57a3ceee984293c384f6046f788e4528e8b068a7549bfefe83da5fe17c96f"
+    },
+    {
+      "file": "art/evidence/tideline-v4/fog-distance/9-100.png",
+      "bytes": 119737,
+      "sha256": "de614c73408647ebe381db75578f6514f3e4fc42778b99354c0fd45279114fe5"
+    },
+    {
+      "file": "art/evidence/tideline-v4/fog-distance/9-180.png",
+      "bytes": 70452,
+      "sha256": "5942abbce04ed6b231d0be4adee796010de0e5d7517404fa5ad137299bcaabb2"
+    },
+    {
+      "file": "art/evidence/tideline-v4/fog-distance/9-45.png",
+      "bytes": 241870,
+      "sha256": "65ddb7440b655103e4296bdea4ec4091fe2721cee4a1b3132d40e09992d1d2a5"
+    },
+    {
+      "file": "art/evidence/tideline-v4/fog-distance/capture.json",
+      "bytes": 54224,
+      "sha256": "333361454dcd05054a495073c2dc574b69c3014a9fa268094d571610bf6057a8"
+    },
+    {
+      "file": "art/evidence/tideline-v4/fog-distance/final-refresh-review.md",
+      "bytes": 2776,
+      "sha256": "e1a67f9df2752c7ae8c75cefa347656de3746bef2eefa6a409cd533bf7e2fb2d"
+    },
+    {
+      "file": "art/evidence/tideline-v4/fog-distance/independent-review-final.md",
+      "bytes": 3953,
+      "sha256": "9f8f5980cb2a410a77ac35dc3f00d501031ae31e6be3c39a5b79a7c667f0662c"
+    },
+    {
+      "file": "art/evidence/tideline-v4/fog-distance/independent-review-round1.md",
+      "bytes": 4280,
+      "sha256": "e6db48bea880eb0f2039dd964d1742dec9f26afa4b6a806efa360d154023adab"
+    },
+    {
+      "file": "art/evidence/tideline-v4/fog-distance/independent-review.md",
+      "bytes": 4280,
+      "sha256": "e6db48bea880eb0f2039dd964d1742dec9f26afa4b6a806efa360d154023adab"
+    },
+    {
+      "file": "art/evidence/tideline-v4/fog-distance/lane-review-final.md",
+      "bytes": 1260,
+      "sha256": "4d22b0c1c18e54ae61bc4dd792b5649c2de4c01d1d0838486f22d64acf104f02"
+    },
+    {
+      "file": "art/evidence/tideline-v4/fog-distance/marker-review.md",
+      "bytes": 2123,
+      "sha256": "ed09a554a4a1c3f3d6ef5d65ea664c5a1ff7b16c6ffea9b0bbec8e45deb2ba62"
+    },
+    {
+      "file": "art/evidence/tideline-v4/generation.json",
+      "bytes": 8605,
+      "sha256": "8d61aa62e89a285454b67392540c7fba0f9b632fcb71b37aee737e646f00e936"
+    },
+    {
+      "file": "art/evidence/tideline-v4/normal-trace/capture.json",
+      "bytes": 1722923,
+      "sha256": "5b6358f1e88e43fce30fffc49c02d202bf2c953158245685f78332a32f9b8843"
+    },
+    {
+      "file": "art/evidence/tideline-v4/normal-trace/finish.png",
+      "bytes": 389454,
+      "sha256": "a37aed805633cb283a9d1d7510e03d5aef0098beb223fe12cffde189b031e149"
+    },
+    {
+      "file": "art/evidence/tideline-v4/normal-trace/material-walk.json",
+      "bytes": 51394,
+      "sha256": "fdb2d42b7150c2abaef1303565e2af6ad9e4ccdb3f610dfc67dc4ec54358e774"
+    },
+    {
+      "file": "art/evidence/tideline-v4/normal-trace/metrics.json",
+      "bytes": 648,
+      "sha256": "b5e8d5c0316f14fcd8f092358b830ba211169bf95872e95584c633f8f1a61cb1"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases/A.png",
+      "bytes": 891217,
+      "sha256": "a9abb8260f3a5279f3c0df3c8dda3e6e8f8eb314bfc043ba9af2b52073b78605"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases/B.png",
+      "bytes": 1033908,
+      "sha256": "f126ac995219736427a17bd60e46144901c1209c677294f159d8b77f91344aa9"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases/C.png",
+      "bytes": 858098,
+      "sha256": "7beebdeaa77a1e1fe23793130a656b2d8dd4121249b2ccbb140fdb6cd4e482e4"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases/D.png",
+      "bytes": 883193,
+      "sha256": "a185085e0c14df4357e44d71e8c2bcbd807f941bc94eba965c33468d8ba089cd"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases/E.png",
+      "bytes": 758343,
+      "sha256": "c283189b2a45298819c774d53b962c2a2bec4c593a5d93e4d7f00a7acdab8441"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases/F.png",
+      "bytes": 1003192,
+      "sha256": "a03cf91e03e38d520a96be9db6bb47fbf4e3bc510868092a8cea5de5a714ad88"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases/G.png",
+      "bytes": 869904,
+      "sha256": "8921368ec77f5b1ccc85c9c8aad2f70936e217e4e547003e00f57e3f69ade022"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases/H.png",
+      "bytes": 1023676,
+      "sha256": "b1a4323482245c102e072dd221d2c846988e691beb0e7d09a5e32e1050692c45"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases/I.png",
+      "bytes": 849876,
+      "sha256": "a510e4585a1be99b48d7065fbc7a39c7dc29bb4a10cc5bd658bfa36ec88241f0"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases/J.png",
+      "bytes": 1047412,
+      "sha256": "c68af4abc3a5a7f5687630dc3c5d1e3fc3ca09c7f397fe1e04fb20df09f1ad35"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases/blind-review.md",
+      "bytes": 3979,
+      "sha256": "b55751b51cb9eac799f832369a0d21b285223085dfe6f8d8c558cc8ec123da20"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases/key.json",
+      "bytes": 7676,
+      "sha256": "b7095011585d1b7f161659bbc22fccf926db2480feee741dd6dd70068e8c137f"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases-round2/A.png",
+      "bytes": 857674,
+      "sha256": "865350b437bb029201e01e717220696cac085a386b1d4fcedf88674c0076d937"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases-round2/B.png",
+      "bytes": 849617,
+      "sha256": "e1b581b16f19ff13807f4cac4735f7aba5b2607af9ed913f999325371a1d6187"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases-round2/C.png",
+      "bytes": 779582,
+      "sha256": "858400b14e28ff168cf48a42cac4a452fee66b9a98a70cce0c46808364961109"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases-round2/D.png",
+      "bytes": 847001,
+      "sha256": "01afc91dd88c3c90da8dea1c8014378570a678476c1ddd9e16aa0c286a5e01ae"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases-round2/E.png",
+      "bytes": 997306,
+      "sha256": "44b8f9c3b4a76e532a2fb93502d57fded021ad6c722d910f65f700f32ac4846e"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases-round2/F.png",
+      "bytes": 1074228,
+      "sha256": "b1c470f3a2e8755fc93ddc29aa49f2757a01b389501b83bcb5ac5e56cf59b2f2"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases-round2/G.png",
+      "bytes": 1128914,
+      "sha256": "2e4f72690679081cc9e4bb6678936a63765f028f5e5bcada9b3c9f9016d735a5"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases-round2/H.png",
+      "bytes": 893138,
+      "sha256": "ef0ff03799c923d3f8f8605bd9dae21e64365dacfc0553c878dbd4ab23dfe649"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases-round2/I.png",
+      "bytes": 907198,
+      "sha256": "ae8225cecb6db7495edf4fd87974813e6e31a49c8fbec7fbac2d55087d1d1bda"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases-round2/J.png",
+      "bytes": 1029704,
+      "sha256": "5a21e4b427f7606b1d2352628a6dc405fa1c7d5012569762b9c1f90322f36d1c"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases-round2/blind-review.md",
+      "bytes": 3689,
+      "sha256": "9e40608510ad837ad819ce314077eee5eea346055d72b3c7646804e0c972f79e"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases-round2/key.json",
+      "bytes": 7701,
+      "sha256": "ac43dd18aae01d6957e608cae689a4ec66f843db035c108402072ec8a944db7a"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases-round3/A.png",
+      "bytes": 775965,
+      "sha256": "3245591c371ab63908f213dcdbb0a7b7e0165ff959a07bcef7e9a015740bb192"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases-round3/B.png",
+      "bytes": 845093,
+      "sha256": "bf1265b3b5c233b38db29ed91378ff6a830ae4e120834d5fda655abd949953b9"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases-round3/C.png",
+      "bytes": 865301,
+      "sha256": "41de34c86b4661801baa110da795a53bd01d2f60710f25e75f43d7b26ffcb0b6"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases-round3/D.png",
+      "bytes": 1172440,
+      "sha256": "2a522a5445c95fbc9a5ff0a98760d9a1ff671c83c95bdb378ba4366c560a515e"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases-round3/E.png",
+      "bytes": 837534,
+      "sha256": "34716d08d0d3da0cd817a57db2466988af06894c8fdd274b173afb51334d4b7b"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases-round3/F.png",
+      "bytes": 998678,
+      "sha256": "87d0b5da9153973d108c20da8c76abaf7d166963e235d37a6781e43c7b79e3e6"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases-round3/G.png",
+      "bytes": 1097880,
+      "sha256": "b0bcef263a12ac4371fd9b117fbd479a1703ba53df5b28a9beb805ae45f7b8c2"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases-round3/H.png",
+      "bytes": 1030794,
+      "sha256": "3330aa1914865e1455a2859856e6bafca645a794aa677750809df726bc2f80ec"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases-round3/I.png",
+      "bytes": 903180,
+      "sha256": "c11851b012e258076b5f4a0257fced80a15ce7f97a4fa24841d21f3547fa64d7"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases-round3/J.png",
+      "bytes": 852416,
+      "sha256": "89613fca3ed028aa7a5bc975d5ac45074158ef1475bd55ef4284152cd255296a"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases-round3/blind-review.md",
+      "bytes": 3708,
+      "sha256": "2e687fb5118af9df5847a1549f84a40ff05c9f23ca617c4e6b3b8e3b0205a6a6"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases-round3/key.json",
+      "bytes": 7697,
+      "sha256": "02cc49b044ca868b84a6878114499a9245b21eee8774f2b725f4d26cc7fed413"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases-round4/A.png",
+      "bytes": 831419,
+      "sha256": "2855293d779d23ae492ed0b89504326f561c5586a3f75f640032b35dc763bc6b"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases-round4/B.png",
+      "bytes": 999086,
+      "sha256": "75667b2ca3b937843de6865448108db3bb0dae95ccd291b1e15b385c0149f2cd"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases-round4/C.png",
+      "bytes": 1116413,
+      "sha256": "f32e6407f811d7de28c57cc27f351b1d44d52b1b05a37e6ac76abf300ce47392"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases-round4/D.png",
+      "bytes": 879774,
+      "sha256": "e2c4da7d92f441b6f10c2cab7b3f402a6d9e77194b635cdff771142a2b23733c"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases-round4/E.png",
+      "bytes": 1126949,
+      "sha256": "837e648a4f80f5f5bd35ba5e94e7d7c2389e7e9757e4f810e69387af10cb3998"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases-round4/F.png",
+      "bytes": 1008651,
+      "sha256": "c855bec595aefcf3f034407c7eb27cbee6ffda95c6e67f31bc78465e1626b2c2"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases-round4/G.png",
+      "bytes": 908933,
+      "sha256": "16d7288196ce9b30d15e69e2079d9ff57a400d7128154dbc909bceda1ec01cc2"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases-round4/H.png",
+      "bytes": 882737,
+      "sha256": "956f2faa749ccd6066010d35cc0267c19ba2c95321451a53a91c964e8776120b"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases-round4/I.png",
+      "bytes": 772283,
+      "sha256": "ee5ca15c57e83cfa2db6b5d2c0975b845f8dcfc415f6db889f7e94cf3d44e2b7"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases-round4/J.png",
+      "bytes": 837087,
+      "sha256": "713ebc9eee9be73b2188b039b845c80b5cb02f8c3624aa9b7b9545bb2473b53b"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases-round4/blind-review.md",
+      "bytes": 3270,
+      "sha256": "d3444863f05f0d14907fca676dfdc001be89811da7f2d88fb2262139359d4dd5"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases-round4/key.json",
+      "bytes": 7705,
+      "sha256": "eb6349fbe255660d14441a3a8a29c1792dd503a0b553a5ec1fe214641aee718c"
+    },
+    {
+      "file": "art/evidence/tideline-v4/phases-round4/score.json",
+      "bytes": 1732,
+      "sha256": "5d671e6c319b2ac22b0dec19230b0c6a7412e2c49d7a2d2239a74b4d11d5f3c4"
+    },
+    {
+      "file": "art/evidence/tideline-v4/pump-hall-0.1.png",
+      "bytes": 1180681,
+      "sha256": "6704ab6c2a01ff4d481793cd66aa6943b0312c72c9f5c8e3e596a5408367d384"
+    },
+    {
+      "file": "art/evidence/tideline-v4/pump-hall-0.15.png",
+      "bytes": 1200745,
+      "sha256": "ec4b86e4dbeee15fdbea2dd9e11117c56db3fe11b0b33b2b02501bdf4f57d1d9"
+    },
+    {
+      "file": "art/evidence/tideline-v4/pump-hall-0.2.png",
+      "bytes": 1116085,
+      "sha256": "03a78d2396858300a7271cfffcae5bc7ebe8d2361d299a71b9a3b5347a537a0d"
+    },
+    {
+      "file": "art/evidence/tideline-v4/pump-hall-capture.json",
+      "bytes": 70624,
+      "sha256": "499eacb077fce55fbf81af1f1007073e41e037bd059527dbe6b83d09c4637520"
+    },
+    {
+      "file": "art/evidence/tideline-v4/race-summary.json",
+      "bytes": 5856,
+      "sha256": "3cc6d3eaa35c56326333e970d13c673583a784a8bb0a8e1ff87ed11ef7a8d999"
+    },
+    {
+      "file": "art/evidence/tideline-v4/reduced-race/capture.json",
+      "bytes": 1740017,
+      "sha256": "17c79365e81d446b97ea6ace664971fb1f8a450718122edfe234e82a94bb289d"
+    },
+    {
+      "file": "art/evidence/tideline-v4/reduced-race/finish.png",
+      "bytes": 416684,
+      "sha256": "84c4fe5626a14dfc55e786d2bc5d3f1447608d63b338a9481816a51c0b5fa0e0"
+    },
+    {
+      "file": "art/evidence/tideline-v4/reduced-race/material-walk.json",
+      "bytes": 69045,
+      "sha256": "7a81e72f3edb006c464ceee36c8098109ea73705ceff8b99e050c1ed55d73294"
+    },
+    {
+      "file": "art/evidence/tideline-v4/reduced-race/metrics.json",
+      "bytes": 651,
+      "sha256": "c2552a6c355196e1467fe3a7c0e521d442ae20382aada7898b5a2a06a86ba821"
+    },
+    {
+      "file": "art/evidence/tideline-v4/reduced-race/motion-audit.json",
+      "bytes": 174,
+      "sha256": "da27974077f678b8dd42ba874dd3b35ebe745edc52fa2ae21fd0978b2b79a863"
+    },
+    {
+      "file": "art/evidence/tideline-v4/render-rule/material-walk.json",
+      "bytes": 51411,
+      "sha256": "02b9c9eb8486690787a4faf2bd5f0ffa2612bb0a38569beb2c1d4ad5f8df67f7"
+    },
+    {
+      "file": "art/evidence/tideline-v4/render-rule/smoke.png",
+      "bytes": 1167778,
+      "sha256": "f8c922d6fddb3455bf2dae586c7c2092807040a114af2034a0e82c63a7a28a39"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-profile.json",
+      "bytes": 355758,
+      "sha256": "3af2517aee022ddedfd808ad6a3765f76f4ec88c0303f28674da9a2d1291480c"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-review-final.md",
+      "bytes": 2082,
+      "sha256": "bc1b3117c07e414ea0bc08dfd2fd12dfd406497a0b64f2d3fded3b827f07f392"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-review.md",
+      "bytes": 2704,
+      "sha256": "6af2ab4b67cbe3ea6f7268e1e202b428ca770a4bb2a3d8d1dd26a55fec5118e5"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/capture.json",
+      "bytes": 721,
+      "sha256": "22c7f0ba25cb23561c2da5ea8397cd112a4cc48608a18944c4f2d4a8e0d1a65c"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/profile.json",
+      "bytes": 3602,
+      "sha256": "0150476e519d937e01ccd440869d80b4f151df7d499ae153440e26ac11a91876"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-00.png",
+      "bytes": 306200,
+      "sha256": "1269877e924bdf8696311d3343ec1995dd0b004b21f5d804a35f053ec1a8977f"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-01.png",
+      "bytes": 306464,
+      "sha256": "715fa7f1d813e1e2443c87c415e1502fb3906495a4bcd39230c6dd7c6ca6842a"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-02.png",
+      "bytes": 305314,
+      "sha256": "aa6e2998d2c407f49880e416e0999b3b99a8e95f85647429021d304bffa6630e"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-03.png",
+      "bytes": 303926,
+      "sha256": "d48d353a60574ebfb436afab7927b78782429c2239e0e2f658d0cba75a646593"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-04.png",
+      "bytes": 305064,
+      "sha256": "0d76041728b400d3d3555c5af8186fffc6482b54d5ce2b1e403578c1df87ffab"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-05.png",
+      "bytes": 304698,
+      "sha256": "ad29b990152097771ef8b965102fd17df82d5aaca3d74668cc7e09e04c25f503"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-06.png",
+      "bytes": 301568,
+      "sha256": "79240ba1277d8acff67bc212d72730b8994e188a3d83c71b03bbb481a5ecaaa3"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-07.png",
+      "bytes": 299548,
+      "sha256": "f639f53f3b7d1f443cc07557e968f0cbaf15137bfda998fa6638fc1988d93264"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-08.png",
+      "bytes": 298422,
+      "sha256": "92db2bb400459d9cfa4dd948936c46b6888a97adc27bfcde35bbe453034ec4eb"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-09.png",
+      "bytes": 302436,
+      "sha256": "5dc3a9a5d3a8c9343854bb39f4c497d6ea3f10603db9d4cd2789947aa268f688"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-10.png",
+      "bytes": 307732,
+      "sha256": "1dec6a3932b298347d7e870b7f7dc61e2fbbff9368096174ddd03486fda1c5f7"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-11.png",
+      "bytes": 302457,
+      "sha256": "c2c38bacbcc30ea6bd8767b61b7fb8dff44291111eead621805de1f0539e8319"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-12.png",
+      "bytes": 303408,
+      "sha256": "8494c9d59a23bd81be61c6fca33b3f674b4d48f42771573e252dcaf71725a953"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-13.png",
+      "bytes": 305835,
+      "sha256": "48c045f4537e26362bbaafa464df13aa477773949809093f97bc308127612826"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-14.png",
+      "bytes": 307555,
+      "sha256": "f1a6810c50c84c6cd1dac874f8f17aa608380dec8d20b5d8ea06517deda32a2f"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-15.png",
+      "bytes": 300234,
+      "sha256": "ee0f8907e1131dfb1f57f12d2aa294d18be1c869668a5c1e6cd40eb27d269ccc"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-16.png",
+      "bytes": 298745,
+      "sha256": "05ae6214fa8b879d3061c7c9254456a3169256326771165120a31e945b7a93b8"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-17.png",
+      "bytes": 303291,
+      "sha256": "05d8eada578616c430e17b717b74ed7d1967b9d150314e17e80036fc849ce098"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-18.png",
+      "bytes": 302954,
+      "sha256": "80a47cdf1545a23caad1a69984c4cb12a4004a390d597ec3c4eada4b0f5a7800"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-19.png",
+      "bytes": 300932,
+      "sha256": "168559def35d1bc3ef033699d22624b35bc3fd891dacdbb4185fe06055a6dd0c"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-20.png",
+      "bytes": 303428,
+      "sha256": "179ae274682fb751c3a214f3b7ff4cdad8f2d37aa3e6aff3d27c3fc115dd1747"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-21.png",
+      "bytes": 308991,
+      "sha256": "5a06495900ea41df24c954b10db2d574a302cf29967fa5801bc98c015302f76c"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-22.png",
+      "bytes": 307182,
+      "sha256": "c0ebaf33981f40f7eee7250c31c6fe7e885301ee78e3ca20bee401326ddfc0b7"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/sky-23.png",
+      "bytes": 306800,
+      "sha256": "607984719c02d603333fcc431530a456dc9026cab36b950f17535c3a41d971bd"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/view-00.png",
+      "bytes": 850716,
+      "sha256": "0eb3f268e96bc4b9a54b66c6355fe0ccf651dcc1331a8c3181259f647a28455c"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/view-01.png",
+      "bytes": 850811,
+      "sha256": "4d3057f065a183dadb5eb6b595d35ed375fc1ca911c4bfefb000c01deba669a9"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/view-02.png",
+      "bytes": 856218,
+      "sha256": "fdaf47973d27203586d731e028eb41755d4c412d9c7104db241ccb620a444ae2"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/view-03.png",
+      "bytes": 785343,
+      "sha256": "41c1743edc57c26a21a25f9616f2bc2fea8d1caf58d437fccb5171ecf5e20b79"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/view-04.png",
+      "bytes": 745762,
+      "sha256": "4533e701067b180b2e16ce6a59c1886d92e38438faf1f57072c92ee50148919e"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/view-05.png",
+      "bytes": 719756,
+      "sha256": "39cbaae4a0f20121d3e252b51fbcbea7ef0beafe4f4e367ec8b2d5bacb47506b"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/view-06.png",
+      "bytes": 680319,
+      "sha256": "8e3df23bc8906b3365bfa2efe41e58be0bcac9aca9f27dd703e133cb55b8849d"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/view-07.png",
+      "bytes": 679181,
+      "sha256": "5db133c082aad65d9699f17fcbcb996f7a253c47167b06d5e17ebcbd2f25e1e2"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/view-08.png",
+      "bytes": 745815,
+      "sha256": "0d6964e10804c11dd9eb2241651f213fad986faaf9ac33f6a609dd8376f1541b"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/view-09.png",
+      "bytes": 830386,
+      "sha256": "e8617e71a1fd51beb2be7dc6cf8f94e588aa60bff454055c20813e5384a0f06a"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/view-10.png",
+      "bytes": 900037,
+      "sha256": "098983acb0ca6e13b807f160149ffab24d652a4420b60435cf7d6b2e81ac84f0"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/view-11.png",
+      "bytes": 923291,
+      "sha256": "6dc279a0464787bc19974aca686375a2ac9ece8a6fb78bc0d1532b6cb7c7660e"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/view-12.png",
+      "bytes": 982428,
+      "sha256": "fa83f7b66ae3275afe2d2015d4760ef467790d34b3594b658e15eb84d666422e"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/view-13.png",
+      "bytes": 1086471,
+      "sha256": "dd1b8587086c07f9e3687b19def8a00857cdcabcde7b792815e8680e608b06ce"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/view-14.png",
+      "bytes": 1112176,
+      "sha256": "38b5809bf62892a9d2a45ad105d90d95d4d73ed116b5fa97e78ac0e2e3ff67b2"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/view-15.png",
+      "bytes": 1050756,
+      "sha256": "c04cde30e5b63d3218ec52c087653f7f4ac9c41ca89a13f67d1d27f3366bdc3e"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/view-16.png",
+      "bytes": 993856,
+      "sha256": "04f601e4b31d5b90f2fe9a6b6659506c6f8663b7e96bd6164b6b7cd931520bad"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/view-17.png",
+      "bytes": 968151,
+      "sha256": "99720ab68c633999afcc6fa2a6c8c8286626a6276b97c976f5f67c32115ecbd2"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/view-18.png",
+      "bytes": 920502,
+      "sha256": "e7d2c7f3d8bdb63df7691a3bb4ec0adae92598ef6e87cc6fd5b6bde0568bc401"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/view-19.png",
+      "bytes": 838537,
+      "sha256": "354c7f2dd0e679844f0281d729d88770381d87b039fa62e700113905c9060f65"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/view-20.png",
+      "bytes": 799755,
+      "sha256": "2b41cd4d8e2e372cb040b680495cee621b69c6f04f63a6814b7e0ce59f2d1f8f"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/view-21.png",
+      "bytes": 803537,
+      "sha256": "821c9ea2ac6a0ab5893a72c9468979cc2d6a71b818159d53c471b5a2801af423"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/view-22.png",
+      "bytes": 840162,
+      "sha256": "bb776c54630dacb706d5cf63988c842a7a37d69e5d9b39086c28dd2c170e9151"
+    },
+    {
+      "file": "art/evidence/tideline-v4/sky-turntable/view-23.png",
+      "bytes": 867570,
+      "sha256": "0c9dff268f8779e502f833aa06cbfe7d6382c73b07b5ba5d9f75719df77e6e83"
+    },
+    {
+      "file": "art/evidence/tideline-v4/validation/npm-test.log",
+      "bytes": 37118,
+      "sha256": "1e8b05714b9b97d9e7dc24fb2afbc7cc235b78cc3166ca97658cf0c74d932f6f"
+    },
+    {
+      "file": "art/references/power-kit-v2/emissive-source.png",
+      "bytes": 2207969,
+      "sha256": "d5b19baf851c690e8641e48b01da45918335e02dace7ca4908d3cff00e2cb3da"
+    },
+    {
+      "file": "art/references/power-kit-v2/hero.png",
+      "bytes": 2588971,
+      "sha256": "aa06ec16b317ad6fd623257424d3a6f2d8371ad1c6c59108934f80169c9db141"
+    },
+    {
+      "file": "art/references/power-kit-v2/material-id.png",
+      "bytes": 1452674,
+      "sha256": "d8a0516c52a07b18ae4bad3b80224670da4e98ac965354b0ccf03540c947859c"
+    },
+    {
+      "file": "art/references/power-kit-v2/metal-source.png",
+      "bytes": 2973322,
+      "sha256": "4102fd8a4ee70c049bf03f91d3cdb3d075164a5b133400e91c53895420c7b2f1"
+    },
+    {
+      "file": "art/references/power-kit-v2/orthographic.png",
+      "bytes": 2379145,
+      "sha256": "e78f53a2de4f8f10af74f947121e6748305a0e4839fa665e7c425c5d62d48c09"
+    },
+    {
+      "file": "art/references/power-kit-v2/signage-source.png",
+      "bytes": 3303617,
+      "sha256": "d42efa3e5f4bdfab1ab74203b6d79b527cf8aaaf0f7ba61c847ecc1169ca52e4"
+    },
+    {
+      "file": "art/textures/tideline-v4/sky-refined-source.png",
+      "bytes": 1720093,
+      "sha256": "1e837f96253a2bbe38f275eefbff2f60ca4df7e4f06e73f2cf7af22f8ae69dd6"
+    },
+    {
+      "file": "art/textures/tideline-v4/sky-source.png",
+      "bytes": 1559297,
+      "sha256": "544bbf89dbca66e50a0ddbd6fb3e94fa1769f0824ebfdbeb1b9c4b07fd6a73c7"
+    },
+    {
+      "file": "docs/briefs/TIDELINE-V4-POLISH.md",
+      "bytes": 9862,
+      "sha256": "c060a0e0d4d8a6f5be32080d72c5e11d5baeaeab0469cef9c5e050271d2f43a1"
+    },
+    {
+      "file": "package.json",
+      "bytes": 6285,
+      "sha256": "0c2029d7ac470d5c80ca53c187e35a6a2ee36b97bcef609d3cd324546270e951"
+    },
+    {
+      "file": "power-kit-v2-review.html",
+      "bytes": 267,
+      "sha256": "d964a0f2a15a2a7d6365823453f12cbe5b90cc6c218aa9adaae140d024fdfd64"
+    },
+    {
+      "file": "public/assets/power-kit-v2/manifest.json",
+      "bytes": 954,
+      "sha256": "e909ab57e6b70e1d3415b128afb03c02945b77da145f4de0f5f8d0584dd35e24"
+    },
+    {
+      "file": "public/assets/power-kit-v2/power_kit.glb",
+      "bytes": 2163940,
+      "sha256": "67ed71c93d1b3ba68226c74d3e32c3b3383d5317d2799c465e9ac82e30ce4131"
+    },
+    {
+      "file": "public/assets/power-kit-v2/shield-preview.png",
+      "bytes": 1047199,
+      "sha256": "3a34f4c70827769f8fa4a33ea61d1fd55f764ec97764142cd3e8292844d08b75"
+    },
+    {
+      "file": "public/assets/power-kit-v2/surge-preview.png",
+      "bytes": 1042976,
+      "sha256": "bfcb5929758e623fef2ee2be195d10d33dcd0d640fb015df8e9ef1b007d32238"
+    },
+    {
+      "file": "public/assets/power-kit-v2/textures/emissive.jpg",
+      "bytes": 331258,
+      "sha256": "4772279a16a6ae199499af2c057054ff89f2d6d10be8063a62e6689b5f01ce7e"
+    },
+    {
+      "file": "public/assets/power-kit-v2/textures/metal.jpg",
+      "bytes": 449340,
+      "sha256": "817ab1971f8bcf9c12688b1bf7b99e40d4455423aae295123523f3d6763096a8"
+    },
+    {
+      "file": "public/assets/power-kit-v2/textures/signage.jpg",
+      "bytes": 602098,
+      "sha256": "3109ce26d37c2ce1abec4ea0c4eefbdf330bdcaac98593195f7c09a798d7078f"
+    },
+    {
+      "file": "public/assets/tideline/manifest.json",
+      "bytes": 710,
+      "sha256": "2816362d1a948b9979dd0fd8b24a10822300b10aa8076b0ae0cbd265f1f617ef"
+    },
+    {
+      "file": "public/assets/tideline-foundry/foundry_world.glb",
+      "bytes": 8798532,
+      "sha256": "8a6e89a866a906740c2e107386652e9b81734e849102fffce9dcc67d276e49e5"
+    },
+    {
+      "file": "public/assets/tideline-foundry/manifest.json",
+      "bytes": 526,
+      "sha256": "6f1b6ae28eaf03f1b3a901b6b6ef76abdaf59567bb9540f42303c6b9cee6c017"
+    },
+    {
+      "file": "public/assets/tideline-v4/horizon.jpg",
+      "bytes": 582922,
+      "sha256": "6fdbef603e558c78cfcf11a21e48b0ea62960f5cedf01fd309642b54d5e55ce5"
+    },
+    {
+      "file": "scripts/lib/typescript-module.mjs",
+      "bytes": 1079,
+      "sha256": "1b9cc5e442e58728838d8c6e2b51ba9e77f612d7a382f4401be75d5408199bf4"
+    },
+    {
+      "file": "scripts/regenerate-tideline-manifest.mjs",
+      "bytes": 1081,
+      "sha256": "ed1725f65963d2501936599e6860899ed1f010878702b8a055dc3e4e6155040f"
+    },
+    {
+      "file": "scripts/validate-power-kit-v2.mjs",
+      "bytes": 2651,
+      "sha256": "60d5248ece63ed717c177d49e0a1e89b0eb048cdc4442615f7e3c473b9c4f5af"
+    },
+    {
+      "file": "scripts/validate-power-kit.mjs",
+      "bytes": 9144,
+      "sha256": "8e510ca03896422ff10b524656bcbc1d5dfd901e01265d8f4f99dcffd13913af"
+    },
+    {
+      "file": "scripts/validate-tideline-contract.mjs",
+      "bytes": 1498,
+      "sha256": "ee71ea081a5b00e5d9b1bb2bcf586aac83a24bb1301920eee0d250da78b6a70a"
+    },
+    {
+      "file": "scripts/validate-tideline-environment.mjs",
+      "bytes": 10758,
+      "sha256": "ec99421b40809e36ce437087456f81c9f15a07173fa16ba2971262171b154b21"
+    },
+    {
+      "file": "scripts/validate-tideline-hardware.mjs",
+      "bytes": 6252,
+      "sha256": "a9a74d518c64ca8bf2a0cdf0e8a39e95563961e91b1a213536b8ce0f0a056883"
+    },
+    {
+      "file": "scripts/validate-tideline-power-chain.mjs",
+      "bytes": 1554,
+      "sha256": "33cacb633295a8f61fcd35ce69b34972210fca9f6ee4ad71053df72febb3aca3"
+    },
+    {
+      "file": "scripts/validate-tideline-runtime.mjs",
+      "bytes": 18678,
+      "sha256": "033dc756403530332530e30e06d648902f8274f4a8897479103d7f3c00ac9bfc"
+    },
+    {
+      "file": "scripts/validate-totem-evolution.mjs",
+      "bytes": 7739,
+      "sha256": "8a74da44da1001486a37f14c0264fff9972340a07d6c914f44498447f81024c1"
+    },
+    {
+      "file": "scripts/visual/tideline-v4/approach-candidates.mjs",
+      "bytes": 1692,
+      "sha256": "cf74afdde3cedbd88ebc4b8991affa60fb93593e2677f382aac9b2ddac1e362e"
+    },
+    {
+      "file": "scripts/visual/tideline-v4/approaches.mjs",
+      "bytes": 2713,
+      "sha256": "0af1422afff40f28bf503694ed5ffb05b14d4d64bf12c337c2ec6e5d5020fc42"
+    },
+    {
+      "file": "scripts/visual/tideline-v4/audio-metrics.py",
+      "bytes": 872,
+      "sha256": "4a2258b0b6428c83afb52c064561bb68a9d7a0991001ffb11e44bc9dddd9b878"
+    },
+    {
+      "file": "scripts/visual/tideline-v4/audio.mjs",
+      "bytes": 4335,
+      "sha256": "155faf87106a049425e561467cdb58dea95e95c691f512de633bcfab9778778f"
+    },
+    {
+      "file": "scripts/visual/tideline-v4/browser.mjs",
+      "bytes": 799,
+      "sha256": "12218c57b7a756e3b3cffd8cd9d876b8d39d8330ef15337f441b39eaa60af629"
+    },
+    {
+      "file": "scripts/visual/tideline-v4/device-comparison.py",
+      "bytes": 717,
+      "sha256": "d928a8e51ec2cd4b831b57d783f0b550ea83024b3656f769e40cb336c77abf4c"
+    },
+    {
+      "file": "scripts/visual/tideline-v4/devices.mjs",
+      "bytes": 1239,
+      "sha256": "ae7d60014632d201a8e0cfc7220cb8660b7c5ccee02214089225484ce1a287b1"
+    },
+    {
+      "file": "scripts/visual/tideline-v4/draw-probe.mjs",
+      "bytes": 2468,
+      "sha256": "c5f0e2a25800ee8cbfa21b3bc2f8057cf1c6c6e4950f4c26aa7dd09496879493"
+    },
+    {
+      "file": "scripts/visual/tideline-v4/evidence-index.py",
+      "bytes": 2054,
+      "sha256": "c90ee3a7931347bec12c93e798faa1df4e1c7a95b49fe8196930fd1d2760b91b"
+    },
+    {
+      "file": "scripts/visual/tideline-v4/fog.mjs",
+      "bytes": 1432,
+      "sha256": "28169a27ad0b49c96f23fa65030d853aa5863f7fcee5abab5a0a4bf83996efd0"
+    },
+    {
+      "file": "scripts/visual/tideline-v4/phases.mjs",
+      "bytes": 1212,
+      "sha256": "19be9e0a9d70332dc57e1431246ee2b6ab15d66c37bb54f0defa9691a303ba39"
+    },
+    {
+      "file": "scripts/visual/tideline-v4/race.mjs",
+      "bytes": 7598,
+      "sha256": "44564927366a7b8a98a3b9b08b17f606a46152d62a7f79250b3a5c12a994b9a1"
+    },
+    {
+      "file": "scripts/visual/tideline-v4/score-phases.py",
+      "bytes": 1061,
+      "sha256": "f779f8e1ba87c2116d706c38be2606952a5e6a9a0ac0d6b2a76277ef3d2a1d6d"
+    },
+    {
+      "file": "scripts/visual/tideline-v4/sky-profile.py",
+      "bytes": 1093,
+      "sha256": "f41d0c469ad551b26db4039d4e66d5e9d62704b082fa3cb66c344f0fbc00cb5a"
+    },
+    {
+      "file": "scripts/visual/tideline-v4/smoke.mjs",
+      "bytes": 2157,
+      "sha256": "eb2ddc933e3a5c3fe86287d31025cf3cddbe62ad6020a251f1808df6f2aba3e5"
+    },
+    {
+      "file": "scripts/visual/tideline-v4/summarize-races.py",
+      "bytes": 2183,
+      "sha256": "44032f2c955b903f757a763049167e76fb3fee538e7eefda86eb7559e3f4edeb"
+    },
+    {
+      "file": "scripts/visual/tideline-v4/turntable-profile.py",
+      "bytes": 1307,
+      "sha256": "5685b726fec8d670cacd484a5b27cfd06e39da3ced65001a72e9d0590de54b17"
+    },
+    {
+      "file": "scripts/visual/tideline-v4/turntable.mjs",
+      "bytes": 1430,
+      "sha256": "0218575b36ac0aa836730b714afba50e8d09bdc39d7b56984334de5997dc221f"
+    },
+    {
+      "file": "src/game/audio.ts",
+      "bytes": 76243,
+      "sha256": "7021da3a73e774c0094ba0b0d33dca91a8a8716c017218df73ee1d837865cf25"
+    },
+    {
+      "file": "src/game/diagnostics.ts",
+      "bytes": 33047,
+      "sha256": "b1ac20d51db460f06d388e910d28cba088774a1803aaf642036cf0b6dabb3e10"
+    },
+    {
+      "file": "src/game/game.ts",
+      "bytes": 102158,
+      "sha256": "d957d33731a6e534fc3d4cb0c10d0ede15b5ea212e312aa0b0bc7cb54aa0922b"
+    },
+    {
+      "file": "src/game/power-kit.ts",
+      "bytes": 6985,
+      "sha256": "7464a261640085db25351837fb225b1ab8f6146d7a2e58ae320c5e1960b6b133"
+    },
+    {
+      "file": "src/game/race-presentation-setup.ts",
+      "bytes": 1300,
+      "sha256": "f09da65fbfcf2a3778863efc52f0a198ed9c6dd3118c50ad8b09ce33d87995d1"
+    },
+    {
+      "file": "src/game/rivals.ts",
+      "bytes": 89594,
+      "sha256": "f1a3982e67b365d67b7330f03a62d8afb24f8fe6db82a2cca671e3eb479418cf"
+    },
+    {
+      "file": "src/game/tideline-bulkheads.ts",
+      "bytes": 4167,
+      "sha256": "123cc9aaff5e157892b5b1950916c07180c1892997087e604dc2769b3e3f5347"
+    },
+    {
+      "file": "src/game/tideline-contract.ts",
+      "bytes": 1376,
+      "sha256": "5bbf378e36d891029b21cb4c860b7a7e7eb92d49d3dac9a8b9b50b392c72b22c"
+    },
+    {
+      "file": "src/game/tideline-course.ts",
+      "bytes": 23766,
+      "sha256": "b607fb624dafe65c7623b948e031a0eefdfbf604bd8e3377f35850dac9b76c90"
+    },
+    {
+      "file": "src/game/tideline-cradles.ts",
+      "bytes": 6476,
+      "sha256": "85ac5ee7b2914d31e28e554d6d3c6cd09a2dcd1fcb61d75442120ce32004b8fd"
+    },
+    {
+      "file": "src/game/tideline-device-batch.ts",
+      "bytes": 3970,
+      "sha256": "c02f7cfb9b623d869b4f487afc5d22be3fd0769ffe2471976a9b759c5381d946"
+    },
+    {
+      "file": "src/game/tideline-device-lod.ts",
+      "bytes": 1389,
+      "sha256": "d07010786ca039a1bcd4f8d6e42a8e8f84277d3e468e5578976ae8e37e02f09d"
+    },
+    {
+      "file": "src/game/tideline-environment.ts",
+      "bytes": 11284,
+      "sha256": "5fc2c5ed6ef54da69bdeead6ea566904efbeefcc24ffdac2df752379dffd173e"
+    },
+    {
+      "file": "src/game/tideline-hardware.ts",
+      "bytes": 2315,
+      "sha256": "99a2e29759b48192ebdddbef71df2dffddfb71324bf5fe7d1a420aabe1a1683c"
+    },
+    {
+      "file": "src/game/tideline-materials.ts",
+      "bytes": 5900,
+      "sha256": "c93022a6ebb4679976efe7adc5ab67798aac71e84b1c9ed8c558157908ecd4df"
+    },
+    {
+      "file": "src/game/tideline-motion.ts",
+      "bytes": 5595,
+      "sha256": "c16ba47de56366c2986d3e4eb0299d2f9c636c361447da7d6eae47ad8fa667fe"
+    },
+    {
+      "file": "src/game/tideline-power-chain.js",
+      "bytes": 1573,
+      "sha256": "a7322892d17b4cfa6f4917d422a6ff43a9a3912ea301b8843919a577b0e4e978"
+    },
+    {
+      "file": "src/game/tideline-power-field.ts",
+      "bytes": 2443,
+      "sha256": "7b460cbb05ca115a500a6b428b073ac5b140cc5ee2f5269dfe5d5d938b63d1ad"
+    },
+    {
+      "file": "src/game/tideline-quay-gauges.ts",
+      "bytes": 3434,
+      "sha256": "3d520549e2adeca7910802bfa5d215a4221f08c9c9ab92c520b7c2a3d4b63d5f"
+    },
+    {
+      "file": "src/game/tideline-refraction.ts",
+      "bytes": 2595,
+      "sha256": "ca49ca8dd96a07e442107ebf3c50b11bf8564244470f8134b420a5b4e3bebb04"
+    },
+    {
+      "file": "src/game/tideline-render-rule.ts",
+      "bytes": 4474,
+      "sha256": "c5f1e31725f6c3720d8a3ea0de8202d15a43e82ed7d63ccd4e893c41d71e0d04"
+    },
+    {
+      "file": "src/game/tideline-rival-powers.ts",
+      "bytes": 2399,
+      "sha256": "956197108ea451c1e1c37e02a879632ffa76f1f0d6bd676c833555c751b27883"
+    },
+    {
+      "file": "src/game/tideline-road-markers.ts",
+      "bytes": 3526,
+      "sha256": "cde6cf6de7c9ffa67251dc1be7da6368139e24f5b180d8995520a09c628240a8"
+    },
+    {
+      "file": "src/game/tideline-road-signals.ts",
+      "bytes": 9318,
+      "sha256": "711a3b55e7727fe62cd3367bd79e7052e4a4d97274bbb0091800ec31c92c7da6"
+    },
+    {
+      "file": "src/game/tideline-runtime.ts",
+      "bytes": 13522,
+      "sha256": "c21a31219d72930e7ea3816f3cec87f06fa2b35ee376e3ea2f144c7f0a286f89"
+    },
+    {
+      "file": "src/game/tideline-sky.ts",
+      "bytes": 2579,
+      "sha256": "134c5a6683b1d15ee063be1108cc3dc35319ca02330128225469754c9030cc32"
+    },
+    {
+      "file": "src/game/tideline-world.ts",
+      "bytes": 5992,
+      "sha256": "fde7ba6b8bb27a8a1d86e2531645b1dbf4034c0b2dd267b20afe3989efb815c5"
+    },
+    {
+      "file": "src/game/totem-evolution.ts",
+      "bytes": 17693,
+      "sha256": "1b01c83fe0d05f48fdf9ff71a6882b781e6c4175072cdee2877437b2f4827b26"
+    },
+    {
+      "file": "src/game/totem.ts",
+      "bytes": 54388,
+      "sha256": "3f194b05ae3311d4dc9fbf5275a18ec776d39d4e1dbf849c516d250b13db86d0"
+    },
+    {
+      "file": "src/review/power-kit-v2.ts",
+      "bytes": 1657,
+      "sha256": "e7476ccbd1ef459444c0642dc1ce15ac88c83542bd5ddd4861b740aabb0ef766"
+    },
+    {
+      "file": "src/review/tideline-audio.ts",
+      "bytes": 649,
+      "sha256": "70a530168882a330626c80a83723cad9cd0e67026a73405c2df3068adee457cc"
+    },
+    {
+      "file": "src/review/tideline-fog.ts",
+      "bytes": 5055,
+      "sha256": "5aaca50d49ced0be1ed235c03e921c948a7a35152fd4bed39f18fa743e0558ff"
+    },
+    {
+      "file": "src/review/tideline-phase.ts",
+      "bytes": 3898,
+      "sha256": "96029847d091fb82d2cada54d39c3de8ce0a4b31b9ffba55e50b3e9f2154e015"
+    },
+    {
+      "file": "src/review/tideline-v4.ts",
+      "bytes": 6208,
+      "sha256": "3623e9357a4c34404509d568f389d61a29c09a7945ee78a88cfcdc00fb59362c"
+    },
+    {
+      "file": "tideline-audio-review.html",
+      "bytes": 273,
+      "sha256": "be343aa7c790dc7a690e283c161273214b7ae9bd9d5ef60135d5be19fdc8b7d2"
+    },
+    {
+      "file": "tideline-fog-review.html",
+      "bytes": 326,
+      "sha256": "82140b2dd8be7925e3d434f3bca6a2503ef4e49bb257f5255bf3cd5de3e7fb28"
+    },
+    {
+      "file": "tideline-v4-review.html",
+      "bytes": 796,
+      "sha256": "0922f79df987a6b8cc7c58efba33c22b76ab3449948a7c8c5b03ee3c33b4788e"
+    },
+    {
+      "file": "vite.config.mjs",
+      "bytes": 378,
+      "sha256": "9e396bbd7d711085e518a7c9f3d9ec73b279ecda62eaaf9f32e611bdee94a2db"
+    }
+  ]
+}

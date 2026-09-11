@@ -1,0 +1,22 @@
+{
+  "script": "scripts/visual/ascension/verify-revision.mjs",
+  "acceptedAutomatedChecks": true,
+  "finalRaceHashesMatchCurrentInputs": true,
+  "fullRecordedDrawAndTriangleWindowsPass": true,
+  "stationSampling": {
+    "expected": 34,
+    "observed": 34,
+    "kind": "Eight sectors × four schedule states plus two board views; discrete images, no Hz."
+  },
+  "trenchSampling": {
+    "expected": 13,
+    "observed": 13,
+    "kind": "Ten even anchors plus three transition anchors; discrete images, no Hz."
+  },
+  "roadLumaSamples": {
+    "expected": 32,
+    "observed": 32,
+    "allAtOrAboveNewFloors": true
+  },
+  "visualAcceptance": "Source-blind mangrove, focal quality and trench classification still pending. Automated checks do not approve Phase B."
+}

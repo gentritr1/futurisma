@@ -1,0 +1,370 @@
+{
+  "script": "scripts/validate-dreamisland-runtime.mjs",
+  "config": {
+    "script": "scripts/build-dreamisland-route.mjs",
+    "measurementScript": "scripts/visual/dreamisland/race.mjs",
+    "measurement": "art/evidence/dreamisland-v1/phase-b/route-revision/calibration/works-calibration.json",
+    "worksLapSeconds": 32.579,
+    "definition": "Mean of flying laps two and three in the full Works demo with the schedule inert",
+    "modeDefinition": "Sprint scales both lap factors by SPRINT_LAP_COUNT / defaultLapCount so the strike lands at the same fraction of the race; the 12 s ramp and the 4 s fish delay are durations and are not scaled.",
+    "defaultLapCount": 3,
+    "laps": 3,
+    "honoursLapOverride": true,
+    "chimeFactor": 1.85,
+    "strikeFactor": 2.05,
+    "chimeTick": 7233,
+    "strikeTick": 8014,
+    "fishRiseTick": 8494,
+    "nightSettledTick": 9454,
+    "nightRampTicks": 1440,
+    "events": [
+      {
+        "id": "chime-warning",
+        "tick": 7233
+      },
+      {
+        "id": "strike",
+        "tick": 8014
+      },
+      {
+        "id": "fish-rise",
+        "tick": 8494
+      },
+      {
+        "id": "night-settled",
+        "tick": 9454
+      }
+    ],
+    "modes": {
+      "race": {
+        "laps": 3,
+        "honoursLapOverride": true,
+        "chimeFactor": 1.85,
+        "strikeFactor": 2.05,
+        "chimeTick": 7233,
+        "strikeTick": 8014,
+        "fishRiseTick": 8494,
+        "nightSettledTick": 9454,
+        "nightRampTicks": 1440,
+        "events": [
+          {
+            "id": "chime-warning",
+            "tick": 7233
+          },
+          {
+            "id": "strike",
+            "tick": 8014
+          },
+          {
+            "id": "fish-rise",
+            "tick": 8494
+          },
+          {
+            "id": "night-settled",
+            "tick": 9454
+          }
+        ]
+      },
+      "sprint": {
+        "laps": 2,
+        "honoursLapOverride": false,
+        "chimeFactor": 1.2333333333333334,
+        "strikeFactor": 1.3666666666666665,
+        "chimeTick": 4822,
+        "strikeTick": 5343,
+        "fishRiseTick": 5823,
+        "nightSettledTick": 6783,
+        "nightRampTicks": 1440,
+        "events": [
+          {
+            "id": "chime-warning",
+            "tick": 4822
+          },
+          {
+            "id": "strike",
+            "tick": 5343
+          },
+          {
+            "id": "fish-rise",
+            "tick": 5823
+          },
+          {
+            "id": "night-settled",
+            "tick": 6783
+          }
+        ]
+      },
+      "timeattack": {
+        "laps": 3,
+        "honoursLapOverride": true,
+        "chimeFactor": 1.85,
+        "strikeFactor": 2.05,
+        "chimeTick": 7233,
+        "strikeTick": 8014,
+        "fishRiseTick": 8494,
+        "nightSettledTick": 9454,
+        "nightRampTicks": 1440,
+        "events": [
+          {
+            "id": "chime-warning",
+            "tick": 7233
+          },
+          {
+            "id": "strike",
+            "tick": 8014
+          },
+          {
+            "id": "fish-rise",
+            "tick": 8494
+          },
+          {
+            "id": "night-settled",
+            "tick": 9454
+          }
+        ]
+      }
+    }
+  },
+  "determinism": {
+    "renderRates": [
+      60,
+      120,
+      240
+    ],
+    "windowSeconds": 120,
+    "tickRateHz": 120,
+    "expectedTicks": 14400,
+    "ticks": [
+      14400,
+      14400,
+      14400
+    ],
+    "frames": [
+      7200,
+      14400,
+      28800
+    ],
+    "expectedFrames": [
+      7200,
+      14400,
+      28800
+    ],
+    "reconciliation": "frames = render rate x window seconds; ticks = 120 Hz x window seconds, identical at every render rate",
+    "identicalSnapshots": true
+  },
+  "snapshotRestore": true,
+  "knownLimitation": "snapshot/restore has exactly one caller, this validator. Pause, resume and the save system do not snapshot the schedule; restore exists to make determinism provable, not to make pause deterministic.",
+  "grip": {
+    "sector": "BASIN",
+    "beforeStrike": 1,
+    "afterStrike": 0.85,
+    "reachesCraftVia": "course.surfaceGripAt"
+  },
+  "fish": {
+    "source": "src/game/data/dreamisland/fish-paths.json",
+    "floorMetres": 6,
+    "fishLowestPointMetres": -1.507,
+    "riseSeconds": 6,
+    "deckSamples": 21249,
+    "minimumDeckClearanceMetres": 8.442,
+    "worst": {
+      "shoal": "reef-loop",
+      "since": 467,
+      "livery": "goldfish-gold",
+      "lateral": -15.899,
+      "clearance": 8.442
+    },
+    "shoals": [
+      {
+        "id": "basin-eight",
+        "batch": "FISHBASIN",
+        "fish": 4,
+        "periodSeconds": 34,
+        "ticksSwept": 8881,
+        "deckSamples": 9840,
+        "minimumDeckClearanceMetres": 9.435,
+        "worst": {
+          "since": 3019,
+          "livery": "goldfish-gold",
+          "lateral": -13.002,
+          "clearance": 9.435
+        }
+      },
+      {
+        "id": "reef-loop",
+        "batch": "FISHREEF",
+        "fish": 4,
+        "periodSeconds": 46,
+        "ticksSwept": 11761,
+        "deckSamples": 11409,
+        "minimumDeckClearanceMetres": 8.442,
+        "worst": {
+          "since": 467,
+          "livery": "goldfish-gold",
+          "lateral": -15.899,
+          "clearance": 8.442
+        }
+      }
+    ],
+    "method": "Every tick of the rise plus two full circuits per shoal, per fish, with the fish turned by the shoal turn; lateral measured against the road at that fish own progress and height against the deck under it. A second implementation of the rule in the validator, not a call into dreamisland-fish.ts."
+  },
+  "nightTurn": {
+    "rampTicks": 1440,
+    "midpointBlend": 0.5,
+    "settledBlend": 1,
+    "reducedMotion": "step 0 -> 1 at strikeTick, same tick as the grip change"
+  },
+  "modes": {
+    "worksLapSeconds": 32.579,
+    "worksLapTicks": 3909.48,
+    "defaultLapCount": 3,
+    "sprintLapCount": 2,
+    "definition": "Sprint scales both lap factors by SPRINT_LAP_COUNT / defaultLapCount so the strike lands at the same fraction of the race; the 12 s ramp and the 4 s fish delay are durations and are not scaled.",
+    "table": {
+      "race": {
+        "laps": 3,
+        "honoursLapOverride": true,
+        "chimeFactor": 1.85,
+        "strikeFactor": 2.05,
+        "strikeTick": 8014,
+        "strikeSeconds": 66.783,
+        "strikeLap": 3,
+        "strikeLapFraction": 0.0499,
+        "fractionOfRace": 0.6833,
+        "raceTicks": 11728,
+        "settledNightTicks": 2274,
+        "settledNightSeconds": 18.95,
+        "fired": [
+          "chime-warning@lap2",
+          "strike@lap3",
+          "fish-rise@lap3",
+          "night-settled@lap3"
+        ]
+      },
+      "sprint": {
+        "laps": 2,
+        "honoursLapOverride": false,
+        "chimeFactor": 1.2333333333333334,
+        "strikeFactor": 1.3666666666666665,
+        "strikeTick": 5343,
+        "strikeSeconds": 44.525,
+        "strikeLap": 2,
+        "strikeLapFraction": 0.3667,
+        "fractionOfRace": 0.6833,
+        "raceTicks": 7819,
+        "settledNightTicks": 1036,
+        "settledNightSeconds": 8.63,
+        "fired": [
+          "chime-warning@lap2",
+          "strike@lap2",
+          "fish-rise@lap2",
+          "night-settled@lap2"
+        ]
+      },
+      "timeattack": {
+        "laps": 3,
+        "honoursLapOverride": true,
+        "chimeFactor": 1.85,
+        "strikeFactor": 2.05,
+        "strikeTick": 8014,
+        "strikeSeconds": 66.783,
+        "strikeLap": 3,
+        "strikeLapFraction": 0.0499,
+        "fractionOfRace": 0.6833,
+        "raceTicks": 11728,
+        "settledNightTicks": 2274,
+        "settledNightSeconds": 18.95,
+        "fired": [
+          "chime-warning@lap2",
+          "strike@lap3",
+          "fish-rise@lap3",
+          "night-settled@lap3"
+        ]
+      }
+    },
+    "lapOverride": {
+      "clamp": {
+        "defaultLapCount": 3,
+        "minimumLapCount": 1,
+        "maximumLapCount": 9
+      },
+      "note": "?laps= reaches race and timeattack and is clamped to the course bounds; sprint ignores it.",
+      "raceReach": {
+        "1": {
+          "raceTicks": 3909,
+          "struck": false,
+          "fired": [],
+          "marginTicks": -4105,
+          "marginSeconds": -34.21
+        },
+        "2": {
+          "raceTicks": 7819,
+          "struck": false,
+          "fired": [
+            "chime-warning"
+          ],
+          "marginTicks": -195,
+          "marginSeconds": -1.63
+        },
+        "3": {
+          "raceTicks": 11728,
+          "struck": true,
+          "fired": [
+            "chime-warning",
+            "strike",
+            "fish-rise",
+            "night-settled"
+          ],
+          "marginTicks": 3714,
+          "marginSeconds": 30.95
+        },
+        "4": {
+          "raceTicks": 15638,
+          "struck": true,
+          "fired": [
+            "chime-warning",
+            "strike",
+            "fish-rise",
+            "night-settled"
+          ],
+          "marginTicks": 7624,
+          "marginSeconds": 63.53
+        },
+        "9": {
+          "raceTicks": 35185,
+          "struck": true,
+          "fired": [
+            "chime-warning",
+            "strike",
+            "fish-rise",
+            "night-settled"
+          ],
+          "marginTicks": 27171,
+          "marginSeconds": 226.43
+        }
+      },
+      "byDesign": "An absolute schedule plus a short race finishes in daylight. Sprint is the format whose lap count is fixed, which is why its schedule is pinned to a fraction of the race instead."
+    }
+  },
+  "save": {
+    "courseKey": "MAP 07",
+    "schemaVersion": 5,
+    "modeRecordKey": "timeattack:works",
+    "ghostKey": "timeattack",
+    "ghostCharacters": 10330,
+    "ghostCeilingCharacters": 16384,
+    "charactersBefore": 25861,
+    "charactersAfter": 23980,
+    "ceilingCharacters": 65536,
+    "ghostBudget": 2,
+    "ghostSlotsAfter": [
+      "MAP 05:race",
+      "MAP 07:timeattack"
+    ],
+    "evictedSlots": [
+      "MAP 06:race"
+    ],
+    "method": "A synthetic worst-case Dream Island lap (the full measured Works lap at the recorder own sample rate) written into an in-memory save that already held two other circuits ghosts, then read back through parseSave. Characters, not bytes: MAX_PAYLOAD_CHARACTERS counts the stored text. The sizes a real browser wrote are in the phase-D soak evidence."
+  },
+  "scope": "Pure clock, grip and blend arithmetic in Node. Not a rendered crossfade: the sky and water are phases B and C and the five-point capture instrument does not exist yet."
+}

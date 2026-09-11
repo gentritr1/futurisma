@@ -1,0 +1,318 @@
+{
+  "script": "scripts/visual/dreamisland-heroes/polish-poses.mjs",
+  "progress": 0.75,
+  "frames": [
+    {
+      "blend": 0,
+      "pose": {
+        "position": [
+          42.69076529926483,
+          4.8,
+          506.4405603990857
+        ],
+        "target": [
+          34.66329150270886,
+          1.15,
+          477.0159165703899
+        ],
+        "fov": 62,
+        "far": 650,
+        "quaternion": [
+          -0.058990709810340596,
+          0.13253807878884327,
+          0.007902364486244668,
+          0.9893893603948656
+        ],
+        "horizonRow": 288.2995659079154
+      },
+      "frames": {
+        "full": "blend-0-full.png",
+        "stacks": "blend-0-stacks.png",
+        "sky": "blend-0-sky.png",
+        "blank": "blend-0-blank.png"
+      },
+      "regions": {
+        "full": {
+          "names": [
+            "dreamisland_blockout_road",
+            "dreamisland_blockout_markers",
+            "body_static",
+            "emissive_static",
+            "canopy_body",
+            "canopy_glass",
+            "steering_fin_L_body",
+            "steering_fin_R_body",
+            "engine_flap_L_0_body",
+            "engine_flap_L_1_body",
+            "engine_flap_R_0_body",
+            "engine_flap_R_1_body",
+            "stabiliser_ring_body",
+            "stabiliser_ring_emissive",
+            "airbrake_L_body",
+            "airbrake_R_body",
+            "elevon_L_body",
+            "elevon_R_body",
+            "skids_body",
+            "totem_race_presence_additive",
+            "TE_boost_meter",
+            "TE_brake_lamps",
+            "TE_gyro_alloy",
+            "TE_gyro_instruments",
+            "TE_instrument_housing",
+            "TE_power_lamps",
+            "TE_service_markings",
+            "TE_twin_layered_exhaust",
+            "TE_telescopic_power_mounts",
+            "PK_surge_cage",
+            "PK_surge_capacitors",
+            "PK_surge_core",
+            "PK_surge_mount",
+            "PK_shield_core",
+            "PK_shield_housing",
+            "PK_shield_lattice",
+            "PK_shield_petals",
+            "sky_backdrop",
+            "rival_totem_body_steering_fins",
+            "rival_totem_body_airbrakes",
+            "rival_totem_body_hull",
+            "rival_totem_emissive_hull",
+            "rival_totem_glass_hull",
+            "rival_engine_glow",
+            "totem_shadow_blobs",
+            "DI_STATIC_DI_MAT_concrete",
+            "DI_STATIC_DI_MAT_emissive",
+            "DI_STATIC_DI_MAT_jungle",
+            "DI_STATIC_DI_MAT_jungle-card",
+            "DI_STATIC_DI_MAT_metal",
+            "DI_STATIC_DI_MAT_signage",
+            "dreamisland_panorama",
+            "dreamisland_sea",
+            "dreamisland_shallows",
+            "dreamisland_foam",
+            "DI_HERO_watchtower-ruin_DI_MAT_concrete",
+            "DI_HERO_watchtower-ruin_DI_MAT_jungle-card",
+            "DI_HERO_watchtower-ruin_DI_MAT_jungle",
+            "DI_HERO_watchtower-ruin_DI_MAT_emissive",
+            "DI_HERO_clock-tower_DI_MAT_metal",
+            "DI_HERO_clock-tower_DI_MAT_concrete",
+            "DI_HERO_clock-tower_DI_MAT_emissive",
+            "DI_HERO_clock-tower_DI_MAT_jungle",
+            "DI_HERO_waterfall-cliff_DI_MAT_jungle-card",
+            "DI_HERO_waterfall-cliff_DI_MAT_jungle",
+            "DI_HERO_waterfall-cliff_DI_MAT_water",
+            "DI_HERO_waterfall-cliff_DI_MAT_concrete",
+            "DI_HERO_sea-stack_DI_MAT_jungle",
+            "DI_HERO_sea-stack_DI_MAT_concrete"
+          ]
+        },
+        "stacks": {
+          "names": [
+            "DI_HERO_sea-stack_DI_MAT_jungle",
+            "DI_HERO_sea-stack_DI_MAT_concrete"
+          ]
+        },
+        "sky": {
+          "names": [
+            "dreamisland_panorama"
+          ]
+        },
+        "blank": {
+          "names": []
+        }
+      },
+      "kerbs": null,
+      "stackPlacements": [
+        {
+          "index": 0,
+          "child": "sea_stack_18m",
+          "position": [
+            233.577,
+            -6,
+            561.291
+          ],
+          "height": 18.72,
+          "distance": 198.90390977212516,
+          "screen": [
+            -354.4341107814903,
+            279.80200662909533
+          ],
+          "inFront": false
+        },
+        {
+          "index": 1,
+          "child": "sea_stack_40m",
+          "position": [
+            -110.469,
+            -6,
+            639.32
+          ],
+          "height": 39.6,
+          "distance": 203.05540912563478,
+          "screen": [
+            1879.4716473609942,
+            349.78182571908457
+          ],
+          "inFront": false
+        },
+        {
+          "index": 2,
+          "child": "sea_stack_26m",
+          "position": [
+            238.958,
+            -6,
+            426.697
+          ],
+          "height": 26.39988,
+          "distance": 212.12379131581656,
+          "screen": [
+            5719.213931340769,
+            229.9319297819343
+          ],
+          "inFront": true
+        },
+        {
+          "index": 3,
+          "child": "sea_stack_32m",
+          "position": [
+            -137.552,
+            -6,
+            380.576
+          ],
+          "height": 32.4,
+          "distance": 220.10447975264145,
+          "screen": [
+            135.0815961374414,
+            268.7911951512307
+          ],
+          "inFront": true
+        },
+        {
+          "index": 4,
+          "child": "sea_stack_26m",
+          "position": [
+            201.95,
+            -6,
+            311.196
+          ],
+          "height": 22.79992,
+          "distance": 252.19155854805302,
+          "screen": [
+            1485.2359536923914,
+            285.80860424078026
+          ],
+          "inFront": true
+        },
+        {
+          "index": 5,
+          "child": "sea_stack_26m",
+          "position": [
+            751.17,
+            -3.814,
+            153.561
+          ],
+          "height": 28.799940000000003,
+          "distance": 791.5434360447891,
+          "screen": [
+            3696.418818606264,
+            265.35897984534364
+          ],
+          "inFront": true
+        }
+      ],
+      "state": {
+        "lights": [
+          {
+            "name": "",
+            "type": "PointLight",
+            "intensity": 0,
+            "color": [
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "name": "",
+            "type": "HemisphereLight",
+            "intensity": 1.056,
+            "color": [
+              0.5209955731953768,
+              0.775822218312646,
+              0.8631572134510892
+            ],
+            "groundColor": [
+              0.158960835050774,
+              0.2541520943200296,
+              0.08437621153575764
+            ]
+          },
+          {
+            "name": "",
+            "type": "DirectionalLight",
+            "intensity": 1.35,
+            "color": [
+              1,
+              0.8713671191959567,
+              0.623960391667596
+            ]
+          },
+          {
+            "name": "",
+            "type": "DirectionalLight",
+            "intensity": 0.405,
+            "color": [
+              0.3915724777393922,
+              0.6866853124288864,
+              0.8069522576650873
+            ]
+          },
+          {
+            "name": "dreamisland_night_ground_fill",
+            "type": "HemisphereLight",
+            "intensity": 0,
+            "color": [
+              0.11193242782769693,
+              0.21223075740342198,
+              0.8069522576650873
+            ],
+            "groundColor": [
+              0.035601314869097636,
+              0.06847816983662762,
+              0.31854677811435356
+            ]
+          },
+          {
+            "name": "dreamisland_tunnel_lamp_-1",
+            "type": "PointLight",
+            "intensity": 0,
+            "color": [
+              1,
+              0.8069522576650873,
+              0.407240211891531
+            ]
+          },
+          {
+            "name": "dreamisland_tunnel_lamp_1",
+            "type": "PointLight",
+            "intensity": 0,
+            "color": [
+              1,
+              0.8069522576650873,
+              0.407240211891531
+            ]
+          }
+        ],
+        "fog": {
+          "color": [
+            0.48514994004665124,
+            0.7083757798856457,
+            0.775822218312646
+          ],
+          "density": 0.0016
+        },
+        "skyBlend": 0
+      }
+    }
+  ],
+  "errors": []
+}

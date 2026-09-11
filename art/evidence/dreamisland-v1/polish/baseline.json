@@ -1,0 +1,117 @@
+{
+  "head": "947f1933a562c5c4df0c0213ff2384eaa674c86a",
+  "files": {
+    "art/blender/build_dreamisland_heroes.py": "5a14c0200fc5977cca1713194f0a3a0c687db17268a29e4bd3a6a7ceff09870a",
+    "art/blender/build_dreamisland_painted.py": "378b06f801e79cd4fa2ba2244018436c268b0abe92bc65dbd50ba7f83f343f84",
+    "art/blender/dreamisland_mesh.py": "199c069135680659a398e0018affd1ef0e5d4c785f47f83f2faf5a7e8a4b4005",
+    "public/assets/dreamisland/painted.glb": "4d97c3bc4b50fa8eb9833ef040223b72aee57123aa946a2453e705b7fe77ebb6",
+    "public/assets/dreamisland/painted.json": "ba4689d373a38c4e79fa4fafcdba9b6e272022932d5af07b3424028f41b4979f",
+    "public/assets/dreamisland/signage-manifest.json": "d05945b1da158936b60f14352e5c080a2d991fc9ce9c43a46ba387cd69b5dae1",
+    "src/game/dreamisland-painted-environment.ts": "77fb36ce08a9f0bcf6f74f0f282bd9dfa37ba5f45cb228a9dc849f20f757634f",
+    "src/game/dreamisland-materials.ts": "2bc49b5ca83cf496bd3d154790189dfbebcd903bc427ec764ae9da902ba129ab",
+    "src/game/dreamisland-water.ts": "83a9ca293a6f433623faf7b984439ffe8560b73d68161e1390877d5c476b217c",
+    "src/game/dreamisland-sky.ts": "f36cde81fe8291449d237706507f2ce4416040e7bb4ccc20b77cf0c6a3025895",
+    "src/game/dreamisland-course.ts": "3ad18b3763816411c48f20b6ecd2ccd08ab23d077ed9ea128fde35b585884872",
+    "src/game/dreamisland-runtime.ts": "b98e9bf4366673a2ee8d0944429b32fad9aebc32d490d3cb8386aa8ff133997a",
+    "src/game/data/dreamisland/route.json": "843494dc36353367249352ec9c4f398b7d2a3437389c443c658e1a9fcafb487f",
+    "src/game/data/dreamisland/schedule.json": "6eea25b12d8d6a1922a4910265b764b4e3bb5280ac63244b6a2b85d6c71d6fae",
+    "src/game/data/dreamisland/rival-pace.json": "688491fbe4003654a162edfa8cba3d379889abffd2be0c75c78f67c842ab8183",
+    "public/assets/dreamisland/heroes/heroes.json": "72945ba7c93d697ef174ce0af0052230e1f1d7cdd98e32fbd565ce27bdfa7680",
+    "public/assets/dreamisland/heroes/sea-stack-set.glb": "ef8183ae3c7c790d7685febd13e0874bd15566f02800feb40f8a0f00b70f756f",
+    "public/assets/dreamisland/heroes/waterfall-cliff.glb": "cd530cf9015421ae243a2536369725ee1033172fe221fcf3666de4e317772f28",
+    "public/assets/dreamisland/heroes/watchtower.glb": "340285676a4cdd8cf6ee43b08f99ceee5045a43ad679dcd8fc8131844ce36d2c",
+    "public/assets/dreamisland/heroes/clock-tower.glb": "bf51f9c27d120e7b6969c6e22958a6d69d32146bf2c8686d3bc8c6817e992339",
+    "public/assets/dreamisland/textures/metal.jpg": "ae8c28ae95073d0c2acee9c16ab13e6ddb1c30f4906ad41b1a9e049b69f3943a",
+    "public/assets/dreamisland/textures/emissive.jpg": "b1464210c8b7f4513497a06c313ba65ba2a2354d2358d9f8eacd80735d5e1d79",
+    "public/assets/dreamisland/textures/concrete.jpg": "1fa66bf620bd081fae2809c79e704dd1403f92f1b90e76a2f0a9284fe3db1b67",
+    "public/assets/dreamisland/textures/signage.jpg": "e360e9cda4171a8f657de4df703117d0b887c545a3a76d43c46abb8a13e0831d",
+    "public/assets/dreamisland/textures/jungle.jpg": "66dd4473ab6ee37e219d2c9c47fcce88a8d7b05777dd7a784d102a1a2dc1f7bb",
+    "public/assets/dreamisland/textures/water.jpg": "de31e9f54dc8eeea23cd6fc5ce269e21273b81a482667a0a9ed74930ececa607",
+    "public/assets/dreamisland/atlas-manifest.json": "ef4e7750c089970df097358fb5575235a378ccc6dbdf91c3c0e496f2d7a46675",
+    "public/assets/dreamisland/jungle-card.png": "829f518b7b2597b55824e70f09fbd7b008eb706cb49880535145d24cb799bb42",
+    "public/assets/dreamisland/sky-day.jpg": "de27f5773ac732e071d5842f37fd8146298f0a767aa92b31b9bbddd8a1c71a6c",
+    "public/assets/dreamisland/sky-night.jpg": "1952bfd54028f77136f1166f3e58d2f27f650cba7ca187a5103dd8eaebcfb0d3"
+  },
+  "phaseCBaselineMetrics": {
+    "script": "scripts/visual/dreamisland/instrument.mjs",
+    "samples": 11950,
+    "activeWindowMs": 96339.19999992847,
+    "activeExpectedSamples": 12041.145713680173,
+    "activeSampleResidual": -91.14571368017278,
+    "windowSamples": 720,
+    "windowMs": 5803.5,
+    "calibration": {
+      "samples": 120,
+      "windowMs": 960.1000000238419,
+      "hz": 124.98698051975845
+    },
+    "expectedRateHz": 124.98698051975845,
+    "expectedSamples": 725.3619414464181,
+    "sampleResidual": -5.361941446418086,
+    "observedRateHz": 124.06306539157406,
+    "p95Ms": 8.5,
+    "peakMainCalls": 75,
+    "peakShadowCalls": 17,
+    "peakTotalCalls": 92,
+    "peakTriangles": 124378,
+    "peakShadowTriangles": 23624,
+    "sizes": [
+      "1280x720"
+    ],
+    "lightingStates": {
+      "day": {
+        "frames": 8160,
+        "peakMainCalls": 74,
+        "peakShadowCalls": 17,
+        "minimumShadowCalls": 17,
+        "peakTotalCalls": 91,
+        "peakTriangles": 123852,
+        "peakShadowTriangles": 23624,
+        "minimumShadowTriangles": 23624
+      },
+      "crossfade": {
+        "frames": 1484,
+        "peakMainCalls": 75,
+        "peakShadowCalls": 17,
+        "minimumShadowCalls": 17,
+        "peakTotalCalls": 92,
+        "peakTriangles": 124378,
+        "peakShadowTriangles": 23624,
+        "minimumShadowTriangles": 23624
+      },
+      "night": {
+        "frames": 2306,
+        "peakMainCalls": 72,
+        "peakShadowCalls": 17,
+        "minimumShadowCalls": 17,
+        "peakTotalCalls": 89,
+        "peakTriangles": 119454,
+        "peakShadowTriangles": 23624,
+        "minimumShadowTriangles": 23624
+      },
+      "note": "Split on the course own nightBlend. renderer.info.render.calls EXCLUDES the shadow pass, so the shadow columns come from wrapping shadowMap.render and differencing the counters around it."
+    },
+    "emissiveStability": {
+      "settledFrames": 2306,
+      "comparisons": 2305,
+      "framesWithAnEmissiveChange": 0,
+      "largestChange": 0,
+      "values": [
+        1.25,
+        1.15,
+        1.45
+      ],
+      "note": "Sampled off the live materials inside the render wrapper, so it is what the renderer saw, not what the course intended."
+    },
+    "schedule": {
+      "framesWithGripBelowOne": 430,
+      "minimumGrip": 0.85,
+      "gripDropSectors": [
+        "BASIN CAUSEWAY"
+      ],
+      "maximumNightBlend": 1,
+      "framesAtFullNight": 2306
+    },
+    "note": "Expected rendering rate comes from a separate pre-start requestAnimationFrame calibration. Physics remains 120 Hz. Each sampled delta covers one render interval, including any stalls."
+  }
+}

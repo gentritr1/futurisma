@@ -30,6 +30,7 @@ import {
   resolveModeLapCount,
   reverseGridOrder,
   sectorDeltaMs,
+  startingGridRows,
 } from "../src/game/race-modes-rules.js";
 import {
   RIVAL_GRID_MINIMUM_SPACING_METERS,
@@ -413,6 +414,85 @@ assert.ok(
     + "and the texture count, not just in the scene graph.",
 );
 
+// The paddock's starting grid, which used to be the one place the absence did
+// not reach. `index.html` shipped four placeholder rows and `GameUi` only
+// replaced them when it was handed a non-empty grid — which in a fieldless
+// format nothing ever is, because `RivalFleet.create` refuses above. So a time
+// attack that spawns ONE craft listed FOUR, on every circuit, and the soak
+// never caught it because `style.css:2225` hides the list under 900 px.
+const FIELD_GRID = Object.freeze([
+  { position: 1, name: "TOTEM", team: "WORKS 07", player: true },
+  { position: 2, name: "PRIVATEER 13", team: "FIELD TOTEM", player: false },
+  { position: 3, name: "NIGHTFORM 24", team: "FIELD TOTEM", player: false },
+  { position: 4, name: "NEEDLE 16", team: "FIELD TOTEM", player: false },
+]);
+
+const soloGrid = startingGridRows("timeattack", FIELD_GRID, "WORKS 07");
+assert.equal(
+  soloGrid.length,
+  1,
+  "A fieldless format must list exactly one starting-grid row. Any other count "
+    + "is the paddock naming craft the race will not put on track.",
+);
+assert.equal(soloGrid.length, modeFieldSize("timeattack"), "The grid must list "
+  + "exactly the craft `fieldSize` classifies.");
+assert.deepEqual(
+  soloGrid[0],
+  { position: 1, name: "TOTEM", team: "WORKS 07", player: true },
+  "The solo row is the player, at P1, under the livery they are racing.",
+);
+// The row follows the livery rather than being frozen at the works sheet — this
+// is what `setPlayerLivery` re-composes when the chip is clicked.
+assert.equal(startingGridRows("timeattack", [], "NEEDLE 16")[0].team, "NEEDLE 16");
+// A fieldless format ignores a field it should never have been given, so a
+// stale fleet can never put rivals back on a solo grid.
+assert.equal(startingGridRows("timeattack", FIELD_GRID, "WORKS 07").length, 1);
+
+// Every format that HAS a field still lists the field verbatim, by identity:
+// the names and liveries the craft are wearing stay the single source of truth.
+for (const mode of RACE_MODES.filter((candidate) => modeHasField(candidate))) {
+  assert.equal(
+    startingGridRows(mode, FIELD_GRID, "WORKS 07"),
+    FIELD_GRID,
+    `\`${mode}\` must list the fleet's own grid, not a recomposition of it.`,
+  );
+  assert.equal(startingGridRows(mode, FIELD_GRID, "WORKS 07").length, 4);
+  // Nothing yet is NOT "one craft": at boot the fleet does not exist, and an
+  // empty answer is what tells `GameUi` to leave the list alone until it does.
+  assert.deepEqual(
+    startingGridRows(mode, [], "WORKS 07"),
+    [],
+    `\`${mode}\` must answer "leave it" rather than inventing a solo grid.`,
+  );
+}
+
+// ...and the reason an empty answer is safe: the markup no longer carries rows
+// of its own for it to leave behind.
+const gridHtml = read("index.html");
+const gridMarkup = gridHtml.slice(gridHtml.indexOf('<ol id="grid-order"'));
+assert.match(
+  gridMarkup.slice(0, gridMarkup.indexOf("</ol>") + 5),
+  /<ol id="grid-order"[^>]*><\/ol>/,
+  "`#grid-order` must ship empty. A hard-coded row is a claim about the field "
+    + "that no format agreed to, and it is what a fieldless race used to show.",
+);
+// And the runtime always offers the list a grid, rather than each caller
+// deciding for itself whether to bother.
+const gridUiSource = read("src/game/ui.ts");
+assert.equal(
+  gridUiSource.split("this.applyStartingGrid(grid);").length - 1,
+  2,
+  "Both `setRaceFormat` and `setPlayerLivery` must route through "
+    + "`applyStartingGrid`; a caller that guards on `grid.length` itself is the "
+    + "original defect.",
+);
+assert.doesNotMatch(
+  gridUiSource,
+  /if \(grid\.length > 0\) \{\s*this\.updateGrid\(grid\);/,
+  "The `grid.length > 0` guard around `updateGrid` is back; a fieldless format "
+    + "will paint nothing again.",
+);
+
 // ---------------------------------------------------------------------------
 // 6. The tier pace merge, against the shipped JSON
 // ---------------------------------------------------------------------------
@@ -627,7 +707,8 @@ console.log(
     + `rival rearmost and the fan still >= ${RIVAL_GRID_MINIMUM_SPACING_METERS} m; delta `
     + `arithmetic against an 8-gate fixture lap with 7 corrupt curves refused, U+2212 `
     + `minus and a ${DELTA_DEAD_BAND_MS} ms dead band where text and colour agree; `
-    + "timeattack reports fieldSize 1 and refuses the fleet before its geometry or atlas "
-    + "is built; both maps' rookie/feral tiers authored, ordered, non-overlapping and "
+    + "timeattack reports fieldSize 1, refuses the fleet before its geometry or atlas "
+    + "is built and lists exactly 1 starting-grid row against the field formats' 4 over "
+    + "an empty `#grid-order`; both maps' rookie/feral tiers authored, ordered, non-overlapping and "
     + "inherited field by field, with no runtime multiplier in either module.",
 );

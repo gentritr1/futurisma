@@ -8,11 +8,13 @@ import { integrateSurgeSpeed } from "./polarity-rules.js";
 import { ABILITY_TICK_RATE, PolaritySimulation } from "./polarity-simulation.js";
 import type { TidelineCourse, TidelineTravelMode } from "./tideline-course";
 import { TIDELINE_ABILITY_CONFIG, TIDELINE_FIELDS, currentLane, inCurrent, tidelineFieldAt } from "./tideline-rules.js";
+import { tideForLap } from "./tideline-tide.js";
+import { TidelinePowerChain } from "./tideline-power-chain.js";
 import { TidelineWorld } from "./tideline-world";
 import type { TotemVisualState } from "./totem";
 import type { GameUi } from "./ui";
 
-/** Stable horizon and shared power rules through the submerged, port and glide sections. */
+/** Stable horizon and shared power rules through the submerged reactor and port road. */
 export class TidelineRuntime implements CircuitRuntime {
   readonly simulation: PolaritySimulation;
   readonly world: TidelineWorld;
@@ -21,6 +23,13 @@ export class TidelineRuntime implements CircuitRuntime {
   private tickRemainder = 0;
   private handledSequence = 0;
   private cameraReady = false;
+  private announcedLap = 1;
+  private onShortcut = false;
+  private shortcutSeconds = 0;
+  private speed = 0;
+  private readonly chain = new TidelinePowerChain();
+  private readonly warnedFields = new Map<string, number>();
+  private readonly bulkheadWarnings: {field:string;lap:number;tick:number;distance:number;secondsAhead:number}[] = [];
   private mode: TidelineTravelMode = "submerged";
   private readonly modeSeconds = { submerged: 0, surface: 0, air: 0 };
   private readonly cameraPosition = new THREE.Vector3();
@@ -59,15 +68,15 @@ export class TidelineRuntime implements CircuitRuntime {
   get shieldActive(): boolean { return this.simulation.shieldActive; }
   private get ridingCurrent(): boolean {
     const s = this.simulation.state;
-    return inCurrent(s.progress) && Math.abs(s.lateral - currentLane(s.seed, s.lap)) < 2.2;
+    return tideForLap(s.lap).current && inCurrent(s.progress) && Math.abs(s.lateral - currentLane(s.seed, s.lap)) < 2.2;
   }
-  get boostRechargeScale(): number { return this.ridingCurrent ? 1.85 : this.mode === "air" ? .75 : 1; }
+  get boostRechargeScale(): number { return this.ridingCurrent ? 1.85 : 1; }
 
   handleActions(running: boolean, progress: number, _position: THREE.Vector3, _lateral: number, demo: boolean): boolean {
     const power = this.input.consumePower();
     if (!running) return false;
     if (power) this.usePower(progress);
-    if (demo && this.simulation.heldPowerKind && !this.simulation.state.activePower) {
+    if (demo && this.simulation.heldPowerKind && (!this.simulation.state.activePower || (this.shieldActive && this.simulation.heldPowerKind === "surge" && this.simulation.state.tick-this.chain.absorbedAt<=240))) {
       const fieldAhead = TIDELINE_FIELDS.some(field => field.progress > progress && field.progress - progress < .025);
       if (this.simulation.heldPowerKind === "shield" ? fieldAhead : this.simulation.launchZoneAt(progress)) this.usePower(progress);
     }
@@ -76,9 +85,24 @@ export class TidelineRuntime implements CircuitRuntime {
 
   step(delta: number, progress: number, lateral: number, lap: number): void {
     const ticks = this.takeTicks(delta);
+    this.course.setLapBoard(lap);
+    this.course.advanceTide(ticks / ABILITY_TICK_RATE);
+    if (lap !== this.announcedLap) {
+      this.announcedLap = lap;
+      this.audio.playTideDrain();
+      this.ui.flashHazard(lap === 2 ? "TIDE FALLING · DAMP CHAMBER DECK / LOWER GRIP" : "TIDE DRAINED · PUMP HALL SHORTCUT OPEN", 4200);
+    }
     this.mode = this.course.travelModeAt(progress);
     this.modeSeconds[this.mode] += ticks / ABILITY_TICK_RATE;
+    if (this.onShortcut) this.shortcutSeconds += ticks / ABILITY_TICK_RATE;
     for (let i = 0; i < ticks; i++) this.simulation.step(progress, lateral, lap);
+    for (const field of TIDELINE_FIELDS) {
+      const distance=((field.progress-progress+1)%1)*this.course.length;
+      if (distance <= Math.max(240,this.speed*2.4) && this.warnedFields.get(field.id)!==lap) {
+        this.warnedFields.set(field.id,lap);this.audio.playBulkheadKlaxon();
+        this.bulkheadWarnings.push({field:field.id,lap,tick:this.simulation.state.tick,distance,secondsAhead:distance/Math.max(1,this.speed)});
+      }
+    }
     this.dispatchEvents();
   }
   advanceClocks(delta: number): void { this.simulation.advanceTicks(this.takeTicks(delta)); }
@@ -100,24 +124,29 @@ export class TidelineRuntime implements CircuitRuntime {
 
   present(_sample: CourseProjection, _position: THREE.Vector3, _forward: THREE.Vector3, state: TotemVisualState): void {
     const s = this.simulation.state;
+    this.onShortcut = _sample.alternateRoad === true;
     state.gravitySign = 1; state.gravityTransition = 0;
+    state.shieldRefundWindow = this.shieldActive && s.tick-s.powerStartTick <= 144;
     state.shieldActive = this.shieldActive; state.overdriveActive = this.surgeActive;
     state.powerReady = this.simulation.heldPowerKind !== null;
     state.heldPowerKind = this.simulation.heldPowerKind;
     state.powerCharge = s.activePower ? s.activeCharge : this.simulation.heldPowerCharge;
     state.powerActivation = s.activePower ? Math.min(1, (s.tick - s.powerStartTick) / (ABILITY_TICK_RATE * .22)) : 0;
-    this.world.update(s.tick / ABILITY_TICK_RATE, this.reducedMotion, this.simulation.getPickupStates(), s.progress, s.seed, s.lap);
+    this.world.update(s.tick / ABILITY_TICK_RATE, this.reducedMotion, this.simulation.getPickupStates(), s.progress, s.seed, s.lap, this.simulation.heldPowerKind === "surge", this.surgeActive);
   }
 
   updateCamera(camera: THREE.PerspectiveCamera, delta: number, position: THREE.Vector3, forward: THREE.Vector3, speed: number): void {
+    this.speed = speed;
     this.target.copy(position).addScaledVector(forward, -11.5); this.target.y += 4.8;
     this.look.copy(position).addScaledVector(forward, 15 + speed * .04); this.look.y += 1.15;
     const response = this.cameraReady ? 1 - Math.exp(-delta * 8) : 1;
     this.cameraPosition.lerp(this.target, response); this.cameraLook.lerp(this.look, response);
     camera.position.copy(this.cameraPosition); camera.up.set(0, 1, 0); camera.lookAt(this.cameraLook);
-    camera.fov = THREE.MathUtils.lerp(camera.fov, this.reducedMotion ? 62 : 59 + Math.min(1, speed / 140) * 7, response);
+    const powerAge=(this.simulation.state.tick-this.simulation.state.powerStartTick)/ABILITY_TICK_RATE;
+    const kick=this.surgeActive?2+5*Math.exp(-powerAge*4):0;
+    camera.fov = THREE.MathUtils.lerp(camera.fov, this.reducedMotion ? 62 : 59 + Math.min(1, speed / 140) * 7 + kick, response);
     camera.updateProjectionMatrix(); this.cameraReady = true;
-    this.world.sky.update(camera);
+    this.world.sky.update(camera, this.course.tide.waterLevel, this.reducedMotion ? 0 : this.course.tide.elapsed, this.course.fogAt(this.simulation.state.progress).color);
   }
 
   updateHud(progress: number): void {
@@ -126,48 +155,64 @@ export class TidelineRuntime implements CircuitRuntime {
     const height = this.course.sample(progress, this.sample).position.y;
     const perfectReady = this.simulation.heldPowerKind === "surge" && Boolean(this.simulation.launchZoneAt(progress));
     const label = (s.activePower ?? this.simulation.heldPowerKind) === "surge" ? "SURGE" : "PHASE SHIELD";
-    this.modeLabel.textContent = mode === "submerged" ? `SUBMERGED / ${Math.round(-height)}m` : mode === "air" ? `GLIDE / ${Math.round(height)}m` : "PORT AFTERLIGHT";
-    this.travelLabel.textContent = mode === "submerged" ? this.ridingCurrent ? "CURRENT HARVEST / 1.85× RECHARGE" : "LIT CURRENT / FASTER RECHARGE"
-      : mode === "air" ? "HOLD YOUR LINE / FOLLOW BEACONS" : "SPACE / NITRO";
+    this.modeLabel.textContent = `LAP ${s.lap} / ${tideForLap(s.lap).label}`;
+    this.travelLabel.textContent = mode === "submerged"
+      ? this.ridingCurrent ? "CURRENT HARVEST / 1.85× RECHARGE" : tideForLap(s.lap).current ? "LIT CURRENT / FASTER RECHARGE" : "REACTOR DRAINING / WATCH THE WATERLINE"
+      : s.lap === 2 && height < -3 ? "DAMP DECK / BRAKE BEFORE TURNING" : "SPACE / NITRO";
     this.powerLabel.textContent = s.activePower ? `${s.powerPerfect ? "PERFECT " : ""}${label} ${this.simulation.powerSeconds.toFixed(1)}s`
       : this.simulation.heldPowerKind ? `E / ${label}${perfectReady ? " · PERFECT NOW" : ""}` : "COLLECT A POWER CAPSULE";
+    if(this.shieldActive && s.tick-s.powerStartTick<=144)this.powerLabel.textContent += " · RETURN WINDOW";
+    this.powerLabel.dataset.device = s.activePower ? (s.powerPerfect ? "perfect" : "active") : this.simulation.heldPowerKind ? (perfectReady ? "perfect" : "held") : "empty";
+    this.powerLabel.dataset.kind = s.activePower ?? this.simulation.heldPowerKind ?? "";
+    this.powerLabel.dataset.charge = String(s.activePower ? s.activeCharge : this.simulation.heldPowerCharge);
+    this.modeLabel.dataset.deck = "none";
+    this.travelLabel.dataset.transfer = "ready";
     if (this.chargeFill) this.chargeFill.style.transform = `scaleX(${s.activePower ? s.activeCharge : this.simulation.heldPowerCharge})`;
-    const next = this.course.flightArcs.find(arc => arc.from > progress);
-    this.routeLabel.textContent = `SUPPLY ${this.simulation.patternForLap(s.lap) ? "B" : "A"} · ${perfectReady ? "LAUNCH STRIP / E FOR +1s SURGE"
-      : mode === "air" ? "GUIDED FLIGHT / TIME YOUR EXIT" : next ? `${next.name} IN ${Math.round((next.from - progress) * this.course.length)}m` : "RETURN TO REACTOR"}`;
+    const tide = tideForLap(s.lap);
+    this.routeLabel.textContent = perfectReady ? "SURGE WINDOW / E FOR +1s"
+      : `1 FLOODED → 2 SLICK → 3 PUMP HALL${tide.shortcut ? " / CUT OPEN" : ""}`;
     this.hud.dataset.deck = "lower"; this.hud.dataset.ready = this.simulation.heldPowerKind ? "true" : "false";
     if (this.diagnosticsOutput) this.diagnosticsOutput.textContent = JSON.stringify({
-      mode, height, modeSeconds: this.modeSeconds, seed: s.seed, tick: s.tick, pickups: s.pickups, powersUsed: s.powersUsed,
+      tide: this.course.tide, onShortcut: this.onShortcut, shortcutSeconds: this.shortcutSeconds, grip: this.course.surfaceGripAt(progress, s.lateral), mode, height, modeSeconds: this.modeSeconds, seed: s.seed, tick: s.tick, pickups: s.pickups, powersUsed: s.powersUsed,
       perfectActivations: s.perfectActivations, shieldAbsorptions: s.shieldAbsorptions, activePower: s.activePower,
-      heldPower: this.simulation.heldPowerKind, powerTime: this.simulation.powerSeconds, ridingCurrent: this.ridingCurrent,
+      chains: this.chain.events, bulkheadWarnings: this.bulkheadWarnings, heldPower: this.simulation.heldPowerKind, powerTime: this.simulation.powerSeconds, ridingCurrent: this.ridingCurrent,
       rechargeScale: this.boostRechargeScale, supply: this.simulation.patternForLap(s.lap), currentLane: currentLane(s.seed, s.lap),
     });
   }
 
   recover(progress: number): void {
+    this.chain.absorbedAt=-10000;
     this.simulation.recover(progress); this.handledSequence = this.simulation.state.eventSequence;
     this.mode = this.course.travelModeAt(progress); this.cameraReady = false;
   }
   reset(): void {
+    this.chain.reset();
     this.simulation.reset(); this.tickRemainder = 0; this.handledSequence = 0; this.cameraReady = false;
+    this.onShortcut = false; this.shortcutSeconds = 0;this.warnedFields.clear();this.bulkheadWarnings.length=0;this.world.bulkheads.reset();
+    this.announcedLap = 1; this.course.setLapBoard(1); this.course.tide.elapsed = 0; this.course.advanceTide(0);
     this.mode = "submerged"; this.modeSeconds.submerged = 0; this.modeSeconds.surface = 0; this.modeSeconds.air = 0;
     this.input.consumePower();
   }
   dispose(): void { this.world.dispose(); this.diagnosticsOutput?.remove(); this.hud.hidden = true; }
   private usePower(progress: number): void {
-    if (!this.simulation.requestPower(progress).ok) { this.audio.playPowerDenied(); return; }
+    const result=this.chain.request(this.simulation,progress);
+    if (!result.ok) { this.audio.playPowerDenied(); return; }
     this.dispatchEvents();
+    if(result.chain)this.ui.flashHazard("CHAIN · BULKHEAD → SURGE / +0.5s",2000);
   }
   private dispatchEvents(): void {
     for (const event of this.simulation.state.events) {
       if (event.sequence <= this.handledSequence) continue;
       this.handledSequence = event.sequence;
       if (event.type === "pickup") {
-        this.audio.playPowerPickup(); this.ui.flashHazard(`${event.kind === "surge" ? "SURGE TURBINE" : "PHASE PROJECTOR"} ACQUIRED · PRESS E`, 1700);
+        this.audio.playDeviceClunk(); this.audio.playPowerPickup(); this.ui.flashHazard(`${event.kind === "surge" ? "SURGE TURBINE" : "PHASE PROJECTOR"} ACQUIRED · PRESS E`, 1700);
       } else if (event.type === "power" && event.kind) {
+        if(event.kind === "surge") this.world.signals.fireSurge(this.simulation.state.progress,event.tick/ABILITY_TICK_RATE);
         this.audio.playPowerActivate(event.kind); this.input.pulse(.3, .5, 130);
         this.ui.flashHazard(event.perfect ? "PERFECT LAUNCH · +1s SURGE" : event.kind === "surge" ? "SURGE · HOLD THRUST" : "PHASE SHIELD ONLINE", 1400);
       } else if (event.type === "absorb") {
+        this.chain.absorb(event.tick);
+        this.world.bulkheads.absorb(event.index,event.tick/ABILITY_TICK_RATE);
         this.audio.playPowerPickup();
         this.ui.flashHazard(event.perfect ? "PERFECT SHIELD · +2s / NITRO RETURNED" : "BULKHEAD ABSORBED · NITRO RETURNED", 1600);
       }

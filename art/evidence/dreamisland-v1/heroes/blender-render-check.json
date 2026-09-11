@@ -1,0 +1,662 @@
+{
+  "status": "VERIFIED",
+  "renderer": "Blender 5.2.0 LTS / Cycles CPU / 24 samples / denoised",
+  "input": "Exported GLBs re-imported; existing shared atlas files bound by DI_MAT role; imported vertex colours",
+  "frames": [
+    {
+      "asset": "clock-tower",
+      "view": "front",
+      "file": "clock-tower-front.png",
+      "cameraType": "orthographic",
+      "cameraPositionGame": [
+        0.0,
+        7.0,
+        -110.0
+      ],
+      "targetGame": [
+        0.0,
+        7.0,
+        -0.0
+      ],
+      "verticalSpanMetres": 19.735892295837402,
+      "scaleBarMetres": 2,
+      "scaleBarPixels": 97.28468169665463,
+      "boundsGame": {
+        "min": [
+          -4.0,
+          0.0,
+          -4.0
+        ],
+        "max": [
+          4.0,
+          14.0,
+          4.0
+        ],
+        "size": [
+          8.0,
+          14.0,
+          8.0
+        ]
+      },
+      "assetSha256": "bf51f9c27d120e7b6969c6e22958a6d69d32146bf2c8686d3bc8c6817e992339"
+    },
+    {
+      "asset": "clock-tower",
+      "view": "side",
+      "file": "clock-tower-side.png",
+      "cameraType": "orthographic",
+      "cameraPositionGame": [
+        110.0,
+        7.0,
+        -0.0
+      ],
+      "targetGame": [
+        0.0,
+        7.0,
+        -0.0
+      ],
+      "verticalSpanMetres": 19.735892295837402,
+      "scaleBarMetres": 2,
+      "scaleBarPixels": 97.28468169665463,
+      "boundsGame": {
+        "min": [
+          -4.0,
+          0.0,
+          -4.0
+        ],
+        "max": [
+          4.0,
+          14.0,
+          4.0
+        ],
+        "size": [
+          8.0,
+          14.0,
+          8.0
+        ]
+      },
+      "assetSha256": "bf51f9c27d120e7b6969c6e22958a6d69d32146bf2c8686d3bc8c6817e992339"
+    },
+    {
+      "asset": "clock-tower",
+      "view": "back",
+      "file": "clock-tower-back.png",
+      "cameraType": "orthographic",
+      "cameraPositionGame": [
+        0.0,
+        7.0,
+        110.0
+      ],
+      "targetGame": [
+        0.0,
+        7.0,
+        -0.0
+      ],
+      "verticalSpanMetres": 19.735892295837402,
+      "scaleBarMetres": 2,
+      "scaleBarPixels": 97.28468169665463,
+      "boundsGame": {
+        "min": [
+          -4.0,
+          0.0,
+          -4.0
+        ],
+        "max": [
+          4.0,
+          14.0,
+          4.0
+        ],
+        "size": [
+          8.0,
+          14.0,
+          8.0
+        ]
+      },
+      "assetSha256": "bf51f9c27d120e7b6969c6e22958a6d69d32146bf2c8686d3bc8c6817e992339"
+    },
+    {
+      "asset": "clock-tower",
+      "view": "three-quarter",
+      "file": "clock-tower-three-quarter.png",
+      "cameraType": "orthographic",
+      "cameraPositionGame": [
+        65.29454803466797,
+        41.27963638305664,
+        -81.61817932128906
+      ],
+      "targetGame": [
+        0.0,
+        7.0,
+        -0.0
+      ],
+      "verticalSpanMetres": 19.735892295837402,
+      "scaleBarMetres": 2,
+      "scaleBarPixels": 97.28468169665463,
+      "boundsGame": {
+        "min": [
+          -4.0,
+          0.0,
+          -4.0
+        ],
+        "max": [
+          4.0,
+          14.0,
+          4.0
+        ],
+        "size": [
+          8.0,
+          14.0,
+          8.0
+        ]
+      },
+      "assetSha256": "bf51f9c27d120e7b6969c6e22958a6d69d32146bf2c8686d3bc8c6817e992339"
+    },
+    {
+      "asset": "clock-tower",
+      "file": "clock-tower-40m.png",
+      "cameraType": "perspective",
+      "distanceMetres": 39.99999935925006,
+      "verticalFovDegrees": 50,
+      "cameraPositionGame": [
+        17.870681762695312,
+        8.787068367004395,
+        -35.741363525390625
+      ],
+      "targetGame": [
+        0.0,
+        7.0,
+        -0.0
+      ],
+      "scaleBarMetres": 2,
+      "scaleBarDepthMetres": 40,
+      "scaleBarPixels": 51.4681660922294,
+      "assetSha256": "bf51f9c27d120e7b6969c6e22958a6d69d32146bf2c8686d3bc8c6817e992339"
+    },
+    {
+      "asset": "watchtower",
+      "view": "front",
+      "file": "watchtower-front.png",
+      "cameraType": "orthographic",
+      "cameraPositionGame": [
+        0.0,
+        15.0,
+        -110.0
+      ],
+      "targetGame": [
+        0.0,
+        15.0,
+        -0.0
+      ],
+      "verticalSpanMetres": 46.8034366607666,
+      "scaleBarMetres": 2,
+      "scaleBarPixels": 41.02262861413887,
+      "boundsGame": {
+        "min": [
+          -14.0,
+          0.0,
+          -14.251358985900879
+        ],
+        "max": [
+          14.0,
+          30.0,
+          14.251358985900879
+        ],
+        "size": [
+          28.0,
+          30.0,
+          28.502717971801758
+        ]
+      },
+      "assetSha256": "340285676a4cdd8cf6ee43b08f99ceee5045a43ad679dcd8fc8131844ce36d2c"
+    },
+    {
+      "asset": "watchtower",
+      "view": "side",
+      "file": "watchtower-side.png",
+      "cameraType": "orthographic",
+      "cameraPositionGame": [
+        110.0,
+        15.0,
+        -0.0
+      ],
+      "targetGame": [
+        0.0,
+        15.0,
+        -0.0
+      ],
+      "verticalSpanMetres": 46.8034366607666,
+      "scaleBarMetres": 2,
+      "scaleBarPixels": 41.02262861413887,
+      "boundsGame": {
+        "min": [
+          -14.0,
+          0.0,
+          -14.251358985900879
+        ],
+        "max": [
+          14.0,
+          30.0,
+          14.251358985900879
+        ],
+        "size": [
+          28.0,
+          30.0,
+          28.502717971801758
+        ]
+      },
+      "assetSha256": "340285676a4cdd8cf6ee43b08f99ceee5045a43ad679dcd8fc8131844ce36d2c"
+    },
+    {
+      "asset": "watchtower",
+      "view": "back",
+      "file": "watchtower-back.png",
+      "cameraType": "orthographic",
+      "cameraPositionGame": [
+        0.0,
+        15.0,
+        110.0
+      ],
+      "targetGame": [
+        0.0,
+        15.0,
+        -0.0
+      ],
+      "verticalSpanMetres": 46.8034366607666,
+      "scaleBarMetres": 2,
+      "scaleBarPixels": 41.02262861413887,
+      "boundsGame": {
+        "min": [
+          -14.0,
+          0.0,
+          -14.251358985900879
+        ],
+        "max": [
+          14.0,
+          30.0,
+          14.251358985900879
+        ],
+        "size": [
+          28.0,
+          30.0,
+          28.502717971801758
+        ]
+      },
+      "assetSha256": "340285676a4cdd8cf6ee43b08f99ceee5045a43ad679dcd8fc8131844ce36d2c"
+    },
+    {
+      "asset": "watchtower",
+      "view": "three-quarter",
+      "file": "watchtower-three-quarter.png",
+      "cameraType": "orthographic",
+      "cameraPositionGame": [
+        65.29454803466797,
+        49.27963638305664,
+        -81.61817932128906
+      ],
+      "targetGame": [
+        0.0,
+        15.0,
+        -0.0
+      ],
+      "verticalSpanMetres": 46.8034366607666,
+      "scaleBarMetres": 2,
+      "scaleBarPixels": 41.02262861413887,
+      "boundsGame": {
+        "min": [
+          -14.0,
+          0.0,
+          -14.251358985900879
+        ],
+        "max": [
+          14.0,
+          30.0,
+          14.251358985900879
+        ],
+        "size": [
+          28.0,
+          30.0,
+          28.502717971801758
+        ]
+      },
+      "assetSha256": "340285676a4cdd8cf6ee43b08f99ceee5045a43ad679dcd8fc8131844ce36d2c"
+    },
+    {
+      "asset": "waterfall-cliff",
+      "view": "front",
+      "file": "waterfall-cliff-front.png",
+      "cameraType": "orthographic",
+      "cameraPositionGame": [
+        0.0,
+        8.045000076293945,
+        -112.35299682617188
+      ],
+      "targetGame": [
+        0.0,
+        8.045000076293945,
+        -2.3529999256134033
+      ],
+      "verticalSpanMetres": 27.053661346435547,
+      "scaleBarMetres": 2,
+      "scaleBarPixels": 70.97006114675008,
+      "boundsGame": {
+        "min": [
+          -10.97249984741211,
+          0.04500000178813934,
+          -8.015999794006348
+        ],
+        "max": [
+          10.97249984741211,
+          16.045000076293945,
+          3.309999942779541
+        ],
+        "size": [
+          21.94499969482422,
+          16.000000074505806,
+          11.325999736785889
+        ]
+      },
+      "assetSha256": "cd530cf9015421ae243a2536369725ee1033172fe221fcf3666de4e317772f28"
+    },
+    {
+      "asset": "waterfall-cliff",
+      "view": "side",
+      "file": "waterfall-cliff-side.png",
+      "cameraType": "orthographic",
+      "cameraPositionGame": [
+        110.0,
+        8.045000076293945,
+        -2.3529999256134033
+      ],
+      "targetGame": [
+        0.0,
+        8.045000076293945,
+        -2.3529999256134033
+      ],
+      "verticalSpanMetres": 27.053661346435547,
+      "scaleBarMetres": 2,
+      "scaleBarPixels": 70.97006114675008,
+      "boundsGame": {
+        "min": [
+          -10.97249984741211,
+          0.04500000178813934,
+          -8.015999794006348
+        ],
+        "max": [
+          10.97249984741211,
+          16.045000076293945,
+          3.309999942779541
+        ],
+        "size": [
+          21.94499969482422,
+          16.000000074505806,
+          11.325999736785889
+        ]
+      },
+      "assetSha256": "cd530cf9015421ae243a2536369725ee1033172fe221fcf3666de4e317772f28"
+    },
+    {
+      "asset": "waterfall-cliff",
+      "view": "back",
+      "file": "waterfall-cliff-back.png",
+      "cameraType": "orthographic",
+      "cameraPositionGame": [
+        0.0,
+        8.045000076293945,
+        107.64700317382812
+      ],
+      "targetGame": [
+        0.0,
+        8.045000076293945,
+        -2.3529999256134033
+      ],
+      "verticalSpanMetres": 27.053661346435547,
+      "scaleBarMetres": 2,
+      "scaleBarPixels": 70.97006114675008,
+      "boundsGame": {
+        "min": [
+          -10.97249984741211,
+          0.04500000178813934,
+          -8.015999794006348
+        ],
+        "max": [
+          10.97249984741211,
+          16.045000076293945,
+          3.309999942779541
+        ],
+        "size": [
+          21.94499969482422,
+          16.000000074505806,
+          11.325999736785889
+        ]
+      },
+      "assetSha256": "cd530cf9015421ae243a2536369725ee1033172fe221fcf3666de4e317772f28"
+    },
+    {
+      "asset": "waterfall-cliff",
+      "view": "three-quarter",
+      "file": "waterfall-cliff-three-quarter.png",
+      "cameraType": "orthographic",
+      "cameraPositionGame": [
+        65.29454803466797,
+        42.32463836669922,
+        -83.97117614746094
+      ],
+      "targetGame": [
+        0.0,
+        8.045000076293945,
+        -2.3529999256134033
+      ],
+      "verticalSpanMetres": 27.053661346435547,
+      "scaleBarMetres": 2,
+      "scaleBarPixels": 70.97006114675008,
+      "boundsGame": {
+        "min": [
+          -10.97249984741211,
+          0.04500000178813934,
+          -8.015999794006348
+        ],
+        "max": [
+          10.97249984741211,
+          16.045000076293945,
+          3.309999942779541
+        ],
+        "size": [
+          21.94499969482422,
+          16.000000074505806,
+          11.325999736785889
+        ]
+      },
+      "assetSha256": "cd530cf9015421ae243a2536369725ee1033172fe221fcf3666de4e317772f28"
+    },
+    {
+      "asset": "sea-stack-set",
+      "view": "front",
+      "file": "sea-stack-set-front.png",
+      "cameraType": "orthographic",
+      "cameraPositionGame": [
+        1.4634437561035156,
+        20.0,
+        -110.00853729248047
+      ],
+      "targetGame": [
+        1.4634437561035156,
+        20.0,
+        -0.008539676666259766
+      ],
+      "verticalSpanMetres": 67.84237998962402,
+      "scaleBarMetres": 2,
+      "scaleBarPixels": 28.300893929335167,
+      "boundsGame": {
+        "min": [
+          -32.800384521484375,
+          0.0,
+          -5.829975605010986
+        ],
+        "max": [
+          35.727272033691406,
+          40.0,
+          5.812896251678467
+        ],
+        "size": [
+          68.52765655517578,
+          40.0,
+          11.642871856689453
+        ]
+      },
+      "assetSha256": "ef8183ae3c7c790d7685febd13e0874bd15566f02800feb40f8a0f00b70f756f"
+    },
+    {
+      "asset": "sea-stack-set",
+      "view": "side",
+      "file": "sea-stack-set-side.png",
+      "cameraType": "orthographic",
+      "cameraPositionGame": [
+        111.46343994140625,
+        20.0,
+        -0.008539676666259766
+      ],
+      "targetGame": [
+        1.4634437561035156,
+        20.0,
+        -0.008539676666259766
+      ],
+      "verticalSpanMetres": 67.84237998962402,
+      "scaleBarMetres": 2,
+      "scaleBarPixels": 28.300893929335167,
+      "boundsGame": {
+        "min": [
+          -32.800384521484375,
+          0.0,
+          -5.829975605010986
+        ],
+        "max": [
+          35.727272033691406,
+          40.0,
+          5.812896251678467
+        ],
+        "size": [
+          68.52765655517578,
+          40.0,
+          11.642871856689453
+        ]
+      },
+      "assetSha256": "ef8183ae3c7c790d7685febd13e0874bd15566f02800feb40f8a0f00b70f756f"
+    },
+    {
+      "asset": "sea-stack-set",
+      "view": "back",
+      "file": "sea-stack-set-back.png",
+      "cameraType": "orthographic",
+      "cameraPositionGame": [
+        1.4634437561035156,
+        20.0,
+        109.99146270751953
+      ],
+      "targetGame": [
+        1.4634437561035156,
+        20.0,
+        -0.008539676666259766
+      ],
+      "verticalSpanMetres": 67.84237998962402,
+      "scaleBarMetres": 2,
+      "scaleBarPixels": 28.300893929335167,
+      "boundsGame": {
+        "min": [
+          -32.800384521484375,
+          0.0,
+          -5.829975605010986
+        ],
+        "max": [
+          35.727272033691406,
+          40.0,
+          5.812896251678467
+        ],
+        "size": [
+          68.52765655517578,
+          40.0,
+          11.642871856689453
+        ]
+      },
+      "assetSha256": "ef8183ae3c7c790d7685febd13e0874bd15566f02800feb40f8a0f00b70f756f"
+    },
+    {
+      "asset": "sea-stack-set",
+      "view": "three-quarter",
+      "file": "sea-stack-set-three-quarter.png",
+      "cameraType": "orthographic",
+      "cameraPositionGame": [
+        66.75799560546875,
+        54.27963638305664,
+        -81.62671661376953
+      ],
+      "targetGame": [
+        1.4634437561035156,
+        20.0,
+        -0.008539676666259766
+      ],
+      "verticalSpanMetres": 67.84237998962402,
+      "scaleBarMetres": 2,
+      "scaleBarPixels": 28.300893929335167,
+      "boundsGame": {
+        "min": [
+          -32.800384521484375,
+          0.0,
+          -5.829975605010986
+        ],
+        "max": [
+          35.727272033691406,
+          40.0,
+          5.812896251678467
+        ],
+        "size": [
+          68.52765655517578,
+          40.0,
+          11.642871856689453
+        ]
+      },
+      "assetSha256": "ef8183ae3c7c790d7685febd13e0874bd15566f02800feb40f8a0f00b70f756f"
+    },
+    {
+      "asset": "sea-stack-set",
+      "file": "sea-stack-set-300m.png",
+      "cameraType": "perspective",
+      "distanceMetres": 300.0,
+      "verticalFovDegrees": 50,
+      "cameraPositionGame": [
+        1.4634437561035156,
+        20.0,
+        -300.008544921875
+      ],
+      "targetGame": [
+        1.4634437561035156,
+        20.0,
+        -0.008539676666259766
+      ],
+      "scaleBarMetres": 2,
+      "scaleBarDepthMetres": 300,
+      "scaleBarPixels": 6.862422145630587,
+      "assetSha256": "ef8183ae3c7c790d7685febd13e0874bd15566f02800feb40f8a0f00b70f756f"
+    },
+    {
+      "asset": "watchtower",
+      "file": "watchtower-40m.png",
+      "cameraType": "perspective",
+      "distanceMetres": 40.00000078678131,
+      "verticalFovDegrees": 65,
+      "cameraPositionGame": [
+        13.083539962768555,
+        20.60723114013672,
+        -37.38154602050781
+      ],
+      "targetGame": [
+        0.0,
+        15.0,
+        -0.0
+      ],
+      "scaleBarMetres": 2,
+      "scaleBarDepthMetres": 40,
+      "scaleBarPixels": 37.672453850819764,
+      "assetSha256": "340285676a4cdd8cf6ee43b08f99ceee5045a43ad679dcd8fc8131844ce36d2c"
+    }
+  ]
+}

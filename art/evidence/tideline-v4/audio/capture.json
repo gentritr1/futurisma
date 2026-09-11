@@ -1,0 +1,14 @@
+{
+  "script": "scripts/visual/tideline-v4/audio.mjs",
+  "capture": "Actual Web Audio master output through MediaStreamDestination and MediaRecorder; ffmpeg decodes to PCM WAV.",
+  "drain": {
+    "seconds": 20,
+    "start": "00:17.125",
+    "end": "00:37.808"
+  },
+  "pumpHall": {
+    "seconds": 10,
+    "mode": "Stationary audition at lap 3 progress .15; engine idles, normal audio clock, real game ambience. Not a slowed or looped race pass."
+  },
+  "errors": []
+}

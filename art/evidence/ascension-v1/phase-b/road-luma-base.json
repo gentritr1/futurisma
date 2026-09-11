@@ -1,0 +1,578 @@
+[
+  {
+    "file": "base-PAD_ROAD.png",
+    "flat_pct": 19.4,
+    "hsplit": 69.0,
+    "skysat": 6.9,
+    "edges_pct": 7.12,
+    "midtone_pct": 67.1,
+    "horizon_row": 324,
+    "mode_rgb": [
+      106,
+      98,
+      90
+    ],
+    "lamp_luma_under": 121.86917743055557,
+    "lamp_luma_between": 128.52340694444445,
+    "lamp_ratio": 0.9482255437193223,
+    "sha256": "95313f5abbc53b3d987fe7bcd5d242695c37460e1000b5c6eb4a042e925a6117"
+  },
+  {
+    "file": "base-APRON_SWEEP.png",
+    "flat_pct": 21.6,
+    "hsplit": 53.5,
+    "skysat": 8.4,
+    "edges_pct": 7.39,
+    "midtone_pct": 82.0,
+    "horizon_row": 324,
+    "mode_rgb": [
+      106,
+      98,
+      90
+    ],
+    "lamp_luma_under": 127.6505,
+    "lamp_luma_between": 120.1262204861111,
+    "lamp_ratio": 1.0626364459269644,
+    "sha256": "47d1a59c3fef73bfdb07681b35b891236b20b351e2df37520152908b9debb017"
+  },
+  {
+    "file": "base-DELUGE_ROAD.png",
+    "flat_pct": 19.1,
+    "hsplit": 64.4,
+    "skysat": 9.4,
+    "edges_pct": 6.74,
+    "midtone_pct": 75.8,
+    "horizon_row": 336,
+    "mode_rgb": [
+      106,
+      98,
+      90
+    ],
+    "lamp_luma_under": 125.17785138888888,
+    "lamp_luma_between": 122.52838472222223,
+    "lamp_ratio": 1.0216232889438077,
+    "sha256": "35b18b7ab4318934e17814d8fd88bb0a8111f5d3b906ef0b7881737786c752e9"
+  },
+  {
+    "file": "base-CRAWLERWAY.png",
+    "flat_pct": 19.3,
+    "hsplit": 72.7,
+    "skysat": 13.7,
+    "edges_pct": 11.07,
+    "midtone_pct": 58.7,
+    "horizon_row": 312,
+    "mode_rgb": [
+      106,
+      98,
+      90
+    ],
+    "lamp_luma_under": 121.92788229166666,
+    "lamp_luma_between": 136.11648333333335,
+    "lamp_ratio": 0.8957613310731775,
+    "sha256": "b1aae9b335e6a29a496fd0e8a8101ce43ef6d02c40f983f6a26bb2b537a039d1"
+  },
+  {
+    "file": "base-MANGROVE_CUT.png",
+    "flat_pct": 18.1,
+    "hsplit": 80.5,
+    "skysat": 11.5,
+    "edges_pct": 12.0,
+    "midtone_pct": 54.1,
+    "horizon_row": 312,
+    "mode_rgb": [
+      106,
+      98,
+      90
+    ],
+    "lamp_luma_under": 124.50383194444446,
+    "lamp_luma_between": 119.60513854166668,
+    "lamp_ratio": 1.0409572152376316,
+    "sha256": "bbe24945461bea38572126719a6667c88ead913249421a70fb8a3b761c1a9a74"
+  },
+  {
+    "file": "base-CAUSEWAY.png",
+    "flat_pct": 20.7,
+    "hsplit": 57.9,
+    "skysat": 20.9,
+    "edges_pct": 11.57,
+    "midtone_pct": 59.5,
+    "horizon_row": 316,
+    "mode_rgb": [
+      106,
+      98,
+      90
+    ],
+    "lamp_luma_under": 126.82504895833333,
+    "lamp_luma_between": 123.88414756944445,
+    "lamp_ratio": 1.023739126002706,
+    "sha256": "18c8edc2e040ee7152af5719dcaaead2e4b973f247d76e67d7b00e7ddbfc3636"
+  },
+  {
+    "file": "base-TANK_FARM.png",
+    "flat_pct": 17.9,
+    "hsplit": 74.7,
+    "skysat": 8.7,
+    "edges_pct": 7.08,
+    "midtone_pct": 66.2,
+    "horizon_row": 324,
+    "mode_rgb": [
+      106,
+      98,
+      90
+    ],
+    "lamp_luma_under": 97.97785555555555,
+    "lamp_luma_between": 115.97204062499999,
+    "lamp_ratio": 0.844840316920616,
+    "sha256": "334e426f571734e5109729dc942d826e09d63a94942fed507dd750764e0bd523"
+  },
+  {
+    "file": "base-TRENCH.png",
+    "flat_pct": 19.3,
+    "hsplit": 13.3,
+    "skysat": 16.3,
+    "edges_pct": 9.92,
+    "midtone_pct": 71.3,
+    "horizon_row": 376,
+    "mode_rgb": [
+      106,
+      98,
+      90
+    ],
+    "lamp_luma_under": 123.82217430555556,
+    "lamp_luma_between": 126.65082812499999,
+    "lamp_ratio": 0.9776657297759423,
+    "sha256": "2cc6016ea0a603137b1a149196ad747e81ed88c12976d7bf3d3ea47e8c2e933d"
+  },
+  {
+    "file": "test-PAD_ROAD.png",
+    "flat_pct": 19.4,
+    "hsplit": 69.0,
+    "skysat": 6.9,
+    "edges_pct": 7.12,
+    "midtone_pct": 67.1,
+    "horizon_row": 324,
+    "mode_rgb": [
+      106,
+      98,
+      90
+    ],
+    "lamp_luma_under": 121.86917743055557,
+    "lamp_luma_between": 128.52340694444445,
+    "lamp_ratio": 0.9482255437193223,
+    "sha256": "dbd45b23f600797c223297d32ed3a97c6b66e1d91652ada54d89bd33c03eb6a8"
+  },
+  {
+    "file": "test-APRON_SWEEP.png",
+    "flat_pct": 21.6,
+    "hsplit": 53.5,
+    "skysat": 8.4,
+    "edges_pct": 7.39,
+    "midtone_pct": 82.0,
+    "horizon_row": 324,
+    "mode_rgb": [
+      106,
+      98,
+      90
+    ],
+    "lamp_luma_under": 127.6505,
+    "lamp_luma_between": 120.1262204861111,
+    "lamp_ratio": 1.0626364459269644,
+    "sha256": "47d1a59c3fef73bfdb07681b35b891236b20b351e2df37520152908b9debb017"
+  },
+  {
+    "file": "test-DELUGE_ROAD.png",
+    "flat_pct": 19.1,
+    "hsplit": 64.4,
+    "skysat": 9.4,
+    "edges_pct": 6.74,
+    "midtone_pct": 75.8,
+    "horizon_row": 336,
+    "mode_rgb": [
+      106,
+      98,
+      90
+    ],
+    "lamp_luma_under": 125.17785138888888,
+    "lamp_luma_between": 122.52838472222223,
+    "lamp_ratio": 1.0216232889438077,
+    "sha256": "35b18b7ab4318934e17814d8fd88bb0a8111f5d3b906ef0b7881737786c752e9"
+  },
+  {
+    "file": "test-CRAWLERWAY.png",
+    "flat_pct": 19.3,
+    "hsplit": 72.7,
+    "skysat": 13.7,
+    "edges_pct": 11.07,
+    "midtone_pct": 58.7,
+    "horizon_row": 312,
+    "mode_rgb": [
+      106,
+      98,
+      90
+    ],
+    "lamp_luma_under": 121.92788229166666,
+    "lamp_luma_between": 136.11648333333335,
+    "lamp_ratio": 0.8957613310731775,
+    "sha256": "b1aae9b335e6a29a496fd0e8a8101ce43ef6d02c40f983f6a26bb2b537a039d1"
+  },
+  {
+    "file": "test-MANGROVE_CUT.png",
+    "flat_pct": 18.1,
+    "hsplit": 80.5,
+    "skysat": 11.5,
+    "edges_pct": 12.0,
+    "midtone_pct": 54.1,
+    "horizon_row": 312,
+    "mode_rgb": [
+      106,
+      98,
+      90
+    ],
+    "lamp_luma_under": 124.50383194444446,
+    "lamp_luma_between": 119.60513854166668,
+    "lamp_ratio": 1.0409572152376316,
+    "sha256": "cd9a55bff0c1727a9ea12d99567d04e246d151d3bb28489d542c6286aacf2a9a"
+  },
+  {
+    "file": "test-CAUSEWAY.png",
+    "flat_pct": 20.7,
+    "hsplit": 57.9,
+    "skysat": 20.9,
+    "edges_pct": 11.57,
+    "midtone_pct": 59.5,
+    "horizon_row": 316,
+    "mode_rgb": [
+      106,
+      98,
+      90
+    ],
+    "lamp_luma_under": 126.82504895833333,
+    "lamp_luma_between": 123.88414756944445,
+    "lamp_ratio": 1.023739126002706,
+    "sha256": "a0d306b26217842fdb37d26fe8d7e133ef269bc4f01c1f78baa5ef41461cd23a"
+  },
+  {
+    "file": "test-TANK_FARM.png",
+    "flat_pct": 17.9,
+    "hsplit": 74.7,
+    "skysat": 8.7,
+    "edges_pct": 7.08,
+    "midtone_pct": 66.2,
+    "horizon_row": 324,
+    "mode_rgb": [
+      106,
+      98,
+      90
+    ],
+    "lamp_luma_under": 97.97785555555555,
+    "lamp_luma_between": 115.97204062499999,
+    "lamp_ratio": 0.844840316920616,
+    "sha256": "a073c3697972d667ee59b8d0f179fc9718fbb8b9768bd62a2df4e45117674fb5"
+  },
+  {
+    "file": "test-TRENCH.png",
+    "flat_pct": 19.3,
+    "hsplit": 13.3,
+    "skysat": 16.3,
+    "edges_pct": 9.92,
+    "midtone_pct": 71.3,
+    "horizon_row": 376,
+    "mode_rgb": [
+      106,
+      98,
+      90
+    ],
+    "lamp_luma_under": 123.82217430555556,
+    "lamp_luma_between": 126.65082812499999,
+    "lamp_ratio": 0.9776657297759423,
+    "sha256": "2cc6016ea0a603137b1a149196ad747e81ed88c12976d7bf3d3ea47e8c2e933d"
+  },
+  {
+    "file": "launch-PAD_ROAD.png",
+    "flat_pct": 19.5,
+    "hsplit": 48.2,
+    "skysat": 6.5,
+    "edges_pct": 6.86,
+    "midtone_pct": 75.0,
+    "horizon_row": 348,
+    "mode_rgb": [
+      106,
+      98,
+      90
+    ],
+    "lamp_luma_under": 122.01270381944444,
+    "lamp_luma_between": 128.58633333333333,
+    "lamp_ratio": 0.9488776968478593,
+    "sha256": "ac60996f051426b17e8fb195eeced29a1ee2174089b9629021b6992d0775437e"
+  },
+  {
+    "file": "launch-APRON_SWEEP.png",
+    "flat_pct": 21.2,
+    "hsplit": 33.9,
+    "skysat": 7.0,
+    "edges_pct": 7.04,
+    "midtone_pct": 85.9,
+    "horizon_row": 340,
+    "mode_rgb": [
+      106,
+      98,
+      90
+    ],
+    "lamp_luma_under": 127.77314479166665,
+    "lamp_luma_between": 120.2443263888889,
+    "lamp_ratio": 1.0626126706255428,
+    "sha256": "bb2ed5bafb52fe8729e31e924d67fa86cb57a85df8e3ed88426d67f6b22dac41"
+  },
+  {
+    "file": "launch-DELUGE_ROAD.png",
+    "flat_pct": 19.1,
+    "hsplit": 64.4,
+    "skysat": 9.4,
+    "edges_pct": 6.74,
+    "midtone_pct": 75.8,
+    "horizon_row": 336,
+    "mode_rgb": [
+      106,
+      98,
+      90
+    ],
+    "lamp_luma_under": 125.17785138888888,
+    "lamp_luma_between": 122.52838472222223,
+    "lamp_ratio": 1.0216232889438077,
+    "sha256": "35b18b7ab4318934e17814d8fd88bb0a8111f5d3b906ef0b7881737786c752e9"
+  },
+  {
+    "file": "launch-CRAWLERWAY.png",
+    "flat_pct": 19.3,
+    "hsplit": 72.7,
+    "skysat": 13.7,
+    "edges_pct": 11.07,
+    "midtone_pct": 58.7,
+    "horizon_row": 312,
+    "mode_rgb": [
+      106,
+      98,
+      90
+    ],
+    "lamp_luma_under": 121.92788229166666,
+    "lamp_luma_between": 136.11648333333335,
+    "lamp_ratio": 0.8957613310731775,
+    "sha256": "b1aae9b335e6a29a496fd0e8a8101ce43ef6d02c40f983f6a26bb2b537a039d1"
+  },
+  {
+    "file": "launch-MANGROVE_CUT.png",
+    "flat_pct": 18.1,
+    "hsplit": 80.5,
+    "skysat": 11.5,
+    "edges_pct": 11.93,
+    "midtone_pct": 54.0,
+    "horizon_row": 312,
+    "mode_rgb": [
+      106,
+      98,
+      90
+    ],
+    "lamp_luma_under": 124.50383194444446,
+    "lamp_luma_between": 119.60513854166668,
+    "lamp_ratio": 1.0409572152376316,
+    "sha256": "f804b55472c00d1c825d797ee8e62faf483fd4cbec031912191bb148d8bd8b12"
+  },
+  {
+    "file": "launch-CAUSEWAY.png",
+    "flat_pct": 20.7,
+    "hsplit": 57.9,
+    "skysat": 20.9,
+    "edges_pct": 11.57,
+    "midtone_pct": 59.5,
+    "horizon_row": 316,
+    "mode_rgb": [
+      106,
+      98,
+      90
+    ],
+    "lamp_luma_under": 126.82504895833333,
+    "lamp_luma_between": 123.88414756944445,
+    "lamp_ratio": 1.023739126002706,
+    "sha256": "959bd75833da1c729a480ba6d0920909bca9315a7389586b4c0d7c1b6f0e1478"
+  },
+  {
+    "file": "launch-TANK_FARM.png",
+    "flat_pct": 17.9,
+    "hsplit": 74.7,
+    "skysat": 8.7,
+    "edges_pct": 7.06,
+    "midtone_pct": 66.2,
+    "horizon_row": 324,
+    "mode_rgb": [
+      106,
+      98,
+      90
+    ],
+    "lamp_luma_under": 97.97785555555555,
+    "lamp_luma_between": 115.97204062499999,
+    "lamp_ratio": 0.844840316920616,
+    "sha256": "9ac8a5be6d322f6504bf8e184c30589b40347310caf0dbf4e47bbf9e14d018f8"
+  },
+  {
+    "file": "launch-TRENCH.png",
+    "flat_pct": 19.3,
+    "hsplit": 13.3,
+    "skysat": 16.3,
+    "edges_pct": 9.92,
+    "midtone_pct": 71.3,
+    "horizon_row": 376,
+    "mode_rgb": [
+      106,
+      98,
+      90
+    ],
+    "lamp_luma_under": 123.82217430555556,
+    "lamp_luma_between": 126.65082812499999,
+    "lamp_ratio": 0.9776657297759423,
+    "sha256": "2cc6016ea0a603137b1a149196ad747e81ed88c12976d7bf3d3ea47e8c2e933d"
+  },
+  {
+    "file": "reopened-PAD_ROAD.png",
+    "flat_pct": 19.4,
+    "hsplit": 69.0,
+    "skysat": 6.9,
+    "edges_pct": 7.12,
+    "midtone_pct": 67.1,
+    "horizon_row": 324,
+    "mode_rgb": [
+      106,
+      98,
+      90
+    ],
+    "lamp_luma_under": 121.86917743055557,
+    "lamp_luma_between": 128.52340694444445,
+    "lamp_ratio": 0.9482255437193223,
+    "sha256": "6bfa1883f2ba6f8f8236be993cc19e3fdafc1675e6ee4f223edfb1240c4220f3"
+  },
+  {
+    "file": "reopened-APRON_SWEEP.png",
+    "flat_pct": 21.6,
+    "hsplit": 53.5,
+    "skysat": 8.4,
+    "edges_pct": 7.39,
+    "midtone_pct": 82.0,
+    "horizon_row": 324,
+    "mode_rgb": [
+      106,
+      98,
+      90
+    ],
+    "lamp_luma_under": 127.6505,
+    "lamp_luma_between": 120.1262204861111,
+    "lamp_ratio": 1.0626364459269644,
+    "sha256": "47d1a59c3fef73bfdb07681b35b891236b20b351e2df37520152908b9debb017"
+  },
+  {
+    "file": "reopened-DELUGE_ROAD.png",
+    "flat_pct": 19.1,
+    "hsplit": 64.4,
+    "skysat": 9.4,
+    "edges_pct": 6.74,
+    "midtone_pct": 75.8,
+    "horizon_row": 336,
+    "mode_rgb": [
+      106,
+      98,
+      90
+    ],
+    "lamp_luma_under": 125.17785138888888,
+    "lamp_luma_between": 122.52838472222223,
+    "lamp_ratio": 1.0216232889438077,
+    "sha256": "35b18b7ab4318934e17814d8fd88bb0a8111f5d3b906ef0b7881737786c752e9"
+  },
+  {
+    "file": "reopened-CRAWLERWAY.png",
+    "flat_pct": 19.3,
+    "hsplit": 72.7,
+    "skysat": 13.7,
+    "edges_pct": 11.07,
+    "midtone_pct": 58.7,
+    "horizon_row": 312,
+    "mode_rgb": [
+      106,
+      98,
+      90
+    ],
+    "lamp_luma_under": 121.92788229166666,
+    "lamp_luma_between": 136.11648333333335,
+    "lamp_ratio": 0.8957613310731775,
+    "sha256": "b1aae9b335e6a29a496fd0e8a8101ce43ef6d02c40f983f6a26bb2b537a039d1"
+  },
+  {
+    "file": "reopened-MANGROVE_CUT.png",
+    "flat_pct": 18.1,
+    "hsplit": 80.5,
+    "skysat": 11.5,
+    "edges_pct": 12.0,
+    "midtone_pct": 54.1,
+    "horizon_row": 312,
+    "mode_rgb": [
+      106,
+      98,
+      90
+    ],
+    "lamp_luma_under": 124.50383194444446,
+    "lamp_luma_between": 119.60513854166668,
+    "lamp_ratio": 1.0409572152376316,
+    "sha256": "a813f1961bb3def1afa827c4449fa7050de8285394bd39deb93742a2df0ef9df"
+  },
+  {
+    "file": "reopened-CAUSEWAY.png",
+    "flat_pct": 20.7,
+    "hsplit": 57.9,
+    "skysat": 20.9,
+    "edges_pct": 11.57,
+    "midtone_pct": 59.5,
+    "horizon_row": 316,
+    "mode_rgb": [
+      106,
+      98,
+      90
+    ],
+    "lamp_luma_under": 126.82504895833333,
+    "lamp_luma_between": 123.88414756944445,
+    "lamp_ratio": 1.023739126002706,
+    "sha256": "18d535d9976f3762ce799cbc44047884f3d4ea6d3d6e06c15a7dcdff48c55207"
+  },
+  {
+    "file": "reopened-TANK_FARM.png",
+    "flat_pct": 17.9,
+    "hsplit": 74.7,
+    "skysat": 8.7,
+    "edges_pct": 7.08,
+    "midtone_pct": 66.2,
+    "horizon_row": 324,
+    "mode_rgb": [
+      106,
+      98,
+      90
+    ],
+    "lamp_luma_under": 97.97785555555555,
+    "lamp_luma_between": 115.97204062499999,
+    "lamp_ratio": 0.844840316920616,
+    "sha256": "4966357bd3ef62515c24f2faf0b5424849695332e77438db1ee2b53652677489"
+  },
+  {
+    "file": "reopened-TRENCH.png",
+    "flat_pct": 19.3,
+    "hsplit": 13.3,
+    "skysat": 16.3,
+    "edges_pct": 9.92,
+    "midtone_pct": 71.3,
+    "horizon_row": 376,
+    "mode_rgb": [
+      106,
+      98,
+      90
+    ],
+    "lamp_luma_under": 123.82217430555556,
+    "lamp_luma_between": 126.65082812499999,
+    "lamp_ratio": 0.9776657297759423,
+    "sha256": "2cc6016ea0a603137b1a149196ad747e81ed88c12976d7bf3d3ea47e8c2e933d"
+  }
+]

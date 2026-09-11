@@ -1,0 +1,42 @@
+{
+  "script": "scripts/design/solve-dreamisland-closure.mjs",
+  "groveLobes": 3,
+  "groveAmplitude": 0.011,
+  "startDegrees": {
+    "GROVE": 58.765125,
+    "POINT": 69.246402,
+    "BASIN": -7.745486,
+    "COURT": 108.855401,
+    "REEF": 53.52966,
+    "CUT": 77.348893
+  },
+  "turnDegrees": {
+    "GROVE": 58.76512506751604,
+    "POINT": 69.24640221500684,
+    "BASIN": -7.745485753865883,
+    "COURT": 108.85540122433936,
+    "REEF": 53.52966004638434,
+    "CUT": 77.34889289080735
+  },
+  "turnDegreesSum": 359.99999569018803,
+  "correctionDegrees": {
+    "GROVE": 6.751604075816431e-8,
+    "POINT": 2.1500683544672938e-7,
+    "BASIN": 2.4613411664375917e-7,
+    "COURT": 2.243393595335874e-7,
+    "REEF": 4.638434347725706e-8,
+    "CUT": -1.091926549179334e-7
+  },
+  "closure": {
+    "xMetres": 2.497287307501317e-10,
+    "zMetres": -2.8491392257688525e-11,
+    "headingRadians": 8.881784197001252e-15
+  },
+  "groveAnalytic": {
+    "baseCurvature": 0.00036479307440942044,
+    "peakCurvature": 0.01136479307440942,
+    "troughCurvature": -0.01063520692559058,
+    "tightestRadiusMetres": 87.99104334347643,
+    "alternatingTurns": 3
+  }
+}

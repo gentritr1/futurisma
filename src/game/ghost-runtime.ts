@@ -182,7 +182,7 @@ class GhostRuntime {
     // Polarity also needs the recorded deck and the continuous transfer pose;
     // sampling its mutable player course would teleport a replay between roads.
     // Keep that circuit's lap records, but do not record or replay a false ghost.
-    this.enabled = !isProbeRun() && course.kind !== "polarity";
+    this.enabled = !isProbeRun() && course.kind !== "polarity" && course.kind !== "tideline";
     if (!this.enabled) return this.root;
     const batches = vehicle.createRivalVisualBatches();
     try {

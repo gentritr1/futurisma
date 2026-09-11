@@ -1,0 +1,427 @@
+{
+ "script": "scripts/visual/dreamisland/atlas-proof.py",
+ "directory": "art/evidence/dreamisland-v1/polish/atlas-added",
+ "maskDelta": 40,
+ "minimumPixels": 400,
+ "measure": "half mean normalised chromaticity distance plus half chromaticity-histogram L1/2, masked pixels against each quadrant of the same role, cropped to the sub-rect the geometry addresses",
+ "claims": [
+  {
+   "id": "watchtower-ivy",
+   "is": "Narrow tower ivy strands use the keyed fern sprite.",
+   "role": "jungle-card",
+   "cell": "fern",
+   "capturedAtProgress": null,
+   "quadrant": "TR",
+   "manifestUv": [
+    0.529297,
+    0.561523,
+    0.970703,
+    0.896484
+   ],
+   "maskPixels": 295,
+   "runTriangles": 16,
+   "matchedTriangles": 16,
+   "uniformCell": null,
+   "addressedRect": [
+    0.5292969942092896,
+    0.10351598262786865,
+    0.9707030057907104,
+    0.4384769797325134
+   ],
+   "accepted": false,
+   "reason": "only 295 masked pixels; nothing to measure"
+  },
+  {
+   "id": "watchtower-moss-joints",
+   "is": "Sparse damp course joints use the moss quadrant.",
+   "role": "jungle",
+   "cell": "moss-blossom",
+   "capturedAtProgress": null,
+   "quadrant": "TR",
+   "manifestUv": [
+    0.504,
+    0.504,
+    0.996,
+    0.996
+   ],
+   "maskPixels": 90,
+   "runTriangles": 96,
+   "matchedTriangles": 96,
+   "uniformCell": null,
+   "addressedRect": [
+    0.5040000081062317,
+    0.0040000081062316895,
+    0.9959999918937683,
+    0.4959999918937683
+   ],
+   "accepted": false,
+   "reason": "only 90 masked pixels; nothing to measure"
+  },
+  {
+   "id": "watchtower-lamps",
+   "is": "Both interior lamp discs address the warm lamp quadrant.",
+   "role": "emissive",
+   "cell": "lamp-disc",
+   "capturedAtProgress": null,
+   "quadrant": "BL",
+   "manifestUv": [
+    0.004,
+    0.004,
+    0.496,
+    0.496
+   ],
+   "maskPixels": 852,
+   "runTriangles": 48,
+   "matchedTriangles": 48,
+   "uniformCell": null,
+   "addressedRect": [
+    0.004000000189989805,
+    0.5040000081062317,
+    0.4959999918937683,
+    0.9959999918937683
+   ],
+   "drawnChromaticity": [
+    0.4258,
+    0.37013
+   ],
+   "quadrantDistances": {
+    "TL": 0.65374,
+    "TR": 0.67737,
+    "BL": 0.16972,
+    "BR": 0.47585
+   },
+   "nearestQuadrant": "BL",
+   "accepted": true,
+   "margin": 0.30613
+  },
+  {
+   "id": "waterfall-sheet",
+   "is": "The full-drop scrolling sheets wrap inside the waterfall quadrant.",
+   "role": "water",
+   "cell": "waterfall",
+   "capturedAtProgress": null,
+   "quadrant": "BR",
+   "manifestUv": [
+    0.504,
+    0.004,
+    0.996,
+    0.496
+   ],
+   "maskPixels": 36428,
+   "runTriangles": 6,
+   "matchedTriangles": 6,
+   "uniformCell": null,
+   "addressedRect": [
+    0.5040000081062317,
+    0.5040000081062317,
+    0.9959999918937683,
+    0.9959999918937683
+   ],
+   "drawnChromaticity": [
+    0.21532,
+    0.351
+   ],
+   "quadrantDistances": {
+    "TL": 0.47613,
+    "TR": 0.64563,
+    "BL": 0.47649,
+    "BR": 0.05445
+   },
+   "nearestQuadrant": "BR",
+   "accepted": true,
+   "margin": 0.42168
+  },
+  {
+   "id": "waterfall-foam-ring",
+   "is": "The plunge-pool ring retains the foam-gradient quadrant in the same draw.",
+   "role": "water",
+   "cell": "foam-gradient",
+   "capturedAtProgress": null,
+   "quadrant": "BL",
+   "manifestUv": [
+    0.004,
+    0.004,
+    0.496,
+    0.496
+   ],
+   "maskPixels": 43544,
+   "runTriangles": 96,
+   "matchedTriangles": 96,
+   "uniformCell": null,
+   "addressedRect": [
+    0.004000000189989805,
+    0.5040000081062317,
+    0.4959999918937683,
+    0.6122399568557739
+   ],
+   "drawnChromaticity": [
+    0.33058,
+    0.33565
+   ],
+   "quadrantDistances": {
+    "TL": 0.61368,
+    "TR": 0.68952,
+    "BL": 0.05848,
+    "BR": 0.49818
+   },
+   "nearestQuadrant": "BL",
+   "accepted": true,
+   "margin": 0.4397
+  },
+  {
+   "id": "waterfall-cliff",
+   "is": "The cliff blocks use the shared masonry quadrant.",
+   "role": "concrete",
+   "cell": "wall-block",
+   "capturedAtProgress": null,
+   "quadrant": "BR",
+   "manifestUv": [
+    0.504,
+    0.004,
+    0.996,
+    0.496
+   ],
+   "maskPixels": 181354,
+   "runTriangles": 792,
+   "matchedTriangles": 792,
+   "uniformCell": null,
+   "addressedRect": [
+    0.5040000081062317,
+    0.5040000081062317,
+    0.9959999918937683,
+    0.9959999918937683
+   ],
+   "drawnChromaticity": [
+    0.3886,
+    0.35205
+   ],
+   "quadrantDistances": {
+    "TL": 0.08858,
+    "TR": 0.06604,
+    "BL": 0.51535,
+    "BR": 0.03242
+   },
+   "nearestQuadrant": "BR",
+   "accepted": true,
+   "margin": 0.03363
+  },
+  {
+   "id": "stack-stone",
+   "is": "The darkened stack stone retains its masonry cell.",
+   "role": "concrete",
+   "cell": "wall-block",
+   "capturedAtProgress": null,
+   "quadrant": "BR",
+   "manifestUv": [
+    0.504,
+    0.004,
+    0.996,
+    0.496
+   ],
+   "maskPixels": 1372,
+   "runTriangles": 1512,
+   "matchedTriangles": 1512,
+   "uniformCell": null,
+   "addressedRect": [
+    0.5040000081062317,
+    0.5040000081062317,
+    0.9959999918937683,
+    0.9959999918937683
+   ],
+   "drawnChromaticity": [
+    0.37851,
+    0.35066
+   ],
+   "quadrantDistances": {
+    "TL": 0.14479,
+    "TR": 0.1288,
+    "BL": 0.4463,
+    "BR": 0.1024
+   },
+   "nearestQuadrant": "BR",
+   "accepted": true,
+   "margin": 0.0264
+  },
+  {
+   "id": "stack-moss",
+   "is": "The tinted stack caps retain their moss cell.",
+   "role": "jungle",
+   "cell": "moss-blossom",
+   "capturedAtProgress": null,
+   "quadrant": "TR",
+   "manifestUv": [
+    0.504,
+    0.504,
+    0.996,
+    0.996
+   ],
+   "maskPixels": 202,
+   "runTriangles": 368,
+   "matchedTriangles": 368,
+   "uniformCell": null,
+   "addressedRect": [
+    0.5040000081062317,
+    0.0040000081062316895,
+    0.9959999918937683,
+    0.4959999918937683
+   ],
+   "accepted": false,
+   "reason": "only 202 masked pixels; nothing to measure"
+  },
+  {
+   "id": "road-sand-shoulder",
+   "is": "The added below-deck shoulder uses the road-sand cell in the existing concrete batch.",
+   "role": "concrete",
+   "cell": "road-sand",
+   "capturedAtProgress": null,
+   "quadrant": "TL",
+   "manifestUv": [
+    0.004,
+    0.504,
+    0.496,
+    0.996
+   ],
+   "maskPixels": 11527,
+   "runTriangles": 1644,
+   "matchedTriangles": 2436,
+   "uniformCell": null,
+   "addressedRect": [
+    0.004000000189989805,
+    0.0040000081062316895,
+    0.4959999918937683,
+    0.4959999918937683
+   ],
+   "drawnChromaticity": [
+    0.3827,
+    0.35362
+   ],
+   "quadrantDistances": {
+    "TL": 0.13824,
+    "TR": 0.1222,
+    "BL": 0.41893,
+    "BR": 0.09949
+   },
+   "nearestQuadrant": "BR",
+   "accepted": false,
+   "margin": 0.02271
+  }
+ ],
+ "accepted": false,
+ "failures": [
+  {
+   "id": "watchtower-ivy",
+   "is": "Narrow tower ivy strands use the keyed fern sprite.",
+   "role": "jungle-card",
+   "cell": "fern",
+   "capturedAtProgress": null,
+   "quadrant": "TR",
+   "manifestUv": [
+    0.529297,
+    0.561523,
+    0.970703,
+    0.896484
+   ],
+   "maskPixels": 295,
+   "runTriangles": 16,
+   "matchedTriangles": 16,
+   "uniformCell": null,
+   "addressedRect": [
+    0.5292969942092896,
+    0.10351598262786865,
+    0.9707030057907104,
+    0.4384769797325134
+   ],
+   "accepted": false,
+   "reason": "only 295 masked pixels; nothing to measure"
+  },
+  {
+   "id": "watchtower-moss-joints",
+   "is": "Sparse damp course joints use the moss quadrant.",
+   "role": "jungle",
+   "cell": "moss-blossom",
+   "capturedAtProgress": null,
+   "quadrant": "TR",
+   "manifestUv": [
+    0.504,
+    0.504,
+    0.996,
+    0.996
+   ],
+   "maskPixels": 90,
+   "runTriangles": 96,
+   "matchedTriangles": 96,
+   "uniformCell": null,
+   "addressedRect": [
+    0.5040000081062317,
+    0.0040000081062316895,
+    0.9959999918937683,
+    0.4959999918937683
+   ],
+   "accepted": false,
+   "reason": "only 90 masked pixels; nothing to measure"
+  },
+  {
+   "id": "stack-moss",
+   "is": "The tinted stack caps retain their moss cell.",
+   "role": "jungle",
+   "cell": "moss-blossom",
+   "capturedAtProgress": null,
+   "quadrant": "TR",
+   "manifestUv": [
+    0.504,
+    0.504,
+    0.996,
+    0.996
+   ],
+   "maskPixels": 202,
+   "runTriangles": 368,
+   "matchedTriangles": 368,
+   "uniformCell": null,
+   "addressedRect": [
+    0.5040000081062317,
+    0.0040000081062316895,
+    0.9959999918937683,
+    0.4959999918937683
+   ],
+   "accepted": false,
+   "reason": "only 202 masked pixels; nothing to measure"
+  },
+  {
+   "id": "road-sand-shoulder",
+   "is": "The added below-deck shoulder uses the road-sand cell in the existing concrete batch.",
+   "role": "concrete",
+   "cell": "road-sand",
+   "capturedAtProgress": null,
+   "quadrant": "TL",
+   "manifestUv": [
+    0.004,
+    0.504,
+    0.496,
+    0.996
+   ],
+   "maskPixels": 11527,
+   "runTriangles": 1644,
+   "matchedTriangles": 2436,
+   "uniformCell": null,
+   "addressedRect": [
+    0.004000000189989805,
+    0.0040000081062316895,
+    0.4959999918937683,
+    0.4959999918937683
+   ],
+   "drawnChromaticity": [
+    0.3827,
+    0.35362
+   ],
+   "quadrantDistances": {
+    "TL": 0.13824,
+    "TR": 0.1222,
+    "BL": 0.41893,
+    "BR": 0.09949
+   },
+   "nearestQuadrant": "BR",
+   "accepted": false,
+   "margin": 0.02271
+  }
+ ]
+}

@@ -1,0 +1,19 @@
+
+> futurisma-race@0.1.0 test:archives
+> npm run validate:assets && npm run validate:environment:history && npm run validate:environment:accepted
+
+
+> futurisma-race@0.1.0 validate:assets
+> node scripts/validate-assets.mjs
+
+ARCHIVES SKIPPED (8 accepted package(s) absent under /Users/gentlegen/Desktop/futurisma-race/polarity_work/artifacts: GREENWATER_ENVIRONMENT_v1.0.zip, GREENWATER_VISUAL_IDENTITY_v1.2.zip, GREENWATER_LIVING_WORLD_v1.3.zip, +5 more)
+
+> futurisma-race@0.1.0 validate:environment:history
+> node scripts/validate-greenwater-package.mjs GREENWATER_ENVIRONMENT_STAGE2.zip GREENWATER_ENVIRONMENT_STAGE1.zip
+
+ARCHIVES SKIPPED (GREENWATER_ENVIRONMENT_STAGE2.zip, GREENWATER_ENVIRONMENT_STAGE1.zip not found under archive root /Users/gentlegen/Desktop/futurisma-race/polarity_work/artifacts)
+
+> futurisma-race@0.1.0 validate:environment:accepted
+> node scripts/validate-greenwater-package.mjs GREENWATER_ENVIRONMENT_v1.0.zip GREENWATER_ENVIRONMENT_STAGE2.zip
+
+ARCHIVES SKIPPED (GREENWATER_ENVIRONMENT_v1.0.zip, GREENWATER_ENVIRONMENT_STAGE2.zip not found under archive root /Users/gentlegen/Desktop/futurisma-race/polarity_work/artifacts)

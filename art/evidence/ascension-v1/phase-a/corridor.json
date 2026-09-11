@@ -1,0 +1,7 @@
+{
+  "script": "scripts/validate-ascension-corridor.mjs",
+  "sampleMethod": "Upward 9m rays every route station and 2m across the road. Static blockout only, no hull envelope or moving event sweep.",
+  "samples": 15179,
+  "hits": [],
+  "accepted": true
+}

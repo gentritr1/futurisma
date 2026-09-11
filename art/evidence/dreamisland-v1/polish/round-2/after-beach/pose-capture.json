@@ -1,0 +1,328 @@
+{
+  "script": "scripts/visual/dreamisland-heroes/polish-poses.mjs",
+  "progress": 0.05,
+  "inputHashes": {
+    "public/assets/dreamisland/painted.json": "474ac27439b2bd01359272d8b679b94929c36c35298f71eac7ea4b41421039ef",
+    "public/assets/dreamisland/painted.glb": "60e11543acce5c6a939fc715eae5aeccdded1a2efc177706ab04a3bdcdf12756",
+    "public/assets/dreamisland/heroes/clock-tower.glb": "c9018befb2119448c5012e37b36dce53f9733e87362ad3af2d127c008f2311f6",
+    "public/assets/dreamisland/heroes/watchtower.glb": "c12978173e1c5b08afbd02bc201a066a517ecacc5781de600f5d27fea2702421",
+    "public/assets/dreamisland/heroes/waterfall-cliff.glb": "fe91b14de5f45f113cd4375f065bdd911176474ab4c646365af7c50cfeb99551",
+    "public/assets/dreamisland/heroes/sea-stack-set.glb": "c109276c737b9dc6fcf52819d27d0ff8e805f30d88449da131228a9b6f45b331",
+    "src/game/dreamisland-sky.ts": "d3eead0f16caa025465c13546113b7c95792e0deff96f82fac5fbeaf7abf7cb7",
+    "src/game/dreamisland-water.ts": "288339c3ddb6b424c07d3ac60052f183e36a60bf0013dc271c868fb9956d6eab",
+    "src/game/dreamisland-materials.ts": "4c26fecfdd49947e2ab2c3a4031c114c91af911903645168e0952085ac621eba",
+    "src/game/dreamisland-painted-environment.ts": "8bd18ec6111a297bdd9ebf20ed8a81076e38c696a5fc84bb8f696755b3ff0629"
+  },
+  "frames": [
+    {
+      "blend": 1,
+      "pose": {
+        "position": [
+          108.49998270988567,
+          4.8,
+          0
+        ],
+        "target": [
+          138.99998270988567,
+          1.15,
+          0
+        ],
+        "fov": 62,
+        "far": 650,
+        "quaternion": [
+          -0.04208533716391777,
+          -0.7058532598180726,
+          -0.04208533716391776,
+          0.7058532598180725
+        ],
+        "horizonRow": 288.29956590791534
+      },
+      "frames": {
+        "full": "blend-1-full.png",
+        "kerb": "blend-1-kerb.png",
+        "stripe": "blend-1-stripe.png",
+        "foam": "blend-1-foam.png",
+        "lamps": "blend-1-lamps.png",
+        "drum": "blend-1-drum.png",
+        "blank": "blend-1-blank.png"
+      },
+      "regions": {
+        "full": {
+          "names": [
+            "dreamisland_blockout_road",
+            "dreamisland_blockout_markers",
+            "body_static",
+            "emissive_static",
+            "canopy_body",
+            "canopy_glass",
+            "steering_fin_L_body",
+            "steering_fin_R_body",
+            "engine_flap_L_0_body",
+            "engine_flap_L_1_body",
+            "engine_flap_R_0_body",
+            "engine_flap_R_1_body",
+            "stabiliser_ring_body",
+            "stabiliser_ring_emissive",
+            "airbrake_L_body",
+            "airbrake_R_body",
+            "elevon_L_body",
+            "elevon_R_body",
+            "skids_body",
+            "totem_race_presence_additive",
+            "TE_boost_meter",
+            "TE_brake_lamps",
+            "TE_gyro_alloy",
+            "TE_gyro_instruments",
+            "TE_instrument_housing",
+            "TE_power_lamps",
+            "TE_service_markings",
+            "TE_twin_layered_exhaust",
+            "TE_telescopic_power_mounts",
+            "PK_surge_cage",
+            "PK_surge_capacitors",
+            "PK_surge_core",
+            "PK_surge_mount",
+            "PK_shield_core",
+            "PK_shield_housing",
+            "PK_shield_lattice",
+            "PK_shield_petals",
+            "sky_backdrop",
+            "rival_totem_body_steering_fins",
+            "rival_totem_body_airbrakes",
+            "rival_totem_body_hull",
+            "rival_totem_emissive_hull",
+            "rival_totem_glass_hull",
+            "rival_engine_glow",
+            "totem_shadow_blobs",
+            "DI_STATIC_DI_MAT_concrete",
+            "DI_STATIC_DI_MAT_emissive",
+            "DI_STATIC_DI_MAT_jungle",
+            "DI_STATIC_DI_MAT_jungle-card",
+            "DI_STATIC_DI_MAT_metal",
+            "DI_STATIC_DI_MAT_signage",
+            "dreamisland_panorama",
+            "dreamisland_sea",
+            "dreamisland_shallows",
+            "dreamisland_foam",
+            "DI_HERO_watchtower-ruin_DI_MAT_concrete",
+            "DI_HERO_watchtower-ruin_DI_MAT_emissive",
+            "DI_HERO_watchtower-ruin_DI_MAT_jungle-card",
+            "DI_HERO_watchtower-ruin_DI_MAT_jungle",
+            "DI_HERO_clock-tower_DI_MAT_metal",
+            "DI_HERO_clock-tower_DI_MAT_concrete",
+            "DI_HERO_clock-tower_DI_MAT_emissive",
+            "DI_HERO_clock-tower_DI_MAT_jungle",
+            "DI_HERO_waterfall-cliff_DI_MAT_jungle-card",
+            "DI_HERO_waterfall-cliff_DI_MAT_water-overlay",
+            "DI_HERO_waterfall-cliff_DI_MAT_jungle",
+            "DI_HERO_waterfall-cliff_DI_MAT_water",
+            "DI_HERO_waterfall-cliff_DI_MAT_concrete",
+            "DI_HERO_sea-stack_DI_MAT_jungle",
+            "DI_HERO_sea-stack_DI_MAT_concrete"
+          ]
+        },
+        "kerb": {
+          "names": [
+            "dreamisland_blockout_road"
+          ]
+        },
+        "stripe": {
+          "names": []
+        },
+        "foam": {
+          "names": [
+            "dreamisland_foam"
+          ]
+        },
+        "lamps": {
+          "names": [
+            "DI_HERO_watchtower-ruin_DI_MAT_emissive"
+          ]
+        },
+        "drum": {
+          "triangles": 3982,
+          "method": "Original world-space concrete triangles classified in tower-local coordinates; exact full/isolation equality selects visible pixels"
+        },
+        "blank": {
+          "names": []
+        }
+      },
+      "kerbs": [
+        {
+          "distance": 39.999999999999204,
+          "line": [
+            [
+              431.59243736874134,
+              355.3213618640584
+            ],
+            [
+              412.46516860735255,
+              355.3213618640584
+            ]
+          ],
+          "center": [
+            428.41569620372513,
+            353.3575195777247
+          ],
+          "normal": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "distance": 39.999999999999204,
+          "line": [
+            [
+              848.4075626312581,
+              355.3213618640584
+            ],
+            [
+              867.534831392647,
+              355.3213618640584
+            ]
+          ],
+          "center": [
+            851.5843037962743,
+            353.3575195777247
+          ],
+          "normal": [
+            0,
+            1,
+            0
+          ]
+        }
+      ],
+      "stackPlacements": null,
+      "state": {
+        "lights": [
+          {
+            "name": "",
+            "type": "PointLight",
+            "intensity": 0,
+            "color": [
+              1,
+              1,
+              1
+            ],
+            "position": [
+              0,
+              2.3,
+              0.9
+            ]
+          },
+          {
+            "name": "",
+            "type": "HemisphereLight",
+            "intensity": 0.35200000000000004,
+            "color": [
+              0.008023192982520522,
+              0.01680737574872404,
+              0.04518620437910503
+            ],
+            "position": [
+              0,
+              1,
+              0
+            ],
+            "groundColor": [
+              0.0024282158682353006,
+              0.005605391621829103,
+              0.01161224517628151
+            ]
+          },
+          {
+            "name": "",
+            "type": "DirectionalLight",
+            "intensity": 0.3,
+            "color": [
+              0.34670405634441115,
+              0.5775804404214573,
+              1
+            ],
+            "position": [
+              88.47014093965007,
+              99.72997705924188,
+              -88.47014093965007
+            ]
+          },
+          {
+            "name": "",
+            "type": "DirectionalLight",
+            "intensity": 0.513,
+            "color": [
+              0.023153366173251366,
+              0.6938717612856897,
+              0.6444796819634361
+            ],
+            "position": [
+              -100,
+              25,
+              -80
+            ]
+          },
+          {
+            "name": "dreamisland_night_ground_fill",
+            "type": "HemisphereLight",
+            "intensity": 0.5,
+            "color": [
+              0.3,
+              0.18,
+              0.035
+            ],
+            "position": [
+              0,
+              1,
+              0
+            ],
+            "groundColor": [
+              0.15,
+              0.09,
+              0.0175
+            ]
+          },
+          {
+            "name": "dreamisland_tunnel_lamp_-1",
+            "type": "PointLight",
+            "intensity": 1100,
+            "color": [
+              1,
+              0.8069522576650873,
+              0.407240211891531
+            ],
+            "position": [
+              663.0990765335861,
+              28.6,
+              299.6334161428029
+            ]
+          },
+          {
+            "name": "dreamisland_tunnel_lamp_1",
+            "type": "PointLight",
+            "intensity": 1100,
+            "color": [
+              1,
+              0.8069522576650873,
+              0.407240211891531
+            ],
+            "position": [
+              648.6069234664138,
+              28.6,
+              298.73458385719715
+            ]
+          }
+        ],
+        "fog": {
+          "color": [
+            0.00749903204046059,
+            0.027320891633823854,
+            0.06847816983662756
+          ],
+          "density": 0.0034
+        },
+        "skyBlend": 1
+      }
+    }
+  ],
+  "errors": []
+}

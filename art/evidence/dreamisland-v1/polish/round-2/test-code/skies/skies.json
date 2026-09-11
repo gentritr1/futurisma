@@ -1,0 +1,94 @@
+{
+ "script": "scripts/prepare-dreamisland-skies.py",
+ "resample": "PIL Image.LANCZOS",
+ "target": [
+  4096,
+  1024
+ ],
+ "edgeLimit": 0.023529411764705882,
+ "jpegQuality": 92,
+ "softening": {
+  "operation": "per sky row and channel, pixel = rowMedian + (pixel - rowMedian) * (1 - amount)",
+  "appliedAfter": "resample to 4096x1024",
+  "skyRows": [
+   0,
+   768
+  ],
+  "reference": "art/references/dreamisland/phase-b/generation.json -> sky_day_revision",
+  "amountByState": {
+   "day": 0.25,
+   "night": 0.0
+  }
+ },
+ "skies": {
+  "day": {
+   "source": "art/references/dreamisland/phase-b/sky-day-v2-gptimage2.png",
+   "sourceSize": [
+    1344,
+    576
+   ],
+   "file": "public/assets/dreamisland/sky-day.jpg",
+   "bytes": 520672,
+   "soften": 0.25,
+   "softeningMeanAbsDelta": 0.0034691964099609774,
+   "edgeDeltaNative": 0.02617556281771968,
+   "edgeDeltaResampled": 0.02266390931372549,
+   "edgeAccepted": true,
+   "skyProfileExit": 0,
+   "skyProfile": {
+    "script": "scripts/visual/tideline-v4/sky-profile.py",
+    "image": "/Users/gentlegen/Desktop/futurisma-race/polarity_work/public/assets/dreamisland/sky-day.jpg",
+    "size": [
+     4096,
+     1024
+    ],
+    "skyRows": [
+     0,
+     768
+    ],
+    "tenDegreeColumns": 114,
+    "maximumTenDegreeWarmthDelta": 0.04691074346405233,
+    "skyLumaMaxMinRatio": 1.0783174685675427,
+    "accepted": true,
+    "acceptanceClause": "bright-sky luma ratio"
+   }
+  },
+  "night": {
+   "source": "art/references/dreamisland/phase-b/sky-night-gptimage2.png",
+   "sourceSize": [
+    1344,
+    576
+   ],
+   "file": "public/assets/dreamisland/sky-night.jpg",
+   "bytes": 405581,
+   "soften": 0.0,
+   "softeningMeanAbsDelta": 0.0,
+   "edgeDeltaNative": 0.005696259985475672,
+   "edgeDeltaResampled": 0.00619766135620915,
+   "edgeAccepted": true,
+   "skyProfileExit": 0,
+   "skyProfile": {
+    "script": "scripts/visual/tideline-v4/sky-profile.py",
+    "image": "/Users/gentlegen/Desktop/futurisma-race/polarity_work/public/assets/dreamisland/sky-night.jpg",
+    "size": [
+     4096,
+     1024
+    ],
+    "skyRows": [
+     0,
+     768
+    ],
+    "tenDegreeColumns": 114,
+    "maximumTenDegreeWarmthDelta": 0.004896854575163399,
+    "skyLumaMaxMinRatio": 6.762650198765916,
+    "accepted": true,
+    "acceptanceClause": "dark-sky absolute spread",
+    "skyLumaMaximum": 0.013667300857843135,
+    "skyLumaMinimum": 0.002020997753267974,
+    "skyLumaSpread": 0.011646303104575161,
+    "darkSkyMaximumLuma": 0.05,
+    "darkSkySpreadLimit": 0.02
+   }
+  }
+ }
+}

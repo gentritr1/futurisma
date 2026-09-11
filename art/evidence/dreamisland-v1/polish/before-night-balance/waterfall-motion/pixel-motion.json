@@ -1,0 +1,23 @@
+{
+  "instrument": "Pillow full-frame absolute RGB difference at 2/255 on isolated waterfall sheets",
+  "results": [
+    {
+      "reduced": false,
+      "changedPixels": 3499,
+      "maximumChannelDifference": 0.03529411764705884,
+      "timeSamples": [
+        2.025,
+        3.0166666666666666
+      ]
+    },
+    {
+      "reduced": true,
+      "changedPixels": 92,
+      "maximumChannelDifference": 0.011764705882352955,
+      "timeSamples": [
+        0,
+        0
+      ]
+    }
+  ]
+}

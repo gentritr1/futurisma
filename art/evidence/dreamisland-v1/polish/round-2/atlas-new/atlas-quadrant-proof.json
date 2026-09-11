@@ -1,0 +1,603 @@
+{
+  "script": "scripts/visual/dreamisland/atlas-quadrant-proof.mjs",
+  "url": "http://127.0.0.1:5217/?map=dreamisland&seed=3868938316&tier=works&demo=1&headless=1&diagnostics=1&start=manual&quality=high&music=0",
+  "errors": [],
+  "atlasManifest": {
+    "file": "public/assets/dreamisland/atlas-manifest.json",
+    "sha256": "ef4e7750c089970df097358fb5575235a378ccc6dbdf91c3c0e496f2d7a46675"
+  },
+  "quadrantColours": {
+    "TL": [
+      255,
+      0,
+      0
+    ],
+    "TR": [
+      0,
+      255,
+      0
+    ],
+    "BL": [
+      0,
+      0,
+      255
+    ],
+    "BR": [
+      255,
+      255,
+      0
+    ]
+  },
+  "materialsSwapped": 18,
+  "method": "Every atlas map and emissiveMap in the live scene replaced by a 1024x1024 four-colour quadrant sheet with the sampler settings copied from the texture it replaced; the shipped mesh isolated over the longest contiguous run of its own index buffer inside the claimed rect and rendered unlit; the mean of the pixels that differ from a background frame taken from the same camera compared against the four colours.",
+  "convention": "Manifest rects are bottom-origin V; every sampler on this map runs flipY:false, so the rect a UV must land in is [u0, 1-v1, u1, 1-v0], and the manifest TL is the debug sheet top-left.",
+  "claims": 11,
+  "decided": 10,
+  "undecided": [
+    "waterfall-mist"
+  ],
+  "results": [
+    {
+      "id": "grove-overhead-fronds",
+      "mesh": "DI_STATIC_DI_MAT_jungle-card",
+      "role": "jungle-card",
+      "cell": "frond",
+      "minimumAbsNormalY": 0.5,
+      "minimumAlpha": 0.9,
+      "claimed": "TL",
+      "rect": [
+        0.03418,
+        0.573242,
+        0.44043,
+        0.918945
+      ],
+      "is": "Single drooping palm frond, the crown cards.",
+      "census": {
+        "matchedTriangles": 168,
+        "isolatedTriangles": 168,
+        "totalTriangles": 8294
+      },
+      "drawn": true,
+      "framed": {
+        "seen": 24,
+        "position": [
+          460.1328125,
+          220.64829025268554,
+          83.05177307128906
+        ],
+        "distance": 168,
+        "target": [
+          460.1328125,
+          19.048290252685547,
+          83.05177307128906
+        ],
+        "samples": 24
+      },
+      "backgroundPixels": 921600,
+      "maskedPixels": 39835,
+      "mean": [
+        252.13003640015063,
+        8.99246893435421,
+        9.348085854148362
+      ],
+      "distances": {
+        "TL": 13.284874773076131,
+        "TR": 352.3870702867693,
+        "BL": 352.1296390197756,
+        "BR": 246.2018049105564
+      },
+      "nearest": "TL",
+      "margin": 232.91693013748028,
+      "decided": true
+    },
+    {
+      "id": "grove-dappled-shade",
+      "mesh": "DI_STATIC_DI_MAT_jungle-card",
+      "role": "jungle-card",
+      "cell": "frond",
+      "maximumAlpha": 0.35,
+      "claimed": "TL",
+      "rect": [
+        0.03418,
+        0.573242,
+        0.44043,
+        0.918945
+      ],
+      "is": "Single drooping palm frond, the crown cards.",
+      "census": {
+        "matchedTriangles": 74,
+        "isolatedTriangles": 74,
+        "totalTriangles": 8294
+      },
+      "drawn": true,
+      "framed": {
+        "seen": 24,
+        "position": [
+          457.89931642951206,
+          384.51162034238206,
+          56.16587967482355
+        ],
+        "distance": 315,
+        "target": [
+          470.8318176269531,
+          6.869787216186523,
+          63.79917907714844
+        ],
+        "samples": 24
+      },
+      "backgroundPixels": 921600,
+      "maskedPixels": 21648,
+      "mean": [
+        253.45814855875832,
+        4.8323170731707314,
+        5.0212028824833705
+      ],
+      "distances": {
+        "TL": 7.1373014893288405,
+        "TR": 356.1602379971678,
+        "BL": 356.0249757635689,
+        "BR": 250.22281943346516
+      },
+      "nearest": "TL",
+      "margin": 243.0855179441363,
+      "decided": true
+    },
+    {
+      "id": "clock-hour-ticks",
+      "mesh": "DI_HERO_clock-tower_DI_MAT_metal",
+      "role": "metal",
+      "cell": "clock-ring-hands",
+      "maximumRedTint": 0.03,
+      "claimed": "BL",
+      "rect": [
+        0.004,
+        0.004,
+        0.496,
+        0.496
+      ],
+      "is": "Aged bronze clock ring and two plain hands on neutral grey.",
+      "census": {
+        "matchedTriangles": 144,
+        "isolatedTriangles": 144,
+        "totalTriangles": 648
+      },
+      "drawn": true,
+      "framed": {
+        "seen": 24,
+        "position": [
+          390.0558776855469,
+          33.859428024291994,
+          673.5360107421875
+        ],
+        "distance": 9.6,
+        "target": [
+          390.0558776855469,
+          22.259428024291992,
+          673.5360107421875
+        ],
+        "samples": 24
+      },
+      "backgroundPixels": 921600,
+      "maskedPixels": 856,
+      "mean": [
+        39.16355140186916,
+        38.54556074766355,
+        247.85630841121494
+      ],
+      "distances": {
+        "TL": 330.9137084135994,
+        "TR": 331.38958591012715,
+        "BL": 55.4127813890834,
+        "BR": 393.5360802197587
+      },
+      "nearest": "BL",
+      "margin": 275.500927024516,
+      "decided": true
+    },
+    {
+      "id": "clock-stair-nosing",
+      "mesh": "DI_HERO_clock-tower_DI_MAT_concrete",
+      "role": "concrete",
+      "cell": "causeway-paving",
+      "minimumRedTint": 0.9,
+      "claimed": "TR",
+      "rect": [
+        0.504,
+        0.504,
+        0.996,
+        0.996
+      ],
+      "is": "Dry limestone paving blocks with mossy joints, the causeway deck.",
+      "census": {
+        "matchedTriangles": 300,
+        "isolatedTriangles": 12,
+        "totalTriangles": 4168
+      },
+      "drawn": true,
+      "framed": {
+        "seen": 24,
+        "position": [
+          394.20916748046875,
+          25.399428939819337,
+          676.505615234375
+        ],
+        "distance": 9.6,
+        "target": [
+          394.20916748046875,
+          13.799428939819336,
+          676.505615234375
+        ],
+        "samples": 24
+      },
+      "backgroundPixels": 921600,
+      "maskedPixels": 968,
+      "mean": [
+        14.339876033057852,
+        252.21797520661158,
+        17.606404958677686
+      ],
+      "distances": {
+        "TL": 349.057570868583,
+        "TR": 22.87700159906112,
+        "BL": 346.663032394009,
+        "BR": 241.31933288757438
+      },
+      "nearest": "TR",
+      "margin": 218.44233128851326,
+      "decided": true
+    },
+    {
+      "id": "watchtower-moss-tops",
+      "mesh": "DI_HERO_watchtower-ruin_DI_MAT_jungle",
+      "role": "jungle",
+      "cell": "moss-blossom",
+      "minimumWorldY": 54.9,
+      "claimed": "TR",
+      "rect": [
+        0.504,
+        0.504,
+        0.996,
+        0.996
+      ],
+      "is": "Moss over stone with small white blossoms; the mossy tops.",
+      "census": {
+        "matchedTriangles": 18,
+        "isolatedTriangles": 18,
+        "totalTriangles": 114
+      },
+      "drawn": true,
+      "framed": {
+        "seen": 24,
+        "position": [
+          664.993896484375,
+          16.246931113355465,
+          298.2847900390625
+        ],
+        "distance": 48.4440874587085,
+        "target": [
+          664.993896484375,
+          55.002201080322266,
+          298.2847900390625
+        ],
+        "samples": 24
+      },
+      "backgroundPixels": 921600,
+      "maskedPixels": 15101,
+      "mean": [
+        6.60903251440302,
+        253.71922389245745,
+        8.10403284550692
+      ],
+      "distances": {
+        "TL": 355.15798266318455,
+        "TR": 10.53541867108959,
+        "BL": 354.0829598844315,
+        "BR": 248.52643413574663
+      },
+      "nearest": "TR",
+      "margin": 237.99101546465704,
+      "decided": true
+    },
+    {
+      "id": "watchtower-window-lamps",
+      "mesh": "DI_HERO_watchtower-ruin_DI_MAT_emissive",
+      "role": "emissive",
+      "cell": "lamp-disc",
+      "minimumWorldY": 43,
+      "claimed": "BL",
+      "rect": [
+        0.004,
+        0.004,
+        0.496,
+        0.496
+      ],
+      "is": "Warm pale-yellow lamp disc for the tunnel and gate lamps.",
+      "census": {
+        "matchedTriangles": 26,
+        "isolatedTriangles": 26,
+        "totalTriangles": 170
+      },
+      "drawn": true,
+      "framed": {
+        "seen": 24,
+        "position": [
+          659.0564622610225,
+          55.98810433417402,
+          259.6169077988442
+        ],
+        "distance": 50.04052395968846,
+        "target": [
+          655.9588012695312,
+          45.97999954223633,
+          309.56146240234375
+        ],
+        "samples": 24
+      },
+      "backgroundPixels": 921600,
+      "maskedPixels": 2326,
+      "mean": [
+        8.383490971625108,
+        8.540842648323302,
+        253.6255374032674
+      ],
+      "distances": {
+        "TL": 353.8623485786276,
+        "TR": 353.7489397672678,
+        "BL": 12.046495815985445,
+        "BR": 431.1469958041425
+      },
+      "nearest": "BL",
+      "margin": 341.70244395128236,
+      "decided": true
+    },
+    {
+      "id": "watchtower-arch-lamps",
+      "mesh": "DI_HERO_watchtower-ruin_DI_MAT_emissive",
+      "role": "emissive",
+      "cell": "lamp-disc",
+      "maximumWorldY": 36,
+      "minimumWorldY": 31,
+      "claimed": "BL",
+      "rect": [
+        0.004,
+        0.004,
+        0.496,
+        0.496
+      ],
+      "is": "Warm pale-yellow lamp disc for the tunnel and gate lamps.",
+      "census": {
+        "matchedTriangles": 88,
+        "isolatedTriangles": 44,
+        "totalTriangles": 170
+      },
+      "drawn": true,
+      "framed": {
+        "seen": 24,
+        "position": [
+          656.1972764865902,
+          35.10756356284424,
+          293.6332359453986
+        ],
+        "distance": 21.319338091877793,
+        "target": [
+          654.884521484375,
+          33.03300094604492,
+          314.7991943359375
+        ],
+        "samples": 24
+      },
+      "backgroundPixels": 921600,
+      "maskedPixels": 15468,
+      "mean": [
+        5.444983191104215,
+        6.157938970778381,
+        254.1954357382984
+      ],
+      "distances": {
+        "TL": 356.2736956007831,
+        "TR": 355.76303732878955,
+        "BL": 8.259260134566894,
+        "BR": 434.5289372434735
+      },
+      "nearest": "BL",
+      "margin": 347.50377719422266,
+      "decided": true
+    },
+    {
+      "id": "waterfall-fast-sheet",
+      "mesh": "DI_HERO_waterfall-cliff_DI_MAT_water-overlay",
+      "role": "water",
+      "cell": "waterfall",
+      "claimed": "BR",
+      "rect": [
+        0.504,
+        0.004,
+        0.996,
+        0.496
+      ],
+      "is": "Vertical white and pale-blue streaks on dark stone; V scrolls with time.",
+      "census": {
+        "matchedTriangles": 6,
+        "isolatedTriangles": 6,
+        "totalTriangles": 8
+      },
+      "drawn": true,
+      "framed": {
+        "seen": 18,
+        "position": [
+          513.8897772731074,
+          19.253995149148665,
+          663.2126555057799
+        ],
+        "distance": 41.269975745743324,
+        "target": [
+          504.796875,
+          11,
+          622.9568481445312
+        ],
+        "samples": 18
+      },
+      "backgroundPixels": 921600,
+      "maskedPixels": 39484,
+      "mean": [
+        254.44119136865567,
+        254.7127950562253,
+        1.8189646439063925
+      ],
+      "distances": {
+        "TL": 254.71990276540404,
+        "TR": 254.4478551376615,
+        "BL": 440.1358477725247,
+        "BR": 1.9244183905728671
+      },
+      "nearest": "BR",
+      "margin": 252.52343674708862,
+      "decided": true
+    },
+    {
+      "id": "waterfall-mist",
+      "mesh": "DI_HERO_waterfall-cliff_DI_MAT_water-overlay",
+      "role": "emissive",
+      "cell": "lamp-disc",
+      "claimed": "BL",
+      "rect": [
+        0.004,
+        0.004,
+        0.496,
+        0.496
+      ],
+      "is": "Warm pale-yellow lamp disc for the tunnel and gate lamps.",
+      "census": {
+        "matchedTriangles": 2,
+        "isolatedTriangles": 2,
+        "totalTriangles": 8
+      },
+      "drawn": true,
+      "framed": {
+        "seen": 6,
+        "position": [
+          506.8889523663329,
+          17.559425891041297,
+          654.2315900193302
+        ],
+        "distance": 32.04713136255512,
+        "target": [
+          499.8280944824219,
+          11.149999618530273,
+          622.9719848632812
+        ],
+        "samples": 6
+      },
+      "backgroundPixels": 921600,
+      "maskedPixels": 0,
+      "mean": null,
+      "distances": null,
+      "nearest": null,
+      "margin": null,
+      "decided": false
+    },
+    {
+      "id": "stack-notch-band",
+      "mesh": "DI_HERO_sea-stack_DI_MAT_concrete",
+      "role": "concrete",
+      "cell": "wall-block",
+      "maximumRedTint": 0.11,
+      "claimed": "BR",
+      "rect": [
+        0.504,
+        0.004,
+        0.996,
+        0.496
+      ],
+      "is": "Weathered limestone wall blocks, the cut walls and the sea stacks.",
+      "census": {
+        "matchedTriangles": 92,
+        "isolatedTriangles": 18,
+        "totalTriangles": 1604
+      },
+      "drawn": true,
+      "framed": {
+        "seen": 24,
+        "position": [
+          -114.36896081326543,
+          23.301201232829282,
+          636.5253712804595
+        ],
+        "distance": 23.200293093499937,
+        "target": [
+          -114.7350845336914,
+          -4.514999866485596,
+          635.5324096679688
+        ],
+        "samples": 24
+      },
+      "backgroundPixels": 921600,
+      "maskedPixels": 3228,
+      "mean": [
+        243.72552664188353,
+        249.25,
+        36.30297397769517
+      ],
+      "distances": {
+        "TL": 252.13207286882027,
+        "TR": 246.48144099807735,
+        "BL": 411.52895891767344,
+        "BR": 38.44583422333414
+      },
+      "nearest": "BR",
+      "margin": 208.0356067747432,
+      "decided": true
+    },
+    {
+      "id": "approach-gate-digits",
+      "mesh": "DI_STATIC_DI_MAT_signage",
+      "role": "signage",
+      "cell": "plate-gate-numbers",
+      "claimed": "BL",
+      "rect": [
+        0.008789,
+        0.241211,
+        0.495117,
+        0.347656
+      ],
+      "is": "Strip of six gate number plates, 1 to 6.",
+      "census": {
+        "matchedTriangles": 12,
+        "isolatedTriangles": 12,
+        "totalTriangles": 212
+      },
+      "drawn": true,
+      "framed": {
+        "seen": 18,
+        "position": [
+          422.79327392578125,
+          125.74488453227417,
+          801.9452866426734
+        ],
+        "distance": 168,
+        "target": [
+          422.79327392578125,
+          17.01300048828125,
+          651.6815185546875
+        ],
+        "samples": 24
+      },
+      "backgroundPixels": 921600,
+      "maskedPixels": 14,
+      "mean": [
+        86.07142857142857,
+        101.64285714285714,
+        242.5
+      ],
+      "distances": {
+        "TL": 312.5290108982864,
+        "TR": 299.55459282346624,
+        "BL": 133.775226497621,
+        "BR": 332.9587444567331
+      },
+      "nearest": "BL",
+      "margin": 165.77936632584525,
+      "decided": true
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "seed": 3868938316,
+  "lap": 3,
+  "progress": 0.004,
+  "camera": [
+    -294.2947615581722,
+    16.997237217220885,
+    -216.05156965818756
+  ],
+  "roadPatches": {
+    "under": {
+      "x": 792,
+      "y": 360
+    },
+    "between": {
+      "x": 792,
+      "y": 76
+    }
+  },
+  "patchHalfSize": 12,
+  "baselineRatio": 1.041673457354964,
+  "minimumRatioChosenAfterBaseline": 1.65,
+  "measuredRatio": 2.0466669942016336,
+  "method": "scripts/visual/frame-metrics.py --lamp-patches=art/evidence/tideline-v3/before/lamp.json --json; fixed overhead camera; no water/glass occlusion; 8-bit Rec.709 display luma",
+  "frames": {
+    "before/lamp.png": "09555a290b15ef1f03f6c66b4fe58caa20680ecbf6acb8eb7b636777c6afd2cc",
+    "after/lamp.png": "a5b606bfb73e52ab4505ee8ba4ac237154a5bd7614ff733084d03a10c1bd6840"
+  }
+}

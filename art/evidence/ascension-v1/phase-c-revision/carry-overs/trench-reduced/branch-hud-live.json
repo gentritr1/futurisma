@@ -1,0 +1,159 @@
+{
+  "script": "scripts/visual/ascension/race.mjs",
+  "ascension": {
+    "script": "src/game/ascension-runtime.ts",
+    "egrets": {
+      "tick": 1285,
+      "risenLap": 0,
+      "riseTick": -10000,
+      "launched": false,
+      "launchAge": 0,
+      "firstBirdPosition": [
+        -111.85955047607422,
+        11.149999618530273,
+        277.7879638671875
+      ]
+    },
+    "powers": {
+      "version": 1,
+      "configId": "ascension-pad-powers-v1",
+      "configHash": "d4c0eb88",
+      "seed": 3868938316,
+      "tick": 1286,
+      "lap": 1,
+      "progress": 0.31531920436878,
+      "lateral": -1.8851659386998767,
+      "lane": 0,
+      "fromLane": 0,
+      "flipStartTick": -126,
+      "nextFlipTick": 0,
+      "heldPower": "surge",
+      "heldCharge": 1,
+      "activePower": null,
+      "activeCharge": 0,
+      "powerStartTick": 0,
+      "powerUntilTick": 0,
+      "powerPerfect": false,
+      "collectedLaps": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "usedWindowLaps": [],
+      "shieldRewardLaps": {},
+      "flips": 0,
+      "pickups": 1,
+      "powersUsed": 0,
+      "perfectActivations": 0,
+      "shieldAbsorptions": 0,
+      "upperTicks": 0,
+      "eventSequence": 1,
+      "events": [
+        {
+          "id": "ascension-pad-powers-v1:e69b504c:1",
+          "sequence": 1,
+          "tick": 374,
+          "type": "pickup",
+          "lap": 1,
+          "lane": 0,
+          "index": 0,
+          "kind": "surge",
+          "perfect": false,
+          "refund": 0
+        }
+      ]
+    },
+    "chains": [],
+    "seed": 3868938316,
+    "tick": 1286,
+    "progress": 0.31570313933143235,
+    "sector": "TRENCH",
+    "effects": {
+      "launchAge": 0,
+      "pad": [
+        231.0088653564453,
+        4,
+        -125.9814453125
+      ],
+      "smokeTop": 20,
+      "cloudGlow": 0,
+      "tick": 1285,
+      "reducedMotion": true,
+      "crawlerPosition": [
+        6.681713104248047,
+        17,
+        330.3438720703125
+      ],
+      "treadTravel": 0,
+      "rocketHeight": 0,
+      "rocketVisible": true,
+      "steamVisible": false,
+      "smokeVisible": false,
+      "delugeVisible": false,
+      "floodVisible": false,
+      "lampScale": 1,
+      "klaxon": false
+    },
+    "trenchOccupied": true,
+    "schedule": {
+      "script": "scripts/build-ascension-route.mjs",
+      "measurementScript": "scripts/visual/ascension/race.mjs",
+      "measurement": "art/evidence/ascension-v1/phase-a/calibration/works-trench.json",
+      "worksLapSeconds": 28.0705,
+      "definition": "Mean of flying laps two and three in the full Works demo before schedule activation",
+      "launchTick": 8253,
+      "reopenTick": 10653,
+      "steamEndTick": 9937,
+      "rocketGoneTick": 9095,
+      "testTick": 4211,
+      "events": [
+        {
+          "id": "crawler-klaxon-1",
+          "tick": 1493
+        },
+        {
+          "id": "crawler-cross-1",
+          "tick": 1853
+        },
+        {
+          "id": "deluge-test",
+          "tick": 4211
+        },
+        {
+          "id": "crawler-klaxon-2",
+          "tick": 5030
+        },
+        {
+          "id": "crawler-cross-2",
+          "tick": 5390
+        },
+        {
+          "id": "launch",
+          "tick": 8253
+        },
+        {
+          "id": "rocket-gone",
+          "tick": 9095
+        },
+        {
+          "id": "steam-clear",
+          "tick": 9937
+        },
+        {
+          "id": "trench-reopen",
+          "tick": 10653
+        }
+      ]
+    },
+    "state": {
+      "trenchOpen": true,
+      "steam": false,
+      "launched": false,
+      "rocketGone": false,
+      "deluge": false
+    },
+    "events": []
+  },
+  "hud": "FUTURISMA\nASCENSION PAD / MAP 06\nRACE ACTIVE · AUTOPILOT\nPAD 09 / LAUNCH DAY\nSPACE / SHIFT · NITRO\nE / SURGE\nT−00:59 / TRENCH OPEN\nVELOCITY\n317\nKM/H\nHOVER LOCK\nRACE TIME\n00:10.716\nLAP 1 / 3\nP1 / 4 · 1.57 CLEAR\nNEXT GATE 03 / 07\nCLEAN ×2\n7.0 KM TO FINISH\nTRENCH\nFINISH\nPLASMA RESERVE\n100%\nSLIPSTREAM\n→\nTURN RIGHT\n90 M\nP1 · YOU\nTOTEM\nP2\nPRIVATEER 13\nP3\nNIGHTFORM 24\nP4\nNEEDLE 16"
+}

@@ -1,0 +1,176 @@
+{
+  "status": "VERIFIED",
+  "renderer": "Blender 5.2.0 LTS / Cycles CPU / 24 samples / denoised",
+  "input": "Exported GLBs re-imported; existing shared atlas files bound by DI_MAT role; imported vertex colours",
+  "frames": [
+    {
+      "asset": "watchtower",
+      "view": "front",
+      "file": "watchtower-front.png",
+      "cameraType": "orthographic",
+      "cameraPositionGame": [
+        0.0,
+        15.0,
+        -110.0
+      ],
+      "targetGame": [
+        0.0,
+        15.0,
+        -0.0
+      ],
+      "verticalSpanMetres": 46.8034366607666,
+      "scaleBarMetres": 2,
+      "scaleBarPixels": 41.02262861413887,
+      "boundsGame": {
+        "min": [
+          -14.0,
+          0.0,
+          -14.251358985900879
+        ],
+        "max": [
+          14.0,
+          30.0,
+          14.251358985900879
+        ],
+        "size": [
+          28.0,
+          30.0,
+          28.502717971801758
+        ]
+      },
+      "assetSha256": "340285676a4cdd8cf6ee43b08f99ceee5045a43ad679dcd8fc8131844ce36d2c"
+    },
+    {
+      "asset": "watchtower",
+      "view": "side",
+      "file": "watchtower-side.png",
+      "cameraType": "orthographic",
+      "cameraPositionGame": [
+        110.0,
+        15.0,
+        -0.0
+      ],
+      "targetGame": [
+        0.0,
+        15.0,
+        -0.0
+      ],
+      "verticalSpanMetres": 46.8034366607666,
+      "scaleBarMetres": 2,
+      "scaleBarPixels": 41.02262861413887,
+      "boundsGame": {
+        "min": [
+          -14.0,
+          0.0,
+          -14.251358985900879
+        ],
+        "max": [
+          14.0,
+          30.0,
+          14.251358985900879
+        ],
+        "size": [
+          28.0,
+          30.0,
+          28.502717971801758
+        ]
+      },
+      "assetSha256": "340285676a4cdd8cf6ee43b08f99ceee5045a43ad679dcd8fc8131844ce36d2c"
+    },
+    {
+      "asset": "watchtower",
+      "view": "back",
+      "file": "watchtower-back.png",
+      "cameraType": "orthographic",
+      "cameraPositionGame": [
+        0.0,
+        15.0,
+        110.0
+      ],
+      "targetGame": [
+        0.0,
+        15.0,
+        -0.0
+      ],
+      "verticalSpanMetres": 46.8034366607666,
+      "scaleBarMetres": 2,
+      "scaleBarPixels": 41.02262861413887,
+      "boundsGame": {
+        "min": [
+          -14.0,
+          0.0,
+          -14.251358985900879
+        ],
+        "max": [
+          14.0,
+          30.0,
+          14.251358985900879
+        ],
+        "size": [
+          28.0,
+          30.0,
+          28.502717971801758
+        ]
+      },
+      "assetSha256": "340285676a4cdd8cf6ee43b08f99ceee5045a43ad679dcd8fc8131844ce36d2c"
+    },
+    {
+      "asset": "watchtower",
+      "view": "three-quarter",
+      "file": "watchtower-three-quarter.png",
+      "cameraType": "orthographic",
+      "cameraPositionGame": [
+        65.29454803466797,
+        49.27963638305664,
+        -81.61817932128906
+      ],
+      "targetGame": [
+        0.0,
+        15.0,
+        -0.0
+      ],
+      "verticalSpanMetres": 46.8034366607666,
+      "scaleBarMetres": 2,
+      "scaleBarPixels": 41.02262861413887,
+      "boundsGame": {
+        "min": [
+          -14.0,
+          0.0,
+          -14.251358985900879
+        ],
+        "max": [
+          14.0,
+          30.0,
+          14.251358985900879
+        ],
+        "size": [
+          28.0,
+          30.0,
+          28.502717971801758
+        ]
+      },
+      "assetSha256": "340285676a4cdd8cf6ee43b08f99ceee5045a43ad679dcd8fc8131844ce36d2c"
+    },
+    {
+      "asset": "watchtower",
+      "file": "watchtower-40m.png",
+      "cameraType": "perspective",
+      "distanceMetres": 40.00000078678131,
+      "verticalFovDegrees": 65,
+      "cameraPositionGame": [
+        13.083539962768555,
+        20.60723114013672,
+        -37.38154602050781
+      ],
+      "targetGame": [
+        0.0,
+        15.0,
+        -0.0
+      ],
+      "scaleBarMetres": 2,
+      "scaleBarDepthMetres": 40,
+      "scaleBarPixels": 37.672453850819764,
+      "assetSha256": "340285676a4cdd8cf6ee43b08f99ceee5045a43ad679dcd8fc8131844ce36d2c"
+    }
+  ]
+}

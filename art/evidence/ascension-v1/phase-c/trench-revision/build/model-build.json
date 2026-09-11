@@ -1,0 +1,2285 @@
+{
+  "script": "art/blender/build_ascension_painted.py",
+  "phase": "B working art",
+  "roles": [
+    "concrete",
+    "metal",
+    "jungle",
+    "water",
+    "signage",
+    "emissive"
+  ],
+  "meshes": 538,
+  "triangles": 192684,
+  "placements": [
+    {
+      "asset": "rocket-platform",
+      "position": [
+        231.0088653564453,
+        -12.0,
+        -125.9814453125
+      ],
+      "yaw": -2.8904578947196247,
+      "scale": 1,
+      "sector": "APRON_SWEEP",
+      "dynamic": true
+    },
+    {
+      "asset": "crawler-transporter",
+      "position": [
+        56.68171310424805,
+        17.0,
+        330.3438720703125
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "sector": "CRAWLERWAY",
+      "dynamic": true
+    },
+    {
+      "asset": "crawlerway-gravel-bed",
+      "position": [
+        18.681713104248047,
+        16.899999618530273,
+        330.3438720703125
+      ],
+      "yaw": 1.5707963267948966,
+      "scale": 1,
+      "sector": "CRAWLERWAY",
+      "dynamic": false
+    },
+    {
+      "asset": "crawlerway-gravel-bed",
+      "position": [
+        56.68171310424805,
+        16.899999618530273,
+        330.3438720703125
+      ],
+      "yaw": 1.5707963267948966,
+      "scale": 1,
+      "sector": "CRAWLERWAY",
+      "dynamic": false
+    },
+    {
+      "asset": "crawlerway-gravel-bed",
+      "position": [
+        94.68171691894531,
+        16.899999618530273,
+        330.3438720703125
+      ],
+      "yaw": 1.5707963267948966,
+      "scale": 1,
+      "sector": "CRAWLERWAY",
+      "dynamic": false
+    },
+    {
+      "asset": "deluge-water-tower",
+      "position": [
+        259.68896484375,
+        4.0,
+        -364.9836120605469
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "sector": "DELUGE_ROAD",
+      "dynamic": false
+    },
+    {
+      "asset": "deluge-water-tower",
+      "position": [
+        470.7002258300781,
+        4.0,
+        -180.97999572753906
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "sector": "DELUGE_ROAD",
+      "dynamic": false
+    },
+    {
+      "asset": "propellant-tank",
+      "position": [
+        -410.73089599609375,
+        4.0,
+        -40.1587028503418
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "sector": "TANK_FARM",
+      "dynamic": false
+    },
+    {
+      "asset": "propellant-tank",
+      "position": [
+        -399.54986572265625,
+        4.0,
+        -94.04813385009766
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "sector": "TANK_FARM",
+      "dynamic": false
+    },
+    {
+      "asset": "propellant-tank",
+      "position": [
+        -371.1930236816406,
+        4.0,
+        -165.23770141601562
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "sector": "TANK_FARM",
+      "dynamic": false
+    },
+    {
+      "asset": "vent-stack",
+      "position": [
+        -473.4219055175781,
+        4.0,
+        -106.03474426269531
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "sector": "TANK_FARM",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        99.80844116210938,
+        2.6184420585632324,
+        -343.08636474609375
+      ],
+      "yaw": 2.428954955874251,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        116.7606430053711,
+        1.8897738456726074,
+        -326.7953796386719
+      ],
+      "yaw": 2.326397379322749,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        154.21617126464844,
+        1.0448572635650635,
+        -326.1768493652344
+      ],
+      "yaw": -0.9017071051662053,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        132.2533416748047,
+        1.0448572635650635,
+        -308.8092346191406
+      ],
+      "yaw": 2.2398855484235876,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        169.55162048339844,
+        0.10894344002008438,
+        -305.2030334472656
+      ],
+      "yaw": -0.9753403159524716,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        146.37062072753906,
+        0.10894344002008438,
+        -289.4981994628906
+      ],
+      "yaw": 2.1662523376373217,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        183.34353637695312,
+        -0.8899974822998047,
+        -283.34930419921875
+      ],
+      "yaw": -1.0388366975399108,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        159.21270751953125,
+        -0.8899974822998047,
+        -269.14703369140625
+      ],
+      "yaw": 2.102755956049882,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        195.76124572753906,
+        -1.9221115112304688,
+        -260.8119812011719
+      ],
+      "yaw": -1.0944058350598378,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        170.87889099121094,
+        -1.9221115112304688,
+        -247.97189331054688
+      ],
+      "yaw": 2.0471868185299553,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        206.9452362060547,
+        -2.9565532207489014,
+        -237.7332000732422
+      ],
+      "yaw": -1.143781300353053,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        181.45945739746094,
+        -2.9565532207489014,
+        -226.13682556152344
+      ],
+      "yaw": 1.99781135323674,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        217.0094451904297,
+        -3.9624078273773193,
+        -214.2176971435547
+      ],
+      "yaw": -1.1883164564721875,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        191.0326690673828,
+        -3.9624078273773193,
+        -203.76747131347656
+      ],
+      "yaw": 1.9532761971176056,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        226.04519653320312,
+        -4.909614562988281,
+        -190.3443603515625
+      ],
+      "yaw": -1.2290758004379383,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        199.6641845703125,
+        -4.909614562988281,
+        -180.9613037109375
+      ],
+      "yaw": 1.9125168531518548,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        234.1247100830078,
+        -5.769865989685059,
+        -166.17355346679688
+      ],
+      "yaw": -1.266909651510068,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        207.4076385498047,
+        -5.769865989685059,
+        -157.79507446289062
+      ],
+      "yaw": 1.8746830020797252,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        241.30398559570312,
+        -6.517452716827393,
+        -141.7526397705078
+      ],
+      "yaw": -1.302511991193593,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        214.30563354492188,
+        -6.517452716827393,
+        -134.33045959472656
+      ],
+      "yaw": 1.8390806623962002,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        247.6251678466797,
+        -7.130032539367676,
+        -117.11939239501953
+      ],
+      "yaw": -1.3364646966268876,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        220.3904266357422,
+        -7.130032539367676,
+        -110.61798858642578
+      ],
+      "yaw": 1.8051279569629055,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        253.1182861328125,
+        -7.589298248291016,
+        -92.3047103881836
+      ],
+      "yaw": -1.3692718614566766,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        225.6849365234375,
+        -7.589298248291016,
+        -86.70014190673828
+      ],
+      "yaw": 1.7723207921331166,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        257.80224609375,
+        -7.881524562835693,
+        -67.3344497680664
+      ],
+      "yaw": -1.4013872448895637,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        230.2030792236328,
+        -7.881524562835693,
+        -62.61365509033203
+      ],
+      "yaw": 1.7402054087002294,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        261.6856384277344,
+        -7.9979777336120605,
+        -42.23097610473633
+      ],
+      "yaw": -1.4332373813426245,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        233.9501495361328,
+        -7.9979777336120605,
+        -38.39146041870117
+      ],
+      "yaw": 1.7083552722471687,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        264.7668762207031,
+        -7.935178279876709,
+        -17.014291763305664
+      ],
+      "yaw": -1.4652427373453596,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        236.92269897460938,
+        -7.935178279876709,
+        -14.064275741577148
+      ],
+      "yaw": 1.6763499162444335,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        267.0338134765625,
+        -7.69500207901001,
+        8.296860694885254
+      ],
+      "yaw": -1.4978387318178932,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        239.10829162597656,
+        -7.69500207901001,
+        10.337861061096191
+      ],
+      "yaw": 1.6437539217719,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        268.4630126953125,
+        -7.284627437591553,
+        33.6839485168457
+      ],
+      "yaw": -1.5314987930076132,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        240.484619140625,
+        -7.284627437591553,
+        34.783992767333984
+      ],
+      "yaw": 1.61009386058218,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        269.0184020996094,
+        -6.716318607330322,
+        59.127498626708984
+      ],
+      "yaw": -1.566762107894608,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        241.01861572265625,
+        -6.716318607330322,
+        59.24045944213867
+      ],
+      "yaw": 1.5748305456951852,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        268.64886474609375,
+        -6.007059574127197,
+        84.60568237304688
+      ],
+      "yaw": -1.6042692418947506,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        240.66455078125,
+        -6.007059574127197,
+        83.66860961914062
+      ],
+      "yaw": 1.5373234116950425,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        267.28521728515625,
+        -5.1780476570129395,
+        110.09230041503906
+      ],
+      "yaw": -1.6448107026155367,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        239.36187744140625,
+        -5.1780476570129395,
+        108.02178955078125
+      ],
+      "yaw": 1.4967819509742564,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        264.8353576660156,
+        -4.25405740737915,
+        135.55401611328125
+      ],
+      "yaw": -1.6893955278207442,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        237.03204345703125,
+        -4.25405740737915,
+        132.24102783203125
+      ],
+      "yaw": 1.452197125769049,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        261.1776428222656,
+        -3.2627036571502686,
+        160.9458770751953
+      ],
+      "yaw": -1.7393510130845855,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        233.57444763183594,
+        -3.2627036571502686,
+        156.24867248535156
+      ],
+      "yaw": 1.4022416405052076,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        256.1512451171875,
+        -2.2336130142211914,
+        186.2040252685547
+      ],
+      "yaw": -1.7964694371694303,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        228.86123657226562,
+        -2.2336130142211914,
+        179.9386749267578
+      ],
+      "yaw": 1.3451232164203628,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        249.54283142089844,
+        -1.1975408792495728,
+        211.2333221435547
+      ],
+      "yaw": -1.8632228230471293,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        222.7315216064453,
+        -1.1975408792495728,
+        203.1615753173828
+      ],
+      "yaw": 1.2783698305426638,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        241.06829833984375,
+        -0.1854506880044937,
+        235.8854522705078
+      ],
+      "yaw": -1.943063178098821,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        214.98614501953125,
+        -0.1854506880044937,
+        225.70106506347656
+      ],
+      "yaw": 1.198529475490972,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        230.35133361816406,
+        0.7724106907844543,
+        259.9190979003906
+      ],
+      "yaw": -2.040780049336245,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        205.38722229003906,
+        0.7724106907844543,
+        247.2386932373047
+      ],
+      "yaw": 1.100812604253548,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        216.90928649902344,
+        1.6474168300628662,
+        282.9278869628906
+      ],
+      "yaw": -2.1626949924856027,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        193.6725616455078,
+        1.6474168300628662,
+        267.3056335449219
+      ],
+      "yaw": 0.9788976611041904,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        179.60443115234375,
+        2.4134178161621094,
+        285.23577880859375
+      ],
+      "yaw": 0.8257162153154751,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-wall-module",
+      "position": [
+        163.06959533691406,
+        3.0475211143493652,
+        300.175048828125
+      ],
+      "yaw": 0.6371443031772008,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-zone-portals",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-scorched-floor",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-pad-underside",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-flame-deflector",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "trench-deluge-hardware",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "sector": "TRENCH",
+      "dynamic": false
+    },
+    {
+      "asset": "mangrove-pier",
+      "position": [
+        6.216519832611084,
+        3.819999933242798,
+        323.1555480957031
+      ],
+      "yaw": 1.4046432575108927,
+      "scale": 1.0384615384615385,
+      "sector": "CRAWLERWAY",
+      "dynamic": false
+    },
+    {
+      "asset": "mangrove-pier",
+      "position": [
+        -20.266111373901367,
+        3.819999933242798,
+        317.9746398925781
+      ],
+      "yaw": 1.343588987650827,
+      "scale": 1,
+      "sector": "MANGROVE_CUT",
+      "dynamic": false
+    },
+    {
+      "asset": "mangrove-pier",
+      "position": [
+        -46.58715057373047,
+        3.819999933242798,
+        312.01953125
+      ],
+      "yaw": 1.3897030744677008,
+      "scale": 1,
+      "sector": "MANGROVE_CUT",
+      "dynamic": false
+    },
+    {
+      "asset": "mangrove-pier",
+      "position": [
+        -73.39421844482422,
+        3.819999933242798,
+        309.0387878417969
+      ],
+      "yaw": 1.507785088700435,
+      "scale": 1,
+      "sector": "MANGROVE_CUT",
+      "dynamic": false
+    },
+    {
+      "asset": "mangrove-pier",
+      "position": [
+        -100.1580810546875,
+        3.819999933242798,
+        305.8462219238281
+      ],
+      "yaw": 1.33659646644649,
+      "scale": 1,
+      "sector": "MANGROVE_CUT",
+      "dynamic": false
+    },
+    {
+      "asset": "mangrove-pier",
+      "position": [
+        -124.79450225830078,
+        3.819999933242798,
+        295.1416931152344
+      ],
+      "yaw": 1.0100638682241727,
+      "scale": 1,
+      "sector": "MANGROVE_CUT",
+      "dynamic": false
+    },
+    {
+      "asset": "mangrove-pier",
+      "position": [
+        -147.2074737548828,
+        3.819999933242798,
+        280.1117858886719
+      ],
+      "yaw": 1.021366423736377,
+      "scale": 1,
+      "sector": "MANGROVE_CUT",
+      "dynamic": false
+    },
+    {
+      "asset": "mangrove-pier",
+      "position": [
+        -171.76808166503906,
+        3.819999933242798,
+        269.1015625
+      ],
+      "yaw": 1.2632209552266167,
+      "scale": 1,
+      "sector": "MANGROVE_CUT",
+      "dynamic": false
+    },
+    {
+      "asset": "mangrove-pier",
+      "position": [
+        -197.57073974609375,
+        3.819999933242798,
+        261.2016906738281
+      ],
+      "yaw": 1.2232292154505737,
+      "scale": 1,
+      "sector": "MANGROVE_CUT",
+      "dynamic": false
+    },
+    {
+      "asset": "mangrove-pier",
+      "position": [
+        -221.7862091064453,
+        3.819999933242798,
+        249.39480590820312
+      ],
+      "yaw": 1.0221402972774347,
+      "scale": 1,
+      "sector": "MANGROVE_CUT",
+      "dynamic": false
+    },
+    {
+      "asset": "mangrove-pier",
+      "position": [
+        -244.39584350585938,
+        3.819999933242798,
+        234.65811157226562
+      ],
+      "yaw": 0.9905636535090273,
+      "scale": 1,
+      "sector": "MANGROVE_CUT",
+      "dynamic": false
+    },
+    {
+      "asset": "mangrove-pier",
+      "position": [
+        -266.9830322265625,
+        3.819999933242798,
+        219.88516235351562
+      ],
+      "yaw": 0.9791888388649947,
+      "scale": 1.1153846153846154,
+      "sector": "CAUSEWAY",
+      "dynamic": false
+    },
+    {
+      "asset": "mangrove-pier",
+      "position": [
+        -289.086181640625,
+        3.819999933242798,
+        204.3998565673828
+      ],
+      "yaw": 0.9394268370190966,
+      "scale": 1.1153846153846154,
+      "sector": "CAUSEWAY",
+      "dynamic": false
+    },
+    {
+      "asset": "mangrove-pier",
+      "position": [
+        -310.5162048339844,
+        3.819999933242798,
+        187.9964599609375
+      ],
+      "yaw": 0.8944624543596467,
+      "scale": 1.1153846153846154,
+      "sector": "CAUSEWAY",
+      "dynamic": false
+    },
+    {
+      "asset": "mangrove-pier",
+      "position": [
+        -331.1239318847656,
+        3.819999933242798,
+        170.57254028320312
+      ],
+      "yaw": 0.8418708988559226,
+      "scale": 1.1153846153846154,
+      "sector": "CAUSEWAY",
+      "dynamic": false
+    },
+    {
+      "asset": "mangrove-pier",
+      "position": [
+        -350.6896667480469,
+        3.819999933242798,
+        151.98826599121094
+      ],
+      "yaw": 0.7782452341704758,
+      "scale": 1.1153846153846154,
+      "sector": "CAUSEWAY",
+      "dynamic": false
+    },
+    {
+      "asset": "mangrove-pier",
+      "position": [
+        -368.883056640625,
+        3.819999933242798,
+        132.06198120117188
+      ],
+      "yaw": 0.6985423521240278,
+      "scale": 1.1153846153846154,
+      "sector": "CAUSEWAY",
+      "dynamic": false
+    },
+    {
+      "asset": "mangrove-pier",
+      "position": [
+        -385.5438232421875,
+        3.819999933242798,
+        110.83213806152344
+      ],
+      "yaw": 0.6451744861654075,
+      "scale": 1.1153846153846154,
+      "sector": "CAUSEWAY",
+      "dynamic": false
+    },
+    {
+      "asset": "mangrove-pier",
+      "position": [
+        -401.30096435546875,
+        3.819999933242798,
+        88.92276763916016
+      ],
+      "yaw": 0.598737246157757,
+      "scale": 1.1153846153846154,
+      "sector": "CAUSEWAY",
+      "dynamic": false
+    },
+    {
+      "asset": "mangrove-pier",
+      "position": [
+        -415.8092041015625,
+        3.819999933242798,
+        66.17000579833984
+      ],
+      "yaw": 0.5330674557612934,
+      "scale": 1.1153846153846154,
+      "sector": "CAUSEWAY",
+      "dynamic": false
+    },
+    {
+      "asset": "mangrove-pier",
+      "position": [
+        -428.5209045410156,
+        3.819999933242798,
+        42.37148666381836
+      ],
+      "yaw": 0.4438547643470258,
+      "scale": 1.1153846153846154,
+      "sector": "CAUSEWAY",
+      "dynamic": false
+    },
+    {
+      "asset": "mangrove-pier",
+      "position": [
+        -438.7047119140625,
+        3.819999933242798,
+        17.39398956298828
+      ],
+      "yaw": 0.3251075511907387,
+      "scale": 1.1153846153846154,
+      "sector": "CAUSEWAY",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        -364.95574951171875,
+        4.0,
+        -259.9278869628906
+      ],
+      "yaw": -0.740923465546786,
+      "scale": 1,
+      "sector": "PAD_ROAD",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        -342.82037353515625,
+        4.0,
+        -239.6787872314453
+      ],
+      "yaw": -0.740923465546786,
+      "scale": 1,
+      "sector": "PAD_ROAD",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        -317.0245666503906,
+        4.0,
+        -304.2273864746094
+      ],
+      "yaw": -0.8981334468089044,
+      "scale": 1,
+      "sector": "PAD_ROAD",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        -298.3324279785156,
+        4.0,
+        -280.7624206542969
+      ],
+      "yaw": -0.8981334468089044,
+      "scale": 1,
+      "sector": "PAD_ROAD",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        -264.0316467285156,
+        4.0,
+        -341.3931579589844
+      ],
+      "yaw": -1.017399398658317,
+      "scale": 1,
+      "sector": "PAD_ROAD",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        -248.26425170898438,
+        4.0,
+        -315.8708190917969
+      ],
+      "yaw": -1.017399398658317,
+      "scale": 1,
+      "sector": "PAD_ROAD",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        -207.19680786132812,
+        4.0,
+        -372.2093505859375
+      ],
+      "yaw": -1.131447660436843,
+      "scale": 1,
+      "sector": "PAD_ROAD",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        -194.43630981445312,
+        4.0,
+        -345.0584716796875
+      ],
+      "yaw": -1.131447660436843,
+      "scale": 1,
+      "sector": "PAD_ROAD",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        -146.84466552734375,
+        4.0,
+        -396.05316162109375
+      ],
+      "yaw": -1.2622302343034768,
+      "scale": 1,
+      "sector": "APRON_SWEEP",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        -137.73388671875,
+        4.0,
+        -367.47003173828125
+      ],
+      "yaw": -1.2622302343034768,
+      "scale": 1,
+      "sector": "APRON_SWEEP",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        -82.95599365234375,
+        4.0,
+        -410.7026062011719
+      ],
+      "yaw": -1.439299381924623,
+      "scale": 1,
+      "sector": "APRON_SWEEP",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        -79.02244567871094,
+        4.0,
+        -380.9615783691406
+      ],
+      "yaw": -1.439299381924623,
+      "scale": 1,
+      "sector": "APRON_SWEEP",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        171.24241638183594,
+        4.0,
+        -374.0940856933594
+      ],
+      "yaw": -1.9183921057100966,
+      "scale": 1,
+      "sector": "DELUGE_ROAD",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        161.0232696533203,
+        4.0,
+        -345.8882751464844
+      ],
+      "yaw": -1.9183921057100966,
+      "scale": 1,
+      "sector": "DELUGE_ROAD",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        230.69898986816406,
+        4.0,
+        -349.27093505859375
+      ],
+      "yaw": -2.017098428867661,
+      "scale": 1,
+      "sector": "DELUGE_ROAD",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        217.75001525878906,
+        4.0,
+        -322.20947265625
+      ],
+      "yaw": -2.017098428867661,
+      "scale": 1,
+      "sector": "DELUGE_ROAD",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        284.6943054199219,
+        4.0,
+        -319.6654968261719
+      ],
+      "yaw": -2.1310565207093446,
+      "scale": 1,
+      "sector": "DELUGE_ROAD",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        268.8810729980469,
+        4.0,
+        -294.1715393066406
+      ],
+      "yaw": -2.1310565207093446,
+      "scale": 1,
+      "sector": "DELUGE_ROAD",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        340.09033203125,
+        4.0,
+        -280.9551086425781
+      ],
+      "yaw": -2.235322079239676,
+      "scale": 1,
+      "sector": "DELUGE_ROAD",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        321.58978271484375,
+        4.0,
+        -257.3388366699219
+      ],
+      "yaw": -2.235322079239676,
+      "scale": 1,
+      "sector": "DELUGE_ROAD",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        388.69989013671875,
+        4.0,
+        -238.3402862548828
+      ],
+      "yaw": -2.348874318108836,
+      "scale": 1,
+      "sector": "DELUGE_ROAD",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        367.64251708984375,
+        4.0,
+        -216.9723663330078
+      ],
+      "yaw": -2.348874318108836,
+      "scale": 1,
+      "sector": "DELUGE_ROAD",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        431.8145751953125,
+        4.0,
+        -189.57489013671875
+      ],
+      "yaw": -2.4937116979753964,
+      "scale": 1,
+      "sector": "DELUGE_ROAD",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        407.89361572265625,
+        4.0,
+        -171.46994018554688
+      ],
+      "yaw": -2.4937116979753964,
+      "scale": 1,
+      "sector": "DELUGE_ROAD",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        466.2691345214844,
+        4.0,
+        -133.21493530273438
+      ],
+      "yaw": -2.70748099686464,
+      "scale": 1,
+      "sector": "DELUGE_ROAD",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        439.0517883300781,
+        4.0,
+        -120.59679412841797
+      ],
+      "yaw": -2.70748099686464,
+      "scale": 1,
+      "sector": "DELUGE_ROAD",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        486.3719787597656,
+        4.0,
+        -69.98762512207031
+      ],
+      "yaw": -2.942386271093029,
+      "scale": 1,
+      "sector": "DELUGE_ROAD",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        456.9652404785156,
+        4.0,
+        -64.05088806152344
+      ],
+      "yaw": -2.942386271093029,
+      "scale": 1,
+      "sector": "DELUGE_ROAD",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        493.80389404296875,
+        4.0,
+        -5.029384613037109
+      ],
+      "yaw": -3.107718821472209,
+      "scale": 1,
+      "sector": "DELUGE_ROAD",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        463.82110595703125,
+        4.0,
+        -4.013363838195801
+      ],
+      "yaw": -3.107718821472209,
+      "scale": 1,
+      "sector": "DELUGE_ROAD",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        490.9928894042969,
+        4.0,
+        60.15811538696289
+      ],
+      "yaw": 3.0196112357046703,
+      "scale": 1,
+      "sector": "DELUGE_ROAD",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        461.2157897949219,
+        4.0,
+        56.50774002075195
+      ],
+      "yaw": 3.0196112357046703,
+      "scale": 1,
+      "sector": "DELUGE_ROAD",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        477.0758056640625,
+        4.0,
+        124.43994140625
+      ],
+      "yaw": 2.8265032872483298,
+      "scale": 1,
+      "sector": "DELUGE_ROAD",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        448.552734375,
+        4.0,
+        115.14289855957031
+      ],
+      "yaw": 2.8265032872483298,
+      "scale": 1,
+      "sector": "DELUGE_ROAD",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        447.505615234375,
+        4.0,
+        184.7333526611328
+      ],
+      "yaw": 2.530691594485791,
+      "scale": 1,
+      "sector": "DELUGE_ROAD",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        422.931640625,
+        4.0,
+        167.5251922607422
+      ],
+      "yaw": 2.530691594485791,
+      "scale": 1,
+      "sector": "DELUGE_ROAD",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        403.438720703125,
+        4.0,
+        234.04286193847656
+      ],
+      "yaw": 2.31159609637574,
+      "scale": 1,
+      "sector": "DELUGE_ROAD",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        383.1923828125,
+        4.0,
+        211.9049835205078
+      ],
+      "yaw": 2.31159609637574,
+      "scale": 1,
+      "sector": "DELUGE_ROAD",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        354.7239685058594,
+        4.0,
+        272.44525146484375
+      ],
+      "yaw": 2.1650861104263326,
+      "scale": 1,
+      "sector": "DELUGE_ROAD",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        337.7728576660156,
+        4.0,
+        247.69325256347656
+      ],
+      "yaw": 2.1650861104263326,
+      "scale": 1,
+      "sector": "DELUGE_ROAD",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        296.3163757324219,
+        4.0,
+        307.0392150878906
+      ],
+      "yaw": 2.040824760760715,
+      "scale": 1,
+      "sector": "DELUGE_ROAD",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        282.7290344238281,
+        4.0,
+        280.2925720214844
+      ],
+      "yaw": 2.040824760760715,
+      "scale": 1,
+      "sector": "DELUGE_ROAD",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        236.55862426757812,
+        4.0,
+        332.5905456542969
+      ],
+      "yaw": 1.903079141810193,
+      "scale": 1,
+      "sector": "DELUGE_ROAD",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        226.7725830078125,
+        4.0,
+        304.2315368652344
+      ],
+      "yaw": 1.903079141810193,
+      "scale": 1,
+      "sector": "DELUGE_ROAD",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        -20.405628204345703,
+        4.0,
+        332.30059814453125
+      ],
+      "yaw": 1.350179939230802,
+      "scale": 1,
+      "sector": "MANGROVE_CUT",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        -14.27835750579834,
+        4.0,
+        304.979248046875
+      ],
+      "yaw": 1.350179939230802,
+      "scale": 1,
+      "sector": "MANGROVE_CUT",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        -80.3415756225586,
+        4.0,
+        322.6149597167969
+      ],
+      "yaw": 1.5019990199811897,
+      "scale": 1,
+      "sector": "MANGROVE_CUT",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        -78.4167709350586,
+        4.0,
+        294.6811828613281
+      ],
+      "yaw": 1.5019990199811897,
+      "scale": 1,
+      "sector": "MANGROVE_CUT",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        -145.2158203125,
+        4.0,
+        298.2193603515625
+      ],
+      "yaw": 0.9619212412205346,
+      "scale": 1,
+      "sector": "MANGROVE_CUT",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        -129.20135498046875,
+        4.0,
+        275.25115966796875
+      ],
+      "yaw": 0.9619212412205346,
+      "scale": 1,
+      "sector": "MANGROVE_CUT",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        -199.22604370117188,
+        4.0,
+        275.4555969238281
+      ],
+      "yaw": 1.2446670958637358,
+      "scale": 1,
+      "sector": "MANGROVE_CUT",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        -190.25543212890625,
+        4.0,
+        248.93148803710938
+      ],
+      "yaw": 1.2446670958637358,
+      "scale": 1,
+      "sector": "MANGROVE_CUT",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        -257.03973388671875,
+        4.0,
+        243.1280059814453
+      ],
+      "yaw": 0.9953116906962507,
+      "scale": 1,
+      "sector": "MANGROVE_CUT",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        -241.8009796142578,
+        4.0,
+        219.6380157470703
+      ],
+      "yaw": 0.9953116906962507,
+      "scale": 1,
+      "sector": "MANGROVE_CUT",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        -310.83673095703125,
+        4.0,
+        208.08929443359375
+      ],
+      "yaw": 0.9152382171474286,
+      "scale": 1,
+      "sector": "CAUSEWAY",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        -291.3294677734375,
+        4.0,
+        182.72265625
+      ],
+      "yaw": 0.9152382171474286,
+      "scale": 1,
+      "sector": "CAUSEWAY",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        -359.8844909667969,
+        4.0,
+        165.4348602294922
+      ],
+      "yaw": 0.785875813663866,
+      "scale": 1,
+      "sector": "CAUSEWAY",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        -337.2679138183594,
+        4.0,
+        142.79664611816406
+      ],
+      "yaw": 0.785875813663866,
+      "scale": 1,
+      "sector": "CAUSEWAY",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        -401.9978332519531,
+        4.0,
+        115.53351593017578
+      ],
+      "yaw": 0.6363975580917631,
+      "scale": 1,
+      "sector": "CAUSEWAY",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        -376.2621154785156,
+        4.0,
+        96.5158462524414
+      ],
+      "yaw": 0.6363975580917631,
+      "scale": 1,
+      "sector": "CAUSEWAY",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        -437.2769470214844,
+        4.0,
+        60.5720100402832
+      ],
+      "yaw": 0.4866985399921483,
+      "scale": 1,
+      "sector": "CAUSEWAY",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        -408.9927062988281,
+        4.0,
+        45.605281829833984
+      ],
+      "yaw": 0.4866985399921483,
+      "scale": 1,
+      "sector": "CAUSEWAY",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        -458.48480224609375,
+        4.0,
+        -3.628678560256958
+      ],
+      "yaw": 0.15696494986638976,
+      "scale": 1,
+      "sector": "TANK_FARM",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        -430.82904052734375,
+        4.0,
+        -8.005672454833984
+      ],
+      "yaw": 0.15696494986638976,
+      "scale": 1,
+      "sector": "TANK_FARM",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        -461.94354248046875,
+        4.0,
+        -69.19154357910156
+      ],
+      "yaw": -0.03748175842049586,
+      "scale": 1,
+      "sector": "TANK_FARM",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        -433.96319580078125,
+        4.0,
+        -68.14230346679688
+      ],
+      "yaw": -0.03748175842049586,
+      "scale": 1,
+      "sector": "TANK_FARM",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        -436.7265930175781,
+        4.0,
+        -131.08123779296875
+      ],
+      "yaw": -0.37547140623954056,
+      "scale": 1,
+      "sector": "TANK_FARM",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        -410.6772155761719,
+        4.0,
+        -120.81332397460938
+      ],
+      "yaw": -0.37547140623954056,
+      "scale": 1,
+      "sector": "TANK_FARM",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        -413.41412353515625,
+        4.0,
+        -192.0216064453125
+      ],
+      "yaw": -0.5653102152170516,
+      "scale": 1,
+      "sector": "TANK_FARM",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        -389.77032470703125,
+        4.0,
+        -177.02261352539062
+      ],
+      "yaw": -0.5653102152170516,
+      "scale": 1,
+      "sector": "TANK_FARM",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        -376.4931640625,
+        4.0,
+        -245.0086669921875
+      ],
+      "yaw": -0.6828323134111516,
+      "scale": 1,
+      "sector": "TANK_FARM",
+      "dynamic": false
+    },
+    {
+      "asset": "street-lamp",
+      "position": [
+        -354.77105712890625,
+        4.0,
+        -227.34088134765625
+      ],
+      "yaw": -0.6828323134111516,
+      "scale": 1,
+      "sector": "TANK_FARM",
+      "dynamic": false
+    },
+    {
+      "asset": "egret-card-set",
+      "position": [
+        -111.00955200195312,
+        12.0,
+        277.7879638671875
+      ],
+      "yaw": 0.0,
+      "scale": 1,
+      "sector": "MANGROVE_CUT",
+      "dynamic": false
+    },
+    {
+      "asset": "egret-card-set",
+      "position": [
+        -117.48885345458984,
+        13.0,
+        273.63116455078125
+      ],
+      "yaw": 0.5,
+      "scale": 1,
+      "sector": "MANGROVE_CUT",
+      "dynamic": false
+    },
+    {
+      "asset": "egret-card-set",
+      "position": [
+        -127.26731872558594,
+        14.0,
+        266.86602783203125
+      ],
+      "yaw": 1.0,
+      "scale": 1,
+      "sector": "MANGROVE_CUT",
+      "dynamic": false
+    },
+    {
+      "asset": "egret-card-set",
+      "position": [
+        -135.71905517578125,
+        12.0,
+        261.3497009277344
+      ],
+      "yaw": 1.5,
+      "scale": 1,
+      "sector": "MANGROVE_CUT",
+      "dynamic": false
+    },
+    {
+      "asset": "egret-card-set",
+      "position": [
+        -148.5231170654297,
+        13.0,
+        254.4618377685547
+      ],
+      "yaw": 2.0,
+      "scale": 1,
+      "sector": "MANGROVE_CUT",
+      "dynamic": false
+    },
+    {
+      "asset": "egret-card-set",
+      "position": [
+        -158.5799102783203,
+        14.0,
+        250.33851623535156
+      ],
+      "yaw": 2.5,
+      "scale": 1,
+      "sector": "MANGROVE_CUT",
+      "dynamic": false
+    },
+    {
+      "asset": "egret-card-set",
+      "position": [
+        -171.36431884765625,
+        12.0,
+        246.24583435058594
+      ],
+      "yaw": 3.0,
+      "scale": 1,
+      "sector": "MANGROVE_CUT",
+      "dynamic": false
+    },
+    {
+      "asset": "egret-card-set",
+      "position": [
+        -179.9397430419922,
+        13.0,
+        243.7772979736328
+      ],
+      "yaw": 3.5,
+      "scale": 1,
+      "sector": "MANGROVE_CUT",
+      "dynamic": false
+    },
+    {
+      "asset": "egret-card-set",
+      "position": [
+        -187.69241333007812,
+        14.0,
+        241.35317993164062
+      ],
+      "yaw": 4.0,
+      "scale": 1,
+      "sector": "MANGROVE_CUT",
+      "dynamic": false
+    },
+    {
+      "asset": "egret-card-set",
+      "position": [
+        -196.96080017089844,
+        12.0,
+        237.7509002685547
+      ],
+      "yaw": 4.5,
+      "scale": 1,
+      "sector": "MANGROVE_CUT",
+      "dynamic": false
+    },
+    {
+      "asset": "egret-card-set",
+      "position": [
+        -203.5883026123047,
+        13.0,
+        234.4940948486328
+      ],
+      "yaw": 5.0,
+      "scale": 1,
+      "sector": "MANGROVE_CUT",
+      "dynamic": false
+    },
+    {
+      "asset": "egret-card-set",
+      "position": [
+        -212.64773559570312,
+        14.0,
+        229.1753692626953
+      ],
+      "yaw": 5.5,
+      "scale": 1,
+      "sector": "MANGROVE_CUT",
+      "dynamic": false
+    }
+  ],
+  "features": {
+    "service-tower-swing-arm": [
+      "three truss bays per side",
+      "hinge cylinder",
+      "umbilical loop",
+      "central repair plate",
+      "caged glass lamp"
+    ],
+    "rocket-platform": [
+      "four piers and open exhaust hole",
+      "hazard deck rim",
+      "open service tower",
+      "repair plate",
+      "caged lamps and beacon"
+    ],
+    "rocket-ascent": [
+      "blunt faceted nose",
+      "two olive boosters",
+      "four fins",
+      "rust core and ceramic upper band",
+      "three separate nozzles"
+    ],
+    "crawler-transporter": [
+      "four 12m long 4m tall linked tread units",
+      "full-size paired cabs with glazed frames",
+      "working deck and open underframe",
+      "CT-2 stencil and hazard rim",
+      "beacon horn and caged lamps"
+    ],
+    "countdown-board": [
+      "A-frame mast",
+      "deep countdown housing",
+      "hazard border",
+      "beacon and horn",
+      "repair plate and cage lamp"
+    ],
+    "trench-wall-module": [
+      "two continuous pipes",
+      "four red valve wheels",
+      "full-height ladder",
+      "caged glass lamps",
+      "hazard band repair plate and drain grate"
+    ],
+    "deluge-water-tower": [
+      "single squat reservoir",
+      "four olive legs",
+      "outlet with red valve",
+      "ladder",
+      "repair plate and caged lamp"
+    ],
+    "propellant-tank": [
+      "two rust bands",
+      "shallow roof",
+      "bent roof vent",
+      "ladder",
+      "repair plate and caged lamp"
+    ],
+    "vent-stack": [
+      "bent exhaust elbow",
+      "two collars",
+      "concrete plinth",
+      "maintenance platform",
+      "ladder and cage lamp"
+    ],
+    "crawlerway-gravel-bed": [
+      "two steel tread strips",
+      "rough concrete gravel median",
+      "two raised curbs",
+      "four cage lamps",
+      "corner repair plate"
+    ],
+    "mangrove-pier": [
+      "four algae-stained piles",
+      "low deck",
+      "two safety rails",
+      "maintenance ladder",
+      "two cage lamps and repair plate"
+    ],
+    "egret-card-set": [
+      "folded S-curved neck",
+      "yellow tapered beak",
+      "two black trailing legs",
+      "white feathered wings",
+      "slender white body"
+    ],
+    "power-kit": [
+      "preserved turbine and iris pivots",
+      "emissive lamp glass",
+      "shallow round rivets",
+      "metal plinths",
+      "six Ascension painted atlas roles"
+    ],
+    "street-lamp": [
+      "metal mast",
+      "cantilever",
+      "cage",
+      "glass",
+      "base"
+    ]
+  },
+  "maquettes": [
+    {
+      "asset": "crawler-transporter",
+      "source": "crawler-maquette-tripo.glb",
+      "sourceSha256": "8f2d8c243086aa51ef59300806e6c8a161b59588b1b2431fd8a842bb1d70c5d5",
+      "sourceDimensions": [
+        1.0827085971832275,
+        0.8033052682876587,
+        0.3824737071990967
+      ],
+      "targetHeight": 12,
+      "uniformScale": 31.37470569644517,
+      "removedObjectNames": [
+        "tripo_node_45af7266-f7e0-439e-924f-247f677ffca2"
+      ]
+    },
+    {
+      "asset": "rocket-platform",
+      "source": "rocket-platform-maquette-tripo.glb",
+      "sourceSha256": "cea8d353dde1dfe6d383a0c342f8c443cc3dc56e6be5b7baacdeaf8095606ac3",
+      "sourceDimensions": [
+        0.6046781539916992,
+        0.47638535499572754,
+        1.0
+      ],
+      "targetHeight": 85.8,
+      "uniformScale": 85.8,
+      "removedObjectNames": [
+        "tripo_node_2633d1d6-af4e-4b4f-8b96-60827a38a125"
+      ]
+    }
+  ],
+  "maquettesRemovedBeforeWorldExport": true
+}

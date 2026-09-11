@@ -1,0 +1,145 @@
+{
+  "instrument": "/Users/gentlegen/Desktop/futurisma-race/polarity_work/scripts/visual/dreamisland-heroes/polish-tint-profile.py",
+  "method": "Shared game lighting/fog/AgX, exact visible full/isolated equality and isolated/blank difference; calibrated geometry and pose recorded in tint-capture.json",
+  "results": [
+    {
+      "name": "stacks-before",
+      "pose": {
+        "position": [
+          1.4634435176849365,
+          24.765808824737228,
+          -39.72361321614314
+        ],
+        "target": [
+          1.4634435176849365,
+          20,
+          -0.008539676666259766
+        ],
+        "fov": 70,
+        "far": 650,
+        "quaternion": [
+          0,
+          0.9982176211846098,
+          0.05967898086042504,
+          0
+        ],
+        "horizonRow": 298.3040061087406
+      },
+      "metrics": {
+        "cap": {
+          "pixels": 1365,
+          "meanLuma": 0.2807244375493787,
+          "meanChroma": 0.28123536594124826
+        },
+        "stone": {
+          "pixels": 164230,
+          "meanLuma": 0.3669512010105388,
+          "meanChroma": 0.12988057160390795
+        }
+      }
+    },
+    {
+      "name": "stacks-after",
+      "pose": {
+        "position": [
+          1.4634435176849365,
+          24.765808824737228,
+          -39.72361321614314
+        ],
+        "target": [
+          1.4634435176849365,
+          20,
+          -0.008539676666259766
+        ],
+        "fov": 70,
+        "far": 650,
+        "quaternion": [
+          0,
+          0.9982176211846098,
+          0.05967898086042504,
+          0
+        ],
+        "horizonRow": 298.3040061087406
+      },
+      "metrics": {
+        "cap": {
+          "pixels": 1364,
+          "meanLuma": 0.20424654361451322,
+          "meanChroma": 0.2150278879880398
+        },
+        "stone": {
+          "pixels": 164139,
+          "meanLuma": 0.2226119440134969,
+          "meanChroma": 0.08244838873413006
+        }
+      }
+    },
+    {
+      "name": "watchtower-accents",
+      "pose": {
+        "position": [
+          13.083540778447937,
+          20.607231762191972,
+          -37.381545081279825
+        ],
+        "target": [
+          0,
+          15,
+          0
+        ],
+        "fov": 70,
+        "far": 650,
+        "quaternion": [
+          -0.011772285964394962,
+          0.9834280486132019,
+          0.06927085522670014,
+          0.16712939627774578
+        ],
+        "horizonRow": 287.20965076428513
+      },
+      "metrics": {
+        "ivy": {
+          "pixels": 229,
+          "meanLuma": 0.29781074749550474,
+          "meanChroma": 0.2119530781745012
+        },
+        "joints": {
+          "pixels": 11,
+          "meanLuma": 0.20359957219251335,
+          "meanChroma": 0.23493761140819966
+        }
+      }
+    },
+    {
+      "name": "shoulder",
+      "pose": {
+        "position": [
+          108.49998270988567,
+          4.8,
+          0
+        ],
+        "target": [
+          138.99998270988567,
+          1.15,
+          0
+        ],
+        "fov": 62,
+        "far": 650,
+        "quaternion": [
+          -0.04208533716391777,
+          -0.7058532598180726,
+          -0.04208533716391776,
+          0.7058532598180725
+        ],
+        "horizonRow": 288.29956590791534
+      },
+      "metrics": {
+        "shoulder": {
+          "pixels": 27,
+          "meanLuma": 0.43208952795933186,
+          "meanChroma": 0.06971677559912853
+        }
+      }
+    }
+  ]
+}

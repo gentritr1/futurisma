@@ -74,6 +74,17 @@ export const NIGHTSHIFT_SKY_ZONES = Object.freeze([
 export const POLARITY_SKY_ZONES = Object.freeze([
   { sector: "GRAVITY_NIGHT", distance: 0, horizon: 0x20213d, zenith: 0x060819, blendDegrees: 24 },
 ]);
+/**
+ * Dream Island. A Y2K screensaver tropic: a pale saturated haze band over a
+ * deep cyan-blue zenith. It gets its OWN zones rather than falling through the
+ * if-chain onto Greenwater's twelve-sector wetland sky, and its own cloud
+ * profile because `cloudProfileFor` returning undefined makes the atmosphere
+ * throw on its very next line. The day->night turn is driven by the course's
+ * blended fog and lighting, not by swapping this table.
+ */
+export const DREAMISLAND_SKY_ZONES = Object.freeze([
+  { sector: "ISLAND", distance: 0, horizon: 0x9dc9dc, zenith: 0x2f6ea8, blendDegrees: 21 },
+]);
 
 /**
  * The accent band the dome has drawn at the horizon line since P4. It is the
@@ -89,6 +100,7 @@ export const SKY_BAND_STRENGTH = Object.freeze({
   nightshift: 0.012,
   polarity: 0.018,
   tideline: 0.012,
+  dreamisland: 0.28,
 });
 
 /**
@@ -157,26 +169,32 @@ export const CLOUD_PROFILES = Object.freeze({
     driftPerSecond: 0.002, azimuthPeriod: 40, stretch: 7,
     lowDegrees: 4, highDegrees: 32, shadowCool: 0.75, seed: 0.83,
   }),
+  dreamisland: Object.freeze({
+    coverage: 0.28, softness: 0.42, strength: 0.11,
+    driftPerSecond: 0.0028, azimuthPeriod: 34, stretch: 5,
+    lowDegrees: 5, highDegrees: 28, shadowCool: 0.6, seed: 0.53,
+  }),
 });
 
 /** Hard ceiling from the P20.5 brief; the validator pins both maps under it. */
 export const CLOUD_MAX_DRIFT_PER_SECOND = 0.004;
 
-/** @param {"greenwater" | "bitterpan" | "nightshift" | "polarity" | "tideline"} kind */
+/** @param {"greenwater" | "bitterpan" | "nightshift" | "polarity" | "tideline" | "ascension" | "dreamisland"} kind */
 export function skyZonesFor(kind) {
+  if (kind === "dreamisland") return DREAMISLAND_SKY_ZONES;
   if (kind === "polarity") return POLARITY_SKY_ZONES;
   if (kind === "nightshift" || kind === "tideline") return NIGHTSHIFT_SKY_ZONES;
   return kind === "bitterpan" ? BITTERPAN_SKY_ZONES : GREENWATER_SKY_ZONES;
 }
 
-/** @param {"greenwater" | "bitterpan" | "nightshift" | "polarity" | "tideline"} kind */
+/** @param {"greenwater" | "bitterpan" | "nightshift" | "polarity" | "tideline" | "ascension" | "dreamisland"} kind */
 export function cloudProfileFor(kind) {
-  return CLOUD_PROFILES[kind === "tideline" ? "nightshift" : kind];
+  return CLOUD_PROFILES[kind === "ascension" ? "greenwater" : kind === "tideline" ? "nightshift" : kind];
 }
 
-/** @param {"greenwater" | "bitterpan" | "nightshift" | "polarity" | "tideline"} kind */
+/** @param {"greenwater" | "bitterpan" | "nightshift" | "polarity" | "tideline" | "ascension" | "dreamisland"} kind */
 export function bandStrengthFor(kind) {
-  return SKY_BAND_STRENGTH[kind];
+  return SKY_BAND_STRENGTH[kind === "ascension" ? "greenwater" : kind];
 }
 
 /**

@@ -1,3 +1,4 @@
+import {isMenuOnlyKey} from './menu-key.js';
 /**
  * P7 — the meta layer's DOM: circuit dispatch, livery issue and the service
  * terminal.
@@ -16,6 +17,7 @@ import type { MapSelection } from "./map-selection";
 import { TRACKS, trackFor } from "./map-selection";
 import { storedBestLapMs } from "./meta-runtime";
 import { save } from "./persistence";
+import { applyInterfaceScale } from "./interface-scale.js";
 import {
   RACE_MODES,
   RACE_MODE_DECKS,
@@ -168,9 +170,9 @@ class ChipGroup {
 }
 
 export class MetaUi {
-  private readonly optionsScreen = requiredElement<HTMLElement>("options-screen");
+  private navigation: import('./menu-navigation').MenuNavigation | null = null;
+  private navigationLoading: Promise<import('./menu-navigation').MenuNavigation> | null = null;
   private readonly optionsButton = requiredElement<HTMLButtonElement>("options-button");
-  private readonly optionsClose = requiredElement<HTMLButtonElement>("options-close");
   private readonly optionsRelink = requiredElement<HTMLButtonElement>("options-relink");
   private readonly optionsNote = requiredElement<HTMLElement>("options-note");
   private readonly masterSlider = requiredElement<HTMLInputElement>("option-master");
@@ -182,12 +184,11 @@ export class MetaUi {
   private readonly tierGroup: ChipGroup;
   private readonly liveryGroup: ChipGroup;
   private readonly motionGroup: ChipGroup;
+  private readonly hudScaleGroup: ChipGroup;
+  private readonly menuScaleGroup: ChipGroup;
   private readonly voiceGroup: ChipGroup;
   private readonly qualityGroup: ChipGroup;
   private readonly renderGroup: ChipGroup;
-  private open = false;
-  /** Where focus came from, so closing the terminal puts it back. */
-  private returnFocus: HTMLElement | null = null;
 
   constructor(
     private readonly ui: GameUi,
@@ -216,9 +217,19 @@ export class MetaUi {
       RACE_MODES.map((mode) => ({
         value: mode,
         label: RACE_MODE_LABELS[mode],
-        note: selection === "polarity"
+        // Phase D — Dream Island's row says what each format DOES to the map's
+        // one mechanic, because that is the choice being made: the clock
+        // strikes on the last lap of a race, on lap 2 of the sprint, and the
+        // solo run keeps the night turn because there is no field to hide it
+        // behind. The lap counts are the course's own (3, and the sprint's 2),
+        // not the five-lap default this row prints for the older circuits.
+        note: selection === "dreamisland"
+          ? mode === "sprint" ? "2 LAPS · DEFEND · NIGHT ON LAP 2"
+            : mode === "timeattack" ? "3 LAPS · SOLO + GHOST · NIGHT LAP"
+            : "3 LAPS · FULL FIELD · NIGHT LAP"
+          : selection === "polarity" || selection === "tideline"
           ? mode === "sprint" ? "2 LAPS · DEFEND" : mode === "timeattack" ? "3 LAPS · SOLO" : "3 LAPS · FULL FIELD"
-          : selection === "nightshift" || selection === "tideline" ? RACE_MODE_DECKS[mode].replace("5 LAPS", "3 LAPS") : RACE_MODE_DECKS[mode],
+          : selection === "nightshift" ? RACE_MODE_DECKS[mode].replace("5 LAPS", "3 LAPS") : RACE_MODE_DECKS[mode],
       })),
       "confirm",
       (value) => this.dispatchFormat("mode", value),
@@ -243,6 +254,36 @@ export class MetaUi {
       "select",
       (value) => {
         void this.hooks.applyLivery(value);
+      },
+    );
+    /*
+      The two interface scales. Unlike damping, resolution and pipeline, these
+      need no relink: both are CSS custom properties on `<body>` that every
+      block reads through `scale()`, so writing them applies on the next frame.
+      That is why they call `applyInterfaceScale` directly instead of going
+      through `refreshPending`'s pending-relink path.
+    */
+    const scaleChips = [
+      { value: "s", label: "S" },
+      { value: "m", label: "M" },
+      { value: "l", label: "L" },
+    ];
+    this.hudScaleGroup = new ChipGroup(
+      requiredElement<HTMLElement>("option-hud-scale"),
+      scaleChips,
+      "select",
+      (value) => {
+        save.updateSettings({ hudScale: value as "s" | "m" | "l" });
+        applyInterfaceScale(save.settings);
+      },
+    );
+    this.menuScaleGroup = new ChipGroup(
+      requiredElement<HTMLElement>("option-menu-scale"),
+      scaleChips,
+      "select",
+      (value) => {
+        save.updateSettings({ menuScale: value as "s" | "m" | "l" });
+        applyInterfaceScale(save.settings);
       },
     );
     this.motionGroup = new ChipGroup(
@@ -293,10 +334,10 @@ export class MetaUi {
     this.masterSlider.addEventListener("input", this.handleMasterInput);
     this.musicSlider.addEventListener("input", this.handleMusicInput);
     this.optionsButton.addEventListener("click", this.handleOpenClick);
-    this.optionsClose.addEventListener("click", this.handleCloseClick);
     this.optionsRelink.addEventListener("click", this.handleRelinkClick);
     window.addEventListener("keydown", this.handleWindowKeyDown, { capture: true });
-    this.optionsScreen.addEventListener("keydown", this.handlePanelKeyDown);
+    document.getElementById('controls-button')!.addEventListener('click',this.handleControlsOpen);
+
 
     this.syncFromSave();
   }
@@ -327,6 +368,8 @@ export class MetaUi {
     this.tierGroup.setValue(raceModes.tier);
     this.liveryGroup.setValue(save.livery);
     this.motionGroup.setValue(settings.reducedMotion ? "on" : "off");
+    this.hudScaleGroup.setValue(settings.hudScale);
+    this.menuScaleGroup.setValue(settings.menuScale);
     this.voiceGroup.setValue(settings.voice ? "on" : "off");
     this.qualityGroup.setValue(settings.quality);
     this.renderGroup.setValue(settings.renderMode);
@@ -404,7 +447,7 @@ export class MetaUi {
     this.optionsNote.dataset.pending = pending ? "true" : "false";
     this.optionsNote.textContent = pending
       ? "CONFIGURATION CHANGED · RELINK TO APPLY"
-      : "LEVELS AND RADIO APPLY LIVE · DAMPING, RESOLUTION AND PIPELINE ON NEXT RELINK";
+      : "LEVELS, RADIO AND INTERFACE SIZE APPLY LIVE · DAMPING, RESOLUTION AND PIPELINE ON NEXT RELINK";
     this.optionsRelink.hidden = !pending;
   }
 
@@ -424,108 +467,28 @@ export class MetaUi {
     this.hooks.setMusicVolume(volume);
   };
 
-  private readonly handleOpenClick = (): void => {
-    this.setOpen(true);
-  };
-
-  private readonly handleCloseClick = (): void => {
-    this.setOpen(false);
-  };
-
-  private readonly handleRelinkClick = (): void => {
-    window.location.reload();
-  };
-
-  private setOpen(open: boolean): void {
-    if (open === this.open) return;
-    this.open = open;
-    this.optionsScreen.hidden = !open;
-    document.body.dataset.options = open ? "true" : "false";
-    if (open) {
-      this.returnFocus = document.activeElement as HTMLElement | null;
-      this.masterSlider.focus({ preventScroll: true });
-    } else {
-      this.returnFocus?.focus({ preventScroll: true });
-      this.returnFocus = null;
-    }
-    // Whatever key opened or closed the terminal must not also reach the race
-    // loop as a start, pause or mute.
+  private openMenu(surface:'controls'|'options'): void {
     this.hooks.suspendInput();
+    this.navigationLoading ??= import('./menu-navigation').then(({MenuNavigation})=>this.navigation=new MenuNavigation(this.hooks.suspendInput));
+    void this.navigationLoading.then(menu=>{if(['intro','paused','result'].includes(document.body.dataset.phase??'intro'))menu.show(surface);});
   }
-
-  /**
-   * The terminal opens from the paddock, from a pause and from the result
-   * screen — never mid-race, where it would be a second pause with none of the
-   * pause's consequences.
-   */
-  private canOpen(): boolean {
-    const phase = document.body.dataset.phase;
-    return phase === undefined
-      || phase === "intro"
-      || phase === "paused"
-      || phase === "result";
-  }
-
-  /**
-   * Capture phase on `window`, ahead of the race loop's own keyboard listener.
-   * `O` opens the terminal; while it is up, anything typed *outside* it is
-   * swallowed so the game underneath is not being driven by accident.
-   *
-   * Keys aimed at the panel's own controls are deliberately left alone here:
-   * stopping them in the capture phase would stop them before they ever reached
-   * the slider or chip they were meant for. {@link handlePanelKeyDown} catches
-   * them on the way back up instead, after the control has had them.
-   */
-  private readonly handleWindowKeyDown = (event: KeyboardEvent): void => {
-    if (this.open) {
-      // `target` is only guaranteed to be an `EventTarget`; `contains()` throws
-      // on anything that is not a `Node`, which would swallow the whole handler.
-      const target = event.target;
-      if (target instanceof Node && this.optionsScreen.contains(target)) return;
-      if (event.key === "Escape") this.setOpen(false);
-      event.preventDefault();
-      event.stopPropagation();
-      return;
-    }
-    // Matched on `key` as well as `code`: a non-QWERTY layout puts `o` on a
-    // different physical key, and `code` alone silently loses it there.
-    const wantsTerminal = event.code === "KeyO"
-      || (event.key.length === 1 && event.key.toLowerCase() === "o");
-    if (
-      !wantsTerminal
-      || event.repeat
-      || event.altKey
-      || event.ctrlKey
-      || event.metaKey
-      || !this.canOpen()
-    ) return;
-    event.preventDefault();
-    event.stopPropagation();
-    this.setOpen(true);
-  };
-
-  /**
-   * Bubble phase on the terminal itself: whatever the panel's controls did not
-   * already claim stops here rather than reaching the race loop's `window`
-   * listener, so `Escape` closes the terminal instead of resuming the race and
-   * `Enter` never launches from behind an open panel.
-   */
-  private readonly handlePanelKeyDown = (event: KeyboardEvent): void => {
-    if (event.key === "Tab") return;
-    if (event.key === "Escape") {
-      event.preventDefault();
-      this.setOpen(false);
-    }
-    event.stopPropagation();
+  private readonly handleOpenClick = (): void => this.openMenu('options');
+  private readonly handleControlsOpen = (): void => this.openMenu('controls');
+  private readonly handleRelinkClick = (): void => window.location.reload();
+  private readonly handleWindowKeyDown = (event:KeyboardEvent): void => {
+    if(!isMenuOnlyKey(event.code,event.key))return;
+    event.preventDefault();event.stopPropagation();
+    if(event.repeat||event.altKey||event.ctrlKey||event.metaKey||!['intro','paused','result'].includes(document.body.dataset.phase??'intro'))return;
+    this.openMenu(event.code==='KeyC'||event.key.toLowerCase()==='c'?'controls':'options');
   };
 
   dispose(): void {
     window.removeEventListener("keydown", this.handleWindowKeyDown, { capture: true });
-    this.optionsScreen.removeEventListener("keydown", this.handlePanelKeyDown);
+    this.navigation?.dispose();
+    document.getElementById('controls-button')?.removeEventListener('click',this.handleControlsOpen);
     this.masterSlider.removeEventListener("input", this.handleMasterInput);
     this.musicSlider.removeEventListener("input", this.handleMusicInput);
     this.optionsButton.removeEventListener("click", this.handleOpenClick);
-    this.optionsClose.removeEventListener("click", this.handleCloseClick);
     this.optionsRelink.removeEventListener("click", this.handleRelinkClick);
     this.trackGroup.dispose();
     this.formatGroup.dispose();

@@ -1,0 +1,28 @@
+{
+  "status": "VERIFIED",
+  "commands": [
+    "Blender --asset=watchtower build",
+    "Blender --asset=watchtower exported-GLB renders",
+    "check.mjs",
+    "render.mjs --asset=watchtower",
+    "audit_evidence.py",
+    "verify_preservation.py"
+  ],
+  "blenderTurntables": 16,
+  "blenderDistanceFrames": 3,
+  "atlasCells": 7,
+  "atlasGridSamples": 175,
+  "cardDiscardCheck": true,
+  "renderApproval": "Explicit user approval: geometry rendering is required evidence; AI generators remain prohibited.",
+  "aiGeneratorsUsed": false,
+  "integration": "UNVERIFIED: separate task after Phase B",
+  "briefSha256": "c631853fb0a39f60d32455213e69cebe9eca6efe4a34390a65b379a220da008a",
+  "head": "e45875030d00a6f04e50d765f8fecab6c2846c7b",
+  "watchtowerRebuild": "VERIFIED: revised 30 m / 28 m / 20 m drum; true arched clearance confirmed by user",
+  "watchtowerAssetSha256": "340285676a4cdd8cf6ee43b08f99ceee5045a43ad679dcd8fc8131844ce36d2c",
+  "watchtowerTriangles": 9278,
+  "watchtowerEvidenceFrames": 5,
+  "approvedOtherAssetsPreserved": true,
+  "headBeforeRebuild": "9109b6f5dda31d4d88c53bb968c7dcb6084a056b",
+  "headObservation": "Shared branch advanced during the rebuild; this task issued no commit command."
+}

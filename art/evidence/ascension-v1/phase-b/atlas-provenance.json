@@ -1,0 +1,53 @@
+{
+  "script": "scripts/visual/ascension/atlas-provenance.py",
+  "atlases": [
+    {
+      "role": "concrete",
+      "file": "public/assets/ascension/textures/concrete.jpg",
+      "source": "art/references/ascension/atlas-concrete-gptimage2.png",
+      "sha256": "d31966e55b69a599799823584dfb8a5989904b305138459f773b94e430e2a69c",
+      "sourceSha256": "f577484af193d6e2e0145b89289d227483ec82abbbbe818f293214a24e9cc071",
+      "conversion": "sips JPEG conversion"
+    },
+    {
+      "role": "metal",
+      "file": "public/assets/ascension/textures/metal.jpg",
+      "source": "art/references/ascension/atlas-metal-gptimage2.png",
+      "sha256": "f5cf64b867e0d7ab41a792e855c64dcbb330e170f7b13fa49868c680a9adaa6f",
+      "sourceSha256": "b0402b053eaa3d5fd49f7f990580e5f16472ace993bdde5dc18e42fa0bf6642f",
+      "conversion": "sips JPEG conversion"
+    },
+    {
+      "role": "jungle",
+      "file": "public/assets/ascension/textures/jungle.jpg",
+      "source": "art/references/ascension/atlas-jungle-card-gptimage2.png",
+      "sha256": "dc3c314f0ad3dbf15d52bd881bda2f29419a9c14995c2f1797d55af09ed2edb9",
+      "sourceSha256": "e579f57f5ece488bbd4ebd0ed0287a063bfe0bbaa3ae70c8646a3cf75f4da0be",
+      "conversion": "sips JPEG conversion"
+    },
+    {
+      "role": "water",
+      "file": "public/assets/ascension/textures/water.jpg",
+      "source": "public/assets/tideline-foundry/textures/water.jpg",
+      "sha256": "4bcb9dc524e29fce50b344138eed827032b29e91565ddf9a5e31a385e0abf502",
+      "sourceSha256": "4bcb9dc524e29fce50b344138eed827032b29e91565ddf9a5e31a385e0abf502",
+      "conversion": "unchanged shared painted atlas"
+    },
+    {
+      "role": "signage",
+      "file": "public/assets/ascension/textures/signage.jpg",
+      "source": "art/references/ascension/atlas-signage-devices-gptimage2.png",
+      "sha256": "99ed7c6e2673e149abfdf096e2205e4f8df09d8201e0b713112396ba3db2fdff",
+      "sourceSha256": "12504a04ce0b48b5c967ad13fdbd9e1ec37334829e891652d14b72539c1cb7ab",
+      "conversion": "sips JPEG conversion"
+    },
+    {
+      "role": "emissive",
+      "file": "public/assets/ascension/textures/emissive.jpg",
+      "source": "public/assets/tideline-foundry/textures/emissive.jpg",
+      "sha256": "2ee97f2715e5b7fee09f4de99debcbf9933825bd6afa3566d0c3164a8a0fbbfd",
+      "sourceSha256": "2ee97f2715e5b7fee09f4de99debcbf9933825bd6afa3566d0c3164a8a0fbbfd",
+      "conversion": "unchanged shared painted atlas"
+    }
+  ]
+}

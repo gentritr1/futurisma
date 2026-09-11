@@ -1,0 +1,69 @@
+{
+  "instrument": "/Users/gentlegen/Desktop/futurisma-race/polarity_work/scripts/visual/dreamisland-heroes/polish-regions.py",
+  "capture": "art/evidence/dreamisland-v1/polish/r7-waterfall-final/pose-capture.json",
+  "method": "Full/isolated render equality at 2/255; isolated/blank difference above 6/255; display luma .2126/.7152/.0722",
+  "results": [
+    {
+      "blend": 0,
+      "metrics": {
+        "waterfallsheets": {
+          "pixels": 3153,
+          "meanLuma": 0.265120081341766,
+          "meanChroma": 0.2203180288924958,
+          "visibleBoundsPixels": [
+            322,
+            228,
+            357,
+            344
+          ],
+          "widthPixels": 35,
+          "heightPixels": 116
+        },
+        "waterfallfoam": {
+          "pixels": 127,
+          "meanLuma": 0.6433136390304152,
+          "meanChroma": 0.03517060367454067,
+          "visibleBoundsPixels": [
+            311,
+            336,
+            388,
+            347
+          ],
+          "widthPixels": 77,
+          "heightPixels": 11
+        }
+      }
+    },
+    {
+      "blend": 1,
+      "metrics": {
+        "waterfallsheets": {
+          "pixels": 3153,
+          "meanLuma": 0.631815443244218,
+          "meanChroma": 0.17350422566743157,
+          "visibleBoundsPixels": [
+            322,
+            228,
+            357,
+            344
+          ],
+          "widthPixels": 35,
+          "heightPixels": 116
+        },
+        "waterfallfoam": {
+          "pixels": 129,
+          "meanLuma": 0.6468566286669706,
+          "meanChroma": 0.1755889952880377,
+          "visibleBoundsPixels": [
+            311,
+            336,
+            388,
+            347
+          ],
+          "widthPixels": 77,
+          "heightPixels": 11
+        }
+      }
+    }
+  ]
+}

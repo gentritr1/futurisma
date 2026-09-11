@@ -1,0 +1,70 @@
+{
+  "script": "scripts/visual/ascension/race.mjs",
+  "ascension": {
+    "script": "src/game/ascension-runtime.ts",
+    "seed": 3868938316,
+    "tick": 1395,
+    "progress": 0.31158487030940996,
+    "sector": "DELUGE ROAD",
+    "trenchOccupied": false,
+    "schedule": {
+      "script": "scripts/build-ascension-route.mjs",
+      "measurementScript": "scripts/visual/ascension/race.mjs",
+      "measurement": "art/evidence/ascension-v1/phase-a/calibration/works-trench.json",
+      "worksLapSeconds": 28.0705,
+      "definition": "Mean of flying laps two and three in the full Works demo before schedule activation",
+      "launchTick": 8253,
+      "reopenTick": 10653,
+      "steamEndTick": 9937,
+      "rocketGoneTick": 9095,
+      "testTick": 4211,
+      "events": [
+        {
+          "id": "crawler-klaxon-1",
+          "tick": 1493
+        },
+        {
+          "id": "crawler-cross-1",
+          "tick": 1853
+        },
+        {
+          "id": "deluge-test",
+          "tick": 4211
+        },
+        {
+          "id": "crawler-klaxon-2",
+          "tick": 5030
+        },
+        {
+          "id": "crawler-cross-2",
+          "tick": 5390
+        },
+        {
+          "id": "launch",
+          "tick": 8253
+        },
+        {
+          "id": "rocket-gone",
+          "tick": 9095
+        },
+        {
+          "id": "steam-clear",
+          "tick": 9937
+        },
+        {
+          "id": "trench-reopen",
+          "tick": 10653
+        }
+      ]
+    },
+    "state": {
+      "trenchOpen": true,
+      "steam": false,
+      "launched": false,
+      "rocketGone": false,
+      "deluge": false
+    },
+    "events": []
+  },
+  "hud": "FUTURISMA\nASCENSION PAD / MAP 06\nRACE ACTIVE · AUTOPILOT\nPAD 09 / LAUNCH DAY\nSPACE / SHIFT · NITRO\nE / DEVICE\nT−00:58 / TRENCH OPEN\nVELOCITY\n317\nKM/H\nAIRBRAKES\nRACE TIME\n00:11.625\nLAP 1 / 3\nP1 / 4 · 0.55 CLEAR\nNEXT GATE 03 / 07\nCLEAN ×2\n7.0 KM TO FINISH\nDELUGE ROAD\nFINISH\nPLASMA RESERVE\n100%\nSLIPSTREAM\n→\nTURN RIGHT\n100 M\nP1 · YOU\nTOTEM\nP2\nPRIVATEER 13\nP3\nNIGHTFORM 24\nP4\nNEEDLE 16"
+}

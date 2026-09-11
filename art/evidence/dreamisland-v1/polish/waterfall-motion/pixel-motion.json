@@ -1,0 +1,28 @@
+[
+  {
+    "reduced": false,
+    "changedPixelsAboveTwoLevels": 8732,
+    "maximumDifference": 0.11764705882352944,
+    "uniforms": [
+      5.05,
+      6.033333333333333
+    ],
+    "emissive": [
+      0.7,
+      0.7
+    ]
+  },
+  {
+    "reduced": true,
+    "changedPixelsAboveTwoLevels": 1173,
+    "maximumDifference": 0.03137254901960784,
+    "uniforms": [
+      0,
+      0
+    ],
+    "emissive": [
+      0.7,
+      0.7
+    ]
+  }
+]

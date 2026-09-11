@@ -1,0 +1,59 @@
+{
+  "script": "art/blender/ascension_trench.py",
+  "routeUnchanged": true,
+  "measuredLengthMetres": 906.335975720997,
+  "zones": [
+    {
+      "name": "ENTRY RAMP",
+      "fromMetres": 0,
+      "toMetres": 180,
+      "lengthMetres": 180,
+      "fromProgress": 0.16,
+      "toProgress": 0.2542148760330578
+    },
+    {
+      "name": "PAD UNDERSIDE",
+      "fromMetres": 180,
+      "toMetres": 440,
+      "lengthMetres": 260,
+      "fromProgress": 0.2542148760330578,
+      "toProgress": 0.39030303030303026
+    },
+    {
+      "name": "SCORCHED ZONE",
+      "fromMetres": 440,
+      "toMetres": 700,
+      "lengthMetres": 260,
+      "fromProgress": 0.39030303030303026,
+      "toProgress": 0.5263911845730027
+    },
+    {
+      "name": "DELUGE EXIT",
+      "fromMetres": 700,
+      "toMetres": 906.335975720997,
+      "lengthMetres": 206.335975720997,
+      "fromProgress": 0.5263911845730027,
+      "toProgress": 0.635
+    }
+  ],
+  "transitions": [
+    {
+      "progress": 0.2542148760330578,
+      "metres": 180,
+      "from": "ENTRY RAMP",
+      "to": "PAD UNDERSIDE"
+    },
+    {
+      "progress": 0.39030303030303026,
+      "metres": 440,
+      "from": "PAD UNDERSIDE",
+      "to": "SCORCHED ZONE"
+    },
+    {
+      "progress": 0.5263911845730027,
+      "metres": 700,
+      "from": "SCORCHED ZONE",
+      "to": "DELUGE EXIT"
+    }
+  ]
+}

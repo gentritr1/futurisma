@@ -231,6 +231,12 @@ export class AmbienceField {
     else this.bus.gain.setTargetAtTime(duck, now, AMBIENCE_SMOOTHING_SECONDS);
     for (const voice of this.voices) {
       voice.target = bedTargetGain(voice.bed, state);
+      if (this.map === "tideline") {
+        if(voice.bed.id === "pump_thrum") voice.target *= 1 + Math.min(2,cue.tideLap-1)*.42 + (cue.draining ? .2 : 0);
+        if(voice.bed.id === "hull_creak") voice.target *= cue.submerged ? 1 : .25;
+        if(voice.bed.id === "brine_lap") voice.target *= cue.submerged ? 1.3 : .55;
+        if(voice.bed.id === "rain_patter") voice.target *= cue.tideLap > 1 ? 1.45 : .65;
+      }
       if (immediate) voice.gain.gain.value = voice.target;
       else voice.gain.gain.setTargetAtTime(voice.target, now, AMBIENCE_SMOOTHING_SECONDS);
       if (!voice.highFilter) continue;

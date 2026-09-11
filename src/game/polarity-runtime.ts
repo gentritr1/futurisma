@@ -170,6 +170,11 @@ export class PolarityRuntime {
     const label = (simulation.activePower ?? this.heldPowerKind) === "surge" ? "SURGE" : "PHASE SHIELD";
     this.powerLabel.textContent = simulation.activePower ? `${simulation.powerPerfect ? "PERFECT " : ""}${label} ${this.simulation.powerSeconds.toFixed(1)}s`
       : this.heldPowerKind ? `E / ${label}${perfectReady ? " · PERFECT NOW" : ""}` : "COLLECT A POWER CAPSULE";
+    this.powerLabel.dataset.device = simulation.activePower ? (simulation.powerPerfect ? "perfect" : "active") : this.heldPowerKind ? (perfectReady ? "perfect" : "held") : "empty";
+    this.powerLabel.dataset.kind = simulation.activePower ?? this.heldPowerKind ?? "";
+    this.powerLabel.dataset.charge = String(simulation.activePower ? simulation.activeCharge : this.heldPowerCharge);
+    this.deckLabel.dataset.deck = this.isFlipping ? "none" : this.ceiling ? "upper" : "lower";
+    this.flipLabel.dataset.transfer = available ? "ready" : "wait";
     if (this.chargeFill) this.chargeFill.style.transform = `scaleX(${simulation.activePower ? simulation.activeCharge : this.heldPowerCharge})`;
     const shortcut = this.course.shortcutAt(progress);
     const supply = `SUPPLY ${this.simulation.patternForLap(simulation.lap) ? "B" : "A"}`;

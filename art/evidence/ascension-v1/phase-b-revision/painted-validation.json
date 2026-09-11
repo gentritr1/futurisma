@@ -1,0 +1,210 @@
+{
+  "script": "scripts/validate-ascension-painted.mjs",
+  "scope": "GLB structure, material roles, UV0, vertex tint, named device pivots, manifest counts and no named maquette nodes. Does not certify visual fidelity or infer geometry provenance from names.",
+  "accepted": true,
+  "records": [
+    {
+      "path": "public/assets/ascension/rocket-platform.glb",
+      "sha256": "75b6eb1ef5df3f111bb0dc74f0905b94aa2228fc3dfcd12e0328ee9d8aefe873",
+      "triangles": 5808,
+      "primitives": 13,
+      "uniqueTriangles": 5808,
+      "uniquePrimitives": 13,
+      "materials": [
+        "AP_MAT_concrete",
+        "AP_MAT_metal",
+        "AP_MAT_signage",
+        "AP_MAT_emissive"
+      ]
+    },
+    {
+      "path": "public/assets/ascension/crawler-transporter.glb",
+      "sha256": "eb04a7f1437b35d9eb2519fb39be19c0a55c39e4f3d5c4a0b6667ff8f57d49e0",
+      "triangles": 9520,
+      "primitives": 7,
+      "uniqueTriangles": 9520,
+      "uniquePrimitives": 7,
+      "materials": [
+        "AP_MAT_emissive",
+        "AP_MAT_metal",
+        "AP_MAT_signage"
+      ]
+    },
+    {
+      "path": "public/assets/ascension/countdown-board.glb",
+      "sha256": "b696b3c3e906161cc731bc3e54d02698e6c2bd7f28de1e51a2ed2c4978b722f8",
+      "triangles": 460,
+      "primitives": 4,
+      "uniqueTriangles": 460,
+      "uniquePrimitives": 4,
+      "materials": [
+        "AP_MAT_concrete",
+        "AP_MAT_emissive",
+        "AP_MAT_metal",
+        "AP_MAT_signage"
+      ]
+    },
+    {
+      "path": "public/assets/ascension/trench-wall-module.glb",
+      "sha256": "a1eb578e4a58e31138cadf353e5019e772357c7667b8542ab543f01188411738",
+      "triangles": 1948,
+      "primitives": 4,
+      "uniqueTriangles": 1948,
+      "uniquePrimitives": 4,
+      "materials": [
+        "AP_MAT_concrete",
+        "AP_MAT_emissive",
+        "AP_MAT_metal",
+        "AP_MAT_signage"
+      ]
+    },
+    {
+      "path": "public/assets/ascension/deluge-water-tower.glb",
+      "sha256": "dfdcdb666761a4022f248181398b3b91efdc20a4d9a456642f987e0f10a818a4",
+      "triangles": 1408,
+      "primitives": 3,
+      "uniqueTriangles": 1408,
+      "uniquePrimitives": 3,
+      "materials": [
+        "AP_MAT_concrete",
+        "AP_MAT_emissive",
+        "AP_MAT_metal"
+      ]
+    },
+    {
+      "path": "public/assets/ascension/propellant-tank.glb",
+      "sha256": "1b0e8011f4644e29f4d47519fff0bf63a6595670882065632f9cfb4940cd5fa8",
+      "triangles": 1364,
+      "primitives": 3,
+      "uniqueTriangles": 1364,
+      "uniquePrimitives": 3,
+      "materials": [
+        "AP_MAT_concrete",
+        "AP_MAT_emissive",
+        "AP_MAT_metal"
+      ]
+    },
+    {
+      "path": "public/assets/ascension/vent-stack.glb",
+      "sha256": "ac93f399cab7dfcb21a1ba0299312db0ae6e6c44084e63843787ecc1785a1912",
+      "triangles": 992,
+      "primitives": 3,
+      "uniqueTriangles": 992,
+      "uniquePrimitives": 3,
+      "materials": [
+        "AP_MAT_concrete",
+        "AP_MAT_emissive",
+        "AP_MAT_metal"
+      ]
+    },
+    {
+      "path": "public/assets/ascension/crawlerway-gravel-bed.glb",
+      "sha256": "9dd554c1aab10935fcea26020bef0f772cfe8bb27aee8f9dfebfca848075e88e",
+      "triangles": 1032,
+      "primitives": 3,
+      "uniqueTriangles": 1032,
+      "uniquePrimitives": 3,
+      "materials": [
+        "AP_MAT_concrete",
+        "AP_MAT_emissive",
+        "AP_MAT_metal"
+      ]
+    },
+    {
+      "path": "public/assets/ascension/mangrove-pier.glb",
+      "sha256": "c64757e3bbb17d041d1cb88fe598efc011a9df5119d02f3e4cb4ab4eaaf65bcc",
+      "triangles": 1048,
+      "primitives": 3,
+      "uniqueTriangles": 1048,
+      "uniquePrimitives": 3,
+      "materials": [
+        "AP_MAT_concrete",
+        "AP_MAT_emissive",
+        "AP_MAT_metal"
+      ]
+    },
+    {
+      "path": "public/assets/ascension/egret-card-set.glb",
+      "sha256": "33b7e2f96d445f458ad706ae2a1846d586c0c8b92314c658377a59746e47db2d",
+      "triangles": 2,
+      "primitives": 1,
+      "uniqueTriangles": 2,
+      "uniquePrimitives": 1,
+      "materials": [
+        "AP_MAT_jungle"
+      ]
+    },
+    {
+      "path": "public/assets/ascension/service-tower-swing-arm.glb",
+      "sha256": "2c1b4f4b8ab34ee63f81327036a4b6c27bca68bc7b81b235036e8c4afdc7aa8c",
+      "triangles": 692,
+      "primitives": 2,
+      "uniqueTriangles": 692,
+      "uniquePrimitives": 2,
+      "materials": [
+        "AP_MAT_emissive",
+        "AP_MAT_metal"
+      ]
+    },
+    {
+      "path": "public/assets/ascension/power-kit.glb",
+      "sha256": "bc2da1cfd048a51e560b220680beca62dd438eb50a0fb4852f9e16e492b4f635",
+      "triangles": 3788,
+      "primitives": 19,
+      "uniqueTriangles": 3788,
+      "uniquePrimitives": 19,
+      "materials": [
+        "AP_MAT_emissive",
+        "AP_MAT_metal",
+        "AP_MAT_signage"
+      ]
+    },
+    {
+      "path": "public/assets/ascension/painted.glb",
+      "sha256": "227afd0e7baf4624ae8d01161f8934505d5c51d550a13d305e2dfa0155327d03",
+      "triangles": 191628,
+      "primitives": 504,
+      "uniqueTriangles": 56924,
+      "uniquePrimitives": 98,
+      "materials": [
+        "AP_MAT_concrete",
+        "AP_MAT_emissive",
+        "AP_MAT_jungle",
+        "AP_MAT_metal",
+        "AP_MAT_signage"
+      ]
+    }
+  ],
+  "atlas": [
+    {
+      "role": "concrete",
+      "path": "public/assets/ascension/textures/concrete.jpg",
+      "sha256": "d31966e55b69a599799823584dfb8a5989904b305138459f773b94e430e2a69c"
+    },
+    {
+      "role": "metal",
+      "path": "public/assets/ascension/textures/metal.jpg",
+      "sha256": "f5cf64b867e0d7ab41a792e855c64dcbb330e170f7b13fa49868c680a9adaa6f"
+    },
+    {
+      "role": "jungle",
+      "path": "public/assets/ascension/textures/jungle.jpg",
+      "sha256": "dc3c314f0ad3dbf15d52bd881bda2f29419a9c14995c2f1797d55af09ed2edb9"
+    },
+    {
+      "role": "water",
+      "path": "public/assets/ascension/textures/water.jpg",
+      "sha256": "f44f4b1a3e711599fb933b06be8862ff13d644d1edef0eeca5aa0fe38ec84864"
+    },
+    {
+      "role": "signage",
+      "path": "public/assets/ascension/textures/signage.jpg",
+      "sha256": "99ed7c6e2673e149abfdf096e2205e4f8df09d8201e0b713112396ba3db2fdff"
+    },
+    {
+      "role": "emissive",
+      "path": "public/assets/ascension/textures/emissive.jpg",
+      "sha256": "2ee97f2715e5b7fee09f4de99debcbf9933825bd6afa3566d0c3164a8a0fbbfd"
+    }
+  ]
+}

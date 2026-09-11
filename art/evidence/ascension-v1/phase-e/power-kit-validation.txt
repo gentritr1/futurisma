@@ -1,0 +1,6 @@
+
+> futurisma-race@0.1.0 validate:power-kit
+> node scripts/validate-power-kit.mjs
+
+Power kit PASS: 3444 Blender triangles, 8 batches, 167552 bytes, no textures; distinct mechanical silhouettes, independent shared-resource clones, reduced motion, mounted inventory/deployment and exactly-once cleanup.
+Pump kit V2 PASS: 3340 triangles, four embedded painted atlases, contact AO, six role allowlist, turbine/iris pivots, independent lamp controls and reduced motion.

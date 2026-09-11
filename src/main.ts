@@ -8,6 +8,7 @@ import { save } from "./game/persistence";
 import { configureRenderMode } from "./game/render-mode.js";
 import { resolveQualityLock, resolveReducedMotion, searchParam } from "./game/query-probes";
 import { GameUi } from "./game/ui";
+import { applyInterfaceScale } from "./game/interface-scale.js";
 
 const canvasElement = document.getElementById("game-canvas");
 if (!(canvasElement instanceof HTMLCanvasElement)) {
@@ -20,11 +21,27 @@ const canvas: HTMLCanvasElement = canvasElement;
 // before anything below builds a renderer or a material. `?render=` still wins.
 const renderMode = configureRenderMode(save.settings.renderMode);
 
+// The two interface scales are read from the same stored settings and written
+// to `<body>` before the first frame, so the HUD never lays out at one size and
+// then jumps to another. The resize listener re-runs only the viewport term.
+applyInterfaceScale(save.settings);
+window.addEventListener("resize", () => applyInterfaceScale(save.settings));
+
 const ui = new GameUi();
+// The ability glyph slots derive their state from the nodes the circuit
+// runtimes already write, so this binds once and needs nothing from them.
+// Circuit-specific presentation stays out of first paint, like the runtimes it
+// reads: the slots only ever show something once a device circuit has loaded.
+void import("./game/ability-slots").then(({ bindAbilitySlots }) => bindAbilitySlots());
 const input = new InputController();
+void import("./game/input-prompts").then(({bindInputPrompts}) => bindInputPrompts(input));
 const courseAssemblyStartedAt = performance.now();
 const selection = resolveMapSelection(window.location.search);
-const course: RaceCourse = selection === "tideline"
+const course: RaceCourse = selection === "dreamisland"
+  ? new (await import("./game/dreamisland-course")).DreamIslandCourse()
+  : selection === "ascension"
+  ? new (await import("./game/ascension-course")).AscensionCourse()
+  : selection === "tideline"
   ? new (await import("./game/tideline-course")).TidelineCourse()
   : selection === "polarity"
   ? new (await import("./game/polarity-course")).PolarityCourse()
@@ -80,6 +97,14 @@ const handleRestartClick = (): void => {
   void beginTrial();
 };
 
+const circuitSelect=document.getElementById('circuit-select-button')!;
+const handleCircuitSelect=():void=>{
+  const url=new URL(window.location.href);
+  url.searchParams.delete('demo');url.searchParams.delete('start');
+  window.location.assign(url.href);
+};
+circuitSelect.addEventListener('click',handleCircuitSelect);
+
 ui.startButton.addEventListener("click", handleStartClick);
 ui.restartButton.addEventListener("click", handleRestartClick);
 
@@ -110,6 +135,7 @@ if (import.meta.hot) {
   import.meta.hot.dispose(() => {
     ui.startButton.removeEventListener("click", handleStartClick);
     ui.restartButton.removeEventListener("click", handleRestartClick);
+    circuitSelect.removeEventListener('click',handleCircuitSelect);
     meta.dispose();
     game.dispose();
   });

@@ -1,0 +1,25 @@
+{
+  "script": "scripts/visual/tideline-v4/audio-metrics.py",
+  "files": [
+    {
+      "file": "art/evidence/tideline-v4/audio/drain-transition.wav",
+      "sampleRate": 48000,
+      "channels": 2,
+      "sampleFrames": 960000,
+      "durationSeconds": 20.0,
+      "peak": 0.235443115234375,
+      "rmsDbFS": -28.9246556281312,
+      "clippedSamples": 0
+    },
+    {
+      "file": "art/evidence/tideline-v4/audio/pump-hall-stationary.wav",
+      "sampleRate": 48000,
+      "channels": 2,
+      "sampleFrames": 480000,
+      "durationSeconds": 10.0,
+      "peak": 0.129180908203125,
+      "rmsDbFS": -31.097515874556173,
+      "clippedSamples": 0
+    }
+  ]
+}

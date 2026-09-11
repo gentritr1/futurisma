@@ -89,12 +89,12 @@ const selectionCode = selectionTransform.code.replace(
   'import { save } from "./persistence";', 'const save = { track: "polarity" };');
 const selectionModule = await import(`data:text/javascript;base64,${Buffer.from(selectionCode).toString("base64")}`);
 assert.equal(selectionModule.resolveMapSelection(""), "polarity");
-for (const track of ["greenwater", "bitterpan", "nightshift", "polarity", "tideline"]) {
+for (const track of ["greenwater", "bitterpan", "nightshift", "polarity", "tideline", "ascension", "dreamisland"]) {
   assert.equal(selectionModule.resolveMapSelection(`?map=${track}`), track);
 }
 assert.equal(selectionModule.resolveMapSelection("?map=unknown"), "greenwater");
 assert.equal(selectionModule.resolveMapSelection("?map=NIGHTSHIFT"), "nightshift");
-assert.equal(selectionModule.TRACKS.length, 5);
+assert.equal(selectionModule.TRACKS.length, 7);
 assert.equal(course.orderedCheckpointCount, 8);
 assert.equal(course.checkpointCount, 7);
 assert.equal(course.defaultLapCount, 3);

@@ -1,0 +1,10 @@
+{
+  "source": "public/assets/greenwater/models/greenwater_environment_runtime.glb",
+  "material": "GW_MAT_jungle",
+  "extraction": "Embedded PNG bufferView copied verbatim; no image editing",
+  "sha256": "d88795e400ab415a7eb49fffd6ef98767338e1f6775d2be256e4872636bcdffb",
+  "implementation": "src/game/ascension-mangroves.ts",
+  "authoredTrunkDiameterMetres": 0.4,
+  "authoredMaximumCanopyTopMetres": 8.9,
+  "blindReview": "pending final image-only review"
+}

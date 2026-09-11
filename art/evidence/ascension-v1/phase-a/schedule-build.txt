@@ -1,0 +1,51 @@
+{"script":"scripts/build-ascension-route.mjs","length":2600.0000000000014,"shortcutMetres":906.3359774727096,"detourMetres":1235.0000000000007}
+{
+  "script": "scripts/build-ascension-route.mjs",
+  "measurementScript": "scripts/visual/ascension/race.mjs",
+  "measurement": "art/evidence/ascension-v1/phase-a/calibration/works-trench.json",
+  "worksLapSeconds": 28.0705,
+  "definition": "Mean of flying laps two and three in the full Works demo before schedule activation",
+  "launchTick": 8253,
+  "reopenTick": 10653,
+  "steamEndTick": 9937,
+  "rocketGoneTick": 9095,
+  "testTick": 4211,
+  "events": [
+    {
+      "id": "crawler-klaxon-1",
+      "tick": 1493
+    },
+    {
+      "id": "crawler-cross-1",
+      "tick": 1853
+    },
+    {
+      "id": "deluge-test",
+      "tick": 4211
+    },
+    {
+      "id": "crawler-klaxon-2",
+      "tick": 5030
+    },
+    {
+      "id": "crawler-cross-2",
+      "tick": 5390
+    },
+    {
+      "id": "launch",
+      "tick": 8253
+    },
+    {
+      "id": "rocket-gone",
+      "tick": 9095
+    },
+    {
+      "id": "steam-clear",
+      "tick": 9937
+    },
+    {
+      "id": "trench-reopen",
+      "tick": 10653
+    }
+  ]
+}

@@ -1,0 +1,299 @@
+{
+  "instrument": "scripts/visual/dreamisland-heroes/polish-attribute-proof.mjs",
+  "before": {
+    "file": "art/evidence/dreamisland-v1/polish/before-palette/painted.glb",
+    "sha256": "298ebc78510072744d614d2e8d64583cd64133e436eefba9baf14e6d15914a11",
+    "meshes": [
+      {
+        "name": "DI_FISHBASIN_DI_MAT_emissive",
+        "primitives": [
+          {
+            "indices": "059b5a807a6295d7090d89868c3fbae8883d571cfc4f2977de128022f658bde7",
+            "attributes": {
+              "POSITION": "8af1acd1cf09a9504a87ffaa716c1327ba04616bf124331acc649ec2b1aa9b5c",
+              "NORMAL": "861a50016b089a0aaeeeec1dc7a41b0e8f41d5872fd5308143792cb864a4d409",
+              "TEXCOORD_0": "efce50e9497fc230766c901f0590b6389666bd6e07e851874cd9e5e89b4a7b02",
+              "COLOR_0": "452f63993c530741f89ce8817326182b2bea040c5dd2ba2015b12d96d5a4bd73"
+            }
+          }
+        ]
+      },
+      {
+        "name": "DI_FISHBASIN_DI_MAT_jungle",
+        "primitives": [
+          {
+            "indices": "2ed2376b231838dd013d2861ef7e77cde0858c146ff75a7a86a0fce0b1ca8d80",
+            "attributes": {
+              "POSITION": "bb0c227d742f4360d967048e2f5a4f5458dcbf13fc05d74769d56ee4287de0a7",
+              "NORMAL": "d63a443d997f224c5938d832e57ea36a285c5d1997a1882bdaa00b7ac7a92fd9",
+              "TEXCOORD_0": "195e31654a6cfa2774bdaf90ed4dfcd4cf5bb9cc1d9a8b9eb5adb93217112e8d",
+              "COLOR_0": "38c77a389313db00e315adf18d51a9f4027e97b19e087d8d2c6c6de3a909eb61"
+            }
+          }
+        ]
+      },
+      {
+        "name": "DI_FISHREEF_DI_MAT_emissive",
+        "primitives": [
+          {
+            "indices": "ebac81927ac264e5537e261310f04314012f27b59abd5d3d9f2e1b841271929d",
+            "attributes": {
+              "POSITION": "bdb394ef97fa34e125a1793645cd172376d5e338686e4d0469c1c48ebb019699",
+              "NORMAL": "bab6391c142033f9539116e3f70a413ff7208cec50a03d8df792480fe7f1f8ab",
+              "TEXCOORD_0": "b7bf1af4cd798c839faef0f41bbed3b34aa9b76dc33dab1a1fb79c541934eadc",
+              "COLOR_0": "452f63993c530741f89ce8817326182b2bea040c5dd2ba2015b12d96d5a4bd73"
+            }
+          }
+        ]
+      },
+      {
+        "name": "DI_FISHREEF_DI_MAT_jungle",
+        "primitives": [
+          {
+            "indices": "4e4ccd1f0a287c71ed3d8f8936d58976a52fec76eea8ae22575da5211745004a",
+            "attributes": {
+              "POSITION": "2917f5390d6ed7aecaea63dfab9c863b965e4bb4a96007db8c1f45ba1b3196b5",
+              "NORMAL": "d7b8a2bb5d3be4c3d33ee404de7fd88c3818541a2217487353a73ad92e2811c6",
+              "TEXCOORD_0": "271702d3ff91913c36a2b866078453becc91f8c53c011e60abb870ba0db470cb",
+              "COLOR_0": "38c77a389313db00e315adf18d51a9f4027e97b19e087d8d2c6c6de3a909eb61"
+            }
+          }
+        ]
+      },
+      {
+        "name": "DI_STATIC_DI_MAT_concrete",
+        "primitives": [
+          {
+            "indices": "ca156336a8c13d1e5b94018676213dffd37173d1ae3e5506f6008f271047dd4a",
+            "attributes": {
+              "POSITION": "332e502e2896a937ab082db56135536f62a93c6be058d88d78d673e592949d1e",
+              "NORMAL": "52e6da3729fc694ec72696769c34bff035c7e1a69c9a180c61a437532d399d9f",
+              "TEXCOORD_0": "e973f0343f8468da1c98ea0ef7e7968ba7cb4a1c0ed809413c6c3313bc39c1d8",
+              "COLOR_0": "d435ecb87cc0e863025a33594be9af1067ed5847cce6e2457a8388c3847f6a2f"
+            }
+          }
+        ]
+      },
+      {
+        "name": "DI_STATIC_DI_MAT_emissive",
+        "primitives": [
+          {
+            "indices": "a5cd49180ff22513c490cecb98b8beadcd00df51b0964be6eba0310caf24954f",
+            "attributes": {
+              "POSITION": "efadfd0aca6170c8ec9c6d64db29b83163f976703594e83beee50bb1a3820392",
+              "NORMAL": "3e7ed75014c1debb475c8dfba3f4dfac564d38078210216a891dc2de1897765f",
+              "TEXCOORD_0": "78ff0ec6efdf69a48c14ca55d2e2b723ac0d7d13db805464779fca52b7836c19",
+              "COLOR_0": "77db66d368d7b91a3361f38fe2d1a1902daeef3cdf03ff132807c0ff2bd99d09"
+            }
+          }
+        ]
+      },
+      {
+        "name": "DI_STATIC_DI_MAT_jungle",
+        "primitives": [
+          {
+            "indices": "6a5e52ec40be9406a9a9844774ae7d027f6adb8c82548749df6367f847a3eae9",
+            "attributes": {
+              "POSITION": "49e28e1d82b333a5fa829316c6f6308d84daa247c568dd3ac889d620b43d09c5",
+              "NORMAL": "1edefc77777910172da6657898254500c7c9ec7eb2f00c0e2eb84a73712753ba",
+              "TEXCOORD_0": "7399adf3a9b657878be2f08055cbd8f1d8437c7fb386c32b1b536d32399b2ab9",
+              "COLOR_0": "8fb9cd0e9d99ee1376522eecd4f834affd831711728bfe1d63abe01223e36130"
+            }
+          }
+        ]
+      },
+      {
+        "name": "DI_STATIC_DI_MAT_jungle-card",
+        "primitives": [
+          {
+            "indices": "24ceb3030d9db9e52c6afb5e477e25d2d01500fb6e792de049b5853881814595",
+            "attributes": {
+              "POSITION": "f2131f170fde24fb390ca0faa9b5ca5a9c3c97312a841e48500a9f5614accb8d",
+              "NORMAL": "436295022a26e22d53eabe4e850ce1f936147b39f48f647f3bb61cf0ec0d2c43",
+              "TEXCOORD_0": "3d29c8f2fd7fd1b95983323bd418c3041be6cc3e8973df90424e3479444f6de8",
+              "COLOR_0": "839db3d22d8d7d5c00c4377dface4e7065cae31f2b43610dc6cb43f172ef5c92"
+            }
+          }
+        ]
+      },
+      {
+        "name": "DI_STATIC_DI_MAT_metal",
+        "primitives": [
+          {
+            "indices": "db46da504457b9d086f086242e99419dfcb3586f3a0e6942ee03298f1565d9bb",
+            "attributes": {
+              "POSITION": "63d29f00bbf9d0a2f1af519020884026a6faa0911a982e09d5b617d85c7963bb",
+              "NORMAL": "998b7df14960583d6b58c234d472905ebdc22124b1488a9ecbb977bff001e257",
+              "TEXCOORD_0": "bf8e5cfccddd9f410a49d1967ab8e6122192a79b6bc1f82d608c50d83ded2c5f",
+              "COLOR_0": "f9c0dd87107f79e6edd43dc59d035945d5973c5f95db3cfd0a191fdaea4033d0"
+            }
+          }
+        ]
+      },
+      {
+        "name": "DI_STATIC_DI_MAT_signage",
+        "primitives": [
+          {
+            "indices": "89d0fad4fb7fa55941d087f4745de5a73661b8a841fc72e536e4b384df01b3e5",
+            "attributes": {
+              "POSITION": "76f24fd7d8f2277bbf769b2f86500e71a74b31ad3cda4223e472bde490fef7e0",
+              "NORMAL": "75e91f569e333e3f274ec0761811ec9eb973378c000acc47e0c1a0bd7c4a1f83",
+              "TEXCOORD_0": "5991fdd3d56b6c440be19642906a46d1b6d65cda2238eced84023cb42ae34b63",
+              "COLOR_0": "4889aab46674e4af9725ee1ab598451a44902cef93fcadbbc1c95885a420f65a"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "after": {
+    "file": "public/assets/dreamisland/painted.glb",
+    "sha256": "71f18233dd571120dbe3a6a95cf5fdaa1211a728d718b5bd6127b2045d77689d",
+    "meshes": [
+      {
+        "name": "DI_FISHBASIN_DI_MAT_emissive",
+        "primitives": [
+          {
+            "indices": "059b5a807a6295d7090d89868c3fbae8883d571cfc4f2977de128022f658bde7",
+            "attributes": {
+              "POSITION": "8af1acd1cf09a9504a87ffaa716c1327ba04616bf124331acc649ec2b1aa9b5c",
+              "NORMAL": "861a50016b089a0aaeeeec1dc7a41b0e8f41d5872fd5308143792cb864a4d409",
+              "TEXCOORD_0": "efce50e9497fc230766c901f0590b6389666bd6e07e851874cd9e5e89b4a7b02",
+              "COLOR_0": "452f63993c530741f89ce8817326182b2bea040c5dd2ba2015b12d96d5a4bd73"
+            }
+          }
+        ]
+      },
+      {
+        "name": "DI_FISHBASIN_DI_MAT_jungle",
+        "primitives": [
+          {
+            "indices": "2ed2376b231838dd013d2861ef7e77cde0858c146ff75a7a86a0fce0b1ca8d80",
+            "attributes": {
+              "POSITION": "bb0c227d742f4360d967048e2f5a4f5458dcbf13fc05d74769d56ee4287de0a7",
+              "NORMAL": "d63a443d997f224c5938d832e57ea36a285c5d1997a1882bdaa00b7ac7a92fd9",
+              "TEXCOORD_0": "195e31654a6cfa2774bdaf90ed4dfcd4cf5bb9cc1d9a8b9eb5adb93217112e8d",
+              "COLOR_0": "38c77a389313db00e315adf18d51a9f4027e97b19e087d8d2c6c6de3a909eb61"
+            }
+          }
+        ]
+      },
+      {
+        "name": "DI_FISHREEF_DI_MAT_emissive",
+        "primitives": [
+          {
+            "indices": "ebac81927ac264e5537e261310f04314012f27b59abd5d3d9f2e1b841271929d",
+            "attributes": {
+              "POSITION": "bdb394ef97fa34e125a1793645cd172376d5e338686e4d0469c1c48ebb019699",
+              "NORMAL": "bab6391c142033f9539116e3f70a413ff7208cec50a03d8df792480fe7f1f8ab",
+              "TEXCOORD_0": "b7bf1af4cd798c839faef0f41bbed3b34aa9b76dc33dab1a1fb79c541934eadc",
+              "COLOR_0": "452f63993c530741f89ce8817326182b2bea040c5dd2ba2015b12d96d5a4bd73"
+            }
+          }
+        ]
+      },
+      {
+        "name": "DI_FISHREEF_DI_MAT_jungle",
+        "primitives": [
+          {
+            "indices": "4e4ccd1f0a287c71ed3d8f8936d58976a52fec76eea8ae22575da5211745004a",
+            "attributes": {
+              "POSITION": "2917f5390d6ed7aecaea63dfab9c863b965e4bb4a96007db8c1f45ba1b3196b5",
+              "NORMAL": "d7b8a2bb5d3be4c3d33ee404de7fd88c3818541a2217487353a73ad92e2811c6",
+              "TEXCOORD_0": "271702d3ff91913c36a2b866078453becc91f8c53c011e60abb870ba0db470cb",
+              "COLOR_0": "38c77a389313db00e315adf18d51a9f4027e97b19e087d8d2c6c6de3a909eb61"
+            }
+          }
+        ]
+      },
+      {
+        "name": "DI_STATIC_DI_MAT_concrete",
+        "primitives": [
+          {
+            "indices": "ca156336a8c13d1e5b94018676213dffd37173d1ae3e5506f6008f271047dd4a",
+            "attributes": {
+              "POSITION": "332e502e2896a937ab082db56135536f62a93c6be058d88d78d673e592949d1e",
+              "NORMAL": "52e6da3729fc694ec72696769c34bff035c7e1a69c9a180c61a437532d399d9f",
+              "TEXCOORD_0": "e973f0343f8468da1c98ea0ef7e7968ba7cb4a1c0ed809413c6c3313bc39c1d8",
+              "COLOR_0": "a642ae4aadbbd1acf2e7febeb6bcdc077cb224e423ec1a346d08b7732d78719e"
+            }
+          }
+        ]
+      },
+      {
+        "name": "DI_STATIC_DI_MAT_emissive",
+        "primitives": [
+          {
+            "indices": "a5cd49180ff22513c490cecb98b8beadcd00df51b0964be6eba0310caf24954f",
+            "attributes": {
+              "POSITION": "efadfd0aca6170c8ec9c6d64db29b83163f976703594e83beee50bb1a3820392",
+              "NORMAL": "3e7ed75014c1debb475c8dfba3f4dfac564d38078210216a891dc2de1897765f",
+              "TEXCOORD_0": "78ff0ec6efdf69a48c14ca55d2e2b723ac0d7d13db805464779fca52b7836c19",
+              "COLOR_0": "77db66d368d7b91a3361f38fe2d1a1902daeef3cdf03ff132807c0ff2bd99d09"
+            }
+          }
+        ]
+      },
+      {
+        "name": "DI_STATIC_DI_MAT_jungle",
+        "primitives": [
+          {
+            "indices": "6a5e52ec40be9406a9a9844774ae7d027f6adb8c82548749df6367f847a3eae9",
+            "attributes": {
+              "POSITION": "49e28e1d82b333a5fa829316c6f6308d84daa247c568dd3ac889d620b43d09c5",
+              "NORMAL": "1edefc77777910172da6657898254500c7c9ec7eb2f00c0e2eb84a73712753ba",
+              "TEXCOORD_0": "7399adf3a9b657878be2f08055cbd8f1d8437c7fb386c32b1b536d32399b2ab9",
+              "COLOR_0": "8fb9cd0e9d99ee1376522eecd4f834affd831711728bfe1d63abe01223e36130"
+            }
+          }
+        ]
+      },
+      {
+        "name": "DI_STATIC_DI_MAT_jungle-card",
+        "primitives": [
+          {
+            "indices": "24ceb3030d9db9e52c6afb5e477e25d2d01500fb6e792de049b5853881814595",
+            "attributes": {
+              "POSITION": "f2131f170fde24fb390ca0faa9b5ca5a9c3c97312a841e48500a9f5614accb8d",
+              "NORMAL": "436295022a26e22d53eabe4e850ce1f936147b39f48f647f3bb61cf0ec0d2c43",
+              "TEXCOORD_0": "3d29c8f2fd7fd1b95983323bd418c3041be6cc3e8973df90424e3479444f6de8",
+              "COLOR_0": "839db3d22d8d7d5c00c4377dface4e7065cae31f2b43610dc6cb43f172ef5c92"
+            }
+          }
+        ]
+      },
+      {
+        "name": "DI_STATIC_DI_MAT_metal",
+        "primitives": [
+          {
+            "indices": "db46da504457b9d086f086242e99419dfcb3586f3a0e6942ee03298f1565d9bb",
+            "attributes": {
+              "POSITION": "63d29f00bbf9d0a2f1af519020884026a6faa0911a982e09d5b617d85c7963bb",
+              "NORMAL": "998b7df14960583d6b58c234d472905ebdc22124b1488a9ecbb977bff001e257",
+              "TEXCOORD_0": "bf8e5cfccddd9f410a49d1967ab8e6122192a79b6bc1f82d608c50d83ded2c5f",
+              "COLOR_0": "f9c0dd87107f79e6edd43dc59d035945d5973c5f95db3cfd0a191fdaea4033d0"
+            }
+          }
+        ]
+      },
+      {
+        "name": "DI_STATIC_DI_MAT_signage",
+        "primitives": [
+          {
+            "indices": "89d0fad4fb7fa55941d087f4745de5a73661b8a841fc72e536e4b384df01b3e5",
+            "attributes": {
+              "POSITION": "76f24fd7d8f2277bbf769b2f86500e71a74b31ad3cda4223e472bde490fef7e0",
+              "NORMAL": "75e91f569e333e3f274ec0761811ec9eb973378c000acc47e0c1a0bd7c4a1f83",
+              "TEXCOORD_0": "5991fdd3d56b6c440be19642906a46d1b6d65cda2238eced84023cb42ae34b63",
+              "COLOR_0": "4889aab46674e4af9725ee1ab598451a44902cef93fcadbbc1c95885a420f65a"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "changedColorMeshes": [
+    "DI_STATIC_DI_MAT_concrete"
+  ],
+  "unchanged": "All indices, positions, normals and UVs. Existing quadrant probes disable vertex colours; this final edit cannot change their sampled cells."
+}

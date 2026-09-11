@@ -1,0 +1,58 @@
+{
+  "script": "scripts/visual/ascension/blind-pack.mjs",
+  "status": "Awaiting independent image-only review",
+  "answerKey": [
+    {
+      "image": "view-01.png",
+      "expected": "SCORCHED ZONE"
+    },
+    {
+      "image": "view-02.png",
+      "expected": "the change from PAD UNDERSIDE to SCORCHED ZONE"
+    },
+    {
+      "image": "view-03.png",
+      "expected": "PAD UNDERSIDE"
+    },
+    {
+      "image": "view-04.png",
+      "expected": "DELUGE EXIT"
+    },
+    {
+      "image": "view-05.png",
+      "expected": "ENTRY RAMP"
+    },
+    {
+      "image": "view-06.png",
+      "expected": "the change from SCORCHED ZONE to DELUGE EXIT"
+    },
+    {
+      "image": "view-07.png",
+      "expected": "PAD UNDERSIDE"
+    },
+    {
+      "image": "view-08.png",
+      "expected": "DELUGE EXIT"
+    },
+    {
+      "image": "view-09.png",
+      "expected": "ENTRY RAMP"
+    },
+    {
+      "image": "view-10.png",
+      "expected": "the change from ENTRY RAMP to PAD UNDERSIDE"
+    },
+    {
+      "image": "view-11.png",
+      "expected": "SCORCHED ZONE"
+    },
+    {
+      "image": "view-12.png",
+      "expected": "PAD UNDERSIDE"
+    },
+    {
+      "image": "view-13.png",
+      "expected": "SCORCHED ZONE"
+    }
+  ]
+}

@@ -1,0 +1,286 @@
+{
+  "script": "scripts/visual/ascension/stations.mjs",
+  "records": [
+    {
+      "file": "base-TRENCH_00.png",
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static painted evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.18375,
+      "tick": 0,
+      "sector": "TRENCH",
+      "trench": true,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        52.85109799557686,
+        9.614095541639895,
+        -387.8995116131514
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "render": {
+        "calls": 60,
+        "triangles": 153876
+      }
+    },
+    {
+      "file": "base-TRENCH_01.png",
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static painted evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.23125,
+      "tick": 0,
+      "sector": "TRENCH",
+      "trench": true,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        126.85891513345145,
+        7.673490317048408,
+        -336.83305178636033
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "render": {
+        "calls": 67,
+        "triangles": 167176
+      }
+    },
+    {
+      "file": "base-TRENCH_02.png",
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static painted evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.27875,
+      "tick": 0,
+      "sector": "TRENCH",
+      "trench": true,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        178.94483282689973,
+        4.238099768203953,
+        -262.9574685604901
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "render": {
+        "calls": 73,
+        "triangles": 185564
+      }
+    },
+    {
+      "file": "base-TRENCH_03.png",
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static painted evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.32625,
+      "tick": 0,
+      "sector": "TRENCH",
+      "trench": true,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        214.96626640620448,
+        0.6202271613611927,
+        -179.92592502529004
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "render": {
+        "calls": 60,
+        "triangles": 164992
+      }
+    },
+    {
+      "file": "base-TRENCH_04.png",
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static painted evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.37374999999999997,
+      "tick": 0,
+      "sector": "TRENCH",
+      "trench": true,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        238.85010529303406,
+        -1.7982892007161455,
+        -92.59244007455462
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "render": {
+        "calls": 47,
+        "triangles": 145136
+      }
+    },
+    {
+      "file": "base-TRENCH_05.png",
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static painted evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.42125,
+      "tick": 0,
+      "sector": "TRENCH",
+      "trench": true,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        252.15448935696855,
+        -2.093999867578237,
+        -3.0211956980961805
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "render": {
+        "calls": 47,
+        "triangles": 145136
+      }
+    },
+    {
+      "file": "base-TRENCH_06.png",
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static painted evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.46875,
+      "tick": 0,
+      "sector": "TRENCH",
+      "trench": true,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        254.64197458719158,
+        -0.15359960779185844,
+        87.49645092075558
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "render": {
+        "calls": 41,
+        "triangles": 116644
+      }
+    },
+    {
+      "file": "base-TRENCH_07.png",
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static painted evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.51625,
+      "tick": 0,
+      "sector": "TRENCH",
+      "trench": true,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        243.93862490405755,
+        3.281897138228731,
+        177.373648552526
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "render": {
+        "calls": 39,
+        "triangles": 115912
+      }
+    },
+    {
+      "file": "base-TRENCH_08.png",
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static painted evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.56375,
+      "tick": 0,
+      "sector": "TRENCH",
+      "trench": true,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        213.50317333364103,
+        6.899661074213298,
+        262.43075521613673
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "render": {
+        "calls": 36,
+        "triangles": 90588
+      }
+    },
+    {
+      "file": "base-TRENCH_09.png",
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static painted evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.6112500000000001,
+      "tick": 0,
+      "sector": "TRENCH",
+      "trench": true,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        149.55785450655898,
+        9.318355987487209,
+        324.8284897661858
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "render": {
+        "calls": 52,
+        "triangles": 105936
+      }
+    }
+  ],
+  "errors": [],
+  "roadPatches": {
+    "under": {
+      "x": 640,
+      "y": 430
+    },
+    "between": {
+      "x": 640,
+      "y": 455
+    }
+  }
+}

@@ -1,0 +1,3782 @@
+{
+  "script": "scripts/visual/ascension/analyse-pcm.py",
+  "captureScript": "scripts/visual/ascension/audio-capture.mjs",
+  "windowSeconds": 0.05,
+  "samplesPerEnvelope": 2400,
+  "pcm": {
+    "A": {
+      "seconds": 100,
+      "rate": 48000,
+      "expected": 4800000,
+      "observed": 4800000,
+      "residual": 0
+    },
+    "B": {
+      "seconds": 100,
+      "rate": 48000,
+      "expected": 4800000,
+      "observed": 4800000,
+      "residual": 0
+    },
+    "C": {
+      "seconds": 100,
+      "rate": 48000,
+      "expected": 4800000,
+      "observed": 4800000,
+      "residual": 0
+    }
+  },
+  "launch": {
+    "expectedDistanceSeconds": 0.7082981576826575,
+    "distanceMetres": 242.94626808515153,
+    "envelopeWindowSeconds": 3.5,
+    "expectedEnvelopeSamples": 70,
+    "observedEnvelopeSamples": 70,
+    "envelopeResidual": 0,
+    "waveformOnsetSeconds": 0.7,
+    "threshold": 0.003,
+    "bandHz": [
+      20,
+      200
+    ],
+    "residualSeconds": -0.008298157682657514,
+    "passGate": true,
+    "envelopes": [
+      {
+        "secondsFromAnchor": -0.5,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.05053653808284665,
+        "masterEnabled": 0.05198801491503236,
+        "musicControl": 0.07908326927314017,
+        "musicEnabled": 0.07835491777383387
+      },
+      {
+        "secondsFromAnchor": -0.45,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.04905572595105697,
+        "masterEnabled": 0.04975599541066834,
+        "musicControl": 0.07987949316398354,
+        "musicEnabled": 0.0780410552515059
+      },
+      {
+        "secondsFromAnchor": -0.4,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.05095309399582091,
+        "masterEnabled": 0.04825488980566081,
+        "musicControl": 0.07502060776940536,
+        "musicEnabled": 0.07494861744691426
+      },
+      {
+        "secondsFromAnchor": -0.35,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.050209874173975745,
+        "masterEnabled": 0.05570245349919229,
+        "musicControl": 0.08241448713927839,
+        "musicEnabled": 0.0836886752961179
+      },
+      {
+        "secondsFromAnchor": -0.3,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.05513352517218504,
+        "masterEnabled": 0.05755665586068601,
+        "musicControl": 0.08836458684243757,
+        "musicEnabled": 0.08701752929975318
+      },
+      {
+        "secondsFromAnchor": -0.25,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.0588321941204802,
+        "masterEnabled": 0.05926917678152782,
+        "musicControl": 0.09396359572823683,
+        "musicEnabled": 0.09719035539198966
+      },
+      {
+        "secondsFromAnchor": -0.2,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.05662937545357497,
+        "masterEnabled": 0.050280550597178966,
+        "musicControl": 0.07851514728288721,
+        "musicEnabled": 0.07222255442193208
+      },
+      {
+        "secondsFromAnchor": -0.15,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.036705773984793286,
+        "masterEnabled": 0.0383403418728715,
+        "musicControl": 0.04110053545201527,
+        "musicEnabled": 0.03914729433410989
+      },
+      {
+        "secondsFromAnchor": -0.1,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.032227230122302455,
+        "masterEnabled": 0.03124000143493161,
+        "musicControl": 0.02922292896130627,
+        "musicEnabled": 0.02961611699319293
+      },
+      {
+        "secondsFromAnchor": -0.05,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.04635813184396334,
+        "masterEnabled": 0.046872190587472634,
+        "musicControl": 0.07218813930068797,
+        "musicEnabled": 0.07472988307809847
+      },
+      {
+        "secondsFromAnchor": -0.0,
+        "controlBandRms": 0.000934921443164245,
+        "enabledBandRms": 0.0008370538265639494,
+        "addedBandRms": 0.0,
+        "masterControl": 0.04829493413692758,
+        "masterEnabled": 0.04047157139739833,
+        "musicControl": 0.06753853029042005,
+        "musicEnabled": 0.04317391249782464
+      },
+      {
+        "secondsFromAnchor": 0.05,
+        "controlBandRms": 0.0022574395374122887,
+        "enabledBandRms": 0.0022020226619180244,
+        "addedBandRms": 0.0,
+        "masterControl": 0.03435571620247347,
+        "masterEnabled": 0.032041990410074946,
+        "musicControl": 0.03229922706842486,
+        "musicEnabled": 0.009099123963046032
+      },
+      {
+        "secondsFromAnchor": 0.1,
+        "controlBandRms": 0.0026808988872229237,
+        "enabledBandRms": 0.0026420403947167064,
+        "addedBandRms": 0.0,
+        "masterControl": 0.03342873506657611,
+        "masterEnabled": 0.02893619881104298,
+        "musicControl": 0.02497465802995642,
+        "musicEnabled": 0.006458599475606998
+      },
+      {
+        "secondsFromAnchor": 0.15,
+        "controlBandRms": 0.003018181841981459,
+        "enabledBandRms": 0.003054423490028426,
+        "addedBandRms": 0.0004691281543148297,
+        "masterControl": 0.03582736488262988,
+        "masterEnabled": 0.030810018479858724,
+        "musicControl": 0.02458956086113062,
+        "musicEnabled": 0.005931049827991337
+      },
+      {
+        "secondsFromAnchor": 0.2,
+        "controlBandRms": 0.002954925466932229,
+        "enabledBandRms": 0.0029812560309114542,
+        "addedBandRms": 0.00039535175062375077,
+        "masterControl": 0.062361069834415396,
+        "masterEnabled": 0.035596497613071036,
+        "musicControl": 0.10460918264808929,
+        "musicEnabled": 0.027923946899390387
+      },
+      {
+        "secondsFromAnchor": 0.25,
+        "controlBandRms": 0.002283368366227105,
+        "enabledBandRms": 0.002194826205668907,
+        "addedBandRms": 0.0,
+        "masterControl": 0.051774799961904386,
+        "masterEnabled": 0.032935048203669035,
+        "musicControl": 0.07043573279388392,
+        "musicEnabled": 0.014898855125514247
+      },
+      {
+        "secondsFromAnchor": 0.3,
+        "controlBandRms": 0.0029514843662765172,
+        "enabledBandRms": 0.0030158605699206033,
+        "addedBandRms": 0.0006198023982102123,
+        "masterControl": 0.04373097888123454,
+        "masterEnabled": 0.029877806144287908,
+        "musicControl": 0.059051403076764875,
+        "musicEnabled": 0.014916781947136639
+      },
+      {
+        "secondsFromAnchor": 0.35,
+        "controlBandRms": 0.003923163666967573,
+        "enabledBandRms": 0.0038673048509812635,
+        "addedBandRms": 0.0,
+        "masterControl": 0.05419445481570723,
+        "masterEnabled": 0.035074392665456,
+        "musicControl": 0.08659278077034648,
+        "musicEnabled": 0.023121231480076946
+      },
+      {
+        "secondsFromAnchor": 0.4,
+        "controlBandRms": 0.003045117858904407,
+        "enabledBandRms": 0.0031220974090275726,
+        "addedBandRms": 0.0006890206505164566,
+        "masterControl": 0.05746311936588164,
+        "masterEnabled": 0.03477141713183819,
+        "musicControl": 0.08429553114521353,
+        "musicEnabled": 0.02013552550943889
+      },
+      {
+        "secondsFromAnchor": 0.45,
+        "controlBandRms": 0.0027555543650986582,
+        "enabledBandRms": 0.0027871833631814796,
+        "addedBandRms": 0.0004187018521350887,
+        "masterControl": 0.042578053961958524,
+        "masterEnabled": 0.030177023637271386,
+        "musicControl": 0.05340792686614797,
+        "musicEnabled": 0.011995074590760924
+      },
+      {
+        "secondsFromAnchor": 0.5,
+        "controlBandRms": 0.002140941639025693,
+        "enabledBandRms": 0.0022146865341003703,
+        "addedBandRms": 0.000566749806009221,
+        "masterControl": 0.06160461328479692,
+        "masterEnabled": 0.03240452926831884,
+        "musicControl": 0.09934866512146938,
+        "musicEnabled": 0.02568683644213541
+      },
+      {
+        "secondsFromAnchor": 0.55,
+        "controlBandRms": 0.0026963886689905445,
+        "enabledBandRms": 0.002506372436678951,
+        "addedBandRms": 0.0,
+        "masterControl": 0.045300971198463595,
+        "masterEnabled": 0.03499974403192842,
+        "musicControl": 0.06028737151280892,
+        "musicEnabled": 0.013848962786349527
+      },
+      {
+        "secondsFromAnchor": 0.6,
+        "controlBandRms": 0.002779406801775994,
+        "enabledBandRms": 0.002731060541967169,
+        "addedBandRms": 0.0,
+        "masterControl": 0.0428941534415116,
+        "masterEnabled": 0.03189421050349314,
+        "musicControl": 0.05667229563242422,
+        "musicEnabled": 0.014154700736921473
+      },
+      {
+        "secondsFromAnchor": 0.65,
+        "controlBandRms": 0.0029393236825636824,
+        "enabledBandRms": 0.0030550279870040294,
+        "addedBandRms": 0.0008328098765613705,
+        "masterControl": 0.0353135828804508,
+        "masterEnabled": 0.029185331818234763,
+        "musicControl": 0.031096861303765457,
+        "musicEnabled": 0.007038323183133612
+      },
+      {
+        "secondsFromAnchor": 0.7,
+        "controlBandRms": 0.003225641388710185,
+        "enabledBandRms": 0.022718397617972678,
+        "addedBandRms": 0.02248823754676534,
+        "masterControl": 0.0625982167450216,
+        "masterEnabled": 0.03648174021278901,
+        "musicControl": 0.1072911324990956,
+        "musicEnabled": 0.028935678429105507
+      },
+      {
+        "secondsFromAnchor": 0.75,
+        "controlBandRms": 0.0028291426512167183,
+        "enabledBandRms": 0.03435185188107262,
+        "addedBandRms": 0.03423515268723391,
+        "masterControl": 0.06478037842383609,
+        "masterEnabled": 0.04091867845165623,
+        "musicControl": 0.10138384051012228,
+        "musicEnabled": 0.02311225210675632
+      },
+      {
+        "secondsFromAnchor": 0.8,
+        "controlBandRms": 0.0027976810206283135,
+        "enabledBandRms": 0.03483713923238866,
+        "addedBandRms": 0.03472462023987662,
+        "masterControl": 0.036588225027994636,
+        "masterEnabled": 0.03359294678604334,
+        "musicControl": 0.04524422393102337,
+        "musicEnabled": 0.011668785349450508
+      },
+      {
+        "secondsFromAnchor": 0.85,
+        "controlBandRms": 0.0028529249019025936,
+        "enabledBandRms": 0.02987379639000885,
+        "addedBandRms": 0.02973725828410901,
+        "masterControl": 0.049213137291642596,
+        "masterEnabled": 0.037648569402666816,
+        "musicControl": 0.07108321297512801,
+        "musicEnabled": 0.01878004320930149
+      },
+      {
+        "secondsFromAnchor": 0.9,
+        "controlBandRms": 0.002934673265213623,
+        "enabledBandRms": 0.035906133113350454,
+        "addedBandRms": 0.03578600407952923,
+        "masterControl": 0.052971659947764205,
+        "masterEnabled": 0.043816474920682205,
+        "musicControl": 0.07640859130207182,
+        "musicEnabled": 0.018881660568630363
+      },
+      {
+        "secondsFromAnchor": 0.95,
+        "controlBandRms": 0.0028086323079838864,
+        "enabledBandRms": 0.030975662918805227,
+        "addedBandRms": 0.03084806765128076,
+        "masterControl": 0.0471414626116793,
+        "masterEnabled": 0.03631044649798908,
+        "musicControl": 0.07491614254861048,
+        "musicEnabled": 0.01783773934436334
+      },
+      {
+        "secondsFromAnchor": 1.0,
+        "controlBandRms": 0.002826102495085329,
+        "enabledBandRms": 0.03209244679988075,
+        "addedBandRms": 0.031967769491949995,
+        "masterControl": 0.0458888615432936,
+        "masterEnabled": 0.02627837763790731,
+        "musicControl": 0.07241664537415096,
+        "musicEnabled": 0.018402992324937684
+      },
+      {
+        "secondsFromAnchor": 1.05,
+        "controlBandRms": 0.002337661680851327,
+        "enabledBandRms": 0.03073930554862559,
+        "addedBandRms": 0.030650289451775874,
+        "masterControl": 0.05510189683565557,
+        "masterEnabled": 0.029878754346074017,
+        "musicControl": 0.08838232122391218,
+        "musicEnabled": 0.022255874834889434
+      },
+      {
+        "secondsFromAnchor": 1.1,
+        "controlBandRms": 0.0028729959929271764,
+        "enabledBandRms": 0.03403115979531689,
+        "addedBandRms": 0.03390967017001222,
+        "masterControl": 0.04594682033624047,
+        "masterEnabled": 0.033570245779596636,
+        "musicControl": 0.07082986260031403,
+        "musicEnabled": 0.017250105700181255
+      },
+      {
+        "secondsFromAnchor": 1.15,
+        "controlBandRms": 0.0022412415469222134,
+        "enabledBandRms": 0.031214226848015277,
+        "addedBandRms": 0.031133660145374935,
+        "masterControl": 0.0287322216637255,
+        "masterEnabled": 0.0308518492694428,
+        "musicControl": 0.03359794240246435,
+        "musicEnabled": 0.007428863034417847
+      },
+      {
+        "secondsFromAnchor": 1.2,
+        "controlBandRms": 0.002505486617388456,
+        "enabledBandRms": 0.02712676159050646,
+        "addedBandRms": 0.027010807673934222,
+        "masterControl": 0.02172809245915486,
+        "masterEnabled": 0.023672768190061453,
+        "musicControl": 0.02565780359807313,
+        "musicEnabled": 0.006559747931214941
+      },
+      {
+        "secondsFromAnchor": 1.25,
+        "controlBandRms": 0.001961492583569347,
+        "enabledBandRms": 0.0232176684698909,
+        "addedBandRms": 0.023134663948766763,
+        "masterControl": 0.039083303005859014,
+        "masterEnabled": 0.022729393187661373,
+        "musicControl": 0.07251736185179114,
+        "musicEnabled": 0.019914440056357133
+      },
+      {
+        "secondsFromAnchor": 1.3,
+        "controlBandRms": 0.0011160044111790334,
+        "enabledBandRms": 0.027740555604831362,
+        "addedBandRms": 0.0277180980483685,
+        "masterControl": 0.05933351129231524,
+        "masterEnabled": 0.024791271614431138,
+        "musicControl": 0.09258058731288474,
+        "musicEnabled": 0.021954620880319832
+      },
+      {
+        "secondsFromAnchor": 1.35,
+        "controlBandRms": 0.001056015885736737,
+        "enabledBandRms": 0.021949572885397155,
+        "addedBandRms": 0.02192415517871632,
+        "masterControl": 0.04266520024340359,
+        "masterEnabled": 0.027312731988680523,
+        "musicControl": 0.07833438644499904,
+        "musicEnabled": 0.019729186410142017
+      },
+      {
+        "secondsFromAnchor": 1.4,
+        "controlBandRms": 0.0011341633044968098,
+        "enabledBandRms": 0.024637769870571716,
+        "addedBandRms": 0.024611651261018313,
+        "masterControl": 0.03510664381713387,
+        "masterEnabled": 0.025125381714419744,
+        "musicControl": 0.050234700781818,
+        "musicEnabled": 0.01179274490967065
+      },
+      {
+        "secondsFromAnchor": 1.45,
+        "controlBandRms": 0.0010643995384121106,
+        "enabledBandRms": 0.02376792896057055,
+        "addedBandRms": 0.023744083488257794,
+        "masterControl": 0.022179431028884495,
+        "masterEnabled": 0.02296276386495221,
+        "musicControl": 0.023344314484854637,
+        "musicEnabled": 0.011277368005258616
+      },
+      {
+        "secondsFromAnchor": 1.5,
+        "controlBandRms": 0.0012194746250659234,
+        "enabledBandRms": 0.0203944844970312,
+        "addedBandRms": 0.020357993013518455,
+        "masterControl": 0.05581199440430589,
+        "masterEnabled": 0.02734435264953599,
+        "musicControl": 0.10491957068919777,
+        "musicEnabled": 0.02483544042917485
+      },
+      {
+        "secondsFromAnchor": 1.55,
+        "controlBandRms": 0.0008847716862972196,
+        "enabledBandRms": 0.015563084300108526,
+        "addedBandRms": 0.015537914016862471,
+        "masterControl": 0.036338462918737775,
+        "masterEnabled": 0.025682264660457983,
+        "musicControl": 0.055753880026447405,
+        "musicEnabled": 0.015641868998438786
+      },
+      {
+        "secondsFromAnchor": 1.6,
+        "controlBandRms": 0.0006865977583992325,
+        "enabledBandRms": 0.025486692145278315,
+        "addedBandRms": 0.02547744217982552,
+        "masterControl": 0.04810171421564745,
+        "masterEnabled": 0.030159397535926197,
+        "musicControl": 0.0842368956914391,
+        "musicEnabled": 0.01965169205347538
+      },
+      {
+        "secondsFromAnchor": 1.65,
+        "controlBandRms": 0.000672470050129741,
+        "enabledBandRms": 0.01780942576720185,
+        "addedBandRms": 0.01779672526587832,
+        "masterControl": 0.043320418743043966,
+        "masterEnabled": 0.02604032226286066,
+        "musicControl": 0.06945904706111557,
+        "musicEnabled": 0.01765703656115273
+      },
+      {
+        "secondsFromAnchor": 1.7,
+        "controlBandRms": 0.0007854414465849426,
+        "enabledBandRms": 0.018830405231471295,
+        "addedBandRms": 0.01881401719238632,
+        "masterControl": 0.04703937789735768,
+        "masterEnabled": 0.0273650679054948,
+        "musicControl": 0.07401957269317855,
+        "musicEnabled": 0.018321372821331332
+      },
+      {
+        "secondsFromAnchor": 1.75,
+        "controlBandRms": 0.0006350624168728531,
+        "enabledBandRms": 0.01752902193503988,
+        "addedBandRms": 0.01751751425647443,
+        "masterControl": 0.056169160746839135,
+        "masterEnabled": 0.029746201145400296,
+        "musicControl": 0.09362100512591809,
+        "musicEnabled": 0.0242373551290211
+      },
+      {
+        "secondsFromAnchor": 1.8,
+        "controlBandRms": 0.0004976124832922118,
+        "enabledBandRms": 0.028948376769796162,
+        "addedBandRms": 0.02894409956143991,
+        "masterControl": 0.04591980943417528,
+        "masterEnabled": 0.028927832544028125,
+        "musicControl": 0.07327469616363602,
+        "musicEnabled": 0.017204210589940858
+      },
+      {
+        "secondsFromAnchor": 1.85,
+        "controlBandRms": 0.0005199602602433844,
+        "enabledBandRms": 0.01414695338161131,
+        "addedBandRms": 0.014137394785081562,
+        "masterControl": 0.031115759041017772,
+        "masterEnabled": 0.02297334689000569,
+        "musicControl": 0.039499659748229526,
+        "musicEnabled": 0.008566993069781868
+      },
+      {
+        "secondsFromAnchor": 1.9,
+        "controlBandRms": 0.00039836121929533614,
+        "enabledBandRms": 0.02135334741726482,
+        "addedBandRms": 0.021349631244154354,
+        "masterControl": 0.028901383690029907,
+        "masterEnabled": 0.02403651159720324,
+        "musicControl": 0.039458181247350475,
+        "musicEnabled": 0.011831915069475446
+      },
+      {
+        "secondsFromAnchor": 1.95,
+        "controlBandRms": 0.0003015425044647857,
+        "enabledBandRms": 0.025542148865389237,
+        "addedBandRms": 0.025540368845803806,
+        "masterControl": 0.04686611937054722,
+        "masterEnabled": 0.02922637502532854,
+        "musicControl": 0.07310962236429891,
+        "musicEnabled": 0.018242038320366038
+      },
+      {
+        "secondsFromAnchor": 2.0,
+        "controlBandRms": 0.0003027767970067501,
+        "enabledBandRms": 0.015154475104074626,
+        "addedBandRms": 0.015151450158028174,
+        "masterControl": 0.03817602212961154,
+        "masterEnabled": 0.024719490124553753,
+        "musicControl": 0.05901167060010916,
+        "musicEnabled": 0.013421976429953285
+      },
+      {
+        "secondsFromAnchor": 2.05,
+        "controlBandRms": 0.0002619031833716488,
+        "enabledBandRms": 0.017815978380319286,
+        "addedBandRms": 0.017814053226892078,
+        "masterControl": 0.027661475683507505,
+        "masterEnabled": 0.025258529443474037,
+        "musicControl": 0.026986925659114296,
+        "musicEnabled": 0.007521583601648649
+      },
+      {
+        "secondsFromAnchor": 2.1,
+        "controlBandRms": 0.0002529074735353869,
+        "enabledBandRms": 0.016816675719963214,
+        "addedBandRms": 0.016814773863487734,
+        "masterControl": 0.0658742799944306,
+        "masterEnabled": 0.033331387498238545,
+        "musicControl": 0.13349619787423045,
+        "musicEnabled": 0.03444089240559973
+      },
+      {
+        "secondsFromAnchor": 2.15,
+        "controlBandRms": 0.0002522600359860477,
+        "enabledBandRms": 0.018694436608197626,
+        "addedBandRms": 0.01869273455041193,
+        "masterControl": 0.04751395521594837,
+        "masterEnabled": 0.029987414992851947,
+        "musicControl": 0.06438327252402264,
+        "musicEnabled": 0.013745930863864619
+      },
+      {
+        "secondsFromAnchor": 2.2,
+        "controlBandRms": 0.00022645385973899817,
+        "enabledBandRms": 0.019638868804068534,
+        "addedBandRms": 0.019637563152102796,
+        "masterControl": 0.035694278845661766,
+        "masterEnabled": 0.02423958830843587,
+        "musicControl": 0.056372116247725354,
+        "musicEnabled": 0.014896697480443916
+      },
+      {
+        "secondsFromAnchor": 2.25,
+        "controlBandRms": 0.00015495638935254742,
+        "enabledBandRms": 0.019813054106185845,
+        "addedBandRms": 0.0198124481458513,
+        "masterControl": 0.04486586008073167,
+        "masterEnabled": 0.025981431765517853,
+        "musicControl": 0.07656058884773827,
+        "musicEnabled": 0.0193414617202726
+      },
+      {
+        "secondsFromAnchor": 2.3,
+        "controlBandRms": 0.00018131236578508073,
+        "enabledBandRms": 0.017776539545348396,
+        "addedBandRms": 0.01777561487075338,
+        "masterControl": 0.04835952029396721,
+        "masterEnabled": 0.027320189405154564,
+        "musicControl": 0.0759002387441311,
+        "musicEnabled": 0.018789700386300213
+      },
+      {
+        "secondsFromAnchor": 2.35,
+        "controlBandRms": 0.00021672995504978953,
+        "enabledBandRms": 0.015401120576156764,
+        "addedBandRms": 0.015399595550789746,
+        "masterControl": 0.06478921701168174,
+        "masterEnabled": 0.029825676899767308,
+        "musicControl": 0.11229901712466314,
+        "musicEnabled": 0.02774732656622581
+      },
+      {
+        "secondsFromAnchor": 2.4,
+        "controlBandRms": 0.00015273388864108634,
+        "enabledBandRms": 0.015432465339299005,
+        "addedBandRms": 0.015431709523183934,
+        "masterControl": 0.05503537186781972,
+        "masterEnabled": 0.027247221019998203,
+        "musicControl": 0.0959063904591489,
+        "musicEnabled": 0.025193822247397576
+      },
+      {
+        "secondsFromAnchor": 2.45,
+        "controlBandRms": 0.00012528192404313374,
+        "enabledBandRms": 0.015424922248722387,
+        "addedBandRms": 0.015424413467572728,
+        "masterControl": 0.05842795682971075,
+        "masterEnabled": 0.027973143055917176,
+        "musicControl": 0.10257360405743171,
+        "musicEnabled": 0.025020028493744663
+      },
+      {
+        "secondsFromAnchor": 2.5,
+        "controlBandRms": 8.67241815693454e-05,
+        "enabledBandRms": 0.016557301877511862,
+        "addedBandRms": 0.016557074753089356,
+        "masterControl": 0.04286442081881271,
+        "masterEnabled": 0.026801243907163066,
+        "musicControl": 0.05826512290712766,
+        "musicEnabled": 0.01282644598558185
+      },
+      {
+        "secondsFromAnchor": 2.55,
+        "controlBandRms": 9.815440804155937e-05,
+        "enabledBandRms": 0.016981709395863638,
+        "addedBandRms": 0.01698142572688599,
+        "masterControl": 0.02536884582313467,
+        "masterEnabled": 0.02912168234664813,
+        "musicControl": 0.027127767881533895,
+        "musicEnabled": 0.006692683047503205
+      },
+      {
+        "secondsFromAnchor": 2.6,
+        "controlBandRms": 9.059137632866575e-05,
+        "enabledBandRms": 0.015924715499983134,
+        "addedBandRms": 0.015924457823044965,
+        "masterControl": 0.02484733408490328,
+        "masterEnabled": 0.02418473272781241,
+        "musicControl": 0.025606613963003236,
+        "musicEnabled": 0.0063344766658024465
+      },
+      {
+        "secondsFromAnchor": 2.65,
+        "controlBandRms": 8.7508485311252e-05,
+        "enabledBandRms": 0.012856822145204573,
+        "addedBandRms": 0.01285652433352114,
+        "masterControl": 0.02772949673182464,
+        "masterEnabled": 0.021125709967025192,
+        "musicControl": 0.024982135992240122,
+        "musicEnabled": 0.006454001846510937
+      },
+      {
+        "secondsFromAnchor": 2.7,
+        "controlBandRms": 8.608658137514424e-05,
+        "enabledBandRms": 0.010594905323032892,
+        "addedBandRms": 0.010594555578434512,
+        "masterControl": 0.03772659715507168,
+        "masterEnabled": 0.026583170149198303,
+        "musicControl": 0.06165000371936457,
+        "musicEnabled": 0.016304991863532018
+      },
+      {
+        "secondsFromAnchor": 2.75,
+        "controlBandRms": 6.77193725745589e-05,
+        "enabledBandRms": 0.013767914257305234,
+        "addedBandRms": 0.01376774771279191,
+        "masterControl": 0.04426448777055716,
+        "masterEnabled": 0.026561718407987368,
+        "musicControl": 0.06859636652735931,
+        "musicEnabled": 0.016812428411659436
+      },
+      {
+        "secondsFromAnchor": 2.8,
+        "controlBandRms": 5.8960860452028535e-05,
+        "enabledBandRms": 0.013870128533680876,
+        "addedBandRms": 0.01387000321405021,
+        "masterControl": 0.029979075357118464,
+        "masterEnabled": 0.025070718479922236,
+        "musicControl": 0.03758640772303629,
+        "musicEnabled": 0.008385282362937011
+      },
+      {
+        "secondsFromAnchor": 2.85,
+        "controlBandRms": 5.40233082905637e-05,
+        "enabledBandRms": 0.012272461228819158,
+        "addedBandRms": 0.012272342323086933,
+        "masterControl": 0.028516862130164793,
+        "masterEnabled": 0.02082342776295278,
+        "musicControl": 0.027058738490387528,
+        "musicEnabled": 0.0067228017226183415
+      },
+      {
+        "secondsFromAnchor": 2.9,
+        "controlBandRms": 5.174692303129071e-05,
+        "enabledBandRms": 0.018100176474124423,
+        "addedBandRms": 0.018100102503864558,
+        "masterControl": 0.026949958349619503,
+        "masterEnabled": 0.02670558479424625,
+        "musicControl": 0.024827725545969213,
+        "musicEnabled": 0.0061545999240100145
+      },
+      {
+        "secondsFromAnchor": 2.95,
+        "controlBandRms": 4.433342675106534e-05,
+        "enabledBandRms": 0.009836713836954744,
+        "addedBandRms": 0.009836613932518112,
+        "masterControl": 0.05505208348901781,
+        "masterEnabled": 0.030587196925162697,
+        "musicControl": 0.09357866443587007,
+        "musicEnabled": 0.025014845193252557
+      }
+    ]
+  },
+  "duck": {
+    "windowSeconds": 4,
+    "expectedEnvelopeSamples": 80.0,
+    "observedEnvelopeSamples": 80,
+    "residual": 0.0,
+    "fullMixChangeDb": -4.00282932441287,
+    "measuredMusicDb": -11.76444713275886,
+    "designDb": -12.041199826559248,
+    "passGate": true,
+    "envelopes": [
+      {
+        "masterA": 0.04829493413692758,
+        "masterB": 0.04047157139739833,
+        "seconds": 0.0,
+        "a": 0.06753853029042005,
+        "b": 0.04317391249782464,
+        "db": -3.8866039741550082
+      },
+      {
+        "masterA": 0.03435571620247347,
+        "masterB": 0.032041990410074946,
+        "seconds": 0.05,
+        "a": 0.03229922706842486,
+        "b": 0.009099123963046032,
+        "db": -11.003850958083259
+      },
+      {
+        "masterA": 0.03342873506657611,
+        "masterB": 0.02893619881104298,
+        "seconds": 0.1,
+        "a": 0.02497465802995642,
+        "b": 0.006458599475606998,
+        "db": -11.74722394593094
+      },
+      {
+        "masterA": 0.03582736488262988,
+        "masterB": 0.030810018479858724,
+        "seconds": 0.15000000000000002,
+        "a": 0.02458956086113062,
+        "b": 0.005931049827991337,
+        "db": -12.352384004059878
+      },
+      {
+        "masterA": 0.062361069834415396,
+        "masterB": 0.035596497613071036,
+        "seconds": 0.2,
+        "a": 0.10460918264808929,
+        "b": 0.027923946899390387,
+        "db": -11.47186010648982
+      },
+      {
+        "masterA": 0.051774799961904386,
+        "masterB": 0.032935048203669035,
+        "seconds": 0.25,
+        "a": 0.07043573279388392,
+        "b": 0.014898855125514247,
+        "db": -13.49280280178003
+      },
+      {
+        "masterA": 0.04373097888123454,
+        "masterB": 0.029877806144287908,
+        "seconds": 0.30000000000000004,
+        "a": 0.059051403076764875,
+        "b": 0.014916781947136639,
+        "db": -11.951101594905655
+      },
+      {
+        "masterA": 0.05419445481570723,
+        "masterB": 0.035074392665456,
+        "seconds": 0.35000000000000003,
+        "a": 0.08659278077034648,
+        "b": 0.023121231480076946,
+        "db": -11.469414494928502
+      },
+      {
+        "masterA": 0.05746311936588164,
+        "masterB": 0.03477141713183819,
+        "seconds": 0.4,
+        "a": 0.08429553114521353,
+        "b": 0.02013552550943889,
+        "db": -12.436831658197589
+      },
+      {
+        "masterA": 0.042578053961958524,
+        "masterB": 0.030177023637271386,
+        "seconds": 0.45,
+        "a": 0.05340792686614797,
+        "b": 0.011995074590760924,
+        "db": -12.972055347008187
+      },
+      {
+        "masterA": 0.06160461328479692,
+        "masterB": 0.03240452926831884,
+        "seconds": 0.5,
+        "a": 0.09934866512146938,
+        "b": 0.02568683644213541,
+        "db": -11.749028315319705
+      },
+      {
+        "masterA": 0.045300971198463595,
+        "masterB": 0.03499974403192842,
+        "seconds": 0.55,
+        "a": 0.06028737151280892,
+        "b": 0.013848962786349527,
+        "db": -12.776182021420304
+      },
+      {
+        "masterA": 0.0428941534415116,
+        "masterB": 0.03189421050349314,
+        "seconds": 0.6000000000000001,
+        "a": 0.05667229563242422,
+        "b": 0.014154700736921473,
+        "db": -12.049402264287071
+      },
+      {
+        "masterA": 0.0353135828804508,
+        "masterB": 0.029185331818234763,
+        "seconds": 0.65,
+        "a": 0.031096861303765457,
+        "b": 0.007038323183133612,
+        "db": -12.904947038166847
+      },
+      {
+        "masterA": 0.0625982167450216,
+        "masterB": 0.03648174021278901,
+        "seconds": 0.7000000000000001,
+        "a": 0.1072911324990956,
+        "b": 0.028935678429105507,
+        "db": -11.382603202502377
+      },
+      {
+        "masterA": 0.06478037842383609,
+        "masterB": 0.04091867845165623,
+        "seconds": 0.75,
+        "a": 0.10138384051012228,
+        "b": 0.02311225210675632,
+        "db": -12.842529450922024
+      },
+      {
+        "masterA": 0.036588225027994636,
+        "masterB": 0.03359294678604334,
+        "seconds": 0.8,
+        "a": 0.04524422393102337,
+        "b": 0.011668785349450508,
+        "db": -11.770749845233384
+      },
+      {
+        "masterA": 0.049213137291642596,
+        "masterB": 0.037648569402666816,
+        "seconds": 0.8500000000000001,
+        "a": 0.07108321297512801,
+        "b": 0.01878004320930149,
+        "db": -11.561409252246674
+      },
+      {
+        "masterA": 0.052971659947764205,
+        "masterB": 0.043816474920682205,
+        "seconds": 0.9,
+        "a": 0.07640859130207182,
+        "b": 0.018881660568630363,
+        "db": -12.142040135713607
+      },
+      {
+        "masterA": 0.0471414626116793,
+        "masterB": 0.03631044649798908,
+        "seconds": 0.9500000000000001,
+        "a": 0.07491614254861048,
+        "b": 0.01783773934436334,
+        "db": -12.464711877569956
+      },
+      {
+        "masterA": 0.0458888615432936,
+        "masterB": 0.02627837763790731,
+        "seconds": 1.0,
+        "a": 0.07241664537415096,
+        "b": 0.018402992324937684,
+        "db": -11.8989991542088
+      },
+      {
+        "masterA": 0.05510189683565557,
+        "masterB": 0.029878754346074017,
+        "seconds": 1.05,
+        "a": 0.08838232122391218,
+        "b": 0.022255874834889434,
+        "db": -11.978414664467987
+      },
+      {
+        "masterA": 0.04594682033624047,
+        "masterB": 0.033570245779596636,
+        "seconds": 1.1,
+        "a": 0.07082986260031403,
+        "b": 0.017250105700181255,
+        "db": -12.268492775397359
+      },
+      {
+        "masterA": 0.0287322216637255,
+        "masterB": 0.0308518492694428,
+        "seconds": 1.1500000000000001,
+        "a": 0.03359794240246435,
+        "b": 0.007428863034417847,
+        "db": -13.107806597679554
+      },
+      {
+        "masterA": 0.02172809245915486,
+        "masterB": 0.023672768190061453,
+        "seconds": 1.2000000000000002,
+        "a": 0.02565780359807313,
+        "b": 0.006559747931214941,
+        "db": -11.846646503895533
+      },
+      {
+        "masterA": 0.039083303005859014,
+        "masterB": 0.022729393187661373,
+        "seconds": 1.25,
+        "a": 0.07251736185179114,
+        "b": 0.019914440056357133,
+        "db": -11.22547793244313
+      },
+      {
+        "masterA": 0.05933351129231524,
+        "masterB": 0.024791271614431138,
+        "seconds": 1.3,
+        "a": 0.09258058731288474,
+        "b": 0.021954620880319832,
+        "db": -12.49987979139382
+      },
+      {
+        "masterA": 0.04266520024340359,
+        "masterB": 0.027312731988680523,
+        "seconds": 1.35,
+        "a": 0.07833438644499904,
+        "b": 0.019729186410142017,
+        "db": -11.976865398433418
+      },
+      {
+        "masterA": 0.03510664381713387,
+        "masterB": 0.025125381714419744,
+        "seconds": 1.4000000000000001,
+        "a": 0.050234700781818,
+        "b": 0.01179274490967065,
+        "db": -12.587778308125774
+      },
+      {
+        "masterA": 0.022179431028884495,
+        "masterB": 0.02296276386495221,
+        "seconds": 1.4500000000000002,
+        "a": 0.023344314484854637,
+        "b": 0.011277368005258616,
+        "db": -6.319467451524656
+      },
+      {
+        "masterA": 0.05581199440430589,
+        "masterB": 0.02734435264953599,
+        "seconds": 1.5,
+        "a": 0.10491957068919777,
+        "b": 0.02483544042917485,
+        "db": -12.515692774766887
+      },
+      {
+        "masterA": 0.036338462918737775,
+        "masterB": 0.025682264660457983,
+        "seconds": 1.55,
+        "a": 0.055753880026447405,
+        "b": 0.015641868998438786,
+        "db": -11.03972903773415
+      },
+      {
+        "masterA": 0.04810171421564745,
+        "masterB": 0.030159397535926197,
+        "seconds": 1.6,
+        "a": 0.0842368956914391,
+        "b": 0.01965169205347538,
+        "db": -12.642048075522833
+      },
+      {
+        "masterA": 0.043320418743043966,
+        "masterB": 0.02604032226286066,
+        "seconds": 1.6500000000000001,
+        "a": 0.06945904706111557,
+        "b": 0.01765703656115273,
+        "db": -11.89622008925096
+      },
+      {
+        "masterA": 0.04703937789735768,
+        "masterB": 0.0273650679054948,
+        "seconds": 1.7000000000000002,
+        "a": 0.07401957269317855,
+        "b": 0.018321372821331332,
+        "db": -12.127771227502206
+      },
+      {
+        "masterA": 0.056169160746839135,
+        "masterB": 0.029746201145400296,
+        "seconds": 1.75,
+        "a": 0.09362100512591809,
+        "b": 0.0242373551290211,
+        "db": -11.737761464258424
+      },
+      {
+        "masterA": 0.04591980943417528,
+        "masterB": 0.028927832544028125,
+        "seconds": 1.8,
+        "a": 0.07327469616363602,
+        "b": 0.017204210589940858,
+        "db": -12.58638552707328
+      },
+      {
+        "masterA": 0.031115759041017772,
+        "masterB": 0.02297334689000569,
+        "seconds": 1.85,
+        "a": 0.039499659748229526,
+        "b": 0.008566993069781868,
+        "db": -13.27529878060301
+      },
+      {
+        "masterA": 0.028901383690029907,
+        "masterB": 0.02403651159720324,
+        "seconds": 1.9000000000000001,
+        "a": 0.039458181247350475,
+        "b": 0.011831915069475446,
+        "db": -10.461640395441334
+      },
+      {
+        "masterA": 0.04686611937054722,
+        "masterB": 0.02922637502532854,
+        "seconds": 1.9500000000000002,
+        "a": 0.07310962236429891,
+        "b": 0.018242038320366038,
+        "db": -12.05802353871432
+      },
+      {
+        "masterA": 0.03817602212961154,
+        "masterB": 0.024719490124553753,
+        "seconds": 2.0,
+        "a": 0.05901167060010916,
+        "b": 0.013421976429953285,
+        "db": -12.862428754297275
+      },
+      {
+        "masterA": 0.027661475683507505,
+        "masterB": 0.025258529443474037,
+        "seconds": 2.0500000000000003,
+        "a": 0.026986925659114296,
+        "b": 0.007521583601648649,
+        "db": -11.096882513892561
+      },
+      {
+        "masterA": 0.0658742799944306,
+        "masterB": 0.033331387498238545,
+        "seconds": 2.1,
+        "a": 0.13349619787423045,
+        "b": 0.03444089240559973,
+        "db": -11.76789001281378
+      },
+      {
+        "masterA": 0.04751395521594837,
+        "masterB": 0.029987414992851947,
+        "seconds": 2.15,
+        "a": 0.06438327252402264,
+        "b": 0.013745930863864619,
+        "db": -13.411977846225797
+      },
+      {
+        "masterA": 0.035694278845661766,
+        "masterB": 0.02423958830843587,
+        "seconds": 2.2,
+        "a": 0.056372116247725354,
+        "b": 0.014896697480443916,
+        "db": -11.559486811179678
+      },
+      {
+        "masterA": 0.04486586008073167,
+        "masterB": 0.025981431765517853,
+        "seconds": 2.25,
+        "a": 0.07656058884773827,
+        "b": 0.0193414617202726,
+        "db": -11.950319450055947
+      },
+      {
+        "masterA": 0.04835952029396721,
+        "masterB": 0.027320189405154564,
+        "seconds": 2.3000000000000003,
+        "a": 0.0759002387441311,
+        "b": 0.018789700386300213,
+        "db": -12.126465738319503
+      },
+      {
+        "masterA": 0.06478921701168174,
+        "masterB": 0.029825676899767308,
+        "seconds": 2.35,
+        "a": 0.11229901712466314,
+        "b": 0.02774732656622581,
+        "db": -12.143096193361025
+      },
+      {
+        "masterA": 0.05503537186781972,
+        "masterB": 0.027247221019998203,
+        "seconds": 2.4000000000000004,
+        "a": 0.0959063904591489,
+        "b": 0.025193822247397576,
+        "db": -11.61106970493249
+      },
+      {
+        "masterA": 0.05842795682971075,
+        "masterB": 0.027973143055917176,
+        "seconds": 2.45,
+        "a": 0.10257360405743171,
+        "b": 0.025020028493744663,
+        "db": -12.254956306784166
+      },
+      {
+        "masterA": 0.04286442081881271,
+        "masterB": 0.026801243907163066,
+        "seconds": 2.5,
+        "a": 0.05826512290712766,
+        "b": 0.01282644598558185,
+        "db": -13.14604660616733
+      },
+      {
+        "masterA": 0.02536884582313467,
+        "masterB": 0.02912168234664813,
+        "seconds": 2.5500000000000003,
+        "a": 0.027127767881533895,
+        "b": 0.006692683047503205,
+        "db": -12.156276052080976
+      },
+      {
+        "masterA": 0.02484733408490328,
+        "masterB": 0.02418473272781241,
+        "seconds": 2.6,
+        "a": 0.025606613963003236,
+        "b": 0.0063344766658024465,
+        "db": -12.132828271250391
+      },
+      {
+        "masterA": 0.02772949673182464,
+        "masterB": 0.021125709967025192,
+        "seconds": 2.6500000000000004,
+        "a": 0.024982135992240122,
+        "b": 0.006454001846510937,
+        "db": -11.756009656476468
+      },
+      {
+        "masterA": 0.03772659715507168,
+        "masterB": 0.026583170149198303,
+        "seconds": 2.7,
+        "a": 0.06165000371936457,
+        "b": 0.016304991863532018,
+        "db": -11.55225041422346
+      },
+      {
+        "masterA": 0.04426448777055716,
+        "masterB": 0.026561718407987368,
+        "seconds": 2.75,
+        "a": 0.06859636652735931,
+        "b": 0.016812428411659436,
+        "db": -12.213413282518921
+      },
+      {
+        "masterA": 0.029979075357118464,
+        "masterB": 0.025070718479922236,
+        "seconds": 2.8000000000000003,
+        "a": 0.03758640772303629,
+        "b": 0.008385282362937011,
+        "db": -13.030262580955679
+      },
+      {
+        "masterA": 0.028516862130164793,
+        "masterB": 0.02082342776295278,
+        "seconds": 2.85,
+        "a": 0.027058738490387528,
+        "b": 0.0067228017226183415,
+        "db": -12.09514485485768
+      },
+      {
+        "masterA": 0.026949958349619503,
+        "masterB": 0.02670558479424625,
+        "seconds": 2.9000000000000004,
+        "a": 0.024827725545969213,
+        "b": 0.0061545999240100145,
+        "db": -12.114742175278359
+      },
+      {
+        "masterA": 0.05505208348901781,
+        "masterB": 0.030587196925162697,
+        "seconds": 2.95,
+        "a": 0.09357866443587007,
+        "b": 0.025014845193252557,
+        "db": -11.459580461014383
+      },
+      {
+        "masterA": 0.050164550091881324,
+        "masterB": 0.02885515581443445,
+        "seconds": 3.0,
+        "a": 0.08227655752945845,
+        "b": 0.018609309790794556,
+        "db": -12.910916934733995
+      },
+      {
+        "masterA": 0.03673064840638649,
+        "masterB": 0.023677635603874692,
+        "seconds": 3.0500000000000003,
+        "a": 0.05863967501578216,
+        "b": 0.015929940418049092,
+        "db": -11.31954806644007
+      },
+      {
+        "masterA": 0.05122866999673571,
+        "masterB": 0.02603045848710772,
+        "seconds": 3.1,
+        "a": 0.0861110177122578,
+        "b": 0.022652466334896145,
+        "db": -11.598864567383785
+      },
+      {
+        "masterA": 0.05468986234004573,
+        "masterB": 0.03135604626664627,
+        "seconds": 3.1500000000000004,
+        "a": 0.09266102695452341,
+        "b": 0.02237054374696995,
+        "db": -12.34441137582966
+      },
+      {
+        "masterA": 0.05547478901045155,
+        "masterB": 0.025954837478833283,
+        "seconds": 3.2,
+        "a": 0.10238559028558164,
+        "b": 0.0259998156171954,
+        "db": -11.90537140761043
+      },
+      {
+        "masterA": 0.04801690815846185,
+        "masterB": 0.026278443616486367,
+        "seconds": 3.25,
+        "a": 0.07786574983591842,
+        "b": 0.017611294155039436,
+        "db": -12.911103982938485
+      },
+      {
+        "masterA": 0.04457751301025182,
+        "masterB": 0.02747597787727891,
+        "seconds": 3.3000000000000003,
+        "a": 0.07634832275672944,
+        "b": 0.02003541094671751,
+        "db": -11.62002492200971
+      },
+      {
+        "masterA": 0.046193521236065904,
+        "masterB": 0.02729271530147364,
+        "seconds": 3.35,
+        "a": 0.07150249747374902,
+        "b": 0.01735196848466222,
+        "db": -12.299449221788848
+      },
+      {
+        "masterA": 0.03220096349584654,
+        "masterB": 0.023202474371561428,
+        "seconds": 3.4000000000000004,
+        "a": 0.04390310889273069,
+        "b": 0.009955764294736436,
+        "db": -12.888413376430206
+      },
+      {
+        "masterA": 0.04778119772003188,
+        "masterB": 0.024319891244229678,
+        "seconds": 3.45,
+        "a": 0.09346606759665284,
+        "b": 0.02486815996979563,
+        "db": -11.500206371579198
+      },
+      {
+        "masterA": 0.07452737217587736,
+        "masterB": 0.027074889551665777,
+        "seconds": 3.5,
+        "a": 0.11389353452962477,
+        "b": 0.027283695137197347,
+        "db": -12.411917654624915
+      },
+      {
+        "masterA": 0.030647823036718664,
+        "masterB": 0.02598097203663088,
+        "seconds": 3.5500000000000003,
+        "a": 0.04313140401812092,
+        "b": 0.011931171307939976,
+        "db": -11.162210284394153
+      },
+      {
+        "masterA": 0.042923918687777375,
+        "masterB": 0.02388684394411907,
+        "seconds": 3.6,
+        "a": 0.06874729322133914,
+        "b": 0.017821679579231153,
+        "db": -11.72613944622493
+      },
+      {
+        "masterA": 0.048100821955663335,
+        "masterB": 0.02417456718720597,
+        "seconds": 3.6500000000000004,
+        "a": 0.08115244533604761,
+        "b": 0.019462021630490912,
+        "db": -12.402273197730644
+      },
+      {
+        "masterA": 0.04616639410517784,
+        "masterB": 0.027335713516853852,
+        "seconds": 3.7,
+        "a": 0.07494765813830546,
+        "b": 0.018906719124605172,
+        "db": -11.962837894438277
+      },
+      {
+        "masterA": 0.04475012906075504,
+        "masterB": 0.027448147071535096,
+        "seconds": 3.75,
+        "a": 0.07480855519158112,
+        "b": 0.01840379892161093,
+        "db": -12.180875751265319
+      },
+      {
+        "masterA": 0.04865494692601971,
+        "masterB": 0.023249921264167157,
+        "seconds": 3.8000000000000003,
+        "a": 0.08521055215700926,
+        "b": 0.02240278713540148,
+        "db": -11.6038265428787
+      },
+      {
+        "masterA": 0.05341709894552222,
+        "masterB": 0.024130841069379867,
+        "seconds": 3.85,
+        "a": 0.08024614351738607,
+        "b": 0.018978854141178343,
+        "db": -12.523083641366242
+      },
+      {
+        "masterA": 0.033258441655159045,
+        "masterB": 0.02507632086374312,
+        "seconds": 3.9000000000000004,
+        "a": 0.04168215267902263,
+        "b": 0.009267875708815852,
+        "db": -13.059398784116564
+      },
+      {
+        "masterA": 0.02534519726603212,
+        "masterB": 0.02584490283789676,
+        "seconds": 3.95,
+        "a": 0.02830200513409587,
+        "b": 0.012539343327883748,
+        "db": -7.07084823726959
+      }
+    ],
+    "scope": "Music bus after production duck gain, synchronous with post-master reference. Total mix contains engine/launch and is not a music-gain measurement."
+  },
+  "klaxon": {
+    "envelopeWindowSeconds": 4.5,
+    "expectedEnvelopeSamples": 90,
+    "observedEnvelopeSamples": 90,
+    "envelopeResidual": 0,
+    "waveformOnsetFromCueSeconds": -0.0,
+    "leadBeforeCrossingSeconds": 3.0159999999999982,
+    "passGate": true,
+    "envelopes": [
+      {
+        "secondsFromAnchor": -0.5,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.06723394859650537,
+        "masterEnabled": 0.06107816787747081,
+        "musicControl": 0.12047388988587732,
+        "musicEnabled": 0.09800005260373315
+      },
+      {
+        "secondsFromAnchor": -0.45,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.05093519228442436,
+        "masterEnabled": 0.032990812880788534,
+        "musicControl": 0.08035972847957142,
+        "musicEnabled": 0.05009626785307016
+      },
+      {
+        "secondsFromAnchor": -0.4,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.03315303758079868,
+        "masterEnabled": 0.030998512775027198,
+        "musicControl": 0.039244646952558346,
+        "musicEnabled": 0.04844545380712023
+      },
+      {
+        "secondsFromAnchor": -0.35,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.048378700859145,
+        "masterEnabled": 0.07905070844275593,
+        "musicControl": 0.09843736231889035,
+        "musicEnabled": 0.13387481179567076
+      },
+      {
+        "secondsFromAnchor": -0.3,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.06924317413786006,
+        "masterEnabled": 0.045845468823435875,
+        "musicControl": 0.11045686095170552,
+        "musicEnabled": 0.0714406819368228
+      },
+      {
+        "secondsFromAnchor": -0.25,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.043090266824378935,
+        "masterEnabled": 0.0510655909498317,
+        "musicControl": 0.06936259558407917,
+        "musicEnabled": 0.08940344798710965
+      },
+      {
+        "secondsFromAnchor": -0.2,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.05307433039767491,
+        "masterEnabled": 0.045356798332922756,
+        "musicControl": 0.09061113755205458,
+        "musicEnabled": 0.06791993707825349
+      },
+      {
+        "secondsFromAnchor": -0.15,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.04129564659027859,
+        "masterEnabled": 0.031211396484964796,
+        "musicControl": 0.055954057540679614,
+        "musicEnabled": 0.03427163106311071
+      },
+      {
+        "secondsFromAnchor": -0.1,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.026958280665010572,
+        "masterEnabled": 0.028115104426222455,
+        "musicControl": 0.03181510964485199,
+        "musicEnabled": 0.03405700859371492
+      },
+      {
+        "secondsFromAnchor": -0.05,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.04498508561333246,
+        "masterEnabled": 0.07552472539536446,
+        "musicControl": 0.09288399577920028,
+        "musicEnabled": 0.12926159431501522
+      },
+      {
+        "secondsFromAnchor": -0.0,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.01582454251860363,
+        "addedBandRms": 0.01582454251860363,
+        "masterControl": 0.06971735226311802,
+        "masterEnabled": 0.05646112902847802,
+        "musicControl": 0.11613695030843524,
+        "musicEnabled": 0.10004886466447321
+      },
+      {
+        "secondsFromAnchor": 0.05,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.007998147940975238,
+        "addedBandRms": 0.007998147940975238,
+        "masterControl": 0.059933273186189774,
+        "masterEnabled": 0.05808882611884878,
+        "musicControl": 0.08954227681035742,
+        "musicEnabled": 0.09641475988840724
+      },
+      {
+        "secondsFromAnchor": 0.1,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.003232237379804129,
+        "addedBandRms": 0.003232237379804129,
+        "masterControl": 0.05510622187794613,
+        "masterEnabled": 0.05218813227177219,
+        "musicControl": 0.09785141988695974,
+        "musicEnabled": 0.0919392039278275
+      },
+      {
+        "secondsFromAnchor": 0.15,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0013481184050490806,
+        "addedBandRms": 0.0013481184050490806,
+        "masterControl": 0.05302778312295883,
+        "masterEnabled": 0.05948756072922018,
+        "musicControl": 0.09316957021248491,
+        "musicEnabled": 0.1079744292859657
+      },
+      {
+        "secondsFromAnchor": 0.2,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0005520868967065146,
+        "addedBandRms": 0.0005520868967065146,
+        "masterControl": 0.05734743246372088,
+        "masterEnabled": 0.05368510856704042,
+        "musicControl": 0.10310961634342086,
+        "musicEnabled": 0.08841356904408797
+      },
+      {
+        "secondsFromAnchor": 0.25,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0002291822935036668,
+        "addedBandRms": 0.0002291822935036668,
+        "masterControl": 0.051789559235651025,
+        "masterEnabled": 0.03987776798680881,
+        "musicControl": 0.08419177097776828,
+        "musicEnabled": 0.049821364991579034
+      },
+      {
+        "secondsFromAnchor": 0.3,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 9.480153640107524e-05,
+        "addedBandRms": 9.480153640107524e-05,
+        "masterControl": 0.030413728915195358,
+        "masterEnabled": 0.04315502608556043,
+        "musicControl": 0.039245349973180146,
+        "musicEnabled": 0.08552943297767103
+      },
+      {
+        "secondsFromAnchor": 0.35,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 3.553071499750389e-05,
+        "addedBandRms": 3.553071499750389e-05,
+        "masterControl": 0.05367344270376373,
+        "masterEnabled": 0.07049762626602973,
+        "musicControl": 0.1152596828004454,
+        "musicEnabled": 0.12837263299175755
+      },
+      {
+        "secondsFromAnchor": 0.4,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.014174131070465815,
+        "addedBandRms": 0.014174131070465815,
+        "masterControl": 0.06682786408010472,
+        "masterEnabled": 0.037281140899433615,
+        "musicControl": 0.10467958249681254,
+        "musicEnabled": 0.04294916262139782
+      },
+      {
+        "secondsFromAnchor": 0.45,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.007093971945845968,
+        "addedBandRms": 0.007093971945845968,
+        "masterControl": 0.03209592815888453,
+        "masterEnabled": 0.03097576656582736,
+        "musicControl": 0.03828965274984129,
+        "musicEnabled": 0.03264707894662949
+      },
+      {
+        "secondsFromAnchor": 0.5,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0029945806090330438,
+        "addedBandRms": 0.0029945806090330438,
+        "masterControl": 0.026704753188840535,
+        "masterEnabled": 0.07092448152801874,
+        "musicControl": 0.06644343331622579,
+        "musicEnabled": 0.13513639973334332
+      },
+      {
+        "secondsFromAnchor": 0.55,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0012578884809976703,
+        "addedBandRms": 0.0012578884809976703,
+        "masterControl": 0.07731141254537471,
+        "masterEnabled": 0.05870398169769644,
+        "musicControl": 0.1393547870541455,
+        "musicEnabled": 0.10709328327745074
+      },
+      {
+        "secondsFromAnchor": 0.6,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0005213007591594041,
+        "addedBandRms": 0.0005213007591594041,
+        "masterControl": 0.06093833081208119,
+        "masterEnabled": 0.04974763413155413,
+        "musicControl": 0.10040447760743668,
+        "musicEnabled": 0.08696035175023864
+      },
+      {
+        "secondsFromAnchor": 0.65,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.00022089185489508357,
+        "addedBandRms": 0.00022089185489508357,
+        "masterControl": 0.04885960395497772,
+        "masterEnabled": 0.05876106726382261,
+        "musicControl": 0.08374391355393364,
+        "musicEnabled": 0.09290540483523616
+      },
+      {
+        "secondsFromAnchor": 0.7,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 9.343684619727258e-05,
+        "addedBandRms": 9.343684619727258e-05,
+        "masterControl": 0.05535586992915997,
+        "masterEnabled": 0.05279186586379251,
+        "musicControl": 0.09179855067629365,
+        "musicEnabled": 0.09592449601764612
+      },
+      {
+        "secondsFromAnchor": 0.75,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 3.524962787019013e-05,
+        "addedBandRms": 3.524962787019013e-05,
+        "masterControl": 0.052644160938288505,
+        "masterEnabled": 0.05342645795255914,
+        "musicControl": 0.09552544922981308,
+        "musicEnabled": 0.091152516768569
+      },
+      {
+        "secondsFromAnchor": 0.8,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.01615511188545493,
+        "addedBandRms": 0.01615511188545493,
+        "masterControl": 0.056449375675265,
+        "masterEnabled": 0.05460102883563816,
+        "musicControl": 0.08957758644001709,
+        "musicEnabled": 0.09264186875151938
+      },
+      {
+        "secondsFromAnchor": 0.85,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.007924168252778538,
+        "addedBandRms": 0.007924168252778538,
+        "masterControl": 0.053988466572840794,
+        "masterEnabled": 0.0625845625653799,
+        "musicControl": 0.10082705366491682,
+        "musicEnabled": 0.10479513364899838
+      },
+      {
+        "secondsFromAnchor": 0.9,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.003268328899053066,
+        "addedBandRms": 0.003268328899053066,
+        "masterControl": 0.0577173851278507,
+        "masterEnabled": 0.04878567345912373,
+        "musicControl": 0.09711549419470382,
+        "musicEnabled": 0.09475468287709307
+      },
+      {
+        "secondsFromAnchor": 0.95,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0013610317779595333,
+        "addedBandRms": 0.0013610317779595333,
+        "masterControl": 0.058378979091190976,
+        "masterEnabled": 0.06695492935688994,
+        "musicControl": 0.1121966651646419,
+        "musicEnabled": 0.11527638021511824
+      },
+      {
+        "secondsFromAnchor": 1.0,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0005580749836603886,
+        "addedBandRms": 0.0005580749836603886,
+        "masterControl": 0.055817934075025936,
+        "masterEnabled": 0.04186110135778937,
+        "musicControl": 0.0933639548385327,
+        "musicEnabled": 0.05593399324435293
+      },
+      {
+        "secondsFromAnchor": 1.05,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.00022687336487929547,
+        "addedBandRms": 0.00022687336487929547,
+        "masterControl": 0.036092853899806994,
+        "masterEnabled": 0.030949182015431752,
+        "musicControl": 0.04669225447854652,
+        "musicEnabled": 0.03683734193616523
+      },
+      {
+        "secondsFromAnchor": 1.1,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 9.423387347231338e-05,
+        "addedBandRms": 9.423387347231338e-05,
+        "masterControl": 0.028733664132638247,
+        "masterEnabled": 0.04095189268532565,
+        "musicControl": 0.03479081720463505,
+        "musicEnabled": 0.06863845535320749
+      },
+      {
+        "secondsFromAnchor": 1.15,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 3.5735377031920234e-05,
+        "addedBandRms": 3.5735377031920234e-05,
+        "masterControl": 0.04848942542275543,
+        "masterEnabled": 0.04938906864953264,
+        "musicControl": 0.0833052416345087,
+        "musicEnabled": 0.08840830456665275
+      },
+      {
+        "secondsFromAnchor": 1.2,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.014174131070465815,
+        "addedBandRms": 0.014174131070465815,
+        "masterControl": 0.04971596273056108,
+        "masterEnabled": 0.03937704300637995,
+        "musicControl": 0.0811690789333809,
+        "musicEnabled": 0.049224242915895194
+      },
+      {
+        "secondsFromAnchor": 1.25,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.007093971945845968,
+        "addedBandRms": 0.007093971945845968,
+        "masterControl": 0.03222696727320271,
+        "masterEnabled": 0.028170879940855983,
+        "musicControl": 0.039481633766648476,
+        "musicEnabled": 0.03507319953202367
+      },
+      {
+        "secondsFromAnchor": 1.3,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0029945806090330438,
+        "addedBandRms": 0.0029945806090330438,
+        "masterControl": 0.02856857861983842,
+        "masterEnabled": 0.028512864888993676,
+        "musicControl": 0.03277726678970313,
+        "musicEnabled": 0.03144611718942993
+      },
+      {
+        "secondsFromAnchor": 1.35,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0012578884809976703,
+        "addedBandRms": 0.0012578884809976703,
+        "masterControl": 0.026474449710875744,
+        "masterEnabled": 0.06281683065129996,
+        "musicControl": 0.030609424215034892,
+        "musicEnabled": 0.11119285209216498
+      },
+      {
+        "secondsFromAnchor": 1.4,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0005213007591594041,
+        "addedBandRms": 0.0005213007591594041,
+        "masterControl": 0.0746639638183614,
+        "masterEnabled": 0.06322279815149198,
+        "musicControl": 0.12722713729168,
+        "musicEnabled": 0.1033222686875196
+      },
+      {
+        "secondsFromAnchor": 1.45,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.00022089185489508357,
+        "addedBandRms": 0.00022089185489508357,
+        "masterControl": 0.05950489135294481,
+        "masterEnabled": 0.05876690278043255,
+        "musicControl": 0.1098484838304432,
+        "musicEnabled": 0.10122294926359443
+      },
+      {
+        "secondsFromAnchor": 1.5,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 9.343684619727258e-05,
+        "addedBandRms": 9.343684619727258e-05,
+        "masterControl": 0.05216592693058283,
+        "masterEnabled": 0.05210991306445055,
+        "musicControl": 0.08381670174197929,
+        "musicEnabled": 0.09713831231029864
+      },
+      {
+        "secondsFromAnchor": 1.55,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 3.524962787019013e-05,
+        "addedBandRms": 3.524962787019013e-05,
+        "masterControl": 0.06227643590479289,
+        "masterEnabled": 0.06269173269478574,
+        "musicControl": 0.10749957683102447,
+        "musicEnabled": 0.10693180974360525
+      },
+      {
+        "secondsFromAnchor": 1.6,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.01615235533970446,
+        "addedBandRms": 0.01615235533970446,
+        "masterControl": 0.06098207578584624,
+        "masterEnabled": 0.053067165945796024,
+        "musicControl": 0.0986130811794699,
+        "musicEnabled": 0.07684510237272163
+      },
+      {
+        "secondsFromAnchor": 1.65,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.007928754822606753,
+        "addedBandRms": 0.007928754822606753,
+        "masterControl": 0.04357181396644213,
+        "masterEnabled": 0.060185823838374876,
+        "musicControl": 0.06129734718588854,
+        "musicEnabled": 0.11117244098166126
+      },
+      {
+        "secondsFromAnchor": 1.7,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0032684287009443675,
+        "addedBandRms": 0.0032684287009443675,
+        "masterControl": 0.07211796064515635,
+        "masterEnabled": 0.0639452002692466,
+        "musicControl": 0.12433933309067224,
+        "musicEnabled": 0.10943892336220344
+      },
+      {
+        "secondsFromAnchor": 1.75,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0013607864467574662,
+        "addedBandRms": 0.0013607864467574662,
+        "masterControl": 0.05730497059007811,
+        "masterEnabled": 0.04764696349970452,
+        "musicControl": 0.09525996757441473,
+        "musicEnabled": 0.08087527916452608
+      },
+      {
+        "secondsFromAnchor": 1.8,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0005585079295886562,
+        "addedBandRms": 0.0005585079295886562,
+        "masterControl": 0.051862718355042886,
+        "masterEnabled": 0.04628793826394501,
+        "musicControl": 0.08817448526192251,
+        "musicEnabled": 0.056189624941134546
+      },
+      {
+        "secondsFromAnchor": 1.85,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.00022679853590956275,
+        "addedBandRms": 0.00022679853590956275,
+        "masterControl": 0.03482744805959766,
+        "masterEnabled": 0.03446062547744716,
+        "musicControl": 0.03799878968897823,
+        "musicEnabled": 0.08367304998694272
+      },
+      {
+        "secondsFromAnchor": 1.9,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 9.417653611323363e-05,
+        "addedBandRms": 9.417653611323363e-05,
+        "masterControl": 0.06146438891058237,
+        "masterEnabled": 0.07343619898896407,
+        "musicControl": 0.11507602491261061,
+        "musicEnabled": 0.13269341126294149
+      },
+      {
+        "secondsFromAnchor": 1.95,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 3.571224066882697e-05,
+        "addedBandRms": 3.571224066882697e-05,
+        "masterControl": 0.06587047400732103,
+        "masterEnabled": 0.05433628031682554,
+        "musicControl": 0.10916155776095185,
+        "musicEnabled": 0.09678934559692286
+      },
+      {
+        "secondsFromAnchor": 2.0,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.014174131070465815,
+        "addedBandRms": 0.014174131070465815,
+        "masterControl": 0.05668898792107456,
+        "masterEnabled": 0.04671176047306497,
+        "musicControl": 0.09975707245489188,
+        "musicEnabled": 0.07889451351848825
+      },
+      {
+        "secondsFromAnchor": 2.05,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.007093971945845968,
+        "addedBandRms": 0.007093971945845968,
+        "masterControl": 0.049075181589349294,
+        "masterEnabled": 0.0511871449426481,
+        "musicControl": 0.08918783235375573,
+        "musicEnabled": 0.09406516575450942
+      },
+      {
+        "secondsFromAnchor": 2.1,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0029945806090330438,
+        "addedBandRms": 0.0029945806090330438,
+        "masterControl": 0.049811347515349144,
+        "masterEnabled": 0.05215604054508998,
+        "musicControl": 0.08804948978868876,
+        "musicEnabled": 0.08727611431580354
+      },
+      {
+        "secondsFromAnchor": 2.15,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0012578884809976703,
+        "addedBandRms": 0.0012578884809976703,
+        "masterControl": 0.05449118542953324,
+        "masterEnabled": 0.04954352729244542,
+        "musicControl": 0.08758993192381752,
+        "musicEnabled": 0.08775442073386108
+      },
+      {
+        "secondsFromAnchor": 2.2,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0005213007591594041,
+        "addedBandRms": 0.0005213007591594041,
+        "masterControl": 0.04995062356363893,
+        "masterEnabled": 0.057074004601851545,
+        "musicControl": 0.09266963003703764,
+        "musicEnabled": 0.10071702653883935
+      },
+      {
+        "secondsFromAnchor": 2.25,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.00022089185489508357,
+        "addedBandRms": 0.00022089185489508357,
+        "masterControl": 0.061019588379690425,
+        "masterEnabled": 0.05627236890248541,
+        "musicControl": 0.10290270835063507,
+        "musicEnabled": 0.09716832375042249
+      },
+      {
+        "secondsFromAnchor": 2.3,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 9.343684619727258e-05,
+        "addedBandRms": 9.343684619727258e-05,
+        "masterControl": 0.05101584023628438,
+        "masterEnabled": 0.039035907910347355,
+        "musicControl": 0.08347448506949584,
+        "musicEnabled": 0.047982179905194905
+      },
+      {
+        "secondsFromAnchor": 2.35,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 3.524962787019013e-05,
+        "addedBandRms": 3.524962787019013e-05,
+        "masterControl": 0.031745903887905,
+        "masterEnabled": 0.02626883370390403,
+        "musicControl": 0.04002321744356856,
+        "musicEnabled": 0.030197132271868484
+      },
+      {
+        "secondsFromAnchor": 2.4,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.02678433451344849,
+        "masterEnabled": 0.026459430464116356,
+        "musicControl": 0.03110720076718113,
+        "musicEnabled": 0.03354383253543368
+      },
+      {
+        "secondsFromAnchor": 2.45,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.0440328435720289,
+        "masterEnabled": 0.06559846843963119,
+        "musicControl": 0.08623332279996844,
+        "musicEnabled": 0.1261286284338003
+      },
+      {
+        "secondsFromAnchor": 2.5,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.06863024021527384,
+        "masterEnabled": 0.0608823928830479,
+        "musicControl": 0.10912770213041113,
+        "musicEnabled": 0.10631059607167169
+      },
+      {
+        "secondsFromAnchor": 2.55,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.05792979344839845,
+        "masterEnabled": 0.04630875763466261,
+        "musicControl": 0.09899712924991365,
+        "musicEnabled": 0.07024603671091378
+      },
+      {
+        "secondsFromAnchor": 2.6,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.042613045736741934,
+        "masterEnabled": 0.027613934475975738,
+        "musicControl": 0.0655842113800822,
+        "musicEnabled": 0.03314250420064881
+      },
+      {
+        "secondsFromAnchor": 2.65,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.028323836227275356,
+        "masterEnabled": 0.06625102517596754,
+        "musicControl": 0.03167877257288477,
+        "musicEnabled": 0.11850315580730882
+      },
+      {
+        "secondsFromAnchor": 2.7,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.0668514839769885,
+        "masterEnabled": 0.04910206348096408,
+        "musicControl": 0.12800860054991753,
+        "musicEnabled": 0.074342870288609
+      },
+      {
+        "secondsFromAnchor": 2.75,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.042408404300069466,
+        "masterEnabled": 0.042928054814843096,
+        "musicControl": 0.06618054414656746,
+        "musicEnabled": 0.0730236159020424
+      },
+      {
+        "secondsFromAnchor": 2.8,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.04690645083978003,
+        "masterEnabled": 0.05217515276424646,
+        "musicControl": 0.08197525862682252,
+        "musicEnabled": 0.09323165428313734
+      },
+      {
+        "secondsFromAnchor": 2.85,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.05236980893961169,
+        "masterEnabled": 0.05039757815678107,
+        "musicControl": 0.0883193139850528,
+        "musicEnabled": 0.0865430464619028
+      },
+      {
+        "secondsFromAnchor": 2.9,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.052808016802568636,
+        "masterEnabled": 0.060830413242205374,
+        "musicControl": 0.085738373465792,
+        "musicEnabled": 0.10423329667563097
+      },
+      {
+        "secondsFromAnchor": 2.95,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.05898463878121299,
+        "masterEnabled": 0.054545461612334485,
+        "musicControl": 0.10846180761439647,
+        "musicEnabled": 0.08829174611662084
+      },
+      {
+        "secondsFromAnchor": 3.0,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.05061233921329729,
+        "masterEnabled": 0.03706082127261784,
+        "musicControl": 0.08281809645274582,
+        "musicEnabled": 0.05845577975161918
+      },
+      {
+        "secondsFromAnchor": 3.05,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.034482177548207774,
+        "masterEnabled": 0.02834916766589438,
+        "musicControl": 0.04225015563671366,
+        "musicEnabled": 0.031724977345896285
+      },
+      {
+        "secondsFromAnchor": 3.1,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.03032503030344284,
+        "masterEnabled": 0.04594539395458197,
+        "musicControl": 0.04174193716562776,
+        "musicEnabled": 0.08237208255076359
+      },
+      {
+        "secondsFromAnchor": 3.15,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.05206288609563616,
+        "masterEnabled": 0.05091269725580649,
+        "musicControl": 0.0918965470409306,
+        "musicEnabled": 0.07857564141425634
+      },
+      {
+        "secondsFromAnchor": 3.2,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.04263919360172894,
+        "masterEnabled": 0.02977142939103889,
+        "musicControl": 0.06501177752225425,
+        "musicEnabled": 0.03977404339018813
+      },
+      {
+        "secondsFromAnchor": 3.25,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.029119349377487058,
+        "masterEnabled": 0.05811078839968191,
+        "musicControl": 0.033327070056549515,
+        "musicEnabled": 0.11758144720160718
+      },
+      {
+        "secondsFromAnchor": 3.3,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.07814741879032079,
+        "masterEnabled": 0.06271372280437768,
+        "musicControl": 0.13514043966102293,
+        "musicEnabled": 0.1102607569117976
+      },
+      {
+        "secondsFromAnchor": 3.35,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.06179640925425709,
+        "masterEnabled": 0.05753618599433402,
+        "musicControl": 0.11166523191261561,
+        "musicEnabled": 0.09119047725634696
+      },
+      {
+        "secondsFromAnchor": 3.4,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.04939077933159605,
+        "masterEnabled": 0.05096948478683462,
+        "musicControl": 0.07452926201243573,
+        "musicEnabled": 0.09362937667608029
+      },
+      {
+        "secondsFromAnchor": 3.45,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.05134107219506503,
+        "masterEnabled": 0.04963144505229609,
+        "musicControl": 0.09218211944303482,
+        "musicEnabled": 0.08275471776726886
+      },
+      {
+        "secondsFromAnchor": 3.5,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.05473130213801034,
+        "masterEnabled": 0.06462229272392109,
+        "musicControl": 0.08392574845874634,
+        "musicEnabled": 0.12273961711491577
+      },
+      {
+        "secondsFromAnchor": 3.55,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.07155932236842233,
+        "masterEnabled": 0.062345326439018585,
+        "musicControl": 0.13430394311777524,
+        "musicEnabled": 0.1069075798609115
+      },
+      {
+        "secondsFromAnchor": 3.6,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.058184005309912995,
+        "masterEnabled": 0.05798649185026856,
+        "musicControl": 0.10118464674814878,
+        "musicEnabled": 0.10669537288954074
+      },
+      {
+        "secondsFromAnchor": 3.65,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.05841062232036693,
+        "masterEnabled": 0.048155164157038195,
+        "musicControl": 0.09530758763233733,
+        "musicEnabled": 0.0745949400437124
+      },
+      {
+        "secondsFromAnchor": 3.7,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.044235453807397594,
+        "masterEnabled": 0.03223110747318003,
+        "musicControl": 0.06716539988384859,
+        "musicEnabled": 0.03619324781211335
+      },
+      {
+        "secondsFromAnchor": 3.75,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.026931234655345814,
+        "masterEnabled": 0.026464811909516852,
+        "musicControl": 0.03152690911112084,
+        "musicEnabled": 0.028548396925304472
+      },
+      {
+        "secondsFromAnchor": 3.8,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.025693152242851652,
+        "masterEnabled": 0.025006834818182458,
+        "musicControl": 0.028097462380394397,
+        "musicEnabled": 0.028217921614732303
+      },
+      {
+        "secondsFromAnchor": 3.85,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.027009188974928953,
+        "masterEnabled": 0.03561405971843376,
+        "musicControl": 0.027370355919146723,
+        "musicEnabled": 0.057280504202549265
+      },
+      {
+        "secondsFromAnchor": 3.9,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.04357390313081927,
+        "masterEnabled": 0.051305142198399954,
+        "musicControl": 0.07246853366963736,
+        "musicEnabled": 0.08531741720177714
+      },
+      {
+        "secondsFromAnchor": 3.95,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.04769618675015246,
+        "masterEnabled": 0.03825238817333344,
+        "musicControl": 0.08031522017260288,
+        "musicEnabled": 0.052203097371170355
+      }
+    ]
+  },
+  "deluge": {
+    "envelopeWindowSeconds": 5.5,
+    "expectedEnvelopeSamples": 110,
+    "observedEnvelopeSamples": 110,
+    "envelopeResidual": 0,
+    "waveformOnsetFromTestSeconds": -0.0,
+    "passGate": true,
+    "envelopes": [
+      {
+        "secondsFromAnchor": -0.5,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.03949893145179502,
+        "masterEnabled": 0.0466595405959912,
+        "musicControl": 0.06328103061374804,
+        "musicEnabled": 0.07848482819779035
+      },
+      {
+        "secondsFromAnchor": -0.45,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.04634450223871869,
+        "masterEnabled": 0.04758059590910768,
+        "musicControl": 0.07760788373189491,
+        "musicEnabled": 0.08631907320277685
+      },
+      {
+        "secondsFromAnchor": -0.4,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.04991550544543549,
+        "masterEnabled": 0.05100302598523332,
+        "musicControl": 0.0890528619074094,
+        "musicEnabled": 0.08121954062630264
+      },
+      {
+        "secondsFromAnchor": -0.35,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.04616932070037868,
+        "masterEnabled": 0.034225145330830306,
+        "musicControl": 0.07639992839632513,
+        "musicEnabled": 0.04737863377650392
+      },
+      {
+        "secondsFromAnchor": -0.3,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.03883303188788254,
+        "masterEnabled": 0.03991590553325035,
+        "musicControl": 0.038371185291703025,
+        "musicEnabled": 0.01928352247657637
+      },
+      {
+        "secondsFromAnchor": -0.25,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.03896233408208609,
+        "masterEnabled": 0.05561207546413674,
+        "musicControl": 0.05166849034461397,
+        "musicEnabled": 0.08875512775672338
+      },
+      {
+        "secondsFromAnchor": -0.2,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.05893181596046305,
+        "masterEnabled": 0.07970657982510866,
+        "musicControl": 0.08265207352843205,
+        "musicEnabled": 0.07132290244644526
+      },
+      {
+        "secondsFromAnchor": -0.15,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.08162271165837895,
+        "masterEnabled": 0.06981872403037007,
+        "musicControl": 0.06465309462340935,
+        "musicEnabled": 0.02362352037802885
+      },
+      {
+        "secondsFromAnchor": -0.1,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.06468668937007219,
+        "masterEnabled": 0.062386402240902555,
+        "musicControl": 0.019299729168085353,
+        "musicEnabled": 0.0803883549357206
+      },
+      {
+        "secondsFromAnchor": -0.05,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.07493333238313438,
+        "masterEnabled": 0.07120892831847515,
+        "musicControl": 0.0896655343094127,
+        "musicEnabled": 0.07284926819773427
+      },
+      {
+        "secondsFromAnchor": -0.0,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.005678289390781035,
+        "addedBandRms": 0.005678289390781035,
+        "masterControl": 0.0691990984219743,
+        "masterEnabled": 0.03633166453431802,
+        "musicControl": 0.06173543714839343,
+        "musicEnabled": 0.054572832023610095
+      },
+      {
+        "secondsFromAnchor": 0.05,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.014626878212290917,
+        "addedBandRms": 0.014626878212290917,
+        "masterControl": 0.0414827686927582,
+        "masterEnabled": 0.05141408948718458,
+        "musicControl": 0.06119849142341973,
+        "musicEnabled": 0.054313697482702886
+      },
+      {
+        "secondsFromAnchor": 0.1,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0171922601041022,
+        "addedBandRms": 0.0171922601041022,
+        "masterControl": 0.050701619944539096,
+        "masterEnabled": 0.04618220619907493,
+        "musicControl": 0.05099900932399898,
+        "musicEnabled": 0.05219751005737006
+      },
+      {
+        "secondsFromAnchor": 0.15,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.01660489287236809,
+        "addedBandRms": 0.01660489287236809,
+        "masterControl": 0.04208209738591852,
+        "masterEnabled": 0.05604066302948236,
+        "musicControl": 0.053033065342692254,
+        "musicEnabled": 0.05374046144789012
+      },
+      {
+        "secondsFromAnchor": 0.2,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.015706503877978988,
+        "addedBandRms": 0.015706503877978988,
+        "masterControl": 0.059437109177603704,
+        "masterEnabled": 0.05902191628695743,
+        "musicControl": 0.05355386696049397,
+        "musicEnabled": 0.05208063948700582
+      },
+      {
+        "secondsFromAnchor": 0.25,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.016346537121307857,
+        "addedBandRms": 0.016346537121307857,
+        "masterControl": 0.058122044577831815,
+        "masterEnabled": 0.048475842312043965,
+        "musicControl": 0.051816757058505886,
+        "musicEnabled": 0.0650131519669213
+      },
+      {
+        "secondsFromAnchor": 0.3,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0171361331961751,
+        "addedBandRms": 0.0171361331961751,
+        "masterControl": 0.050678155562278455,
+        "masterEnabled": 0.04402060278724098,
+        "musicControl": 0.06598179010265721,
+        "musicEnabled": 0.0502742931206366
+      },
+      {
+        "secondsFromAnchor": 0.35,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.015753341921144116,
+        "addedBandRms": 0.015753341921144116,
+        "masterControl": 0.037872169088596475,
+        "masterEnabled": 0.0482597885933618,
+        "musicControl": 0.053614863226940354,
+        "musicEnabled": 0.07419287155519438
+      },
+      {
+        "secondsFromAnchor": 0.4,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.01657605089169679,
+        "addedBandRms": 0.01657605089169679,
+        "masterControl": 0.05041061561112033,
+        "masterEnabled": 0.03869172092604164,
+        "musicControl": 0.07035130812858262,
+        "musicEnabled": 0.03952038814520166
+      },
+      {
+        "secondsFromAnchor": 0.45,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.01701901826245554,
+        "addedBandRms": 0.01701901826245554,
+        "masterControl": 0.03291097231944054,
+        "masterEnabled": 0.03378391687217727,
+        "musicControl": 0.03475683379395004,
+        "musicEnabled": 0.023617758279497664
+      },
+      {
+        "secondsFromAnchor": 0.5,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.01687428332928504,
+        "addedBandRms": 0.01687428332928504,
+        "masterControl": 0.026785867052264083,
+        "masterEnabled": 0.03242081561186614,
+        "musicControl": 0.02171480756357077,
+        "musicEnabled": 0.03327416931134784
+      },
+      {
+        "secondsFromAnchor": 0.55,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.015614564822772629,
+        "addedBandRms": 0.015614564822772629,
+        "masterControl": 0.02895029956906945,
+        "masterEnabled": 0.03570499881608427,
+        "musicControl": 0.03883743182968749,
+        "musicEnabled": 0.05190087791361271
+      },
+      {
+        "secondsFromAnchor": 0.6,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.01621266121658101,
+        "addedBandRms": 0.01621266121658101,
+        "masterControl": 0.03345733351249875,
+        "masterEnabled": 0.03013926115002352,
+        "musicControl": 0.0510294499771281,
+        "musicEnabled": 0.034773651822817976
+      },
+      {
+        "secondsFromAnchor": 0.65,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.016377648505288753,
+        "addedBandRms": 0.016377648505288753,
+        "masterControl": 0.032104825491317296,
+        "masterEnabled": 0.029144844366075322,
+        "musicControl": 0.029991617774079583,
+        "musicEnabled": 0.017909088848070565
+      },
+      {
+        "secondsFromAnchor": 0.7,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.017290149899300243,
+        "addedBandRms": 0.017290149899300243,
+        "masterControl": 0.02309906655207702,
+        "masterEnabled": 0.02802327781256451,
+        "musicControl": 0.017857713485886932,
+        "musicEnabled": 0.01647349932693379
+      },
+      {
+        "secondsFromAnchor": 0.75,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.016267304718614487,
+        "addedBandRms": 0.016267304718614487,
+        "masterControl": 0.022169167493031397,
+        "masterEnabled": 0.03339010720872078,
+        "musicControl": 0.016120980517309234,
+        "musicEnabled": 0.04886084352468538
+      },
+      {
+        "secondsFromAnchor": 0.8,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.017294249119025575,
+        "addedBandRms": 0.017294249119025575,
+        "masterControl": 0.03636281867509437,
+        "masterEnabled": 0.04661758936184302,
+        "musicControl": 0.06086429373785612,
+        "musicEnabled": 0.07191097193340608
+      },
+      {
+        "secondsFromAnchor": 0.85,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.01658048869949335,
+        "addedBandRms": 0.01658048869949335,
+        "masterControl": 0.04903233181764544,
+        "masterEnabled": 0.05379064725305889,
+        "musicControl": 0.06448786713873175,
+        "musicEnabled": 0.04655637947606719
+      },
+      {
+        "secondsFromAnchor": 0.9,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.016602848294403748,
+        "addedBandRms": 0.016602848294403748,
+        "masterControl": 0.05827857228125026,
+        "masterEnabled": 0.05587613507627957,
+        "musicControl": 0.05141404237150179,
+        "musicEnabled": 0.05710244060583198
+      },
+      {
+        "secondsFromAnchor": 0.95,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.01773500539697905,
+        "addedBandRms": 0.01773500539697905,
+        "masterControl": 0.05139748714781187,
+        "masterEnabled": 0.03834731076290193,
+        "musicControl": 0.05407166263929213,
+        "musicEnabled": 0.06424562777188385
+      },
+      {
+        "secondsFromAnchor": 1.0,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.015729880596398862,
+        "addedBandRms": 0.015729880596398862,
+        "masterControl": 0.04286792413660903,
+        "masterEnabled": 0.04201835894728386,
+        "musicControl": 0.06402645322198451,
+        "musicEnabled": 0.05083562769011508
+      },
+      {
+        "secondsFromAnchor": 1.05,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.014045341771096197,
+        "addedBandRms": 0.014045341771096197,
+        "masterControl": 0.039539359326255956,
+        "masterEnabled": 0.03635814864501013,
+        "musicControl": 0.04805478004770011,
+        "musicEnabled": 0.053680304544688834
+      },
+      {
+        "secondsFromAnchor": 1.1,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.012958986919917315,
+        "addedBandRms": 0.012958986919917315,
+        "masterControl": 0.042004130369192934,
+        "masterEnabled": 0.044699008647958505,
+        "musicControl": 0.061249869835367676,
+        "musicEnabled": 0.06145409926035955
+      },
+      {
+        "secondsFromAnchor": 1.15,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.01140058321319423,
+        "addedBandRms": 0.01140058321319423,
+        "masterControl": 0.042018765218891474,
+        "masterEnabled": 0.04019046531393809,
+        "musicControl": 0.06470826827515629,
+        "musicEnabled": 0.056609890799437824
+      },
+      {
+        "secondsFromAnchor": 1.2,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.01047720454633975,
+        "addedBandRms": 0.01047720454633975,
+        "masterControl": 0.03810582016404505,
+        "masterEnabled": 0.03797823302957632,
+        "musicControl": 0.04869693278299009,
+        "musicEnabled": 0.04680319118742457
+      },
+      {
+        "secondsFromAnchor": 1.25,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.009337927538594552,
+        "addedBandRms": 0.009337927538594552,
+        "masterControl": 0.03549635147180839,
+        "masterEnabled": 0.02949630730437297,
+        "musicControl": 0.04388856234209382,
+        "musicEnabled": 0.02445644476082683
+      },
+      {
+        "secondsFromAnchor": 1.3,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.008379337351576654,
+        "addedBandRms": 0.008379337351576654,
+        "masterControl": 0.029616534707573663,
+        "masterEnabled": 0.06678140568143288,
+        "musicControl": 0.06468735772566805,
+        "musicEnabled": 0.12444855814704818
+      },
+      {
+        "secondsFromAnchor": 1.35,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.007745645961152274,
+        "addedBandRms": 0.007745645961152274,
+        "masterControl": 0.0704457227664,
+        "masterEnabled": 0.05020339482087865,
+        "musicControl": 0.12342493589921366,
+        "musicEnabled": 0.07756994569869217
+      },
+      {
+        "secondsFromAnchor": 1.4,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.006559989662548364,
+        "addedBandRms": 0.006559989662548364,
+        "masterControl": 0.05054706432630676,
+        "masterEnabled": 0.05367677438569372,
+        "musicControl": 0.06399707808258841,
+        "musicEnabled": 0.08479452224071489
+      },
+      {
+        "secondsFromAnchor": 1.45,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.006158843425287897,
+        "addedBandRms": 0.006158843425287897,
+        "masterControl": 0.05124847697519017,
+        "masterEnabled": 0.04598466935203582,
+        "musicControl": 0.08273501249511041,
+        "musicEnabled": 0.06782652873075685
+      },
+      {
+        "secondsFromAnchor": 1.5,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.00544927760300106,
+        "addedBandRms": 0.00544927760300106,
+        "masterControl": 0.044091479000017315,
+        "masterEnabled": 0.04594137902003998,
+        "musicControl": 0.0674664678873489,
+        "musicEnabled": 0.071946492889578
+      },
+      {
+        "secondsFromAnchor": 1.55,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0049827623785684986,
+        "addedBandRms": 0.0049827623785684986,
+        "masterControl": 0.046569688500156185,
+        "masterEnabled": 0.04820809730386376,
+        "musicControl": 0.07332256971559308,
+        "musicEnabled": 0.07312962900842206
+      },
+      {
+        "secondsFromAnchor": 1.6,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.004579847163682121,
+        "addedBandRms": 0.004579847163682121,
+        "masterControl": 0.0491366388853435,
+        "masterEnabled": 0.04908106976184469,
+        "musicControl": 0.07300243556397372,
+        "musicEnabled": 0.07705572147939133
+      },
+      {
+        "secondsFromAnchor": 1.65,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.004044082686528949,
+        "addedBandRms": 0.004044082686528949,
+        "masterControl": 0.049707073211339936,
+        "masterEnabled": 0.0548485632669471,
+        "musicControl": 0.08344087423935731,
+        "musicEnabled": 0.09061284845841165
+      },
+      {
+        "secondsFromAnchor": 1.7,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.003739960082199007,
+        "addedBandRms": 0.003739960082199007,
+        "masterControl": 0.05570805008572037,
+        "masterEnabled": 0.03736432448413991,
+        "musicControl": 0.08261952757738761,
+        "musicEnabled": 0.052237439086786075
+      },
+      {
+        "secondsFromAnchor": 1.75,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.003377099486508366,
+        "addedBandRms": 0.003377099486508366,
+        "masterControl": 0.04051669794604825,
+        "masterEnabled": 0.032556774800703965,
+        "musicControl": 0.044280841267545175,
+        "musicEnabled": 0.024589654016968436
+      },
+      {
+        "secondsFromAnchor": 1.8,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0027960645310000478,
+        "addedBandRms": 0.0027960645310000478,
+        "masterControl": 0.03218838352570379,
+        "masterEnabled": 0.033442898474481106,
+        "musicControl": 0.023533286308756868,
+        "musicEnabled": 0.024686567949825357
+      },
+      {
+        "secondsFromAnchor": 1.85,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.002603629174294583,
+        "addedBandRms": 0.002603629174294583,
+        "masterControl": 0.028959103262836225,
+        "masterEnabled": 0.0544637776851577,
+        "musicControl": 0.024967146331143972,
+        "musicEnabled": 0.09357740859592657
+      },
+      {
+        "secondsFromAnchor": 1.9,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0023207425646566224,
+        "addedBandRms": 0.0023207425646566224,
+        "masterControl": 0.06028052802907889,
+        "masterEnabled": 0.05628533198128895,
+        "musicControl": 0.09965917890851474,
+        "musicEnabled": 0.0890503523505895
+      },
+      {
+        "secondsFromAnchor": 1.95,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0020519343843028223,
+        "addedBandRms": 0.0020519343843028223,
+        "masterControl": 0.055239631377372415,
+        "masterEnabled": 0.0448893910808728,
+        "musicControl": 0.08597342685269492,
+        "musicEnabled": 0.06593277191173005
+      },
+      {
+        "secondsFromAnchor": 2.0,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0018750527950607595,
+        "addedBandRms": 0.0018750527950607595,
+        "masterControl": 0.044466468693562716,
+        "masterEnabled": 0.03556040565942271,
+        "musicControl": 0.06411507086664676,
+        "musicEnabled": 0.033978212208733566
+      },
+      {
+        "secondsFromAnchor": 2.05,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.001703988133596818,
+        "addedBandRms": 0.001703988133596818,
+        "masterControl": 0.030791399405315164,
+        "masterEnabled": 0.04725919463763796,
+        "musicControl": 0.027680778422152785,
+        "musicEnabled": 0.08254421167190588
+      },
+      {
+        "secondsFromAnchor": 2.1,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0016111296638753533,
+        "addedBandRms": 0.0016111296638753533,
+        "masterControl": 0.05522515017075745,
+        "masterEnabled": 0.054201750175324345,
+        "musicControl": 0.0920395269967082,
+        "musicEnabled": 0.07457145148053847
+      },
+      {
+        "secondsFromAnchor": 2.15,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0014065291995753312,
+        "addedBandRms": 0.0014065291995753312,
+        "masterControl": 0.04794626442133274,
+        "masterEnabled": 0.046141307988253825,
+        "musicControl": 0.06515260497592515,
+        "musicEnabled": 0.06771571337549552
+      },
+      {
+        "secondsFromAnchor": 2.2,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0011967986749577394,
+        "addedBandRms": 0.0011967986749577394,
+        "masterControl": 0.044827498002286276,
+        "masterEnabled": 0.04377563040143212,
+        "musicControl": 0.06889595985072122,
+        "musicEnabled": 0.0659775264958636
+      },
+      {
+        "secondsFromAnchor": 2.25,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0011203913008427516,
+        "addedBandRms": 0.0011203913008427516,
+        "masterControl": 0.04456707307983471,
+        "masterEnabled": 0.048081677480638615,
+        "musicControl": 0.06665606209533102,
+        "musicEnabled": 0.07525681184721941
+      },
+      {
+        "secondsFromAnchor": 2.3,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0010584482754200702,
+        "addedBandRms": 0.0010584482754200702,
+        "masterControl": 0.05088030762246539,
+        "masterEnabled": 0.05196508164913406,
+        "musicControl": 0.07433174656159013,
+        "musicEnabled": 0.08023166433442257
+      },
+      {
+        "secondsFromAnchor": 2.35,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0008768388389454475,
+        "addedBandRms": 0.0008768388389454475,
+        "masterControl": 0.05121292043615481,
+        "masterEnabled": 0.058589992563318344,
+        "musicControl": 0.08359123723768049,
+        "musicEnabled": 0.08432096674593902
+      },
+      {
+        "secondsFromAnchor": 2.4,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0008266483401769436,
+        "addedBandRms": 0.0008266483401769436,
+        "masterControl": 0.05058227145904185,
+        "masterEnabled": 0.04270920673612806,
+        "musicControl": 0.08281657613810063,
+        "musicEnabled": 0.0568626895435205
+      },
+      {
+        "secondsFromAnchor": 2.45,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0007657542649955326,
+        "addedBandRms": 0.0007657542649955326,
+        "masterControl": 0.03930302925678056,
+        "masterEnabled": 0.03072874481463375,
+        "musicControl": 0.05000679594225016,
+        "musicEnabled": 0.02261306886645449
+      },
+      {
+        "secondsFromAnchor": 2.5,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0006864592394410925,
+        "addedBandRms": 0.0006864592394410925,
+        "masterControl": 0.032817808183228894,
+        "masterEnabled": 0.041551419869840046,
+        "musicControl": 0.022178506508455407,
+        "musicEnabled": 0.05676839960312864
+      },
+      {
+        "secondsFromAnchor": 2.55,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0005698371785595721,
+        "addedBandRms": 0.0005698371785595721,
+        "masterControl": 0.042177458423222736,
+        "masterEnabled": 0.04929531804596631,
+        "musicControl": 0.065751072760244,
+        "musicEnabled": 0.07135499706665767
+      },
+      {
+        "secondsFromAnchor": 2.6,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0005329908622327161,
+        "addedBandRms": 0.0005329908622327161,
+        "masterControl": 0.045368877106279695,
+        "masterEnabled": 0.03470913864145501,
+        "musicControl": 0.06704107334409305,
+        "musicEnabled": 0.03914187067640674
+      },
+      {
+        "secondsFromAnchor": 2.65,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0004827269104672509,
+        "addedBandRms": 0.0004827269104672509,
+        "masterControl": 0.03720931262996881,
+        "masterEnabled": 0.05160955044365483,
+        "musicControl": 0.03169943587860861,
+        "musicEnabled": 0.09566407655203533
+      },
+      {
+        "secondsFromAnchor": 2.7,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.00045907561446132663,
+        "addedBandRms": 0.00045907561446132663,
+        "masterControl": 0.06536031496363544,
+        "masterEnabled": 0.07051409645104809,
+        "musicControl": 0.11251465142758742,
+        "musicEnabled": 0.11568788464774388
+      },
+      {
+        "secondsFromAnchor": 2.75,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.00038909164327849177,
+        "addedBandRms": 0.00038909164327849177,
+        "masterControl": 0.062261285662251704,
+        "masterEnabled": 0.04593160484122339,
+        "musicControl": 0.10007730205247878,
+        "musicEnabled": 0.06282145233818535
+      },
+      {
+        "secondsFromAnchor": 2.8,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.00037359687688476827,
+        "addedBandRms": 0.00037359687688476827,
+        "masterControl": 0.045945841738129996,
+        "masterEnabled": 0.05074072290479493,
+        "musicControl": 0.07410564758763453,
+        "musicEnabled": 0.07962664416370613
+      },
+      {
+        "secondsFromAnchor": 2.85,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0003210493846016754,
+        "addedBandRms": 0.0003210493846016754,
+        "masterControl": 0.05222984602409198,
+        "masterEnabled": 0.04801120856322283,
+        "musicControl": 0.07501555849306195,
+        "musicEnabled": 0.06935760658806049
+      },
+      {
+        "secondsFromAnchor": 2.9,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0002892753650926451,
+        "addedBandRms": 0.0002892753650926451,
+        "masterControl": 0.04561009550135032,
+        "masterEnabled": 0.052944376459774345,
+        "musicControl": 0.07053073845395297,
+        "musicEnabled": 0.08888031436071507
+      },
+      {
+        "secondsFromAnchor": 2.95,
+        "controlBandRms": 0.00044744336598415005,
+        "enabledBandRms": 0.000278406897742831,
+        "addedBandRms": 0.0,
+        "masterControl": 0.05542314542450358,
+        "masterEnabled": 0.06106992228114856,
+        "musicControl": 0.09603074636256585,
+        "musicEnabled": 0.10417080276847145
+      },
+      {
+        "secondsFromAnchor": 3.0,
+        "controlBandRms": 0.002571677777981121,
+        "enabledBandRms": 0.00023435988493224726,
+        "addedBandRms": 0.0,
+        "masterControl": 0.05967136383543156,
+        "masterEnabled": 0.05513319205313204,
+        "musicControl": 0.09877347955456212,
+        "musicEnabled": 0.08310521720541103
+      },
+      {
+        "secondsFromAnchor": 3.05,
+        "controlBandRms": 0.00016813288340517742,
+        "enabledBandRms": 0.00020956389149245908,
+        "addedBandRms": 0.00012509339764881348,
+        "masterControl": 0.05212861236507231,
+        "masterEnabled": 0.05720925490318453,
+        "musicControl": 0.08203685931486937,
+        "musicEnabled": 0.08082718174359337
+      },
+      {
+        "secondsFromAnchor": 3.1,
+        "controlBandRms": 0.0008467236207263419,
+        "enabledBandRms": 0.00019308306375315928,
+        "addedBandRms": 0.0,
+        "masterControl": 0.04859619494968936,
+        "masterEnabled": 0.036250623884733706,
+        "musicControl": 0.07427632534325075,
+        "musicEnabled": 0.03275344783150905
+      },
+      {
+        "secondsFromAnchor": 3.15,
+        "controlBandRms": 0.00046072255353884724,
+        "enabledBandRms": 0.00017004074188174797,
+        "addedBandRms": 0.0,
+        "masterControl": 0.03147463880410921,
+        "masterEnabled": 0.02919041977203139,
+        "musicControl": 0.03029761418683276,
+        "musicEnabled": 0.024915512719150906
+      },
+      {
+        "secondsFromAnchor": 3.2,
+        "controlBandRms": 1.9383217847264632e-05,
+        "enabledBandRms": 0.00015624726660225732,
+        "addedBandRms": 0.00015504031471382648,
+        "masterControl": 0.03442800938066812,
+        "masterEnabled": 0.03397536467195723,
+        "musicControl": 0.024885428599815997,
+        "musicEnabled": 0.02536632286854202
+      },
+      {
+        "secondsFromAnchor": 3.25,
+        "controlBandRms": 0.000508203003838919,
+        "enabledBandRms": 0.00013905690348006944,
+        "addedBandRms": 0.0,
+        "masterControl": 0.03280927716996136,
+        "masterEnabled": 0.03468380953983918,
+        "musicControl": 0.02601601714847228,
+        "musicEnabled": 0.03682637499988271
+      },
+      {
+        "secondsFromAnchor": 3.3,
+        "controlBandRms": 0.00013741480777740124,
+        "enabledBandRms": 0.00012509266884163116,
+        "addedBandRms": 0.0,
+        "masterControl": 0.03365461895465457,
+        "masterEnabled": 0.04691493350610253,
+        "musicControl": 0.04731049405658223,
+        "musicEnabled": 0.07301459729371904
+      },
+      {
+        "secondsFromAnchor": 3.35,
+        "controlBandRms": 7.358648638170445e-06,
+        "enabledBandRms": 0.00011516803096340791,
+        "addedBandRms": 0.00011493270050863869,
+        "masterControl": 0.04972186913208053,
+        "masterEnabled": 0.04309009229217942,
+        "musicControl": 0.07293355262140654,
+        "musicEnabled": 0.0554392946618829
+      },
+      {
+        "secondsFromAnchor": 3.4,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 9.763580595875574e-05,
+        "addedBandRms": 9.763580595875574e-05,
+        "masterControl": 0.04124169282090531,
+        "masterEnabled": 0.03487022581287507,
+        "musicControl": 0.04751327965339771,
+        "musicEnabled": 0.02726848718820767
+      },
+      {
+        "secondsFromAnchor": 3.45,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 9.188702899748024e-05,
+        "addedBandRms": 9.188702899748024e-05,
+        "masterControl": 0.030507511570360486,
+        "masterEnabled": 0.03189256286686433,
+        "musicControl": 0.02600717469187514,
+        "musicEnabled": 0.023811584922824206
+      },
+      {
+        "secondsFromAnchor": 3.5,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 8.147659831031041e-05,
+        "addedBandRms": 8.147659831031041e-05,
+        "masterControl": 0.030612854048135636,
+        "masterEnabled": 0.029174644111978818,
+        "musicControl": 0.02366644120839171,
+        "musicEnabled": 0.04821228395874209
+      },
+      {
+        "secondsFromAnchor": 3.55,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 7.431204650488935e-05,
+        "addedBandRms": 7.431204650488935e-05,
+        "masterControl": 0.0445273216126757,
+        "masterEnabled": 0.06809560854208774,
+        "musicControl": 0.07347478651848305,
+        "musicEnabled": 0.1075741547329865
+      },
+      {
+        "secondsFromAnchor": 3.6,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 6.845979947633647e-05,
+        "addedBandRms": 6.845979947633647e-05,
+        "masterControl": 0.06206334954154099,
+        "masterEnabled": 0.049380081435861235,
+        "musicControl": 0.10033704103095828,
+        "musicEnabled": 0.06765973394477381
+      },
+      {
+        "secondsFromAnchor": 3.65,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 6.042968089743065e-05,
+        "addedBandRms": 6.042968089743065e-05,
+        "masterControl": 0.04217146901453067,
+        "masterEnabled": 0.051726687123001436,
+        "musicControl": 0.06419882901640338,
+        "musicEnabled": 0.08278062357189579
+      },
+      {
+        "secondsFromAnchor": 3.7,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 5.572800312721052e-05,
+        "addedBandRms": 5.572800312721052e-05,
+        "masterControl": 0.051780598637858916,
+        "masterEnabled": 0.05385375655457334,
+        "musicControl": 0.08188365295001461,
+        "musicEnabled": 0.08896669407440722
+      },
+      {
+        "secondsFromAnchor": 3.75,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 5.0765494216475476e-05,
+        "addedBandRms": 5.0765494216475476e-05,
+        "masterControl": 0.05821116282472538,
+        "masterEnabled": 0.05395320602300583,
+        "musicControl": 0.0916089609031176,
+        "musicEnabled": 0.07773439601637526
+      },
+      {
+        "secondsFromAnchor": 3.8,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 4.192876023468463e-05,
+        "addedBandRms": 4.192876023468463e-05,
+        "masterControl": 0.049282995753227476,
+        "masterEnabled": 0.06581168689067984,
+        "musicControl": 0.08702226681157402,
+        "musicEnabled": 0.10595625573762946
+      },
+      {
+        "secondsFromAnchor": 3.85,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 3.918559300856843e-05,
+        "addedBandRms": 3.918559300856843e-05,
+        "masterControl": 0.05974863475803781,
+        "masterEnabled": 0.04158887841192071,
+        "musicControl": 0.09589299168212567,
+        "musicEnabled": 0.05948362907760436
+      },
+      {
+        "secondsFromAnchor": 3.9,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 3.4738114034196154e-05,
+        "addedBandRms": 3.4738114034196154e-05,
+        "masterControl": 0.04293967332932435,
+        "masterEnabled": 0.04713383217665075,
+        "musicControl": 0.06324346409275819,
+        "musicEnabled": 0.0709243965774
+      },
+      {
+        "secondsFromAnchor": 3.95,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 3.079641357524786e-05,
+        "addedBandRms": 3.079641357524786e-05,
+        "masterControl": 0.04771087780465674,
+        "masterEnabled": 0.04560066316907286,
+        "musicControl": 0.06545790877386402,
+        "musicEnabled": 0.05937712259652593
+      },
+      {
+        "secondsFromAnchor": 4.0,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 2.9874227900973344e-05,
+        "addedBandRms": 2.9874227900973344e-05,
+        "masterControl": 0.04207588020508202,
+        "masterEnabled": 0.032654459043661564,
+        "musicControl": 0.055140665439988544,
+        "musicEnabled": 0.03148065366025341
+      },
+      {
+        "secondsFromAnchor": 4.05,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 5.525603361168758e-07,
+        "addedBandRms": 5.525603361168758e-07,
+        "masterControl": 0.0319469434967193,
+        "masterEnabled": 0.07187086882722911,
+        "musicControl": 0.027994953630269038,
+        "musicEnabled": 0.12478044790059702
+      },
+      {
+        "secondsFromAnchor": 4.1,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.07309289085846192,
+        "masterEnabled": 0.057045651322627663,
+        "musicControl": 0.13155694071067292,
+        "musicEnabled": 0.08384467824196917
+      },
+      {
+        "secondsFromAnchor": 4.15,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.052121725258798754,
+        "masterEnabled": 0.052093212214012696,
+        "musicControl": 0.07863455380801186,
+        "musicEnabled": 0.08303912557865549
+      },
+      {
+        "secondsFromAnchor": 4.2,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.052295652962690536,
+        "masterEnabled": 0.04539103291621513,
+        "musicControl": 0.08373301305881431,
+        "musicEnabled": 0.07088108555097289
+      },
+      {
+        "secondsFromAnchor": 4.25,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.04737611738431234,
+        "masterEnabled": 0.04707969466952793,
+        "musicControl": 0.0680502666910955,
+        "musicEnabled": 0.07316838737748568
+      },
+      {
+        "secondsFromAnchor": 4.3,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.05067878167916882,
+        "masterEnabled": 0.050814514834316954,
+        "musicControl": 0.0723846331651491,
+        "musicEnabled": 0.07263792987578
+      },
+      {
+        "secondsFromAnchor": 4.35,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.047517134795159226,
+        "masterEnabled": 0.04781741370911627,
+        "musicControl": 0.07200920141136011,
+        "musicEnabled": 0.0710777517952354
+      },
+      {
+        "secondsFromAnchor": 4.4,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.04763005543924418,
+        "masterEnabled": 0.05936824434417083,
+        "musicControl": 0.07972290527749568,
+        "musicEnabled": 0.09408681298430199
+      },
+      {
+        "secondsFromAnchor": 4.45,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.055039455468833334,
+        "masterEnabled": 0.045870915355490864,
+        "musicControl": 0.08983666522487986,
+        "musicEnabled": 0.060075367585549135
+      },
+      {
+        "secondsFromAnchor": 4.5,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.041245425718954745,
+        "masterEnabled": 0.03488540106860759,
+        "musicControl": 0.05324999986533571,
+        "musicEnabled": 0.030562116877510072
+      },
+      {
+        "secondsFromAnchor": 4.55,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.031196671384195292,
+        "masterEnabled": 0.0476789858209045,
+        "musicControl": 0.028819081901350668,
+        "musicEnabled": 0.08408808873861469
+      },
+      {
+        "secondsFromAnchor": 4.6,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.05668167439566187,
+        "masterEnabled": 0.051432345012167334,
+        "musicControl": 0.09297121005003299,
+        "musicEnabled": 0.07710242372359628
+      },
+      {
+        "secondsFromAnchor": 4.65,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.05049261848717028,
+        "masterEnabled": 0.04448650357868364,
+        "musicControl": 0.06914247635188578,
+        "musicEnabled": 0.06387504804108018
+      },
+      {
+        "secondsFromAnchor": 4.7,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.044779424052792664,
+        "masterEnabled": 0.04900592473773944,
+        "musicControl": 0.06769180628050202,
+        "musicEnabled": 0.07000972212398857
+      },
+      {
+        "secondsFromAnchor": 4.75,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.04550517302490022,
+        "masterEnabled": 0.03770246879437975,
+        "musicControl": 0.06753665768193805,
+        "musicEnabled": 0.04482913898622891
+      },
+      {
+        "secondsFromAnchor": 4.8,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.03262249400536464,
+        "masterEnabled": 0.02885387368786332,
+        "musicControl": 0.03799192222979737,
+        "musicEnabled": 0.029048407520263594
+      },
+      {
+        "secondsFromAnchor": 4.85,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.027772045126164706,
+        "masterEnabled": 0.03972518652052846,
+        "musicControl": 0.028938429373111786,
+        "musicEnabled": 0.07734258209135038
+      },
+      {
+        "secondsFromAnchor": 4.9,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.05211248853864652,
+        "masterEnabled": 0.05172131460310347,
+        "musicControl": 0.08910052145463604,
+        "musicEnabled": 0.08827311058086341
+      },
+      {
+        "secondsFromAnchor": 4.95,
+        "controlBandRms": 0.0,
+        "enabledBandRms": 0.0,
+        "addedBandRms": 0.0,
+        "masterControl": 0.05171534514268468,
+        "masterEnabled": 0.04472800180104084,
+        "musicControl": 0.0886233996298016,
+        "musicEnabled": 0.07171022905729263
+      }
+    ]
+  },
+  "postMasterLaunch": {
+    "method": "50 ms 20\u2013200 Hz differential event waveform matched to post-master PCM; three consecutive windows require correlation >0.5 and projected RMS >0.003. Mixer latency calibrated by 0\u201320 ms lag scan at 1 ms spacing. This confirms routing, not perceived loudness.",
+    "measuredMixerLagSeconds": 0.006,
+    "calibrationCorrelation": 0.7806732917533329,
+    "waveformOnsetSeconds": 0.7,
+    "expectedSeconds": 0.7082981576826575,
+    "residualSeconds": -0.008298157682657514,
+    "passGate": true,
+    "envelopes": [
+      {
+        "seconds": -0.5,
+        "correlation": 0.0,
+        "projectedRms": 0.0
+      },
+      {
+        "seconds": -0.45,
+        "correlation": 0.0,
+        "projectedRms": 0.0
+      },
+      {
+        "seconds": -0.4,
+        "correlation": 0.0,
+        "projectedRms": 0.0
+      },
+      {
+        "seconds": -0.35,
+        "correlation": 0.0,
+        "projectedRms": 0.0
+      },
+      {
+        "seconds": -0.3,
+        "correlation": 0.0,
+        "projectedRms": 0.0
+      },
+      {
+        "seconds": -0.25,
+        "correlation": 0.0,
+        "projectedRms": 0.0
+      },
+      {
+        "seconds": -0.2,
+        "correlation": 0.0,
+        "projectedRms": 0.0
+      },
+      {
+        "seconds": -0.15,
+        "correlation": 0.0,
+        "projectedRms": 0.0
+      },
+      {
+        "seconds": -0.1,
+        "correlation": 0.0,
+        "projectedRms": 0.0
+      },
+      {
+        "seconds": -0.05,
+        "correlation": 0.0,
+        "projectedRms": 0.0
+      },
+      {
+        "seconds": -0.0,
+        "correlation": 0.2637094837318507,
+        "projectedRms": 0.006113035319333235
+      },
+      {
+        "seconds": 0.05,
+        "correlation": 0.06010394487912195,
+        "projectedRms": 0.0006586811285456637
+      },
+      {
+        "seconds": 0.1,
+        "correlation": 0.5411229742767336,
+        "projectedRms": 0.005766929797335636
+      },
+      {
+        "seconds": 0.15,
+        "correlation": -0.5589300808566077,
+        "projectedRms": -0.0057485859592414515
+      },
+      {
+        "seconds": 0.2,
+        "correlation": -0.33857947208806216,
+        "projectedRms": -0.0056041153133483
+      },
+      {
+        "seconds": 0.25,
+        "correlation": 0.2526695338834338,
+        "projectedRms": 0.003038628589435946
+      },
+      {
+        "seconds": 0.3,
+        "correlation": 0.3329408048683505,
+        "projectedRms": 0.004267336341880106
+      },
+      {
+        "seconds": 0.35,
+        "correlation": 0.3142491182938115,
+        "projectedRms": 0.005352175524685643
+      },
+      {
+        "seconds": 0.4,
+        "correlation": -0.4267134002405195,
+        "projectedRms": -0.0060920646696064245
+      },
+      {
+        "seconds": 0.45,
+        "correlation": 0.06670570195798912,
+        "projectedRms": 0.0007114814033782201
+      },
+      {
+        "seconds": 0.5,
+        "correlation": 0.17001121174802494,
+        "projectedRms": 0.002403553606233121
+      },
+      {
+        "seconds": 0.55,
+        "correlation": 0.34534556979001907,
+        "projectedRms": 0.004715599113638089
+      },
+      {
+        "seconds": 0.6,
+        "correlation": -0.07876840433398927,
+        "projectedRms": -0.0009764668921581484
+      },
+      {
+        "seconds": 0.65,
+        "correlation": 0.1486505741404126,
+        "projectedRms": 0.001656265561772976
+      },
+      {
+        "seconds": 0.7,
+        "correlation": 0.7771780802567227,
+        "projectedRms": 0.015812537181674333
+      },
+      {
+        "seconds": 0.75,
+        "correlation": 0.7365104366327302,
+        "projectedRms": 0.01731070050723128
+      },
+      {
+        "seconds": 0.8,
+        "correlation": 0.7806570486665682,
+        "projectedRms": 0.013625058045339365
+      },
+      {
+        "seconds": 0.85,
+        "correlation": 0.8280669388587045,
+        "projectedRms": 0.020490560246819032
+      },
+      {
+        "seconds": 0.9,
+        "correlation": 0.9129001250168912,
+        "projectedRms": 0.02653106920069578
+      },
+      {
+        "seconds": 0.95,
+        "correlation": 0.7421435423305173,
+        "projectedRms": 0.014756636639411128
+      },
+      {
+        "seconds": 1.0,
+        "correlation": 0.6281235750704786,
+        "projectedRms": 0.00893643668220022
+      },
+      {
+        "seconds": 1.05,
+        "correlation": 0.8072749725929769,
+        "projectedRms": 0.01781014271637505
+      },
+      {
+        "seconds": 1.1,
+        "correlation": 0.8574596814678507,
+        "projectedRms": 0.022876362779022816
+      },
+      {
+        "seconds": 1.15,
+        "correlation": 0.8248539805740367,
+        "projectedRms": 0.01706046394475492
+      },
+      {
+        "seconds": 1.2,
+        "correlation": 0.7657579695300455,
+        "projectedRms": 0.012650782337527025
+      },
+      {
+        "seconds": 1.25,
+        "correlation": 0.6759562043049603,
+        "projectedRms": 0.009543303234929785
+      },
+      {
+        "seconds": 1.3,
+        "correlation": 0.7017565984418306,
+        "projectedRms": 0.01390588375361162
+      },
+      {
+        "seconds": 1.35,
+        "correlation": 0.7303788875512225,
+        "projectedRms": 0.015564399192562785
+      },
+      {
+        "seconds": 1.4,
+        "correlation": 0.7419154321398889,
+        "projectedRms": 0.012757492329472268
+      },
+      {
+        "seconds": 1.45,
+        "correlation": 0.75113022474014,
+        "projectedRms": 0.012920690384003354
+      },
+      {
+        "seconds": 1.5,
+        "correlation": 0.5613109846020055,
+        "projectedRms": 0.012211576646670814
+      },
+      {
+        "seconds": 1.55,
+        "correlation": 0.371895911852293,
+        "projectedRms": 0.006513908587593469
+      },
+      {
+        "seconds": 1.6,
+        "correlation": 0.6719935672128229,
+        "projectedRms": 0.015684902944862755
+      },
+      {
+        "seconds": 1.65,
+        "correlation": 0.6790292322212521,
+        "projectedRms": 0.014659121937520468
+      },
+      {
+        "seconds": 1.7,
+        "correlation": 0.534263237274091,
+        "projectedRms": 0.01075320525439619
+      },
+      {
+        "seconds": 1.75,
+        "correlation": 0.5591418751902334,
+        "projectedRms": 0.01192815703779832
+      },
+      {
+        "seconds": 1.8,
+        "correlation": 0.6416878154315179,
+        "projectedRms": 0.013254836857087301
+      },
+      {
+        "seconds": 1.85,
+        "correlation": 0.24689724105322305,
+        "projectedRms": 0.003846911547799446
+      },
+      {
+        "seconds": 1.9,
+        "correlation": 0.33525961799621334,
+        "projectedRms": 0.005562152766674432
+      },
+      {
+        "seconds": 1.95,
+        "correlation": 0.4606090371868615,
+        "projectedRms": 0.009197592947283697
+      },
+      {
+        "seconds": 2.0,
+        "correlation": 0.03331243465135459,
+        "projectedRms": 0.0005227818762843139
+      },
+      {
+        "seconds": 2.05,
+        "correlation": 0.648463299496852,
+        "projectedRms": 0.012984675493652217
+      },
+      {
+        "seconds": 2.1,
+        "correlation": 0.5702915314192042,
+        "projectedRms": 0.015419148327891817
+      },
+      {
+        "seconds": 2.15,
+        "correlation": 0.5939893611753257,
+        "projectedRms": 0.013013790057560174
+      },
+      {
+        "seconds": 2.2,
+        "correlation": 0.35135966120162676,
+        "projectedRms": 0.006353541956181038
+      },
+      {
+        "seconds": 2.25,
+        "correlation": 0.4047552244627236,
+        "projectedRms": 0.008505968813089624
+      },
+      {
+        "seconds": 2.3,
+        "correlation": 0.5333935928029763,
+        "projectedRms": 0.011446502090409805
+      },
+      {
+        "seconds": 2.35,
+        "correlation": 0.48624680801033754,
+        "projectedRms": 0.009014206647763314
+      },
+      {
+        "seconds": 2.4,
+        "correlation": 0.34146371607093595,
+        "projectedRms": 0.0073517156418448585
+      },
+      {
+        "seconds": 2.45,
+        "correlation": 0.4978370883903191,
+        "projectedRms": 0.010835259155080388
+      },
+      {
+        "seconds": 2.5,
+        "correlation": 0.41721931539329715,
+        "projectedRms": 0.007956344749910168
+      },
+      {
+        "seconds": 2.55,
+        "correlation": 0.6948243095836129,
+        "projectedRms": 0.014455423960047455
+      },
+      {
+        "seconds": 2.6,
+        "correlation": 0.3791081645494927,
+        "projectedRms": 0.006437002579577809
+      },
+      {
+        "seconds": 2.65,
+        "correlation": 0.21503402437220903,
+        "projectedRms": 0.0033060176639915766
+      },
+      {
+        "seconds": 2.7,
+        "correlation": 0.3410681527224004,
+        "projectedRms": 0.006263909871114462
+      },
+      {
+        "seconds": 2.75,
+        "correlation": 0.1204458164249088,
+        "projectedRms": 0.0019997438540822147
+      },
+      {
+        "seconds": 2.8,
+        "correlation": 0.37885288312070825,
+        "projectedRms": 0.006542510801247921
+      },
+      {
+        "seconds": 2.85,
+        "correlation": 0.27038409993216456,
+        "projectedRms": 0.004228916419789768
+      },
+      {
+        "seconds": 2.9,
+        "correlation": 0.5354801330826503,
+        "projectedRms": 0.010396776684002443
+      },
+      {
+        "seconds": 2.95,
+        "correlation": 0.45926383083564265,
+        "projectedRms": 0.009715795610770121
+      }
+    ]
+  }
+}

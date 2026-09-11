@@ -1,0 +1,211 @@
+{
+  "status": "VERIFIED",
+  "method": "Manual inspection of rendered PNGs with view_image, plus exported-geometry assertions for counts and dimensions",
+  "assets": {
+    "clock-tower": [
+      {
+        "status": "VERIFIED",
+        "feature": "stepped three-tier plinth",
+        "observation": "Three distinct plinth tiers are visible.",
+        "frames": [
+          "clock-tower-front.png",
+          "clock-tower-three-quarter.png"
+        ]
+      },
+      {
+        "status": "VERIFIED",
+        "feature": "square mossy shaft with visible block courses",
+        "observation": "Square block courses and moss patches read; recessed backing closes sky leaks in the shaft.",
+        "frames": [
+          "clock-tower-front.png",
+          "clock-tower-back.png"
+        ]
+      },
+      {
+        "status": "VERIFIED",
+        "feature": "round white 3.2 m face with two plain metal hands",
+        "observation": "The white round face has exactly two visible plain geometry hands.",
+        "frames": [
+          "clock-tower-front.png",
+          "clock-tower-three-quarter.png"
+        ]
+      },
+      {
+        "status": "VERIFIED",
+        "feature": "pitched hip roof with finial",
+        "observation": "Four pitched roof faces meet the finial.",
+        "frames": [
+          "clock-tower-front.png",
+          "clock-tower-side.png"
+        ]
+      },
+      {
+        "status": "VERIFIED",
+        "feature": "winding side stair with stepped stone parapet",
+        "observation": "Separate stair risers and the stepped parapet are readable at 40 m in the 50-degree-VFOV frame.",
+        "frames": [
+          "clock-tower-side.png",
+          "clock-tower-back.png",
+          "clock-tower-three-quarter.png",
+          "clock-tower-40m.png"
+        ]
+      }
+    ],
+    "watchtower": [
+      {
+        "status": "VERIFIED",
+        "feature": "tapered drum with individual block courses",
+        "observation": "The full drum has broad solid flanks, a vertical lower section through the arch and a tapered upper section. Recessed mortar keeps the block courses continuous.",
+        "frames": [
+          "watchtower-side.png",
+          "watchtower-three-quarter.png",
+          "watchtower-40m.png"
+        ]
+      },
+      {
+        "status": "VERIFIED",
+        "feature": "twelve crenellation slots with exactly three missing merlons",
+        "observation": "Nine merlons are present; the exported vertices leave exactly slots 1, 5 and 8 empty.",
+        "frames": [
+          "watchtower-three-quarter.png",
+          "watchtower-back.png"
+        ]
+      },
+      {
+        "status": "VERIFIED",
+        "feature": "two recessed arched windows on opposite faces",
+        "observation": "An arched window is recessed above each mouth; both openings have dark backs and stone frames.",
+        "frames": [
+          "watchtower-front.png",
+          "watchtower-back.png"
+        ]
+      },
+      {
+        "status": "VERIFIED",
+        "feature": "full-depth arched tunnel with a keystone at both mouths",
+        "observation": "The shallow elliptical through-arch has individually separated voussoirs, straight jamb stones and a central trapezoidal keystone at each mouth.",
+        "frames": [
+          "watchtower-front.png",
+          "watchtower-back.png",
+          "watchtower-three-quarter.png",
+          "watchtower-40m.png"
+        ]
+      },
+      {
+        "status": "VERIFIED",
+        "feature": "lower-third ivy and moss with jungle atlas and vertex tint",
+        "observation": "The green band wraps the curved structural drum and tunnel surfaces. Exported vertex colours vary across its height and around its circumference.",
+        "frames": [
+          "watchtower-front.png",
+          "watchtower-side.png",
+          "watchtower-three-quarter.png"
+        ]
+      }
+    ],
+    "waterfall-cliff": [
+      {
+        "status": "VERIFIED",
+        "feature": "stacked mossy stone block cliff with ledges",
+        "observation": "Stacked masonry blocks and moss caps read; a recessed backing closes joint sky leaks.",
+        "frames": [
+          "waterfall-cliff-front.png",
+          "waterfall-cliff-three-quarter.png"
+        ]
+      },
+      {
+        "status": "VERIFIED",
+        "feature": "elliptical plunge-pool foam ring mesh",
+        "observation": "A complete cyan foam ring is visible in the three-quarter frame.",
+        "frames": [
+          "waterfall-cliff-three-quarter.png"
+        ]
+      },
+      {
+        "status": "VERIFIED",
+        "feature": "two blossom clumps on the existing jungle-card sheet",
+        "observation": "Two separate blossom clumps use the existing keyed sprite.",
+        "frames": [
+          "waterfall-cliff-front.png",
+          "waterfall-cliff-three-quarter.png"
+        ]
+      },
+      {
+        "status": "VERIFIED",
+        "feature": "projecting block ledges that cast distinct shadows",
+        "observation": "Ledges project in side view and cast clear shadows in the three-quarter view.",
+        "frames": [
+          "waterfall-cliff-side.png",
+          "waterfall-cliff-three-quarter.png"
+        ]
+      },
+      {
+        "status": "VERIFIED",
+        "feature": "overhanging top lip with waterfall_sheet_anchor",
+        "observation": "The overhanging lip is visible; the named anchor measures Y=16 over the pool datum Y=0.",
+        "frames": [
+          "waterfall-cliff-side.png",
+          "waterfall-cliff-three-quarter.png"
+        ]
+      }
+    ],
+    "sea-stack-set": [
+      {
+        "status": "VERIFIED",
+        "feature": "four tapered block silhouettes",
+        "observation": "All four tapered silhouettes are visible together from front/back/three-quarter.",
+        "frames": [
+          "sea-stack-set-front.png",
+          "sea-stack-set-three-quarter.png"
+        ]
+      },
+      {
+        "status": "VERIFIED",
+        "feature": "individual moss caps",
+        "observation": "All four moss caps are visible in the three-quarter view.",
+        "frames": [
+          "sea-stack-set-three-quarter.png"
+        ]
+      },
+      {
+        "status": "VERIFIED",
+        "feature": "one natural through-arch in the 32 m stack",
+        "observation": "The 32 m stack has a visible through-arch in front and back.",
+        "frames": [
+          "sea-stack-set-front.png",
+          "sea-stack-set-back.png"
+        ]
+      },
+      {
+        "status": "VERIFIED",
+        "feature": "four different lean/profile combinations",
+        "observation": "The short buttress, needle, arch and overhanging tall profiles differ in lean and outline.",
+        "frames": [
+          "sea-stack-set-front.png",
+          "sea-stack-set-three-quarter.png"
+        ]
+      },
+      {
+        "status": "VERIFIED",
+        "feature": "distinct buttress, needle, arch and overhanging tall silhouettes",
+        "observation": "All four profiles remain separated and distinguishable against the sky at 300 m / 50-degree VFOV.",
+        "frames": [
+          "sea-stack-set-front.png",
+          "sea-stack-set-three-quarter.png",
+          "sea-stack-set-300m.png"
+        ]
+      }
+    ]
+  },
+  "limitations": [
+    "Standalone authored lighting and camera; full-game lighting/fog/performance remain unverified until integration.",
+    "The set is staged along X, so the strict side view occludes smaller sea stacks; front/back/three-quarter and 300 m frames show all four."
+  ],
+  "watchtowerAssetSha256": "340285676a4cdd8cf6ee43b08f99ceee5045a43ad679dcd8fc8131844ce36d2c",
+  "watchtowerReadability": {
+    "status": "VERIFIED",
+    "frame": "watchtower-40m.png",
+    "distanceFromAssetCentreMetres": 40,
+    "verticalFovDegrees": 65,
+    "observation": "Taper, crenellations, recessed window, broad mossy flanks and the arch-stone ring remain visible."
+  }
+}

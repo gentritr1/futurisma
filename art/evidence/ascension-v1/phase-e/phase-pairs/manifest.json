@@ -1,0 +1,9 @@
+{
+  "script": "scripts/visual/ascension/phase-e-packs.mjs",
+  "stations": 3,
+  "states": 2,
+  "expected": 6,
+  "observed": 6,
+  "keySha256": "6f3ff84608d82092db050caa62e98a66064e4c29dd3e3f5cb21e7dc2d720d681",
+  "errors": []
+}

@@ -1,0 +1,620 @@
+{
+  "script": "scripts/visual/ascension/report-phase-c.py",
+  "runs": [
+    {
+      "name": "trench",
+      "script": "scripts/visual/ascension/race.mjs",
+      "measurementScript": "scripts/visual/ascension/instrument.mjs",
+      "lapTimesMs": [
+        30108,
+        28508,
+        28383
+      ],
+      "finalClassification": [
+        {
+          "position": 1,
+          "name": "PRIVATEER 13",
+          "player": false,
+          "finishTimeMs": 85250,
+          "gapMs": 0
+        },
+        {
+          "position": 2,
+          "name": "TOTEM",
+          "player": true,
+          "finishTimeMs": 87000,
+          "gapMs": 1750
+        },
+        {
+          "position": 3,
+          "name": "NIGHTFORM 24",
+          "player": false,
+          "finishTimeMs": 87253,
+          "gapMs": 2003
+        },
+        {
+          "position": 4,
+          "name": "NEEDLE 16",
+          "player": false,
+          "finishTimeMs": 89244,
+          "gapMs": 3994
+        }
+      ],
+      "sameClassificationAndLapsAsB": true,
+      "impacts": 4,
+      "missedGates": 0,
+      "recoveries": 0,
+      "errors": [],
+      "peakAllRecordedDraws": 119,
+      "peakAllRecordedMainTriangles": 213736,
+      "peakTotalDraws": 119,
+      "peakMainDraws": 102,
+      "peakShadowDraws": 17,
+      "peakMainTriangles": 213736,
+      "peakShadowTriangles": 23624,
+      "p95Ms": 8.5,
+      "windows": [
+        {
+          "kind": "all recorded render intervals",
+          "observed": 11242,
+          "windowSeconds": 113.49370000004768,
+          "expectedRateHz": 124.62353308024848,
+          "expected": 14143.985876355739,
+          "residual": -2901.9858763557386
+        },
+        {
+          "kind": "calibration",
+          "observed": 120,
+          "windowSeconds": 0.9628999999761582,
+          "expectedRateHz": 124.62353308024848,
+          "expected": 120.0,
+          "residual": 0.0
+        },
+        {
+          "kind": "active rendering",
+          "observed": 10663,
+          "windowSeconds": 86.44220000004768,
+          "expectedRateHz": 124.62353308024848,
+          "expected": 10772.732371235397,
+          "residual": -109.7323712353973
+        },
+        {
+          "kind": "p95 tail",
+          "observed": 720,
+          "windowSeconds": 5.801399999976158,
+          "expectedRateHz": 124.62353308024848,
+          "expected": 722.9909648087822,
+          "residual": -2.9909648087822234
+        }
+      ],
+      "materialViolations": [],
+      "publishedEffectFlags": {
+        "steam": true,
+        "launch": true,
+        "persistentSmoke": true,
+        "lampFlicker": true
+      },
+      "flagScope": "Event state published through the HUD; may trail the rendered state by one frame. Flags are not frame-accurate image proof."
+    },
+    {
+      "name": "deluge",
+      "script": "scripts/visual/ascension/race.mjs",
+      "measurementScript": "scripts/visual/ascension/instrument.mjs",
+      "lapTimesMs": [
+        33958,
+        31300,
+        31308
+      ],
+      "finalClassification": [
+        {
+          "position": 1,
+          "name": "PRIVATEER 13",
+          "player": false,
+          "finishTimeMs": 85250,
+          "gapMs": 0
+        },
+        {
+          "position": 2,
+          "name": "NIGHTFORM 24",
+          "player": false,
+          "finishTimeMs": 87253,
+          "gapMs": 2003
+        },
+        {
+          "position": 3,
+          "name": "NEEDLE 16",
+          "player": false,
+          "finishTimeMs": 89244,
+          "gapMs": 3994
+        },
+        {
+          "position": 4,
+          "name": "TOTEM",
+          "player": true,
+          "finishTimeMs": 96567,
+          "gapMs": 11317
+        }
+      ],
+      "sameClassificationAndLapsAsB": true,
+      "impacts": 1,
+      "missedGates": 0,
+      "recoveries": 0,
+      "errors": [],
+      "peakAllRecordedDraws": 115,
+      "peakAllRecordedMainTriangles": 203258,
+      "peakTotalDraws": 115,
+      "peakMainDraws": 98,
+      "peakShadowDraws": 17,
+      "peakMainTriangles": 203258,
+      "peakShadowTriangles": 23624,
+      "p95Ms": 8.5,
+      "windows": [
+        {
+          "kind": "all recorded render intervals",
+          "observed": 12437,
+          "windowSeconds": 121.06010000002384,
+          "expectedRateHz": 123.80068090983522,
+          "expected": 14987.322811015694,
+          "residual": -2550.3228110156942
+        },
+        {
+          "kind": "calibration",
+          "observed": 120,
+          "windowSeconds": 0.9692999999523163,
+          "expectedRateHz": 123.80068090983522,
+          "expected": 120.0,
+          "residual": 0.0
+        },
+        {
+          "kind": "active rendering",
+          "observed": 11859,
+          "windowSeconds": 95.79220000004769,
+          "expectedRateHz": 123.80068090983522,
+          "expected": 11859.139585857021,
+          "residual": -0.13958585702130222
+        },
+        {
+          "kind": "p95 tail",
+          "observed": 720,
+          "windowSeconds": 5.798800000071526,
+          "expectedRateHz": 123.80068090983522,
+          "expected": 717.8953884688075,
+          "residual": 2.1046115311925178
+        }
+      ],
+      "materialViolations": [],
+      "publishedEffectFlags": {
+        "steam": true,
+        "launch": true,
+        "persistentSmoke": true,
+        "lampFlicker": true
+      },
+      "flagScope": "Event state published through the HUD; may trail the rendered state by one frame. Flags are not frame-accurate image proof."
+    },
+    {
+      "name": "trench-reduced",
+      "script": "scripts/visual/ascension/race.mjs",
+      "measurementScript": "scripts/visual/ascension/instrument.mjs",
+      "lapTimesMs": [
+        30108,
+        28508,
+        28383
+      ],
+      "finalClassification": [
+        {
+          "position": 1,
+          "name": "PRIVATEER 13",
+          "player": false,
+          "finishTimeMs": 85250,
+          "gapMs": 0
+        },
+        {
+          "position": 2,
+          "name": "TOTEM",
+          "player": true,
+          "finishTimeMs": 87000,
+          "gapMs": 1750
+        },
+        {
+          "position": 3,
+          "name": "NIGHTFORM 24",
+          "player": false,
+          "finishTimeMs": 87253,
+          "gapMs": 2003
+        },
+        {
+          "position": 4,
+          "name": "NEEDLE 16",
+          "player": false,
+          "finishTimeMs": 89244,
+          "gapMs": 3994
+        }
+      ],
+      "sameClassificationAndLapsAsB": true,
+      "impacts": 4,
+      "missedGates": 0,
+      "recoveries": 0,
+      "errors": [],
+      "peakAllRecordedDraws": 119,
+      "peakAllRecordedMainTriangles": 213736,
+      "peakTotalDraws": 119,
+      "peakMainDraws": 102,
+      "peakShadowDraws": 17,
+      "peakMainTriangles": 213736,
+      "peakShadowTriangles": 23624,
+      "p95Ms": 8.600000023841858,
+      "windows": [
+        {
+          "kind": "all recorded render intervals",
+          "observed": 11258,
+          "windowSeconds": 112.82769999992847,
+          "expectedRateHz": 124.1464928585145,
+          "expected": 14007.163252283737,
+          "residual": -2749.163252283737
+        },
+        {
+          "kind": "calibration",
+          "observed": 120,
+          "windowSeconds": 0.9666000000238418,
+          "expectedRateHz": 124.1464928585145,
+          "expected": 120.0,
+          "residual": 0.0
+        },
+        {
+          "kind": "active rendering",
+          "observed": 10678,
+          "windowSeconds": 86.186,
+          "expectedRateHz": 124.1464928585145,
+          "expected": 10699.689633503933,
+          "residual": -21.689633503932782
+        },
+        {
+          "kind": "p95 tail",
+          "observed": 720,
+          "windowSeconds": 5.805199999928474,
+          "expectedRateHz": 124.1464928585145,
+          "expected": 720.6952203333688,
+          "residual": -0.6952203333687521
+        }
+      ],
+      "materialViolations": [],
+      "publishedEffectFlags": {
+        "steam": true,
+        "launch": true,
+        "persistentSmoke": true,
+        "lampFlicker": false
+      },
+      "flagScope": "Event state published through the HUD; may trail the rendered state by one frame. Flags are not frame-accurate image proof."
+    }
+  ],
+  "sameInputsAndCurrentFiles": true,
+  "budgetBefore": {
+    "totalDraws": 110,
+    "mainTriangles": 208592,
+    "source": "art/evidence/ascension-v1/phase-b-revision/fix-5/after/metrics.json",
+    "measurementScript": "scripts/visual/ascension/instrument.mjs"
+  },
+  "luma": {
+    "script": "scripts/visual/frame-metrics.py",
+    "baseScript": "scripts/visual/ascension/record-road-base.py",
+    "pinScript": "scripts/visual/ascension/pin-road-floor.py",
+    "sampling": "32 discrete sector/schedule image patches, not a timed window. New scorched paint base is retained alongside the previous B and blockout baselines.",
+    "rows": [
+      {
+        "file": "base-PAD_ROAD.png",
+        "luma": 121.86917743055557,
+        "floor": 103.58880081597223,
+        "passes": true
+      },
+      {
+        "file": "base-APRON_SWEEP.png",
+        "luma": 127.6505,
+        "floor": 108.50292499999999,
+        "passes": true
+      },
+      {
+        "file": "base-DELUGE_ROAD.png",
+        "luma": 125.17785138888888,
+        "floor": 106.40117368055554,
+        "passes": true
+      },
+      {
+        "file": "base-CRAWLERWAY.png",
+        "luma": 121.92788229166666,
+        "floor": 103.63869994791666,
+        "passes": true
+      },
+      {
+        "file": "base-MANGROVE_CUT.png",
+        "luma": 124.50383194444446,
+        "floor": 105.82825715277778,
+        "passes": true
+      },
+      {
+        "file": "base-CAUSEWAY.png",
+        "luma": 126.82504895833333,
+        "floor": 107.80129161458332,
+        "passes": true
+      },
+      {
+        "file": "base-TANK_FARM.png",
+        "luma": 97.97785555555555,
+        "floor": 83.28117722222221,
+        "passes": true
+      },
+      {
+        "file": "base-TRENCH.png",
+        "luma": 101.50498923611111,
+        "floor": 86.27924085069445,
+        "passes": true
+      },
+      {
+        "file": "test-PAD_ROAD.png",
+        "luma": 121.86917743055557,
+        "floor": 103.58880081597223,
+        "passes": true
+      },
+      {
+        "file": "test-APRON_SWEEP.png",
+        "luma": 127.6505,
+        "floor": 108.50292499999999,
+        "passes": true
+      },
+      {
+        "file": "test-DELUGE_ROAD.png",
+        "luma": 125.17785138888888,
+        "floor": 106.40117368055554,
+        "passes": true
+      },
+      {
+        "file": "test-CRAWLERWAY.png",
+        "luma": 121.92788229166666,
+        "floor": 103.63869994791666,
+        "passes": true
+      },
+      {
+        "file": "test-MANGROVE_CUT.png",
+        "luma": 124.50383194444446,
+        "floor": 105.82825715277778,
+        "passes": true
+      },
+      {
+        "file": "test-CAUSEWAY.png",
+        "luma": 126.82504895833333,
+        "floor": 107.80129161458332,
+        "passes": true
+      },
+      {
+        "file": "test-TANK_FARM.png",
+        "luma": 97.97785555555555,
+        "floor": 83.28117722222221,
+        "passes": true
+      },
+      {
+        "file": "test-TRENCH.png",
+        "luma": 107.82040763888888,
+        "floor": 86.27924085069445,
+        "passes": true
+      },
+      {
+        "file": "launch-PAD_ROAD.png",
+        "luma": 122.01270381944444,
+        "floor": 103.58880081597223,
+        "passes": true
+      },
+      {
+        "file": "launch-APRON_SWEEP.png",
+        "luma": 127.77314479166665,
+        "floor": 108.50292499999999,
+        "passes": true
+      },
+      {
+        "file": "launch-DELUGE_ROAD.png",
+        "luma": 125.17785138888888,
+        "floor": 106.40117368055554,
+        "passes": true
+      },
+      {
+        "file": "launch-CRAWLERWAY.png",
+        "luma": 121.92788229166666,
+        "floor": 103.63869994791666,
+        "passes": true
+      },
+      {
+        "file": "launch-MANGROVE_CUT.png",
+        "luma": 124.50383194444446,
+        "floor": 105.82825715277778,
+        "passes": true
+      },
+      {
+        "file": "launch-CAUSEWAY.png",
+        "luma": 126.82504895833333,
+        "floor": 107.80129161458332,
+        "passes": true
+      },
+      {
+        "file": "launch-TANK_FARM.png",
+        "luma": 97.97785555555555,
+        "floor": 83.28117722222221,
+        "passes": true
+      },
+      {
+        "file": "launch-TRENCH.png",
+        "luma": 108.51287881944444,
+        "floor": 86.27924085069445,
+        "passes": true
+      },
+      {
+        "file": "reopened-PAD_ROAD.png",
+        "luma": 121.86917743055557,
+        "floor": 103.58880081597223,
+        "passes": true
+      },
+      {
+        "file": "reopened-APRON_SWEEP.png",
+        "luma": 127.6505,
+        "floor": 108.50292499999999,
+        "passes": true
+      },
+      {
+        "file": "reopened-DELUGE_ROAD.png",
+        "luma": 125.17785138888888,
+        "floor": 106.40117368055554,
+        "passes": true
+      },
+      {
+        "file": "reopened-CRAWLERWAY.png",
+        "luma": 121.92788229166666,
+        "floor": 103.63869994791666,
+        "passes": true
+      },
+      {
+        "file": "reopened-MANGROVE_CUT.png",
+        "luma": 124.50383194444446,
+        "floor": 105.82825715277778,
+        "passes": true
+      },
+      {
+        "file": "reopened-CAUSEWAY.png",
+        "luma": 126.82504895833333,
+        "floor": 107.80129161458332,
+        "passes": true
+      },
+      {
+        "file": "reopened-TANK_FARM.png",
+        "luma": 97.97785555555555,
+        "floor": 83.28117722222221,
+        "passes": true
+      },
+      {
+        "file": "reopened-TRENCH.png",
+        "luma": 107.43861215277778,
+        "floor": 86.27924085069445,
+        "passes": true
+      }
+    ]
+  },
+  "clearance": {
+    "swingArms": {
+      "minimumClearanceMetres": 14.4330977162427,
+      "note": "Rotation is about the vertical hinge axis, so the measured minimum Y is invariant over the entire swing; compared conservatively with the highest road anywhere."
+    },
+    "flame": {
+      "minimumClearanceMetres": 10.306408214946938,
+      "baseY": 4,
+      "note": "Flame and engine glow begin two metres below the measured authored nozzle envelope, entirely above the running lane."
+    },
+    "script": "scripts/validate-ascension-events.mjs",
+    "sha256": "7949554a4c94bb0ad215ffe779cd6e7bec3d0cda7cb8a44c7c45b05581bf53b8",
+    "scope": "Exported painted crawler and rocket geometry using production spline/ascent pose. Crawler vertical AABB is checked against the maximum centreline height plus the widest half-road times sin(maximum bank), a conservative global edge-height bound. Rocket projected AABB is checked against every route station expanded by full road half-width. Transparent effects are not solid obstructions. Runtime belt bounds are separately constrained to the approved 4m envelope.",
+    "belt": {
+      "minimumY": 1.8322264647041564e-05,
+      "maximumY": 3.999981677735353,
+      "maximumAbsoluteZ": 5.99999351253352,
+      "phaseSamples": 721,
+      "platesPerTrack": 48,
+      "note": "Spatial phase samples over a full revolution, including repeated endpoint; not a timed rendering sample."
+    },
+    "crawler": {
+      "bankEdgeAllowanceMetres": 0.5198613444262441,
+      "minimumClearanceMetres": 12.480138655573755,
+      "samples": 1442,
+      "windowSecondsPerCrossing": 6,
+      "hz": 120,
+      "crossings": 2,
+      "expectedSamples": 1442,
+      "reconciliation": "2 \u00d7 (6 seconds \u00d7 120 Hz + 1 inclusive endpoint)"
+    },
+    "launch": {
+      "minimumClearanceMetres": 12.378074994764178,
+      "samples": 843,
+      "windowSeconds": 7.016666666666667,
+      "hz": 120,
+      "expectedSamples": 843,
+      "overlappingSpatialProbes": 11802,
+      "reconciliation": "window seconds \u00d7 120 Hz + 1 inclusive endpoint"
+    },
+    "violations": [],
+    "accepted": true
+  },
+  "forkMeasurement": {
+    "script": "scripts/measure-ascension-driving.mjs",
+    "clockHz": 120,
+    "controller": "Production DemoAutopilot and handling; isolated no nitro, powers or traffic. Not a browser Works calibration.",
+    "results": [
+      {
+        "lateral": 0,
+        "branch": false,
+        "seconds": 96.40833333335613,
+        "branchSeconds": 0.025,
+        "minimumBranchProgress": 0.16,
+        "maximumBranchProgress": 0.16,
+        "edgeSteps": 0,
+        "lapTimes": [
+          33.766666666665394,
+          31.324999999999143,
+          31.31666666669159
+        ],
+        "forkTicks": [
+          1717,
+          1717,
+          1717
+        ],
+        "forkSeconds": [
+          14.308333333333334,
+          14.308333333333334,
+          14.308333333333334
+        ],
+        "completed": 3,
+        "missedGates": 0
+      },
+      {
+        "lateral": 0,
+        "branch": true,
+        "seconds": 86.08333333334791,
+        "branchSeconds": 27.41666666666575,
+        "minimumBranchProgress": 0.16,
+        "maximumBranchProgress": 0.635,
+        "edgeSteps": 1,
+        "lapTimes": [
+          30.308333333332254,
+          27.891666666665085,
+          27.88333333335057
+        ],
+        "forkTicks": [
+          1294,
+          1294,
+          1294
+        ],
+        "forkSeconds": [
+          10.783333333333333,
+          10.783333333333333,
+          10.783333333333333
+        ],
+        "completed": 3,
+        "missedGates": 0
+      }
+    ],
+    "forkSavingSeconds": [
+      3.5250000000000004,
+      3.5250000000000004,
+      3.5250000000000004
+    ],
+    "sampleReconciliation": [
+      {
+        "branch": false,
+        "windowSeconds": 42.925,
+        "expectedRateHz": 120,
+        "observedSamples": 5151
+      },
+      {
+        "branch": true,
+        "windowSeconds": 32.35,
+        "expectedRateHz": 120,
+        "observedSamples": 3882
+      }
+    ],
+    "savingSeconds": 3.4416666666694056
+  },
+  "acceptance": "Trench blind classification is pending. These measurements do not assert phase or whole-level visual acceptance."
+}

@@ -1,0 +1,20 @@
+{
+  "status": "VERIFIED",
+  "residual": 1,
+  "instrument": "scripts/visual/dreamisland-heroes/polish-profile.py",
+  "before": {
+    "seaPixels": 76254,
+    "seaLumaStd": 0.07981430070958037,
+    "horizonColumns": 963,
+    "horizonMeanStep": 0.27885442849483155,
+    "horizonMaximumStep": 0.29049045751633984
+  },
+  "after": {
+    "seaPixels": 76245,
+    "seaLumaStd": 0.10559352254484575,
+    "horizonColumns": 963,
+    "horizonMeanStep": 0.08592662336516457,
+    "horizonMaximumStep": 0.0944130718954248
+  },
+  "note": "The near-zero baseline in the brief was not reproduced: the shipped texture already had measurable variation. The new geometry and slower UV layer increase it and soften the actual sea/sky boundary. The separate panorama band is residual 9."
+}

@@ -1,0 +1,13 @@
+{
+  "script": "scripts/visual/ascension/rival-powers-capture.mjs",
+  "scope": "Live seeded rival events, inspected from an auxiliary chase-height camera while the normal demo continues. Gameplay and event state are unchanged. Simultaneous launch-grid powers can yield paired images of the same combined state; these are not separate visual activations. This is not the player driving camera or a performance benchmark.",
+  "rivals": 3,
+  "powerTypes": 2,
+  "laps": 3,
+  "expected": 18,
+  "observed": 18,
+  "uniqueImageHashes": 15,
+  "residual": 0,
+  "keySha256": "72b8086f476d74e6accf43ba723431fe165ee0ff4309447b69f5fd11ed1cda12",
+  "errors": []
+}

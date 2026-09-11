@@ -1,0 +1,9 @@
+{
+  "script": "scripts/visual/ascension/device-review.mjs",
+  "frames": 4,
+  "expected": 4,
+  "residual": 0,
+  "keySha256": "7269fcbcd5263325cc37bc43594bc7dbf6d7fe371c9699533e0707b6745c4357",
+  "errors": [],
+  "scope": "Pair 1: proposal and current model road inspection. Pair 2: control and proposed Shield cue at 120 m, identical camera. Source mapping and per-frame metadata withheld."
+}

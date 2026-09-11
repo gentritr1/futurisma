@@ -1,0 +1,129 @@
+{
+  "script": "scripts/visual/ascension/check-sky-frames.py",
+  "region": "top 22% of frame, averaged per column; adjacent 10%-width windows",
+  "expectedDiscreteFrames": 24,
+  "actualFrames": 24,
+  "pass": false,
+  "rows": [
+    {
+      "file": "00.png",
+      "adjacentTenPercentWindowLumaRatio": 5.052802850836787,
+      "pass": false
+    },
+    {
+      "file": "01.png",
+      "adjacentTenPercentWindowLumaRatio": 5.30161462117053,
+      "pass": false
+    },
+    {
+      "file": "02.png",
+      "adjacentTenPercentWindowLumaRatio": 5.287142037784585,
+      "pass": false
+    },
+    {
+      "file": "03.png",
+      "adjacentTenPercentWindowLumaRatio": 4.048262155442972,
+      "pass": false
+    },
+    {
+      "file": "04.png",
+      "adjacentTenPercentWindowLumaRatio": 3.4349632784190014,
+      "pass": false
+    },
+    {
+      "file": "05.png",
+      "adjacentTenPercentWindowLumaRatio": 2.3095906815312106,
+      "pass": false
+    },
+    {
+      "file": "06.png",
+      "adjacentTenPercentWindowLumaRatio": 2.2855679320281843,
+      "pass": false
+    },
+    {
+      "file": "07.png",
+      "adjacentTenPercentWindowLumaRatio": 4.2937322946241085,
+      "pass": false
+    },
+    {
+      "file": "08.png",
+      "adjacentTenPercentWindowLumaRatio": 4.556927514301642,
+      "pass": false
+    },
+    {
+      "file": "09.png",
+      "adjacentTenPercentWindowLumaRatio": 4.603025035894985,
+      "pass": false
+    },
+    {
+      "file": "10.png",
+      "adjacentTenPercentWindowLumaRatio": 4.510413231672115,
+      "pass": false
+    },
+    {
+      "file": "11.png",
+      "adjacentTenPercentWindowLumaRatio": 4.335140883438197,
+      "pass": false
+    },
+    {
+      "file": "12.png",
+      "adjacentTenPercentWindowLumaRatio": 4.224290376804388,
+      "pass": false
+    },
+    {
+      "file": "13.png",
+      "adjacentTenPercentWindowLumaRatio": 4.100764793245296,
+      "pass": false
+    },
+    {
+      "file": "14.png",
+      "adjacentTenPercentWindowLumaRatio": 3.8406741765785752,
+      "pass": false
+    },
+    {
+      "file": "15.png",
+      "adjacentTenPercentWindowLumaRatio": 3.6247163603541224,
+      "pass": false
+    },
+    {
+      "file": "16.png",
+      "adjacentTenPercentWindowLumaRatio": 3.5127263071995247,
+      "pass": false
+    },
+    {
+      "file": "17.png",
+      "adjacentTenPercentWindowLumaRatio": 3.392371812126004,
+      "pass": false
+    },
+    {
+      "file": "18.png",
+      "adjacentTenPercentWindowLumaRatio": 3.474853485647597,
+      "pass": false
+    },
+    {
+      "file": "19.png",
+      "adjacentTenPercentWindowLumaRatio": 3.9469454248135607,
+      "pass": false
+    },
+    {
+      "file": "20.png",
+      "adjacentTenPercentWindowLumaRatio": 3.9664160388661798,
+      "pass": false
+    },
+    {
+      "file": "21.png",
+      "adjacentTenPercentWindowLumaRatio": 3.736715466851593,
+      "pass": false
+    },
+    {
+      "file": "22.png",
+      "adjacentTenPercentWindowLumaRatio": 4.207747493206537,
+      "pass": false
+    },
+    {
+      "file": "23.png",
+      "adjacentTenPercentWindowLumaRatio": 4.90667640790575,
+      "pass": false
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "instrument": "/Users/gentlegen/Desktop/futurisma-race/polarity_work/scripts/visual/dreamisland-heroes/polish-regions.py",
+  "capture": "art/evidence/dreamisland-v1/polish/round-2/before-grove/pose-capture.json",
+  "method": "Full/isolated render equality at 2/255; isolated/blank difference above 6/255; display luma .2126/.7152/.0722",
+  "results": [
+    {
+      "blend": 0,
+      "metrics": {
+        "foliage": {
+          "pixels": 61449,
+          "meanLuma": 0.2455002602189796,
+          "lumaStd": 0.08817007610380964,
+          "meanChroma": 0.22960708050897619,
+          "visibleBoundsPixels": [
+            116,
+            0,
+            1280,
+            333
+          ],
+          "widthPixels": 1164,
+          "heightPixels": 333,
+          "horizonRow": 324.3770740489751,
+          "columnsAboveHorizon": 1095,
+          "frameColumns": 1280,
+          "columnCoverage": 0.85546875,
+          "topThirdColumnCoverage": 0.79609375
+        },
+        "road": {
+          "pixels": 406196,
+          "meanLuma": 0.41439450517561405,
+          "lumaStd": 0.04277384520316323,
+          "meanChroma": 0.04933389637650055,
+          "visibleBoundsPixels": [
+            0,
+            299,
+            1280,
+            720
+          ],
+          "widthPixels": 1280,
+          "heightPixels": 421
+        }
+      }
+    }
+  ]
+}

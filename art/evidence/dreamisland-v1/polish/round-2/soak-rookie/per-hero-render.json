@@ -1,0 +1,84 @@
+{
+  "instrument": "scripts/visual/dreamisland/race.mjs with polish-transport.mjs render census",
+  "method": "Main calls from the existing draw hook; shadow calls from each hero mesh onBeforeShadow. Peak submitted geometry per asset and lighting state.",
+  "states": {
+    "day": {
+      "watchtower-ruin": {
+        "mainCalls": 4,
+        "mainTriangles": 9578,
+        "shadowCalls": 0,
+        "shadowTriangles": 0
+      },
+      "sea-stack": {
+        "mainCalls": 2,
+        "mainTriangles": 1972,
+        "shadowCalls": 0,
+        "shadowTriangles": 0
+      },
+      "waterfall-cliff": {
+        "mainCalls": 5,
+        "mainTriangles": 1226,
+        "shadowCalls": 0,
+        "shadowTriangles": 0
+      },
+      "clock-tower": {
+        "mainCalls": 4,
+        "mainTriangles": 5248,
+        "shadowCalls": 4,
+        "shadowTriangles": 5248
+      }
+    },
+    "crossfade": {
+      "watchtower-ruin": {
+        "mainCalls": 4,
+        "mainTriangles": 9578,
+        "shadowCalls": 0,
+        "shadowTriangles": 0
+      },
+      "sea-stack": {
+        "mainCalls": 2,
+        "mainTriangles": 1972,
+        "shadowCalls": 0,
+        "shadowTriangles": 0
+      },
+      "waterfall-cliff": {
+        "mainCalls": 5,
+        "mainTriangles": 1226,
+        "shadowCalls": 0,
+        "shadowTriangles": 0
+      },
+      "clock-tower": {
+        "mainCalls": 4,
+        "mainTriangles": 5248,
+        "shadowCalls": 0,
+        "shadowTriangles": 0
+      }
+    },
+    "night": {
+      "clock-tower": {
+        "mainCalls": 4,
+        "mainTriangles": 5248,
+        "shadowCalls": 4,
+        "shadowTriangles": 5248
+      },
+      "sea-stack": {
+        "mainCalls": 2,
+        "mainTriangles": 1972,
+        "shadowCalls": 0,
+        "shadowTriangles": 0
+      },
+      "waterfall-cliff": {
+        "mainCalls": 5,
+        "mainTriangles": 1226,
+        "shadowCalls": 0,
+        "shadowTriangles": 0
+      },
+      "watchtower-ruin": {
+        "mainCalls": 4,
+        "mainTriangles": 9578,
+        "shadowCalls": 0,
+        "shadowTriangles": 0
+      }
+    }
+  }
+}

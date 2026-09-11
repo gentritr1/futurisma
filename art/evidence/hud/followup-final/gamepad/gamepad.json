@@ -1,0 +1,227 @@
+{
+  "script": "scripts/visual/hud/gamepad-prompts.mjs",
+  "probeOnly": false,
+  "executed": {
+    "confirmButton": 0,
+    "confirmObserved": "Focused SYSTEM OPTIONS activated and terminal opened",
+    "backButton": 1,
+    "backObserved": "Terminal closed and returned to paddock"
+  },
+  "keyboard": [
+    {
+      "action": "confirm",
+      "text": "ENTER"
+    },
+    {
+      "action": "options",
+      "text": "O"
+    },
+    {
+      "action": "controls",
+      "text": "C"
+    }
+  ],
+  "gamepad": [
+    {
+      "action": "confirm",
+      "text": "A"
+    },
+    {
+      "action": "options",
+      "text": "Y"
+    },
+    {
+      "action": "controls",
+      "text": "X"
+    }
+  ],
+  "optionsGamepad": [
+    {
+      "action": "confirm",
+      "text": "A"
+    },
+    {
+      "action": "options",
+      "text": "Y"
+    },
+    {
+      "action": "controls",
+      "text": "X"
+    },
+    {
+      "action": "back",
+      "text": "B"
+    }
+  ],
+  "optionsKeyboard": [
+    {
+      "action": "confirm",
+      "text": "ENTER"
+    },
+    {
+      "action": "options",
+      "text": "O"
+    },
+    {
+      "action": "controls",
+      "text": "C"
+    },
+    {
+      "action": "back",
+      "text": "ESC"
+    }
+  ],
+  "disconnected": [
+    {
+      "action": "confirm",
+      "text": "ENTER"
+    },
+    {
+      "action": "options",
+      "text": "O"
+    },
+    {
+      "action": "controls",
+      "text": "C"
+    }
+  ],
+  "allKeyboard": [
+    {
+      "action": "confirm",
+      "text": "ENTER"
+    },
+    {
+      "action": "options",
+      "text": "O"
+    },
+    {
+      "action": "quit",
+      "text": "HOLD"
+    },
+    {
+      "action": "confirm",
+      "text": "ENTER"
+    },
+    {
+      "action": "options",
+      "text": "O"
+    },
+    {
+      "action": "controls",
+      "text": "C"
+    },
+    {
+      "action": "confirm",
+      "text": "ENTER"
+    },
+    {
+      "action": "options",
+      "text": "O"
+    },
+    {
+      "action": "back",
+      "text": "ESC"
+    },
+    {
+      "action": "apply",
+      "text": "APPLY"
+    },
+    {
+      "action": "back",
+      "text": "ESC"
+    }
+  ],
+  "allGamepad": [
+    {
+      "action": "confirm",
+      "text": "A"
+    },
+    {
+      "action": "options",
+      "text": "Y"
+    },
+    {
+      "action": "quit",
+      "text": "B HOLD"
+    },
+    {
+      "action": "confirm",
+      "text": "A"
+    },
+    {
+      "action": "options",
+      "text": "Y"
+    },
+    {
+      "action": "controls",
+      "text": "X"
+    },
+    {
+      "action": "confirm",
+      "text": "A"
+    },
+    {
+      "action": "options",
+      "text": "Y"
+    },
+    {
+      "action": "back",
+      "text": "B"
+    },
+    {
+      "action": "apply",
+      "text": "A"
+    },
+    {
+      "action": "back",
+      "text": "B"
+    }
+  ],
+  "allDisconnected": [
+    {
+      "action": "confirm",
+      "text": "ENTER"
+    },
+    {
+      "action": "options",
+      "text": "O"
+    },
+    {
+      "action": "quit",
+      "text": "HOLD"
+    },
+    {
+      "action": "confirm",
+      "text": "ENTER"
+    },
+    {
+      "action": "options",
+      "text": "O"
+    },
+    {
+      "action": "controls",
+      "text": "C"
+    },
+    {
+      "action": "confirm",
+      "text": "ENTER"
+    },
+    {
+      "action": "options",
+      "text": "O"
+    },
+    {
+      "action": "back",
+      "text": "ESC"
+    },
+    {
+      "action": "apply",
+      "text": "APPLY"
+    },
+    {
+      "action": "back",
+      "text": "ESC"
+    }
+  ],
+  "errors": []
+}

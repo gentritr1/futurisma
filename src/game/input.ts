@@ -1,3 +1,4 @@
+import {isMenuOnlyKey} from './menu-key.js';
 import { resolveActionSuppression } from "./action-gate";
 import { resolveSteeringInput, sanitizeTrigger } from "./input-shaping";
 
@@ -33,6 +34,40 @@ const DRIVING_KEYS = new Set([
 ]);
 
 const START_KEYS = new Set(["Enter", "Escape", "KeyP"]);
+/**
+ * The keys a focused control owns.
+ *
+ * Enter and Space ACTIVATE whatever has focus - that is what they mean to a
+ * browser and to anyone driving the menus from the keyboard. So when focus is on
+ * a button or a chip, they must not also reach the race as a global shortcut, or
+ * pressing Enter on RESUME both clicks the button and toggles the pause, and the
+ * two cancel out.
+ *
+ * Escape is deliberately NOT in here. It is the pause key and the quit-hold key,
+ * it belongs to no control, and it has to work wherever focus happens to sit.
+ */
+const CONTROL_OWNED_KEYS = new Set(["Enter", "NumpadEnter", "Space"]);
+
+/**
+ * Is this event aimed at a control that owns its own keys?
+ *
+ * The canvas is explicitly not one: it carries `tabindex` so it can take focus
+ * for driving, but it activates nothing, so the race keeps its shortcuts while
+ * the player is actually driving.
+ */
+function targetOwnsKeys(target: EventTarget | null): boolean {
+  // Duck-typed on purpose: the runtime validators drive this controller under a
+  // Node stub with no global `Element`, and dispatch from a bare EventTarget.
+  // Anything without `closest` (window, document, a stub) owns no keys.
+  const element = target as Partial<Element> | null;
+  if (!element || typeof element.closest !== "function") return false;
+  if (element.id === "game-canvas") return false;
+  return Boolean(
+    element.closest(
+      'button, a[href], input, select, textarea, [role="button"], [role="radio"], [tabindex]:not([tabindex="-1"])',
+    ),
+  );
+}
 const ACTION_KEYS = new Set([...START_KEYS, "KeyR", "KeyM", "Space", "KeyE"]);
 
 function hasHeldKeyboardAction(keys: ReadonlySet<string>): boolean {
@@ -43,6 +78,21 @@ function hasHeldKeyboardAction(keys: ReadonlySet<string>): boolean {
 }
 
 export class InputController {
+  activeDevice: "keyboard" | "gamepad" = "keyboard";
+  onDeviceChange: ((device: "keyboard" | "gamepad") => void) | null = null;
+  onMenuButton: ((button: number) => boolean) | null = null;
+  private connectedPadIndex: number | null = null;
+
+  private setActiveDevice(device: "keyboard" | "gamepad"): void {
+    if (device === this.activeDevice) return;
+    this.activeDevice = device;
+    this.onDeviceChange?.(device);
+  }
+  private readonly handleKeyboardActivity = (): void => this.setActiveDevice("keyboard");
+  private readonly handlePadConnection = (): void => {
+    this.setActiveDevice(this.activeGamepad() ? "gamepad" : "keyboard");
+  };
+
   private readonly keys = new Set<string>();
   private readonly frame: InputFrame = {
     throttle: 0,
@@ -62,9 +112,12 @@ export class InputController {
   private previousGamepadButtons: boolean[] = [];
 
   constructor() {
+    window.addEventListener("keydown", this.handleKeyboardActivity, {capture: true});
     window.addEventListener("keydown", this.handleKeyDown, { passive: false });
     window.addEventListener("keyup", this.handleKeyUp);
     window.addEventListener("blur", this.clearKeys);
+    window.addEventListener("gamepadconnected", this.handlePadConnection);
+    window.addEventListener("gamepaddisconnected", this.handlePadConnection);
   }
 
   read(): InputFrame {
@@ -78,6 +131,13 @@ export class InputController {
       || (!this.gravityControls && this.keys.has("Space"));
 
     const gamepad = this.activeGamepad();
+    if (gamepad) {
+      if (this.connectedPadIndex !== gamepad.index || gamepad.buttons.some(button => button.pressed) || gamepad.axes.some(axis => Math.abs(axis) > .2)) this.setActiveDevice("gamepad");
+      this.connectedPadIndex = gamepad.index;
+    } else {
+      this.connectedPadIndex = null;
+      this.setActiveDevice("keyboard");
+    }
     const actionControlHeld = hasHeldKeyboardAction(this.keys)
       || Boolean(gamepad?.buttons[9]?.pressed)
       || Boolean(gamepad?.buttons[3]?.pressed)
@@ -101,30 +161,31 @@ export class InputController {
       return this.frame;
     }
 
+    const handled = gamepad.buttons.map((button,index) => acceptActions && button.pressed && !this.previousGamepadButtons[index] ? this.onMenuButton?.(index) ?? false : false);
     if (
-      acceptActions
+      acceptActions && !handled[9]
       && gamepad.buttons[9]?.pressed
       && !this.previousGamepadButtons[9]
     ) {
       this.startRequested = true;
     }
     if (
-      acceptActions
+      acceptActions && !handled[3]
       && gamepad.buttons[3]?.pressed
       && !this.previousGamepadButtons[3]
     ) {
       this.resetRequested = true;
     }
     if (
-      acceptActions
+      acceptActions && !handled[8]
       && gamepad.buttons[8]?.pressed
       && !this.previousGamepadButtons[8]
     ) {
       this.muteRequested = true;
     }
     if (acceptActions) {
-      if (this.gravityControls && gamepad.buttons[2]?.pressed && !this.previousGamepadButtons[2]) this.flipRequested = true;
-      if (this.powerControls && gamepad.buttons[1]?.pressed && !this.previousGamepadButtons[1]) this.powerRequested = true;
+      if (!handled[2] && this.gravityControls && gamepad.buttons[2]?.pressed && !this.previousGamepadButtons[2]) this.flipRequested = true;
+      if (!handled[1] && this.powerControls && gamepad.buttons[1]?.pressed && !this.previousGamepadButtons[1]) this.powerRequested = true;
       if (this.flipRequested || this.powerRequested) this.controlIntentRequested = true;
     }
     this.previousGamepadButtons.length = gamepad.buttons.length;
@@ -168,6 +229,34 @@ export class InputController {
     this.actionsSuppressedUntilRelease = true;
   }
 
+  /**
+   * Is this physical key down right now?
+   *
+   * The hold-to-quit confirm polls this once per presentation frame instead of
+   * latching a keyup listener of its own. `keys` is filled by window-level
+   * handlers and emptied by `clearKeys` on blur, so a release that lands on
+   * some other element - or an OS-swallowed keyup after Alt-Tab - still reads
+   * as "not held" here. That is the whole reason the hold is poll-based: an
+   * event-latched hold can only be cancelled by an event it actually receives.
+   */
+  isHeld(code: string): boolean {
+    return this.keys.has(code);
+  }
+
+  /**
+   * True while an action key held from before a focus loss must be released
+   * before it can act again. A quit hold resets on this: it is exactly the
+   * window where the matching keyup may never arrive.
+   */
+  get actionsSuppressed(): boolean {
+    return this.actionsSuppressedUntilRelease;
+  }
+
+  /** Gamepad B - the pad's own quit-hold source. */
+  isGamepadCancelHeld(): boolean {
+    return Boolean(this.activeGamepad()?.buttons[1]?.pressed);
+  }
+
   pulse(strongMagnitude: number, weakMagnitude: number, duration: number): void {
     const gamepad = this.activeGamepad();
     const actuator = gamepad?.vibrationActuator as GamepadHapticActuator & {
@@ -189,9 +278,12 @@ export class InputController {
   }
 
   dispose(): void {
+    window.removeEventListener("keydown", this.handleKeyboardActivity, {capture: true});
     window.removeEventListener("keydown", this.handleKeyDown);
     window.removeEventListener("keyup", this.handleKeyUp);
     window.removeEventListener("blur", this.clearKeys);
+    window.removeEventListener("gamepadconnected", this.handlePadConnection);
+    window.removeEventListener("gamepaddisconnected", this.handlePadConnection);
     this.clearKeys();
   }
 
@@ -230,11 +322,16 @@ export class InputController {
   }
 
   private readonly handleKeyDown = (event: KeyboardEvent): void => {
+    this.setActiveDevice("keyboard");
+    if (isMenuOnlyKey(event.code,event.key)) return;
     if (CONTROL_KEYS.has(event.code)) event.preventDefault();
     this.keys.add(event.code);
     if (DRIVING_KEYS.has(event.code)) this.controlIntentRequested = true;
     if (event.repeat) return;
     if (this.actionsSuppressedUntilRelease && ACTION_KEYS.has(event.code)) return;
+    // The key is already in `keys` above, so a hold that polls `isHeld` still
+    // sees it; what stops here is only the global ACTION it would have fired.
+    if (CONTROL_OWNED_KEYS.has(event.code) && targetOwnsKeys(event.target)) return;
 
     if (START_KEYS.has(event.code)) {
       this.startRequested = true;

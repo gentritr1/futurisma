@@ -19,6 +19,7 @@ export interface NeonEnvironmentOptions {
   maximumDistance?: number;
   opticalEffects?: boolean;
   lightIntensity?: number;
+  preferLightsAhead?: boolean;
 }
 
 export class NeonEnvironment implements RaceEnvironment {
@@ -31,6 +32,8 @@ export class NeonEnvironment implements RaceEnvironment {
   private readonly groups: {mesh:THREE.Mesh;sphere:THREE.Sphere;triangles:number}[]=[];
   private readonly frustum = new THREE.Frustum();
   private readonly projection = new THREE.Matrix4();
+  private readonly forward = new THREE.Vector3();
+  private readonly lampOffset = new THREE.Vector3();
 
   private constructor(root:THREE.Group, lamps:NeonLamp[], private readonly options:NeonEnvironmentOptions) {
     this.root=root;
@@ -90,13 +93,19 @@ export class NeonEnvironment implements RaceEnvironment {
     this.frustum.setFromProjectionMatrix(this.projection);
     this.stats.visibleGroups=0;this.stats.visibleTriangles=0;
     for(const group of this.groups) {
+      if(group.mesh.name.includes('MOTION_')) {
+        group.mesh.updateWorldMatrix(true,false);
+        group.sphere.copy(group.mesh.geometry.boundingSphere!).applyMatrix4(group.mesh.matrixWorld);
+      }
       group.mesh.visible=this.frustum.intersectsSphere(group.sphere)
         && group.sphere.distanceToPoint(camera.position)<=(this.options.maximumDistance??Infinity);
       if(group.mesh.visible) {this.stats.visibleGroups++;this.stats.visibleTriangles+=group.triangles;}
     }
     this.distances.fill(Infinity);this.nearest.fill(-1);
+    camera.getWorldDirection(this.forward);
     for(let index=0;index<this.lamps.length;index++) {
-      const distance=camera.position.distanceToSquared(this.lamps[index].position);
+      let distance=camera.position.distanceToSquared(this.lamps[index].position);
+      if(this.options.preferLightsAhead && this.lampOffset.copy(this.lamps[index].position).sub(camera.position).dot(this.forward)<-10) distance*=4;
       for(let slot=0;slot<LIGHT_COUNT;slot++) {
         if(distance>=this.distances[slot]) continue;
         for(let shift=LIGHT_COUNT-1;shift>slot;shift--) {

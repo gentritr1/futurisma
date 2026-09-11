@@ -1,0 +1,77 @@
+{
+  "script": "scripts/visual/hud/menu-paths.mjs",
+  "records": [
+    {
+      "name": "controls",
+      "phase": "intro",
+      "controls": true,
+      "options": false,
+      "pause": false,
+      "time": "00:00.000"
+    },
+    {
+      "name": "controls-options",
+      "phase": "intro",
+      "controls": false,
+      "options": true,
+      "pause": false,
+      "returnTo": "controls",
+      "time": "00:00.000"
+    },
+    {
+      "name": "back-to-controls",
+      "phase": "intro",
+      "controls": true,
+      "options": false,
+      "pause": false,
+      "returnTo": "controls",
+      "time": "00:00.000"
+    },
+    {
+      "name": "back-to-paddock",
+      "phase": "intro",
+      "controls": false,
+      "options": false,
+      "pause": false,
+      "returnTo": "controls",
+      "time": "00:00.000"
+    },
+    {
+      "name": "race-menu-keys",
+      "phase": "race",
+      "controls": false,
+      "options": false,
+      "pause": false,
+      "returnTo": "controls",
+      "time": "00:00.175"
+    },
+    {
+      "name": "paused",
+      "phase": "paused",
+      "controls": false,
+      "options": false,
+      "pause": true,
+      "returnTo": "controls",
+      "time": "00:00.625"
+    },
+    {
+      "name": "pause-options",
+      "phase": "paused",
+      "controls": false,
+      "options": true,
+      "pause": true,
+      "returnTo": "paused",
+      "time": "00:00.625"
+    },
+    {
+      "name": "back-to-pause",
+      "phase": "paused",
+      "controls": false,
+      "options": false,
+      "pause": true,
+      "returnTo": "paused",
+      "time": "00:00.625"
+    }
+  ],
+  "errors": []
+}

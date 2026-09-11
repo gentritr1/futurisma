@@ -1,0 +1,50 @@
+{
+  "works": {
+    "windowSamples": 720,
+    "windowMs": 5820.799999952316,
+    "calibration": {
+      "samples": 120,
+      "windowMs": 966.2000000476837,
+      "hz": 124.1978886297638
+    },
+    "expectedSamples": 722.9310701302069,
+    "sampleResidual": -2.9310701302068765,
+    "p95Ms": 8.5
+  },
+  "rookie": {
+    "windowSamples": 720,
+    "windowMs": 5806.799999952316,
+    "calibration": {
+      "samples": 120,
+      "windowMs": 966.8999998569489,
+      "hz": 124.10797395568703
+    },
+    "expectedSamples": 720.6701831599655,
+    "sampleResidual": -0.6701831599655179,
+    "p95Ms": 8.5
+  },
+  "feral": {
+    "windowSamples": 720,
+    "windowMs": 5831.599999904633,
+    "calibration": {
+      "samples": 120,
+      "windowMs": 964.5,
+      "hz": 124.41679626749611
+    },
+    "expectedSamples": 725.548989101665,
+    "sampleResidual": -5.548989101665029,
+    "p95Ms": 8.5
+  },
+  "works-reduced": {
+    "windowSamples": 720,
+    "windowMs": 5820,
+    "calibration": {
+      "samples": 120,
+      "windowMs": 961.8000001907349,
+      "hz": 124.76606360595005
+    },
+    "expectedSamples": 726.1384901866294,
+    "sampleResidual": -6.138490186629383,
+    "p95Ms": 8.5
+  }
+}

@@ -1,0 +1,266 @@
+{
+  "script": "scripts/visual/ascension/report-phase-e.py",
+  "measurementScripts": [
+    "scripts/visual/ascension/race.mjs",
+    "scripts/visual/ascension/instrument.mjs",
+    "scripts/visual/ascension/stations.mjs",
+    "scripts/visual/ascension/check-road-floor.py"
+  ],
+  "runs": [
+    {
+      "name": "trench",
+      "lapsMs": [
+        29975,
+        28100,
+        27983
+      ],
+      "acceptedCarryOverLapsMs": [
+        29975,
+        28100,
+        27983
+      ],
+      "unchangedLaps": true,
+      "mainDraws": 107,
+      "shadowDraws": 17,
+      "peakTotalDraws": 124,
+      "mainTriangles": 213808,
+      "shadowTriangles": 23624,
+      "p95Ms": 8.600000023841858,
+      "sizes": [
+        "1280x720"
+      ],
+      "windows": [
+        {
+          "name": "calibration",
+          "seconds": 0.97,
+          "expectedRateHz": 123.71134020618557,
+          "expected": 120,
+          "observed": 120,
+          "residual": 0
+        },
+        {
+          "name": "all recorded render intervals",
+          "seconds": 114.522,
+          "expectedRateHz": 123.71134020618557,
+          "expected": 14167.670103092785,
+          "observed": 11115,
+          "residual": -3052.670103092785
+        },
+        {
+          "name": "active",
+          "seconds": 85.28589999997615,
+          "expectedRateHz": 123.71134020618557,
+          "expected": 10550.832989687771,
+          "observed": 10529,
+          "residual": -21.83298968777126
+        },
+        {
+          "name": "tail",
+          "seconds": 5.8191999999284745,
+          "expectedRateHz": 123.71134020618557,
+          "expected": 719.9010309189865,
+          "observed": 720,
+          "residual": 0.0989690810134789
+        }
+      ]
+    },
+    {
+      "name": "deluge",
+      "lapsMs": [
+        33408,
+        29992,
+        29867
+      ],
+      "acceptedCarryOverLapsMs": [
+        33408,
+        29992,
+        29867
+      ],
+      "unchangedLaps": true,
+      "mainDraws": 110,
+      "shadowDraws": 17,
+      "peakTotalDraws": 127,
+      "mainTriangles": 207152,
+      "shadowTriangles": 23624,
+      "p95Ms": 8.600000023841858,
+      "sizes": [
+        "1280x720"
+      ],
+      "windows": [
+        {
+          "name": "calibration",
+          "seconds": 0.9661999999284744,
+          "expectedRateHz": 124.19788864508727,
+          "expected": 120,
+          "observed": 120,
+          "residual": 0
+        },
+        {
+          "name": "all recorded render intervals",
+          "seconds": 119.25240000009536,
+          "expectedRateHz": 124.19788864508727,
+          "expected": 14810.89629587125,
+          "observed": 12026,
+          "residual": -2784.896295871249
+        },
+        {
+          "name": "active",
+          "seconds": 92.46940000009536,
+          "expectedRateHz": 124.19788864508727,
+          "expected": 11484.504244289878,
+          "observed": 11440,
+          "residual": -44.50424428987753
+        },
+        {
+          "name": "tail",
+          "seconds": 5.815700000047683,
+          "expectedRateHz": 124.19788864508727,
+          "expected": 722.2976609991563,
+          "observed": 720,
+          "residual": -2.297660999156278
+        }
+      ]
+    },
+    {
+      "name": "trench-reduced",
+      "lapsMs": [
+        29975,
+        28100,
+        27983
+      ],
+      "acceptedCarryOverLapsMs": [
+        29975,
+        28100,
+        27983
+      ],
+      "unchangedLaps": true,
+      "mainDraws": 107,
+      "shadowDraws": 17,
+      "peakTotalDraws": 124,
+      "mainTriangles": 213808,
+      "shadowTriangles": 23624,
+      "p95Ms": 8.600000023841858,
+      "sizes": [
+        "1280x720"
+      ],
+      "windows": [
+        {
+          "name": "calibration",
+          "seconds": 0.9655,
+          "expectedRateHz": 124.28793371310202,
+          "expected": 120,
+          "observed": 120,
+          "residual": 0
+        },
+        {
+          "name": "all recorded render intervals",
+          "seconds": 113.671,
+          "expectedRateHz": 124.28793371310202,
+          "expected": 14127.93371310202,
+          "observed": 11116,
+          "residual": -3011.93371310202
+        },
+        {
+          "name": "active",
+          "seconds": 85.26519999992847,
+          "expectedRateHz": 124.28793371310202,
+          "expected": 10597.435525625497,
+          "observed": 10537,
+          "residual": -60.435525625496666
+        },
+        {
+          "name": "tail",
+          "seconds": 5.805299999952316,
+          "expectedRateHz": 124.28793371310202,
+          "expected": 721.5287415787446,
+          "observed": 720,
+          "residual": -1.5287415787446434
+        }
+      ]
+    }
+  ],
+  "before": {
+    "checkpoint": "551e4c8",
+    "mainDraws": 110,
+    "shadowDraws": 17,
+    "totalDraws": 127,
+    "mainTriangles": 207152,
+    "shadowTriangles": 23624,
+    "p95Ms": 8.600000023841858
+  },
+  "afterPeakTotalDraws": 127,
+  "headroomTo145": 18,
+  "schedule": {
+    "source": "src/game/data/ascension/schedule.json",
+    "builder": "scripts/build-ascension-route.mjs",
+    "measurementScript": "scripts/visual/ascension/race.mjs",
+    "measuredWorksLapSeconds": 28.0705,
+    "launchSeconds": 68.775,
+    "launchLapRatio": 2.4500810459379068
+  },
+  "road": {
+    "samples": 32,
+    "expected": 32,
+    "residual": 0,
+    "accepted": true,
+    "floorSource": "art/evidence/ascension-v1/phase-c-revision/carry-overs/road-luma-floor.json"
+  },
+  "boards": {
+    "states": 4,
+    "boardsPerState": 2,
+    "expected": 8,
+    "observed": 8,
+    "distanceMetres": 150,
+    "allPass": true
+  },
+  "reviewStatus": "Blind keys withheld. No human classification or five-detail approval inferred.",
+  "fork": {
+    "script": "scripts/measure-ascension-driving.mjs",
+    "savingSeconds": [
+      3.5250000000000004,
+      3.5250000000000004,
+      3.5250000000000004
+    ],
+    "windows": [
+      {
+        "branch": false,
+        "windowSeconds": 42.925,
+        "expectedRateHz": 120,
+        "observedSamples": 5151,
+        "expectedSamples": 5151.0,
+        "residual": 0.0
+      },
+      {
+        "branch": true,
+        "windowSeconds": 32.35,
+        "expectedRateHz": 120,
+        "observedSamples": 3882,
+        "expectedSamples": 3882.0,
+        "residual": 0.0
+      }
+    ]
+  },
+  "clearance": {
+    "script": "scripts/validate-ascension-events.mjs",
+    "crawler": {
+      "bankEdgeAllowanceMetres": 0.5198613444262441,
+      "minimumClearanceMetres": 12.480138655573755,
+      "samples": 1442,
+      "windowSecondsPerCrossing": 6,
+      "hz": 120,
+      "crossings": 2,
+      "expectedSamples": 1442,
+      "reconciliation": "2 \u00d7 (6 seconds \u00d7 120 Hz + 1 inclusive endpoint)"
+    },
+    "launch": {
+      "minimumClearanceMetres": 12.378074994764178,
+      "samples": 843,
+      "windowSeconds": 7.016666666666667,
+      "hz": 120,
+      "expectedSamples": 843,
+      "overlappingSpatialProbes": 11802,
+      "reconciliation": "window seconds \u00d7 120 Hz + 1 inclusive endpoint"
+    },
+    "accepted": true
+  }
+}

@@ -1,3 +1,4 @@
+import {resultPresentation} from './result-presentation.js';
 import {
   formatRaceGap,
   formatRacePosition,
@@ -8,7 +9,7 @@ import {
 } from "./hud-presentation.js";
 import { DRIFT_REWARD_MINIMUM_CHARGE, SLIPSTREAM_LOCK_THRESHOLD } from "./physics";
 import { publishRadioFrame } from "./pit-radio";
-import { resolveReducedMotion } from "./query-probes";
+import { resolveRaceMode, resolveReducedMotion } from "./query-probes";
 import { soundtrackChip } from "./soundtrack";
 import {
   RACE_MODE_LABELS,
@@ -16,10 +17,9 @@ import {
   SECTOR_DELTA_HOLD_MS,
   deltaTone,
   formatDeltaSeconds,
+  startingGridRows,
 } from "./race-modes-rules.js";
 import type { RaceResultSummary } from "./race-modes";
-import { isFoundryEdition } from "./tideline-style";
-import { resolveAbilitySeed } from "./ability-seed";
 
 /**
  * G2 round 2 - where the contact glow steps from a brush to a firm lean.
@@ -119,13 +119,39 @@ export interface RaceStandingEntry extends RaceGridEntry {
   gapMs: number;
 }
 
+/**
+ * The ladder's gap column.
+ *
+ * Signed against the player and rounded to a tenth, because a ladder read at
+ * 300 km/h is a glance and a hundredth is noise. The sign is the carrier, not
+ * the colour: a minus is ahead, a plus is behind. The player's own row is a
+ * dash rather than a zero - "0.0" invites the reader to compare it with the
+ * others, and it is not that kind of number.
+ */
+export function formatLadderGap(gapMs: number | null | undefined, player: boolean): string {
+  if (player) return "\u2014";
+  if (gapMs === null || gapMs === undefined || !Number.isFinite(gapMs)) return "";
+  const seconds = Math.abs(gapMs) / 1000;
+  if (seconds >= 100) return gapMs < 0 ? "\u2212>99s" : "+>99s";
+  const sign = gapMs < 0 ? "\u2212" : "+";
+  return `${sign}${seconds.toFixed(1)}`;
+}
+
 export interface FieldOrderEntry {
   position: number;
   name: string;
   player: boolean;
+  /**
+   * Signed milliseconds against the player: negative ahead, positive behind,
+   * `null` on the player's own row and whenever the field is not running. It is
+   * computed from the same distance-over-speed model as the gap line above the
+   * ladder, so the two can never tell different stories about the same rival.
+   */
+  gapMs?: number | null;
 }
 
 export interface RaceCoursePresentation {
+  scheduleLabel?: string;
   mapName: string;
   mapCode: string;
   checkpointCount: number;
@@ -174,6 +200,7 @@ export class GameUi {
   private readonly driveState = requiredElement<HTMLElement>("drive-state");
   private readonly timeValue = requiredElement<HTMLElement>("time-value");
   private readonly lapValue = requiredElement<HTMLElement>("lap-value");
+  private readonly lapPips = requiredElement<HTMLElement>("lap-pips");
   private readonly lastLapValue = requiredElement<HTMLElement>("last-lap-value");
   private readonly positionValue = requiredElement<HTMLElement>("position-value");
   private readonly gapValue = requiredElement<HTMLElement>("gap-value");
@@ -189,7 +216,7 @@ export class GameUi {
   private readonly slipstreamChip = requiredElement<HTMLElement>("slipstream-chip");
   private readonly slipstreamLabel = requiredElement<HTMLElement>(
     "slipstream-chip",
-  ).querySelector<HTMLElement>(".slipstream__label")!;
+  ).querySelector<HTMLElement>(".hud-chip__label")!;
   private readonly slipstreamFill = requiredElement<HTMLElement>("slipstream-fill");
   private readonly edgeWarning = requiredElement<HTMLElement>("edge-warning");
   private readonly edgeWarningLabel = requiredElement<HTMLElement>("edge-warning-label");
@@ -261,6 +288,8 @@ export class GameUi {
   /** P7 — the issue the player is racing under; drives every label that used
    * to read a hard-coded `WORKS 07`. */
   private playerLiveryLabel = "WORKS 07";
+  /** The format this page load is racing; fixed at load, like `raceModes.mode`. */
+  private readonly raceMode = resolveRaceMode();
   /** The course half of the intro footer, kept so a livery swap can rebuild it
    * without re-running `setRaceFormat`. */
   private courseFooterLabel = "GREENWATER FIELD RACE";
@@ -311,25 +340,21 @@ export class GameUi {
     }`;
     const polarity = course.mapCode === "MAP 04";
     const tideline = course.mapCode === "MAP 05";
-    const foundry = tideline && isFoundryEdition;
-    document.body.dataset.map = tideline ? "tideline" : polarity ? "polarity" : course.mapCode === "MAP 03" ? "nightshift" : course.mapCode === "MAP 02" ? "bitterpan" : "greenwater";
-    document.querySelector<HTMLElement>(".intro-panel h1")!.textContent = foundry ? "FOUNDRY" : tideline ? "TIDELINE" : polarity ? "POLARITY" : course.mapCode === "MAP 03" ? "NIGHT SHIFT" : "TOTEM";
-    document.querySelector<HTMLElement>(".intro-code")!.textContent = foundry ? "PELAGIC PUMPWORKS · TIDELINE FOUNDRY CUT" : tideline ? "PELAGIC REACTOR · 03:42 AM" : polarity ? "VECTOR EXCHANGE · 02:14 AM" : course.mapCode === "MAP 03" ? "MERIDIAN DISTRICT · AFTER HOURS" : "KAIRO DYNAMICS · KD-0714";
+    const ascension = course.mapCode === "MAP 06";
+    const island = course.mapCode === "MAP 07";
+    document.body.dataset.map = island ? "dreamisland" : ascension ? "ascension" : tideline ? "tideline" : polarity ? "polarity" : course.mapCode === "MAP 03" ? "nightshift" : course.mapCode === "MAP 02" ? "bitterpan" : "greenwater";
+    document.querySelector<HTMLElement>(".intro-panel h1")!.textContent = island ? "DREAM ISLAND" : ascension ? "ASCENSION PAD" : tideline ? "TIDELINE" : polarity ? "POLARITY" : course.mapCode === "MAP 03" ? "NIGHT SHIFT" : "TOTEM";
+    document.querySelector<HTMLElement>(".intro-code")!.textContent = island ? "DREAM ISLAND · DAY INTO NIGHT" : ascension ? "PAD 09 · LAUNCH DAY / DAWN" : tideline ? "PELAGIC PUMPWORKS · THE TIDE CYCLE" : polarity ? "VECTOR EXCHANGE · 02:14 AM" : course.mapCode === "MAP 03" ? "MERIDIAN DISTRICT · AFTER HOURS" : "KAIRO DYNAMICS · KD-0714";
     const editionLink = document.getElementById("tideline-edition") as HTMLAnchorElement;
-    editionLink.hidden = !tideline;
-    if (tideline) {
-      const editionUrl = new URL(location.href);
-      editionUrl.searchParams.set("seed", String(resolveAbilitySeed()));
-      if (foundry) editionUrl.searchParams.delete("edition"); else editionUrl.searchParams.set("edition", "foundry");
-      editionLink.href = editionUrl.href;
-      editionLink.textContent = foundry ? "COMPARE / ORIGINAL TIDELINE" : "COMPARE / THE FOUNDRY CUT";
-    }
+    editionLink.hidden = true;
     document.querySelectorAll<HTMLElement>("[data-polarity-control]").forEach((element) => { element.hidden = !polarity; });
-    document.querySelectorAll<HTMLElement>("[data-power-control]").forEach((element) => { element.hidden = !polarity && !tideline; });
-    this.introDeck.textContent = foundry
-      ? `Race the reclaimed pumpworks: corroded gantries, caged sodium lights and damp concrete. Dive through the reactor, climb the port, then glide over the ocean. Follow the lit current; time E on a launch strip. ${lapLabel}.`
+    document.querySelectorAll<HTMLElement>("[data-power-control]").forEach((element) => { element.hidden = !polarity && !tideline && !ascension && !island; });
+    this.introDeck.textContent = island
+      ? `The clock strikes: day turns to night and the causeway goes wet. ${course.scheduleLabel ?? "Measuring Works lap"}. ${lapLabel}.`
+      : ascension
+      ? `Launch day: trench shortcut or Deluge Road. ${course.scheduleLabel ?? "Measuring Works lap"}. ${lapLabel}.`
       : tideline
-      ? `Dive through the flooded reactor. Climb the drydock. Glide between ocean platforms. Follow the lit landing paths; time E on a launch strip for a stronger Surge. Supplies change each lap. ${lapLabel}.`
+      ? `Lap 1: flooded reactor, lit recharge current. Lap 2: water falls outside the sealed chamber; condensation lowers deck grip. Lap 3: the drained pump hall opens a shorter line. Race the reactor and port; time E for Surge or Shield. ${lapLabel}.`
       : polarity ? `Choose your line. SPACE changes roads at marked junctions, with a six-second commitment. Upper: shorter, tighter. Lower: stronger devices and faster recharge. Time E on a launch strip. SHIFT fires nitro. ${lapLabel}.`
       : course.mapCode === "MAP 01"
       ? `Four ships. ${lapLabel} through Greenwater Strip. Follow the amber turn markers, clear all eight gates, and bring TOTEM home through The Cradle.`
@@ -347,10 +372,7 @@ export class GameUi {
     this.finishValue.textContent = presentation.finishLabel;
     this.lastLapValue.hidden = true;
     this.progressFill.style.transform = "scaleX(0)";
-    if (grid.length > 0) {
-      this.updateGrid(grid);
-      this.updateFieldOrder(grid);
-    }
+    this.applyStartingGrid(grid);
   }
 
   /**
@@ -371,10 +393,7 @@ export class GameUi {
   setPlayerLivery(label: string, grid: readonly RaceGridEntry[]): void {
     this.playerLiveryLabel = label;
     this.introFooter.textContent = `${label} · ${this.courseFooterLabel}`;
-    if (grid.length > 0) {
-      this.updateGrid(grid);
-      this.updateFieldOrder(grid);
-    }
+    this.applyStartingGrid(grid);
   }
 
   /**
@@ -388,6 +407,26 @@ export class GameUi {
     this.dispatchRecord.dataset.recorded = bestLapMs === null ? "false" : "true";
   }
 
+  /**
+   * Pips are capped: past nine laps they stop being countable at a glance and
+   * the fraction beside them is the honest readout, so the row is dropped
+   * rather than drawn as a bar nobody can parse.
+   */
+  private renderLapPips(lap: number, totalLaps: number): void {
+    if (!Number.isFinite(totalLaps) || totalLaps < 2 || totalLaps > 9) {
+      this.lapPips.replaceChildren();
+      return;
+    }
+    const done = Math.min(Math.max(lap - 1, 0), totalLaps);
+    const fragment = document.createDocumentFragment();
+    for (let index = 0; index < totalLaps; index += 1) {
+      const pip = document.createElement("i");
+      pip.dataset.done = index < done ? "true" : "false";
+      fragment.append(pip);
+    }
+    this.lapPips.replaceChildren(fragment);
+  }
+
   updateFieldOrder(entries: readonly FieldOrderEntry[]): void {
     const key = entries.map((entry) => `${entry.player ? "Y" : "N"}${entry.name}`).join("|");
     if (key === this.lastFieldOrderKey) return;
@@ -395,13 +434,18 @@ export class GameUi {
     const fragment = document.createDocumentFragment();
     for (const entry of entries) {
       const row = document.createElement("li");
+      const bar = document.createElement("i");
       const position = document.createElement("span");
       const name = document.createElement("span");
+      const gap = document.createElement("span");
       name.className = "n";
-      position.textContent = `P${entry.position}${entry.player ? " · YOU" : ""}`;
-      name.textContent = entry.name;
+      gap.className = "gap";
+      position.textContent = `P${entry.position}`;
+      name.textContent = entry.player ? `${entry.name} · YOU` : entry.name;
+      gap.textContent = formatLadderGap(entry.gapMs, entry.player);
       row.dataset.best = entry.player ? "true" : "false";
-      row.append(position, name);
+      row.dataset.player = entry.player ? "true" : "false";
+      row.append(bar, position, name, gap);
       fragment.append(row);
     }
     this.fieldOrder.replaceChildren(fragment);
@@ -449,8 +493,13 @@ export class GameUi {
     standings: readonly RaceStandingEntry[] = [],
     summary: RaceResultSummary | null = null,
   ): void {
-    const newBestLap = summary?.newBestLap ?? false;
-    this.resultTime.textContent = formatRaceTime(elapsedMs);
+    const {timeAttack,newBestLap,previousBestLapMs}=resultPresentation(summary);
+    this.resultTime.textContent = timeAttack ? formatRaceTime(bestLapMs) : formatRacePosition(position,racerCount);
+    this.resultScreen.querySelector('.result-status')!.textContent = timeAttack ? 'BEST LAP' : 'CLASSIFICATION LOCKED';
+    this.resultScreen.dataset.mode=summary?.mode??'race';
+    this.resultScreen.dataset.newBestLap=String(newBestLap);
+    this.resultScreen.dataset.previousBestLapMs=previousBestLapMs===null?'':String(previousBestLapMs);
+
     // G4 — the format and the field the time was set against, ahead of the
     // classification. A 2-lap sprint time and a 5-lap race time are different
     // numbers about different things, and a screen that printed them the same
@@ -458,7 +507,8 @@ export class GameUi {
     const format = summary
       ? `${RACE_MODE_LABELS[summary.mode]} · ${RIVAL_TIER_LABELS[summary.tier]} · `
       : "";
-    this.resultDetail.textContent = `${format}${
+    const previous=timeAttack?`PREVIOUS BEST ${previousBestLapMs===null?'—':formatRaceTime(previousBestLapMs)} · `:'';
+    this.resultDetail.textContent = `${previous}RACE TIME ${formatRaceTime(elapsedMs)} · ${format}${
       formatRacePosition(position, racerCount)
     } · TOTEM / ${this.playerLiveryLabel} · ${totalLaps} ${
       totalLaps === 1 ? "LAP" : "LAPS"
@@ -693,7 +743,7 @@ export class GameUi {
       this.gapValue.textContent = gapLabel;
       this.lastGapLabel = gapLabel;
     }
-    const lapLabel = `LAP ${Math.min(frame.lap, frame.totalLaps)} / ${frame.totalLaps}`;
+    const lapLabel = `${Math.min(frame.lap, frame.totalLaps)} / ${frame.totalLaps}`;
     const lastLapTimeLabel = frame.lastLapMs === null
       ? ""
       : ` · LAST ${formatRaceTime(frame.lastLapMs)}`;
@@ -710,6 +760,11 @@ export class GameUi {
         : `GATE ${frame.missedGate.toString().padStart(2, "0")} MISSED · RECOVER`;
     if (lapLabel !== this.lastLapLabel) {
       this.lapValue.textContent = lapLabel;
+      // One pip per lap, filled as it is completed. It is the same fact the
+      // text already carries, in a form that survives peripheral vision - the
+      // driver should not have to read a fraction to know how much race is
+      // left. Rebuilt only on the lap change, never per frame.
+      this.renderLapPips(frame.lap, frame.totalLaps);
       this.lastLapLabel = lapLabel;
     }
     if (lastLapTimeLabel !== this.lastLapTimeLabel) {
@@ -839,6 +894,9 @@ export class GameUi {
       this.boostMeter.dataset.state = boostState;
       this.boostLabel.textContent = boostPresentation.label;
       this.boostFill.dataset.active = boostState === "active" ? "true" : "false";
+      // Same edge, so the streak on the numeral and the flash on the meter are
+      // one event rather than two that happen to land together.
+      this.speedValue.dataset.boost = boostState === "active" ? "true" : "false";
       document.body.dataset.boost = boostState === "active" ? "true" : "false";
       this.lastBoostState = boostState;
     }
@@ -998,6 +1056,28 @@ export class GameUi {
     this.lapEvent.dataset.active = "false";
     this.lapEvent.setAttribute("aria-hidden", "true");
     this.lapEventUntil = 0;
+  }
+
+  /**
+   * The starting-grid list, composed from what the format actually spawns.
+   *
+   * Both callers used to guard on `grid.length > 0` themselves, so in a
+   * fieldless format neither ever painted anything and `index.html`'s four
+   * placeholder rows were what the player read — three rivals a time attack
+   * does not spawn, on every circuit, invisible to the soak only because
+   * `style.css:2225` hides the list under 900 px. The guard now lives in
+   * `startingGridRows`, which answers "leave it" with an empty array and
+   * answers a solo format with the player's own row.
+   *
+   * The in-race position ladder still takes only a real field: a time attack
+   * has no ladder to keep, and handing it a one-row field would put a `P1 / 1`
+   * beside a clock that is already the only opponent.
+   */
+  private applyStartingGrid(grid: readonly RaceGridEntry[]): void {
+    const rows = startingGridRows(this.raceMode, grid, this.playerLiveryLabel);
+    if (rows.length === 0) return;
+    this.updateGrid(rows);
+    if (grid.length > 0) this.updateFieldOrder(grid);
   }
 
   private updateGrid(grid: readonly RaceGridEntry[]): void {

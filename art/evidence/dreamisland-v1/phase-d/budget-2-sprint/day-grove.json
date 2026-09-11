@@ -1,0 +1,133 @@
+{
+  "script": "src/game/dreamisland-runtime.ts",
+  "seed": 3868938316,
+  "tick": 865,
+  "progress": 0.1914632802258347,
+  "sector": "PALM GROVE",
+  "nightBlend": 0,
+  "nightBlendPinned": null,
+  "reducedMotion": false,
+  "grip": 1,
+  "powers": {
+    "version": 1,
+    "configId": "dream-island-powers-v1",
+    "configHash": "bb830811",
+    "seed": 3868938316,
+    "tick": 865,
+    "lap": 1,
+    "progress": 0.19119016731971872,
+    "lateral": 8.84864507191108,
+    "lane": 0,
+    "fromLane": 0,
+    "flipStartTick": -126,
+    "nextFlipTick": 0,
+    "heldPower": null,
+    "heldCharge": 0,
+    "activePower": "surge",
+    "activeCharge": 1,
+    "powerStartTick": 436,
+    "powerUntilTick": 916,
+    "powerPerfect": true,
+    "collectedLaps": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "usedWindowLaps": [],
+    "shieldRewardLaps": {},
+    "flips": 0,
+    "pickups": 1,
+    "powersUsed": 1,
+    "perfectActivations": 1,
+    "shieldAbsorptions": 0,
+    "upperTicks": 0,
+    "eventSequence": 2,
+    "events": [
+      {
+        "id": "dream-island-powers-v1:e69b504c:1",
+        "sequence": 1,
+        "tick": 307,
+        "type": "pickup",
+        "lap": 1,
+        "lane": 0,
+        "index": 0,
+        "kind": "surge",
+        "perfect": false,
+        "refund": 0
+      },
+      {
+        "id": "dream-island-powers-v1:e69b504c:2",
+        "sequence": 2,
+        "tick": 436,
+        "type": "power",
+        "lap": 1,
+        "lane": 0,
+        "index": -1,
+        "kind": "surge",
+        "perfect": true,
+        "refund": 0
+      }
+    ]
+  },
+  "schedule": {
+    "laps": 2,
+    "honoursLapOverride": false,
+    "chimeFactor": 1.2333333333333334,
+    "strikeFactor": 1.3666666666666665,
+    "chimeTick": 4822,
+    "strikeTick": 5343,
+    "fishRiseTick": 5823,
+    "nightSettledTick": 6783,
+    "nightRampTicks": 1440,
+    "events": [
+      {
+        "id": "chime-warning",
+        "tick": 4822
+      },
+      {
+        "id": "strike",
+        "tick": 5343
+      },
+      {
+        "id": "fish-rise",
+        "tick": 5823
+      },
+      {
+        "id": "night-settled",
+        "tick": 6783
+      }
+    ]
+  },
+  "state": {
+    "chimed": false,
+    "struck": false,
+    "fishRisen": false,
+    "nightSettled": false
+  },
+  "events": [],
+  "painted": {
+    "paintedMeshes": 10,
+    "paintedTriangles": 66380,
+    "manifestTriangles": 66380,
+    "emissiveMaterials": 2,
+    "cardMaterials": 1,
+    "fishMeshes": 4,
+    "fishVisible": 0,
+    "reskinnedCourseDraws": 2,
+    "waterSurfaces": 3,
+    "waterTriangles": 2238,
+    "skyPanoramas": 2,
+    "flowShaders": 4,
+    "waterfallFlowShaders": 1,
+    "heroPlacements": 9,
+    "heroSourceMeshes": 46,
+    "heroMeshes": 14,
+    "heroTriangles": 17340,
+    "fishShoals": 2,
+    "fishShoalMeshes": 4,
+    "fishDeckSamples": 0,
+    "fishMinimumDeckClearance": null
+  }
+}

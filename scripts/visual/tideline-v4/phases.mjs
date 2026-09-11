@@ -1,0 +1,6 @@
+import {mkdir,writeFile} from 'node:fs/promises';
+import {launchReviewBrowser} from './browser.mjs';
+const out='art/evidence/tideline-v4/phases-round4';await mkdir(out,{recursive:true});
+const samples=[{id:'A',lap:3,p:.414},{id:'B',lap:2,p:.022},{id:'C',lap:1,p:.141},{id:'D',lap:2,p:.512},{id:'E',lap:3,p:.642},{id:'F',lap:1,p:.951},{id:'G',lap:2,p:.672},{id:'H',lap:3,p:.822},{id:'I',lap:1,p:.594},{id:'J',lap:3,p:.151}];
+const browser=await launchReviewBrowser();const errors=[],records=[];
+try{const page=await browser.newPage();page.on('pageerror',e=>errors.push(String(e)));for(const sample of samples){await page.goto(`http://127.0.0.1:5215/tideline-v4-review.html?lap=${sample.lap}&progress=${sample.p}&seconds=8`,{waitUntil:'networkidle0'});await page.waitForFunction(()=>window.tidelineReview);await page.screenshot({path:`${out}/${sample.id}.png`,clip:{x:0,y:0,width:1280,height:720}});records.push({...sample,state:await page.$eval('#review-state',e=>JSON.parse(e.textContent))});}await writeFile('/tmp/tideline-v4-phase-key.json',JSON.stringify({script:'scripts/visual/tideline-v4/phases.mjs',records,errors},null,2));if(errors.length)throw Error(errors.join('\n'));}finally{await browser.close();}

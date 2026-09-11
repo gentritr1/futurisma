@@ -1,0 +1,187 @@
+{
+  "instrument": "/Users/gentlegen/Desktop/futurisma-race/polarity_work/scripts/visual/dreamisland-heroes/polish2-feature-profile.py",
+  "capture": "art/evidence/dreamisland-v1/polish/round-2/hero-features/focal-capture.json",
+  "method": "Difference >2/255 in any channel between identical 40 m full and feature-hidden renders; display luma on changed full-frame pixels. Transparent mist is tested against its actual background, not a blank isolation.",
+  "rows": [
+    {
+      "asset": "clock-tower",
+      "blend": 0,
+      "feature": "bezel",
+      "changedPixels": 1460,
+      "meanLuma": 0.3147128004297609,
+      "maximumChannelDelta": 0.49803921568627446,
+      "full": "clock-tower-40m-day.png",
+      "without": "clock-tower-40m-day-without-bezel.png"
+    },
+    {
+      "asset": "clock-tower",
+      "blend": 0,
+      "feature": "ticks",
+      "changedPixels": 93,
+      "meanLuma": 0.36072696605523935,
+      "maximumChannelDelta": 0.6588235294117647,
+      "full": "clock-tower-40m-day.png",
+      "without": "clock-tower-40m-day-without-ticks.png"
+    },
+    {
+      "asset": "clock-tower",
+      "blend": 0,
+      "feature": "nosings",
+      "changedPixels": 795,
+      "meanLuma": 0.45920953409791593,
+      "maximumChannelDelta": 0.37254901960784315,
+      "full": "clock-tower-40m-day.png",
+      "without": "clock-tower-40m-day-without-nosings.png"
+    },
+    {
+      "asset": "watchtower",
+      "blend": 0,
+      "feature": "moss-tops",
+      "changedPixels": 2262,
+      "meanLuma": 0.3119281659471923,
+      "maximumChannelDelta": 0.5098039215686274,
+      "full": "watchtower-40m-day.png",
+      "without": "watchtower-40m-day-without-moss-tops.png"
+    },
+    {
+      "asset": "watchtower",
+      "blend": 0,
+      "feature": "windows",
+      "changedPixels": 120,
+      "meanLuma": 0.14606586928104576,
+      "maximumChannelDelta": 0.4901960784313726,
+      "full": "watchtower-40m-day.png",
+      "without": "watchtower-40m-day-without-windows.png"
+    },
+    {
+      "asset": "watchtower",
+      "blend": 0,
+      "feature": "portal-lamps",
+      "changedPixels": 2111,
+      "meanLuma": 0.34018965270617957,
+      "maximumChannelDelta": 0.7294117647058823,
+      "full": "watchtower-40m-day.png",
+      "without": "watchtower-40m-day-without-portal-lamps.png"
+    },
+    {
+      "asset": "waterfall-cliff",
+      "blend": 0,
+      "feature": "fast-sheet",
+      "changedPixels": 23956,
+      "meanLuma": 0.3516024453982628,
+      "maximumChannelDelta": 0.42745098039215684,
+      "full": "waterfall-cliff-40m-day.png",
+      "without": "waterfall-cliff-40m-day-without-fast-sheet.png"
+    },
+    {
+      "asset": "waterfall-cliff",
+      "blend": 0,
+      "feature": "mist",
+      "changedPixels": 1703,
+      "meanLuma": 0.41132937814468123,
+      "maximumChannelDelta": 0.14901960784313725,
+      "full": "waterfall-cliff-40m-day.png",
+      "without": "waterfall-cliff-40m-day-without-mist.png"
+    },
+    {
+      "asset": "sea-stack-set",
+      "blend": 0,
+      "feature": "notches",
+      "changedPixels": 6817,
+      "meanLuma": 0.12482818961822663,
+      "maximumChannelDelta": 0.6666666666666667,
+      "full": "sea-stack-set-40m-day.png",
+      "without": "sea-stack-set-40m-day-without-notches.png"
+    },
+    {
+      "asset": "clock-tower",
+      "blend": 1,
+      "feature": "bezel",
+      "changedPixels": 1130,
+      "meanLuma": 0.11198471282318237,
+      "maximumChannelDelta": 0.7568627450980392,
+      "full": "clock-tower-40m-night.png",
+      "without": "clock-tower-40m-night-without-bezel.png"
+    },
+    {
+      "asset": "clock-tower",
+      "blend": 1,
+      "feature": "ticks",
+      "changedPixels": 77,
+      "meanLuma": 0.3831793735676087,
+      "maximumChannelDelta": 0.7843137254901961,
+      "full": "clock-tower-40m-night.png",
+      "without": "clock-tower-40m-night-without-ticks.png"
+    },
+    {
+      "asset": "clock-tower",
+      "blend": 1,
+      "feature": "nosings",
+      "changedPixels": 665,
+      "meanLuma": 0.20648816983635557,
+      "maximumChannelDelta": 0.23137254901960783,
+      "full": "clock-tower-40m-night.png",
+      "without": "clock-tower-40m-night-without-nosings.png"
+    },
+    {
+      "asset": "watchtower",
+      "blend": 1,
+      "feature": "moss-tops",
+      "changedPixels": 2262,
+      "meanLuma": 0.08618065810232138,
+      "maximumChannelDelta": 0.2235294117647059,
+      "full": "watchtower-40m-night.png",
+      "without": "watchtower-40m-night-without-moss-tops.png"
+    },
+    {
+      "asset": "watchtower",
+      "blend": 1,
+      "feature": "windows",
+      "changedPixels": 90,
+      "meanLuma": 0.22969036165577342,
+      "maximumChannelDelta": 0.6745098039215687,
+      "full": "watchtower-40m-night.png",
+      "without": "watchtower-40m-night-without-windows.png"
+    },
+    {
+      "asset": "watchtower",
+      "blend": 1,
+      "feature": "portal-lamps",
+      "changedPixels": 2111,
+      "meanLuma": 0.4177016000222922,
+      "maximumChannelDelta": 0.6666666666666667,
+      "full": "watchtower-40m-night.png",
+      "without": "watchtower-40m-night-without-portal-lamps.png"
+    },
+    {
+      "asset": "waterfall-cliff",
+      "blend": 1,
+      "feature": "fast-sheet",
+      "changedPixels": 24404,
+      "meanLuma": 0.5010234140337007,
+      "maximumChannelDelta": 0.4784313725490196,
+      "full": "waterfall-cliff-40m-night.png",
+      "without": "waterfall-cliff-40m-night-without-fast-sheet.png"
+    },
+    {
+      "asset": "waterfall-cliff",
+      "blend": 1,
+      "feature": "mist",
+      "changedPixels": 1631,
+      "meanLuma": 0.535689341556365,
+      "maximumChannelDelta": 0.10196078431372549,
+      "full": "waterfall-cliff-40m-night.png",
+      "without": "waterfall-cliff-40m-night-without-mist.png"
+    },
+    {
+      "asset": "sea-stack-set",
+      "blend": 1,
+      "feature": "notches",
+      "changedPixels": 6560,
+      "meanLuma": 0.020740389646102343,
+      "maximumChannelDelta": 0.20392156862745098,
+      "full": "sea-stack-set-40m-night.png",
+      "without": "sea-stack-set-40m-night-without-notches.png"
+    }
+  ]
+}

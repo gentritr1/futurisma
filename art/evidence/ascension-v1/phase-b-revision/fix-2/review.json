@@ -1,0 +1,18 @@
+{
+  "status": "awaiting image-only reviewer",
+  "rocketPlatform": [
+    "three arms contact rocket",
+    "beacon and cage lamps",
+    "09 stencil",
+    "hazard deck rim",
+    "open sooted exhaust hole"
+  ],
+  "crawler": [
+    "four linked tread units",
+    "paired full-scale cabs",
+    "beacon",
+    "front-facing horn",
+    "CT-2 stencil and hazard deck rim"
+  ],
+  "geometryScript": "scripts/validate-ascension-heroes.mjs"
+}

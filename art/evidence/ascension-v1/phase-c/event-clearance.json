@@ -1,0 +1,43 @@
+{
+  "swingArms": {
+    "minimumClearanceMetres": 14.4330977162427,
+    "note": "Rotation is about the vertical hinge axis, so the measured minimum Y is invariant over the entire swing; compared conservatively with the highest road anywhere."
+  },
+  "flame": {
+    "minimumClearanceMetres": 10.306408214946938,
+    "baseY": 4,
+    "note": "Flame and engine glow begin two metres below the measured authored nozzle envelope, entirely above the running lane."
+  },
+  "script": "scripts/validate-ascension-events.mjs",
+  "sha256": "7949554a4c94bb0ad215ffe779cd6e7bec3d0cda7cb8a44c7c45b05581bf53b8",
+  "scope": "Exported painted crawler and rocket geometry using production spline/ascent pose. Crawler vertical AABB is checked against the maximum centreline height plus the widest half-road times sin(maximum bank), a conservative global edge-height bound. Rocket projected AABB is checked against every route station expanded by full road half-width. Transparent effects are not solid obstructions. Runtime belt bounds are separately constrained to the approved 4m envelope.",
+  "belt": {
+    "minimumY": 0.000018322264647041564,
+    "maximumY": 3.999981677735353,
+    "maximumAbsoluteZ": 5.99999351253352,
+    "phaseSamples": 721,
+    "platesPerTrack": 48,
+    "note": "Spatial phase samples over a full revolution, including repeated endpoint; not a timed rendering sample."
+  },
+  "crawler": {
+    "bankEdgeAllowanceMetres": 0.5198613444262441,
+    "minimumClearanceMetres": 12.480138655573755,
+    "samples": 1442,
+    "windowSecondsPerCrossing": 6,
+    "hz": 120,
+    "crossings": 2,
+    "expectedSamples": 1442,
+    "reconciliation": "2 × (6 seconds × 120 Hz + 1 inclusive endpoint)"
+  },
+  "launch": {
+    "minimumClearanceMetres": 12.378074994764178,
+    "samples": 843,
+    "windowSeconds": 7.016666666666667,
+    "hz": 120,
+    "expectedSamples": 843,
+    "overlappingSpatialProbes": 11802,
+    "reconciliation": "window seconds × 120 Hz + 1 inclusive endpoint"
+  },
+  "violations": [],
+  "accepted": true
+}

@@ -1,0 +1,27 @@
+{
+  "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+  "chromeVersion": "152.0.7977.76",
+  "node": "20.19.4",
+  "renderer": "Headless Chrome requested ANGLE Metal via scripts/visual/tideline-v4/browser.mjs; no shared browser",
+  "build": "Vite dev server 127.0.0.1:5200 as requested",
+  "workload": "Works seed 3868938316, three laps, high quality, 1280x720 device scale 1",
+  "warmup": "120 physics ticks excluded, independent 120-interval pre-start rAF calibration",
+  "gates": {
+    "peakTotalDraws": 110,
+    "phaseCReservedDraws": 35
+  },
+  "thermalPower": "Not measured",
+  "gpu": {
+    "SPDisplaysDataType": [
+      {
+        "_name": "Apple M1 Pro",
+        "spdisplays_metal": "spdisplays_supported",
+        "spdisplays_vendor": "sppci_vendor_Apple",
+        "sppci_bus": "spdisplays_builtin",
+        "sppci_cores": "14",
+        "sppci_device_type": "spdisplays_gpu",
+        "sppci_model": "Apple M1 Pro"
+      }
+    ]
+  }
+}

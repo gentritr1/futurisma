@@ -1,0 +1,7 @@
+{
+  "script": "scripts/visual/ascension/focal-review-e.py",
+  "pairs": 13,
+  "expectedDetailsPerPair": 5,
+  "status": "Independent review pending; authored checklist withheld",
+  "keySha256": "12863ca0487445125360a6b5ad3cca87706dab707d8b85032479b0a6bcbfd9cc"
+}

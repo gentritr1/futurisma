@@ -1,0 +1,115 @@
+{
+  "instrument": "/Users/gentlegen/Desktop/futurisma-race/polarity_work/scripts/visual/dreamisland-heroes/polish-regions.py",
+  "capture": "art/evidence/dreamisland-v1/polish/road-trials/pose-capture.json",
+  "method": "Full/isolated render equality at 2/255; isolated/blank difference above 6/255; display luma .2126/.7152/.0722",
+  "results": [
+    {
+      "blend": 0,
+      "metrics": {
+        "kerb": {
+          "pixels": 431001,
+          "meanLuma": 0.42352088540079363,
+          "meanChroma": 0.24991774051204374,
+          "visibleBoundsPixels": [
+            0,
+            268,
+            1280,
+            720
+          ],
+          "widthPixels": 1280,
+          "heightPixels": 452
+        }
+      }
+    },
+    {
+      "blend": 0,
+      "metrics": {
+        "kerb": {
+          "pixels": 430993,
+          "meanLuma": 0.41091801261136907,
+          "meanChroma": 0.04761074550912819,
+          "visibleBoundsPixels": [
+            0,
+            268,
+            1280,
+            720
+          ],
+          "widthPixels": 1280,
+          "heightPixels": 452
+        }
+      }
+    },
+    {
+      "blend": 0,
+      "metrics": {
+        "kerb": {
+          "pixels": 430993,
+          "meanLuma": 0.38938470565579,
+          "meanChroma": 0.04358766938710574,
+          "visibleBoundsPixels": [
+            0,
+            268,
+            1280,
+            720
+          ],
+          "widthPixels": 1280,
+          "heightPixels": 452
+        }
+      }
+    },
+    {
+      "blend": 1,
+      "metrics": {
+        "kerb": {
+          "pixels": 430551,
+          "meanLuma": 0.14351042864043662,
+          "meanChroma": 0.06536487831985106,
+          "visibleBoundsPixels": [
+            0,
+            269,
+            1280,
+            720
+          ],
+          "widthPixels": 1280,
+          "heightPixels": 451
+        }
+      }
+    },
+    {
+      "blend": 1,
+      "metrics": {
+        "kerb": {
+          "pixels": 425430,
+          "meanLuma": 0.1473388278821013,
+          "meanChroma": 0.18875292495297724,
+          "visibleBoundsPixels": [
+            0,
+            269,
+            1280,
+            720
+          ],
+          "widthPixels": 1280,
+          "heightPixels": 451
+        }
+      }
+    },
+    {
+      "blend": 1,
+      "metrics": {
+        "kerb": {
+          "pixels": 429973,
+          "meanLuma": 0.1332953796250681,
+          "meanChroma": 0.2131499273803011,
+          "visibleBoundsPixels": [
+            0,
+            269,
+            1280,
+            720
+          ],
+          "widthPixels": 1280,
+          "heightPixels": 451
+        }
+      }
+    }
+  ]
+}

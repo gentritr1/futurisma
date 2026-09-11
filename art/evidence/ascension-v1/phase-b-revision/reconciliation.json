@@ -1,0 +1,1015 @@
+{
+  "script": "scripts/visual/ascension/reconcile-revision.mjs",
+  "runs": [
+    {
+      "directory": "fix-5/before",
+      "script": "scripts/visual/ascension/instrument.mjs",
+      "activeRender": {
+        "observed": 10664,
+        "windowSeconds": 86.40460000002385,
+        "expectedRateHz": 123.71134020618557,
+        "expected": 10689.228865982332,
+        "residual": -25.228865982331627
+      },
+      "tailRender": {
+        "observed": 720,
+        "windowSeconds": 5.835200000047684,
+        "expectedRateHz": 123.71134020618557,
+        "expected": 721.880412377033,
+        "residual": -1.8804123770330534
+      },
+      "calibration": {
+        "observed": 120,
+        "windowSeconds": 0.97,
+        "expectedRateHz": 123.71134020618557,
+        "expected": 120,
+        "residual": 0
+      },
+      "physics": {
+        "observed": 10440,
+        "windowSeconds": 87,
+        "expectedRateHz": 120,
+        "expected": 10440,
+        "residual": 0
+      },
+      "rivalUpdates": {
+        "observed": 10440,
+        "windowSeconds": 87,
+        "expectedRateHz": 120,
+        "expected": 10440,
+        "residual": 0
+      },
+      "audioControlsAgainstRaceWindow": {
+        "observed": 2609,
+        "windowSeconds": 87,
+        "expectedRateHz": 30,
+        "expected": 2610,
+        "residual": -1
+      },
+      "atmosphereAgainstRaceWindow": {
+        "observed": 2608,
+        "windowSeconds": 87,
+        "expectedRateHz": 30,
+        "expected": 2610,
+        "residual": -2
+      },
+      "cadenceBoundaryNote": "Audio and atmosphere counters do not export exact first/last control timestamps. Residuals against the player race window are reported, not assumed zero or independently certified control rates.",
+      "presentationCoast": {
+        "scheduleTickAtCapture": 10467,
+        "racePhysicsSteps": 10440,
+        "difference": 27,
+        "note": "Schedule advances during the post-finish coast; do not use this later tick as the completed race duration."
+      },
+      "eventCounts": "Impacts, powers, gate samples and free-deck eligible samples are event/condition counts, not fixed-rate time series. No unrecorded eligible sampling window is inferred.",
+      "allRecordedPeakDraws": 144,
+      "allRecordedPeakTriangles": 399870,
+      "peakTotalDraws": 144,
+      "peakMainDraws": 127,
+      "peakShadowDraws": 17,
+      "peakMainTriangles": 399870,
+      "p95Ms": 8.700000047683716,
+      "lapTimesMs": [
+        30108,
+        28508,
+        28383
+      ],
+      "impacts": 4,
+      "missedGates": 0,
+      "recoveries": 0,
+      "errors": []
+    },
+    {
+      "directory": "fix-5/after",
+      "script": "scripts/visual/ascension/instrument.mjs",
+      "activeRender": {
+        "observed": 10682,
+        "windowSeconds": 86.22910000002385,
+        "expectedRateHz": 124.24932698894665,
+        "expected": 10713.907641865542,
+        "residual": -31.907641865542246
+      },
+      "tailRender": {
+        "observed": 720,
+        "windowSeconds": 5.809299999952317,
+        "expectedRateHz": 124.24932698894665,
+        "expected": 721.8016152709631,
+        "residual": -1.8016152709631115
+      },
+      "calibration": {
+        "observed": 120,
+        "windowSeconds": 0.9657999999523162,
+        "expectedRateHz": 124.24932698894665,
+        "expected": 120,
+        "residual": 0
+      },
+      "physics": {
+        "observed": 10440,
+        "windowSeconds": 87,
+        "expectedRateHz": 120,
+        "expected": 10440,
+        "residual": 0
+      },
+      "rivalUpdates": {
+        "observed": 10440,
+        "windowSeconds": 87,
+        "expectedRateHz": 120,
+        "expected": 10440,
+        "residual": 0
+      },
+      "audioControlsAgainstRaceWindow": {
+        "observed": 2611,
+        "windowSeconds": 87,
+        "expectedRateHz": 30,
+        "expected": 2610,
+        "residual": 1
+      },
+      "atmosphereAgainstRaceWindow": {
+        "observed": 2609,
+        "windowSeconds": 87,
+        "expectedRateHz": 30,
+        "expected": 2610,
+        "residual": -1
+      },
+      "cadenceBoundaryNote": "Audio and atmosphere counters do not export exact first/last control timestamps. Residuals against the player race window are reported, not assumed zero or independently certified control rates.",
+      "presentationCoast": {
+        "scheduleTickAtCapture": 10466,
+        "racePhysicsSteps": 10440,
+        "difference": 26,
+        "note": "Schedule advances during the post-finish coast; do not use this later tick as the completed race duration."
+      },
+      "eventCounts": "Impacts, powers, gate samples and free-deck eligible samples are event/condition counts, not fixed-rate time series. No unrecorded eligible sampling window is inferred.",
+      "allRecordedPeakDraws": 110,
+      "allRecordedPeakTriangles": 208592,
+      "peakTotalDraws": 110,
+      "peakMainDraws": 93,
+      "peakShadowDraws": 17,
+      "peakMainTriangles": 208592,
+      "p95Ms": 8.400000095367432,
+      "lapTimesMs": [
+        30108,
+        28508,
+        28383
+      ],
+      "impacts": 4,
+      "missedGates": 0,
+      "recoveries": 0,
+      "errors": []
+    },
+    {
+      "directory": "deluge",
+      "script": "scripts/visual/ascension/instrument.mjs",
+      "activeRender": {
+        "observed": 11870,
+        "windowSeconds": 95.78210000002385,
+        "expectedRateHz": 124.54592631032693,
+        "expected": 11929.270368451334,
+        "residual": -59.270368451334434
+      },
+      "tailRender": {
+        "observed": 720,
+        "windowSeconds": 5.787699999928474,
+        "expectedRateHz": 124.54592631032693,
+        "expected": 720.8344576973709,
+        "residual": -0.8344576973709081
+      },
+      "calibration": {
+        "observed": 120,
+        "windowSeconds": 0.9635,
+        "expectedRateHz": 124.54592631032693,
+        "expected": 120,
+        "residual": 0
+      },
+      "physics": {
+        "observed": 11588,
+        "windowSeconds": 96.567,
+        "expectedRateHz": 120,
+        "expected": 11588.039999999999,
+        "residual": -0.039999999999054126
+      },
+      "rivalUpdates": {
+        "observed": 11588,
+        "windowSeconds": 96.567,
+        "expectedRateHz": 120,
+        "expected": 11588.039999999999,
+        "residual": -0.039999999999054126
+      },
+      "audioControlsAgainstRaceWindow": {
+        "observed": 2897,
+        "windowSeconds": 96.567,
+        "expectedRateHz": 30,
+        "expected": 2897.0099999999998,
+        "residual": -0.009999999999763531
+      },
+      "atmosphereAgainstRaceWindow": {
+        "observed": 2896,
+        "windowSeconds": 96.567,
+        "expectedRateHz": 30,
+        "expected": 2897.0099999999998,
+        "residual": -1.0099999999997635
+      },
+      "cadenceBoundaryNote": "Audio and atmosphere counters do not export exact first/last control timestamps. Residuals against the player race window are reported, not assumed zero or independently certified control rates.",
+      "presentationCoast": {
+        "scheduleTickAtCapture": 11616,
+        "racePhysicsSteps": 11588,
+        "difference": 28,
+        "note": "Schedule advances during the post-finish coast; do not use this later tick as the completed race duration."
+      },
+      "eventCounts": "Impacts, powers, gate samples and free-deck eligible samples are event/condition counts, not fixed-rate time series. No unrecorded eligible sampling window is inferred.",
+      "allRecordedPeakDraws": 101,
+      "allRecordedPeakTriangles": 198786,
+      "peakTotalDraws": 101,
+      "peakMainDraws": 84,
+      "peakShadowDraws": 17,
+      "peakMainTriangles": 198786,
+      "p95Ms": 8.399999976158142,
+      "lapTimesMs": [
+        33958,
+        31300,
+        31308
+      ],
+      "impacts": 1,
+      "missedGates": 0,
+      "recoveries": 0,
+      "errors": []
+    },
+    {
+      "directory": "trench-reduced",
+      "script": "scripts/visual/ascension/instrument.mjs",
+      "activeRender": {
+        "observed": 10685,
+        "windowSeconds": 86.19929999995232,
+        "expectedRateHz": 124.1978886297638,
+        "expected": 10705.771061357676,
+        "residual": -20.771061357676444
+      },
+      "tailRender": {
+        "observed": 720,
+        "windowSeconds": 5.794799999952316,
+        "expectedRateHz": 124.1978886297638,
+        "expected": 719.701925025833,
+        "residual": 0.2980749741669797
+      },
+      "calibration": {
+        "observed": 120,
+        "windowSeconds": 0.9662000000476837,
+        "expectedRateHz": 124.1978886297638,
+        "expected": 120,
+        "residual": 0
+      },
+      "physics": {
+        "observed": 10440,
+        "windowSeconds": 87,
+        "expectedRateHz": 120,
+        "expected": 10440,
+        "residual": 0
+      },
+      "rivalUpdates": {
+        "observed": 10440,
+        "windowSeconds": 87,
+        "expectedRateHz": 120,
+        "expected": 10440,
+        "residual": 0
+      },
+      "audioControlsAgainstRaceWindow": {
+        "observed": 2611,
+        "windowSeconds": 87,
+        "expectedRateHz": 30,
+        "expected": 2610,
+        "residual": 1
+      },
+      "atmosphereAgainstRaceWindow": {
+        "observed": 0,
+        "windowSeconds": 87,
+        "expectedRateHz": 30,
+        "expected": 2610,
+        "residual": -2610
+      },
+      "cadenceBoundaryNote": "Audio and atmosphere counters do not export exact first/last control timestamps. Residuals against the player race window are reported, not assumed zero or independently certified control rates.",
+      "presentationCoast": {
+        "scheduleTickAtCapture": 10462,
+        "racePhysicsSteps": 10440,
+        "difference": 22,
+        "note": "Schedule advances during the post-finish coast; do not use this later tick as the completed race duration."
+      },
+      "eventCounts": "Impacts, powers, gate samples and free-deck eligible samples are event/condition counts, not fixed-rate time series. No unrecorded eligible sampling window is inferred.",
+      "allRecordedPeakDraws": 110,
+      "allRecordedPeakTriangles": 208592,
+      "peakTotalDraws": 110,
+      "peakMainDraws": 93,
+      "peakShadowDraws": 17,
+      "peakMainTriangles": 208592,
+      "p95Ms": 8.400000095367432,
+      "lapTimesMs": [
+        30108,
+        28508,
+        28383
+      ],
+      "impacts": 4,
+      "missedGates": 0,
+      "recoveries": 0,
+      "errors": []
+    },
+    {
+      "directory": "fix-5/attempt-sector-batch",
+      "script": "scripts/visual/ascension/instrument.mjs",
+      "activeRender": {
+        "observed": 10692,
+        "windowSeconds": 86.19389999997615,
+        "expectedRateHz": 123.53304509259343,
+        "expected": 10647.794935403543,
+        "residual": 44.205064596457305
+      },
+      "tailRender": {
+        "observed": 720,
+        "windowSeconds": 5.799299999952316,
+        "expectedRateHz": 123.53304509259343,
+        "expected": 716.4051883995866,
+        "residual": 3.5948116004134363
+      },
+      "calibration": {
+        "observed": 120,
+        "windowSeconds": 0.9713999999761581,
+        "expectedRateHz": 123.53304509259343,
+        "expected": 120,
+        "residual": 0
+      },
+      "physics": {
+        "observed": 10440,
+        "windowSeconds": 87,
+        "expectedRateHz": 120,
+        "expected": 10440,
+        "residual": 0
+      },
+      "rivalUpdates": {
+        "observed": 10440,
+        "windowSeconds": 87,
+        "expectedRateHz": 120,
+        "expected": 10440,
+        "residual": 0
+      },
+      "audioControlsAgainstRaceWindow": {
+        "observed": 2610,
+        "windowSeconds": 87,
+        "expectedRateHz": 30,
+        "expected": 2610,
+        "residual": 0
+      },
+      "atmosphereAgainstRaceWindow": {
+        "observed": 2609,
+        "windowSeconds": 87,
+        "expectedRateHz": 30,
+        "expected": 2610,
+        "residual": -1
+      },
+      "cadenceBoundaryNote": "Audio and atmosphere counters do not export exact first/last control timestamps. Residuals against the player race window are reported, not assumed zero or independently certified control rates.",
+      "presentationCoast": {
+        "scheduleTickAtCapture": 10464,
+        "racePhysicsSteps": 10440,
+        "difference": 24,
+        "note": "Schedule advances during the post-finish coast; do not use this later tick as the completed race duration."
+      },
+      "eventCounts": "Impacts, powers, gate samples and free-deck eligible samples are event/condition counts, not fixed-rate time series. No unrecorded eligible sampling window is inferred.",
+      "allRecordedPeakDraws": 174,
+      "allRecordedPeakTriangles": 323354,
+      "peakTotalDraws": 174,
+      "peakMainDraws": 157,
+      "peakShadowDraws": 17,
+      "peakMainTriangles": 323354,
+      "p95Ms": 8.399999976158142,
+      "lapTimesMs": [
+        30108,
+        28508,
+        28383
+      ],
+      "impacts": 4,
+      "missedGates": 0,
+      "recoveries": 0,
+      "errors": []
+    },
+    {
+      "directory": "fix-5/attempt-trench-cells",
+      "script": "scripts/visual/ascension/instrument.mjs",
+      "activeRender": {
+        "observed": 10681,
+        "windowSeconds": 86.21009999990463,
+        "expectedRateHz": 124.36521919677179,
+        "expected": 10721.537983463755,
+        "residual": -40.537983463755154
+      },
+      "tailRender": {
+        "observed": 720,
+        "windowSeconds": 5.806,
+        "expectedRateHz": 124.36521919677179,
+        "expected": 722.0644626564571,
+        "residual": -2.064462656457067
+      },
+      "calibration": {
+        "observed": 120,
+        "windowSeconds": 0.9648999999761582,
+        "expectedRateHz": 124.36521919677179,
+        "expected": 120,
+        "residual": 0
+      },
+      "physics": {
+        "observed": 10440,
+        "windowSeconds": 87,
+        "expectedRateHz": 120,
+        "expected": 10440,
+        "residual": 0
+      },
+      "rivalUpdates": {
+        "observed": 10440,
+        "windowSeconds": 87,
+        "expectedRateHz": 120,
+        "expected": 10440,
+        "residual": 0
+      },
+      "audioControlsAgainstRaceWindow": {
+        "observed": 2610,
+        "windowSeconds": 87,
+        "expectedRateHz": 30,
+        "expected": 2610,
+        "residual": 0
+      },
+      "atmosphereAgainstRaceWindow": {
+        "observed": 2609,
+        "windowSeconds": 87,
+        "expectedRateHz": 30,
+        "expected": 2610,
+        "residual": -1
+      },
+      "cadenceBoundaryNote": "Audio and atmosphere counters do not export exact first/last control timestamps. Residuals against the player race window are reported, not assumed zero or independently certified control rates.",
+      "presentationCoast": {
+        "scheduleTickAtCapture": 10464,
+        "racePhysicsSteps": 10440,
+        "difference": 24,
+        "note": "Schedule advances during the post-finish coast; do not use this later tick as the completed race duration."
+      },
+      "eventCounts": "Impacts, powers, gate samples and free-deck eligible samples are event/condition counts, not fixed-rate time series. No unrecorded eligible sampling window is inferred.",
+      "allRecordedPeakDraws": 135,
+      "allRecordedPeakTriangles": 280636,
+      "peakTotalDraws": 135,
+      "peakMainDraws": 118,
+      "peakShadowDraws": 17,
+      "peakMainTriangles": 280636,
+      "p95Ms": 8.5,
+      "lapTimesMs": [
+        30108,
+        28508,
+        28383
+      ],
+      "impacts": 4,
+      "missedGates": 0,
+      "recoveries": 0,
+      "errors": []
+    },
+    {
+      "directory": "fix-5/attempt-wall-instances",
+      "script": "scripts/visual/ascension/instrument.mjs",
+      "activeRender": {
+        "observed": 10686,
+        "windowSeconds": 86.18979999995231,
+        "expectedRateHz": 124.64942350567739,
+        "expected": 10743.508882063688,
+        "residual": -57.50888206368836
+      },
+      "tailRender": {
+        "observed": 720,
+        "windowSeconds": 5.808100000023842,
+        "expectedRateHz": 124.64942350567739,
+        "expected": 723.9763166662967,
+        "residual": -3.976316666296725
+      },
+      "calibration": {
+        "observed": 120,
+        "windowSeconds": 0.9626999999284744,
+        "expectedRateHz": 124.64942350567739,
+        "expected": 120,
+        "residual": 0
+      },
+      "physics": {
+        "observed": 10440,
+        "windowSeconds": 87,
+        "expectedRateHz": 120,
+        "expected": 10440,
+        "residual": 0
+      },
+      "rivalUpdates": {
+        "observed": 10440,
+        "windowSeconds": 87,
+        "expectedRateHz": 120,
+        "expected": 10440,
+        "residual": 0
+      },
+      "audioControlsAgainstRaceWindow": {
+        "observed": 2610,
+        "windowSeconds": 87,
+        "expectedRateHz": 30,
+        "expected": 2610,
+        "residual": 0
+      },
+      "atmosphereAgainstRaceWindow": {
+        "observed": 2609,
+        "windowSeconds": 87,
+        "expectedRateHz": 30,
+        "expected": 2610,
+        "residual": -1
+      },
+      "cadenceBoundaryNote": "Audio and atmosphere counters do not export exact first/last control timestamps. Residuals against the player race window are reported, not assumed zero or independently certified control rates.",
+      "presentationCoast": {
+        "scheduleTickAtCapture": 10463,
+        "racePhysicsSteps": 10440,
+        "difference": 23,
+        "note": "Schedule advances during the post-finish coast; do not use this later tick as the completed race duration."
+      },
+      "eventCounts": "Impacts, powers, gate samples and free-deck eligible samples are event/condition counts, not fixed-rate time series. No unrecorded eligible sampling window is inferred.",
+      "allRecordedPeakDraws": 120,
+      "allRecordedPeakTriangles": 285512,
+      "peakTotalDraws": 120,
+      "peakMainDraws": 103,
+      "peakShadowDraws": 17,
+      "peakMainTriangles": 285512,
+      "p95Ms": 8.400000095367432,
+      "lapTimesMs": [
+        30108,
+        28508,
+        28383
+      ],
+      "impacts": 4,
+      "missedGates": 0,
+      "recoveries": 0,
+      "errors": []
+    },
+    {
+      "directory": "fix-5/attempt-distant-wall-lod",
+      "script": "scripts/visual/ascension/instrument.mjs",
+      "activeRender": {
+        "observed": 10675,
+        "windowSeconds": 86.1915,
+        "expectedRateHz": 123.95413698153206,
+        "expected": 10683.79299764372,
+        "residual": -8.79299764372081
+      },
+      "tailRender": {
+        "observed": 720,
+        "windowSeconds": 5.815800000071525,
+        "expectedRateHz": 123.95413698153206,
+        "expected": 720.89246986606,
+        "residual": -0.8924698660599688
+      },
+      "calibration": {
+        "observed": 120,
+        "windowSeconds": 0.9680999999046326,
+        "expectedRateHz": 123.95413698153206,
+        "expected": 120,
+        "residual": 0
+      },
+      "physics": {
+        "observed": 10440,
+        "windowSeconds": 87,
+        "expectedRateHz": 120,
+        "expected": 10440,
+        "residual": 0
+      },
+      "rivalUpdates": {
+        "observed": 10440,
+        "windowSeconds": 87,
+        "expectedRateHz": 120,
+        "expected": 10440,
+        "residual": 0
+      },
+      "audioControlsAgainstRaceWindow": {
+        "observed": 2610,
+        "windowSeconds": 87,
+        "expectedRateHz": 30,
+        "expected": 2610,
+        "residual": 0
+      },
+      "atmosphereAgainstRaceWindow": {
+        "observed": 2609,
+        "windowSeconds": 87,
+        "expectedRateHz": 30,
+        "expected": 2610,
+        "residual": -1
+      },
+      "cadenceBoundaryNote": "Audio and atmosphere counters do not export exact first/last control timestamps. Residuals against the player race window are reported, not assumed zero or independently certified control rates.",
+      "presentationCoast": {
+        "scheduleTickAtCapture": 10466,
+        "racePhysicsSteps": 10440,
+        "difference": 26,
+        "note": "Schedule advances during the post-finish coast; do not use this later tick as the completed race duration."
+      },
+      "eventCounts": "Impacts, powers, gate samples and free-deck eligible samples are event/condition counts, not fixed-rate time series. No unrecorded eligible sampling window is inferred.",
+      "allRecordedPeakDraws": 112,
+      "allRecordedPeakTriangles": 218084,
+      "peakTotalDraws": 112,
+      "peakMainDraws": 95,
+      "peakShadowDraws": 17,
+      "peakMainTriangles": 218084,
+      "p95Ms": 8.5,
+      "lapTimesMs": [
+        30108,
+        28508,
+        28383
+      ],
+      "impacts": 4,
+      "missedGates": 0,
+      "recoveries": 0,
+      "errors": []
+    },
+    {
+      "directory": "fix-5/attempt-before-hidden-caps",
+      "script": "scripts/visual/ascension/instrument.mjs",
+      "activeRender": {
+        "observed": 10664,
+        "windowSeconds": 86.18890000009537,
+        "expectedRateHz": 124.85693475915429,
+        "expected": 10761.28186427518,
+        "residual": -97.28186427518085
+      },
+      "tailRender": {
+        "observed": 720,
+        "windowSeconds": 5.818100000023842,
+        "expectedRateHz": 124.85693475915429,
+        "expected": 726.4301321252124,
+        "residual": -6.430132125212367
+      },
+      "calibration": {
+        "observed": 120,
+        "windowSeconds": 0.9611000000238419,
+        "expectedRateHz": 124.85693475915429,
+        "expected": 120.00000000000001,
+        "residual": -1.4210854715202004e-14
+      },
+      "physics": {
+        "observed": 10440,
+        "windowSeconds": 87,
+        "expectedRateHz": 120,
+        "expected": 10440,
+        "residual": 0
+      },
+      "rivalUpdates": {
+        "observed": 10440,
+        "windowSeconds": 87,
+        "expectedRateHz": 120,
+        "expected": 10440,
+        "residual": 0
+      },
+      "audioControlsAgainstRaceWindow": {
+        "observed": 2610,
+        "windowSeconds": 87,
+        "expectedRateHz": 30,
+        "expected": 2610,
+        "residual": 0
+      },
+      "atmosphereAgainstRaceWindow": {
+        "observed": 2609,
+        "windowSeconds": 87,
+        "expectedRateHz": 30,
+        "expected": 2610,
+        "residual": -1
+      },
+      "cadenceBoundaryNote": "Audio and atmosphere counters do not export exact first/last control timestamps. Residuals against the player race window are reported, not assumed zero or independently certified control rates.",
+      "presentationCoast": {
+        "scheduleTickAtCapture": 10463,
+        "racePhysicsSteps": 10440,
+        "difference": 23,
+        "note": "Schedule advances during the post-finish coast; do not use this later tick as the completed race duration."
+      },
+      "eventCounts": "Impacts, powers, gate samples and free-deck eligible samples are event/condition counts, not fixed-rate time series. No unrecorded eligible sampling window is inferred.",
+      "allRecordedPeakDraws": 110,
+      "allRecordedPeakTriangles": 218140,
+      "peakTotalDraws": 110,
+      "peakMainDraws": 93,
+      "peakShadowDraws": 17,
+      "peakMainTriangles": 218140,
+      "p95Ms": 8.5,
+      "lapTimesMs": [
+        30108,
+        28508,
+        28383
+      ],
+      "impacts": 4,
+      "missedGates": 0,
+      "recoveries": 0,
+      "errors": []
+    },
+    {
+      "directory": "fix-5/attempt-deluge-before-hidden-caps",
+      "script": "scripts/visual/ascension/instrument.mjs",
+      "activeRender": {
+        "observed": 11871,
+        "windowSeconds": 95.78280000007153,
+        "expectedRateHz": 123.82623052011944,
+        "expected": 11860.423072671354,
+        "residual": 10.57692732864598
+      },
+      "tailRender": {
+        "observed": 720,
+        "windowSeconds": 5.805400000095368,
+        "expectedRateHz": 123.82623052011944,
+        "expected": 718.8607986733105,
+        "residual": 1.1392013266895447
+      },
+      "calibration": {
+        "observed": 120,
+        "windowSeconds": 0.9691000000238419,
+        "expectedRateHz": 123.82623052011944,
+        "expected": 120,
+        "residual": 0
+      },
+      "physics": {
+        "observed": 11588,
+        "windowSeconds": 96.567,
+        "expectedRateHz": 120,
+        "expected": 11588.039999999999,
+        "residual": -0.039999999999054126
+      },
+      "rivalUpdates": {
+        "observed": 11588,
+        "windowSeconds": 96.567,
+        "expectedRateHz": 120,
+        "expected": 11588.039999999999,
+        "residual": -0.039999999999054126
+      },
+      "audioControlsAgainstRaceWindow": {
+        "observed": 2897,
+        "windowSeconds": 96.567,
+        "expectedRateHz": 30,
+        "expected": 2897.0099999999998,
+        "residual": -0.009999999999763531
+      },
+      "atmosphereAgainstRaceWindow": {
+        "observed": 2896,
+        "windowSeconds": 96.567,
+        "expectedRateHz": 30,
+        "expected": 2897.0099999999998,
+        "residual": -1.0099999999997635
+      },
+      "cadenceBoundaryNote": "Audio and atmosphere counters do not export exact first/last control timestamps. Residuals against the player race window are reported, not assumed zero or independently certified control rates.",
+      "presentationCoast": {
+        "scheduleTickAtCapture": 11615,
+        "racePhysicsSteps": 11588,
+        "difference": 27,
+        "note": "Schedule advances during the post-finish coast; do not use this later tick as the completed race duration."
+      },
+      "eventCounts": "Impacts, powers, gate samples and free-deck eligible samples are event/condition counts, not fixed-rate time series. No unrecorded eligible sampling window is inferred.",
+      "allRecordedPeakDraws": 101,
+      "allRecordedPeakTriangles": 229366,
+      "peakTotalDraws": 101,
+      "peakMainDraws": 84,
+      "peakShadowDraws": 17,
+      "peakMainTriangles": 229366,
+      "p95Ms": 8.5,
+      "lapTimesMs": [
+        33958,
+        31300,
+        31308
+      ],
+      "impacts": 1,
+      "missedGates": 0,
+      "recoveries": 0,
+      "errors": []
+    },
+    {
+      "directory": "fix-5/attempt-before-key-fringe",
+      "script": "scripts/visual/ascension/instrument.mjs",
+      "activeRender": {
+        "observed": 10677,
+        "windowSeconds": 86.19619999992848,
+        "expectedRateHz": 124.08230792786853,
+        "expected": 10695.423430603267,
+        "residual": -18.423430603266752
+      },
+      "tailRender": {
+        "observed": 720,
+        "windowSeconds": 5.800699999928474,
+        "expectedRateHz": 124.08230792786853,
+        "expected": 719.7642435883118,
+        "residual": 0.23575641168815764
+      },
+      "calibration": {
+        "observed": 120,
+        "windowSeconds": 0.9671000000238419,
+        "expectedRateHz": 124.08230792786853,
+        "expected": 120.00000000000001,
+        "residual": -1.4210854715202004e-14
+      },
+      "physics": {
+        "observed": 10440,
+        "windowSeconds": 87,
+        "expectedRateHz": 120,
+        "expected": 10440,
+        "residual": 0
+      },
+      "rivalUpdates": {
+        "observed": 10440,
+        "windowSeconds": 87,
+        "expectedRateHz": 120,
+        "expected": 10440,
+        "residual": 0
+      },
+      "audioControlsAgainstRaceWindow": {
+        "observed": 2610,
+        "windowSeconds": 87,
+        "expectedRateHz": 30,
+        "expected": 2610,
+        "residual": 0
+      },
+      "atmosphereAgainstRaceWindow": {
+        "observed": 2609,
+        "windowSeconds": 87,
+        "expectedRateHz": 30,
+        "expected": 2610,
+        "residual": -1
+      },
+      "cadenceBoundaryNote": "Audio and atmosphere counters do not export exact first/last control timestamps. Residuals against the player race window are reported, not assumed zero or independently certified control rates.",
+      "presentationCoast": {
+        "scheduleTickAtCapture": 10465,
+        "racePhysicsSteps": 10440,
+        "difference": 25,
+        "note": "Schedule advances during the post-finish coast; do not use this later tick as the completed race duration."
+      },
+      "eventCounts": "Impacts, powers, gate samples and free-deck eligible samples are event/condition counts, not fixed-rate time series. No unrecorded eligible sampling window is inferred.",
+      "allRecordedPeakDraws": 110,
+      "allRecordedPeakTriangles": 208592,
+      "peakTotalDraws": 110,
+      "peakMainDraws": 93,
+      "peakShadowDraws": 17,
+      "peakMainTriangles": 208592,
+      "p95Ms": 8.399999976158142,
+      "lapTimesMs": [
+        30108,
+        28508,
+        28383
+      ],
+      "impacts": 4,
+      "missedGates": 0,
+      "recoveries": 0,
+      "errors": []
+    },
+    {
+      "directory": "fix-5/attempt-deluge-before-key-fringe",
+      "script": "scripts/visual/ascension/instrument.mjs",
+      "activeRender": {
+        "observed": 11868,
+        "windowSeconds": 95.81689999997616,
+        "expectedRateHz": 124.80499219968799,
+        "expected": 11958.427457095308,
+        "residual": -90.42745709530755
+      },
+      "tailRender": {
+        "observed": 720,
+        "windowSeconds": 5.808899999976158,
+        "expectedRateHz": 124.80499219968799,
+        "expected": 724.979719185792,
+        "residual": -4.979719185791964
+      },
+      "calibration": {
+        "observed": 120,
+        "windowSeconds": 0.9615,
+        "expectedRateHz": 124.80499219968799,
+        "expected": 120,
+        "residual": 0
+      },
+      "physics": {
+        "observed": 11588,
+        "windowSeconds": 96.567,
+        "expectedRateHz": 120,
+        "expected": 11588.039999999999,
+        "residual": -0.039999999999054126
+      },
+      "rivalUpdates": {
+        "observed": 11588,
+        "windowSeconds": 96.567,
+        "expectedRateHz": 120,
+        "expected": 11588.039999999999,
+        "residual": -0.039999999999054126
+      },
+      "audioControlsAgainstRaceWindow": {
+        "observed": 2897,
+        "windowSeconds": 96.567,
+        "expectedRateHz": 30,
+        "expected": 2897.0099999999998,
+        "residual": -0.009999999999763531
+      },
+      "atmosphereAgainstRaceWindow": {
+        "observed": 2896,
+        "windowSeconds": 96.567,
+        "expectedRateHz": 30,
+        "expected": 2897.0099999999998,
+        "residual": -1.0099999999997635
+      },
+      "cadenceBoundaryNote": "Audio and atmosphere counters do not export exact first/last control timestamps. Residuals against the player race window are reported, not assumed zero or independently certified control rates.",
+      "presentationCoast": {
+        "scheduleTickAtCapture": 11616,
+        "racePhysicsSteps": 11588,
+        "difference": 28,
+        "note": "Schedule advances during the post-finish coast; do not use this later tick as the completed race duration."
+      },
+      "eventCounts": "Impacts, powers, gate samples and free-deck eligible samples are event/condition counts, not fixed-rate time series. No unrecorded eligible sampling window is inferred.",
+      "allRecordedPeakDraws": 101,
+      "allRecordedPeakTriangles": 198786,
+      "peakTotalDraws": 101,
+      "peakMainDraws": 84,
+      "peakShadowDraws": 17,
+      "peakMainTriangles": 198786,
+      "p95Ms": 8.5,
+      "lapTimesMs": [
+        33958,
+        31300,
+        31308
+      ],
+      "impacts": 1,
+      "missedGates": 0,
+      "recoveries": 0,
+      "errors": []
+    },
+    {
+      "directory": "fix-5/attempt-reduced-before-key-fringe",
+      "script": "scripts/visual/ascension/instrument.mjs",
+      "activeRender": {
+        "observed": 10675,
+        "windowSeconds": 86.2085,
+        "expectedRateHz": 123.83900928792569,
+        "expected": 10675.975232198141,
+        "residual": -0.9752321981413843
+      },
+      "tailRender": {
+        "observed": 720,
+        "windowSeconds": 5.82,
+        "expectedRateHz": 123.83900928792569,
+        "expected": 720.7430340557275,
+        "residual": -0.7430340557275485
+      },
+      "calibration": {
+        "observed": 120,
+        "windowSeconds": 0.969,
+        "expectedRateHz": 123.83900928792569,
+        "expected": 119.99999999999999,
+        "residual": 1.4210854715202004e-14
+      },
+      "physics": {
+        "observed": 10440,
+        "windowSeconds": 87,
+        "expectedRateHz": 120,
+        "expected": 10440,
+        "residual": 0
+      },
+      "rivalUpdates": {
+        "observed": 10440,
+        "windowSeconds": 87,
+        "expectedRateHz": 120,
+        "expected": 10440,
+        "residual": 0
+      },
+      "audioControlsAgainstRaceWindow": {
+        "observed": 2611,
+        "windowSeconds": 87,
+        "expectedRateHz": 30,
+        "expected": 2610,
+        "residual": 1
+      },
+      "atmosphereAgainstRaceWindow": {
+        "observed": 0,
+        "windowSeconds": 87,
+        "expectedRateHz": 30,
+        "expected": 2610,
+        "residual": -2610
+      },
+      "cadenceBoundaryNote": "Audio and atmosphere counters do not export exact first/last control timestamps. Residuals against the player race window are reported, not assumed zero or independently certified control rates.",
+      "presentationCoast": {
+        "scheduleTickAtCapture": 10464,
+        "racePhysicsSteps": 10440,
+        "difference": 24,
+        "note": "Schedule advances during the post-finish coast; do not use this later tick as the completed race duration."
+      },
+      "eventCounts": "Impacts, powers, gate samples and free-deck eligible samples are event/condition counts, not fixed-rate time series. No unrecorded eligible sampling window is inferred.",
+      "allRecordedPeakDraws": 110,
+      "allRecordedPeakTriangles": 208592,
+      "peakTotalDraws": 110,
+      "peakMainDraws": 93,
+      "peakShadowDraws": 17,
+      "peakMainTriangles": 208592,
+      "p95Ms": 8.5,
+      "lapTimesMs": [
+        30108,
+        28508,
+        28383
+      ],
+      "impacts": 4,
+      "missedGates": 0,
+      "recoveries": 0,
+      "errors": []
+    }
+  ],
+  "finalInputHashesMatch": true,
+  "reducedMatchesTrench": true,
+  "forkLapSavingsSeconds": [
+    3.85,
+    2.792,
+    2.925
+  ],
+  "forkNote": "Whole-lap differences under identical demo seed; Phase A fork segment timing remains separate. These are not retimed segment-only savings.",
+  "budgetPassed": true
+}

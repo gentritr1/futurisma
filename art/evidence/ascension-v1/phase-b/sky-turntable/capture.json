@@ -1,0 +1,679 @@
+{
+  "script": "scripts/visual/ascension/sky-turntable.mjs",
+  "sampling": "24 discrete azimuth stations, one frame per 15 degrees; not a timed frame-rate sample.",
+  "records": [
+    {
+      "file": "00.png",
+      "yaw": 0,
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static painted evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.74,
+      "tick": 0,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "render": {
+        "calls": 81,
+        "triangles": 158606
+      }
+    },
+    {
+      "file": "01.png",
+      "yaw": 15,
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static painted evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.74,
+      "tick": 0,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "render": {
+        "calls": 81,
+        "triangles": 172506
+      }
+    },
+    {
+      "file": "02.png",
+      "yaw": 30,
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static painted evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.74,
+      "tick": 0,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "render": {
+        "calls": 74,
+        "triangles": 175914
+      }
+    },
+    {
+      "file": "03.png",
+      "yaw": 45,
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static painted evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.74,
+      "tick": 0,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "render": {
+        "calls": 83,
+        "triangles": 187202
+      }
+    },
+    {
+      "file": "04.png",
+      "yaw": 60,
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static painted evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.74,
+      "tick": 0,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "render": {
+        "calls": 86,
+        "triangles": 190286
+      }
+    },
+    {
+      "file": "05.png",
+      "yaw": 75,
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static painted evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.74,
+      "tick": 0,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "render": {
+        "calls": 84,
+        "triangles": 192036
+      }
+    },
+    {
+      "file": "06.png",
+      "yaw": 90,
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static painted evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.74,
+      "tick": 0,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "render": {
+        "calls": 67,
+        "triangles": 158320
+      }
+    },
+    {
+      "file": "07.png",
+      "yaw": 105,
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static painted evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.74,
+      "tick": 0,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "render": {
+        "calls": 46,
+        "triangles": 123468
+      }
+    },
+    {
+      "file": "08.png",
+      "yaw": 120,
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static painted evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.74,
+      "tick": 0,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "render": {
+        "calls": 44,
+        "triangles": 121760
+      }
+    },
+    {
+      "file": "09.png",
+      "yaw": 135,
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static painted evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.74,
+      "tick": 0,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "render": {
+        "calls": 36,
+        "triangles": 90588
+      }
+    },
+    {
+      "file": "10.png",
+      "yaw": 150,
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static painted evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.74,
+      "tick": 0,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "render": {
+        "calls": 26,
+        "triangles": 67696
+      }
+    },
+    {
+      "file": "11.png",
+      "yaw": 165,
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static painted evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.74,
+      "tick": 0,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "render": {
+        "calls": 18,
+        "triangles": 61446
+      }
+    },
+    {
+      "file": "12.png",
+      "yaw": 180,
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static painted evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.74,
+      "tick": 0,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "render": {
+        "calls": 13,
+        "triangles": 54710
+      }
+    },
+    {
+      "file": "13.png",
+      "yaw": 195,
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static painted evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.74,
+      "tick": 0,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "render": {
+        "calls": 13,
+        "triangles": 54710
+      }
+    },
+    {
+      "file": "14.png",
+      "yaw": 210,
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static painted evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.74,
+      "tick": 0,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "render": {
+        "calls": 15,
+        "triangles": 57534
+      }
+    },
+    {
+      "file": "15.png",
+      "yaw": 225,
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static painted evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.74,
+      "tick": 0,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "render": {
+        "calls": 16,
+        "triangles": 58830
+      }
+    },
+    {
+      "file": "16.png",
+      "yaw": 240,
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static painted evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.74,
+      "tick": 0,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "render": {
+        "calls": 20,
+        "triangles": 67854
+      }
+    },
+    {
+      "file": "17.png",
+      "yaw": 255,
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static painted evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.74,
+      "tick": 0,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "render": {
+        "calls": 33,
+        "triangles": 82306
+      }
+    },
+    {
+      "file": "18.png",
+      "yaw": 270,
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static painted evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.74,
+      "tick": 0,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "render": {
+        "calls": 38,
+        "triangles": 91690
+      }
+    },
+    {
+      "file": "19.png",
+      "yaw": 285,
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static painted evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.74,
+      "tick": 0,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "render": {
+        "calls": 41,
+        "triangles": 92610
+      }
+    },
+    {
+      "file": "20.png",
+      "yaw": 300,
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static painted evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.74,
+      "tick": 0,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "render": {
+        "calls": 48,
+        "triangles": 95288
+      }
+    },
+    {
+      "file": "21.png",
+      "yaw": 315,
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static painted evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.74,
+      "tick": 0,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "render": {
+        "calls": 53,
+        "triangles": 96646
+      }
+    },
+    {
+      "file": "22.png",
+      "yaw": 330,
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static painted evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.74,
+      "tick": 0,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "render": {
+        "calls": 53,
+        "triangles": 96646
+      }
+    },
+    {
+      "file": "23.png",
+      "yaw": 345,
+      "script": "scripts/visual/ascension/review.ts",
+      "scope": "Static painted evidence station; production course, board and environment geometry, course lights, fog and tone mapping. No running race or vehicle.",
+      "progress": 0.74,
+      "tick": 0,
+      "sector": "MANGROVE CUT",
+      "trench": false,
+      "board": null,
+      "boardDistance": null,
+      "camera": [
+        -167.72764097712107,
+        6.4,
+        270.4455496041969
+      ],
+      "schedule": {
+        "trenchOpen": true,
+        "steam": false,
+        "launched": false,
+        "rocketGone": false,
+        "deluge": false
+      },
+      "render": {
+        "calls": 63,
+        "triangles": 126142
+      }
+    }
+  ],
+  "errors": []
+}

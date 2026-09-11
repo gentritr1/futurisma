@@ -1,0 +1,18 @@
+{
+  "script": "scripts/visual/ascension/device-review.mjs",
+  "expectedFrames": 4,
+  "observedFrames": 4,
+  "countResidual": 0,
+  "nearEyeMetres": 1.6,
+  "nearHorizontalStandOffMetres": 2.349999999999989,
+  "nearProjectedBounds": {
+    "left": 310.8710365501257,
+    "right": 747.7807533882615,
+    "top": 93.69229172369225,
+    "bottom": 685.1182387967795
+  },
+  "farHorizontalStandOffMetres": 120.00000000007776,
+  "identicalFarCameras": true,
+  "pageErrors": [],
+  "deviceMaterialExceptions": []
+}

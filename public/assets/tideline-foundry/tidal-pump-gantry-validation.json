@@ -1,9 +1,9 @@
 {
   "pass": true,
-  "triangles": 3180,
+  "triangles": 3504,
   "primitives": 5,
-  "bytes": 291652,
-  "minimumCentralHeight": 13.204999923706055,
+  "bytes": 2578028,
+  "minimumCentralHeight": 15.362099647521973,
   "minimumSupportLateral": 18.600000381469727,
   "exactPartCounts": {
     "concrete_foot": 2,
@@ -18,10 +18,10 @@
     "metre-scale zero root",
     "indexes/normals/UV0/COLOR_0",
     "finite non-degenerate geometry",
-    "painted AO/wear variation",
+    "painted atlas AO/wear and restrained vertex tint",
     "six allowed roles",
     "three amber lamps plus one dead",
-    "no maps or runtime images",
+    "painted base atlases; no PBR detail maps",
     "reference planes excluded",
     "source references and provenance present"
   ]
