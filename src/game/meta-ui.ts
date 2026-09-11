@@ -217,7 +217,17 @@ export class MetaUi {
       RACE_MODES.map((mode) => ({
         value: mode,
         label: RACE_MODE_LABELS[mode],
-        note: selection === "polarity" || selection === "tideline"
+        // Phase D — Dream Island's row says what each format DOES to the map's
+        // one mechanic, because that is the choice being made: the clock
+        // strikes on the last lap of a race, on lap 2 of the sprint, and the
+        // solo run keeps the night turn because there is no field to hide it
+        // behind. The lap counts are the course's own (3, and the sprint's 2),
+        // not the five-lap default this row prints for the older circuits.
+        note: selection === "dreamisland"
+          ? mode === "sprint" ? "2 LAPS · DEFEND · NIGHT ON LAP 2"
+            : mode === "timeattack" ? "3 LAPS · SOLO + GHOST · NIGHT LAP"
+            : "3 LAPS · FULL FIELD · NIGHT LAP"
+          : selection === "polarity" || selection === "tideline"
           ? mode === "sprint" ? "2 LAPS · DEFEND" : mode === "timeattack" ? "3 LAPS · SOLO" : "3 LAPS · FULL FIELD"
           : selection === "nightshift" ? RACE_MODE_DECKS[mode].replace("5 LAPS", "3 LAPS") : RACE_MODE_DECKS[mode],
       })),

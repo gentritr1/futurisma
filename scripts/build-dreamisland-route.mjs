@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import {mkdirSync,writeFileSync,readFileSync} from 'node:fs';
+import {RACE_MODES,SPRINT_LAP_COUNT} from '../src/game/race-modes-rules.js';
 // Dream Island: a closed 2,400 m island loop authored as a curvature schedule
 // rather than a ring of hand-placed points, because the districts are specified
 // by ARC LENGTH (300/380/260/300/340/460/360 m) and only an arc-length
@@ -104,20 +105,64 @@ const calibrationFile=process.argv.find(a=>a.startsWith('--calibration='))?.slic
 if(process.argv.includes('--bootstrap')){
  const config={script:'scripts/build-dreamisland-route.mjs',bootstrap:true,measurementScript:null,measurement:null,
   worksLapSeconds:null,definition:'Inert bootstrap: no lap has been measured yet',
-  chimeTick:null,strikeTick:null,fishRiseTick:null,nightSettledTick:null,nightRampTicks:12*120,events:[]};
+  chimeTick:null,strikeTick:null,fishRiseTick:null,nightSettledTick:null,nightRampTicks:12*120,events:[],
+  modes:Object.fromEntries(RACE_MODES.map(mode=>[mode,{laps:null,honoursLapOverride:mode!=='sprint',chimeFactor:null,strikeFactor:null,
+   chimeTick:null,strikeTick:null,fishRiseTick:null,nightSettledTick:null,nightRampTicks:12*120,events:[]}]))};
  writeFileSync(new URL('schedule.json',out),JSON.stringify(config,null,2));console.log('bootstrap schedule written');
 }
+// Phase D. The two authored factors below are LAP FRACTIONS of the race, not
+// of the clock: 1.85 L and 2.05 L put the warning late in lap 2 and the strike
+// just after the lap-2/lap-3 boundary of a three-lap race, so the last lap is
+// the night lap. A sprint is two laps, and 2.05 L of a two-lap race never
+// arrives — the race is over 0.95 L before the clock would strike, so the map's
+// whole identity would be missing from the format. The sprint therefore races
+// the same schedule expressed as the same FRACTION OF THE RACE: every factor is
+// scaled by SPRINT_LAP_COUNT / defaultLapCount, which puts the strike at
+// 2.05 x 2/3 = 1.3667 L, i.e. 0.37 into lap 2, and keeps the night lap.
+//
+// What is deliberately NOT scaled is the twelve-second ramp and the four-second
+// fish delay. Those are durations in seconds, authored against how a crossfade
+// reads on screen (brief section 5), not against how long a race is; scaling
+// them would change the look of the turn rather than where it lands.
+//
+// `?laps=` on `race` is left alone on purpose: race is the format that honours
+// the override, and a one- or two-lap race finishing in daylight is the honest
+// consequence of an absolute schedule. Sprint is the format whose lap count is
+// fixed, which is exactly why its schedule can be pinned to a fraction of it.
+const RACE_MODE_LAP_FACTORS={chime:1.85,strike:2.05};
+const FISH_RISE_SECONDS=4,NIGHT_RAMP_SECONDS=12;
+// Never typed: read back out of the course that declares it, so the factor
+// table cannot drift from the lap count it is scaled against. `validate-
+// dreamisland.mjs` asserts the two agree.
+const courseSource=readFileSync(new URL('../src/game/dreamisland-course.ts',import.meta.url),'utf8');
+const defaultLapCount=Number(/readonly defaultLapCount = (\d+)/.exec(courseSource)?.[1]);
+if(!Number.isSafeInteger(defaultLapCount)||defaultLapCount<1)throw Error('Could not read defaultLapCount from dreamisland-course.ts');
+const modeLapCount=mode=>mode==='sprint'?SPRINT_LAP_COUNT:defaultLapCount;
 if(calibrationFile){
  const race=JSON.parse(readFileSync(calibrationFile,'utf8'));
  if(race.errors.length)throw Error('Calibration contains browser errors');
  const laps=race.diagnostics.current.lapTimesMs;
  if(laps.length!==3)throw Error('Calibration must complete three laps');
  const L=(laps[1]+laps[2])/2000,tick=factor=>Math.round(factor*L*120);
- const strikeTick=tick(2.05);
+ const table=mode=>{
+  const scale=modeLapCount(mode)/defaultLapCount;
+  const chimeFactor=RACE_MODE_LAP_FACTORS.chime*scale,strikeFactor=RACE_MODE_LAP_FACTORS.strike*scale;
+  const strikeTick=tick(strikeFactor);
+  return {laps:modeLapCount(mode),honoursLapOverride:mode!=='sprint',chimeFactor,strikeFactor,
+   chimeTick:tick(chimeFactor),strikeTick,fishRiseTick:strikeTick+FISH_RISE_SECONDS*120,
+   nightSettledTick:strikeTick+NIGHT_RAMP_SECONDS*120,nightRampTicks:NIGHT_RAMP_SECONDS*120,
+   events:[{id:'chime-warning',tick:tick(chimeFactor)},{id:'strike',tick:strikeTick},
+    {id:'fish-rise',tick:strikeTick+FISH_RISE_SECONDS*120},{id:'night-settled',tick:strikeTick+NIGHT_RAMP_SECONDS*120}].sort((a,b)=>a.tick-b.tick)};
+ };
+ const modes=Object.fromEntries(RACE_MODES.map(mode=>[mode,table(mode)]));
+ // The top level stays exactly what it was before phase D — the race table —
+ // so every existing reader (the course's static import, both validators, the
+ // HUD) keeps working unchanged and `modes` is purely additive.
  const config={script:'scripts/build-dreamisland-route.mjs',measurementScript:race.script,measurement:calibrationFile,
   worksLapSeconds:L,definition:'Mean of flying laps two and three in the full Works demo with the schedule inert',
-  chimeTick:tick(1.85),strikeTick,fishRiseTick:strikeTick+4*120,nightSettledTick:strikeTick+12*120,nightRampTicks:12*120,
-  events:[{id:'chime-warning',tick:tick(1.85)},{id:'strike',tick:strikeTick},
-   {id:'fish-rise',tick:strikeTick+4*120},{id:'night-settled',tick:strikeTick+12*120}].sort((a,b)=>a.tick-b.tick)};
+  modeDefinition:'Sprint scales both lap factors by SPRINT_LAP_COUNT / defaultLapCount so the strike lands at the same fraction of the race; the 12 s ramp and the 4 s fish delay are durations and are not scaled.',
+  defaultLapCount,
+  ...modes.race,
+  modes};
  writeFileSync(new URL('schedule.json',out),JSON.stringify(config,null,2));console.log(JSON.stringify(config,null,2));
 }

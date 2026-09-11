@@ -473,6 +473,8 @@ export class FuturismaGame {
     this.cameraSurfaceProjection = this.course.createProjectionScratch();
     this.cameraLookAhead = this.course.createSampleScratch();
     this.totalLaps = resolveLapCount(this.course);
+    // Before `setRaceFormat` composes the panel below. See `RaceCourse`.
+    this.course.selectRaceFormat?.(raceModes.mode, this.totalLaps);
     this.progress = this.course.startProgress;
     this.lateral = this.course.startLateral;
     this.renderer = new THREE.WebGLRenderer({

@@ -3,7 +3,7 @@ import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
 import * as THREE from 'three';
 import {sourceModule} from './visual/dreamisland/modules.mjs';
 import {simulateRivalField} from './lib/rival-field-sim.mjs';
-import {applyPaceTier} from '../src/game/race-modes-rules.js';
+import {RACE_MODES,SPRINT_LAP_COUNT,applyPaceTier} from '../src/game/race-modes-rules.js';
 import {VEHICLE_CLEARANCE_METERS} from '../src/game/rival-race.js';
 import {DREAMISLAND_ABILITY_CONFIG,DREAMISLAND_FIELDS,dreamislandFieldAt} from '../src/game/dreamisland-powers-config.js';
 import {disposeObject3DResources} from '../src/game/graphics-resources.js';
@@ -161,6 +161,44 @@ for(let i=0;i<schedule.events.length;i++){
 }
 // The final lap is the night lap: the strike lands after the second flying lap.
 assert.ok(schedule.strikeTick/120>laps[0]/1000+laps[1]/1000,'The strike must fall inside the last lap.');
+
+// --- Phase D. Every mode's table reproduces from the SAME measured lap, and
+// the lap count the sprint factors are scaled against is the one the course
+// declares. This is the provenance half; the behaviour half (which event fires
+// in which lap of which format) is in validate-dreamisland-runtime.mjs.
+const declaredLapCount=Number(/readonly defaultLapCount = (\d+)/
+  .exec(readFileSync(new URL('../src/game/dreamisland-course.ts',import.meta.url),'utf8'))?.[1]);
+assert.equal(schedule.defaultLapCount,declaredLapCount,
+  'The factor table is scaled against a lap count the course does not declare.');
+assert.deepEqual(Object.keys(schedule.modes),[...RACE_MODES],'Every format needs a table.');
+for(const mode of RACE_MODES){
+  const table=schedule.modes[mode];
+  const scale=(mode==='sprint'?SPRINT_LAP_COUNT:declaredLapCount)/declaredLapCount;
+  assert.equal(table.laps,mode==='sprint'?SPRINT_LAP_COUNT:declaredLapCount);
+  assert.equal(table.honoursLapOverride,mode!=='sprint');
+  close(table.chimeFactor,1.85*scale,1e-12,`${mode} chime factor`);
+  close(table.strikeFactor,2.05*scale,1e-12,`${mode} strike factor`);
+  assert.equal(table.chimeTick,tick(table.chimeFactor),`${mode} chime tick is not the measured lap times its factor.`);
+  assert.equal(table.strikeTick,tick(table.strikeFactor),`${mode} strike tick is not the measured lap times its factor.`);
+  // Durations, not fractions: the twelve-second crossfade and the four-second
+  // fish delay read the same on screen however long the race is.
+  assert.equal(table.fishRiseTick,table.strikeTick+4*120,`${mode} fish delay must stay four seconds.`);
+  assert.equal(table.nightSettledTick,table.strikeTick+12*120,`${mode} ramp must stay twelve seconds.`);
+  assert.equal(table.nightRampTicks,12*120);
+  assert.deepEqual(table.events.map(e=>e.id),['chime-warning','strike','fish-rise','night-settled']);
+  for(let i=0;i<table.events.length;i++){
+    assert.ok(table.events[i].tick>0,`${mode}: an event at tick 0 can never fire.`);
+    assert.ok(i===0||table.events[i].tick>=table.events[i-1].tick,`${mode}: restore() rebuilds sequence from array order.`);
+  }
+  // Same fraction of the race in every format. That is the whole design: the
+  // strike is 2.05/3 of the way through whatever race is being run.
+  close(table.strikeTick/(worksLap*120)/table.laps,2.05/declaredLapCount,2e-4,`${mode} strike as a fraction of its race`);
+}
+// The top level IS the race table, byte for byte, so every pre-phase-D reader
+// (the course's static import, the HUD, the determinism test) is unaffected.
+for(const key of ['chimeTick','strikeTick','fishRiseTick','nightSettledTick','nightRampTicks'])
+  assert.equal(schedule[key],schedule.modes.race[key],`Top-level ${key} must stay the race table.`);
+assert.deepEqual(schedule.events,schedule.modes.race.events);
 
 // --- Powers. `validConfig` throws at construction, so the shape is asserted here.
 assert.equal(DREAMISLAND_ABILITY_CONFIG.id,'dream-island-powers-v1');

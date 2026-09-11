@@ -9,7 +9,8 @@
  * a second, so a schedule that flipped a profile would be smoothed into a 1 s
  * crossfade instead of a 12 s one). */
 /** @typedef {{id:string,tick:number}} ScheduleEvent */
-/** @typedef {{events:ScheduleEvent[],chimeTick:number,strikeTick:number,fishRiseTick:number,nightSettledTick:number,nightRampTicks:number}} ScheduleConfig */
+/** @typedef {{events:ScheduleEvent[],chimeTick:number,strikeTick:number,fishRiseTick:number,nightSettledTick:number,nightRampTicks:number,laps?:number,chimeFactor?:number,strikeFactor?:number,honoursLapOverride?:boolean}} ScheduleConfig */
+/** @typedef {ScheduleConfig & {worksLapSeconds?:number,defaultLapCount?:number,modes?:Record<string,ScheduleConfig>}} ScheduleCalibration */
 /** A bootstrap config carries null ticks and is as inert as no config at all.
  * @param {ScheduleConfig|null|undefined} config @returns {config is ScheduleConfig} */
 const armed = config => !!config && Number.isSafeInteger(config.strikeTick);
@@ -18,9 +19,34 @@ export class DreamIslandSchedule {
   /** @type {(ScheduleEvent & {sequence:number})[]} */
   events=[];
   state={chimed:false,struck:false,fishRisen:false,nightSettled:false};
-  /** @param {ScheduleConfig|null} config @param {number} seed */
-  constructor(config = null, seed = 3868938316) { this.config=armed(config)?config:null; this.seed=seed>>>0; this.reset(); }
+  /** @type {ScheduleConfig|null} */
+  config=null;
+  /** The whole build-produced file, kept beside the table in force so a later
+   * `select()` still has every mode's table to choose from. `config` is one
+   * table; this is the sheet all of them are printed on. */
+  /** @type {ScheduleCalibration|null} */
+  calibration=null;
+  /** @param {ScheduleCalibration|null} config @param {number} seed */
+  constructor(config = null, seed = 3868938316) { this.calibration=config??null; this.config=armed(config)?config:null; this.seed=seed>>>0; this.reset(); }
   reset() { this.tick=0; this.lap=1; this.events=/** @type {(ScheduleEvent & {sequence:number})[]} */([]); this.state={chimed:false,struck:false,fishRisen:false,nightSettled:false}; }
+  /** Phase D — swap in the table this race FORMAT is authored against.
+   *
+   * The format is resolved once, at load, by `race-modes-rules.js`, and every
+   * consumer downstream reads that answer rather than re-deriving it; this is
+   * the schedule's reader. Sprint's two laps end 0.95 L before a 2.05 L strike
+   * would arrive, so the sprint table is the same schedule expressed as the
+   * same fraction of the race (build-dreamisland-route.mjs writes both from one
+   * measured L). Rewinds the clock, because a table swap mid-race would put the
+   * derived booleans on a tick that means something else in the new table.
+   * A name with no table keeps the one already loaded, so a bootstrap or a
+   * `?calibrate=1` run stays exactly as inert as it was.
+   * @param {string} mode */
+  select(mode) {
+    const table=this.calibration?.modes?.[mode];
+    if(!table)return;
+    this.config=armed(table)?table:null;
+    this.reset();
+  }
   /** @param {number} ticks @param {number} lap */
   advanceTicks(ticks,lap=this.lap) {
     if(!Number.isSafeInteger(ticks)||ticks<0)throw new Error('Schedule requires nonnegative integer ticks');

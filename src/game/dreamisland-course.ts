@@ -111,7 +111,45 @@ export class DreamIslandCourse implements RaceCourse {
   readonly timeOfDayStops = null;
   readonly rivalPace = rivalPace;
   readonly flightArcs = route.flightArcs;
-  get scheduleLabel(): string { return this.schedule.config?.events.map(e=>`${e.id}: ${(e.tick/120).toFixed(2)}s`).join(" · ") ?? "Measuring Works lap"; }
+  /** Phase D — the intro panel's line about the schedule, in the driver's own
+   * terms rather than the build file's. It names the same two moments the HUD
+   * counts down to (`dreamisland-runtime.ts` prints THE STRIKE IN mm:ss), so the
+   * panel and the readout cannot describe different races, and it names the lap
+   * the strike lands in — which is the whole difference between the formats:
+   * lap 3 of a race, lap 2 of a sprint, and never at all on `?laps=1` or 2. */
+  get scheduleLabel(): string {
+    const config = this.schedule.config;
+    if (!config) return "Measuring Works lap";
+    const clock = (tick: number) => {
+      const seconds = Math.round(tick / 120);
+      return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
+    };
+    const lap = this.strikeLap;
+    return `${this.raceFormat === "sprint" ? "SPRINT · " : ""}THE STRIKE IN ${clock(config.strikeTick)}`
+      + `${lap === null ? " — after this race ends, so it stays day" : ` on lap ${lap}`}`
+      + `, night settled by ${clock(config.nightSettledTick)}`;
+  }
+  /** Which lap the strike lands in, or null when the race ends before it does.
+   * Derived from the measured Works lap the schedule was calibrated against —
+   * the same number every tick in the file came from — so it is an estimate of
+   * the LAP, never of the tick. */
+  get strikeLap(): number | null {
+    const config = this.schedule.config, seconds = this.schedule.calibration?.worksLapSeconds;
+    if (!config || !seconds) return null;
+    const lap = Math.floor(config.strikeTick / (seconds * 120)) + 1;
+    return lap > this.raceLapCount ? null : lap;
+  }
+  /** The format this page load races, handed down rather than re-derived. */
+  private raceFormat = "race";
+  private raceLapCount = this.defaultLapCount;
+  /** Phase D — `RaceCourse.selectRaceFormat`. Called once by `game.ts` after
+   * `resolveLapCount`, before the intro panel is composed, so the schedule the
+   * HUD counts down to is the one this format actually races. */
+  selectRaceFormat(mode: string, totalLaps: number): void {
+    this.raceFormat = mode;
+    this.raceLapCount = totalLaps;
+    this.schedule.select(mode);
+  }
   // A bootstrap schedule carries null ticks; the class treats that exactly as no
   // calibration, so the cast never hides a live config with the wrong shape.
   readonly schedule = new DreamIslandSchedule(typeof location!=="undefined"&&new URLSearchParams(location.search).has("calibrate")?null:calibration as unknown as ConstructorParameters<typeof DreamIslandSchedule>[0],typeof location === "undefined" ? 3868938316 : resolveAbilitySeed());
