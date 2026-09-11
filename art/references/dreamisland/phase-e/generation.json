@@ -1,0 +1,114 @@
+{
+ "generated": "2026-09-11",
+ "tool": "Higgsfield MCP (orchestrator session)",
+ "balance_before": 51.98,
+ "balance_after_estimate": null,
+ "routing": "mirelo_text_to_audio (2.0 cr per clip regardless of 4/5/8 s; concurrency 2 on the starter plan) for eight signature SFX; gpt_image_2 (0.5 cr) for the power-kit orthographic sheet. Beds are NOT meant to ship as loops: the game's audio is procedural, the two bed clips are tone-match references (see DREAM-ISLAND-POLISH-3.md E1).",
+ "jobs": {
+  "clock-quarter-chime.mp3": {
+   "model": "mirelo_text_to_audio",
+   "job_id": "74ef5973-dbdc-4eae-9140-98d35af30045",
+   "requested_seconds": 5,
+   "measured_seconds": 5.01551,
+   "bytes": 40560,
+   "format": "mp3 44.1 kHz mono 64 kbps",
+   "cost_credits": "~1.66 (measured from the balance delta: 51.98 -> 38.23 across 8 clips + one 0.5 cr sheet)",
+   "role": "chime-warning event",
+   "prompt": "A single quarter-hour chime from a large old stone clock tower bell: one clear bronze bell strike with a long natural decay, outdoors, slight distance, no music, no voices, no reverb tail beyond the bell itself",
+   "review": "VERIFIED format/duration by ffprobe. UNVERIFIED content: the orchestrator cannot listen; the implementer's ear and the user's are the acceptance. Transcode to the radio bank's 24 kHz / 48 kbps mono before shipping."
+  },
+  "clock-strike-three-tolls.mp3": {
+   "model": "mirelo_text_to_audio",
+   "job_id": "0c3fc515-0ed1-4675-a8bd-709be1ec6c0b",
+   "requested_seconds": 8,
+   "measured_seconds": 8.010884,
+   "bytes": 64592,
+   "format": "mp3 44.1 kHz mono 64 kbps",
+   "cost_credits": "~1.66 (measured from the balance delta: 51.98 -> 38.23 across 8 clips + one 0.5 cr sheet)",
+   "role": "strike event",
+   "prompt": "A great clock tower striking the hour: three slow deep bronze bell tolls, each with a long resonant decay overlapping the next, heard outdoors across water at night, majestic and slightly eerie, no music, no voices",
+   "review": "VERIFIED format/duration by ffprobe. UNVERIFIED content: the orchestrator cannot listen; the implementer's ear and the user's are the acceptance. Transcode to the radio bank's 24 kHz / 48 kbps mono before shipping."
+  },
+  "waterfall-loop.mp3": {
+   "model": "mirelo_text_to_audio",
+   "job_id": "14c42455-a3a9-43ea-9641-ecacd920198c",
+   "requested_seconds": 8,
+   "measured_seconds": 8.010884,
+   "bytes": 64592,
+   "format": "mp3 44.1 kHz mono 64 kbps",
+   "cost_credits": "~1.66 (measured from the balance delta: 51.98 -> 38.23 across 8 clips + one 0.5 cr sheet)",
+   "role": "BASIN positional loop",
+   "prompt": "A tall tropical waterfall pouring into a stone pool, steady heavy water roar with fine spray hiss, seamless loop, no birds, no music, no voices",
+   "review": "VERIFIED format/duration by ffprobe. UNVERIFIED content: the orchestrator cannot listen; the implementer's ear and the user's are the acceptance. Transcode to the radio bank's 24 kHz / 48 kbps mono before shipping."
+  },
+  "fish-rise.mp3": {
+   "model": "mirelo_text_to_audio",
+   "job_id": "2772872b-736b-41d6-bcd6-f1e6b756ad02",
+   "requested_seconds": 4,
+   "measured_seconds": 4.017052,
+   "bytes": 32618,
+   "format": "mp3 44.1 kHz mono 64 kbps",
+   "cost_credits": "~1.66 (measured from the balance delta: 51.98 -> 38.23 across 8 clips + one 0.5 cr sheet)",
+   "role": "fish-rise event",
+   "prompt": "Large fish rising out of a pool into the air: a soft watery whoosh, bubbles and a wet surface break, then silence, magical but naturalistic, no music, no voices",
+   "review": "VERIFIED format/duration by ffprobe. UNVERIFIED content: the orchestrator cannot listen; the implementer's ear and the user's are the acceptance. Transcode to the radio bank's 24 kHz / 48 kbps mono before shipping."
+  },
+  "surf-bed-day.mp3": {
+   "model": "mirelo_text_to_audio",
+   "job_id": "c2c43732-275e-40f3-af98-005ed7ddae85",
+   "requested_seconds": 8,
+   "measured_seconds": 8.010884,
+   "bytes": 64592,
+   "format": "mp3 44.1 kHz mono 64 kbps",
+   "cost_credits": "~1.66 (measured from the balance delta: 51.98 -> 38.23 across 8 clips + one 0.5 cr sheet)",
+   "role": "tone-match reference for the BEACH/REEF procedural bed",
+   "prompt": "Gentle tropical surf on a white sand beach: small waves washing in and drawing back over sand, a light breeze, seamless loop, daytime, no birds, no music, no voices",
+   "review": "VERIFIED format/duration by ffprobe. UNVERIFIED content: the orchestrator cannot listen; the implementer's ear and the user's are the acceptance. Transcode to the radio bank's 24 kHz / 48 kbps mono before shipping."
+  },
+  "night-bed.mp3": {
+   "model": "mirelo_text_to_audio",
+   "job_id": "5d41b1ea-7555-4589-a816-d12e436181c0",
+   "requested_seconds": 8,
+   "measured_seconds": 8.010884,
+   "bytes": 64592,
+   "format": "mp3 44.1 kHz mono 64 kbps",
+   "cost_credits": "~1.66 (measured from the balance delta: 51.98 -> 38.23 across 8 clips + one 0.5 cr sheet)",
+   "role": "tone-match reference for the post-strike bed",
+   "prompt": "Tropical island at night: soft crickets, distant slow water lapping against stone, an occasional gentle drip, very calm, seamless loop, no music, no voices, no wind",
+   "review": "VERIFIED format/duration by ffprobe. UNVERIFIED content: the orchestrator cannot listen; the implementer's ear and the user's are the acceptance. Transcode to the radio bank's 24 kHz / 48 kbps mono before shipping."
+  },
+  "tunnel-pass.mp3": {
+   "model": "mirelo_text_to_audio",
+   "job_id": "1ab83941-ab26-459d-aee9-df11a973b69a",
+   "requested_seconds": 4,
+   "measured_seconds": 4.017052,
+   "bytes": 32618,
+   "format": "mp3 44.1 kHz mono 64 kbps",
+   "cost_credits": "~1.66 (measured from the balance delta: 51.98 -> 38.23 across 8 clips + one 0.5 cr sheet)",
+   "role": "POINT bore one-shot",
+   "prompt": "A fast vehicle passing through a short stone tunnel: a rising wind rush, the sound closing in with a boxy echo, then opening out again into the open air, no engine, no music, no voices",
+   "review": "VERIFIED format/duration by ffprobe. UNVERIFIED content: the orchestrator cannot listen; the implementer's ear and the user's are the acceptance. Transcode to the radio bank's 24 kHz / 48 kbps mono before shipping."
+  },
+  "day-birds.mp3": {
+   "model": "mirelo_text_to_audio",
+   "job_id": "f7fabc50-86b2-4fbe-adb6-b20d96c474fe",
+   "requested_seconds": 8,
+   "measured_seconds": 8.010884,
+   "bytes": 64592,
+   "format": "mp3 44.1 kHz mono 64 kbps",
+   "cost_credits": "~1.66 (measured from the balance delta: 51.98 -> 38.23 across 8 clips + one 0.5 cr sheet)",
+   "role": "GROVE/CUT verge, ducks over the ramp",
+   "prompt": "Sparse tropical daytime birds in palm trees: a few distant bright calls and short chirps with silence between them, light breeze in fronds, seamless loop, no surf, no music, no voices",
+   "review": "VERIFIED format/duration by ffprobe. UNVERIFIED content: the orchestrator cannot listen; the implementer's ear and the user's are the acceptance. Transcode to the radio bank's 24 kHz / 48 kbps mono before shipping."
+  },
+  "power-kit-ortho-gptimage2.png": {
+   "model": "gpt_image_2",
+   "job_id": "85e571a6-9e06-4d3c-86bb-70f8e5abac0e",
+   "aspect": "1:1",
+   "cost_credits": 0.5,
+   "prompt": "Orthographic model sheet for a game modeller, on a flat neutral mid-grey background, zero perspective, no lens distortion. TWO small trackside racing devices for a tropical island circuit, each shown in a 2 by 2 grid of views (front elevation, right side elevation, top-down plan, three-quarter) — left half of the image is DEVICE A, right half is DEVICE B, all views of one device at the same scale. DEVICE A, the SURGE booster 'sunburst': a squat iron cage on a stone mount holding a glowing amber-orange core with four capacitor cylinders around it, a small radial sunburst ornament on top, worn cyan-painted stripe on the mount. DEVICE B, the SHIELD 'tide bell': a bronze bell-shaped housing on a stone mount, four hinged petals folded around a pale cyan glowing core, a fine lattice ring at the base, moss in the mount joints. Both about 1.6 metres tall. Early-2000s PS2 painted game texture style, flat even lighting, no drop shadows, no ground plane, no text, no labels, no arrows, no dimension lines.",
+   "review": "KEEP — build directly from this. Both devices in four views at one scale: surge cage + four capacitors + amber core + sunburst finial on the cyan-striped stone mount; shield bronze bell + four petals + cyan core + lattice ring + moss. Photoreal-leaning as all gpt_image_2 sheets are; the atlases give the flat look."
+  }
+ },
+ "balance_after": 38.23
+}

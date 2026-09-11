@@ -2,14 +2,14 @@
 
 # FUTURISMA
 
-### Five circuits. A changing tide. One more clean lap.
+### Seven circuits. A changing tide. A clock that turns the day. One more clean lap.
 
 **A futuristic hover racer with an early-2000s console soul.**
 
-Rain-soaked cities, drowned reactors, sodium-lit pumpworks and a changing tide.<br>
+Rain-soaked cities, drowned reactors, sodium-lit pumpworks, a rocket pad counting down, and an island that goes dark when its clock strikes.<br>
 Read the road, choose your line, and make the boost count.
 
-[Start racing](#start-racing) · [Explore the circuits](#five-circuits-five-identities) · [Learn the controls](#controls) · [Inside the workshop](#built-in-blender)
+[Start racing](#start-racing) · [Explore the circuits](#seven-circuits-seven-identities) · [Learn the controls](#controls) · [Inside the workshop](#built-in-blender)
 
 ![Bitterpan Works at 317 km/h](docs/media/bitterpan.jpg)
 
@@ -17,7 +17,7 @@ Read the road, choose your line, and make the boost count.
 
 </div>
 
-## Five circuits, five identities
+## Seven circuits, seven identities
 
 | Circuit | The atmosphere | The racing idea |
 |---|---|---|
@@ -26,6 +26,8 @@ Read the road, choose your line, and make the boost count.
 | **03 · Night Shift** | Meridian at 02:17: neon motels, closed arcades, apartment towers and rain. | A roughly 1.96 km city circuit through six districts and an expressway underpass. |
 | **04 · Polarity** | A magnetic interchange: power halls, inverter rings and another road 22 metres above. | Optional gravity transfers, narrower express routes and a choice between distance and recharge. |
 | **05 · Tideline** | A sealed glass road beneath green water, warm lamp pools and a working refinery. | A 2.07 km road circuit: flooded on lap one, slick on lap two, with a shorter pump-hall route opening on lap three. |
+| **06 · Ascension Pad** | A rocket launch base: crawlerway, flame trench, deluge towers and a countdown board. | A 2.6 km loop with a launch scheduled from your own measured lap: the trench route closes, the deluge floods, and the pad goes up mid-race. |
+| **07 · Dream Island** | A Y2K-screensaver tropical island: white sand, cobalt sea, a watchtower with a tunnel through it, and a stone clock tower in the jungle. | A 2.4 km loop raced from day into night. When the clock strikes, the sky turns to stars, the water lights the road's edges, and goldfish drift over the track. `?map=dreamisland`. |
 
 <table>
 <tr>
@@ -149,6 +151,12 @@ Append these to the local game URL, combining options with `&`.
 | `?diagnostics=1` | Show telemetry for local performance checks. |
 
 Additional QA probes and rendering switches are documented in [Provenance](docs/PROVENANCE.md).
+
+## How Dream Island was made
+
+Map 07 was built in one week by a small crew — one person, a planning-and-review Claude, a building Claude, Codex for 3D and polish, and Higgsfield for pictures and sound — with every phase checked by re-running its tests rather than reading its report. The story, in plain words: [docs/blog/dream-island-diary.html](docs/blog/dream-island-diary.html).
+
+If you want to continue the work: start at [docs/briefs/DREAM-ISLAND-HANDOFF.md](docs/briefs/DREAM-ISLAND-HANDOFF.md) (state detection, verification commands, rules), then the level brief [DREAM-ISLAND-LEVEL.md](docs/briefs/DREAM-ISLAND-LEVEL.md). The next pass is sound, a running clock and real power-kit hardware: [DREAM-ISLAND-POLISH-3.md](docs/briefs/DREAM-ISLAND-POLISH-3.md). Evidence for every phase lives under `art/evidence/dreamisland-v1/`.
 
 ## Development and verification
 
