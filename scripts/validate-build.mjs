@@ -78,9 +78,35 @@ for (const name of javascriptNames) {
 // measured-plus-headroom rule the HUD pass used). The two compressed ceilings
 // that decide what a visitor downloads are untouched and both still pass with
 // 1.2 KiB and 0.3 KiB to spare.
+//
+// `work/hud-followup` (HUD follow-up, six UI fixes) — re-pinned 2026-09-12 by
+// the measured-plus-~1.5-KiB rule M1 set and the 2026-09-09 HUD merge used
+// again. Measured on a clean `main` checkout at eafe0b9 and on this branch
+// with `validate-build.mjs`'s own arithmetic (initial /assets JS+CSS named by
+// dist/index.html, gzipSync per file, shell = gzip(html) + jsGzip + cssGzip):
+//
+//                     JS raw     JS gzip   shell gzip
+//   main  eafe0b9     971.37     265.11      276.994
+//   work/hud-followup 972.27     265.42      277.414
+//   delta              +0.90      +0.31       +0.420
+//
+// main had 0.63 KiB of raw headroom and SIX BYTES of shell headroom, so the
+// shell ceiling was unmeetable by any change at all — the same "baseline
+// sitting exactly on the ceiling" the 2026-09-09 merge hit with Codex's phase
+// E tree. New pins: 972 -> 974 raw, 266 -> 267 gzip, 277 -> 279 shell, each
+// measured + ~1.5 KiB (973.77 / 266.92 / 278.91 rounded up).
+//
+// What the bytes bought, all of it in the initial shell because the paddock
+// and the HUD clock are first paint and cannot be split behind a lazy import:
+// `resolveTimingPresentation` and the `formatRaceTime` it composes (moved out
+// of ui.ts so `validate:hud` can assert the four clock cases under Node), the
+// `#intro-objective` line and the three fields that keep format, laps and
+// field alive across the three directions they arrive from, and the minimap's
+// named radii and player-dot ring. The stylesheet moved +0.08 KiB gzip and
+// still passes its own 8 KiB ceiling at 7.33.
 assert.ok(
-  javascript.rawBytes <= 972 * 1024,
-  `Initial JavaScript exceeds 972 KiB raw (${(javascript.rawBytes / 1024).toFixed(1)} KiB).`,
+  javascript.rawBytes <= 974 * 1024,
+  `Initial JavaScript exceeds 974 KiB raw (${(javascript.rawBytes / 1024).toFixed(1)} KiB).`,
 );
 // The JavaScript ceiling, re-baselined four times on 2026-09-03 from 224.2 KiB
 // gzip. Every rationale is kept, because each one names what its bytes bought
@@ -289,9 +315,14 @@ assert.ok(
 // cost buys gravity/power input and audio hooks, a shortcut minimap, two map
 // dispatch choices and their HUD. The road data, Blender environments and
 // Polarity runtime remain lazy; the ceiling allows 2.8 KiB of resplit headroom.
+// 266 -> 267 on `work/hud-followup`; see the measurement table above the raw
+// ceiling. This one was NOT failing (265.42 against 266) and moves only so the
+// three ceilings keep the same ~1.5 KiB of working margin as each other —
+// a gzip ceiling 0.58 KiB above the measurement would be the next phase's
+// chunk-boundary failure rather than its spend failure.
 assert.ok(
-  javascriptGzip <= 266 * 1024,
-  `JavaScript bundle exceeds 266 KiB gzip (${(javascriptGzip / 1024).toFixed(1)} KiB).`,
+  javascriptGzip <= 267 * 1024,
+  `JavaScript bundle exceeds 267 KiB gzip (${(javascriptGzip / 1024).toFixed(1)} KiB).`,
 );
 // Re-baselined 2026-08-28 from a measured 4.35 KiB gzip (the 4 KiB ceiling
 // predated the HUD turn-cue and hazard styling) plus headroom for the planned
@@ -342,9 +373,12 @@ assert.ok(
 // shell, so 252 and 262 both stand with about 1.7 KiB of room each — which is
 // the working margin H2a's note above argues main needs and is why neither
 // number moves again here.
+// 277 -> 279 on `work/hud-followup`, measured 277.414 + ~1.5 KiB. See the
+// table above the raw ceiling: main sat at 276.994 against 277, six bytes of
+// headroom, which is what made this the ceiling that had to move.
 assert.ok(
-  shellGzip <= 277 * 1024,
-  `Initial app shell exceeds 277 KiB gzip (${(shellGzip / 1024).toFixed(3)} KiB; ${shellGzip} B).`,
+  shellGzip <= 279 * 1024,
+  `Initial app shell exceeds 279 KiB gzip (${(shellGzip / 1024).toFixed(3)} KiB; ${shellGzip} B).`,
 );
 
 // ---------------------------------------------------------------------------

@@ -1944,7 +1944,25 @@ body[data-options="true"] .hud {
   overflow-y: auto;
 }
 
-@media (max-height: 900px) and (min-width: 701px) {
+/*
+  900 -> 1100, on all three of this file's intro-compaction blocks, and the
+  number came off the measurement rather than out of the air.
+
+  1080 is the common desktop height and it was NEVER compacted, so the launch
+  screen ran its full-size h1 (96px) and full deck there. Measured on `main` at
+  eafe0b9, at a 1920x1080 viewport, `#start-button` bottom already sat at
+  1093.47 on Ascension, 1078.91 on Night Shift and 1076.88 on Dream Island —
+  below the fold before this phase touched anything, reachable only because
+  `.screen--intro` scrolls. The objective line and the circuit h1 then took
+  five of the seven circuits past it.
+
+  1100 rather than 1080 exactly: the threshold has to cover the viewport, not
+  sit on it, and a browser chrome that eats a few pixels must not drop the
+  panel back to the uncompacted layout at 1084. Nothing new is hidden and the
+  h1 is not shrunk further — this is the compaction the file already authored
+  for laptops, applied at the height that actually needs it.
+*/
+@media (max-height: 1100px) and (min-width: 701px) {
   /* The screen's padding is horizontal-first (`5vw`); on a laptop that spends
      128px of vertical room the panel needs more than the gutter does. */
   .screen--intro {
@@ -2280,7 +2298,7 @@ body[data-map="polarity"] .intro-panel h1,
 body[data-map="nightshift"] .intro-panel h1 { font-size: clamp(3rem, 8vw, 6.4rem); letter-spacing: -.065em; }
 /* Four circuits add a second row: keep launch reachable at laptop heights. */
 .screen--intro { align-items: safe center; }
-@media (max-height: 900px) and (min-width: 701px) {
+@media (max-height: 1100px) and (min-width: 701px) {
   body[data-map="polarity"] .intro-panel h1,
   body[data-map="nightshift"] .intro-panel h1 { font-size: clamp(2.6rem, 6vw, 3.6rem); }
   .screen--intro .chip small { display: none; }
@@ -2302,7 +2320,7 @@ body[data-map="nightshift"] .intro-panel h1 { letter-spacing: -.03em; }
 .edition-switch:hover { color: #fff0cf; }
 .edition-switch:focus-visible { outline: 2px solid #e4b775; outline-offset: 5px; }
 .edition-switch[hidden] { display: none; }
-@media (max-height: 900px) and (min-width: 701px) {
+@media (max-height: 1100px) and (min-width: 701px) {
   body[data-map="tideline"] .intro-panel h1 { font-size: clamp(2.6rem, 6vw, 3.6rem); }
   .screen--intro .intro-deck { line-height: 1.45; }
 }
