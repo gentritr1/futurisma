@@ -151,3 +151,19 @@ Reviewed against `art/evidence/dreamisland-v1/alive/3d/` by re-reading the final
 5. *Sky unchanged* as before (sky-only frames pixel-identical).
 
 Redo steps 1, 2 and 4 of §5.1 under these criteria, re-run the ordered table, and re-report. Steps 3 (depth band), 5.2–5.6 need no change. Commit nothing.
+
+## 9. F-3D REVIEW 2 (2026-09-12, `review-8/`) — three rulings, one new REQUEST CHANGES
+
+Read `review-8/README.md`, the ordered table and the frames `step-4/court/blend-000.png`, `blend-000-sea-2x.png`, `blend-100.png`, `step-4/reef/blend-100.png`.
+
+**Accepted:** the sea is cobalt again with no lattice (sea chroma 51.6 vs 51.3 at step 0, whole-frame 21.86 vs 21.79); the wet road at night has no pattern and the rails are excluded; skies pixel-identical; works Δp95 0.0 ms; the autocorrelation script and its results.
+
+**Rulings on the three residuals Codex reported honestly:**
+
+1. *REEF whole-frame chroma 17.78 vs "21.8".* My error: 21.8 was COURT's step-0 value written as if it were universal. The floor is per pose, its own step 0: COURT ≥ 21.79, REEF ≥ 17.57. REEF passes at 17.78. §8 item 1 reads that way from now on.
+2. *One rail pixel differs by one red level.* Below the instrument's resolution (a 1/255 step in one pixel of a 1280×720 frame). Passes. "Pixel-identical" in §8 item 3 means: no pixel differs by more than 2 levels in any channel.
+3. *The glint cannot reach white.* Two of my constraints fought each other: the 1.0 additive cap is compressed by AgX to ≈212, so white is unreachable whatever the geometry; and at COURT the real sun's half-vector needs a 60° tilt, so a physically placed sun never sparkles for this camera. The painting's sparkle is art-directed, and ours may be too. **Ruling:** drop the 1.0 cap (the sparsity gates — coverage 0.15–1.0 %, max blob 60 px, autocorrelation ≤ 0.30 — are what stop tiling, and they stay); and let the glint use a *sparkle direction*, not the shadow light: the sun's azimuth with an elevation chosen so the far band of the sea sparkles from the chase camera at both poses. State the vector in the README and keep it a single uniform. Re-run the day rows of the table with the sea white % now between 0.15 and 1.0 at COURT and REEF.
+
+**New REQUEST CHANGES — REEF night is blown out.** `step-4/reef/blend-100.png`: the shallows either side of the pier render as flat white slabs (whole-frame white 0.98 %, p99 239). The painting's night shallows are a cyan glow, never white. The "distance boost" of the shallows/foam emission to 64/96 beyond 160 m is withdrawn. New gates for the water at night, both poses: no water pixel above 239 (water-band whitePct 0.00), and the shallows band keeps chroma ≥ its step-0 value (it must read cyan, not white). Consequently the COURT night p99 ≥ 150 gate is **moved to the combined build**: in the isolated tree there are no bollards and no capsule, and the range must come from those sources plus the foam, not from overdriven water. Report the isolated COURT night p99 as a number, not as a gate.
+
+Redo: the glint (item 3) and the REEF night emission (new REQUEST CHANGES). Re-run the ordered table, re-report in `review-9/`. Commit nothing.
