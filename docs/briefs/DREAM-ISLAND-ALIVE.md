@@ -130,3 +130,24 @@ The measurement table (shipped / yours / target) for COURT and REEF, day and nig
 ## 7. Order of work and the seam between tracks
 
 Opus starts now with primitives under the §5 node names; Codex starts now on the water (§5.1), which touches no Opus file. The GLBs land as file replacements. If a contract in §5 has to change, the change is written into this file first, by the orchestrator, and both tracks are told. Commit nothing; report in the handoff's format with a "numbers this pass measured for the first time" section.
+
+## 8. F-3D REVIEW 2026-09-12 — REQUEST CHANGES on §5.1 (water and wet road); the rest of §5 stands
+
+Reviewed against `art/evidence/dreamisland-v1/alive/3d/` by re-reading the final frames (`final/court/blend-000.png`, `blend-100.png`, `autopilot-final/court-day.png`, `court-before-after.png`) and the shader in `dreamisland-reflections.ts`. The GLB contracts, atlas proofs, glass/chrome recipes, glow batch, AO byte-proof and the four isolated soaks are **accepted as reported** (VERIFIED by re-running `inspect-glb.py` and reading the soak tables; the combined build is still to be validated once F-CODE lands).
+
+**What failed, and why the gates did not catch it.** Both water gates in §5.1 were met, and the look is wrong:
+
+- **Day sea.** The sea is a pale white-blue field covered by a regular lattice of white dashes. Whole-frame chroma fell from 21.8 (step 0) to 16.8 against a painting at 22.1; the day mean rose from 142 to 151 against a painting at 117. The cause is two things in the shader: (1) the fresnel term `.02+.98*(1-cosθ)^5` reaches ≈1 at the grazing angles a chase camera sees, so most of the sea becomes the sky dome, which is bright and pale; (2) the "glint" is `pow(max(dot(N,H),0),128)*60` over a normal built from TWO fixed-frequency sines (`sin(.72x+.31z)`, `sin(.83z−.23x)`), which is a perfectly periodic lattice, so every crest saturates to white in a grid. The whitePct gate rewarded exactly that.
+- **Night road.** The wet-road term uses the same sine lattice at 18× frequency with exponent 24, so the tarmac is a screen-wide grid of cyan dots; the kerb rails went bright cyan-white with it. The p99 gate rewarded that too.
+
+**Lesson, recorded for every later brief:** a highlight or range gate must travel with (a) a floor on the metric it can steal from (chroma, the road's darkness) and (b) an aperiodicity check plus a 2× crop for the eyeball. A number that can be satisfied by tiling white over a surface is not a gate.
+
+**Corrected §5.1 acceptance (replaces the two gates; same poses, same script, same isolation masks as `measure.py`):**
+
+1. *Sea keeps its colour.* Sea-band chroma (the `-sea` isolation) ≥ its step-0 value, and whole-frame day chroma ≥ 21.8. Sea-band p50 luma within ±8 of step 0. Achieve it by capping the reflection weight (fresnel × ≤ 0.35 at grazing, ≤ 0.08 at normal incidence) and multiplying the reflected sky by the sea's own cell colour so the mirror is cobalt, not white.
+2. *Glints are sparse and aperiodic.* Sea-band whitePct between 0.15 and 1.0 %. No white connected component larger than 60 px at 1280×720. The 2-D autocorrelation of the sea band's white mask has no secondary peak above 0.30 of the zero-lag value (a 12-line numpy script, committed beside `measure.py`). The normal must come from a non-repeating field: ≥ 4 sines at incommensurate frequencies and directions, or a hashed noise; amplitude such that the surface normal tilts ≤ 8°; glint exponent ≥ 64, magnitude clamped so a single crest never adds more than 1.0 to `outgoingLight`. Attach a 400×200 px crop of the sea at 2× in the README.
+3. *Wet road is a streak, not a pattern.* Road band (the `-road` isolation) at night: p50 ≥ 30.9 (unchanged), whitePct 0.00, and the same autocorrelation test passes. The reflection on the road uses the smooth surface normal (perturbation ≤ 0.01) and a low exponent (≤ 8) so the lamp reflection is one broad vertical streak that moves with the camera, as it does in `target-court-night-gptimage2.png`. The kerb rail material is excluded from the wet term: a crop of the rails must be pixel-identical to step 0.
+4. *Night range still climbs.* Night p99 ≥ 150 and range ≥ 140 stand, but they must be earned by the emissive foam, shallows, bollard cores and the capsule (the sources), not by the road: the road band's night p99 must stay ≤ the painting's road band p99, measured with the same mask on `target-court-night-gptimage2.png` (state the number).
+5. *Sky unchanged* as before (sky-only frames pixel-identical).
+
+Redo steps 1, 2 and 4 of §5.1 under these criteria, re-run the ordered table, and re-report. Steps 3 (depth band), 5.2–5.6 need no change. Commit nothing.
