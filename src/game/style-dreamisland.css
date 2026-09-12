@@ -1,0 +1,678 @@
+/*
+  Dream Island's HUD skin — Phase F §4.5.
+
+  THIS FILE IS NOT IN THE SHELL. It is imported from `dreamisland-runtime.ts`,
+  which `circuit-runtime.ts` reaches only through a dynamic import, so Vite
+  emits it as the island chunk's own stylesheet and a race on any other circuit
+  never downloads a byte of it. `validate-build.mjs` pins that by name.
+
+  EVERYTHING IS SCOPED to `:root[data-circuit="dreamisland"]`. That attribute is
+  set by `circuit-runtime.ts` when a runtime loads and deleted when it disposes,
+  so the six other circuits render byte-identically — which is proved, not
+  asserted, by `scripts/visual/dreamisland/greenwater-hud.mjs`.
+
+  THE DAY/NIGHT SWITCH IS ONE CUSTOM PROPERTY. `--di-night` is written by
+  `dreamisland-hud.ts` from the course's own `nightBlend`, so the HUD crosses
+  over on exactly the ramp the world does rather than on a second timer that
+  could disagree with it. Cobalt ink on light glass by day; cyan ink on dark
+  glass at night; every colour below is a `color-mix` between the two ends,
+  weighted by that one number.
+*/
+/*
+  Round 2, item 2 — the two faces, self-hosted.
+  Both are SIL OFL 1.1; the licence and the provenance table are in
+  `public/assets/dreamisland/fonts/`. The paths are absolute from the site root
+  because `public/` is copied verbatim into the build, so the same URL works on
+  the dev server and in `dist`. `font-display: swap` means a slow font shows the
+  fallback face rather than nothing — the HUD is a driving instrument and must
+  never be blank.
+
+  These rules are in THIS file only, and this file is reached only through the
+  island's lazy chunk, so no other circuit fetches a byte of either face.
+*/
+@font-face {
+  font-family: Michroma;
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/assets/dreamisland/fonts/michroma-latin-v21.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Share Tech Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/assets/dreamisland/fonts/share-tech-mono-latin-v16.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root[data-circuit="dreamisland"] {
+  --di-night: 0;
+  /*
+    §4.5 asked for Michroma and Share Tech Mono from Google Fonts. The shipped
+    CSP is `style-src 'self'` (index.html:11, public/_headers:2) and
+    validate-security.mjs asserts it, so a the Google Fonts CSS host stylesheet is
+    blocked outright. These stacks name the two faces first anyway — if the
+    faces are ever self-hosted the skin picks them up with no further change —
+    and otherwise fall through to §4.5's own stated fallback, the shell's
+    condensed face and its mono face.
+  */
+  --di-michroma: Michroma, var(--condensed), "Arial Narrow", sans-serif;
+  --di-mono: "Share Tech Mono", var(--mono), ui-monospace, monospace;
+  --di-day-ink: #0038d9;
+  --di-night-ink: #b8fbff;
+  --di-ink: color-mix(in oklab, var(--di-night-ink) calc(var(--di-night) * 100%), var(--di-day-ink));
+  /*
+    Round 2, item 3. The day glass was 62 % opaque, and cobalt ink on it
+    measured 3.1-4.4:1 against the frame behind it - under the 4.5:1 gate even
+    where there WAS a pill. Cobalt's relative luminance is 0.056, so the ground
+    under it has to reach 0.427 to make 4.5:1, which is a light aqua at 88 %
+    rather than a tint at 62 %. Measured, not chosen: see
+    `round-2/contrast/contrast.json`.
+  */
+  --di-day-glass: oklch(0.955 0.03 220 / 0.94);
+  /*
+    Round 2, item 3, the night half of the same problem: cyan ink at luminance
+    0.83 needs a ground BELOW 0.14 to make 4.5:1, and the old night glass sat at
+    0.22 lightness and 66 % alpha, which let a lit road through and measured
+    4.03:1 on the gap line. Darker and more opaque.
+  */
+  --di-night-glass: oklch(0.15 0.04 240 / 0.92);
+  --di-glass: color-mix(in oklab, var(--di-night-glass) calc(var(--di-night) * 100%), var(--di-day-glass));
+  --di-edge: color-mix(in oklab, var(--di-night-ink) calc(var(--di-night) * 55%), oklch(1 0 0 / 0.75));
+  /* The world bubble's ground: opaque in both states, because what is behind it
+     is the world and not a screen edge. */
+  --di-bubble-ground: color-mix(in oklab, oklch(0.17 0.045 240) calc(var(--di-night) * 100%), oklch(0.965 0.025 220));
+  --di-cyan: #35e6ff;
+  --di-amber: #ffb765;
+  /*
+    The gel: one highlight down the top half and one shadow up from the bottom,
+    which is what makes a flat pill read as a lozenge of glass rather than as a
+    rounded rectangle with a border.
+  */
+  /*
+    Round 2, item 3. The gel is the white highlight that makes a flat pill read
+    as glass, and at night it was doing the opposite of its job: a fixed 50 %
+    white top stop lifted the DARK night pill to a mid grey, and cyan ink on
+    that measured 4.35:1 — the pill was the thing failing the gate, not the
+    scene behind it. Both the highlight and the shadow now scale with
+    `--di-night`, so the lozenge keeps its gel by day and stays dark at night.
+  */
+  --di-gel: linear-gradient(
+    180deg,
+    oklch(1 0 0 / calc(0.5 - var(--di-night) * 0.42)) 0%,
+    oklch(1 0 0 / calc(0.16 - var(--di-night) * 0.12)) 46%,
+    oklch(0.5 0.04 230 / 0.1) 54%,
+    oklch(0.3 0.05 240 / calc(0.16 + var(--di-night) * 0.12)) 100%
+  );
+  --di-chrome: conic-gradient(
+    from 210deg,
+    #eef4f8 0deg,
+    #9fb4c4 62deg,
+    #f6fbff 120deg,
+    #7f97ab 190deg,
+    #e8f2f8 260deg,
+    #a9bccb 320deg,
+    #eef4f8 360deg
+  );
+  --di-pill-shadow: 0 1px 0 oklch(1 0 0 / 0.55) inset, 0 -6px 12px -8px oklch(0.2 0.05 240 / 0.6) inset,
+    0 4px 14px -6px oklch(0.2 0.05 240 / 0.55);
+}
+
+/* ---------------------------------------------------------------- the pills */
+/*
+  The shell's plates are skewed slabs. Under the island they become aqua glass
+  lozenges: the skew is removed, the radius goes to a full round end, and the
+  gel plus a one-pixel white border at 75% does the rest.
+*/
+:root[data-circuit="dreamisland"] .plate,
+:root[data-circuit="dreamisland"] .hud-chip,
+:root[data-circuit="dreamisland"] .delta-chip,
+:root[data-circuit="dreamisland"] #lap-event,
+:root[data-circuit="dreamisland"] #turn-cue {
+  transform: none;
+  border-radius: 999px;
+  background: var(--di-glass);
+  background-image: var(--di-gel);
+  border: 1px solid var(--di-edge);
+  box-shadow: var(--di-pill-shadow);
+  backdrop-filter: blur(6px);
+  color: var(--di-ink);
+  padding-inline: 14px;
+}
+
+:root[data-circuit="dreamisland"] .plate > * {
+  transform: none;
+}
+
+:root[data-circuit="dreamisland"] .hud-label,
+:root[data-circuit="dreamisland"] .hud-gate__sector,
+:root[data-circuit="dreamisland"] .hud-drive__state,
+:root[data-circuit="dreamisland"] .hud-timing__tag b {
+  font-family: var(--di-michroma);
+  letter-spacing: 0.06em;
+  color: var(--di-ink);
+  text-shadow: none;
+}
+
+:root[data-circuit="dreamisland"] #time-value,
+:root[data-circuit="dreamisland"] #speed-value,
+:root[data-circuit="dreamisland"] #lap-value,
+:root[data-circuit="dreamisland"] #position-value,
+:root[data-circuit="dreamisland"] #boost-value,
+:root[data-circuit="dreamisland"] #gap-value,
+:root[data-circuit="dreamisland"] .field-order li,
+:root[data-circuit="dreamisland"] #delta-chip-value,
+:root[data-circuit="dreamisland"] #turn-distance {
+  font-family: var(--di-mono);
+  color: var(--di-ink);
+  text-shadow: 0 1px 0 oklch(1 0 0 / calc(0.5 - var(--di-night) * 0.5));
+}
+
+/* ------------------------------------------------------- chrome roundels */
+/*
+  Position and speed get the conic chrome. They are the two numbers a driver
+  reads without looking, so they are the two that get the loudest object.
+*/
+:root[data-circuit="dreamisland"] .hud-standing__tab,
+:root[data-circuit="dreamisland"] .hud-drive__speed {
+  background: var(--di-chrome);
+  border-radius: 999px;
+  border: 1px solid oklch(1 0 0 / 0.8);
+  box-shadow: var(--di-pill-shadow);
+  padding-inline: 18px;
+  color: #06233f;
+}
+
+/*
+  The roundels keep their chrome in BOTH states, so their text keeps its dark
+  ink in both states too. The first night capture had `--di-ink` winning here on
+  id specificity and printed pale cyan on pale chrome: the speed read as a
+  ghost and the KM/H label under it was gone. These selectors are written at the
+  roundel's own depth so they outrank the id rules above.
+*/
+:root[data-circuit="dreamisland"] .hud-standing__tab #position-value,
+:root[data-circuit="dreamisland"] .hud-standing__tab b,
+:root[data-circuit="dreamisland"] .hud-drive__speed #speed-value,
+:root[data-circuit="dreamisland"] .hud-drive__speed .hud-label,
+:root[data-circuit="dreamisland"] .hud-drive__speed .hud-drive__state,
+:root[data-circuit="dreamisland"] .hud-drive__number {
+  font-family: var(--di-mono);
+  color: #06233f;
+  text-shadow: 0 1px 0 oklch(1 0 0 / 0.7);
+}
+
+/* --------------------------------------------------------- the timing tower */
+:root[data-circuit="dreamisland"] .field-order {
+  gap: 3px;
+  padding: 8px 10px;
+  border-radius: 18px;
+  background: var(--di-glass);
+  background-image: var(--di-gel);
+  border: 1px solid var(--di-edge);
+  box-shadow: var(--di-pill-shadow);
+  backdrop-filter: blur(6px);
+}
+
+:root[data-circuit="dreamisland"] .field-order li {
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+
+:root[data-circuit="dreamisland"] .field-order li[data-player="true"] {
+  background: color-mix(in oklab, var(--di-cyan) 26%, transparent);
+  box-shadow: 0 0 0 1px var(--di-edge) inset;
+}
+
+:root[data-circuit="dreamisland"] .field-order li i {
+  background: color-mix(in oklab, var(--di-ink) 45%, transparent);
+  border-radius: 2px;
+}
+
+:root[data-circuit="dreamisland"] .field-order li[data-player="true"] i {
+  background: var(--di-cyan);
+}
+
+/*
+  The plasma reserve and the two lines under it are the last shell nodes that
+  were still speaking the base game's acid green inside an aqua-glass HUD.
+*/
+:root[data-circuit="dreamisland"] .hud-reserve__fill {
+  background: linear-gradient(90deg, var(--di-cyan), color-mix(in oklab, var(--di-cyan) 45%, #ffffff));
+}
+
+:root[data-circuit="dreamisland"] #polarity-flip,
+:root[data-circuit="dreamisland"] #polarity-deck,
+:root[data-circuit="dreamisland"] #polarity-route {
+  font-family: var(--di-michroma);
+  color: var(--di-ink);
+  text-shadow: none;
+}
+
+/* ------------------------------------------------- round 2: glass everywhere */
+/*
+  Item 3. Four blocks of the shell's HUD had no backing at all and sat straight
+  on sky, sand or sea: the gate strip, the race clock, the plasma labels and the
+  bottom-left ability text. They get the same pill recipe as everything else -
+  the fix the brief asks for, rather than darkening the day ink, which would
+  have broken the Direction B palette the whole skin is built on.
+*/
+:root[data-circuit="dreamisland"] .hud-gate,
+:root[data-circuit="dreamisland"] .hud-timing,
+:root[data-circuit="dreamisland"] .hud-reserve,
+:root[data-circuit="dreamisland"] #polarity-hud .hud-gravity,
+:root[data-circuit="dreamisland"] .hud-standing__stack,
+:root[data-circuit="dreamisland"] .race-header__identity,
+:root[data-circuit="dreamisland"] .system-state {
+  border-radius: 22px;
+  padding: 10px 16px;
+  background: var(--di-glass);
+  background-image: var(--di-gel);
+  border: 1px solid var(--di-edge);
+  box-shadow: var(--di-pill-shadow);
+  backdrop-filter: blur(6px);
+}
+
+/*
+  The field ladder already carries its own pill, so the stack around it must not
+  draw a second one behind it; it backs only the gap line above the ladder.
+*/
+:root[data-circuit="dreamisland"] .hud-standing__stack {
+  padding: 8px 10px 0;
+}
+
+:root[data-circuit="dreamisland"] .field-order {
+  background: none;
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  padding: 4px 0 6px;
+}
+
+/*
+  Every remaining ink in the shell's own palette - muted grey, acid green, the
+  shell's cyan - becomes the island's ink, so no text is a colour the backing
+  was not designed for. The chrome roundels keep their dark ink (below).
+*/
+:root[data-circuit="dreamisland"] #checkpoint-value,
+:root[data-circuit="dreamisland"] #finish-value,
+:root[data-circuit="dreamisland"] #sector-value,
+:root[data-circuit="dreamisland"] #clean-chain,
+:root[data-circuit="dreamisland"] #turn-label,
+:root[data-circuit="dreamisland"] #turn-distance,
+:root[data-circuit="dreamisland"] #system-status,
+:root[data-circuit="dreamisland"] .course-name,
+:root[data-circuit="dreamisland"] .wordmark,
+:root[data-circuit="dreamisland"] #last-lap-value,
+:root[data-circuit="dreamisland"] #boost-label,
+:root[data-circuit="dreamisland"] #boost-value,
+:root[data-circuit="dreamisland"] #time-value,
+:root[data-circuit="dreamisland"] #gap-value,
+:root[data-circuit="dreamisland"] .hud-standing__gap,
+:root[data-circuit="dreamisland"] #polarity-flip,
+:root[data-circuit="dreamisland"] #polarity-deck,
+:root[data-circuit="dreamisland"] #polarity-route,
+:root[data-circuit="dreamisland"] .field-order li,
+:root[data-circuit="dreamisland"] .field-order li .gap,
+:root[data-circuit="dreamisland"] .hud-label {
+  color: var(--di-ink);
+  text-shadow: none;
+}
+
+/* The header row is a strip of glass rather than three, so the wordmark, the
+   map name and the system lamp share one ground. */
+:root[data-circuit="dreamisland"] .race-header__identity,
+:root[data-circuit="dreamisland"] .system-state {
+  padding: 6px 14px;
+  border-radius: 999px;
+}
+
+/* ------------------------------------------------------------- the clock dial */
+:root[data-circuit="dreamisland"] .di-clock {
+  display: inline-block;
+  margin-left: 10px;
+  vertical-align: middle;
+  line-height: 0;
+}
+
+:root[data-circuit="dreamisland"] .di-clock__face {
+  fill: var(--di-glass);
+}
+
+:root[data-circuit="dreamisland"] .di-clock__rim {
+  fill: none;
+  stroke: var(--di-edge);
+  stroke-width: 2;
+}
+
+:root[data-circuit="dreamisland"] .di-clock__ticks line {
+  stroke: color-mix(in oklab, var(--di-ink) 55%, transparent);
+  stroke-width: 1.5;
+}
+
+:root[data-circuit="dreamisland"] .di-clock__hour,
+:root[data-circuit="dreamisland"] .di-clock__minute {
+  stroke: var(--di-ink);
+  stroke-linecap: round;
+}
+
+:root[data-circuit="dreamisland"] .di-clock__hour { stroke-width: 4; }
+:root[data-circuit="dreamisland"] .di-clock__minute { stroke-width: 2.5; }
+:root[data-circuit="dreamisland"] .di-clock__pin { fill: var(--di-cyan); }
+
+/* --------------------------------------------------------------- the layer */
+.di-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9;
+  color: var(--di-ink);
+}
+
+/* ------------------------------------------------------------ the power slot */
+/*
+  §4.6. The shell's 56 px ability slot is hidden for this circuit and replaced
+  by a 96 px glass pill at the bottom centre — the one place on the screen a
+  driver's eye already returns to, because it is directly under the craft.
+*/
+:root[data-circuit="dreamisland"] #polarity-hud .hud-device {
+  display: none;
+}
+
+.di-slot {
+  position: absolute;
+  left: 50%;
+  bottom: 26px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: 96px;
+  padding: 0 22px 0 16px;
+  border-radius: 999px;
+  background: var(--di-glass);
+  background-image: var(--di-gel);
+  border: 1px solid var(--di-edge);
+  box-shadow: var(--di-pill-shadow);
+  backdrop-filter: blur(6px);
+  transition: height 180ms ease, padding 180ms ease, opacity 180ms ease;
+}
+
+.di-slot[data-teach="true"] {
+  height: 120px;
+  padding: 0 30px 0 22px;
+}
+
+.di-slot__orb {
+  display: grid;
+  place-items: center;
+  width: 62px;
+  height: 62px;
+  border-radius: 999px;
+  background: var(--di-chrome);
+  box-shadow: 0 2px 8px -3px oklch(0.2 0.05 240 / 0.7);
+}
+
+.di-slot__orbbase { fill: oklch(0.18 0.04 235 / 0.55); }
+
+.di-slot__ring {
+  fill: none;
+  stroke: var(--di-cyan);
+  stroke-width: 4;
+  transform: rotate(-90deg);
+  transform-origin: 22px 22px;
+  transition: stroke-dashoffset 90ms linear;
+}
+
+.di-slot[data-kind="surge"] .di-slot__ring { stroke: var(--di-amber); }
+
+.di-slot__glyph { fill: oklch(0.92 0.02 220 / 0.85); }
+.di-slot__glyphcore { fill: var(--di-cyan); }
+.di-slot[data-kind="surge"] .di-slot__glyphcore { fill: var(--di-amber); }
+
+/* The orb fills from the bottom for the 400 ms of the collected state. */
+.di-slot[data-power-state="collected"] .di-slot__orb {
+  background:
+    linear-gradient(0deg, var(--di-cyan) 0 100%) bottom / 100% 100% no-repeat,
+    var(--di-chrome);
+  animation: di-fill 400ms ease-out 1;
+}
+
+@keyframes di-fill {
+  from { background-size: 100% 0%, auto; }
+  to { background-size: 100% 100%, auto; }
+}
+
+.di-slot__text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 236px;
+}
+
+.di-slot__name {
+  font: 400 20px/1.1 var(--di-michroma);
+  letter-spacing: 0.05em;
+  color: var(--di-ink);
+}
+
+.di-slot[data-teach="true"] .di-slot__name { font-size: 26px; }
+
+.di-slot__advice {
+  font: 400 13px/1.2 var(--di-mono);
+  letter-spacing: 0.08em;
+  color: color-mix(in oklab, var(--di-ink) 78%, transparent);
+}
+
+.di-slot__key {
+  display: grid;
+  place-items: center;
+  min-width: 40px;
+  height: 40px;
+  padding: 0 10px;
+  border-radius: 10px;
+  background: var(--di-chrome);
+  border: 1px solid oklch(1 0 0 / 0.85);
+  box-shadow: 0 3px 0 oklch(0.45 0.04 235 / 0.75);
+  font: 400 16px/1 var(--di-mono);
+  color: #06233f;
+}
+
+/* The keycap pulses only while a power is held: it is the one moment the key
+   does anything, and a keycap that always pulses says nothing. */
+.di-slot[data-power-state="armed"] .di-slot__key,
+.di-slot[data-power-state="collected"] .di-slot__key {
+  animation: di-key 900ms ease-in-out infinite;
+}
+
+@keyframes di-key {
+  0%, 100% { box-shadow: 0 3px 0 oklch(0.45 0.04 235 / 0.75), 0 0 0 0 var(--di-cyan); }
+  50% { box-shadow: 0 3px 0 oklch(0.45 0.04 235 / 0.75), 0 0 0 7px color-mix(in oklab, var(--di-cyan) 0%, transparent); }
+}
+
+.di-slot[data-power-state="hunting"] { opacity: 0.86; }
+
+/* ------------------------------------------------------------- world bubble */
+/*
+  Round 2, item 6. The pill is at least 40 px tall with 20 px Michroma on the
+  name, and it hangs ABOVE its anchor with a chevron pointing down at the
+  capsule: the runtime translates it by -100% of its own height, so the tip of
+  the chevron is the point the projection put on screen.
+*/
+.di-bubble {
+  position: absolute;
+  top: 0;
+  left: 0;
+  /*
+    `max-content`, because an absolutely positioned shrink-to-fit box can end up
+    narrower than the pill it holds and then the pill's own children overflow
+    its rounded ground: `PHASE SHIELD` at 21 px Michroma is 220 px of name, and
+    65 px of it hung off the right-hand end of the pill and onto the sea, which
+    is what the contrast checker was reporting as 4.26:1 on an opaque pill.
+  */
+  width: max-content;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 140ms ease;
+}
+
+.di-bubble__pill > * { flex: 0 0 auto; }
+
+/*
+  The bubble's own glass is more opaque than the HUD's. It is the only pill that
+  floats over the WORLD rather than over a screen edge, so the ground under it
+  is whatever the sea is doing: measured 3.99:1 against the day REEF water at
+  the shared opacity, which is the only element in the frame that was still
+  under the gate once every HUD block had a backing.
+*/
+.di-bubble__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 10px 22px;
+  border-radius: 999px;
+  white-space: nowrap;
+  /*
+    NO GEL on this one. The gel's lower half is a shadow, the bubble's 21 px
+    name sits across exactly that band, and over the bright REEF water it read
+    4.13:1 — the last element under the gate. A flat ground, and the lozenge
+    keeps its glass from the border and the drop shadow instead.
+  */
+  /* FULLY OPAQUE. At 96 % the craft showing through four per cent of it was
+     still enough to drop the 21 px name to 4.11:1 while the 14 px advice line
+     beside it passed at 4.84 — the bubble is the one pill with a moving,
+     arbitrary ground, so it gets a solid one. */
+  background: var(--di-bubble-ground);
+  border: 1px solid var(--di-edge);
+  box-shadow: var(--di-pill-shadow);
+}
+
+.di-bubble__chevron {
+  display: block;
+  width: 18px;
+  height: 12px;
+  margin-top: -1px;
+  background: var(--di-bubble-ground);
+  border-bottom: 1px solid var(--di-edge);
+  border-right: 1px solid var(--di-edge);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  filter: drop-shadow(0 2px 3px oklch(0.2 0.05 240 / 0.45));
+}
+
+.di-bubble[data-active="true"] { opacity: 1; }
+.di-bubble__name { font: 400 21px/1.1 var(--di-michroma); color: var(--di-ink); }
+.di-bubble__advice,
+.di-bubble__range { font: 400 14px/1 var(--di-mono); color: color-mix(in oklab, var(--di-ink) 82%, transparent); }
+
+/* ---------------------------------------------------------- the feel moments */
+/* Fire: speed lines at the edges, and an edge sweep in the power's colour. */
+.di-lines {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 120ms ease;
+  background:
+    radial-gradient(120% 80% at 50% 50%, transparent 52%, oklch(0.15 0.05 240 / 0.42) 100%),
+    repeating-conic-gradient(
+      from 0deg at 50% 50%,
+      oklch(1 0 0 / 0.16) 0deg 0.5deg,
+      transparent 0.5deg 3deg
+    );
+  mask-image: radial-gradient(115% 80% at 50% 50%, transparent 46%, #000 92%);
+}
+
+.di-lines[data-active="true"] { opacity: 1; animation: di-sweep 520ms ease-out 1; }
+.di-lines[data-kind="surge"] { --di-sweep: var(--di-amber); }
+.di-lines[data-kind="shield"] { --di-sweep: var(--di-cyan); }
+
+@keyframes di-sweep {
+  from { box-shadow: inset 0 0 0 0 var(--di-sweep, var(--di-cyan)); }
+  35% { box-shadow: inset 0 0 90px 22px var(--di-sweep, var(--di-cyan)); }
+  to { box-shadow: inset 0 0 40px 0 transparent; }
+}
+
+/* The strike: 300 ms of white going cyan, from the HUD layer. */
+.di-flash {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: linear-gradient(180deg, #ffffff 0%, #b8fbff 60%, #35e6ff 100%);
+  mix-blend-mode: screen;
+}
+
+.di-flash[data-active="true"] { display: block; }
+.di-flash[data-active="false"] { opacity: 0 !important; }
+
+/* One goldfish across the top of the HUD, 2.4 s. */
+.di-fish {
+  position: absolute;
+  top: 96px;
+  left: 0;
+  color: #ff9a3c;
+  opacity: 0;
+  transition: opacity 200ms ease;
+  filter: drop-shadow(0 2px 6px oklch(0.2 0.05 240 / 0.45));
+}
+
+.di-fish[data-active="true"] { opacity: 0.95; }
+
+/* The overtake pill, floating up out of the timing tower. */
+.di-pills {
+  position: absolute;
+  left: 34px;
+  top: 232px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.di-pill {
+  align-self: flex-start;
+  padding: 6px 16px;
+  border-radius: 999px;
+  background: var(--di-glass);
+  background-image: var(--di-gel);
+  border: 1px solid var(--di-edge);
+  box-shadow: var(--di-pill-shadow);
+  backdrop-filter: blur(6px);
+  font: 400 13px/1 var(--di-michroma);
+  letter-spacing: 0.05em;
+  color: var(--di-ink);
+  animation: di-float 1600ms ease-out forwards;
+}
+
+.di-pill[data-gained="true"] { box-shadow: var(--di-pill-shadow), 0 0 0 1px var(--di-cyan); }
+.di-pill[data-still="true"] { animation: none; }
+
+@keyframes di-float {
+  0% { transform: translateY(10px); opacity: 0; }
+  18% { transform: translateY(0); opacity: 1; }
+  74% { transform: translateY(-14px); opacity: 1; }
+  100% { transform: translateY(-30px); opacity: 0; }
+}
+
+/*
+  `?motion=reduce` and the OS setting both land here. The runtime already
+  refuses to start the flash, the fish and the speed lines; this is the second
+  belt, for the CSS-only animations above.
+*/
+@media (prefers-reduced-motion: reduce) {
+  .di-slot,
+  .di-slot__ring,
+  .di-bubble { transition: none; }
+
+  .di-slot[data-power-state="collected"] .di-slot__orb,
+  .di-slot[data-power-state="armed"] .di-slot__key,
+  .di-slot[data-power-state="collected"] .di-slot__key,
+  .di-lines[data-active="true"],
+  .di-pill { animation: none; }
+}

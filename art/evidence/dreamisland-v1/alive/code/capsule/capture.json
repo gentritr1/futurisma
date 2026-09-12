@@ -1,0 +1,83 @@
+{
+  "script": "scripts/visual/dreamisland/alive-capsule-pixels.mjs",
+  "base": "http://127.0.0.1:5210",
+  "viewport": "1280x720",
+  "camera": "DreamIslandRuntime.updateCamera: 11.5 m back, 4.8 m up, aimed 19 m ahead, FOV 62",
+  "pickup": "court-turbine (progress .575)",
+  "rows": [
+    {
+      "state": "day",
+      "distanceMetres": 300,
+      "craftProgress": 0.44999999999989826,
+      "capsule": "art/evidence/dreamisland-v1/alive/code/capsule/day-300m-capsule.png",
+      "column": "art/evidence/dreamisland-v1/alive/code/capsule/day-300m-column.png",
+      "ring": "art/evidence/dreamisland-v1/alive/code/capsule/day-300m-ring.png",
+      "blank": "art/evidence/dreamisland-v1/alive/code/capsule/day-300m-blank.png",
+      "full": "art/evidence/dreamisland-v1/alive/code/capsule/day-300m-full.png"
+    },
+    {
+      "state": "day",
+      "distanceMetres": 150,
+      "craftProgress": 0.5124999999999491,
+      "capsule": "art/evidence/dreamisland-v1/alive/code/capsule/day-150m-capsule.png",
+      "column": "art/evidence/dreamisland-v1/alive/code/capsule/day-150m-column.png",
+      "ring": "art/evidence/dreamisland-v1/alive/code/capsule/day-150m-ring.png",
+      "blank": "art/evidence/dreamisland-v1/alive/code/capsule/day-150m-blank.png",
+      "full": "art/evidence/dreamisland-v1/alive/code/capsule/day-150m-full.png"
+    },
+    {
+      "state": "day",
+      "distanceMetres": 40,
+      "craftProgress": 0.5583333333333197,
+      "capsule": "art/evidence/dreamisland-v1/alive/code/capsule/day-40m-capsule.png",
+      "column": "art/evidence/dreamisland-v1/alive/code/capsule/day-40m-column.png",
+      "ring": "art/evidence/dreamisland-v1/alive/code/capsule/day-40m-ring.png",
+      "blank": "art/evidence/dreamisland-v1/alive/code/capsule/day-40m-blank.png",
+      "full": "art/evidence/dreamisland-v1/alive/code/capsule/day-40m-full.png"
+    },
+    {
+      "state": "night",
+      "distanceMetres": 300,
+      "craftProgress": 0.44999999999989826,
+      "capsule": "art/evidence/dreamisland-v1/alive/code/capsule/night-300m-capsule.png",
+      "column": "art/evidence/dreamisland-v1/alive/code/capsule/night-300m-column.png",
+      "ring": "art/evidence/dreamisland-v1/alive/code/capsule/night-300m-ring.png",
+      "blank": "art/evidence/dreamisland-v1/alive/code/capsule/night-300m-blank.png",
+      "full": "art/evidence/dreamisland-v1/alive/code/capsule/night-300m-full.png"
+    },
+    {
+      "state": "night",
+      "distanceMetres": 150,
+      "craftProgress": 0.5124999999999491,
+      "capsule": "art/evidence/dreamisland-v1/alive/code/capsule/night-150m-capsule.png",
+      "column": "art/evidence/dreamisland-v1/alive/code/capsule/night-150m-column.png",
+      "ring": "art/evidence/dreamisland-v1/alive/code/capsule/night-150m-ring.png",
+      "blank": "art/evidence/dreamisland-v1/alive/code/capsule/night-150m-blank.png",
+      "full": "art/evidence/dreamisland-v1/alive/code/capsule/night-150m-full.png"
+    },
+    {
+      "state": "night",
+      "distanceMetres": 40,
+      "craftProgress": 0.5583333333333197,
+      "capsule": "art/evidence/dreamisland-v1/alive/code/capsule/night-40m-capsule.png",
+      "column": "art/evidence/dreamisland-v1/alive/code/capsule/night-40m-column.png",
+      "ring": "art/evidence/dreamisland-v1/alive/code/capsule/night-40m-ring.png",
+      "blank": "art/evidence/dreamisland-v1/alive/code/capsule/night-40m-blank.png",
+      "full": "art/evidence/dreamisland-v1/alive/code/capsule/night-40m-full.png"
+    }
+  ],
+  "errors": [
+    "Applying inline style violates the following Content Security Policy directive 'style-src 'self''. Either the 'unsafe-inline' keyword, a hash ('sha256-mfdt0e5wTbas5+1kJi7UFq6ahzT4sL2wv/45RjdiHaI='), or a nonce ('nonce-...') is required to enable inline execution. The action has been blocked.",
+    "THREE.THREE.WebGLProgram: Shader Error 0 - VALIDATE_STATUS false\n\nMaterial Name: TOTEM_race_presence_masked_alpha\nMaterial Type: ShaderMaterial\n\nProgram Info Log: Vertex shader is not compiled.\nVERTEX\n\nERROR: 0:84: 'instanceColor' : undeclared identifier\nERROR: 0:84: '=' : dimension mismatch\nERROR: 0:84: 'assign' : cannot convert from 'const highp float' to 'out highp 3-component vector of float'\n\n  79: \tvarying float vFogDepth;\n  80: #endif\n  81: \n  82:   void main() {\n  83:     vEffectUv = uv;\n> 84:     vEffectData = instanceColor;\n  85:     vec4 mvPosition = modelViewMatrix * instanceMatrix * vec4(position, 1.0);\n  86:     gl_Position = projectionMatrix * mvPosition;\n  87: #ifdef USE_FOG\n  88: \tvFogDepth = - mvPosition.z;\n  89: #endif\n  90:   }\n",
+    "Applying inline style violates the following Content Security Policy directive 'style-src 'self''. Either the 'unsafe-inline' keyword, a hash ('sha256-mfdt0e5wTbas5+1kJi7UFq6ahzT4sL2wv/45RjdiHaI='), or a nonce ('nonce-...') is required to enable inline execution. The action has been blocked.",
+    "THREE.THREE.WebGLProgram: Shader Error 0 - VALIDATE_STATUS false\n\nMaterial Name: TOTEM_race_presence_masked_alpha\nMaterial Type: ShaderMaterial\n\nProgram Info Log: Vertex shader is not compiled.\nVERTEX\n\nERROR: 0:84: 'instanceColor' : undeclared identifier\nERROR: 0:84: '=' : dimension mismatch\nERROR: 0:84: 'assign' : cannot convert from 'const highp float' to 'out highp 3-component vector of float'\n\n  79: \tvarying float vFogDepth;\n  80: #endif\n  81: \n  82:   void main() {\n  83:     vEffectUv = uv;\n> 84:     vEffectData = instanceColor;\n  85:     vec4 mvPosition = modelViewMatrix * instanceMatrix * vec4(position, 1.0);\n  86:     gl_Position = projectionMatrix * mvPosition;\n  87: #ifdef USE_FOG\n  88: \tvFogDepth = - mvPosition.z;\n  89: #endif\n  90:   }\n",
+    "Applying inline style violates the following Content Security Policy directive 'style-src 'self''. Either the 'unsafe-inline' keyword, a hash ('sha256-mfdt0e5wTbas5+1kJi7UFq6ahzT4sL2wv/45RjdiHaI='), or a nonce ('nonce-...') is required to enable inline execution. The action has been blocked.",
+    "THREE.THREE.WebGLProgram: Shader Error 0 - VALIDATE_STATUS false\n\nMaterial Name: TOTEM_race_presence_masked_alpha\nMaterial Type: ShaderMaterial\n\nProgram Info Log: Vertex shader is not compiled.\nVERTEX\n\nERROR: 0:84: 'instanceColor' : undeclared identifier\nERROR: 0:84: '=' : dimension mismatch\nERROR: 0:84: 'assign' : cannot convert from 'const highp float' to 'out highp 3-component vector of float'\n\n  79: \tvarying float vFogDepth;\n  80: #endif\n  81: \n  82:   void main() {\n  83:     vEffectUv = uv;\n> 84:     vEffectData = instanceColor;\n  85:     vec4 mvPosition = modelViewMatrix * instanceMatrix * vec4(position, 1.0);\n  86:     gl_Position = projectionMatrix * mvPosition;\n  87: #ifdef USE_FOG\n  88: \tvFogDepth = - mvPosition.z;\n  89: #endif\n  90:   }\n",
+    "Applying inline style violates the following Content Security Policy directive 'style-src 'self''. Either the 'unsafe-inline' keyword, a hash ('sha256-mfdt0e5wTbas5+1kJi7UFq6ahzT4sL2wv/45RjdiHaI='), or a nonce ('nonce-...') is required to enable inline execution. The action has been blocked.",
+    "THREE.THREE.WebGLProgram: Shader Error 0 - VALIDATE_STATUS false\n\nMaterial Name: TOTEM_race_presence_masked_alpha\nMaterial Type: ShaderMaterial\n\nProgram Info Log: Vertex shader is not compiled.\nVERTEX\n\nERROR: 0:84: 'instanceColor' : undeclared identifier\nERROR: 0:84: '=' : dimension mismatch\nERROR: 0:84: 'assign' : cannot convert from 'const highp float' to 'out highp 3-component vector of float'\n\n  79: \tvarying float vFogDepth;\n  80: #endif\n  81: \n  82:   void main() {\n  83:     vEffectUv = uv;\n> 84:     vEffectData = instanceColor;\n  85:     vec4 mvPosition = modelViewMatrix * instanceMatrix * vec4(position, 1.0);\n  86:     gl_Position = projectionMatrix * mvPosition;\n  87: #ifdef USE_FOG\n  88: \tvFogDepth = - mvPosition.z;\n  89: #endif\n  90:   }\n",
+    "Applying inline style violates the following Content Security Policy directive 'style-src 'self''. Either the 'unsafe-inline' keyword, a hash ('sha256-mfdt0e5wTbas5+1kJi7UFq6ahzT4sL2wv/45RjdiHaI='), or a nonce ('nonce-...') is required to enable inline execution. The action has been blocked.",
+    "THREE.THREE.WebGLProgram: Shader Error 0 - VALIDATE_STATUS false\n\nMaterial Name: TOTEM_race_presence_masked_alpha\nMaterial Type: ShaderMaterial\n\nProgram Info Log: Vertex shader is not compiled.\nVERTEX\n\nERROR: 0:84: 'instanceColor' : undeclared identifier\nERROR: 0:84: '=' : dimension mismatch\nERROR: 0:84: 'assign' : cannot convert from 'const highp float' to 'out highp 3-component vector of float'\n\n  79: \tvarying float vFogDepth;\n  80: #endif\n  81: \n  82:   void main() {\n  83:     vEffectUv = uv;\n> 84:     vEffectData = instanceColor;\n  85:     vec4 mvPosition = modelViewMatrix * instanceMatrix * vec4(position, 1.0);\n  86:     gl_Position = projectionMatrix * mvPosition;\n  87: #ifdef USE_FOG\n  88: \tvFogDepth = - mvPosition.z;\n  89: #endif\n  90:   }\n",
+    "Applying inline style violates the following Content Security Policy directive 'style-src 'self''. Either the 'unsafe-inline' keyword, a hash ('sha256-mfdt0e5wTbas5+1kJi7UFq6ahzT4sL2wv/45RjdiHaI='), or a nonce ('nonce-...') is required to enable inline execution. The action has been blocked.",
+    "THREE.THREE.WebGLProgram: Shader Error 0 - VALIDATE_STATUS false\n\nMaterial Name: TOTEM_race_presence_masked_alpha\nMaterial Type: ShaderMaterial\n\nProgram Info Log: Vertex shader is not compiled.\nVERTEX\n\nERROR: 0:84: 'instanceColor' : undeclared identifier\nERROR: 0:84: '=' : dimension mismatch\nERROR: 0:84: 'assign' : cannot convert from 'const highp float' to 'out highp 3-component vector of float'\n\n  79: \tvarying float vFogDepth;\n  80: #endif\n  81: \n  82:   void main() {\n  83:     vEffectUv = uv;\n> 84:     vEffectData = instanceColor;\n  85:     vec4 mvPosition = modelViewMatrix * instanceMatrix * vec4(position, 1.0);\n  86:     gl_Position = projectionMatrix * mvPosition;\n  87: #ifdef USE_FOG\n  88: \tvFogDepth = - mvPosition.z;\n  89: #endif\n  90:   }\n"
+  ]
+}

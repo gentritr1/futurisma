@@ -1,0 +1,17 @@
+{
+  "script": "scripts/visual/dreamisland/alive-skin-parity.mjs",
+  "base": "http://127.0.0.1:5211",
+  "viewport": "1440x810",
+  "applied": {
+    "missing": [],
+    "circuit": "dreamisland",
+    "skinLinks": 1,
+    "styleTags": 0,
+    "lapPlateRadius": "999px",
+    "slotFont": "Michroma",
+    "bubblePillHeight": "45.0938px"
+  },
+  "errors": [],
+  "frame": "skin.png",
+  "sha256": "494888bdcccf7ffa9ac4214caac048a18265e6325edaeb66bf33fa529171b57d"
+}

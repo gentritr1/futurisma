@@ -285,6 +285,9 @@ export class GameUi {
   private systemStatusLabel = "SYSTEM STANDBY";
   private demoAutopilot = false;
   private lastFieldOrderKey = "";
+  /** The gap each row was last written with, so a live update can tell a real
+   * move from the same number arriving again four times a second. */
+  private lastFieldOrderGaps: (number | null)[] = [];
   /** P7 — the issue the player is racing under; drives every label that used
    * to read a hard-coded `WORKS 07`. */
   private playerLiveryLabel = "WORKS 07";
@@ -427,10 +430,35 @@ export class GameUi {
     this.lapPips.replaceChildren(fragment);
   }
 
+  /**
+   * Phase F. The rebuild is still keyed on the ORDER — rebuilding four rows
+   * every 250 ms throws away the browser's own text layout for nothing — but
+   * the gap text is no longer part of that key. It was, and a rival's gap
+   * therefore froze at whatever it read when the order last changed and only
+   * moved again when somebody overtook somebody: on a clean lap with a settled
+   * field the whole ladder showed stale seconds for a minute at a time. Now the
+   * rows are rebuilt on an order change and the gap spans are written in place
+   * whenever the gap has moved by at least 0.1 s, which is the resolution
+   * `formatLadderGap` prints at; writing more often would rewrite the same
+   * string four times a second.
+   */
   updateFieldOrder(entries: readonly FieldOrderEntry[]): void {
     const key = entries.map((entry) => `${entry.player ? "Y" : "N"}${entry.name}`).join("|");
-    if (key === this.lastFieldOrderKey) return;
+    const gaps = entries.map((entry) =>
+      typeof entry.gapMs === "number" && Number.isFinite(entry.gapMs) ? entry.gapMs : null);
+    const rows = this.fieldOrder.children;
+    if (key === this.lastFieldOrderKey && rows.length === entries.length) {
+      for (let index = 0; index < entries.length; index += 1) {
+        const now = gaps[index], was = this.lastFieldOrderGaps[index];
+        if (was === now || (was !== null && now !== null && Math.abs(now - was) < 100)) continue;
+        this.lastFieldOrderGaps[index] = now;
+        const gap = rows[index].querySelector<HTMLElement>(".gap");
+        if (gap) gap.textContent = formatLadderGap(entries[index].gapMs, entries[index].player);
+      }
+      return;
+    }
     this.lastFieldOrderKey = key;
+    this.lastFieldOrderGaps = gaps;
     const fragment = document.createDocumentFragment();
     for (const entry of entries) {
       const row = document.createElement("li");

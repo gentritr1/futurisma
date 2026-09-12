@@ -42,14 +42,17 @@ export class DreamIslandPowers {
   }
   const transfer=document.getElementById('polarity-flip');if(transfer)transfer.dataset.transfer='ready';
   const fill=document.getElementById('power-charge-fill');if(fill)fill.style.transform=`scaleX(${active?this.simulation.state.activeCharge:this.simulation.heldPowerCharge})`;
-  // Charge and collection drive the existing instanced cores, plates and hinges.
-  this.course.hardware?.update(this.simulation.getPickupStates(),this.simulation.state.tick,this.course.nightBlend);
+  // Charge and collection drive the existing instanced cores, plates and hinges,
+  // and phase F's capsules over the road, from the same pickup states.
+  const states=this.simulation.getPickupStates();
+  this.course.hardware?.update(states,this.simulation.state.tick,this.course.nightBlend);
+  this.course.capsules?.update(states,this.simulation.state.tick,this.course.nightBlend,this.course.reducedMotion);
  }
  private use(progress:number){const result=this.simulation.requestPower(progress);if(!result.ok)this.audio?.playPowerDenied();this.dispatch();}
  private dispatch(){for(const e of this.simulation.state.events){if(e.sequence<=this.sequence)continue;this.sequence=e.sequence;
   if(e.type==='pickup'){this.audio?.playDeviceClunk();this.audio?.playPowerPickup();}
   if(e.type==='power'&&e.kind)this.audio?.playPowerActivate(e.kind);
  }}
- reset(){this.simulation.reset();this.course.hardware?.reset();this.sequence=0;}
- dispose(){this.course.hardware?.dispose();this.course.hardware=null;}
+ reset(){this.simulation.reset();this.course.hardware?.reset();this.course.capsules?.reset();this.sequence=0;}
+ dispose(){this.course.hardware?.dispose();this.course.hardware=null;this.course.capsules?.dispose();this.course.capsules=null;}
 }

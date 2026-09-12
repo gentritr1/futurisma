@@ -197,7 +197,7 @@
     "floorMetres": 6,
     "fishLowestPointMetres": -1.507,
     "riseSeconds": 6,
-    "deckSamples": 21249,
+    "deckSamples": 95691,
     "minimumDeckClearanceMetres": 8.442,
     "worst": {
       "shoal": "reef-loop",
@@ -210,10 +210,12 @@
       {
         "id": "basin-eight",
         "batch": "FISHBASIN",
+        "source": null,
         "fish": 4,
         "periodSeconds": 34,
         "ticksSwept": 8881,
         "deckSamples": 9840,
+        "floorMetres": null,
         "minimumDeckClearanceMetres": 9.435,
         "worst": {
           "since": 3019,
@@ -225,16 +227,120 @@
       {
         "id": "reef-loop",
         "batch": "FISHREEF",
+        "source": null,
         "fish": 4,
         "periodSeconds": 46,
         "ticksSwept": 11761,
         "deckSamples": 11409,
+        "floorMetres": null,
         "minimumDeckClearanceMetres": 8.442,
         "worst": {
           "since": 467,
           "livery": "goldfish-gold",
           "lateral": -15.899,
           "clearance": 8.442
+        }
+      },
+      {
+        "id": "grove-cross",
+        "batch": "FISHGROVECROSS",
+        "source": "reef-loop",
+        "fish": 4,
+        "periodSeconds": 38,
+        "ticksSwept": 9841,
+        "deckSamples": 9035,
+        "floorMetres": 8.85,
+        "minimumDeckClearanceMetres": 9.693,
+        "worst": {
+          "since": 509,
+          "livery": "goldfish-gold",
+          "lateral": -13.805,
+          "clearance": 9.693
+        }
+      },
+      {
+        "id": "court-cross",
+        "batch": "FISHCOURTCROSS",
+        "source": "reef-loop",
+        "fish": 4,
+        "periodSeconds": 43,
+        "ticksSwept": 11041,
+        "deckSamples": 16131,
+        "floorMetres": 8.85,
+        "minimumDeckClearanceMetres": 9.693,
+        "worst": {
+          "since": 519,
+          "livery": "goldfish-gold",
+          "lateral": -14.812,
+          "clearance": 9.693
+        }
+      },
+      {
+        "id": "court-arc",
+        "batch": "FISHCOURTARC",
+        "source": "reef-loop",
+        "fish": 4,
+        "periodSeconds": 51,
+        "ticksSwept": 12961,
+        "deckSamples": 14916,
+        "floorMetres": 8.85,
+        "minimumDeckClearanceMetres": 9.693,
+        "worst": {
+          "since": 535,
+          "livery": "goldfish-gold",
+          "lateral": -14.965,
+          "clearance": 9.693
+        }
+      },
+      {
+        "id": "reef-cross",
+        "batch": "FISHREEFCROSS",
+        "source": "reef-loop",
+        "fish": 4,
+        "periodSeconds": 47,
+        "ticksSwept": 12001,
+        "deckSamples": 10773,
+        "floorMetres": 8.85,
+        "minimumDeckClearanceMetres": 9.693,
+        "worst": {
+          "since": 519,
+          "livery": "goldfish-gold",
+          "lateral": -15.769,
+          "clearance": 9.693
+        }
+      },
+      {
+        "id": "reef-arc",
+        "batch": "FISHREEFARC",
+        "source": "reef-loop",
+        "fish": 4,
+        "periodSeconds": 55,
+        "ticksSwept": 13921,
+        "deckSamples": 13099,
+        "floorMetres": 8.85,
+        "minimumDeckClearanceMetres": 9.693,
+        "worst": {
+          "since": 525,
+          "livery": "goldfish-gold",
+          "lateral": -15.976,
+          "clearance": 9.693
+        }
+      },
+      {
+        "id": "cut-cross",
+        "batch": "FISHCUTCROSS",
+        "source": "reef-loop",
+        "fish": 4,
+        "periodSeconds": 41,
+        "ticksSwept": 10561,
+        "deckSamples": 10488,
+        "floorMetres": 8.85,
+        "minimumDeckClearanceMetres": 9.693,
+        "worst": {
+          "since": 524,
+          "livery": "goldfish-gold",
+          "lateral": -13.839,
+          "clearance": 9.693
         }
       }
     ],

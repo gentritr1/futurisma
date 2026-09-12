@@ -1,0 +1,57 @@
+{
+  "method": "Blender BVHTree, 8 deterministic cosine hemisphere rays, radius 2.4 m, colour-only accessor patch",
+  "trianglesBefore": {
+    "DI_FISHBASIN_DI_MAT_emissive": 80,
+    "DI_FISHBASIN_DI_MAT_jungle": 432,
+    "DI_FISHREEF_DI_MAT_emissive": 80,
+    "DI_FISHREEF_DI_MAT_jungle": 432,
+    "DI_STATIC_DI_MAT_concrete": 23180,
+    "DI_STATIC_DI_MAT_emissive": 1232,
+    "DI_STATIC_DI_MAT_jungle": 30632,
+    "DI_STATIC_DI_MAT_jungle-card": 8294,
+    "DI_STATIC_DI_MAT_metal": 2120,
+    "DI_STATIC_DI_MAT_signage": 212
+  },
+  "trianglesAfter": {
+    "DI_FISHBASIN_DI_MAT_emissive": 80,
+    "DI_FISHBASIN_DI_MAT_jungle": 432,
+    "DI_FISHREEF_DI_MAT_emissive": 80,
+    "DI_FISHREEF_DI_MAT_jungle": 432,
+    "DI_STATIC_DI_MAT_concrete": 23180,
+    "DI_STATIC_DI_MAT_emissive": 1232,
+    "DI_STATIC_DI_MAT_jungle": 30632,
+    "DI_STATIC_DI_MAT_jungle-card": 8294,
+    "DI_STATIC_DI_MAT_metal": 2120,
+    "DI_STATIC_DI_MAT_signage": 212
+  },
+  "trianglesAdded": 0,
+  "bytesChanged": 408585,
+  "sourceSha256": "60e11543acce5c6a939fc715eae5aeccdded1a2efc177706ab04a3bdcdf12756",
+  "resultSha256": "7bb24e916f6345b6e5084ed9cb67e621a6130bb7b4cd03ac679e398fd42ff291",
+  "meshes": [
+    {
+      "mesh": "DI_STATIC_DI_MAT_concrete",
+      "vertices": 45496,
+      "minimum": 0.65,
+      "mean": 0.8493454094865482
+    },
+    {
+      "mesh": "DI_STATIC_DI_MAT_jungle",
+      "vertices": 63015,
+      "minimum": 0.65,
+      "mean": 0.896583650718083
+    },
+    {
+      "mesh": "DI_STATIC_DI_MAT_metal",
+      "vertices": 3888,
+      "minimum": 0.65,
+      "mean": 0.9023726851851852
+    },
+    {
+      "mesh": "DI_STATIC_DI_MAT_signage",
+      "vertices": 424,
+      "minimum": 0.65,
+      "mean": 0.9490271226415095
+    }
+  ]
+}

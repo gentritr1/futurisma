@@ -12,6 +12,9 @@ const tier=flag('tier')??'works',seed=flag('seed')??'3868938316',calibrate=proce
 // data directory across launches, which is what makes a ghost recorded by one
 // invocation visible to the next.
 const mode=flag('mode')??'race',laps=flag('laps'),profile=flag('profile');
+// `--base=` so a second worktree can soak against its OWN dev server. The
+// default is the 5200 the map has always used, so no existing invocation moves.
+const base=flag('base')??'http://127.0.0.1:5200';
 if(!['race','sprint','timeattack'].includes(mode))throw Error('--mode= must be race, sprint or timeattack');
 if(laps!==undefined&&!/^-?\d+$/.test(laps))throw Error('--laps= must be an integer');
 const out=flag('out')??'art/evidence/dreamisland-v1/phase-a/'+(calibrate?'calibration':'soak-'+tier)+(reduced?'-reduced':'');
@@ -34,6 +37,12 @@ const flagTimeoutMs=Math.max(240000,(Number(laps)||3)*45000);
 const browser=await launchReviewBrowser({...(profile?{userDataDir:profile}:{}),protocolTimeout:flagTimeoutMs+120000});
 try{
  const page=await browser.newPage(),errors=[];
+ // Round 2, item 1: there is no ignored console error any more. The island's
+ // stylesheet used to be a Vite-injected `<style>` element, which the shipped
+ // `style-src 'self'` blocks on the dev server, and this harness used to carry
+ // an exception for that one message. The skin is now a `<link>` to a file on
+ // this origin in both dev and build, so every console error fails the soak
+ // again, as it did before phase F.
  page.on('pageerror',e=>{errors.push(String(e));console.log(String(e));});
  page.on('console',m=>{if(m.type()==='error'){errors.push(m.text());console.log(m.text());}});
  const grip=flag('grip');
@@ -43,7 +52,7 @@ try{
  await instrument(page,{...(grip!==undefined?{grip:Number(grip)}:{}),...(basinWidth!==undefined?{basinWidth:Number(basinWidth)}:{})});
  // `?autostart=1` does not exist. `demo=1` autostarts UNLESS diagnostics and
  // start=manual are both present, which they are here, so the harness clicks.
- const url='http://127.0.0.1:5200/?map=dreamisland&seed='+seed+'&tier='+tier+'&mode='+mode
+ const url=base+'/?map=dreamisland&seed='+seed+'&tier='+tier+'&mode='+mode
   +'&demo=1&headless=1&diagnostics=1&start=manual&quality=high&music=0'
   +(laps!==undefined?'&laps='+laps:'')
   +(calibrate?'&calibrate=1':'')+(reduced?'&motion=reduce':'');

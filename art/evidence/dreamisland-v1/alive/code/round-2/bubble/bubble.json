@@ -1,0 +1,76 @@
+{
+  "script": "scripts/visual/dreamisland/alive-bubble-size.mjs",
+  "base": "http://127.0.0.1:5210",
+  "viewport": "1440x810",
+  "gate": {
+    "nameFontPxMin": 20,
+    "pillHeightPxMin": 40,
+    "chevronBelowPill": true,
+    "bobAmplitudePx": 5
+  },
+  "worst": {
+    "pillHeightPx": 45,
+    "nameFontPx": 21,
+    "nameFamily": "Michroma",
+    "chevronBelowPill": true,
+    "nameInsidePill": true,
+    "bobAmplitudePx": 5,
+    "labels": [
+      "SURGE",
+      "PHASE SHIELD"
+    ]
+  },
+  "samples": [
+    {
+      "text": "SURGE",
+      "pill": {
+        "x": 564,
+        "y": 264,
+        "w": 312,
+        "h": 45
+      },
+      "name": {
+        "x": 587,
+        "y": 275,
+        "w": 106,
+        "h": 23
+      },
+      "chevron": {
+        "x": 711,
+        "y": 309,
+        "w": 18,
+        "h": 12
+      },
+      "nameFontPx": 21,
+      "nameFamily": "Michroma",
+      "chevronBelowPill": true,
+      "nameInsidePill": true
+    },
+    {
+      "text": "PHASE SHIELD",
+      "pill": {
+        "x": 496,
+        "y": 270,
+        "w": 426,
+        "h": 45
+      },
+      "name": {
+        "x": 519,
+        "y": 281,
+        "w": 220,
+        "h": 23
+      },
+      "chevron": {
+        "x": 700,
+        "y": 315,
+        "w": 18,
+        "h": 12
+      },
+      "nameFontPx": 21,
+      "nameFamily": "Michroma",
+      "chevronBelowPill": true,
+      "nameInsidePill": true
+    }
+  ],
+  "errors": []
+}

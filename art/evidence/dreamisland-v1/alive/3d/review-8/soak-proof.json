@@ -1,0 +1,96 @@
+{
+  "soaks": [
+    {
+      "name": "baseline",
+      "draws": 105,
+      "triangles": 162258,
+      "p95Ms": 9,
+      "sampleResidual": -0.46817247872479584,
+      "errors": [],
+      "materialViolations": 0,
+      "missedGates": 0,
+      "recoveries": 0,
+      "lapTimesMs": [
+        33158,
+        32125,
+        31925
+      ],
+      "finalSourceMatches": true,
+      "ceilingsPass": true
+    },
+    {
+      "name": "works",
+      "draws": 105,
+      "triangles": 162258,
+      "p95Ms": 9,
+      "sampleResidual": -3.52211647013155,
+      "errors": [],
+      "materialViolations": 0,
+      "missedGates": 0,
+      "recoveries": 0,
+      "lapTimesMs": [
+        33158,
+        32125,
+        31925
+      ],
+      "finalSourceMatches": true,
+      "ceilingsPass": true
+    },
+    {
+      "name": "rookie",
+      "draws": 105,
+      "triangles": 162258,
+      "p95Ms": 8.799999952316284,
+      "sampleResidual": 2.185185191072037,
+      "errors": [],
+      "materialViolations": 0,
+      "missedGates": 0,
+      "recoveries": 0,
+      "lapTimesMs": [
+        33158,
+        32125,
+        31925
+      ],
+      "finalSourceMatches": true,
+      "ceilingsPass": true
+    },
+    {
+      "name": "feral",
+      "draws": 106,
+      "triangles": 162350,
+      "p95Ms": 8.5,
+      "sampleResidual": -0.931869982040439,
+      "errors": [],
+      "materialViolations": 0,
+      "missedGates": 0,
+      "recoveries": 0,
+      "lapTimesMs": [
+        33158,
+        32067,
+        31900
+      ],
+      "finalSourceMatches": true,
+      "ceilingsPass": true
+    },
+    {
+      "name": "works-reduced",
+      "draws": 103,
+      "triangles": 161808,
+      "p95Ms": 9,
+      "sampleResidual": -5.444375472226511,
+      "errors": [],
+      "materialViolations": 0,
+      "missedGates": 0,
+      "recoveries": 0,
+      "lapTimesMs": [
+        33158,
+        32125,
+        31925
+      ],
+      "finalSourceMatches": true,
+      "ceilingsPass": true
+    }
+  ],
+  "worksDeltaMs": 0,
+  "shaderBudgetPass": true
+}

@@ -1,0 +1,70 @@
+{
+  "script": "scripts/visual/dreamisland/instrument.mjs",
+  "samples": 11938,
+  "activeWindowMs": 96543.09999990463,
+  "activeExpectedSamples": 12021.554428018559,
+  "activeSampleResidual": -83.55442801855861,
+  "windowSamples": 720,
+  "windowMs": 5839.199999809265,
+  "calibration": {
+    "samples": 120,
+    "windowMs": 963.6999998092651,
+    "hz": 124.52007888736155
+  },
+  "expectedRateHz": 124.52007888736155,
+  "expectedSamples": 727.0976446153313,
+  "sampleResidual": -7.097644615331319,
+  "observedRateHz": 123.30456227283163,
+  "p95Ms": 8.5,
+  "peakMainCalls": 86,
+  "peakShadowCalls": 23,
+  "peakTotalCalls": 103,
+  "peakTriangles": 132936,
+  "peakShadowTriangles": 28872,
+  "sizes": [
+    "1280x720"
+  ],
+  "lightingStates": {
+    "day": {
+      "frames": 8124,
+      "peakMainCalls": 86,
+      "peakShadowCalls": 23,
+      "minimumShadowCalls": 17,
+      "peakTotalCalls": 103,
+      "peakTriangles": 132936,
+      "peakShadowTriangles": 28872,
+      "minimumShadowTriangles": 23624
+    },
+    "crossfade": null,
+    "night": {
+      "frames": 3814,
+      "peakMainCalls": 86,
+      "peakShadowCalls": 23,
+      "minimumShadowCalls": 17,
+      "peakTotalCalls": 103,
+      "peakTriangles": 132936,
+      "peakShadowTriangles": 28872,
+      "minimumShadowTriangles": 23624
+    },
+    "note": "Split on the course own nightBlend. renderer.info.render.calls EXCLUDES the shadow pass, so the shadow columns come from wrapping shadowMap.render and differencing the counters around it."
+  },
+  "emissiveStability": {
+    "settledFrames": 3814,
+    "comparisons": 3813,
+    "framesWithAnEmissiveChange": 0,
+    "largestChange": 0,
+    "values": [],
+    "note": "Sampled off the live materials inside the render wrapper, so it is what the renderer saw, not what the course intended."
+  },
+  "schedule": {
+    "framesWithGripBelowOne": 431,
+    "minimumGrip": 0.85,
+    "gripDropSectors": [
+      "BASIN CAUSEWAY",
+      "CLOCK COURT"
+    ],
+    "maximumNightBlend": 1,
+    "framesAtFullNight": 3814
+  },
+  "note": "Expected rendering rate comes from a separate pre-start requestAnimationFrame calibration. Physics remains 120 Hz. Each sampled delta covers one render interval, including any stalls."
+}

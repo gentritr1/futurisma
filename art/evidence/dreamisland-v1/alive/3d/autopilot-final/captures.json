@@ -1,0 +1,87 @@
+{
+  "viewport": [
+    1600,
+    900
+  ],
+  "label": "final",
+  "rows": [
+    {
+      "pose": "court",
+      "progress": 0.5751671171929371,
+      "tick": 2332,
+      "camera": [
+        334.70314124617,
+        15.548746479597948,
+        747.775664566638
+      ],
+      "quaternion": [
+        -0.06497709964657944,
+        0.7174439374002302,
+        0.0675337356376478,
+        0.6902835415682439
+      ],
+      "fov": 62,
+      "blend": 0,
+      "frame": "court-day.png"
+    },
+    {
+      "pose": "reef",
+      "progress": 0.7500536440052561,
+      "tick": 2934,
+      "camera": [
+        39.354261166535785,
+        5.76,
+        506.4700973360882
+      ],
+      "quaternion": [
+        -0.05923806877183781,
+        0.09664256788152538,
+        0.005762153814702363,
+        0.9935380530532605
+      ],
+      "fov": 62,
+      "blend": 0,
+      "frame": "reef-day.png"
+    },
+    {
+      "pose": "court",
+      "progress": 0.5751671171929371,
+      "tick": 2332,
+      "camera": [
+        334.68709974340584,
+        15.547753199384985,
+        747.7798811608359
+      ],
+      "quaternion": [
+        -0.06498042613303308,
+        0.7174168659248072,
+        0.06753190516813147,
+        0.6903115430662877
+      ],
+      "fov": 62,
+      "blend": 1,
+      "frame": "court-night.png"
+    },
+    {
+      "pose": "reef",
+      "progress": 0.7500536440052561,
+      "tick": 2934,
+      "camera": [
+        39.5040406445993,
+        5.76,
+        506.9502664134051
+      ],
+      "quaternion": [
+        -0.05923448091583272,
+        0.09725921706496891,
+        0.005798920505846878,
+        0.9934778777041329
+      ],
+      "fov": 62,
+      "blend": 1,
+      "frame": "reef-night.png"
+    }
+  ],
+  "errors": [],
+  "note": "Canvas read immediately after the shipped autopilot render at the first progress crossing; world/craft/rivals retained, DOM HUD omitted. Same instrument world crop."
+}

@@ -1,0 +1,187 @@
+{
+  "sky": [
+    {
+      "pose": "court",
+      "state": "000",
+      "changedPixels": 0
+    },
+    {
+      "pose": "court",
+      "state": "100",
+      "changedPixels": 0
+    },
+    {
+      "pose": "reef",
+      "state": "000",
+      "changedPixels": 0
+    },
+    {
+      "pose": "reef",
+      "state": "100",
+      "changedPixels": 0
+    }
+  ],
+  "quadrants": [
+    {
+      "name": "PR_ball",
+      "expected": [
+        "BR"
+      ],
+      "pixels": {
+        "TL": 0,
+        "TR": 0,
+        "BL": 0,
+        "BR": 33236
+      }
+    },
+    {
+      "name": "PR_ring",
+      "expected": [
+        "BR"
+      ],
+      "pixels": {
+        "TL": 0,
+        "TR": 0,
+        "BL": 0,
+        "BR": 27345
+      }
+    },
+    {
+      "name": "PR_sphere",
+      "expected": [
+        "TR"
+      ],
+      "pixels": {
+        "TL": 0,
+        "TR": 29103,
+        "BL": 0,
+        "BR": 0
+      }
+    },
+    {
+      "name": "PR_pipes",
+      "expected": [
+        "TR"
+      ],
+      "pixels": {
+        "TL": 0,
+        "TR": 51857,
+        "BL": 0,
+        "BR": 0
+      }
+    },
+    {
+      "name": "PR_bollard",
+      "expected": [
+        "BR",
+        "TR"
+      ],
+      "pixels": {
+        "TL": 0,
+        "TR": 1301,
+        "BL": 0,
+        "BR": 4862
+      }
+    },
+    {
+      "name": "PR_plinth",
+      "expected": [
+        "BR"
+      ],
+      "pixels": {
+        "TL": 0,
+        "TR": 0,
+        "BL": 0,
+        "BR": 70619
+      }
+    },
+    {
+      "name": "capsule",
+      "expected": [
+        "TR"
+      ],
+      "pixels": {
+        "TL": 0,
+        "TR": 59701,
+        "BL": 0,
+        "BR": 0
+      }
+    },
+    {
+      "name": "CAP_frame",
+      "expected": [
+        "TR"
+      ],
+      "pixels": {
+        "TL": 0,
+        "TR": 18220,
+        "BL": 0,
+        "BR": 0
+      }
+    },
+    {
+      "name": "CAP_glass",
+      "expected": [
+        "TR"
+      ],
+      "pixels": {
+        "TL": 0,
+        "TR": 50425,
+        "BL": 0,
+        "BR": 0
+      }
+    },
+    {
+      "name": "CAP_core",
+      "expected": [
+        "TR"
+      ],
+      "pixels": {
+        "TL": 0,
+        "TR": 17649,
+        "BL": 0,
+        "BR": 0
+      }
+    },
+    {
+      "name": "CAP_cap",
+      "expected": [
+        "TR"
+      ],
+      "pixels": {
+        "TL": 0,
+        "TR": 4228,
+        "BL": 0,
+        "BR": 0
+      }
+    },
+    {
+      "name": "PR_bollard_core",
+      "expected": [
+        "TR"
+      ],
+      "pixels": {
+        "TL": 0,
+        "TR": 1248,
+        "BL": 0,
+        "BR": 0
+      }
+    }
+  ],
+  "glow": [
+    {
+      "pose": "court",
+      "p99With": 183.8,
+      "p99Without": 183.8,
+      "delta": 0.0,
+      "changedPixels": 0
+    },
+    {
+      "pose": "reef",
+      "p99With": 227.4,
+      "p99Without": 227.4,
+      "delta": 0.0,
+      "changedPixels": 0
+    }
+  ]
+}

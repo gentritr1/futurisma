@@ -130,3 +130,82 @@ The measurement table (shipped / yours / target) for COURT and REEF, day and nig
 ## 7. Order of work and the seam between tracks
 
 Opus starts now with primitives under the §5 node names; Codex starts now on the water (§5.1), which touches no Opus file. The GLBs land as file replacements. If a contract in §5 has to change, the change is written into this file first, by the orchestrator, and both tracks are told. Commit nothing; report in the handoff's format with a "numbers this pass measured for the first time" section.
+
+## 8. F-3D REVIEW 2026-09-12 — REQUEST CHANGES on §5.1 (water and wet road); the rest of §5 stands
+
+Reviewed against `art/evidence/dreamisland-v1/alive/3d/` by re-reading the final frames (`final/court/blend-000.png`, `blend-100.png`, `autopilot-final/court-day.png`, `court-before-after.png`) and the shader in `dreamisland-reflections.ts`. The GLB contracts, atlas proofs, glass/chrome recipes, glow batch, AO byte-proof and the four isolated soaks are **accepted as reported** (VERIFIED by re-running `inspect-glb.py` and reading the soak tables; the combined build is still to be validated once F-CODE lands).
+
+**What failed, and why the gates did not catch it.** Both water gates in §5.1 were met, and the look is wrong:
+
+- **Day sea.** The sea is a pale white-blue field covered by a regular lattice of white dashes. Whole-frame chroma fell from 21.8 (step 0) to 16.8 against a painting at 22.1; the day mean rose from 142 to 151 against a painting at 117. The cause is two things in the shader: (1) the fresnel term `.02+.98*(1-cosθ)^5` reaches ≈1 at the grazing angles a chase camera sees, so most of the sea becomes the sky dome, which is bright and pale; (2) the "glint" is `pow(max(dot(N,H),0),128)*60` over a normal built from TWO fixed-frequency sines (`sin(.72x+.31z)`, `sin(.83z−.23x)`), which is a perfectly periodic lattice, so every crest saturates to white in a grid. The whitePct gate rewarded exactly that.
+- **Night road.** The wet-road term uses the same sine lattice at 18× frequency with exponent 24, so the tarmac is a screen-wide grid of cyan dots; the kerb rails went bright cyan-white with it. The p99 gate rewarded that too.
+
+**Lesson, recorded for every later brief:** a highlight or range gate must travel with (a) a floor on the metric it can steal from (chroma, the road's darkness) and (b) an aperiodicity check plus a 2× crop for the eyeball. A number that can be satisfied by tiling white over a surface is not a gate.
+
+**Corrected §5.1 acceptance (replaces the two gates; same poses, same script, same isolation masks as `measure.py`):**
+
+1. *Sea keeps its colour.* Sea-band chroma (the `-sea` isolation) ≥ its step-0 value, and whole-frame day chroma ≥ 21.8. Sea-band p50 luma within ±8 of step 0. Achieve it by capping the reflection weight (fresnel × ≤ 0.35 at grazing, ≤ 0.08 at normal incidence) and multiplying the reflected sky by the sea's own cell colour so the mirror is cobalt, not white.
+2. *Glints are sparse and aperiodic.* Sea-band whitePct between 0.15 and 1.0 %. No white connected component larger than 60 px at 1280×720. The 2-D autocorrelation of the sea band's white mask has no secondary peak above 0.30 of the zero-lag value (a 12-line numpy script, committed beside `measure.py`). The normal must come from a non-repeating field: ≥ 4 sines at incommensurate frequencies and directions, or a hashed noise; amplitude such that the surface normal tilts ≤ 8°; glint exponent ≥ 64, magnitude clamped so a single crest never adds more than 1.0 to `outgoingLight`. Attach a 400×200 px crop of the sea at 2× in the README.
+3. *Wet road is a streak, not a pattern.* Road band (the `-road` isolation) at night: p50 ≥ 30.9 (unchanged), whitePct 0.00, and the same autocorrelation test passes. The reflection on the road uses the smooth surface normal (perturbation ≤ 0.01) and a low exponent (≤ 8) so the lamp reflection is one broad vertical streak that moves with the camera, as it does in `target-court-night-gptimage2.png`. The kerb rail material is excluded from the wet term: a crop of the rails must be pixel-identical to step 0.
+4. *Night range still climbs.* Night p99 ≥ 150 and range ≥ 140 stand, but they must be earned by the emissive foam, shallows, bollard cores and the capsule (the sources), not by the road: the road band's night p99 must stay ≤ the painting's road band p99, measured with the same mask on `target-court-night-gptimage2.png` (state the number).
+5. *Sky unchanged* as before (sky-only frames pixel-identical).
+
+Redo steps 1, 2 and 4 of §5.1 under these criteria, re-run the ordered table, and re-report. Steps 3 (depth band), 5.2–5.6 need no change. Commit nothing.
+
+## 9. F-3D REVIEW 2 (2026-09-12, `review-8/`) — three rulings, one new REQUEST CHANGES
+
+Read `review-8/README.md`, the ordered table and the frames `step-4/court/blend-000.png`, `blend-000-sea-2x.png`, `blend-100.png`, `step-4/reef/blend-100.png`.
+
+**Accepted:** the sea is cobalt again with no lattice (sea chroma 51.6 vs 51.3 at step 0, whole-frame 21.86 vs 21.79); the wet road at night has no pattern and the rails are excluded; skies pixel-identical; works Δp95 0.0 ms; the autocorrelation script and its results.
+
+**Rulings on the three residuals Codex reported honestly:**
+
+1. *REEF whole-frame chroma 17.78 vs "21.8".* My error: 21.8 was COURT's step-0 value written as if it were universal. The floor is per pose, its own step 0: COURT ≥ 21.79, REEF ≥ 17.57. REEF passes at 17.78. §8 item 1 reads that way from now on.
+2. *One rail pixel differs by one red level.* Below the instrument's resolution (a 1/255 step in one pixel of a 1280×720 frame). Passes. "Pixel-identical" in §8 item 3 means: no pixel differs by more than 2 levels in any channel.
+3. *The glint cannot reach white.* Two of my constraints fought each other: the 1.0 additive cap is compressed by AgX to ≈212, so white is unreachable whatever the geometry; and at COURT the real sun's half-vector needs a 60° tilt, so a physically placed sun never sparkles for this camera. The painting's sparkle is art-directed, and ours may be too. **Ruling:** drop the 1.0 cap (the sparsity gates — coverage 0.15–1.0 %, max blob 60 px, autocorrelation ≤ 0.30 — are what stop tiling, and they stay); and let the glint use a *sparkle direction*, not the shadow light: the sun's azimuth with an elevation chosen so the far band of the sea sparkles from the chase camera at both poses. State the vector in the README and keep it a single uniform. Re-run the day rows of the table with the sea white % now between 0.15 and 1.0 at COURT and REEF.
+
+**New REQUEST CHANGES — REEF night is blown out.** `step-4/reef/blend-100.png`: the shallows either side of the pier render as flat white slabs (whole-frame white 0.98 %, p99 239). The painting's night shallows are a cyan glow, never white. The "distance boost" of the shallows/foam emission to 64/96 beyond 160 m is withdrawn. New gates for the water at night, both poses: no water pixel above 239 (water-band whitePct 0.00), and the shallows band keeps chroma ≥ its step-0 value (it must read cyan, not white). Consequently the COURT night p99 ≥ 150 gate is **moved to the combined build**: in the isolated tree there are no bollards and no capsule, and the range must come from those sources plus the foam, not from overdriven water. Report the isolated COURT night p99 as a number, not as a gate.
+
+Redo: the glint (item 3) and the REEF night emission (new REQUEST CHANGES). Re-run the ordered table, re-report in `review-9/`. Commit nothing.
+
+## 10. F-3D REVIEW 3 (2026-09-12, `review-9/`) — APPROVED in isolation; combined gates pending
+
+Read `review-9/README.md`, the ordered table, `step-4/court/blend-000.png`, `blend-000-sea-2x.png`, `step-4/reef/blend-100.png`. Sea white 0.234 % (COURT) / 0.269 % (REEF), blob ≤ 60 px, AC ≤ 0.30, per-pose chroma floors met (21.86 / 17.87), night water maximum 166.9 / 194.2 with shallows chroma at baseline, road AC 0.000, rails within tolerance, skies identical. Sparkle direction is one stated uniform. Feral: the first run's 12.2 ms carried a −40-frame residual (a starved capture on a shared host, most likely the concurrent F-CODE soaks); the unchanged-source repeat at 9.3 ms with residual −0.6 is the valid row, and the combined soaks will re-measure it anyway. The isolated COURT night p99 is 88.9, reported as a number; its ≥ 150 gate is decided on the combined build with the bollards and capsule present. F-3D is done for this pass; it waits for F-CODE's GLB integration and the orchestrator's combined run.
+
+## 11. COMBINED REVIEW 1 (2026-09-12) — both tracks in one tree; F-3D accepted, F-CODE REQUEST CHANGES (round 2)
+
+Run by the orchestrator on the merged working tree (F-3D review-9 water + F-CODE), evidence in `art/evidence/dreamisland-v1/alive/combined/`: `npm run test:code` PASS (76 PASS lines, exit 0); `vite build` + `validate-build` PASS (shell 277.2 KiB gzip, initial JS 972.1 KiB raw / 265.4 gzip); four soaks on a dev server of the merged tree (the render-walk hook `__diScene` exists only on the dev server, so a `vite preview` soak fails at the material walk — both tracks measured on dev servers for that reason):
+
+| tier | draws (main+shadow) | triangles | p95 ms | window / expected (residual) |
+|---|---:|---:|---:|---|
+| rookie | 123 | 185,612 | 8.7 | 720 / 722.3 (−2.3) |
+| works | 123 | 185,612 | 8.6 | 720 / 716.1 (+3.9) |
+| feral | 124 | 185,708 | 8.6 | 720 / 708.6 (+11.4) |
+| works-reduced | 120 | 182,060 | 8.6 | 720 / 721.5 (−1.5) |
+
+All inside §6 (≤ 130 / ≤ 205,000). Missed gates 0, material violations 0, laps byte-identical to the shipped calibration (33158 / 32125 / 31925 ms).
+
+**The moved night gate passes on the combined build.** Autopilot chase camera, `court-autopilot/`, `measure-frames.py` HUD-cropped: COURT night p99 **204.2**, range **201.4** (gate ≥ 150 / ≥ 140; the painting is 193.5 / 191.5). REEF night 157.6 / 156.8. COURT day chroma 18.5 (shipped 19.0), whitePct 1.53 — the capsule column, not the sea.
+
+**F-3D: ACCEPTED for merge.** Nothing further.
+
+**F-CODE: accepted as built with these rulings** — capsule as 6 draws (the node contract makes it four meshes plus column and ring); raw JS ceiling 972 → 973 KiB (documented); the `input-prompt-map.js` row for the power prompt; the per-instance prop cull; the fish "contributes to p99" target is **withdrawn**: AgX saturates at ≈185 for any emissive value while the frame's p99 is set by the capsule column at 212, so the target was unreachable by construction (same lesson as E4: a target must be reachable by the actor it names; this one was not reachable by any actor under the tone curve). Emissive stays at 6.0.
+
+**F-CODE round 2 — REQUEST CHANGES, six items, all measurable:**
+
+1. **The skin must apply on the dev server.** Today the island stylesheet is injected by Vite as a `<style>` element and the shipped CSP (`style-src 'self'`) blocks it, so on `npm run dev` the new HUD renders unstyled (raw bubble text, black circles where the chrome roundels are — see `combined/court-autopilot/court-day.png`). That is what the user's own playtest would show. Load the skin through a `<link rel="stylesheet">` whose `href` is `new URL('./style-dreamisland.css', import.meta.url)` (a self URL in dev and in the build), appended by the runtime and removed on dispose. Acceptance: `alive-hud.mjs` frames shot on the dev server and on `vite preview` are pixel-identical for every state; `race.mjs` no longer needs its ignored CSP message (remove the exception). No CSP or validator change.
+2. **Self-host the two faces.** Michroma and Share Tech Mono (both SIL OFL) as woff2 under `public/assets/dreamisland/fonts/`, `@font-face` in the island stylesheet only, `font-display: swap`. Pin the new served bytes in `validate-build.mjs` at measured + 10 % and state both numbers. Nothing in the shell references them. (Orchestrator's decision: they are lazy bytes on one circuit; the look was chosen with these faces.)
+3. **Day legibility of every HUD text.** In `hud-1440/slot-in-range.png` the gate strip (`NEXT GATE … BEACH STRAIGHT`, `12.0 KM TO FINISH`) and the bottom-left labels (`SPACE / SHIFT · NITRO`, `DREAM ISLAND / DAY INTO NIGHT`, `THE STRIKE IN`) sit on bare sky and sand with no backing. Acceptance: for every visible HUD text element, the WCAG contrast ratio between its ink and the mean colour of the frame behind its bounding box is ≥ 4.5 on the day BEACH, COURT and REEF frames and the night COURT frame at 1440×810 — a 30-line script over the DOM rects and the screenshot, committed beside `alive-hud.mjs`, its table in the README. Fix with glass backings (the pill recipe), not by darkening the day ink alone.
+4. **Toys where the driver can see them.** `props.json` puts balls and rings 14–34 m from the road centre and spheres 8–26 m beyond the edge, so from the chase camera they are dots. The painting's toys sit at the road's edge. New placement rules: ≥ 60 % of balls and rings within halfWidth + 1.5 … + 10 m; ball scale so the ball is ≥ 1.8 m across; ≥ 1/3 of spheres within halfWidth + 2 … + 12 m at 2–6 m height (never over the deck — the corridor rays still decide); counts doubled (balls 44, rings 28, spheres 60) — the cull keeps the drawn triangles bounded, report the new peak. Acceptance: in each of the three day frames (BEACH, COURT, REEF, autopilot chase pose) at least four toys are ≥ 20 px tall, counted by the isolation method the capsule table used.
+5. **The capsule reads too small.** 37 px at 40 m. The painting's capsule at ~60 m is ~110 px of 752, i.e. an 8–9 m object. Scale the capsule instances ×2.2 (6.6 m; the GLB stays 3 m at scale 1 — a runtime scale on the instance matrix) and the column to 3 m wide, ring to 6 m. Acceptance: capsule ≥ 70 px tall at 40 m, column ≥ 12 px wide at 150 m, same capture script; corridor still 0 (the capsule's bottom stays above 8.85 m? No — it hovers at 2.2 m over the lane and is a pickup, not an obstacle: it has no collision, state that in the README).
+6. **The world bubble is a whisper.** Name 14 px, range 12 px, pill ≈ 26 px tall. The canvas board is the reference: name ≥ 20 px Michroma, pill ≥ 40 px tall, chevron below it, bobbing ± 5 px. Acceptance: DOM-measured sizes in the README and the `slot-in-range` frame re-shot.
+
+Evidence to `art/evidence/dreamisland-v1/alive/code/round-2/`, `npm run test:code` PASS, four soaks re-run (draws now ≤ 130 with doubled toys — report), the Greenwater diff re-run. Commit nothing.
+
+## 12. COMBINED REVIEW 2 (2026-09-13) — APPROVE and merge
+
+F-CODE round 2 reviewed against §11 by reading `art/evidence/dreamisland-v1/alive/code/round-2/README.md` and the frames (`hud-1440/slot-in-range.png`, `skin-night.png`, `slot-hunting.png`, `capsule/day-40m-full.png`): skin on both servers (stylesheet and fonts byte-identical dev↔build, frames within the harness's own noise floor — a 3,763-pixel delta-3 spread between two captures of the same server is the control, so "pixel-identical" is not a claim either of us makes); fonts self-hosted at 19,028 B pinned 20,931; 158 text elements at ≥ 4.5:1 with the worst at 4.79; 4 / 7 / 4 toys ≥ 20 px on BEACH / COURT / REEF; capsule 81 px at 40 m, column 20 px at 150 m; bubble 21 px name in a 45 px pill. Rulings: the capsule rise 2.2 → 3.8 m is accepted (at ×2.2 the old rise buried a third of it); the deterministic 16 m toy grid is accepted (four scattered seeds could not meet the floor; the shallows are thinner than round 1 and that is the tradeoff); the `SPACE / SHIFT · NITRO` two-line wrap is a known cosmetic residual for the next polish list.
+
+Orchestrator's own run on the merged tree (`combined-final/`): `npm run test:code` PASS (76 PASS lines); four soaks on a dev server — rookie 123 draws / 192,172 tris / p95 8.9 ms (residual +3.8), works 123 / 192,172 / 8.7 (−2.1), feral 124 / 192,268 / 8.9 (−0.2), works-reduced 120 / 188,524 / 8.8 (+5.7); 0 missed gates, 0 material violations, laps identical to the shipped calibration. Everything in §6 holds. Merged to `main`.
+
+Still UNVERIFIED after merge: real GPU / browser matrix for `backdrop-filter` and `color-mix`; prop pop-in at the cull boundary; the wet-road streak and the fish glow judged by a person, not an instrument. That person is the next step.

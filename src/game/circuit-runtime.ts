@@ -28,6 +28,14 @@ export async function createCircuitRuntime(course: RaceCourse, input: InputContr
   } else return null;
   await runtime.ready;
   if (cancelled()) { runtime.dispose(); return null; }
+  // Phase F. The ONE shared change the island's HUD skin needs: the circuit's
+  // own id on the document element, so a stylesheet that ships inside a
+  // circuit's lazy chunk can scope itself to that circuit and reach the shared
+  // HUD nodes. It is cleared on dispose, so a quit to the paddock and a second
+  // race on another map cannot leave the island's skin behind.
+  document.documentElement.dataset.circuit = course.kind;
+  const disposeRuntime = runtime.dispose.bind(runtime);
+  runtime.dispose = () => { delete document.documentElement.dataset.circuit; disposeRuntime(); };
   return runtime;
 }
 

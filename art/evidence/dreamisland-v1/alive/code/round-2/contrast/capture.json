@@ -1,0 +1,3079 @@
+{
+  "script": "scripts/visual/dreamisland/alive-contrast.mjs",
+  "base": "http://127.0.0.1:5210",
+  "viewport": "1440x810",
+  "method": "the background frame is the same frozen pose with every HUD element's color set to transparent, so the mean inside a text rect is the background and not the text itself",
+  "poses": [
+    {
+      "id": "day-beach",
+      "district": "BEACH",
+      "from": 0,
+      "to": 0.125,
+      "night": false,
+      "frame": "day-beach.png",
+      "background": "day-beach-nohud.png",
+      "frozen": {
+        "progress": 0.04531746803839942,
+        "nightBlend": 0,
+        "sector": "BEACH STRAIGHT",
+        "tick": 307
+      },
+      "texts": [
+        {
+          "id": "position-value",
+          "className": "",
+          "text": "P1 / 4",
+          "color": "rgb(6, 35, 63)",
+          "inkRgb": [
+            6,
+            35,
+            63
+          ],
+          "fontSize": "62px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 54,
+            "y": 50,
+            "width": 205,
+            "height": 66
+          }
+        },
+        {
+          "id": null,
+          "className": "hud-label",
+          "text": "LAP",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "11px",
+          "fontFamily": "Michroma",
+          "rect": {
+            "x": 303,
+            "y": 57,
+            "width": 35,
+            "height": 12
+          }
+        },
+        {
+          "id": "lap-value",
+          "className": "",
+          "text": "1 / 9",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "40px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 303,
+            "y": 71,
+            "width": 115,
+            "height": 38
+          }
+        },
+        {
+          "id": "gap-value",
+          "className": "hud-standing__gap",
+          "text": "1.28 CLEAR",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "14px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 46,
+            "y": 138,
+            "width": 401,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "",
+          "text": "P1",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 69,
+            "y": 171,
+            "width": 30,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "n",
+          "text": "TOTEM · YOU",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 109,
+            "y": 171,
+            "width": 127,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "gap",
+          "text": "—",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 247,
+            "y": 171,
+            "width": 59,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "",
+          "text": "P2",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 69,
+            "y": 200,
+            "width": 30,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "n",
+          "text": "PRIVATEER 13",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 109,
+            "y": 200,
+            "width": 127,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "gap",
+          "text": "+1.2",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 247,
+            "y": 200,
+            "width": 59,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "",
+          "text": "P3",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 69,
+            "y": 228,
+            "width": 30,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "n",
+          "text": "NIGHTFORM 24",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 109,
+            "y": 228,
+            "width": 127,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "gap",
+          "text": "+1.4",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 247,
+            "y": 228,
+            "width": 59,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "",
+          "text": "P4",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 69,
+            "y": 257,
+            "width": 30,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "n",
+          "text": "NEEDLE 16",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 109,
+            "y": 257,
+            "width": 127,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "gap",
+          "text": "+1.6",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 247,
+            "y": 257,
+            "width": 59,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "hud-label",
+          "text": "RACE TIME",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "10px",
+          "fontFamily": "Michroma",
+          "rect": {
+            "x": 1284,
+            "y": 64,
+            "width": 88,
+            "height": 11
+          }
+        },
+        {
+          "id": "time-value",
+          "className": "hud-timing__clock",
+          "text": "00:02.558",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "36px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 1209,
+            "y": 85,
+            "width": 179,
+            "height": 38
+          }
+        },
+        {
+          "id": "checkpoint-value",
+          "className": "",
+          "text": "NEXT GATE 01 / 07",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "12px",
+          "fontFamily": "SFMono-Regular",
+          "rect": {
+            "x": 473,
+            "y": 62,
+            "width": 152,
+            "height": 13
+          }
+        },
+        {
+          "id": "sector-value",
+          "className": "hud-gate__sector",
+          "text": "BEACH STRAIGHT",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "11px",
+          "fontFamily": "Michroma",
+          "rect": {
+            "x": 637,
+            "y": 62,
+            "width": 159,
+            "height": 12
+          }
+        },
+        {
+          "id": "finish-value",
+          "className": "hud-gate__finish",
+          "text": "21.5 KM TO FINISH",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "12px",
+          "fontFamily": "SFMono-Regular",
+          "rect": {
+            "x": 818,
+            "y": 62,
+            "width": 152,
+            "height": 13
+          }
+        },
+        {
+          "id": "turn-label",
+          "className": "hud-cue__label",
+          "text": "HARD RIGHT",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "14px",
+          "fontFamily": "SFMono-Regular",
+          "rect": {
+            "x": 768,
+            "y": 151,
+            "width": 98,
+            "height": 14
+          }
+        },
+        {
+          "id": "turn-distance",
+          "className": "hud-cue__distance",
+          "text": "210 M",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "26px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 883,
+            "y": 145,
+            "width": 70,
+            "height": 26
+          }
+        },
+        {
+          "id": "speed-value",
+          "className": "hud-drive__number",
+          "text": "220",
+          "color": "rgb(6, 35, 63)",
+          "inkRgb": [
+            6,
+            35,
+            63
+          ],
+          "fontSize": "92px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 56,
+            "y": 418,
+            "width": 152,
+            "height": 80
+          }
+        },
+        {
+          "id": null,
+          "className": "hud-label",
+          "text": "KM/H",
+          "color": "rgb(6, 35, 63)",
+          "inkRgb": [
+            6,
+            35,
+            63
+          ],
+          "fontSize": "11px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 221,
+            "y": 462,
+            "width": 83,
+            "height": 12
+          }
+        },
+        {
+          "id": "drive-state",
+          "className": "hud-drive__state",
+          "text": "HOVER LOCK",
+          "color": "rgb(6, 35, 63)",
+          "inkRgb": [
+            6,
+            35,
+            63
+          ],
+          "fontSize": "13px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 221,
+            "y": 479,
+            "width": 83,
+            "height": 14
+          }
+        },
+        {
+          "id": "boost-label",
+          "className": "hud-label",
+          "text": "PLASMA RESERVE",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "11px",
+          "fontFamily": "Michroma",
+          "rect": {
+            "x": 54,
+            "y": 533,
+            "width": 165,
+            "height": 12
+          }
+        },
+        {
+          "id": "boost-value",
+          "className": "hud-reserve__percent",
+          "text": "94%",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "24px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 331,
+            "y": 523,
+            "width": 41,
+            "height": 25
+          }
+        },
+        {
+          "id": "polarity-flip",
+          "className": "hud-ability__action",
+          "text": "SPACE / SHIFT · NITRO",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "22px",
+          "fontFamily": "Michroma",
+          "rect": {
+            "x": 130,
+            "y": 612,
+            "width": 248,
+            "height": 47
+          }
+        },
+        {
+          "id": "polarity-deck",
+          "className": "hud-ability__deck",
+          "text": "DREAM ISLAND / DAY INTO NIGHT",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "10px",
+          "fontFamily": "Michroma",
+          "rect": {
+            "x": 130,
+            "y": 663,
+            "width": 248,
+            "height": 21
+          }
+        },
+        {
+          "id": "polarity-route",
+          "className": "hud-ability__reason",
+          "text": "THE STRIKE IN 01:05",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "11.5px",
+          "fontFamily": "Michroma",
+          "rect": {
+            "x": 130,
+            "y": 689,
+            "width": 248,
+            "height": 16
+          }
+        },
+        {
+          "id": null,
+          "className": "di-slot__name",
+          "text": "SURGE COLLECTED",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "20px",
+          "fontFamily": "Michroma",
+          "rect": {
+            "x": 582,
+            "y": 715,
+            "width": 292,
+            "height": 22
+          }
+        },
+        {
+          "id": null,
+          "className": "di-slot__advice",
+          "text": "THE BEACH STRAIGHT IS NEXT · 71 M",
+          "color": "oklab(0.447932 -0.0269586 -0.243862 / 0.78)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "13px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 582,
+            "y": 741,
+            "width": 292,
+            "height": 16
+          }
+        },
+        {
+          "id": null,
+          "className": "di-slot__key",
+          "text": "E",
+          "color": "rgb(6, 35, 63)",
+          "inkRgb": [
+            6,
+            35,
+            63
+          ],
+          "fontSize": "16px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 888,
+            "y": 716,
+            "width": 40,
+            "height": 40
+          }
+        },
+        {
+          "id": null,
+          "className": "wordmark",
+          "text": "FUTURISMA",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "14.08px",
+          "fontFamily": "Inter",
+          "rect": {
+            "x": 49,
+            "y": 21,
+            "width": 104,
+            "height": 17
+          }
+        },
+        {
+          "id": "course-name",
+          "className": "course-name",
+          "text": "DREAM ISLAND / MAP 07",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "10.72px",
+          "fontFamily": "SFMono-Regular",
+          "rect": {
+            "x": 169,
+            "y": 25,
+            "width": 154,
+            "height": 13
+          }
+        },
+        {
+          "id": "system-status",
+          "className": "",
+          "text": "RACE ACTIVE · AUTOPILOT",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "10.72px",
+          "fontFamily": "SFMono-Regular",
+          "rect": {
+            "x": 1223,
+            "y": 21,
+            "width": 168,
+            "height": 13
+          }
+        }
+      ]
+    },
+    {
+      "id": "day-court",
+      "district": "COURT",
+      "from": 0.5167,
+      "to": 0.6583,
+      "night": false,
+      "frame": "day-court.png",
+      "background": "day-court-nohud.png",
+      "frozen": {
+        "progress": 0.5699647988696981,
+        "nightBlend": 0,
+        "sector": "CLOCK COURT",
+        "tick": 2313
+      },
+      "texts": [
+        {
+          "id": "position-value",
+          "className": "",
+          "text": "P1 / 4",
+          "color": "rgb(6, 35, 63)",
+          "inkRgb": [
+            6,
+            35,
+            63
+          ],
+          "fontSize": "62px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 54,
+            "y": 50,
+            "width": 205,
+            "height": 66
+          }
+        },
+        {
+          "id": null,
+          "className": "hud-label",
+          "text": "LAP",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "11px",
+          "fontFamily": "Michroma",
+          "rect": {
+            "x": 303,
+            "y": 57,
+            "width": 35,
+            "height": 12
+          }
+        },
+        {
+          "id": "lap-value",
+          "className": "",
+          "text": "1 / 9",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "40px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 303,
+            "y": 71,
+            "width": 115,
+            "height": 38
+          }
+        },
+        {
+          "id": "gap-value",
+          "className": "hud-standing__gap",
+          "text": "1.69 CLEAR",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "14px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 46,
+            "y": 138,
+            "width": 401,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "",
+          "text": "P1",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 69,
+            "y": 171,
+            "width": 30,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "n",
+          "text": "TOTEM · YOU",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 109,
+            "y": 171,
+            "width": 127,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "gap",
+          "text": "—",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 247,
+            "y": 171,
+            "width": 59,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "",
+          "text": "P2",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 69,
+            "y": 200,
+            "width": 30,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "n",
+          "text": "PRIVATEER 13",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 109,
+            "y": 200,
+            "width": 127,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "gap",
+          "text": "+1.7",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 247,
+            "y": 200,
+            "width": 59,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "",
+          "text": "P3",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 69,
+            "y": 228,
+            "width": 30,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "n",
+          "text": "NIGHTFORM 24",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 109,
+            "y": 228,
+            "width": 127,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "gap",
+          "text": "+2.2",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 247,
+            "y": 228,
+            "width": 59,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "",
+          "text": "P4",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 69,
+            "y": 257,
+            "width": 30,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "n",
+          "text": "NEEDLE 16",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 109,
+            "y": 257,
+            "width": 127,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "gap",
+          "text": "+2.7",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 247,
+            "y": 257,
+            "width": 59,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "hud-label",
+          "text": "RACE TIME",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "10px",
+          "fontFamily": "Michroma",
+          "rect": {
+            "x": 1284,
+            "y": 64,
+            "width": 88,
+            "height": 11
+          }
+        },
+        {
+          "id": "time-value",
+          "className": "hud-timing__clock",
+          "text": "00:19.275",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "36px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 1209,
+            "y": 85,
+            "width": 179,
+            "height": 38
+          }
+        },
+        {
+          "id": "checkpoint-value",
+          "className": "",
+          "text": "NEXT GATE 05 / 07",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "12px",
+          "fontFamily": "SFMono-Regular",
+          "rect": {
+            "x": 473,
+            "y": 62,
+            "width": 152,
+            "height": 13
+          }
+        },
+        {
+          "id": "sector-value",
+          "className": "hud-gate__sector",
+          "text": "CLOCK COURT",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "11px",
+          "fontFamily": "Michroma",
+          "rect": {
+            "x": 637,
+            "y": 62,
+            "width": 128,
+            "height": 12
+          }
+        },
+        {
+          "id": "clean-chain",
+          "className": "clean-chain",
+          "text": "CLEAN ×4",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "11px",
+          "fontFamily": "SFMono-Regular",
+          "rect": {
+            "x": 778,
+            "y": 63,
+            "width": 69,
+            "height": 12
+          }
+        },
+        {
+          "id": "finish-value",
+          "className": "hud-gate__finish",
+          "text": "20.2 KM TO FINISH",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "12px",
+          "fontFamily": "SFMono-Regular",
+          "rect": {
+            "x": 869,
+            "y": 62,
+            "width": 152,
+            "height": 13
+          }
+        },
+        {
+          "id": "turn-label",
+          "className": "hud-cue__label",
+          "text": "TURN RIGHT",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "14px",
+          "fontFamily": "SFMono-Regular",
+          "rect": {
+            "x": 768,
+            "y": 151,
+            "width": 98,
+            "height": 14
+          }
+        },
+        {
+          "id": "turn-distance",
+          "className": "hud-cue__distance",
+          "text": "NOW",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "26px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 883,
+            "y": 145,
+            "width": 42,
+            "height": 26
+          }
+        },
+        {
+          "id": "speed-value",
+          "className": "hud-drive__number",
+          "text": "296",
+          "color": "rgb(6, 35, 63)",
+          "inkRgb": [
+            6,
+            35,
+            63
+          ],
+          "fontSize": "92px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 56,
+            "y": 418,
+            "width": 152,
+            "height": 80
+          }
+        },
+        {
+          "id": null,
+          "className": "hud-label",
+          "text": "KM/H",
+          "color": "rgb(6, 35, 63)",
+          "inkRgb": [
+            6,
+            35,
+            63
+          ],
+          "fontSize": "11px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 221,
+            "y": 462,
+            "width": 74,
+            "height": 12
+          }
+        },
+        {
+          "id": "drive-state",
+          "className": "hud-drive__state",
+          "text": "AIRBRAKES",
+          "color": "rgb(6, 35, 63)",
+          "inkRgb": [
+            6,
+            35,
+            63
+          ],
+          "fontSize": "13px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 221,
+            "y": 479,
+            "width": 74,
+            "height": 14
+          }
+        },
+        {
+          "id": "boost-label",
+          "className": "hud-label",
+          "text": "PLASMA RESERVE",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "11px",
+          "fontFamily": "Michroma",
+          "rect": {
+            "x": 54,
+            "y": 533,
+            "width": 165,
+            "height": 12
+          }
+        },
+        {
+          "id": "boost-value",
+          "className": "hud-reserve__percent",
+          "text": "100%",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "24px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 317,
+            "y": 523,
+            "width": 55,
+            "height": 25
+          }
+        },
+        {
+          "id": "polarity-flip",
+          "className": "hud-ability__action",
+          "text": "SPACE / SHIFT · NITRO",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "22px",
+          "fontFamily": "Michroma",
+          "rect": {
+            "x": 130,
+            "y": 612,
+            "width": 248,
+            "height": 47
+          }
+        },
+        {
+          "id": "polarity-deck",
+          "className": "hud-ability__deck",
+          "text": "DREAM ISLAND / DAY INTO NIGHT",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "10px",
+          "fontFamily": "Michroma",
+          "rect": {
+            "x": 130,
+            "y": 663,
+            "width": 248,
+            "height": 21
+          }
+        },
+        {
+          "id": "polarity-route",
+          "className": "hud-ability__reason",
+          "text": "THE STRIKE IN 00:48",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "11.5px",
+          "fontFamily": "Michroma",
+          "rect": {
+            "x": 130,
+            "y": 689,
+            "width": 248,
+            "height": 16
+          }
+        },
+        {
+          "id": null,
+          "className": "di-bubble__name",
+          "text": "SURGE",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "21px",
+          "fontFamily": "Michroma",
+          "rect": {
+            "x": 758,
+            "y": 272,
+            "width": 106,
+            "height": 23
+          }
+        },
+        {
+          "id": null,
+          "className": "di-bubble__advice",
+          "text": "DRIVE THROUGH",
+          "color": "oklab(0.447932 -0.0269586 -0.243862 / 0.82)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "14px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 876,
+            "y": 277,
+            "width": 98,
+            "height": 14
+          }
+        },
+        {
+          "id": null,
+          "className": "di-bubble__range",
+          "text": "12 M",
+          "color": "oklab(0.447932 -0.0269586 -0.243862 / 0.82)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "14px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 986,
+            "y": 277,
+            "width": 30,
+            "height": 14
+          }
+        },
+        {
+          "id": null,
+          "className": "di-slot__name",
+          "text": "SURGE · 12 M",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "20px",
+          "fontFamily": "Michroma",
+          "rect": {
+            "x": 610,
+            "y": 715,
+            "width": 236,
+            "height": 22
+          }
+        },
+        {
+          "id": null,
+          "className": "di-slot__advice",
+          "text": "DRIVE THROUGH THE CAPSULE",
+          "color": "oklab(0.447932 -0.0269586 -0.243862 / 0.78)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "13px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 610,
+            "y": 741,
+            "width": 236,
+            "height": 16
+          }
+        },
+        {
+          "id": null,
+          "className": "di-slot__key",
+          "text": "E",
+          "color": "rgb(6, 35, 63)",
+          "inkRgb": [
+            6,
+            35,
+            63
+          ],
+          "fontSize": "16px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 860,
+            "y": 716,
+            "width": 40,
+            "height": 40
+          }
+        },
+        {
+          "id": null,
+          "className": "wordmark",
+          "text": "FUTURISMA",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "14.08px",
+          "fontFamily": "Inter",
+          "rect": {
+            "x": 49,
+            "y": 21,
+            "width": 104,
+            "height": 17
+          }
+        },
+        {
+          "id": "course-name",
+          "className": "course-name",
+          "text": "DREAM ISLAND / MAP 07",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "10.72px",
+          "fontFamily": "SFMono-Regular",
+          "rect": {
+            "x": 169,
+            "y": 25,
+            "width": 154,
+            "height": 13
+          }
+        },
+        {
+          "id": "system-status",
+          "className": "",
+          "text": "RACE ACTIVE · AUTOPILOT",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "10.72px",
+          "fontFamily": "SFMono-Regular",
+          "rect": {
+            "x": 1223,
+            "y": 21,
+            "width": 168,
+            "height": 13
+          }
+        }
+      ]
+    },
+    {
+      "id": "day-reef",
+      "district": "REEF",
+      "from": 0.6583,
+      "to": 0.85,
+      "night": false,
+      "frame": "day-reef.png",
+      "background": "day-reef-nohud.png",
+      "frozen": {
+        "progress": 0.7375833307159871,
+        "nightBlend": 0,
+        "sector": "REEF SHALLOWS",
+        "tick": 2893
+      },
+      "texts": [
+        {
+          "id": "position-value",
+          "className": "",
+          "text": "P1 / 4",
+          "color": "rgb(6, 35, 63)",
+          "inkRgb": [
+            6,
+            35,
+            63
+          ],
+          "fontSize": "62px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 54,
+            "y": 50,
+            "width": 205,
+            "height": 66
+          }
+        },
+        {
+          "id": null,
+          "className": "hud-label",
+          "text": "LAP",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "11px",
+          "fontFamily": "Michroma",
+          "rect": {
+            "x": 303,
+            "y": 57,
+            "width": 35,
+            "height": 12
+          }
+        },
+        {
+          "id": "lap-value",
+          "className": "",
+          "text": "1 / 9",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "40px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 303,
+            "y": 71,
+            "width": 115,
+            "height": 38
+          }
+        },
+        {
+          "id": "gap-value",
+          "className": "hud-standing__gap",
+          "text": "1.91 CLEAR",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "14px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 46,
+            "y": 138,
+            "width": 401,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "",
+          "text": "P1",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 69,
+            "y": 171,
+            "width": 30,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "n",
+          "text": "TOTEM · YOU",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 109,
+            "y": 171,
+            "width": 127,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "gap",
+          "text": "—",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 247,
+            "y": 171,
+            "width": 59,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "",
+          "text": "P2",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 69,
+            "y": 200,
+            "width": 30,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "n",
+          "text": "PRIVATEER 13",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 109,
+            "y": 200,
+            "width": 127,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "gap",
+          "text": "+1.8",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 247,
+            "y": 200,
+            "width": 59,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "",
+          "text": "P3",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 69,
+            "y": 228,
+            "width": 30,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "n",
+          "text": "NIGHTFORM 24",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 109,
+            "y": 228,
+            "width": 127,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "gap",
+          "text": "+2.5",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 247,
+            "y": 228,
+            "width": 59,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "",
+          "text": "P4",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 69,
+            "y": 257,
+            "width": 30,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "n",
+          "text": "NEEDLE 16",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 109,
+            "y": 257,
+            "width": 127,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "gap",
+          "text": "+2.9",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 247,
+            "y": 257,
+            "width": 59,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "hud-label",
+          "text": "RACE TIME",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "10px",
+          "fontFamily": "Michroma",
+          "rect": {
+            "x": 1284,
+            "y": 64,
+            "width": 88,
+            "height": 11
+          }
+        },
+        {
+          "id": "time-value",
+          "className": "hud-timing__clock",
+          "text": "00:24.108",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "36px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 1209,
+            "y": 85,
+            "width": 179,
+            "height": 38
+          }
+        },
+        {
+          "id": "checkpoint-value",
+          "className": "",
+          "text": "NEXT GATE 06 / 07",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "12px",
+          "fontFamily": "SFMono-Regular",
+          "rect": {
+            "x": 473,
+            "y": 62,
+            "width": 152,
+            "height": 13
+          }
+        },
+        {
+          "id": "sector-value",
+          "className": "hud-gate__sector",
+          "text": "REEF SHALLOWS",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "11px",
+          "fontFamily": "Michroma",
+          "rect": {
+            "x": 637,
+            "y": 62,
+            "width": 154,
+            "height": 12
+          }
+        },
+        {
+          "id": "clean-chain",
+          "className": "clean-chain",
+          "text": "CLEAN ×5",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "11px",
+          "fontFamily": "SFMono-Regular",
+          "rect": {
+            "x": 804,
+            "y": 63,
+            "width": 69,
+            "height": 12
+          }
+        },
+        {
+          "id": "finish-value",
+          "className": "hud-gate__finish",
+          "text": "19.8 KM TO FINISH",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "12px",
+          "fontFamily": "SFMono-Regular",
+          "rect": {
+            "x": 895,
+            "y": 62,
+            "width": 152,
+            "height": 13
+          }
+        },
+        {
+          "id": "turn-label",
+          "className": "hud-cue__label",
+          "text": "HARD LEFT",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "14px",
+          "fontFamily": "SFMono-Regular",
+          "rect": {
+            "x": 768,
+            "y": 151,
+            "width": 88,
+            "height": 14
+          }
+        },
+        {
+          "id": "turn-distance",
+          "className": "hud-cue__distance",
+          "text": "300 M",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "26px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 873,
+            "y": 145,
+            "width": 70,
+            "height": 26
+          }
+        },
+        {
+          "id": "speed-value",
+          "className": "hud-drive__number",
+          "text": "317",
+          "color": "rgb(6, 35, 63)",
+          "inkRgb": [
+            6,
+            35,
+            63
+          ],
+          "fontSize": "92px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 56,
+            "y": 418,
+            "width": 152,
+            "height": 80
+          }
+        },
+        {
+          "id": null,
+          "className": "hud-label",
+          "text": "KM/H",
+          "color": "rgb(6, 35, 63)",
+          "inkRgb": [
+            6,
+            35,
+            63
+          ],
+          "fontSize": "11px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 221,
+            "y": 462,
+            "width": 83,
+            "height": 12
+          }
+        },
+        {
+          "id": "drive-state",
+          "className": "hud-drive__state",
+          "text": "HOVER LOCK",
+          "color": "rgb(6, 35, 63)",
+          "inkRgb": [
+            6,
+            35,
+            63
+          ],
+          "fontSize": "13px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 221,
+            "y": 479,
+            "width": 83,
+            "height": 14
+          }
+        },
+        {
+          "id": "boost-label",
+          "className": "hud-label",
+          "text": "PLASMA RESERVE",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "11px",
+          "fontFamily": "Michroma",
+          "rect": {
+            "x": 54,
+            "y": 533,
+            "width": 165,
+            "height": 12
+          }
+        },
+        {
+          "id": "boost-value",
+          "className": "hud-reserve__percent",
+          "text": "100%",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "24px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 317,
+            "y": 523,
+            "width": 55,
+            "height": 25
+          }
+        },
+        {
+          "id": "polarity-flip",
+          "className": "hud-ability__action",
+          "text": "SPACE / SHIFT · NITRO",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "22px",
+          "fontFamily": "Michroma",
+          "rect": {
+            "x": 130,
+            "y": 612,
+            "width": 248,
+            "height": 47
+          }
+        },
+        {
+          "id": "polarity-deck",
+          "className": "hud-ability__deck",
+          "text": "DREAM ISLAND / DAY INTO NIGHT",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "10px",
+          "fontFamily": "Michroma",
+          "rect": {
+            "x": 130,
+            "y": 663,
+            "width": 248,
+            "height": 21
+          }
+        },
+        {
+          "id": "polarity-route",
+          "className": "hud-ability__reason",
+          "text": "THE STRIKE IN 00:43",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "11.5px",
+          "fontFamily": "Michroma",
+          "rect": {
+            "x": 130,
+            "y": 689,
+            "width": 248,
+            "height": 16
+          }
+        },
+        {
+          "id": null,
+          "className": "di-slot__name",
+          "text": "SURGE · 402 M",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "20px",
+          "fontFamily": "Michroma",
+          "rect": {
+            "x": 610,
+            "y": 715,
+            "width": 236,
+            "height": 22
+          }
+        },
+        {
+          "id": null,
+          "className": "di-slot__advice",
+          "text": "FIND A CAPSULE",
+          "color": "oklab(0.447932 -0.0269586 -0.243862 / 0.78)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "13px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 610,
+            "y": 741,
+            "width": 236,
+            "height": 16
+          }
+        },
+        {
+          "id": null,
+          "className": "di-slot__key",
+          "text": "E",
+          "color": "rgb(6, 35, 63)",
+          "inkRgb": [
+            6,
+            35,
+            63
+          ],
+          "fontSize": "16px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 860,
+            "y": 716,
+            "width": 40,
+            "height": 40
+          }
+        },
+        {
+          "id": null,
+          "className": "wordmark",
+          "text": "FUTURISMA",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "14.08px",
+          "fontFamily": "Inter",
+          "rect": {
+            "x": 49,
+            "y": 21,
+            "width": 104,
+            "height": 17
+          }
+        },
+        {
+          "id": "course-name",
+          "className": "course-name",
+          "text": "DREAM ISLAND / MAP 07",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "10.72px",
+          "fontFamily": "SFMono-Regular",
+          "rect": {
+            "x": 169,
+            "y": 25,
+            "width": 154,
+            "height": 13
+          }
+        },
+        {
+          "id": "system-status",
+          "className": "",
+          "text": "RACE ACTIVE · AUTOPILOT",
+          "color": "oklab(0.447932 -0.0269586 -0.243862)",
+          "inkRgb": [
+            0,
+            56,
+            217
+          ],
+          "fontSize": "10.72px",
+          "fontFamily": "SFMono-Regular",
+          "rect": {
+            "x": 1223,
+            "y": 21,
+            "width": 168,
+            "height": 13
+          }
+        }
+      ]
+    },
+    {
+      "id": "night-court",
+      "district": "COURT",
+      "from": 0.5167,
+      "to": 0.6583,
+      "night": true,
+      "frame": "night-court.png",
+      "background": "night-court-nohud.png",
+      "frozen": {
+        "progress": 0.5697525238448979,
+        "nightBlend": 1,
+        "sector": "CLOCK COURT",
+        "tick": 9998
+      },
+      "texts": [
+        {
+          "id": "position-value",
+          "className": "",
+          "text": "P1 / 4",
+          "color": "rgb(6, 35, 63)",
+          "inkRgb": [
+            6,
+            35,
+            63
+          ],
+          "fontSize": "62px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 54,
+            "y": 50,
+            "width": 205,
+            "height": 66
+          }
+        },
+        {
+          "id": null,
+          "className": "hud-label",
+          "text": "LAP",
+          "color": "oklab(0.943947 -0.0622406 -0.0240152)",
+          "inkRgb": [
+            184,
+            251,
+            255
+          ],
+          "fontSize": "11px",
+          "fontFamily": "Michroma",
+          "rect": {
+            "x": 303,
+            "y": 57,
+            "width": 35,
+            "height": 12
+          }
+        },
+        {
+          "id": "lap-value",
+          "className": "",
+          "text": "3 / 9",
+          "color": "oklab(0.943947 -0.0622406 -0.0240152)",
+          "inkRgb": [
+            184,
+            251,
+            255
+          ],
+          "fontSize": "40px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 303,
+            "y": 71,
+            "width": 115,
+            "height": 38
+          }
+        },
+        {
+          "id": "gap-value",
+          "className": "hud-standing__gap",
+          "text": "0.45 CLEAR",
+          "color": "oklab(0.943947 -0.0622406 -0.0240152)",
+          "inkRgb": [
+            184,
+            251,
+            255
+          ],
+          "fontSize": "14px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 46,
+            "y": 138,
+            "width": 401,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "",
+          "text": "P1",
+          "color": "oklab(0.943947 -0.0622406 -0.0240152)",
+          "inkRgb": [
+            184,
+            251,
+            255
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 69,
+            "y": 171,
+            "width": 30,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "n",
+          "text": "TOTEM · YOU",
+          "color": "oklab(0.943947 -0.0622406 -0.0240152)",
+          "inkRgb": [
+            184,
+            251,
+            255
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 109,
+            "y": 171,
+            "width": 127,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "gap",
+          "text": "—",
+          "color": "oklab(0.943947 -0.0622406 -0.0240152)",
+          "inkRgb": [
+            184,
+            251,
+            255
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 247,
+            "y": 171,
+            "width": 59,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "",
+          "text": "P2",
+          "color": "oklab(0.943947 -0.0622406 -0.0240152)",
+          "inkRgb": [
+            184,
+            251,
+            255
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 69,
+            "y": 200,
+            "width": 30,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "n",
+          "text": "PRIVATEER 13",
+          "color": "oklab(0.943947 -0.0622406 -0.0240152)",
+          "inkRgb": [
+            184,
+            251,
+            255
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 109,
+            "y": 200,
+            "width": 127,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "gap",
+          "text": "+0.4",
+          "color": "oklab(0.943947 -0.0622406 -0.0240152)",
+          "inkRgb": [
+            184,
+            251,
+            255
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 247,
+            "y": 200,
+            "width": 59,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "",
+          "text": "P3",
+          "color": "oklab(0.943947 -0.0622406 -0.0240152)",
+          "inkRgb": [
+            184,
+            251,
+            255
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 69,
+            "y": 228,
+            "width": 30,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "n",
+          "text": "NIGHTFORM 24",
+          "color": "oklab(0.943947 -0.0622406 -0.0240152)",
+          "inkRgb": [
+            184,
+            251,
+            255
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 109,
+            "y": 228,
+            "width": 127,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "gap",
+          "text": "+2.0",
+          "color": "oklab(0.943947 -0.0622406 -0.0240152)",
+          "inkRgb": [
+            184,
+            251,
+            255
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 247,
+            "y": 228,
+            "width": 59,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "",
+          "text": "P4",
+          "color": "oklab(0.943947 -0.0622406 -0.0240152)",
+          "inkRgb": [
+            184,
+            251,
+            255
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 69,
+            "y": 257,
+            "width": 30,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "n",
+          "text": "NEEDLE 16",
+          "color": "oklab(0.943947 -0.0622406 -0.0240152)",
+          "inkRgb": [
+            184,
+            251,
+            255
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 109,
+            "y": 257,
+            "width": 127,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "gap",
+          "text": "+3.7",
+          "color": "oklab(0.943947 -0.0622406 -0.0240152)",
+          "inkRgb": [
+            184,
+            251,
+            255
+          ],
+          "fontSize": "12px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 247,
+            "y": 257,
+            "width": 59,
+            "height": 21
+          }
+        },
+        {
+          "id": null,
+          "className": "hud-label",
+          "text": "RACE TIME",
+          "color": "oklab(0.943947 -0.0622406 -0.0240152)",
+          "inkRgb": [
+            184,
+            251,
+            255
+          ],
+          "fontSize": "10px",
+          "fontFamily": "Michroma",
+          "rect": {
+            "x": 1284,
+            "y": 64,
+            "width": 88,
+            "height": 11
+          }
+        },
+        {
+          "id": "time-value",
+          "className": "hud-timing__clock",
+          "text": "01:23.316",
+          "color": "oklab(0.943947 -0.0622406 -0.0240152)",
+          "inkRgb": [
+            184,
+            251,
+            255
+          ],
+          "fontSize": "36px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 1209,
+            "y": 85,
+            "width": 179,
+            "height": 38
+          }
+        },
+        {
+          "id": "last-lap-value",
+          "className": "hud-timing__secondary",
+          "text": "· LAST 00:32.125",
+          "color": "oklab(0.943947 -0.0622406 -0.0240152)",
+          "inkRgb": [
+            184,
+            251,
+            255
+          ],
+          "fontSize": "12px",
+          "fontFamily": "SFMono-Regular",
+          "rect": {
+            "x": 1245,
+            "y": 130,
+            "width": 143,
+            "height": 15
+          }
+        },
+        {
+          "id": "checkpoint-value",
+          "className": "",
+          "text": "NEXT GATE 05 / 07",
+          "color": "oklab(0.943947 -0.0622406 -0.0240152)",
+          "inkRgb": [
+            184,
+            251,
+            255
+          ],
+          "fontSize": "12px",
+          "fontFamily": "SFMono-Regular",
+          "rect": {
+            "x": 473,
+            "y": 62,
+            "width": 152,
+            "height": 13
+          }
+        },
+        {
+          "id": "sector-value",
+          "className": "hud-gate__sector",
+          "text": "CLOCK COURT",
+          "color": "oklab(0.943947 -0.0622406 -0.0240152)",
+          "inkRgb": [
+            184,
+            251,
+            255
+          ],
+          "fontSize": "11px",
+          "fontFamily": "Michroma",
+          "rect": {
+            "x": 637,
+            "y": 62,
+            "width": 128,
+            "height": 12
+          }
+        },
+        {
+          "id": "clean-chain",
+          "className": "clean-chain",
+          "text": "CLEAN ×20",
+          "color": "oklab(0.943947 -0.0622406 -0.0240152)",
+          "inkRgb": [
+            184,
+            251,
+            255
+          ],
+          "fontSize": "11px",
+          "fontFamily": "SFMono-Regular",
+          "rect": {
+            "x": 778,
+            "y": 63,
+            "width": 78,
+            "height": 12
+          }
+        },
+        {
+          "id": "finish-value",
+          "className": "hud-gate__finish",
+          "text": "15.4 KM TO FINISH",
+          "color": "oklab(0.943947 -0.0622406 -0.0240152)",
+          "inkRgb": [
+            184,
+            251,
+            255
+          ],
+          "fontSize": "12px",
+          "fontFamily": "SFMono-Regular",
+          "rect": {
+            "x": 877,
+            "y": 62,
+            "width": 152,
+            "height": 13
+          }
+        },
+        {
+          "id": "turn-label",
+          "className": "hud-cue__label",
+          "text": "TURN RIGHT",
+          "color": "oklab(0.943947 -0.0622406 -0.0240152)",
+          "inkRgb": [
+            184,
+            251,
+            255
+          ],
+          "fontSize": "14px",
+          "fontFamily": "SFMono-Regular",
+          "rect": {
+            "x": 768,
+            "y": 151,
+            "width": 98,
+            "height": 14
+          }
+        },
+        {
+          "id": "turn-distance",
+          "className": "hud-cue__distance",
+          "text": "NOW",
+          "color": "oklab(0.943947 -0.0622406 -0.0240152)",
+          "inkRgb": [
+            184,
+            251,
+            255
+          ],
+          "fontSize": "26px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 883,
+            "y": 145,
+            "width": 42,
+            "height": 26
+          }
+        },
+        {
+          "id": "speed-value",
+          "className": "hud-drive__number",
+          "text": "296",
+          "color": "rgb(6, 35, 63)",
+          "inkRgb": [
+            6,
+            35,
+            63
+          ],
+          "fontSize": "92px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 56,
+            "y": 401,
+            "width": 152,
+            "height": 80
+          }
+        },
+        {
+          "id": null,
+          "className": "hud-label",
+          "text": "KM/H",
+          "color": "rgb(6, 35, 63)",
+          "inkRgb": [
+            6,
+            35,
+            63
+          ],
+          "fontSize": "11px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 221,
+            "y": 445,
+            "width": 74,
+            "height": 12
+          }
+        },
+        {
+          "id": "drive-state",
+          "className": "hud-drive__state",
+          "text": "AIRBRAKES",
+          "color": "rgb(6, 35, 63)",
+          "inkRgb": [
+            6,
+            35,
+            63
+          ],
+          "fontSize": "13px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 221,
+            "y": 462,
+            "width": 74,
+            "height": 14
+          }
+        },
+        {
+          "id": "boost-label",
+          "className": "hud-label",
+          "text": "PLASMA RESERVE",
+          "color": "oklab(0.943947 -0.0622406 -0.0240152)",
+          "inkRgb": [
+            184,
+            251,
+            255
+          ],
+          "fontSize": "11px",
+          "fontFamily": "Michroma",
+          "rect": {
+            "x": 54,
+            "y": 516,
+            "width": 165,
+            "height": 12
+          }
+        },
+        {
+          "id": "boost-value",
+          "className": "hud-reserve__percent",
+          "text": "100%",
+          "color": "oklab(0.943947 -0.0622406 -0.0240152)",
+          "inkRgb": [
+            184,
+            251,
+            255
+          ],
+          "fontSize": "24px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 317,
+            "y": 507,
+            "width": 55,
+            "height": 25
+          }
+        },
+        {
+          "id": "polarity-flip",
+          "className": "hud-ability__action",
+          "text": "SPACE / SHIFT · NITRO",
+          "color": "oklab(0.943947 -0.0622406 -0.0240152)",
+          "inkRgb": [
+            184,
+            251,
+            255
+          ],
+          "fontSize": "22px",
+          "fontFamily": "Michroma",
+          "rect": {
+            "x": 130,
+            "y": 596,
+            "width": 248,
+            "height": 47
+          }
+        },
+        {
+          "id": "polarity-deck",
+          "className": "hud-ability__deck",
+          "text": "DREAM ISLAND / DAY INTO NIGHT",
+          "color": "oklab(0.943947 -0.0622406 -0.0240152)",
+          "inkRgb": [
+            184,
+            251,
+            255
+          ],
+          "fontSize": "10px",
+          "fontFamily": "Michroma",
+          "rect": {
+            "x": 130,
+            "y": 647,
+            "width": 248,
+            "height": 21
+          }
+        },
+        {
+          "id": "polarity-route",
+          "className": "hud-ability__reason",
+          "text": "NIGHT · THE BASIN IS WET",
+          "color": "oklab(0.943947 -0.0622406 -0.0240152)",
+          "inkRgb": [
+            184,
+            251,
+            255
+          ],
+          "fontSize": "11.5px",
+          "fontFamily": "Michroma",
+          "rect": {
+            "x": 130,
+            "y": 672,
+            "width": 248,
+            "height": 33
+          }
+        },
+        {
+          "id": null,
+          "className": "di-bubble__name",
+          "text": "SURGE",
+          "color": "oklab(0.943947 -0.0622406 -0.0240152)",
+          "inkRgb": [
+            184,
+            251,
+            255
+          ],
+          "fontSize": "21px",
+          "fontFamily": "Michroma",
+          "rect": {
+            "x": 759,
+            "y": 279,
+            "width": 106,
+            "height": 23
+          }
+        },
+        {
+          "id": null,
+          "className": "di-bubble__advice",
+          "text": "DRIVE THROUGH",
+          "color": "oklab(0.943947 -0.0622406 -0.0240152 / 0.82)",
+          "inkRgb": [
+            184,
+            251,
+            255
+          ],
+          "fontSize": "14px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 877,
+            "y": 284,
+            "width": 98,
+            "height": 14
+          }
+        },
+        {
+          "id": null,
+          "className": "di-bubble__range",
+          "text": "13 M",
+          "color": "oklab(0.943947 -0.0622406 -0.0240152 / 0.82)",
+          "inkRgb": [
+            184,
+            251,
+            255
+          ],
+          "fontSize": "14px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 987,
+            "y": 284,
+            "width": 30,
+            "height": 14
+          }
+        },
+        {
+          "id": null,
+          "className": "di-slot__name",
+          "text": "SURGE · 13 M",
+          "color": "oklab(0.943947 -0.0622406 -0.0240152)",
+          "inkRgb": [
+            184,
+            251,
+            255
+          ],
+          "fontSize": "20px",
+          "fontFamily": "Michroma",
+          "rect": {
+            "x": 610,
+            "y": 715,
+            "width": 236,
+            "height": 22
+          }
+        },
+        {
+          "id": null,
+          "className": "di-slot__advice",
+          "text": "DRIVE THROUGH THE CAPSULE",
+          "color": "oklab(0.943947 -0.0622406 -0.0240152 / 0.78)",
+          "inkRgb": [
+            185,
+            251,
+            255
+          ],
+          "fontSize": "13px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 610,
+            "y": 741,
+            "width": 236,
+            "height": 16
+          }
+        },
+        {
+          "id": null,
+          "className": "di-slot__key",
+          "text": "E",
+          "color": "rgb(6, 35, 63)",
+          "inkRgb": [
+            6,
+            35,
+            63
+          ],
+          "fontSize": "16px",
+          "fontFamily": "\"Share Tech Mono\"",
+          "rect": {
+            "x": 860,
+            "y": 716,
+            "width": 40,
+            "height": 40
+          }
+        },
+        {
+          "id": null,
+          "className": "wordmark",
+          "text": "FUTURISMA",
+          "color": "oklab(0.943947 -0.0622406 -0.0240152)",
+          "inkRgb": [
+            184,
+            251,
+            255
+          ],
+          "fontSize": "14.08px",
+          "fontFamily": "Inter",
+          "rect": {
+            "x": 49,
+            "y": 21,
+            "width": 104,
+            "height": 17
+          }
+        },
+        {
+          "id": "course-name",
+          "className": "course-name",
+          "text": "DREAM ISLAND / MAP 07",
+          "color": "oklab(0.943947 -0.0622406 -0.0240152)",
+          "inkRgb": [
+            184,
+            251,
+            255
+          ],
+          "fontSize": "10.72px",
+          "fontFamily": "SFMono-Regular",
+          "rect": {
+            "x": 169,
+            "y": 25,
+            "width": 154,
+            "height": 13
+          }
+        },
+        {
+          "id": "system-status",
+          "className": "",
+          "text": "RACE ACTIVE · AUTOPILOT",
+          "color": "oklab(0.943947 -0.0622406 -0.0240152)",
+          "inkRgb": [
+            184,
+            251,
+            255
+          ],
+          "fontSize": "10.72px",
+          "fontFamily": "SFMono-Regular",
+          "rect": {
+            "x": 1223,
+            "y": 21,
+            "width": 168,
+            "height": 13
+          }
+        }
+      ]
+    }
+  ],
+  "errors": []
+}

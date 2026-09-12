@@ -1,0 +1,71 @@
+{
+  "script": "scripts/visual/dreamisland/alive-toys.mjs",
+  "base": "http://127.0.0.1:5210",
+  "viewport": "1440x810",
+  "kinds": {
+    "toys": [
+      "PR_ball",
+      "PR_ring"
+    ],
+    "all": [
+      "PR_ball",
+      "PR_ring",
+      "PR_sphere"
+    ]
+  },
+  "poses": [
+    {
+      "id": "day-beach",
+      "at": 0.0625,
+      "full": "art/evidence/dreamisland-v1/alive/code/round-2/toys/day-beach-full.png",
+      "toys": "art/evidence/dreamisland-v1/alive/code/round-2/toys/day-beach-toys.png",
+      "all": "art/evidence/dreamisland-v1/alive/code/round-2/toys/day-beach-all.png",
+      "blank": "art/evidence/dreamisland-v1/alive/code/round-2/toys/day-beach-blank.png",
+      "frozen": {
+        "progress": 0.0625,
+        "sector": "BEACH STRAIGHT",
+        "props": {
+          "visibleInstances": 214,
+          "visibleTriangles": 16000
+        }
+      }
+    },
+    {
+      "id": "day-court",
+      "at": 0.5875,
+      "full": "art/evidence/dreamisland-v1/alive/code/round-2/toys/day-court-full.png",
+      "toys": "art/evidence/dreamisland-v1/alive/code/round-2/toys/day-court-toys.png",
+      "all": "art/evidence/dreamisland-v1/alive/code/round-2/toys/day-court-all.png",
+      "blank": "art/evidence/dreamisland-v1/alive/code/round-2/toys/day-court-blank.png",
+      "frozen": {
+        "progress": 0.5875,
+        "sector": "CLOCK COURT",
+        "props": {
+          "visibleInstances": 214,
+          "visibleTriangles": 16000
+        }
+      }
+    },
+    {
+      "id": "day-reef",
+      "at": 0.7542,
+      "full": "art/evidence/dreamisland-v1/alive/code/round-2/toys/day-reef-full.png",
+      "toys": "art/evidence/dreamisland-v1/alive/code/round-2/toys/day-reef-toys.png",
+      "all": "art/evidence/dreamisland-v1/alive/code/round-2/toys/day-reef-all.png",
+      "blank": "art/evidence/dreamisland-v1/alive/code/round-2/toys/day-reef-blank.png",
+      "frozen": {
+        "progress": 0.7542,
+        "sector": "REEF SHALLOWS",
+        "props": {
+          "visibleInstances": 214,
+          "visibleTriangles": 16000
+        }
+      }
+    }
+  ],
+  "errors": [
+    "THREE.THREE.WebGLProgram: Shader Error 0 - VALIDATE_STATUS false\n\nMaterial Name: TOTEM_race_presence_masked_alpha\nMaterial Type: ShaderMaterial\n\nProgram Info Log: Vertex shader is not compiled.\nVERTEX\n\nERROR: 0:84: 'instanceColor' : undeclared identifier\nERROR: 0:84: '=' : dimension mismatch\nERROR: 0:84: 'assign' : cannot convert from 'const highp float' to 'out highp 3-component vector of float'\n\n  79: \tvarying float vFogDepth;\n  80: #endif\n  81: \n  82:   void main() {\n  83:     vEffectUv = uv;\n> 84:     vEffectData = instanceColor;\n  85:     vec4 mvPosition = modelViewMatrix * instanceMatrix * vec4(position, 1.0);\n  86:     gl_Position = projectionMatrix * mvPosition;\n  87: #ifdef USE_FOG\n  88: \tvFogDepth = - mvPosition.z;\n  89: #endif\n  90:   }\n",
+    "THREE.THREE.WebGLProgram: Shader Error 0 - VALIDATE_STATUS false\n\nMaterial Name: TOTEM_race_presence_masked_alpha\nMaterial Type: ShaderMaterial\n\nProgram Info Log: Vertex shader is not compiled.\nVERTEX\n\nERROR: 0:84: 'instanceColor' : undeclared identifier\nERROR: 0:84: '=' : dimension mismatch\nERROR: 0:84: 'assign' : cannot convert from 'const highp float' to 'out highp 3-component vector of float'\n\n  79: \tvarying float vFogDepth;\n  80: #endif\n  81: \n  82:   void main() {\n  83:     vEffectUv = uv;\n> 84:     vEffectData = instanceColor;\n  85:     vec4 mvPosition = modelViewMatrix * instanceMatrix * vec4(position, 1.0);\n  86:     gl_Position = projectionMatrix * mvPosition;\n  87: #ifdef USE_FOG\n  88: \tvFogDepth = - mvPosition.z;\n  89: #endif\n  90:   }\n",
+    "THREE.THREE.WebGLProgram: Shader Error 0 - VALIDATE_STATUS false\n\nMaterial Name: TOTEM_race_presence_masked_alpha\nMaterial Type: ShaderMaterial\n\nProgram Info Log: Vertex shader is not compiled.\nVERTEX\n\nERROR: 0:84: 'instanceColor' : undeclared identifier\nERROR: 0:84: '=' : dimension mismatch\nERROR: 0:84: 'assign' : cannot convert from 'const highp float' to 'out highp 3-component vector of float'\n\n  79: \tvarying float vFogDepth;\n  80: #endif\n  81: \n  82:   void main() {\n  83:     vEffectUv = uv;\n> 84:     vEffectData = instanceColor;\n  85:     vec4 mvPosition = modelViewMatrix * instanceMatrix * vec4(position, 1.0);\n  86:     gl_Position = projectionMatrix * mvPosition;\n  87: #ifdef USE_FOG\n  88: \tvFogDepth = - mvPosition.z;\n  89: #endif\n  90:   }\n"
+  ]
+}

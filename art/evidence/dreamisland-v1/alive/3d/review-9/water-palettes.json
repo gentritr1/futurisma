@@ -1,0 +1,130 @@
+[
+  {
+    "name": "painting-water",
+    "pixels": 4816,
+    "region": {
+      "rectangle": [
+        0,
+        312,
+        86,
+        368
+      ]
+    },
+    "palette": [
+      {
+        "hex": "#266dba",
+        "percent": 18.15
+      },
+      {
+        "hex": "#4b7fc3",
+        "percent": 14.83
+      },
+      {
+        "hex": "#608dc8",
+        "percent": 13.85
+      },
+      {
+        "hex": "#2a73c0",
+        "percent": 13.0
+      },
+      {
+        "hex": "#3b7cc5",
+        "percent": 12.92
+      },
+      {
+        "hex": "#3875bf",
+        "percent": 12.71
+      },
+      {
+        "hex": "#b0c0da",
+        "percent": 10.26
+      },
+      {
+        "hex": "#1f5ea1",
+        "percent": 4.3
+      }
+    ]
+  },
+  {
+    "name": "court-water",
+    "pixels": 79331,
+    "region": {
+      "mask": "visible pixels exactly matching sea or shallows isolation and differing from blank"
+    },
+    "palette": [
+      {
+        "hex": "#1a59c8",
+        "percent": 18.66
+      },
+      {
+        "hex": "#5c97c0",
+        "percent": 13.7
+      },
+      {
+        "hex": "#9ac2dc",
+        "percent": 12.34
+      },
+      {
+        "hex": "#2362c5",
+        "percent": 11.64
+      },
+      {
+        "hex": "#1053c4",
+        "percent": 11.47
+      },
+      {
+        "hex": "#3b75ca",
+        "percent": 11.22
+      },
+      {
+        "hex": "#1556c4",
+        "percent": 11.1
+      },
+      {
+        "hex": "#074dc0",
+        "percent": 9.87
+      }
+    ]
+  },
+  {
+    "name": "reef-water",
+    "pixels": 106992,
+    "region": {
+      "mask": "visible pixels exactly matching sea or shallows isolation and differing from blank"
+    },
+    "palette": [
+      {
+        "hex": "#499a8e",
+        "percent": 30.49
+      },
+      {
+        "hex": "#4e9d8f",
+        "percent": 20.96
+      },
+      {
+        "hex": "#1c5dbd",
+        "percent": 19.24
+      },
+      {
+        "hex": "#67aaa7",
+        "percent": 7.66
+      },
+      {
+        "hex": "#0951a3",
+        "percent": 7.45
+      },
+      {
+        "hex": "#39869a",
+        "percent": 5.08
+      },
+      {
+        "hex": "#49949c",
+        "percent": 4.64
+      },
+      {
+        "hex": "#4e9b94",
+        "percent": 4.49
+      }
+    ]
+  }
+]

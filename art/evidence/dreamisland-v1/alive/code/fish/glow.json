@@ -1,0 +1,23 @@
+{
+ "pose": "chase camera 40 m short of the court-cross shoal, nightBlend pinned to 1",
+ "tick": 13654,
+ "distanceMetres": 40,
+ "fishVisibleMeshes": 16,
+ "withFish": {
+  "p99": 212.467,
+  "p999": 232.168,
+  "max": 232.168,
+  "mean": 22.071
+ },
+ "withoutFish": {
+  "p99": 212.467,
+  "p999": 232.168,
+  "max": 232.168,
+  "mean": 22.042
+ },
+ "changedPixels": 5949,
+ "fishPixelsAboveNoFishP99": 0,
+ "totalPixels": 921600,
+ "p99Delta": 0.0,
+ "p999Delta": 0.0
+}

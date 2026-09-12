@@ -142,3 +142,15 @@ export function applyDreamIslandAtlasFlow(
  * silently no-ops, which is what the diagnostics counter is for. */
 let flowInstallations = 0;
 export const dreamIslandFlowInstallations = (): number => flowInstallations;
+
+/** Vertex red encodes distance across the shallows, not an extra texture. */
+export function applyDreamIslandDepthBand(material:THREE.MeshLambertMaterial){
+ const previous=material.onBeforeCompile,key=material.customProgramCacheKey();
+ material.vertexColors=true;
+ material.onBeforeCompile=(shader,renderer)=>{
+  previous.call(material,shader,renderer);
+  shader.fragmentShader=shader.fragmentShader.replace('#include <color_fragment>',`
+   diffuseColor.rgb*=mix(vec3(.10,.88,.82),vec3(.025,.16,.48),smoothstep(.66,.80,vColor.r));`);
+ };
+ material.customProgramCacheKey=()=>key+'-depth-band-v1';material.needsUpdate=true;
+}

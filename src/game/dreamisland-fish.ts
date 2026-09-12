@@ -33,7 +33,13 @@ import type {DreamIslandCourse} from './dreamisland-course';
 type Point={progress:number;lateral:number;rise:number};
 type FishData={livery:string;yaw:number}&Point;
 type ShoalData={id:string;batch:string;sector:string;periodSeconds:number;
- startHeadingYaw:number;rest:Point;fish:FishData[];path:Point[]};
+ startHeadingYaw:number;rest:Point;fish:FishData[];path:Point[];
+ /** Phase F: a shoal with no batch of its own in `painted.glb`, which
+  * instances the named shipped shoal's already re-origined geometry. */
+ source?:string;minimumDeckClearanceMetres?:number};
+/** Where a shoal's geometry lives: its own baked meshes, or a slot in the
+ * shared instanced meshes the phase-F shoals were added as. */
+type Rig={place(position:THREE.Vector3,yaw:number):void;setVisible(visible:boolean):void;meshes:number};
 const TICK_RATE=120;
 /** Half the goldfish's widest span, from `painted.json`'s measured 6.026 m
  * width. A fish this far off the road edge still has nothing over the deck. */
@@ -53,7 +59,8 @@ class Shoal {
   * how the first run of this counter produced a clearance of -5.3 m for fish
   * that were still in the water. */
  readonly fish:{offset:THREE.Vector3;progressOffset:number}[]=[];
- constructor(readonly data:ShoalData,readonly meshes:THREE.Mesh[],course:DreamIslandCourse){
+ constructor(readonly data:ShoalData,readonly rig:Rig,source:THREE.Mesh[],
+  reorigin:boolean,course:DreamIslandCourse){
   routePoint(course,data.rest,this.restWorld);
   const scratch=new THREE.Vector3();
   for(const fish of data.fish){
@@ -62,15 +69,16 @@ class Shoal {
     progressOffset:fish.progress-data.rest.progress});
   }
   const box=new THREE.Box3();
-  for(const mesh of meshes){
+  for(const mesh of source){
    mesh.geometry.computeBoundingBox();
    box.union(mesh.geometry.boundingBox!);
   }
   this.restLowestY=box.min.y;
+  if(!reorigin)return;
   // Re-origin: the world build bakes absolute coordinates, so without this a
   // yaw would swing the shoal around the map origin instead of around itself.
   const shift=new THREE.Matrix4().makeTranslation(-this.restWorld.x,-this.restWorld.y,-this.restWorld.z);
-  for(const mesh of meshes){
+  for(const mesh of source){
    mesh.geometry.applyMatrix4(shift);
    mesh.geometry.computeBoundingSphere();
    mesh.position.copy(this.restWorld);
@@ -107,14 +115,51 @@ export class DreamIslandShoals {
  minimumDeckClearance=Number.POSITIVE_INFINITY;
  deckSamples=0;
  visibleMeshes=0;
+ /**
+  * Phase F: the six added shoals share ONE `InstancedMesh` per material, built
+  * from a shipped shoal's geometry AFTER that shoal has re-origined it. Six
+  * shoals therefore cost two draws rather than twelve, and the instanced
+  * meshes are added to this group for the caller to parent.
+  */
+ readonly instancedRoot=new THREE.Group();
+ readonly report={bakedShoals:0,instancedShoals:0,instancedDraws:0,instancedTriangles:0,
+  perShoalFloors:[] as {id:string;floorMetres:number}[]};
+ private readonly instanced:THREE.InstancedMesh[]=[];
  constructor(private readonly course:DreamIslandCourse,meshes:THREE.Mesh[]){
+  this.instancedRoot.name='dreamisland_fish_instanced';
+  const baked=new Map<string,THREE.Mesh[]>();
   for(const data of DATA.shoals){
+   if(data.source)continue;
    const owned=meshes.filter(mesh=>mesh.name.startsWith('DI_'+data.batch+'_'));
    if(owned.length===0)continue;
-   this.shoals.push(new Shoal(data,owned,course));
+   baked.set(data.id,owned);
+   this.shoals.push(new Shoal(data,bakedRig(owned),owned,true,course));
+   this.report.bakedShoals++;
+  }
+  // Second pass, because a source shoal's geometry is only centred on its own
+  // origin once its `Shoal` has re-origined it above. Cloning before that would
+  // instance a cluster built around the map origin.
+  const added=DATA.shoals.filter(data=>data.source&&baked.has(data.source));
+  if(added.length){
+   const template=baked.get(added[0].source!)!;
+   for(const mesh of template){
+    const instance=new THREE.InstancedMesh(mesh.geometry,mesh.material,added.length);
+    instance.name=mesh.name.replace(/^DI_[A-Z]+_/,'DI_FISHADDED_');
+    instance.frustumCulled=false;instance.castShadow=false;instance.receiveShadow=false;
+    this.instanced.push(instance);this.instancedRoot.add(instance);
+    this.report.instancedDraws++;
+    this.report.instancedTriangles+=(mesh.geometry.index?.count??mesh.geometry.attributes.position.count)/3*added.length;
+   }
+   added.forEach((data,index)=>{
+    this.shoals.push(new Shoal(data,instancedRig(this.instanced,index),template,false,course));
+    this.report.instancedShoals++;
+    if(data.minimumDeckClearanceMetres!==undefined){
+     this.report.perShoalFloors.push({id:data.id,floorMetres:data.minimumDeckClearanceMetres});
+    }
+   });
   }
  }
- get meshCount(){return this.shoals.reduce((total,shoal)=>total+shoal.meshes.length,0);}
+ get meshCount(){return this.shoals.reduce((total,shoal)=>total+shoal.rig.meshes,0);}
  /** Where a shoal is at an absolute tick, in route space, already blended out of
   * its resting point. Pure: the same tick always gives the same point. */
  private pointAt(shoal:Shoal,tick:number,fishRiseTick:number,into:Point):number{
@@ -150,10 +195,11 @@ export class DreamIslandShoals {
  update(tick:number,fishRiseTick:number|null,reducedMotion:boolean):void{
   this.visibleMeshes=0;
   const risen=fishRiseTick!==null&&!reducedMotion&&tick>=fishRiseTick;
+  for(const instance of this.instanced)instance.visible=risen;
   for(const shoal of this.shoals){
-   for(const mesh of shoal.meshes)mesh.visible=risen;
+   shoal.rig.setVisible(risen);
    if(!risen)continue;
-   this.visibleMeshes+=shoal.meshes.length;
+   this.visibleMeshes+=shoal.rig.meshes;
    const blend=this.pointAt(shoal,tick,fishRiseTick!,this.scratch);
    routePoint(this.course,this.scratch,this.here);
    // Heading from a point a little further along the same path, so the shoal
@@ -164,10 +210,7 @@ export class DreamIslandShoals {
    routePoint(this.course,this.ahead,this.next);
    const heading=Math.atan2(this.next.x-this.here.x,this.next.z-this.here.z);
    const turn=THREE.MathUtils.euclideanModulo(heading-shoal.data.startHeadingYaw+Math.PI,Math.PI*2)-Math.PI;
-   for(const mesh of shoal.meshes){
-    mesh.position.copy(this.here);
-    mesh.rotation.y=turn*blend;
-   }
+   shoal.rig.place(this.here,turn*blend);
    // Clearance, PER FISH. Each fish's world position is the shoal's origin plus
    // its own resting offset turned by the shoal's turn; its lateral is then
    // measured against the road at its own progress, and its lowest point is its
@@ -188,4 +231,32 @@ export class DreamIslandShoals {
    }
   }
  }
+}
+
+
+/** A shipped shoal's own baked meshes: a position and a yaw, as phase C had it. */
+function bakedRig(meshes:THREE.Mesh[]):Rig{
+ return {
+  meshes:meshes.length,
+  place(position,yaw){for(const mesh of meshes){mesh.position.copy(position);mesh.rotation.y=yaw;}},
+  setVisible(visible){for(const mesh of meshes)mesh.visible=visible;},
+ };
+}
+/** One slot of the shared instanced meshes. A hidden shoal is scaled to zero
+ * rather than culled, because an `InstancedMesh` has no per-instance visible
+ * flag; the whole mesh's `visible` still does the real hiding before the rise. */
+function instancedRig(meshes:THREE.InstancedMesh[],index:number):Rig{
+ const matrix=new THREE.Matrix4();
+ return {
+  meshes:meshes.length,
+  place(position,yaw){
+   matrix.makeRotationY(yaw).setPosition(position);
+   for(const mesh of meshes){mesh.setMatrixAt(index,matrix);mesh.instanceMatrix.needsUpdate=true;}
+  },
+  setVisible(visible){
+   if(visible)return;
+   matrix.makeScale(0,0,0);
+   for(const mesh of meshes){mesh.setMatrixAt(index,matrix);mesh.instanceMatrix.needsUpdate=true;}
+  },
+ };
 }
