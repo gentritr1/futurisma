@@ -58,12 +58,15 @@ const VIEWPORTS = arg("viewports", "1280x720,1920x1080").split(",").filter(Boole
  *   fold, or inside the launch screen's own scrollable content.
  *
  * They diverge at 1920x1080, where the panel is taller than the viewport on
- * most circuits. That is NOT new: measured on `main` at 1920x1080, Ascension's
+ * most circuits. That is NOT new: measured on `main` at eafe0b9, Ascension's
  * button sat at 1093.47 against a 1080 viewport, Night Shift at 1078.91 and
- * Dream Island at 1076.88 — and `.screen--intro` did not scroll, so the
- * control was unreachable rather than merely low. Neither number is asserted
- * at that viewport; both are recorded for every capture, and the console
- * prints every above-fold failure whether or not it is fatal.
+ * Dream Island at 1076.88. `.screen--intro` has scrolled since the dispatch
+ * sheet landed ("the scroll is the last-resort guarantee that nothing is ever
+ * unreachable"), so those buttons were low rather than lost — which is why
+ * `launchVisible` is the one that is asserted everywhere and
+ * `launchAboveFold` only where the brief set a bound. Both are recorded for
+ * every capture, and the console prints every above-fold failure whether or
+ * not it is fatal.
  */
 const readPaddock = () => {
   const text = (selector) => document.querySelector(selector)?.textContent?.trim() ?? null;
@@ -86,6 +89,11 @@ const readPaddock = () => {
     footer: text("#intro-footer"),
     startButtonTop: box ? Number(box.top.toFixed(2)) : null,
     startButtonBottom: box ? Number(box.bottom.toFixed(2)) : null,
+    /* The last control on the panel, recorded because it is the first thing to
+       go below the fold and it is NOT the one the bound names. */
+    controlsButtonBottom: Number(
+      (document.getElementById("controls-button")?.getBoundingClientRect().bottom ?? 0).toFixed(2),
+    ),
     launchAboveFold: Boolean(
       box && box.height > 0 && box.width > 0
         && box.top >= 0 && box.bottom <= window.innerHeight,
