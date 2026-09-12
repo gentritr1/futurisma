@@ -2,10 +2,12 @@ import {resultPresentation} from './result-presentation.js';
 import {
   formatRaceGap,
   formatRacePosition,
+  formatRaceTime,
   resolveBoostPresentation,
   resolveFinishPresentation,
   resolveInitialRacePresentation,
   resolveRaceStage,
+  resolveTimingPresentation,
 } from "./hud-presentation.js";
 import { DRIFT_REWARD_MINIMUM_CHARGE, SLIPSTREAM_LOCK_THRESHOLD } from "./physics";
 import { publishRadioFrame } from "./pit-radio";
@@ -51,6 +53,9 @@ export interface HudFrame {
   speedKph: number;
   boost: number;
   elapsedMs: number;
+  /** Time on the CURRENT lap. The clock a time attack is actually scored on;
+   * `game.ts` already tracks `lapStartElapsedMs` for the live delta. */
+  lapElapsedMs: number;
   lastLapMs: number | null;
   lap: number;
   totalLaps: number;
@@ -167,15 +172,9 @@ function requiredElement<T extends HTMLElement>(id: string): T {
   return element as T;
 }
 
-export function formatRaceTime(milliseconds: number): string {
-  const safe = Math.max(0, Math.floor(milliseconds));
-  const minutes = Math.floor(safe / 60_000);
-  const seconds = Math.floor((safe % 60_000) / 1_000);
-  const millis = safe % 1_000;
-  return `${minutes.toString().padStart(2, "0")}:${seconds
-    .toString()
-    .padStart(2, "0")}.${millis.toString().padStart(3, "0")}`;
-}
+/** Moved to `hud-presentation.js` so the pure timing helper can compose it; the
+ * name is re-exported here because that is where every caller already finds it. */
+export { formatRaceTime };
 
 export class GameUi {
   readonly startButton = requiredElement<HTMLButtonElement>("start-button");
@@ -193,6 +192,7 @@ export class GameUi {
   private readonly gridOrder = requiredElement<HTMLOListElement>("grid-order");
   private readonly fieldOrder = requiredElement<HTMLOListElement>("field-order");
   private readonly introDeck = requiredElement<HTMLElement>("intro-deck");
+  private readonly introObjective = requiredElement<HTMLElement>("intro-objective");
   private readonly introFooter = requiredElement<HTMLElement>("intro-footer");
   private readonly courseName = requiredElement<HTMLElement>("course-name");
   private readonly systemStatus = requiredElement<HTMLElement>("system-status");
@@ -202,6 +202,7 @@ export class GameUi {
   private readonly lapValue = requiredElement<HTMLElement>("lap-value");
   private readonly lapPips = requiredElement<HTMLElement>("lap-pips");
   private readonly lastLapValue = requiredElement<HTMLElement>("last-lap-value");
+  private readonly timingTag = requiredElement<HTMLElement>("timing-tag");
   private readonly positionValue = requiredElement<HTMLElement>("position-value");
   private readonly gapValue = requiredElement<HTMLElement>("gap-value");
   private readonly checkpointValue = requiredElement<HTMLElement>("checkpoint-value");
@@ -265,6 +266,7 @@ export class GameUi {
   private readonly errorMessage = requiredElement<HTMLElement>("error-message");
   private lastLapLabel = "";
   private lastLapTimeLabel = "";
+  private lastTimingTag = "RACE TIME";
   private lastPositionLabel = "";
   private lastGapLabel = "";
   private lastCheckpointLabel = "";
@@ -309,6 +311,21 @@ export class GameUi {
    * whichever arrives second does not clobber the first.
    */
   private raceFormatLabel = "FIELD RACE";
+  /**
+   * The two halves of the objective line that are not the format label.
+   *
+   * Held rather than recomputed because the three facts arrive from three
+   * directions and in an order that is not fixed: `setRaceFormat` knows the
+   * laps, `MetaUi` knows the format, and only the fleet knows how many craft
+   * are on the grid — and `MetaUi.syncFromSave` calls `setPlayerLivery` with an
+   * EMPTY grid, so a line rebuilt from its arguments alone would lose the field
+   * every time the livery changed. `startingGridRows` is the arbiter: it
+   * answers `[]` for a field format whose fleet does not exist yet, which is
+   * the one state the line has nothing true to say about, so the segment is
+   * left off until it does.
+   */
+  private objectiveGridRows = 0;
+  private objectiveLaps = 0;
   private readonly reducedMotion = window.matchMedia(
     "(prefers-reduced-motion: reduce)",
   ).matches;
@@ -343,8 +360,19 @@ export class GameUi {
     const ascension = course.mapCode === "MAP 06";
     const island = course.mapCode === "MAP 07";
     document.body.dataset.map = island ? "dreamisland" : ascension ? "ascension" : tideline ? "tideline" : polarity ? "polarity" : course.mapCode === "MAP 03" ? "nightshift" : course.mapCode === "MAP 02" ? "bitterpan" : "greenwater";
-    document.querySelector<HTMLElement>(".intro-panel h1")!.textContent = island ? "DREAM ISLAND" : ascension ? "ASCENSION PAD" : tideline ? "TIDELINE" : polarity ? "POLARITY" : course.mapCode === "MAP 03" ? "NIGHT SHIFT" : "TOTEM";
-    document.querySelector<HTMLElement>(".intro-code")!.textContent = island ? "DREAM ISLAND · DAY INTO NIGHT" : ascension ? "PAD 09 · LAUNCH DAY / DAWN" : tideline ? "PELAGIC PUMPWORKS · THE TIDE CYCLE" : polarity ? "VECTOR EXCHANGE · 02:14 AM" : course.mapCode === "MAP 03" ? "MERIDIAN DISTRICT · AFTER HOURS" : "KAIRO DYNAMICS · KD-0714";
+    /*
+      The h1 is the CIRCUIT, on every map. It used to be the craft — `TOTEM` —
+      on Greenwater and Bitterpan and the circuit everywhere else, which made
+      the largest word on the launch screen name the one thing that never
+      changes between dispatches. `mapName` is the course's own label, and
+      uppercased it is exactly the string each per-map branch was hard-coding
+      (`Night Shift` -> `NIGHT SHIFT`, `Ascension Pad` -> `ASCENSION PAD`), so
+      the chain collapses into the value it was spelling out. The craft keeps
+      its identity in the LIVERY chips and the footer.
+    */
+    document.querySelector<HTMLElement>(".intro-panel h1")!.textContent = course.mapName.toUpperCase();
+    // Brand, index, then the per-map flavour line exactly as it was written.
+    document.querySelector<HTMLElement>(".intro-code")!.textContent = `FUTURISMA · ${course.mapCode} · ${island ? "DREAM ISLAND · DAY INTO NIGHT" : ascension ? "PAD 09 · LAUNCH DAY / DAWN" : tideline ? "PELAGIC PUMPWORKS · THE TIDE CYCLE" : polarity ? "VECTOR EXCHANGE · 02:14 AM" : course.mapCode === "MAP 03" ? "MERIDIAN DISTRICT · AFTER HOURS" : "KAIRO DYNAMICS · KD-0714"}`;
     const editionLink = document.getElementById("tideline-edition") as HTMLAnchorElement;
     editionLink.hidden = true;
     document.querySelectorAll<HTMLElement>("[data-polarity-control]").forEach((element) => { element.hidden = !polarity; });
@@ -372,7 +400,30 @@ export class GameUi {
     this.finishValue.textContent = presentation.finishLabel;
     this.lastLapValue.hidden = true;
     this.progressFill.style.transform = "scaleX(0)";
+    this.objectiveLaps = presentation.totalLaps;
     this.applyStartingGrid(grid);
+    this.renderObjective();
+  }
+
+  /**
+   * The objective line under the h1: format, laps, field. Three facts the
+   * paddock previously carried only inside a prose sentence.
+   *
+   * A segment it has no true value for is omitted rather than guessed. That
+   * only happens before the fleet exists, which is before the launch screen is
+   * shown at all — `main.ts` awaits `initialize()`, which hands the real grid
+   * to `setRaceFormat`, and only then calls `showReady`.
+   */
+  private renderObjective(): void {
+    const parts = [this.raceFormatLabel];
+    if (this.objectiveLaps > 0) {
+      parts.push(`${this.objectiveLaps} ${this.objectiveLaps === 1 ? "LAP" : "LAPS"}`);
+    }
+    if (this.objectiveGridRows > 0) {
+      const rivals = this.objectiveGridRows - 1;
+      parts.push(rivals === 0 ? "SOLO" : `${rivals} RIVAL${rivals === 1 ? "" : "S"}`);
+    }
+    this.introObjective.textContent = parts.join(" · ");
   }
 
   /**
@@ -388,6 +439,7 @@ export class GameUi {
     this.raceFormatLabel = label;
     this.courseFooterLabel = `${this.courseFooterName} ${label}`;
     this.introFooter.textContent = `${this.playerLiveryLabel} · ${this.courseFooterLabel}`;
+    this.renderObjective();
   }
 
   setPlayerLivery(label: string, grid: readonly RaceGridEntry[]): void {
@@ -728,7 +780,15 @@ export class GameUi {
       this.sectorDelta.setAttribute("aria-hidden", "true");
     }
     this.speedValue.textContent = Math.round(frame.speedKph).toString().padStart(3, "0");
-    this.timeValue.textContent = formatRaceTime(frame.elapsedMs);
+    // The clock is written every frame, as it always was; the tag and the
+    // secondary line beside it are change-guarded below.
+    const timing = resolveTimingPresentation(
+      this.raceMode,
+      frame.elapsedMs,
+      frame.lapElapsedMs,
+      frame.lastLapMs,
+    );
+    this.timeValue.textContent = formatRaceTime(timing.clockMs);
     const positionLabel = formatRacePosition(frame.position, frame.racerCount);
     const gapLabel = formatRaceGap(
       frame.position,
@@ -744,9 +804,7 @@ export class GameUi {
       this.lastGapLabel = gapLabel;
     }
     const lapLabel = `${Math.min(frame.lap, frame.totalLaps)} / ${frame.totalLaps}`;
-    const lastLapTimeLabel = frame.lastLapMs === null
-      ? ""
-      : ` · LAST ${formatRaceTime(frame.lastLapMs)}`;
+    const lastLapTimeLabel = timing.secondary;
     const checkpointLabel = frame.missedGate === null
       ? frame.finishArmed
         ? frame.lap === frame.totalLaps
@@ -766,6 +824,10 @@ export class GameUi {
       // left. Rebuilt only on the lap change, never per frame.
       this.renderLapPips(frame.lap, frame.totalLaps);
       this.lastLapLabel = lapLabel;
+    }
+    if (timing.tag !== this.lastTimingTag) {
+      this.timingTag.textContent = timing.tag;
+      this.lastTimingTag = timing.tag;
     }
     if (lastLapTimeLabel !== this.lastLapTimeLabel) {
       this.lastLapValue.textContent = lastLapTimeLabel;
@@ -1076,6 +1138,8 @@ export class GameUi {
   private applyStartingGrid(grid: readonly RaceGridEntry[]): void {
     const rows = startingGridRows(this.raceMode, grid, this.playerLiveryLabel);
     if (rows.length === 0) return;
+    this.objectiveGridRows = rows.length;
+    this.renderObjective();
     this.updateGrid(rows);
     if (grid.length > 0) this.updateFieldOrder(grid);
   }

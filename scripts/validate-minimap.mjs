@@ -178,9 +178,14 @@ assert.throws(
 
 // --- Fit transform -------------------------------------------------------
 
-const PANEL_WIDTH = 120;
-const PANEL_HEIGHT = 74;
-const PANEL_PADDING = 9;
+// Mirrors of `minimap.ts`'s CANVAS_WIDTH / OUTLINE_HEIGHT / OUTLINE_PADDING.
+// Re-pinned with the panel's own measured growth (120x128 -> 160x172 canvas):
+// 120 -> 160, 74 -> 99, 9 -> 12. The assertion below is the reason they are
+// mirrored rather than imported — it must fail if the drawing code's numbers
+// and the fit it asks for ever stop agreeing.
+const PANEL_WIDTH = 160;
+const PANEL_HEIGHT = 99;
+const PANEL_PADDING = 12;
 const transform = fitOutlineTransform(
   outline.bounds,
   PANEL_WIDTH,
