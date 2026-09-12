@@ -25,20 +25,38 @@ import {
  * four dots.
  */
 
-/** CSS pixel footprint. Small on purpose — see PRODUCT.md's HUD anti-reference. */
-const CANVAS_WIDTH = 120;
-const CANVAS_HEIGHT = 128;
+/**
+ * CSS pixel footprint.
+ *
+ * 120x128 -> 160x172, the `.minimap` CSS box going 132x140 -> 172x184 with it
+ * (`rebuild` writes the canvas size back as an inline style, so the canvas
+ * numbers are what the panel actually measures once the class exists; the CSS
+ * pair is what the paddock shows before it does).
+ *
+ * Every constant below is in the same CSS pixels and was rescaled by its own
+ * axis' factor — x by 160/120 = 1.3333, y by 172/128 = 1.34375 — so the panel
+ * grows rather than changing shape. `fitOutlineTransform` takes the smaller of
+ * the two axis fits, so a per-axis rescale leaves the outline the same drawing
+ * at a larger size.
+ */
+const CANVAS_WIDTH = 160;
+const CANVAS_HEIGHT = 172;
 
-const OUTLINE_HEIGHT = 74;
-const OUTLINE_PADDING = 9;
+const OUTLINE_HEIGHT = 99; // 74 * 1.34375 = 99.4
+const OUTLINE_PADDING = 12; // 9 * 1.34375 = 12.1
 
-const RADAR_WIDTH = 46;
-const RADAR_HEIGHT = 44;
+const RADAR_WIDTH = 61; // 46 * 1.3333 = 61.3
+const RADAR_HEIGHT = 59; // 44 * 1.34375 = 59.1
 const RADAR_LEFT = (CANVAS_WIDTH - RADAR_WIDTH) / 2;
-const RADAR_TOP = 82;
+const RADAR_TOP = 110; // 82 * 1.34375 = 110.2; 110 + 59 = 169 <= 172
 
-const GATE_TICK_LENGTH = 3.5;
+const GATE_TICK_LENGTH = 4.7; // 3.5 * 1.34
 const GATE_TICK_COUNT = 8;
+
+/** The dot radii. Both were below the size the captures could find. */
+const PLAYER_DOT_RADIUS = 3.4; // was 2.1
+const CONTACT_DOT_RADIUS = 2.6; // was 1.7
+const CONTACT_DOT_RADIUS_CLOSE = 3.4; // was 2.3
 
 /**
  * sRGB mirrors of the `--acid` / `--cyan` / `--muted` / `--dim` oklch tokens in
@@ -51,6 +69,15 @@ const ACID = "192, 240, 0";
 const CYAN = "77, 232, 255";
 const MUTED = "147, 169, 172";
 const DIM = "97, 118, 120";
+/**
+ * `--plate-dark`'s own hue at the HUD's darkest step: the sRGB mirror of
+ * `oklch(0.1 0.014 205)`, which converts to rgb(1, 4, 5). Written out for the
+ * same reason as the four above — an `oklch()` string assigned to `fillStyle`
+ * or `strokeStyle` fails silently on an engine that cannot parse it, leaving
+ * the PREVIOUS colour in place, and a player dot ringed in acid instead of
+ * near-black is exactly the failure this ring exists to prevent.
+ */
+const PLATE_DARK = "1, 4, 5";
 
 /** Idle is deliberately low contrast; proximity is what earns brightness. */
 const IDLE_OUTLINE_ALPHA = 0.3;
@@ -322,12 +349,19 @@ export class Minimap {
     // The upper player's dot follows its bypass instead of the lower detour.
     const playerOutline = (this.polarity?.lane === 1 || alternateRoad) && this.upperOutline
       ? this.upperOutline : this.outline;
+    // Drawn after the gate ticks so the dot is never cut by one, and ringed in
+    // near-black: acid on acid is unreadable the moment a circuit's own palette
+    // is bright, which is what Bitterpan's pan does to it. The ring strokes the
+    // SAME path the fill just used, so it costs no extra arc and the dot stays
+    // the last arc this tick — `validate:polarity-minimap` reads it as such.
     const player = this.outlinePointAt(playerProgress, this.outlineTransform, playerOutline);
     context.fillStyle = rgba(ACID, 0.92);
     context.beginPath();
-    context.arc(player.x, player.y, 2.1, 0, Math.PI * 2);
+    context.arc(player.x, player.y, PLAYER_DOT_RADIUS, 0, Math.PI * 2);
     context.fill();
-    ops += 4;
+    context.strokeStyle = rgba(PLATE_DARK, 0.9);
+    context.stroke();
+    ops += 5;
 
     // Radar frame.
     context.strokeStyle = rgba(MUTED, alert ? 0.42 : 0.24);
@@ -351,7 +385,7 @@ export class Minimap {
       context.arc(
         RADAR_LEFT + placed.x * RADAR_WIDTH,
         RADAR_TOP + placed.y * RADAR_HEIGHT,
-        close ? 2.3 : 1.7,
+        close ? CONTACT_DOT_RADIUS_CLOSE : CONTACT_DOT_RADIUS,
         0,
         Math.PI * 2,
       );

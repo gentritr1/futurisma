@@ -1983,7 +1983,7 @@ export class FuturismaGame {
     this.ui.update({
       speedKph: this.speed * 3.6,
       boost: this.boostReserve,
-      elapsedMs: this.elapsedMs,
+      elapsedMs: this.elapsedMs, lapElapsedMs: this.elapsedMs - this.lapStartElapsedMs,
       lastLapMs: this.lastLapMs,
       lap: this.lap,
       totalLaps: this.totalLaps,

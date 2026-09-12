@@ -116,3 +116,54 @@ export function resolveBoostPresentation(boostActive, boostLocked) {
   if (boostActive) return { label: "PLASMA DISCHARGE", state: "active" };
   return { label: "PLASMA RESERVE", state: "ready" };
 }
+
+/**
+ * `mm:ss.mmm`. Lives here rather than in `ui.ts` because
+ * {@link resolveTimingPresentation} composes the secondary line out of it and
+ * that helper has to stay runnable under Node — `validate:hud` asserts its
+ * four cases, and a helper that reached into the DOM module could not be
+ * asserted at all. `ui.ts` re-exports it, so every existing caller is
+ * unchanged.
+ * @param {number} milliseconds
+ */
+export function formatRaceTime(milliseconds) {
+  const safe = Math.max(0, Math.floor(milliseconds));
+  const minutes = Math.floor(safe / 60_000);
+  const seconds = Math.floor((safe % 60_000) / 1_000);
+  const millis = safe % 1_000;
+  return `${minutes.toString().padStart(2, "0")}:${seconds
+    .toString()
+    .padStart(2, "0")}.${millis.toString().padStart(3, "0")}`;
+}
+
+/**
+ * What the clock block says, per format.
+ *
+ * A time attack is scored on ONE lap, so the total elapsed is the least useful
+ * number the block can lead with: at 4:12 into a five-lap solo run the driver
+ * is asking "how is THIS lap going", and the delta chip below already answers
+ * it against the record. The tag moves with the number so the two can never
+ * disagree — a block that reads `RACE TIME` over a lap clock would be worse
+ * than the total it replaced.
+ *
+ * Race and sprint are byte-for-byte what they were: the same tag, the same
+ * clock, the same ` · LAST mm:ss.mmm` secondary that appears on the first
+ * completed lap.
+ *
+ * @param {string} mode the resolved race mode
+ * @param {number} elapsedMs total race time
+ * @param {number} lapElapsedMs time on the current lap
+ * @param {number | null} lastLapMs the last completed lap, or null
+ * @returns {{ tag: string; clockMs: number; secondary: string }}
+ */
+export function resolveTimingPresentation(mode, elapsedMs, lapElapsedMs, lastLapMs) {
+  const last = lastLapMs === null ? "" : ` · LAST ${formatRaceTime(lastLapMs)}`;
+  if (mode !== "timeattack") {
+    return { tag: "RACE TIME", clockMs: elapsedMs, secondary: last };
+  }
+  return {
+    tag: "LAP TIME",
+    clockMs: lapElapsedMs,
+    secondary: `TOTAL ${formatRaceTime(elapsedMs)}${last}`,
+  };
+}

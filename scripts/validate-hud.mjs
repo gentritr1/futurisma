@@ -1,4 +1,5 @@
 import {resultPresentation} from "../src/game/result-presentation.js";
+import {resolveTimingPresentation} from "../src/game/hud-presentation.js";
 /**
  * HUD pass — the logic a screenshot cannot check.
  *
@@ -220,3 +221,34 @@ for(const mode of ['race','sprint','timeattack']){
 assert.equal(resultPresentation(null).newBestLap,false);
 assert.deepEqual(resultPresentation({mode:'timeattack',previousBestLapMs:12345}),{timeAttack:true,newBestLap:false,previousBestLapMs:12345});
 console.log('HUD result verdict PASS: no NEW BEST without summary.newBestLap.');
+
+/* ------------------------------------------------------------ timing block */
+//
+// The four cases the clock block can be in. The two race cases must be
+// byte-for-byte what shipped before the helper existed, because the whole
+// claim of this change is that only a time attack moved.
+{
+  const race = resolveTimingPresentation("race", 252_000, 34_500, null);
+  assert.deepEqual(race, {tag: "RACE TIME", clockMs: 252_000, secondary: ""},
+    "A field race with no completed lap is the tag, the total, and nothing else.");
+
+  const raceWithLast = resolveTimingPresentation("race", 252_000, 34_500, 38_400);
+  assert.deepEqual(raceWithLast,
+    {tag: "RACE TIME", clockMs: 252_000, secondary: " · LAST 00:38.400"},
+    "A completed lap adds the LAST line the HUD already showed, unchanged.");
+  assert.deepEqual(resolveTimingPresentation("sprint", 252_000, 34_500, 38_400), raceWithLast,
+    "Sprint is a race with fewer laps; its clock block must not differ.");
+
+  const attack = resolveTimingPresentation("timeattack", 252_000, 34_500, null);
+  assert.deepEqual(attack,
+    {tag: "LAP TIME", clockMs: 34_500, secondary: "TOTAL 04:12.000"},
+    "Time attack leads with the lap it is scored on and demotes the total.");
+
+  const attackWithLast = resolveTimingPresentation("timeattack", 252_000, 1_200, 38_400);
+  assert.deepEqual(attackWithLast,
+    {tag: "LAP TIME", clockMs: 1_200, secondary: "TOTAL 04:12.000 · LAST 00:38.400"},
+    "After a lap completes the clock is the new lap and the total keeps running.");
+  assert.ok(attackWithLast.clockMs < 1_000 + 1_000,
+    "The lap clock restarts at the crossing rather than carrying the race total.");
+}
+console.log("HUD timing PASS: race/sprint unchanged, time attack leads with the lap.");

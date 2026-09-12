@@ -471,10 +471,10 @@ body[data-graphics-context="lost"] .system-state__lamp {
   width: 414px;
   transform-origin: bottom left;
   /* 34 left pad + 340 instruments + 40 fade. The fade is the block's own edge. */
-  padding: 14px 40px 20px 34px;
+  padding: 14px 40px 16px 34px; /* bottom was 20 */
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px; /* was 6 */
   background: linear-gradient(
     90deg,
     oklch(0.09 0.012 205 / 0.76),
@@ -488,8 +488,11 @@ body[data-graphics-context="lost"] .system-state__lamp {
   top: 50%;
   transform-origin: center right;
   transform: translateY(-50%) scale(var(--hud-scale));
-  width: 132px;
-  height: 140px;
+  /* 132x140 -> 172x184, with the canvas backing (160x172, set by
+     `Minimap.rebuild` as an inline style) growing by the same ratio on each
+     axis so the outline fit is unchanged in shape. */
+  width: 172px;
+  height: 184px;
   clip-path: var(--chamfer);
   background: oklch(0.1 0.014 205 / 0.72);
 }
@@ -869,6 +872,13 @@ body[data-graphics-context="lost"] .system-state__lamp {
 }
 
 /* ------------------------------------------------------------ drive cluster */
+/*
+  The chips read at 14px rather than 12px, and the track-event label carries
+  its own dark plate. Coloured text alone was the whole contrast story for
+  GUST / SALT DROP / SQUALL, and Bitterpan's pan is bright enough to eat it;
+  the plate is the same recipe the standing block already uses, so the colour
+  is now a label on a backing rather than the only thing holding it up.
+*/
 
 .hud-drive__chips {
   display: flex;
@@ -876,7 +886,7 @@ body[data-graphics-context="lost"] .system-state__lamp {
   gap: 5px;
   width: 300px;
   margin-bottom: 4px;
-  font: 400 12px/1 var(--mono);
+  font: 400 14px/1 var(--mono);
   letter-spacing: 0.14em;
 }
 
@@ -898,7 +908,7 @@ body[data-graphics-context="lost"] .system-state__lamp {
 
 .hud-chip__track {
   display: block;
-  height: 3px;
+  height: 5px;
   background: oklch(0.8 0.02 210 / 0.16);
   transform: skewX(-10deg);
 }
@@ -915,6 +925,11 @@ body[data-graphics-context="lost"] .system-state__lamp {
 }
 
 .track-event .hud-chip__label {
+  display: inline-flex;
+  align-self: flex-start;
+  padding: 3px 8px;
+  background: var(--plate-dark);
+  clip-path: var(--chamfer);
   font-weight: 600;
   color: var(--cyan);
 }
@@ -1065,11 +1080,19 @@ body[data-graphics-context="lost"] .system-state__lamp {
 
 /* ---------------------------------------------------------------- abilities */
 
+/*
+  The 13px deck and reason lines cost vertical room, and on Tideline at
+  1280x720 HUD SCALE L the drive cluster was already the tallest the game can
+  build — 19.26 px clear of the standing block, measured on eafe0b9. Rather
+  than take the type back, the spacing pays for it: 24 CSS px between these
+  three rules and `.hud-drive`'s own gap and bottom padding, which is 28.8 px
+  of screen at scale L.
+*/
 .hud-abilities {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-top: 12px;
+  gap: 8px; /* was 12 */
+  margin-top: 4px; /* was 12; `.hud-drive`'s own gap already separates it */
   width: 340px;
 }
 
@@ -1094,7 +1117,7 @@ body[data-graphics-context="lost"] .system-state__lamp {
 .hud-ability__text {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px; /* was 4 */
   min-width: 0;
   max-width: 268px;
 }
@@ -1125,7 +1148,10 @@ body[data-graphics-context="lost"] .system-state__lamp {
 .hud-ability__meter {
   display: block;
   width: 140px;
-  height: 3px;
+  /* 3px -> 6px. The fill stays a `scaleX()` on `#power-charge-fill`, which
+     `ability-slots.ts` reads back off the inline transform: only the track's
+     height changed, never the mechanism. */
+  height: 6px;
   background: oklch(0.8 0.02 210 / 0.16);
   transform: skewX(-10deg);
 }
@@ -1231,7 +1257,7 @@ body[data-graphics-context="lost"] .system-state__lamp {
 }
 
 .hud-ability__deck {
-  font: 400 10px/1 var(--mono);
+  font: 400 13px/1.2 var(--mono);
   letter-spacing: 0.14em;
   color: var(--amber);
 }
@@ -1241,7 +1267,7 @@ body[data-graphics-context="lost"] .system-state__lamp {
 }
 
 .hud-ability__reason {
-  font: 400 11.5px/1.35 var(--mono);
+  font: 400 13px/1.3 var(--mono);
   letter-spacing: 0.1em;
   color: var(--muted);
 }
@@ -1437,9 +1463,26 @@ body[data-phase="resuming"] .hud::before {
   text-wrap: balance;
 }
 
+/*
+  The objective. Directly under the h1 and above the prose, because the three
+  facts it carries — format, laps, field — are what the driver is dispatching
+  on and the deck below is the colour around them. Mono and tracked so it reads
+  as instrumentation rather than a second headline, and one line: it is three
+  short tokens and a wrap would make it look like copy.
+*/
+.intro-objective {
+  margin: 12px 0 0;
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  white-space: nowrap;
+  color: var(--ink);
+}
+
 .intro-deck {
   max-width: 46ch;
-  margin: 24px 0 28px;
+  margin: 18px 0 28px;
   color: var(--muted);
   line-height: 1.6;
   text-wrap: pretty;
@@ -1901,7 +1944,25 @@ body[data-options="true"] .hud {
   overflow-y: auto;
 }
 
-@media (max-height: 900px) and (min-width: 701px) {
+/*
+  900 -> 1100, on all three of this file's intro-compaction blocks, and the
+  number came off the measurement rather than out of the air.
+
+  1080 is the common desktop height and it was NEVER compacted, so the launch
+  screen ran its full-size h1 (96px) and full deck there. Measured on `main` at
+  eafe0b9, at a 1920x1080 viewport, `#start-button` bottom already sat at
+  1093.47 on Ascension, 1078.91 on Night Shift and 1076.88 on Dream Island —
+  below the fold before this phase touched anything, reachable only because
+  `.screen--intro` scrolls. The objective line and the circuit h1 then took
+  five of the seven circuits past it.
+
+  1100 rather than 1080 exactly: the threshold has to cover the viewport, not
+  sit on it, and a browser chrome that eats a few pixels must not drop the
+  panel back to the uncompacted layout at 1084. Nothing new is hidden and the
+  h1 is not shrunk further — this is the compaction the file already authored
+  for laptops, applied at the height that actually needs it.
+*/
+@media (max-height: 1100px) and (min-width: 701px) {
   /* The screen's padding is horizontal-first (`5vw`); on a laptop that spends
      128px of vertical room the panel needs more than the gutter does. */
   .screen--intro {
@@ -1916,8 +1977,13 @@ body[data-options="true"] .hud {
     font-size: clamp(2.6rem, 6vw, 3.6rem);
   }
 
+  .intro-objective {
+    margin-top: 8px;
+    font-size: 0.76rem;
+  }
+
   .intro-deck {
-    margin-block: 14px 16px;
+    margin-block: 10px 16px;
     font-size: 0.88rem;
   }
 
@@ -1940,10 +2006,8 @@ body[data-options="true"] .hud {
   }
 }
 
-/* Below this the key legend is the first thing to go — the dispatch sheet is
-   what the screen is for, and the legend is reference rather than a decision.
-   `.intro-footer` goes with it because it is absolutely positioned and would
-   otherwise sit on top of whatever ends up last.
+/* The absolutely-positioned footer is what goes here: on a short viewport it
+   would otherwise sit on top of whatever the panel ends with.
 
    G4 — 680 -> 800, and the number was measured rather than nudged. The phase
    adds two rows to the dispatch sheet (FORMAT and FIELD), each a `.chip` with
@@ -1952,9 +2016,19 @@ body[data-options="true"] .hud {
    this repository's own harness viewport — the first G4 paddock screenshot at
    1280x720 showed the absolutely-positioned footer sitting across the middle
    of the key legend, which is exactly the collision this rule exists to
-   prevent and is why it had to move with the sheet that caused it. */
+   prevent and is why it had to move with the sheet that caused it.
+
+   `.controls-list` used to be hidden here too, and that was correct while the
+   key legend lived on the intro panel. `7371a5f` moved the legend into
+   `#controls-screen` and the rule followed the class name instead of the
+   panel: the CONTROLS view then computed `display: none` on its only content
+   at 1280x720, so pressing C opened a screen with ten rows and nothing
+   visible. The intro panel no longer contains a `.controls-list` at all, so
+   the rule had nothing left to protect — it is the dedicated view's whole
+   reason to exist, and `.options-panel` already scrolls (`max-height: 88vh;
+   overflow-y: auto`) when the rows do not fit. Same story for the
+   `max-width: 700px` block below. */
 @media (max-height: 800px) and (min-width: 701px) {
-  .controls-list,
   .intro-footer {
     display: none;
   }
@@ -2041,13 +2115,15 @@ body[data-options="true"] .hud {
     font-size: 4rem;
   }
 
-  .intro-deck {
-    margin-block: 18px 20px;
-    font-size: 0.9rem;
+  .intro-objective {
+    margin-top: 10px;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
   }
 
-  .controls-list {
-    display: none;
+  .intro-deck {
+    margin-block: 14px 20px;
+    font-size: 0.9rem;
   }
 
   .intro-footer {
@@ -2083,7 +2159,7 @@ body[data-options="true"] .hud {
 }
 
 @media (max-height: 520px) {
-  /* A 128px panel plus RACE TIME does not fit a short viewport. */
+  /* A 172px panel plus RACE TIME does not fit a short viewport. */
   .minimap {
     display: none;
   }
@@ -2133,8 +2209,12 @@ body[data-options="true"] .hud {
     font-size: 3.4rem;
   }
 
+  .intro-objective {
+    margin-top: 6px;
+  }
+
   .intro-deck {
-    margin-block: 12px 14px;
+    margin-block: 8px 14px;
   }
 
   .controls-list {
@@ -2218,7 +2298,7 @@ body[data-map="polarity"] .intro-panel h1,
 body[data-map="nightshift"] .intro-panel h1 { font-size: clamp(3rem, 8vw, 6.4rem); letter-spacing: -.065em; }
 /* Four circuits add a second row: keep launch reachable at laptop heights. */
 .screen--intro { align-items: safe center; }
-@media (max-height: 900px) and (min-width: 701px) {
+@media (max-height: 1100px) and (min-width: 701px) {
   body[data-map="polarity"] .intro-panel h1,
   body[data-map="nightshift"] .intro-panel h1 { font-size: clamp(2.6rem, 6vw, 3.6rem); }
   .screen--intro .chip small { display: none; }
@@ -2240,7 +2320,7 @@ body[data-map="nightshift"] .intro-panel h1 { letter-spacing: -.03em; }
 .edition-switch:hover { color: #fff0cf; }
 .edition-switch:focus-visible { outline: 2px solid #e4b775; outline-offset: 5px; }
 .edition-switch[hidden] { display: none; }
-@media (max-height: 900px) and (min-width: 701px) {
+@media (max-height: 1100px) and (min-width: 701px) {
   body[data-map="tideline"] .intro-panel h1 { font-size: clamp(2.6rem, 6vw, 3.6rem); }
   .screen--intro .intro-deck { line-height: 1.45; }
 }
