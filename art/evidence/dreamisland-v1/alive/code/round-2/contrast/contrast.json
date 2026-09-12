@@ -1,0 +1,3169 @@
+{
+ "script": "scripts/visual/dreamisland/alive-contrast.py",
+ "gate": 4.5,
+ "method": "the background frame is the same frozen pose with every HUD element's color set to transparent, so the mean inside a text rect is the background and not the text itself",
+ "elements": 158,
+ "failures": 0,
+ "rows": [
+  {
+   "pose": "day-beach",
+   "id": "position-value",
+   "class": "",
+   "text": "P1 / 4",
+   "ink": [
+    6.0,
+    35.0,
+    63.0
+   ],
+   "fontSize": "62px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    195.1,
+    208.9,
+    219.1
+   ],
+   "ratio": 10.2,
+   "pass": true
+  },
+  {
+   "pose": "day-beach",
+   "id": null,
+   "class": "hud-label",
+   "text": "LAP",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "11px",
+   "font": "Michroma",
+   "backgroundMean": [
+    225.5,
+    243.8,
+    250.5
+   ],
+   "ratio": 7.21,
+   "pass": true
+  },
+  {
+   "pose": "day-beach",
+   "id": "lap-value",
+   "class": "",
+   "text": "1 / 9",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "40px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    204.4,
+    228.7,
+    237.8
+   ],
+   "ratio": 6.23,
+   "pass": true
+  },
+  {
+   "pose": "day-beach",
+   "id": "gap-value",
+   "class": "hud-standing__gap",
+   "text": "1.28 CLEAR",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "14px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    229.5,
+    245.8,
+    251.2
+   ],
+   "ratio": 7.36,
+   "pass": true
+  },
+  {
+   "pose": "day-beach",
+   "id": null,
+   "class": "",
+   "text": "P1",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    178.4,
+    239.2,
+    250.5
+   ],
+   "ratio": 6.49,
+   "pass": true
+  },
+  {
+   "pose": "day-beach",
+   "id": null,
+   "class": "n",
+   "text": "TOTEM \u00b7 YOU",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    178.7,
+    239.5,
+    251.2
+   ],
+   "ratio": 6.51,
+   "pass": true
+  },
+  {
+   "pose": "day-beach",
+   "id": null,
+   "class": "gap",
+   "text": "\u2014",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    178.8,
+    240.2,
+    251.8
+   ],
+   "ratio": 6.54,
+   "pass": true
+  },
+  {
+   "pose": "day-beach",
+   "id": null,
+   "class": "",
+   "text": "P2",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    205.7,
+    231.3,
+    240.0
+   ],
+   "ratio": 6.36,
+   "pass": true
+  },
+  {
+   "pose": "day-beach",
+   "id": null,
+   "class": "n",
+   "text": "PRIVATEER 13",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    206.5,
+    232.0,
+    240.7
+   ],
+   "ratio": 6.4,
+   "pass": true
+  },
+  {
+   "pose": "day-beach",
+   "id": null,
+   "class": "gap",
+   "text": "+1.2",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    206.9,
+    232.9,
+    241.7
+   ],
+   "ratio": 6.45,
+   "pass": true
+  },
+  {
+   "pose": "day-beach",
+   "id": null,
+   "class": "",
+   "text": "P3",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    193.4,
+    219.8,
+    229.8
+   ],
+   "ratio": 5.7,
+   "pass": true
+  },
+  {
+   "pose": "day-beach",
+   "id": null,
+   "class": "n",
+   "text": "NIGHTFORM 24",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    194.0,
+    220.9,
+    230.4
+   ],
+   "ratio": 5.75,
+   "pass": true
+  },
+  {
+   "pose": "day-beach",
+   "id": null,
+   "class": "gap",
+   "text": "+1.4",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    194.4,
+    221.7,
+    231.7
+   ],
+   "ratio": 5.8,
+   "pass": true
+  },
+  {
+   "pose": "day-beach",
+   "id": null,
+   "class": "",
+   "text": "P4",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    186.0,
+    213.3,
+    223.0
+   ],
+   "ratio": 5.34,
+   "pass": true
+  },
+  {
+   "pose": "day-beach",
+   "id": null,
+   "class": "n",
+   "text": "NEEDLE 16",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    187.1,
+    214.1,
+    223.8
+   ],
+   "ratio": 5.38,
+   "pass": true
+  },
+  {
+   "pose": "day-beach",
+   "id": null,
+   "class": "gap",
+   "text": "+1.6",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    187.8,
+    215.0,
+    225.0
+   ],
+   "ratio": 5.43,
+   "pass": true
+  },
+  {
+   "pose": "day-beach",
+   "id": null,
+   "class": "hud-label",
+   "text": "RACE TIME",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "10px",
+   "font": "Michroma",
+   "backgroundMean": [
+    203.9,
+    227.1,
+    235.6
+   ],
+   "ratio": 6.14,
+   "pass": true
+  },
+  {
+   "pose": "day-beach",
+   "id": "time-value",
+   "class": "hud-timing__clock",
+   "text": "00:02.558",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "36px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    195.2,
+    221.9,
+    231.7
+   ],
+   "ratio": 5.81,
+   "pass": true
+  },
+  {
+   "pose": "day-beach",
+   "id": "checkpoint-value",
+   "class": "",
+   "text": "NEXT GATE 01 / 07",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "12px",
+   "font": "SFMono-Regular",
+   "backgroundMean": [
+    219.5,
+    242.0,
+    250.1
+   ],
+   "ratio": 7.06,
+   "pass": true
+  },
+  {
+   "pose": "day-beach",
+   "id": "sector-value",
+   "class": "hud-gate__sector",
+   "text": "BEACH STRAIGHT",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "11px",
+   "font": "Michroma",
+   "backgroundMean": [
+    225.7,
+    246.1,
+    252.5
+   ],
+   "ratio": 7.33,
+   "pass": true
+  },
+  {
+   "pose": "day-beach",
+   "id": "finish-value",
+   "class": "hud-gate__finish",
+   "text": "21.5 KM TO FINISH",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "12px",
+   "font": "SFMono-Regular",
+   "backgroundMean": [
+    219.5,
+    242.0,
+    250.1
+   ],
+   "ratio": 7.05,
+   "pass": true
+  },
+  {
+   "pose": "day-beach",
+   "id": "turn-label",
+   "class": "hud-cue__label",
+   "text": "HARD RIGHT",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "14px",
+   "font": "SFMono-Regular",
+   "backgroundMean": [
+    212.2,
+    236.7,
+    245.1
+   ],
+   "ratio": 6.7,
+   "pass": true
+  },
+  {
+   "pose": "day-beach",
+   "id": "turn-distance",
+   "class": "hud-cue__distance",
+   "text": "210 M",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "26px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    208.2,
+    233.2,
+    242.1
+   ],
+   "ratio": 6.49,
+   "pass": true
+  },
+  {
+   "pose": "day-beach",
+   "id": "speed-value",
+   "class": "hud-drive__number",
+   "text": "220",
+   "ink": [
+    6.0,
+    35.0,
+    63.0
+   ],
+   "fontSize": "92px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    195.7,
+    208.7,
+    218.5
+   ],
+   "ratio": 10.19,
+   "pass": true
+  },
+  {
+   "pose": "day-beach",
+   "id": null,
+   "class": "hud-label",
+   "text": "KM/H",
+   "ink": [
+    6.0,
+    35.0,
+    63.0
+   ],
+   "fontSize": "11px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    220.0,
+    231.2,
+    238.6
+   ],
+   "ratio": 12.68,
+   "pass": true
+  },
+  {
+   "pose": "day-beach",
+   "id": "drive-state",
+   "class": "hud-drive__state",
+   "text": "HOVER LOCK",
+   "ink": [
+    6.0,
+    35.0,
+    63.0
+   ],
+   "fontSize": "13px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    216.2,
+    226.9,
+    234.3
+   ],
+   "ratio": 12.19,
+   "pass": true
+  },
+  {
+   "pose": "day-beach",
+   "id": "boost-label",
+   "class": "hud-label",
+   "text": "PLASMA RESERVE",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "11px",
+   "font": "Michroma",
+   "backgroundMean": [
+    216.5,
+    236.4,
+    242.8
+   ],
+   "ratio": 6.73,
+   "pass": true
+  },
+  {
+   "pose": "day-beach",
+   "id": "boost-value",
+   "class": "hud-reserve__percent",
+   "text": "94%",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "24px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    217.7,
+    236.9,
+    243.1
+   ],
+   "ratio": 6.76,
+   "pass": true
+  },
+  {
+   "pose": "day-beach",
+   "id": "polarity-flip",
+   "class": "hud-ability__action",
+   "text": "SPACE / SHIFT \u00b7 NITRO",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "22px",
+   "font": "Michroma",
+   "backgroundMean": [
+    224.6,
+    240.6,
+    245.6
+   ],
+   "ratio": 7.03,
+   "pass": true
+  },
+  {
+   "pose": "day-beach",
+   "id": "polarity-deck",
+   "class": "hud-ability__deck",
+   "text": "DREAM ISLAND / DAY INTO NIGHT",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "10px",
+   "font": "Michroma",
+   "backgroundMean": [
+    217.5,
+    237.2,
+    243.5
+   ],
+   "ratio": 6.78,
+   "pass": true
+  },
+  {
+   "pose": "day-beach",
+   "id": "polarity-route",
+   "class": "hud-ability__reason",
+   "text": "THE STRIKE IN 01:05",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "11.5px",
+   "font": "Michroma",
+   "backgroundMean": [
+    201.0,
+    225.1,
+    233.0
+   ],
+   "ratio": 6.01,
+   "pass": true
+  },
+  {
+   "pose": "day-beach",
+   "id": null,
+   "class": "di-slot__name",
+   "text": "SURGE COLLECTED",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "20px",
+   "font": "Michroma",
+   "backgroundMean": [
+    219.1,
+    239.4,
+    245.8
+   ],
+   "ratio": 6.91,
+   "pass": true
+  },
+  {
+   "pose": "day-beach",
+   "id": null,
+   "class": "di-slot__advice",
+   "text": "THE BEACH STRAIGHT IS NEXT \u00b7 71 M",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "13px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    195.8,
+    221.6,
+    230.3
+   ],
+   "ratio": 5.8,
+   "pass": true
+  },
+  {
+   "pose": "day-beach",
+   "id": null,
+   "class": "di-slot__key",
+   "text": "E",
+   "ink": [
+    6.0,
+    35.0,
+    63.0
+   ],
+   "fontSize": "16px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    197.8,
+    211.7,
+    221.8
+   ],
+   "ratio": 10.49,
+   "pass": true
+  },
+  {
+   "pose": "day-beach",
+   "id": null,
+   "class": "wordmark",
+   "text": "FUTURISMA",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "14.08px",
+   "font": "Inter",
+   "backgroundMean": [
+    204.7,
+    228.9,
+    237.6
+   ],
+   "ratio": 6.24,
+   "pass": true
+  },
+  {
+   "pose": "day-beach",
+   "id": "course-name",
+   "class": "course-name",
+   "text": "DREAM ISLAND / MAP 07",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "10.72px",
+   "font": "SFMono-Regular",
+   "backgroundMean": [
+    199.8,
+    225.8,
+    235.3
+   ],
+   "ratio": 6.04,
+   "pass": true
+  },
+  {
+   "pose": "day-beach",
+   "id": "system-status",
+   "class": "",
+   "text": "RACE ACTIVE \u00b7 AUTOPILOT",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "10.72px",
+   "font": "SFMono-Regular",
+   "backgroundMean": [
+    204.4,
+    228.9,
+    237.6
+   ],
+   "ratio": 6.23,
+   "pass": true
+  },
+  {
+   "pose": "day-court",
+   "id": "position-value",
+   "class": "",
+   "text": "P1 / 4",
+   "ink": [
+    6.0,
+    35.0,
+    63.0
+   ],
+   "fontSize": "62px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    195.1,
+    208.9,
+    219.1
+   ],
+   "ratio": 10.2,
+   "pass": true
+  },
+  {
+   "pose": "day-court",
+   "id": null,
+   "class": "hud-label",
+   "text": "LAP",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "11px",
+   "font": "Michroma",
+   "backgroundMean": [
+    226.3,
+    244.2,
+    250.3
+   ],
+   "ratio": 7.24,
+   "pass": true
+  },
+  {
+   "pose": "day-court",
+   "id": "lap-value",
+   "class": "",
+   "text": "1 / 9",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "40px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    205.5,
+    229.2,
+    237.7
+   ],
+   "ratio": 6.26,
+   "pass": true
+  },
+  {
+   "pose": "day-court",
+   "id": "gap-value",
+   "class": "hud-standing__gap",
+   "text": "1.69 CLEAR",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "14px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    229.7,
+    246.0,
+    251.3
+   ],
+   "ratio": 7.37,
+   "pass": true
+  },
+  {
+   "pose": "day-court",
+   "id": null,
+   "class": "",
+   "text": "P1",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    178.8,
+    239.3,
+    250.9
+   ],
+   "ratio": 6.5,
+   "pass": true
+  },
+  {
+   "pose": "day-court",
+   "id": null,
+   "class": "n",
+   "text": "TOTEM \u00b7 YOU",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    179.3,
+    240.0,
+    251.2
+   ],
+   "ratio": 6.53,
+   "pass": true
+  },
+  {
+   "pose": "day-court",
+   "id": null,
+   "class": "gap",
+   "text": "\u2014",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    179.7,
+    240.2,
+    252.1
+   ],
+   "ratio": 6.56,
+   "pass": true
+  },
+  {
+   "pose": "day-court",
+   "id": null,
+   "class": "",
+   "text": "P2",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    206.7,
+    231.5,
+    240.2
+   ],
+   "ratio": 6.38,
+   "pass": true
+  },
+  {
+   "pose": "day-court",
+   "id": null,
+   "class": "n",
+   "text": "PRIVATEER 13",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    207.6,
+    232.6,
+    240.9
+   ],
+   "ratio": 6.45,
+   "pass": true
+  },
+  {
+   "pose": "day-court",
+   "id": null,
+   "class": "gap",
+   "text": "+1.7",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    207.9,
+    233.3,
+    242.1
+   ],
+   "ratio": 6.49,
+   "pass": true
+  },
+  {
+   "pose": "day-court",
+   "id": null,
+   "class": "",
+   "text": "P3",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    193.4,
+    220.5,
+    229.8
+   ],
+   "ratio": 5.73,
+   "pass": true
+  },
+  {
+   "pose": "day-court",
+   "id": null,
+   "class": "n",
+   "text": "NIGHTFORM 24",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    194.5,
+    221.2,
+    230.7
+   ],
+   "ratio": 5.77,
+   "pass": true
+  },
+  {
+   "pose": "day-court",
+   "id": null,
+   "class": "gap",
+   "text": "+2.2",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    195.4,
+    222.2,
+    231.7
+   ],
+   "ratio": 5.83,
+   "pass": true
+  },
+  {
+   "pose": "day-court",
+   "id": null,
+   "class": "",
+   "text": "P4",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    186.3,
+    213.6,
+    223.0
+   ],
+   "ratio": 5.35,
+   "pass": true
+  },
+  {
+   "pose": "day-court",
+   "id": null,
+   "class": "n",
+   "text": "NEEDLE 16",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    187.1,
+    214.2,
+    223.8
+   ],
+   "ratio": 5.39,
+   "pass": true
+  },
+  {
+   "pose": "day-court",
+   "id": null,
+   "class": "gap",
+   "text": "+2.7",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    184.4,
+    211.5,
+    218.5
+   ],
+   "ratio": 5.23,
+   "pass": true
+  },
+  {
+   "pose": "day-court",
+   "id": null,
+   "class": "hud-label",
+   "text": "RACE TIME",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "10px",
+   "font": "Michroma",
+   "backgroundMean": [
+    203.9,
+    227.1,
+    235.6
+   ],
+   "ratio": 6.14,
+   "pass": true
+  },
+  {
+   "pose": "day-court",
+   "id": "time-value",
+   "class": "hud-timing__clock",
+   "text": "00:19.275",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "36px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    195.3,
+    222.0,
+    231.7
+   ],
+   "ratio": 5.82,
+   "pass": true
+  },
+  {
+   "pose": "day-court",
+   "id": "checkpoint-value",
+   "class": "",
+   "text": "NEXT GATE 05 / 07",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "12px",
+   "font": "SFMono-Regular",
+   "backgroundMean": [
+    219.5,
+    242.0,
+    250.0
+   ],
+   "ratio": 7.06,
+   "pass": true
+  },
+  {
+   "pose": "day-court",
+   "id": "sector-value",
+   "class": "hud-gate__sector",
+   "text": "CLOCK COURT",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "11px",
+   "font": "Michroma",
+   "backgroundMean": [
+    221.0,
+    242.9,
+    251.0
+   ],
+   "ratio": 7.12,
+   "pass": true
+  },
+  {
+   "pose": "day-court",
+   "id": "clean-chain",
+   "class": "clean-chain",
+   "text": "CLEAN \u00d74",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "11px",
+   "font": "SFMono-Regular",
+   "backgroundMean": [
+    219.3,
+    241.9,
+    250.2
+   ],
+   "ratio": 7.04,
+   "pass": true
+  },
+  {
+   "pose": "day-court",
+   "id": "finish-value",
+   "class": "hud-gate__finish",
+   "text": "20.2 KM TO FINISH",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "12px",
+   "font": "SFMono-Regular",
+   "backgroundMean": [
+    192.1,
+    221.9,
+    234.5
+   ],
+   "ratio": 5.79,
+   "pass": true
+  },
+  {
+   "pose": "day-court",
+   "id": "turn-label",
+   "class": "hud-cue__label",
+   "text": "TURN RIGHT",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "14px",
+   "font": "SFMono-Regular",
+   "backgroundMean": [
+    210.3,
+    235.2,
+    244.5
+   ],
+   "ratio": 6.61,
+   "pass": true
+  },
+  {
+   "pose": "day-court",
+   "id": "turn-distance",
+   "class": "hud-cue__distance",
+   "text": "NOW",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "26px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    213.0,
+    237.1,
+    244.6
+   ],
+   "ratio": 6.72,
+   "pass": true
+  },
+  {
+   "pose": "day-court",
+   "id": "speed-value",
+   "class": "hud-drive__number",
+   "text": "296",
+   "ink": [
+    6.0,
+    35.0,
+    63.0
+   ],
+   "fontSize": "92px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    196.3,
+    209.2,
+    218.9
+   ],
+   "ratio": 10.24,
+   "pass": true
+  },
+  {
+   "pose": "day-court",
+   "id": null,
+   "class": "hud-label",
+   "text": "KM/H",
+   "ink": [
+    6.0,
+    35.0,
+    63.0
+   ],
+   "fontSize": "11px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    220.8,
+    231.8,
+    239.1
+   ],
+   "ratio": 12.76,
+   "pass": true
+  },
+  {
+   "pose": "day-court",
+   "id": "drive-state",
+   "class": "hud-drive__state",
+   "text": "AIRBRAKES",
+   "ink": [
+    6.0,
+    35.0,
+    63.0
+   ],
+   "fontSize": "13px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    215.5,
+    226.1,
+    233.6
+   ],
+   "ratio": 12.11,
+   "pass": true
+  },
+  {
+   "pose": "day-court",
+   "id": "boost-label",
+   "class": "hud-label",
+   "text": "PLASMA RESERVE",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "11px",
+   "font": "Michroma",
+   "backgroundMean": [
+    216.9,
+    236.6,
+    242.8
+   ],
+   "ratio": 6.74,
+   "pass": true
+  },
+  {
+   "pose": "day-court",
+   "id": "boost-value",
+   "class": "hud-reserve__percent",
+   "text": "100%",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "24px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    217.6,
+    237.2,
+    243.4
+   ],
+   "ratio": 6.78,
+   "pass": true
+  },
+  {
+   "pose": "day-court",
+   "id": "polarity-flip",
+   "class": "hud-ability__action",
+   "text": "SPACE / SHIFT \u00b7 NITRO",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "22px",
+   "font": "Michroma",
+   "backgroundMean": [
+    224.6,
+    240.6,
+    245.6
+   ],
+   "ratio": 7.03,
+   "pass": true
+  },
+  {
+   "pose": "day-court",
+   "id": "polarity-deck",
+   "class": "hud-ability__deck",
+   "text": "DREAM ISLAND / DAY INTO NIGHT",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "10px",
+   "font": "Michroma",
+   "backgroundMean": [
+    217.5,
+    237.3,
+    243.6
+   ],
+   "ratio": 6.78,
+   "pass": true
+  },
+  {
+   "pose": "day-court",
+   "id": "polarity-route",
+   "class": "hud-ability__reason",
+   "text": "THE STRIKE IN 00:48",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "11.5px",
+   "font": "Michroma",
+   "backgroundMean": [
+    201.1,
+    225.2,
+    233.1
+   ],
+   "ratio": 6.02,
+   "pass": true
+  },
+  {
+   "pose": "day-court",
+   "id": null,
+   "class": "di-bubble__name",
+   "text": "SURGE",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "21px",
+   "font": "Michroma",
+   "backgroundMean": [
+    225.7,
+    247.7,
+    254.7
+   ],
+   "ratio": 7.42,
+   "pass": true
+  },
+  {
+   "pose": "day-court",
+   "id": null,
+   "class": "di-bubble__advice",
+   "text": "DRIVE THROUGH",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "14px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    225.9,
+    247.9,
+    254.9
+   ],
+   "ratio": 7.44,
+   "pass": true
+  },
+  {
+   "pose": "day-court",
+   "id": null,
+   "class": "di-bubble__range",
+   "text": "12 M",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "14px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    225.9,
+    247.9,
+    254.9
+   ],
+   "ratio": 7.44,
+   "pass": true
+  },
+  {
+   "pose": "day-court",
+   "id": null,
+   "class": "di-slot__name",
+   "text": "SURGE \u00b7 12 M",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "20px",
+   "font": "Michroma",
+   "backgroundMean": [
+    219.8,
+    240.1,
+    246.2
+   ],
+   "ratio": 6.95,
+   "pass": true
+  },
+  {
+   "pose": "day-court",
+   "id": null,
+   "class": "di-slot__advice",
+   "text": "DRIVE THROUGH THE CAPSULE",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "13px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    194.8,
+    220.6,
+    229.1
+   ],
+   "ratio": 5.74,
+   "pass": true
+  },
+  {
+   "pose": "day-court",
+   "id": null,
+   "class": "di-slot__key",
+   "text": "E",
+   "ink": [
+    6.0,
+    35.0,
+    63.0
+   ],
+   "fontSize": "16px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    198.2,
+    211.8,
+    221.7
+   ],
+   "ratio": 10.49,
+   "pass": true
+  },
+  {
+   "pose": "day-court",
+   "id": null,
+   "class": "wordmark",
+   "text": "FUTURISMA",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "14.08px",
+   "font": "Inter",
+   "backgroundMean": [
+    204.9,
+    229.0,
+    237.6
+   ],
+   "ratio": 6.24,
+   "pass": true
+  },
+  {
+   "pose": "day-court",
+   "id": "course-name",
+   "class": "course-name",
+   "text": "DREAM ISLAND / MAP 07",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "10.72px",
+   "font": "SFMono-Regular",
+   "backgroundMean": [
+    199.9,
+    225.9,
+    235.3
+   ],
+   "ratio": 6.05,
+   "pass": true
+  },
+  {
+   "pose": "day-court",
+   "id": "system-status",
+   "class": "",
+   "text": "RACE ACTIVE \u00b7 AUTOPILOT",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "10.72px",
+   "font": "SFMono-Regular",
+   "backgroundMean": [
+    204.7,
+    228.9,
+    237.6
+   ],
+   "ratio": 6.24,
+   "pass": true
+  },
+  {
+   "pose": "day-reef",
+   "id": "position-value",
+   "class": "",
+   "text": "P1 / 4",
+   "ink": [
+    6.0,
+    35.0,
+    63.0
+   ],
+   "fontSize": "62px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    195.2,
+    208.9,
+    219.1
+   ],
+   "ratio": 10.2,
+   "pass": true
+  },
+  {
+   "pose": "day-reef",
+   "id": null,
+   "class": "hud-label",
+   "text": "LAP",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "11px",
+   "font": "Michroma",
+   "backgroundMean": [
+    225.5,
+    243.8,
+    250.5
+   ],
+   "ratio": 7.21,
+   "pass": true
+  },
+  {
+   "pose": "day-reef",
+   "id": "lap-value",
+   "class": "",
+   "text": "1 / 9",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "40px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    204.4,
+    228.7,
+    237.8
+   ],
+   "ratio": 6.23,
+   "pass": true
+  },
+  {
+   "pose": "day-reef",
+   "id": "gap-value",
+   "class": "hud-standing__gap",
+   "text": "1.91 CLEAR",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "14px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    229.3,
+    245.8,
+    251.2
+   ],
+   "ratio": 7.36,
+   "pass": true
+  },
+  {
+   "pose": "day-reef",
+   "id": null,
+   "class": "",
+   "text": "P1",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    178.4,
+    239.2,
+    250.5
+   ],
+   "ratio": 6.49,
+   "pass": true
+  },
+  {
+   "pose": "day-reef",
+   "id": null,
+   "class": "n",
+   "text": "TOTEM \u00b7 YOU",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    178.7,
+    239.5,
+    251.2
+   ],
+   "ratio": 6.51,
+   "pass": true
+  },
+  {
+   "pose": "day-reef",
+   "id": null,
+   "class": "gap",
+   "text": "\u2014",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    178.8,
+    240.2,
+    251.8
+   ],
+   "ratio": 6.54,
+   "pass": true
+  },
+  {
+   "pose": "day-reef",
+   "id": null,
+   "class": "",
+   "text": "P2",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    205.8,
+    231.3,
+    240.0
+   ],
+   "ratio": 6.36,
+   "pass": true
+  },
+  {
+   "pose": "day-reef",
+   "id": null,
+   "class": "n",
+   "text": "PRIVATEER 13",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    206.5,
+    232.0,
+    240.7
+   ],
+   "ratio": 6.4,
+   "pass": true
+  },
+  {
+   "pose": "day-reef",
+   "id": null,
+   "class": "gap",
+   "text": "+1.8",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    206.9,
+    232.9,
+    241.7
+   ],
+   "ratio": 6.45,
+   "pass": true
+  },
+  {
+   "pose": "day-reef",
+   "id": null,
+   "class": "",
+   "text": "P3",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    193.4,
+    219.8,
+    229.8
+   ],
+   "ratio": 5.7,
+   "pass": true
+  },
+  {
+   "pose": "day-reef",
+   "id": null,
+   "class": "n",
+   "text": "NIGHTFORM 24",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    193.8,
+    220.8,
+    230.4
+   ],
+   "ratio": 5.75,
+   "pass": true
+  },
+  {
+   "pose": "day-reef",
+   "id": null,
+   "class": "gap",
+   "text": "+2.5",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    194.4,
+    221.7,
+    231.7
+   ],
+   "ratio": 5.8,
+   "pass": true
+  },
+  {
+   "pose": "day-reef",
+   "id": null,
+   "class": "",
+   "text": "P4",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    186.0,
+    213.1,
+    223.0
+   ],
+   "ratio": 5.33,
+   "pass": true
+  },
+  {
+   "pose": "day-reef",
+   "id": null,
+   "class": "n",
+   "text": "NEEDLE 16",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    186.9,
+    214.1,
+    223.8
+   ],
+   "ratio": 5.38,
+   "pass": true
+  },
+  {
+   "pose": "day-reef",
+   "id": null,
+   "class": "gap",
+   "text": "+2.9",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    187.8,
+    215.0,
+    225.0
+   ],
+   "ratio": 5.43,
+   "pass": true
+  },
+  {
+   "pose": "day-reef",
+   "id": null,
+   "class": "hud-label",
+   "text": "RACE TIME",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "10px",
+   "font": "Michroma",
+   "backgroundMean": [
+    203.9,
+    227.1,
+    235.6
+   ],
+   "ratio": 6.14,
+   "pass": true
+  },
+  {
+   "pose": "day-reef",
+   "id": "time-value",
+   "class": "hud-timing__clock",
+   "text": "00:24.108",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "36px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    195.0,
+    221.9,
+    231.7
+   ],
+   "ratio": 5.81,
+   "pass": true
+  },
+  {
+   "pose": "day-reef",
+   "id": "checkpoint-value",
+   "class": "",
+   "text": "NEXT GATE 06 / 07",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "12px",
+   "font": "SFMono-Regular",
+   "backgroundMean": [
+    219.4,
+    242.0,
+    250.0
+   ],
+   "ratio": 7.05,
+   "pass": true
+  },
+  {
+   "pose": "day-reef",
+   "id": "sector-value",
+   "class": "hud-gate__sector",
+   "text": "REEF SHALLOWS",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "11px",
+   "font": "Michroma",
+   "backgroundMean": [
+    220.6,
+    242.9,
+    251.0
+   ],
+   "ratio": 7.11,
+   "pass": true
+  },
+  {
+   "pose": "day-reef",
+   "id": "clean-chain",
+   "class": "clean-chain",
+   "text": "CLEAN \u00d75",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "11px",
+   "font": "SFMono-Regular",
+   "backgroundMean": [
+    218.9,
+    241.9,
+    250.2
+   ],
+   "ratio": 7.04,
+   "pass": true
+  },
+  {
+   "pose": "day-reef",
+   "id": "finish-value",
+   "class": "hud-gate__finish",
+   "text": "19.8 KM TO FINISH",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "12px",
+   "font": "SFMono-Regular",
+   "backgroundMean": [
+    167.5,
+    203.5,
+    221.7
+   ],
+   "ratio": 4.79,
+   "pass": true
+  },
+  {
+   "pose": "day-reef",
+   "id": "turn-label",
+   "class": "hud-cue__label",
+   "text": "HARD LEFT",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "14px",
+   "font": "SFMono-Regular",
+   "backgroundMean": [
+    209.0,
+    234.7,
+    243.8
+   ],
+   "ratio": 6.57,
+   "pass": true
+  },
+  {
+   "pose": "day-reef",
+   "id": "turn-distance",
+   "class": "hud-cue__distance",
+   "text": "300 M",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "26px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    208.3,
+    233.2,
+    242.1
+   ],
+   "ratio": 6.49,
+   "pass": true
+  },
+  {
+   "pose": "day-reef",
+   "id": "speed-value",
+   "class": "hud-drive__number",
+   "text": "317",
+   "ink": [
+    6.0,
+    35.0,
+    63.0
+   ],
+   "fontSize": "92px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    192.5,
+    206.2,
+    216.6
+   ],
+   "ratio": 9.93,
+   "pass": true
+  },
+  {
+   "pose": "day-reef",
+   "id": null,
+   "class": "hud-label",
+   "text": "KM/H",
+   "ink": [
+    6.0,
+    35.0,
+    63.0
+   ],
+   "fontSize": "11px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    220.0,
+    231.2,
+    238.6
+   ],
+   "ratio": 12.68,
+   "pass": true
+  },
+  {
+   "pose": "day-reef",
+   "id": "drive-state",
+   "class": "hud-drive__state",
+   "text": "HOVER LOCK",
+   "ink": [
+    6.0,
+    35.0,
+    63.0
+   ],
+   "fontSize": "13px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    216.2,
+    226.9,
+    234.3
+   ],
+   "ratio": 12.19,
+   "pass": true
+  },
+  {
+   "pose": "day-reef",
+   "id": "boost-label",
+   "class": "hud-label",
+   "text": "PLASMA RESERVE",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "11px",
+   "font": "Michroma",
+   "backgroundMean": [
+    216.5,
+    236.7,
+    242.9
+   ],
+   "ratio": 6.74,
+   "pass": true
+  },
+  {
+   "pose": "day-reef",
+   "id": "boost-value",
+   "class": "hud-reserve__percent",
+   "text": "100%",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "24px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    217.7,
+    237.0,
+    243.1
+   ],
+   "ratio": 6.77,
+   "pass": true
+  },
+  {
+   "pose": "day-reef",
+   "id": "polarity-flip",
+   "class": "hud-ability__action",
+   "text": "SPACE / SHIFT \u00b7 NITRO",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "22px",
+   "font": "Michroma",
+   "backgroundMean": [
+    224.6,
+    240.6,
+    245.6
+   ],
+   "ratio": 7.03,
+   "pass": true
+  },
+  {
+   "pose": "day-reef",
+   "id": "polarity-deck",
+   "class": "hud-ability__deck",
+   "text": "DREAM ISLAND / DAY INTO NIGHT",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "10px",
+   "font": "Michroma",
+   "backgroundMean": [
+    217.5,
+    237.2,
+    243.5
+   ],
+   "ratio": 6.78,
+   "pass": true
+  },
+  {
+   "pose": "day-reef",
+   "id": "polarity-route",
+   "class": "hud-ability__reason",
+   "text": "THE STRIKE IN 00:43",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "11.5px",
+   "font": "Michroma",
+   "backgroundMean": [
+    201.0,
+    225.1,
+    233.1
+   ],
+   "ratio": 6.01,
+   "pass": true
+  },
+  {
+   "pose": "day-reef",
+   "id": null,
+   "class": "di-slot__name",
+   "text": "SURGE \u00b7 402 M",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "20px",
+   "font": "Michroma",
+   "backgroundMean": [
+    203.0,
+    222.1,
+    227.6
+   ],
+   "ratio": 5.89,
+   "pass": true
+  },
+  {
+   "pose": "day-reef",
+   "id": null,
+   "class": "di-slot__advice",
+   "text": "FIND A CAPSULE",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "13px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    181.6,
+    205.0,
+    212.0
+   ],
+   "ratio": 4.93,
+   "pass": true
+  },
+  {
+   "pose": "day-reef",
+   "id": null,
+   "class": "di-slot__key",
+   "text": "E",
+   "ink": [
+    6.0,
+    35.0,
+    63.0
+   ],
+   "fontSize": "16px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    187.5,
+    200.0,
+    208.2
+   ],
+   "ratio": 9.32,
+   "pass": true
+  },
+  {
+   "pose": "day-reef",
+   "id": null,
+   "class": "wordmark",
+   "text": "FUTURISMA",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "14.08px",
+   "font": "Inter",
+   "backgroundMean": [
+    204.8,
+    229.0,
+    237.6
+   ],
+   "ratio": 6.24,
+   "pass": true
+  },
+  {
+   "pose": "day-reef",
+   "id": "course-name",
+   "class": "course-name",
+   "text": "DREAM ISLAND / MAP 07",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "10.72px",
+   "font": "SFMono-Regular",
+   "backgroundMean": [
+    199.9,
+    225.8,
+    235.3
+   ],
+   "ratio": 6.04,
+   "pass": true
+  },
+  {
+   "pose": "day-reef",
+   "id": "system-status",
+   "class": "",
+   "text": "RACE ACTIVE \u00b7 AUTOPILOT",
+   "ink": [
+    0.0,
+    56.0,
+    217.0
+   ],
+   "fontSize": "10.72px",
+   "font": "SFMono-Regular",
+   "backgroundMean": [
+    204.4,
+    228.8,
+    237.6
+   ],
+   "ratio": 6.23,
+   "pass": true
+  },
+  {
+   "pose": "night-court",
+   "id": "position-value",
+   "class": "",
+   "text": "P1 / 4",
+   "ink": [
+    6.0,
+    35.0,
+    63.0
+   ],
+   "fontSize": "62px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    195.1,
+    208.8,
+    219.1
+   ],
+   "ratio": 10.19,
+   "pass": true
+  },
+  {
+   "pose": "night-court",
+   "id": null,
+   "class": "hud-label",
+   "text": "LAP",
+   "ink": [
+    184.0,
+    251.0,
+    255.0
+   ],
+   "fontSize": "11px",
+   "font": "Michroma",
+   "backgroundMean": [
+    15.8,
+    26.8,
+    38.3
+   ],
+   "ratio": 15.17,
+   "pass": true
+  },
+  {
+   "pose": "night-court",
+   "id": "lap-value",
+   "class": "",
+   "text": "3 / 9",
+   "ink": [
+    184.0,
+    251.0,
+    255.0
+   ],
+   "fontSize": "40px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    8.2,
+    21.8,
+    34.4
+   ],
+   "ratio": 15.93,
+   "pass": true
+  },
+  {
+   "pose": "night-court",
+   "id": "gap-value",
+   "class": "hud-standing__gap",
+   "text": "0.45 CLEAR",
+   "ink": [
+    184.0,
+    251.0,
+    255.0
+   ],
+   "fontSize": "14px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    17.9,
+    29.9,
+    40.9
+   ],
+   "ratio": 14.72,
+   "pass": true
+  },
+  {
+   "pose": "night-court",
+   "id": null,
+   "class": "",
+   "text": "P1",
+   "ink": [
+    184.0,
+    251.0,
+    255.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    23.4,
+    78.8,
+    94.4
+   ],
+   "ratio": 7.91,
+   "pass": true
+  },
+  {
+   "pose": "night-court",
+   "id": null,
+   "class": "n",
+   "text": "TOTEM \u00b7 YOU",
+   "ink": [
+    184.0,
+    251.0,
+    255.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    23.4,
+    78.8,
+    94.5
+   ],
+   "ratio": 7.9,
+   "pass": true
+  },
+  {
+   "pose": "night-court",
+   "id": null,
+   "class": "gap",
+   "text": "\u2014",
+   "ink": [
+    184.0,
+    251.0,
+    255.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    23.5,
+    78.8,
+    94.6
+   ],
+   "ratio": 7.9,
+   "pass": true
+  },
+  {
+   "pose": "night-court",
+   "id": null,
+   "class": "",
+   "text": "P2",
+   "ink": [
+    184.0,
+    251.0,
+    255.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    9.5,
+    23.2,
+    36.2
+   ],
+   "ratio": 15.73,
+   "pass": true
+  },
+  {
+   "pose": "night-court",
+   "id": null,
+   "class": "n",
+   "text": "PRIVATEER 13",
+   "ink": [
+    184.0,
+    251.0,
+    255.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    9.5,
+    23.2,
+    36.3
+   ],
+   "ratio": 15.72,
+   "pass": true
+  },
+  {
+   "pose": "night-court",
+   "id": null,
+   "class": "gap",
+   "text": "+0.4",
+   "ink": [
+    184.0,
+    251.0,
+    255.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    9.5,
+    23.2,
+    36.3
+   ],
+   "ratio": 15.73,
+   "pass": true
+  },
+  {
+   "pose": "night-court",
+   "id": null,
+   "class": "",
+   "text": "P3",
+   "ink": [
+    184.0,
+    251.0,
+    255.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    7.8,
+    23.4,
+    37.3
+   ],
+   "ratio": 15.72,
+   "pass": true
+  },
+  {
+   "pose": "night-court",
+   "id": null,
+   "class": "n",
+   "text": "NIGHTFORM 24",
+   "ink": [
+    184.0,
+    251.0,
+    255.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    7.8,
+    23.4,
+    37.3
+   ],
+   "ratio": 15.72,
+   "pass": true
+  },
+  {
+   "pose": "night-court",
+   "id": null,
+   "class": "gap",
+   "text": "+2.0",
+   "ink": [
+    184.0,
+    251.0,
+    255.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    7.9,
+    23.4,
+    37.7
+   ],
+   "ratio": 15.71,
+   "pass": true
+  },
+  {
+   "pose": "night-court",
+   "id": null,
+   "class": "",
+   "text": "P4",
+   "ink": [
+    184.0,
+    251.0,
+    255.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    7.0,
+    24.0,
+    38.6
+   ],
+   "ratio": 15.65,
+   "pass": true
+  },
+  {
+   "pose": "night-court",
+   "id": null,
+   "class": "n",
+   "text": "NEEDLE 16",
+   "ink": [
+    184.0,
+    251.0,
+    255.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    7.0,
+    24.0,
+    38.6
+   ],
+   "ratio": 15.65,
+   "pass": true
+  },
+  {
+   "pose": "night-court",
+   "id": null,
+   "class": "gap",
+   "text": "+3.7",
+   "ink": [
+    184.0,
+    251.0,
+    255.0
+   ],
+   "fontSize": "12px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    6.9,
+    24.2,
+    36.9
+   ],
+   "ratio": 15.66,
+   "pass": true
+  },
+  {
+   "pose": "night-court",
+   "id": null,
+   "class": "hud-label",
+   "text": "RACE TIME",
+   "ink": [
+    184.0,
+    251.0,
+    255.0
+   ],
+   "fontSize": "10px",
+   "font": "Michroma",
+   "backgroundMean": [
+    10.4,
+    24.6,
+    37.8
+   ],
+   "ratio": 15.54,
+   "pass": true
+  },
+  {
+   "pose": "night-court",
+   "id": "time-value",
+   "class": "hud-timing__clock",
+   "text": "01:23.316",
+   "ink": [
+    184.0,
+    251.0,
+    255.0
+   ],
+   "fontSize": "36px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    9.0,
+    21.7,
+    34.3
+   ],
+   "ratio": 15.93,
+   "pass": true
+  },
+  {
+   "pose": "night-court",
+   "id": "last-lap-value",
+   "class": "hud-timing__secondary",
+   "text": "\u00b7 LAST 00:32.125",
+   "ink": [
+    184.0,
+    251.0,
+    255.0
+   ],
+   "fontSize": "12px",
+   "font": "SFMono-Regular",
+   "backgroundMean": [
+    6.1,
+    23.0,
+    36.2
+   ],
+   "ratio": 15.82,
+   "pass": true
+  },
+  {
+   "pose": "night-court",
+   "id": "checkpoint-value",
+   "class": "",
+   "text": "NEXT GATE 05 / 07",
+   "ink": [
+    184.0,
+    251.0,
+    255.0
+   ],
+   "fontSize": "12px",
+   "font": "SFMono-Regular",
+   "backgroundMean": [
+    11.8,
+    23.1,
+    35.0
+   ],
+   "ratio": 15.72,
+   "pass": true
+  },
+  {
+   "pose": "night-court",
+   "id": "sector-value",
+   "class": "hud-gate__sector",
+   "text": "CLOCK COURT",
+   "ink": [
+    184.0,
+    251.0,
+    255.0
+   ],
+   "fontSize": "11px",
+   "font": "Michroma",
+   "backgroundMean": [
+    12.0,
+    23.2,
+    35.1
+   ],
+   "ratio": 15.7,
+   "pass": true
+  },
+  {
+   "pose": "night-court",
+   "id": "clean-chain",
+   "class": "clean-chain",
+   "text": "CLEAN \u00d720",
+   "ink": [
+    184.0,
+    251.0,
+    255.0
+   ],
+   "fontSize": "11px",
+   "font": "SFMono-Regular",
+   "backgroundMean": [
+    11.6,
+    22.9,
+    34.8
+   ],
+   "ratio": 15.74,
+   "pass": true
+  },
+  {
+   "pose": "night-court",
+   "id": "finish-value",
+   "class": "hud-gate__finish",
+   "text": "15.4 KM TO FINISH",
+   "ink": [
+    184.0,
+    251.0,
+    255.0
+   ],
+   "fontSize": "12px",
+   "font": "SFMono-Regular",
+   "backgroundMean": [
+    15.9,
+    23.6,
+    32.1
+   ],
+   "ratio": 15.62,
+   "pass": true
+  },
+  {
+   "pose": "night-court",
+   "id": "turn-label",
+   "class": "hud-cue__label",
+   "text": "TURN RIGHT",
+   "ink": [
+    184.0,
+    251.0,
+    255.0
+   ],
+   "fontSize": "14px",
+   "font": "SFMono-Regular",
+   "backgroundMean": [
+    10.4,
+    23.6,
+    35.8
+   ],
+   "ratio": 15.68,
+   "pass": true
+  },
+  {
+   "pose": "night-court",
+   "id": "turn-distance",
+   "class": "hud-cue__distance",
+   "text": "NOW",
+   "ink": [
+    184.0,
+    251.0,
+    255.0
+   ],
+   "fontSize": "26px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    24.2,
+    35.2,
+    47.1
+   ],
+   "ratio": 13.81,
+   "pass": true
+  },
+  {
+   "pose": "night-court",
+   "id": "speed-value",
+   "class": "hud-drive__number",
+   "text": "296",
+   "ink": [
+    6.0,
+    35.0,
+    63.0
+   ],
+   "fontSize": "92px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    196.2,
+    209.1,
+    218.8
+   ],
+   "ratio": 10.23,
+   "pass": true
+  },
+  {
+   "pose": "night-court",
+   "id": null,
+   "class": "hud-label",
+   "text": "KM/H",
+   "ink": [
+    6.0,
+    35.0,
+    63.0
+   ],
+   "fontSize": "11px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    220.3,
+    231.4,
+    238.7
+   ],
+   "ratio": 12.7,
+   "pass": true
+  },
+  {
+   "pose": "night-court",
+   "id": "drive-state",
+   "class": "hud-drive__state",
+   "text": "AIRBRAKES",
+   "ink": [
+    6.0,
+    35.0,
+    63.0
+   ],
+   "fontSize": "13px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    217.8,
+    228.2,
+    235.4
+   ],
+   "ratio": 12.35,
+   "pass": true
+  },
+  {
+   "pose": "night-court",
+   "id": "boost-label",
+   "class": "hud-label",
+   "text": "PLASMA RESERVE",
+   "ink": [
+    184.0,
+    251.0,
+    255.0
+   ],
+   "fontSize": "11px",
+   "font": "Michroma",
+   "backgroundMean": [
+    12.9,
+    24.0,
+    35.0
+   ],
+   "ratio": 15.6,
+   "pass": true
+  },
+  {
+   "pose": "night-court",
+   "id": "boost-value",
+   "class": "hud-reserve__percent",
+   "text": "100%",
+   "ink": [
+    184.0,
+    251.0,
+    255.0
+   ],
+   "fontSize": "24px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    13.6,
+    25.6,
+    37.1
+   ],
+   "ratio": 15.38,
+   "pass": true
+  },
+  {
+   "pose": "night-court",
+   "id": "polarity-flip",
+   "class": "hud-ability__action",
+   "text": "SPACE / SHIFT \u00b7 NITRO",
+   "ink": [
+    184.0,
+    251.0,
+    255.0
+   ],
+   "fontSize": "22px",
+   "font": "Michroma",
+   "backgroundMean": [
+    17.7,
+    29.2,
+    40.1
+   ],
+   "ratio": 14.82,
+   "pass": true
+  },
+  {
+   "pose": "night-court",
+   "id": "polarity-deck",
+   "class": "hud-ability__deck",
+   "text": "DREAM ISLAND / DAY INTO NIGHT",
+   "ink": [
+    184.0,
+    251.0,
+    255.0
+   ],
+   "fontSize": "10px",
+   "font": "Michroma",
+   "backgroundMean": [
+    13.4,
+    24.9,
+    36.7
+   ],
+   "ratio": 15.46,
+   "pass": true
+  },
+  {
+   "pose": "night-court",
+   "id": "polarity-route",
+   "class": "hud-ability__reason",
+   "text": "NIGHT \u00b7 THE BASIN IS WET",
+   "ink": [
+    184.0,
+    251.0,
+    255.0
+   ],
+   "fontSize": "11.5px",
+   "font": "Michroma",
+   "backgroundMean": [
+    9.6,
+    22.8,
+    34.6
+   ],
+   "ratio": 15.8,
+   "pass": true
+  },
+  {
+   "pose": "night-court",
+   "id": null,
+   "class": "di-bubble__name",
+   "text": "SURGE",
+   "ink": [
+    184.0,
+    251.0,
+    255.0
+   ],
+   "fontSize": "21px",
+   "font": "Michroma",
+   "backgroundMean": [
+    0.0,
+    18.0,
+    33.0
+   ],
+   "ratio": 16.49,
+   "pass": true
+  },
+  {
+   "pose": "night-court",
+   "id": null,
+   "class": "di-bubble__advice",
+   "text": "DRIVE THROUGH",
+   "ink": [
+    184.0,
+    251.0,
+    255.0
+   ],
+   "fontSize": "14px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    0.0,
+    18.0,
+    33.0
+   ],
+   "ratio": 16.49,
+   "pass": true
+  },
+  {
+   "pose": "night-court",
+   "id": null,
+   "class": "di-bubble__range",
+   "text": "13 M",
+   "ink": [
+    184.0,
+    251.0,
+    255.0
+   ],
+   "fontSize": "14px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    0.0,
+    18.0,
+    33.0
+   ],
+   "ratio": 16.49,
+   "pass": true
+  },
+  {
+   "pose": "night-court",
+   "id": null,
+   "class": "di-slot__name",
+   "text": "SURGE \u00b7 13 M",
+   "ink": [
+    184.0,
+    251.0,
+    255.0
+   ],
+   "fontSize": "20px",
+   "font": "Michroma",
+   "backgroundMean": [
+    16.7,
+    29.2,
+    40.7
+   ],
+   "ratio": 14.83,
+   "pass": true
+  },
+  {
+   "pose": "night-court",
+   "id": null,
+   "class": "di-slot__advice",
+   "text": "DRIVE THROUGH THE CAPSULE",
+   "ink": [
+    185.0,
+    251.0,
+    255.0
+   ],
+   "fontSize": "13px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    11.4,
+    26.7,
+    39.1
+   ],
+   "ratio": 15.28,
+   "pass": true
+  },
+  {
+   "pose": "night-court",
+   "id": null,
+   "class": "di-slot__key",
+   "text": "E",
+   "ink": [
+    6.0,
+    35.0,
+    63.0
+   ],
+   "fontSize": "16px",
+   "font": "\"Share Tech Mono\"",
+   "backgroundMean": [
+    190.0,
+    203.3,
+    213.5
+   ],
+   "ratio": 9.64,
+   "pass": true
+  },
+  {
+   "pose": "night-court",
+   "id": null,
+   "class": "wordmark",
+   "text": "FUTURISMA",
+   "ink": [
+    184.0,
+    251.0,
+    255.0
+   ],
+   "fontSize": "14.08px",
+   "font": "Inter",
+   "backgroundMean": [
+    9.8,
+    22.5,
+    34.7
+   ],
+   "ratio": 15.82,
+   "pass": true
+  },
+  {
+   "pose": "night-court",
+   "id": "course-name",
+   "class": "course-name",
+   "text": "DREAM ISLAND / MAP 07",
+   "ink": [
+    184.0,
+    251.0,
+    255.0
+   ],
+   "fontSize": "10.72px",
+   "font": "SFMono-Regular",
+   "backgroundMean": [
+    8.4,
+    21.7,
+    34.0
+   ],
+   "ratio": 15.95,
+   "pass": true
+  },
+  {
+   "pose": "night-court",
+   "id": "system-status",
+   "class": "",
+   "text": "RACE ACTIVE \u00b7 AUTOPILOT",
+   "ink": [
+    184.0,
+    251.0,
+    255.0
+   ],
+   "fontSize": "10.72px",
+   "font": "SFMono-Regular",
+   "backgroundMean": [
+    9.6,
+    22.4,
+    34.6
+   ],
+   "ratio": 15.85,
+   "pass": true
+  }
+ ]
+}

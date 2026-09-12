@@ -1,0 +1,14 @@
+{
+  "court": {
+    "closestRequiredNormalTiltDegrees": 60.55783038466149,
+    "allowedTiltDegrees": 8,
+    "upperBoundBlinnBeforeClamp": 5.889480699600315e-14,
+    "method": "Shipped pinned camera rays at the centres of every visible sea-mask pixel, actual DAY_LIGHTING direction normalized (.55,.62,-.55). An 8-degree cone about up bounds every shader normal."
+  },
+  "reef": {
+    "closestRequiredNormalTiltDegrees": 24.77807763631264,
+    "allowedTiltDegrees": 8,
+    "upperBoundBlinnBeforeClamp": 0.24712146673960422,
+    "method": "Shipped pinned camera rays at the centres of every visible sea-mask pixel, actual DAY_LIGHTING direction normalized (.55,.62,-.55). An 8-degree cone about up bounds every shader normal."
+  }
+}

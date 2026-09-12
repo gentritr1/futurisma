@@ -1,0 +1,17 @@
+{
+  "script": "scripts/validate-build.mjs",
+  "javascriptGzip": 271475,
+  "shellGzip": 283640,
+  "stylesheetGzip": 7428,
+  "htmlGzip": 4737,
+  "javascriptRaw": 994692,
+  "initialChunks": 19,
+  "radioBytes": 186028,
+  "islandAudioBytes": 225912,
+  "ceilings": {
+    "javascriptGzip": 272384,
+    "shellGzip": 283648,
+    "dreamIslandAudio": 248504
+  },
+  "passed": true
+}

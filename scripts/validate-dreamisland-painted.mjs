@@ -212,6 +212,58 @@ for(const pickup of DREAMISLAND_ABILITY_CONFIG.pickups){
  hardwarePlacements.push({id:pickup.id,progress:pickup.progress,triggerLateral:pickup.lateral,
   position:position.toArray(),groundY,hardwareLateral:lateral,lateralOffset:lateral-pickup.lateral,triangles,plateTopMetres});
 }
+// --- 4a. Phase F ALIVE: the props layer, in the same corridor scene.
+//
+// `dreamisland-props.ts` builds these at runtime from `props.glb` and throws if
+// anything is over the deck below 8.85 m. That check reads the placement data
+// and the geometry's own bounding box; this one puts the real meshes into the
+// scene the rays are about to sweep, so a prop that reaches over the road is
+// caught by the same probe the watchtower is.
+const propsData=read('src/game/data/dreamisland/props.json');
+const propsGlb=await loadGeometry('public/assets/dreamisland/props.glb');
+const propGround=scene.getObjectByName('DI_STATIC_DI_MAT_jungle');
+assert.ok(propGround,'Missing painted ground for prop placement');
+propGround.updateWorldMatrix(true,false);
+const propGroundTop=new THREE.Box3().setFromObject(propGround).max.y+1;
+const propRay=new THREE.Raycaster(new THREE.Vector3(),new THREE.Vector3(0,-1,0));
+const propCounts={},propKinds=new Set();
+for(const prop of propsData.props){
+  const template=propsGlb.getObjectByName(prop.kind);
+  assert.ok(template,`props.glb has no node named ${prop.kind}; dreamisland-props.ts instances by name`);
+  propKinds.add(prop.kind);
+  propCounts[prop.kind]=(propCounts[prop.kind]??0)+1;
+  const sample=hardwareCourse.sample(((prop.progress%1)+1)%1);
+  const position=sample.position.clone().addScaledVector(sample.right,prop.lateral);
+  if(prop.anchor==='water')position.y=propsData.seaLevelMetres+prop.rise;
+  else if(prop.anchor==='ground'){
+    propRay.set(new THREE.Vector3(position.x,propGroundTop,position.z),new THREE.Vector3(0,-1,0));
+    const hit=propRay.intersectObject(propGround,false)[0];
+    position.y=(hit?hit.point.y:position.y)+prop.rise;
+  }else position.y+=prop.rise;
+  const instance=template.clone(true),holder=new THREE.Group();
+  holder.add(instance);
+  holder.position.copy(position);holder.rotation.y=prop.yaw;
+  holder.scale.setScalar(prop.scale);
+  holder.name='PROP_'+prop.kind;
+  scene.add(holder);
+}
+// The bollard's lit core rides on every bollard placement, which is a runtime
+// rule and not a row of the data; it is instanced here for the same reason.
+for(const prop of propsData.props.filter(row=>row.kind==='PR_bollard')){
+  const template=propsGlb.getObjectByName('PR_bollard_core');
+  assert.ok(template,'props.glb has no node named PR_bollard_core');
+  const sample=hardwareCourse.sample(((prop.progress%1)+1)%1);
+  const position=sample.position.clone().addScaledVector(sample.right,prop.lateral);
+  position.y+=prop.rise;
+  const holder=new THREE.Group();holder.add(template.clone(true));
+  holder.position.copy(position);holder.rotation.y=prop.yaw;holder.scale.setScalar(prop.scale);
+  holder.name='PROP_PR_bollard_core';scene.add(holder);
+}
+propCounts.PR_bollard_core=propCounts.PR_bollard??0;
+assert.deepEqual(propCounts,propsData.counts.PR_bollard_core===undefined
+  ?{...propsData.counts,PR_bollard_core:propsData.counts.PR_bollard}:propsData.counts,
+  'props.json counts do not match the rows it carries');
+
 scene.updateMatrixWorld(true);
 const ray=new THREE.Raycaster(),up=new THREE.Vector3(0,1,0),hits=[];
 // The bore's lintel is at 8 m and the road runs under it, so the probe there is
@@ -333,6 +385,10 @@ const report={script:'scripts/validate-dreamisland-painted.mjs',
   lateralClearanceMetres:boreClearance,
   note:'Road edges in the bore local frame. This is the check the upward ray cannot make: a road buried in solid masonry has nothing above it to hit.'},
  audioSources:{instrument:'scripts/prepare-dreamisland-audio-positions.mjs --check',anchors:painted.audioSources.sources.length,matched:true},
+ props:{source:'public/assets/dreamisland/props.glb',data:'src/game/data/dreamisland/props.json',
+  kinds:[...propKinds].sort(),counts:propCounts,
+  corridorClearanceMetres:propsData.corridorClearanceMetres,
+  note:'Every authored prop, plus the bollard cores the runtime rides on the bollard placements, instanced into the corridor scene before the rays are cast.'},
  powerKit:{placements:hardwarePlacements,plateAtlasCell:'concrete/road-sand',hingeSweep:'closed and open at 0.70 rad, with matching lamps and deck plates included in corridor rays'},
  corridor:{samples,boreSamples,openClearanceMetres:OPEN_CLEARANCE,boreClearanceMetres:BORE_CLEARANCE,
   rideHeightMetres:RIDE_HEIGHT,intrusions:hits.length,heroPlacementsInScene:heroPlacements.length,

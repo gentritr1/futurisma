@@ -1,0 +1,198 @@
+{
+  "sky": [
+    {
+      "pose": "court",
+      "blend": "000",
+      "changedPixels": 0
+    },
+    {
+      "pose": "court",
+      "blend": "000",
+      "reference": "original step-0",
+      "changedPixels": 0
+    },
+    {
+      "pose": "court",
+      "blend": "100",
+      "changedPixels": 0
+    },
+    {
+      "pose": "court",
+      "blend": "100",
+      "reference": "original step-0",
+      "changedPixels": 0
+    },
+    {
+      "pose": "reef",
+      "blend": "000",
+      "changedPixels": 0
+    },
+    {
+      "pose": "reef",
+      "blend": "000",
+      "reference": "original step-0",
+      "changedPixels": 0
+    },
+    {
+      "pose": "reef",
+      "blend": "100",
+      "changedPixels": 0
+    },
+    {
+      "pose": "reef",
+      "blend": "100",
+      "reference": "original step-0",
+      "changedPixels": 0
+    }
+  ],
+  "rails": [
+    {
+      "pose": "court",
+      "blend": "000",
+      "changedPixels": 1
+    },
+    {
+      "pose": "court",
+      "blend": "100",
+      "changedPixels": 0
+    },
+    {
+      "pose": "reef",
+      "blend": "000",
+      "changedPixels": 0
+    },
+    {
+      "pose": "reef",
+      "blend": "100",
+      "changedPixels": 0
+    }
+  ],
+  "emission": [
+    {
+      "pose": "court",
+      "withEmission": {
+        "frame": "blend-100.png",
+        "lumaMean": 33.36,
+        "lumaStd": 24.59,
+        "satMean": 156.66,
+        "satP90": 210.0,
+        "chromaMean": 10.93,
+        "p01": 2.4,
+        "p50": 35.2,
+        "p99": 152.8,
+        "range": 150.5,
+        "blackPct": 25.29,
+        "whitePct": 0.0
+      },
+      "withoutWaterEmission": {
+        "frame": "blend-100-without-water-emission.png",
+        "lumaMean": 31.46,
+        "lumaStd": 17.7,
+        "satMean": 159.34,
+        "satP90": 215.77,
+        "chromaMean": 11.05,
+        "p01": 2.4,
+        "p50": 35.1,
+        "p99": 72.2,
+        "range": 69.9,
+        "blackPct": 25.3,
+        "whitePct": 0.0
+      }
+    },
+    {
+      "pose": "reef",
+      "withEmission": {
+        "frame": "blend-100.png",
+        "lumaMean": 49.69,
+        "lumaStd": 62.2,
+        "satMean": 131.76,
+        "satP90": 191.25,
+        "chromaMean": 9.13,
+        "p01": 0.0,
+        "p50": 33.3,
+        "p99": 239.0,
+        "range": 239.0,
+        "blackPct": 26.1,
+        "whitePct": 0.98
+      },
+      "withoutWaterEmission": {
+        "frame": "blend-100-without-water-emission.png",
+        "lumaMean": 29.34,
+        "lumaStd": 17.33,
+        "satMean": 156.84,
+        "satP90": 255.0,
+        "chromaMean": 9.76,
+        "p01": 0.0,
+        "p50": 32.7,
+        "p99": 72.4,
+        "range": 72.4,
+        "blackPct": 26.3,
+        "whitePct": 0.0
+      }
+    }
+  ],
+  "gates": [
+    {
+      "pose": "court",
+      "blend": "000",
+      "checks": {
+        "skyUnchanged": true,
+        "railsUnchanged": false,
+        "seaChroma": true,
+        "seaMedian": true,
+        "wholeFrameChroma": true,
+        "seaWhite": false,
+        "whiteBlob": true,
+        "autocorrelation": true
+      }
+    },
+    {
+      "pose": "court",
+      "blend": "100",
+      "checks": {
+        "skyUnchanged": true,
+        "railsUnchanged": true,
+        "roadMedian": true,
+        "roadWhite": true,
+        "roadP99": true,
+        "roadAutocorrelation": true,
+        "nightP99": true,
+        "nightRange": true
+      }
+    },
+    {
+      "pose": "reef",
+      "blend": "000",
+      "checks": {
+        "skyUnchanged": true,
+        "railsUnchanged": true,
+        "seaChroma": true,
+        "seaMedian": true,
+        "wholeFrameChroma": false,
+        "seaWhite": false,
+        "whiteBlob": true,
+        "autocorrelation": true
+      }
+    },
+    {
+      "pose": "reef",
+      "blend": "100",
+      "checks": {
+        "skyUnchanged": true,
+        "railsUnchanged": true,
+        "roadMedian": true,
+        "roadWhite": true,
+        "roadP99": true,
+        "roadAutocorrelation": true,
+        "nightP99": true,
+        "nightRange": true
+      }
+    }
+  ],
+  "acceptedRecipesAndGlowUnchanged": true,
+  "paintingRoadP99": 222.18198395610656,
+  "finalSourceHashes": {
+    "src/game/dreamisland-water.ts": "70d29a5381d58b34b2aebbcb62da90640c8da0a22a4d686a37b33a3e2d3063cd",
+    "src/game/dreamisland-reflections.ts": "c36ccd8b04337b5a0a967c59716e8c02525165ebe96bd6408ae3d3fc11affc09"
+  }
+}

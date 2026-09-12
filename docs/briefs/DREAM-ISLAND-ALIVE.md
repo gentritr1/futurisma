@@ -201,3 +201,11 @@ All inside §6 (≤ 130 / ≤ 205,000). Missed gates 0, material violations 0, l
 6. **The world bubble is a whisper.** Name 14 px, range 12 px, pill ≈ 26 px tall. The canvas board is the reference: name ≥ 20 px Michroma, pill ≥ 40 px tall, chevron below it, bobbing ± 5 px. Acceptance: DOM-measured sizes in the README and the `slot-in-range` frame re-shot.
 
 Evidence to `art/evidence/dreamisland-v1/alive/code/round-2/`, `npm run test:code` PASS, four soaks re-run (draws now ≤ 130 with doubled toys — report), the Greenwater diff re-run. Commit nothing.
+
+## 12. COMBINED REVIEW 2 (2026-09-13) — APPROVE and merge
+
+F-CODE round 2 reviewed against §11 by reading `art/evidence/dreamisland-v1/alive/code/round-2/README.md` and the frames (`hud-1440/slot-in-range.png`, `skin-night.png`, `slot-hunting.png`, `capsule/day-40m-full.png`): skin on both servers (stylesheet and fonts byte-identical dev↔build, frames within the harness's own noise floor — a 3,763-pixel delta-3 spread between two captures of the same server is the control, so "pixel-identical" is not a claim either of us makes); fonts self-hosted at 19,028 B pinned 20,931; 158 text elements at ≥ 4.5:1 with the worst at 4.79; 4 / 7 / 4 toys ≥ 20 px on BEACH / COURT / REEF; capsule 81 px at 40 m, column 20 px at 150 m; bubble 21 px name in a 45 px pill. Rulings: the capsule rise 2.2 → 3.8 m is accepted (at ×2.2 the old rise buried a third of it); the deterministic 16 m toy grid is accepted (four scattered seeds could not meet the floor; the shallows are thinner than round 1 and that is the tradeoff); the `SPACE / SHIFT · NITRO` two-line wrap is a known cosmetic residual for the next polish list.
+
+Orchestrator's own run on the merged tree (`combined-final/`): `npm run test:code` PASS (76 PASS lines); four soaks on a dev server — rookie 123 draws / 192,172 tris / p95 8.9 ms (residual +3.8), works 123 / 192,172 / 8.7 (−2.1), feral 124 / 192,268 / 8.9 (−0.2), works-reduced 120 / 188,524 / 8.8 (+5.7); 0 missed gates, 0 material violations, laps identical to the shipped calibration. Everything in §6 holds. Merged to `main`.
+
+Still UNVERIFIED after merge: real GPU / browser matrix for `backdrop-filter` and `color-mix`; prop pop-in at the cull boundary; the wet-road streak and the fish glow judged by a person, not an instrument. That person is the next step.

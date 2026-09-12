@@ -9,6 +9,9 @@ import {DreamIslandSky} from './dreamisland-sky';
 import {DreamIslandWater} from './dreamisland-water';
 import {dreamIslandClockAngles} from './dreamisland-clock.js';
 import {DreamIslandHardware} from './dreamisland-hardware';
+import {DreamIslandRoadPaint} from './dreamisland-roadpaint';
+import {DreamIslandProps} from './dreamisland-props';
+import {DreamIslandCapsules} from './dreamisland-capsules';
 
 /**
  * Phase B replaces the procedural blockout with the painted GLB.
@@ -36,6 +39,14 @@ import {DreamIslandHardware} from './dreamisland-hardware';
  *    authored data rather than something to hope for. See
  *    `dreamisland-fish.ts`.
  */
+/**
+ * Phase F §4.3. The shared emissive term is `blend * 1.25`; the goldfish need
+ * more than that to reach the night's brightest one per cent from 40 m, and
+ * `scripts/visual/dreamisland/alive-fish-glow.mjs` measures the p99 of the same
+ * pinned night pose with the shoals shown and hidden to say whether they do.
+ */
+const FISH_NIGHT_EMISSIVE=6.0;
+
 export class DreamIslandPaintedEnvironment implements RaceEnvironment {
  readonly stats:RaceEnvironmentStats={meshes:0,triangles:0,materials:0,textures:0,visibleGroups:0,
   visibleTriangles:0,shaderModel:'lambert',signageSource:'baked',contractDrift:[]};
@@ -44,6 +55,9 @@ export class DreamIslandPaintedEnvironment implements RaceEnvironment {
   cardMaterials:0,fishMeshes:0,fishVisible:0,reskinnedCourseDraws:0,waterSurfaces:0,waterTriangles:0,
   skyPanoramas:0,flowShaders:0,waterfallFlowShaders:0,heroPlacements:0,heroSourceMeshes:0,heroMeshes:0,heroTriangles:0,
   fishShoals:0,fishShoalMeshes:0,fishDeckSamples:0,
+  /** Phase F ALIVE. Every one of these reads zero if its module built nothing. */
+  roadPaintDraws:0,roadPaintTriangles:0,propDraws:0,propTriangles:0,propsPlaced:0,
+  capsuleDraws:0,capsuleTriangles:0,fishInstancedShoals:0,fishInstancedDraws:0,
   /** Metres, over the whole race. `null` until a shoal has actually been over
    * the deck, so a race that never saw one reads as unmeasured rather than as
    * a comfortable number. */
@@ -67,6 +81,13 @@ export class DreamIslandPaintedEnvironment implements RaceEnvironment {
  private waterfallOverlay:THREE.MeshLambertMaterial|null=null;
  private readonly fish:THREE.Mesh[]=[];
  private shoals:DreamIslandShoals|null=null;
+ private roadPaint:DreamIslandRoadPaint|null=null;
+ private props:DreamIslandProps|null=null;
+ /** The goldfish get their own emissive material so §4.3's night intensity can
+  * be raised without lifting every lamp, sign and foam line on the island with
+  * it: the GLB binds one `DI_MAT_emissive` to the fish and to the static world
+  * alike, so without this clone the two cannot be separated. */
+ private fishEmissive:THREE.MeshLambertMaterial|null=null;
  private readonly byRole=new Map<string,THREE.MeshLambertMaterial>();
  private readonly frustum=new THREE.Frustum();
  private readonly projection=new THREE.Matrix4();
@@ -119,6 +140,16 @@ export class DreamIslandPaintedEnvironment implements RaceEnvironment {
    // transform; `visible = false` on all of them hides the lot.
    if(object.name.startsWith('DI_FISH')){this.fish.push(object);object.visible=false;this.counters.fishMeshes++;}
   });
+  // §4.3 — one clone of the emissive material, owned by the fish alone.
+  for(const mesh of this.fish){
+   const material=mesh.material as THREE.MeshLambertMaterial;
+   if(!material.emissiveMap||material.name!=='DI_MAT_emissive')continue;
+   this.fishEmissive??=(()=>{
+    const clone=material.clone();clone.name='DI_MAT_emissive_fish';clone.emissiveIntensity=0;
+    return clone;
+   })();
+   mesh.material=this.fishEmissive;
+  }
   for(const mesh of this.meshes){
    this.stats.triangles+=(mesh.geometry.index?.count??mesh.geometry.attributes.position.count)/3;
   }
@@ -130,10 +161,17 @@ export class DreamIslandPaintedEnvironment implements RaceEnvironment {
   const concrete=this.byRole.get('DI_MAT_concrete')?.map,metal=this.byRole.get('DI_MAT_metal')?.map;
   if(concrete&&metal)this.counters.reskinnedCourseDraws=course.applyPaintedAtlases(concrete,metal);
   this.shapeKerbs();
+  // §4.1 — the road paint. Built here rather than in the course because it
+  // needs nothing from the painted world but the deck the course already
+  // describes, and because this is where the per-frame update already runs.
+  this.roadPaint=new DreamIslandRoadPaint(course);
+  this.counters.roadPaintDraws=this.roadPaint.report.draws;
+  this.counters.roadPaintTriangles=this.roadPaint.report.triangles;
+  course.group.userData.roadPaint=this.roadPaint.report;
   this.water=new DreamIslandWater(course);
   this.counters.waterSurfaces=this.water.surfaces;
   this.counters.waterTriangles=this.water.triangles;
-  root.add(this.sky.root,this.water.root);
+  root.add(this.sky.root,this.water.root,this.roadPaint.root);
   this.nightFill.name='dreamisland_night_ground_fill';root.add(this.nightFill);
   // The acceptance rule for this phase is that a module which silently no-ops
   // must READ ZERO somewhere, because a green soak cannot tell the difference:
@@ -216,6 +254,15 @@ export class DreamIslandPaintedEnvironment implements RaceEnvironment {
   // its meshes have drifted apart, which is exactly the silent failure a single
   // number would hide.
   this.counters.fishShoalMeshes=this.shoals.meshCount;
+  this.counters.fishInstancedShoals=this.shoals.report.instancedShoals;
+  this.counters.fishInstancedDraws=this.shoals.report.instancedDraws;
+  if(this.shoals.report.instancedDraws){
+   this.root.add(this.shoals.instancedRoot);
+   this.shoals.instancedRoot.traverse(object=>{
+    if(object instanceof THREE.Mesh)this.meshes.push(object);
+   });
+   this.stats.triangles+=this.shoals.report.instancedTriangles;
+  }
  }
  /**
   * The four hero GLBs, merged by material and bound to the materials above.
@@ -312,6 +359,28 @@ export class DreamIslandPaintedEnvironment implements RaceEnvironment {
   course.hardware.root.traverse(object=>{if(object instanceof THREE.Mesh)environment.meshes.push(object);});
   environment.stats.meshes+=course.hardware.report.meshes;
   environment.stats.triangles+=course.hardware.report.triangles;
+  // §4.2 — the props. They are placed AFTER the painted world exists because
+  // the `anchor: "ground"` placements are seated by the same downward ray the
+  // power-kit feet use; a prop layer built before the world would float.
+  environment.props=await DreamIslandProps.load(course,environment.root);
+  environment.root.add(environment.props.root);
+  environment.counters.propDraws=environment.props.report.draws;
+  environment.counters.propTriangles=environment.props.report.triangles;
+  environment.counters.propsPlaced=environment.props.report.instances;
+  course.group.userData.props=environment.props.report;
+  environment.props.root.traverse(object=>{if(object instanceof THREE.Mesh)environment.meshes.push(object);});
+  environment.stats.meshes+=environment.props.report.draws;
+  environment.stats.triangles+=environment.props.report.triangles;
+  // §4.4 — the capsules. Driven from the pickup states by `dreamisland-powers`,
+  // which is where the hardware is driven from too.
+  course.capsules=await DreamIslandCapsules.load(course);
+  environment.root.add(course.capsules.root);
+  environment.counters.capsuleDraws=course.capsules.report.draws;
+  environment.counters.capsuleTriangles=course.capsules.report.triangles;
+  course.group.userData.capsules=course.capsules.report;
+  course.capsules.root.traverse(object=>{if(object instanceof THREE.Mesh)environment.meshes.push(object);});
+  environment.stats.meshes+=course.capsules.report.draws;
+  environment.stats.triangles+=course.capsules.report.triangles;
   return environment;
  }
  updateVisibility(camera:THREE.Camera){
@@ -345,6 +414,14 @@ export class DreamIslandPaintedEnvironment implements RaceEnvironment {
   // Decision 3 and decision 6 both live here: the shoals drift on authored
   // closed paths from `fish-rise`, and under reduced motion they never spawn.
   this.shoals?.update(this.course.schedule.tick,this.course.schedule.config?.fishRiseTick??null,reduced);
+  // §4.2 — every prop's idle motion is a pure function of the same tick.
+  // The frustum is built a few lines down for the mesh visibility sweep; the
+  // props need the same one, so it is built before them instead.
+  this.frustum.setFromProjectionMatrix(this.projection.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse));
+  this.props?.update(this.course.schedule.tick,blend,reduced,this.frustum);
+  // §4.3 — the fish carry their own night emissive, measured against the night
+  // p99 with and without them rather than set by eye. See FISH_NIGHT_EMISSIVE.
+  if(this.fishEmissive)this.fishEmissive.emissiveIntensity=blend*FISH_NIGHT_EMISSIVE;
   this.counters.fishVisible=this.shoals?.visibleMeshes??0;
   this.counters.fishDeckSamples=this.shoals?.deckSamples??0;
   this.counters.fishMinimumDeckClearance=this.shoals&&this.shoals.deckSamples>0

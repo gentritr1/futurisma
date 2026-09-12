@@ -1,0 +1,41 @@
+[
+  {
+    "check": "build",
+    "command": [
+      "npm",
+      "run",
+      "build"
+    ],
+    "cwd": "/tmp/dreamisland-f3d-eafe0b9",
+    "exitCode": 0
+  },
+  {
+    "check": "build-ceilings",
+    "command": [
+      "node",
+      "scripts/validate-build.mjs"
+    ],
+    "cwd": "/tmp/dreamisland-f3d-eafe0b9",
+    "exitCode": 0
+  },
+  {
+    "check": "runtime",
+    "command": [
+      "npm",
+      "run",
+      "validate:dreamisland-runtime"
+    ],
+    "cwd": "/tmp/dreamisland-f3d-eafe0b9",
+    "exitCode": 0
+  },
+  {
+    "check": "painted",
+    "command": [
+      "npm",
+      "run",
+      "validate:dreamisland-painted"
+    ],
+    "cwd": "/tmp/dreamisland-f3d-eafe0b9",
+    "exitCode": 0
+  }
+]

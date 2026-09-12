@@ -1,0 +1,39 @@
+{
+  "shellGzip": 282801,
+  "island": [
+    {
+      "file": "dreamisland-course-D7YCLDF3.js",
+      "bytes": 154638,
+      "gzip": 56842,
+      "initial": false
+    },
+    {
+      "file": "dreamisland-materials-BWnzJkHW.js",
+      "bytes": 3744,
+      "gzip": 1452,
+      "initial": false
+    },
+    {
+      "file": "dreamisland-painted-environment-DWS_paBS.js",
+      "bytes": 46531,
+      "gzip": 15727,
+      "initial": false
+    },
+    {
+      "file": "dreamisland-powers-config-Cvace4G3.js",
+      "bytes": 777,
+      "gzip": 388,
+      "initial": false
+    },
+    {
+      "file": "dreamisland-runtime-CG-2OdTt.js",
+      "bytes": 14357,
+      "gzip": 5977,
+      "initial": false
+    }
+  ],
+  "islandGzip": 80386,
+  "islandCeiling": 85820,
+  "referenceMeasurement": 78018,
+  "scope": "isolated eafe0b9 + F-3D, aggregate named island lazy JS; final combined pin belongs to orchestrator"
+}

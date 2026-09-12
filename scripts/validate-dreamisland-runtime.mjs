@@ -187,9 +187,22 @@ for(const shoal of fishPaths.shoals){
     }
   }
   if(shoalWorst<worstClearance){worstClearance=shoalWorst;worstRow={shoal:shoal.id,...shoalRow};}
-  fishReport.push({id:shoal.id,batch:shoal.batch,fish:shoal.fish.length,periodSeconds:shoal.periodSeconds,
-    ticksSwept:span+1,deckSamples:shoalSamples,
+  fishReport.push({id:shoal.id,batch:shoal.batch,source:shoal.source??null,fish:shoal.fish.length,
+    periodSeconds:shoal.periodSeconds,ticksSwept:span+1,deckSamples:shoalSamples,
+    floorMetres:shoal.minimumDeckClearanceMetres??null,
     minimumDeckClearanceMetres:Number.isFinite(shoalWorst)?+shoalWorst.toFixed(3):null,worst:shoalRow});
+  // Phase F §4.3. A shoal MAY declare its own floor, and the six shoals added
+  // in that pass declare 8.85 m — the corridor rule, applied to the fish that
+  // now fly over the road. This is an extra assertion, not a replacement: the
+  // map-wide floor below still has to hold for every shoal including these.
+  if(shoal.minimumDeckClearanceMetres!==undefined){
+    assert.ok(shoalSamples>0,
+      `${shoal.id} declares a per-shoal deck clearance floor but never passes over the deck, `
+      +'so the floor was never tested and the path does not do what it says.');
+    assert.ok(shoalWorst>=shoal.minimumDeckClearanceMetres,
+      `${shoal.id} declares a ${shoal.minimumDeckClearanceMetres} m floor over the deck; `
+      +`the worst point of its drift measures ${shoalWorst.toFixed(3)} m: ${JSON.stringify(shoalRow)}`);
+  }
 }
 assert.ok(deckSamples>0,'No shoal ever passes over the deck, so the six metre rule was never tested. '
   +'Either the paths do not cross the road or the sweep is not measuring what it thinks.');

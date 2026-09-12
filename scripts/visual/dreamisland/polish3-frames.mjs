@@ -3,6 +3,8 @@ import {launchReviewBrowser} from '../tideline-v4/browser.mjs';
 import {instrument} from './instrument.mjs';
 const out=process.argv.find(a=>a.startsWith('--out='))?.slice(6)??'art/evidence/dreamisland-v1/polish-3/frames';
 const requested=process.argv.find(a=>a.startsWith('--shots='))?.slice(8).split(',');
+// `--base=`, defaulting to the 5200 this script has always used.
+const base=process.argv.find(a=>a.startsWith('--base='))?.slice(7)??'http://127.0.0.1:5200';
 await mkdir(out,{recursive:true});
 const browser=await launchReviewBrowser();
 const captures=[];
@@ -23,7 +25,7 @@ try{
   ...['surge','shield'].flatMap(kind=>[0,1].map(blend=>({id:kind+'-plate-'+(blend?'night':'day'),kind,blend,distance:8,plate:true}))),
  ]){
   if(requested&&!requested.includes(shot.id))continue;
-  await page.goto('http://127.0.0.1:5200/?map=dreamisland&diagnostics=1&start=manual&headless=1&quality=high&music=0&nightBlend='+shot.blend,{waitUntil:'networkidle0'});
+  await page.goto(base+'/?map=dreamisland&diagnostics=1&start=manual&headless=1&quality=high&music=0&nightBlend='+shot.blend,{waitUntil:'networkidle0'});
   await page.waitForFunction(()=>!!window.__diCourse?.hardware&&!!window.__diCamera);
   const meta=await page.evaluate(shot=>{
    const course=window.__diCourse,scene=window.__diScene,camera=window.__diCamera,V=camera.position.constructor;

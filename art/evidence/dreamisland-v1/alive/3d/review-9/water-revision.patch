@@ -1,0 +1,132 @@
+--- before/src/game/dreamisland-water.ts
++++ after/src/game/dreamisland-water.ts
+@@ -1,6 +1,6 @@
+ import * as THREE from 'three';
+ import {CELL,applyDreamIslandAtlasFlow,applyDreamIslandDepthBand} from './dreamisland-materials';
+-import {DreamIslandReflections,applyDreamIslandReflection,applyDreamIslandEmissionDistance,DreamIslandGlow,bindDreamIslandNodeMaterials} from './dreamisland-reflections';
++import {DreamIslandReflections,applyDreamIslandReflection,DreamIslandGlow,bindDreamIslandNodeMaterials} from './dreamisland-reflections';
+ import type {DreamIslandCourse} from './dreamisland-course';
+ 
+ /**
+@@ -103,7 +103,7 @@
+    pool(course,.4725,-46,110,150,TILES.shallows),
+   ];
+   const shallowsMaterial=new THREE.MeshLambertMaterial({name:'dreamisland_shallows',color:this.shallowsDay,
+-   emissive:0x8ff4ec,emissiveIntensity:0});
++   emissive:0x48f4ec,emissiveIntensity:0});
+   applyDreamIslandAtlasFlow(shallowsMaterial,{cell:CELL.causticShallows,tile:new THREE.Vector2(1,1),
+    scroll:new THREE.Vector2(.0018,.0012),time:this.time,emissiveCell:CELL.shallowsGlow,key:'shallows'});
+   load('/assets/dreamisland/textures/water.jpg',t=>{shallowsMaterial.map=t;shallowsMaterial.needsUpdate=true;});
+@@ -127,12 +127,11 @@
+   this.foam=new THREE.Mesh(merge(foam),foamMaterial);
+   this.foam.name='dreamisland_foam';this.foam.frustumCulled=false;this.foam.renderOrder=-8;
+   for(const material of [seaMaterial,shallowsMaterial])applyDreamIslandReflection(material,this.reflections,this.time);
+-  for(const material of [shallowsMaterial,foamMaterial])applyDreamIslandEmissionDistance(material);
+   const road=course.group.getObjectByName('dreamisland_blockout_road') as THREE.Mesh;
+   if(road)applyDreamIslandReflection(road.material as THREE.MeshLambertMaterial,this.reflections,this.time,'road');
+   this.sea.onBeforeRender=(renderer,scene,camera)=>{
+    this.reflections.initialize(renderer,scene);
+-   this.reflections.update(scene,this.seaBlend.value);
++   this.reflections.update(this.seaBlend.value);
+    if(this.materialScan++%60===0)bindDreamIslandNodeMaterials(scene,this.reflections);
+    this.glow.update(scene,camera,this.seaBlend.value);
+   };
+@@ -151,8 +150,8 @@
+   // round-1 edge colours so the stronger daytime cyan does not dim the cue.
+   (this.shallows.material as THREE.MeshLambertMaterial).color.lerpColors(this.shallowsDay,this.edgeNight,nightBlend);
+   (this.foam.material as THREE.MeshLambertMaterial).color.lerpColors(this.foamDay,this.edgeNight,nightBlend);
+-  (this.shallows.material as THREE.MeshLambertMaterial).emissiveIntensity=nightBlend*64.0;
+-  (this.foam.material as THREE.MeshLambertMaterial).emissiveIntensity=nightBlend*96.0;
++  (this.shallows.material as THREE.MeshLambertMaterial).emissiveIntensity=nightBlend*1.20;
++  (this.foam.material as THREE.MeshLambertMaterial).emissiveIntensity=nightBlend*1.50;
+  }
+ }
+ 
+--- before/src/game/dreamisland-reflections.ts
++++ after/src/game/dreamisland-reflections.ts
+@@ -7,7 +7,8 @@
+  readonly day={value:null as THREE.Texture|null};
+  readonly night={value:null as THREE.Texture|null};
+  readonly blend={value:0};
+- readonly sun={value:new THREE.Vector3()};
++ // Art-directed facet sparkle: shadow-sun azimuth, elevation 85.5 degrees.
++ readonly sparkleDirection={value:new THREE.Vector3(.055479,.996917,-.055479).normalize()};
+  readonly enabled={value:0};
+  private pending=false;
+  private targets:THREE.WebGLRenderTarget[]=[];
+@@ -34,11 +35,7 @@
+    }finally{material.dispose();generator.dispose();}
+   }
+  }
+- update(scene:THREE.Scene,blend:number){
+-  this.blend.value=blend;
+-  scene.traverse(object=>{if(object instanceof THREE.DirectionalLight&&object.castShadow)
+-   this.sun.value.copy(object.position).sub(object.target.position).normalize();});
+- }
++ update(blend:number){this.blend.value=blend;}
+  dispose(){for(const target of this.targets)target.dispose();this.targets=[];}
+ }
+ 
+@@ -48,14 +45,14 @@
+  material.onBeforeCompile=(shader,renderer)=>{
+   previous.call(material,shader,renderer);
+   Object.assign(shader.uniforms,{diEnvDay:reflection.day,diEnvNight:reflection.night,
+-   diReflectionBlend:reflection.blend,diReflectionReady:reflection.enabled,diReflectionTime:time,diSun:reflection.sun});
++   diReflectionBlend:reflection.blend,diReflectionReady:reflection.enabled,diReflectionTime:time,diSparkleDirection:reflection.sparkleDirection});
+   shader.vertexShader='varying vec3 diReflectionWorld;\n'+(kind==='road'?'varying float diWetRoad;\n':'')+shader.vertexShader.replace('#include <project_vertex>',
+    (kind==='road'?'diWetRoad=1.-step(.5,uv.y);\n':'')+'diReflectionWorld=(modelMatrix*vec4(transformed,1.)).xyz;\n#include <project_vertex>');
+   shader.fragmentShader=`varying vec3 diReflectionWorld;
+    ${kind==='road'?'varying float diWetRoad;':''}
+    uniform sampler2D diEnvDay,diEnvNight;
+    uniform float diReflectionBlend,diReflectionReady,diReflectionTime;
+-   uniform vec3 diSun;
++   uniform vec3 diSparkleDirection;
+    #define ENVMAP_TYPE_CUBE_UV
+    #define CUBEUV_TEXEL_WIDTH 0.0026041666666666665
+    #define CUBEUV_TEXEL_HEIGHT 0.001953125
+@@ -79,9 +76,12 @@
+     // Atlas tint is linear and includes the sea's day/night material colour.
+     vec3 diCellHue=diffuseColor.rgb/max(max(diffuseColor.r,diffuseColor.g),max(diffuseColor.b,.0001));
+     vec3 diTintedSky=diEnvironment*diffuseColor.rgb*diCellHue;
+-    outgoingLight=mix(outgoingLight,diTintedSky,.14*diFresnel*diReflectionReady);
+-    vec3 diHalf=normalize(diView+diSun);
+-    float diGlint=min(1.,pow(max(dot(diNormal,diHalf),0.),64.)*4.);
++    outgoingLight=mix(outgoingLight,diTintedSky,.20*diFresnel*diReflectionReady);
++    // A narrow facet-facing lobe, composed for grazing views rather than a
++    // physical sun half-vector. One world-space direction serves every pose.
++    // Reject the dim lobe fringe so rare white facets do not wash out the cell.
++    float diFarBand=1.-smoothstep(.08,.22,max(diView.y,0.));
++    float diGlint=64.*smoothstep(.12,.5,pow(max(dot(diNormal,diSparkleDirection),0.),20000.))*diFarBand;
+     outgoingLight+=vec3(1.,.98,.91)*diGlint*(1.-diReflectionBlend)*diReflectionReady;`:
+     `// Road and kerbs share a draw: their atlas quadrant is the material boundary.
+     if(diWetRoad>.5){
+@@ -92,28 +92,7 @@
+     }`}
+     #include <opaque_fragment>`);
+  };
+- material.customProgramCacheKey=()=>cache+'-reflection-8-'+kind;material.needsUpdate=true;
+-}
+-
+-/** Keep nearby glow at its original energy; let distant sources survive fog.
+- * This is an art-directed distance response, not physical light transport.
+- * Fog and tone mapping still run normally after the emissive term.
+- */
+-export function applyDreamIslandEmissionDistance(material:THREE.MeshLambertMaterial){
+- const previous=material.onBeforeCompile,cache=material.customProgramCacheKey();
+- material.onBeforeCompile=(shader,renderer)=>{
+-  previous.call(material,shader,renderer);
+-  shader.vertexShader='varying vec3 diEmissionWorld;\n'+shader.vertexShader.replace('#include <project_vertex>',
+-   'diEmissionWorld=(modelMatrix*vec4(transformed,1.)).xyz;\n#include <project_vertex>');
+-  // Atlas flow has already expanded the emissive-map chunk. Scale its result
+-  // immediately before Lambert assembles outgoing light, including reflection.
+-  const marker='vec3 outgoingLight =';
+-  if(!shader.fragmentShader.includes(marker))throw Error('Dream Island emission: missing Lambert light assembly');
+-  shader.fragmentShader='varying vec3 diEmissionWorld;\n'+shader.fragmentShader.replace(marker,
+-   `totalEmissiveRadiance*=mix(.1875,1.,smoothstep(80.,160.,distance(cameraPosition,diEmissionWorld)));
+-    vec3 outgoingLight =`);
+- };
+- material.customProgramCacheKey=()=>cache+'-emission-distance-1';material.needsUpdate=true;
++ material.customProgramCacheKey=()=>cache+'-reflection-9-'+kind;material.needsUpdate=true;
+ }
+ 
+ /** The two node recipes. Source UVs already point inside their atlas cells. */

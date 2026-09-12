@@ -1,0 +1,20 @@
+{
+  "script": "scripts/visual/dreamisland/alive-fish-glow.mjs",
+  "base": "http://127.0.0.1:5210",
+  "viewport": "1280x720",
+  "pose": "chase camera 40 m short of the court-cross shoal, nightBlend pinned to 1",
+  "meta": {
+    "tick": 13654,
+    "fishRiseTick": 8494,
+    "periodSeconds": 43,
+    "craftProgress": 0.5583333333333197,
+    "shoalProgress": 0.575,
+    "distanceMetres": 40
+  },
+  "withFish": "art/evidence/dreamisland-v1/alive/code/fish/night-40m-with-fish.png",
+  "withoutFish": "art/evidence/dreamisland-v1/alive/code/fish/night-40m-without-fish.png",
+  "fishVisibleMeshes": 16,
+  "errors": [
+    "Applying inline style violates the following Content Security Policy directive 'style-src 'self''. Either the 'unsafe-inline' keyword, a hash ('sha256-mfdt0e5wTbas5+1kJi7UFq6ahzT4sL2wv/45RjdiHaI='), or a nonce ('nonce-...') is required to enable inline execution. The action has been blocked."
+  ]
+}

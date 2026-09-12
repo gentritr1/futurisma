@@ -1,0 +1,515 @@
+{
+  "script": "scripts/visual/dreamisland/alive-hud.mjs",
+  "base": "http://127.0.0.1:5210",
+  "url": "http://127.0.0.1:5210/?map=dreamisland&demo=1&headless=1&diagnostics=1&start=manual&seed=3868938316&tier=works&laps=5&quality=high&music=0&voice=0",
+  "viewport": "1440x810",
+  "shots": [
+    {
+      "frame": "slot-hunting.png",
+      "note": "§4.6 state 1: hunting the nearest uncollected capsule",
+      "state": {
+        "powerState": "hunting",
+        "teach": "false",
+        "kind": "surge",
+        "slotText": "SURGE · 887 MFIND A CAPSULEE",
+        "bubble": "false",
+        "lines": "false",
+        "flash": "false",
+        "fish": "false",
+        "pills": 0,
+        "night": 0,
+        "struck": false,
+        "nightBlend": 0,
+        "progress": 0.20530628159634134,
+        "tick": 921,
+        "report": {
+          "attached": 1,
+          "slotStates": {
+            "in-range": 2,
+            "collected": 1,
+            "armed": 1,
+            "active": 1,
+            "hunting": 1
+          },
+          "firstArmedShown": 1,
+          "bubbleFrames": 157,
+          "overtakePills": 0,
+          "strikeEvents": 0,
+          "strikeFlashesShown": 0,
+          "fishSwims": 0,
+          "clockDialFrames": 285,
+          "stylesheet": "src/game/style-dreamisland.css",
+          "fonts": [
+            "Michroma",
+            "Share Tech Mono"
+          ],
+          "stylesheetHref": "http://127.0.0.1:5210/src/game/style-dreamisland.css",
+          "powerState": "hunting"
+        },
+        "phase": "running",
+        "circuit": "dreamisland",
+        "skinApplied": "999px"
+      }
+    },
+    {
+      "frame": "slot-in-range.png",
+      "note": "§4.6 state 2: inside 120 m, with the world bubble projected on the capsule",
+      "state": {
+        "powerState": "in-range",
+        "teach": "false",
+        "kind": "surge",
+        "slotText": "SURGE · 98 MDRIVE THROUGH THE CAPSULEE",
+        "bubble": "true",
+        "lines": "false",
+        "flash": "false",
+        "fish": "false",
+        "pills": 0,
+        "night": 0,
+        "struck": false,
+        "nightBlend": 0,
+        "progress": 0.0039613878094826305,
+        "tick": 48,
+        "report": {
+          "attached": 1,
+          "slotStates": {
+            "in-range": 1
+          },
+          "firstArmedShown": 0,
+          "bubbleFrames": 103,
+          "overtakePills": 0,
+          "strikeEvents": 0,
+          "strikeFlashesShown": 0,
+          "fishSwims": 0,
+          "clockDialFrames": 103,
+          "stylesheet": "src/game/style-dreamisland.css",
+          "fonts": [
+            "Michroma",
+            "Share Tech Mono"
+          ],
+          "stylesheetHref": "http://127.0.0.1:5210/src/game/style-dreamisland.css",
+          "powerState": "in-range"
+        },
+        "phase": "running",
+        "circuit": "dreamisland",
+        "skinApplied": "999px"
+      }
+    },
+    {
+      "frame": "slot-collected.png",
+      "note": "§4.6 state 3: the 400 ms collect",
+      "state": {
+        "powerState": "collected",
+        "teach": "false",
+        "kind": "surge",
+        "slotText": "SURGE COLLECTEDTHE BEACH STRAIGHT IS NEXT · 70 ME",
+        "bubble": "false",
+        "lines": "false",
+        "flash": "false",
+        "fish": "false",
+        "pills": 0,
+        "night": 0,
+        "struck": false,
+        "nightBlend": 0,
+        "progress": 0.045954644723350535,
+        "tick": 310,
+        "report": {
+          "attached": 1,
+          "slotStates": {
+            "in-range": 1,
+            "collected": 1
+          },
+          "firstArmedShown": 0,
+          "bubbleFrames": 156,
+          "overtakePills": 0,
+          "strikeEvents": 0,
+          "strikeFlashesShown": 0,
+          "fishSwims": 0,
+          "clockDialFrames": 157,
+          "stylesheet": "src/game/style-dreamisland.css",
+          "fonts": [
+            "Michroma",
+            "Share Tech Mono"
+          ],
+          "stylesheetHref": "http://127.0.0.1:5210/src/game/style-dreamisland.css",
+          "powerState": "collected"
+        },
+        "phase": "running",
+        "circuit": "dreamisland",
+        "skinApplied": "999px"
+      }
+    },
+    {
+      "frame": "slot-armed-first-time.png",
+      "note": "§4.6 state 4, first time only: the pill at 120 px reading HOLD E TO FIRE",
+      "state": {
+        "powerState": "armed",
+        "teach": "true",
+        "kind": "surge",
+        "slotText": "HOLD E TO FIRETHE BEACH STRAIGHT IS NEXT · 44 ME",
+        "bubble": "false",
+        "lines": "false",
+        "flash": "false",
+        "fish": "false",
+        "pills": 0,
+        "night": 0,
+        "struck": false,
+        "nightBlend": 0,
+        "progress": 0.05676455262153057,
+        "tick": 359,
+        "report": {
+          "attached": 1,
+          "slotStates": {
+            "in-range": 1,
+            "collected": 1,
+            "armed": 1
+          },
+          "firstArmedShown": 1,
+          "bubbleFrames": 156,
+          "overtakePills": 0,
+          "strikeEvents": 0,
+          "strikeFlashesShown": 0,
+          "fishSwims": 0,
+          "clockDialFrames": 168,
+          "stylesheet": "src/game/style-dreamisland.css",
+          "fonts": [
+            "Michroma",
+            "Share Tech Mono"
+          ],
+          "stylesheetHref": "http://127.0.0.1:5210/src/game/style-dreamisland.css",
+          "powerState": "armed"
+        },
+        "phase": "running",
+        "circuit": "dreamisland",
+        "skinApplied": "999px"
+      }
+    },
+    {
+      "frame": "slot-armed.png",
+      "note": "§4.6 state 4: armed, after the first-time teach has retired",
+      "state": {
+        "powerState": "armed",
+        "teach": "false",
+        "kind": "surge",
+        "slotText": "SURGE READYTHE BEACH STRAIGHT IS NEXT · 376 ME",
+        "bubble": "false",
+        "lines": "false",
+        "flash": "false",
+        "fish": "false",
+        "pills": 0,
+        "night": 0,
+        "struck": false,
+        "nightBlend": 0,
+        "progress": 0.9183891729425797,
+        "tick": 3586,
+        "report": {
+          "attached": 1,
+          "slotStates": {
+            "in-range": 5,
+            "collected": 2,
+            "armed": 2,
+            "active": 1,
+            "hunting": 4
+          },
+          "firstArmedShown": 1,
+          "bubbleFrames": 272,
+          "overtakePills": 0,
+          "strikeEvents": 0,
+          "strikeFlashesShown": 0,
+          "fishSwims": 0,
+          "clockDialFrames": 844,
+          "stylesheet": "src/game/style-dreamisland.css",
+          "fonts": [
+            "Michroma",
+            "Share Tech Mono"
+          ],
+          "stylesheetHref": "http://127.0.0.1:5210/src/game/style-dreamisland.css",
+          "powerState": "armed"
+        },
+        "phase": "running",
+        "circuit": "dreamisland",
+        "skinApplied": "999px"
+      }
+    },
+    {
+      "frame": "slot-active.png",
+      "note": "§4.6 state 5: a power firing, the orb ring draining",
+      "state": {
+        "powerState": "active",
+        "teach": "false",
+        "kind": "surge",
+        "slotText": "SURGE 4.0 SHOLD THE LINEE",
+        "bubble": "false",
+        "lines": "true",
+        "flash": "false",
+        "fish": "false",
+        "pills": 0,
+        "night": 0,
+        "struck": false,
+        "nightBlend": 0,
+        "progress": 0.07589959822356951,
+        "tick": 439,
+        "report": {
+          "attached": 1,
+          "slotStates": {
+            "in-range": 1,
+            "collected": 1,
+            "armed": 1,
+            "active": 1
+          },
+          "firstArmedShown": 1,
+          "bubbleFrames": 157,
+          "overtakePills": 0,
+          "strikeEvents": 0,
+          "strikeFlashesShown": 0,
+          "fishSwims": 0,
+          "clockDialFrames": 185,
+          "stylesheet": "src/game/style-dreamisland.css",
+          "fonts": [
+            "Michroma",
+            "Share Tech Mono"
+          ],
+          "stylesheetHref": "http://127.0.0.1:5210/src/game/style-dreamisland.css",
+          "powerState": "active"
+        },
+        "phase": "running",
+        "circuit": "dreamisland",
+        "skinApplied": "999px"
+      }
+    },
+    {
+      "frame": "feel-fire.png",
+      "note": "§4.7 the fire: the speed-line overlay and the widened FOV",
+      "state": {
+        "powerState": "active",
+        "teach": "false",
+        "kind": "surge",
+        "slotText": "SURGE 4.0 SHOLD THE LINEE",
+        "bubble": "false",
+        "lines": "true",
+        "flash": "false",
+        "fish": "false",
+        "pills": 0,
+        "night": 0,
+        "struck": false,
+        "nightBlend": 0,
+        "progress": 0.07564706975099256,
+        "tick": 438,
+        "report": {
+          "attached": 1,
+          "slotStates": {
+            "in-range": 1,
+            "collected": 1,
+            "armed": 1,
+            "active": 1
+          },
+          "firstArmedShown": 1,
+          "bubbleFrames": 156,
+          "overtakePills": 0,
+          "strikeEvents": 0,
+          "strikeFlashesShown": 0,
+          "fishSwims": 0,
+          "clockDialFrames": 184,
+          "stylesheet": "src/game/style-dreamisland.css",
+          "fonts": [
+            "Michroma",
+            "Share Tech Mono"
+          ],
+          "stylesheetHref": "http://127.0.0.1:5210/src/game/style-dreamisland.css",
+          "powerState": "active"
+        },
+        "phase": "running",
+        "circuit": "dreamisland",
+        "skinApplied": "999px"
+      }
+    },
+    {
+      "frame": "feel-strike-flash.png",
+      "note": "§4.7 the strike: the white-to-cyan flash, inside its 300 ms",
+      "state": {
+        "powerState": "armed",
+        "teach": "false",
+        "kind": "surge",
+        "slotText": "SURGE READYTHE BEACH STRAIGHT IS NEXT · 74 ME",
+        "bubble": "false",
+        "lines": "false",
+        "flash": "true",
+        "fish": "true",
+        "pills": 0,
+        "night": 0,
+        "struck": true,
+        "nightBlend": 0.0000014460894633058983,
+        "progress": 0.04424009338663537,
+        "tick": 8015,
+        "report": {
+          "attached": 1,
+          "slotStates": {
+            "in-range": 8,
+            "collected": 3,
+            "armed": 3,
+            "active": 2,
+            "hunting": 6
+          },
+          "firstArmedShown": 1,
+          "bubbleFrames": 391,
+          "overtakePills": 0,
+          "strikeEvents": 1,
+          "strikeFlashesShown": 1,
+          "fishSwims": 1,
+          "clockDialFrames": 1775,
+          "stylesheet": "src/game/style-dreamisland.css",
+          "fonts": [
+            "Michroma",
+            "Share Tech Mono"
+          ],
+          "stylesheetHref": "http://127.0.0.1:5210/src/game/style-dreamisland.css",
+          "powerState": "armed"
+        },
+        "phase": "running",
+        "circuit": "dreamisland",
+        "skinApplied": "999px"
+      }
+    },
+    {
+      "frame": "feel-strike-fish.png",
+      "note": "§4.7 the strike: the goldfish crossing the top of the HUD",
+      "state": {
+        "powerState": "armed",
+        "teach": "false",
+        "kind": "surge",
+        "slotText": "SURGE READYTHE BEACH STRAIGHT IS NEXT · 47 ME",
+        "bubble": "false",
+        "lines": "false",
+        "flash": "false",
+        "fish": "true",
+        "pills": 0,
+        "night": 0,
+        "struck": true,
+        "nightBlend": 0.0023858393079132373,
+        "progress": 0.05536401398713786,
+        "tick": 8055,
+        "report": {
+          "attached": 1,
+          "slotStates": {
+            "in-range": 8,
+            "collected": 3,
+            "armed": 3,
+            "active": 2,
+            "hunting": 7
+          },
+          "firstArmedShown": 1,
+          "bubbleFrames": 390,
+          "overtakePills": 0,
+          "strikeEvents": 1,
+          "strikeFlashesShown": 1,
+          "fishSwims": 1,
+          "clockDialFrames": 1782,
+          "stylesheet": "src/game/style-dreamisland.css",
+          "fonts": [
+            "Michroma",
+            "Share Tech Mono"
+          ],
+          "stylesheetHref": "http://127.0.0.1:5210/src/game/style-dreamisland.css",
+          "powerState": "armed"
+        },
+        "phase": "running",
+        "circuit": "dreamisland",
+        "skinApplied": "999px"
+      }
+    },
+    {
+      "frame": "skin-night.png",
+      "note": "§4.5 the skin at nightBlend 1",
+      "state": {
+        "powerState": "hunting",
+        "teach": "false",
+        "kind": "surge",
+        "slotText": "SURGE · 416 MFIND A CAPSULEE",
+        "bubble": "false",
+        "lines": "false",
+        "flash": "false",
+        "fish": "false",
+        "pills": 0,
+        "night": 0.999,
+        "struck": true,
+        "nightBlend": 0.999175925925926,
+        "progress": 0.4018432573768025,
+        "tick": 9430,
+        "report": {
+          "attached": 1,
+          "slotStates": {
+            "in-range": 8,
+            "collected": 3,
+            "armed": 3,
+            "active": 3,
+            "hunting": 8
+          },
+          "firstArmedShown": 1,
+          "bubbleFrames": 392,
+          "overtakePills": 0,
+          "strikeEvents": 1,
+          "strikeFlashesShown": 1,
+          "fishSwims": 1,
+          "clockDialFrames": 2070,
+          "stylesheet": "src/game/style-dreamisland.css",
+          "fonts": [
+            "Michroma",
+            "Share Tech Mono"
+          ],
+          "stylesheetHref": "http://127.0.0.1:5210/src/game/style-dreamisland.css",
+          "powerState": "hunting"
+        },
+        "phase": "running",
+        "circuit": "dreamisland",
+        "skinApplied": "999px"
+      }
+    },
+    {
+      "frame": "feel-overtake.png",
+      "note": "§4.7 an overtake pill floating out of the timing tower",
+      "state": {
+        "powerState": "armed",
+        "teach": "false",
+        "kind": "surge",
+        "slotText": "SURGE READYTHE BEACH STRAIGHT IS NEXT · 161 ME",
+        "bubble": "false",
+        "lines": "false",
+        "flash": "false",
+        "fish": "false",
+        "pills": 1,
+        "night": 0.996,
+        "struck": true,
+        "nightBlend": 1,
+        "progress": 0.007842964656981533,
+        "tick": 11711,
+        "report": {
+          "attached": 1,
+          "slotStates": {
+            "in-range": 10,
+            "collected": 4,
+            "armed": 4,
+            "active": 3,
+            "hunting": 10
+          },
+          "firstArmedShown": 1,
+          "bubbleFrames": 508,
+          "overtakePills": 1,
+          "strikeEvents": 1,
+          "strikeFlashesShown": 1,
+          "fishSwims": 1,
+          "clockDialFrames": 2545,
+          "stylesheet": "src/game/style-dreamisland.css",
+          "fonts": [
+            "Michroma",
+            "Share Tech Mono"
+          ],
+          "stylesheetHref": "http://127.0.0.1:5210/src/game/style-dreamisland.css",
+          "powerState": "armed"
+        },
+        "phase": "running",
+        "circuit": "dreamisland",
+        "skinApplied": "999px"
+      }
+    }
+  ],
+  "errors": []
+}

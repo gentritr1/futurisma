@@ -1,0 +1,279 @@
+{
+  "sky": [
+    {
+      "pose": "court",
+      "blend": "000",
+      "changedPixels": 0,
+      "maxChannelDelta": 0,
+      "pixelsAboveTwo": 0
+    },
+    {
+      "pose": "court",
+      "blend": "000",
+      "reference": "original step-0",
+      "changedPixels": 0
+    },
+    {
+      "pose": "court",
+      "blend": "100",
+      "changedPixels": 0,
+      "maxChannelDelta": 0,
+      "pixelsAboveTwo": 0
+    },
+    {
+      "pose": "court",
+      "blend": "100",
+      "reference": "original step-0",
+      "changedPixels": 0
+    },
+    {
+      "pose": "reef",
+      "blend": "000",
+      "changedPixels": 0,
+      "maxChannelDelta": 0,
+      "pixelsAboveTwo": 0
+    },
+    {
+      "pose": "reef",
+      "blend": "000",
+      "reference": "original step-0",
+      "changedPixels": 0
+    },
+    {
+      "pose": "reef",
+      "blend": "100",
+      "changedPixels": 0,
+      "maxChannelDelta": 0,
+      "pixelsAboveTwo": 0
+    },
+    {
+      "pose": "reef",
+      "blend": "100",
+      "reference": "original step-0",
+      "changedPixels": 0
+    }
+  ],
+  "rails": [
+    {
+      "pose": "court",
+      "blend": "000",
+      "changedPixels": 1,
+      "maxChannelDelta": 1,
+      "pixelsAboveTwo": 0
+    },
+    {
+      "pose": "court",
+      "blend": "100",
+      "changedPixels": 0,
+      "maxChannelDelta": 0,
+      "pixelsAboveTwo": 0
+    },
+    {
+      "pose": "reef",
+      "blend": "000",
+      "changedPixels": 0,
+      "maxChannelDelta": 0,
+      "pixelsAboveTwo": 0
+    },
+    {
+      "pose": "reef",
+      "blend": "100",
+      "changedPixels": 0,
+      "maxChannelDelta": 0,
+      "pixelsAboveTwo": 0
+    }
+  ],
+  "emission": [
+    {
+      "pose": "court",
+      "withEmission": {
+        "frame": "blend-100.png",
+        "lumaMean": 32.22,
+        "lumaStd": 19.42,
+        "satMean": 158.34,
+        "satP90": 211.29,
+        "chromaMean": 11.09,
+        "p01": 2.4,
+        "p50": 35.2,
+        "p99": 88.9,
+        "range": 86.6,
+        "blackPct": 25.3,
+        "whitePct": 0.0
+      },
+      "withoutWaterEmission": {
+        "frame": "blend-100-without-water-emission.png",
+        "lumaMean": 31.45,
+        "lumaStd": 17.69,
+        "satMean": 159.33,
+        "satP90": 215.77,
+        "chromaMean": 11.05,
+        "p01": 2.4,
+        "p50": 35.1,
+        "p99": 72.2,
+        "range": 69.9,
+        "blackPct": 25.31,
+        "whitePct": 0.0
+      }
+    },
+    {
+      "pose": "reef",
+      "withEmission": {
+        "frame": "blend-100.png",
+        "lumaMean": 38.84,
+        "lumaStd": 37.92,
+        "satMean": 144.69,
+        "satP90": 217.5,
+        "chromaMean": 10.29,
+        "p01": 0.0,
+        "p50": 33.3,
+        "p99": 172.6,
+        "range": 172.6,
+        "blackPct": 26.11,
+        "whitePct": 0.0
+      },
+      "withoutWaterEmission": {
+        "frame": "blend-100-without-water-emission.png",
+        "lumaMean": 29.18,
+        "lumaStd": 17.16,
+        "satMean": 156.82,
+        "satP90": 255.0,
+        "chromaMean": 9.72,
+        "p01": 0.0,
+        "p50": 32.6,
+        "p99": 72.4,
+        "range": 72.4,
+        "blackPct": 26.49,
+        "whitePct": 0.0
+      }
+    }
+  ],
+  "gates": [
+    {
+      "pose": "court",
+      "blend": "000",
+      "checks": {
+        "skyUnchanged": true,
+        "railsUnchanged": true,
+        "seaChroma": true,
+        "seaMedian": true,
+        "wholeFrameChroma": true,
+        "seaWhite": true,
+        "whiteBlob": true,
+        "autocorrelation": true
+      }
+    },
+    {
+      "pose": "court",
+      "blend": "100",
+      "checks": {
+        "skyUnchanged": true,
+        "railsUnchanged": true,
+        "roadMedian": true,
+        "roadWhite": true,
+        "roadP99": true,
+        "roadAutocorrelation": true,
+        "nightWaterMaximum": true,
+        "nightWaterWhite": true,
+        "shallowsChroma": true
+      }
+    },
+    {
+      "pose": "reef",
+      "blend": "000",
+      "checks": {
+        "skyUnchanged": true,
+        "railsUnchanged": true,
+        "seaChroma": true,
+        "seaMedian": true,
+        "wholeFrameChroma": true,
+        "seaWhite": true,
+        "whiteBlob": true,
+        "autocorrelation": true
+      }
+    },
+    {
+      "pose": "reef",
+      "blend": "100",
+      "checks": {
+        "skyUnchanged": true,
+        "railsUnchanged": true,
+        "roadMedian": true,
+        "roadWhite": true,
+        "roadP99": true,
+        "roadAutocorrelation": true,
+        "nightWaterMaximum": true,
+        "nightWaterWhite": true,
+        "shallowsChroma": true
+      }
+    }
+  ],
+  "acceptedRecipesAndGlowUnchanged": true,
+  "paintingRoadP99": 222.18198395610656,
+  "finalSourceHashes": {
+    "src/game/dreamisland-water.ts": "af684200b667f8c3442440a80499af566aaed78276408d5e232d9656a7177b68",
+    "src/game/dreamisland-reflections.ts": "6094686e2acd9720b540c9826248251a2d0b1a8e6552b6f8bd8ec27d9c2ab08d"
+  },
+  "captures": [
+    {
+      "stage": 0,
+      "pose": "court",
+      "sourceMatches": true,
+      "errors": []
+    },
+    {
+      "stage": 0,
+      "pose": "reef",
+      "sourceMatches": true,
+      "errors": []
+    },
+    {
+      "stage": 1,
+      "pose": "court",
+      "sourceMatches": true,
+      "errors": []
+    },
+    {
+      "stage": 1,
+      "pose": "reef",
+      "sourceMatches": true,
+      "errors": []
+    },
+    {
+      "stage": 2,
+      "pose": "court",
+      "sourceMatches": true,
+      "errors": []
+    },
+    {
+      "stage": 2,
+      "pose": "reef",
+      "sourceMatches": true,
+      "errors": []
+    },
+    {
+      "stage": 3,
+      "pose": "court",
+      "sourceMatches": true,
+      "errors": []
+    },
+    {
+      "stage": 3,
+      "pose": "reef",
+      "sourceMatches": true,
+      "errors": []
+    },
+    {
+      "stage": 4,
+      "pose": "court",
+      "sourceMatches": true,
+      "errors": []
+    },
+    {
+      "stage": 4,
+      "pose": "reef",
+      "sourceMatches": true,
+      "errors": []
+    }
+  ],
+  "acceptedAssetsUnchanged": true
+}

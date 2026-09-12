@@ -2,7 +2,7 @@
   "script": "scripts/validate-dreamisland-painted.mjs",
   "painted": {
     "file": "public/assets/dreamisland/painted.glb",
-    "sha256": "60e11543acce5c6a939fc715eae5aeccdded1a2efc177706ab04a3bdcdf12756",
+    "sha256": "7bb24e916f6345b6e5084ed9cb67e621a6130bb7b4cd03ac679e398fd42ff291",
     "meshes": 10,
     "triangles": 66694,
     "trianglesPerMesh": {
@@ -502,6 +502,29 @@
     "instrument": "scripts/prepare-dreamisland-audio-positions.mjs --check",
     "anchors": 7,
     "matched": true
+  },
+  "props": {
+    "source": "public/assets/dreamisland/props.glb",
+    "data": "src/game/data/dreamisland/props.json",
+    "kinds": [
+      "PR_ball",
+      "PR_bollard",
+      "PR_pipes",
+      "PR_plinth",
+      "PR_ring",
+      "PR_sphere"
+    ],
+    "counts": {
+      "PR_bollard": 200,
+      "PR_ball": 44,
+      "PR_ring": 28,
+      "PR_sphere": 60,
+      "PR_plinth": 7,
+      "PR_pipes": 7,
+      "PR_bollard_core": 200
+    },
+    "corridorClearanceMetres": 8.85,
+    "note": "Every authored prop, plus the bollard cores the runtime rides on the bollard placements, instanced into the corridor scene before the rays are cast."
   },
   "powerKit": {
     "placements": [

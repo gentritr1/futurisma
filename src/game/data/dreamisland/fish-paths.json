@@ -24,35 +24,35 @@
    "startHeadingYaw": -1.48479,
    "rest": {
     "progress": 0.455,
-    "lateral": -42.0,
+    "lateral": -42,
     "rise": -7.05
    },
    "fish": [
     {
      "livery": "goldfish-orange",
      "progress": 0.448,
-     "lateral": -34.0,
+     "lateral": -34,
      "rise": -6.6,
      "yaw": -1.70479
     },
     {
      "livery": "goldfish-white",
      "progress": 0.455,
-     "lateral": -46.0,
+     "lateral": -46,
      "rise": -7.2,
      "yaw": -1.39479
     },
     {
      "livery": "goldfish-red",
      "progress": 0.462,
-     "lateral": -36.0,
+     "lateral": -36,
      "rise": -6.9,
      "yaw": -1.54479
     },
     {
      "livery": "goldfish-gold",
      "progress": 0.455,
-     "lateral": -52.0,
+     "lateral": -52,
      "rise": -7.5,
      "yaw": -1.29479
     }
@@ -60,7 +60,7 @@
    "path": [
     {
      "progress": 0.459,
-     "lateral": -26.0,
+     "lateral": -26,
      "rise": 11.222
     },
     {
@@ -70,7 +70,7 @@
     },
     {
      "progress": 0.47738,
-     "lateral": 16.0,
+     "lateral": 16,
      "rise": 11.4
     },
     {
@@ -80,7 +80,7 @@
     },
     {
      "progress": 0.485,
-     "lateral": -26.0,
+     "lateral": -26,
      "rise": 11.222
     },
     {
@@ -90,7 +90,7 @@
     },
     {
      "progress": 0.47738,
-     "lateral": -68.0,
+     "lateral": -68,
      "rise": 8.2
     },
     {
@@ -100,7 +100,7 @@
     },
     {
      "progress": 0.459,
-     "lateral": -26.0,
+     "lateral": -26,
      "rise": 11.222
     },
     {
@@ -110,7 +110,7 @@
     },
     {
      "progress": 0.44062,
-     "lateral": 16.0,
+     "lateral": 16,
      "rise": 11.4
     },
     {
@@ -120,7 +120,7 @@
     },
     {
      "progress": 0.433,
-     "lateral": -26.0,
+     "lateral": -26,
      "rise": 11.222
     },
     {
@@ -130,7 +130,7 @@
     },
     {
      "progress": 0.44062,
-     "lateral": -68.0,
+     "lateral": -68,
      "rise": 8.2
     },
     {
@@ -149,35 +149,35 @@
    "startHeadingYaw": -2.9243,
    "rest": {
     "progress": 0.755,
-    "lateral": -34.0,
+    "lateral": -34,
     "rise": -3.4
    },
    "fish": [
     {
      "livery": "goldfish-orange",
      "progress": 0.742,
-     "lateral": -28.0,
+     "lateral": -28,
      "rise": -3.1,
      "yaw": -3.1443
     },
     {
      "livery": "goldfish-white",
      "progress": 0.755,
-     "lateral": -38.0,
+     "lateral": -38,
      "rise": -3.4,
      "yaw": -2.8343
     },
     {
      "livery": "goldfish-red",
      "progress": 0.768,
-     "lateral": -30.0,
+     "lateral": -30,
      "rise": -3.3,
      "yaw": -2.9843
     },
     {
      "livery": "goldfish-gold",
      "progress": 0.755,
-     "lateral": -40.0,
+     "lateral": -40,
      "rise": -3.8,
      "yaw": -2.7343
     }
@@ -185,7 +185,7 @@
    "path": [
     {
      "progress": 0.76,
-     "lateral": 36.0,
+     "lateral": 36,
      "rise": 9.556
     },
     {
@@ -196,22 +196,22 @@
     {
      "progress": 0.80384,
      "lateral": 24.284,
-     "rise": 11.0
+     "rise": 11
     },
     {
      "progress": 0.81728,
      "lateral": 11.307,
-     "rise": 11.0
+     "rise": 11
     },
     {
      "progress": 0.822,
-     "lateral": -4.0,
-     "rise": 11.0
+     "lateral": -4,
+     "rise": 11
     },
     {
      "progress": 0.81728,
      "lateral": -19.307,
-     "rise": 11.0
+     "rise": 11
     },
     {
      "progress": 0.80384,
@@ -225,7 +225,7 @@
     },
     {
      "progress": 0.76,
-     "lateral": -44.0,
+     "lateral": -44,
      "rise": 8.4
     },
     {
@@ -241,22 +241,22 @@
     {
      "progress": 0.70272,
      "lateral": -19.307,
-     "rise": 11.0
+     "rise": 11
     },
     {
      "progress": 0.698,
-     "lateral": -4.0,
-     "rise": 11.0
+     "lateral": -4,
+     "rise": 11
     },
     {
      "progress": 0.70272,
      "lateral": 11.307,
-     "rise": 11.0
+     "rise": 11
     },
     {
      "progress": 0.71616,
      "lateral": 24.284,
-     "rise": 11.0
+     "rise": 11
     },
     {
      "progress": 0.73627,
@@ -264,6 +264,763 @@
      "rise": 9.995
     }
    ]
+  },
+  {
+   "id": "grove-cross",
+   "batch": "FISHGROVECROSS",
+   "source": "reef-loop",
+   "sector": "GROVE",
+   "periodSeconds": 38,
+   "startHeadingYaw": -2.9243,
+   "minimumDeckClearanceMetres": 8.85,
+   "rest": {
+    "progress": 0.17,
+    "lateral": -52,
+    "rise": -6
+   },
+   "fish": [
+    {
+     "livery": "goldfish-orange",
+     "progress": 0.157,
+     "lateral": -46,
+     "rise": -5.7,
+     "yaw": -3.1443
+    },
+    {
+     "livery": "goldfish-white",
+     "progress": 0.17,
+     "lateral": -56,
+     "rise": -6,
+     "yaw": -2.8343
+    },
+    {
+     "livery": "goldfish-red",
+     "progress": 0.183,
+     "lateral": -48,
+     "rise": -5.9,
+     "yaw": -2.9843
+    },
+    {
+     "livery": "goldfish-gold",
+     "progress": 0.17,
+     "lateral": -58,
+     "rise": -6.4,
+     "yaw": -2.7343
+    }
+   ],
+   "path": [
+    {
+     "progress": 0.183,
+     "lateral": 0,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.18201,
+     "lateral": 15.307,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.17919,
+     "lateral": 28.284,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.17497,
+     "lateral": 36.955,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.17,
+     "lateral": 40,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.16503,
+     "lateral": 36.955,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.16081,
+     "lateral": 28.284,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.15799,
+     "lateral": 15.307,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.157,
+     "lateral": 0,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.15799,
+     "lateral": -15.307,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.16081,
+     "lateral": -28.284,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.16503,
+     "lateral": -36.955,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.17,
+     "lateral": -40,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.17497,
+     "lateral": -36.955,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.17919,
+     "lateral": -28.284,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.18201,
+     "lateral": -15.307,
+     "rise": 11.6
+    }
+   ]
+  },
+  {
+   "id": "court-cross",
+   "batch": "FISHCOURTCROSS",
+   "source": "reef-loop",
+   "sector": "COURT",
+   "periodSeconds": 43,
+   "startHeadingYaw": -2.9243,
+   "minimumDeckClearanceMetres": 8.85,
+   "rest": {
+    "progress": 0.575,
+    "lateral": -52,
+    "rise": -6
+   },
+   "fish": [
+    {
+     "livery": "goldfish-orange",
+     "progress": 0.562,
+     "lateral": -46,
+     "rise": -5.7,
+     "yaw": -3.1443
+    },
+    {
+     "livery": "goldfish-white",
+     "progress": 0.575,
+     "lateral": -56,
+     "rise": -6,
+     "yaw": -2.8343
+    },
+    {
+     "livery": "goldfish-red",
+     "progress": 0.588,
+     "lateral": -48,
+     "rise": -5.9,
+     "yaw": -2.9843
+    },
+    {
+     "livery": "goldfish-gold",
+     "progress": 0.575,
+     "lateral": -58,
+     "rise": -6.4,
+     "yaw": -2.7343
+    }
+   ],
+   "path": [
+    {
+     "progress": 0.589,
+     "lateral": 0,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.58793,
+     "lateral": 16.838,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.5849,
+     "lateral": 31.113,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.58036,
+     "lateral": 40.651,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.575,
+     "lateral": 44,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.56964,
+     "lateral": 40.651,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.5651,
+     "lateral": 31.113,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.56207,
+     "lateral": 16.838,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.561,
+     "lateral": 0,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.56207,
+     "lateral": -16.838,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.5651,
+     "lateral": -31.113,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.56964,
+     "lateral": -40.651,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.575,
+     "lateral": -44,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.58036,
+     "lateral": -40.651,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.5849,
+     "lateral": -31.113,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.58793,
+     "lateral": -16.838,
+     "rise": 11.6
+    }
+   ]
+  },
+  {
+   "id": "court-arc",
+   "batch": "FISHCOURTARC",
+   "source": "reef-loop",
+   "sector": "COURT",
+   "periodSeconds": 51,
+   "startHeadingYaw": -2.9243,
+   "minimumDeckClearanceMetres": 8.85,
+   "rest": {
+    "progress": 0.622,
+    "lateral": -52,
+    "rise": -6
+   },
+   "fish": [
+    {
+     "livery": "goldfish-orange",
+     "progress": 0.609,
+     "lateral": -46,
+     "rise": -5.7,
+     "yaw": -3.1443
+    },
+    {
+     "livery": "goldfish-white",
+     "progress": 0.622,
+     "lateral": -56,
+     "rise": -6,
+     "yaw": -2.8343
+    },
+    {
+     "livery": "goldfish-red",
+     "progress": 0.635,
+     "lateral": -48,
+     "rise": -5.9,
+     "yaw": -2.9843
+    },
+    {
+     "livery": "goldfish-gold",
+     "progress": 0.622,
+     "lateral": -58,
+     "rise": -6.4,
+     "yaw": -2.7343
+    }
+   ],
+   "path": [
+    {
+     "progress": 0.633,
+     "lateral": 0,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.63216,
+     "lateral": 13.777,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.62978,
+     "lateral": 25.456,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.62621,
+     "lateral": 33.26,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.622,
+     "lateral": 36,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.61779,
+     "lateral": 33.26,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.61422,
+     "lateral": 25.456,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.61184,
+     "lateral": 13.777,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.611,
+     "lateral": 0,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.61184,
+     "lateral": -13.777,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.61422,
+     "lateral": -25.456,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.61779,
+     "lateral": -33.26,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.622,
+     "lateral": -36,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.62621,
+     "lateral": -33.26,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.62978,
+     "lateral": -25.456,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.63216,
+     "lateral": -13.777,
+     "rise": 11.6
+    }
+   ]
+  },
+  {
+   "id": "reef-cross",
+   "batch": "FISHREEFCROSS",
+   "source": "reef-loop",
+   "sector": "REEF",
+   "periodSeconds": 47,
+   "startHeadingYaw": -2.9243,
+   "minimumDeckClearanceMetres": 8.85,
+   "rest": {
+    "progress": 0.702,
+    "lateral": -52,
+    "rise": -6
+   },
+   "fish": [
+    {
+     "livery": "goldfish-orange",
+     "progress": 0.689,
+     "lateral": -46,
+     "rise": -5.7,
+     "yaw": -3.1443
+    },
+    {
+     "livery": "goldfish-white",
+     "progress": 0.702,
+     "lateral": -56,
+     "rise": -6,
+     "yaw": -2.8343
+    },
+    {
+     "livery": "goldfish-red",
+     "progress": 0.715,
+     "lateral": -48,
+     "rise": -5.9,
+     "yaw": -2.9843
+    },
+    {
+     "livery": "goldfish-gold",
+     "progress": 0.702,
+     "lateral": -58,
+     "rise": -6.4,
+     "yaw": -2.7343
+    }
+   ],
+   "path": [
+    {
+     "progress": 0.715,
+     "lateral": 0,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.71401,
+     "lateral": 16.073,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.71119,
+     "lateral": 29.698,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.70697,
+     "lateral": 38.803,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.702,
+     "lateral": 42,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.69703,
+     "lateral": 38.803,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.69281,
+     "lateral": 29.698,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.68999,
+     "lateral": 16.073,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.689,
+     "lateral": 0,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.68999,
+     "lateral": -16.073,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.69281,
+     "lateral": -29.698,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.69703,
+     "lateral": -38.803,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.702,
+     "lateral": -42,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.70697,
+     "lateral": -38.803,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.71119,
+     "lateral": -29.698,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.71401,
+     "lateral": -16.073,
+     "rise": 11.6
+    }
+   ]
+  },
+  {
+   "id": "reef-arc",
+   "batch": "FISHREEFARC",
+   "source": "reef-loop",
+   "sector": "REEF",
+   "periodSeconds": 55,
+   "startHeadingYaw": -2.9243,
+   "minimumDeckClearanceMetres": 8.85,
+   "rest": {
+    "progress": 0.792,
+    "lateral": -52,
+    "rise": -6
+   },
+   "fish": [
+    {
+     "livery": "goldfish-orange",
+     "progress": 0.779,
+     "lateral": -46,
+     "rise": -5.7,
+     "yaw": -3.1443
+    },
+    {
+     "livery": "goldfish-white",
+     "progress": 0.792,
+     "lateral": -56,
+     "rise": -6,
+     "yaw": -2.8343
+    },
+    {
+     "livery": "goldfish-red",
+     "progress": 0.805,
+     "lateral": -48,
+     "rise": -5.9,
+     "yaw": -2.9843
+    },
+    {
+     "livery": "goldfish-gold",
+     "progress": 0.792,
+     "lateral": -58,
+     "rise": -6.4,
+     "yaw": -2.7343
+    }
+   ],
+   "path": [
+    {
+     "progress": 0.804,
+     "lateral": 0,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.80309,
+     "lateral": 14.542,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.80049,
+     "lateral": 26.87,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.79659,
+     "lateral": 35.107,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.792,
+     "lateral": 38,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.78741,
+     "lateral": 35.107,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.78351,
+     "lateral": 26.87,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.78091,
+     "lateral": 14.542,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.78,
+     "lateral": 0,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.78091,
+     "lateral": -14.542,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.78351,
+     "lateral": -26.87,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.78741,
+     "lateral": -35.107,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.792,
+     "lateral": -38,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.79659,
+     "lateral": -35.107,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.80049,
+     "lateral": -26.87,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.80309,
+     "lateral": -14.542,
+     "rise": 11.6
+    }
+   ]
+  },
+  {
+   "id": "cut-cross",
+   "batch": "FISHCUTCROSS",
+   "source": "reef-loop",
+   "sector": "CUT",
+   "periodSeconds": 41,
+   "startHeadingYaw": -2.9243,
+   "minimumDeckClearanceMetres": 8.85,
+   "rest": {
+    "progress": 0.908,
+    "lateral": -52,
+    "rise": -6
+   },
+   "fish": [
+    {
+     "livery": "goldfish-orange",
+     "progress": 0.895,
+     "lateral": -46,
+     "rise": -5.7,
+     "yaw": -3.1443
+    },
+    {
+     "livery": "goldfish-white",
+     "progress": 0.908,
+     "lateral": -56,
+     "rise": -6,
+     "yaw": -2.8343
+    },
+    {
+     "livery": "goldfish-red",
+     "progress": 0.921,
+     "lateral": -48,
+     "rise": -5.9,
+     "yaw": -2.9843
+    },
+    {
+     "livery": "goldfish-gold",
+     "progress": 0.908,
+     "lateral": -58,
+     "rise": -6.4,
+     "yaw": -2.7343
+    }
+   ],
+   "path": [
+    {
+     "progress": 0.92,
+     "lateral": 0,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.91909,
+     "lateral": 15.307,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.91649,
+     "lateral": 28.284,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.91259,
+     "lateral": 36.955,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.908,
+     "lateral": 40,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.90341,
+     "lateral": 36.955,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.89951,
+     "lateral": 28.284,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.89691,
+     "lateral": 15.307,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.896,
+     "lateral": 0,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.89691,
+     "lateral": -15.307,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.89951,
+     "lateral": -28.284,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.90341,
+     "lateral": -36.955,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.908,
+     "lateral": -40,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.91259,
+     "lateral": -36.955,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.91649,
+     "lateral": -28.284,
+     "rise": 11.6
+    },
+    {
+     "progress": 0.91909,
+     "lateral": -15.307,
+     "rise": 11.6
+    }
+   ]
   }
- ]
+ ],
+ "instancedShoals": 6
 }

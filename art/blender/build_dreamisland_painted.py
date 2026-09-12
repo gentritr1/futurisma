@@ -35,6 +35,67 @@ from mathutils import Vector
 sys.path.insert(0,str(Path(__file__).parent))
 from dreamisland_mesh import Asset,coord,empty,triangles
 
+def bake_alive_ao():
+ """Ray-bake colours in Blender, patching only existing GLB COLOR_0 bytes.
+
+ Patching the existing accessors avoids export triangulation and preserves
+ positions, normals, UVs, index buffers and node transforms byte-for-byte.
+ """
+ import struct,hashlib
+ import numpy as np
+ from mathutils.bvhtree import BVHTree
+ root=Path(__file__).resolve().parents[2]
+ path=root/'public/assets/dreamisland/painted.glb'
+ evidence=root/'art/evidence/dreamisland-v1/alive/3d/ao';evidence.mkdir(parents=True,exist_ok=True)
+ original=path.read_bytes();data=bytearray(original)
+ size=struct.unpack_from('<I',data,12)[0];doc=json.loads(data[20:20+size]);start=20+size+8
+ def accessor(index):
+  a=doc['accessors'][index];view=doc['bufferViews'][a['bufferView']]
+  dtype={5126:'<f4',5125:'<u4',5123:'<u2',5121:'u1'}[a['componentType']]
+  count={'SCALAR':1,'VEC2':2,'VEC3':3,'VEC4':4}[a['type']];item=np.dtype(dtype).itemsize
+  return np.ndarray((a['count'],count),dtype=dtype,buffer=data,offset=start+view.get('byteOffset',0)+a.get('byteOffset',0),strides=(view.get('byteStride',item*count),item))
+ vertices=[];faces=[];targets=[];before={}
+ for node in doc['nodes']:
+  if 'mesh' not in node:continue
+  for primitive in doc['meshes'][node['mesh']]['primitives']:
+   before[node['name']]=before.get(node['name'],0)+len(accessor(primitive['indices']))//3
+   if not node['name'].startswith('DI_STATIC_') or 'jungle-card' in node['name'] or 'emissive' in node['name']:continue
+   attr=primitive['attributes']
+   if 'COLOR_0' not in attr:continue
+   assert not any(k in node for k in ['matrix','translation','rotation','scale']),node['name']
+   pos=accessor(attr['POSITION']);indices=accessor(primitive['indices']).reshape(-1,3)
+   base=len(vertices);vertices.extend(tuple(p) for p in pos);faces.extend(tuple(int(i)+base for i in face) for face in indices)
+   targets.append((node['name'],pos,accessor(attr['NORMAL']),accessor(attr['COLOR_0'])))
+ tree=BVHTree.FromPolygons(vertices,faces,all_triangles=True)
+ cache={};rows=[]
+ for name,positions,normals,colors in targets:
+  occlusion=[]
+  maximum=1 if colors.dtype.kind=='f' else np.iinfo(colors.dtype).max
+  for i,(p,n) in enumerate(zip(positions,normals)):
+   key=tuple(round(float(v),5) for v in [*p,*n])
+   factor=cache.get(key)
+   if factor is None:
+    point=Vector(p);normal=Vector(n).normalized()
+    side=normal.cross(Vector((0,1,0)) if abs(normal.y)<.9 else Vector((1,0,0))).normalized();up=normal.cross(side)
+    hits=0
+    for ray in range(8):
+     angle=ray*2.399963229728653;radius=math.sqrt((ray+.5)/8)
+     direction=(side*(math.cos(angle)*radius)+up*(math.sin(angle)*radius)+normal*math.sqrt(1-radius*radius)).normalized()
+     hit=tree.ray_cast(point+normal*.025,direction,2.4)
+     if hit[0] is not None:hits+=1
+    factor=1-.35*hits/8;cache[key]=factor
+   colors[i,:3]=np.clip(np.asarray(colors[i,:3],dtype=float)*factor,0,maximum).astype(colors.dtype)
+   occlusion.append(factor)
+  rows.append(dict(mesh=name,vertices=len(positions),minimum=min(occlusion),mean=sum(occlusion)/len(occlusion)))
+ assert len(data)==len(original)
+ (evidence/'painted-before.glb').write_bytes(original)
+ path.write_bytes(data)
+ report=dict(method='Blender BVHTree, 8 deterministic cosine hemisphere rays, radius 2.4 m, colour-only accessor patch',trianglesBefore=before,trianglesAfter=before,trianglesAdded=0,bytesChanged=sum(a!=b for a,b in zip(original,data)),sourceSha256=hashlib.sha256(original).hexdigest(),resultSha256=hashlib.sha256(data).hexdigest(),meshes=rows)
+ (evidence/'bake.json').write_text(json.dumps(report,indent=2));print(json.dumps(report))
+
+if '--alive-ao' in sys.argv:
+ bake_alive_ao();sys.exit(0)
+
 ROOT=Path(__file__).resolve().parents[2]
 OUT=ROOT/'public/assets/dreamisland'
 # Polish writes its own build record; earlier phase evidence remains untouched,

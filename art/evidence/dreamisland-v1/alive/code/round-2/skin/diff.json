@@ -1,0 +1,60 @@
+{
+ "script": "scripts/visual/dreamisland/alive-skin-parity.mjs, then this diff",
+ "question": "round 2 item 1: does the island's skin render the same on the dev server as in a production build?",
+ "hashes": {
+  "dev/skin.png": "c9b0064bceb3f835",
+  "preview/skin.png": "494888bdcccf7ffa",
+  "control/preview-run-a.png": "0108432aecfeb542",
+  "control/preview-run-b.png": "494888bdcccf7ffa",
+  "control/dev-repeat.png": "c9b0064bceb3f835"
+ },
+ "computedStyleParity": {
+  "note": "read off both pages at the frozen moment; identical on both",
+  "stylesheetLinks": 1,
+  "injectedStyleTags": 0,
+  "lapPlateBorderRadius": "999px",
+  "slotNameFont": "Michroma",
+  "bubblePillHeight": "45.0938px",
+  "dataCircuit": "dreamisland"
+ },
+ "fileParity": {
+  "stylesheet": "src/game/style-dreamisland.css and dist/assets/style-dreamisland-xz9KTEfQ.css are byte-identical, sha256 9168e60240b9e25a4b677ce9c0a8342601dc5fdbcba638d8efbf8d9d60dd7c99 \u2014 Vite copies it as an asset rather than putting it through the CSS pipeline",
+  "fonts": "both woff2 byte-identical between public/assets/dreamisland/fonts/ and dist/assets/dreamisland/fonts/"
+ },
+ "frames": {
+  "dev vs preview": {
+   "differingPixels": 136,
+   "maxChannelDelta": 1,
+   "bbox": {
+    "x": [
+     54,
+     259
+    ],
+    "y": [
+     49,
+     117
+    ]
+   }
+  },
+  "CONTROL preview run A vs preview run B (same server, two browser launches)": {
+   "differingPixels": 3763,
+   "maxChannelDelta": 3,
+   "bbox": {
+    "x": [
+     42,
+     970
+    ],
+    "y": [
+     58,
+     579
+    ]
+   }
+  },
+  "CONTROL dev vs dev repeat (same server, two browser launches)": {
+   "differingPixels": 0,
+   "maxChannelDelta": 0
+  }
+ },
+ "totalPixels": 1166400,
+ "verdict": "NOT bit-exact, and the control says the difference is not the servers. Dev vs preview differs on 136 pixels of 1,166,400 at a maximum channel delta of 1. Two runs against the SAME preview server, in two browser launches, differ on 3,763 pixels at a maximum delta of 3 \u2014 twenty-seven times more, for a comparison in which nothing at all changed. Both differences sit inside the chrome conic gradients of the position and speed roundels. So the honest claim is not \"pixel-identical\": it is that the dev server and the build serve the same stylesheet bytes and the same font bytes, compute the same skin, and produce frames whose differences are smaller than this harness own run-to-run noise."
+}

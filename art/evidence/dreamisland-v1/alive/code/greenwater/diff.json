@@ -1,0 +1,20 @@
+{
+ "script": "scripts/visual/dreamisland/greenwater-hud.mjs",
+ "before": "the tree with src/game/ui.ts, src/game/circuit-runtime.ts and src/game/input-prompt-map.js reverted to eafe0b9; every phase-F island module still present",
+ "after": "the same tree with the three shared touches in place",
+ "determinism": "three BEFORE runs and two AFTER runs, five identical sha256s; the harness freezes the game frames, hides every canvas, switches off every CSS animation and transition, removes anything covering most of the viewport, and pins both the strings and the state attributes the drive cluster keys its colour on",
+ "sha256_all_five_runs": "f50151d3f835bfce61d77e93a7cc9099f3b556a27b34740ac6349c0f33bdcbe1",
+ "beforeRuns": [
+  "before-1",
+  "before-2",
+  "before-3"
+ ],
+ "afterRuns": [
+  "after-1",
+  "after-2"
+ ],
+ "differingPixels": 0,
+ "totalPixels": 921600,
+ "maxChannelDelta": 0,
+ "verdict": "byte-identical"
+}

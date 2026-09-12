@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import type {DreamIslandHardware} from './dreamisland-hardware';
+import type {DreamIslandCapsules} from './dreamisland-capsules';
 import { resolveAbilitySeed } from "./ability-seed";
 import calibration from "./data/dreamisland/schedule.json";
 import { DreamIslandSchedule } from "./dreamisland-schedule.js";
@@ -186,6 +187,10 @@ export class DreamIslandCourse implements RaceCourse {
    * shares a material, so the blockout spends three draws in total. */
   readonly markers: THREE.InstancedMesh;
   hardware:DreamIslandHardware|null=null;
+  /** Phase F §4.4. The capsules take the same pickup states the hardware does,
+   * from `dreamisland-powers.ts`, so the thing over the road and the thing on
+   * the verge cannot disagree about whether a pickup has been taken. */
+  capsules:DreamIslandCapsules|null=null;
   readonly deviceMarkerOffset: number;
   private readonly turns: { from: number; to: number; radius: number; direction: "LEFT" | "RIGHT" }[] = [];
 

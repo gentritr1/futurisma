@@ -1,0 +1,39 @@
+<!doctype html><html><head><link rel="icon" href="data:,"><style>body{margin:0;background:#071322}canvas{display:block}</style></head><body><script type="module">
+import * as THREE from 'three';
+import {GLTFLoader} from '/node_modules/three/examples/jsm/loaders/GLTFLoader.js';
+import {DreamIslandSky} from '/src/game/dreamisland-sky.ts';
+import {configureToneMapping} from '/src/game/atmosphere.ts';
+import {DreamIslandReflections,bindDreamIslandNodeMaterials,DreamIslandGlow} from '/src/game/dreamisland-reflections.ts';
+const args=new URLSearchParams(location.search),night=Number(args.get('night')||0),distance=Number(args.get('distance')||8),kind=args.get('kind')||'capsule';
+const renderer=new THREE.WebGLRenderer({antialias:args.get('quadrants')!=='1'});renderer.setSize(1280,720);renderer.outputColorSpace=THREE.SRGBColorSpace;configureToneMapping(renderer);document.body.append(renderer.domElement);
+const scene=new THREE.Scene();scene.fog=new THREE.FogExp2(night?0x0b1524:0xb9dbe4,night?.0034:.0016);
+const camera=new THREE.PerspectiveCamera(35,1280/720,.1,1000);
+const sky=new DreamIslandSky();await sky.ready;scene.add(sky.root);sky.update(camera,scene.fog.color,night);
+const hemisphere=new THREE.HemisphereLight(night?0x16233c:0xbfe4ef,night?0x08111c:0x6f8a52,night?.4:1.2);scene.add(hemisphere);
+const key=new THREE.DirectionalLight(night?0x9fc8ff:0xfff0cf,night?.30:1.35);key.position.set(55,62,-55);key.castShadow=true;scene.add(key);
+const reflection=new DreamIslandReflections();reflection.initialize(renderer,scene);reflection.update(scene,night);
+const gltf=await new GLTFLoader().loadAsync('/assets/dreamisland/'+(kind==='capsule'?'capsule':'props')+'.glb');
+for(const node of [...gltf.scene.children]){
+ if(args.has('node')&&node.name!==args.get('node'))continue;
+ if(kind==='capsule'||node.name===kind||(kind==='PR_bollard'&&node.name==='PR_bollard_core'))scene.add(node);
+}
+bindDreamIslandNodeMaterials(scene,reflection);
+const targets=[];scene.traverse(o=>{if(o.isMesh&&/^(CAP_|PR_)/.test(o.name))targets.push(o);});
+const bounds=new THREE.Box3();for(const o of targets)bounds.expandByObject(o);const target=bounds.getCenter(new THREE.Vector3());
+camera.position.copy(target).addScaledVector(new THREE.Vector3(.35,.18,1).normalize(),distance);camera.lookAt(target);camera.updateMatrixWorld();sky.update(camera,scene.fog.color,night);
+for(const mesh of targets){mesh.material.emissiveIntensity=mesh.name==='CAP_glass'?.12:night?4:.35;}
+const normalTextures=new Map();
+if(args.get('quadrants')==='1'){
+ // TL red, TR green, BL blue, BR yellow in upload order (flipY=false).
+ const pixels=new Uint8Array([255,0,0,255,0,255,0,255,0,0,255,255,255,255,0,255]);
+ const texture=new THREE.DataTexture(pixels,2,2);texture.colorSpace=THREE.SRGBColorSpace;texture.magFilter=THREE.NearestFilter;texture.minFilter=THREE.NearestFilter;texture.needsUpdate=true;
+ for(const o of targets){normalTextures.set(o,o.material);o.material=new THREE.MeshBasicMaterial({map:texture});}
+}
+if(args.get('glow')==='1'){
+ const glow=new DreamIslandGlow(null);await glow.ready;scene.add(glow.mesh);glow.update(scene,camera,night);
+ if(args.has('withoutGlow'))glow.mesh.visible=false;
+}
+renderer.render(scene,camera);
+window.__assetProof={kind,night,distance,pmrem:scene.userData.dreamIslandReflections,nodes:targets.map(o=>({name:o.name,type:o.material.type,toneMapped:o.material.toneMapped,fog:o.material.fog,metalness:o.material.metalness,roughness:o.material.roughness,opacity:o.material.opacity,depthWrite:o.material.depthWrite,atlas:o.userData,triangles:(o.geometry.index?.count??o.geometry.attributes.position.count)/3})),bounds:[bounds.min.toArray(),bounds.max.toArray()]};
+window.__assetReady=true;
+</script></body></html>

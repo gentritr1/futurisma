@@ -1,0 +1,15 @@
+{
+  "script": "scripts/visual/dreamisland/greenwater-hud.mjs",
+  "url": "http://127.0.0.1:5210/?map=greenwater&seed=714&tier=works&demo=1&headless=1&diagnostics=1&start=manual&quality=high&music=0&voice=0",
+  "applied": {
+    "missing": [],
+    "circuit": null,
+    "hudHidden": false,
+    "islandStylesheet": false,
+    "islandLink": [],
+    "scripts": []
+  },
+  "errors": [],
+  "frame": "greenwater-hud.png",
+  "sha256": "f50151d3f835bfce61d77e93a7cc9099f3b556a27b34740ac6349c0f33bdcbe1"
+}

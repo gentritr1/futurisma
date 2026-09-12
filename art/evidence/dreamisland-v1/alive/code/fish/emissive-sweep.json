@@ -1,0 +1,19 @@
+{
+ "what": "Phase F §4.3 asks for the goldfish night emissive to be raised 'until a fish at 40 m contributes to the night p99'. This is the sweep that was run to find that value, and the reason the acceptance is reported as NOT MET rather than as met.",
+ "method": "FISH_NIGHT_EMISSIVE in src/game/dreamisland-painted-environment.ts was set to each value below, then scripts/visual/dreamisland/alive-fish-glow.mjs was run against the dev server at 127.0.0.1:5210 and the pair measured with the same Rec.709 luma the .py file uses. 'fish max' is the brightest pixel that differs between the with-fish and without-fish frames by more than 1; 'frame p99' is the 99th percentile of the WITHOUT-fish frame, i.e. the threshold the brief names.",
+ "pose": "chase camera 40 m short of the court-cross shoal, nightBlend pinned to 1, schedule tick fishRiseTick + one full period (13654)",
+ "framePercentiles_noFish": {"p95": 70.6, "p97": 164.5, "p99": 212.5, "p99.5": 232.2},
+ "sweep": [
+  {"emissive": 3.4, "fishMaxLuma": 151.2, "fishPixelsAboveFrameP99": 0, "changedPixels": 4208},
+  {"emissive": 6.0, "fishMaxLuma": 170.0, "fishPixelsAboveFrameP99": 0, "changedPixels": 2001,
+   "fishPixelsAboveFrameP95": 358, "fishPixelsAboveFrameP97": 1,
+   "brightestFishPixelPercentileOfFrame": 97.152},
+  {"emissive": 10.0, "fishMaxLuma": 185.0, "fishPixelsAboveFrameP99": 0, "changedPixels": 4208}
+ ],
+ "shipped": 6.0,
+ "whyNotMet": [
+  "The response saturates. Trebling the emissive term from 3.4 to 10.0 moves the brightest fish pixel from 151 to 185 luma, a 22% gain for a 194% raise, because AgX tone mapping compresses everything above the knee. The curve does not reach 212 at any value that leaves a goldfish looking like a goldfish at 8 m.",
+  "The threshold moved during this pass. The night p99 at this pose is 212.5 and it is set by the capsule light column and its emissive core - §4.4's own work, added in the same pass that §4.3 was written for. §4.3's target was written against a night whose brightest one per cent was the foam line.",
+  "At the shipped 6.0 the fish are measurably, not invisibly, brighter: the brightest fish pixel sits at the 97.15th percentile of the frame, 358 fish pixels are above the frame's p95 and one is above its p97. 6.0 rather than 10.0 because 6.0 is where the curve's slope collapses - 3.4 to 6.0 buys 19 luma, 6.0 to 10.0 buys 15 for another two thirds of the term."
+ ]
+}

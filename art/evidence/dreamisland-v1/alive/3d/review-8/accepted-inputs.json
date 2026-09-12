@@ -1,0 +1,26 @@
+[
+  {
+    "file": "src/game/dreamisland-materials.ts",
+    "acceptedSha256": "f19982dbb80bed81aa7f3718f5d124510da5f35621f93928570efaaf322c4e37",
+    "currentSha256": "f19982dbb80bed81aa7f3718f5d124510da5f35621f93928570efaaf322c4e37",
+    "unchanged": true
+  },
+  {
+    "file": "public/assets/dreamisland/painted.glb",
+    "acceptedSha256": "7bb24e916f6345b6e5084ed9cb67e621a6130bb7b4cd03ac679e398fd42ff291",
+    "currentSha256": "7bb24e916f6345b6e5084ed9cb67e621a6130bb7b4cd03ac679e398fd42ff291",
+    "unchanged": true
+  },
+  {
+    "file": "public/assets/dreamisland/props.glb",
+    "acceptedSha256": "4e5153d788f04498528eefdd1f0994188eb3deb3d11cc3913227b6e36ed303c2",
+    "currentSha256": "4e5153d788f04498528eefdd1f0994188eb3deb3d11cc3913227b6e36ed303c2",
+    "unchanged": true
+  },
+  {
+    "file": "public/assets/dreamisland/capsule.glb",
+    "acceptedSha256": "28ee0c150bbe63452ce0a01446f85ff3b05e8556af8e90affc8d99a348f6fd4d",
+    "currentSha256": "28ee0c150bbe63452ce0a01446f85ff3b05e8556af8e90affc8d99a348f6fd4d",
+    "unchanged": true
+  }
+]

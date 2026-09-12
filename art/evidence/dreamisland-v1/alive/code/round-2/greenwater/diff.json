@@ -1,0 +1,13 @@
+{
+ "script": "scripts/visual/dreamisland/greenwater-hud.mjs, then this diff",
+ "round": 2,
+ "before": "the tree with src/game/ui.ts, src/game/circuit-runtime.ts and src/game/input-prompt-map.js reverted to eafe0b9; every phase-F island module, the new stylesheet link and the self-hosted faces present",
+ "after": "the same tree with the three shared touches in place",
+ "runs": "three before, two after, five identical sha256",
+ "sha256": "f50151d3f835bfce61d77e93a7cc9099f3b556a27b34740ac6349c0f33bdcbe1",
+ "differingPixels": 0,
+ "totalPixels": 921600,
+ "maxChannelDelta": 0,
+ "verdict": "byte-identical",
+ "note": "Round 2 moved the island stylesheet to a runtime <link> and self-hosted two faces. Greenwater loads neither: it never imports the island chunk, and the hash is the same one round 1 measured."
+}

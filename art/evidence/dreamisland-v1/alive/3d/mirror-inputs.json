@@ -1,0 +1,12 @@
+{
+  "base": "eafe0b9",
+  "directory": "/tmp/dreamisland-f3d-eafe0b9",
+  "files": {
+    "src/game/dreamisland-water.ts": "fbb27edd8b864701dd1d293945af91226fa784e65105555c5ae0c8d8d57059f5",
+    "src/game/dreamisland-materials.ts": "f19982dbb80bed81aa7f3718f5d124510da5f35621f93928570efaaf322c4e37",
+    "src/game/dreamisland-reflections.ts": "20d85f5e87049afa12a36821acb404a5b40227fc4c16ae699ddf08b459040c71",
+    "public/assets/dreamisland/painted.glb": "7bb24e916f6345b6e5084ed9cb67e621a6130bb7b4cd03ac679e398fd42ff291",
+    "public/assets/dreamisland/props.glb": "4e5153d788f04498528eefdd1f0994188eb3deb3d11cc3913227b6e36ed303c2",
+    "public/assets/dreamisland/capsule.glb": "28ee0c150bbe63452ce0a01446f85ff3b05e8556af8e90affc8d99a348f6fd4d"
+  }
+}

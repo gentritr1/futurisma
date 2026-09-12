@@ -1,0 +1,96 @@
+{
+  "soaks": [
+    {
+      "name": "baseline",
+      "draws": 105,
+      "triangles": 162258,
+      "p95Ms": 9,
+      "sampleResidual": -1.6681999855421736,
+      "errors": [],
+      "materialViolations": 0,
+      "missedGates": 0,
+      "recoveries": 0,
+      "lapTimesMs": [
+        33158,
+        32125,
+        31925
+      ],
+      "finalSourceMatches": true,
+      "ceilingsPass": true
+    },
+    {
+      "name": "works",
+      "draws": 105,
+      "triangles": 162258,
+      "p95Ms": 8.800000190734863,
+      "sampleResidual": 2.5281243199694927,
+      "errors": [],
+      "materialViolations": 0,
+      "missedGates": 0,
+      "recoveries": 0,
+      "lapTimesMs": [
+        33158,
+        32125,
+        31925
+      ],
+      "finalSourceMatches": true,
+      "ceilingsPass": true
+    },
+    {
+      "name": "rookie",
+      "draws": 105,
+      "triangles": 162258,
+      "p95Ms": 8.700000047683716,
+      "sampleResidual": -0.0614627856862171,
+      "errors": [],
+      "materialViolations": 0,
+      "missedGates": 0,
+      "recoveries": 0,
+      "lapTimesMs": [
+        33158,
+        32125,
+        31925
+      ],
+      "finalSourceMatches": true,
+      "ceilingsPass": true
+    },
+    {
+      "name": "feral",
+      "draws": 106,
+      "triangles": 162350,
+      "p95Ms": 12.200000047683716,
+      "sampleResidual": -40.19037765723954,
+      "errors": [],
+      "materialViolations": 0,
+      "missedGates": 0,
+      "recoveries": 0,
+      "lapTimesMs": [
+        33158,
+        32067,
+        31900
+      ],
+      "finalSourceMatches": true,
+      "ceilingsPass": false
+    },
+    {
+      "name": "works-reduced",
+      "draws": 103,
+      "triangles": 161808,
+      "p95Ms": 9.899999856948853,
+      "sampleResidual": -10.140671461228521,
+      "errors": [],
+      "materialViolations": 0,
+      "missedGates": 0,
+      "recoveries": 0,
+      "lapTimesMs": [
+        33158,
+        32125,
+        31925
+      ],
+      "finalSourceMatches": true,
+      "ceilingsPass": true
+    }
+  ],
+  "worksDeltaMs": -0.19999980926513672,
+  "shaderBudgetPass": true
+}

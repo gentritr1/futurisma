@@ -1,0 +1,160 @@
+{
+ "script": "scripts/visual/dreamisland/alive-capsule-pixels.py",
+ "source": "art/evidence/dreamisland-v1/alive/code/round-2/capsule/capture.json",
+ "viewport": "1280x720",
+ "camera": "DreamIslandRuntime.updateCamera: 11.5 m back, 4.8 m up, aimed 19 m ahead, FOV 62",
+ "tolerancePerChannel": 6,
+ "method": "bounding box of pixels differing from the same pose with every mesh hidden",
+ "rows": [
+  {
+   "state": "day",
+   "distanceMetres": 300,
+   "capsule": {
+    "pixels": 69,
+    "heightPx": 14,
+    "widthPx": 6,
+    "top": 294,
+    "bottom": 307
+   },
+   "column": {
+    "pixels": 489,
+    "heightPx": 83,
+    "widthPx": 7,
+    "top": 219,
+    "bottom": 301
+   },
+   "ring": {
+    "pixels": 1,
+    "heightPx": 1,
+    "widthPx": 1,
+    "top": 308,
+    "bottom": 308
+   }
+  },
+  {
+   "state": "day",
+   "distanceMetres": 150,
+   "capsule": {
+    "pixels": 271,
+    "heightPx": 28,
+    "widthPx": 14,
+    "top": 301,
+    "bottom": 328
+   },
+   "column": {
+    "pixels": 2207,
+    "heightPx": 170,
+    "widthPx": 20,
+    "top": 145,
+    "bottom": 314
+   },
+   "ring": {
+    "pixels": 18,
+    "heightPx": 3,
+    "widthPx": 27,
+    "top": 329,
+    "bottom": 331
+   }
+  },
+  {
+   "state": "day",
+   "distanceMetres": 40,
+   "capsule": {
+    "pixels": 2007,
+    "heightPx": 81,
+    "widthPx": 36,
+    "top": 266,
+    "bottom": 346
+   },
+   "column": {
+    "pixels": 11816,
+    "heightPx": 307,
+    "widthPx": 47,
+    "top": 0,
+    "bottom": 306
+   },
+   "ring": {
+    "pixels": 217,
+    "heightPx": 12,
+    "widthPx": 72,
+    "top": 345,
+    "bottom": 356
+   }
+  },
+  {
+   "state": "night",
+   "distanceMetres": 300,
+   "capsule": {
+    "pixels": 62,
+    "heightPx": 14,
+    "widthPx": 6,
+    "top": 294,
+    "bottom": 307
+   },
+   "column": {
+    "pixels": 492,
+    "heightPx": 83,
+    "widthPx": 7,
+    "top": 219,
+    "bottom": 301
+   },
+   "ring": {
+    "pixels": 1,
+    "heightPx": 1,
+    "widthPx": 1,
+    "top": 308,
+    "bottom": 308
+   }
+  },
+  {
+   "state": "night",
+   "distanceMetres": 150,
+   "capsule": {
+    "pixels": 263,
+    "heightPx": 28,
+    "widthPx": 13,
+    "top": 301,
+    "bottom": 328
+   },
+   "column": {
+    "pixels": 2226,
+    "heightPx": 172,
+    "widthPx": 20,
+    "top": 143,
+    "bottom": 314
+   },
+   "ring": {
+    "pixels": 18,
+    "heightPx": 3,
+    "widthPx": 27,
+    "top": 329,
+    "bottom": 331
+   }
+  },
+  {
+   "state": "night",
+   "distanceMetres": 40,
+   "capsule": {
+    "pixels": 2217,
+    "heightPx": 81,
+    "widthPx": 36,
+    "top": 266,
+    "bottom": 346
+   },
+   "column": {
+    "pixels": 11816,
+    "heightPx": 307,
+    "widthPx": 47,
+    "top": 0,
+    "bottom": 306
+   },
+   "ring": {
+    "pixels": 217,
+    "heightPx": 12,
+    "widthPx": 72,
+    "top": 345,
+    "bottom": 356
+   }
+  }
+ ]
+}

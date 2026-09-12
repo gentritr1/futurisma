@@ -78,9 +78,26 @@ for (const name of javascriptNames) {
 // measured-plus-headroom rule the HUD pass used). The two compressed ceilings
 // that decide what a visitor downloads are untouched and both still pass with
 // 1.2 KiB and 0.3 KiB to spare.
+// Phase F ALIVE (2026-09-12): 972 -> 973 raw. The island's own bytes are all
+// lazy and cost the initial graph 0.13 KiB raw (measured: 971.40 -> 971.53 with
+// every phase-F module in the tree and the three shared touches reverted). The
+// move is bought by those three touches and nothing else: `data-circuit` and
+// its dispose wrapper in circuit-runtime.ts, the live-gap write in
+// `updateFieldOrder`, and the `power` row of the shared prompt map — 0.57 KiB
+// raw together, measured by building with and without them. 971.53 -> 972.10;
+// the ceiling goes to 973, which is measured + 0.9 KiB on the same
+// measured-plus-headroom rule the line above it used.
+//
+// One thing was tried to avoid moving it and DID work, and is recorded because
+// it is the cheaper lesson: `dreamisland-props.ts` first built its ball and its
+// chrome sphere from `THREE.IcosahedronGeometry`, which had no other consumer
+// in the tree, and importing it pulled `PolyhedronGeometry` into the SHARED
+// three chunk the shell loads — 0.9 KiB gzip and 2.1 KiB raw, on the shell, for
+// a 1.2 m ball. `SphereGeometry(.6, 8, 6)` has the same triangle count, was
+// already in the bundle, and gave all of it back.
 assert.ok(
-  javascript.rawBytes <= 972 * 1024,
-  `Initial JavaScript exceeds 972 KiB raw (${(javascript.rawBytes / 1024).toFixed(1)} KiB).`,
+  javascript.rawBytes <= 973 * 1024,
+  `Initial JavaScript exceeds 973 KiB raw (${(javascript.rawBytes / 1024).toFixed(1)} KiB).`,
 );
 // The JavaScript ceiling, re-baselined four times on 2026-09-03 from 224.2 KiB
 // gzip. Every rationale is kept, because each one names what its bytes bought
@@ -342,9 +359,117 @@ assert.ok(
 // shell, so 252 and 262 both stand with about 1.7 KiB of room each — which is
 // the working margin H2a's note above argues main needs and is why neither
 // number moves again here.
+// Phase F ALIVE (2026-09-12): 277.0 -> 277.5 KiB gzip, which is the exact
+// allowance DREAM-ISLAND-ALIVE.md §4.5 writes down for this pass ("shell gzip
+// may not grow by more than 0.5 KiB (the attribute and its one-line setter)").
+// Measured 277.06 with every phase-F island module present and the three shared
+// touches reverted, and 277.27 with them: +0.21 KiB spent of the 0.5 allowed,
+// and 0.23 KiB of the allowance left unspent. The island's HUD skin, its fonts
+// fallback, its road paint, props, capsules and the whole §4.6 power slot are
+// on the far side of the dynamic import and appear in the island chunk ceiling
+// below instead.
 assert.ok(
-  shellGzip <= 277 * 1024,
-  `Initial app shell exceeds 277 KiB gzip (${(shellGzip / 1024).toFixed(3)} KiB; ${shellGzip} B).`,
+  shellGzip <= 277.5 * 1024,
+  `Initial app shell exceeds 277.5 KiB gzip (${(shellGzip / 1024).toFixed(3)} KiB; ${shellGzip} B).`,
+);
+
+// ---------------------------------------------------------------------------
+// The Dream Island lazy chunk, pinned for the first time (Phase F ALIVE).
+//
+// Everything the island is - course, runtime, powers, painted environment,
+// water, road paint, props, capsules, the HUD controller, `style-dreamisland.css`
+// and the 150 KiB route.json - reaches the player only through the dynamic
+// import in `circuit-runtime.ts`. The assertion near the top of this file
+// already pins that none of it is INITIAL. This one pins how big it is, so the
+// next phase spends against a number instead of against nothing.
+//
+// MEASURED 102,295 B gzip over 6 files after round 2 (course 6,358; materials
+// 50,042 - which is where rollup put route.json this build; painted environment
+// 28,424; runtime 9,964; the skin's stylesheet 7,114; powers config 393). It was
+// 95,627 B before round 2; the 6.7 KiB is the glass backings, the @font-face
+// rules and the bubble in the stylesheet, and the doubled prop placements.
+// CEILING = ceil(measured * 1.10) = 112,525 B, the same measured-plus-ten-percent
+// rule DREAM-ISLAND-ALIVE.md §6 asks for. The file names carry content hashes
+// and rollup moves modules between these chunks from build to build, so the
+// ceiling is on the TOTAL of everything named `dreamisland-*`, never on one of
+// them: a build that shifted route.json from the materials chunk to the course
+// chunk would otherwise read as a catastrophe and a saving at once.
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// The island's two self-hosted faces (Phase F round 2, item 2).
+//
+// Michroma and Share Tech Mono, SIL OFL 1.1, latin subset only, served from
+// `public/` and referenced by `@font-face` in `src/game/style-dreamisland.css`
+// and nowhere else. They are a different axis from the gzip ceilings above:
+// woff2 is already Brotli inside, so what matters is the bytes that reach a
+// visitor who drives this one circuit.
+//
+// MEASURED 19,028 B over two files (Michroma 11,620; Share Tech Mono 7,408).
+// CEILING = ceil(measured * 1.10) = 20,931 B. The latin-ext subsets were
+// deliberately not taken - the HUD writes upper-case ASCII - and taking them
+// would roughly double this, so the ceiling is also the thing that would catch
+// somebody quietly adding them.
+// ---------------------------------------------------------------------------
+const fontDirectory = new URL("dreamisland/fonts/", assetsDirectory);
+const fontNames = (await readdir(fontDirectory)).filter((name) => name.endsWith(".woff2")).sort();
+assert.deepEqual(
+  fontNames,
+  ["michroma-latin-v21.woff2", "share-tech-mono-latin-v16.woff2"],
+  "The island's self-hosted faces are not the two the stylesheet names.",
+);
+let fontBytes = 0;
+for (const name of fontNames) {
+  const bytes = await readFile(new URL(name, fontDirectory));
+  // A woff2 that is not a woff2 fails silently in the browser and the HUD
+  // falls back to the shell's faces without anybody noticing.
+  assert.equal(
+    bytes.subarray(0, 4).toString("latin1"),
+    "wOF2",
+    `dist/assets/dreamisland/fonts/${name} does not begin with a wOF2 signature.`,
+  );
+  fontBytes += bytes.byteLength;
+}
+const FONT_BYTES_MEASURED = 19_028;
+const FONT_BYTES_CEILING = 20_931;
+assert.ok(
+  fontBytes <= FONT_BYTES_CEILING,
+  `The island's self-hosted faces serve ${fontBytes} B against a ${FONT_BYTES_CEILING} B `
+    + `ceiling (measured ${FONT_BYTES_MEASURED} B + 10%).`,
+);
+assert.ok(
+  !htmlSource.includes("dreamisland/fonts/"),
+  "The production shell must not reference the island's faces.",
+);
+console.log(
+  `Dream Island faces: ${fontBytes} B over ${fontNames.length} woff2 against a `
+    + `${FONT_BYTES_CEILING} B ceiling (measured ${FONT_BYTES_MEASURED} B + 10%); `
+    + "referenced only by the island's own stylesheet.",
+);
+
+// `style-dreamisland-*.css` is in this set as well as `dreamisland-*`: round 2
+// moved the skin from a Vite CSS import to a `new URL(..., import.meta.url)`
+// asset, which Vite emits under the FILE's name rather than the chunk's, and a
+// pattern that only matched `dreamisland-` silently stopped counting 2.4 KiB of
+// the island's own lazy bytes the moment that landed.
+const islandChunkNames = (await readdir(assetsDirectory))
+  .filter((name) => /^(?:dreamisland-|style-dreamisland-)/.test(name) && /\.(?:js|css)$/.test(name))
+  .sort();
+assert.ok(
+  islandChunkNames.length > 0,
+  "No dreamisland-* chunk was emitted; the island's lazy chunk has vanished.",
+);
+const islandChunks = await measureAssets(islandChunkNames);
+const ISLAND_CHUNK_MEASURED = 102_295;
+const ISLAND_CHUNK_CEILING = 112_525;
+assert.ok(
+  islandChunks.gzipBytes <= ISLAND_CHUNK_CEILING,
+  `The Dream Island chunk is ${islandChunks.gzipBytes} B gzip against a ${ISLAND_CHUNK_CEILING} B `
+    + `ceiling (measured ${ISLAND_CHUNK_MEASURED} B + 10%). Re-measure and record what bought the bytes.`,
+);
+console.log(
+  `Dream Island chunk: ${(islandChunks.gzipBytes / 1024).toFixed(2)} KiB gzip over `
+    + `${islandChunkNames.length} lazy files, against a ${(ISLAND_CHUNK_CEILING / 1024).toFixed(2)} KiB `
+    + `ceiling (measured ${(ISLAND_CHUNK_MEASURED / 1024).toFixed(2)} KiB + 10%).`,
 );
 
 // ---------------------------------------------------------------------------

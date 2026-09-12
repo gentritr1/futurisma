@@ -1,0 +1,100 @@
+{
+ "script": "scripts/visual/dreamisland/alive-toys.py",
+ "tolerancePerChannel": 8,
+ "minHeightPx": 20,
+ "minPixels": 12,
+ "gate": "at least 4 toys >= 20 px tall per pose",
+ "viewport": "1440x810",
+ "rows": [
+  {
+   "pose": "day-beach",
+   "sector": "BEACH STRAIGHT",
+   "progress": 0.0625,
+   "ballsAndRings": {
+    "drawn": 8,
+    "atLeast20px": 4,
+    "tallest": [
+     95,
+     45,
+     30,
+     21
+    ]
+   },
+   "withSpheres": {
+    "drawn": 18,
+    "atLeast20px": 6,
+    "tallest": [
+     95,
+     45,
+     30,
+     23,
+     21,
+     20
+    ]
+   },
+   "pass": true,
+   "passBallsAndRingsAlone": true
+  },
+  {
+   "pose": "day-court",
+   "sector": "CLOCK COURT",
+   "progress": 0.5875,
+   "ballsAndRings": {
+    "drawn": 25,
+    "atLeast20px": 7,
+    "tallest": [
+     63,
+     40,
+     34,
+     32,
+     24,
+     22,
+     20
+    ]
+   },
+   "withSpheres": {
+    "drawn": 37,
+    "atLeast20px": 7,
+    "tallest": [
+     63,
+     40,
+     34,
+     32,
+     24,
+     22,
+     20
+    ]
+   },
+   "pass": true,
+   "passBallsAndRingsAlone": true
+  },
+  {
+   "pose": "day-reef",
+   "sector": "REEF SHALLOWS",
+   "progress": 0.7542,
+   "ballsAndRings": {
+    "drawn": 25,
+    "atLeast20px": 4,
+    "tallest": [
+     48,
+     45,
+     38,
+     36
+    ]
+   },
+   "withSpheres": {
+    "drawn": 40,
+    "atLeast20px": 5,
+    "tallest": [
+     48,
+     45,
+     38,
+     36,
+     24
+    ]
+   },
+   "pass": true,
+   "passBallsAndRingsAlone": true
+  }
+ ]
+}

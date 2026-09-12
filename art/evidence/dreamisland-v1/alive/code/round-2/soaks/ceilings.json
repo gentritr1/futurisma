@@ -1,0 +1,175 @@
+{
+ "script": "scripts/visual/dreamisland/race.mjs",
+ "round": 2,
+ "date": "2026-09-12",
+ "ceilings": {
+  "drawsMax": 130,
+  "trianglesMax": 205000,
+  "p95ReportOnlyMs": 11,
+  "missedGates": 0,
+  "materialViolations": 0
+ },
+ "note": "Merged tree: F-CODE round 2 plus the F-3D track review-9 work, which is frozen and accepted.",
+ "rows": [
+  {
+   "tier": "rookie",
+   "draws": 123,
+   "mainCalls": 104,
+   "shadowCalls": 23,
+   "triangles": 192172,
+   "mainTriangles": 163300,
+   "shadowTriangles": 28872,
+   "p95Ms": 8.7,
+   "windowSamples": 720,
+   "expectedSamples": 721.7,
+   "sampleResidual": -1.66,
+   "missedGates": 0,
+   "materialViolations": 0,
+   "lapsMs": [
+    33158,
+    32125,
+    31925
+   ],
+   "propsAuthored": 346,
+   "propsInstances": 546,
+   "propsTrianglesAuthored": 45352,
+   "propsVisibleAtSample": 222,
+   "propsTrianglesAtSample": 16304,
+   "capsuleScale": 2.2,
+   "capsuleLowestAboveDeck": 0.5,
+   "hudStates": [
+    "active",
+    "armed",
+    "collected",
+    "hunting",
+    "in-range"
+   ],
+   "fonts": [
+    "Michroma",
+    "Share Tech Mono"
+   ],
+   "stylesheetHref": "http://127.0.0.1:5210/src/game/style-dreamisland.css",
+   "errors": 0
+  },
+  {
+   "tier": "works",
+   "draws": 123,
+   "mainCalls": 104,
+   "shadowCalls": 23,
+   "triangles": 192172,
+   "mainTriangles": 163300,
+   "shadowTriangles": 28872,
+   "p95Ms": 8.6,
+   "windowSamples": 720,
+   "expectedSamples": 717.2,
+   "sampleResidual": 2.8,
+   "missedGates": 0,
+   "materialViolations": 0,
+   "lapsMs": [
+    33158,
+    32125,
+    31925
+   ],
+   "propsAuthored": 346,
+   "propsInstances": 546,
+   "propsTrianglesAuthored": 45352,
+   "propsVisibleAtSample": 222,
+   "propsTrianglesAtSample": 16304,
+   "capsuleScale": 2.2,
+   "capsuleLowestAboveDeck": 0.5,
+   "hudStates": [
+    "active",
+    "armed",
+    "collected",
+    "hunting",
+    "in-range"
+   ],
+   "fonts": [
+    "Michroma",
+    "Share Tech Mono"
+   ],
+   "stylesheetHref": "http://127.0.0.1:5210/src/game/style-dreamisland.css",
+   "errors": 0
+  },
+  {
+   "tier": "feral",
+   "draws": 124,
+   "mainCalls": 104,
+   "shadowCalls": 23,
+   "triangles": 192268,
+   "mainTriangles": 163396,
+   "shadowTriangles": 28872,
+   "p95Ms": 8.7,
+   "windowSamples": 720,
+   "expectedSamples": 724.3,
+   "sampleResidual": -4.32,
+   "missedGates": 0,
+   "materialViolations": 0,
+   "lapsMs": [
+    33158,
+    32067,
+    31900
+   ],
+   "propsAuthored": 346,
+   "propsInstances": 546,
+   "propsTrianglesAuthored": 45352,
+   "propsVisibleAtSample": 222,
+   "propsTrianglesAtSample": 16304,
+   "capsuleScale": 2.2,
+   "capsuleLowestAboveDeck": 0.5,
+   "hudStates": [
+    "active",
+    "armed",
+    "collected",
+    "hunting",
+    "in-range"
+   ],
+   "fonts": [
+    "Michroma",
+    "Share Tech Mono"
+   ],
+   "stylesheetHref": "http://127.0.0.1:5210/src/game/style-dreamisland.css",
+   "errors": 0
+  },
+  {
+   "tier": "works-reduced",
+   "draws": 120,
+   "mainCalls": 103,
+   "shadowCalls": 23,
+   "triangles": 188524,
+   "mainTriangles": 159652,
+   "shadowTriangles": 28872,
+   "p95Ms": 8.7,
+   "windowSamples": 720,
+   "expectedSamples": 721.8,
+   "sampleResidual": -1.77,
+   "missedGates": 0,
+   "materialViolations": 0,
+   "lapsMs": [
+    33158,
+    32125,
+    31925
+   ],
+   "propsAuthored": 346,
+   "propsInstances": 546,
+   "propsTrianglesAuthored": 45352,
+   "propsVisibleAtSample": 222,
+   "propsTrianglesAtSample": 16304,
+   "capsuleScale": 2.2,
+   "capsuleLowestAboveDeck": 0.5,
+   "hudStates": [
+    "active",
+    "armed",
+    "collected",
+    "hunting",
+    "in-range"
+   ],
+   "fonts": [
+    "Michroma",
+    "Share Tech Mono"
+   ],
+   "stylesheetHref": "http://127.0.0.1:5210/src/game/style-dreamisland.css",
+   "errors": 0
+  }
+ ]
+}
