@@ -1,0 +1,66 @@
+{
+ "generated": "2026-09-12",
+ "tool": "Higgsfield MCP (orchestrator session)",
+ "balance_before": 38.23,
+ "balance_after": 29.23,
+ "cost_note": "9 credits for 9 gpt_image_2 jobs at 1k/medium, edits and text-only alike (1 cr each, measured from the balance delta). The five direction concepts (jobs 1-5) fed the design canvas; jobs 6-9 are the phase-F inputs.",
+ "model": "gpt_image_2",
+ "params": {"aspect_ratio": "16:9", "resolution": "1k", "quality": "medium"},
+ "sources": {
+  "shipped-court-day-aad5942.png": "player-view capture at aad5942, demo autopilot, works tier, seed 3868938316, CLOCK COURT progress 0.575, lap 1, nightBlend 0, 1600x900 with HUD; uploaded as di-day-court-pickup.jpg (media cc5a2cdb-4087-4e99-9813-9206e76ffae3)",
+  "shipped-court-night-aad5942.png": "same pose with ?nightBlend=1; uploaded as di-night-court-pickup.jpg (media 484a3263-acb8-4ce6-bcc1-5e6a49630bf4)"
+ },
+ "jobs": {
+  "target-court-day-gptimage2.png": {
+   "job_id": "8ba86973-71c0-4b1a-b557-8f1340b2d5ba",
+   "reference": "shipped-court-day-aad5942.png",
+   "role": "THE day target frame for phase F: Direction B world + C road paint at the shipped camera",
+   "prompt": "Edit this video game screenshot. Remove every on-screen UI element (all text, panels, bars, minimap, numbers) so only the 3D world and the hover racer remain. Keep the exact camera, road curve, low-poly PS2-era look, flat-shaded palms, sand and sea colours. Paint the road properly: crisp white edge lines on both sides, a dashed white centre line, red-and-white striped kerb along the inside of the bend, faint cyan chevrons on the tarmac leading to the pickup. Then make it a year-2000 3D screensaver come alive: several large orange goldfish drifting slowly through the air above the sea and road, mirrored chrome spheres floating at different heights reflecting the sky, glossy beach balls and inflatable rings on the sand and water, a chrome 3D-pipes sculpture on the shore, sun sparkle on the water, a gentle lens flare, two rival hover racers ahead. The power pickup is a 3 m translucent aqua glass capsule in a chrome frame hovering just above the lane, slowly spinning, with a soft cyan light column reaching the sky and a glowing cyan ring painted on the tarmac beneath it. Dreamy, glossy, playful. No text anywhere.",
+   "measured": {"lumaMean": 117.19, "lumaStd": 47.34, "chromaMean": 22.12, "p01": 27.2, "p50": 110.4, "p99": 219.2, "blackPct": 0.41, "whitePct": 0.35},
+   "verdict": "ACCEPTED as target. Note the painting invents a chrome spire cluster on the far island and a second capsule tint; neither is in scope."
+  },
+  "target-court-night-gptimage2.png": {
+   "job_id": "ab447444-bee6-4931-a588-1c153c800892",
+   "reference": "shipped-court-night-aad5942.png",
+   "role": "THE night target frame for phase F",
+   "prompt": "Edit this night-time video game screenshot. Remove every on-screen UI element (all text, panels, bars, minimap, numbers) so only the 3D world and the hover racer remain. Keep the exact camera, road curve, low-poly PS2-era look, the starry navy sky, dark palms and sand. Paint the road properly: crisp white edge lines on both sides, a dashed white centre line, red-and-white striped kerb along the inside of the bend, the tarmac faintly wet and reflecting the lamps. Then make the night alive like a year-2000 3D screensaver: several large goldfish glowing soft orange from inside drifting through the air above the road and sea, mirrored chrome spheres reflecting stars and neon, a chrome pipes sculpture on the shore lit cyan from below, small cyan lamp posts along both road edges, bioluminescent cyan glow on the shoreline foam, two rival hover racers ahead with red tail lights. The power pickup is a 3 m translucent aqua glass capsule in a chrome frame hovering just above the lane, glowing brightly, with a cyan light column reaching the sky and a glowing cyan ring painted on the tarmac beneath it. Dreamy, glossy, luminous. No text anywhere.",
+   "measured": {"lumaMean": 31.03, "lumaStd": 34.87, "chromaMean": 8.85, "p01": 2.1, "p50": 19.9, "p99": 193.5, "blackPct": 38.92, "whitePct": 0.06},
+   "verdict": "ACCEPTED as target. The wet-road planar reflection is a painting trick; §5.1 step 4 of the brief fakes it with fresnel + one lamp direction."
+  },
+  "capsule-ortho-gptimage2.png": {
+   "job_id": "c8302462-889c-4daa-9255-bcf46e7e259e",
+   "role": "modelling reference for capsule.glb (front, side, back, top at one scale)",
+   "prompt": "Orthographic modelling reference sheet on a flat neutral grey background, four views in a row (front, side, back, top) of ONE object at the same scale: a hovering power capsule for a low-poly PS2-era racing game. A translucent aqua glass capsule 3 m tall, rounded ends, held in a brushed chrome frame of two rings and four vertical ribs, a small chrome cap at each end, a bright cyan glowing core cylinder inside. Clean silhouette, no decoration, no environment, no text, even lighting, hard edges suitable for modelling in under 800 triangles.",
+   "verdict": "ACCEPTED. Four views consistent; the side view shows the rib pattern is four ribs at 90 degrees."
+  },
+  "props-sheet-gptimage2.png": {
+   "job_id": "c1706ac8-cf42-42ce-bf48-d4a306defb0a",
+   "role": "modelling reference for props.glb (ball, ring, sphere, pipes, bollard, plinth; front + side each)",
+   "prompt": "Orthographic modelling reference sheet on a flat neutral grey background, a grid of separate low-poly props for a PS2-era racing game, each shown in a front view and a side view at consistent scale, evenly spaced, no overlap: 1. a striped inflatable beach ball 1 m across in green, white, orange, pink; 2. an inflatable swim ring 1.2 m across, yellow; 3. a mirrored chrome sphere 1 m across; 4. a chrome 3D-pipes sculpture 4 m tall, three bent tubes joined with elbows; 5. a cyan glowing lamp bollard 1.1 m tall on a stone base; 6. a small stone plinth 0.6 m tall. Clean flat shading, hard edges, no environment, no text, no shadows.",
+   "verdict": "ACCEPTED. The sheet is not at one consistent scale (the ball and the pipes sculpture are drawn the same height); the brief's metre sizes govern, the sheet gives shape only."
+  },
+  "direction-b-day-gptimage2.png": {
+   "job_id": "238249f7-2f4e-4105-a007-3e3f1737098e",
+   "reference": "shipped-court-day-aad5942.png",
+   "role": "Direction B concept as shown on the canvas (no road paint); superseded by the target frame",
+   "measured": {"lumaMean": 133.96, "lumaStd": 38.78, "chromaMean": 20.81, "p99": 227.7, "blackPct": 0.27, "whitePct": 0.35}
+  },
+  "direction-b-night-gptimage2.png": {
+   "job_id": "8a02edad-a299-4fb3-8214-f1d66ef7e7b8",
+   "reference": "shipped-court-night-aad5942.png",
+   "role": "Direction B night concept as shown on the canvas; superseded by the target frame",
+   "measured": {"lumaMean": 30.64, "lumaStd": 36.39, "chromaMean": 8.56, "p99": 181.7, "blackPct": 45.25, "whitePct": 0.12}
+  },
+  "not_kept": {
+   "direction-a-day": "e61e0e35-4103-4b7c-a02b-7e32938b17d1",
+   "direction-a-night": "0185e417-d829-4f65-980b-e034e8bfdfdf",
+   "direction-c-day": "446836f3-aa38-427d-bc1e-62eef55536b2",
+   "note": "Race Weekend and The Stage were not chosen; their frames live only on the design canvas."
+  }
+ },
+ "shipped_measured": {
+  "script": "scripts/visual/grade/measure-frames.py (HUD cropped)",
+  "shipped-court-day-aad5942.png": {"lumaMean": 132.89, "lumaStd": 52.65, "chromaMean": 18.97, "p01": 17.3, "p50": 129.1, "p99": 207.3, "blackPct": 0.35, "whitePct": 0.0},
+  "shipped-court-night-aad5942.png": {"lumaMean": 30.42, "lumaStd": 18.07, "chromaMean": 10.65, "p01": 3.5, "p50": 30.9, "p99": 79.1, "blackPct": 23.3, "whitePct": 0.0}
+ }
+}
