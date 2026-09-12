@@ -471,10 +471,10 @@ body[data-graphics-context="lost"] .system-state__lamp {
   width: 414px;
   transform-origin: bottom left;
   /* 34 left pad + 340 instruments + 40 fade. The fade is the block's own edge. */
-  padding: 14px 40px 20px 34px;
+  padding: 14px 40px 16px 34px; /* bottom was 20 */
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px; /* was 6 */
   background: linear-gradient(
     90deg,
     oklch(0.09 0.012 205 / 0.76),
@@ -1080,11 +1080,19 @@ body[data-graphics-context="lost"] .system-state__lamp {
 
 /* ---------------------------------------------------------------- abilities */
 
+/*
+  The 13px deck and reason lines cost vertical room, and on Tideline at
+  1280x720 HUD SCALE L the drive cluster was already the tallest the game can
+  build — 19.26 px clear of the standing block, measured on eafe0b9. Rather
+  than take the type back, the spacing pays for it: 24 CSS px between these
+  three rules and `.hud-drive`'s own gap and bottom padding, which is 28.8 px
+  of screen at scale L.
+*/
 .hud-abilities {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-top: 12px;
+  gap: 8px; /* was 12 */
+  margin-top: 4px; /* was 12; `.hud-drive`'s own gap already separates it */
   width: 340px;
 }
 
@@ -1109,7 +1117,7 @@ body[data-graphics-context="lost"] .system-state__lamp {
 .hud-ability__text {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px; /* was 4 */
   min-width: 0;
   max-width: 268px;
 }
