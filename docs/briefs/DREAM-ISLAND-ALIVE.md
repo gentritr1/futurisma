@@ -209,3 +209,18 @@ F-CODE round 2 reviewed against §11 by reading `art/evidence/dreamisland-v1/ali
 Orchestrator's own run on the merged tree (`combined-final/`): `npm run test:code` PASS (76 PASS lines); four soaks on a dev server — rookie 123 draws / 192,172 tris / p95 8.9 ms (residual +3.8), works 123 / 192,172 / 8.7 (−2.1), feral 124 / 192,268 / 8.9 (−0.2), works-reduced 120 / 188,524 / 8.8 (+5.7); 0 missed gates, 0 material violations, laps identical to the shipped calibration. Everything in §6 holds. Merged to `main`.
 
 Still UNVERIFIED after merge: real GPU / browser matrix for `backdrop-filter` and `color-mix`; prop pop-in at the cull boundary; the wet-road streak and the fish glow judged by a person, not an instrument. That person is the next step.
+
+## 13. VS-DESIGN CHECK (2026-09-13) — a review correction, three fixes, and what is left
+
+The user asked how close the build is to the target painting. Measured at the painting's pose with the same script — and the first answer was wrong in a way that also voids one §11 gate:
+
+**Correction.** `measure-frames.py`'s default HUD crop drops only the corner bands. The island's aqua-glass turn cue and world bubble sit inside the measured world band and are near-white, so the "COURT night p99 204" in §11 and the "day white 6 %" first reported here were HUD pixels, not the world. With every `#app` child but the canvas hidden and `--full` measurement, the world at COURT (capsule ≈ 36 m ahead) reads: **day chroma 19.7, white 0.10 %, p99 208; night p99 116.9** (painting 22.1 / 0.35 / 219 and 194). The §11 night gate is therefore **not met** and moves to `DREAM-ISLAND-VS-DESIGN.md` G1 with the corrected instrument. Recorded in project memory as a scar: a look gate is captured with the HUD hidden or it is void.
+
+**Three faults reported to the user, and what each turned out to be.**
+1. *"The light column is an opaque white bar."* True, and the cause was the blend mode, not the opacity: an additive quad over a ~220-luma sky clips to white at any opacity (0.55 → 0.22 moved the clipped share from 6.13 to 5.64 %). Fixed by drawing the column **normally blended by day** (a tinted pane the sky shows through, as in the painting) and **additively at night** (a second `InstancedMesh` on the same quad, `dreamisland_capsule_column_night`, opacity = 0.7·nightBlend; the day pass fades to 0.5·(1−nightBlend)). +1 draw (capsules now 7).
+2. *"The sea lost its blue."* **False alarm, withdrawn.** My patch comparison landed on different content at different poses. With the HUD out of the band the frame chroma is 19.7, above the 19.0 the map shipped with before Phase F, and Codex's pinned-pose sea (51,101,178) is bluer than the shipped sea (55,101,157). The water shader is untouched.
+3. *"The column is dusty pink at night."* True: an amber (SURGE) beam whitened 55 % toward white and added over navy sums to salmon. Fixed by making the beam the island's cyan (#33f0f0) for every kind — the capsule core and ring still carry SURGE amber / SHIELD cyan — and dropping the whitening.
+
+`npm run test:code` PASS after the change. Evidence `art/evidence/dreamisland-v1/alive/vs-design/` (`fix-4-nohud/` is the final state, `painting-vs-build-after-column-fix.jpg` the side-by-side, `nohud-capture.mjs` the instrument).
+
+**What is left, now honestly measured** (all in `DREAM-ISLAND-VS-DESIGN.md` for Codex): night sources (world p99 117 → ≥ 160, painting 194); day darks (p01 46 vs 27, lumaStd 42 vs 47 — the build has no shadow); toy stripes multiplied into the tan sand cell.

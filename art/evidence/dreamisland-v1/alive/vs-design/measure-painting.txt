@@ -1,0 +1,4 @@
+frame                                    lumaMean    lumaStd    satMean     satP90 chromaMean        p01        p50        p99      range   blackPct   whitePct
+target-court-day-gptimage2.png             117.19      47.34      105.7     205.77      22.12       27.2      110.4      219.2      192.0       0.41       0.35
+target-court-night-gptimage2.png            31.03      34.87     155.02     233.75       8.85        2.1       19.9      193.5      191.5      38.92       0.06
+MEAN                                        74.11      41.11     130.36     219.76      15.48      14.65      65.15     206.35     191.75      19.66        0.2

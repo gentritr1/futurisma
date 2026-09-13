@@ -1,0 +1,37 @@
+# Dream Island — Phase G "VS DESIGN": closing the measured gap to the target painting
+
+**STATUS: FINAL (2026-09-13). For Codex. Start from `main` after the column-fix commit (the one whose message begins `fix(dream-island): capsule column`).** Read `DREAM-ISLAND-ALIVE.md` §2 (the targets), §8–§9 (the water gates that bind) and §13 (the instrument correction this brief exists because of). Everything in `DREAM-ISLAND-HANDOFF.md` and the round-1 collision rule still applies. Opus is not on this pass; you own the files named in §3 and nothing else. Commit nothing.
+
+## 1. Where the build stands against the painting, measured correctly
+
+The Phase F gates were captured with the HUD in the frame. The island's HUD is aqua glass, near-white, and two of its elements (the turn cue and the world bubble) sit inside the "world band" the grade instrument measures. That inflated the night range gate to 204 and the day white to 6 %. Neither number was the world. **The instrument for this pass:** the chase camera from the demo autopilot, `?map=dreamisland&seed=3868938316&tier=works&laps=3&demo=1&headless=1&diagnostics=1&start=manual&quality=high&music=0` (`&nightBlend=1` for night), 1280×720, screenshot taken at progress 0.560 ± 0.006 (COURT, capsule ≈ 36 m ahead) and 0.735 ± 0.006 (REEF), with every child of `#app` except `#game-canvas` set `visibility:hidden` before the shot, then `scripts/visual/grade/measure-frames.py --full`. The paintings are measured the same way. The capture script is `art/evidence/dreamisland-v1/alive/vs-design/nohud-capture.mjs`.
+
+| COURT, world only | lumaMean | lumaStd | chroma | p01 | p50 | p99 | range | black % | white % |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| painting, day | 117.2 | 47.3 | 22.1 | 27.2 | 110.4 | 219.2 | 192.0 | 0.41 | 0.35 |
+| build, day (after the column fix) | 137.8 | 41.9 | 19.7 | 46.2 | 132.5 | 208.5 | 162.3 | 0.14 | 0.10 |
+| painting, night | 31.0 | 34.9 | 8.9 | 2.1 | 19.9 | 193.5 | 191.5 | 38.9 | 0.06 |
+| build, night (after the column fix) | 37.8 | 29.9 | 9.4 | 0.0 | 37.8 | **116.9** | 116.9 | 30.2 | 0.05 |
+
+Frames: `art/evidence/dreamisland-v1/alive/vs-design/fix-4-nohud/` and the side-by-side `painting-vs-build-after-column-fix.jpg`.
+
+What the rows say. **Day:** the colour is back (19.7, above the 19.0 we started Phase F with; the painting's 22.1 is mostly its saturated toys and sky), the highlights are no longer clipped, and the sea, sparkle and road all hold their gates. What is left by day is **the dark end**: our p01 is 45 against the painting's 27, our lumaStd 42 against 47, our mean 138 against 117. The build has no shadow. Everything is lit flat and the frame reads bright and thin next to the painting's grounded one. **Night:** the world's brightest 1 % is at 117, the painting's at 194. The sources are too dim: the bollard cores read as small yellow dots, the shallows strip carries most of the range on its own, the capsule core is small, the fish are not in frame. The dark end is right (black 30 % vs 39 %, p01 0 vs 2).
+
+## 2. What this pass does — three items, each with its number
+
+### G1. Night sources (Codex, `dreamisland-props.ts` bollard core emissive is Opus's file — see §3 for how you touch it)
+Raise the night world so **COURT night p99 ≥ 160 and REEF night p99 ≥ 160 with the HUD hidden**, painting 194, without the road band's p50 rising above 45 (today 37.8) and without any water pixel clipping (the §9 gates). The sources, in order of what they should contribute: bollard cores (200 of them line the road; at night they must read as lamps with a halo, not dots — the glow sprite batch already exists and already targets them, so the fix is intensity and sprite size, measured by the with/without method review-8 used), the capsule column's additive night pass (`dreamisland_capsule_column_night`, opacity = nightBlend; you may raise its vertex-colour fade curve and the tint's night intensity), the capsule core, and the fish emissive where a shoal is in frame. Report each source's p99 contribution with and without it, the way the glow README did. Do not raise the shallows/foam emission again: it is at the §9 limit.
+
+### G2. Day darks
+Give the day frame a floor: **COURT day p01 ≤ 34 and lumaStd ≥ 45**, with chroma ≥ 19.0 and white ≤ 0.35 % still holding. Three levers, try them in this order and measure after each: (a) the AO bake's strength — the current colour-only bake moved lumaStd by 0.25, so it is far too gentle; re-bake with a longer ray radius and a stronger contact term under the palms, the toys, the kerbs and the capsule mounts; (b) the shadow map's ambient term — the painted world multiplies atlas colour by vertex colour, and if the ambient light is the reason nothing gets dark, lower it and raise the directional to keep the mean; (c) the sand cell's vertex tint under the palm canopies. Topology stays byte-identical (the validator's triangle counts prove it). The other six circuits are untouched (this is all inside the island's own materials and GLB).
+
+### G3. Toys' colour
+`build_dreamisland_props.py` puts `PR_ball` and `PR_ring` on the jungle atlas's **sand** cell and multiplies the stripe palette into it, so every stripe is tan-shifted. In `fix-4-nohud/court60-day.png` the balls read acceptably at the road edge, but next to the painting's saturated green-white-orange they are dull. Move the ball and ring onto the whitest cell any atlas has (state which; the concrete atlas's lightest cell or an emissive cell with intensity 0 are the candidates), so the vertex stripes show their own colour. Acceptance: the mean chroma of the ball's isolated pixels at 8 m (the phase-C isolation method) rises by ≥ 30 % and the ball's stripe palette measured on screen is within 20 levels per channel of the palette authored in the script. Triangle counts unchanged.
+
+## 3. Ownership for this pass
+
+You own: `src/game/dreamisland-water.ts`, `dreamisland-materials.ts`, `dreamisland-reflections.ts`, `art/blender/build_dreamisland_*.py`, the three GLBs, the AO bake, `art/evidence/dreamisland-v1/vs-design/**`. For G1 you also own, this pass only, the **numbers** in `dreamisland-props.ts` (bollard core emissive intensity and its nightBlend curve), `dreamisland-capsules.ts` (the night column's tint intensity and vertex fade) and the glow sprite sizes in `dreamisland-reflections.ts`'s glow batch. Structure, node names, draw counts and the day column's normal-blend material stay as they are. Route, schedule, powers, pace, autopilot, `game.ts`: untouched. Draws ≤ 130, triangles ≤ 205,000, the §6 ceilings and `npm run test:code` at the end.
+
+## 4. Evidence
+
+`art/evidence/dreamisland-v1/vs-design/` with a README naming every command: the table above with a "yours" row per item, per pose, day and night, from the instrument in §1 and nothing else; the with/without source table for G1; the AO before/after frames and the topology proof for G2; the ball isolation crops and the on-screen palette for G3; four soaks; the material walk. Report in the handoff's format. If a target in §2 turns out unreachable, say why with the measurement that shows it, and finish the rest — the two feel targets in POLISH-3 and the fish target in Phase F were both withdrawn that way, and both withdrawals were right.

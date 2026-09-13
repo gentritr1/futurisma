@@ -66,6 +66,8 @@ const CAPSULE_METRES=3,CAPSULE_CENTRE_RISE=3.8,SPIN_REVS_PER_SECOND=.25;
  */
 const CAPSULE_SCALE=2.2;
 const COLUMN_WIDTH=3,COLUMN_HEIGHT=40;
+/** The beam's colour (sRGB #33f0f0, the island's foam cyan from the design canvas). */
+const COLUMN_CYAN=new THREE.Color(0x33f0f0);
 const RING_DIAMETER=6,RING_RISE=.035;
 /** §4.4: the capsule scales to zero over 250 ms and returns over 1 s. */
 const COLLAPSE_TICKS=Math.round(.25*TICK_RATE),RETURN_TICKS=TICK_RATE;
@@ -95,6 +97,9 @@ export class DreamIslandCapsules{
  readonly presence:number[]=[];
  private readonly nodes:Node[]=[];
  private readonly columns:Node;
+ /** The same quad drawn ADDITIVELY, faded in with nightBlend: over the navy the
+  * beam must glow, over the day sky it must not (see the column material). */
+ private readonly columnsNight:Node;
  private readonly rings:Node;
  private readonly core:Node;
  private readonly columnTints:number[][]=[];
@@ -203,10 +208,28 @@ export class DreamIslandCapsules{
    columnColors[i*3]=fade;columnColors[i*3+1]=fade;columnColors[i*3+2]=fade;
   }
   column.setAttribute('color',new THREE.Float32BufferAttribute(columnColors,3));
+  // NORMAL blending, not additive. An additive beam over the day sky clips to
+  // white whatever its opacity (the sky is already at ~220 luma; +40 saturates),
+  // and that one stripe was 6 % of the frame's world band. A normally blended
+  // beam is a tinted pane the sky shows through - darker than the sky by day,
+  // as the painting's beam is, and a coloured stripe against the navy at night.
   const columnMaterial=new THREE.MeshBasicMaterial({name:'dreamisland_capsule_column',
-   vertexColors:true,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,
+   vertexColors:true,transparent:true,blending:THREE.NormalBlending,depthWrite:false,
    side:THREE.DoubleSide});
-  this.columns=this.addNode('column',column,columnMaterial,columnBases,tints,false);
+  // The column keeps the power's own hue (15 % towards white, not 55 %): at
+  // 55 % an additive amber beam over the day sky rendered white, and at night
+  // over navy it rendered dusty pink. SURGE is amber, SHIELD is cyan, from 300 m.
+  // The beam is the ISLAND'S cyan for every kind. The capsule core and the ring
+  // carry SURGE amber / SHIELD cyan; the beam is only there to be seen from
+  // 300 m, and an amber beam added over the night sky sums to salmon, which is
+  // what the first playtest read as "dusty pink". Cyan over navy stays cyan.
+  const beamTints=tints.map(()=>COLUMN_CYAN.clone());
+  this.columns=this.addNode('column',column,columnMaterial,columnBases,beamTints,false,true);
+  const columnNightMaterial=new THREE.MeshBasicMaterial({name:'dreamisland_capsule_column_night',
+   vertexColors:true,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,
+   side:THREE.DoubleSide,opacity:0});
+  this.columnsNight=this.addNode('column-night',column,columnNightMaterial,columnBases,beamTints,false,true);
+  this.columnsNight.mesh.renderOrder=7;
   this.columns.mesh.renderOrder=6;
 
   // --- the ring on the tarmac --------------------------------------------------
@@ -220,7 +243,7 @@ export class DreamIslandCapsules{
   // own tallest node decides how far the capsule reaches below its centre.
   let lowest=0;
   for(const node of this.nodes){
-   if(node===this.columns||node===this.rings)continue;
+   if(node===this.columns||node===this.columnsNight||node===this.rings)continue;
    node.mesh.geometry.computeBoundingBox();
    lowest=Math.min(lowest,node.mesh.geometry.boundingBox!.min.y*CAPSULE_SCALE);
   }
@@ -228,14 +251,14 @@ export class DreamIslandCapsules{
   this.update(pickups.map(()=>({available:true,charge:1})),0,0,false);
  }
  private addNode(name:string,geometry:THREE.BufferGeometry,material:THREE.Material,
-  bases:THREE.Matrix4[],tints:THREE.Color[],spins:boolean,white=false):Node{
+  bases:THREE.Matrix4[],tints:THREE.Color[],spins:boolean,white=false,whiten=.55):Node{
   const mesh=new THREE.InstancedMesh(geometry,material,bases.length);
   mesh.name='DI_CAPSULE_'+name;mesh.frustumCulled=false;mesh.castShadow=false;mesh.receiveShadow=false;
   bases.forEach((base,i)=>{
    mesh.setMatrixAt(i,base);
    // The core is the power's own colour; the chrome and glass take a pale tint
    // of it so the capsule reads as SURGE or SHIELD before its label does.
-   mesh.setColorAt(i,white?tints[i]:tints[i].clone().lerp(new THREE.Color(0xffffff),.55));
+   mesh.setColorAt(i,white?tints[i]:tints[i].clone().lerp(new THREE.Color(0xffffff),whiten));
   });
   mesh.instanceMatrix.needsUpdate=true;
   if(mesh.instanceColor)mesh.instanceColor.needsUpdate=true;
@@ -272,7 +295,7 @@ export class DreamIslandCapsules{
     const presence=this.presence[index];
     this.matrix.copy(node.base[index]);
     if(node.spins)this.matrix.multiply(this.spin.makeRotationY(spin));
-    if(node===this.columns){/* the column fades; it never scales */}
+    if(node===this.columns||node===this.columnsNight){/* the column fades; it never scales */}
     else if(node===this.rings)this.matrix.multiply(this.scaling.makeScale(
      THREE.MathUtils.lerp(.6,1,presence),1,THREE.MathUtils.lerp(.6,1,presence)));
     else this.matrix.multiply(this.scaling.makeScale(
@@ -284,16 +307,22 @@ export class DreamIslandCapsules{
   // The column and the ring fade rather than shrink: a column that scaled to
   // zero would collapse towards the deck and read as the light falling over.
   const mean=this.presence.reduce((total,value)=>total+value,0)/Math.max(1,this.presence.length);
-  (this.columns.mesh.material as THREE.MeshBasicMaterial).opacity=mean*(.55+nightBlend*.45);
+  // Day 0.22, night 0.50. At 0.55 by day the additive quad clipped 6 % of the
+  // frame's world band to white (vs-design/court60-day.png, 2026-09-13): the
+  // beam must read as light the sky is still visible through, not a bar.
+  (this.columns.mesh.material as THREE.MeshBasicMaterial).opacity=mean*.5*(1-nightBlend);
+  (this.columnsNight.mesh.material as THREE.MeshBasicMaterial).opacity=mean*nightBlend*.7;
   (this.rings.mesh.material as THREE.MeshBasicMaterial).opacity=mean*(.5+nightBlend*.5);
   // Per-instance presence, so one collected pickup does not dim the other four.
   this.captureColumnTints();
-  const tint=this.columns.mesh.instanceColor?.array??null;
-  if(tint)for(let index=0;index<this.presence.length;index++){
-   const presence=this.presence[index],base=this.columnTints[index];
-   if(base)for(let c=0;c<3;c++)tint[index*3+c]=base[c]*presence;
+  for(const node of [this.columns,this.columnsNight]){
+   const tint=node.mesh.instanceColor?.array??null;
+   if(tint)for(let index=0;index<this.presence.length;index++){
+    const presence=this.presence[index],base=this.columnTints[index];
+    if(base)for(let c=0;c<3;c++)tint[index*3+c]=base[c]*presence;
+   }
+   if(node.mesh.instanceColor)node.mesh.instanceColor.needsUpdate=true;
   }
-  if(this.columns.mesh.instanceColor)this.columns.mesh.instanceColor.needsUpdate=true;
   (this.core.mesh.material as THREE.MeshLambertMaterial).emissiveIntensity=1.2+nightBlend*1.6;
  }
  /** Captured once the instance colours exist; called from the constructor's
