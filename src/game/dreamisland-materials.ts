@@ -154,3 +154,20 @@ export function applyDreamIslandDepthBand(material:THREE.MeshLambertMaterial){
  };
  material.customProgramCacheKey=()=>key+'-depth-band-v1';material.needsUpdate=true;
 }
+
+/** Island-only ambient trim. Keep the existing shadowed direct light and the
+ * night response; sea, foliage cutouts, lamps and the other circuits bypass it. */
+export function applyDreamIslandDayLight(material:THREE.MeshLambertMaterial,night:{value:number}){
+ if(material.userData.diDayLightBound)return;
+ material.userData.diDayLightBound=true;
+ const previous=material.onBeforeCompile,key=material.customProgramCacheKey();
+ material.onBeforeCompile=(shader,renderer)=>{
+  previous.call(material,shader,renderer);
+  shader.uniforms.diDayLightNight=night;
+  shader.fragmentShader='uniform float diDayLightNight;\n'+shader.fragmentShader.replace(
+   '#include <aomap_fragment>',`#include <aomap_fragment>
+    reflectedLight.indirectDiffuse*=mix(.22,1.,diDayLightNight);
+    reflectedLight.directDiffuse*=mix(1.2,1.,diDayLightNight);`);
+ };
+ material.customProgramCacheKey=()=>key+'-island-day-light-v1';material.needsUpdate=true;
+}

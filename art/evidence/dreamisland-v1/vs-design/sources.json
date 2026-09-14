@@ -1,0 +1,82 @@
+[
+  {
+    "pose": "court",
+    "source": "bollard",
+    "withP99": 161.4,
+    "withoutP99": 157.0,
+    "delta": 4.4,
+    "changedPixels": 20139
+  },
+  {
+    "pose": "court",
+    "source": "column",
+    "withP99": 161.4,
+    "withoutP99": 123.5,
+    "delta": 37.9,
+    "changedPixels": 17032
+  },
+  {
+    "pose": "court",
+    "source": "capsule",
+    "withP99": 161.4,
+    "withoutP99": 161.4,
+    "delta": 0.0,
+    "changedPixels": 4647
+  },
+  {
+    "pose": "court",
+    "source": "fish",
+    "withP99": 161.4,
+    "withoutP99": 161.4,
+    "delta": 0.0,
+    "changedPixels": 4010
+  },
+  {
+    "pose": "court",
+    "source": "glow",
+    "withP99": 161.4,
+    "withoutP99": 157.0,
+    "delta": 4.4,
+    "changedPixels": 19839
+  },
+  {
+    "pose": "reef",
+    "source": "bollard",
+    "withP99": 174.2,
+    "withoutP99": 173.4,
+    "delta": 0.8,
+    "changedPixels": 9405
+  },
+  {
+    "pose": "reef",
+    "source": "column",
+    "withP99": 174.2,
+    "withoutP99": 174.2,
+    "delta": 0.0,
+    "changedPixels": 861
+  },
+  {
+    "pose": "reef",
+    "source": "capsule",
+    "withP99": 174.2,
+    "withoutP99": 174.2,
+    "delta": 0.0,
+    "changedPixels": 584
+  },
+  {
+    "pose": "reef",
+    "source": "fish",
+    "withP99": 174.2,
+    "withoutP99": 174.2,
+    "delta": 0.0,
+    "changedPixels": 584
+  },
+  {
+    "pose": "reef",
+    "source": "glow",
+    "withP99": 174.2,
+    "withoutP99": 173.4,
+    "delta": 0.8,
+    "changedPixels": 9284
+  }
+]

@@ -1,0 +1,245 @@
+[
+  {
+    "asset": "painted",
+    "sourceSha256": "7bb24e916f6345b6e5084ed9cb67e621a6130bb7b4cd03ac679e398fd42ff291",
+    "resultSha256": "6027368989e3c8a8be66e4be37116297904e0372b94be19dee9e3794ba0533b7",
+    "beforeBytes": 8268880,
+    "afterBytes": 8268880,
+    "trianglesBefore": 66694,
+    "trianglesAfter": 66694,
+    "checks": [
+      {
+        "node": "DI_FISHBASIN_DI_MAT_emissive",
+        "primitive": 0,
+        "triangles": 80,
+        "indicesIdentical": true,
+        "preservedTriangleAttributesIdentical": true,
+        "requiredInvariantPass": true,
+        "preserved": [
+          "POSITION",
+          "NORMAL",
+          "TEXCOORD_0"
+        ]
+      },
+      {
+        "node": "DI_FISHBASIN_DI_MAT_jungle",
+        "primitive": 0,
+        "triangles": 432,
+        "indicesIdentical": true,
+        "preservedTriangleAttributesIdentical": true,
+        "requiredInvariantPass": true,
+        "preserved": [
+          "POSITION",
+          "NORMAL",
+          "TEXCOORD_0"
+        ]
+      },
+      {
+        "node": "DI_FISHREEF_DI_MAT_emissive",
+        "primitive": 0,
+        "triangles": 80,
+        "indicesIdentical": true,
+        "preservedTriangleAttributesIdentical": true,
+        "requiredInvariantPass": true,
+        "preserved": [
+          "POSITION",
+          "NORMAL",
+          "TEXCOORD_0"
+        ]
+      },
+      {
+        "node": "DI_FISHREEF_DI_MAT_jungle",
+        "primitive": 0,
+        "triangles": 432,
+        "indicesIdentical": true,
+        "preservedTriangleAttributesIdentical": true,
+        "requiredInvariantPass": true,
+        "preserved": [
+          "POSITION",
+          "NORMAL",
+          "TEXCOORD_0"
+        ]
+      },
+      {
+        "node": "DI_STATIC_DI_MAT_concrete",
+        "primitive": 0,
+        "triangles": 23180,
+        "indicesIdentical": true,
+        "preservedTriangleAttributesIdentical": true,
+        "requiredInvariantPass": true,
+        "preserved": [
+          "POSITION",
+          "NORMAL",
+          "TEXCOORD_0"
+        ]
+      },
+      {
+        "node": "DI_STATIC_DI_MAT_emissive",
+        "primitive": 0,
+        "triangles": 1232,
+        "indicesIdentical": true,
+        "preservedTriangleAttributesIdentical": true,
+        "requiredInvariantPass": true,
+        "preserved": [
+          "POSITION",
+          "NORMAL",
+          "TEXCOORD_0"
+        ]
+      },
+      {
+        "node": "DI_STATIC_DI_MAT_jungle",
+        "primitive": 0,
+        "triangles": 30632,
+        "indicesIdentical": true,
+        "preservedTriangleAttributesIdentical": true,
+        "requiredInvariantPass": true,
+        "preserved": [
+          "POSITION",
+          "NORMAL",
+          "TEXCOORD_0"
+        ]
+      },
+      {
+        "node": "DI_STATIC_DI_MAT_jungle-card",
+        "primitive": 0,
+        "triangles": 8294,
+        "indicesIdentical": true,
+        "preservedTriangleAttributesIdentical": true,
+        "requiredInvariantPass": true,
+        "preserved": [
+          "POSITION",
+          "NORMAL",
+          "TEXCOORD_0"
+        ]
+      },
+      {
+        "node": "DI_STATIC_DI_MAT_metal",
+        "primitive": 0,
+        "triangles": 2120,
+        "indicesIdentical": true,
+        "preservedTriangleAttributesIdentical": true,
+        "requiredInvariantPass": true,
+        "preserved": [
+          "POSITION",
+          "NORMAL",
+          "TEXCOORD_0"
+        ]
+      },
+      {
+        "node": "DI_STATIC_DI_MAT_signage",
+        "primitive": 0,
+        "triangles": 212,
+        "indicesIdentical": true,
+        "preservedTriangleAttributesIdentical": true,
+        "requiredInvariantPass": true,
+        "preserved": [
+          "POSITION",
+          "NORMAL",
+          "TEXCOORD_0"
+        ]
+      }
+    ]
+  },
+  {
+    "asset": "props",
+    "sourceSha256": "4e5153d788f04498528eefdd1f0994188eb3deb3d11cc3913227b6e36ed303c2",
+    "resultSha256": "e49fcddc39b3c6716c809ce3d4e4e0e58d6b0727052599a1c5ec5ea3733b239a",
+    "beforeBytes": 1338352,
+    "afterBytes": 919012,
+    "trianglesBefore": 1092,
+    "trianglesAfter": 1092,
+    "checks": [
+      {
+        "node": "PR_ball",
+        "primitive": 0,
+        "triangles": 168,
+        "indicesIdentical": false,
+        "preservedTriangleAttributesIdentical": true,
+        "requiredInvariantPass": true,
+        "preserved": [
+          "POSITION",
+          "NORMAL",
+          "COLOR_0"
+        ]
+      },
+      {
+        "node": "PR_bollard",
+        "primitive": 0,
+        "triangles": 64,
+        "indicesIdentical": true,
+        "preservedTriangleAttributesIdentical": true,
+        "requiredInvariantPass": true,
+        "preserved": [
+          "POSITION",
+          "NORMAL",
+          "COLOR_0"
+        ]
+      },
+      {
+        "node": "PR_bollard_core",
+        "primitive": 0,
+        "triangles": 12,
+        "indicesIdentical": true,
+        "preservedTriangleAttributesIdentical": true,
+        "requiredInvariantPass": true,
+        "preserved": [
+          "POSITION",
+          "NORMAL",
+          "COLOR_0"
+        ]
+      },
+      {
+        "node": "PR_pipes",
+        "primitive": 0,
+        "triangles": 340,
+        "indicesIdentical": true,
+        "preservedTriangleAttributesIdentical": true,
+        "requiredInvariantPass": true,
+        "preserved": [
+          "POSITION",
+          "NORMAL",
+          "COLOR_0"
+        ]
+      },
+      {
+        "node": "PR_plinth",
+        "primitive": 0,
+        "triangles": 36,
+        "indicesIdentical": true,
+        "preservedTriangleAttributesIdentical": true,
+        "requiredInvariantPass": true,
+        "preserved": [
+          "POSITION",
+          "NORMAL",
+          "COLOR_0"
+        ]
+      },
+      {
+        "node": "PR_ring",
+        "primitive": 0,
+        "triangles": 256,
+        "indicesIdentical": true,
+        "preservedTriangleAttributesIdentical": true,
+        "requiredInvariantPass": true,
+        "preserved": [
+          "POSITION",
+          "NORMAL",
+          "COLOR_0"
+        ]
+      },
+      {
+        "node": "PR_sphere",
+        "primitive": 0,
+        "triangles": 216,
+        "indicesIdentical": false,
+        "preservedTriangleAttributesIdentical": true,
+        "requiredInvariantPass": true,
+        "preserved": [
+          "POSITION",
+          "NORMAL",
+          "COLOR_0"
+        ]
+      }
+    ]
+  }
+]

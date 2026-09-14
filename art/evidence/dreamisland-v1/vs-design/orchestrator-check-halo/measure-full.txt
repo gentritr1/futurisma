@@ -1,0 +1,5 @@
+frame                                    lumaMean    lumaStd    satMean     satP90 chromaMean        p01        p50        p99      range   blackPct   whitePct
+court60-night.png                           36.38       32.2     140.84      255.0       9.48        0.0       34.9      158.9      158.9      30.17       0.08
+reef60-night.png                            36.66       36.9      116.2      255.0       7.87        0.0       31.5      172.6      172.6      30.98       0.05
+court60-day.png                            129.16      48.06      94.64     220.57      20.44       22.2      115.1      208.5      186.3       0.51        0.1
+MEAN                                         67.4      39.05     117.23     243.52       12.6        7.4       60.5      180.0      172.6      20.55       0.08

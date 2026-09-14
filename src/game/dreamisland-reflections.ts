@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import fishPaths from './data/dreamisland/fish-paths.json';
+import {applyDreamIslandDayLight} from './dreamisland-materials';
 import type {DreamIslandCourse} from './dreamisland-course';
 
 /** Per-water-owner resources: the existing dome is captured once in each state. */
@@ -85,6 +86,7 @@ export function applyDreamIslandReflection(material:THREE.MeshLambertMaterial,re
     outgoingLight+=vec3(1.,.98,.91)*diGlint*(1.-diReflectionBlend)*diReflectionReady;`:
     `// Road and kerbs share a draw: their atlas quadrant is the material boundary.
     if(diWetRoad>.5){
+     outgoingLight*=mix(1.,.74,diReflectionBlend);
      vec3 diLampHalf=normalize(diView+normalize(vec3(-.93,.45,.25)));
      float diLamp=pow(max(dot(diNormal,diLampHalf),0.),8.);
      outgoingLight+=diReflectionBlend*diReflectionReady*(
@@ -122,6 +124,11 @@ export function bindDreamIslandEnvironment(material:THREE.MeshStandardMaterial,r
 export function bindDreamIslandNodeMaterials(scene:THREE.Scene,reflections:DreamIslandReflections){
  if(!reflections.day.value)return;
  scene.traverse(object=>{
+  if(object instanceof THREE.Mesh && object.material instanceof THREE.MeshLambertMaterial
+   && /^(DI_STATIC_|DI_HERO_|dreamisland_blockout_road$)/.test(object.name)
+   && !/emissive|signage|jungle-card/.test(object.material.name)){
+   applyDreamIslandDayLight(object.material,reflections.blend);
+  }
   if(!(object instanceof THREE.Mesh)||object.userData.diRecipeBound)return;
   const chrome=/^(PR_sphere|PR_pipes|CAP_frame|CAP_cap)$/.test(object.name);
   const glass=object.name==='CAP_glass';
@@ -188,9 +195,12 @@ export class DreamIslandGlow {
      }
      return;
     }
-    if(!['CAP_core','PR_bollard_core'].includes(object.name))return;
+    // The capsule builder prefixes its nodes ('DI_CAPSULE_CAP_core'); match by
+    // suffix so the capsule core gets its halo too (it never did before this line).
+    const coreKind=/(?:^|_)(CAP_core|PR_bollard_core)$/.exec(object.name)?.[1];
+    if(!coreKind)return;
     object.geometry.computeBoundingBox();
-    this.addSource(object,[object.geometry.boundingBox!.getCenter(new THREE.Vector3())],object.name==='CAP_core'?3.8:1.8);
+    this.addSource(object,[object.geometry.boundingBox!.getCenter(new THREE.Vector3())],coreKind==='CAP_core'?3.8:3.4);
    });
   }
   let count=0;
@@ -216,7 +226,7 @@ export class DreamIslandGlow {
     }
    }
   }
-  this.mesh.count=count;this.mesh.instanceMatrix.needsUpdate=true;this.material.opacity=nightBlend*.65;
+  this.mesh.count=count;this.mesh.instanceMatrix.needsUpdate=true;this.material.opacity=nightBlend*.30;
   this.mesh.userData.sources=this.sources.length;this.mesh.userData.instances=count;
  }
  dispose(){this.mesh.geometry.dispose();this.material.emissiveMap?.dispose();this.material.dispose();}

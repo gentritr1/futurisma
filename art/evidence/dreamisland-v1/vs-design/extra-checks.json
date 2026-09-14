@@ -1,0 +1,114 @@
+{
+  "sparkle": [
+    {
+      "stage": "baseline",
+      "pose": "court",
+      "seaPixels": 74328,
+      "chroma": 55.74517736143853,
+      "p50": 85.1912,
+      "whitePct": 0.313475406307179,
+      "maximumBlob": 4,
+      "autocorrelation": 0.034334763948497854
+    },
+    {
+      "stage": "final",
+      "pose": "court",
+      "seaPixels": 74068,
+      "chroma": 55.72059129233877,
+      "p50": 85.1912,
+      "whitePct": 0.26597180968839446,
+      "maximumBlob": 4,
+      "autocorrelation": 0.03553299492385787
+    },
+    {
+      "stage": "baseline",
+      "pose": "reef",
+      "seaPixels": 34183,
+      "chroma": 56.11272724722327,
+      "p50": 86.1912,
+      "whitePct": 0.3130210923558494,
+      "maximumBlob": 4,
+      "autocorrelation": 0.07476635514018694
+    },
+    {
+      "stage": "final",
+      "pose": "reef",
+      "seaPixels": 34181,
+      "chroma": 56.09703731177413,
+      "p50": 86.1912,
+      "whitePct": 0.37740265059536,
+      "maximumBlob": 5,
+      "autocorrelation": 0.05426356589147287
+    }
+  ],
+  "controls": [
+    {
+      "pose": "court",
+      "state": "day",
+      "fullP99": 208.5,
+      "controlP99": 208.5,
+      "changedPixels": 0
+    },
+    {
+      "pose": "court",
+      "state": "night",
+      "fullP99": 161.4,
+      "controlP99": 161.4,
+      "changedPixels": 4010
+    },
+    {
+      "pose": "reef",
+      "state": "day",
+      "fullP99": 208.5,
+      "controlP99": 208.5,
+      "changedPixels": 0
+    },
+    {
+      "pose": "reef",
+      "state": "night",
+      "fullP99": 174.2,
+      "controlP99": 174.2,
+      "changedPixels": 584
+    }
+  ],
+  "atlas": [
+    {
+      "node": "PR_ball",
+      "uvMin": [
+        0.673828125,
+        0.673828125
+      ],
+      "uvMax": [
+        0.673828125,
+        0.673828125
+      ],
+      "atlasRole": "emissive",
+      "atlasCell": "clock-face",
+      "emissiveFactor": [
+        0,
+        0,
+        0
+      ],
+      "material": "DI_MAT_emissive_pigment"
+    },
+    {
+      "node": "PR_ring",
+      "uvMin": [
+        0.673828125,
+        0.673828125
+      ],
+      "uvMax": [
+        0.673828125,
+        0.673828125
+      ],
+      "atlasRole": "emissive",
+      "atlasCell": "clock-face",
+      "emissiveFactor": [
+        0,
+        0,
+        0
+      ],
+      "material": "DI_MAT_emissive_pigment"
+    }
+  ]
+}

@@ -226,6 +226,7 @@ export class DreamIslandCapsules{
   const beamTints=tints.map(()=>COLUMN_CYAN.clone());
   this.columns=this.addNode('column',column,columnMaterial,columnBases,beamTints,false,true);
   const columnNightMaterial=new THREE.MeshBasicMaterial({name:'dreamisland_capsule_column_night',
+   color:new THREE.Color(3,3,3),
    vertexColors:true,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,
    side:THREE.DoubleSide,opacity:0});
   this.columnsNight=this.addNode('column-night',column,columnNightMaterial,columnBases,beamTints,false,true);
@@ -311,7 +312,7 @@ export class DreamIslandCapsules{
   // frame's world band to white (vs-design/court60-day.png, 2026-09-13): the
   // beam must read as light the sky is still visible through, not a bar.
   (this.columns.mesh.material as THREE.MeshBasicMaterial).opacity=mean*.5*(1-nightBlend);
-  (this.columnsNight.mesh.material as THREE.MeshBasicMaterial).opacity=mean*nightBlend*.7;
+  (this.columnsNight.mesh.material as THREE.MeshBasicMaterial).opacity=mean*nightBlend;
   (this.rings.mesh.material as THREE.MeshBasicMaterial).opacity=mean*(.5+nightBlend*.5);
   // Per-instance presence, so one collected pickup does not dim the other four.
   this.captureColumnTints();

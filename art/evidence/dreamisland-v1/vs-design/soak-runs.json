@@ -1,0 +1,39 @@
+[
+  {
+    "label": "rookie",
+    "args": [
+      "scripts/visual/dreamisland/race.mjs",
+      "--tier=rookie",
+      "--out=art/evidence/dreamisland-v1/vs-design/soak-rookie"
+    ],
+    "exitCode": 0
+  },
+  {
+    "label": "works",
+    "args": [
+      "scripts/visual/dreamisland/race.mjs",
+      "--tier=works",
+      "--out=art/evidence/dreamisland-v1/vs-design/soak-works"
+    ],
+    "exitCode": 0
+  },
+  {
+    "label": "feral",
+    "args": [
+      "scripts/visual/dreamisland/race.mjs",
+      "--tier=feral",
+      "--out=art/evidence/dreamisland-v1/vs-design/soak-feral"
+    ],
+    "exitCode": 0
+  },
+  {
+    "label": "works-reduced",
+    "args": [
+      "scripts/visual/dreamisland/race.mjs",
+      "--tier=works",
+      "--out=art/evidence/dreamisland-v1/vs-design/soak-works-reduced",
+      "--reduced"
+    ],
+    "exitCode": 0
+  }
+]

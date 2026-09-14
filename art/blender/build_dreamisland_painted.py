@@ -46,8 +46,10 @@ def bake_alive_ao():
  from mathutils.bvhtree import BVHTree
  root=Path(__file__).resolve().parents[2]
  path=root/'public/assets/dreamisland/painted.glb'
- evidence=root/'art/evidence/dreamisland-v1/alive/3d/ao';evidence.mkdir(parents=True,exist_ok=True)
- original=path.read_bytes();data=bytearray(original)
+ canopy_tint='--canopy-tint' in sys.argv
+ evidence=root/'art/evidence/dreamisland-v1/vs-design'/('g2-canopy' if canopy_tint else 'g2-ao');evidence.mkdir(parents=True,exist_ok=True)
+ source=next((root/arg.split('=',1)[1] for arg in sys.argv if arg.startswith('--ao-source=')),root/'art/evidence/dreamisland-v1/alive/3d/ao/painted-before.glb')
+ original=source.read_bytes();data=bytearray(original)
  size=struct.unpack_from('<I',data,12)[0];doc=json.loads(data[20:20+size]);start=20+size+8
  def accessor(index):
   a=doc['accessors'][index];view=doc['bufferViews'][a['bufferView']]
@@ -67,6 +69,24 @@ def bake_alive_ao():
    base=len(vertices);vertices.extend(tuple(p) for p in pos);faces.extend(tuple(int(i)+base for i in face) for face in indices)
    targets.append((node['name'],pos,accessor(attr['NORMAL']),accessor(attr['COLOR_0'])))
  tree=BVHTree.FromPolygons(vertices,faces,all_triangles=True)
+ palms=[p for p in json.loads((root/'public/assets/dreamisland/painted.json').read_text())['placements'] if p['asset'].startswith('palm-')]
+ sand_rect=json.loads((root/'public/assets/dreamisland/atlas-manifest.json').read_text())['roles']['jungle']['sand']['uv']
+ canopy_vertices=0
+ if canopy_tint:
+  for node in doc['nodes']:
+   if node.get('name')!='DI_STATIC_DI_MAT_jungle':continue
+   for primitive in doc['meshes'][node['mesh']]['primitives']:
+    attr=primitive['attributes'];positions=accessor(attr['POSITION']);uvs=accessor(attr['TEXCOORD_0']);colors=accessor(attr['COLOR_0'])
+    for i,(point,uv) in enumerate(zip(positions,uvs)):
+     if not(sand_rect[0]<=uv[0]<=sand_rect[2] and 1-sand_rect[3]<=uv[1]<=1-sand_rect[1]):continue
+     contact=0.
+     for palm in palms:
+      px,py,pz=palm['position']
+      if abs(float(point[1])-py)>2.:continue
+      radius=3.5*palm['scale'];distance=math.hypot(float(point[0])-px,float(point[2])-pz)
+      contact=max(contact,max(0.,1-distance/radius)**2)
+     if contact>0:
+      colors[i,:3]=(np.asarray(colors[i,:3],dtype=float)*(1-.28*contact)).astype(colors.dtype);canopy_vertices+=1
  cache={};rows=[]
  for name,positions,normals,colors in targets:
   occlusion=[]
@@ -78,19 +98,19 @@ def bake_alive_ao():
     point=Vector(p);normal=Vector(n).normalized()
     side=normal.cross(Vector((0,1,0)) if abs(normal.y)<.9 else Vector((1,0,0))).normalized();up=normal.cross(side)
     hits=0
-    for ray in range(8):
-     angle=ray*2.399963229728653;radius=math.sqrt((ray+.5)/8)
+    for ray in range(24):
+     angle=ray*2.399963229728653;radius=math.sqrt((ray+.5)/24)
      direction=(side*(math.cos(angle)*radius)+up*(math.sin(angle)*radius)+normal*math.sqrt(1-radius*radius)).normalized()
-     hit=tree.ray_cast(point+normal*.025,direction,2.4)
+     hit=tree.ray_cast(point+normal*.025,direction,14.0)
      if hit[0] is not None:hits+=1
-    factor=1-.35*hits/8;cache[key]=factor
+    factor=1-.88*hits/24;cache[key]=factor
    colors[i,:3]=np.clip(np.asarray(colors[i,:3],dtype=float)*factor,0,maximum).astype(colors.dtype)
    occlusion.append(factor)
   rows.append(dict(mesh=name,vertices=len(positions),minimum=min(occlusion),mean=sum(occlusion)/len(occlusion)))
  assert len(data)==len(original)
  (evidence/'painted-before.glb').write_bytes(original)
  path.write_bytes(data)
- report=dict(method='Blender BVHTree, 8 deterministic cosine hemisphere rays, radius 2.4 m, colour-only accessor patch',trianglesBefore=before,trianglesAfter=before,trianglesAdded=0,bytesChanged=sum(a!=b for a,b in zip(original,data)),sourceSha256=hashlib.sha256(original).hexdigest(),resultSha256=hashlib.sha256(data).hexdigest(),meshes=rows)
+ report=dict(method='Blender BVHTree, 24 deterministic cosine hemisphere rays, radius 14 m, strength .88, colour-only accessor patch',trianglesBefore=before,trianglesAfter=before,trianglesAdded=0,canopyTint=canopy_tint,canopyVertices=canopy_vertices,canopyRadiusMetres=3.5,canopyStrength=.28,bytesChanged=sum(a!=b for a,b in zip(original,data)),sourceSha256=hashlib.sha256(original).hexdigest(),resultSha256=hashlib.sha256(data).hexdigest(),meshes=rows)
  (evidence/'bake.json').write_text(json.dumps(report,indent=2));print(json.dumps(report))
 
 if '--alive-ao' in sys.argv:

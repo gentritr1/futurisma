@@ -1,0 +1,45 @@
+{
+  "kind": "PR_ball",
+  "night": 0,
+  "distance": 8,
+  "pmrem": {
+    "pmremCpuMs": 173.20000004768372,
+    "size": 128,
+    "passes": 2
+  },
+  "nodes": [
+    {
+      "name": "PR_ball",
+      "type": "MeshLambertMaterial",
+      "toneMapped": true,
+      "fog": true,
+      "opacity": 1,
+      "depthWrite": true,
+      "atlas": {
+        "name": "PR_ball",
+        "atlasRole": "emissive",
+        "atlasCell": "clock-face",
+        "recipe": "emissive",
+        "atlasRect": [
+          0.504,
+          0.004,
+          0.996,
+          0.496
+        ]
+      },
+      "triangles": 168
+    }
+  ],
+  "bounds": [
+    [
+      -0.7499999403953552,
+      -0.75,
+      -0.75
+    ],
+    [
+      0.7499998807907104,
+      0.75,
+      0.7499998807907104
+    ]
+  ]
+}

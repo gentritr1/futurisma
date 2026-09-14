@@ -1,0 +1,15 @@
+{
+  "art/blender/build_dreamisland_painted.py": "468999757af0dc6b0346b0c7c4a0f58ab2fda5a08dcf8030f18b5f3b7d54c699",
+  "art/blender/build_dreamisland_props.py": "498ec7dca8a73a0013c373f64ea4b9ea26fef00ab4ed59cabd2ff26d121fcdbc",
+  "src/game/dreamisland-props.ts": "7f317dc644303569731945e6b763be73d30661e6769696b3ce2dc29375c105a0",
+  "src/game/dreamisland-capsules.ts": "d7192c0bcc9257b4f800bb8cf96ad7b28f3beab17b8e8dda7e4e2182853c3d60",
+  "src/game/dreamisland-materials.ts": "eb6dbec407dd8783e81f2408cb8cc9a64ba0ad4eb831753cb8a439da366fda99",
+  "src/game/dreamisland-reflections.ts": "dc3de538e9d7351669a65aefb8fdb3407761280edaa1a55656234449f4ad95ac",
+  "public/assets/dreamisland/painted.glb": "6027368989e3c8a8be66e4be37116297904e0372b94be19dee9e3794ba0533b7",
+  "public/assets/dreamisland/props.glb": "e49fcddc39b3c6716c809ce3d4e4e0e58d6b0727052599a1c5ec5ea3733b239a",
+  "public/assets/dreamisland/capsule.glb": "28ee0c150bbe63452ce0a01446f85ff3b05e8556af8e90affc8d99a348f6fd4d",
+  "src/game/game.ts": "4e45ee4d7e965eff8647a58158add3297d9c027811576d601afc5384b6ca47fd",
+  "src/game/data/dreamisland/route.json": "843494dc36353367249352ec9c4f398b7d2a3437389c443c658e1a9fcafb487f",
+  "src/game/data/dreamisland/schedule.json": "a2abc0537a4c6743703c308a80ebacd45edd6f90224e0c2c86b53d37fd7accf7",
+  "src/game/data/dreamisland/rival-pace.json": "688491fbe4003654a162edfa8cba3d379889abffd2be0c75c78f67c842ab8183"
+}

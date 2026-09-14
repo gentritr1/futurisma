@@ -1,0 +1,66 @@
+[
+  {
+    "tier": "rookie",
+    "draws": 125,
+    "triangles": 192292,
+    "p95": 8.899999856948853,
+    "samples": 720,
+    "expected": 726.2092518150744,
+    "residual": -6.209251815074367,
+    "laps": [
+      33158,
+      32125,
+      31925
+    ],
+    "missed": 0,
+    "violations": 0
+  },
+  {
+    "tier": "works",
+    "draws": 125,
+    "triangles": 192292,
+    "p95": 8.699999809265137,
+    "samples": 720,
+    "expected": 727.4267912653748,
+    "residual": -7.426791265374845,
+    "laps": [
+      33158,
+      32125,
+      31925
+    ],
+    "missed": 0,
+    "violations": 0
+  },
+  {
+    "tier": "feral",
+    "draws": 126,
+    "triangles": 192388,
+    "p95": 8.700000047683716,
+    "samples": 720,
+    "expected": 721.3757487707912,
+    "residual": -1.3757487707912333,
+    "laps": [
+      33158,
+      32067,
+      31900
+    ],
+    "missed": 0,
+    "violations": 0
+  },
+  {
+    "tier": "works-reduced",
+    "draws": 122,
+    "triangles": 188644,
+    "p95": 8.600000143051147,
+    "samples": 720,
+    "expected": 722.1656183508859,
+    "residual": -2.165618350885893,
+    "laps": [
+      33158,
+      32125,
+      31925
+    ],
+    "missed": 0,
+    "violations": 0
+  }
+]

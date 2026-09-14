@@ -4,15 +4,15 @@ from pathlib import Path
 from mathutils import Vector
 ROOT=Path(__file__).resolve().parents[2]
 OUT=ROOT/'public/assets/dreamisland'
-EVIDENCE=ROOT/'art/evidence/dreamisland-v1/alive/3d/build'
+EVIDENCE=ROOT/'art/evidence/dreamisland-v1/vs-design/build'
 ATLAS=json.loads((OUT/'atlas-manifest.json').read_text())
 
 def setup():
  bpy.ops.wm.read_factory_settings(use_empty=True)
  EVIDENCE.mkdir(parents=True,exist_ok=True)
 
-def material(role,chrome=False,glass=False):
- name='DI_MAT_'+role+('_chrome' if chrome else '_glass' if glass else '')
+def material(role,chrome=False,glass=False,pigment=False):
+ name='DI_MAT_'+role+('_pigment' if pigment else '_chrome' if chrome else '_glass' if glass else '')
  if name in bpy.data.materials:return bpy.data.materials[name]
  m=bpy.data.materials.new(name);m.use_nodes=True
  p=m.node_tree.nodes.get('Principled BSDF')
@@ -22,7 +22,7 @@ def material(role,chrome=False,glass=False):
  t=m.node_tree.nodes.new('ShaderNodeTexImage');t.image=bpy.data.images.load(str(OUT/'textures'/f'{role}.jpg'),check_existing=True)
  m.node_tree.links.new(t.outputs['Color'],p.inputs['Base Color'])
  if role=='emissive':
-  m.node_tree.links.new(t.outputs['Color'],p.inputs['Emission Color']);p.inputs['Emission Strength'].default_value=3
+  m.node_tree.links.new(t.outputs['Color'],p.inputs['Emission Color']);p.inputs['Emission Strength'].default_value=0 if pigment else 3
  return m
 
 def finish_node(name,parts,role,cell,chrome=False,glass=False,stripes=False):
@@ -31,7 +31,8 @@ def finish_node(name,parts,role,cell,chrome=False,glass=False,stripes=False):
  bpy.context.view_layer.objects.active=parts[0];bpy.ops.object.join();o=bpy.context.object;o.name=name
  # Bake transforms and put every node at the same origin for instanced consumers.
  bpy.ops.object.transform_apply(location=True,rotation=True,scale=True)
- o.data.materials.clear();o.data.materials.append(material(role,chrome,glass))
+ pigment=name in ['PR_ball','PR_ring'] and role=='emissive'
+ o.data.materials.clear();o.data.materials.append(material(role,chrome,glass,pigment))
  rect=ATLAS['roles'][role][cell]['uv'];u0,v0,u1,v1=rect
  uv=o.data.uv_layers.active or o.data.uv_layers.new(name='UVMap')
  colors=o.data.color_attributes.new(name='Color',type='FLOAT_COLOR',domain='CORNER')
@@ -44,7 +45,8 @@ def finish_node(name,parts,role,cell,chrome=False,glass=False,stripes=False):
    co=o.data.vertices[o.data.loops[li].vertex_index].co
    u=(math.atan2(co.y,co.x)+math.pi)/math.tau
    v=.5+.45*math.sin(co.z*2)
-   uv.data[li].uv=(u0+(u1-u0)*(.02+.96*u),v0+(v1-v0)*v)
+   # Neutral white patch inside emissive/clock-face, clear of the hands.
+   uv.data[li].uv=(690/1024,1-690/1024) if pigment else (u0+(u1-u0)*(.02+.96*u),v0+(v1-v0)*v)
    colors.data[li].color=palette[stripe] if stripes else (1,1,1,1)
  o['atlasRole']=role;o['atlasCell']=cell;o['recipe']='glass' if glass else 'chrome' if chrome else role
  o['atlasRect']=rect
@@ -91,8 +93,8 @@ def export(filename,nodes,ceilings):
 
 if __name__=='__main__':
  setup();nodes=[]
- nodes.append(finish_node('PR_ball',[sphere(.75)],'jungle','sand',stripes=True))
- nodes.append(finish_node('PR_ring',[torus(.85,.25)],'jungle','sand'))
+ nodes.append(finish_node('PR_ball',[sphere(.75)],'emissive','clock-face',stripes=True))
+ nodes.append(finish_node('PR_ring',[torus(.85,.25)],'emissive','clock-face'))
  nodes.append(finish_node('PR_sphere',[sphere(.7,rings=10)],'metal','rail',chrome=True))
  pipes=[]
  for x,height in [(-.8,2.6),(0,3.85),(.8,1.9)]:pipes.append(cylinder(.15,height,height/2,x=x,vertices=8))

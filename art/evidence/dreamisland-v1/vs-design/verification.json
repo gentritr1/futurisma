@@ -1,0 +1,9 @@
+{
+  "pixelGates": "PASS",
+  "fourSoaksCompleted": true,
+  "testCodeExit": 0,
+  "pixelGateScope": "G1 night p99, road median and same-frame composited-water clipping; G2 COURT day only",
+  "g3Chroma": "NOT_MET",
+  "g3Palette": "NOT_MET",
+  "strictSeaChromaFloor": "NOT_DEMONSTRATED"
+}

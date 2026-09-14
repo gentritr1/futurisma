@@ -1,0 +1,382 @@
+[
+  {
+    "pose": "court",
+    "state": "day",
+    "kind": "sea",
+    "visible": {
+      "pixels": 74068,
+      "p50": 85.1912,
+      "p99": 210.5658,
+      "maximum": 254.0,
+      "whitePct": 0.26597180968839446,
+      "chroma": 55.72059129233877
+    },
+    "isolated": {
+      "pixels": 573439,
+      "p50": 75.5562,
+      "p99": 201.3612,
+      "maximum": 254.7874,
+      "whitePct": 0.08143847907100843,
+      "chroma": 66.6258599363591
+    }
+  },
+  {
+    "pose": "court",
+    "state": "day",
+    "kind": "shallows",
+    "visible": {
+      "pixels": 4900,
+      "p50": 143.2608,
+      "p99": 157.9736,
+      "maximum": 251.647,
+      "whitePct": 0.4693877551020408,
+      "chroma": 25.93060209343515
+    },
+    "isolated": {
+      "pixels": 7873,
+      "p50": 145.77700000000002,
+      "p99": 199.5762,
+      "maximum": 251.647,
+      "whitePct": 0.4318557093865108,
+      "chroma": 24.758205835681483
+    }
+  },
+  {
+    "pose": "court",
+    "state": "day",
+    "kind": "road",
+    "visible": {
+      "pixels": 86015,
+      "p50": 95.4144,
+      "p99": 127.4224,
+      "maximum": 141.57599999999996,
+      "whitePct": 0.0,
+      "chroma": 7.922560025878063
+    },
+    "isolated": {
+      "pixels": 368649,
+      "p50": 99.274,
+      "p99": 139.5038,
+      "maximum": 201.33199999999997,
+      "whitePct": 0.0,
+      "chroma": 8.543176071792976
+    }
+  },
+  {
+    "pose": "court",
+    "state": "night",
+    "kind": "sea",
+    "visible": {
+      "pixels": 76516,
+      "p50": 9.1576,
+      "p99": 41.9192,
+      "maximum": 64.70259999999999,
+      "whitePct": 0.0,
+      "chroma": 6.690222043102214
+    },
+    "isolated": {
+      "pixels": 577280,
+      "p50": 1.0722,
+      "p99": 40.7748,
+      "maximum": 64.70259999999999,
+      "whitePct": 0.0,
+      "chroma": 2.0280199881649237
+    },
+    "baselineVisiblePixelsInFinal": {
+      "pixels": 76923,
+      "p50": 9.1576,
+      "p99": 41.9192,
+      "maximum": 85.0058,
+      "whitePct": 0.0,
+      "chroma": 6.796522757774695
+    },
+    "baselineVisible": {
+      "pixels": 76923,
+      "p50": 9.1576,
+      "p99": 41.9192,
+      "maximum": 64.70259999999999,
+      "whitePct": 0.0,
+      "chroma": 6.697214252365668
+    },
+    "sameFrameWaterWithGlow": {
+      "pixels": 76821,
+      "p50": 9.1576,
+      "p99": 41.9192,
+      "maximum": 67.2574,
+      "whitePct": 0.0,
+      "chroma": 6.6999887996567224
+    },
+    "sameFrameWaterWithoutGlow": {
+      "pixels": 76821,
+      "p50": 9.1576,
+      "p99": 41.9192,
+      "maximum": 64.70259999999999,
+      "whitePct": 0.0,
+      "chroma": 6.694849799130794
+    }
+  },
+  {
+    "pose": "court",
+    "state": "night",
+    "kind": "shallows",
+    "visible": {
+      "pixels": 4806,
+      "p50": 89.9498,
+      "p99": 135.79739999999993,
+      "maximum": 145.38879999999997,
+      "whitePct": 0.0,
+      "chroma": 18.97446430504895
+    },
+    "isolated": {
+      "pixels": 7924,
+      "p50": 83.2364,
+      "p99": 131.9147019999999,
+      "maximum": 145.38879999999997,
+      "whitePct": 0.0,
+      "chroma": 18.0772080800739
+    },
+    "baselineVisiblePixelsInFinal": {
+      "pixels": 4875,
+      "p50": 89.7586,
+      "p99": 135.49656000000007,
+      "maximum": 145.38879999999997,
+      "whitePct": 0.0,
+      "chroma": 18.92132331466679
+    },
+    "baselineVisible": {
+      "pixels": 4875,
+      "p50": 89.23119999999999,
+      "p99": 135.384656,
+      "maximum": 146.3166,
+      "whitePct": 0.0,
+      "chroma": 18.931306808149603
+    },
+    "sameFrameWaterWithGlow": {
+      "pixels": 4901,
+      "p50": 89.9516,
+      "p99": 135.3832,
+      "maximum": 145.38879999999997,
+      "whitePct": 0.0,
+      "chroma": 18.975141085508547
+    },
+    "sameFrameWaterWithoutGlow": {
+      "pixels": 4901,
+      "p50": 89.68239999999999,
+      "p99": 135.3832,
+      "maximum": 145.38879999999997,
+      "whitePct": 0.0,
+      "chroma": 18.947763413712128
+    }
+  },
+  {
+    "pose": "court",
+    "state": "night",
+    "kind": "road",
+    "visible": {
+      "pixels": 85993,
+      "p50": 40.7388,
+      "p99": 85.89024,
+      "maximum": 97.87519999999999,
+      "whitePct": 0.0,
+      "chroma": 6.813551817950135
+    },
+    "isolated": {
+      "pixels": 368599,
+      "p50": 47.6614,
+      "p99": 98.67299999999999,
+      "maximum": 118.4724,
+      "whitePct": 0.0,
+      "chroma": 7.9419919083718415
+    }
+  },
+  {
+    "pose": "reef",
+    "state": "day",
+    "kind": "sea",
+    "visible": {
+      "pixels": 34181,
+      "p50": 86.1912,
+      "p99": 206.49759999999998,
+      "maximum": 254.0,
+      "whitePct": 0.37740265059536,
+      "chroma": 56.09703731177413
+    },
+    "isolated": {
+      "pixels": 542720,
+      "p50": 78.0536,
+      "p99": 169.7502,
+      "maximum": 254.99999999999997,
+      "whitePct": 0.13119103773584906,
+      "chroma": 68.59232647105215
+    }
+  },
+  {
+    "pose": "reef",
+    "state": "day",
+    "kind": "shallows",
+    "visible": {
+      "pixels": 94614,
+      "p50": 135.9812,
+      "p99": 154.9812,
+      "maximum": 254.99999999999997,
+      "whitePct": 0.39423341154586006,
+      "chroma": 27.666863965967988
+    },
+    "isolated": {
+      "pixels": 143857,
+      "p50": 136.1256,
+      "p99": 187.40524000000016,
+      "maximum": 254.99999999999997,
+      "whitePct": 0.30585929082352614,
+      "chroma": 27.539335084757845
+    }
+  },
+  {
+    "pose": "reef",
+    "state": "day",
+    "kind": "road",
+    "visible": {
+      "pixels": 91029,
+      "p50": 95.529,
+      "p99": 127.13759999999999,
+      "maximum": 138.50379999999998,
+      "whitePct": 0.0,
+      "chroma": 8.303356748552364
+    },
+    "isolated": {
+      "pixels": 403933,
+      "p50": 98.6992,
+      "p99": 139.42950399999995,
+      "maximum": 197.336,
+      "whitePct": 0.0,
+      "chroma": 8.427660161298506
+    }
+  },
+  {
+    "pose": "reef",
+    "state": "night",
+    "kind": "sea",
+    "visible": {
+      "pixels": 36187,
+      "p50": 9.0854,
+      "p99": 41.9192,
+      "maximum": 65.5662,
+      "whitePct": 0.0,
+      "chroma": 6.16558746600507
+    },
+    "isolated": {
+      "pixels": 545280,
+      "p50": 0.0,
+      "p99": 34.3364,
+      "maximum": 72.2092,
+      "whitePct": 0.0,
+      "chroma": 0.7882086632757723
+    },
+    "baselineVisiblePixelsInFinal": {
+      "pixels": 36228,
+      "p50": 9.0854,
+      "p99": 41.9192,
+      "maximum": 99.332,
+      "whitePct": 0.0,
+      "chroma": 6.170992330800967
+    },
+    "baselineVisible": {
+      "pixels": 36228,
+      "p50": 9.0854,
+      "p99": 41.9192,
+      "maximum": 65.5662,
+      "whitePct": 0.0,
+      "chroma": 6.170397245416342
+    },
+    "sameFrameWaterWithGlow": {
+      "pixels": 36233,
+      "p50": 9.0854,
+      "p99": 41.9192,
+      "maximum": 68.4992,
+      "whitePct": 0.0,
+      "chroma": 6.179703567050188
+    },
+    "sameFrameWaterWithoutGlow": {
+      "pixels": 36233,
+      "p50": 9.0854,
+      "p99": 41.9192,
+      "maximum": 65.5662,
+      "whitePct": 0.0,
+      "chroma": 6.178888472552141
+    }
+  },
+  {
+    "pose": "reef",
+    "state": "night",
+    "kind": "shallows",
+    "visible": {
+      "pixels": 88535,
+      "p50": 107.20979999999999,
+      "p99": 180.32260000000002,
+      "maximum": 196.32659999999998,
+      "whitePct": 0.0,
+      "chroma": 23.417996661532676
+    },
+    "isolated": {
+      "pixels": 143824,
+      "p50": 112.85279999999999,
+      "p99": 182.03779999999998,
+      "maximum": 196.32659999999998,
+      "whitePct": 0.0,
+      "chroma": 23.57701445999811
+    },
+    "baselineVisiblePixelsInFinal": {
+      "pixels": 92342,
+      "p50": 107.70779999999999,
+      "p99": 181.9656,
+      "maximum": 213.337,
+      "whitePct": 0.0,
+      "chroma": 23.438484411365206
+    },
+    "baselineVisible": {
+      "pixels": 92342,
+      "p50": 106.6286,
+      "p99": 180.2504,
+      "maximum": 195.4542,
+      "whitePct": 0.0,
+      "chroma": 23.436746906526768
+    },
+    "sameFrameWaterWithGlow": {
+      "pixels": 94385,
+      "p50": 108.8448,
+      "p99": 186.82039999999998,
+      "maximum": 232.48659999999998,
+      "whitePct": 0.0,
+      "chroma": 23.53865918538052
+    },
+    "sameFrameWaterWithoutGlow": {
+      "pixels": 94385,
+      "p50": 107.34619999999998,
+      "p99": 180.2504,
+      "maximum": 196.32659999999998,
+      "whitePct": 0.0,
+      "chroma": 23.436382484185827
+    }
+  },
+  {
+    "pose": "reef",
+    "state": "night",
+    "kind": "road",
+    "visible": {
+      "pixels": 91075,
+      "p50": 32.58,
+      "p99": 82.74,
+      "maximum": 95.59559999999999,
+      "whitePct": 0.0,
+      "chroma": 4.839285175102357
+    },
+    "isolated": {
+      "pixels": 403963,
+      "p50": 39.870000000000005,
+      "p99": 96.5956,
+      "maximum": 114.5406,
+      "whitePct": 0.0,
+      "chroma": 6.15023775412019
+    }
+  }
+]

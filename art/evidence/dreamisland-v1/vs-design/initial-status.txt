@@ -1,0 +1,26 @@
+ D art/evidence/dreamisland-v1/alive/combined-final/after-hud-merge/soak-works/race.json
+ M scripts/validate-corridor.mjs
+ M src/game/environment.ts
+ M src/game/neon-environment.ts
+?? art/evidence/design-next/
+?? art/evidence/dreamisland-v1/alive/combined-final/after-hud-merge/hud/capture.json
+?? art/evidence/dreamisland-v1/alive/combined-final/after-hud-merge/hud/feel-overtake.png
+?? art/evidence/dreamisland-v1/alive/combined-final/after-hud-merge/hud/skin-night.png
+?? art/evidence/dreamisland-v1/vs-design/
+?? art/evidence/grand-tour-preview/
+?? art/evidence/hangar-road/
+?? art/evidence/map-polish-review/
+?? experiments/
+?? scripts/validate-hangar-opening.mjs
+?? scripts/visual/grand-tour-capture-results.mjs
+?? scripts/visual/grand-tour-controls-review.mjs
+?? scripts/visual/grand-tour-fable-review.mjs
+?? scripts/visual/grand-tour-review.mjs
+?? scripts/visual/hangar-face-probe.mjs
+?? scripts/visual/hangar-race-review.mjs
+?? scripts/visual/hangar-road-review.mjs
+?? scripts/visual/map-polish-report.py
+?? scripts/visual/map-polish-review.mjs
+?? scripts/visual/neon-optics-review.mjs
+?? scripts/visual/neon-race-review.mjs
+?? src/game/greenwater-hangar-opening.js

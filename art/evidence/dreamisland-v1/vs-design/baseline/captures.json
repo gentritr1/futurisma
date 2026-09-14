@@ -1,0 +1,869 @@
+{
+  "rows": [
+    {
+      "name": "court-day",
+      "url": "http://127.0.0.1:5200/?map=dreamisland&seed=3868938316&tier=works&laps=3&demo=1&headless=1&diagnostics=1&start=manual&quality=high&music=0",
+      "progress": 0.560141721242807,
+      "tick": 2278,
+      "nightBlend": 0,
+      "camera": [
+        369.6478215336669,
+        17.52388809120143,
+        733.2525521585669
+      ],
+      "quaternion": [
+        -0.05443619367316606,
+        0.7888023659942824,
+        0.07060699601460702,
+        0.6081465122271053
+      ],
+      "fov": 62,
+      "meshes": [
+        {
+          "name": "sky_backdrop",
+          "triangles": 528,
+          "castShadow": false
+        },
+        {
+          "name": "dreamisland_panorama",
+          "triangles": 1520,
+          "castShadow": false
+        },
+        {
+          "name": "dreamisland_sea",
+          "triangles": 1802,
+          "castShadow": false
+        },
+        {
+          "name": "dreamisland_shallows",
+          "triangles": 234,
+          "castShadow": false
+        },
+        {
+          "name": "dreamisland_foam",
+          "triangles": 202,
+          "castShadow": false
+        },
+        {
+          "name": "dreamisland_blockout_road",
+          "triangles": 9832,
+          "castShadow": false
+        },
+        {
+          "name": "dreamisland_blockout_markers",
+          "triangles": 12,
+          "castShadow": false
+        },
+        {
+          "name": "stabiliser_ring_emissive",
+          "triangles": 24,
+          "castShadow": false
+        },
+        {
+          "name": "emissive_static",
+          "triangles": 84,
+          "castShadow": false
+        },
+        {
+          "name": "elevon_L_body",
+          "triangles": 28,
+          "castShadow": true
+        },
+        {
+          "name": "elevon_R_body",
+          "triangles": 28,
+          "castShadow": true
+        },
+        {
+          "name": "stabiliser_ring_body",
+          "triangles": 2104,
+          "castShadow": true
+        },
+        {
+          "name": "engine_flap_L_1_body",
+          "triangles": 28,
+          "castShadow": true
+        },
+        {
+          "name": "engine_flap_L_0_body",
+          "triangles": 28,
+          "castShadow": true
+        },
+        {
+          "name": "engine_flap_R_1_body",
+          "triangles": 28,
+          "castShadow": true
+        },
+        {
+          "name": "engine_flap_R_0_body",
+          "triangles": 28,
+          "castShadow": true
+        },
+        {
+          "name": "airbrake_L_body",
+          "triangles": 28,
+          "castShadow": true
+        },
+        {
+          "name": "airbrake_R_body",
+          "triangles": 28,
+          "castShadow": true
+        },
+        {
+          "name": "skids_body",
+          "triangles": 72,
+          "castShadow": true
+        },
+        {
+          "name": "body_static",
+          "triangles": 3438,
+          "castShadow": true
+        },
+        {
+          "name": "canopy_body",
+          "triangles": 12,
+          "castShadow": true
+        },
+        {
+          "name": "steering_fin_L_body",
+          "triangles": 28,
+          "castShadow": true
+        },
+        {
+          "name": "steering_fin_R_body",
+          "triangles": 28,
+          "castShadow": true
+        },
+        {
+          "name": "TE_boost_meter",
+          "triangles": 376,
+          "castShadow": false
+        },
+        {
+          "name": "TE_brake_lamps",
+          "triangles": 72,
+          "castShadow": false
+        },
+        {
+          "name": "TE_gyro_alloy",
+          "triangles": 700,
+          "castShadow": false
+        },
+        {
+          "name": "TE_instrument_housing",
+          "triangles": 60,
+          "castShadow": false
+        },
+        {
+          "name": "TE_gyro_instruments",
+          "triangles": 240,
+          "castShadow": false
+        },
+        {
+          "name": "TE_power_lamps",
+          "triangles": 24,
+          "castShadow": false
+        },
+        {
+          "name": "TE_service_markings",
+          "triangles": 48,
+          "castShadow": false
+        },
+        {
+          "name": "PK_shield_lattice",
+          "triangles": 104,
+          "castShadow": false
+        },
+        {
+          "name": "PK_shield_core",
+          "triangles": 136,
+          "castShadow": false
+        },
+        {
+          "name": "PK_surge_cage",
+          "triangles": 848,
+          "castShadow": false
+        },
+        {
+          "name": "PK_shield_housing",
+          "triangles": 480,
+          "castShadow": false
+        },
+        {
+          "name": "PK_surge_mount",
+          "triangles": 368,
+          "castShadow": false
+        },
+        {
+          "name": "PK_shield_petals",
+          "triangles": 360,
+          "castShadow": false
+        },
+        {
+          "name": "PK_surge_capacitors",
+          "triangles": 740,
+          "castShadow": false
+        },
+        {
+          "name": "PK_surge_core",
+          "triangles": 408,
+          "castShadow": false
+        },
+        {
+          "name": "TE_telescopic_power_mounts",
+          "triangles": 24,
+          "castShadow": false
+        },
+        {
+          "name": "rival_totem_body_steering_fins",
+          "triangles": 28,
+          "castShadow": true
+        },
+        {
+          "name": "rival_totem_body_hull",
+          "triangles": 5794,
+          "castShadow": true
+        },
+        {
+          "name": "rival_totem_body_airbrakes",
+          "triangles": 28,
+          "castShadow": true
+        },
+        {
+          "name": "rival_totem_emissive_hull",
+          "triangles": 108,
+          "castShadow": false
+        },
+        {
+          "name": "DI_STATIC_DI_MAT_emissive",
+          "triangles": 1232,
+          "castShadow": false
+        },
+        {
+          "name": "DI_HERO_sea-stack_DI_MAT_jungle",
+          "triangles": 368,
+          "castShadow": false
+        },
+        {
+          "name": "DI_STATIC_DI_MAT_jungle",
+          "triangles": 30632,
+          "castShadow": false
+        },
+        {
+          "name": "DI_HERO_sea-stack_DI_MAT_concrete",
+          "triangles": 1604,
+          "castShadow": false
+        },
+        {
+          "name": "DI_STATIC_DI_MAT_concrete",
+          "triangles": 23180,
+          "castShadow": false
+        },
+        {
+          "name": "DI_POWER_DI_MAT_concrete",
+          "triangles": 228,
+          "castShadow": false
+        },
+        {
+          "name": "DI_STATIC_DI_MAT_metal",
+          "triangles": 2120,
+          "castShadow": false
+        },
+        {
+          "name": "DI_POWER_DI_MAT_metal",
+          "triangles": 3776,
+          "castShadow": false
+        },
+        {
+          "name": "DI_POWER_petals",
+          "triangles": 36,
+          "castShadow": false
+        },
+        {
+          "name": "DI_STATIC_DI_MAT_signage",
+          "triangles": 212,
+          "castShadow": false
+        },
+        {
+          "name": "dreamisland_road_paint",
+          "triangles": 4630,
+          "castShadow": false
+        },
+        {
+          "name": "DI_POWER_core_surge",
+          "triangles": 36,
+          "castShadow": false
+        },
+        {
+          "name": "DI_POWER_core_shield",
+          "triangles": 44,
+          "castShadow": false
+        },
+        {
+          "name": "DI_POWER_plate_surge",
+          "triangles": 12,
+          "castShadow": false
+        },
+        {
+          "name": "DI_POWER_plate_shield",
+          "triangles": 12,
+          "castShadow": false
+        },
+        {
+          "name": "PR_ball",
+          "triangles": 168,
+          "castShadow": false
+        },
+        {
+          "name": "PR_ring",
+          "triangles": 256,
+          "castShadow": false
+        },
+        {
+          "name": "PR_bollard",
+          "triangles": 64,
+          "castShadow": false
+        },
+        {
+          "name": "PR_bollard_core",
+          "triangles": 12,
+          "castShadow": false
+        },
+        {
+          "name": "PR_plinth",
+          "triangles": 36,
+          "castShadow": false
+        },
+        {
+          "name": "DI_CAPSULE_CAP_frame",
+          "triangles": 240,
+          "castShadow": false
+        },
+        {
+          "name": "DI_CAPSULE_CAP_core",
+          "triangles": 44,
+          "castShadow": false
+        },
+        {
+          "name": "DI_CAPSULE_CAP_cap",
+          "triangles": 88,
+          "castShadow": false
+        },
+        {
+          "name": "PR_sphere",
+          "triangles": 216,
+          "castShadow": false
+        },
+        {
+          "name": "PR_pipes",
+          "triangles": 340,
+          "castShadow": false
+        },
+        {
+          "name": "rival_engine_glow",
+          "triangles": 2,
+          "castShadow": false
+        },
+        {
+          "name": "rival_totem_glass_hull",
+          "triangles": 100,
+          "castShadow": false
+        },
+        {
+          "name": "canopy_glass",
+          "triangles": 100,
+          "castShadow": false
+        },
+        {
+          "name": "DI_STATIC_DI_MAT_jungle-card",
+          "triangles": 8294,
+          "castShadow": false
+        },
+        {
+          "name": "DI_CAPSULE_CAP_glass",
+          "triangles": 216,
+          "castShadow": false
+        },
+        {
+          "name": "totem_shadow_blobs",
+          "triangles": 2,
+          "castShadow": false
+        },
+        {
+          "name": "TE_twin_layered_exhaust",
+          "triangles": 48,
+          "castShadow": false
+        },
+        {
+          "name": "totem_race_presence_alpha",
+          "triangles": 2,
+          "castShadow": false
+        },
+        {
+          "name": "totem_race_presence_additive",
+          "triangles": 2,
+          "castShadow": false
+        },
+        {
+          "name": "DI_CAPSULE_ring",
+          "triangles": 48,
+          "castShadow": false
+        },
+        {
+          "name": "DI_CAPSULE_column",
+          "triangles": 12,
+          "castShadow": false
+        },
+        {
+          "name": "DI_CAPSULE_column-night",
+          "triangles": 12,
+          "castShadow": false
+        },
+        {
+          "name": "dreamisland_glow_sprites",
+          "triangles": 2,
+          "castShadow": false
+        }
+      ],
+      "glow": {
+        "atlasCell": "emissive/shallows-glow",
+        "worldMetres": true,
+        "sources": 4,
+        "instances": 0
+      }
+    },
+    {
+      "name": "reef-day",
+      "url": "http://127.0.0.1:5200/?map=dreamisland&seed=3868938316&tier=works&laps=3&demo=1&headless=1&diagnostics=1&start=manual&quality=high&music=0",
+      "progress": 0.7351491342978627,
+      "tick": 2885,
+      "nightBlend": 0,
+      "camera": [
+        51.6598738269902,
+        5.76,
+        540.5352065790413
+      ],
+      "quaternion": [
+        -0.0589042907161147,
+        0.1429416554392905,
+        0.008522660595888732,
+        0.9879399434843567
+      ],
+      "fov": 62,
+      "meshes": [
+        {
+          "name": "sky_backdrop",
+          "triangles": 528,
+          "castShadow": false
+        },
+        {
+          "name": "dreamisland_panorama",
+          "triangles": 1520,
+          "castShadow": false
+        },
+        {
+          "name": "dreamisland_sea",
+          "triangles": 1802,
+          "castShadow": false
+        },
+        {
+          "name": "dreamisland_shallows",
+          "triangles": 234,
+          "castShadow": false
+        },
+        {
+          "name": "dreamisland_foam",
+          "triangles": 202,
+          "castShadow": false
+        },
+        {
+          "name": "dreamisland_blockout_road",
+          "triangles": 9832,
+          "castShadow": false
+        },
+        {
+          "name": "dreamisland_blockout_markers",
+          "triangles": 12,
+          "castShadow": false
+        },
+        {
+          "name": "stabiliser_ring_emissive",
+          "triangles": 24,
+          "castShadow": false
+        },
+        {
+          "name": "emissive_static",
+          "triangles": 84,
+          "castShadow": false
+        },
+        {
+          "name": "elevon_L_body",
+          "triangles": 28,
+          "castShadow": true
+        },
+        {
+          "name": "elevon_R_body",
+          "triangles": 28,
+          "castShadow": true
+        },
+        {
+          "name": "stabiliser_ring_body",
+          "triangles": 2104,
+          "castShadow": true
+        },
+        {
+          "name": "engine_flap_L_1_body",
+          "triangles": 28,
+          "castShadow": true
+        },
+        {
+          "name": "engine_flap_L_0_body",
+          "triangles": 28,
+          "castShadow": true
+        },
+        {
+          "name": "engine_flap_R_1_body",
+          "triangles": 28,
+          "castShadow": true
+        },
+        {
+          "name": "engine_flap_R_0_body",
+          "triangles": 28,
+          "castShadow": true
+        },
+        {
+          "name": "airbrake_L_body",
+          "triangles": 28,
+          "castShadow": true
+        },
+        {
+          "name": "airbrake_R_body",
+          "triangles": 28,
+          "castShadow": true
+        },
+        {
+          "name": "skids_body",
+          "triangles": 72,
+          "castShadow": true
+        },
+        {
+          "name": "body_static",
+          "triangles": 3438,
+          "castShadow": true
+        },
+        {
+          "name": "canopy_body",
+          "triangles": 12,
+          "castShadow": true
+        },
+        {
+          "name": "steering_fin_L_body",
+          "triangles": 28,
+          "castShadow": true
+        },
+        {
+          "name": "steering_fin_R_body",
+          "triangles": 28,
+          "castShadow": true
+        },
+        {
+          "name": "TE_boost_meter",
+          "triangles": 376,
+          "castShadow": false
+        },
+        {
+          "name": "TE_brake_lamps",
+          "triangles": 72,
+          "castShadow": false
+        },
+        {
+          "name": "TE_gyro_alloy",
+          "triangles": 700,
+          "castShadow": false
+        },
+        {
+          "name": "TE_instrument_housing",
+          "triangles": 60,
+          "castShadow": false
+        },
+        {
+          "name": "TE_gyro_instruments",
+          "triangles": 240,
+          "castShadow": false
+        },
+        {
+          "name": "TE_power_lamps",
+          "triangles": 24,
+          "castShadow": false
+        },
+        {
+          "name": "TE_service_markings",
+          "triangles": 48,
+          "castShadow": false
+        },
+        {
+          "name": "PK_shield_lattice",
+          "triangles": 104,
+          "castShadow": false
+        },
+        {
+          "name": "PK_shield_core",
+          "triangles": 136,
+          "castShadow": false
+        },
+        {
+          "name": "PK_surge_cage",
+          "triangles": 848,
+          "castShadow": false
+        },
+        {
+          "name": "PK_shield_housing",
+          "triangles": 480,
+          "castShadow": false
+        },
+        {
+          "name": "PK_shield_petals",
+          "triangles": 360,
+          "castShadow": false
+        },
+        {
+          "name": "PK_surge_mount",
+          "triangles": 368,
+          "castShadow": false
+        },
+        {
+          "name": "PK_surge_capacitors",
+          "triangles": 740,
+          "castShadow": false
+        },
+        {
+          "name": "PK_surge_core",
+          "triangles": 408,
+          "castShadow": false
+        },
+        {
+          "name": "TE_telescopic_power_mounts",
+          "triangles": 24,
+          "castShadow": false
+        },
+        {
+          "name": "rival_totem_body_hull",
+          "triangles": 5794,
+          "castShadow": true
+        },
+        {
+          "name": "rival_totem_body_steering_fins",
+          "triangles": 28,
+          "castShadow": true
+        },
+        {
+          "name": "rival_totem_body_airbrakes",
+          "triangles": 28,
+          "castShadow": true
+        },
+        {
+          "name": "rival_totem_emissive_hull",
+          "triangles": 108,
+          "castShadow": false
+        },
+        {
+          "name": "DI_STATIC_DI_MAT_emissive",
+          "triangles": 1232,
+          "castShadow": false
+        },
+        {
+          "name": "DI_HERO_sea-stack_DI_MAT_jungle",
+          "triangles": 368,
+          "castShadow": false
+        },
+        {
+          "name": "DI_STATIC_DI_MAT_jungle",
+          "triangles": 30632,
+          "castShadow": false
+        },
+        {
+          "name": "DI_HERO_sea-stack_DI_MAT_concrete",
+          "triangles": 1604,
+          "castShadow": false
+        },
+        {
+          "name": "DI_STATIC_DI_MAT_concrete",
+          "triangles": 23180,
+          "castShadow": false
+        },
+        {
+          "name": "DI_POWER_DI_MAT_concrete",
+          "triangles": 228,
+          "castShadow": false
+        },
+        {
+          "name": "DI_POWER_DI_MAT_metal",
+          "triangles": 3776,
+          "castShadow": false
+        },
+        {
+          "name": "DI_STATIC_DI_MAT_metal",
+          "triangles": 2120,
+          "castShadow": false
+        },
+        {
+          "name": "DI_POWER_petals",
+          "triangles": 36,
+          "castShadow": false
+        },
+        {
+          "name": "DI_STATIC_DI_MAT_signage",
+          "triangles": 212,
+          "castShadow": false
+        },
+        {
+          "name": "dreamisland_road_paint",
+          "triangles": 4630,
+          "castShadow": false
+        },
+        {
+          "name": "DI_POWER_core_surge",
+          "triangles": 36,
+          "castShadow": false
+        },
+        {
+          "name": "DI_POWER_core_shield",
+          "triangles": 44,
+          "castShadow": false
+        },
+        {
+          "name": "DI_POWER_plate_surge",
+          "triangles": 12,
+          "castShadow": false
+        },
+        {
+          "name": "DI_POWER_plate_shield",
+          "triangles": 12,
+          "castShadow": false
+        },
+        {
+          "name": "PR_ball",
+          "triangles": 168,
+          "castShadow": false
+        },
+        {
+          "name": "PR_ring",
+          "triangles": 256,
+          "castShadow": false
+        },
+        {
+          "name": "PR_bollard",
+          "triangles": 64,
+          "castShadow": false
+        },
+        {
+          "name": "PR_bollard_core",
+          "triangles": 12,
+          "castShadow": false
+        },
+        {
+          "name": "PR_plinth",
+          "triangles": 36,
+          "castShadow": false
+        },
+        {
+          "name": "DI_CAPSULE_CAP_frame",
+          "triangles": 240,
+          "castShadow": false
+        },
+        {
+          "name": "DI_CAPSULE_CAP_core",
+          "triangles": 44,
+          "castShadow": false
+        },
+        {
+          "name": "DI_CAPSULE_CAP_cap",
+          "triangles": 88,
+          "castShadow": false
+        },
+        {
+          "name": "PR_sphere",
+          "triangles": 216,
+          "castShadow": false
+        },
+        {
+          "name": "PR_pipes",
+          "triangles": 340,
+          "castShadow": false
+        },
+        {
+          "name": "rival_engine_glow",
+          "triangles": 2,
+          "castShadow": false
+        },
+        {
+          "name": "rival_totem_glass_hull",
+          "triangles": 100,
+          "castShadow": false
+        },
+        {
+          "name": "DI_CAPSULE_CAP_glass",
+          "triangles": 216,
+          "castShadow": false
+        },
+        {
+          "name": "DI_STATIC_DI_MAT_jungle-card",
+          "triangles": 8294,
+          "castShadow": false
+        },
+        {
+          "name": "canopy_glass",
+          "triangles": 100,
+          "castShadow": false
+        },
+        {
+          "name": "totem_shadow_blobs",
+          "triangles": 2,
+          "castShadow": false
+        },
+        {
+          "name": "TE_twin_layered_exhaust",
+          "triangles": 48,
+          "castShadow": false
+        },
+        {
+          "name": "totem_race_presence_alpha",
+          "triangles": 2,
+          "castShadow": false
+        },
+        {
+          "name": "DI_CAPSULE_ring",
+          "triangles": 48,
+          "castShadow": false
+        },
+        {
+          "name": "totem_race_presence_additive",
+          "triangles": 2,
+          "castShadow": false
+        },
+        {
+          "name": "DI_CAPSULE_column",
+          "triangles": 12,
+          "castShadow": false
+        },
+        {
+          "name": "DI_CAPSULE_column-night",
+          "triangles": 12,
+          "castShadow": false
+        },
+        {
+          "name": "dreamisland_glow_sprites",
+          "triangles": 2,
+          "castShadow": false
+        }
+      ],
+      "glow": {
+        "atlasCell": "emissive/shallows-glow",
+        "worldMetres": true,
+        "sources": 4,
+        "instances": 0
+      }
+    }
+  ],
+  "errors": []
+}

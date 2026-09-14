@@ -321,7 +321,7 @@ export class DreamIslandProps{
   let drawnInstances=0,drawnTriangles=0;
   for(const entry of this.meshes){
    if(entry.emissive){
-    (entry.mesh.material as THREE.MeshLambertMaterial).emissiveIntensity=nightBlend*1.6;
+    (entry.mesh.material as THREE.MeshLambertMaterial).emissiveIntensity=nightBlend*16;
    }
    // PER-INSTANCE CULLING, because `InstancedMesh` has none of its own.
    //
