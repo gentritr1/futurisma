@@ -1,0 +1,147 @@
+{
+  "lance": {
+    "triangles": 712,
+    "meshes": 9,
+    "drawCalls": 25,
+    "min": [
+      -1.62,
+      -0.44,
+      -4.72
+    ],
+    "max": [
+      1.62,
+      1.12,
+      2.632
+    ],
+    "bytes": 110608,
+    "label": "LANCE S3",
+    "glow": [
+      0.29,
+      0.89,
+      1.0
+    ],
+    "renders": {
+      "hero": "art/evidence/garage-frames/lance-hero.png",
+      "rear": "art/evidence/garage-frames/lance-rear.png",
+      "side": "art/evidence/garage-frames/lance-side.png",
+      "top": "art/evidence/garage-frames/lance-top.png",
+      "front": "art/evidence/garage-frames/lance-front.png"
+    }
+  },
+  "sidewinder": {
+    "triangles": 736,
+    "meshes": 9,
+    "drawCalls": 26,
+    "min": [
+      -1.78,
+      -0.44,
+      -3.35
+    ],
+    "max": [
+      1.78,
+      1.24,
+      2.5
+    ],
+    "bytes": 99372,
+    "label": "SIDEWINDER D2",
+    "glow": [
+      1.0,
+      0.25,
+      0.66
+    ],
+    "renders": {
+      "hero": "art/evidence/garage-frames/sidewinder-hero.png",
+      "rear": "art/evidence/garage-frames/sidewinder-rear.png",
+      "side": "art/evidence/garage-frames/sidewinder-side.png",
+      "top": "art/evidence/garage-frames/sidewinder-top.png",
+      "front": "art/evidence/garage-frames/sidewinder-front.png"
+    }
+  },
+  "bulwark": {
+    "triangles": 1292,
+    "meshes": 9,
+    "drawCalls": 25,
+    "min": [
+      -1.737,
+      -0.45,
+      -3.67
+    ],
+    "max": [
+      1.737,
+      1.17,
+      2.512
+    ],
+    "bytes": 144884,
+    "label": "BULWARK G4",
+    "glow": [
+      1.0,
+      0.64,
+      0.1
+    ],
+    "renders": {
+      "hero": "art/evidence/garage-frames/bulwark-hero.png",
+      "rear": "art/evidence/garage-frames/bulwark-rear.png",
+      "side": "art/evidence/garage-frames/bulwark-side.png",
+      "top": "art/evidence/garage-frames/bulwark-top.png",
+      "front": "art/evidence/garage-frames/bulwark-front.png"
+    }
+  },
+  "corona": {
+    "triangles": 1732,
+    "meshes": 10,
+    "drawCalls": 28,
+    "min": [
+      -1.557,
+      -0.705,
+      -3.65
+    ],
+    "max": [
+      1.557,
+      1.225,
+      2.532
+    ],
+    "bytes": 146716,
+    "label": "CORONA P5",
+    "glow": [
+      0.6,
+      0.42,
+      1.0
+    ],
+    "renders": {
+      "hero": "art/evidence/garage-frames/corona-hero.png",
+      "rear": "art/evidence/garage-frames/corona-rear.png",
+      "side": "art/evidence/garage-frames/corona-side.png",
+      "top": "art/evidence/garage-frames/corona-top.png",
+      "front": "art/evidence/garage-frames/corona-front.png"
+    }
+  },
+  "halo": {
+    "triangles": 1084,
+    "meshes": 10,
+    "drawCalls": 28,
+    "min": [
+      -1.62,
+      -0.42,
+      -4.0
+    ],
+    "max": [
+      1.62,
+      1.84,
+      2.612
+    ],
+    "bytes": 123764,
+    "label": "HALO X1",
+    "glow": [
+      0.95,
+      0.98,
+      1.0
+    ],
+    "renders": {
+      "hero": "art/evidence/garage-frames/halo-hero.png",
+      "rear": "art/evidence/garage-frames/halo-rear.png",
+      "side": "art/evidence/garage-frames/halo-side.png",
+      "top": "art/evidence/garage-frames/halo-top.png",
+      "front": "art/evidence/garage-frames/halo-front.png"
+    }
+  }
+}
