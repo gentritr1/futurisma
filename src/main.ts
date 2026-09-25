@@ -94,10 +94,11 @@ if (garageCredits) garageCredits.textContent = `CR ${save.garage.credits.toLocal
 
 /**
  * Re-reads the saved garage onto the craft: handling now, the body and paint
- * lazily. `refitting` is the latest refit, which a launch waits for so the
- * grid never shows TOTEM popping into the fitted frame after START.
+ * lazily. The refit is handed to the game synchronously, even before the bay
+ * chunk arrives, because `startTrial` — reached by the button, Enter and a
+ * pad's START alike — waits for the latest one, so the grid never shows TOTEM
+ * popping into the fitted frame after the launch.
  */
-let refitting: Promise<void> = Promise.resolve();
 const liveryRow = document.getElementById("livery-select")?.parentElement ?? null;
 const refitCraft = (preview: string | null): void => {
   if (stockCraft) return;
@@ -107,10 +108,17 @@ const refitCraft = (preview: string | null): void => {
   if (liveryRow) liveryRow.hidden = garage.chassis !== "totem";
   // Non-fatal like the livery swap: a look that cannot load costs the paint,
   // never the race — the handling above is already installed.
-  refitting = loadGarageBay()
-    .then(({ applyCraftLook }) => game.refitCraft((vehicle) => applyCraftLook(vehicle, garage, preview, selection)))
-    .catch(() => undefined);
+  void game.refitCraft(async (vehicle) => {
+    const { applyCraftLook } = await loadGarageBay();
+    await applyCraftLook(vehicle, garage, preview, selection);
+  });
 };
+
+// Fetch the fitted frame's body now, alongside the course, rather than after
+// it: `mountBody` does nothing until the craft has loaded, but the body lands
+// in the per-craft cache, so the refit after `initialize()` mounts it at once
+// and a heavy circuit never shows TOTEM on the grid first.
+refitCraft(null);
 
 let garageScreen: Promise<GarageScreen> | null = null;
 const openGarage = (): void => {
@@ -134,7 +142,6 @@ for (const button of garageButtons) button?.addEventListener("click", openGarage
 
 async function beginTrial(): Promise<void> {
   if (!game.canStart()) return;
-  await refitting;
   await game.startTrial();
   canvas.focus({ preventScroll: true });
 }

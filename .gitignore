@@ -25,3 +25,8 @@ __pycache__/
 # `git ls-files` on every run of `npm run test:code`.
 public/assets/audio/music/*
 !public/assets/audio/music/.gitkeep
+
+# Garage frames: `build_garage_frames.py --render` writes full-size Cycles PNGs
+# (about 27 MB for the set) next to the committed contact and blueprint JPEGs;
+# only the JPEG sheets are evidence in git.
+art/evidence/garage-frames/*.png

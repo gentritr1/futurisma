@@ -138,12 +138,14 @@ import { readFileSync } from "node:fs";
 // HUD and disposal). The cap is widened by that wiring cost only; gravity,
 // powers and their presentation remain in the dedicated runtime/world modules.
 //
-// The garage adds 4, again wiring only: the `activeHandling` import (the five
+// The garage adds 5, again wiring only: the `activeHandling` import (the five
 // handling arguments ride on lines that already existed), the finish facts the
-// purse settles on, and the two-line `refitCraft` hook that hands the craft to
-// the lazy `garage-look.ts`. The rules, purse, contracts and showroom live in
-// `garage-rules.js` / `garage-economy.js` / `garage-bay.ts`.
-const GAME_LINE_BUDGET = 2_581;
+// purse settles on, and the `refitCraft` hook that hands the craft to the lazy
+// `garage-look.ts` and records the refit every launch path waits for (the
+// wait itself rides on `startTrial`'s existing audio await). The rules, purse,
+// contracts, showroom and frame bodies live in `garage-rules.js` /
+// `garage-economy.js` / `garage-bay.ts` / `totem.ts`.
+const GAME_LINE_BUDGET = 2_582;
 
 function read(path) {
   return readFileSync(new URL(`../${path}`, import.meta.url), "utf8");

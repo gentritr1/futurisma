@@ -1345,7 +1345,9 @@ export class TotemVehicle {
     body.traverse((object) => {
       if (!(object instanceof THREE.Mesh)) return;
       const name = (object.material as THREE.Material).name;
-      object.castShadow = !/^(FRAME_glass|FRAME_lights|TE_)/.test(name);
+      // Glass and the thin lit strips stay out of the shadow pass; the kit's
+      // lamp meshes cast (CORONA's plasma cells are its biggest volumes).
+      object.castShadow = !/^(FRAME_glass|FRAME_lights)$/.test(name);
       object.receiveShadow = true;
     });
     body.userData.garageBounds = new THREE.Box3().setFromObject(body);

@@ -1,6 +1,6 @@
 {
   "bulwark": {
-    "triangles": 1372,
+    "triangles": 1444,
     "meshes": 8,
     "drawCalls": 17,
     "min": [
@@ -13,7 +13,7 @@
       1.195,
       2.54
     ],
-    "bytes": 157728,
+    "bytes": 162132,
     "label": "BULWARK G4",
     "glow": [
       1.0,
@@ -72,7 +72,7 @@
     "min": [
       -1.69,
       -0.48,
-      -4.72
+      -4.42
     ],
     "max": [
       1.69,
@@ -88,7 +88,7 @@
     ]
   },
   "sidewinder": {
-    "triangles": 972,
+    "triangles": 1116,
     "meshes": 8,
     "drawCalls": 17,
     "min": [
@@ -101,7 +101,7 @@
       1.28,
       2.65
     ],
-    "bytes": 118808,
+    "bytes": 128908,
     "label": "SIDEWINDER D2",
     "glow": [
       1.0,

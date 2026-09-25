@@ -361,12 +361,19 @@ export class TotemEvolution {
       this.surgeConduit.instanceMatrix.needsUpdate = true;
     }
     const bounds = body?.userData.garageBounds as THREE.Box3 | undefined;
+    // Tideline's pump-hardware refund dome stands in for the shield there; it
+    // is sized the same way, a hair larger, as TOTEM's own pair is.
+    const dome = this.pumpField?.root.getObjectByName("tideline_refund_hex_dome");
     if (bounds) {
       bounds.getCenter(this.shield.position);
       bounds.getSize(this.shield.scale).multiplyScalar(0.56);
+      dome?.position.copy(this.shield.position);
+      dome?.scale.copy(this.shield.scale).multiplyScalar(1.02);
     } else {
       this.shield.position.set(0, 0.1, -0.55);
       this.shield.scale.set(1.86, 1.28, 3.75);
+      dome?.position.set(0, 0.1, -0.55);
+      dome?.scale.set(1.9, 1.3, 3.8);
     }
     const lamps = new Map<string, THREE.Material>([
       ["TE_boost", this.boostLamp], ["TE_brake", this.brakeLamp],

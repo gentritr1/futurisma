@@ -547,8 +547,9 @@ export class FuturismaGame {
     await applyRaceLivery(this.vehicle, this.rivalFleet, code, this.ui);
     this.renderRequested = true;
   };
-  /** Garage — hands the player's craft to a refit (lazy `garage-look.ts`) and repaints the paddock once it lands. */
-  readonly refitCraft = async (fit: (vehicle: TotemVehicle) => Promise<void>): Promise<void> => { await fit(this.vehicle); this.renderRequested = true; };
+  /** Garage — the latest refit of the player's craft (lazy `garage-look.ts`); every launch path waits for it. */
+  private refitting: Promise<void> = Promise.resolve();
+  readonly refitCraft = (fit: (vehicle: TotemVehicle) => Promise<void>): Promise<void> => (this.refitting = fit(this.vehicle).then(() => { this.renderRequested = true; }, () => undefined));
 
   private updateTidelineMaterials: (() => void) | null = null;
 
@@ -613,7 +614,7 @@ export class FuturismaGame {
     if (!this.canStart()) return;
     this.trialStartPending = true;
     try {
-      await this.audio.start().catch(() => undefined);
+      await Promise.all([this.audio.start().catch(() => undefined), this.refitting]);
       if (this.contextLost || this.disposed) return;
       this.audio.setPaused(false);
       this.resetRaceState();

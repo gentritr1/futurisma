@@ -33,6 +33,10 @@ THE CONTRACT each frame keeps with `TotemVehicle.mountBody`
     swaps for the kit's live materials so they keep reporting state.
   - Every material is single-sided, like TOTEM's.
 
+Budget (revised at the stage-2 review, pinned by the validator): at most
+3,000 triangles, 21 draw calls and 200 KiB per body. TOTEM itself is 6,186
+triangles over 18 draws.
+
 Style (the stage-1 review's family note): TOTEM's signature is a dark hull,
 signal-coloured control surfaces, exposed structure and one big ring. Every
 frame keeps at least one exposed spar or boom, signal-coloured movers, and an
@@ -585,7 +589,9 @@ def build_lance(root, mats, frame):
     body = Builder('body_static')
     hull(body, frame['stations'])
     canopy(body, [(-2.9, 0.18, 0.40, 0.46), (-2.2, 0.26, 0.46, 0.74), (-1.2, 0.27, 0.56, 0.80), (-0.5, 0.22, 0.58, 0.70)])
-    body.tube([(0, 0.1, -4.3), (0, 0.1, -4.72)], 0.03, 'FRAME_metal')
+    # A short pitot probe: the contact model measures TOTEM's 2.2 m hull, so
+    # the nose stays within half a metre of it to keep wall contact honest.
+    body.tube([(0, 0.1, -4.3), (0, 0.1, -4.42)], 0.03, 'FRAME_metal')
     body.plate([(-0.5, -0.13, -3.55), (0.5, -0.13, -3.55), (0.62, -0.15, -2.9), (-0.62, -0.15, -2.9)], 0.04, 'FRAME_trim')
     for s in (-1, 1):
         # Swept delta wings on a visible root spar, with exposed wingtip booms.
@@ -619,6 +625,11 @@ def build_sidewinder(root, mats, frame):
         body.box((s * 1.56, -0.16, 0.45), (0.16, 0.34, 3.3), 'FRAME_accent')
         for z in (-0.7, 0.45, 1.6):
             body.box((s * 1.65, -0.2, z), (0.03, 0.05, 0.8), 'FRAME_lights')
+        # Dark hazard chevrons along the skirt's upper face: the drift read
+        # carries from the chase camera, not only on the flank.
+        for n in range(6):
+            z0 = -1.05 + n * 0.56
+            body.fin([(z0, -0.13), (z0 + 0.2, -0.13), (z0 + 0.36, 0.0), (z0 + 0.16, 0.0)], s * 1.645, 0.02, 'FRAME_trim')
         # Front outrigger canards on an exposed strut.
         body.plate([(s * 0.9, 0.06, -2.95), (s * 1.78, 0.02, -2.75), (s * 1.78, 0.02, -2.25), (s * 1.0, 0.06, -2.1)], 0.06, 'FRAME_paint')
         body.tube([(s * 0.9, 0.12, -2.5), (s * 1.74, 0.06, -2.5)], 0.05, 'FRAME_metal')
@@ -651,7 +662,10 @@ def build_bulwark(root, mats, frame):
     # Bull bar.
     for x in (-0.9, 0.9):
         body.tube([(x, -0.18, -3.62), (x, 0.36, -3.5)], 0.05, 'FRAME_metal')
-    body.tube([(-1.0, 0.3, -3.55), (1.0, 0.3, -3.55)], 0.05, 'FRAME_metal')
+    # The top rail hazard-banded amber and black.
+    for n in range(5):
+        x0 = -1.0 + n * 0.4
+        body.tube([(x0, 0.3, -3.55), (x0 + 0.4, 0.3, -3.55)], 0.055, 'FRAME_accent' if n % 2 == 0 else 'FRAME_trim')
     body.tube([(-1.0, 0.0, -3.62), (1.0, 0.0, -3.62)], 0.05, 'FRAME_metal')
     body.box((0, -0.05, -3.46), (1.5, 0.12, 0.05), 'FRAME_lights')
     # Spine spar with lift hooks, flanked by two dorsal ducts.

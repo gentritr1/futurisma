@@ -30,7 +30,12 @@ const ANCHORS = [
 const ROLES = new Set(["FRAME_paint", "FRAME_accent", "FRAME_trim", "FRAME_metal", "FRAME_glass", "FRAME_lights",
   "TE_boost", "TE_brake", "TE_gravity", "TE_power"]);
 const REQUIRED_ROLES = ["FRAME_paint", "FRAME_accent", "FRAME_lights", "TE_boost", "TE_brake", "TE_gravity", "TE_power"];
-/** TOTEM itself is 6,186 triangles over 18 draws; a frame body stays well under it. */
+/**
+ * The budget, revised at stage 2 from the plan's first estimate (<= 2,000
+ * triangles, 100-150 KB) once review added exposed structure and lit detail:
+ * TOTEM itself is 6,186 triangles over 18 draws, and a body stays under half
+ * its triangles and at or under its draw calls plus three.
+ */
 const MAX_TRIANGLES = 3_000;
 const MAX_DRAWS = 21;
 const MAX_BYTES = 200 * 1024;
@@ -142,9 +147,9 @@ for (const code of bodies) {
 // Runtime wiring: the body is mounted, not scaled; refits are serialized and a
 // launch waits for the latest one; the GLBs are fetched only by the lazy look.
 const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
-const [totem, look, main, catalog, index] = await Promise.all([
+const [totem, look, main, catalog, index, game] = await Promise.all([
   read("src/game/totem.ts"), read("src/game/garage-look.ts"), read("src/main.ts"),
-  read("src/game/garage-catalog.js"), read("index.html"),
+  read("src/game/garage-catalog.js"), read("index.html"), read("src/game/game.ts"),
 ]);
 assert.match(totem, /mountBody\(body: THREE\.Object3D \| null\): void/, "TotemVehicle.mountBody is gone.");
 assert.match(totem, /this\.racePresence\?\.rebind\(this\.model, named\)/, "mountBody no longer re-anchors the race presence.");
@@ -153,7 +158,12 @@ assert.match(look, /vehicle\.mountBody\(body\)/, "garage-look.ts no longer mount
 assert.match(look, /serials\.get\(vehicle\) !== serial/, "garage-look.ts lost the latest-refit-wins guard.");
 assert.doesNotMatch(look, /hull\.scale\.set\(width/, "A frame body must not be stance-scaled on top of its own geometry.");
 assert.doesNotMatch(catalog, /stance/, "The catalog still carries stance scales.");
-assert.match(main, /await refitting;\s*\n\s*await game\.startTrial\(\)/, "A launch must wait for the latest refit.");
+// The wait lives in `startTrial`, which the button, Enter and a pad's START all
+// reach; `main.ts` hands the refit over synchronously, before the bay loads.
+assert.match(game, /await Promise\.all\(\[this\.audio\.start\(\)\.catch\(\(\) => undefined\), this\.refitting\]\)/,
+  "startTrial must wait for the latest refit on every launch path.");
+assert.match(main, /void game\.refitCraft\(async \(vehicle\) => \{\s*\n\s*const \{ applyCraftLook \} = await loadGarageBay\(\);/,
+  "main.ts must hand the refit to the game before the bay chunk loads.");
 assert.doesNotMatch(index, /garage\/frames/, "The frame GLBs must stay out of the initial shell.");
 
 console.log(`Garage frames PASS: ${report.join("; ")}; pivots identity and mirrored, airbrakes forward of their hinges, anchors mirrored, jets on the kit's line, single-sided role materials with all four kit lamps, manifest current; bodies mount (never scale), refits serialize and a launch waits for the latest.`);
