@@ -782,6 +782,12 @@ export class TotemVehicle {
   private readonly rotationOffset = new THREE.Quaternion();
   private racePresence: TotemRacePresence | null = null;
   private evolution: TotemEvolution | null = null;
+  /** Garage — the frame body shown in place of the authored hull; null is TOTEM. */
+  private body: THREE.Object3D | null = null;
+  /** Garage — TOTEM's own hull meshes as loaded, with the visibility each had. */
+  private readonly authoredHull: { mesh: THREE.Object3D; visible: boolean }[] = [];
+  /** Garage — TOTEM's animated pivots, so a body's can be unbound again. */
+  private readonly authoredPivots = new Map<string, { node: THREE.Object3D; neutral: NeutralTransform }>();
   private model: THREE.Object3D | null = null;
   private originalVisibleMeshes: OriginalVisibleMesh[] = [];
   private readonly pivotMatrices = new Map<string, THREE.Matrix4>();
@@ -856,7 +862,13 @@ export class TotemVehicle {
         quaternion: node.quaternion.clone(),
         position: node.position.clone(),
       });
+      this.authoredPivots.set(name, { node, neutral: this.neutral.get(name)! });
     }
+    // Captured before the race-presence batches and the kit join the model,
+    // so a mounted frame body hides exactly TOTEM's hull and nothing else.
+    this.model.traverse((object) => {
+      if (object instanceof THREE.Mesh) this.authoredHull.push({ mesh: object, visible: object.visible });
+    });
 
     this.racePresence = new TotemRacePresence(
       this.model,
@@ -1316,6 +1328,57 @@ export class TotemVehicle {
    */
   craftSurfaces(): { hull: THREE.Group; lights: THREE.MeshStandardMaterial | null; flame: THREE.Color | null } {
     return { hull: this.visual, lights: this.bodyMaterial("TOTEM_emissive"), flame: this.evolution?.boostColor ?? null };
+  }
+
+  /**
+   * Garage — loads a frame body with the craft's own loader and gives it the
+   * treatments the hull got at load: the material grade under the caller's
+   * texture class (a frame's livery atlas is painted, so `garage-look.ts`
+   * opts it in; TOTEM's own pixel-authored sheets never take it) and hull
+   * shadows, with glass and lamps left out of the shadow pass the way TOTEM's
+   * are. Its model-space bounds are measured here, while it has no parent, for
+   * the kit and the underglow to size themselves by.
+   */
+  async loadBody(url: string, treatment: Ps2MaterialTreatmentOptions): Promise<THREE.Object3D> {
+    const body = (await new GLTFLoader().loadAsync(url)).scene;
+    applyPs2MaterialTreatment(body, treatment);
+    body.traverse((object) => {
+      if (!(object instanceof THREE.Mesh)) return;
+      const name = (object.material as THREE.Material).name;
+      object.castShadow = !/^(FRAME_glass|FRAME_lights|TE_)/.test(name);
+      object.receiveShadow = true;
+    });
+    body.userData.garageBounds = new THREE.Box3().setFromObject(body);
+    return body;
+  }
+
+  /**
+   * Garage — shows a frame body in place of the authored hull, or TOTEM again
+   * with null. Pivots the body names take over TOTEM's in `updateVisual`; the
+   * race-presence anchors and the kit re-anchor to it. Rivals and the ghost
+   * cloned TOTEM at load and never see any of this.
+   */
+  mountBody(body: THREE.Object3D | null): void {
+    if (!this.model || body === this.body) return;
+    if (this.body) this.model.remove(this.body);
+    this.body = body;
+    for (const { mesh, visible } of this.authoredHull) mesh.visible = body ? false : visible;
+    const named = new Map<string, THREE.Object3D>();
+    body?.traverse((object) => {
+      if (object.name) named.set(object.name, object);
+    });
+    for (const [name, authored] of this.authoredPivots) {
+      const node = named.get(name);
+      // A body's neutral pose is captured once: a remount must not take the
+      // pose `updateVisual` last left it in as its rest.
+      if (node) node.userData.garageNeutral ??= { quaternion: node.quaternion.clone(), position: node.position.clone() };
+      this.nodes.set(name, node ?? authored.node);
+      this.neutral.set(name, node ? node.userData.garageNeutral : authored.neutral);
+    }
+    if (body) this.model.add(body);
+    this.model.updateMatrixWorld(true);
+    this.racePresence?.rebind(this.model, named);
+    this.evolution?.anchorTo(body, named);
   }
 
   private bodyMaterial(name = "TOTEM_body"): THREE.MeshStandardMaterial | null {

@@ -132,9 +132,19 @@ for (const name of javascriptNames) {
 // the bay its dependencies through `GarageHooks` instead.
 // New pins: 974 -> 980 raw, 267 -> 270 gzip, 279 -> 282 shell (979.42 /
 // 269.30 / 281.40 rounded up). The stylesheet does not move: 7.33 KiB.
+//
+// Garage frame bodies (same branch): 977.92 -> 981.07 raw, 267.80 -> 268.73
+// gzip, 279.90 -> 280.86 shell. What the bytes bought is the mount contract,
+// which has to live beside the private state it swaps: `TotemVehicle.loadBody`
+// / `mountBody` (hide TOTEM's hull, rebind pivots by name), the kit's
+// `anchorTo` (jets, device hardpoints, conduit, shield, live lamps) and the
+// race presence's `rebind`. The bodies themselves are lazy GLBs and the
+// showroom logic stays in the `garage-bay` chunk. Only the RAW ceiling moves,
+// 980 -> 983 (measured + ~1.5 KiB), as the Dream Island registration did: the
+// two compressed ceilings that decide what a visitor downloads both still pass.
 assert.ok(
-  javascript.rawBytes <= 980 * 1024,
-  `Initial JavaScript exceeds 980 KiB raw (${(javascript.rawBytes / 1024).toFixed(1)} KiB).`,
+  javascript.rawBytes <= 983 * 1024,
+  `Initial JavaScript exceeds 983 KiB raw (${(javascript.rawBytes / 1024).toFixed(1)} KiB).`,
 // Merged 2026-09-13 with Phase F ALIVE, whose own note follows; the combined
 // tree measures under the 974 pin (see the phase-F merge commit).
 // Phase F ALIVE (2026-09-12): 972 -> 973 raw. The island's own bytes are all

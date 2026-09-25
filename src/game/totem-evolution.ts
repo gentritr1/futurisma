@@ -16,6 +16,8 @@ const CEILING = new THREE.Color(0xfa8ecb);
 const SHIELD = new THREE.Color(0xb899ff);
 const BRAKE = new THREE.Color(0xff4221);
 const POWER_IDLE = new THREE.Color(0x3b325a);
+/** Where the kit meets TOTEM's own hull: jet exits, device hardpoints, mount base. */
+const TOTEM_ANCHORS = { jetX: 0.45, jetY: 0.215659, jetZ: 2.5, deviceX: 0.78, deviceY: 0.64, deviceZ: -0.05, mountBase: 0.38 };
 const TWO_PI = Math.PI * 2;
 
 /** Player-only assembly: no materials or geometry are shared with the rival fleet. */
@@ -34,6 +36,9 @@ export class TotemEvolution {
   private readonly lightColor = new THREE.Color();
   /** Nitro jet and lamp colour; the garage's BOOST FLAME paint writes it. */
   readonly boostColor = BOOST.clone();
+  /** Garage — where the kit meets the hull: TOTEM's numbers until a frame body re-anchors them. */
+  private readonly anchors = { ...TOTEM_ANCHORS };
+  private readonly kit: THREE.Object3D;
   private readonly pumpField: TidelinePowerField | null;
   private rotorSpeed = 0;
   private engineStrength = 0;
@@ -92,6 +97,7 @@ export class TotemEvolution {
     this.powerLamp = requiredMaterial("TE_power");
     this.pumpField = powerKit?.templates.surge.userData.pumpHardware && Field ? new Field() : null;
     if(this.pumpField)this.root.add(this.pumpField.root);
+    this.kit = asset;
     this.root.add(asset);
 
     this.jetMaterial = new THREE.ShaderMaterial({
@@ -263,7 +269,7 @@ export class TotemEvolution {
     const nozzleWidth = 0.23 + (firing ? 0.14 : 0);
     for (let engine = 0; engine < 2; engine += 1) {
       for (let layer = 0; layer < 2; layer += 1) {
-        this.placement.position.set(engine === 0 ? -0.45 : 0.45, 0.215659, 2.50);
+        this.placement.position.set(engine === 0 ? -this.anchors.jetX : this.anchors.jetX, this.anchors.jetY, this.anchors.jetZ);
         const radius = nozzleWidth * (layer === 0 ? 0.66 : 1.22);
         this.placement.scale.set(radius, radius, length * (layer === 0 ? 0.78 : 1));
         this.placement.updateMatrix();
@@ -288,7 +294,7 @@ export class TotemEvolution {
       [this.shieldDevice, this.shieldDeployment, state.shieldActive === true],
     ] as const) {
       if (!device) continue;
-      device.root.position.y = .64 + deployment * .46;
+      device.root.position.y = this.anchors.deviceY + deployment * .46;
       device.root.scale.setScalar(.42 + deployment * .2);
       device.update(state.elapsed, state.reducedMotion, deployment > .05 ? charge : .12, active ? activation : 0);
     }
@@ -306,9 +312,9 @@ export class TotemEvolution {
       for (let side = 0; side < 2; side += 1) {
         const device = side === 0 ? this.surgeDevice : this.shieldDevice;
         if (!device) continue;
-        const height = Math.max(.08, device.root.position.y - device.root.scale.x * .46 - .38);
+        const height = Math.max(.08, device.root.position.y - device.root.scale.x * .46 - this.anchors.mountBase);
         for (let support = 0; support < 2; support += 1) {
-          this.placement.position.set(side === 0 ? -.78 : .78, .38 + height / 2, -.05 + (support === 0 ? -.14 : .14));
+          this.placement.position.set((side === 0 ? -1 : 1) * this.anchors.deviceX, this.anchors.mountBase + height / 2, this.anchors.deviceZ + (support === 0 ? -.14 : .14));
           this.placement.scale.set(1, height, 1);
           this.placement.updateMatrix();
           this.powerMounts.setMatrixAt(side * 2 + support, this.placement.matrix);
@@ -318,6 +324,62 @@ export class TotemEvolution {
     }
     this.shieldMaterial.uniforms.uColor.value.copy(shieldColor);
     this.shieldMaterial.uniforms.uOpacity.value = state.reducedMotion ? 0.5 : 0.65;
+  }
+
+  /**
+   * Garage — re-anchors the kit to a frame body's `FX_jet_*` and `HARDPOINT_*`
+   * empties (TOTEM's own numbers with null), hides TOTEM's instrument housing
+   * and gyro under a body, sizes the shield to the body, and hands the body's
+   * `TE_*` lamp meshes the kit's live lamp materials so they keep reporting.
+   */
+  anchorTo(body: THREE.Object3D | null, named: ReadonlyMap<string, THREE.Object3D>): void {
+    const local = (name: string): THREE.Vector3 | null => {
+      const node = named.get(name);
+      return node ? this.root.worldToLocal(node.getWorldPosition(new THREE.Vector3())) : null;
+    };
+    const jet = local("FX_jet_right");
+    const hardpoint = local("HARDPOINT_right");
+    Object.assign(this.anchors, TOTEM_ANCHORS);
+    if (jet) Object.assign(this.anchors, { jetX: jet.x, jetY: jet.y, jetZ: jet.z - 0.03 });
+    if (hardpoint) {
+      Object.assign(this.anchors, { deviceX: hardpoint.x, deviceY: hardpoint.y + 0.26, deviceZ: hardpoint.z, mountBase: hardpoint.y });
+    }
+    this.kit.visible = body === null;
+    for (const device of [this.surgeDevice, this.shieldDevice]) {
+      if (!device) continue;
+      device.root.position.x = Math.sign(device.root.position.x) * this.anchors.deviceX;
+      device.root.position.z = this.anchors.deviceZ;
+    }
+    if (this.surgeConduit) {
+      const { deviceX, mountBase, deviceZ, jetZ } = this.anchors;
+      for (let segment = 0; segment < 6; segment += 1) {
+        this.placement.position.set(-(deviceX - .08), mountBase + .11, deviceZ + .25 + segment * (jetZ - .9 - deviceZ) / 5);
+        this.placement.scale.setScalar(1);
+        this.placement.updateMatrix();
+        this.surgeConduit.setMatrixAt(segment, this.placement.matrix);
+      }
+      this.surgeConduit.instanceMatrix.needsUpdate = true;
+    }
+    const bounds = body?.userData.garageBounds as THREE.Box3 | undefined;
+    if (bounds) {
+      bounds.getCenter(this.shield.position);
+      bounds.getSize(this.shield.scale).multiplyScalar(0.56);
+    } else {
+      this.shield.position.set(0, 0.1, -0.55);
+      this.shield.scale.set(1.86, 1.28, 3.75);
+    }
+    const lamps = new Map<string, THREE.Material>([
+      ["TE_boost", this.boostLamp], ["TE_brake", this.brakeLamp],
+      ["TE_gravity", this.gravityLamp], ["TE_power", this.powerLamp],
+    ]);
+    body?.traverse((object) => {
+      if (!(object instanceof THREE.Mesh)) return;
+      const lamp = lamps.get((object.material as THREE.Material).name);
+      if (lamp && object.material !== lamp) {
+        (object.material as THREE.Material).dispose();
+        object.material = lamp;
+      }
+    });
   }
 
   reset(): void {

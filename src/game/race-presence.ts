@@ -181,6 +181,8 @@ export class TotemRacePresence {
   private readonly impactNose: THREE.Vector3;
   private readonly impactLeft: THREE.Vector3;
   private readonly impactRight: THREE.Vector3;
+  /** Garage — each anchor's authored position, so a refit back to TOTEM restores it. */
+  private readonly authoredAnchors: [string, THREE.Vector3, THREE.Vector3][];
   private impactActive = false;
   private impactAge = 0;
   private impactSide = 0;
@@ -263,6 +265,25 @@ export class TotemRacePresence {
       "FX_impact_right",
       new THREE.Vector3(1.53, 0.44, 2.05),
     );
+    this.authoredAnchors = ([
+      ["FX_engine_left", this.engineLeft], ["FX_engine_right", this.engineRight],
+      ["FX_boost_center", this.boostCenter], ["FX_trail_wing_left", this.brakeLeft],
+      ["FX_trail_wing_right", this.brakeRight], ["FX_dust_rear_left", this.sprayLeft],
+      ["FX_dust_rear_right", this.sprayRight], ["FX_impact_nose", this.impactNose],
+      ["FX_impact_left", this.impactLeft], ["FX_impact_right", this.impactRight],
+    ] as const).map(([name, anchor]) => [name, anchor, anchor.clone()]);
+  }
+
+  /**
+   * Garage — re-reads every anchor from a frame body's own nodes, or restores
+   * TOTEM's authored positions for a name the body does not carry (and for
+   * every name when `nodes` is empty), so spray, sparks and exhaust land on
+   * the hull the player actually sees.
+   */
+  rebind(model: THREE.Object3D, nodes: ReadonlyMap<string, THREE.Object3D>): void {
+    for (const [name, anchor, authored] of this.authoredAnchors) {
+      anchor.copy(anchorPosition(model, nodes, name, authored));
+    }
   }
 
   update(state: RacePresenceVisualState): void {

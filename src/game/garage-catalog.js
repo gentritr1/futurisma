@@ -3,8 +3,9 @@
  *
  * Lazy by construction: nothing in the initial shell imports this file. The
  * handling numbers are in `garage-rules.js` (first paint needs them to race);
- * this is the showroom card — names, deck lines, prices, colours and each
- * frame's stance — and it arrives with the garage screen or the first purse.
+ * this is the showroom card — names, deck lines, prices and colours — and it
+ * arrives with the garage screen or the first purse. Each frame's body is its
+ * own GLB (`public/assets/garage/frames/`), mounted by `garage-look.ts`.
  * `scripts/validate-garage.mjs` asserts the two files name exactly the same
  * frames, parts and paints, so the showroom cannot list a craft the race loop
  * does not know how to drive.
@@ -22,9 +23,6 @@ import { FRAME_CODES, PAINT_CODES, PART_CODES, STAT_LIMITS } from "./garage-rule
  * @property {string} note The trade it makes, for the showroom line.
  * @property {number} price Credits. The works frame is issued, never bought.
  * @property {number} licence Contracts that must be on file before purchase.
- * @property {readonly [number, number, number]} stance Width, height, length
- *   scale on the player's visual hull. Visual only: the contact model, apron
- *   and camera all keep measuring the authored 2.2 m hull.
  * @property {string} glow The paint `stock` resolves to on this frame's lights.
  * @property {string} flame The paint `stock` resolves to on its boost jets.
  */
@@ -38,7 +36,6 @@ export const FRAME_CARDS = [
     note: "THE FACTORY BASELINE · NO WEAKNESS, NO EDGE",
     price: 0,
     licence: 0,
-    stance: [1, 1, 1],
     glow: "stock",
     flame: "ember",
   },
@@ -49,7 +46,6 @@ export const FRAME_CARDS = [
     note: "HIGHEST CAP AND PULL · LOOSE IN THE TURNS",
     price: 2_400,
     licence: 0,
-    stance: [0.93, 0.95, 1.08],
     glow: "cyan",
     flame: "cyan",
   },
@@ -60,7 +56,6 @@ export const FRAME_CARDS = [
     note: "BANKS A DRIFT FAST, ROTATES HARD · SOFT CAP",
     price: 1_800,
     licence: 0,
-    stance: [1.05, 0.97, 0.96],
     glow: "magenta",
     flame: "magenta",
   },
@@ -71,7 +66,6 @@ export const FRAME_CARDS = [
     note: "HOLDS A LINE IN THE WET · HEAVY OFF THE LINE",
     price: 1_500,
     licence: 0,
-    stance: [1.08, 1.04, 1],
     glow: "amber",
     flame: "amber",
   },
@@ -82,7 +76,6 @@ export const FRAME_CARDS = [
     note: "REFILLS THE RESERVE FASTEST, HITS HARDER ON BOOST",
     price: 3_200,
     licence: 0,
-    stance: [1, 1.03, 1.03],
     glow: "violet",
     flame: "violet",
   },
@@ -93,7 +86,6 @@ export const FRAME_CARDS = [
     note: "ISSUED ONLY TO DRIVERS WITH EIGHT CONTRACTS ON FILE",
     price: 7_500,
     licence: 8,
-    stance: [0.97, 0.94, 1.05],
     glow: "white",
     flame: "white",
   },

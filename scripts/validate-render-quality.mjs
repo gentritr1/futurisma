@@ -420,8 +420,12 @@ assert.match(
     + "character, or P14 would quietly re-grade the era-accurate opt-in.",
 );
 
-// Who takes which class. Only the baked environment GLBs opt into painterly.
-for (const path of ["src/game/environment.ts", "src/game/bitterpan-environment.ts"]) {
+// Who takes which class. Only the baked environment GLBs and the garage's
+// frame bodies opt into painterly: a frame's livery atlas is painted at 512
+// with noise and gradients (`art/blender/build_garage_frames.py`), not drawn
+// texel-by-texel, and `garage-look.ts` passes the class into
+// `TotemVehicle.loadBody` so totem.ts itself never names it.
+for (const path of ["src/game/environment.ts", "src/game/bitterpan-environment.ts", "src/game/garage-look.ts"]) {
   assert.match(
     read(path),
     /textureCharacter:\s*"painterly"/,

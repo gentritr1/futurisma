@@ -92,16 +92,24 @@ if (!stockCraft) installHandling(handlingFor(save.garage));
 const garageCredits = document.getElementById("garage-credits");
 if (garageCredits) garageCredits.textContent = `CR ${save.garage.credits.toLocaleString("en-US")}`;
 
-/** Re-reads the saved garage onto the craft: handling now, the look lazily. */
+/**
+ * Re-reads the saved garage onto the craft: handling now, the body and paint
+ * lazily. `refitting` is the latest refit, which a launch waits for so the
+ * grid never shows TOTEM popping into the fitted frame after START.
+ */
+let refitting: Promise<void> = Promise.resolve();
+const liveryRow = document.getElementById("livery-select")?.parentElement ?? null;
 const refitCraft = (preview: string | null): void => {
   if (stockCraft) return;
   const garage = save.garage;
   installHandling(handlingFor(garage));
+  // The decal sheets are TOTEM's; a frame with its own body wears its own paint.
+  if (liveryRow) liveryRow.hidden = garage.chassis !== "totem";
   // Non-fatal like the livery swap: a look that cannot load costs the paint,
   // never the race — the handling above is already installed.
-  void loadGarageBay().then(({ applyCraftLook }) => {
-    game.refitCraft((vehicle) => applyCraftLook(vehicle, garage, preview));
-  }, () => undefined);
+  refitting = loadGarageBay()
+    .then(({ applyCraftLook }) => game.refitCraft((vehicle) => applyCraftLook(vehicle, garage, preview, selection)))
+    .catch(() => undefined);
 };
 
 let garageScreen: Promise<GarageScreen> | null = null;
@@ -126,6 +134,7 @@ for (const button of garageButtons) button?.addEventListener("click", openGarage
 
 async function beginTrial(): Promise<void> {
   if (!game.canStart()) return;
+  await refitting;
   await game.startTrial();
   canvas.focus({ preventScroll: true });
 }
