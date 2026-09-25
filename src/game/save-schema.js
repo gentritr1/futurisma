@@ -62,11 +62,16 @@
  * @property {string} track The last dispatched circuit; `?map=` still wins.
  * @property {string} mode Schema v3. The last dispatched format; `?mode=` wins.
  * @property {string} tier Schema v3. The last dispatched field strength.
+ * @property {import("./garage-rules.js").Garage} garage Schema v6. Credits,
+ *   the owned frames and their fitted parts and paint, owned colours, the
+ *   contract board (as serials) and the circuits with a logged finish.
+ *   Normalized by `normalizeGarage` in `garage-rules.js`.
  *
  * @typedef {object} SavePort
  * @property {() => string | null} read
  * @property {(text: string) => void} write
  */
+import { defaultGarage, normalizeGarage } from "./garage-rules.js";
 import { MAX_GHOST_CHARACTERS, normalizeGhost } from "./ghost.js";
 import { LIVERY_CODES } from "./liveries.js";
 import {
@@ -175,6 +180,7 @@ export function defaultSave(schemaVersion) {
     track: DEFAULT_TRACK,
     mode: DEFAULT_RACE_MODE,
     tier: DEFAULT_RIVAL_TIER,
+    garage: defaultGarage(),
   };
 }
 
@@ -602,6 +608,30 @@ const MIGRATIONS = [
      */
     step: (source) => source,
   },
+  {
+    from: 5,
+    to: 6,
+    /**
+     * v5 → v6. The garage gave the file one new top-level object, `garage`.
+     *
+     * PURELY ADDITIVE, an identity like the two rungs before it. A v5 file has
+     * no `garage`; `normalizeGarage` supplies the starting one — the works
+     * frame, stock paint, the signing credits and the first three contracts —
+     * which is exactly what a fresh install gets. A returning driver keeps
+     * every lap, ghost and setting and walks into the garage as a new signing.
+     *
+     * Deliberately NOT back-credited from the laps already on file. Paying out
+     * for history would make the purse a function of how long a browser has
+     * existed rather than of racing, and the records carry no finishing
+     * positions to pay from anyway.
+     *
+     * WIPE RISK: none. Nothing is relocated, renamed, or dropped.
+     *
+     * @param {Record<string, unknown>} source
+     * @returns {Record<string, unknown>}
+     */
+    step: (source) => source,
+  },
 ];
 
 /**
@@ -664,6 +694,7 @@ export function parseSave(text, schemaVersion) {
     track: normalizeTrack(source.track),
     mode: normalizeMode(source.mode),
     tier: normalizeTier(source.tier),
+    garage: normalizeGarage(source.garage),
   };
 }
 
@@ -850,6 +881,28 @@ export function createSaveStore(port, schemaVersion) {
     /** G4 — the last dispatched field strength. @returns {string} */
     get tier() {
       return save.tier;
+    },
+    /**
+     * Garage — a deep copy, so a caller can build the next garage from it
+     * without the stored one moving until {@link setGarage} accepts it.
+     *
+     * @returns {import("./garage-rules.js").Garage}
+     */
+    get garage() {
+      return normalizeGarage(save.garage);
+    },
+    /**
+     * Garage — replaces the stored garage with a normalized copy of `next`.
+     * The garage's transactions are pure functions in `garage-economy.js`;
+     * this is only the write, and it re-runs the same guard a read does, so a
+     * bug there can cost a purchase but never corrupt the file.
+     *
+     * @param {unknown} next
+     */
+    setGarage(next) {
+      save = { ...save, garage: normalizeGarage(next) };
+      flush();
+      return normalizeGarage(save.garage);
     },
     /**
      * @param {string} courseKey

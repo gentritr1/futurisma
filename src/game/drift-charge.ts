@@ -67,8 +67,9 @@ export class DriftBank {
   /**
    * Advances the bank one step and returns the reserve payout for this step,
    * which is zero on every step that is not a rewarded drift release.
+   * `chargeScale` is the fitted frame's drift stat (1 for the works craft).
    */
-  update(driftActive: boolean, driftIntensity: number, delta: number): number {
+  update(driftActive: boolean, driftIntensity: number, delta: number, chargeScale = 1): number {
     if (driftActive && !this.wasDrifting) this.entries += 1;
     this.maximumIntensity = Math.max(this.maximumIntensity, driftIntensity);
     const release = resolveDriftRelease(this.charge, this.wasDrifting, driftActive);
@@ -82,6 +83,7 @@ export class DriftBank {
       this.charge,
       driftActive ? driftIntensity : 0,
       delta,
+      chargeScale,
     );
     this.wasDrifting = driftActive;
     return release.reward;

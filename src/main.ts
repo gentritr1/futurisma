@@ -1,10 +1,13 @@
 import { FuturismaGame } from "./game/game";
 import type { RaceCourse } from "./game/course";
 import { InputController } from "./game/input";
-import { resolveMapSelection } from "./game/map-selection";
-import { restoreStoredLivery } from "./game/meta-runtime";
+import { TRACKS, resolveMapSelection } from "./game/map-selection";
+import { handlingFor, installHandling } from "./game/garage-rules.js";
+import type { GarageScreen } from "./game/garage-bay";
+import { loadGarageBay, restoreStoredLivery } from "./game/meta-runtime";
 import { MetaUi } from "./game/meta-ui";
 import { save } from "./game/persistence";
+import { raceModes } from "./game/race-modes";
 import { configureRenderMode } from "./game/render-mode.js";
 import { resolveQualityLock, resolveReducedMotion, searchParam } from "./game/query-probes";
 import { GameUi } from "./game/ui";
@@ -77,8 +80,49 @@ const meta = new MetaUi(
     setMasterVolume: (volume) => game.setMasterVolume(volume),
     setMusicVolume: (volume) => game.setMusicVolume(volume),
     suspendInput: () => input.suspendActionsUntilRelease(),
+    openGarage: () => openGarage(),
   },
 );
+
+// Garage — the fitted craft's handling is installed before the first fixed
+// step. A demo, and `?craft=stock`, race the works TOTEM so every soak and
+// autopilot baseline stays comparable with the ones recorded before the garage.
+const stockCraft = new URLSearchParams(window.location.search).has("demo") || searchParam("craft") === "stock";
+if (!stockCraft) installHandling(handlingFor(save.garage));
+const garageCredits = document.getElementById("garage-credits");
+if (garageCredits) garageCredits.textContent = `CR ${save.garage.credits.toLocaleString("en-US")}`;
+
+/** Re-reads the saved garage onto the craft: handling now, the look lazily. */
+const refitCraft = (preview: string | null): void => {
+  if (stockCraft) return;
+  const garage = save.garage;
+  installHandling(handlingFor(garage));
+  // Non-fatal like the livery swap: a look that cannot load costs the paint,
+  // never the race — the handling above is already installed.
+  void loadGarageBay().then(({ applyCraftLook }) => {
+    game.refitCraft((vehicle) => applyCraftLook(vehicle, garage, preview));
+  }, () => undefined);
+};
+
+let garageScreen: Promise<GarageScreen> | null = null;
+const openGarage = (): void => {
+  const body = document.body.dataset;
+  if (!["intro", "result"].includes(body.phase ?? "") || body.options === "true" || body.controls === "true") return;
+  garageScreen ??= loadGarageBay().then(({ GarageScreen }) => new GarageScreen({
+    refit: refitCraft,
+    suspendInput: () => input.suspendActionsUntilRelease(),
+    save,
+    here: { track: selection, mode: raceModes.mode, tier: raceModes.tier },
+    tracks: TRACKS,
+  }));
+  // A chunk that fails to arrive is retried on the next press, not cached.
+  void garageScreen.then((screen) => screen.show(), () => {
+    garageScreen = null;
+  });
+};
+// The G key reaches this through `MetaUi`, which owns every menu key.
+const garageButtons = ["garage-button", "result-garage-button"].map((id) => document.getElementById(id));
+for (const button of garageButtons) button?.addEventListener("click", openGarage);
 
 async function beginTrial(): Promise<void> {
   if (!game.canStart()) return;
@@ -119,6 +163,11 @@ game
     // starts, so the field is never issued against paint the player can see is
     // wrong. Returns null and keeps the works sheet if it cannot be applied.
     await restoreStoredLivery((code) => game.applyLivery(code));
+    // Garage — the fitted look goes on after the fleet and the ghost have
+    // cloned their materials in `initialize()`, so it stays on the player's
+    // craft. Loading it warms the purse too, so a finish settles in-frame.
+    refitCraft(null);
+    if (stockCraft) void loadGarageBay().catch(() => undefined);
     const parameters = new URLSearchParams(window.location.search);
     const manualDemoStart = parameters.has("diagnostics")
       && parameters.has("demo")
@@ -136,6 +185,8 @@ if (import.meta.hot) {
     ui.startButton.removeEventListener("click", handleStartClick);
     ui.restartButton.removeEventListener("click", handleRestartClick);
     circuitSelect.removeEventListener('click',handleCircuitSelect);
+    for (const button of garageButtons) button?.removeEventListener("click", openGarage);
+    void garageScreen?.then((screen) => screen.dispose(), () => undefined);
     meta.dispose();
     game.dispose();
   });

@@ -10,4 +10,6 @@ export const INPUT_PROMPTS = {
   // own lazy chunk, so the label has to exist in the shared map or the shell's
   // next device change would throw on an unmapped prompt.
   power: {keyboard: 'E', gamepad: 'B'},
+  // Garage: a focused button on a pad, so the pad prompt is the confirm face.
+  garage: {keyboard: 'G', gamepad: 'A'},
 };

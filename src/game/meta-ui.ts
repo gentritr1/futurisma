@@ -37,6 +37,8 @@ export interface MetaUiHooks {
   setMusicVolume(volume: number): void;
   /** Drops any action the overlay just swallowed before the game sees it. */
   suspendInput(): void;
+  /** Garage — opens the works bay; it decides for itself whether it may. */
+  openGarage(): void;
 }
 
 /**
@@ -478,8 +480,9 @@ export class MetaUi {
   private readonly handleWindowKeyDown = (event:KeyboardEvent): void => {
     if(!isMenuOnlyKey(event.code,event.key))return;
     event.preventDefault();event.stopPropagation();
-    if(event.repeat||event.altKey||event.ctrlKey||event.metaKey||!['intro','paused','result'].includes(document.body.dataset.phase??'intro'))return;
-    this.openMenu(event.code==='KeyC'||event.key.toLowerCase()==='c'?'controls':'options');
+    if(event.repeat||event.altKey||event.ctrlKey||event.metaKey||document.body.dataset.garage==='true'||!['intro','paused','result'].includes(document.body.dataset.phase??'intro'))return;
+    if(event.code==='KeyG'||event.key.toLowerCase()==='g')this.hooks.openGarage();
+    else this.openMenu(event.code==='KeyC'||event.key.toLowerCase()==='c'?'controls':'options');
   };
 
   dispose(): void {

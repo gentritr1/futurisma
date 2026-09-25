@@ -61,6 +61,12 @@ export interface RaceResultInputs {
   contact: { nearMisses: number; peakCleanGateChain: number };
   rivals: { slipstreamSeconds: number } | undefined;
   topSpeedMetersPerSecond: number;
+  /**
+   * Garage — the facts the purse and the contract board settle on that the
+   * stats above do not already carry. `demo` is the race having been launched
+   * on autopilot, which pays nothing whoever finished it.
+   */
+  finish?: { position: number; racerCount: number; driftCashes: number; demo: boolean };
 }
 
 class RaceModes {

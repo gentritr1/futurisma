@@ -8,6 +8,7 @@
  */
 import { ghostRuntime } from "./ghost-runtime";
 import { bootLiveryToApply, liveryFor } from "./liveries.js";
+import { resolveMapSelection } from "./map-selection";
 import { save } from "./persistence";
 import { raceModes } from "./race-modes";
 import type { RaceResultInputs, RaceResultSummary } from "./race-modes";
@@ -133,14 +134,33 @@ export function recordFinishedRace(
   lapTimesMs: readonly number[],
   inputs: RaceResultInputs,
 ): RaceResultSummary {
-  return raceModes.recordFinish(
+  const summary = raceModes.recordFinish(
     bestLapMs,
     raceMs,
     lapTimesMs,
     ghostRuntime.bestLapRecording(lapTimesMs[lapTimesMs.length - 1] ?? null),
     inputs,
   );
+  // Garage — the purse settles off the SAME summary the result screen prints,
+  // so a `NEW BEST LAP` line in the purse and the `NEW BEST` flash cannot
+  // disagree. Warmed chunk: same frame. Cold (a finish inside the first second
+  // of a page): one microtask later, into the same result panel.
+  const track = resolveMapSelection(window.location.search);
+  const settle = (module: PurseModule): void => module.settleFinish(summary, inputs, lapTimesMs.length, save, track);
+  if (purse) settle(purse);
+  else void loadGarageBay().then(settle, () => undefined);
+  return summary;
 }
+
+type PurseModule = typeof import("./garage-bay");
+let purse: PurseModule | null = null;
+/**
+ * Garage — the one lazy garage chunk (`garage-bay.ts`), memoized. `main.ts`
+ * calls it once the grid is up, for the craft's look, which also warms the
+ * purse so the finish line never waits on the network; the showroom arrives
+ * on the same request.
+ */
+export const loadGarageBay = (): Promise<PurseModule> => import("./garage-bay").then((module) => (purse = module));
 
 /**
  * The stored best lap the paddock line prints, for the format that is about to

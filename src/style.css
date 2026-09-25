@@ -1784,6 +1784,26 @@ body[data-options="true"] .hud {
   font-size: 0.58rem;
 }
 
+/* Garage — OPTIONS and CONTROLS on one row under GARAGE, so the paddock keeps
+   the three button rows it had and the bay costs no height. */
+.intro-pair {
+  width: min(320px, 100%);
+  display: flex;
+  gap: 6px;
+}
+
+.intro-pair .ghost-button {
+  flex: 1;
+  min-width: 0;
+  gap: 8px;
+  padding-inline: 10px;
+}
+
+/* The result panel centres its launch button; the pair under it follows. */
+.result-panel .intro-pair {
+  margin-inline: auto;
+}
+
 .screen--options {
   z-index: 30;
   align-items: center;

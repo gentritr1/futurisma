@@ -104,9 +104,37 @@ for (const name of javascriptNames) {
 // field alive across the three directions they arrive from, and the minimap's
 // named radii and player-dot ring. The stylesheet moved +0.08 KiB gzip and
 // still passes its own 8 KiB ceiling at 7.33.
+//
+// Garage (`claude/trusting-thompson-am0fst`) — re-pinned by the same
+// measured-plus-~1.5-KiB rule, measured with this file's own arithmetic on a
+// clean worktree of the parent commit and on the branch:
+//
+//                     JS raw     JS gzip   shell gzip   initial files
+//   parent a6445a4    972.91     265.64      277.633        19
+//   garage            977.92     267.80      279.896        20
+//   delta              +5.01      +2.16       +2.263        +1
+//
+// What the bytes bought, and why each has to be first paint: `garage-rules.js`
+// (2.9 KiB raw, its own shared chunk) — the frame and part numbers the race
+// loop multiplies by from the FIRST fixed step, and `normalizeGarage`, which
+// the save file runs at module evaluation; the five handling arguments in
+// `physics.js`; the v6 rung and two store methods in `save-schema.js`; the
+// `main.ts` wiring that installs the fitted handling, labels the GARAGE button
+// with the balance and opens the bay on G; the purse seam in `meta-runtime.ts`;
+// the gamepad surface in `input-prompts.ts`; and the chunk table entries for
+// the new files. What stayed OUT, measured: the showroom, the purse, the
+// contracts, the catalog and the look are ONE lazy chunk (`garage-bay`, 22.4
+// KiB raw / 8.7 KiB gzip, plus 1.7 KiB gzip of its own stylesheet) fetched
+// after the grid is up. What was tried: three separate dynamic imports cost
+// +0.4 KiB of preload glue in the entry chunk, and letting the lazy modules
+// import `persistence` / `race-modes` / `map-selection` split those into four
+// extra shared chunks (+0.7 KiB gzip); both were undone, the latter by handing
+// the bay its dependencies through `GarageHooks` instead.
+// New pins: 974 -> 980 raw, 267 -> 270 gzip, 279 -> 282 shell (979.42 /
+// 269.30 / 281.40 rounded up). The stylesheet does not move: 7.33 KiB.
 assert.ok(
-  javascript.rawBytes <= 974 * 1024,
-  `Initial JavaScript exceeds 974 KiB raw (${(javascript.rawBytes / 1024).toFixed(1)} KiB).`,
+  javascript.rawBytes <= 980 * 1024,
+  `Initial JavaScript exceeds 980 KiB raw (${(javascript.rawBytes / 1024).toFixed(1)} KiB).`,
 // Merged 2026-09-13 with Phase F ALIVE, whose own note follows; the combined
 // tree measures under the 974 pin (see the phase-F merge commit).
 // Phase F ALIVE (2026-09-12): 972 -> 973 raw. The island's own bytes are all
@@ -339,9 +367,10 @@ assert.ok(
 // three ceilings keep the same ~1.5 KiB of working margin as each other —
 // a gzip ceiling 0.58 KiB above the measurement would be the next phase's
 // chunk-boundary failure rather than its spend failure.
+// 267 -> 270 for the garage; see the measurement table above the raw ceiling.
 assert.ok(
-  javascriptGzip <= 267 * 1024,
-  `JavaScript bundle exceeds 267 KiB gzip (${(javascriptGzip / 1024).toFixed(1)} KiB).`,
+  javascriptGzip <= 270 * 1024,
+  `JavaScript bundle exceeds 270 KiB gzip (${(javascriptGzip / 1024).toFixed(1)} KiB).`,
 );
 // Re-baselined 2026-08-28 from a measured 4.35 KiB gzip (the 4 KiB ceiling
 // predated the HUD turn-cue and hazard styling) plus headroom for the planned
@@ -406,9 +435,11 @@ assert.ok(
 // 277 -> 279 on `work/hud-followup`, measured 277.414 + ~1.5 KiB. See the
 // table above the raw ceiling: main sat at 276.994 against 277, six bytes of
 // headroom, which is what made this the ceiling that had to move.
+// 279 -> 282 for the garage (measured 279.896); see the table above the raw
+// ceiling.
 assert.ok(
-  shellGzip <= 279 * 1024,
-  `Initial app shell exceeds 279 KiB gzip (${(shellGzip / 1024).toFixed(3)} KiB; ${shellGzip} B).`,
+  shellGzip <= 282 * 1024,
+  `Initial app shell exceeds 282 KiB gzip (${(shellGzip / 1024).toFixed(3)} KiB; ${shellGzip} B).`,
 );
 
 // ---------------------------------------------------------------------------

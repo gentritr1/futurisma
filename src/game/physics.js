@@ -1,6 +1,24 @@
+import { NEUTRAL_HANDLING } from "./garage-rules.js";
+export { NEUTRAL_HANDLING };
+
 export const CRUISE_MAX_SPEED = 86;
 export const BOOST_MAX_SPEED = 112;
 export const BOOST_RESERVE_CUTOFF = 0.012;
+
+/**
+ * Garage — the craft's handling as five multipliers on the authored model.
+ *
+ * Every integrator that reads one takes it as a trailing optional argument
+ * defaulting to {@link NEUTRAL_HANDLING}, and every use is a multiply by
+ * exactly 1.0 there, so the works craft and every existing call site integrate
+ * bit-for-bit as they did before the garage existed.
+ * `scripts/validate-garage.mjs` drives the integrators with and without it and
+ * compares with `Object.is`. The object lives in `garage-rules.js`, which
+ * imports nothing, so the lazy garage chunks can share it without pulling this
+ * file out of the entry chunk.
+ *
+ * @typedef {import("./garage-rules.js").Handling} Handling
+ */
 
 /*
  * P5 drift economy — the whole drift/boost tradeoff lives in these seven
@@ -385,6 +403,8 @@ export function calculateSlipstream(distanceBehindMeters, lateralGapMeters, spee
  * @param {number} driftIntent
  * @param {number} delta
  * @param {number} [slipstream] 0..1 tow from the craft ahead
+ * @param {Readonly<Handling>} [handling] garage fit; top speed lifts both
+ *   caps, accel scales the engine, plasma half-scales the boost thrust
  */
 export function integrateSpeed(
   speed,
@@ -394,16 +414,18 @@ export function integrateSpeed(
   driftIntent,
   delta,
   slipstream = 0,
+  handling = NEUTRAL_HANDLING,
 ) {
   const tow = Number.isFinite(slipstream) ? clamp(slipstream, 0, 1) : 0;
   // The tow is a drag reduction expressed as a lift of the cruise cap: it moves
   // the knee where overspeed drag starts and, with it, the engine's own falloff
   // curve. It is deliberately NOT a change to CRUISE_MAX_SPEED itself - the
   // constant stays the authored cruise and the tow is a bonus over it.
-  const cruiseCap = CRUISE_MAX_SPEED * (1 + SLIPSTREAM_CRUISE_BONUS * tow);
-  const maxSpeed = boostActive ? BOOST_MAX_SPEED : cruiseCap;
-  const engineForce = throttle * (26 - (speed / maxSpeed) * 12);
-  const boostForce = boostActive ? 34 : 0;
+  const cruiseCap = CRUISE_MAX_SPEED * handling.topSpeed * (1 + SLIPSTREAM_CRUISE_BONUS * tow);
+  const boostCap = BOOST_MAX_SPEED * handling.topSpeed;
+  const maxSpeed = boostActive ? boostCap : cruiseCap;
+  const engineForce = throttle * (26 - (speed / maxSpeed) * 12) * handling.accel;
+  const boostForce = boostActive ? 34 * (1 + (handling.plasma - 1) * 0.5) : 0;
   const brakeForce = brake * lerp(46, 25, driftIntent);
   const drag = 1.2 + speed * 0.038 + speed * speed * 0.0007;
   const overspeedDrag = boostActive
@@ -416,7 +438,7 @@ export function integrateSpeed(
     - drag
     - overspeedDrag
   ) * delta;
-  return clamp(nextSpeed, 0, BOOST_MAX_SPEED);
+  return clamp(nextSpeed, 0, boostCap);
 }
 
 /**
@@ -449,8 +471,9 @@ export function integrateCoastSpeed(speed, delta) {
  * @param {number} charge
  * @param {number} driftIntensity zero (or less) means off drift, and decays
  * @param {number} delta
+ * @param {number} [chargeScale] garage drift stat; scales charging, never decay
  */
-export function integrateDriftCharge(charge, driftIntensity, delta) {
+export function integrateDriftCharge(charge, driftIntensity, delta, chargeScale = 1) {
   const current = Number.isFinite(charge)
     ? clamp(charge, 0, DRIFT_CHARGE_CAP)
     : 0;
@@ -459,7 +482,7 @@ export function integrateDriftCharge(charge, driftIntensity, delta) {
     : 0;
   const step = Number.isFinite(delta) ? Math.max(0, delta) : 0;
   const rate = intensity > 0
-    ? intensity * DRIFT_CHARGE_RATE
+    ? intensity * DRIFT_CHARGE_RATE * chargeScale
     : -DRIFT_CHARGE_DECAY_RATE;
   return clamp(current + rate * step, 0, DRIFT_CHARGE_CAP);
 }
@@ -494,6 +517,8 @@ export function resolveDriftRelease(charge, wasDrifting, isDrifting) {
  * @param {number} [slipstream] 0..1 tow, which speeds the refill but never the drain
  * @param {number} [regenMultiplier] G2 clean-gate chain, which likewise only
  *   ever multiplies the PASSIVE regen - see `cleanGateRegenMultiplier`
+ * @param {number} [plasma] garage plasma stat, on the passive regen only and
+ *   outside the chain's [1, 2] clamp so a weak cell can sit below 1
  */
 export function integrateBoostReserve(
   reserve,
@@ -502,6 +527,7 @@ export function integrateBoostReserve(
   reward = 0,
   slipstream = 0,
   regenMultiplier = 1,
+  plasma = 1,
 ) {
   const current = Number.isFinite(reserve) ? clamp(reserve, 0, 1) : 0;
   const payout = Number.isFinite(reward) ? Math.max(0, reward) : 0;
@@ -510,7 +536,7 @@ export function integrateBoostReserve(
   const chain = Number.isFinite(regenMultiplier) ? clamp(regenMultiplier, 1, 2) : 1;
   const rate = reserveBoostActive
     ? -BOOST_RESERVE_DRAIN_RATE
-    : BOOST_RESERVE_REGEN_RATE * (1 + SLIPSTREAM_REGEN_BONUS * tow) * chain;
+    : BOOST_RESERVE_REGEN_RATE * (1 + SLIPSTREAM_REGEN_BONUS * tow) * chain * plasma;
   return clamp(current + payout + rate * step, 0, 1);
 }
 
@@ -543,10 +569,17 @@ export function calculateTurnAuthority(speedRatio) {
   return lerp(0.32, 1, smoothstep(speedRatio, 0.015, 0.2));
 }
 
-/** @param {number} speedRatio @param {number} driftIntent */
-export function calculateTurnRate(speedRatio, driftIntent) {
+/**
+ * @param {number} speedRatio
+ * @param {number} driftIntent
+ * @param {Readonly<Handling>} [handling] half the drift stat reaches the drift
+ *   rotation and 0.4 of the grip stat reaches the nose, so neither stat can
+ *   turn the craft into a different vehicle
+ */
+export function calculateTurnRate(speedRatio, driftIntent, handling = NEUTRAL_HANDLING) {
   return lerp(1.85, 0.92, smoothstep(speedRatio, 0.12, 1))
-    * (1 + driftIntent * 0.58);
+    * (1 + driftIntent * 0.58 * (1 + (handling.drift - 1) * 0.5))
+    * (1 + (handling.grip - 1) * 0.4);
 }
 
 /**
@@ -555,6 +588,8 @@ export function calculateTurnRate(speedRatio, driftIntent) {
  * @param {number} surfaceGrip
  * @param {number} brake
  * @param {number} steer
+ * @param {number} [grip] garage grip stat; scales the surface term, never the
+ *   braking straighten, so a low-grip frame still stops sliding on the brakes
  */
 export function calculateGripRate(
   speedRatio,
@@ -562,10 +597,12 @@ export function calculateGripRate(
   surfaceGrip,
   brake,
   steer,
+  grip = 1,
 ) {
   return lerp(7.2, 1.85, smoothstep(speedRatio, 0.08, 1))
     * lerp(1, 0.36, driftIntent)
     * surfaceGrip
+    * grip
     + brake * 2.2 * (1 - Math.abs(steer));
 }
 

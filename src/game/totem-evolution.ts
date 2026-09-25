@@ -32,6 +32,8 @@ export class TotemEvolution {
   private readonly shieldMaterial: THREE.ShaderMaterial;
   private readonly placement = new THREE.Object3D();
   private readonly lightColor = new THREE.Color();
+  /** Nitro jet and lamp colour; the garage's BOOST FLAME paint writes it. */
+  readonly boostColor = BOOST.clone();
   private readonly pumpField: TidelinePowerField | null;
   private rotorSpeed = 0;
   private engineStrength = 0;
@@ -243,7 +245,7 @@ export class TotemEvolution {
     }
     this.rotor.rotation.x = state.reducedMotion ? 0 : transition * 0.16;
 
-    this.lightColor.copy(firing ? (overdrive ? surgeColor : BOOST) : reserve > 0.18 ? READY : RECHARGING);
+    this.lightColor.copy(firing ? (overdrive ? surgeColor : this.boostColor) : reserve > 0.18 ? READY : RECHARGING);
     this.setLamp(this.boostLamp, this.lightColor, firing ? 2.1 : 0.35 + reserve * 0.5, delta);
     this.setLamp(this.brakeLamp, BRAKE, 0.08 + THREE.MathUtils.clamp(state.brake, 0, 1) * 2.1, delta);
     this.setLamp(this.gravityLamp, transition > 0.02 ? RECHARGING : inverted ? CEILING : FLOOR, transition > 0.02 ? 1.8 : 0.8, delta);
@@ -271,7 +273,7 @@ export class TotemEvolution {
     this.jets.instanceMatrix.needsUpdate = true;
     this.jetMaterial.uniforms.uTime.value = state.reducedMotion ? 0 : state.elapsed * 9;
     this.jetMaterial.uniforms.uStrength.value = this.engineStrength;
-    this.jetMaterial.uniforms.uColor.value.copy(overdrive ? surgeColor : BOOST);
+    this.jetMaterial.uniforms.uColor.value.copy(overdrive ? surgeColor : this.boostColor);
     this.shield.visible = !this.pumpField && state.shieldActive === true;
     this.pumpField?.update(state.elapsed,state.reducedMotion,overdrive,state.shieldActive === true,state.shieldRefundWindow === true);
     const charge = THREE.MathUtils.clamp(state.powerCharge ?? 1, 0, 1);

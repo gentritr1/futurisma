@@ -91,6 +91,7 @@ import {
 } from "./render-quality";
 import { configureShadowMap } from "./shadows";
 import { applyRaceLivery, recordFinishedRace } from "./meta-runtime";
+import { activeHandling } from "./garage-rules.js";
 // G4 - the race FORMAT. Every decision lives in race-modes.ts; six calls here.
 import { raceModes } from "./race-modes";
 import { save } from "./persistence";
@@ -546,6 +547,8 @@ export class FuturismaGame {
     await applyRaceLivery(this.vehicle, this.rivalFleet, code, this.ui);
     this.renderRequested = true;
   };
+  /** Garage — hands the player's craft to a refit (lazy `garage-look.ts`) and repaints the paddock. */
+  readonly refitCraft = (fit: (vehicle: TotemVehicle) => void): void => { fit(this.vehicle); this.renderRequested = true; };
 
   private updateTidelineMaterials: (() => void) | null = null;
 
@@ -927,7 +930,7 @@ export class FuturismaGame {
       driftIntent,
       driftResponse,
     );
-    const driftReward = this.driftBank.update(this.driftActive, this.driftIntensity, delta);
+    const driftReward = this.driftBank.update(this.driftActive, this.driftIntensity, delta, activeHandling().drift);
     if (this.driftActive && !wasDriftActive) {
       this.audio.playDriftEngage();
       this.input.pulse(0.08, 0.18, 75);
@@ -953,7 +956,7 @@ export class FuturismaGame {
       this.boostActive,
       driftIntent,
       delta,
-      slipstream,
+      slipstream, activeHandling(),
     );
     this.speed = this.circuitRuntime?.applySurge(speedBeforeStep, this.speed, input, delta) ?? this.speed;
     // G4 - out of the guard below: the result screen prints TOP SPEED in
@@ -969,7 +972,7 @@ export class FuturismaGame {
     // multiplier on the PASSIVE regen term.
     this.boostReserve = integrateBoostReserve(
       this.boostReserve, reserveBoost, delta,
-      driftReward, slipstream, this.contact.regenMultiplier * (this.circuitRuntime?.boostRechargeScale ?? 1),
+      driftReward, slipstream, this.contact.regenMultiplier * (this.circuitRuntime?.boostRechargeScale ?? 1), activeHandling().plasma,
     );
 
     this.steerAmount = integrateSteering(
@@ -978,7 +981,7 @@ export class FuturismaGame {
       delta,
     );
     const turnAuthority = calculateTurnAuthority(speedRatio);
-    const turnRate = calculateTurnRate(speedRatio, driftIntent);
+    const turnRate = calculateTurnRate(speedRatio, driftIntent, activeHandling());
     this.forward.applyAxisAngle(
       beforeMove.up,
       -this.steerAmount * turnRate * turnAuthority * delta,
@@ -1017,7 +1020,7 @@ export class FuturismaGame {
       driftIntent,
       this.surfaceGrip,
       input.brake,
-      input.steer,
+      input.steer, activeHandling().grip,
     );
     const gripResponse = 1 - Math.exp(-delta * gripRate);
     this.travelDirection.lerp(this.forward, gripResponse);
@@ -2064,6 +2067,7 @@ export class FuturismaGame {
         contact: this.contact.diagnostics(),
         rivals: this.rivalFleet?.diagnostics(),
         topSpeedMetersPerSecond: this.diagnosticTopSpeed,
+        finish: { position: this.raceStatus.position, racerCount: this.raceStatus.racerCount, driftCashes: this.driftBank.rewards, demo: this.demoMode },
       }),
     );
   }

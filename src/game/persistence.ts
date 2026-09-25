@@ -49,8 +49,13 @@ import {
  * half-understood. That is the rule the version number exists to carry and it
  * does not bend for a small field. The cost of the rung is one identity step;
  * the cost of skipping it would be a v3 build reading a v4 file as its own.
+ *
+ * The garage added v6: one top-level `garage` object (credits, owned frames and
+ * their parts and paint, the contract board, logged circuits). Additive and an
+ * identity rung, for the same reason as v4 and v5: an older build must discard
+ * a file that holds credits it cannot see, rather than rewrite it without them.
  */
-export const SCHEMA_VERSION = 5;
+export const SCHEMA_VERSION = 6;
 
 /**
  * The single storage key. Every key this game writes is prefixed `futurisma.`

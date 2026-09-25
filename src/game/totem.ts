@@ -1307,7 +1307,18 @@ export class TotemVehicle {
     return true;
   }
 
-  private bodyMaterial(): THREE.MeshStandardMaterial | null {
+  /**
+   * Garage — the player-only surfaces a fitted look reaches: the visual hull
+   * (the frame's stance), the running-light material and the boost jets'
+   * colour. Rivals and the ghost cloned their materials at load, so a refit
+   * after `initialize()` never reaches the field. `garage-look.ts` does the
+   * work, lazily; this only hands the three over.
+   */
+  craftSurfaces(): { hull: THREE.Group; lights: THREE.MeshStandardMaterial | null; flame: THREE.Color | null } {
+    return { hull: this.visual, lights: this.bodyMaterial("TOTEM_emissive"), flame: this.evolution?.boostColor ?? null };
+  }
+
+  private bodyMaterial(name = "TOTEM_body"): THREE.MeshStandardMaterial | null {
     let found: THREE.MeshStandardMaterial | null = null;
     this.model?.traverse((object) => {
       if (found || !(object instanceof THREE.Mesh)) return;
@@ -1316,7 +1327,7 @@ export class TotemVehicle {
         : [object.material];
       for (const material of materials) {
         if (
-          material.name === "TOTEM_body"
+          material.name === name
           && material instanceof THREE.MeshStandardMaterial
         ) {
           found = material;

@@ -7,6 +7,13 @@ import {
   MAX_GHOST_FRAMES,
 } from "../src/game/ghost.js";
 import {
+  FRAME_CODES,
+  MAX_PART_STAGE,
+  PAINT_CODES,
+  PART_CODES,
+  defaultGarage,
+} from "../src/game/garage-rules.js";
+import {
   BAKED_LIVERY_CODE,
   bootLiveryToApply,
   liveryFor,
@@ -231,6 +238,53 @@ function assertUsableSave(save, label) {
     RIVAL_TIERS.includes(save.tier),
     `${label}: tier "${save.tier}" is not a shipped field strength.`,
   );
+  assertUsableGarage(save.garage, label);
+}
+
+/**
+ * Schema v6 — the garage. The same blunt rule as every other field: whatever
+ * arrived, what comes out names only frames, parts and paints this build
+ * authored, owns the works frame, and holds a whole number of credits.
+ * `scripts/validate-garage.mjs` attacks `normalizeGarage` directly; this is the
+ * check that the SAVE FILE never hands the game anything else.
+ */
+function assertUsableGarage(garage, label) {
+  assert.ok(garage && typeof garage === "object", `${label}: garage missing.`);
+  assert.ok(
+    Number.isInteger(garage.credits) && garage.credits >= 0,
+    `${label}: garage.credits is ${String(garage.credits)}.`,
+  );
+  assert.ok(FRAME_CODES.includes(garage.chassis), `${label}: chassis "${garage.chassis}".`);
+  assert.ok(Object.hasOwn(garage.fleet, garage.chassis), `${label}: racing an unowned frame.`);
+  assert.ok(Object.hasOwn(garage.fleet, "totem"), `${label}: the works frame is not owned.`);
+  for (const [code, fit] of Object.entries(garage.fleet)) {
+    assert.ok(FRAME_CODES.includes(code), `${label}: fleet has frame "${code}".`);
+    assert.deepEqual(Object.keys(fit.parts), PART_CODES, `${label}: ${code} parts are free-form.`);
+    for (const stage of Object.values(fit.parts)) {
+      assert.ok(
+        Number.isInteger(stage) && stage >= 0 && stage <= MAX_PART_STAGE,
+        `${label}: ${code} part stage ${String(stage)}.`,
+      );
+    }
+    for (const slot of ["glow", "flame", "under"]) {
+      assert.ok(PAINT_CODES.includes(fit[slot]), `${label}: ${code}.${slot} is "${fit[slot]}".`);
+    }
+  }
+  for (const paint of garage.paints) {
+    assert.ok(PAINT_CODES.includes(paint), `${label}: owns paint "${paint}".`);
+  }
+  for (const track of garage.circuits) {
+    assert.ok(TRACK_CODES.includes(track), `${label}: logged circuit "${track}".`);
+  }
+  const board = garage.contracts;
+  assert.equal(board.active.length, 3, `${label}: contract board is not three slots.`);
+  assert.equal(new Set(board.active).size, 3, `${label}: contract board repeats a serial.`);
+  for (const serial of board.active) {
+    assert.ok(
+      Number.isInteger(serial) && serial >= 0 && serial < board.next,
+      `${label}: contract serial ${String(serial)} is not below next ${board.next}.`,
+    );
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -304,6 +358,29 @@ const authored = {
   track: "bitterpan",
   mode: "timeattack",
   tier: "feral",
+  // Garage, v6. Every field off its default, for the reason the settings above
+  // are: a fixture at the defaults cannot tell a stored value from a dropped one.
+  garage: {
+    credits: 12_345,
+    chassis: "sidewinder",
+    fleet: {
+      totem: {
+        parts: { engine: 1, thrusters: 0, stabilisers: 0, skid: 0, plasma: 0 },
+        glow: "stock",
+        flame: "stock",
+        under: "off",
+      },
+      sidewinder: {
+        parts: { engine: 0, thrusters: 2, stabilisers: 1, skid: 3, plasma: 1 },
+        glow: "magenta",
+        flame: "cyan",
+        under: "violet",
+      },
+    },
+    paints: ["stock", "off", "cyan", "magenta", "violet"],
+    contracts: { next: 11, active: [4, 9, 10], done: 8 },
+    circuits: ["greenwater", "tideline", "dreamisland"],
+  },
 };
 const roundTripped = parseSave(serializeSave(authored), SCHEMA_VERSION);
 assert.deepEqual(
@@ -312,6 +389,18 @@ assert.deepEqual(
   "A valid v1 payload must round-trip byte-for-byte through parse/serialize.",
 );
 assertUsableSave(roundTripped, "round trip");
+
+// v5 -> v6 is an identity rung. A v5 file (the authored one without its
+// garage) must arrive holding the STARTING garage — not a back-credited one —
+// with every lap, ghost, setting and dispatch choice byte-for-byte intact.
+{
+  const { garage: _authoredGarage, ...v5Fields } = authored;
+  const upgraded = parseSave(JSON.stringify({ ...v5Fields, schemaVersion: 5 }), SCHEMA_VERSION);
+  assert.deepEqual(upgraded.garage, defaultGarage(), "v5 -> v6 did not deal the starting garage.");
+  const { garage: _upgradedGarage, ...upgradedFields } = upgraded;
+  assert.deepEqual(upgradedFields, v5Fields, "v5 -> v6 moved a field it had no reason to touch.");
+  assertUsableSave(upgraded, "v5 -> v6");
+}
 
 // A default save must itself survive a round trip, or a first run would rewrite
 // a file it cannot read back.
@@ -1682,7 +1771,8 @@ assert.match(
 }
 
 console.log(
-  `Persistence PASS: v${SCHEMA_VERSION} round trip with per-mode ghosts and mode/tier best laps, `
+  `Persistence PASS: v${SCHEMA_VERSION} round trip with per-mode ghosts, mode/tier best laps and `
+    + "a fitted garage, v5 -> v6 dealt the starting garage with nothing else moved, "
     + `v1, v2 and v3 migrated field by field (the v2 ghost RELOCATED into `
     + `ghosts.race, not dropped), the global two-replay budget held across `
     + `${RACE_MODES.length} formats on one circuit with every lap time and split `

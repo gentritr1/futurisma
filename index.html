@@ -340,12 +340,25 @@
             <kbd data-prompt="confirm">ENTER</kbd>
           </button>
 
-          <button id="options-button" class="ghost-button" type="button">
-            <span>SYSTEM OPTIONS</span>
-            <kbd data-prompt="options">O</kbd>
+          <!--
+            Garage. The balance rides on the button because it is the one
+            number that says whether the bay is worth opening; the bay itself
+            is built by the lazy `garage-ui.ts` on the first press.
+          -->
+          <button id="garage-button" class="ghost-button" type="button">
+            <span>GARAGE · <b id="garage-credits">CR 400</b></span>
+            <kbd data-prompt="garage">G</kbd>
           </button>
 
-          <button id="controls-button" class="ghost-button" type="button"><span>CONTROLS</span><kbd data-prompt="controls">C</kbd></button>
+          <!-- OPTIONS and CONTROLS share a row so the GARAGE costs the paddock no height. -->
+          <div class="intro-pair">
+            <button id="options-button" class="ghost-button" type="button">
+              <span>SYSTEM OPTIONS</span>
+              <kbd data-prompt="options">O</kbd>
+            </button>
+
+            <button id="controls-button" class="ghost-button" type="button"><span>CONTROLS</span><kbd data-prompt="controls">C</kbd></button>
+          </div>
 
         </div>
         <p id="intro-footer" class="intro-footer">WORKS LIVERY 07 · GREENWATER FIELD RACE</p>
@@ -370,11 +383,16 @@
             coming back to.
           -->
           <dl id="result-stats" class="result-stats" aria-label="Race statistics" hidden></dl>
+          <!-- Garage purse: written by the lazy `garage-purse.ts` at the finish. -->
+          <section id="result-purse" class="purse" aria-label="Purse" hidden></section>
           <button id="restart-button" class="launch-button" type="button">
             <span>RACE AGAIN</span>
             <kbd data-prompt="confirm">ENTER</kbd>
           </button>
-          <button id="circuit-select-button" class="ghost-button" type="button"><span>CIRCUIT SELECT</span></button>
+          <div class="intro-pair">
+            <button id="circuit-select-button" class="ghost-button" type="button"><span>CIRCUIT SELECT</span></button>
+            <button id="result-garage-button" class="ghost-button" type="button"><span>GARAGE</span><kbd data-prompt="garage">G</kbd></button>
+          </div>
         </div>
       </section>
 

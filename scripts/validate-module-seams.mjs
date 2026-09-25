@@ -137,7 +137,13 @@ import { readFileSync } from "node:fs";
 // Polarity adds 25 lines of integration (load, input, simulation, pose, camera,
 // HUD and disposal). The cap is widened by that wiring cost only; gravity,
 // powers and their presentation remain in the dedicated runtime/world modules.
-const GAME_LINE_BUDGET = 2_577;
+//
+// The garage adds 4, again wiring only: the `activeHandling` import (the five
+// handling arguments ride on lines that already existed), the finish facts the
+// purse settles on, and the two-line `refitCraft` hook that hands the craft to
+// the lazy `garage-look.ts`. The rules, purse, contracts and showroom live in
+// `garage-rules.js` / `garage-economy.js` / `garage-bay.ts`.
+const GAME_LINE_BUDGET = 2_581;
 
 function read(path) {
   return readFileSync(new URL(`../${path}`, import.meta.url), "utf8");

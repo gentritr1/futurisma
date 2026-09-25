@@ -9,7 +9,7 @@
 Rain-soaked cities, drowned reactors, sodium-lit pumpworks, a rocket pad counting down, and an island that goes dark when its clock strikes.<br>
 Read the road, choose your line, and make the boost count.
 
-[Start racing](#start-racing) · [Explore the circuits](#seven-circuits-seven-identities) · [Learn the controls](#controls) · [Inside the workshop](#built-in-blender)
+[Start racing](#start-racing) · [Explore the circuits](#seven-circuits-seven-identities) · [The garage](#the-garage) · [Learn the controls](#controls) · [Inside the workshop](#built-in-blender)
 
 ![Bitterpan Works at 317 km/h](docs/media/bitterpan.jpg)
 
@@ -59,7 +59,28 @@ Open the address Vite prints. Choose your circuit, format, rival field and liver
 
 **Rookie → Works → Feral** selects progressively faster authored rival pace. Rivals never rubber-band to your speed. They contest lines, boost and drift; an air cushion handles close contact without a hard vehicle collision.
 
-Circuit choice, settings, liveries, records and supported ghosts are saved locally in your browser.
+Circuit choice, settings, liveries, records, supported ghosts and your garage are saved locally in your browser.
+
+## The garage
+
+Every classified race pays. Spend the credits on a faster craft, then take it into a harder field. Press **G** on the paddock or the result screen to open the works bay.
+
+**Race → get paid → fit the craft → race a harder field.** The **purse** pays for your finishing place, the field strength and the distance. It adds bonuses for a new best lap, a clean-gate chain, near misses, cashed drifts and your first finish on each circuit. The result screen itemises every line. Autopilot runs earn nothing.
+
+**Contracts** send you round the whole game. Three are on the board at a time, each on a specific circuit. Examples: *win the field race at Tideline against Works or harder*, *reach 370 km/h at Bitterpan*, *cash six drifts on Dream Island*. **DISPATCH** loads the circuit with a format and field that can close the contract. Any seven consecutive contracts cover all seven circuits, and a board never opens on two of the same objective. Scrap a contract you don't want for CR 100.
+
+| Frame | Spec | What it trades |
+|---|---|---|
+| **TOTEM KD-07** | Works all-rounder | Nothing. The authored craft, issued free. |
+| **LANCE S3** | Straight-line | Highest top speed and pull; loose in the turns. |
+| **SIDEWINDER D2** | Drift | Banks a drift ~30% faster and rotates harder; a softer top speed. |
+| **BULWARK G4** | High grip | Holds a line in the wet; heavy off the line. |
+| **CORONA P5** | Plasma | Refills the reserve fastest and hits harder on boost; slower pull. |
+| **HALO X1** | Works prototype | Better at everything. Licensed only after **eight contracts**, then bought. |
+
+**Parts** stage one frame at a time: engine, thrusters, stabilisers, skid rig and plasma cell, three stages each. **Paint** fits running lights, boost flame and a neon **underglow**. A colour is bought once and works in any slot on any frame. While you browse, the craft behind the panel previews each frame and colour.
+
+Rivals keep their authored pace and never rubber-band. A better craft is an honest advantage, and the Feral field is where it earns its price. The works TOTEM with nothing fitted drives exactly as before the garage existed, so every record and ghost still stands.
 
 ## Controls
 
@@ -73,6 +94,7 @@ Circuit choice, settings, liveries, records and supported ghosts are saved local
 | Nitro, other circuits | `Space` or `Shift` | A |
 | Deploy power, Polarity and Tideline | `E` | B |
 | Recover to last gate | `R` | Y |
+| Garage, from the paddock or result screen | `G` | Focus GARAGE, then A |
 | Pause | `Esc` or `P` | Start |
 | Mute | `M` | Back |
 
@@ -142,7 +164,8 @@ Append these to the local game URL, combining options with `&`.
 | `?tier=rookie`, `works`, `feral` | Select rival pace. |
 | `?laps=1`…`9` | Set race length; sprint remains two laps. |
 | `?seed=714` | Repeat the power supply and route-choice pattern. |
-| `?demo=1` | Autopilot showcase; driving input returns control to you. |
+| `?demo=1` | Autopilot showcase; driving input returns control to you. Races the works craft and pays no purse. |
+| `?craft=stock` | Race the works TOTEM whatever the garage has fitted, for comparable soaks. |
 | `?motion=reduce` | Reduce decorative motion and gravity-roll effects. |
 | `?quality=low` / `high` | Lock the render scale. |
 | `?render=ps2` | Console-era raster treatment without shadows. |

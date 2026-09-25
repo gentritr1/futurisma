@@ -188,7 +188,7 @@ for(const kbd of html.matchAll(/<kbd([^>]*)>/g)){
 assert.equal(INPUT_PROMPTS.confirm.gamepad,'A');
 assert.equal(INPUT_PROMPTS.back.gamepad,'B');
 
-for(const code of ['KeyO','KeyC'])assert.equal(isMenuOnlyKey(code),true,'O and C are exclusively menu keys');
+for(const code of ['KeyO','KeyC','KeyG'])assert.equal(isMenuOnlyKey(code),true,'O, C and G are exclusively menu keys');
 assert.equal(isMenuOnlyKey('Other','O'),true);
 assert.equal(isMenuOnlyKey('KeyW','w'),false);
 const inputSource=readFileSync(new URL('../src/game/input.ts',import.meta.url),'utf8');
