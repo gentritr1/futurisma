@@ -38,10 +38,10 @@ const RUNS = process.argv.includes("--quick") ? [["lance", true, true]]
     : [["lance", true, false], ["sidewinder", true, false], ["bulwark", true, true]];
 /**
  * Wide (1280×752 is its tightest: the last 1280-class screen wider than 17:10;
- * 1440×1080 its tallest), column (1280-class screens too tall for the wide
+ * 1440×1400 its tallest), column (1280-class screens too tall for the wide
  * panel, tablets, phones on their side) and upright (phones, tablets).
  */
-const SCREENS = arg("screens", "1280x720,1280x752,1440x1080,1280x800,1366x1024,1024x768,1180x820,844x390,667x375,800x600,390x844,768x1024").split(",").map((size) => size.split("x").map(Number));
+const SCREENS = arg("screens", "1280x720,1280x752,1440x1400,1280x800,1366x1024,1024x768,1180x820,844x390,667x375,800x600,390x844,768x1024").split(",").map((size) => size.split("x").map(Number));
 const CLEAR = 16;
 const DAY = 20400;
 const fit = () => ({ parts: { engine: 0, thrusters: 0, stabilisers: 0, skid: 0, plasma: 0 }, glow: "stock", flame: "stock", under: "off", body: "factory", pattern: "steady" });
