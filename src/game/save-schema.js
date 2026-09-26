@@ -62,7 +62,8 @@
  * @property {string} track The last dispatched circuit; `?map=` still wins.
  * @property {string} mode Schema v3. The last dispatched format; `?mode=` wins.
  * @property {string} tier Schema v3. The last dispatched field strength.
- * @property {import("./garage-rules.js").Garage} garage Schema v6. Credits,
+ * @property {import("./garage-rules.js").Garage} garage Schema v6 (v7 added
+ *   body paint, patterns and the daily board inside it). Credits,
  *   the owned frames and their fitted parts and paint, owned colours, the
  *   contract board (as serials) and the circuits with a logged finish.
  *   Normalized by `normalizeGarage` in `garage-rules.js`.
@@ -624,6 +625,27 @@ const MIGRATIONS = [
      * for history would make the purse a function of how long a browser has
      * existed rather than of racing, and the records carry no finishing
      * positions to pay from anyway.
+     *
+     * WIPE RISK: none. Nothing is relocated, renamed, or dropped.
+     *
+     * @param {Record<string, unknown>} source
+     * @returns {Record<string, unknown>}
+     */
+    step: (source) => source,
+  },
+  {
+    from: 6,
+    to: 7,
+    /**
+     * v6 → v7. Daily ops and body paint: `garage` gained `schemes`,
+     * `patterns`, `goldLeaf` and `daily`, and each fitted frame a `body` and a
+     * `pattern`.
+     *
+     * PURELY ADDITIVE, an identity. A v6 garage has none of them and
+     * `normalizeGarage` supplies the defaults: factory paint, the steady
+     * pattern, no streak, and a daily board that starts on the first race of
+     * the day. The rung exists so that a v6 build DISCARDS a v7 file rather
+     * than rewriting it without the paint it cannot see.
      *
      * WIPE RISK: none. Nothing is relocated, renamed, or dropped.
      *

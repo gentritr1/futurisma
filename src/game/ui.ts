@@ -293,6 +293,17 @@ export class GameUi {
   /** P7 — the issue the player is racing under; drives every label that used
    * to read a hard-coded `WORKS 07`. */
   private playerLiveryLabel = "WORKS 07";
+  /**
+   * Garage — the frame on the grid, as every player row and line names it:
+   * `label` in the lists, `short` in running copy, and `team` (a bodied
+   * frame's paint scheme) where TOTEM names its livery. TOTEM until the bay
+   * says otherwise, so a stock craft reads exactly as it always has; the rows
+   * themselves keep TOTEM as the player's data name.
+   */
+  private craft = { label: "TOTEM", short: "TOTEM", team: "" };
+  /** What the paddock was last painted from, so a refit can repaint it. */
+  private lastGrid: readonly RaceGridEntry[] = [];
+  private lastDeck: { course: RaceCoursePresentation; lapLabel: string } | null = null;
   /** The format this page load is racing; fixed at load, like `raceModes.mode`. */
   private readonly raceMode = resolveRaceMode();
   /** The course half of the intro footer, kept so a livery swap can rebuild it
@@ -380,20 +391,12 @@ export class GameUi {
     editionLink.hidden = true;
     document.querySelectorAll<HTMLElement>("[data-polarity-control]").forEach((element) => { element.hidden = !polarity; });
     document.querySelectorAll<HTMLElement>("[data-power-control]").forEach((element) => { element.hidden = !polarity && !tideline && !ascension && !island; });
-    this.introDeck.textContent = island
-      ? `The clock strikes: day turns to night and the causeway goes wet. ${course.scheduleLabel ?? "Measuring Works lap"}. ${lapLabel}.`
-      : ascension
-      ? `Launch day: trench shortcut or Deluge Road. ${course.scheduleLabel ?? "Measuring Works lap"}. ${lapLabel}.`
-      : tideline
-      ? `Lap 1: flooded reactor, lit recharge current. Lap 2: water falls outside the sealed chamber; condensation lowers deck grip. Lap 3: the drained pump hall opens a shorter line. Race the reactor and port; time E for Surge or Shield. ${lapLabel}.`
-      : polarity ? `Choose your line. SPACE changes roads at marked junctions, with a six-second commitment. Upper: shorter, tighter. Lower: stronger devices and faster recharge. Time E on a launch strip. SHIFT fires nitro. ${lapLabel}.`
-      : course.mapCode === "MAP 01"
-      ? `Four ships. ${lapLabel} through Greenwater Strip. Follow the amber turn markers, clear all eight gates, and bring TOTEM home through The Cradle.`
-      : `Four ships. ${lapLabel} through ${course.mapName}. Follow the amber turn markers, clear all ${course.checkpointCount} sector gates, and bring TOTEM home through ${course.finishName}.`;
+    this.lastDeck = { course, lapLabel };
+    this.renderDeck();
     this.courseName.textContent = `${course.mapName.toUpperCase()} / ${course.mapCode}`;
     this.courseFooterName = course.mapName.toUpperCase();
     this.courseFooterLabel = `${this.courseFooterName} ${this.raceFormatLabel}`;
-    this.introFooter.textContent = `${this.playerLiveryLabel} · ${this.courseFooterLabel}`;
+    this.introFooter.textContent = `${this.lead} · ${this.courseFooterLabel}`;
     document.title = `FUTURISMA · ${course.mapName}`;
     this.checkpointValue.textContent = `NEXT GATE 01 / ${course.checkpointCount
       .toString()
@@ -406,6 +409,23 @@ export class GameUi {
     this.objectiveLaps = presentation.totalLaps;
     this.applyStartingGrid(grid);
     this.renderObjective();
+  }
+
+  /** The briefing under the circuit name, which names the craft bringing it home. */
+  private renderDeck(): void {
+    if (!this.lastDeck) return;
+    const { course, lapLabel } = this.lastDeck;
+    const map = course.mapCode;
+    this.introDeck.textContent = map === "MAP 07"
+      ? `The clock strikes: day turns to night and the causeway goes wet. ${course.scheduleLabel ?? "Measuring Works lap"}. ${lapLabel}.`
+      : map === "MAP 06"
+      ? `Launch day: trench shortcut or Deluge Road. ${course.scheduleLabel ?? "Measuring Works lap"}. ${lapLabel}.`
+      : map === "MAP 05"
+      ? `Lap 1: flooded reactor, lit recharge current. Lap 2: water falls outside the sealed chamber; condensation lowers deck grip. Lap 3: the drained pump hall opens a shorter line. Race the reactor and port; time E for Surge or Shield. ${lapLabel}.`
+      : map === "MAP 04" ? `Choose your line. SPACE changes roads at marked junctions, with a six-second commitment. Upper: shorter, tighter. Lower: stronger devices and faster recharge. Time E on a launch strip. SHIFT fires nitro. ${lapLabel}.`
+      : map === "MAP 01"
+      ? `Four ships. ${lapLabel} through Greenwater Strip. Follow the amber turn markers, clear all eight gates, and bring ${this.craft.short} home through The Cradle.`
+      : `Four ships. ${lapLabel} through ${course.mapName}. Follow the amber turn markers, clear all ${course.checkpointCount} sector gates, and bring ${this.craft.short} home through ${course.finishName}.`;
   }
 
   /**
@@ -441,14 +461,44 @@ export class GameUi {
   setRaceModeLabel(label: string): void {
     this.raceFormatLabel = label;
     this.courseFooterLabel = `${this.courseFooterName} ${label}`;
-    this.introFooter.textContent = `${this.playerLiveryLabel} · ${this.courseFooterLabel}`;
+    this.introFooter.textContent = `${this.lead} · ${this.courseFooterLabel}`;
     this.renderObjective();
   }
 
   setPlayerLivery(label: string, grid: readonly RaceGridEntry[]): void {
     this.playerLiveryLabel = label;
-    this.introFooter.textContent = `${label} · ${this.courseFooterLabel}`;
+    this.introFooter.textContent = `${this.lead} · ${this.courseFooterLabel}`;
     this.applyStartingGrid(grid);
+  }
+
+  /**
+   * Garage — START while the fitted frame's body is still arriving. The launch
+   * waits for it either way (`startTrial`); this says why, on the status line,
+   * without swapping the button's label and reflowing the paddock.
+   */
+  setFitting(label: string | null): void {
+    this.startButton.toggleAttribute("aria-busy", label !== null);
+    if (document.body.dataset.phase === "intro") this.setSystemStatus(label ? `FITTING ${label}` : `${this.craft.short} READY`);
+  }
+
+  /** The paddock footer's lead: the livery TOTEM wears, or a frame and its paint. */
+  private get lead(): string {
+    return this.craft.team ? `${this.craft.label} · ${this.craft.team}` : this.playerLiveryLabel;
+  }
+
+  /**
+   * Garage — the frame on the grid, from the bay once a refit has landed.
+   * Repaints everything in the paddock that names the player's craft; a race
+   * never sees it change, because the bay only opens between races.
+   */
+  setPlayerCraft(label: string, short: string, team: string): void {
+    this.craft = { label, short, team };
+    this.introFooter.textContent = `${this.lead} · ${this.courseFooterLabel}`;
+    this.renderDeck();
+    if (document.body.dataset.phase !== "intro") return;
+    this.setSystemStatus(`${short} READY`);
+    this.lastFieldOrderKey = "";
+    this.applyStartingGrid(this.lastGrid);
   }
 
   /**
@@ -521,7 +571,7 @@ export class GameUi {
       name.className = "n";
       gap.className = "gap";
       position.textContent = `P${entry.position}`;
-      name.textContent = entry.player ? `${entry.name} · YOU` : entry.name;
+      name.textContent = entry.player ? `${this.craft.short} · YOU` : entry.name;
       gap.textContent = formatLadderGap(entry.gapMs, entry.player);
       row.dataset.best = entry.player ? "true" : "false";
       row.dataset.player = entry.player ? "true" : "false";
@@ -535,7 +585,7 @@ export class GameUi {
     this.loadingScreen.hidden = true;
     this.startScreen.hidden = false;
     this.resultScreen.hidden = true;
-    this.setSystemStatus("TOTEM READY");
+    this.setSystemStatus(`${this.craft.short} READY`);
     document.body.dataset.phase = "intro";
     this.startButton.focus({ preventScroll: true });
   }
@@ -590,7 +640,7 @@ export class GameUi {
     const previous=timeAttack?`PREVIOUS BEST ${previousBestLapMs===null?'—':formatRaceTime(previousBestLapMs)} · `:'';
     this.resultDetail.textContent = `${previous}RACE TIME ${formatRaceTime(elapsedMs)} · ${format}${
       formatRacePosition(position, racerCount)
-    } · TOTEM / ${this.playerLiveryLabel} · ${totalLaps} ${
+    } · ${this.craft.label} / ${this.craft.team || this.playerLiveryLabel} · ${totalLaps} ${
       totalLaps === 1 ? "LAP" : "LAPS"
     } LOGGED · BEST ${formatRaceTime(bestLapMs)}`;
     // P7 — the flash and the file are decided by one comparison in the save
@@ -665,7 +715,7 @@ export class GameUi {
 
     const phase = document.body.dataset.phase;
     if (!phase) this.setSystemStatus("SYSTEM STANDBY");
-    else if (phase === "intro") this.setSystemStatus("TOTEM READY");
+    else if (phase === "intro") this.setSystemStatus(`${this.craft.short} READY`);
     else if (phase === "result") this.setSystemStatus("CLASSIFICATION LOCKED");
     else if (phase === "paused") this.setSystemStatus("RACE PAUSED");
     else if (phase === "resuming") this.setSystemStatus("RESUME SEQUENCE");
@@ -1164,7 +1214,8 @@ export class GameUi {
    * beside a clock that is already the only opponent.
    */
   private applyStartingGrid(grid: readonly RaceGridEntry[]): void {
-    const rows = startingGridRows(this.raceMode, grid, this.playerLiveryLabel);
+    this.lastGrid = grid;
+    const rows = startingGridRows(this.raceMode, grid, this.craft.team || this.playerLiveryLabel);
     if (rows.length === 0) return;
     this.objectiveGridRows = rows.length;
     this.renderObjective();
@@ -1181,8 +1232,8 @@ export class GameUi {
       name.className = "n";
       const team = document.createElement("strong");
       position.textContent = `P${entry.position}${entry.player ? " · YOU" : ""}`;
-      name.textContent = entry.name;
-      team.textContent = entry.team;
+      name.textContent = entry.player ? this.craft.label : entry.name;
+      team.textContent = entry.player && this.craft.team ? this.craft.team : entry.team;
       row.dataset.best = entry.player ? "true" : "false";
       row.append(position, name, team);
       fragment.append(row);
@@ -1270,7 +1321,7 @@ export class GameUi {
         name.className = "n";
         const gap = document.createElement("strong");
         position.textContent = `P${entry.position}${entry.player ? " · YOU" : ""}`;
-        name.textContent = entry.name;
+        name.textContent = entry.player ? this.craft.label : entry.name;
         gap.textContent = entry.position === 1
           ? formatRaceTime(entry.finishTimeMs)
           : `+${formatRaceTime(entry.gapMs)}`;

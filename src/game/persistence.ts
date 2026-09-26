@@ -54,8 +54,15 @@ import {
  * their parts and paint, the contract board, logged circuits). Additive and an
  * identity rung, for the same reason as v4 and v5: an older build must discard
  * a file that holds credits it cannot see, rather than rewrite it without them.
+ *
+ * Daily ops and body paint added v7: inside `garage`, owned paint schemes and
+ * underglow patterns, a body scheme and pattern per fitted frame, the GOLD LEAF
+ * flag and the daily board. An identity rung again, and for the sharpest form
+ * of that reason yet: a v6 build would normalize a v7 garage straight past
+ * fields it has never heard of and, on its next write, delete paint the driver
+ * paid for.
  */
-export const SCHEMA_VERSION = 6;
+export const SCHEMA_VERSION = 7;
 
 /**
  * The single storage key. Every key this game writes is prefixed `futurisma.`

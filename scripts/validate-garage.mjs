@@ -4,6 +4,7 @@ import { readFile, readdir } from "node:fs/promises";
 import {
   CIRCUIT_CODES,
   CONTRACT_SLOTS,
+  DAILY_FIELDS,
   DEFAULT_FRAME,
   FRAMES,
   FRAME_CODES,
@@ -12,9 +13,12 @@ import {
   PAINT_CODES,
   PARTS,
   PART_CODES,
+  PATTERN_CODES,
   STARTING_CREDITS,
   STAT_LIMITS,
   activeHandling,
+  bodySchemes,
+  craftNames,
   defaultGarage,
   handlingFor,
   installHandling,
@@ -24,22 +28,41 @@ import {
   FRAME_CARDS,
   PAINT_CARDS,
   PART_CARDS,
+  PATTERN_CARDS,
+  SCHEME_CARDS,
   SCRAP_PRICE,
   frameCard,
   resolvePaint,
+  schemeCard,
 } from "../src/game/garage-catalog.js";
 import {
   CONTRACT_KINDS,
+  STREAK_PAY,
+  SWEEP_BONUS,
+  WEEKLY_PAY,
   buyFrame,
   buyPart,
   contractFor,
   contractMet,
+  dailyJobs,
   describeContract,
+  describeJob,
+  fitBody,
   fitPaint,
+  fitPattern,
+  hasNews,
+  jobDone,
+  liveStreak,
   racePurse,
+  readDaily,
   scrapContract,
+  seenDaily,
   selectFrame,
   settleRace,
+  sweptToday,
+  weekOf,
+  weeklyDone,
+  weeklyJob,
 } from "../src/game/garage-economy.js";
 import {
   BOOST_MAX_SPEED,
@@ -72,6 +95,12 @@ import { TRACK_CODES } from "../src/game/save-schema.js";
  *   5. THE LOOP PAYS. A synthetic career settled race by race reaches its first
  *      upgrade, first new frame and the HALO licence inside stated bounds,
  *      and nothing — a demo, a scrapped contract, a one-lap race — farms.
+ *   6. DAILY OPS ARE BOUNDED. The day's jobs are a pure function of the day;
+ *      a year of perfect days never pays more than the stated cap; each job,
+ *      the sweep and the weekly pay once; the streak climbs one rung a
+ *      counted day, loops at seven and unlocks GOLD LEAF once; and a clock
+ *      wound back or forward can neither freeze the board nor bank a streak.
+ *      Body paint and patterns are bought once and worn only when owned.
  */
 
 const report = [];
@@ -269,7 +298,14 @@ function assertSane(garage, label) {
     assert.deepEqual(Object.keys(fit.parts), PART_CODES, `${label}: ${code} parts.`);
     for (const stage of Object.values(fit.parts)) assert.ok(Number.isInteger(stage) && stage >= 0 && stage <= MAX_PART_STAGE, `${label}: stage ${stage}.`);
     for (const slot of ["glow", "flame", "under"]) assert.ok(PAINT_CODES.includes(fit[slot]), `${label}: ${slot}.`);
+    assert.ok(bodySchemes(code).includes(fit.body), `${label}: ${code} body ${fit.body}.`);
+    assert.ok(fit.body === "factory" || (fit.body === "gold" ? garage.goldLeaf : garage.schemes.includes(`${code}:${fit.body}`)),
+      `${label}: ${code} wears ${fit.body} unowned.`);
+    assert.ok(garage.patterns.includes(fit.pattern), `${label}: ${code} pattern ${fit.pattern} unowned.`);
   }
+  assert.ok(garage.patterns.includes("steady") && garage.patterns.every((code) => PATTERN_CODES.includes(code)), `${label}: patterns.`);
+  assert.equal(typeof garage.goldLeaf, "boolean", `${label}: goldLeaf.`);
+  assert.ok(garage.daily.length === DAILY_FIELDS && garage.daily.every((value) => Number.isInteger(value) && value >= 0), `${label}: daily.`);
   assert.ok(garage.paints.includes("stock") && garage.paints.includes("off"), `${label}: free paints missing.`);
   assert.ok(garage.paints.every((code) => PAINT_CODES.includes(code)), `${label}: paints.`);
   assert.ok(garage.circuits.every((code) => CIRCUIT_CODES.includes(code)), `${label}: circuits.`);
@@ -283,6 +319,13 @@ function assertSane(garage, label) {
   assert.deepEqual(normalizeGarage(JSON.parse(JSON.stringify(garage))), garage, `${label}: JSON round trip moved it.`);
 }
 const hostile = [
+  ["unowned body", { chassis: "lance", fleet: { lance: { body: "strike" } } }],
+  ["gold without the streak", { chassis: "lance", fleet: { lance: { body: "gold" } }, schemes: ["lance:gold"] }],
+  ["another frame's scheme", { chassis: "lance", fleet: { lance: { body: "dazzle" } }, schemes: ["lance:dazzle", "halo:dazzle"] }],
+  ["unowned pattern", { fleet: { totem: { pattern: "chase" } } }],
+  ["daily wrong length", { daily: [1, 2, 3] }],
+  ["daily hostile values", { daily: [1, -2, 3.5, "x", null, 1e12, 0, 0, 0] }],
+  ["goldLeaf as a string", { goldLeaf: "true" }],
   ["null", null],
   ["array", [1, 2, 3]],
   ["string", "rich"],
@@ -491,6 +534,195 @@ report.push(
     + `all ${CIRCUIT_CODES.length} circuits by race ${milestones.allCircuits}, HALO licence race ${milestones.haloLicence}, `
     + `${Object.keys(veteran.fleet).length} frames in the bay after 120`,
 );
+
+// ---------------------------------------------------------------------------
+// 6. Daily ops and body paint
+// ---------------------------------------------------------------------------
+
+const DAY = 20_400;
+/** A race that does every job there is, on the day's circuit. */
+const perfect = (day, extra = {}) => ({
+  ...baseFacts, track: dailyJobs(day)[2].track, laps: 9, topSpeedKph: 420, nearMisses: 20, cleanGateChain: 30,
+  slipstreamSeconds: 40, driftCashes: 20, position: 1, racerCount: 4, day, ...extra,
+});
+const paidBy = (settlement, codes) => settlement.lines.filter((line) => codes.includes(line.code))
+  .reduce((sum, line) => sum + line.amount, 0);
+
+// Deterministic, three distinct kinds, the third always the circuit of the day,
+// and seven block-aligned days visit all seven circuits.
+for (let day = 1; day < 800; day += 1) {
+  const jobs = dailyJobs(day);
+  assert.deepEqual(jobs, dailyJobs(day), "dailyJobs is not a pure function of the day.");
+  assert.equal(new Set(jobs.map((job) => job.kind)).size, 3, `day ${day} repeats a job.`);
+  assert.equal(jobs[2].kind, "circuit");
+  assert.ok(CIRCUIT_CODES.includes(jobs[2].track ?? ""), `day ${day} circuit ${jobs[2].track}.`);
+  assert.deepEqual(jobs.map((job) => job.reward), [150, 200, 250], `day ${day} pays off-table.`);
+  assert.ok(jobs.every((job) => typeof describeJob(job) === "string" && describeJob(job).length > 0));
+}
+// Every Monday-to-Sunday week tours all seven circuits.
+for (let week = weekOf(DAY); week < weekOf(DAY) + 60; week += 1) {
+  const monday = week * 7 - 3;
+  assert.equal(weekOf(monday), week);
+  assert.equal(weekOf(monday - 1), week - 1, "weeks do not start on Monday.");
+  const seen = new Set(Array.from({ length: 7 }, (_, index) => dailyJobs(monday + index)[2].track));
+  assert.equal(seen.size, 7, `week ${week} skips a circuit of the day.`);
+}
+
+// A year of perfect days, one race a day: the cap holds, the streak climbs a
+// rung a day and loops, GOLD LEAF unlocks once, the weekly pays once a week.
+{
+  let garage = defaultGarage();
+  let dayMax = 0;
+  let weeklies = 0;
+  let unlocks = 0;
+  /** @type {Map<number, number>} */
+  const weeksPaid = new Map();
+  const payWeek = (settlement, day) => {
+    const paid = settlement.lines.filter((line) => line.code === "weekly").length;
+    if (paid > 0) weeksPaid.set(weekOf(day), (weeksPaid.get(weekOf(day)) ?? 0) + paid);
+    return paid;
+  };
+  for (let day = DAY; day < DAY + 365; day += 1) {
+    const settled = settleRace(garage, perfect(day));
+    const daily = paidBy(settled, ["daily", "sweep", "streak"]);
+    dayMax = Math.max(dayMax, daily);
+    weeklies += payWeek(settled, day);
+    unlocks += settled.goldLeaf ? 1 : 0;
+    const state = readDaily(settled.garage.daily, day);
+    const rung = ((day - DAY) % STREAK_PAY.length);
+    assert.equal(settled.lines.find((line) => line.code === "streak")?.amount, STREAK_PAY[rung], `day ${day - DAY}: streak rung.`);
+    assert.equal(liveStreak(state), day - DAY + 1, "the streak skipped a counted day.");
+    assert.ok(sweptToday(state) && [0, 1, 2].every((slot) => jobDone(state, slot)));
+    // Racing again the same day pays nothing more from the day's board (the
+    // weekly may legitimately close on it, and is counted).
+    const again = settleRace(settled.garage, perfect(day));
+    assert.equal(paidBy(again, ["daily", "sweep", "streak"]), 0, `day ${day - DAY}: the board paid twice.`);
+    weeklies += payWeek(again, day);
+    garage = normalizeGarage(again.garage);
+  }
+  const cap = 150 + 200 + 250 + SWEEP_BONUS + Math.max(...STREAK_PAY);
+  assert.ok(dayMax <= cap && cap === 1_350, `a day paid ${dayMax} from the board; the cap is ${cap}.`);
+  assert.equal(unlocks, 1, "GOLD LEAF unlocked more than once, or never.");
+  assert.ok(garage.goldLeaf, "a 365-day streak never unlocked GOLD LEAF.");
+  assert.ok([...weeksPaid.values()].every((count) => count === 1), "a week paid its weekly twice.");
+  // Every whole week whose job this driver can do (it never closes a
+  // contract: it races the circuit of the day) paid.
+  for (let week = weekOf(DAY) + 1; week < weekOf(DAY + 364); week += 1) {
+    if (weeklyJob(week).kind !== "contracts") assert.ok(weeksPaid.has(week), `week ${week} (${weeklyJob(week).kind}) never paid.`);
+  }
+  report.push(`daily: ${365} perfect days pay at most CR ${dayMax} a day from the board (cap ${cap}; ${cap + WEEKLY_PAY} with the weekly), ${weeklies} weeklies, GOLD LEAF once`);
+}
+
+// The streak counts a day with ONE job done; a missed day restarts the ladder.
+{
+  const lapsOnly = (day) => ({ ...baseFacts, track: "nowhere", laps: 3, racerCount: 1, mode: "timeattack", day,
+    topSpeedKph: 0, cleanGateChain: 0, driftCashes: 0, nearMisses: 0, slipstreamSeconds: 0 });
+  // Find a day whose total job is laps; three 3-lap races close it.
+  const lapDay = Array.from({ length: 50 }, (_, index) => DAY + index).find((day) => dailyJobs(day)[0].kind === "laps");
+  let garage = defaultGarage();
+  for (let race = 0; race < 3; race += 1) garage = settleRace(garage, lapsOnly(lapDay)).garage;
+  const state = readDaily(garage.daily, lapDay);
+  assert.ok(jobDone(state, 0) && !sweptToday(state) && liveStreak(state) === 1, "one job did not count the day.");
+  // A missed day: the next counted day is day 1 of the ladder again.
+  const later = settleRace(garage, perfect(lapDay + 2));
+  assert.equal(later.lines.find((line) => line.code === "streak")?.amount, STREAK_PAY[0], "a missed day kept the ladder.");
+  assert.equal(liveStreak(readDaily(garage.daily, lapDay + 2)), 0, "a missed day still reads as a live streak.");
+  // A one-lap race advances a lap total by one lap, never by a race's worth.
+  const oneLap = settleRace(defaultGarage(), { ...lapsOnly(lapDay), laps: 1 });
+  assert.equal(readDaily(oneLap.garage.daily, lapDay).progress[0], 1, "a one-lap race counted as more than a lap.");
+  // A demo and a race without a day leave the board alone.
+  assert.deepEqual(settleRace(garage, { ...perfect(lapDay), demo: true }).garage.daily, garage.daily, "a demo moved the board.");
+  const { day: _day, ...undated } = perfect(lapDay);
+  assert.deepEqual(settleRace(garage, undated).garage.daily, garage.daily, "an undated race moved the board.");
+}
+
+// Clock rollback and a stored future day.
+{
+  const ahead = settleRace(defaultGarage(), perfect(DAY + 30)).garage;
+  // Wound back: the stored future day neither freezes the board nor keeps its streak.
+  const back = settleRace(ahead, perfect(DAY));
+  assert.ok(paidBy(back, ["daily"]) === 600, "a stored future day froze today's jobs.");
+  assert.equal(back.lines.find((line) => line.code === "streak")?.amount, STREAK_PAY[0], "a rolled-back clock kept a streak from the future.");
+  const readBack = readDaily(ahead.daily, DAY);
+  assert.ok(readBack.streak === 0 && readBack.lastDay === 0 && readBack.progress.every((value) => value === 0));
+  // Then forward again: the ladder restarts rather than resuming the future one.
+  const forward = settleRace(back.garage, perfect(DAY + 1));
+  assert.equal(forward.lines.find((line) => line.code === "streak")?.amount, STREAK_PAY[1], "the ladder did not resume from the rolled-back day.");
+  // A new week re-deals the weekly; the old week's pay flag does not carry.
+  const nextWeek = readDaily(forward.garage.daily, DAY + 14);
+  assert.ok(!weeklyDone(nextWeek) && nextWeek.weekly === 0 && nextWeek.week === weekOf(DAY + 14));
+  assert.ok(weeklyJob(weekOf(DAY)).reward === WEEKLY_PAY);
+  // The bay's once-only DAILY landing clears.
+  assert.ok(hasNews(readDaily(forward.garage.daily, DAY + 1)) && !hasNews(readDaily(seenDaily(forward.garage).daily, DAY + 1)));
+}
+
+// Body paint and patterns.
+{
+  assert.deepEqual(bodySchemes("totem"), ["factory"], "TOTEM gained body schemes; its paint is the livery.");
+  for (const frame of FRAMES.filter((entry) => entry.signature)) {
+    assert.deepEqual(bodySchemes(frame.code), ["factory", "noir", "arctic", frame.signature, "gold"]);
+    for (const code of bodySchemes(frame.code)) assert.equal(schemeCard(code).code, code, `${code} has no card.`);
+    assert.ok(craftNames({ ...defaultGarage(), chassis: frame.code, fleet: { [frame.code]: { body: "factory" } } }).label === frame.name);
+    assert.equal(frameCard(frame.code).label, frame.name, `${frame.code}: the rules name the frame differently from its card.`);
+  }
+  assert.deepEqual(PATTERN_CARDS.map((card) => card.code), PATTERN_CODES, "Pattern cards drift from the rules.");
+  assert.equal(schemeCard("gold").price, null, "GOLD LEAF is for sale.");
+  const lance = normalizeGarage({ ...buyFrame({ ...defaultGarage(), credits: 99_999 }, "lance").garage });
+  const noir = fitBody(lance, "noir");
+  assert.ok(noir.ok && noir.spent === schemeCard("noir").price && noir.garage.schemes.includes("lance:noir"));
+  const backToFactory = fitBody(noir.garage, "factory");
+  const noirAgain = fitBody(backToFactory.garage, "noir");
+  assert.ok(backToFactory.ok && backToFactory.spent === 0 && noirAgain.ok && noirAgain.spent === 0, "a scheme was charged twice on one frame.");
+  assert.equal(fitBody(lance, "gold").reason, "streak", "GOLD LEAF fitted without the streak.");
+  const gilded = fitBody({ ...lance, goldLeaf: true }, "gold");
+  assert.ok(gilded.ok && gilded.spent === 0 && gilded.garage.fleet.lance.body === "gold");
+  assert.equal(fitBody(lance, "dazzle").reason, "unknown", "another frame's signature was sold to the LANCE.");
+  assert.equal(fitBody(defaultGarage(), "noir").reason, "unknown", "TOTEM was sold body paint.");
+  // Owned per frame: the BULWARK has not bought the LANCE's NOIR.
+  const bulwark = normalizeGarage({ ...buyFrame(noir.garage, "bulwark").garage });
+  assert.ok(fitBody(bulwark, "noir").spent === schemeCard("noir").price, "a scheme bought for one frame fitted another free.");
+  const chase = fitPattern(lance, "chase");
+  assert.ok(chase.ok && chase.spent === 350 && chase.garage.patterns.includes("chase"));
+  const chaseElsewhere = fitPattern({ ...chase.garage, chassis: "totem" }, "chase");
+  assert.ok(chaseElsewhere.ok && chaseElsewhere.spent === 0, "a pattern was charged twice.");
+  assert.equal(fitPattern(lance, "strobe").reason, "unknown");
+  // A garage that loses its streak flag loses the gold, never the frame.
+  const stripped = normalizeGarage({ ...gilded.garage, goldLeaf: false });
+  assert.equal(stripped.fleet.lance.body, "factory");
+  for (const result of [noir, backToFactory, gilded, chase, chaseElsewhere]) assertSane(normalizeGarage(result.garage), "paint");
+  assert.ok(SCHEME_CARDS.every((card) => card.price === null || card.price > 0 || card.code === "factory"));
+  report.push("body paint bought once per frame, patterns once per driver, GOLD LEAF only by the streak");
+}
+
+// The career again, with a day passing every three races and the dailies on:
+// the first frame arrives sooner, the HALO stays contract-gated.
+{
+  let garage = defaultGarage();
+  const milestones = { firstFrame: null, haloLicence: null };
+  for (let race = 1; race <= 120; race += 1) {
+    const contract = contractFor(garage.contracts.active[race % CONTRACT_SLOTS]);
+    const day = DAY + Math.floor(race / 3);
+    const facts = { ...winning(contract), day };
+    const settled = settleRace(garage, race % 3 !== 0 ? facts : { ...facts, position: 2, newBestLap: false, topSpeedKph: 300, nearMisses: 0, cleanGateChain: 3, slipstreamSeconds: 0, driftCashes: 0 });
+    garage = normalizeGarage(settled.garage);
+    for (;;) {
+      const fit = garage.fleet[garage.chassis];
+      const part = PART_CARDS.filter((card) => fit.parts[card.code] < MAX_PART_STAGE)
+        .sort((a, b) => a.prices[fit.parts[a.code]] - b.prices[fit.parts[b.code]])[0];
+      const frame = FRAME_CARDS.filter((card) => !Object.hasOwn(garage.fleet, card.code) && garage.contracts.done >= card.licence)
+        .sort((a, b) => a.price - b.price)[0];
+      const next = part ? buyPart(garage, part.code) : frame ? buyFrame(garage, frame.code) : null;
+      if (!next?.ok) break;
+      if (!part) milestones.firstFrame ??= race;
+      garage = normalizeGarage(next.garage);
+    }
+    if (garage.contracts.done >= frameCard("halo").licence) milestones.haloLicence ??= race;
+  }
+  assertSane(garage, "daily career");
+  assert.ok(milestones.firstFrame !== null && milestones.firstFrame <= 12, `with dailies, first new frame at race ${milestones.firstFrame}.`);
+  assert.ok(milestones.haloLicence !== null && milestones.haloLicence >= 8, `with dailies, the HALO licence at race ${milestones.haloLicence}: credits bought it.`);
+  report.push(`daily career: first new frame race ${milestones.firstFrame}, HALO licence race ${milestones.haloLicence} (still contracts)`);
+}
 
 // ---------------------------------------------------------------------------
 // 6. Wiring and the lazy boundary

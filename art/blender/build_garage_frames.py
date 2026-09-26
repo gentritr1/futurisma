@@ -27,7 +27,8 @@ THE CONTRACT each frame keeps with `TotemVehicle.mountBody`
     where TOTEM's would have been.
   - Materials by role: `FRAME_paint` (the painted livery atlas; parts that are
     not the hull sample its clean-paint row), `FRAME_accent` (the signal
-    colour every mover wears), `FRAME_trim`, `FRAME_metal`, `FRAME_glass`,
+    colour every mover wears, sampled from the accent half of that same row),
+    `FRAME_trim`, `FRAME_metal`, `FRAME_glass`,
     `FRAME_lights` (tinted by the RUNNING LIGHTS paint), and the kit's four
     lamps `TE_boost` / `TE_brake` / `TE_gravity` / `TE_power`, which the runtime
     swaps for the kit's live materials so they keep reporting state.
@@ -55,6 +56,7 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 ROOT = Path(__file__).resolve().parents[2]
 OUTPUT = ROOT / 'public/assets/garage/frames'
+PAINT = OUTPUT / 'paint'
 EVIDENCE = ROOT / 'art/evidence/garage-frames'
 TEXTURES = ROOT / 'art/textures/garage-frames'
 for folder in (OUTPUT, EVIDENCE, TEXTURES):
@@ -70,7 +72,11 @@ def g2b(p):
 # Geometry: one builder per object; faces carry a material role and UVs.
 # ---------------------------------------------------------------------------
 
-FLAT_UV = (0.5, 0.004)  # the clean-paint row at the very top of every atlas
+# The clean-paint row at the very top of every atlas: the paint on its left
+# half, the accent on its right. Both materials sample the ONE atlas, so a body
+# paint scheme is a single texture swap at runtime and recolours everything.
+FLAT_UV = (0.25, 0.006)
+ACCENT_UV = (0.75, 0.006)
 
 
 class Builder:
@@ -84,7 +90,7 @@ class Builder:
 
     def face(self, points, role, uvs=None):
         ids = [self.v(p) for p in points]
-        self.faces.append((ids, role, uvs or [FLAT_UV] * len(ids)))
+        self.faces.append((ids, role, uvs or [ACCENT_UV if role == 'FRAME_accent' else FLAT_UV] * len(ids)))
 
     # A closed solid from rings of 3D points (same count), capped both ends.
     def loft(self, rings, role, uv_rings=None, cap_role=None, belly_edges=(), belly_role='FRAME_trim'):
@@ -279,11 +285,15 @@ def aerofoil(builder, spans, role):
 SIZE = 512
 
 
+def linear_to_srgb(c):
+    return c * 12.92 if c <= 0.0031308 else 1.055 * c ** (1 / 2.4) - 0.055
+
+
 def to_rgb(colour, alpha=255):
     return tuple(int(max(0, min(1, c)) * 255) for c in colour) + (alpha,)
 
 
-def paint_atlas(frame, stations, path):
+def paint_atlas(frame, stations, path, quality=90):
     livery = frame['livery']
     base = np.array(livery['base'], float)
     u = np.linspace(0, 1, SIZE)[None, :].repeat(SIZE, 0)
@@ -310,6 +320,20 @@ def paint_atlas(frame, stations, path):
             mask = mirror(rule['u0'], rule['u1']) & window & (((u * rule['period'] * 3 + v * rule['period']) % 1) < 0.5)
         elif kind == 'split':
             mask = (u >= rule['u']) & (u <= 1 - rule['u']) & window
+        elif kind == 'fade':
+            # Nose-to-tail blend from `colour` to `colour2` across the window.
+            t = np.clip((v - rule['v0']) / (rule['v1'] - rule['v0']), 0, 1)[..., None]
+            blend = colour * (1 - t) + np.array(rule['colour2'], float) * t
+            img = np.where(window[..., None], blend, img)
+            continue
+        elif kind == 'dazzle':
+            # Disruptive test-car camouflage, mirrored so both flanks match.
+            um = np.minimum(u, 1 - u)
+            phase = np.sin(um * 2 * np.pi * 4 + v * 2 * np.pi * 5 + 2.2 * np.sin(v * 2 * np.pi * 2 + um * 9))
+            mask = window & (phase > 0.1)
+        elif kind == 'stars':
+            specks = np.random.default_rng(frame['seed'] + 7).random((SIZE, SIZE)) < rule['density']
+            mask = window & specks
         else:
             raise ValueError(kind)
         img[mask] = colour
@@ -363,21 +387,139 @@ def paint_atlas(frame, stations, path):
     # and rear evidence renders each show one flank to check it by.
     font = ImageFont.load_default(size=int(livery.get('number_size', 64)))
     small = ImageFont.load_default(size=13)
+    # A keyline in the opposite value, so a number reads over any panel it
+    # crosses (HALO's X1 used to sink into the pearl split beside it).
+    light = 0.2126 * livery['number'][0] + 0.7152 * livery['number'][1] + 0.0722 * livery['number'][2] > 0.35
+    keyline = (14, 15, 17, 235) if light else (226, 222, 210, 235)
     for side in ('right', 'left'):
         text = Image.new('RGBA', (220, 90), (0, 0, 0, 0))
         tdraw = ImageDraw.Draw(text)
-        tdraw.text((110, 45), frame['number'], font=font, anchor='mm', fill=to_rgb(livery['number'], 235))
-        tdraw.text((110, 84), 'KAIRO DYNAMICS', font=small, anchor='mb', fill=to_rgb(livery['number'], 170))
+        if 'number_plate' in livery:
+            # A racing-number panel, for a number that has to cross a split.
+            tdraw.rounded_rectangle([12, 4, 208, 88], radius=12, fill=to_rgb(livery['number_plate']),
+                                    outline=(0, 0, 0, 160), width=2)
+        tdraw.text((110, 45), frame['number'], font=font, anchor='mm', fill=to_rgb(livery['number'], 235),
+                   stroke_width=3, stroke_fill=keyline)
+        tdraw.text((110, 84), 'KAIRO DYNAMICS', font=small, anchor='mb', fill=to_rgb(livery['number'], 170),
+                   stroke_width=1, stroke_fill=keyline[:3] + (150,))
         stencil = text.transpose(Image.Transpose.TRANSVERSE if side == 'right' else Image.Transpose.TRANSPOSE)
         cu = livery.get('number_u', 0.3)
         cx = int((cu if side == 'right' else 1 - cu) * SIZE)
         cy = int(livery.get('number_v', 0.5) * SIZE)
         out.alpha_composite(stencil, (cx - stencil.width // 2, cy - stencil.height // 2))
     out = out.convert('RGB')
-    # The clean-paint row every non-hull painted part samples.
-    ImageDraw.Draw(out).rectangle([0, 0, SIZE, 4], fill=to_rgb(livery['base'])[:3])
-    out.save(path, quality=90)
+    # The clean row every non-hull part samples: paint left, accent right. The
+    # accent is a linear material colour, so it is encoded as sRGB here to land
+    # on screen exactly as the untextured material did.
+    clean = ImageDraw.Draw(out)
+    clean.rectangle([0, 0, SIZE // 2 - 1, 7], fill=to_rgb(livery['base'])[:3])
+    clean.rectangle([SIZE // 2, 0, SIZE, 7], fill=to_rgb([linear_to_srgb(c) for c in livery['accent']])[:3])
+    out.save(path, quality=quality)
     return path
+
+
+# ---------------------------------------------------------------------------
+# Body paint schemes
+# ---------------------------------------------------------------------------
+#
+# Every scheme is a whole livery for `paint_atlas`, so a scheme is one 512
+# atlas the runtime swaps in for the GLB's own (paint AND accent: both sample
+# it). NOIR, ARCTIC and GOLD LEAF are rules over the frame's factory livery —
+# its patterns stay, its colours change, and the signal colours (the ones
+# that ARE the frame) survive NOIR and ARCTIC; each signature is authored.
+# `src/game/garage-rules.js` lists the same codes (`bodySchemes`), and the
+# validator checks every atlas it names was built.
+
+def luminance(c):
+    return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]
+
+
+def is_signal(c):
+    hi, lo = max(c), min(c)
+    return hi > 0.08 and (hi - lo) / hi > 0.45
+
+
+def recolour(livery, base, number, accent, rule_colour, plate):
+    out = dict(livery, base=base, number=number, accent=accent,
+               rules=[dict(rule, colour=rule_colour(tuple(rule['colour']))) for rule in livery.get('rules', [])])
+    if 'number_plate' in livery:
+        out['number_plate'] = plate
+    return out
+
+
+INK = (0.03, 0.03, 0.035)
+
+SIGNATURES = {
+    'lance': ('strike', lambda f: dict(
+        f, base=(0.80, 0.79, 0.76), accent=(0.55, 0.025, 0.02), number=(0.04, 0.04, 0.045),
+        rules=[dict(kind='band', v0=0, v1=0.2, colour=(0.62, 0.05, 0.04)),
+               dict(kind='split', u=0.36, v0=0.2, v1=0.9, colour=(0.62, 0.05, 0.04)),
+               dict(kind='spine', at=[0.46, 0.54], width=0.016, v0=0.2, colour=(0.82, 0.8, 0.76)),
+               dict(kind='side', u0=0.18, u1=0.2, v0=0.2, colour=INK),
+               dict(kind='band', v0=0.9, v1=1, colour=(0.05, 0.05, 0.055))])),
+    'sidewinder': ('neon', lambda f: dict(
+        f, base=(0.16, 0.17, 0.19), accent=(0.02, 0.55, 0.72), number=(0.1, 0.85, 0.95),
+        rules=[dict(kind='hazard', u0=0.18, u1=0.3, v0=0.12, v1=0.32, period=7, colour=(0.05, 0.75, 0.85)),
+               dict(kind='spine', at=[0.5], width=0.07, v0=0.05, v1=0.95, colour=INK),
+               dict(kind='spine', at=[0.5], width=0.03, v0=0.05, v1=0.95, colour=(0.9, 0.15, 0.55)),
+               dict(kind='side', u0=0.15, u1=0.17, colour=(0.05, 0.75, 0.85))])),
+    'bulwark': ('hazard', lambda f: dict(
+        f, base=(0.95, 0.4, 0.03), accent=(0.02, 0.02, 0.022), number=INK,
+        rules=[dict(kind='hazard', u0=0.0, u1=0.5, v0=0.03, v1=0.13, period=9, colour=INK),
+               dict(kind='hazard', u0=0.02, u1=0.24, v0=0.2, v1=0.86, period=5, colour=INK),
+               dict(kind='spine', at=[0.5], width=0.14, v0=0.2, v1=0.85, colour=(0.05, 0.05, 0.05)),
+               dict(kind='band', v0=0.9, v1=1, colour=INK)])),
+    'corona': ('nebula', lambda f: dict(
+        f, base=(0.55, 0.1, 0.62), accent=(0.03, 0.72, 0.82), number=(0.95, 0.95, 1.0),
+        rules=[dict(kind='fade', v0=0.08, v1=1, colour=(0.62, 0.1, 0.66), colour2=(0.02, 0.07, 0.18)),
+               dict(kind='stars', density=0.012, v0=0.25, colour=(0.9, 0.95, 1.0)),
+               dict(kind='spine', at=[0.44, 0.56], width=0.02, colour=(0.2, 0.85, 0.95)),
+               dict(kind='band', v0=0.0, v1=0.06, colour=(0.2, 0.85, 0.95))])),
+    'halo': ('dazzle', lambda f: dict(
+        f, base=(0.86, 0.87, 0.88), accent=(0.95, 0.32, 0.03), number=(0.96, 0.46, 0.1),
+        number_plate=INK,
+        rules=[dict(kind='dazzle', v0=0.08, v1=0.95, colour=INK),
+               dict(kind='band', v0=0.0, v1=0.1, colour=INK)])),
+}
+
+
+def scheme_liveries(code, frame):
+    factory = frame['livery']
+    accent = factory['accent']
+    signature, paint = SIGNATURES[code]
+    return {
+        'noir': recolour(factory, (0.035, 0.036, 0.04), (0.86, 0.86, 0.84), accent,
+                         lambda c: c if is_signal(c) else (0.02 + 0.1 * luminance(c),) * 3, (0.02, 0.02, 0.022)),
+        'arctic': recolour(factory, (0.84, 0.85, 0.86), (0.05, 0.055, 0.065), accent,
+                           lambda c: c if is_signal(c) else (0.62, 0.64, 0.66) if luminance(c) > 0.3 else (0.16, 0.17, 0.19),
+                           (0.9, 0.9, 0.9)),
+        signature: paint(factory),
+        'gold': gilded(recolour(factory, (0.88, 0.68, 0.24), INK, INK,
+                                lambda c: INK if is_signal(c) or luminance(c) < 0.3 else (0.96, 0.84, 0.5), (0.8, 0.6, 0.2))),
+    }
+
+
+def gilded(livery):
+    """GOLD LEAF's own finish over any frame: black pinstripes down the spine and flanks."""
+    return dict(livery, grime=0.08, rules=[*livery['rules'],
+                dict(kind='spine', at=[0.5], width=0.006, v0=0.1, v1=0.92, colour=INK),
+                dict(kind='side', u0=0.205, u1=0.212, v0=0.12, v1=0.9, colour=INK)])
+
+
+def swatch(livery):
+    """The two colours the paint shop's chip shows: paint, then accent, as sRGB hex."""
+    base = to_rgb(livery['base'])[:3]
+    accent = to_rgb([linear_to_srgb(c) for c in livery['accent']])[:3]
+    return ['#%02x%02x%02x' % base, '#%02x%02x%02x' % accent]
+
+
+def paint_schemes(code, frame):
+    PAINT.mkdir(parents=True, exist_ok=True)
+    paints = {'factory': {'swatch': swatch(frame['livery'])}}
+    for scheme, livery in scheme_liveries(code, frame).items():
+        path = paint_atlas(dict(frame, livery=livery), frame['stations'], PAINT / f'{code}-{scheme}.jpg', quality=85)
+        paints[scheme] = {'bytes': path.stat().st_size, 'swatch': swatch(livery)}
+    return paints
 
 
 # ---------------------------------------------------------------------------
@@ -416,7 +558,7 @@ def make_materials(frame, atlas_path):
         if name == 'FRAME_glass':
             shader.inputs['Alpha'].default_value = 0.62
             mat.surface_render_method = 'BLENDED'
-        if name == 'FRAME_paint':
+        if name in ('FRAME_paint', 'FRAME_accent'):
             tex = mat.node_tree.nodes.new('ShaderNodeTexImage')
             tex.image = image
             mat.node_tree.links.new(tex.outputs['Color'], shader.inputs['Base Color'])
@@ -571,7 +713,7 @@ FRAMES = {
     'halo': dict(
         label='HALO X1', number='X1', seed=89, glow=(0.95, 0.98, 1.0),
         livery=dict(base=(0.12, 0.13, 0.14), accent=(0.80, 0.61, 0.24), number=(0.96, 0.46, 0.1),
-                    number_u=0.28, number_v=0.47, number_size=58,
+                    number_u=0.28, number_v=0.47, number_size=58, number_plate=(0.07, 0.075, 0.08),
                     rules=[dict(kind='split', u=0.36, colour=(0.76, 0.77, 0.78)),
                            dict(kind='spine', at=[0.355, 0.645], width=0.01, colour=(0.80, 0.61, 0.24)),
                            dict(kind='band', v0=0.0, v1=0.1, colour=(0.08, 0.085, 0.09))]),
@@ -871,6 +1013,7 @@ def build(code):
     stats['bytes'] = path.stat().st_size
     stats['label'] = frame['label']
     stats['glow'] = list(frame['glow'])
+    stats['paints'] = paint_schemes(code, frame)
     if RENDER:
         render_views(code, mats)
     print(code, json.dumps(stats))

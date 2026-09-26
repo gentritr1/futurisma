@@ -30,13 +30,17 @@
  *
  * @typedef {"engine" | "thrusters" | "stabilisers" | "skid" | "plasma"} PartCode
  * @typedef {Record<PartCode, number>} PartLevels
- * @typedef {{ parts: PartLevels, glow: string, flame: string, under: string }} FrameFit
+ * @typedef {{ parts: PartLevels, glow: string, flame: string, under: string, body: string, pattern: string }} FrameFit
  * @typedef {{ next: number, active: number[], done: number }} ContractBoard
  * @typedef {{
  *   credits: number,
  *   chassis: string,
  *   fleet: Record<string, FrameFit>,
  *   paints: string[],
+ *   schemes: string[],
+ *   patterns: string[],
+ *   goldLeaf: boolean,
+ *   daily: number[],
  *   contracts: ContractBoard,
  *   circuits: string[],
  * }} Garage
@@ -72,15 +76,20 @@ export const CIRCUIT_CODES = ["greenwater", "bitterpan", "nightshift", "polarity
  * (see `garage-catalog.js`), which is what keeps the loop pointed at all seven
  * circuits rather than at the one the player farms fastest.
  *
- * @type {readonly { code: string, stats: Readonly<Handling> }[]}
+ * `name` is here rather than in the catalog because the paddock names the
+ * craft at first paint — the grid, the ladder, the briefing — and a name that
+ * arrived with the lazy chunk would flip on every load. `signature` is the
+ * frame's own body paint scheme (see {@link bodySchemes}); TOTEM has none.
+ *
+ * @type {readonly { code: string, name: string, signature?: string, stats: Readonly<Handling> }[]}
  */
 export const FRAMES = [
-  { code: "totem", stats: NEUTRAL_HANDLING },
-  { code: "lance", stats: { topSpeed: 1.035, accel: 1.08, grip: 0.88, drift: 0.85, plasma: 0.95 } },
-  { code: "sidewinder", stats: { topSpeed: 0.98, accel: 1, grip: 0.94, drift: 1.45, plasma: 1.05 } },
-  { code: "bulwark", stats: { topSpeed: 0.975, accel: 0.96, grip: 1.18, drift: 0.85, plasma: 1 } },
-  { code: "corona", stats: { topSpeed: 0.99, accel: 0.94, grip: 1, drift: 1.1, plasma: 1.35 } },
-  { code: "halo", stats: { topSpeed: 1.03, accel: 1.06, grip: 1.08, drift: 1.2, plasma: 1.15 } },
+  { code: "totem", name: "TOTEM", stats: NEUTRAL_HANDLING },
+  { code: "lance", name: "LANCE S3", signature: "strike", stats: { topSpeed: 1.035, accel: 1.08, grip: 0.88, drift: 0.85, plasma: 0.95 } },
+  { code: "sidewinder", name: "SIDEWINDER D2", signature: "neon", stats: { topSpeed: 0.98, accel: 1, grip: 0.94, drift: 1.45, plasma: 1.05 } },
+  { code: "bulwark", name: "BULWARK G4", signature: "hazard", stats: { topSpeed: 0.975, accel: 0.96, grip: 1.18, drift: 0.85, plasma: 1 } },
+  { code: "corona", name: "CORONA P5", signature: "nebula", stats: { topSpeed: 0.99, accel: 0.94, grip: 1, drift: 1.1, plasma: 1.35 } },
+  { code: "halo", name: "HALO X1", signature: "dazzle", stats: { topSpeed: 1.03, accel: 1.06, grip: 1.08, drift: 1.2, plasma: 1.15 } },
 ];
 export const FRAME_CODES = FRAMES.map((frame) => frame.code);
 export const DEFAULT_FRAME = "totem";
@@ -125,6 +134,53 @@ export const STAT_LIMITS = {
 export const PAINT_CODES = ["stock", "off", "acid", "cyan", "magenta", "amber", "violet", "white", "ember"];
 const FREE_PAINTS = ["stock", "off"];
 
+/**
+ * Body paint, for a frame with its own body: `factory` (the atlas its GLB
+ * ships with), NOIR and ARCTIC on every frame, the frame's signature scheme,
+ * and `gold` — the streak's reward, never sold, fitted only while `goldLeaf`
+ * is on file. Each is its own atlas, so a scheme is owned per frame
+ * (`"lance:noir"` in `schemes`). TOTEM has no body atlas: its paint is the
+ * livery the paddock issues.
+ *
+ * @param {string} frame
+ * @returns {string[]}
+ */
+export function bodySchemes(frame) {
+  const signature = FRAMES.find((entry) => entry.code === frame)?.signature;
+  return signature ? ["factory", "noir", "arctic", signature, "gold"] : ["factory"];
+}
+
+/** Underglow patterns: bought once, fitted per frame like the colour. */
+export const PATTERN_CODES = ["steady", "breathe", "chase", "heartbeat"];
+
+/**
+ * The daily board, as bounded whole numbers rather than an object: the day
+ * and week it belongs to, three job counters, paid flags, the weekly counter,
+ * the streak and the last day that counted for it. Its meaning — and every
+ * rule about rolling it over — lives in the lazy `garage-economy.js`; the
+ * shell only has to carry it through a save intact, which a fixed-length list
+ * of small integers needs no knowledge of the board to do.
+ */
+export const DAILY_FIELDS = 9;
+const MAX_DAILY_VALUE = 10_000_000;
+
+/**
+ * The names the paddock gives the craft on the grid: its name in the lists,
+ * its first word in running copy, and — for a bodied frame — the paint it
+ * wears where TOTEM's lines name its livery (empty: the livery stands).
+ *
+ * @param {Garage} garage
+ */
+export function craftNames(garage) {
+  const frame = FRAMES.find((entry) => entry.code === garage.chassis) ?? FRAMES[0];
+  const body = garage.fleet[frame.code]?.body ?? "factory";
+  return {
+    label: frame.name,
+    short: frame.name.split(" ")[0],
+    team: frame.signature ? (body === "gold" ? "GOLD LEAF" : body.toUpperCase()) : "",
+  };
+}
+
 export const STARTING_CREDITS = 400;
 const MAX_CREDITS = 9_999_999;
 export const CONTRACT_SLOTS = 3;
@@ -137,6 +193,8 @@ export function defaultFit() {
     glow: "stock",
     flame: "stock",
     under: "off",
+    body: "factory",
+    pattern: "steady",
   };
 }
 
@@ -147,6 +205,10 @@ export function defaultGarage() {
     chassis: DEFAULT_FRAME,
     fleet: { [DEFAULT_FRAME]: defaultFit() },
     paints: [...FREE_PAINTS],
+    schemes: [],
+    patterns: ["steady"],
+    goldLeaf: false,
+    daily: Array(DAILY_FIELDS).fill(0),
     contracts: { next: CONTRACT_SLOTS, active: [0, 1, 2], done: 0 },
     circuits: [],
   };
@@ -185,6 +247,8 @@ function normalizeFit(raw) {
   fit.glow = paintOr(source.glow, "stock");
   fit.flame = paintOr(source.flame, "stock");
   fit.under = paintOr(source.under, "off");
+  if (typeof source.body === "string") fit.body = source.body;
+  if (typeof source.pattern === "string") fit.pattern = source.pattern;
   return fit;
 }
 
@@ -223,6 +287,28 @@ export function normalizeGarage(raw) {
   if (Array.isArray(source.circuits)) {
     const logged = new Set(source.circuits);
     garage.circuits = CIRCUIT_CODES.filter((code) => logged.has(code));
+  }
+  // Body paint and patterns: only what this build sells, and a frame can only
+  // wear what is on file for it — GOLD LEAF only while the streak's flag is.
+  garage.goldLeaf = source.goldLeaf === true;
+  if (Array.isArray(source.schemes)) {
+    const owned = new Set(source.schemes);
+    garage.schemes = FRAME_CODES.flatMap((frame) => bodySchemes(frame).slice(1, -1).map((scheme) => `${frame}:${scheme}`))
+      .filter((key) => owned.has(key));
+  }
+  if (Array.isArray(source.patterns)) {
+    const owned = new Set(["steady", ...source.patterns]);
+    garage.patterns = PATTERN_CODES.filter((code) => owned.has(code));
+  }
+  for (const [frame, fit] of Object.entries(garage.fleet)) {
+    const wearable = fit.body === "factory" || (fit.body === "gold" ? garage.goldLeaf && bodySchemes(frame).includes("gold")
+      : garage.schemes.includes(`${frame}:${fit.body}`));
+    if (!wearable) fit.body = "factory";
+    if (!garage.patterns.includes(fit.pattern)) fit.pattern = "steady";
+  }
+  if (Array.isArray(source.daily) && source.daily.length === DAILY_FIELDS
+    && source.daily.every((value) => wholeNumber(value, MAX_DAILY_VALUE))) {
+    garage.daily = /** @type {number[]} */ ([...source.daily]);
   }
   if (isPlainObject(source.contracts)) {
     const board = /** @type {Record<string, unknown>} */ (source.contracts);

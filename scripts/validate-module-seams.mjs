@@ -145,7 +145,11 @@ import { readFileSync } from "node:fs";
 // wait itself rides on `startTrial`'s existing audio await). The rules, purse,
 // contracts, showroom and frame bodies live in `garage-rules.js` /
 // `garage-economy.js` / `garage-bay.ts` / `totem.ts`.
-const GAME_LINE_BUDGET = 2_582;
+// 2,582 -> 2,584 for the garage's daily ops round: `requestRender`, one
+// documented line that lets the showroom draw an underglow pattern in motion
+// while the paddock otherwise draws only on request. The paint shop, the
+// DAILY board and the day clock live in `garage-ui.ts` / `garage-purse.ts`.
+const GAME_LINE_BUDGET = 2_584;
 
 function read(path) {
   return readFileSync(new URL(`../${path}`, import.meta.url), "utf8");

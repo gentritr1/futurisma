@@ -13,13 +13,49 @@
       1.195,
       2.54
     ],
-    "bytes": 162132,
+    "bytes": 163256,
     "label": "BULWARK G4",
     "glow": [
       1.0,
       0.64,
       0.1
-    ]
+    ],
+    "paints": {
+      "factory": {
+        "swatch": [
+          "#4c4f35",
+          "#f1cb4a"
+        ]
+      },
+      "noir": {
+        "bytes": 32872,
+        "swatch": [
+          "#08090a",
+          "#f1cb4a"
+        ]
+      },
+      "arctic": {
+        "bytes": 59617,
+        "swatch": [
+          "#d6d8db",
+          "#f1cb4a"
+        ]
+      },
+      "hazard": {
+        "bytes": 78525,
+        "swatch": [
+          "#f26607",
+          "#262628"
+        ]
+      },
+      "gold": {
+        "bytes": 68423,
+        "swatch": [
+          "#e0ad3d",
+          "#303034"
+        ]
+      }
+    }
   },
   "corona": {
     "triangles": 2064,
@@ -35,13 +71,49 @@
       1.235,
       2.56
     ],
-    "bytes": 180984,
+    "bytes": 180744,
     "label": "CORONA P5",
     "glow": [
       0.6,
       0.42,
       1.0
-    ]
+    ],
+    "paints": {
+      "factory": {
+        "swatch": [
+          "#212644",
+          "#b18de9"
+        ]
+      },
+      "noir": {
+        "bytes": 28141,
+        "swatch": [
+          "#08090a",
+          "#b18de9"
+        ]
+      },
+      "arctic": {
+        "bytes": 52799,
+        "swatch": [
+          "#d6d8db",
+          "#b18de9"
+        ]
+      },
+      "nebula": {
+        "bytes": 76280,
+        "swatch": [
+          "#8c199e",
+          "#30dce9"
+        ]
+      },
+      "gold": {
+        "bytes": 51605,
+        "swatch": [
+          "#e0ad3d",
+          "#303034"
+        ]
+      }
+    }
   },
   "halo": {
     "triangles": 1344,
@@ -57,13 +129,49 @@
       1.296,
       2.63
     ],
-    "bytes": 141792,
+    "bytes": 139528,
     "label": "HALO X1",
     "glow": [
       0.95,
       0.98,
       1.0
-    ]
+    ],
+    "paints": {
+      "factory": {
+        "swatch": [
+          "#1e2123",
+          "#e7cc86"
+        ]
+      },
+      "noir": {
+        "bytes": 21883,
+        "swatch": [
+          "#08090a",
+          "#e7cc86"
+        ]
+      },
+      "arctic": {
+        "bytes": 48502,
+        "swatch": [
+          "#d6d8db",
+          "#e7cc86"
+        ]
+      },
+      "dazzle": {
+        "bytes": 57700,
+        "swatch": [
+          "#dbdde0",
+          "#f99930"
+        ]
+      },
+      "gold": {
+        "bytes": 56675,
+        "swatch": [
+          "#e0ad3d",
+          "#303034"
+        ]
+      }
+    }
   },
   "lance": {
     "triangles": 1080,
@@ -79,13 +187,49 @@
       1.12,
       2.688
     ],
-    "bytes": 139100,
+    "bytes": 139432,
     "label": "LANCE S3",
     "glow": [
       0.29,
       0.89,
       1.0
-    ]
+    ],
+    "paints": {
+      "factory": {
+        "swatch": [
+          "#b2a88e",
+          "#4abbc8"
+        ]
+      },
+      "noir": {
+        "bytes": 26952,
+        "swatch": [
+          "#08090a",
+          "#4abbc8"
+        ]
+      },
+      "arctic": {
+        "bytes": 52031,
+        "swatch": [
+          "#d6d8db",
+          "#4abbc8"
+        ]
+      },
+      "strike": {
+        "bytes": 50058,
+        "swatch": [
+          "#ccc9c1",
+          "#c32b26"
+        ]
+      },
+      "gold": {
+        "bytes": 54532,
+        "swatch": [
+          "#e0ad3d",
+          "#303034"
+        ]
+      }
+    }
   },
   "sidewinder": {
     "triangles": 1116,
@@ -101,12 +245,48 @@
       1.28,
       2.65
     ],
-    "bytes": 128908,
+    "bytes": 129132,
     "label": "SIDEWINDER D2",
     "glow": [
       1.0,
       0.25,
       0.66
-    ]
+    ],
+    "paints": {
+      "factory": {
+        "swatch": [
+          "#151518",
+          "#e75db1"
+        ]
+      },
+      "noir": {
+        "bytes": 31337,
+        "swatch": [
+          "#08090a",
+          "#e75db1"
+        ]
+      },
+      "arctic": {
+        "bytes": 62134,
+        "swatch": [
+          "#d6d8db",
+          "#e75db1"
+        ]
+      },
+      "neon": {
+        "bytes": 42208,
+        "swatch": [
+          "#282b30",
+          "#26c3dc"
+        ]
+      },
+      "gold": {
+        "bytes": 66076,
+        "swatch": [
+          "#e0ad3d",
+          "#303034"
+        ]
+      }
+    }
   }
 }

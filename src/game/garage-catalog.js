@@ -13,7 +13,7 @@
  * Voice: the KAIRO DYNAMICS dispatch terminal. Upper-case, mono, a fleet
  * number on every frame, no marketing adjectives.
  */
-import { FRAME_CODES, PAINT_CODES, PART_CODES, STAT_LIMITS } from "./garage-rules.js";
+import { FRAME_CODES, PAINT_CODES, PART_CODES, PATTERN_CODES, STAT_LIMITS } from "./garage-rules.js";
 
 /**
  * @typedef {object} FrameCard
@@ -149,6 +149,78 @@ export function partCard(code) {
   return PART_CARDS.find((card) => card.code === code) ?? PART_CARDS[0];
 }
 
+/**
+ * @typedef {object} SchemeCard
+ * @property {string} code
+ * @property {string} label
+ * @property {number | null} price Per frame. Null: never sold (GOLD LEAF, the streak's).
+ * @property {string} note
+ */
+
+/**
+ * Body paint. The first three and GOLD LEAF are offered on every bodied frame;
+ * each signature belongs to one frame (`signature` in `garage-rules.js`).
+ *
+ * @type {readonly SchemeCard[]}
+ */
+export const SCHEME_CARDS = [
+  { code: "factory", label: "FACTORY", price: 0, note: "THE LIVERY IT LEFT THE WORKS IN" },
+  { code: "noir", label: "NOIR", price: 600, note: "GLOSS BLACK · SIGNAL COLOURS KEPT" },
+  { code: "arctic", label: "ARCTIC", price: 600, note: "PEARL WHITE · SIGNAL COLOURS KEPT" },
+  { code: "strike", label: "STRIKE", price: 900, note: "RED OVER WHITE · INTERCEPTOR SPLIT" },
+  { code: "neon", label: "NEON", price: 900, note: "GRAPHITE · CYAN SKIRTS · PINK SPINE" },
+  { code: "hazard", label: "HAZARD", price: 900, note: "SAFETY ORANGE · BLACK BANDING" },
+  { code: "nebula", label: "NEBULA", price: 900, note: "VIOLET TO NAVY · STAR FIELD" },
+  { code: "dazzle", label: "DAZZLE", price: 900, note: "TEST-TRACK CAMOUFLAGE · ORANGE RING" },
+  { code: "gold", label: "GOLD LEAF", price: null, note: "DAY 7 OF A DAILY STREAK · NEVER SOLD" },
+];
+
+/**
+ * What each scheme's chip shows before its atlas is ever fetched: the paint
+ * and the accent, as the Blender build painted them. The build writes the same
+ * pairs into `public/assets/garage/frames/manifest.json`, and
+ * `scripts/validate-garage-frames.mjs` holds the two equal.
+ *
+ * @type {Readonly<Record<string, Readonly<Record<string, readonly [string, string]>>>>}
+ */
+export const SCHEME_SWATCHES = {
+  lance: { factory: ["#b2a88e", "#4abbc8"], noir: ["#08090a", "#4abbc8"], arctic: ["#d6d8db", "#4abbc8"], strike: ["#ccc9c1", "#c32b26"], gold: ["#e0ad3d", "#303034"] },
+  sidewinder: { factory: ["#151518", "#e75db1"], noir: ["#08090a", "#e75db1"], arctic: ["#d6d8db", "#e75db1"], neon: ["#282b30", "#26c3dc"], gold: ["#e0ad3d", "#303034"] },
+  bulwark: { factory: ["#4c4f35", "#f1cb4a"], noir: ["#08090a", "#f1cb4a"], arctic: ["#d6d8db", "#f1cb4a"], hazard: ["#f26607", "#262628"], gold: ["#e0ad3d", "#303034"] },
+  corona: { factory: ["#212644", "#b18de9"], noir: ["#08090a", "#b18de9"], arctic: ["#d6d8db", "#b18de9"], nebula: ["#8c199e", "#30dce9"], gold: ["#e0ad3d", "#303034"] },
+  halo: { factory: ["#1e2123", "#e7cc86"], noir: ["#08090a", "#e7cc86"], arctic: ["#d6d8db", "#e7cc86"], dazzle: ["#dbdde0", "#f99930"], gold: ["#e0ad3d", "#303034"] },
+};
+
+/**
+ * @typedef {object} PatternCard
+ * @property {string} code
+ * @property {string} label
+ * @property {number} price Bought once; fits any frame.
+ */
+
+/**
+ * Underglow patterns. Every one stays at or under 3 Hz, and all of them hold
+ * STEADY under reduced motion.
+ *
+ * @type {readonly PatternCard[]}
+ */
+export const PATTERN_CARDS = [
+  { code: "steady", label: "STEADY", price: 0 },
+  { code: "breathe", label: "BREATHE", price: 350 },
+  { code: "chase", label: "CHASE", price: 350 },
+  { code: "heartbeat", label: "HEARTBEAT", price: 350 },
+];
+
+/** @param {string} code @returns {SchemeCard} */
+export function schemeCard(code) {
+  return SCHEME_CARDS.find((card) => card.code === code) ?? SCHEME_CARDS[0];
+}
+
+/** @param {string} code @returns {PatternCard} */
+export function patternCard(code) {
+  return PATTERN_CARDS.find((card) => card.code === code) ?? PATTERN_CARDS[0];
+}
+
 /** @param {string} code @returns {PaintCard} */
 export function paintCard(code) {
   return PAINT_CARDS.find((card) => card.code === code) ?? PAINT_CARDS[0];
@@ -201,11 +273,12 @@ export function formatCredits(credits) {
 
 // The shell's code lists are the contract this table has to honour; a
 // mismatch is a build-time bug, so it throws on import rather than rendering
-// a showroom the race loop disagrees with. Cheap: three array comparisons.
+// a showroom the race loop disagrees with. Cheap: four array comparisons.
 for (const [codes, cards, name] of /** @type {const} */ ([
   [FRAME_CODES, FRAME_CARDS, "frame"],
   [PART_CODES, PART_CARDS, "part"],
   [PAINT_CODES, PAINT_CARDS, "paint"],
+  [PATTERN_CODES, PATTERN_CARDS, "pattern"],
 ])) {
   const listed = cards.map((card) => card.code);
   if (listed.length !== codes.length || !codes.every((code) => listed.includes(code))) {

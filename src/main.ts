@@ -2,7 +2,7 @@ import { FuturismaGame } from "./game/game";
 import type { RaceCourse } from "./game/course";
 import { InputController } from "./game/input";
 import { TRACKS, resolveMapSelection } from "./game/map-selection";
-import { handlingFor, installHandling } from "./game/garage-rules.js";
+import { craftNames, handlingFor, installHandling, type Garage } from "./game/garage-rules.js";
 import type { GarageScreen } from "./game/garage-bay";
 import { loadGarageBay, restoreStoredLivery } from "./game/meta-runtime";
 import { MetaUi } from "./game/meta-ui";
@@ -12,6 +12,7 @@ import { configureRenderMode } from "./game/render-mode.js";
 import { resolveQualityLock, resolveReducedMotion, searchParam } from "./game/query-probes";
 import { GameUi } from "./game/ui";
 import { applyInterfaceScale } from "./game/interface-scale.js";
+import { LIVERIES } from "./game/liveries.js";
 
 const canvasElement = document.getElementById("game-canvas");
 if (!(canvasElement instanceof HTMLCanvasElement)) {
@@ -100,17 +101,35 @@ if (garageCredits) garageCredits.textContent = `CR ${save.garage.credits.toLocal
  * popping into the fitted frame after the launch.
  */
 const liveryRow = document.getElementById("livery-select")?.parentElement ?? null;
-const refitCraft = (preview: string | null): void => {
+let refits = 0;
+const refitCraft = (preview: string | null, trial: Garage | null = null): void => {
   if (stockCraft) return;
   const garage = save.garage;
   installHandling(handlingFor(garage));
+  // Named now, from the shell's own table, so the grid, the ladder and the
+  // briefing never say TOTEM for a moment on a load that fits a LANCE.
+  const names = craftNames(garage);
+  ui.setPlayerCraft(names.label, names.short, names.team);
   // The decal sheets are TOTEM's; a frame with its own body wears its own paint.
   if (liveryRow) liveryRow.hidden = garage.chassis !== "totem";
   // Non-fatal like the livery swap: a look that cannot load costs the paint,
   // never the race — the handling above is already installed.
-  void game.refitCraft(async (vehicle) => {
-    const { applyCraftLook } = await loadGarageBay();
-    await applyCraftLook(vehicle, garage, preview, selection);
+  // `trial` is the paint shop showing a scheme or a pattern before it is
+  // bought: the look comes from it, the handling and the names never do.
+  const fitting = game.refitCraft(async (vehicle) => {
+    const { applyCraftLook, markDaily } = await loadGarageBay();
+    markDaily(garage);
+    await applyCraftLook(vehicle, trial ?? garage, preview, selection, { still: resolveReducedMotion() });
+  });
+  // A body still on its way says so rather than leaving START looking dead
+  // while `startTrial` waits for it. Only a wait long enough to notice shows
+  // (a cached body or a paint-shop preview never flickers the status line),
+  // and only the latest refit may clear it.
+  const serial = ++refits;
+  const busy = setTimeout(() => garage.chassis !== "totem" && serial === refits && ui.setFitting(names.label), 150);
+  void fitting.then(() => {
+    clearTimeout(busy);
+    if (serial === refits) ui.setFitting(null);
   });
 };
 
@@ -126,6 +145,13 @@ const openGarage = (): void => {
   if (!["intro", "result"].includes(body.phase ?? "") || body.options === "true" || body.controls === "true") return;
   garageScreen ??= loadGarageBay().then(({ GarageScreen }) => new GarageScreen({
     refit: refitCraft,
+    requestRender: () => game.requestRender(),
+    reducedMotion: resolveReducedMotion,
+    liveries: LIVERIES,
+    setLivery: (code) => {
+      void game.applyLivery(code);
+      meta.showLivery(code);
+    },
     suspendInput: () => input.suspendActionsUntilRelease(),
     save,
     here: { track: selection, mode: raceModes.mode, tier: raceModes.tier },

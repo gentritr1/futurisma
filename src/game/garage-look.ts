@@ -15,6 +15,16 @@
  * takes a serial and only the latest one mounts; a stale load still lands in
  * the cache for the next time.
  *
+ * BODY PAINT. A scheme is a whole 512 atlas (`paint/<frame>-<scheme>.jpg`),
+ * and both `FRAME_paint` and `FRAME_accent` sample the atlas they were built
+ * with, so one texture swap repaints the body and its signal colour together.
+ * A scheme is fetched once per page and shared; FACTORY puts the GLB's own map
+ * back. The swap waits for the atlas BEFORE the body mounts, so a refit never
+ * shows the factory paint for a frame and then the scheme.
+ *
+ * UNDERGLOW PATTERNS animate in the wash's own shader from a time uniform, all
+ * at or under 3 Hz, and hold STEADY when the driver asked for reduced motion.
+ *
  * WHY TOTEM'S LIGHTS GO MONOCHROME FIRST. `TOTEM_emissive` samples a painted
  * emissive map whose lamps are cyan and acid green; tinting it directly would
  * MULTIPLY (amber over cyan is mud). A fitted colour swaps in a one-channel
@@ -25,7 +35,7 @@
 import * as THREE from "three";
 import type { TotemVehicle } from "./totem";
 import { resolvePaint } from "./garage-catalog.js";
-import type { Garage } from "./garage-rules.js";
+import { PATTERN_CODES, type Garage } from "./garage-rules.js";
 
 const UNDERGLOW_NAME = "garage_underglow";
 const WORKS_FLAME = 0xff581d;
@@ -42,6 +52,10 @@ const monoLights = new WeakMap<THREE.MeshStandardMaterial, THREE.Texture>();
 /** Per craft, so a new game (a relink, a hot reload) never mounts a disposed body. */
 const bodies = new WeakMap<TotemVehicle, Map<string, Promise<THREE.Object3D | null>>>();
 const serials = new WeakMap<TotemVehicle, number>();
+/** Scheme atlases by URL, fetched once per page and shared by every craft. */
+const schemeMaps = new Map<string, Promise<THREE.Texture | null>>();
+/** Each body material's own map, so FACTORY can put it back. */
+const factoryMaps = new WeakMap<THREE.MeshStandardMaterial, THREE.Texture | null>();
 
 /**
  * One channel of the painted emissive map, in the source's own orientation and
@@ -113,7 +127,7 @@ function fitTotemLights(lights: THREE.MeshStandardMaterial, hex: number | null):
 function createUnderglow(): THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial> {
   const material = new THREE.ShaderMaterial({
     name: UNDERGLOW_NAME,
-    uniforms: { uColor: { value: new THREE.Color() } },
+    uniforms: { uColor: { value: new THREE.Color() }, uPattern: { value: 0 }, uTime: { value: 0 } },
     vertexShader: `
       varying vec2 vUv;
       void main() {
@@ -121,14 +135,28 @@ function createUnderglow(): THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial
         gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
       }
     `,
+    // Patterns: 0 STEADY, 1 BREATHE (0.5 Hz swell), 2 CHASE (a band sweeping
+    // nose to tail at 0.8 Hz), 3 HEARTBEAT (a double pulse at 0.9 Hz). None
+    // exceeds 3 Hz and none lifts the wash past its steady 0.6 ceiling.
     fragmentShader: `
       uniform vec3 uColor;
+      uniform float uPattern;
+      uniform float uTime;
       varying vec2 vUv;
       void main() {
         vec2 edge = abs(vUv - 0.5) * 2.0;
         float reach = length(max(edge - vec2(0.42, 0.6), 0.0)) / 0.5;
         float glow = (1.0 - smoothstep(0.0, 1.0, reach)) * 0.6;
-        gl_FragColor = vec4(uColor * glow, glow);
+        float level = 1.0;
+        if (uPattern > 2.5) {
+          float beat = fract(uTime * 0.9);
+          level = 0.35 + 0.65 * max(exp(-beat * 16.0), exp(-abs(beat - 0.24) * 16.0));
+        } else if (uPattern > 1.5) {
+          level = 0.3 + 0.7 * smoothstep(0.62, 1.0, fract(vUv.y + uTime * 0.8));
+        } else if (uPattern > 0.5) {
+          level = 0.55 + 0.45 * sin(uTime * 3.14159265);
+        }
+        gl_FragColor = vec4(uColor * glow * level, glow * level);
         #include <colorspace_fragment>
       }
     `,
@@ -139,6 +167,9 @@ function createUnderglow(): THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial
   });
   const mesh = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 6.4), material);
   mesh.name = UNDERGLOW_NAME;
+  mesh.onBeforeRender = () => {
+    material.uniforms.uTime.value = performance.now() / 1000;
+  };
   mesh.rotation.x = -Math.PI / 2;
   mesh.renderOrder = 2;
   return mesh;
@@ -178,22 +209,82 @@ function bodyFor(vehicle: TotemVehicle, frame: string, circuit: string): Promise
   return body;
 }
 
+/** The body's two atlas-sampling materials, paint and accent. */
+function atlasMaterials(body: THREE.Object3D): THREE.MeshStandardMaterial[] {
+  const found = new Set<THREE.MeshStandardMaterial>();
+  body.traverse((object) => {
+    const material = (object as THREE.Mesh).material as THREE.MeshStandardMaterial | undefined;
+    if (material && (material.name === "FRAME_paint" || material.name === "FRAME_accent")) found.add(material);
+  });
+  for (const material of found) if (!factoryMaps.has(material)) factoryMaps.set(material, material.map);
+  return [...found];
+}
+
+/**
+ * A scheme's atlas, sampled exactly like the factory one it replaces: same
+ * orientation, colour space, wrapping and filter class (the PS2 treatment and
+ * the painterly class were applied to the factory map at load).
+ */
+function schemeMap(frame: string, scheme: string, factory: THREE.Texture): Promise<THREE.Texture | null> {
+  const url = `/assets/garage/frames/paint/${frame}-${scheme}.jpg`;
+  let map = schemeMaps.get(url);
+  if (!map) {
+    map = new THREE.TextureLoader().loadAsync(url)
+      .then((texture) => {
+        texture.flipY = factory.flipY;
+        texture.colorSpace = factory.colorSpace;
+        texture.wrapS = factory.wrapS;
+        texture.wrapT = factory.wrapT;
+        texture.magFilter = factory.magFilter;
+        texture.minFilter = factory.minFilter;
+        texture.generateMipmaps = factory.generateMipmaps;
+        texture.anisotropy = factory.anisotropy;
+        texture.channel = factory.channel;
+        return texture;
+      })
+      // A scheme that will not load costs the paint, never the race: the body
+      // keeps its factory livery and a later refit tries again.
+      .catch((error: unknown) => {
+        console.warn(`Garage paint ${frame}-${scheme} could not load; keeping the factory livery.`, error);
+        schemeMaps.delete(url);
+        return null;
+      });
+    schemeMaps.set(url, map);
+  }
+  return map;
+}
+
+/** Options the running page decides for the look. */
+export interface CraftLookOptions {
+  /** Reduced motion, as `resolveReducedMotion` reads it: patterns hold STEADY. */
+  still?: boolean;
+}
+
 /**
  * Fits the frame on the grid — or, with `previewFrame`, one the driver is only
- * looking at in the showroom, wearing its signature colours. Resolves once the
- * refit is on the craft (or has been superseded by a newer one).
+ * looking at in the showroom, wearing its own fitted look. `garage` may be a
+ * trial garage the paint shop built to show a scheme or a pattern before it is
+ * bought. Resolves once the refit is on the craft (or has been superseded by a
+ * newer one).
  */
 export async function applyCraftLook(
   vehicle: TotemVehicle,
   garage: Garage,
   previewFrame: string | null = null,
   circuit = "",
+  options: CraftLookOptions = {},
 ): Promise<void> {
   const serial = (serials.get(vehicle) ?? 0) + 1;
   serials.set(vehicle, serial);
   const frame = previewFrame ?? garage.chassis;
   const body = frame === "totem" ? null : await bodyFor(vehicle, frame, circuit);
   if (serials.get(vehicle) !== serial) return;
+  const scheme = garage.fleet[frame]?.body ?? "factory";
+  const surfaces = body ? atlasMaterials(body) : [];
+  const factory = surfaces.length > 0 ? factoryMaps.get(surfaces[0]) ?? null : null;
+  const painted = factory && scheme !== "factory" ? await schemeMap(frame, scheme, factory) : null;
+  if (serials.get(vehicle) !== serial) return;
+  for (const material of surfaces) material.map = painted ?? factoryMaps.get(material) ?? material.map;
   vehicle.mountBody(body);
 
   const fit = garage.fleet[frame];
@@ -223,6 +314,7 @@ export async function applyCraftLook(
   // back on in the paint shop does not rebuild a material mid-browse.
   underglow.visible = under !== null;
   if (under !== null) underglow.material.uniforms.uColor.value.setHex(under);
+  underglow.material.uniforms.uPattern.value = options.still ? 0 : Math.max(0, PATTERN_CODES.indexOf(fit?.pattern ?? "steady"));
   // Sized to the hull it sits under, so wide skirts or pontoons never hide it.
   const bounds = body?.userData.garageBounds as THREE.Box3 | undefined;
   if (bounds) {

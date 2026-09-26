@@ -1,8 +1,13 @@
 /**
- * Garage — the works bay. Four tabs over one save: CRAFT (buy and choose a
- * frame), PARTS (stage the frame on the grid), PAINT (lights, boost flame,
- * underglow) and CONTRACTS (the board that sends the driver round all seven
- * circuits).
+ * Garage — the works bay. Five tabs over one save: CRAFT (buy and choose a
+ * frame), PARTS (stage the frame on the grid), PAINT (body paint, lights,
+ * boost flame, underglow and its pattern), CONTRACTS (the board that sends the
+ * driver round all seven circuits) and DAILY (the day's three jobs, the week's
+ * one and the streak).
+ *
+ * Nothing in the paint shop is bought blind: pointing at a finish, or tabbing
+ * onto it, shows it on the craft behind the panel from a trial garage; the
+ * click is the purchase, and leaving the row puts the fitted look back.
  *
  * Lazy: `main.ts` imports this on the first GARAGE press, so none of it is in
  * the initial shell. It is built node by node with the DOM API, because
@@ -26,34 +31,55 @@ import {
   PAINT_CARDS,
   PAINT_SLOTS,
   PART_CARDS,
+  PATTERN_CARDS,
+  SCHEME_SWATCHES,
   SCRAP_PRICE,
   STAT_ROWS,
   frameCard,
   formatCredits,
   paintCard,
   resolvePaint,
+  schemeCard,
   statFill,
 } from "./garage-catalog.js";
 import {
+  STREAK_PAY,
+  SWEEP_BONUS,
   buyFrame,
   buyPart,
   contractFor,
+  dailyJobs,
   describeContract,
+  describeJob,
+  describeWeekly,
+  fitBody,
   fitPaint,
+  fitPattern,
+  hasNews,
+  jobDone,
+  jobProgressLabel,
+  liveStreak,
+  readDaily,
   scrapContract,
+  seenDaily,
   selectFrame,
-  type Contract,
+  sweptToday,
+  weeklyDone,
+  weeklyJob,
+  weeklyProgress,
   type Transaction,
 } from "./garage-economy.js";
 import {
   MAX_PART_STAGE,
   PARTS,
+  bodySchemes,
   defaultFit,
   handlingFor,
+  type FrameFit,
   type Garage,
   type Handling,
 } from "./garage-rules.js";
-import type { GarageStore } from "./garage-purse";
+import { markDaily, msToMidnight, today, type GarageStore } from "./garage-purse";
 
 /**
  * Everything the bay needs from the running page. Handed over by `main.ts`
@@ -62,12 +88,25 @@ import type { GarageStore } from "./garage-purse";
  * modules out of the entry chunk.
  */
 export interface GarageHooks {
-  /** Re-installs the saved craft's handling and puts a look on the TOTEM. */
-  refit(previewFrame: string | null): void;
+  /**
+   * Re-installs the saved craft's handling and puts a look on the craft: the
+   * saved one, a frame the showroom is viewing, or — with `trial` — a scheme or
+   * pattern the paint shop is showing before it is bought.
+   */
+  refit(previewFrame: string | null, trial?: Garage | null): void;
+  /** One more paddock frame (the paddock only draws on request). */
+  requestRender(): void;
+  /** `resolveReducedMotion` from `query-probes.ts`: patterns hold still. */
+  reducedMotion(): boolean;
+  /** `LIVERIES` from `liveries.js`: TOTEM's body paint is its livery. */
+  liveries: readonly { code: string; label: string; deck: string }[];
+  /** Issues a livery to TOTEM, as the paddock's LIVERY row does. */
+  setLivery(code: string): void;
   /** Drops any action the bay just swallowed before the game sees it. */
   suspendInput(): void;
   /** `save` from `persistence.ts`. */
   save: GarageStore & {
+    readonly livery: string;
     setTrack(track: string): string;
     setRaceMode(mode: string): string;
     setTier(tier: string): string;
@@ -78,12 +117,13 @@ export interface GarageHooks {
   tracks: readonly { selection: string; label: string; mapCode: string }[];
 }
 
-type Tab = "craft" | "parts" | "paint" | "contracts";
+type Tab = "craft" | "parts" | "paint" | "contracts" | "daily";
 const TABS: readonly { code: Tab; label: string }[] = [
   { code: "craft", label: "CRAFT" },
   { code: "parts", label: "PARTS" },
   { code: "paint", label: "PAINT" },
   { code: "contracts", label: "CONTRACTS" },
+  { code: "daily", label: "DAILY" },
 ];
 const TIER_ORDER = ["rookie", "works", "feral"];
 const ROMAN = ["", "I", "II", "III"];
@@ -127,6 +167,10 @@ export class GarageScreen {
   private viewed = "totem";
   private returnFocus: HTMLElement | null = null;
   private opened = false;
+  /** The paint shop's what-if: the saved garage with one finish changed. */
+  private trial: Garage | null = null;
+  /** The showroom's own frame loop, running only while a pattern moves. */
+  private animation = 0;
 
   constructor(private readonly hooks: GarageHooks) {
     this.screen.id = "garage-screen";
@@ -176,6 +220,12 @@ export class GarageScreen {
       this.screen.hidden = false;
       document.body.dataset.garage = "true";
       this.hooks.suspendInput();
+      // A finish that closed a job lands the next visit on DAILY, once.
+      const garage = this.hooks.save.garage;
+      if (hasNews(readDaily(garage.daily, today()))) {
+        tab = "daily";
+        this.hooks.save.setGarage(seenDaily(garage));
+      }
     }
     this.setNote("", "idle");
     this.showTab(tab);
@@ -185,6 +235,8 @@ export class GarageScreen {
   hide(): void {
     if (!this.opened) return;
     this.opened = false;
+    this.trial = null;
+    this.animate();
     this.screen.hidden = true;
     document.body.dataset.garage = "false";
     this.hooks.refit(null);
@@ -194,6 +246,7 @@ export class GarageScreen {
   }
 
   dispose(): void {
+    cancelAnimationFrame(this.animation);
     window.removeEventListener("keydown", this.handleWindowKeys, { capture: true });
     this.screen.remove();
     delete document.body.dataset.garage;
@@ -209,8 +262,66 @@ export class GarageScreen {
     }
     // The showroom previews the frame being looked at; every other tab shows
     // the craft that will actually race.
+    this.trial = null;
     this.hooks.refit(tab === "craft" && this.viewed !== this.hooks.save.garage.chassis ? this.viewed : null);
     this.render();
+    this.animate();
+  }
+
+  /**
+   * Shows one finish on the craft without buying it, or — with null — puts the
+   * fitted look back. The trial is the saved garage with the change on the
+   * frame on the grid, so everything else about the craft stays as it races.
+   */
+  private previewLook(change: Partial<FrameFit> | null): void {
+    const garage = this.hooks.save.garage;
+    if (change === null) {
+      if (!this.trial) return;
+      this.trial = null;
+      this.hooks.refit(null);
+    } else {
+      const fit = garage.fleet[garage.chassis] ?? defaultFit();
+      this.trial = { ...garage, fleet: { ...garage.fleet, [garage.chassis]: { ...fit, ...change } } };
+      this.hooks.refit(null, this.trial);
+    }
+    this.animate();
+  }
+
+  /** Pointer or keyboard focus on a chip previews it; leaving its row restores. */
+  private previewable(chip: HTMLButtonElement, change: Partial<FrameFit>): HTMLButtonElement {
+    chip.addEventListener("pointerenter", () => this.previewLook(change));
+    chip.addEventListener("focus", () => this.previewLook(change));
+    return chip;
+  }
+
+  private previewRow(row: HTMLElement): HTMLElement {
+    row.addEventListener("pointerleave", () => this.previewLook(null));
+    row.addEventListener("focusout", (event) => {
+      if (!(event.relatedTarget instanceof Node && row.contains(event.relatedTarget))) this.previewLook(null);
+    });
+    return row;
+  }
+
+  /**
+   * The paddock only draws when something asks it to, so an underglow pattern
+   * in the showroom would sit still. While one is on show (and motion is not
+   * reduced), the bay asks for a frame every frame; nowhere else does.
+   */
+  private animate(): void {
+    const garage = this.trial ?? this.hooks.save.garage;
+    const fit = garage.fleet[garage.chassis];
+    const moving = this.opened && !this.hooks.reducedMotion() && fit !== undefined
+      && fit.under !== "off" && fit.pattern !== "steady";
+    if (moving && !this.animation) {
+      const tick = (): void => {
+        this.hooks.requestRender();
+        this.animation = requestAnimationFrame(tick);
+      };
+      this.animation = requestAnimationFrame(tick);
+    } else if (!moving && this.animation) {
+      cancelAnimationFrame(this.animation);
+      this.animation = 0;
+    }
   }
 
   private render(): void {
@@ -219,11 +330,13 @@ export class GarageScreen {
     this.credits.textContent = formatCredits(garage.credits);
     const walletLine = document.getElementById("garage-credits");
     if (walletLine) walletLine.textContent = formatCredits(garage.credits);
+    markDaily(garage);
     this.body.replaceChildren(
       ...(this.tab === "craft" ? this.renderCraft(garage)
         : this.tab === "parts" ? this.renderParts(garage)
         : this.tab === "paint" ? this.renderPaint(garage)
-        : this.renderContracts(garage)),
+        : this.tab === "contracts" ? this.renderContracts(garage)
+        : this.renderDaily(garage)),
     );
     if (focusKey) {
       const target = this.screen.querySelector<HTMLElement>(`[data-key="${focusKey}"]`);
@@ -334,19 +447,18 @@ export class GarageScreen {
 
   private renderPaint(garage: Garage): HTMLElement[] {
     const fit = garage.fleet[garage.chassis] ?? defaultFit();
-    const title = node("p", "garage__card-title", `${frameCard(garage.chassis).label} · PAINT SHOP`);
-    const hint = node("p", "garage__card-note", "A COLOUR IS BOUGHT ONCE AND FITS ANY SLOT ON ANY FRAME");
+    const label = frameCard(garage.chassis).label;
+    const title = node("p", "garage__card-title", `${label} · PAINT SHOP`);
+    const hint = node("p", "garage__card-note", "POINT AT A FINISH TO SEE IT ON THE CRAFT · BODY PAINT IS PER FRAME, COLOURS AND PATTERNS FIT ANY");
     const slots = PAINT_SLOTS.map((slot) => {
-      const row = node("div", "dispatch__row garage__slot");
-      const key = node("span", "dispatch__key", slot.label);
       const chips = node("div", "chip-row garage__paints");
       for (const paint of PAINT_CARDS) {
         if (slot.code === "under" ? paint.code === "stock" : paint.code === "off") continue;
         const owned = garage.paints.includes(paint.code);
-        const chip = button("chip garage__paint", `paint-${slot.code}-${paint.code}`, () => {
+        const chip = this.previewable(button("chip garage__paint", `paint-${slot.code}-${paint.code}`, () => {
           this.commit(fitPaint(this.hooks.save.garage, slot.code, paint.code),
             owned ? `${slot.label} · ${paint.label}` : `${paint.label} BOUGHT · ${slot.label}`);
-        });
+        }), { [slot.code]: paint.code });
         chip.setAttribute("role", "radio");
         chip.setAttribute("aria-checked", String(fit[slot.code] === paint.code));
         const swatch = node("i", "garage__swatch");
@@ -356,10 +468,93 @@ export class GarageScreen {
         chip.append(swatch, node("strong", "", paint.label), node("small", "", owned ? "OWNED" : formatCredits(paintCard(paint.code).price)));
         chips.append(chip);
       }
-      row.append(key, chips);
-      return row;
+      return this.paintRow(slot.label, chips);
     });
-    return [title, hint, ...slots];
+    return [title, hint, this.renderBody(garage, fit, label), ...slots, ...this.renderPatterns(garage, fit)];
+  }
+
+  private paintRow(key: string, chips: HTMLElement): HTMLElement {
+    const row = node("div", "dispatch__row garage__slot");
+    row.append(node("span", "dispatch__key", key), this.previewRow(chips));
+    return row;
+  }
+
+  /**
+   * BODY. A bodied frame's schemes, each chip showing its paint over its
+   * accent; TOTEM's body paint is the livery the paddock issues, free, so its
+   * row is those liveries and fitting one is issuing it.
+   */
+  private renderBody(garage: Garage, fit: FrameFit, label: string): HTMLElement {
+    const chips = node("div", "chip-row garage__paints");
+    if (garage.chassis === "totem") {
+      for (const livery of this.hooks.liveries) {
+        const chip = button("chip garage__paint", `body-${livery.code}`, () => {
+          this.hooks.setLivery(livery.code);
+          this.setNote(`${livery.label} ISSUED TO TOTEM`, "ok");
+          this.render();
+        });
+        chip.setAttribute("role", "radio");
+        chip.setAttribute("aria-checked", String(this.hooks.save.livery === livery.code));
+        const swatch = node("i", "garage__swatch");
+        swatch.dataset.swatch = "works";
+        chip.append(swatch, node("strong", "", livery.label), node("small", "", "ISSUED FREE"));
+        chips.append(chip);
+      }
+      return this.paintRow("BODY", chips);
+    }
+    const frame = garage.chassis;
+    for (const code of bodySchemes(frame)) {
+      const card = schemeCard(code);
+      const owned = code === "factory" || (code === "gold" ? garage.goldLeaf : garage.schemes.includes(`${frame}:${code}`));
+      const chip = this.previewable(button("chip garage__paint", `body-${code}`, () => {
+        this.commit(fitBody(this.hooks.save.garage, code), owned ? `${card.label} ON ${label}` : `${card.label} BOUGHT · ON ${label}`);
+      }), { body: code });
+      chip.setAttribute("role", "radio");
+      chip.setAttribute("aria-checked", String(fit.body === code));
+      if (!owned && card.price === null) chip.setAttribute("aria-disabled", "true");
+      chip.title = card.note;
+      const swatch = node("i", "garage__swatch");
+      const [paint, accent] = SCHEME_SWATCHES[frame]?.[code] ?? ["#000000", "#000000"];
+      swatch.dataset.swatch = "scheme";
+      swatch.style.setProperty("--swatch", paint);
+      swatch.style.setProperty("--swatch-accent", accent);
+      chip.append(swatch, node("strong", "", card.label), node("small", "",
+        owned ? (code === "gold" ? "UNLOCKED" : "OWNED") : card.price === null ? "STREAK" : formatCredits(card.price)));
+      chips.append(chip);
+    }
+    return this.paintRow("BODY", chips);
+  }
+
+  /**
+   * PATTERN. With no underglow fitted a pattern has nothing to move, so the
+   * preview borrows the running-light colour to show it on.
+   */
+  private renderPatterns(garage: Garage, fit: FrameFit): HTMLElement[] {
+    const chips = node("div", "chip-row garage__paints");
+    const card = frameCard(garage.chassis);
+    const under = fit.under !== "off" ? fit.under : fit.glow !== "stock" ? fit.glow : card.glow !== "stock" ? card.glow : "acid";
+    for (const pattern of PATTERN_CARDS) {
+      const owned = garage.patterns.includes(pattern.code);
+      const chip = this.previewable(button("chip garage__paint", `pattern-${pattern.code}`, () => {
+        this.commit(fitPattern(this.hooks.save.garage, pattern.code),
+          owned ? `UNDERGLOW · ${pattern.label}` : `${pattern.label} BOUGHT · UNDERGLOW`);
+      }), { pattern: pattern.code, under });
+      chip.setAttribute("role", "radio");
+      chip.setAttribute("aria-checked", String(fit.pattern === pattern.code));
+      const swatch = node("i", "garage__swatch");
+      swatch.dataset.swatch = "pattern";
+      swatch.dataset.pattern = pattern.code;
+      chip.append(swatch, node("strong", "", pattern.label), node("small", "", owned ? "OWNED" : formatCredits(pattern.price)));
+      chips.append(chip);
+    }
+    const notes = [
+      fit.under === "off" ? "NO UNDERGLOW FITTED · A PATTERN SHOWS ONCE ONE IS" : "",
+      this.hooks.reducedMotion() ? "REDUCED MOTION IS ON · PATTERNS HOLD STEADY" : "",
+    ].filter(Boolean);
+    return [
+      this.paintRow("PATTERN", chips),
+      ...(notes.length > 0 ? [node("p", "garage__card-note", notes.join(" · "))] : []),
+    ];
   }
 
   private renderContracts(garage: Garage): HTMLElement[] {
@@ -371,7 +566,7 @@ export class GarageScreen {
       const item = node("li", "garage__contract");
       item.dataset.here = String(contract.track === here);
       const actions = node("div", "garage__contract-actions");
-      const go = button("chip garage__go", `contract-go-${slot}`, () => this.dispatch(contract));
+      const go = button("chip garage__go", `contract-go-${slot}`, () => this.dispatch(contract.track, contract.mode, contract.tier));
       go.append(node("strong", "", contract.track === here ? "RACE IT HERE" : "DISPATCH"));
       const scrap = button("chip garage__scrap", `contract-scrap-${slot}`, () => {
         this.commit(scrapContract(this.hooks.save.garage, slot), "CONTRACT SCRAPPED · NEXT ONE DEALT");
@@ -395,27 +590,122 @@ export class GarageScreen {
   }
 
   /**
-   * Sends the driver to a contract's circuit with a format and field that can
-   * close it. The choices are stored before navigating, as the dispatch sheet
+   * DAILY. The streak up top as seven pips (today's lit once it counts), the
+   * day's three jobs with their bars, the sweep, the week's job and GOLD
+   * LEAF's standing. The reset time is computed on render, not ticked: a live
+   * countdown would be a region re-announcing itself every minute.
+   */
+  private renderDaily(garage: Garage): HTMLElement[] {
+    const day = today();
+    const state = readDaily(garage.daily, day);
+    const streak = liveStreak(state);
+    const rung = streak === 0 ? 0 : ((streak - 1) % STREAK_PAY.length) + 1;
+    const countedToday = state.lastDay === day;
+    const left = msToMidnight();
+    const head = node("div", "garage__daily-head");
+    const heading = node("div", "garage__daily-title");
+    heading.append(
+      node("p", "garage__card-title", streak === 0 ? "STREAK · ONE JOB TODAY STARTS IT"
+        : `STREAK · DAY ${rung} OF ${STREAK_PAY.length}${countedToday ? " · TODAY COUNTED" : " · ONE JOB TODAY KEEPS IT"}`),
+      node("p", "garage__card-note", `NEW JOBS IN ${Math.floor(left / 3_600_000)} H ${Math.floor(left / 60_000) % 60} MIN`),
+    );
+    const pips = node("ol", "garage__streak");
+    pips.setAttribute("aria-label", `STREAK LADDER · DAY ${rung} OF ${STREAK_PAY.length}`);
+    for (const [index, pay] of STREAK_PAY.entries()) {
+      const pip = node("li");
+      pip.dataset.on = String(index < rung);
+      pip.dataset.today = String(countedToday && index === rung - 1);
+      pip.append(node("small", "", index === STREAK_PAY.length - 1 && !garage.goldLeaf ? "GOLD" : `+${pay}`));
+      pips.append(pip);
+    }
+    head.append(heading, pips);
+
+    const list = node("ol", "garage__contracts garage__jobs");
+    for (const [slot, job] of dailyJobs(day).entries()) {
+      const track = job.track ? this.hooks.tracks.find((entry) => entry.selection === job.track) : undefined;
+      const done = jobDone(state, slot);
+      const item = this.jobItem(
+        job.track ? `CIRCUIT OF THE DAY · ${track?.mapCode ?? ""} · ${track?.label ?? job.track.toUpperCase()}`
+          : job.cumulative ? "TODAY'S TOTAL" : "BEST SINGLE RACE",
+        describeJob(job),
+        done ? "PAID" : `+ ${formatCredits(job.reward)}`,
+        done ? "DONE" : jobProgressLabel(job, state.progress[slot]),
+        Math.min(state.progress[slot], job.target),
+        job.target,
+        done,
+      );
+      item.dataset.here = String(job.track !== null && job.track === this.hooks.here.track);
+      if (job.track && !done) {
+        const go = button("chip garage__go", `daily-go-${slot}`, () => this.dispatch(job.track ?? "", null, null));
+        go.append(node("strong", "", job.track === this.hooks.here.track ? "RACE IT HERE" : "DISPATCH"));
+        const actions = node("div", "garage__contract-actions");
+        actions.append(go);
+        item.append(actions);
+      }
+      list.append(item);
+    }
+    const sweep = node("p", "garage__card-note garage__sweep",
+      sweptToday(state) ? "SWEPT · ALL THREE PAID TODAY" : `SWEEP ALL THREE · + ${formatCredits(SWEEP_BONUS)}`);
+    sweep.dataset.done = String(sweptToday(state));
+
+    const weekly = weeklyJob(state.week);
+    const weekDone = weeklyDone(state);
+    const progress = Math.min(weeklyProgress(state, weekly), weekly.target);
+    const week = node("ol", "garage__contracts garage__jobs");
+    week.append(this.jobItem("THIS WEEK · NEW JOB EVERY MONDAY", describeWeekly(weekly),
+      weekDone ? "PAID" : `+ ${formatCredits(weekly.reward)}`, weekDone ? "DONE" : `${progress}/${weekly.target}`,
+      progress, weekly.target, weekDone));
+    const gold = node("p", "garage__card-note", garage.goldLeaf
+      ? "GOLD LEAF · UNLOCKED · FITS ANY BODIED FRAME IN THE PAINT SHOP"
+      : "GOLD LEAF · DAY 7 OF A STREAK UNLOCKS IT · NEVER SOLD");
+    return [head, list, sweep, week, gold];
+  }
+
+  private jobItem(where: string, goal: string, pay: string, count: string, value: number, target: number, done: boolean): HTMLElement {
+    const item = node("li", "garage__contract garage__job");
+    item.dataset.done = String(done);
+    const bar = node("span", "garage__bar garage__job-bar");
+    bar.setAttribute("role", "progressbar");
+    bar.setAttribute("aria-label", goal);
+    bar.setAttribute("aria-valuemin", "0");
+    bar.setAttribute("aria-valuemax", String(target));
+    bar.setAttribute("aria-valuenow", String(value));
+    const fill = node("i", "garage__fill");
+    fill.style.setProperty("--fill", (target > 0 ? value / target : 0).toFixed(3));
+    bar.append(fill);
+    const meter = node("div", "garage__job-meter");
+    meter.append(bar, node("span", "garage__job-count", count));
+    item.append(
+      node("p", "garage__contract-where", where),
+      node("p", "garage__contract-goal", goal),
+      node("p", "garage__contract-pay", pay),
+      meter,
+    );
+    return item;
+  }
+
+  /**
+   * Sends the driver to a contract's (or the day's) circuit with a format and
+   * field that can close it. The choices are stored before navigating, as the dispatch sheet
    * does, and a contract for the circuit already loaded just closes the bay.
    */
-  private dispatch(contract: Contract): void {
-    const mode = contract.mode === "field"
+  private dispatch(track: string, wanted: string | null, minimum: string | null): void {
+    const mode = wanted === "field"
       ? (this.hooks.here.mode === "timeattack" ? "race" : this.hooks.here.mode)
-      : contract.mode ?? this.hooks.here.mode;
-    const tier = contract.tier && TIER_ORDER.indexOf(this.hooks.here.tier) < TIER_ORDER.indexOf(contract.tier)
-      ? contract.tier
+      : wanted ?? this.hooks.here.mode;
+    const tier = minimum && TIER_ORDER.indexOf(this.hooks.here.tier) < TIER_ORDER.indexOf(minimum)
+      ? minimum
       : this.hooks.here.tier;
-    this.hooks.save.setTrack(contract.track);
+    this.hooks.save.setTrack(track);
     this.hooks.save.setRaceMode(mode);
     this.hooks.save.setTier(tier);
-    if (contract.track === this.hooks.here.track && mode === this.hooks.here.mode && tier === this.hooks.here.tier) {
+    if (track === this.hooks.here.track && mode === this.hooks.here.mode && tier === this.hooks.here.tier) {
       this.hide();
       if (document.body.dataset.phase === "intro") document.getElementById("start-button")?.focus({ preventScroll: true });
       return;
     }
     const parameters = new URLSearchParams(window.location.search);
-    parameters.set("map", contract.track);
+    parameters.set("map", track);
     parameters.set("mode", mode);
     parameters.set("tier", tier);
     parameters.delete("demo");
@@ -423,6 +713,8 @@ export class GarageScreen {
   }
 
   private commit(result: Transaction, success: string): void {
+    // A refusal leaves the preview on the craft: the driver is still pointing
+    // at it, and leaving the row puts the fitted look back as usual.
     if (result.ok) {
       this.hooks.save.setGarage(result.garage);
       if (this.tab === "craft") this.viewed = this.hooks.save.garage.chassis;
@@ -436,6 +728,7 @@ export class GarageScreen {
       result.reason === "credits" ? `NOT ENOUGH CREDITS · ${formatCredits(garage.credits)} IN THE BANK`
         : result.reason === "licence" ? `${card.label} NEEDS ${card.licence} CONTRACTS ON FILE · ${garage.contracts.done} SO FAR`
         : result.reason === "maxed" ? "STAGE III IS THE LAST STAGE"
+        : result.reason === "streak" ? "GOLD LEAF IS DAY 7 OF A DAILY STREAK · SEE DAILY"
         : "NOT AVAILABLE",
       "refused",
     );

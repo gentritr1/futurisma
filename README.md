@@ -78,7 +78,25 @@ Every classified race pays. Spend the credits on a faster craft, then take it in
 | **CORONA P5** | Plasma | Refills the reserve fastest and hits harder on boost; slower pull. |
 | **HALO X1** | Works prototype | Better at everything. Licensed only after **eight contracts**, then bought. |
 
-**Parts** stage one frame at a time: engine, thrusters, stabilisers, skid rig and plasma cell, three stages each. **Paint** fits running lights, boost flame and a neon **underglow**. A colour is bought once and works in any slot on any frame. While you browse, the craft behind the panel previews each frame and colour.
+Every frame after TOTEM races its own 3D body, built in Blender with the rest of the fleet.
+
+**Parts** stage one frame at a time: engine, thrusters, stabilisers, skid rig and plasma cell, three stages each.
+
+**Paint** covers the body and the lights:
+
+- **Body paint.** Each frame has **NOIR** and **ARCTIC** (CR 600) and its own signature scheme (CR 900): LANCE **STRIKE**, SIDEWINDER **NEON**, BULWARK **HAZARD**, CORONA **NEBULA**, HALO **DAZZLE**. A scheme is bought per frame. TOTEM's body paint is its four free liveries.
+- **Colours.** Running lights, boost flame and a neon **underglow**. A colour is bought once and works in any slot on any frame.
+- **Underglow patterns.** **BREATHE**, **CHASE** and **HEARTBEAT** (CR 350 each, bought once). They hold steady under reduced motion.
+
+Nothing is bought blind. Point at a finish, or tab onto it, and the craft behind the panel wears it; click to buy. The grid, the live ladder and the result screen name the frame you race, for example *LANCE S3 · STRIKE*.
+
+**Daily ops** give you a reason to race every day. The **DAILY** tab (key `5`) deals three jobs each local day:
+
+- a total across the day's races, such as *complete 9 laps* (CR 150);
+- a single-race best, such as *reach 340 km/h* (CR 200);
+- a finish on the **circuit of the day** (CR 250). **DISPATCH** takes you there, and each Monday-to-Sunday week tours all seven circuits.
+
+Clear all three for a **sweep** bonus (CR 250). One **weekly job** pays CR 1,200. A **streak** counts every day you finish at least one job and climbs a seven-day ladder, CR 75 up to CR 500 on day 7. The first day 7 also unlocks **GOLD LEAF**, the only paint scheme credits cannot buy. Jobs pay in the purse at the finish, the purse ends by naming your next job, and both GARAGE buttons show the day's count.
 
 Rivals keep their authored pace and never rubber-band. A better craft is an honest advantage, and the Feral field is where it earns its price. The works TOTEM with nothing fitted drives exactly as before the garage existed, so every record and ghost still stands.
 
@@ -166,6 +184,7 @@ Append these to the local game URL, combining options with `&`.
 | `?seed=714` | Repeat the power supply and route-choice pattern. |
 | `?demo=1` | Autopilot showcase; driving input returns control to you. Races the works craft and pays no purse. |
 | `?craft=stock` | Race the works TOTEM whatever the garage has fitted, for comparable soaks. |
+| `?day=20400` | Pin the daily-ops calendar day (days since 1970-01-01), for QA and screenshots. |
 | `?motion=reduce` | Reduce decorative motion and gravity-roll effects. |
 | `?quality=low` / `high` | Lock the render scale. |
 | `?render=ps2` | Console-era raster treatment without shadows. |

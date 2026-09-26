@@ -547,6 +547,8 @@ export class FuturismaGame {
     await applyRaceLivery(this.vehicle, this.rivalFleet, code, this.ui);
     this.renderRequested = true;
   };
+  /** Garage — one more paddock frame, for a showroom underglow pattern in motion. */
+  readonly requestRender = (): void => { this.renderRequested = true; };
   /** Garage — the latest refit of the player's craft (lazy `garage-look.ts`); every launch path waits for it. */
   private refitting: Promise<void> = Promise.resolve();
   readonly refitCraft = (fit: (vehicle: TotemVehicle) => Promise<void>): Promise<void> => (this.refitting = fit(this.vehicle).then(() => { this.renderRequested = true; }, () => undefined));

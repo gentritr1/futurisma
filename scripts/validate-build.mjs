@@ -142,9 +142,21 @@ for (const name of javascriptNames) {
 // showroom logic stays in the `garage-bay` chunk. Only the RAW ceiling moves,
 // 980 -> 983 (measured + ~1.5 KiB), as the Dream Island registration did: the
 // two compressed ceilings that decide what a visitor downloads both still pass.
+//
+// Garage daily ops and body paint (same branch): 981.3 -> 984.2 raw, measured
+// against the previous commit's build: +1.35 KiB in `garage-rules.js` (v7's
+// save fields — owned schemes and patterns, the GOLD LEAF flag and the daily
+// board, all totalled by `normalizeGarage` at module evaluation — and each
+// frame's `name`, so the grid, ladder and briefing name a LANCE at first paint
+// rather than flipping from TOTEM when the lazy chunk lands) and +1.55 KiB in
+// the entry chunk (`GameUi.setPlayerCraft` / `setFitting`, `main.ts`'s fitting
+// state on START, `requestRender`, `MetaUi.showLivery`). Every rule about the
+// daily board, the paint shop, the scheme atlases and the day clock is in the
+// lazy `garage-bay` chunk. Only the RAW ceiling moves, 983 -> 986 (measured +
+// ~1.5 KiB), as the two garage rounds before it did.
 assert.ok(
-  javascript.rawBytes <= 983 * 1024,
-  `Initial JavaScript exceeds 983 KiB raw (${(javascript.rawBytes / 1024).toFixed(1)} KiB).`,
+  javascript.rawBytes <= 986 * 1024,
+  `Initial JavaScript exceeds 986 KiB raw (${(javascript.rawBytes / 1024).toFixed(1)} KiB).`,
 // Merged 2026-09-13 with Phase F ALIVE, whose own note follows; the combined
 // tree measures under the 974 pin (see the phase-F merge commit).
 // Phase F ALIVE (2026-09-12): 972 -> 973 raw. The island's own bytes are all

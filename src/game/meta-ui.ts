@@ -359,6 +359,11 @@ export class MetaUi {
     );
   }
 
+  /** Garage — the bay issued a livery; the paddock's LIVERY row follows it. */
+  showLivery(code: string): void {
+    this.liveryGroup.setValue(code);
+  }
+
   private syncFromSave(): void {
     const settings = save.settings;
     this.trackGroup.setValue(this.selection);

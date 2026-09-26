@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
-import { FRAME_CODES } from "../src/game/garage-rules.js";
+import { SCHEME_CARDS, SCHEME_SWATCHES } from "../src/game/garage-catalog.js";
+import { FRAME_CODES, bodySchemes } from "../src/game/garage-rules.js";
 
 /**
  * Garage frames — the five frame bodies keep the contract `TotemVehicle.mountBody`
@@ -17,7 +18,11 @@ import { FRAME_CODES } from "../src/game/garage-rules.js";
  *   - materials are the declared roles only, all single-sided like TOTEM's,
  *     with the four kit lamps present so their reporting survives a mount;
  *   - triangles, draw calls, bytes and bounds sit inside the budget, and the
- *     manifest the build wrote matches what was exported.
+ *     manifest the build wrote matches what was exported;
+ *   - every body paint scheme the rules offer a frame was built: a 512 JPEG
+ *     under the atlas ceiling, its bytes pinned in the manifest, and its chip
+ *     swatch in the catalog the same pair the build painted; and both the paint
+ *     and the accent sample the ONE atlas, so a scheme is a single swap.
  */
 
 const PIVOTS = ["steering_fin_L", "steering_fin_R", "airbrake_L", "airbrake_R", "elevon_L", "elevon_R", "skids"]
@@ -54,6 +59,26 @@ function parseGlb(bytes) {
   return JSON.parse(bytes.subarray(20, 20 + jsonLength).toString("utf8"));
 }
 
+/**
+ * A scheme atlas is fetched only when fitted or previewed. The ceiling leaves
+ * room for the busiest schemes (HAZARD's stripes, NEBULA's star field), which
+ * JPEG spends the most bytes on.
+ */
+const MAX_ATLAS_BYTES = 96 * 1024;
+
+/** Width and height from a baseline or progressive JPEG's frame header. */
+function jpegSize(bytes) {
+  assert.equal(bytes.readUInt16BE(0), 0xffd8, "not a JPEG");
+  for (let at = 2; at < bytes.length;) {
+    const marker = bytes.readUInt16BE(at);
+    if (marker === 0xffc0 || marker === 0xffc2) return [bytes.readUInt16BE(at + 7), bytes.readUInt16BE(at + 5)];
+    at += 2 + bytes.readUInt16BE(at + 2);
+  }
+  throw new Error("JPEG without a frame header");
+}
+
+let atlasBytes = 0;
+let atlases = 0;
 const report = [];
 for (const code of bodies) {
   const bytes = await readFile(new URL(`${code}.glb`, root));
@@ -104,6 +129,10 @@ for (const code of bodies) {
   }
   const paint = gltf.materials.find((material) => material.name === "FRAME_paint");
   assert.ok(paint.pbrMetallicRoughness?.baseColorTexture, `${label}: FRAME_paint lost its livery atlas.`);
+  const accent = gltf.materials.find((material) => material.name === "FRAME_accent");
+  assert.equal(gltf.textures[accent.pbrMetallicRoughness?.baseColorTexture?.index ?? -1]?.source,
+    gltf.textures[paint.pbrMetallicRoughness.baseColorTexture.index].source,
+    `${label}: FRAME_accent does not sample the livery atlas, so a paint scheme cannot recolour it.`);
   assert.equal(gltf.images.length, 1, `${label}: one livery atlas per frame.`);
   assert.equal(gltf.images[0].mimeType, "image/jpeg", `${label}: the atlas ships as JPEG.`);
 
@@ -141,6 +170,21 @@ for (const code of bodies) {
   assert.equal(pinned.bytes, bytes.length, `${label}: the manifest's bytes are stale; rebuild.`);
   assert.equal(pinned.triangles, triangles, `${label}: the manifest's triangles are stale; rebuild.`);
   assert.equal(pinned.drawCalls, draws, `${label}: the manifest's draw calls are stale; rebuild.`);
+  // Body paint: every scheme the rules offer this frame, built and pinned.
+  const paints = pinned.paints ?? {};
+  assert.deepEqual(Object.keys(paints).sort(), bodySchemes(code).sort(), `${label}: the build's schemes differ from the rules'.`);
+  for (const scheme of bodySchemes(code)) {
+    assert.deepEqual(SCHEME_SWATCHES[code]?.[scheme], paints[scheme].swatch,
+      `${code}-${scheme}: the catalog's chip swatch is not the colour the build painted; copy it from the manifest.`);
+    assert.ok(SCHEME_CARDS.some((card) => card.code === scheme), `${scheme} has no catalog card.`);
+    if (scheme === "factory") continue;
+    const atlas = await readFile(new URL(`paint/${code}-${scheme}.jpg`, root));
+    assert.equal(atlas.length, paints[scheme].bytes, `${code}-${scheme}.jpg: the manifest's bytes are stale; rebuild.`);
+    assert.ok(atlas.length <= MAX_ATLAS_BYTES, `${code}-${scheme}.jpg is ${atlas.length} B against ${MAX_ATLAS_BYTES}.`);
+    assert.deepEqual(jpegSize(atlas), [512, 512], `${code}-${scheme}.jpg is not a 512 atlas.`);
+    atlasBytes += atlas.length;
+    atlases += 1;
+  }
   report.push(`${code} ${triangles} tris / ${draws} draws / ${(bytes.length / 1024).toFixed(0)} KiB`);
 }
 
@@ -162,8 +206,8 @@ assert.doesNotMatch(catalog, /stance/, "The catalog still carries stance scales.
 // reach; `main.ts` hands the refit over synchronously, before the bay loads.
 assert.match(game, /await Promise\.all\(\[this\.audio\.start\(\)\.catch\(\(\) => undefined\), this\.refitting\]\)/,
   "startTrial must wait for the latest refit on every launch path.");
-assert.match(main, /void game\.refitCraft\(async \(vehicle\) => \{\s*\n\s*const \{ applyCraftLook \} = await loadGarageBay\(\);/,
+assert.match(main, /= game\.refitCraft\(async \(vehicle\) => \{\s*\n\s*const \{ applyCraftLook[\w\s,]*\} = await loadGarageBay\(\);/,
   "main.ts must hand the refit to the game before the bay chunk loads.");
 assert.doesNotMatch(index, /garage\/frames/, "The frame GLBs must stay out of the initial shell.");
 
-console.log(`Garage frames PASS: ${report.join("; ")}; pivots identity and mirrored, airbrakes forward of their hinges, anchors mirrored, jets on the kit's line, single-sided role materials with all four kit lamps, manifest current; bodies mount (never scale), refits serialize and a launch waits for the latest.`);
+console.log(`Garage frames PASS: ${report.join("; ")}; ${atlases} paint schemes built (${(atlasBytes / 1024).toFixed(0)} KiB, fetched one at a time), each matching its catalog swatch; pivots identity and mirrored, airbrakes forward of their hinges, anchors mirrored, jets on the kit's line, single-sided role materials with all four kit lamps, manifest current; bodies mount (never scale), refits serialize and a launch waits for the latest.`);

@@ -7,10 +7,13 @@ import {
   MAX_GHOST_FRAMES,
 } from "../src/game/ghost.js";
 import {
+  DAILY_FIELDS,
   FRAME_CODES,
   MAX_PART_STAGE,
   PAINT_CODES,
   PART_CODES,
+  PATTERN_CODES,
+  bodySchemes,
   defaultGarage,
 } from "../src/game/garage-rules.js";
 import {
@@ -269,7 +272,21 @@ function assertUsableGarage(garage, label) {
     for (const slot of ["glow", "flame", "under"]) {
       assert.ok(PAINT_CODES.includes(fit[slot]), `${label}: ${code}.${slot} is "${fit[slot]}".`);
     }
+    // v7: a body only from this frame's schemes, and only one on file for it.
+    assert.ok(bodySchemes(code).includes(fit.body), `${label}: ${code} wears body "${fit.body}".`);
+    assert.ok(
+      fit.body === "factory" || (fit.body === "gold" ? garage.goldLeaf : garage.schemes.includes(`${code}:${fit.body}`)),
+      `${label}: ${code} wears "${fit.body}" without owning it.`,
+    );
+    assert.ok(garage.patterns.includes(fit.pattern), `${label}: ${code} pattern "${fit.pattern}" not owned.`);
   }
+  assert.ok(PATTERN_CODES.includes("steady") && garage.patterns.includes("steady"), `${label}: STEADY not owned.`);
+  assert.equal(typeof garage.goldLeaf, "boolean", `${label}: goldLeaf is not a boolean.`);
+  assert.ok(
+    Array.isArray(garage.daily) && garage.daily.length === DAILY_FIELDS
+      && garage.daily.every((value) => Number.isInteger(value) && value >= 0 && value <= 10_000_000),
+    `${label}: the daily board is ${JSON.stringify(garage.daily)}.`,
+  );
   for (const paint of garage.paints) {
     assert.ok(PAINT_CODES.includes(paint), `${label}: owns paint "${paint}".`);
   }
@@ -358,8 +375,9 @@ const authored = {
   track: "bitterpan",
   mode: "timeattack",
   tier: "feral",
-  // Garage, v6. Every field off its default, for the reason the settings above
-  // are: a fixture at the defaults cannot tell a stored value from a dropped one.
+  // Garage, v6 (+ v7 paint and daily board). Every field off its default, for
+  // the reason the settings above are: a fixture at the defaults cannot tell a
+  // stored value from a dropped one.
   garage: {
     credits: 12_345,
     chassis: "sidewinder",
@@ -369,15 +387,23 @@ const authored = {
         glow: "stock",
         flame: "stock",
         under: "off",
+        body: "factory",
+        pattern: "breathe",
       },
       sidewinder: {
         parts: { engine: 0, thrusters: 2, stabilisers: 1, skid: 3, plasma: 1 },
         glow: "magenta",
         flame: "cyan",
         under: "violet",
+        body: "neon",
+        pattern: "chase",
       },
     },
     paints: ["stock", "off", "cyan", "magenta", "violet"],
+    schemes: ["sidewinder:noir", "sidewinder:neon"],
+    patterns: ["steady", "breathe", "chase"],
+    goldLeaf: true,
+    daily: [20_356, 6, 312, 1, 5, 2_908, 12, 4, 20_356],
     contracts: { next: 11, active: [4, 9, 10], done: 8 },
     circuits: ["greenwater", "tideline", "dreamisland"],
   },
@@ -400,6 +426,27 @@ assertUsableSave(roundTripped, "round trip");
   const { garage: _upgradedGarage, ...upgradedFields } = upgraded;
   assert.deepEqual(upgradedFields, v5Fields, "v5 -> v6 moved a field it had no reason to touch.");
   assertUsableSave(upgraded, "v5 -> v6");
+}
+
+// v6 -> v7 is an identity rung too. A v6 garage (the authored one without
+// its paint and board) keeps every v6 field and gains only v7's defaults.
+{
+  const { schemes: _schemes, patterns: _patterns, goldLeaf: _goldLeaf, daily: _daily, ...v6Garage } = authored.garage;
+  const v6Fleet = Object.fromEntries(Object.entries(v6Garage.fleet).map(([code, { body: _body, pattern: _pattern, ...fit }]) => [code, fit]));
+  const upgraded = parseSave(JSON.stringify({ ...authored, garage: { ...v6Garage, fleet: v6Fleet }, schemaVersion: 6 }), SCHEMA_VERSION);
+  const starting = defaultGarage();
+  assert.deepEqual(upgraded.garage, {
+    ...v6Garage,
+    fleet: Object.fromEntries(Object.entries(v6Fleet).map(([code, fit]) => [code, { ...fit, body: "factory", pattern: "steady" }])),
+    schemes: starting.schemes,
+    patterns: starting.patterns,
+    goldLeaf: starting.goldLeaf,
+    daily: starting.daily,
+  }, "v6 -> v7 changed a v6 garage field or dealt something other than v7's defaults.");
+  const { garage: _upgradedGarage, ...upgradedFields } = upgraded;
+  const { garage: _authoredGarage, ...authoredFields } = authored;
+  assert.deepEqual(upgradedFields, { ...authoredFields, schemaVersion: SCHEMA_VERSION }, "v6 -> v7 moved a field outside the garage.");
+  assertUsableSave(upgraded, "v6 -> v7");
 }
 
 // A default save must itself survive a round trip, or a first run would rewrite

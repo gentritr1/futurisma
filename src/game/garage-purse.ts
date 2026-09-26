@@ -17,7 +17,7 @@
  * mono dispatch voice: itemised lines, a total, the balance.
  */
 import { formatCredits } from "./garage-catalog.js";
-import { settleRace, type RaceFacts, type Settlement } from "./garage-economy.js";
+import { jobDone, readDaily, settleRace, type RaceFacts, type Settlement } from "./garage-economy.js";
 import type { Garage } from "./garage-rules.js";
 import type { RaceResultInputs, RaceResultSummary } from "./race-modes";
 
@@ -32,6 +32,45 @@ function node<K extends keyof HTMLElementTagNameMap>(tag: K, className: string, 
   element.className = className;
   if (text) element.textContent = text;
   return element;
+}
+
+/**
+ * The local calendar day, as days since 1970-01-01: the one clock read in the
+ * garage, made here so the economy stays pure. `?day=` pins it, for QA, soaks
+ * and screenshots, the way `?motion=reduce` pins motion.
+ */
+export function today(now = Date.now()): number {
+  const pinned = Number(new URLSearchParams(window.location.search).get("day"));
+  if (Number.isInteger(pinned) && pinned > 0) return pinned;
+  return Math.floor((now - new Date(now).getTimezoneOffset() * 60_000) / 86_400_000);
+}
+
+/** Milliseconds until local midnight, when the daily jobs turn over. */
+export function msToMidnight(now = Date.now()): number {
+  const midnight = new Date(now);
+  midnight.setHours(24, 0, 0, 0);
+  return midnight.getTime() - now;
+}
+
+/**
+ * The paddock's and the result screen's GARAGE buttons carry the day's count,
+ * so the loop is visible before the bay is opened. Built and written from this
+ * chunk (warmed at boot by the first refit), so the shell carries none of it.
+ */
+export function markDaily(garage: Garage): void {
+  const state = readDaily(garage.daily, today());
+  const done = [0, 1, 2].filter((slot) => jobDone(state, slot)).length;
+  for (const id of ["garage-button", "result-garage-button"]) {
+    const span = document.querySelector(`#${id} > span`);
+    if (!span) continue;
+    let label = span.querySelector<HTMLElement>("[data-garage-daily]");
+    if (!label) {
+      label = node("small", "garage__daily-count");
+      label.dataset.garageDaily = "";
+      span.append(" ", label);
+    }
+    label.textContent = done === 3 ? "· DAILY SWEPT" : `· DAILY ${done}/3`;
+  }
 }
 
 /** The race as the economy sees it: only facts the race already measured. */
@@ -52,6 +91,7 @@ export function raceFacts(summary: RaceResultSummary, inputs: RaceResultInputs, 
     slipstreamSeconds: summary.slipstreamSeconds,
     driftCashes: finish.driftCashes,
     demo: finish.demo,
+    day: today(),
   };
 }
 
@@ -74,6 +114,12 @@ function renderPurse(settlement: Settlement, balance: number): void {
     row.append(node("span", "", line.label), node("b", "", `+${line.amount.toLocaleString("en-US")}`));
     list.append(row);
   }
+  if (settlement.goldLeaf) {
+    const row = node("li", "purse__line");
+    row.dataset.code = "unlock";
+    row.append(node("span", "", "GOLD LEAF UNLOCKED · FIT IT IN THE PAINT SHOP"));
+    list.append(row);
+  }
   const foot = node("p", "purse__foot");
   foot.append(
     node("span", "", settlement.completed.length > 0
@@ -81,7 +127,10 @@ function renderPurse(settlement: Settlement, balance: number): void {
       : "OPEN THE GARAGE TO SPEND"),
     node("span", "purse__balance", `BALANCE ${formatCredits(balance)}`),
   );
-  panel.replaceChildren(head, list, foot);
+  // Every result screen ends pointing at the next race worth running.
+  const next = node("p", "purse__next", settlement.next);
+  next.hidden = !settlement.next;
+  panel.replaceChildren(head, list, foot, next);
   panel.dataset.contract = String(settlement.completed.length > 0);
   panel.hidden = false;
 }
@@ -107,6 +156,7 @@ export function settleFinish(
     renderPurse(settlement, stored.credits);
     const credits = document.getElementById("garage-credits");
     if (credits) credits.textContent = formatCredits(stored.credits);
+    markDaily(stored);
   } catch (error) {
     console.warn("The purse could not be settled.", error);
   }

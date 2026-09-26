@@ -21,4 +21,4 @@ document.head.append(sheet);
 
 export { GarageScreen } from "./garage-ui";
 export { applyCraftLook } from "./garage-look";
-export { settleFinish } from "./garage-purse";
+export { markDaily, settleFinish } from "./garage-purse";
