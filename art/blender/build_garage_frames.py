@@ -262,6 +262,18 @@ def hull(builder, stations, textured=True, offset_x=0.0):
                  cap_role='FRAME_trim', belly_edges=(0, 7))
 
 
+def flank(stations, z, inset):
+    """The hull at z: chine half-width, chine height, and the deck's height `inset` inboard of the chine."""
+    for a, b in zip(stations, stations[1:]):
+        if a['z'] <= z <= b['z']:
+            t = (z - a['z']) / (b['z'] - a['z'])
+            st = {k: a[k] + (b[k] - a[k]) * t for k in ('w', 'top', 'mid', 'roof', 'drop')}
+            shoulder = st['top'] - (st['top'] - st['mid']) * st['drop']
+            run = st['w'] * (1 - st['roof'])
+            return st['w'], st['mid'], st['mid'] + (shoulder - st['mid']) * min(inset / run, 1)
+    raise ValueError(f'z {z} is off the hull')
+
+
 def canopy(builder, stations):
     rings = []
     for z, w, base, top in stations:
@@ -472,7 +484,7 @@ SIGNATURES = {
                dict(kind='side', u0=0.15, u1=0.17, colour=(0.05, 0.75, 0.85))])),
     'bulwark': ('hazard', lambda f: dict(
         f, base=(0.95, 0.4, 0.03), accent=(0.02, 0.02, 0.022), number=INK,
-        rules=[dict(kind='hazard', u0=0.0, u1=0.5, v0=0.03, v1=0.13, period=9, colour=INK),
+        rules=[dict(kind='hazard', u0=0.0, u1=0.5, v0=0.03, v1=0.13, period=5, colour=INK),
                dict(kind='hazard', u0=0.02, u1=0.24, v0=0.2, v1=0.86, period=5, colour=INK),
                dict(kind='spine', at=[0.5], width=0.14, v0=0.2, v1=0.85, colour=(0.05, 0.05, 0.05)),
                dict(kind='band', v0=0.9, v1=1, colour=INK)])),
@@ -796,9 +808,14 @@ def build_sidewinder(root, mats, frame):
         # Front outrigger canards on an exposed strut.
         body.plate([(s * 0.9, 0.06, -2.95), (s * 1.78, 0.02, -2.75), (s * 1.78, 0.02, -2.25), (s * 1.0, 0.06, -2.1)], 0.06, 'FRAME_paint')
         body.tube([(s * 0.9, 0.12, -2.5), (s * 1.74, 0.06, -2.5)], 0.05, 'FRAME_metal')
-        # Canted side gills.
+        # Canted side gills, rooted in the deck just inboard of the chine and
+        # raised outward over it, so they follow the waist wherever it runs.
         for z in (-0.35, -0.05, 0.25):
-            body.plate([(s * 1.1, 0.44, z), (s * 1.4, 0.3, z), (s * 1.4, 0.3, z + 0.14), (s * 1.1, 0.44, z + 0.14)], 0.03, 'FRAME_trim')
+            gill = []
+            for zz in (z, z + 0.14):
+                w, mid, deck = flank(frame['stations'], zz, 0.26)
+                gill.append([(s * (w - 0.26), deck - 0.01, zz), (s * (w + 0.02), mid + 0.14, zz)])
+            body.plate([gill[0][0], gill[0][1], gill[1][1], gill[1][0]], 0.03, 'FRAME_trim')
         # The wing stands on two swept pylons.
         body.fin([(1.45, 0.5), (1.85, 0.5), (2.25, 1.0), (1.95, 1.0)], s * 0.62, 0.06, 'FRAME_metal')
     aerofoil(body, [(-1.38, 1.02, 2.2, 0.45), (0.0, 0.98, 1.95, 0.62), (1.38, 1.02, 2.2, 0.45)], 'FRAME_accent')
@@ -919,10 +936,10 @@ def build_halo(root, mats, frame):
     ring = empty('stabiliser_ring_pivot', (0, 0.26, 2.05), root)
     halo = Builder('stabiliser_ring_body', (0, 0.26, 2.05))
     rake = math.radians(15)
-    halo.arc((0, 0.26, 2.05), 1.72, 0.14, 0.24, 0, math.tau, 'FRAME_accent', steps=24, squash=0.5, rake=rake)
+    halo.arc((0, 0.26, 2.05), 1.72, 0.14, 0.24, 0, math.tau, 'FRAME_accent', steps=24, squash=0.42, rake=rake)
     for n in range(6):
         a = math.tau * (n + 0.25) / 6
-        halo.arc((0, 0.26, 2.05 + 0.13), 1.72, 0.05, 0.03, a, a + math.radians(26), 'FRAME_lights', steps=3, squash=0.5, rake=rake)
+        halo.arc((0, 0.26, 2.05 + 0.13), 1.72, 0.05, 0.03, a, a + math.radians(26), 'FRAME_lights', steps=3, squash=0.42, rake=rake)
     halo.finish(mats, ring)
     movers(root, mats,
            steering=((1.28, 0.3, -2.4), [(-2.4, 0.3), (-1.7, 0.3), (-1.85, 0.72), (-2.2, 0.72)], 1.28),

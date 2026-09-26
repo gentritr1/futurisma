@@ -52,13 +52,15 @@ const BOUNDS = { min: [-1.85, -0.9, -4.8], max: [1.85, 1.35, 2.75] };
  * The ranges `TotemVehicle.updateVisual` drives each pivot through (degrees,
  * or metres for the skids' drop), so the envelope holds in every pose the race
  * can put a body in, not only at rest. The source lines these come from are
- * pinned below; change one and this table has to follow.
+ * pinned below; change one and this table has to follow. The ring's is the
+ * widest the inputs allow: game.ts sets lateralLoad = steer * 0.45 - slip with
+ * steer and slip each clamped to +-1, so +-1.45 * 12 plus the drift's 10.
  */
 const MOTION = {
   steering_fin_L_pivot: ["y", -20, 20], steering_fin_R_pivot: ["y", -20, 20],
   airbrake_L_pivot: ["x", 0, 60], airbrake_R_pivot: ["x", 0, 60],
   elevon_L_pivot: ["y", -15, 15], elevon_R_pivot: ["y", -15, 15],
-  stabiliser_ring_pivot: ["z", -22, 22], skids_pivot: ["drop", 0, -0.22],
+  stabiliser_ring_pivot: ["z", -(1.45 * 12 + 10), 1.45 * 12 + 10], skids_pivot: ["drop", 0, -0.22],
 };
 
 /** Every vertex of one primitive, in its node's model-space frame. */
@@ -73,12 +75,24 @@ function vertices(bytes, gltf, primitive) {
   });
 }
 
-function turn(axis, radians, [x, y, z]) {
-  const c = Math.cos(radians);
-  const s = Math.sin(radians);
-  if (axis === "x") return [x, y * c - z * s, y * s + z * c];
-  if (axis === "y") return [x * c + z * s, y, -x * s + z * c];
-  return [x * c - y * s, x * s + y * c, z];
+/**
+ * The exact range of u cos t - v sin t for t in [a, b]: the endpoints, or the
+ * crest (+-hypot) wherever the turn passes one, so no pose between samples can
+ * slip through.
+ */
+function sweep(u, v, a, b) {
+  const at = (t) => u * Math.cos(t) - v * Math.sin(t);
+  const passes = (t) => t + Math.ceil((a - t) / (2 * Math.PI)) * 2 * Math.PI <= b;
+  const crest = Math.atan2(v, u);
+  return [passes(Math.PI - crest) ? -Math.hypot(u, v) : Math.min(at(a), at(b)),
+    passes(-crest) ? Math.hypot(u, v) : Math.max(at(a), at(b))];
+}
+
+/** Every coordinate's range as a point turns about one axis through [a, b] radians. */
+function reach(axis, [x, y, z], a, b) {
+  if (axis === "x") return [[x, x], sweep(y, z, a, b), sweep(z, -y, a, b)];
+  if (axis === "y") return [sweep(x, -z, a, b), [y, y], sweep(z, x, a, b)];
+  return [sweep(x, y, a, b), sweep(y, -x, a, b), [z, z]];
 }
 
 const root = new URL("../public/assets/garage/frames/", import.meta.url);
@@ -207,8 +221,8 @@ for (const code of bodies) {
     assert.ok(min[axis] >= BOUNDS.min[axis] - 1e-3 && max[axis] <= BOUNDS.max[axis] + 1e-3,
       `${label}: bounds ${min.map((v) => v.toFixed(2))} .. ${max.map((v) => v.toFixed(2))} leave the envelope.`);
   }
-  // Swept: every vertex under an animated pivot, at nine points across its
-  // range, about the pivot's own origin. The whole craft's pitch and bank
+  // Swept: every vertex under an animated pivot, across its whole range and
+  // exactly (crests included), about the pivot's own origin. The whole craft's pitch and bank
   // (updateVisual's lerps on the visual group) are left out by design, as
   // they are for TOTEM: the envelope is the body's, not the banked craft's.
   nodes.forEach((node, index) => {
@@ -226,15 +240,13 @@ for (const code of bodies) {
     const at = position(index);
     for (const primitive of gltf.meshes[node.mesh].primitives) {
       const points = vertices(bytes, gltf, primitive).map((v) => [v[0] + at[0] - origin[0], v[1] + at[1] - origin[1], v[2] + at[2] - origin[2]]);
-      for (let step = 0; step <= 8; step += 1) {
-        const amount = from + (to - from) * step / 8;
-        for (const point of points) {
-          const moved = axis === "drop" ? [point[0], point[1] + amount, point[2]] : turn(axis, amount * Math.PI / 180, point);
-          for (let k = 0; k < 3; k += 1) {
-            const value = moved[k] + origin[k];
-            assert.ok(value >= BOUNDS.min[k] - 1e-3 && value <= BOUNDS.max[k] + 1e-3,
-              `${label}: ${nodes[pivot].name} at ${amount.toFixed(1)} takes ${node.name} to ${"xyz"[k]} ${value.toFixed(3)}, outside the envelope.`);
-          }
+      for (const point of points) {
+        const ranges = axis === "drop" ? [[point[0], point[0]], [point[1] + to, point[1]], [point[2], point[2]]]
+          : reach(axis, point, from * Math.PI / 180, to * Math.PI / 180);
+        for (let k = 0; k < 3; k += 1) {
+          const [low, high] = ranges[k].map((value) => value + origin[k]);
+          assert.ok(low >= BOUNDS.min[k] - 1e-3 && high <= BOUNDS.max[k] + 1e-3,
+            `${label}: ${nodes[pivot].name} over ${from.toFixed(1)}..${to.toFixed(1)} takes ${node.name} to ${"xyz"[k]} ${low.toFixed(3)}..${high.toFixed(3)}, outside the envelope.`);
         }
       }
     }
@@ -296,6 +308,10 @@ for (const line of ["state.steer * 20 * DEG", "state.brake * 60 * DEG", "(-state
   "(-state.lateralLoad * 12 - state.steer * state.driftIntensity * 10) * DEG", "retract * 0.22"]) {
   assert.ok(totem.includes(line), `updateVisual changed (${line}); update MOTION in validate-garage-frames.mjs.`);
 }
+// ...and the ring's +-1.45 lateral load follows these.
+assert.ok(game.includes("this.vehicleVisualState.lateralLoad = this.steerAmount * 0.45 - slip;")
+  && /const slip = THREE\.MathUtils\.clamp\(\s*this\.presentationTravelDirection\.dot\(vehicleRight\) \* speedRatio \* 2\.4,\s*-1,\s*1,\s*\);/.test(game),
+  "game.ts changed how lateralLoad is bounded; update the ring's range in MOTION.");
 assert.match(totem, /this\.racePresence\?\.rebind\(this\.model, named\)/, "mountBody no longer re-anchors the race presence.");
 assert.match(totem, /this\.evolution\?\.anchorTo\(body, named\)/, "mountBody no longer re-anchors the kit.");
 assert.match(look, /vehicle\.mountBody\(body\)/, "garage-look.ts no longer mounts the body.");

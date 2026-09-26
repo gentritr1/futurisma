@@ -165,7 +165,7 @@ export function partCard(code) {
  */
 export const SCHEME_CARDS = [
   { code: "factory", label: "FACTORY", price: 0, note: "THE LIVERY IT LEFT THE WORKS IN" },
-  { code: "noir", label: "NOIR", price: 600, note: "GLOSS BLACK · SIGNAL COLOURS KEPT" },
+  { code: "noir", label: "NOIR", price: 600, note: "SATIN BLACK · SIGNAL COLOURS KEPT" },
   { code: "arctic", label: "ARCTIC", price: 600, note: "PEARL WHITE · SIGNAL COLOURS KEPT" },
   { code: "strike", label: "STRIKE", price: 900, note: "RED OVER WHITE · INTERCEPTOR SPLIT" },
   { code: "neon", label: "NEON", price: 900, note: "GRAPHITE · CYAN SKIRTS · PINK SPINE" },
