@@ -4,16 +4,16 @@
     "meshes": 8,
     "drawCalls": 17,
     "min": [
-      -1.737,
-      -0.45,
+      -1.774,
+      -0.49,
       -3.67
     ],
     "max": [
-      1.737,
+      1.774,
       1.195,
       2.54
     ],
-    "bytes": 163256,
+    "bytes": 159852,
     "label": "BULWARK G4",
     "glow": [
       1.0,
@@ -28,14 +28,14 @@
         ]
       },
       "noir": {
-        "bytes": 32872,
+        "bytes": 28651,
         "swatch": [
           "#08090a",
           "#f1cb4a"
         ]
       },
       "arctic": {
-        "bytes": 59617,
+        "bytes": 52890,
         "swatch": [
           "#d6d8db",
           "#f1cb4a"
@@ -49,7 +49,7 @@
         ]
       },
       "gold": {
-        "bytes": 68423,
+        "bytes": 63930,
         "swatch": [
           "#e0ad3d",
           "#303034"
@@ -58,7 +58,7 @@
     }
   },
   "corona": {
-    "triangles": 2064,
+    "triangles": 1936,
     "meshes": 9,
     "drawCalls": 18,
     "min": [
@@ -71,7 +71,7 @@
       1.235,
       2.56
     ],
-    "bytes": 180744,
+    "bytes": 173828,
     "label": "CORONA P5",
     "glow": [
       0.6,
@@ -93,14 +93,14 @@
         ]
       },
       "arctic": {
-        "bytes": 52799,
+        "bytes": 51561,
         "swatch": [
           "#d6d8db",
           "#b18de9"
         ]
       },
       "nebula": {
-        "bytes": 77160,
+        "bytes": 61560,
         "swatch": [
           "#8c199e",
           "#30dce9"
@@ -121,15 +121,15 @@
     "drawCalls": 19,
     "min": [
       -1.79,
-      -0.496,
+      -0.636,
       -4.0
     ],
     "max": [
       1.79,
-      1.296,
+      1.156,
       2.63
     ],
-    "bytes": 139528,
+    "bytes": 139532,
     "label": "HALO X1",
     "glow": [
       0.95,
@@ -209,7 +209,7 @@
         ]
       },
       "arctic": {
-        "bytes": 52031,
+        "bytes": 49730,
         "swatch": [
           "#d6d8db",
           "#4abbc8"
@@ -245,7 +245,7 @@
       1.28,
       2.65
     ],
-    "bytes": 137480,
+    "bytes": 140264,
     "label": "SIDEWINDER D2",
     "glow": [
       1.0,
@@ -255,7 +255,7 @@
     "paints": {
       "factory": {
         "swatch": [
-          "#3f354f",
+          "#553866",
           "#e75db1"
         ]
       },

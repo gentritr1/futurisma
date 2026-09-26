@@ -48,6 +48,39 @@ const MAX_BYTES = 200 * 1024;
 /** Model space: TOTEM spans x +-1.7, y -0.9 (its ring) to 1.37, z -3.9 to 2.47. */
 const BOUNDS = { min: [-1.85, -0.9, -4.8], max: [1.85, 1.35, 2.75] };
 
+/**
+ * The ranges `TotemVehicle.updateVisual` drives each pivot through (degrees,
+ * or metres for the skids' drop), so the envelope holds in every pose the race
+ * can put a body in, not only at rest. The source lines these come from are
+ * pinned below; change one and this table has to follow.
+ */
+const MOTION = {
+  steering_fin_L_pivot: ["y", -20, 20], steering_fin_R_pivot: ["y", -20, 20],
+  airbrake_L_pivot: ["x", 0, 60], airbrake_R_pivot: ["x", 0, 60],
+  elevon_L_pivot: ["y", -15, 15], elevon_R_pivot: ["y", -15, 15],
+  stabiliser_ring_pivot: ["z", -22, 22], skids_pivot: ["drop", 0, -0.22],
+};
+
+/** Every vertex of one primitive, in its node's model-space frame. */
+function vertices(bytes, gltf, primitive) {
+  const accessor = gltf.accessors[primitive.attributes.POSITION];
+  const view = gltf.bufferViews[accessor.bufferView];
+  const base = 20 + bytes.readUInt32LE(12) + 8 + (view.byteOffset ?? 0) + (accessor.byteOffset ?? 0);
+  const stride = view.byteStride ?? 12;
+  return Array.from({ length: accessor.count }, (_, index) => {
+    const at = base + index * stride;
+    return [bytes.readFloatLE(at), bytes.readFloatLE(at + 4), bytes.readFloatLE(at + 8)];
+  });
+}
+
+function turn(axis, radians, [x, y, z]) {
+  const c = Math.cos(radians);
+  const s = Math.sin(radians);
+  if (axis === "x") return [x, y * c - z * s, y * s + z * c];
+  if (axis === "y") return [x * c + z * s, y, -x * s + z * c];
+  return [x * c - y * s, x * s + y * c, z];
+}
+
 const root = new URL("../public/assets/garage/frames/", import.meta.url);
 const manifest = JSON.parse(await readFile(new URL("manifest.json", root), "utf8"));
 const bodies = FRAME_CODES.filter((code) => code !== "totem");
@@ -128,6 +161,13 @@ for (const code of bodies) {
   for (const material of gltf.materials) {
     assert.ok(!material.doubleSided, `${label}: ${material.name} is double-sided; TOTEM's materials are not.`);
   }
+  // The finish, per role, as close to TOTEM's own hull (roughness 0.78,
+  // metalness 0.14) as each role should be: a rebake cannot drift glossier.
+  for (const [name, metal, rough] of [["FRAME_paint", 0.12, 0.72], ["FRAME_accent", 0.18, 0.70], ["FRAME_metal", 0.18, 0.65]]) {
+    const pbr = gltf.materials.find((material) => material.name === name)?.pbrMetallicRoughness ?? {};
+    assert.ok(Math.abs((pbr.metallicFactor ?? 1) - metal) < 1e-3 && Math.abs((pbr.roughnessFactor ?? 1) - rough) < 1e-3,
+      `${label}: ${name} is metalness ${pbr.metallicFactor} / roughness ${pbr.roughnessFactor}, not ${metal} / ${rough}.`);
+  }
   const paint = gltf.materials.find((material) => material.name === "FRAME_paint");
   assert.ok(paint.pbrMetallicRoughness?.baseColorTexture, `${label}: FRAME_paint lost its livery atlas.`);
   const accent = gltf.materials.find((material) => material.name === "FRAME_accent");
@@ -167,6 +207,36 @@ for (const code of bodies) {
     assert.ok(min[axis] >= BOUNDS.min[axis] - 1e-3 && max[axis] <= BOUNDS.max[axis] + 1e-3,
       `${label}: bounds ${min.map((v) => v.toFixed(2))} .. ${max.map((v) => v.toFixed(2))} leave the envelope.`);
   }
+  // Swept: every vertex under an animated pivot, at nine points across its
+  // range, about the pivot's own origin.
+  nodes.forEach((node, index) => {
+    if (node.mesh === undefined) return;
+    let pivot;
+    for (let at = parent.get(index); at !== undefined; at = parent.get(at)) {
+      if (MOTION[nodes[at].name]) {
+        pivot = at;
+        break;
+      }
+    }
+    if (pivot === undefined) return;
+    const [axis, from, to] = MOTION[nodes[pivot].name];
+    const origin = position(pivot);
+    const at = position(index);
+    for (const primitive of gltf.meshes[node.mesh].primitives) {
+      const points = vertices(bytes, gltf, primitive).map((v) => [v[0] + at[0] - origin[0], v[1] + at[1] - origin[1], v[2] + at[2] - origin[2]]);
+      for (let step = 0; step <= 8; step += 1) {
+        const amount = from + (to - from) * step / 8;
+        for (const point of points) {
+          const moved = axis === "drop" ? [point[0], point[1] + amount, point[2]] : turn(axis, amount * Math.PI / 180, point);
+          for (let k = 0; k < 3; k += 1) {
+            const value = moved[k] + origin[k];
+            assert.ok(value >= BOUNDS.min[k] - 1e-3 && value <= BOUNDS.max[k] + 1e-3,
+              `${label}: ${nodes[pivot].name} at ${amount.toFixed(1)} takes ${node.name} to ${"xyz"[k]} ${value.toFixed(3)}, outside the envelope.`);
+          }
+        }
+      }
+    }
+  });
   const pinned = manifest[code];
   assert.equal(pinned.bytes, bytes.length, `${label}: the manifest's bytes are stale; rebuild.`);
   assert.equal(pinned.triangles, triangles, `${label}: the manifest's triangles are stale; rebuild.`);
@@ -197,6 +267,11 @@ const [totem, look, main, catalog, index, game, bay] = await Promise.all([
   read("src/game/garage-catalog.js"), read("index.html"), read("src/game/game.ts"), read("src/game/garage-ui.ts"),
 ]);
 assert.match(totem, /mountBody\(body: THREE\.Object3D \| null\): void/, "TotemVehicle.mountBody is gone.");
+// The swept-pose table above follows these lines.
+for (const line of ["state.steer * 20 * DEG", "state.brake * 60 * DEG", "(-state.steer * 9 + state.brake * 6) * DEG",
+  "(-state.lateralLoad * 12 - state.steer * state.driftIntensity * 10) * DEG", "retract * 0.22"]) {
+  assert.ok(totem.includes(line), `updateVisual changed (${line}); update MOTION in validate-garage-frames.mjs.`);
+}
 assert.match(totem, /this\.racePresence\?\.rebind\(this\.model, named\)/, "mountBody no longer re-anchors the race presence.");
 assert.match(totem, /this\.evolution\?\.anchorTo\(body, named\)/, "mountBody no longer re-anchors the kit.");
 assert.match(look, /vehicle\.mountBody\(body\)/, "garage-look.ts no longer mounts the body.");

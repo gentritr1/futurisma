@@ -332,8 +332,15 @@ def paint_atlas(frame, stations, path, quality=90):
             phase = np.sin(um * 2 * np.pi * 4 + v * 2 * np.pi * 5 + 2.2 * np.sin(v * 2 * np.pi * 2 + um * 9))
             mask = window & (phase > 0.1)
         elif kind == 'stars':
+            # Clusters a few pixels across rather than single specks, which
+            # the chase camera's mip levels would average away.
             specks = np.random.default_rng(frame['seed'] + 7).random((SIZE, SIZE)) < rule['density']
-            mask = window & specks
+            grown = specks.copy()
+            for dy in range(-2, 3):
+                for dx in range(-2, 3):
+                    if dx * dx + dy * dy <= 5:
+                        grown |= np.roll(np.roll(specks, dy, 0), dx, 1)
+            mask = window & grown
         else:
             raise ValueError(kind)
         img[mask] = colour
@@ -472,7 +479,7 @@ SIGNATURES = {
     'corona': ('nebula', lambda f: dict(
         f, base=(0.55, 0.1, 0.62), accent=(0.03, 0.72, 0.82), number=(0.95, 0.95, 1.0),
         rules=[dict(kind='fade', v0=0.08, v1=0.8, colour=(0.62, 0.1, 0.66), colour2=(0.01, 0.03, 0.12)),
-               dict(kind='stars', density=0.012, v0=0.25, colour=(0.9, 0.95, 1.0)),
+               dict(kind='stars', density=0.0016, v0=0.25, colour=(0.9, 0.95, 1.0)),
                dict(kind='spine', at=[0.44, 0.56], width=0.02, colour=(0.2, 0.85, 0.95)),
                dict(kind='band', v0=0.0, v1=0.06, colour=(0.2, 0.85, 0.95))])),
     'halo': ('dazzle', lambda f: dict(
@@ -483,16 +490,26 @@ SIGNATURES = {
 }
 
 
+# ARCTIC on a pale base loses a frame's own structure; these put it back.
+ARCTIC_EXTRAS = {
+    'lance': [dict(kind='spine', at=[0.5], width=0.12, v0=0.2, v1=0.9, colour=(0.16, 0.17, 0.19))],
+    'bulwark': [dict(kind='side', u0=0.02, u1=0.14, colour=(0.2, 0.21, 0.22))],
+    'corona': [dict(kind='side', u0=0.16, u1=0.34, v0=0.2, v1=0.85, colour=(0.13, 0.15, 0.27))],
+}
+
+
 def scheme_liveries(code, frame):
     factory = frame['livery']
     accent = factory['accent']
     signature, paint = SIGNATURES[code]
+    arctic = recolour(factory, (0.84, 0.85, 0.86), (0.05, 0.055, 0.065), accent,
+                      lambda c: c if is_signal(c) else (0.62, 0.64, 0.66) if luminance(c) > 0.3 else (0.16, 0.17, 0.19),
+                      (0.9, 0.9, 0.9))
+    arctic['rules'] = [*arctic['rules'], *ARCTIC_EXTRAS.get(code, [])]
     return {
         'noir': recolour(factory, (0.035, 0.036, 0.04), (0.86, 0.86, 0.84), accent,
                          lambda c: c if is_signal(c) else (0.02 + 0.1 * luminance(c),) * 3, (0.02, 0.02, 0.022)),
-        'arctic': recolour(factory, (0.84, 0.85, 0.86), (0.05, 0.055, 0.065), accent,
-                           lambda c: c if is_signal(c) else (0.62, 0.64, 0.66) if luminance(c) > 0.3 else (0.16, 0.17, 0.19),
-                           (0.9, 0.9, 0.9)),
+        'arctic': arctic,
         signature: paint(factory),
         'gold': gilded(recolour(factory, (0.88, 0.68, 0.24), INK, INK,
                                 lambda c: INK if is_signal(c) or luminance(c) < 0.3 else (0.96, 0.84, 0.5), (0.8, 0.6, 0.2))),
@@ -529,10 +546,12 @@ def paint_schemes(code, frame):
 def make_materials(frame, atlas_path):
     livery = frame['livery']
     specs = {
-        'FRAME_paint': (livery['base'], 0.12, 0.62, None, 0),
-        'FRAME_accent': (livery['accent'], 0.18, 0.55, None, 0),
+        # Closer to TOTEM's own hull (roughness 0.78, metalness 0.14): the
+        # bodies read as the same painted, worked metal, not a glossier kit.
+        'FRAME_paint': (livery['base'], 0.12, 0.72, None, 0),
+        'FRAME_accent': (livery['accent'], 0.18, 0.70, None, 0),
         'FRAME_trim': ((0.045, 0.05, 0.055), 0.3, 0.7, None, 0),
-        'FRAME_metal': ((0.30, 0.32, 0.33), 0.55, 0.42, None, 0),
+        'FRAME_metal': ((0.30, 0.32, 0.33), 0.18, 0.65, None, 0),
         'FRAME_glass': ((0.01, 0.035, 0.05), 0.1, 0.18, None, 0),
         # Near-black under a glow, at TOTEM's own 0.62, so the paint shop's
         # emissive tint is the whole colour and nothing muddies it.
@@ -667,7 +686,7 @@ FRAMES = {
         label='SIDEWINDER D2', number='D2', seed=47, glow=(1.0, 0.25, 0.66),
         # Graphite-plum rather than near-black, so NOIR on this frame reads as
         # a change of paint rather than the same car (stage-3 review).
-        livery=dict(base=(0.25, 0.21, 0.31), accent=(0.80, 0.11, 0.44), number=(0.92, 0.22, 0.58),
+        livery=dict(base=(0.337, 0.22, 0.40), accent=(0.80, 0.11, 0.44), number=(0.92, 0.22, 0.58),
                     number_u=0.3, number_v=0.5, number_size=70,
                     rules=[dict(kind='hazard', u0=0.18, u1=0.3, v0=0.12, v1=0.32, period=7, colour=(0.80, 0.11, 0.44)),
                            dict(kind='spine', at=[0.5], width=0.07, v0=0.05, v1=0.95, colour=(0.6, 0.6, 0.62)),
@@ -678,7 +697,7 @@ FRAMES = {
         stations=[st(-3.35, 0.28, 0.18, 0.06, -0.04, 0.5, 0.5),
                   st(-2.8, 0.95, 0.38, 0.2, -0.22, 0.45, 0.72),
                   st(-1.7, 1.08, 0.54, 0.26, -0.3, 0.4, 0.8),
-                  st(-0.5, 1.18, 0.64, 0.28, -0.34, 0.36, 0.8),
+                  st(-0.5, 0.95, 0.64, 0.28, -0.34, 0.36, 0.8),
                   st(0.8, 1.46, 0.64, 0.3, -0.36, 0.34, 0.8),
                   st(1.8, 1.5, 0.58, 0.3, -0.32, 0.36, 0.78),
                   st(2.4, 1.22, 0.48, 0.28, -0.24, 0.4, 0.75)],
@@ -687,7 +706,7 @@ FRAMES = {
         label='BULWARK G4', number='G4', seed=59, glow=(1.0, 0.64, 0.10),
         livery=dict(base=(0.30, 0.31, 0.21), accent=(0.88, 0.60, 0.07), number=(0.93, 0.66, 0.1),
                     number_u=0.3, number_v=0.55, number_size=76, seams=[0.16, 0.3, 0.42], grime=0.22,
-                    rules=[dict(kind='hazard', u0=0.0, u1=0.5, v0=0.03, v1=0.13, period=9, colour=(0.88, 0.60, 0.07)),
+                    rules=[dict(kind='hazard', u0=0.0, u1=0.5, v0=0.03, v1=0.13, period=5, colour=(0.88, 0.60, 0.07)),
                            dict(kind='side', u0=0.08, u1=0.13, colour=(0.10, 0.10, 0.09)),
                            dict(kind='spine', at=[0.5], width=0.14, v0=0.2, v1=0.85, colour=(0.24, 0.25, 0.16))]),
         stations=[st(-3.45, 0.86, 0.32, 0.10, -0.18, 0.72, 0.8, 0.4),
@@ -762,7 +781,7 @@ def build_lance(root, mats, frame):
 def build_sidewinder(root, mats, frame):
     body = Builder('body_static')
     hull(body, frame['stations'])
-    canopy(body, [(-1.7, 0.2, 0.52, 0.56), (-1.15, 0.34, 0.58, 0.9), (-0.35, 0.34, 0.64, 0.92), (0.2, 0.24, 0.64, 0.74)])
+    canopy(body, [(-1.7, 0.2, 0.52, 0.58), (-1.15, 0.34, 0.58, 0.9), (-0.35, 0.34, 0.64, 0.92), (0.2, 0.24, 0.64, 0.74)])
     body.plate([(-0.6, -0.2, -3.6), (0.6, -0.2, -3.6), (0.9, -0.22, -2.7), (-0.9, -0.22, -2.7)], 0.04, 'FRAME_trim')
     for s in (-1, 1):
         # Drift skirts along the flared rear, lit in three running segments.
@@ -789,7 +808,7 @@ def build_sidewinder(root, mats, frame):
     anchors(root, 0.26, 2.48, hardpoint=(0.78, 0.46, -0.05), nose=(0, 0.1, -3.4),
             wing=(1.64, -0.2, 1.9), dust=(1.4, -0.3, 1.6), flank=(1.6, 0.0, 1.4))
     movers(root, mats,
-           steering=((1.74, 0.04, -2.8), [(-2.8, 0.04), (-2.25, 0.04), (-2.35, 0.46), (-2.6, 0.46)], 1.74),
+           steering=((1.6, 0.04, -2.8), [(-2.8, 0.04), (-2.25, 0.04), (-2.35, 0.46), (-2.6, 0.46)], 1.6),
            elevon=((1.4, 0.8, 1.95), [(1.95, 0.8), (2.6, 0.8), (2.6, 1.28), (2.05, 1.28)], 1.4),
            airbrake=((0.72, 0.6, 1.2), (0.5, 0.95, 0.62, 0.56, 0.6, 1.2)))
     skids(root, mats, 0.6, -1.8, 1.6, -0.38)
@@ -820,8 +839,8 @@ def build_bulwark(root, mats, frame):
         body.pod((s * 0.34, 1.0), 0.14, 0.1, 1.95, 'FRAME_trim', segments=6, nose=0.9, tail=1.0, end_role='FRAME_lights')
         # Four hover pods on plate outriggers, lit flat underneath.
         for zc in (-2.2, 1.45):
-            body.pod((s * 1.46, -0.12), 0.3, zc - 0.85, zc + 0.85, 'FRAME_accent', segments=8, end_role='FRAME_trim')
-            body.box((s * 1.46, -0.43, zc), (0.36, 0.04, 1.3), 'FRAME_lights')
+            body.pod((s * 1.46, -0.12), 0.34, zc - 0.85, zc + 0.85, 'FRAME_accent', segments=8, end_role='FRAME_trim')
+            body.box((s * 1.46, -0.47, zc), (0.36, 0.04, 1.3), 'FRAME_lights')
             body.plate([(s * 1.05, 0.12, zc - 0.32), (s * 1.34, -0.02, zc - 0.32), (s * 1.34, -0.02, zc + 0.32), (s * 1.05, 0.12, zc + 0.32)], 0.1, 'FRAME_metal')
         body.box((s * 1.17, 0.46, -0.3), (0.08, 0.26, 2.4), 'FRAME_trim')
     rear_kit(body, 0.26, 2.52, radius=0.26)
@@ -831,7 +850,7 @@ def build_bulwark(root, mats, frame):
     movers(root, mats,
            steering=((1.46, 0.16, -2.75), [(-2.75, 0.16), (-2.0, 0.16), (-2.1, 0.5), (-2.55, 0.5)], 1.46),
            elevon=((1.46, 0.16, 1.05), [(1.05, 0.16), (2.0, 0.16), (2.1, 0.56), (1.4, 0.56)], 1.46),
-           airbrake=((0.62, 0.93, 1.9), (0.58, 0.95, 0.94, 0.92, 1.3, 1.9)))
+           airbrake=((0.62, 0.93, 1.9), (0.58, 0.95, 0.94, 0.92, 1.46, 1.9)))
     skids(root, mats, 0.7, -2.4, 1.9, -0.38)
 
 
@@ -840,10 +859,12 @@ def build_corona(root, mats, frame):
     hull(body, frame['stations'])
     canopy(body, [(-2.6, 0.2, 0.56, 0.62), (-2.0, 0.34, 0.62, 0.92), (-1.1, 0.36, 0.72, 0.98), (-0.4, 0.28, 0.76, 0.86)])
     for s in (-1, 1):
-        # The plasma cells ARE the reserve lamp: the kit drives TE_boost, so
-        # the cells glow ready, recharging or firing with the reserve.
+        # The plasma cells ARE the reserve gauge: the kit drives TE_boost, and
+        # garage-look.ts lights them in four bands along z -1.7..1.7 by the
+        # reserve. The three sleeve rings sit on the band edges, so the four
+        # segments a player sees are exactly the four bands.
         body.pod((s * 1.28, 0.12), 0.22, -1.7, 1.7, 'TE_boost', segments=8, nose=0.8, tail=0.8, end_role='FRAME_metal')
-        for z in (-1.3, -0.45, 0.45, 1.3):
+        for z in (-0.85, 0.0, 0.85):
             body.arc((s * 1.28, 0.12, z), 0.255, 0.07, 0.16, 0, math.tau, 'FRAME_trim', steps=8)
         body.pod((s * 1.28, 0.12), 0.3, -2.25, -1.55, 'FRAME_paint', segments=8, nose=0.35, tail=1.0, end_role='FRAME_trim')
         body.pod((s * 1.28, 0.12), 0.3, 1.55, 2.2, 'FRAME_paint', segments=8, nose=1.0, tail=0.8, end_role='FRAME_trim')
@@ -867,7 +888,7 @@ def build_corona(root, mats, frame):
     movers(root, mats,
            steering=((1.28, 0.4, -2.1), [(-2.1, 0.36), (-1.55, 0.36), (-1.65, 0.78), (-1.95, 0.78)], 1.28),
            elevon=((1.28, 0.4, 1.55), [(1.55, 0.36), (2.15, 0.36), (2.15, 0.72), (1.8, 0.72)], 1.28),
-           airbrake=((0.45, 0.8, 1.2), (0.18, 0.62, 0.82, 0.76, 0.55, 1.2)))
+           airbrake=((0.45, 0.8, 1.2), (0.18, 0.62, 0.82, 0.76, 0.64, 1.2)))
     skids(root, mats, 0.5, -2.2, 1.7, -0.38)
 
 
@@ -891,16 +912,17 @@ def build_halo(root, mats, frame):
     rear_kit(body, 0.24, 2.6, radius=0.24)
     body.finish(mats, root)
     anchors(root, 0.24, 2.6, hardpoint=(0.78, 0.16, -0.05), nose=(0, 0.14, -4.0),
-            wing=(1.72, 0.4, 2.05), dust=(1.28, -0.28, 2.0), flank=(1.58, 0.05, 1.2))
+            wing=(1.72, 0.26, 2.05), dust=(1.28, -0.28, 2.0), flank=(1.58, 0.05, 1.2))
     # The halo: a full flattened ring round the tail, wider than the hull,
-    # raked forward, lit in segments; it rolls with the load like TOTEM's.
-    ring = empty('stabiliser_ring_pivot', (0, 0.4, 2.05), root)
-    halo = Builder('stabiliser_ring_body', (0, 0.4, 2.05))
+    # raked forward, lit in segments; it rolls with the load like TOTEM's,
+    # and sits low enough that its full roll stays inside the envelope.
+    ring = empty('stabiliser_ring_pivot', (0, 0.26, 2.05), root)
+    halo = Builder('stabiliser_ring_body', (0, 0.26, 2.05))
     rake = math.radians(15)
-    halo.arc((0, 0.4, 2.05), 1.72, 0.14, 0.24, 0, math.tau, 'FRAME_accent', steps=24, squash=0.5, rake=rake)
+    halo.arc((0, 0.26, 2.05), 1.72, 0.14, 0.24, 0, math.tau, 'FRAME_accent', steps=24, squash=0.5, rake=rake)
     for n in range(6):
         a = math.tau * (n + 0.25) / 6
-        halo.arc((0, 0.4, 2.05 + 0.13), 1.72, 0.05, 0.03, a, a + math.radians(26), 'FRAME_lights', steps=3, squash=0.5, rake=rake)
+        halo.arc((0, 0.26, 2.05 + 0.13), 1.72, 0.05, 0.03, a, a + math.radians(26), 'FRAME_lights', steps=3, squash=0.5, rake=rake)
     halo.finish(mats, ring)
     movers(root, mats,
            steering=((1.28, 0.3, -2.4), [(-2.4, 0.3), (-1.7, 0.3), (-1.85, 0.72), (-2.2, 0.72)], 1.28),
