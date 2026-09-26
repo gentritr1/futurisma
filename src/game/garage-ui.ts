@@ -79,6 +79,7 @@ import {
   type Garage,
   type Handling,
 } from "./garage-rules.js";
+import { turnCraft } from "./garage-look";
 import { markDaily, msToMidnight, today, type GarageStore } from "./garage-purse";
 
 /**
@@ -126,6 +127,10 @@ const TABS: readonly { code: Tab; label: string }[] = [
   { code: "daily", label: "DAILY" },
 ];
 const TIER_ORDER = ["rookie", "works", "feral"];
+/** One turn of the showroom every 24 s, in radians per millisecond. */
+const TURN_RATE = (Math.PI * 2) / 24_000;
+/** Reduced motion's still showroom angle: a three-quarter view of the flank. */
+const STILL_YAW = -0.7;
 const ROMAN = ["", "I", "II", "III"];
 
 function node<K extends keyof HTMLElementTagNameMap>(tag: K, className = "", text = ""): HTMLElementTagNameMap[K] {
@@ -169,8 +174,9 @@ export class GarageScreen {
   private opened = false;
   /** The paint shop's what-if: the saved garage with one finish changed. */
   private trial: Garage | null = null;
-  /** The showroom's own frame loop, running only while a pattern moves. */
+  /** The showroom's own frame loop, running while the bay is open. */
   private animation = 0;
+  private yaw = 0;
 
   constructor(private readonly hooks: GarageHooks) {
     this.screen.id = "garage-screen";
@@ -303,24 +309,31 @@ export class GarageScreen {
   }
 
   /**
-   * The paddock only draws when something asks it to, so an underglow pattern
-   * in the showroom would sit still. While one is on show (and motion is not
-   * reduced), the bay asks for a frame every frame; nowhere else does.
+   * The showroom turntable. While the bay is open the craft turns slowly in
+   * place, so a body and its paint are seen from every side rather than only
+   * from the chase camera behind it; the same frame loop draws an underglow
+   * pattern in motion, because the paddock only draws when asked. Under
+   * reduced motion nothing turns: the craft is held at a still three-quarter
+   * angle instead, and closing the bay puts it back exactly as it races.
    */
   private animate(): void {
-    const garage = this.trial ?? this.hooks.save.garage;
-    const fit = garage.fleet[garage.chassis];
-    const moving = this.opened && !this.hooks.reducedMotion() && fit !== undefined
-      && fit.under !== "off" && fit.pattern !== "steady";
-    if (moving && !this.animation) {
-      const tick = (): void => {
+    const still = this.hooks.reducedMotion();
+    if (this.opened && !still && !this.animation) {
+      let last = performance.now();
+      const tick = (now: number): void => {
+        this.yaw = (this.yaw + (now - last) * TURN_RATE) % (Math.PI * 2);
+        last = now;
+        turnCraft(this.yaw);
         this.hooks.requestRender();
         this.animation = requestAnimationFrame(tick);
       };
       this.animation = requestAnimationFrame(tick);
-    } else if (!moving && this.animation) {
+    } else if (!this.opened || still) {
       cancelAnimationFrame(this.animation);
       this.animation = 0;
+      this.yaw = this.opened ? STILL_YAW : 0;
+      turnCraft(this.yaw);
+      this.hooks.requestRender();
     }
   }
 

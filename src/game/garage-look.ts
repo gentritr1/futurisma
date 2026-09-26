@@ -56,6 +56,18 @@ const serials = new WeakMap<TotemVehicle, number>();
 const schemeMaps = new Map<string, Promise<THREE.Texture | null>>();
 /** Each body material's own map, so FACTORY can put it back. */
 const factoryMaps = new WeakMap<THREE.MeshStandardMaterial, THREE.Texture | null>();
+/** The craft the last refit dressed: the one the showroom turns. */
+let showroomCraft: TotemVehicle | null = null;
+
+/**
+ * The showroom turntable: yaws the craft's visual group (which the race loop
+ * never yaws; it banks and pitches it) about its own origin, in place in
+ * front of the chase camera. Zero puts it back exactly as it races.
+ */
+export function turnCraft(radians: number): void {
+  const hull = showroomCraft?.craftSurfaces().hull;
+  if (hull) hull.rotation.y = radians;
+}
 
 /**
  * One channel of the painted emissive map, in the source's own orientation and
@@ -276,6 +288,7 @@ export async function applyCraftLook(
 ): Promise<void> {
   const serial = (serials.get(vehicle) ?? 0) + 1;
   serials.set(vehicle, serial);
+  showroomCraft = vehicle;
   const frame = previewFrame ?? garage.chassis;
   const body = frame === "totem" ? null : await bodyFor(vehicle, frame, circuit);
   if (serials.get(vehicle) !== serial) return;
