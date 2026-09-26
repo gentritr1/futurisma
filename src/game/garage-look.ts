@@ -39,6 +39,8 @@ import { PATTERN_CODES, type Garage } from "./garage-rules.js";
 
 const UNDERGLOW_NAME = "garage_underglow";
 const WORKS_FLAME = 0xff581d;
+/** Phases that draw every frame, where an underglow pattern can move. */
+const MOVING_PHASES = new Set(["race", "countdown", "paused", "resuming"]);
 /** Circuits whose render rule adapts every gameplay material for their fog. */
 const RULED_CIRCUITS = new Set(["tideline", "ascension", "dreamisland"]);
 
@@ -139,7 +141,7 @@ function fitTotemLights(lights: THREE.MeshStandardMaterial, hex: number | null):
 function createUnderglow(): THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial> {
   const material = new THREE.ShaderMaterial({
     name: UNDERGLOW_NAME,
-    uniforms: { uColor: { value: new THREE.Color() }, uPattern: { value: 0 }, uTime: { value: 0 } },
+    uniforms: { uColor: { value: new THREE.Color() }, uPattern: { value: 0 }, uTime: { value: 0 }, uHold: { value: 1 } },
     vertexShader: `
       varying vec2 vUv;
       void main() {
@@ -154,13 +156,16 @@ function createUnderglow(): THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial
       uniform vec3 uColor;
       uniform float uPattern;
       uniform float uTime;
+      uniform float uHold;
       varying vec2 vUv;
       void main() {
         vec2 edge = abs(vUv - 0.5) * 2.0;
         float reach = length(max(edge - vec2(0.42, 0.6), 0.0)) / 0.5;
         float glow = (1.0 - smoothstep(0.0, 1.0, reach)) * 0.6;
         float level = 1.0;
-        if (uPattern > 2.5) {
+        if (uHold > 0.5) {
+          level = 1.0;
+        } else if (uPattern > 2.5) {
           float beat = fract(uTime * 0.9);
           level = 0.35 + 0.65 * max(exp(-beat * 16.0), exp(-abs(beat - 0.24) * 16.0));
         } else if (uPattern > 1.5) {
@@ -179,8 +184,14 @@ function createUnderglow(): THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial
   });
   const mesh = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 6.4), material);
   mesh.name = UNDERGLOW_NAME;
+  // A pattern only moves where frames keep coming: racing, and the open bay.
+  // The paddock and the result screen draw on request, so a still frame there
+  // would freeze the pattern at whatever phase it had (BREATHE near its floor
+  // reads as OFF); those frames hold the full steady wash instead.
   mesh.onBeforeRender = () => {
+    const body = document.body.dataset;
     material.uniforms.uTime.value = performance.now() / 1000;
+    material.uniforms.uHold.value = body.garage === "true" || MOVING_PHASES.has(body.phase ?? "") ? 0 : 1;
   };
   mesh.rotation.x = -Math.PI / 2;
   mesh.renderOrder = 2;
@@ -328,13 +339,13 @@ export async function applyCraftLook(
   underglow.visible = under !== null;
   if (under !== null) underglow.material.uniforms.uColor.value.setHex(under);
   underglow.material.uniforms.uPattern.value = options.still ? 0 : Math.max(0, PATTERN_CODES.indexOf(fit?.pattern ?? "steady"));
-  // Sized to the hull it sits under, so wide skirts or pontoons never hide it.
+  // Sized past the hull it sits under — about 0.4 m beyond both flanks and
+  // behind the tail — so the rim, and a pattern moving in it, reads from the
+  // chase camera rather than hiding under the skirts. TOTEM uses its own
+  // measured envelope (3.4 m wide, 6.37 m long).
   const bounds = body?.userData.garageBounds as THREE.Box3 | undefined;
-  if (bounds) {
-    underglow.scale.set((bounds.max.x - bounds.min.x + 0.5) / 3.4, (bounds.max.z - bounds.min.z) * 0.92 / 6.4, 1);
-    underglow.position.set(0, bounds.min.y + 0.1, (bounds.min.z + bounds.max.z) / 2);
-  } else {
-    underglow.scale.set(1, 1, 1);
-    underglow.position.set(0, 0.05, 0.1);
-  }
+  const width = bounds ? bounds.max.x - bounds.min.x : 3.4;
+  const length = bounds ? bounds.max.z - bounds.min.z : 6.37;
+  underglow.scale.set((width + 1.2) / 3.4, length * 1.15 / 6.4, 1);
+  underglow.position.set(0, bounds ? bounds.min.y + 0.1 : 0.05, bounds ? (bounds.min.z + bounds.max.z) / 2 : 0.1);
 }

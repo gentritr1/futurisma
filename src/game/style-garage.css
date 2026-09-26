@@ -356,6 +356,18 @@ body[data-garage="true"] #game-canvas {
   opacity: 0.6;
 }
 
+/* A purchase lands: one short flash of the acid ink on the chip it bought. */
+.chip[data-bought="true"] {
+  animation: garage-bought 380ms var(--ease-out) 1;
+}
+
+@keyframes garage-bought {
+  from {
+    border-color: var(--acid);
+    box-shadow: 0 0 0 2px var(--acid), 0 0 18px var(--acid);
+  }
+}
+
 .garage__swatch[data-swatch="off"] {
   border: 1px solid var(--line);
   background: linear-gradient(135deg, transparent 45%, var(--dim) 45% 55%, transparent 55%);
@@ -649,6 +661,10 @@ body[data-garage="true"] #game-canvas {
   .garage__fill,
   #game-canvas {
     transition: none;
+  }
+
+  .chip[data-bought="true"] {
+    animation: none;
   }
 }
 

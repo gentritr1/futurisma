@@ -57,6 +57,11 @@ export class PolarityCourse implements RaceCourse {
   readonly mapName = "Polarity";
   readonly mapCode = "MAP 04";
   readonly finishName = "Vector Exchange";
+  readonly flavour = "VECTOR EXCHANGE · 02:14 AM";
+
+  briefing(laps: string): string {
+    return `Choose your line. SPACE changes roads at marked junctions, with a six-second commitment. Upper: shorter, tighter. Lower: stronger devices and faster recharge. Time E on a launch strip. SHIFT fires nitro. ${laps}.`;
+  }
   readonly startLabel = "VECTOR EXCHANGE";
   readonly startProgress = .002;
   readonly startLateral = 0;

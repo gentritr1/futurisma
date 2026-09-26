@@ -364,9 +364,32 @@ assert.ok(
   "The diagnostics line must still be emitted as [FUTURISMA_DIAGNOSTICS].",
 );
 
+// Each circuit's paddock copy (the flavour line and the briefing) lives on its
+// own course class, in its lazy chunk, not in the first-paint UI: moving it
+// there bought the shell back its headroom. The strings are the ones the
+// paddock printed before the move, byte for byte (checked in a browser on all
+// seven circuits at 1 lap and at the default), pinned here as the source.
+const COURSE_COPY = {
+  "src/game/course.ts": ["KAIRO DYNAMICS · KD-0714", "`Four ships. ${laps} through Greenwater Strip. Follow the amber turn markers, clear all eight gates, and bring ${craft} home through The Cradle.`"],
+  "src/game/bitterpan-course.ts": ["KAIRO DYNAMICS · KD-0714", "`Four ships. ${laps} through ${this.mapName}. Follow the amber turn markers, clear all ${this.checkpointCount} sector gates, and bring ${craft} home through ${this.finishName}.`"],
+  "src/game/nightshift-course.ts": ["MERIDIAN DISTRICT · AFTER HOURS", "`Four ships. ${laps} through ${this.mapName}. Follow the amber turn markers, clear all ${this.checkpointCount} sector gates, and bring ${craft} home through ${this.finishName}.`"],
+  "src/game/polarity-course.ts": ["VECTOR EXCHANGE · 02:14 AM", "`Choose your line. SPACE changes roads at marked junctions, with a six-second commitment. Upper: shorter, tighter. Lower: stronger devices and faster recharge. Time E on a launch strip. SHIFT fires nitro. ${laps}.`"],
+  "src/game/tideline-course.ts": ["PELAGIC PUMPWORKS · THE TIDE CYCLE", "`Lap 1: flooded reactor, lit recharge current. Lap 2: water falls outside the sealed chamber; condensation lowers deck grip. Lap 3: the drained pump hall opens a shorter line. Race the reactor and port; time E for Surge or Shield. ${laps}.`"],
+  "src/game/ascension-course.ts": ["PAD 09 · LAUNCH DAY / DAWN", "`Launch day: trench shortcut or Deluge Road. ${this.scheduleLabel}. ${laps}.`"],
+  "src/game/dreamisland-course.ts": ["DREAM ISLAND · DAY INTO NIGHT", "`The clock strikes: day turns to night and the causeway goes wet. ${this.scheduleLabel}. ${laps}.`"],
+};
+const uiSource = readFileSync(new URL("../src/game/ui.ts", import.meta.url), "utf8");
+for (const [path, [flavour, briefing]] of Object.entries(COURSE_COPY)) {
+  const source = readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
+  assert.ok(source.includes(`readonly flavour = "${flavour}";`), `${path}: its paddock flavour line changed or moved.`);
+  assert.ok(source.includes(`return ${briefing};`), `${path}: its paddock briefing changed or moved.`);
+  assert.ok(!uiSource.includes(flavour), `ui.ts carries ${path}'s flavour line again; circuit copy belongs to its lazy course.`);
+}
+assert.ok(!/Four ships\.|Choose your line\.|Launch day:|The clock strikes/.test(uiSource), "ui.ts carries circuit briefing copy again.");
+
 console.log(
   `Module seams PASS: game.ts ${gameLines}/${GAME_LINE_BUDGET} lines, lighting, `
     + "effects, scene assets, autopilot, track events and diagnostics extracted, "
     + "contributor "
-    + "spread order pinned.",
+    + "spread order pinned; each circuit's paddock copy lives on its lazy course.",
 );

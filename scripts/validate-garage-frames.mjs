@@ -191,9 +191,9 @@ for (const code of bodies) {
 // Runtime wiring: the body is mounted, not scaled; refits are serialized and a
 // launch waits for the latest one; the GLBs are fetched only by the lazy look.
 const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
-const [totem, look, main, catalog, index, game] = await Promise.all([
+const [totem, look, main, catalog, index, game, bay] = await Promise.all([
   read("src/game/totem.ts"), read("src/game/garage-look.ts"), read("src/main.ts"),
-  read("src/game/garage-catalog.js"), read("index.html"), read("src/game/game.ts"),
+  read("src/game/garage-catalog.js"), read("index.html"), read("src/game/game.ts"), read("src/game/garage-ui.ts"),
 ]);
 assert.match(totem, /mountBody\(body: THREE\.Object3D \| null\): void/, "TotemVehicle.mountBody is gone.");
 assert.match(totem, /this\.racePresence\?\.rebind\(this\.model, named\)/, "mountBody no longer re-anchors the race presence.");
@@ -209,5 +209,15 @@ assert.match(game, /await Promise\.all\(\[this\.audio\.start\(\)\.catch\(\(\) =>
 assert.match(main, /= game\.refitCraft\(async \(vehicle\) => \{\s*\n\s*const \{ applyCraftLook[\w\s,]*\} = await loadGarageBay\(\);/,
   "main.ts must hand the refit to the game before the bay chunk loads.");
 assert.doesNotMatch(index, /garage\/frames/, "The frame GLBs must stay out of the initial shell.");
+// The showroom turntable yaws the craft's visual group, which is only safe
+// while the race loop never yaws it; and closing the bay must put the turn
+// back to zero BEFORE the refit that repaints the paddock.
+assert.doesNotMatch(totem, /visual\.rotation\.y\s*=/, "totem.ts now yaws the visual group; the showroom turntable would fight it.");
+assert.match(look, /hull\.rotation\.y = radians/, "turnCraft no longer yaws the craft's visual group.");
+const hide = bay.slice(bay.indexOf("  hide(): void {"), bay.indexOf("  dispose(): void {"));
+assert.ok(hide.indexOf("this.animate()") >= 0 && hide.indexOf("this.animate()") < hide.indexOf("this.hooks.refit(null)"),
+  "hide() must stop the turntable (animate) before it refits the paddock.");
+assert.match(bay, /this\.yaw = this\.opened \? STILL_YAW : 0;\s*\n\s*turnCraft\(this\.yaw\);/,
+  "a closed bay must turn the craft back to zero.");
 
-console.log(`Garage frames PASS: ${report.join("; ")}; ${atlases} paint schemes built (${(atlasBytes / 1024).toFixed(0)} KiB, fetched one at a time), each matching its catalog swatch; pivots identity and mirrored, airbrakes forward of their hinges, anchors mirrored, jets on the kit's line, single-sided role materials with all four kit lamps, manifest current; bodies mount (never scale), refits serialize and a launch waits for the latest.`);
+console.log(`Garage frames PASS: ${report.join("; ")}; the showroom turntable owns the visual group's yaw and zeroes it before the paddock refits; ${atlases} paint schemes built (${(atlasBytes / 1024).toFixed(0)} KiB, fetched one at a time), each matching its catalog swatch; pivots identity and mirrored, airbrakes forward of their hinges, anchors mirrored, jets on the kit's line, single-sided role materials with all four kit lamps, manifest current; bodies mount (never scale), refits serialize and a launch waits for the latest.`);

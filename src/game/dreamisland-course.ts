@@ -103,6 +103,11 @@ export class DreamIslandCourse implements RaceCourse {
   readonly mapName = "Dream Island";
   readonly mapCode = "MAP 07";
   readonly finishName = "the Strike Line";
+  readonly flavour = "DREAM ISLAND · DAY INTO NIGHT";
+
+  briefing(laps: string): string {
+    return `The clock strikes: day turns to night and the causeway goes wet. ${this.scheduleLabel}. ${laps}.`;
+  }
   readonly startLabel = "BEACH STRAIGHT";
   readonly startProgress = .002;
   readonly startLateral = 0;

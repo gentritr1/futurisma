@@ -156,12 +156,13 @@ export interface FieldOrderEntry {
 }
 
 export interface RaceCoursePresentation {
-  scheduleLabel?: string;
   mapName: string;
   mapCode: string;
   checkpointCount: number;
-  finishName: string;
   startLabel: string;
+  /** The circuit's own paddock copy, from its lazy course chunk. */
+  flavour: string;
+  briefing(laps: string, craft: string): string;
 }
 
 type PauseReason = "FOCUS LOST" | "GRAPHICS LINK LOST" | "GRAPHICS LINK RESTORED";
@@ -353,14 +354,8 @@ export class GameUi {
   setRaceFormat(
     totalLaps: number,
     courseLengthMeters: number,
-    grid: readonly RaceGridEntry[] = [],
-    course: RaceCoursePresentation = {
-      mapName: "Greenwater Strip",
-      mapCode: "MAP 01",
-      checkpointCount: 8,
-      finishName: "The Cradle",
-      startLabel: "RUNWAY 09",
-    },
+    grid: readonly RaceGridEntry[],
+    course: RaceCoursePresentation,
   ): void {
     const presentation = resolveInitialRacePresentation(
       totalLaps,
@@ -386,7 +381,7 @@ export class GameUi {
     */
     document.querySelector<HTMLElement>(".intro-panel h1")!.textContent = course.mapName.toUpperCase();
     // Brand, index, then the per-map flavour line exactly as it was written.
-    document.querySelector<HTMLElement>(".intro-code")!.textContent = `FUTURISMA · ${course.mapCode} · ${island ? "DREAM ISLAND · DAY INTO NIGHT" : ascension ? "PAD 09 · LAUNCH DAY / DAWN" : tideline ? "PELAGIC PUMPWORKS · THE TIDE CYCLE" : polarity ? "VECTOR EXCHANGE · 02:14 AM" : course.mapCode === "MAP 03" ? "MERIDIAN DISTRICT · AFTER HOURS" : "KAIRO DYNAMICS · KD-0714"}`;
+    document.querySelector<HTMLElement>(".intro-code")!.textContent = `FUTURISMA · ${course.mapCode} · ${course.flavour}`;
     const editionLink = document.getElementById("tideline-edition") as HTMLAnchorElement;
     editionLink.hidden = true;
     document.querySelectorAll<HTMLElement>("[data-polarity-control]").forEach((element) => { element.hidden = !polarity; });
@@ -413,19 +408,7 @@ export class GameUi {
 
   /** The briefing under the circuit name, which names the craft bringing it home. */
   private renderDeck(): void {
-    if (!this.lastDeck) return;
-    const { course, lapLabel } = this.lastDeck;
-    const map = course.mapCode;
-    this.introDeck.textContent = map === "MAP 07"
-      ? `The clock strikes: day turns to night and the causeway goes wet. ${course.scheduleLabel ?? "Measuring Works lap"}. ${lapLabel}.`
-      : map === "MAP 06"
-      ? `Launch day: trench shortcut or Deluge Road. ${course.scheduleLabel ?? "Measuring Works lap"}. ${lapLabel}.`
-      : map === "MAP 05"
-      ? `Lap 1: flooded reactor, lit recharge current. Lap 2: water falls outside the sealed chamber; condensation lowers deck grip. Lap 3: the drained pump hall opens a shorter line. Race the reactor and port; time E for Surge or Shield. ${lapLabel}.`
-      : map === "MAP 04" ? `Choose your line. SPACE changes roads at marked junctions, with a six-second commitment. Upper: shorter, tighter. Lower: stronger devices and faster recharge. Time E on a launch strip. SHIFT fires nitro. ${lapLabel}.`
-      : map === "MAP 01"
-      ? `Four ships. ${lapLabel} through Greenwater Strip. Follow the amber turn markers, clear all eight gates, and bring ${this.craft.short} home through The Cradle.`
-      : `Four ships. ${lapLabel} through ${course.mapName}. Follow the amber turn markers, clear all ${course.checkpointCount} sector gates, and bring ${this.craft.short} home through ${course.finishName}.`;
+    if (this.lastDeck) this.introDeck.textContent = this.lastDeck.course.briefing(this.lastDeck.lapLabel, this.craft.short);
   }
 
   /**

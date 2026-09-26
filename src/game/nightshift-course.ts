@@ -49,6 +49,11 @@ export class NightshiftCourse implements RaceCourse {
   readonly mapName = "Night Shift";
   readonly mapCode = "MAP 03";
   readonly finishName = "the Meridian Motel";
+  readonly flavour = "MERIDIAN DISTRICT · AFTER HOURS";
+
+  briefing(laps: string, craft: string): string {
+    return `Four ships. ${laps} through ${this.mapName}. Follow the amber turn markers, clear all ${this.checkpointCount} sector gates, and bring ${craft} home through ${this.finishName}.`;
+  }
   readonly startLabel = "MOTEL MILE";
   readonly startProgress = .002;
   readonly startLateral = 0;

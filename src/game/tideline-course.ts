@@ -61,6 +61,11 @@ export class TidelineCourse implements RaceCourse {
   readonly mapName = "Tideline";
   readonly mapCode = "MAP 05";
   readonly finishName = "the Pelagic Reactor";
+  readonly flavour = "PELAGIC PUMPWORKS · THE TIDE CYCLE";
+
+  briefing(laps: string): string {
+    return `Lap 1: flooded reactor, lit recharge current. Lap 2: water falls outside the sealed chamber; condensation lowers deck grip. Lap 3: the drained pump hall opens a shorter line. Race the reactor and port; time E for Surge or Shield. ${laps}.`;
+  }
   readonly startLabel = "DROWNED REACTOR";
   readonly startProgress = .002;
   readonly startLateral = 0;

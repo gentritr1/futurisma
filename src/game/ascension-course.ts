@@ -48,6 +48,11 @@ export class AscensionCourse implements RaceCourse {
   readonly mapName = "Ascension Pad";
   readonly mapCode = "MAP 06";
   readonly finishName = "Pad 09";
+  readonly flavour = "PAD 09 · LAUNCH DAY / DAWN";
+
+  briefing(laps: string): string {
+    return `Launch day: trench shortcut or Deluge Road. ${this.scheduleLabel}. ${laps}.`;
+  }
   readonly startLabel = "PAD ROAD";
   readonly startProgress = .002;
   readonly startLateral = 0;

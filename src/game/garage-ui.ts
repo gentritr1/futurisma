@@ -210,6 +210,11 @@ export class GarageScreen {
     panel.append(code, head, tabs, this.body, this.note, this.closeButton);
     this.screen.append(panel);
     this.screen.addEventListener("keydown", this.handlePanelKeys);
+    this.screen.addEventListener("pointerdown", (event) => {
+      if (event.pointerType === "touch" && !(event.target instanceof Element && event.target.closest(".garage__paints"))) {
+        this.previewLook(null);
+      }
+    });
     (document.getElementById("app") ?? document.body).append(this.screen);
     window.addEventListener("keydown", this.handleWindowKeys, { capture: true });
   }
@@ -263,7 +268,6 @@ export class GarageScreen {
     for (const [index, entry] of TABS.entries()) {
       const selected = entry.code === tab;
       this.tabButtons[index].setAttribute("aria-selected", String(selected));
-      this.tabButtons[index].setAttribute("aria-checked", String(selected));
       this.tabButtons[index].tabIndex = selected ? 0 : -1;
     }
     // The showroom previews the frame being looked at; every other tab shows
@@ -300,8 +304,31 @@ export class GarageScreen {
     return chip;
   }
 
-  private previewRow(row: HTMLElement): HTMLElement {
-    row.addEventListener("pointerleave", () => this.previewLook(null));
+  /**
+   * A row of chips is one radio group: Tab lands on the fitted chip and the
+   * arrows (with Home and End) move along the row — previewing as they go,
+   * because focus previews — so the paint shop is five tab stops, not forty.
+   * On touch, leaving is not a gesture: a tap ends with `pointerleave`, so a
+   * touched preview stays until the driver taps somewhere else.
+   */
+  private previewRow(row: HTMLElement, label: string): HTMLElement {
+    row.setAttribute("role", "radiogroup");
+    row.setAttribute("aria-label", label);
+    const chips = [...row.querySelectorAll<HTMLButtonElement>("button")];
+    const fitted = Math.max(0, chips.findIndex((chip) => chip.getAttribute("aria-checked") === "true"));
+    chips.forEach((chip, index) => { chip.tabIndex = index === fitted ? 0 : -1; });
+    row.addEventListener("keydown", (event) => {
+      const at = chips.indexOf(event.target as HTMLButtonElement);
+      const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[event.key];
+      const to = event.key === "Home" ? 0 : event.key === "End" ? chips.length - 1
+        : step === undefined || at < 0 ? -1 : (at + step + chips.length) % chips.length;
+      if (to < 0) return;
+      event.preventDefault();
+      chips[to].focus({ preventScroll: false });
+    });
+    row.addEventListener("pointerleave", (event) => {
+      if (event.pointerType !== "touch") this.previewLook(null);
+    });
     row.addEventListener("focusout", (event) => {
       if (!(event.relatedTarget instanceof Node && row.contains(event.relatedTarget))) this.previewLook(null);
     });
@@ -319,6 +346,8 @@ export class GarageScreen {
   private animate(): void {
     const still = this.hooks.reducedMotion();
     if (this.opened && !still && !this.animation) {
+      // From the three-quarter view, not the race pose the driver just left.
+      if (this.yaw === 0) this.yaw = STILL_YAW;
       let last = performance.now();
       const tick = (now: number): void => {
         this.yaw = (this.yaw + (now - last) * TURN_RATE) % (Math.PI * 2);
@@ -447,7 +476,7 @@ export class GarageScreen {
       }
       const maxed = stage >= MAX_PART_STAGE;
       const action = button("chip garage__buy", `part-${card.code}`, () => {
-        this.commit(buyPart(this.hooks.save.garage, card.code), `${card.label} STAGE ${ROMAN[stage + 1]} FITTED`);
+        this.commit(buyPart(this.hooks.save.garage, card.code), `${card.label} STAGE ${ROMAN[stage + 1]} FITTED`, `part-${card.code}`);
       });
       action.append(node("strong", "", maxed ? "MAXED" : `STAGE ${ROMAN[stage + 1]}`));
       if (!maxed) action.append(node("small", "", formatCredits(card.prices[stage])));
@@ -470,7 +499,7 @@ export class GarageScreen {
         const owned = garage.paints.includes(paint.code);
         const chip = this.previewable(button("chip garage__paint", `paint-${slot.code}-${paint.code}`, () => {
           this.commit(fitPaint(this.hooks.save.garage, slot.code, paint.code),
-            owned ? `${slot.label} · ${paint.label}` : `${paint.label} BOUGHT · ${slot.label}`);
+            owned ? `${slot.label} · ${paint.label}` : `${paint.label} BOUGHT · ${slot.label}`, `paint-${slot.code}-${paint.code}`);
         }), { [slot.code]: paint.code });
         chip.setAttribute("role", "radio");
         chip.setAttribute("aria-checked", String(fit[slot.code] === paint.code));
@@ -488,7 +517,7 @@ export class GarageScreen {
 
   private paintRow(key: string, chips: HTMLElement): HTMLElement {
     const row = node("div", "dispatch__row garage__slot");
-    row.append(node("span", "dispatch__key", key), this.previewRow(chips));
+    row.append(node("span", "dispatch__key", key), this.previewRow(chips, key));
     return row;
   }
 
@@ -523,7 +552,7 @@ export class GarageScreen {
       const card = schemeCard(code);
       const owned = code === "factory" || (code === "gold" ? garage.goldLeaf : garage.schemes.includes(`${frame}:${code}`));
       const chip = this.previewable(button("chip garage__paint", `body-${code}`, () => {
-        this.commit(fitBody(this.hooks.save.garage, code), owned ? `${card.label} ON ${label}` : `${card.label} BOUGHT · ON ${label}`);
+        this.commit(fitBody(this.hooks.save.garage, code), owned ? `${card.label} ON ${label}` : `${card.label} BOUGHT · ON ${label}`, `body-${code}`);
       }), { body: code });
       chip.setAttribute("role", "radio");
       chip.setAttribute("aria-checked", String(fit.body === code));
@@ -553,7 +582,7 @@ export class GarageScreen {
       const owned = garage.patterns.includes(pattern.code);
       const chip = this.previewable(button("chip garage__paint", `pattern-${pattern.code}`, () => {
         this.commit(fitPattern(this.hooks.save.garage, pattern.code),
-          owned ? `UNDERGLOW · ${pattern.label}` : `${pattern.label} BOUGHT · UNDERGLOW`);
+          owned ? `UNDERGLOW · ${pattern.label}` : `${pattern.label} BOUGHT · UNDERGLOW`, `pattern-${pattern.code}`);
       }), { pattern: pattern.code, under });
       chip.setAttribute("role", "radio");
       chip.setAttribute("aria-checked", String(fit.pattern === pattern.code));
@@ -733,7 +762,7 @@ export class GarageScreen {
     window.location.search = parameters.toString();
   }
 
-  private commit(result: Transaction, success: string): void {
+  private commit(result: Transaction, success: string, key = ""): void {
     // A refusal leaves the preview on the craft: the driver is still pointing
     // at it, and leaving the row puts the fitted look back as usual.
     if (result.ok) {
@@ -741,6 +770,11 @@ export class GarageScreen {
       if (this.tab === "craft") this.viewed = this.hooks.save.garage.chassis;
       this.setNote(result.spent > 0 ? `${success} · −${formatCredits(result.spent)}` : success, "ok");
       this.showTab(this.tab);
+      // A purchase lands with a one-shot flash on the chip it bought (never on
+      // a refusal, never under reduced motion).
+      const bought = key && result.spent > 0 && !this.hooks.reducedMotion()
+        ? this.screen.querySelector<HTMLElement>(`[data-key="${key}"]`) : null;
+      if (bought) bought.dataset.bought = "true";
       return;
     }
     const garage = this.hooks.save.garage;

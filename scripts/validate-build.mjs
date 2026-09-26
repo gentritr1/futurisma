@@ -458,7 +458,11 @@ assert.ok(
 // table above the raw ceiling: main sat at 276.994 against 277, six bytes of
 // headroom, which is what made this the ceiling that had to move.
 // 279 -> 282 for the garage (measured 279.896); see the table above the raw
-// ceiling.
+// ceiling. The garage's daily-ops round left it at 281.952 (49 B of headroom);
+// the polish round after it bought the headroom back without moving the
+// ceiling, by moving each circuit's paddock flavour line and briefing out of
+// ui.ts onto its lazy course class: 281.287 KiB, briefings byte-identical on
+// all seven circuits (pinned in validate-module-seams.mjs).
 assert.ok(
   shellGzip <= 282 * 1024,
   `Initial app shell exceeds 282 KiB gzip (${(shellGzip / 1024).toFixed(3)} KiB; ${shellGzip} B).`,
