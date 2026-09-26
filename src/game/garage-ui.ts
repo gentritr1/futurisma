@@ -444,7 +444,7 @@ export class GarageScreen {
     if (card.code !== garage.chassis) {
       const action = button("launch-button garage__action", "frame-action", () => {
         this.commit(owned ? selectFrame(this.hooks.save.garage, card.code) : buyFrame(this.hooks.save.garage, card.code),
-          owned ? `${card.label} ON THE GRID` : `${card.label} SIGNED · ON THE GRID`);
+          owned ? `${card.label} ON THE GRID` : `${card.label} SIGNED · ON THE GRID`, `frame-${card.code}`);
       });
       action.append(node("span", "", owned ? "PUT ON THE GRID" : `BUY · ${formatCredits(card.price)}`));
       detail.append(action);

@@ -39,8 +39,12 @@ import { PATTERN_CODES, type Garage } from "./garage-rules.js";
 
 const UNDERGLOW_NAME = "garage_underglow";
 const WORKS_FLAME = 0xff581d;
-/** Phases that draw every frame, where an underglow pattern can move. */
-const MOVING_PHASES = new Set(["race", "countdown", "paused", "resuming"]);
+/**
+ * The paddock phases that draw every frame, where an underglow pattern can
+ * move: the race (its countdown included) and the resume sequence. Pause, the
+ * paddock and a settled result draw on request (`frame-scheduling.js`).
+ */
+const MOVING_PHASES = new Set(["race", "resuming"]);
 /** Circuits whose render rule adapts every gameplay material for their fog. */
 const RULED_CIRCUITS = new Set(["tideline", "ascension", "dreamisland"]);
 
@@ -141,7 +145,13 @@ function fitTotemLights(lights: THREE.MeshStandardMaterial, hex: number | null):
 function createUnderglow(): THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial> {
   const material = new THREE.ShaderMaterial({
     name: UNDERGLOW_NAME,
-    uniforms: { uColor: { value: new THREE.Color() }, uPattern: { value: 0 }, uTime: { value: 0 }, uHold: { value: 1 } },
+    uniforms: {
+      uColor: { value: new THREE.Color() },
+      uPattern: { value: 0 },
+      uTime: { value: 0 },
+      uHold: { value: 1 },
+      uInner: { value: new THREE.Vector2(0.74, 0.87) },
+    },
     vertexShader: `
       varying vec2 vUv;
       void main() {
@@ -157,10 +167,14 @@ function createUnderglow(): THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial
       uniform float uPattern;
       uniform float uTime;
       uniform float uHold;
+      uniform vec2 uInner;
       varying vec2 vUv;
       void main() {
+        // Full brightness out to the hull's edge (uInner, as a share of the
+        // plane), fading to nothing across the band outside it: the rim the
+        // chase camera actually sees, rather than light spent under the hull.
         vec2 edge = abs(vUv - 0.5) * 2.0;
-        float reach = length(max(edge - vec2(0.42, 0.6), 0.0)) / 0.5;
+        float reach = length(max((edge - uInner) / (1.0 - uInner), 0.0));
         float glow = (1.0 - smoothstep(0.0, 1.0, reach)) * 0.6;
         float level = 1.0;
         if (uHold > 0.5) {
@@ -347,5 +361,6 @@ export async function applyCraftLook(
   const width = bounds ? bounds.max.x - bounds.min.x : 3.4;
   const length = bounds ? bounds.max.z - bounds.min.z : 6.37;
   underglow.scale.set((width + 1.2) / 3.4, length * 1.15 / 6.4, 1);
+  underglow.material.uniforms.uInner.value.set(width / (width + 1.2), 1 / 1.15);
   underglow.position.set(0, bounds ? bounds.min.y + 0.1 : 0.05, bounds ? (bounds.min.z + bounds.max.z) / 2 : 0.1);
 }

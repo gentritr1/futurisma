@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
 import { SCHEME_CARDS, SCHEME_SWATCHES } from "../src/game/garage-catalog.js";
+import { phaseRunsContinuousPresentation } from "../src/game/frame-scheduling.js";
 import { FRAME_CODES, bodySchemes } from "../src/game/garage-rules.js";
 
 /**
@@ -214,6 +215,16 @@ assert.doesNotMatch(index, /garage\/frames/, "The frame GLBs must stay out of th
 // back to zero BEFORE the refit that repaints the paddock.
 assert.doesNotMatch(totem, /visual\.rotation\.y\s*=/, "totem.ts now yaws the visual group; the showroom turntable would fight it.");
 assert.match(look, /hull\.rotation\.y = radians/, "turnCraft no longer yaws the craft's visual group.");
+// An underglow pattern moves only where frames keep coming; every other phase
+// holds the steady wash, or a still frame would freeze it at a random phase.
+// The paddock's body phases map onto the race loop's: intro = standby,
+// race = countdown/running, paused, resuming, result = finished.
+{
+  const moving = JSON.parse(look.match(/const MOVING_PHASES = new Set\((\[[^\]]*\])\)/)?.[1] ?? "null");
+  const bodyToLoop = { intro: "standby", race: "running", paused: "paused", resuming: "resuming" };
+  assert.deepEqual(moving?.sort(), Object.keys(bodyToLoop).filter((phase) => phaseRunsContinuousPresentation(bodyToLoop[phase], 0)).sort(),
+    "MOVING_PHASES must be exactly the paddock phases that draw every frame (frame-scheduling.js).");
+}
 const hide = bay.slice(bay.indexOf("  hide(): void {"), bay.indexOf("  dispose(): void {"));
 assert.ok(hide.indexOf("this.animate()") >= 0 && hide.indexOf("this.animate()") < hide.indexOf("this.hooks.refit(null)"),
   "hide() must stop the turntable (animate) before it refits the paddock.");
