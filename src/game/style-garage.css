@@ -674,11 +674,13 @@ body[data-garage="true"] #game-canvas {
   itself and a boosted plume never runs under the panel (check:garage-framing
   measures every one of them):
 
-  - wide (landscape from 1280 px): the panel on the left, the picture slid
-    right beside it, the holds in the panel under CRAFT and PAINT;
-  - column (landscape below 1280 px: phones on their side, tablets, small
-    windows): the panel in a narrow scrolling column on the left with the holds
-    pinned at its foot, and the picture slid so the craft centres in the rest;
+  - wide (landscape from 1440 px, or from 1280 px wider than 17:10): the panel
+    on the left, the picture slid right beside it, the holds in the panel under
+    CRAFT and PAINT;
+  - column (the rest of landscape: phones on their side, tablets, small
+    windows, and 1280-class screens too tall for the wide panel's plume room):
+    the panel in a narrow scrolling column on the left with the holds pinned at
+    its foot, and the picture slid so the craft centres in the rest;
   - upright (portrait, any width): the panel scrolls in the top half and the
     holds sit at the foot of the screen, under the craft and under the thumb.
 
@@ -714,7 +716,7 @@ body[data-garage="true"] #game-canvas {
 /* The column is min(42vw, 380px) wide inside 12 px of screen; the holds take
    its last 44 px and an 8 px gap, and the picture slides by half the column so
    the craft centres in what is left. */
-@media (orientation: landscape) and (max-width: 1279px) {
+@media (orientation: landscape) and (max-width: 1279px), (orientation: landscape) and (max-width: 1439px) and (max-aspect-ratio: 17/10) {
   body[data-garage="true"] #game-canvas {
     transform: translateX(calc(6px + min(21vw, 190px)));
   }
@@ -743,7 +745,7 @@ body[data-garage="true"] #game-canvas {
    panel arrives by fading only: a sliding panel would carry the pinned holds
    with it for the 240 ms of its entrance. (One more class than the shell's
    entrance rule, so it wins however the sheets are ordered.) */
-@media (orientation: portrait), (orientation: landscape) and (max-width: 1279px) {
+@media (orientation: portrait), (orientation: landscape) and (max-width: 1279px), (orientation: landscape) and (max-width: 1439px) and (max-aspect-ratio: 17/10) {
   @starting-style {
     .screen.screen--garage:not([hidden]) .garage {
       transform: none;
@@ -757,7 +759,7 @@ body[data-garage="true"] #game-canvas {
 
 /* Five tabs need about 560 px; narrower, they wrap three over two. The column
    is always narrower. */
-@media (max-width: 620px), (orientation: landscape) and (max-width: 1279px) {
+@media (max-width: 620px), (orientation: landscape) and (max-width: 1279px), (orientation: landscape) and (max-width: 1439px) and (max-aspect-ratio: 17/10) {
   .garage__tabs {
     grid-template-columns: repeat(6, minmax(0, 1fr));
   }
@@ -771,7 +773,7 @@ body[data-garage="true"] #game-canvas {
   }
 }
 
-@media (max-width: 700px), (orientation: landscape) and (max-width: 1279px) {
+@media (max-width: 700px), (orientation: landscape) and (max-width: 1279px), (orientation: landscape) and (max-width: 1439px) and (max-aspect-ratio: 17/10) {
   .garage__frames,
   .garage__paints {
     grid-template-columns: repeat(2, minmax(0, 1fr));

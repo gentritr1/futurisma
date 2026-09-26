@@ -392,7 +392,7 @@ assert.ok(totem.includes("if (this.body) { const body = this.body; this.body = n
   // The framing's layouts are the sheet's: the upright query in both files, the
   // column's never overlapping it, and the pinned holds' rules on both.
   const sheet = await read("src/game/style-garage.css");
-  const [upright, column] = ["(orientation: portrait)", "(orientation: landscape) and (max-width: 1279px)"];
+  const [upright, column] = ["(orientation: portrait)", "(orientation: landscape) and (max-width: 1279px), (orientation: landscape) and (max-width: 1439px) and (max-aspect-ratio: 17/10)"];
   assert.ok(bay.includes(`const UPRIGHT_SCREEN = "${upright}";`) && bay.includes("private readonly upright = matchMedia(UPRIGHT_SCREEN);")
     && sheet.includes(`@media ${upright} {`) && sheet.includes(`@media ${column} {`),
     "The demo's framing and the bay's upright and column layouts no longer share their media queries.");
