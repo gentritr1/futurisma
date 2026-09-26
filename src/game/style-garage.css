@@ -670,6 +670,32 @@ body[data-garage="true"] #game-canvas {
 }
 
 /* Five tabs need about 560 px; narrower, they wrap three over two. */
+/* A phone held upright frames the craft big in the lower part of the screen,
+   so the bay keeps that part clear: the panel scrolls in the top half over a
+   wash that fades out above the craft, and the showroom holds sit at the foot
+   of the screen, under the craft and under the thumb. (The picture's sideways
+   slide is already off below 900 px.) */
+@media (max-width: 620px) and (orientation: portrait) {
+  .screen--garage {
+    align-items: flex-start;
+    padding: 12px 16px;
+    background: linear-gradient(180deg, oklch(0.055 0.012 210 / 0.96) 0 44%, transparent 60%);
+  }
+
+  .garage.options-panel {
+    max-height: 50vh;
+  }
+
+  .garage__demo {
+    position: fixed;
+    left: 16px;
+    right: 16px;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    z-index: 31;
+    background: oklch(0.055 0.012 210 / 0.9);
+  }
+}
+
 @media (max-width: 620px) {
   .garage__tabs {
     grid-template-columns: repeat(6, minmax(0, 1fr));

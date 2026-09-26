@@ -134,6 +134,8 @@ const TIER_ORDER = ["rookie", "works", "feral"];
 const TURN_RATE = (Math.PI * 2) / 24_000;
 /** Reduced motion's still showroom angle: a three-quarter view of the flank. */
 const STILL_YAW = -0.7;
+/** How far up the track the demo moves the craft, so its boosted plume stays in frame (m). */
+const DEMO_PUSH = 3;
 const ROMAN = ["", "I", "II", "III"];
 
 function node<K extends keyof HTMLElementTagNameMap>(tag: K, className = "", text = ""): HTMLElementTagNameMap[K] {
@@ -181,6 +183,7 @@ export class GarageScreen {
   private animation = 0;
   private last = 0;
   private yaw = 0;
+  private push = 0;
   /** The showroom demo: two momentary holds under CRAFT and PAINT. */
   private readonly demoStrip = node("div", "garage__demo");
   private readonly boostHold: HTMLButtonElement;
@@ -229,6 +232,7 @@ export class GarageScreen {
     meter.setAttribute("aria-hidden", "true");
     for (let quarter = 0; quarter < 4; quarter += 1) this.meter.push(meter.appendChild(node("i")));
     this.boostHold.append(meter);
+    this.syncMeter(1, false);
     this.boostHold.setAttribute("aria-label", "Hold to boost · reserve 4 of 4");
     this.brakeHold.setAttribute("aria-label", "Hold to brake");
     this.demoStrip.setAttribute("role", "group");
@@ -245,8 +249,9 @@ export class GarageScreen {
     });
     (document.getElementById("app") ?? document.body).append(this.screen);
     window.addEventListener("keydown", this.handleWindowKeys, { capture: true });
-    window.addEventListener("blur", this.releaseHold);
-    document.addEventListener("visibilitychange", this.releaseHold);
+    // Leaving the page ends the demo at once: a hidden tab runs no frame to end it on.
+    window.addEventListener("blur", this.interrupt);
+    document.addEventListener("visibilitychange", this.interrupt);
   }
 
   get isOpen(): boolean {
@@ -291,8 +296,8 @@ export class GarageScreen {
     clearTimeout(this.rollCheck);
     this.sound.dispose();
     window.removeEventListener("keydown", this.handleWindowKeys, { capture: true });
-    window.removeEventListener("blur", this.releaseHold);
-    document.removeEventListener("visibilitychange", this.releaseHold);
+    window.removeEventListener("blur", this.interrupt);
+    document.removeEventListener("visibilitychange", this.interrupt);
     this.screen.remove();
     delete document.body.dataset.garage;
   }
@@ -378,8 +383,9 @@ export class GarageScreen {
    * angle instead, and closing the bay puts it back exactly as it races.
    *
    * The same loop runs the showroom demo, under reduced motion too: while a
-   * hold is on, or its reserve is still refilling, the craft eases to the nearer
-   * rear three-quarter, where its jets, gauge and airbrakes face the camera.
+   * hold is on, or its reserve is still refilling, the craft eases to the rear
+   * three-quarter (the side whose plume stays on screen) and a few metres up
+   * the track, where its jets, gauge and airbrakes face the camera in frame.
    */
   private animate(): void {
     const still = this.hooks.reducedMotion();
@@ -388,6 +394,7 @@ export class GarageScreen {
       this.animation = 0;
       this.endDemo();
       this.yaw = 0;
+      this.push = 0;
       turnCraft(0);
       this.hooks.requestRender();
       return;
@@ -404,6 +411,7 @@ export class GarageScreen {
     cancelAnimationFrame(this.animation);
     this.animation = 0;
     this.yaw = STILL_YAW;
+    this.push = 0;
     turnCraft(this.yaw);
     this.hooks.requestRender();
   }
@@ -412,10 +420,12 @@ export class GarageScreen {
     const seconds = Math.min(0.1, (now - this.last) / 1000);
     this.last = now;
     const still = this.hooks.reducedMotion();
+    const ease = 1 - Math.exp(-seconds * 10);
     if (this.demoing) {
+      // The short way round to the three-quarter.
       const yaw = Math.atan2(Math.sin(this.yaw), Math.cos(this.yaw));
-      const target = yaw < 0 ? STILL_YAW : -STILL_YAW;
-      this.yaw = still ? target : yaw + (target - yaw) * (1 - Math.exp(-seconds * 10));
+      const turn = Math.atan2(Math.sin(STILL_YAW - yaw), Math.cos(STILL_YAW - yaw));
+      this.yaw = still ? STILL_YAW : yaw + turn * ease;
       const frame = demoCraft(this.hold, seconds, still);
       this.sound.set(frame.throttle, frame.speedRatio, frame.brake, frame.firing, frame.recharging);
       this.syncMeter(frame.reserve, frame.recharging);
@@ -424,7 +434,9 @@ export class GarageScreen {
     } else if (!still) {
       this.yaw = (this.yaw + seconds * 1000 * TURN_RATE) % (Math.PI * 2);
     }
-    turnCraft(this.yaw);
+    const push = this.demoing ? DEMO_PUSH : 0;
+    this.push = still ? push : this.push + (push - this.push) * ease;
+    turnCraft(this.yaw, this.push);
     this.hooks.requestRender();
     this.animation = this.opened && (this.demoing || !still) ? requestAnimationFrame(this.tick) : 0;
   };
@@ -478,6 +490,8 @@ export class GarageScreen {
     this.hold = null;
     delete (kind === "boost" ? this.boostHold : this.brakeHold).dataset.held;
   }
+
+  private readonly interrupt = (): void => this.endDemo();
 
   private readonly releaseHold = (): void => {
     if (this.hold) this.endHold(this.hold);

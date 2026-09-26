@@ -74,11 +74,15 @@ let showroomCraft: TotemVehicle | null = null;
 /**
  * The showroom turntable: yaws the craft's visual group (which the race loop
  * never yaws; it banks and pitches it) about its own origin, in place in
- * front of the chase camera. Zero puts it back exactly as it races.
+ * front of the chase camera, and (for the demo) pushes it `push` metres up
+ * the track, so a boosted plume stays in frame. Zero and zero put it back
+ * exactly as it races.
  */
-export function turnCraft(radians: number): void {
+export function turnCraft(radians: number, push = 0): void {
   const hull = showroomCraft?.craftSurfaces().hull;
-  if (hull) hull.rotation.y = radians;
+  if (!hull) return;
+  hull.rotation.y = radians;
+  hull.position.z = -push;
 }
 
 /**
@@ -115,6 +119,13 @@ function fitPlume(hull: THREE.Object3D, frame: string): void {
   }
   (material.uniforms.uProfile.value as THREE.Vector3).fromArray(PLUMES[frame] ?? [1, 1, 1]);
 }
+
+/**
+ * The race presence's centre boost flare, as width and opacity, for a frame
+ * whose plume it would drown: LANCE's needles under a TOTEM-sized flare read
+ * as mismatched. Carried on the body's boost centre, where `rebind` reads it.
+ */
+const FLARES: Readonly<Record<string, readonly [number, number]>> = { lance: [0.65, 0.55] };
 
 /** A showroom hold: the jets on BOOST, the airbrakes on BRAKE. */
 export type DemoHold = "boost" | "brake" | null;
@@ -348,6 +359,9 @@ function bodyFor(vehicle: TotemVehicle, frame: string, circuit: string): Promise
         loaded.traverse((object) => {
           if ((object as THREE.Mesh).isMesh && !ringed(object)) floor.expandByObject(object);
         });
+        const flare = FLARES[frame];
+        const centre = loaded.getObjectByName("FX_boost_center");
+        if (flare && centre) centre.userData.flare = flare;
         if (!floor.isEmpty()) loaded.userData.washFloor = floor.min.y;
         await applyCircuitRule(circuit, loaded);
         return loaded;

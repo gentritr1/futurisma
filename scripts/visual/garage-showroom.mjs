@@ -17,7 +17,13 @@
  * - under `?motion=reduce` the demo still runs, and the craft holds its
  *   three-quarter angle;
  * - on RESULT the holds stay disabled while the HUD shows the craft still
- *   coasting, and come back once it reads 000.
+ *   coasting, and come back once it reads 000;
+ * - the meter opens full; a blur mid-hold ends the demo in the same task and
+ *   silences the engine; the demo moves the craft up the track to frame its
+ *   plume and puts it back;
+ * - on a 390×844 phone the craft shows under the panel and the holds sit at
+ *   the foot of the screen;
+ * - LANCE's boost centre asks for its smaller flare.
  *
  *   npm run check:garage-showroom
  *
@@ -45,7 +51,7 @@ const DEG = Math.PI / 180;
 function probe() {
   let body = null;
   let kit = null;
-  let hull;
+  let hull = null;
   for (const scene of window.__scenes) scene.traverse((object) => {
     if (/^FRAME_/.test(object.name) && object.parent) body = object;
   });
@@ -57,7 +63,7 @@ function probe() {
     }
   });
   // The body mounts on TOTEM's model, inside the visual group the showroom turns.
-  hull = body?.parent?.parent ?? null;
+  for (let at = body; at; at = at.parent) if (at.name === "totem_visual_motion") hull = at;
   const brake = body?.getObjectByName("airbrake_L_pivot");
   const jets = hull?.getObjectByName("TE_twin_layered_exhaust");
   const meter = [...document.querySelectorAll(".garage__meter i")].filter((bar) => bar.dataset.on === "true").length;
@@ -73,11 +79,14 @@ function probe() {
     held: document.querySelector('[data-held="true"]')?.dataset.key ?? null,
     sound: window.__sound?.state ?? null,
     plume: jets?.material.uniforms.uProfile?.value.toArray().map((value) => Math.round(value * 100) / 100) ?? null,
+    push: hull ? -hull.position.z : null,
+    flare: body?.getObjectByName("FX_boost_center")?.userData.flare ?? null,
   };
 }
 
-async function openPage(browser, query) {
-  const context = await browser.newContext({ viewport: { width: 1280, height: 720 } });
+async function openPage(browser, query, device = {}) {
+  const { width = 1280, height = 720, ...rest } = device;
+  const context = await browser.newContext({ viewport: { width, height }, ...rest });
   await context.addInitScript(([key, value]) => {
     if (!sessionStorage.getItem("seeded")) { localStorage.setItem(key, value); sessionStorage.setItem("seeded", "1"); }
     // The showroom engine's context, so its state can be read.
@@ -142,11 +151,14 @@ try {
     const rest = await tab.evaluate(probe);
     assert.equal(rest.frame, "FRAME_corona", "The bay is not showing the saved CORONA.");
     assert.deepEqual(rest.plume, [0.9, 1, 1.1], `CORONA's jets wear ${rest.plume}, not its plume profile.`);
+    assert.equal(rest.meter, 4, "The bay opens with the meter dark over a full reserve.");
+    assert.ok(rest.pitch !== null && rest.push !== null, "The probe cannot find the craft's visual group (totem_visual_motion).");
     // Held until the meter has stepped down, not for a fixed time: the demo
     // caps each frame at 0.1 s, so a slow renderer drains it slower in wall time.
     const quarters = (count) => tab.waitForFunction((n) => document.querySelectorAll(".garage__meter i[data-on=true]").length === n, count, { timeout: 30_000 });
     await holdFor(tab, "hold-boost", 200);
     await quarters(3);
+    assert.ok((await tab.evaluate(probe)).push > 2.5, "The demo did not move the craft up the track to frame its plume.");
     // The gauge's fill is what the renderer last uploaded, a frame behind the
     // meter (a slow renderer's frame can be 0.4 s): wait for it to follow.
     await tab.waitForFunction(() => window.__fill <= 0.75, null, { timeout: 10_000 });
@@ -180,6 +192,22 @@ try {
       `The craft is not at rest after the demo: airbrake ${after.airbrake}, pitch ${after.pitch}, bank ${after.bank}.`);
     assert.ok(after.kit < 0.9 && after.fill === 1, `The lamps are not back at idle (kit ${after.kit}, gauge ${after.fill}).`);
     assert.equal(await tab.evaluate(() => window.__sound?.state), "suspended", "The showroom engine did not go to sleep after the demo.");
+    await tab.waitForFunction(() => { let z = null; for (const scene of window.__scenes) scene.traverse((o) => { if (o.name === "totem_visual_motion") z = o.position.z; }); return z !== null && Math.abs(z) < 0.02; }, null, { timeout: 20_000 });
+    // Leaving the page mid-hold ends the demo in the same task: a hidden tab runs no frame.
+    await holdFor(tab, "hold-boost", 900);
+    const left = await tab.evaluate(() => {
+      window.dispatchEvent(new Event("blur"));
+      let kit = null;
+      for (const scene of window.__scenes) scene.traverse((object) => {
+        if (object.isMesh && object.material?.name === "TE_boost" && !/^FRAME_/.test(object.parent?.name ?? "")) kit = object.material.emissiveIntensity;
+      });
+      return { running: document.querySelector(".garage__demo")?.dataset.running, kit };
+    });
+    await tab.mouse.up();
+    assert.equal(left.running, "false", "A blur mid-hold did not end the demo at once.");
+    assert.ok(left.kit < 0.9, `A blur mid-hold left the kit firing (${left.kit}).`);
+    await tab.waitForTimeout(700);
+    assert.equal(await tab.evaluate(() => window.__sound?.state), "suspended", "A blur mid-hold left the showroom engine running.");
     // 2. Swap frames mid-hold: the hold ends and both bodies are at rest.
     await tab.focus('[data-key="hold-boost"]');
     await tab.keyboard.down("Space");
@@ -193,11 +221,14 @@ try {
     assert.equal(swapped.meter, 4, "A frame swap left the demo's reserve drained.");
     assert.ok(Math.abs(swapped.airbrake ?? 0) < 1e-6 && Math.abs(swapped.pitch) < 1e-3, "The new frame is not at rest after a swap mid-hold.");
     assert.deepEqual(swapped.plume, [0.72, 0.72, 1.22], `After the swap the jets wear ${swapped.plume}, not LANCE's profile.`);
+    assert.deepEqual(swapped.flare, [0.65, 0.55], `LANCE's boost centre asks for ${swapped.flare}, not its smaller flare.`);
     // 3. Close the bay and START: nothing of the demo reaches the race.
     await tab.evaluate(() => document.querySelector('[data-key="frame-corona"]')?.click());
     await tab.waitForTimeout(1500);
     await tab.keyboard.press("Escape");
     await tab.waitForFunction(() => document.body.dataset.garage === "false", null, { timeout: 30_000 });
+    const closed = await tab.evaluate(probe);
+    assert.ok(closed.push === 0 && closed.pitch !== null, `A closed bay leaves the craft pushed (${closed.push}) or turned.`);
     const saved = await tab.evaluate(() => JSON.parse(localStorage.getItem("futurisma.save.v1")).garage);
     assert.deepEqual(saved, before, "The demo changed the saved garage.");
     await tab.evaluate(() => document.getElementById("start-button")?.click());
@@ -206,6 +237,7 @@ try {
     assert.deepEqual(race.plume, [0.9, 1, 1.1], `CORONA races with ${race.plume}, not its own plume (a swap back must not compound).`);
     assert.equal(await tab.evaluate(() => document.getElementById("boost-value")?.textContent), "100%", "The race starts without a full reserve.");
     assert.ok(race.kit < 1.2 && Math.abs(race.airbrake) < 1e-6, `The race inherits the demo: kit ${race.kit}, airbrake ${race.airbrake}.`);
+    assert.equal(race.push, 0, "The race starts with the craft still pushed up the track.");
     assert.deepEqual(errors, [], "Page errors during the showroom demo.");
     await context.close();
     console.log("Hold, release, swap and launch: the demo drives the craft and leaves the race untouched.");
@@ -214,10 +246,11 @@ try {
   {
     const { context, tab, errors } = await openPage(browser, "&motion=reduce");
     await openBay(tab);
-    const angle = await tab.evaluate(() => { let hull = null; for (const scene of window.__scenes) scene.traverse((o) => { if (/^FRAME_/.test(o.name) && o.parent) hull = o.parent.parent; }); return hull?.rotation.y ?? null; });
+    const angle = await tab.evaluate(() => { let hull = null; for (const scene of window.__scenes) scene.traverse((o) => { if (o.name === "totem_visual_motion") hull = o; }); return hull?.rotation.y ?? null; });
+    assert.ok(Math.abs(angle - -0.7) < 1e-6, `Under reduced motion the bay holds ${angle}, not the -0.7 three-quarter.`);
     await holdFor(tab, "hold-boost", 1100);
     const held = await tab.evaluate(probe);
-    const yaw = await tab.evaluate(() => { let hull = null; for (const scene of window.__scenes) scene.traverse((o) => { if (/^FRAME_/.test(o.name) && o.parent) hull = o.parent.parent; }); return hull?.rotation.y ?? null; });
+    const yaw = await tab.evaluate(() => { let hull = null; for (const scene of window.__scenes) scene.traverse((o) => { if (o.name === "totem_visual_motion") hull = o; }); return hull?.rotation.y ?? null; });
     assert.ok(held.kit > 1.2, "Under reduced motion BOOST does not fire.");
     assert.ok(Math.abs(yaw - angle) < 1e-6, `Under reduced motion the craft turned (${angle} -> ${yaw}).`);
     await tab.mouse.up();
@@ -239,7 +272,29 @@ try {
     await context.close();
     console.log("Reduced motion: the demo runs and the craft holds still.");
   }
-  // 5. Tideline: the circuit rule reworks the jets' shader for fog as the race
+  // 5. A phone held upright: the panel keeps to the top half, the craft shows
+  // below it, and the holds sit at the foot of the screen.
+  {
+    const { context, tab, errors } = await openPage(browser, "", { width: 390, height: 844, hasTouch: true, isMobile: true });
+    await openBay(tab);
+    const layout = await tab.evaluate(() => {
+      const panel = document.querySelector(".garage")?.getBoundingClientRect();
+      const strip = document.querySelector(".garage__demo")?.getBoundingClientRect();
+      return { panel: panel?.bottom, strip: strip && [strip.top, strip.bottom], height: innerHeight, slide: getComputedStyle(document.getElementById("game-canvas")).transform };
+    });
+    assert.ok(layout.panel <= layout.height * 0.55, `On a phone the panel reaches ${layout.panel} of ${layout.height}: the craft is hidden.`);
+    assert.ok(layout.strip[0] >= layout.height * 0.8 && layout.strip[1] <= layout.height, `On a phone the holds sit at ${layout.strip}, not at the foot of the screen.`);
+    assert.ok(layout.slide === "none", `On a phone the bay still slides the picture (${layout.slide}).`);
+    const box = await tab.locator('[data-key="hold-boost"]').boundingBox();
+    await tab.touchscreen.tap(box.x + box.width / 2, box.y + box.height / 2);
+    await holdFor(tab, "hold-boost", 300);
+    await tab.waitForFunction(() => document.querySelectorAll(".garage__meter i[data-on=true]").length < 4, null, { timeout: 30_000 });
+    await tab.mouse.up();
+    assert.deepEqual(errors, [], "Page errors on a phone.");
+    await context.close();
+    console.log("Phone: the craft shows under the panel and the holds work at the foot of the screen.");
+  }
+  // 6. Tideline: the circuit rule reworks the jets' shader for fog as the race
   // loads, after the bay taught it the plume profile; both must hold.
   {
     const { context, tab, errors } = await openPage(browser, "&map=tideline");

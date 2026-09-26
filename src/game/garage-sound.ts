@@ -24,6 +24,7 @@ export class ShowroomSound {
   private engineGain: GainNode | null = null;
   private harmonicGain: GainNode | null = null;
   private windGain: GainNode | null = null;
+  private roarGain: GainNode | null = null;
   private firing = false;
   private braking = false;
   private recharging = false;
@@ -69,6 +70,21 @@ export class ShowroomSound {
       this.windGain.gain.value = 0;
       wind.connect(this.windGain);
       this.windGain.connect(filter);
+      // The boost's sustained roar under the onset cue: the same noise through a
+      // low band (250 Hz band-pass, 1.4 kHz low-pass) straight to the master.
+      const band = context.createBiquadFilter();
+      band.type = "bandpass";
+      band.frequency.value = 250;
+      band.Q.value = 0.7;
+      const smooth = context.createBiquadFilter();
+      smooth.type = "lowpass";
+      smooth.frequency.value = 1_400;
+      this.roarGain = context.createGain();
+      this.roarGain.gain.value = 0;
+      wind.connect(band);
+      band.connect(smooth);
+      smooth.connect(this.roarGain);
+      this.roarGain.connect(master);
       wind.start();
       Object.assign(this, { context, master, filter });
     }
@@ -89,6 +105,8 @@ export class ShowroomSound {
     this.engineGain?.gain.setTargetAtTime(0.025 + throttle * 0.035 + speedRatio * 0.025, now, 0.08);
     this.harmonicGain?.gain.setTargetAtTime(0.008 + speedRatio * 0.021 + (firing ? 0.02 : 0), now, 0.06);
     this.windGain?.gain.setTargetAtTime(Math.pow(speedRatio, 2) * (0.045 + brake * 0.035), now, 0.1);
+    // Roar: 60 ms attack, 180 ms release (a third of each as the time constant).
+    this.roarGain?.gain.setTargetAtTime(firing ? 0.025 : 0, now, firing ? 0.02 : 0.06);
     this.filter?.frequency.setTargetAtTime(820 + speedRatio * 1_850 + brake * 420 + (firing ? 1_400 : 0), now, 0.08);
     // The race's boost cue as the jets light; the airbrakes' thunk as they
     // swing up; `playPowerDenied`'s pair when the reserve runs dry.
@@ -115,6 +133,7 @@ export class ShowroomSound {
     const context = this.context;
     if (!context || !this.master) return;
     this.master.gain.setTargetAtTime(0, context.currentTime, 0.06);
+    this.roarGain?.gain.setTargetAtTime(0, context.currentTime, 0.06);
     this.firing = this.braking = this.recharging = false;
     clearTimeout(this.sleep);
     this.sleep = window.setTimeout(() => void context.suspend().catch(() => undefined), 400);

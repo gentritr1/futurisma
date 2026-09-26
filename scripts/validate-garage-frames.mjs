@@ -373,6 +373,28 @@ assert.ok(totem.includes("if (this.body) { const body = this.body; this.body = n
   }
   assert.ok(hud.includes("document.body.dataset.muted = String(muted);") && sound.includes('document.body.dataset.muted === "true"'),
     "The showroom engine no longer hears the game's mute.");
+  // Round 9: the demo frames its plume (3 m up the track, always the -0.7
+  // three-quarter by the short way), ends at once on blur or a hidden tab, and
+  // the boost carries its roar (band-pass 250 Hz Q 0.7, low-pass 1.4 kHz,
+  // 0.025, 60 ms attack and 180 ms release).
+  for (const needle of ["const DEMO_PUSH = 3;", "const turn = Math.atan2(Math.sin(STILL_YAW - yaw), Math.cos(STILL_YAW - yaw));",
+    'window.addEventListener("blur", this.interrupt);', 'document.addEventListener("visibilitychange", this.interrupt);',
+    "private readonly interrupt = (): void => this.endDemo();"]) {
+    assert.ok(bay.includes(needle), `garage-ui.ts lost part of the showroom demo: ${needle}`);
+  }
+  assert.ok(look.includes("hull.position.z = -push;"), "turnCraft no longer frames the demo by pushing the craft up the track.");
+  for (const needle of ["band.frequency.value = 250;", "band.Q.value = 0.7;", "smooth.frequency.value = 1_400;",
+    "this.roarGain?.gain.setTargetAtTime(firing ? 0.025 : 0, now, firing ? 0.02 : 0.06);"]) {
+    assert.ok(sound.includes(needle), `garage-sound.ts lost part of the boost roar: ${needle}`);
+  }
+  // LANCE's centre flare: the lazy look tags its boost centre, the shell's race
+  // presence reads the tag on every mount and scales width and opacity by it.
+  const presence = await read("src/game/race-presence.ts");
+  assert.ok(look.includes("const FLARES: Readonly<Record<string, readonly [number, number]>> = { lance: [0.65, 0.55] };")
+    && look.includes("if (flare && centre) centre.userData.flare = flare;"), "garage-look.ts no longer shrinks LANCE's centre flare.");
+  assert.ok(presence.includes('this.flare = nodes.get("FX_boost_center")?.userData.flare ?? [1, 1];')
+    && presence.includes("(1.35 + boostRead * 0.28) * this.flare[0],")
+    && presence.includes("(0.42 + boostRead * 0.24) * boostPulse * this.flare[1],"), "race-presence.ts no longer scales the centre flare by the body's boost centre.");
 }
 // Plume profiles: each frame's exhaust shape on the kit's jets. The profile
 // scales the jet's own vertices (nozzle at z 0, so it never moves), is taught
@@ -427,7 +449,7 @@ assert.match(look, /hull\.rotation\.y = radians/, "turnCraft no longer yaws the 
 const hide = bay.slice(bay.indexOf("  hide(): void {"), bay.indexOf("  dispose(): void {"));
 assert.ok(hide.indexOf("this.animate()") >= 0 && hide.indexOf("this.animate()") < hide.indexOf("this.refit(null)"),
   "hide() must stop the turntable (animate) before it refits the paddock.");
-assert.match(bay, /if \(!this\.opened\) \{[^}]*this\.endDemo\(\);\s*this\.yaw = 0;\s*turnCraft\(0\);/,
+assert.match(bay, /if \(!this\.opened\) \{[^}]*this\.endDemo\(\);\s*this\.yaw = 0;\s*this\.push = 0;\s*turnCraft\(0\);/,
   "a closed bay must end the showroom demo and turn the craft back to zero.");
 
 console.log(`Garage frames PASS: ${report.join("; ")}; the showroom turntable owns the visual group's yaw and zeroes it before the paddock refits; ${atlases} paint schemes built (${(atlasBytes / 1024).toFixed(0)} KiB, fetched one at a time), each matching its catalog swatch; pivots identity and mirrored, airbrakes forward of their hinges, anchors mirrored, jets on the kit's line, single-sided role materials with all four kit lamps, manifest current; bodies mount (never scale), refits serialize and a launch waits for the latest.`);

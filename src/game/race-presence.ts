@@ -284,7 +284,11 @@ export class TotemRacePresence {
     for (const [name, anchor, authored] of this.authoredAnchors) {
       anchor.copy(anchorPosition(model, nodes, name, authored));
     }
+    // The centre flare's width and opacity, as the body's boost centre asks for them.
+    this.flare = nodes.get("FX_boost_center")?.userData.flare ?? [1, 1];
   }
+
+  private flare: readonly number[] = [1, 1];
 
   update(state: RacePresenceVisualState): void {
     this.beginFrame();
@@ -337,9 +341,9 @@ export class TotemRacePresence {
         this.additive,
         "boost_core_flare",
         this.boostCenter,
-        1.35 + boostRead * 0.28,
+        (1.35 + boostRead * 0.28) * this.flare[0],
         1.42 + boostRead * 0.4,
-        (0.42 + boostRead * 0.24) * boostPulse,
+        (0.42 + boostRead * 0.24) * boostPulse * this.flare[1],
       );
       this.addEffect(
         this.masked,
