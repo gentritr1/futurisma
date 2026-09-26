@@ -228,6 +228,11 @@ async function applyCircuitRule(circuit: string, ...roots: THREE.Object3D[]): Pr
   applyTidelineRenderRule(...roots);
 }
 
+function ringed(object: THREE.Object3D): boolean {
+  for (let at: THREE.Object3D | null = object; at; at = at.parent) if (at.name === "stabiliser_ring_pivot") return true;
+  return false;
+}
+
 function bodyFor(vehicle: TotemVehicle, frame: string, circuit: string): Promise<THREE.Object3D | null> {
   let cache = bodies.get(vehicle);
   if (!cache) bodies.set(vehicle, (cache = new Map()));
@@ -237,6 +242,13 @@ function bodyFor(vehicle: TotemVehicle, frame: string, circuit: string): Promise
     // the linear painterly class, like the baked environment GLBs.
     body = vehicle.loadBody(`/assets/garage/frames/${frame}.glb`, { textureCharacter: "painterly" })
       .then(async (loaded) => {
+        // The wash lies under the hull and skids. CORONA's and HALO's rings hang
+        // lower than both, so they are left out of the floor it is measured from.
+        const floor = new THREE.Box3();
+        loaded.traverse((object) => {
+          if ((object as THREE.Mesh).isMesh && !ringed(object)) floor.expandByObject(object);
+        });
+        if (!floor.isEmpty()) loaded.userData.washFloor = floor.min.y;
         await applyCircuitRule(circuit, loaded);
         return loaded;
       })
@@ -307,6 +319,8 @@ const GAUGE_NAME = "TE_boost_gauge";
  * four bands by the reserve. The copy takes the same PS2 treatment and circuit
  * rule the lamp had (a material made after the body's load would otherwise skip
  * the grade and the fog), then the band mask is added on top of that shader.
+ * Every cell is re-dressed before the one await, so a second refit that lands
+ * meanwhile finds no `TE_boost` cell left to dress again.
  */
 async function fitCellGauge(body: THREE.Object3D, reserve: () => number, circuit: string): Promise<void> {
   const cells: THREE.Mesh[] = [];
@@ -349,8 +363,8 @@ ${shader.fragmentShader}`
       gauge.emissiveIntensity = lamp.emissiveIntensity;
       fill.value = reserve();
     };
-    await applyCircuitRule(circuit, mesh);
   }
+  await applyCircuitRule(circuit, ...cells);
 }
 
 /** Options the running page decides for the look. */
@@ -426,5 +440,6 @@ export async function applyCraftLook(
   const length = bounds ? bounds.max.z - bounds.min.z : 6.37;
   underglow.scale.set((width + 1.2) / 3.4, length * 1.15 / 6.4, 1);
   underglow.material.uniforms.uInner.value.set(width / (width + 1.2), 1 / 1.15);
-  underglow.position.set(0, bounds ? bounds.min.y + 0.1 : 0.05, bounds ? (bounds.min.z + bounds.max.z) / 2 : 0.1);
+  const floor = (body?.userData.washFloor as number | undefined) ?? bounds?.min.y;
+  underglow.position.set(0, floor !== undefined ? floor + 0.1 : 0.05, bounds ? (bounds.min.z + bounds.max.z) / 2 : 0.1);
 }

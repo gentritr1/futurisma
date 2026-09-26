@@ -208,7 +208,9 @@ for (const code of bodies) {
       `${label}: bounds ${min.map((v) => v.toFixed(2))} .. ${max.map((v) => v.toFixed(2))} leave the envelope.`);
   }
   // Swept: every vertex under an animated pivot, at nine points across its
-  // range, about the pivot's own origin.
+  // range, about the pivot's own origin. The whole craft's pitch and bank
+  // (updateVisual's lerps on the visual group) are left out by design, as
+  // they are for TOTEM: the envelope is the body's, not the banked craft's.
   nodes.forEach((node, index) => {
     if (node.mesh === undefined) return;
     let pivot;
@@ -280,9 +282,13 @@ assert.match(totem, /mountBody\(body: THREE\.Object3D \| null\): void/, "TotemVe
     "corona.glb: no TE_boost cell outboard of x 1.0; the reserve gauge has nothing to light.");
   const reach = cells.reduce((span, accessor) => [Math.min(span[0], accessor.min[2]), Math.max(span[1], accessor.max[2])], [Infinity, -Infinity]);
   assert.ok(reach[0] <= -1.6 && reach[1] >= 1.6, `corona.glb: the cells span z ${reach}, not the gauge's -1.7..1.7.`);
-  for (const needle of ["const CELL_Z = [-1.7, 1.7] as const;", "applyPs2MaterialTreatment(mesh);", "await applyCircuitRule(circuit, mesh);",
-    "fill.value = reserve();", 'frame === "corona") await fitCellGauge(']) {
+  for (const needle of ["const CELL_Z = [-1.7, 1.7] as const;", "applyPs2MaterialTreatment(mesh);",
+    "fill.value = reserve();", 'frame === "corona") await fitCellGauge(', "await applyCircuitRule(circuit, ...cells);"]) {
     assert.ok(look.includes(needle), `garage-look.ts lost part of CORONA's cell gauge: ${needle}`);
+  }
+  // CORONA's and HALO's rings hang below their skids; the wash is measured from the hull and skids alone.
+  for (const needle of ['at.name === "stabiliser_ring_pivot"', "userData.washFloor as number"]) {
+    assert.ok(look.includes(needle), `garage-look.ts measures the wash from the ring again: ${needle}`);
   }
 }
 // The swept-pose table above follows these lines.
