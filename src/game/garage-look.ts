@@ -87,6 +87,8 @@ export function turnCraft(radians: number): void {
  * long narrow columns (not taller: its rear gauge pads sit just above the
  * plume), HALO's two thin ribbons (not wider: its ARC WHITE plumes would merge
  * into one white slab over the ring). TOTEM, and anything unlisted, keeps 1.
+ * Tried and rejected against the firing evidence: CORONA at height 1.1 (it
+ * climbs over the outer pads), HALO at 1.35 × 0.42 and 1.2 × 0.5 (one slab).
  */
 const PLUMES: Readonly<Record<string, readonly [number, number, number]>> = {
   lance: [0.72, 0.72, 1.22],
