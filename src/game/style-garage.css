@@ -669,13 +669,27 @@ body[data-garage="true"] #game-canvas {
   font-variant-numeric: tabular-nums;
 }
 
-/* Five tabs need about 560 px; narrower, they wrap three over two. */
-/* A phone held upright frames the craft big in the lower part of the screen,
-   so the bay keeps that part clear: the panel scrolls in the top half over a
-   wash that fades out above the craft, and the showroom holds sit at the foot
-   of the screen, under the craft and under the thumb. (The picture's sideways
-   slide is already off below 900 px.) */
-@media (max-width: 620px) and (orientation: portrait) {
+/*
+  The bay's three layouts, so the craft always has a side of the screen to
+  itself and a boosted plume never runs under the panel (check:garage-framing
+  measures every one of them):
+
+  - wide (landscape from 1280 px): the panel on the left, the picture slid
+    right beside it, the holds in the panel under CRAFT and PAINT;
+  - column (landscape below 1280 px: phones on their side, tablets, small
+    windows): the panel in a narrow scrolling column on the left with the holds
+    pinned at its foot, and the picture slid so the craft centres in the rest;
+  - upright (portrait, any width): the panel scrolls in the top half and the
+    holds sit at the foot of the screen, under the craft and under the thumb.
+
+  The column and upright queries never overlap, and `garage-ui.ts` frames the
+  demo by the upright one.
+*/
+@media (orientation: portrait) {
+  body[data-garage="true"] #game-canvas {
+    transform: none;
+  }
+
   .screen--garage {
     align-items: flex-start;
     padding: 12px 16px;
@@ -697,7 +711,53 @@ body[data-garage="true"] #game-canvas {
   }
 }
 
-@media (max-width: 620px) {
+/* The column is min(42vw, 380px) wide inside 12 px of screen; the holds take
+   its last 44 px and an 8 px gap, and the picture slides by half the column so
+   the craft centres in what is left. */
+@media (orientation: landscape) and (max-width: 1279px) {
+  body[data-garage="true"] #game-canvas {
+    transform: translateX(calc(6px + min(21vw, 190px)));
+  }
+
+  .screen--garage {
+    align-items: flex-start;
+    padding: 12px;
+    background: linear-gradient(90deg, oklch(0.055 0.012 210 / 0.96) 0 calc(min(42vw, 380px) + 12px), transparent calc(min(42vw, 380px) + 60px));
+  }
+
+  .garage.options-panel {
+    width: min(42vw, 380px);
+    max-height: calc(100dvh - 76px);
+  }
+
+  .garage__demo {
+    position: fixed;
+    left: 12px;
+    width: min(42vw, 380px);
+    bottom: 12px;
+    z-index: 31;
+  }
+}
+
+/* Wherever the holds are pinned to the screen they are thumb-sized, and the
+   panel arrives by fading only: a sliding panel would carry the pinned holds
+   with it for the 240 ms of its entrance. (One more class than the shell's
+   entrance rule, so it wins however the sheets are ordered.) */
+@media (orientation: portrait), (orientation: landscape) and (max-width: 1279px) {
+  @starting-style {
+    .screen.screen--garage:not([hidden]) .garage {
+      transform: none;
+    }
+  }
+
+  .garage__hold {
+    min-height: 44px;
+  }
+}
+
+/* Five tabs need about 560 px; narrower, they wrap three over two. The column
+   is always narrower. */
+@media (max-width: 620px), (orientation: landscape) and (max-width: 1279px) {
   .garage__tabs {
     grid-template-columns: repeat(6, minmax(0, 1fr));
   }
@@ -711,7 +771,7 @@ body[data-garage="true"] #game-canvas {
   }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 700px), (orientation: landscape) and (max-width: 1279px) {
   .garage__frames,
   .garage__paints {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -729,7 +789,9 @@ body[data-garage="true"] #game-canvas {
   .garage__pips {
     display: none;
   }
+}
 
+@media (max-width: 700px) {
   .purse__lines {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -743,12 +805,5 @@ body[data-garage="true"] #game-canvas {
 
   .chip[data-bought="true"] {
     animation: none;
-  }
-}
-
-/* Below a laptop's width the panel spans the screen; there is no beside. */
-@media (max-width: 900px) {
-  body[data-garage="true"] #game-canvas {
-    transform: none;
   }
 }

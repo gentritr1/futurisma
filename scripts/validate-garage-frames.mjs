@@ -373,18 +373,42 @@ assert.ok(totem.includes("if (this.body) { const body = this.body; this.body = n
   }
   assert.ok(hud.includes("document.body.dataset.muted = String(muted);") && sound.includes('document.body.dataset.muted === "true"'),
     "The showroom engine no longer hears the game's mute.");
-  // Round 9: the demo frames its plume (3 m up the track, always the -0.7
-  // three-quarter by the short way), ends at once on blur or a hidden tab, and
-  // the boost carries its roar (band-pass 250 Hz Q 0.7, low-pass 1.4 kHz,
-  // 0.025, 60 ms attack and 180 ms release).
-  for (const needle of ["const DEMO_PUSH = 3;", "const turn = Math.atan2(Math.sin(STILL_YAW - yaw), Math.cos(STILL_YAW - yaw));",
+  // The demo frames its plume per screen (measured by check:garage-framing),
+  // turning by the short way; it ends at once on blur or a hidden tab; and the
+  // boost carries its roar (band-pass 250 Hz Q 0.7, low-pass 1.4 kHz, 0.075,
+  // 60 ms attack and 180 ms release).
+  for (const needle of ["const DEMO_FRAMING = { wide: [-0.25, 4], upright: [0, 4] } as const;",
+    'const [demoYaw, demoPush] = DEMO_FRAMING[this.upright.matches ? "upright" : "wide"];',
+    "const turn = Math.atan2(Math.sin(demoYaw - yaw), Math.cos(demoYaw - yaw));",
     'window.addEventListener("blur", this.interrupt);', 'document.addEventListener("visibilitychange", this.interrupt);',
     "private readonly interrupt = (): void => this.endDemo();"]) {
     assert.ok(bay.includes(needle), `garage-ui.ts lost part of the showroom demo: ${needle}`);
   }
   assert.ok(look.includes("hull.position.z = -push;"), "turnCraft no longer frames the demo by pushing the craft up the track.");
+  // Held still, the demo's framing is read before the demo can end in a frame,
+  // so a refilled reserve never cuts the craft away on its own.
+  assert.ok(/const push = this\.demoing \? demoPush : 0;\s*if \(this\.demoing\) \{/.test(bay),
+    "The demo's push must be taken before the demo can end, or reduced motion cuts away when the reserve refills.");
+  // The framing's layouts are the sheet's: the upright query in both files, the
+  // column's never overlapping it, and the pinned holds' rules on both.
+  const sheet = await read("src/game/style-garage.css");
+  const [upright, column] = ["(orientation: portrait)", "(orientation: landscape) and (max-width: 1279px)"];
+  assert.ok(bay.includes(`const UPRIGHT_SCREEN = "${upright}";`) && bay.includes("private readonly upright = matchMedia(UPRIGHT_SCREEN);")
+    && sheet.includes(`@media ${upright} {`) && sheet.includes(`@media ${column} {`),
+    "The demo's framing and the bay's upright and column layouts no longer share their media queries.");
+  const pinned = sheet.match(new RegExp(`@media ${`${upright}, ${column}`.replace(/[()]/g, "\\$&")} \\{([\\s\\S]*?)\\n\\}`))?.[1] ?? "";
+  assert.ok(pinned.includes("min-height: 44px;"), "Wherever the holds are pinned they must be 44 px.");
+  // The panel enters by fading only where the holds are pinned, or its 240 ms
+  // slide carries them. The override outranks the shell's entrance rule by a
+  // class, so it holds whichever sheet is later.
+  const shell = await read("src/style.css");
+  assert.ok(/@starting-style \{\s*\.screen\.screen--garage:not\(\[hidden\]\) \.garage \{\s*transform: none;/.test(pinned),
+    "Where the holds are pinned, the panel must enter without sliding them.");
+  assert.ok(/@starting-style \{\s*\.screen:not\(\[hidden\]\) :is\(\.intro-panel, \.result-panel\) \{\s*transform: translateY\(18px\);/.test(shell)
+    && shell.includes("transform 240ms var(--ease-out),") && bay.includes('node("div", "intro-panel options-panel garage")'),
+    "The shell's panel entrance changed; re-check that the garage's override still outranks it.");
   for (const needle of ["band.frequency.value = 250;", "band.Q.value = 0.7;", "smooth.frequency.value = 1_400;",
-    "this.roarGain?.gain.setTargetAtTime(firing ? 0.025 : 0, now, firing ? 0.02 : 0.06);"]) {
+    "this.roarGain?.gain.setTargetAtTime(firing ? 0.075 : 0, now, firing ? 0.02 : 0.06);"]) {
     assert.ok(sound.includes(needle), `garage-sound.ts lost part of the boost roar: ${needle}`);
   }
   // LANCE's centre flare: the lazy look tags its boost centre, the shell's race

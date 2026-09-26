@@ -134,8 +134,16 @@ const TIER_ORDER = ["rookie", "works", "feral"];
 const TURN_RATE = (Math.PI * 2) / 24_000;
 /** Reduced motion's still showroom angle: a three-quarter view of the flank. */
 const STILL_YAW = -0.7;
-/** How far up the track the demo moves the craft, so its boosted plume stays in frame (m). */
-const DEMO_PUSH = 3;
+/**
+ * Where the demo turns the craft and how far up the track it moves it (m), so
+ * a boosted plume stays clear of the panel, the holds and the screen's edges
+ * (check:garage-framing measures it): an upright screen, whose panel keeps to
+ * the top half, looks straight down the tail; a wider one, whose panel keeps
+ * to the left, takes a shallow rear three-quarter.
+ */
+const DEMO_FRAMING = { wide: [-0.25, 4], upright: [0, 4] } as const;
+/** The bay's upright layout, as `style-garage.css` lays it out. */
+const UPRIGHT_SCREEN = "(orientation: portrait)";
 const ROMAN = ["", "I", "II", "III"];
 
 function node<K extends keyof HTMLElementTagNameMap>(tag: K, className = "", text = ""): HTMLElementTagNameMap[K] {
@@ -195,6 +203,7 @@ export class GarageScreen {
   private quarters = 4;
   private rollCheck = 0;
   private readonly sound: ShowroomSound;
+  private readonly upright = matchMedia(UPRIGHT_SCREEN);
 
   constructor(private readonly hooks: GarageHooks) {
     this.screen.id = "garage-screen";
@@ -383,9 +392,10 @@ export class GarageScreen {
    * angle instead, and closing the bay puts it back exactly as it races.
    *
    * The same loop runs the showroom demo, under reduced motion too: while a
-   * hold is on, or its reserve is still refilling, the craft eases to the rear
-   * three-quarter (the side whose plume stays on screen) and a few metres up
-   * the track, where its jets, gauge and airbrakes face the camera in frame.
+   * hold is on, or its reserve is still refilling, the craft eases round to
+   * show its tail (`DEMO_FRAMING`) and a few metres up the track, where its
+   * jets, gauge and airbrakes face the camera in frame. Under reduced motion
+   * it cuts there on the press and stays until the driver's next move.
    */
   private animate(): void {
     const still = this.hooks.reducedMotion();
@@ -421,11 +431,17 @@ export class GarageScreen {
     this.last = now;
     const still = this.hooks.reducedMotion();
     const ease = 1 - Math.exp(-seconds * 10);
+    // Read every frame, so turning the phone mid-hold reframes the craft.
+    const [demoYaw, demoPush] = DEMO_FRAMING[this.upright.matches ? "upright" : "wide"];
+    // Taken before the demo can end below: held still, the craft keeps the
+    // demo's framing when the reserve refills, rather than cutting away on its
+    // own, until the driver next does something (`animate()` puts it back).
+    const push = this.demoing ? demoPush : 0;
     if (this.demoing) {
-      // The short way round to the three-quarter.
+      // The short way round to the demo's angle.
       const yaw = Math.atan2(Math.sin(this.yaw), Math.cos(this.yaw));
-      const turn = Math.atan2(Math.sin(STILL_YAW - yaw), Math.cos(STILL_YAW - yaw));
-      this.yaw = still ? STILL_YAW : yaw + turn * ease;
+      const turn = Math.atan2(Math.sin(demoYaw - yaw), Math.cos(demoYaw - yaw));
+      this.yaw = still ? demoYaw : yaw + turn * ease;
       const frame = demoCraft(this.hold, seconds, still);
       this.sound.set(frame.throttle, frame.speedRatio, frame.brake, frame.firing, frame.recharging);
       this.syncMeter(frame.reserve, frame.recharging);
@@ -433,8 +449,11 @@ export class GarageScreen {
       if (!this.hold && frame.reserve >= 1) this.endDemo();
     } else if (!still) {
       this.yaw = (this.yaw + seconds * 1000 * TURN_RATE) % (Math.PI * 2);
+    } else {
+      // Held still with no demo on: the setting came on mid-turn, or the demo
+      // was cut short by a blur or a hidden tab.
+      this.yaw = STILL_YAW;
     }
-    const push = this.demoing ? DEMO_PUSH : 0;
     this.push = still ? push : this.push + (push - this.push) * ease;
     turnCraft(this.yaw, this.push);
     this.hooks.requestRender();

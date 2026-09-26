@@ -14,8 +14,9 @@
  * - closing the bay and STARTing leaves nothing of the demo in the race (the
  *   reserve is 100 %, nothing is firing, the airbrakes are down) and the
  *   save's garage is untouched;
- * - under `?motion=reduce` the demo still runs, and the craft holds its
- *   three-quarter angle;
+ * - under `?motion=reduce` the demo still runs, and the craft cuts to the
+ *   demo's framing on the press and stays there until the next move in the
+ *   bay, which cuts it back to the still three-quarter;
  * - on RESULT the holds stay disabled while the HUD shows the craft still
  *   coasting, and come back once it reads 000;
  * - the meter opens full; a blur mid-hold ends the demo in the same task and
@@ -258,8 +259,18 @@ try {
     const held = await tab.evaluate(probe);
     const yaw = await tab.evaluate(() => { let hull = null; for (const scene of window.__scenes) scene.traverse((o) => { if (o.name === "totem_visual_motion") hull = o; }); return hull?.rotation.y ?? null; });
     assert.ok(held.kit > 1.2, "Under reduced motion BOOST does not fire.");
-    assert.ok(Math.abs(yaw - angle) < 1e-6, `Under reduced motion the craft turned (${angle} -> ${yaw}).`);
+    // Held still, the demo cuts straight to its framing (no easing between),
+    // keeps it when the reserve refills, and cuts back on the next move.
+    assert.ok(Math.abs(yaw - -0.25) < 1e-6 && Math.abs(held.push - 4) < 1e-6, `Under reduced motion the demo eased or missed its framing (${yaw}, ${held.push}).`);
     await tab.mouse.up();
+    await tab.waitForFunction(() => document.querySelector(".garage__demo")?.dataset.running === "false", null, { timeout: 30_000 });
+    await tab.waitForTimeout(500);
+    const pose = () => tab.evaluate(() => { let hull = null; for (const scene of window.__scenes) scene.traverse((o) => { if (o.name === "totem_visual_motion") hull = o; }); return hull && [hull.rotation.y, hull.position.z]; });
+    const kept = await pose();
+    assert.ok(Math.abs(kept[0] - -0.25) < 1e-6 && Math.abs(kept[1] + 4) < 1e-6, `Under reduced motion the craft cut away on its own when the reserve refilled (${kept}).`);
+    await tab.evaluate(() => document.querySelector('[data-key="tab-parts"]')?.click());
+    const back = await pose();
+    assert.ok(Math.abs(back[0] - -0.7) < 1e-6 && back[1] === 0, `Under reduced motion the next move did not cut the craft back to rest (${back}).`);
     // RESULT: while the race loop still coasts the craft (the HUD is not at
     // 000) the holds are disabled, and they come back once it has stopped. The
     // phase and speed are set here; reaching a real result needs a whole lap.
@@ -292,6 +303,7 @@ try {
     assert.ok(layout.strip[0] >= layout.height * 0.8 && layout.strip[1] <= layout.height, `On a phone the holds sit at ${layout.strip}, not at the foot of the screen.`);
     assert.ok(layout.slide === "none", `On a phone the bay still slides the picture (${layout.slide}).`);
     const box = await tab.locator('[data-key="hold-boost"]').boundingBox();
+    assert.ok(box.height >= 44, `On a phone the holds are ${box.height} px tall, not a 44 px thumb target.`);
     await tab.touchscreen.tap(box.x + box.width / 2, box.y + box.height / 2);
     await holdFor(tab, "hold-boost", 300);
     await tab.waitForFunction(() => document.querySelectorAll(".garage__meter i[data-on=true]").length < 4, null, { timeout: 30_000 });

@@ -106,7 +106,7 @@ export class ShowroomSound {
     this.harmonicGain?.gain.setTargetAtTime(0.008 + speedRatio * 0.021 + (firing ? 0.02 : 0), now, 0.06);
     this.windGain?.gain.setTargetAtTime(Math.pow(speedRatio, 2) * (0.045 + brake * 0.035), now, 0.1);
     // Roar: 60 ms attack, 180 ms release (a third of each as the time constant).
-    this.roarGain?.gain.setTargetAtTime(firing ? 0.025 : 0, now, firing ? 0.02 : 0.06);
+    this.roarGain?.gain.setTargetAtTime(firing ? 0.075 : 0, now, firing ? 0.02 : 0.06);
     this.filter?.frequency.setTargetAtTime(820 + speedRatio * 1_850 + brake * 420 + (firing ? 1_400 : 0), now, 0.08);
     // The race's boost cue as the jets light; the airbrakes' thunk as they
     // swing up; `playPowerDenied`'s pair when the reserve runs dry.
