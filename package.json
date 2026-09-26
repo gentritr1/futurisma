@@ -34,6 +34,7 @@
     "validate:garage": "node scripts/validate-garage.mjs",
     "validate:garage-frames": "node scripts/validate-garage-frames.mjs",
     "check:garage-binding": "node scripts/visual/garage-binding.mjs",
+    "check:garage-showroom": "node scripts/visual/garage-showroom.mjs",
     "validate:physics": "node scripts/validate-physics.mjs",
     "validate:pose": "node scripts/validate-pose.mjs",
     "validate:race": "node scripts/validate-race-rules.mjs",

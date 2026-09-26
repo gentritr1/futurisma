@@ -158,6 +158,57 @@ body[data-garage="true"] #game-canvas {
   margin-top: 4px;
 }
 
+/* The showroom demo: two momentary holds under CRAFT and PAINT. A hold is
+   pressed for as long as it is held, so it takes the pointer (no scroll, no
+   long-press menu) and lights like a fitted chip while it is down. */
+.garage__demo {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.garage__demo[hidden] {
+  display: none;
+}
+
+.garage__hold {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  column-gap: 8px;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.garage__hold small {
+  grid-column: 1;
+}
+
+.garage__hold[data-held="true"] {
+  border-color: var(--acid);
+  color: var(--acid);
+}
+
+/* The demo's reserve, in the gauge's quarters. */
+.garage__meter {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  display: inline-flex;
+  gap: 3px;
+}
+
+.garage__meter i {
+  width: 9px;
+  height: 14px;
+  background: var(--line);
+}
+
+.garage__meter i[data-on="true"] {
+  background: var(--acid);
+}
+
 /* Stat bars: the fill is the frame as fitted, the mark is the frame on the
    grid, so browsing the showroom reads as a comparison without a second row. */
 .garage__stats {

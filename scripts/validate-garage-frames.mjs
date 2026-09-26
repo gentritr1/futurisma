@@ -338,6 +338,39 @@ assert.match(totem, /this\.racePresence\?\.rebind\(this\.model, named\)/, "mount
 // A body that mounted while the kit was still loading must take the kit when it lands.
 assert.ok(totem.includes("if (this.body) { const body = this.body; this.body = null; this.mountBody(body); }"),
   "TotemVehicle no longer re-mounts a body the kit missed; that craft would race on TOTEM's anchors.");
+// The showroom demo (hold BOOST / hold BRAKE in the bay). It drives the craft's
+// own updateVisual from a state of its own, and settles it back in the kit's
+// 0.1 s steps; every refit from the bay ends it first, on the body it is on; on
+// RESULT it waits for the race loop to let go (the HUD at 000).
+{
+  const [sound, audio, space, hud] = await Promise.all([
+    read("src/game/garage-sound.ts"), read("src/game/audio.ts"), read("src/game/audio-space.js"), read("src/game/ui.ts"),
+  ]);
+  for (const needle of ["const DEMO_DRAIN = 0.25;", "const DEMO_RECOVER = 0.5;", "for (let step = 0; step < 40; step += 1)",
+    "throttle: 0, brake: 0, speedRatio: 0, boostActive: false, boostReserve: 1, reducedMotion: true, delta: 0.1"]) {
+    assert.ok(look.includes(needle), `garage-look.ts lost part of the showroom demo: ${needle}`);
+  }
+  assert.equal(bay.split("this.hooks.refit(").length, 2, "garage-ui.ts refits the craft outside its one refit helper.");
+  assert.ok(bay.includes("this.endDemo();\n    this.hooks.refit(previewFrame, trial);"), "The bay's refit no longer ends the demo first.");
+  assert.ok(bay.includes('document.getElementById("speed-value")?.textContent !== "000"')
+    && hud.includes('this.speedValue.textContent = Math.round(frame.speedKph).toString().padStart(3, "0");'),
+    "The showroom's RESULT gate no longer reads the HUD's speed as the race writes it.");
+  // The showroom engine is the race's player engine: same ceiling, pitch,
+  // gains, filter and boost cue, with nothing imported from the running page.
+  assert.ok(!/^import /m.test(sound), "garage-sound.ts imports from the page; a lazy import would split the entry chunk.");
+  for (const [mine, race, where] of [
+    ["const CEILING = 0.34;", "const MASTER_GAIN_CEILING = 0.34;", audio],
+    ["52 + speedRatio * 118 + throttle * 24 + (firing ? 18 : 0)", "52 + speedRatio * 118 + throttle * 24 + (boost ? 18 : 0)", audio],
+    ["0.025 + throttle * 0.035 + speedRatio * 0.025", "0.025 + throttle * 0.035 + speedRatio * 0.025", space],
+    ["0.008 + speedRatio * 0.021 + (firing ? 0.02 : 0)", "0.008 + speedRatio * 0.021 + (boost ? 0.02 : 0)", space],
+    ["820 + speedRatio * 1_850 + brake * 420", "820\n        + speedRatio * 1_850\n        + brake * 420", audio],
+    ['this.tone(115, 0.2, 0.04, "sawtooth", 0, 2.2);', 'this.playTone(115, 0.2, 0.04, "sawtooth", 0, 2.2);', audio],
+  ]) {
+    assert.ok(sound.includes(mine) && where.includes(race), `The showroom engine and the race's disagree: ${mine}`);
+  }
+  assert.ok(hud.includes("document.body.dataset.muted = String(muted);") && sound.includes('document.body.dataset.muted === "true"'),
+    "The showroom engine no longer hears the game's mute.");
+}
 assert.match(totem, /this\.evolution\?\.anchorTo\(body, named\)/, "mountBody no longer re-anchors the kit.");
 assert.match(look, /vehicle\.mountBody\(body\)/, "garage-look.ts no longer mounts the body.");
 assert.match(look, /serials\.get\(vehicle\) !== serial/, "garage-look.ts lost the latest-refit-wins guard.");
@@ -366,9 +399,9 @@ assert.match(look, /hull\.rotation\.y = radians/, "turnCraft no longer yaws the 
     "MOVING_PHASES must be exactly the paddock phases that draw every frame (frame-scheduling.js).");
 }
 const hide = bay.slice(bay.indexOf("  hide(): void {"), bay.indexOf("  dispose(): void {"));
-assert.ok(hide.indexOf("this.animate()") >= 0 && hide.indexOf("this.animate()") < hide.indexOf("this.hooks.refit(null)"),
+assert.ok(hide.indexOf("this.animate()") >= 0 && hide.indexOf("this.animate()") < hide.indexOf("this.refit(null)"),
   "hide() must stop the turntable (animate) before it refits the paddock.");
-assert.match(bay, /this\.yaw = this\.opened \? STILL_YAW : 0;\s*\n\s*turnCraft\(this\.yaw\);/,
-  "a closed bay must turn the craft back to zero.");
+assert.match(bay, /if \(!this\.opened\) \{[^}]*this\.endDemo\(\);\s*this\.yaw = 0;\s*turnCraft\(0\);/,
+  "a closed bay must end the showroom demo and turn the craft back to zero.");
 
 console.log(`Garage frames PASS: ${report.join("; ")}; the showroom turntable owns the visual group's yaw and zeroes it before the paddock refits; ${atlases} paint schemes built (${(atlasBytes / 1024).toFixed(0)} KiB, fetched one at a time), each matching its catalog swatch; pivots identity and mirrored, airbrakes forward of their hinges, anchors mirrored, jets on the kit's line, single-sided role materials with all four kit lamps, manifest current; bodies mount (never scale), refits serialize and a launch waits for the latest.`);

@@ -88,7 +88,7 @@ Every frame after TOTEM races its own 3D body, built in Blender with the rest of
 - **Colours.** Running lights, boost flame and a neon **underglow**. A colour is bought once and works in any slot on any frame.
 - **Underglow patterns.** **BREATHE**, **CHASE** and **HEARTBEAT** (CR 350 each, bought once). They hold steady under reduced motion.
 
-Nothing is bought blind. Point at a finish, or tab onto it, and the craft behind the panel wears it; click to buy. The grid, the live ladder and the result screen name the frame you race, for example *LANCE S3 · STRIKE*.
+Nothing is bought blind. Point at a finish, or tab onto it, and the craft behind the panel wears it; click to buy. On CRAFT and PAINT, hold **BOOST** or **BRAKE** (pointer, or Space on the focused button) and the craft in the bay runs for you, with its engine sound: the jets fire and CORONA's gauge drains quarter by quarter, or the airbrakes stand up. Let go and it settles back and the reserve refills. The grid, the live ladder and the result screen name the frame you race, for example *LANCE S3 · STRIKE*.
 
 **Daily ops** give you a reason to race every day. The **DAILY** tab (key `5`) deals three jobs each local day:
 

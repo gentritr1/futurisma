@@ -39,7 +39,7 @@
  * colour IS the light, so it is tinted directly.
  */
 import * as THREE from "three";
-import { applyPs2MaterialTreatment, type TotemVehicle } from "./totem";
+import { applyPs2MaterialTreatment, type TotemVehicle, type TotemVisualState } from "./totem";
 import { resolvePaint } from "./garage-catalog.js";
 import { PATTERN_CODES, type Garage } from "./garage-rules.js";
 
@@ -79,6 +79,71 @@ let showroomCraft: TotemVehicle | null = null;
 export function turnCraft(radians: number): void {
   const hull = showroomCraft?.craftSurfaces().hull;
   if (hull) hull.rotation.y = radians;
+}
+
+/** A showroom hold: the jets on BOOST, the airbrakes on BRAKE. */
+export type DemoHold = "boost" | "brake" | null;
+
+/** Reserve per second: BOOST drains it in four seconds, and it refills in two. */
+const DEMO_DRAIN = 0.25;
+const DEMO_RECOVER = 0.5;
+/** An emptied reserve fires again once it is back to a quarter. */
+const DEMO_REARM = 0.25;
+
+/**
+ * The showroom demo's own visual state: never the race's, never saved. It
+ * drives the craft's own `updateVisual` (fins, airbrakes, lamps, jets, CORONA's
+ * gauge) as a race would, from a separate reserve.
+ */
+const demo: TotemVisualState & { boostReserve: number } = {
+  steer: 0, lateralLoad: 0, throttle: 0, brake: 0, speedRatio: 0, boostActive: false,
+  driftIntensity: 0, surfaceGrip: 1, reducedMotion: false, elapsed: 0, delta: 0, boostReserve: 1,
+};
+let demoEmpty = false;
+
+/** What one demo frame did: for the bay's meter and the showroom's engine. */
+export interface DemoFrame {
+  reserve: number;
+  recharging: boolean;
+  firing: boolean;
+  throttle: number;
+  brake: number;
+  speedRatio: number;
+}
+
+/**
+ * One showroom frame of a hold (or of the recovery after it): BOOST fires at
+ * throttle 0.6 and 55 % speed until the reserve runs out, BRAKE puts the
+ * airbrakes up.
+ */
+export function demoCraft(hold: DemoHold, seconds: number, still: boolean): DemoFrame {
+  if (demo.boostReserve >= DEMO_REARM) demoEmpty = false;
+  const firing = hold === "boost" && !demoEmpty;
+  demo.boostReserve = THREE.MathUtils.clamp(demo.boostReserve + (firing ? -DEMO_DRAIN : DEMO_RECOVER) * seconds, 0, 1);
+  if (demo.boostReserve <= 0) demoEmpty = true;
+  demo.boostActive = firing;
+  demo.throttle = hold === "boost" ? 0.6 : 0;
+  demo.brake = hold === "brake" ? 1 : 0;
+  demo.speedRatio = hold ? 0.55 : 0;
+  demo.reducedMotion = still;
+  demo.delta = seconds;
+  demo.elapsed += seconds;
+  showroomCraft?.updateVisual(demo);
+  return { reserve: demo.boostReserve, recharging: demoEmpty, firing, throttle: demo.throttle, brake: demo.brake, speedRatio: demo.speedRatio };
+}
+
+/**
+ * Puts the craft back at rest after a demo: stopped, reserve full, nothing
+ * firing, stepped in the kit's own 0.1 s steps (it clamps each step, and its
+ * lamps ease over several) so nothing of the demo is left on the paddock.
+ */
+export function restCraft(): void {
+  Object.assign(demo, { throttle: 0, brake: 0, speedRatio: 0, boostActive: false, boostReserve: 1, reducedMotion: true, delta: 0.1 });
+  demoEmpty = false;
+  for (let step = 0; step < 40; step += 1) {
+    demo.elapsed += 0.1;
+    showroomCraft?.updateVisual(demo);
+  }
 }
 
 /**

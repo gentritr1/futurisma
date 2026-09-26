@@ -79,7 +79,8 @@ import {
   type Garage,
   type Handling,
 } from "./garage-rules.js";
-import { turnCraft } from "./garage-look";
+import { demoCraft, restCraft, turnCraft, type DemoHold } from "./garage-look";
+import { ShowroomSound } from "./garage-sound";
 import { markDaily, msToMidnight, today, type GarageStore } from "./garage-purse";
 
 /**
@@ -107,6 +108,8 @@ export interface GarageHooks {
   suspendInput(): void;
   /** `save` from `persistence.ts`. */
   save: GarageStore & {
+    /** The listener's master volume, which the showroom's engine plays at. */
+    readonly settings: { readonly masterVolume: number };
     readonly livery: string;
     setTrack(track: string): string;
     setRaceMode(mode: string): string;
@@ -174,9 +177,22 @@ export class GarageScreen {
   private opened = false;
   /** The paint shop's what-if: the saved garage with one finish changed. */
   private trial: Garage | null = null;
-  /** The showroom's own frame loop, running while the bay is open. */
+  /** The showroom's own frame loop: the turntable, and the demo while it runs. */
   private animation = 0;
+  private last = 0;
   private yaw = 0;
+  /** The showroom demo: two momentary holds under CRAFT and PAINT. */
+  private readonly demoStrip = node("div", "garage__demo");
+  private readonly boostHold: HTMLButtonElement;
+  private readonly brakeHold: HTMLButtonElement;
+  private readonly meter: HTMLElement[] = [];
+  private hold: DemoHold = null;
+  /** Something of the demo is on the craft: a hold, or a reserve still refilling. */
+  private demoing = false;
+  private quarters = 4;
+  private stoppedSince = 0;
+  private rollCheck = 0;
+  private readonly sound: ShowroomSound;
 
   constructor(private readonly hooks: GarageHooks) {
     this.screen.id = "garage-screen";
@@ -207,16 +223,30 @@ export class GarageScreen {
     // re-labels this one too, because it carries the same `data-prompt`.
     back.textContent = document.querySelector('kbd[data-prompt="back"]')?.textContent || "ESC";
     this.closeButton.append(node("span", "", "RETURN TO PADDOCK"), back);
-    panel.append(code, head, tabs, this.body, this.note, this.closeButton);
+    this.sound = new ShowroomSound(() => this.hooks.save.settings.masterVolume);
+    this.boostHold = this.holdButton("boost", "BOOST");
+    this.brakeHold = this.holdButton("brake", "BRAKE");
+    const meter = node("span", "garage__meter");
+    meter.setAttribute("aria-hidden", "true");
+    for (let quarter = 0; quarter < 4; quarter += 1) this.meter.push(meter.appendChild(node("i")));
+    this.boostHold.append(meter);
+    this.boostHold.setAttribute("aria-label", "Hold to boost · reserve 4 of 4");
+    this.brakeHold.setAttribute("aria-label", "Hold to brake");
+    this.demoStrip.setAttribute("aria-label", "Showroom");
+    this.demoStrip.append(this.boostHold, this.brakeHold);
+    panel.append(code, head, tabs, this.body, this.demoStrip, this.note, this.closeButton);
     this.screen.append(panel);
     this.screen.addEventListener("keydown", this.handlePanelKeys);
     this.screen.addEventListener("pointerdown", (event) => {
-      if (event.pointerType === "touch" && !(event.target instanceof Element && event.target.closest(".garage__paints"))) {
+      // A touched preview stays through a demo hold: that is how a flame is heard and seen before it is bought.
+      if (event.pointerType === "touch" && !(event.target instanceof Element && event.target.closest(".garage__paints, .garage__demo"))) {
         this.previewLook(null);
       }
     });
     (document.getElementById("app") ?? document.body).append(this.screen);
     window.addEventListener("keydown", this.handleWindowKeys, { capture: true });
+    window.addEventListener("blur", this.releaseHold);
+    document.addEventListener("visibilitychange", this.releaseHold);
   }
 
   get isOpen(): boolean {
@@ -250,7 +280,7 @@ export class GarageScreen {
     this.animate();
     this.screen.hidden = true;
     document.body.dataset.garage = "false";
-    this.hooks.refit(null);
+    this.refit(null);
     this.hooks.suspendInput();
     this.returnFocus?.focus({ preventScroll: true });
     this.returnFocus = null;
@@ -258,7 +288,11 @@ export class GarageScreen {
 
   dispose(): void {
     cancelAnimationFrame(this.animation);
+    clearTimeout(this.rollCheck);
+    this.sound.dispose();
     window.removeEventListener("keydown", this.handleWindowKeys, { capture: true });
+    window.removeEventListener("blur", this.releaseHold);
+    document.removeEventListener("visibilitychange", this.releaseHold);
     this.screen.remove();
     delete document.body.dataset.garage;
   }
@@ -273,7 +307,7 @@ export class GarageScreen {
     // The showroom previews the frame being looked at; every other tab shows
     // the craft that will actually race.
     this.trial = null;
-    this.hooks.refit(tab === "craft" && this.viewed !== this.hooks.save.garage.chassis ? this.viewed : null);
+    this.refit(tab === "craft" && this.viewed !== this.hooks.save.garage.chassis ? this.viewed : null);
     this.render();
     this.animate();
   }
@@ -288,11 +322,11 @@ export class GarageScreen {
     if (change === null) {
       if (!this.trial) return;
       this.trial = null;
-      this.hooks.refit(null);
+      this.refit(null);
     } else {
       const fit = garage.fleet[garage.chassis] ?? defaultFit();
       this.trial = { ...garage, fleet: { ...garage.fleet, [garage.chassis]: { ...fit, ...change } } };
-      this.hooks.refit(null, this.trial);
+      this.refit(null, this.trial);
     }
     this.animate();
   }
@@ -342,28 +376,162 @@ export class GarageScreen {
    * pattern in motion, because the paddock only draws when asked. Under
    * reduced motion nothing turns: the craft is held at a still three-quarter
    * angle instead, and closing the bay puts it back exactly as it races.
+   *
+   * The same loop runs the showroom demo, under reduced motion too: while a
+   * hold is on, or its reserve is still refilling, the craft eases to the nearer
+   * rear three-quarter, where its jets, gauge and airbrakes face the camera.
    */
   private animate(): void {
     const still = this.hooks.reducedMotion();
-    if (this.opened && !still && !this.animation) {
-      // From the three-quarter view, not the race pose the driver just left.
-      if (this.yaw === 0) this.yaw = STILL_YAW;
-      let last = performance.now();
-      const tick = (now: number): void => {
-        this.yaw = (this.yaw + (now - last) * TURN_RATE) % (Math.PI * 2);
-        last = now;
-        turnCraft(this.yaw);
-        this.hooks.requestRender();
-        this.animation = requestAnimationFrame(tick);
-      };
-      this.animation = requestAnimationFrame(tick);
-    } else if (!this.opened || still) {
+    if (!this.opened) {
       cancelAnimationFrame(this.animation);
       this.animation = 0;
-      this.yaw = this.opened ? STILL_YAW : 0;
-      turnCraft(this.yaw);
+      this.endDemo();
+      this.yaw = 0;
+      turnCraft(0);
       this.hooks.requestRender();
+      return;
     }
+    if (this.demoing || !still) {
+      // From the three-quarter view, not the race pose the driver just left.
+      if (this.yaw === 0) this.yaw = STILL_YAW;
+      if (!this.animation) {
+        this.last = performance.now();
+        this.animation = requestAnimationFrame(this.tick);
+      }
+      return;
+    }
+    cancelAnimationFrame(this.animation);
+    this.animation = 0;
+    this.yaw = STILL_YAW;
+    turnCraft(this.yaw);
+    this.hooks.requestRender();
+  }
+
+  private readonly tick = (now: number): void => {
+    const seconds = Math.min(0.1, (now - this.last) / 1000);
+    this.last = now;
+    const still = this.hooks.reducedMotion();
+    if (this.demoing) {
+      const yaw = Math.atan2(Math.sin(this.yaw), Math.cos(this.yaw));
+      const target = yaw < 0 ? STILL_YAW : -STILL_YAW;
+      this.yaw = still ? target : yaw + (target - yaw) * (1 - Math.exp(-seconds * 10));
+      const frame = demoCraft(this.hold, seconds, still);
+      this.sound.set(frame.throttle, frame.speedRatio, frame.brake, frame.firing, frame.recharging);
+      this.syncMeter(frame.reserve, frame.recharging);
+      // Let go and refilled: the craft goes back to rest and the turntable resumes.
+      if (!this.hold && frame.reserve >= 1) this.endDemo();
+    } else if (!still) {
+      this.yaw = (this.yaw + seconds * 1000 * TURN_RATE) % (Math.PI * 2);
+    }
+    turnCraft(this.yaw);
+    this.hooks.requestRender();
+    this.animation = this.opened && (this.demoing || !still) ? requestAnimationFrame(this.tick) : 0;
+  };
+
+  /** Every refit from the bay ends the demo first, on the body it is on now. */
+  private refit(previewFrame: string | null, trial?: Garage | null): void {
+    this.endDemo();
+    this.hooks.refit(previewFrame, trial);
+  }
+
+  /** A momentary button: held by pointer, or by Space or Enter while focused. */
+  private holdButton(kind: "boost" | "brake", label: string): HTMLButtonElement {
+    const element = node("button", "chip garage__hold");
+    element.type = "button";
+    element.dataset.key = `hold-${kind}`;
+    element.append(node("strong", "", label), node("small", "", "HOLD · SPACE"));
+    const end = (): void => this.endHold(kind);
+    element.addEventListener("pointerdown", (event) => {
+      if (event.button !== 0 || element.disabled) return;
+      event.preventDefault();
+      element.setPointerCapture(event.pointerId);
+      this.startHold(kind);
+    });
+    for (const type of ["pointerup", "pointercancel", "lostpointercapture", "blur"]) element.addEventListener(type, end);
+    element.addEventListener("keydown", (event) => {
+      if (event.key !== " " && event.key !== "Enter") return;
+      event.preventDefault();
+      if (!event.repeat) this.startHold(kind);
+    });
+    element.addEventListener("keyup", (event) => {
+      if (event.key !== " " && event.key !== "Enter") return;
+      event.stopPropagation();
+      end();
+    });
+    element.addEventListener("contextmenu", (event) => event.preventDefault());
+    return element;
+  }
+
+  private startHold(kind: "boost" | "brake"): void {
+    if (!this.opened || this.hold || this.rolling()) return;
+    this.hold = kind;
+    this.demoing = true;
+    this.demoStrip.dataset.running = "true";
+    this.sound.wake();
+    (kind === "boost" ? this.boostHold : this.brakeHold).dataset.held = "true";
+    this.animate();
+  }
+
+  private endHold(kind: "boost" | "brake"): void {
+    if (this.hold !== kind) return;
+    this.hold = null;
+    delete (kind === "boost" ? this.boostHold : this.brakeHold).dataset.held;
+  }
+
+  private readonly releaseHold = (): void => {
+    if (this.hold) this.endHold(this.hold);
+  };
+
+  /** Ends any demo at once: the craft back at rest, the engine faded, the meter full. */
+  private endDemo(): void {
+    this.releaseHold();
+    if (!this.demoing) return;
+    this.demoing = false;
+    this.demoStrip.dataset.running = "false";
+    restCraft();
+    this.sound.rest();
+    this.syncMeter(1, false);
+  }
+
+  private syncMeter(reserve: number, recharging: boolean): void {
+    const quarters = Math.ceil(reserve * 4 - 1e-6);
+    this.meter.forEach((bar, index) => { bar.dataset.on = String(index < quarters); });
+    const label = this.boostHold.querySelector("strong");
+    if (label) label.textContent = recharging ? "RECHARGING" : "BOOST";
+    if (quarters !== this.quarters) {
+      this.quarters = quarters;
+      this.boostHold.setAttribute("aria-label", `Hold to boost · reserve ${quarters} of 4`);
+    }
+  }
+
+  /**
+   * On RESULT the race loop still drives the craft while it coasts, so the
+   * demo waits until the HUD has read 000 for half a second (the loop stops
+   * presenting exactly when the speed reaches zero).
+   */
+  private rolling(): boolean {
+    if (document.body.dataset.phase !== "result") return false;
+    if (document.getElementById("speed-value")?.textContent !== "000") {
+      this.stoppedSince = 0;
+      return true;
+    }
+    this.stoppedSince ||= performance.now();
+    return performance.now() - this.stoppedSince < 500;
+  }
+
+  /** The strip on CRAFT and PAINT only, disabled while the craft is still rolling. */
+  private syncStrip(): void {
+    clearTimeout(this.rollCheck);
+    const shown = this.tab === "craft" || this.tab === "paint";
+    this.demoStrip.hidden = !shown;
+    const rolling = shown && this.rolling();
+    for (const hold of [this.boostHold, this.brakeHold]) {
+      hold.disabled = rolling;
+      const prompt = hold.querySelector("small");
+      if (prompt) prompt.textContent = rolling ? "CRAFT STILL ROLLING" : "HOLD · SPACE";
+    }
+    if (rolling && this.opened) this.rollCheck = window.setTimeout(() => this.syncStrip(), 250);
   }
 
   private render(): void {
@@ -380,6 +548,7 @@ export class GarageScreen {
         : this.tab === "contracts" ? this.renderContracts(garage)
         : this.renderDaily(garage)),
     );
+    this.syncStrip();
     if (focusKey) {
       const target = this.screen.querySelector<HTMLElement>(`[data-key="${focusKey}"]`);
       if (target && !target.hasAttribute("disabled")) target.focus({ preventScroll: true });

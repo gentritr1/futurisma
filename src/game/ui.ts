@@ -676,6 +676,8 @@ export class GameUi {
   }
 
   setAudioMuted(muted: boolean): void {
+    // Also on the page, so the garage's showroom engine stays quiet too.
+    document.body.dataset.muted = String(muted);
     this.setSystemStatus(muted ? "AUDIO MUTED" : "AUDIO ONLINE");
   }
 
