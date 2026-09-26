@@ -84,6 +84,12 @@ function probe() {
   };
 }
 
+/** Every probe field an assertion reads must be there: a missing object would otherwise compare as a pass. */
+function present(state, ...fields) {
+  for (const field of fields) assert.ok(state[field] !== null && state[field] !== undefined, `The probe could not read ${field}.`);
+  return state;
+}
+
 async function openPage(browser, query, device = {}) {
   const { width = 1280, height = 720, ...rest } = device;
   const context = await browser.newContext({ viewport: { width, height }, ...rest });
@@ -148,7 +154,7 @@ try {
     const { context, tab, errors } = await openPage(browser, "");
     const before = await tab.evaluate(() => JSON.parse(localStorage.getItem("futurisma.save.v1")).garage);
     await openBay(tab);
-    const rest = await tab.evaluate(probe);
+    const rest = present(await tab.evaluate(probe), "airbrake", "pitch", "bank", "kit", "push", "plume");
     assert.equal(rest.frame, "FRAME_corona", "The bay is not showing the saved CORONA.");
     assert.deepEqual(rest.plume, [0.9, 1, 1.1], `CORONA's jets wear ${rest.plume}, not its plume profile.`);
     assert.equal(rest.meter, 4, "The bay opens with the meter dark over a full reserve.");
@@ -187,7 +193,7 @@ try {
     await tab.waitForFunction(() => document.querySelector(".garage__demo")?.dataset.running === "false", null, { timeout: 30_000 });
     await tab.waitForFunction(() => window.__fill === 1, null, { timeout: 10_000 });
     await tab.waitForTimeout(600);
-    const after = await tab.evaluate(probe);
+    const after = present(await tab.evaluate(probe), "airbrake", "pitch", "bank", "kit", "fill", "push");
     assert.ok(Math.abs(after.airbrake) < 1e-6 && Math.abs(after.pitch) < 1e-3 && Math.abs(after.bank) < 1e-3,
       `The craft is not at rest after the demo: airbrake ${after.airbrake}, pitch ${after.pitch}, bank ${after.bank}.`);
     assert.ok(after.kit < 0.9 && after.fill === 1, `The lamps are not back at idle (kit ${after.kit}, gauge ${after.fill}).`);
@@ -227,13 +233,13 @@ try {
     await tab.waitForTimeout(1500);
     await tab.keyboard.press("Escape");
     await tab.waitForFunction(() => document.body.dataset.garage === "false", null, { timeout: 30_000 });
-    const closed = await tab.evaluate(probe);
+    const closed = present(await tab.evaluate(probe), "pitch", "push");
     assert.ok(closed.push === 0 && closed.pitch !== null, `A closed bay leaves the craft pushed (${closed.push}) or turned.`);
     const saved = await tab.evaluate(() => JSON.parse(localStorage.getItem("futurisma.save.v1")).garage);
     assert.deepEqual(saved, before, "The demo changed the saved garage.");
     await tab.evaluate(() => document.getElementById("start-button")?.click());
     await tab.waitForFunction(() => document.body.dataset.phase === "race", null, { timeout: 120_000 });
-    const race = await tab.evaluate(probe);
+    const race = present(await tab.evaluate(probe), "kit", "airbrake", "push", "plume");
     assert.deepEqual(race.plume, [0.9, 1, 1.1], `CORONA races with ${race.plume}, not its own plume (a swap back must not compound).`);
     assert.equal(await tab.evaluate(() => document.getElementById("boost-value")?.textContent), "100%", "The race starts without a full reserve.");
     assert.ok(race.kit < 1.2 && Math.abs(race.airbrake) < 1e-6, `The race inherits the demo: kit ${race.kit}, airbrake ${race.airbrake}.`);

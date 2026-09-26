@@ -683,6 +683,7 @@ body[data-garage="true"] #game-canvas {
   }
 
   .garage.options-panel {
+    width: min(640px, 100vw - 32px);
     max-height: 50vh;
   }
 
