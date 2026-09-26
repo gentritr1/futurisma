@@ -652,6 +652,15 @@ for (let week = weekOf(DAY); week < weekOf(DAY) + 60; week += 1) {
   const nextWeek = readDaily(forward.garage.daily, DAY + 14);
   assert.ok(!weeklyDone(nextWeek) && nextWeek.weekly === 0 && nextWeek.week === weekOf(DAY + 14));
   assert.ok(weeklyJob(weekOf(DAY)).reward === WEEKLY_PAY);
+  // A day the board cannot store (past its 9,999,999 bound) is no day at all:
+  // it would never match itself and re-pay the jobs on every race.
+  const unstorable = settleRace(forward.garage, perfect(99_999_999));
+  assert.ok(paidBy(unstorable, ["daily", "sweep", "streak", "weekly"]) === 0
+    && JSON.stringify(unstorable.garage.daily) === JSON.stringify(forward.garage.daily), "an unstorable day paid the board.");
+  // A non-finite measurement neither pays a job nor poisons the stored board.
+  const poisoned = settleRace(defaultGarage(), { ...perfect(DAY), topSpeedKph: Number.NaN, slipstreamSeconds: Infinity, track: "nowhere", laps: 0, driftCashes: 0, nearMisses: 0, cleanGateChain: 0, position: 4 });
+  assert.equal(paidBy(poisoned, ["daily"]), 0, "a non-finite fact paid a job.");
+  assert.ok(poisoned.garage.daily.every(Number.isFinite), "a non-finite fact reached the stored board.");
   // The bay's once-only DAILY landing clears.
   assert.ok(hasNews(readDaily(forward.garage.daily, DAY + 1)) && !hasNews(readDaily(seenDaily(forward.garage).daily, DAY + 1)));
 }

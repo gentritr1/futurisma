@@ -471,7 +471,7 @@ SIGNATURES = {
                dict(kind='band', v0=0.9, v1=1, colour=INK)])),
     'corona': ('nebula', lambda f: dict(
         f, base=(0.55, 0.1, 0.62), accent=(0.03, 0.72, 0.82), number=(0.95, 0.95, 1.0),
-        rules=[dict(kind='fade', v0=0.08, v1=1, colour=(0.62, 0.1, 0.66), colour2=(0.02, 0.07, 0.18)),
+        rules=[dict(kind='fade', v0=0.08, v1=0.8, colour=(0.62, 0.1, 0.66), colour2=(0.01, 0.03, 0.12)),
                dict(kind='stars', density=0.012, v0=0.25, colour=(0.9, 0.95, 1.0)),
                dict(kind='spine', at=[0.44, 0.56], width=0.02, colour=(0.2, 0.85, 0.95)),
                dict(kind='band', v0=0.0, v1=0.06, colour=(0.2, 0.85, 0.95))])),
@@ -665,7 +665,9 @@ FRAMES = {
     ),
     'sidewinder': dict(
         label='SIDEWINDER D2', number='D2', seed=47, glow=(1.0, 0.25, 0.66),
-        livery=dict(base=(0.085, 0.085, 0.095), accent=(0.80, 0.11, 0.44), number=(0.92, 0.22, 0.58),
+        # Graphite-plum rather than near-black, so NOIR on this frame reads as
+        # a change of paint rather than the same car (stage-3 review).
+        livery=dict(base=(0.25, 0.21, 0.31), accent=(0.80, 0.11, 0.44), number=(0.92, 0.22, 0.58),
                     number_u=0.3, number_v=0.5, number_size=70,
                     rules=[dict(kind='hazard', u0=0.18, u1=0.3, v0=0.12, v1=0.32, period=7, colour=(0.80, 0.11, 0.44)),
                            dict(kind='spine', at=[0.5], width=0.07, v0=0.05, v1=0.95, colour=(0.6, 0.6, 0.62)),

@@ -492,6 +492,7 @@ export class GameUi {
    * never sees it change, because the bay only opens between races.
    */
   setPlayerCraft(label: string, short: string, team: string): void {
+    if (label === this.craft.label && team === this.craft.team) return;
     this.craft = { label, short, team };
     this.introFooter.textContent = `${this.lead} · ${this.courseFooterLabel}`;
     this.renderDeck();

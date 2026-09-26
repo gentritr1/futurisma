@@ -100,7 +100,7 @@
         ]
       },
       "nebula": {
-        "bytes": 76280,
+        "bytes": 77160,
         "swatch": [
           "#8c199e",
           "#30dce9"
@@ -245,7 +245,7 @@
       1.28,
       2.65
     ],
-    "bytes": 129132,
+    "bytes": 137480,
     "label": "SIDEWINDER D2",
     "glow": [
       1.0,
@@ -255,7 +255,7 @@
     "paints": {
       "factory": {
         "swatch": [
-          "#151518",
+          "#3f354f",
           "#e75db1"
         ]
       },

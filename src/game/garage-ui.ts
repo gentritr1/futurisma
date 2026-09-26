@@ -503,6 +503,9 @@ export class GarageScreen {
       return this.paintRow("BODY", chips);
     }
     const frame = garage.chassis;
+    // Five schemes on a bodied frame: one row of five, so GOLD LEAF is never
+    // left on a line of its own.
+    chips.classList.add("garage__paints--body");
     for (const code of bodySchemes(frame)) {
       const card = schemeCard(code);
       const owned = code === "factory" || (code === "gold" ? garage.goldLeaf : garage.schemes.includes(`${frame}:${code}`));
@@ -613,9 +616,14 @@ export class GarageScreen {
     pips.setAttribute("aria-label", `STREAK LADDER · DAY ${rung} OF ${STREAK_PAY.length}`);
     for (const [index, pay] of STREAK_PAY.entries()) {
       const pip = node("li");
+      const today = countedToday && index === rung - 1;
       pip.dataset.on = String(index < rung);
-      pip.dataset.today = String(countedToday && index === rung - 1);
-      pip.append(node("small", "", index === STREAK_PAY.length - 1 && !garage.goldLeaf ? "GOLD" : `+${pay}`));
+      pip.dataset.today = String(today);
+      // The state is in the words as well as the colour.
+      const prize = index === STREAK_PAY.length - 1 && !garage.goldLeaf ? `GOLD LEAF + ${pay}` : `+${pay}`;
+      pip.setAttribute("aria-label", `DAY ${index + 1} · ${prize} · ${today ? "COUNTED TODAY" : index < rung ? "COUNTED" : "TO COME"}`);
+      if (today) pip.setAttribute("aria-current", "step");
+      pip.append(node("small", "", index === STREAK_PAY.length - 1 && !garage.goldLeaf ? `GOLD +${pay}` : `+${pay}`));
       pips.append(pip);
     }
     head.append(heading, pips);

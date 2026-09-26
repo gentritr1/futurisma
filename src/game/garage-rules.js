@@ -177,7 +177,7 @@ export function craftNames(garage) {
   return {
     label: frame.name,
     short: frame.name.split(" ")[0],
-    team: frame.signature ? (body === "gold" ? "GOLD LEAF" : body.toUpperCase()) : "",
+    team: frame.signature ? body === "gold" ? "GOLD LEAF" : body.toUpperCase() : "",
   };
 }
 

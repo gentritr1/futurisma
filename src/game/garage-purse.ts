@@ -41,7 +41,7 @@ function node<K extends keyof HTMLElementTagNameMap>(tag: K, className: string, 
  */
 export function today(now = Date.now()): number {
   const pinned = Number(new URLSearchParams(window.location.search).get("day"));
-  if (Number.isInteger(pinned) && pinned > 0) return pinned;
+  if (Number.isInteger(pinned) && pinned > 0 && pinned < 9_999_999) return pinned;
   return Math.floor((now - new Date(now).getTimezoneOffset() * 60_000) / 86_400_000);
 }
 
@@ -117,7 +117,7 @@ function renderPurse(settlement: Settlement, balance: number): void {
   if (settlement.goldLeaf) {
     const row = node("li", "purse__line");
     row.dataset.code = "unlock";
-    row.append(node("span", "", "GOLD LEAF UNLOCKED · FIT IT IN THE PAINT SHOP"));
+    row.append(node("span", "", "GOLD LEAF UNLOCKED · FITS ANY BODIED FRAME"));
     list.append(row);
   }
   const foot = node("p", "purse__foot");

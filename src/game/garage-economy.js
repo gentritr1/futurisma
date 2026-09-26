@@ -331,7 +331,9 @@ export function settleRace(garage, facts) {
   let { daily, goldLeaf } = garage;
   let unlocked = false;
   let next = "";
-  if (typeof facts.day === "number" && Number.isInteger(facts.day) && facts.day > 0) {
+  // A day the board cannot store would never match itself again and re-pay
+  // every job on every race, so it leaves the board alone like no day at all.
+  if (typeof facts.day === "number" && Number.isInteger(facts.day) && facts.day > 0 && facts.day <= MAX_COUNT) {
     const settled = settleDaily(readDaily(daily, facts.day), facts, completed.length, goldLeaf);
     lines.push(...settled.lines);
     daily = writeDaily(settled.state);
@@ -546,8 +548,8 @@ function jobGain(job, facts) {
     case "laps": return count(facts.laps);
     case "drifts": return count(facts.driftCashes);
     case "close": return inField ? count(facts.nearMisses) : 0;
-    case "draft": return inField ? Math.floor(Math.max(0, facts.slipstreamSeconds)) : 0;
-    case "speed": return Math.floor(Math.max(0, facts.topSpeedKph));
+    case "draft": return inField ? count(facts.slipstreamSeconds) : 0;
+    case "speed": return count(facts.topSpeedKph);
     case "podium": return inField && facts.position >= 1 && facts.position <= 3 ? 1 : 0;
     case "chain": return count(facts.cleanGateChain);
     case "circuit": return facts.track === job.track ? 1 : 0;

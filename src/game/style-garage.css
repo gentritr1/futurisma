@@ -297,6 +297,10 @@ body[data-garage="true"] #game-canvas {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
+.garage__paints--body {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
 .garage__paint {
   display: grid;
   grid-template-columns: 12px minmax(0, 1fr);
@@ -426,7 +430,7 @@ body[data-garage="true"] #game-canvas {
   padding: 0;
   list-style: none;
   display: grid;
-  grid-template-columns: repeat(7, 38px);
+  grid-template-columns: repeat(7, 42px);
   gap: 4px;
   font-family: var(--mono);
 }

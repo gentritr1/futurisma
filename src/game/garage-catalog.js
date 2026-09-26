@@ -185,7 +185,7 @@ export const SCHEME_CARDS = [
  */
 export const SCHEME_SWATCHES = {
   lance: { factory: ["#b2a88e", "#4abbc8"], noir: ["#08090a", "#4abbc8"], arctic: ["#d6d8db", "#4abbc8"], strike: ["#ccc9c1", "#c32b26"], gold: ["#e0ad3d", "#303034"] },
-  sidewinder: { factory: ["#151518", "#e75db1"], noir: ["#08090a", "#e75db1"], arctic: ["#d6d8db", "#e75db1"], neon: ["#282b30", "#26c3dc"], gold: ["#e0ad3d", "#303034"] },
+  sidewinder: { factory: ["#3f354f", "#e75db1"], noir: ["#08090a", "#e75db1"], arctic: ["#d6d8db", "#e75db1"], neon: ["#282b30", "#26c3dc"], gold: ["#e0ad3d", "#303034"] },
   bulwark: { factory: ["#4c4f35", "#f1cb4a"], noir: ["#08090a", "#f1cb4a"], arctic: ["#d6d8db", "#f1cb4a"], hazard: ["#f26607", "#262628"], gold: ["#e0ad3d", "#303034"] },
   corona: { factory: ["#212644", "#b18de9"], noir: ["#08090a", "#b18de9"], arctic: ["#d6d8db", "#b18de9"], nebula: ["#8c199e", "#30dce9"], gold: ["#e0ad3d", "#303034"] },
   halo: { factory: ["#1e2123", "#e7cc86"], noir: ["#08090a", "#e7cc86"], arctic: ["#d6d8db", "#e7cc86"], dazzle: ["#dbdde0", "#f99930"], gold: ["#e0ad3d", "#303034"] },
