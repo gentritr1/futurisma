@@ -78,7 +78,7 @@ Every classified race pays. Spend the credits on a faster craft, then take it in
 | **CORONA P5** | Plasma | Refills the reserve fastest and hits harder on boost; slower pull. |
 | **HALO X1** | Works prototype | Better at everything. Licensed only after **eight contracts**, then bought. |
 
-Every frame after TOTEM races its own 3D body, built in Blender with the rest of the fleet.
+Every frame after TOTEM races its own 3D body, built in Blender with the rest of the fleet. CORONA's body is also its plasma gauge: its side cells and the four pads across its tail light a quarter of the reserve each, the pads filling left to right like the HUD bar. Below a quarter the last lit pad breathes, and it holds steady under reduced motion.
 
 **Parts** stage one frame at a time: engine, thrusters, stabilisers, skid rig and plasma cell, three stages each.
 

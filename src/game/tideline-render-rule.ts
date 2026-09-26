@@ -65,14 +65,29 @@ export function applyTidelineRenderRule(...roots: THREE.Object3D[]): () => void 
       if (!source.fragmentShader.includes("fog_pars_fragment")) {
         source.fragmentShader = '#include <fog_pars_fragment>\n' + source.fragmentShader;
         const end = source.fragmentShader.lastIndexOf("}");
-        const additive = source.blending === THREE.AdditiveBlending;
-        source.fragmentShader = source.fragmentShader.slice(0,end) + (additive ? ADDITIVE_FOG : '\n#include <fog_fragment>') + '\n' + source.fragmentShader.slice(end);
-        if (additive) source.userData.additiveFog = true;
+        source.fragmentShader = source.fragmentShader.slice(0,end) + '\n#include <fog_fragment>\n' + source.fragmentShader.slice(end);
+      }
+      // Whether the shader brought its own fog (race presence's flares do) or
+      // was just given it, additive light fades rather than taking fog colour.
+      if (source.blending === THREE.AdditiveBlending && source.fragmentShader.includes("#include <fog_fragment>")) {
+        source.fragmentShader = source.fragmentShader.replace("#include <fog_fragment>", ADDITIVE_FOG);
+        source.userData.additiveFog = true;
       }
       if (!source.fragmentShader.includes("tonemapping_fragment")) {
         source.fragmentShader = source.fragmentShader.replace('#include <colorspace_fragment>', '#include <tonemapping_fragment>\n#include <colorspace_fragment>');
       }
       source.fog = true;
+    } else if (source.blending === THREE.AdditiveBlending && !source.userData.additiveFog) {
+      // Every other built-in additive material (Standard, Points, Line) fades
+      // the same way, on its own shader.
+      const compile = source.onBeforeCompile.bind(source);
+      const key = source.customProgramCacheKey.bind(source);
+      source.onBeforeCompile = (shader, renderer) => {
+        compile(shader, renderer);
+        shader.fragmentShader = shader.fragmentShader.replace("#include <fog_fragment>", ADDITIVE_FOG);
+      };
+      source.customProgramCacheKey = () => `${key()}|additive-fog`;
+      source.userData.additiveFog = true;
     }
     target.toneMapped = true;
     if ("fog" in target) target.fog = true;
@@ -97,15 +112,17 @@ export function applyTidelineRenderRule(...roots: THREE.Object3D[]): () => void 
   };
 }
 
-export function auditTidelineGameplayMaterials(root: THREE.Object3D): {object:string;material:string;type:string;toneMapped:boolean;fog:boolean;additiveFog:boolean}[] {
+export function auditTidelineGameplayMaterials(root: THREE.Object3D): {object:string;material:string;type:string;toneMapped:boolean;fog:boolean;additive:boolean;additiveFog:boolean}[] {
   const rows: ReturnType<typeof auditTidelineGameplayMaterials> = [];
   root.traverse(object => {
     if (!object.userData.tidelineGameplay) return;
     const mesh=object as THREE.Mesh;
     for(const material of Array.isArray(mesh.material)?mesh.material:[mesh.material]) {
       const fog = !('fog' in material) || material.fog === true;
+      // Recorded, never thrown: this runs as a race loads.
+      const additive = material.blending === THREE.AdditiveBlending;
       const additiveFog = material.userData.additiveFog === true;
-      rows.push({object:object.name,material:material.name,type:material.type,toneMapped:material.toneMapped,fog,additiveFog});
+      rows.push({object:object.name,material:material.name,type:material.type,toneMapped:material.toneMapped,fog,additive,additiveFog});
       if (!material.toneMapped || !fog) throw new Error(`Tideline render rule failed: ${object.name}/${material.name}`);
     }
   });

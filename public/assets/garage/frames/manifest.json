@@ -58,7 +58,7 @@
     }
   },
   "corona": {
-    "triangles": 1936,
+    "triangles": 1984,
     "meshes": 9,
     "drawCalls": 18,
     "min": [
@@ -71,7 +71,7 @@
       1.235,
       2.56
     ],
-    "bytes": 173828,
+    "bytes": 176612,
     "label": "CORONA P5",
     "glow": [
       0.6,

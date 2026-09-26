@@ -276,28 +276,49 @@ for (const code of bodies) {
 // Runtime wiring: the body is mounted, not scaled; refits are serialized and a
 // launch waits for the latest one; the GLBs are fetched only by the lazy look.
 const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
-const [totem, look, main, catalog, index, game, bay] = await Promise.all([
+const [totem, look, main, catalog, index, game, bay, evolution] = await Promise.all([
   read("src/game/totem.ts"), read("src/game/garage-look.ts"), read("src/main.ts"),
-  read("src/game/garage-catalog.js"), read("index.html"), read("src/game/game.ts"), read("src/game/garage-ui.ts"),
+  read("src/game/garage-catalog.js"), read("index.html"), read("src/game/game.ts"), read("src/game/garage-ui.ts"), read("src/game/totem-evolution.ts"),
 ]);
 assert.match(totem, /mountBody\(body: THREE\.Object3D \| null\): void/, "TotemVehicle.mountBody is gone.");
-// CORONA's cells are its plasma gauge: two long TE_boost cells outboard, which
+// CORONA's plasma gauge: two long TE_boost cells outboard, and four TE_boost
+// pads across the tail where the chase camera always looks, which
 // garage-look.ts masks into four bands by the reserve, on its own treated copy
-// of the kit's lamp (PS2 treatment and the circuit rule, so it fogs and grades).
+// of the kit's live lamp (PS2 treatment and the circuit rule, so it fogs and
+// grades).
 {
   const bytes = await readFile(new URL("corona.glb", root));
   const gltf = parseGlb(bytes);
   const lamp = gltf.materials.findIndex((material) => material.name === "TE_boost");
-  const cells = gltf.meshes.flatMap((mesh) => mesh.primitives).filter((primitive) => primitive.material === lamp)
-    .map((primitive) => gltf.accessors[primitive.attributes.POSITION]);
-  assert.ok(cells.some((accessor) => Math.abs(accessor.max[0]) > 1 || Math.abs(accessor.min[0]) > 1),
-    "corona.glb: no TE_boost cell outboard of x 1.0; the reserve gauge has nothing to light.");
-  const reach = cells.reduce((span, accessor) => [Math.min(span[0], accessor.min[2]), Math.max(span[1], accessor.max[2])], [Infinity, -Infinity]);
-  assert.ok(reach[0] <= -1.6 && reach[1] >= 1.6, `corona.glb: the cells span z ${reach}, not the gauge's -1.7..1.7.`);
-  for (const needle of ["const CELL_Z = [-1.7, 1.7] as const;", "applyPs2MaterialTreatment(mesh);",
-    "fill.value = reserve();", 'frame === "corona") await fitCellGauge(', "await applyCircuitRule(circuit, ...cells);"]) {
+  const lit = [];
+  gltf.nodes.forEach((node) => {
+    for (const primitive of node.mesh === undefined ? [] : gltf.meshes[node.mesh].primitives) {
+      if (primitive.material !== lamp) continue;
+      assert.ok(!node.translation || node.translation.every((value) => Math.abs(value) < 1e-6), "corona.glb: the gauge's mesh moved off the body origin; its model-space bands would drift.");
+      lit.push(...vertices(bytes, gltf, primitive));
+    }
+  });
+  const cells = lit.filter(([x]) => Math.abs(x) >= 1);
+  assert.ok(cells.length > 0, "corona.glb: no TE_boost cell outboard of x 1.0; the reserve gauge has nothing to light.");
+  const reach = [Math.min(...cells.map((v) => v[2])), Math.max(...cells.map((v) => v[2]))];
+  assert.ok(reach[0] <= -1.6 && reach[1] >= 1.6 && reach[1] <= 2, `corona.glb: the cells span z ${reach}, not the gauge's -1.7..1.7.`);
+  // Every inboard TE_boost is a rear pad: behind z 2.0, inside x +-0.4, in four.
+  const pads = lit.filter(([x]) => Math.abs(x) < 1);
+  assert.ok(pads.every(([x, , z]) => z > 2 && Math.abs(x) <= 0.4 + 1e-3), "corona.glb: a TE_boost inboard of the cells is not one of the rear pads.");
+  // Four pads, one per quarter of that 0.8 m, each inside its own quarter.
+  const quarters = new Set(pads.map(([x]) => {
+    const quarter = Math.min(3, Math.floor((x + 0.4) / 0.2));
+    assert.ok(Math.abs(x - (-0.3 + quarter * 0.2)) <= 0.09, `corona.glb: a rear pad at x ${x.toFixed(3)} straddles two quarters.`);
+    return quarter;
+  }));
+  assert.equal(quarters.size, 4, `corona.glb: the rear gauge lights ${quarters.size} quarters, not four.`);
+  for (const needle of ["const CELL_Z = [-1.7, 1.7] as const;", "const PAD_Z = 2.0;", "const PAD_X = 0.4;", "applyPs2MaterialTreatment(mesh);",
+    "fill.value = reserve();", 'if (body?.parent && craft.flame && frame === "corona") await fitCellGauge(', "await applyCircuitRule(circuit, ...cells);"]) {
     assert.ok(look.includes(needle), `garage-look.ts lost part of CORONA's cell gauge: ${needle}`);
   }
+  // The pulse tells idle from firing by the kit's own lamp numbers.
+  assert.ok(evolution.includes("firing ? 2.1 : 0.35 + reserve * 0.5") && look.includes("const FIRING = 1.2;"),
+    "The kit's boost lamp levels changed; re-check FIRING in garage-look.ts.");
   // CORONA's and HALO's rings hang below their skids; the wash is measured from the hull and skids alone.
   for (const needle of ['at.name === "stabiliser_ring_pivot"', "userData.washFloor as number"]) {
     assert.ok(look.includes(needle), `garage-look.ts measures the wash from the ring again: ${needle}`);
@@ -313,6 +334,9 @@ assert.ok(game.includes("this.vehicleVisualState.lateralLoad = this.steerAmount 
   && /const slip = THREE\.MathUtils\.clamp\(\s*this\.presentationTravelDirection\.dot\(vehicleRight\) \* speedRatio \* 2\.4,\s*-1,\s*1,\s*\);/.test(game),
   "game.ts changed how lateralLoad is bounded; update the ring's range in MOTION.");
 assert.match(totem, /this\.racePresence\?\.rebind\(this\.model, named\)/, "mountBody no longer re-anchors the race presence.");
+// A body that mounted while the kit was still loading must take the kit when it lands.
+assert.ok(totem.includes("if (this.body) { const body = this.body; this.body = null; this.mountBody(body); }"),
+  "TotemVehicle no longer re-mounts a body the kit missed; that craft would race on TOTEM's anchors.");
 assert.match(totem, /this\.evolution\?\.anchorTo\(body, named\)/, "mountBody no longer re-anchors the kit.");
 assert.match(look, /vehicle\.mountBody\(body\)/, "garage-look.ts no longer mounts the body.");
 assert.match(look, /serials\.get\(vehicle\) !== serial/, "garage-look.ts lost the latest-refit-wins guard.");

@@ -604,13 +604,21 @@ def make_materials(frame, atlas_path):
 JET_X = 0.45
 
 
-def rear_kit(body, jet_y, jet_z, radius=0.23, depth=0.55, afterburner=False):
-    """Twin nozzles and the kit's four lamps, on every frame."""
+def rear_kit(body, jet_y, jet_z, radius=0.23, depth=0.55, afterburner=False, gauge=False):
+    """Twin nozzles and the kit's four lamps, on every frame. With `gauge`, the
+    boost lamp is four pads across 0.8 m, the reserve repeated where the chase
+    camera always looks (garage-look.ts lights them left to right)."""
     for side in (-1, 1):
         body.nozzle((side * JET_X, jet_y), radius, jet_z, depth)
         if afterburner:
             body.arc((side * JET_X, jet_y, jet_z + 0.01), radius + 0.035, 0.045, 0.035, 0, math.tau, 'FRAME_lights', steps=10)
-    body.box((0, jet_y + radius + 0.12, jet_z - 0.14), (0.52, 0.06, 0.1), 'TE_boost')
+    if gauge:
+        # Rooted in the deck: the outer pads reach down to it where it falls
+        # away towards the shoulders, rather than floating over it.
+        for x in (-0.3, -0.1, 0.1, 0.3):
+            body.box((x, jet_y + radius + 0.09, jet_z - 0.14), (0.17, 0.18, 0.12), 'TE_boost')
+    else:
+        body.box((0, jet_y + radius + 0.12, jet_z - 0.14), (0.52, 0.06, 0.1), 'TE_boost')
     for side in (-1, 1):
         body.box((side * (JET_X + radius + 0.28), jet_y + 0.02, jet_z - 0.2), (0.3, 0.07, 0.05), 'TE_brake')
     body.box((-0.1, jet_y + radius + 0.2, jet_z - 0.2), (0.08, 0.05, 0.08), 'TE_gravity')
@@ -889,7 +897,7 @@ def build_corona(root, mats, frame):
             body.plate([(s * 0.7, 0.2, z - 0.3), (s * 1.1, 0.14, z - 0.25), (s * 1.1, 0.14, z + 0.25), (s * 0.7, 0.2, z + 0.3)], 0.08, 'FRAME_metal')
         # Dorsal conduits from each cell up into the coil.
         body.tube([(s * 1.28, 0.36, 1.35), (s * 0.95, 0.92, 1.8), (s * 0.56, 1.0, 2.24)], 0.045, 'FRAME_metal')
-    rear_kit(body, 0.26, 2.54, radius=0.24)
+    rear_kit(body, 0.26, 2.54, radius=0.24, gauge=True)
     body.finish(mats, root)
     anchors(root, 0.26, 2.54, hardpoint=(0.78, 0.38, -0.05), nose=(0, 0.12, -3.65),
             wing=(1.28, 0.12, 2.2), dust=(1.28, -0.2, 1.6), flank=(1.5, 0.12, 1.2))

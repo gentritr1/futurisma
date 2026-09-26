@@ -309,20 +309,34 @@ function schemeMap(frame: string, scheme: string, factory: THREE.Texture): Promi
   return map;
 }
 
-/** CORONA's cells: model-space x beyond this is a cell; their length along z. */
+/**
+ * CORONA's gauge, in model space. The side cells lie beyond x 1.0 and run
+ * z -1.7..1.7, nose to tail. The four rear pads sit behind z 2.0, across x
+ * -0.4..0.4. Both show four quarters of the reserve.
+ */
 const CELL_X = 1.0;
 const CELL_Z = [-1.7, 1.7] as const;
+const PAD_Z = 2.0;
+const PAD_X = 0.4;
 const GAUGE_NAME = "TE_boost_gauge";
+/** The kit idles its boost lamp at 0.85 at most and fires it at 2.1. */
+const FIRING = 1.2;
 
 /**
- * Gives CORONA's cells their own copy of the kit's live boost lamp, masked into
- * four bands by the reserve. The copy takes the same PS2 treatment and circuit
- * rule the lamp had (a material made after the body's load would otherwise skip
- * the grade and the fog), then the band mask is added on top of that shader.
- * Every cell is re-dressed before the one await, so a second refit that lands
- * meanwhile finds no `TE_boost` cell left to dress again.
+ * Gives CORONA's cells and rear pads their own copy of the kit's live boost
+ * lamp, masked into four bands by the reserve. The copy takes the same PS2
+ * treatment and circuit rule the lamp had (a material made after the body's
+ * load would otherwise skip the grade and the fog), then the band mask is
+ * added on top of that shader.
+ *
+ * The side cells fill from the tail, the band nearest the chase camera, and
+ * the pads fill from the left, like the HUD bar, so the two always show the
+ * same count. Under a quarter, and not firing, the lit band breathes between
+ * 60 % and full at 2 Hz: a "nearly out" cue that never goes dark, held steady
+ * under reduced motion. Every mesh is re-dressed before the one await, so a
+ * second refit that lands meanwhile finds no `TE_boost` left to dress again.
  */
-async function fitCellGauge(body: THREE.Object3D, reserve: () => number, circuit: string): Promise<void> {
+async function fitCellGauge(body: THREE.Object3D, reserve: () => number, circuit: string, still: boolean): Promise<void> {
   const cells: THREE.Mesh[] = [];
   body.traverse((object) => {
     const mesh = object as THREE.Mesh;
@@ -338,30 +352,36 @@ async function fitCellGauge(body: THREE.Object3D, reserve: () => number, circuit
     const treated = gauge.onBeforeCompile.bind(gauge);
     const treatedKey = gauge.customProgramCacheKey.bind(gauge);
     const fill = { value: 1 };
+    const pulse = { value: 1 };
     gauge.onBeforeCompile = (shader, renderer) => {
       treated(shader, renderer);
       shader.uniforms.uFill = fill;
+      shader.uniforms.uPulse = pulse;
       shader.vertexShader = `varying vec3 vCell;\n${shader.vertexShader}`
         .replace("#include <begin_vertex>", "#include <begin_vertex>\nvCell = position;");
-      shader.fragmentShader = `uniform float uFill;\nvarying vec3 vCell;
+      shader.fragmentShader = `uniform float uFill;\nuniform float uPulse;\nvarying vec3 vCell;
 float cellLevel() {
-  if (abs(vCell.x) < ${CELL_X.toFixed(1)}) return 1.0;
-  float band = floor(clamp((vCell.z - (${CELL_Z[0].toFixed(1)})) / ${(CELL_Z[1] - CELL_Z[0]).toFixed(1)}, 0.0, 0.999) * 4.0);
+  float band;
+  if (abs(vCell.x) >= ${CELL_X.toFixed(1)}) band = floor(clamp((vCell.z - (${CELL_Z[0].toFixed(1)})) / ${(CELL_Z[1] - CELL_Z[0]).toFixed(1)}, 0.0, 0.999) * 4.0);
+  else if (vCell.z > ${PAD_Z.toFixed(1)}) band = 3.0 - floor(clamp((vCell.x + ${PAD_X.toFixed(1)}) / ${(PAD_X * 2).toFixed(1)}, 0.0, 0.999) * 4.0);
+  else return 1.0;
   return clamp(uFill * 4.0 - (3.0 - band), 0.0, 1.0);
 }
 ${shader.fragmentShader}`
-        .replace("#include <color_fragment>", "#include <color_fragment>\ndiffuseColor.rgb *= mix(0.45, 1.0, cellLevel());")
-        .replace("#include <emissivemap_fragment>", "#include <emissivemap_fragment>\ntotalEmissiveRadiance *= mix(0.15, 1.0, cellLevel());");
+        .replace("#include <color_fragment>", "#include <color_fragment>\ndiffuseColor.rgb *= mix(0.12, 1.0, cellLevel());")
+        .replace("#include <emissivemap_fragment>", "#include <emissivemap_fragment>\ntotalEmissiveRadiance *= mix(0.0, 1.8, cellLevel()) * uPulse;");
     };
     gauge.customProgramCacheKey = () => `${treatedKey()}|cell-gauge`;
     gauge.needsUpdate = true;
     // Follows the kit's lamp (colour, state, intensity) and reads the reserve
-    // each frame the cells are drawn: no hook in the race loop.
+    // each frame the gauge is drawn: no hook in the race loop.
     mesh.onBeforeRender = () => {
       gauge.color.copy(lamp.color);
       gauge.emissive.copy(lamp.emissive);
       gauge.emissiveIntensity = lamp.emissiveIntensity;
       fill.value = reserve();
+      pulse.value = !still && fill.value < 0.25 && lamp.emissiveIntensity < FIRING
+        ? 0.8 + 0.2 * Math.cos(performance.now() * 0.004 * Math.PI) : 1;
     };
   }
   await applyCircuitRule(circuit, ...cells);
@@ -400,7 +420,11 @@ export async function applyCraftLook(
   if (serials.get(vehicle) !== serial) return;
   for (const material of surfaces) material.map = painted ?? factoryMaps.get(material) ?? material.map;
   vehicle.mountBody(body);
-  if (body && frame === "corona") await fitCellGauge(body, vehicle.craftSurfaces().reserve, circuit);
+  // Only on a mounted body under a live kit. Before `initialize()`, or while
+  // the kit is still loading, the cells hold the GLB's own lamp; the refit
+  // main.ts issues after `initialize()` dresses them on the kit's.
+  const craft = vehicle.craftSurfaces();
+  if (body?.parent && craft.flame && frame === "corona") await fitCellGauge(body, craft.reserve, circuit, options.still ?? false);
   if (serials.get(vehicle) !== serial) return;
 
   const fit = garage.fleet[frame];

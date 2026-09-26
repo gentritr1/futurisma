@@ -138,4 +138,39 @@ try {
   if (previous === undefined) delete globalThis.__tidelineAssetPorts;
   else globalThis.__tidelineAssetPorts = previous;
 }
-console.log("Tideline environment PASS: painted lit road, exterior water/particulate, continuous dry-chamber mask, timed drainage, pause/reduced motion, triangle budget and all four partial-load cleanup orders.");
+// The render rule's fog for ADDITIVE light: every additive material, whether it
+// brought its own fog chunk or not, fades in the fog instead of taking its
+// colour; everything else keeps three's own fog.
+{
+  const {applyTidelineRenderRule,auditTidelineGameplayMaterials}=await import(await compileLeaf("src/game/tideline-render-rule.ts"));
+  const FADE="gl_FragColor.rgb *= 1.0 - fogFactor";
+  const chunk="void main(){\n#include <fog_fragment>\n}";
+  const own=new THREE.ShaderMaterial({name:"own",blending:THREE.AdditiveBlending,fog:true,vertexShader:"#include <fog_pars_vertex>\nvoid main(){}",fragmentShader:"#include <fog_pars_fragment>\n"+chunk});
+  const bare=new THREE.ShaderMaterial({name:"bare",blending:THREE.AdditiveBlending,vertexShader:"void main(){gl_Position=vec4(0.);}",fragmentShader:"void main(){gl_FragColor=vec4(1.);}"});
+  const plain=new THREE.ShaderMaterial({name:"plain",vertexShader:"void main(){gl_Position=vec4(0.);}",fragmentShader:"void main(){gl_FragColor=vec4(1.);}"});
+  const basic=new THREE.MeshBasicMaterial({name:"basic",blending:THREE.AdditiveBlending});
+  const standard=new THREE.MeshStandardMaterial({name:"standard",blending:THREE.AdditiveBlending});
+  const points=new THREE.PointsMaterial({name:"points",blending:THREE.AdditiveBlending});
+  const lambert=new THREE.MeshLambertMaterial({name:"lambert"});
+  const holder=new THREE.Group();
+  for(const material of [own,bare,plain,basic,standard,points,lambert]){const mesh=new THREE.Mesh(new THREE.BufferGeometry(),material);mesh.name=material.name;holder.add(mesh);}
+  applyTidelineRenderRule(holder);
+  applyTidelineRenderRule(holder); // a second pass (garage body, then the race roots) must not stack
+  const compiled=(material)=>{const shader={uniforms:{},vertexShader:"",fragmentShader:chunk};material.onBeforeCompile(shader,{});return shader.fragmentShader;};
+  for(const material of [own,bare]){
+    assert.ok(material.fragmentShader.includes(FADE)&&!material.fragmentShader.includes("#include <fog_fragment>"),`Additive shader ${material.name} still mixes toward the fog colour.`);
+    assert.equal(material.fragmentShader.split(FADE).length,2,`Additive shader ${material.name} fades twice.`);
+  }
+  assert.ok(plain.fragmentShader.includes("#include <fog_fragment>")&&!plain.fragmentShader.includes(FADE),"A normal shader lost three's own fog.");
+  const lit=holder.getObjectByName("basic").material;
+  for(const material of [lit,holder.getObjectByName("standard").material,holder.getObjectByName("points").material]){
+    const out=compiled(material);
+    assert.ok(out.includes(FADE)&&!out.includes("#include <fog_fragment>"),`Additive ${material.type} still mixes toward the fog colour.`);
+    assert.ok(material.customProgramCacheKey().endsWith("|additive-fog")&&!material.customProgramCacheKey().includes("|additive-fog|additive-fog"),`Additive ${material.type} shares a program with its fogged self, or stacked its key.`);
+  }
+  assert.ok(!compiled(holder.getObjectByName("lambert").material).includes(FADE),"A normal built-in material took the additive fade.");
+  holder.traverse((object)=>{if(object!==holder)object.userData.tidelineGameplay=true;});
+  const rows=auditTidelineGameplayMaterials(holder);
+  assert.ok(rows.filter((row)=>row.additive).every((row)=>row.additiveFog)&&rows.filter((row)=>row.additive).length===5,"The audit does not see every additive material fade.");
+}
+console.log("Tideline environment PASS: painted lit road, exterior water/particulate, continuous dry-chamber mask, timed drainage, pause/reduced motion, triangle budget, all four partial-load cleanup orders, and additive light that fades in the fog.");

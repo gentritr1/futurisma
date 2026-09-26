@@ -881,6 +881,8 @@ export class TotemVehicle {
       this.evolution = await TotemEvolution.load(pumpWorks,powerKitUrl);
       applyPs2MaterialTreatment(this.evolution.root);
       this.model.add(this.evolution.root);
+      // A garage body mounted while the kit was still loading takes it now.
+      if (this.body) { const body = this.body; this.body = null; this.mountBody(body); }
     } catch (error) {
       console.warn("TOTEM enhancement kit could not load; using the original craft.", error);
     }
