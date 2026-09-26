@@ -190,7 +190,6 @@ export class GarageScreen {
   /** Something of the demo is on the craft: a hold, or a reserve still refilling. */
   private demoing = false;
   private quarters = 4;
-  private stoppedSince = 0;
   private rollCheck = 0;
   private readonly sound: ShowroomSound;
 
@@ -232,6 +231,7 @@ export class GarageScreen {
     this.boostHold.append(meter);
     this.boostHold.setAttribute("aria-label", "Hold to boost · reserve 4 of 4");
     this.brakeHold.setAttribute("aria-label", "Hold to brake");
+    this.demoStrip.setAttribute("role", "group");
     this.demoStrip.setAttribute("aria-label", "Showroom");
     this.demoStrip.append(this.boostHold, this.brakeHold);
     panel.append(code, head, tabs, this.body, this.demoStrip, this.note, this.closeButton);
@@ -507,17 +507,12 @@ export class GarageScreen {
 
   /**
    * On RESULT the race loop still drives the craft while it coasts, so the
-   * demo waits until the HUD has read 000 for half a second (the loop stops
-   * presenting exactly when the speed reaches zero).
+   * demo waits for the HUD's 000. That is enough: the coast snaps the speed to
+   * exactly zero at 1.26 km/h (physics.js COAST_STOP_SPEED), before the readout
+   * could round to 000, and the loop stops presenting at zero.
    */
   private rolling(): boolean {
-    if (document.body.dataset.phase !== "result") return false;
-    if (document.getElementById("speed-value")?.textContent !== "000") {
-      this.stoppedSince = 0;
-      return true;
-    }
-    this.stoppedSince ||= performance.now();
-    return performance.now() - this.stoppedSince < 500;
+    return document.body.dataset.phase === "result" && document.getElementById("speed-value")?.textContent !== "000";
   }
 
   /** The strip on CRAFT and PAINT only, disabled while the craft is still rolling. */

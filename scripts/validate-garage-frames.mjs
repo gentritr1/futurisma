@@ -355,6 +355,9 @@ assert.ok(totem.includes("if (this.body) { const body = this.body; this.body = n
   assert.ok(bay.includes('document.getElementById("speed-value")?.textContent !== "000"')
     && hud.includes('this.speedValue.textContent = Math.round(frame.speedKph).toString().padStart(3, "0");'),
     "The showroom's RESULT gate no longer reads the HUD's speed as the race writes it.");
+  // ...and "000" means stopped only while the coast snaps to zero above 0.5 km/h (0.139 m/s).
+  const stop = Number((await read("src/game/physics.js")).match(/const COAST_STOP_SPEED = ([\d.]+);/)?.[1]);
+  assert.ok(stop >= 0.5 / 3.6, `COAST_STOP_SPEED ${stop} m/s is under 0.5 km/h: the HUD could read 000 while the craft still coasts.`);
   // The showroom engine is the race's player engine: same ceiling, pitch,
   // gains, filter and boost cue, with nothing imported from the running page.
   assert.ok(!/^import /m.test(sound), "garage-sound.ts imports from the page; a lazy import would split the entry chunk.");

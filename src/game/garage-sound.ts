@@ -96,7 +96,11 @@ export class ShowroomSound {
       this.tone(115, 0.2, 0.04, "sawtooth", 0, 2.2);
       this.tone(460, 0.14, 0.024, "square", 0.04, 1.5);
     }
-    if (brake > 0 && !this.braking) this.tone(92, 0.16, 0.05, "sine", 0, 0.6);
+    // The airbrakes' swing: a mid click (laptop speakers have no 92 Hz) over the thunk's body.
+    if (brake > 0 && !this.braking) {
+      this.tone(1_200, 0.008, 0.02, "square", 0, 1);
+      this.tone(92, 0.16, 0.05, "sine", 0, 0.6);
+    }
     if (recharging && !this.recharging) {
       this.tone(220, 0.09, 0.016, "triangle", 0, 0.82);
       this.tone(180, 0.1, 0.012, "triangle", 0.105, 1);
@@ -122,7 +126,7 @@ export class ShowroomSound {
     this.context = this.master = null;
   }
 
-  /** `EngineAudio.playTone`: one enveloped oscillator, swept to `ratio`. */
+  /** `EngineAudio.playTone`: one enveloped oscillator, swept to `ratio` (a click attacks in a third of itself). */
   private tone(frequency: number, duration: number, amplitude: number, type: OscillatorType, delay: number, ratio: number): void {
     const context = this.context;
     if (!context || !this.master) return;
@@ -133,7 +137,7 @@ export class ShowroomSound {
     oscillator.frequency.setValueAtTime(frequency, at);
     oscillator.frequency.exponentialRampToValueAtTime(frequency * ratio, at + duration);
     gain.gain.setValueAtTime(0.0001, at);
-    gain.gain.exponentialRampToValueAtTime(amplitude, at + 0.012);
+    gain.gain.exponentialRampToValueAtTime(amplitude, at + Math.min(0.012, duration / 3));
     gain.gain.exponentialRampToValueAtTime(0.0001, at + duration);
     oscillator.connect(gain);
     gain.connect(this.master);
