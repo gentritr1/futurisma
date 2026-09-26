@@ -1321,13 +1321,14 @@ export class TotemVehicle {
 
   /**
    * Garage — the player-only surfaces a fitted look reaches: the visual hull
-   * (the frame's stance), the running-light material and the boost jets'
-   * colour. Rivals and the ghost cloned their materials at load, so a refit
-   * after `initialize()` never reaches the field. `garage-look.ts` does the
-   * work, lazily; this only hands the three over.
+   * (the frame's stance), the running-light material, the boost jets'
+   * colour and the live plasma reserve (CORONA's cell gauge). Rivals and the
+   * ghost cloned their materials at load, so a refit after `initialize()`
+   * never reaches the field. `garage-look.ts` does the work, lazily; this only
+   * hands them over.
    */
-  craftSurfaces(): { hull: THREE.Group; lights: THREE.MeshStandardMaterial | null; flame: THREE.Color | null } {
-    return { hull: this.visual, lights: this.bodyMaterial("TOTEM_emissive"), flame: this.evolution?.boostColor ?? null };
+  craftSurfaces(): { hull: THREE.Group; lights: THREE.MeshStandardMaterial | null; flame: THREE.Color | null; reserve: () => number } {
+    return { hull: this.visual, lights: this.bodyMaterial("TOTEM_emissive"), flame: this.evolution?.boostColor ?? null, reserve: () => this.evolution?.reserve ?? 1 };
   }
 
   /**

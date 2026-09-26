@@ -267,6 +267,24 @@ const [totem, look, main, catalog, index, game, bay] = await Promise.all([
   read("src/game/garage-catalog.js"), read("index.html"), read("src/game/game.ts"), read("src/game/garage-ui.ts"),
 ]);
 assert.match(totem, /mountBody\(body: THREE\.Object3D \| null\): void/, "TotemVehicle.mountBody is gone.");
+// CORONA's cells are its plasma gauge: two long TE_boost cells outboard, which
+// garage-look.ts masks into four bands by the reserve, on its own treated copy
+// of the kit's lamp (PS2 treatment and the circuit rule, so it fogs and grades).
+{
+  const bytes = await readFile(new URL("corona.glb", root));
+  const gltf = parseGlb(bytes);
+  const lamp = gltf.materials.findIndex((material) => material.name === "TE_boost");
+  const cells = gltf.meshes.flatMap((mesh) => mesh.primitives).filter((primitive) => primitive.material === lamp)
+    .map((primitive) => gltf.accessors[primitive.attributes.POSITION]);
+  assert.ok(cells.some((accessor) => Math.abs(accessor.max[0]) > 1 || Math.abs(accessor.min[0]) > 1),
+    "corona.glb: no TE_boost cell outboard of x 1.0; the reserve gauge has nothing to light.");
+  const reach = cells.reduce((span, accessor) => [Math.min(span[0], accessor.min[2]), Math.max(span[1], accessor.max[2])], [Infinity, -Infinity]);
+  assert.ok(reach[0] <= -1.6 && reach[1] >= 1.6, `corona.glb: the cells span z ${reach}, not the gauge's -1.7..1.7.`);
+  for (const needle of ["const CELL_Z = [-1.7, 1.7] as const;", "applyPs2MaterialTreatment(mesh);", "await applyCircuitRule(circuit, mesh);",
+    "fill.value = reserve();", 'frame === "corona") await fitCellGauge(']) {
+    assert.ok(look.includes(needle), `garage-look.ts lost part of CORONA's cell gauge: ${needle}`);
+  }
+}
 // The swept-pose table above follows these lines.
 for (const line of ["state.steer * 20 * DEG", "state.brake * 60 * DEG", "(-state.steer * 9 + state.brake * 6) * DEG",
   "(-state.lateralLoad * 12 - state.steer * state.driftIntensity * 10) * DEG", "retract * 0.22"]) {

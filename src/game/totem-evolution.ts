@@ -36,6 +36,8 @@ export class TotemEvolution {
   private readonly lightColor = new THREE.Color();
   /** Nitro jet and lamp colour; the garage's BOOST FLAME paint writes it. */
   readonly boostColor = BOOST.clone();
+  /** Garage — the plasma reserve as of the last update, for CORONA's cell gauge. */
+  reserve = 1;
   /** Garage — where the kit meets the hull: TOTEM's numbers until a frame body re-anchors them. */
   private readonly anchors = { ...TOTEM_ANCHORS };
   private readonly kit: THREE.Object3D;
@@ -239,7 +241,7 @@ export class TotemEvolution {
     const surgeColor = state.surgeColor ?? OVERDRIVE;
     const shieldColor = state.shieldColor ?? SHIELD;
     const firing = state.boostActive || overdrive;
-    const reserve = THREE.MathUtils.clamp(state.boostReserve ?? 1, 0, 1);
+    const reserve = this.reserve = THREE.MathUtils.clamp(state.boostReserve ?? 1, 0, 1);
     const inverted = (state.gravitySign ?? 1) < 0;
     const spinDirection = inverted ? -1 : 1;
     const targetSpeed = (0.65 + speed * 5.4 + (firing ? 10 : 0)) * spinDirection;

@@ -22,6 +22,12 @@
  * back. The swap waits for the atlas BEFORE the body mounts, so a refit never
  * shows the factory paint for a frame and then the scheme.
  *
+ * CORONA'S CELLS ARE ITS PLASMA GAUGE. The kit lights every `TE_boost` lamp
+ * alike; on CORONA the two long cells get their own copy of that live lamp,
+ * which follows its colour and intensity every frame and lights the cells in
+ * four bands along their length by the reserve, so the frame whose deck is
+ * plasma shows how much it has left.
+ *
  * UNDERGLOW PATTERNS animate in the wash's own shader from a time uniform, all
  * at or under 3 Hz, and hold STEADY when the driver asked for reduced motion.
  *
@@ -33,7 +39,7 @@
  * colour IS the light, so it is tinted directly.
  */
 import * as THREE from "three";
-import type { TotemVehicle } from "./totem";
+import { applyPs2MaterialTreatment, type TotemVehicle } from "./totem";
 import { resolvePaint } from "./garage-catalog.js";
 import { PATTERN_CODES, type Garage } from "./garage-rules.js";
 
@@ -291,6 +297,62 @@ function schemeMap(frame: string, scheme: string, factory: THREE.Texture): Promi
   return map;
 }
 
+/** CORONA's cells: model-space x beyond this is a cell; their length along z. */
+const CELL_X = 1.0;
+const CELL_Z = [-1.7, 1.7] as const;
+const GAUGE_NAME = "TE_boost_gauge";
+
+/**
+ * Gives CORONA's cells their own copy of the kit's live boost lamp, masked into
+ * four bands by the reserve. The copy takes the same PS2 treatment and circuit
+ * rule the lamp had (a material made after the body's load would otherwise skip
+ * the grade and the fog), then the band mask is added on top of that shader.
+ */
+async function fitCellGauge(body: THREE.Object3D, reserve: () => number, circuit: string): Promise<void> {
+  const cells: THREE.Mesh[] = [];
+  body.traverse((object) => {
+    const mesh = object as THREE.Mesh;
+    const material = mesh.material as THREE.Material | undefined;
+    if (material && !Array.isArray(material) && material.name === "TE_boost") cells.push(mesh);
+  });
+  for (const mesh of cells) {
+    const lamp = mesh.material as THREE.MeshStandardMaterial;
+    const gauge = lamp.clone();
+    gauge.name = GAUGE_NAME;
+    mesh.material = gauge;
+    applyPs2MaterialTreatment(mesh);
+    const treated = gauge.onBeforeCompile.bind(gauge);
+    const treatedKey = gauge.customProgramCacheKey.bind(gauge);
+    const fill = { value: 1 };
+    gauge.onBeforeCompile = (shader, renderer) => {
+      treated(shader, renderer);
+      shader.uniforms.uFill = fill;
+      shader.vertexShader = `varying vec3 vCell;\n${shader.vertexShader}`
+        .replace("#include <begin_vertex>", "#include <begin_vertex>\nvCell = position;");
+      shader.fragmentShader = `uniform float uFill;\nvarying vec3 vCell;
+float cellLevel() {
+  if (abs(vCell.x) < ${CELL_X.toFixed(1)}) return 1.0;
+  float band = floor(clamp((vCell.z - (${CELL_Z[0].toFixed(1)})) / ${(CELL_Z[1] - CELL_Z[0]).toFixed(1)}, 0.0, 0.999) * 4.0);
+  return clamp(uFill * 4.0 - (3.0 - band), 0.0, 1.0);
+}
+${shader.fragmentShader}`
+        .replace("#include <color_fragment>", "#include <color_fragment>\ndiffuseColor.rgb *= mix(0.45, 1.0, cellLevel());")
+        .replace("#include <emissivemap_fragment>", "#include <emissivemap_fragment>\ntotalEmissiveRadiance *= mix(0.15, 1.0, cellLevel());");
+    };
+    gauge.customProgramCacheKey = () => `${treatedKey()}|cell-gauge`;
+    gauge.needsUpdate = true;
+    // Follows the kit's lamp (colour, state, intensity) and reads the reserve
+    // each frame the cells are drawn: no hook in the race loop.
+    mesh.onBeforeRender = () => {
+      gauge.color.copy(lamp.color);
+      gauge.emissive.copy(lamp.emissive);
+      gauge.emissiveIntensity = lamp.emissiveIntensity;
+      fill.value = reserve();
+    };
+    await applyCircuitRule(circuit, mesh);
+  }
+}
+
 /** Options the running page decides for the look. */
 export interface CraftLookOptions {
   /** Reduced motion, as `resolveReducedMotion` reads it: patterns hold STEADY. */
@@ -324,6 +386,8 @@ export async function applyCraftLook(
   if (serials.get(vehicle) !== serial) return;
   for (const material of surfaces) material.map = painted ?? factoryMaps.get(material) ?? material.map;
   vehicle.mountBody(body);
+  if (body && frame === "corona") await fitCellGauge(body, vehicle.craftSurfaces().reserve, circuit);
+  if (serials.get(vehicle) !== serial) return;
 
   const fit = garage.fleet[frame];
   const glow = resolvePaint(frame, "glow", fit?.glow ?? "stock");
