@@ -81,6 +81,39 @@ export function turnCraft(radians: number): void {
   if (hull) hull.rotation.y = radians;
 }
 
+/**
+ * Each frame's exhaust, as width × height × length on the kit's jets: LANCE's
+ * long needles, SIDEWINDER's flat fans, BULWARK's short fat burners, CORONA's
+ * long narrow columns (not taller: its rear gauge pads sit just above the
+ * plume), HALO's two thin ribbons (not wider: its ARC WHITE plumes would merge
+ * into one white slab over the ring). TOTEM, and anything unlisted, keeps 1.
+ */
+const PLUMES: Readonly<Record<string, readonly [number, number, number]>> = {
+  lance: [0.72, 0.72, 1.22],
+  sidewinder: [1.2, 0.6, 0.92],
+  bulwark: [1.35, 0.85, 0.76],
+  corona: [0.9, 1.0, 1.1],
+  halo: [1.0, 0.5, 1.1],
+};
+
+/**
+ * Shapes the kit's jets for the frame on the grid. The profile scales the
+ * jet's own vertices, before the shell's per-frame instance sizes, so the
+ * nozzle (z 0) never moves and the two layers stay nested. The shader learns
+ * `uProfile` once; every refit sets it outright, so nothing compounds.
+ */
+function fitPlume(hull: THREE.Object3D, frame: string): void {
+  const jets = hull.getObjectByName("TE_twin_layered_exhaust") as THREE.Mesh | undefined;
+  const material = jets?.material as THREE.ShaderMaterial | undefined;
+  if (!material?.isShaderMaterial) return;
+  if (!material.uniforms.uProfile) {
+    material.uniforms.uProfile = { value: new THREE.Vector3(1, 1, 1) };
+    material.vertexShader = `uniform vec3 uProfile;\n${material.vertexShader.replace("vec4(position, 1.0)", "vec4(position * uProfile, 1.0)")}`;
+    material.needsUpdate = true;
+  }
+  (material.uniforms.uProfile.value as THREE.Vector3).fromArray(PLUMES[frame] ?? [1, 1, 1]);
+}
+
 /** A showroom hold: the jets on BOOST, the airbrakes on BRAKE. */
 export type DemoHold = "boost" | "brake" | null;
 
@@ -490,6 +523,7 @@ export async function applyCraftLook(
   // the kit is still loading, the cells hold the GLB's own lamp; the refit
   // main.ts issues after `initialize()` dresses them on the kit's.
   const craft = vehicle.craftSurfaces();
+  fitPlume(craft.hull, body ? frame : "totem");
   if (body?.parent && craft.flame && frame === "corona") await fitCellGauge(body, craft, circuit, options.still ?? false);
   if (serials.get(vehicle) !== serial) return;
 

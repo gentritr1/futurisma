@@ -374,6 +374,29 @@ assert.ok(totem.includes("if (this.body) { const body = this.body; this.body = n
   assert.ok(hud.includes("document.body.dataset.muted = String(muted);") && sound.includes('document.body.dataset.muted === "true"'),
     "The showroom engine no longer hears the game's mute.");
 }
+// Plume profiles: each frame's exhaust shape on the kit's jets. The profile
+// scales the jet's own vertices (nozzle at z 0, so it never moves), is taught
+// to the shader once, and is set outright on every refit, TOTEM included.
+{
+  const table = look.match(/const PLUMES[^=]*= \{([^}]*)\};/)?.[1] ?? "";
+  const plumes = Object.fromEntries([...table.matchAll(/(\w+): \[([\d.]+), ([\d.]+), ([\d.]+)\]/g)].map((row) => [row[1], row.slice(2).map(Number)]));
+  assert.deepEqual(Object.keys(plumes).sort(), bodies.slice().sort(), "PLUMES must give every bodied frame a profile, and only those.");
+  for (const [code, factors] of Object.entries(plumes)) {
+    assert.ok(factors.every((factor) => factor >= 0.3 && factor <= 1.6), `${code}'s plume ${factors} leaves 0.3..1.6.`);
+  }
+  assert.ok(evolution.includes("gl_Position = projectionMatrix * modelViewMatrix * instanceMatrix * vec4(position, 1.0);"),
+    "The kit's jet shader changed its projection line; the plume profile's anchor is gone.");
+  for (const needle of ['"vec4(position * uProfile, 1.0)"', "if (!material.uniforms.uProfile) {", 'fitPlume(craft.hull, body ? frame : "totem");']) {
+    assert.ok(look.includes(needle), `garage-look.ts lost part of the plume profile: ${needle}`);
+  }
+  // A superseded refit returns at its serial check, before it can mount a body
+  // or shape the plume for one that never mounted.
+  const apply = look.slice(look.indexOf("export async function applyCraftLook("));
+  const check = apply.indexOf("if (serials.get(vehicle) !== serial) return;");
+  const mount = apply.indexOf("vehicle.mountBody(body);");
+  const plume = apply.indexOf("fitPlume(craft.hull");
+  assert.ok(check >= 0 && check < mount && mount < plume, "applyCraftLook must check its serial, mount the body, then shape the plume, in that order.");
+}
 assert.match(totem, /this\.evolution\?\.anchorTo\(body, named\)/, "mountBody no longer re-anchors the kit.");
 assert.match(look, /vehicle\.mountBody\(body\)/, "garage-look.ts no longer mounts the body.");
 assert.match(look, /serials\.get\(vehicle\) !== serial/, "garage-look.ts lost the latest-refit-wins guard.");

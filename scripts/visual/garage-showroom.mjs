@@ -1,5 +1,6 @@
 /**
  * Showroom demo acceptance: hold BOOST and BRAKE in the garage, then race.
+ * (It also checks each frame's plume profile follows the swaps.)
  *
  * With a saved CORONA it opens the bay, holds BOOST through all four quarters
  * of the demo's reserve, then holds BRAKE, and lets go. It checks:
@@ -58,6 +59,7 @@ function probe() {
   // The body mounts on TOTEM's model, inside the visual group the showroom turns.
   hull = body?.parent?.parent ?? null;
   const brake = body?.getObjectByName("airbrake_L_pivot");
+  const jets = hull?.getObjectByName("TE_twin_layered_exhaust");
   const meter = [...document.querySelectorAll(".garage__meter i")].filter((bar) => bar.dataset.on === "true").length;
   return {
     frame: body?.name ?? null,
@@ -70,6 +72,7 @@ function probe() {
     label: document.querySelector('[data-key="hold-boost"] strong')?.textContent ?? null,
     held: document.querySelector('[data-held="true"]')?.dataset.key ?? null,
     sound: window.__sound?.state ?? null,
+    plume: jets?.material.uniforms.uProfile?.value.toArray().map((value) => Math.round(value * 100) / 100) ?? null,
   };
 }
 
@@ -85,7 +88,7 @@ async function openPage(browser, query) {
   const errors = [];
   tab.on("pageerror", (error) => errors.push(String(error)));
   tab.on("console", (message) => { if (message.type() === "error") errors.push(message.text().slice(0, 300)); });
-  await tab.goto(`http://127.0.0.1:${PORT}/?map=greenwater&laps=1&day=${DAY}${query}`, { waitUntil: "domcontentloaded" });
+  await tab.goto(`http://127.0.0.1:${PORT}/?laps=1&day=${DAY}${query.includes("map=") ? "" : "&map=greenwater"}${query}`, { waitUntil: "domcontentloaded" });
   await tab.waitForFunction(() => document.body.dataset.phase === "intro" && !document.getElementById("start-screen")?.hidden, null, { timeout: 300_000 });
   await tab.evaluate(async () => {
     const url = performance.getEntriesByType("resource").map((entry) => entry.name).find((name) => /\/node_modules\/\.vite\/deps\/three\.js/.test(name));
@@ -138,6 +141,7 @@ try {
     await openBay(tab);
     const rest = await tab.evaluate(probe);
     assert.equal(rest.frame, "FRAME_corona", "The bay is not showing the saved CORONA.");
+    assert.deepEqual(rest.plume, [0.9, 1, 1.1], `CORONA's jets wear ${rest.plume}, not its plume profile.`);
     // Held until the meter has stepped down, not for a fixed time: the demo
     // caps each frame at 0.1 s, so a slow renderer drains it slower in wall time.
     const quarters = (count) => tab.waitForFunction((n) => document.querySelectorAll(".garage__meter i[data-on=true]").length === n, count, { timeout: 30_000 });
@@ -188,6 +192,7 @@ try {
     assert.equal(swapped.held, null, "A frame swap left the hold on.");
     assert.equal(swapped.meter, 4, "A frame swap left the demo's reserve drained.");
     assert.ok(Math.abs(swapped.airbrake ?? 0) < 1e-6 && Math.abs(swapped.pitch) < 1e-3, "The new frame is not at rest after a swap mid-hold.");
+    assert.deepEqual(swapped.plume, [0.72, 0.72, 1.22], `After the swap the jets wear ${swapped.plume}, not LANCE's profile.`);
     // 3. Close the bay and START: nothing of the demo reaches the race.
     await tab.evaluate(() => document.querySelector('[data-key="frame-corona"]')?.click());
     await tab.waitForTimeout(1500);
@@ -198,6 +203,7 @@ try {
     await tab.evaluate(() => document.getElementById("start-button")?.click());
     await tab.waitForFunction(() => document.body.dataset.phase === "race", null, { timeout: 120_000 });
     const race = await tab.evaluate(probe);
+    assert.deepEqual(race.plume, [0.9, 1, 1.1], `CORONA races with ${race.plume}, not its own plume (a swap back must not compound).`);
     assert.equal(await tab.evaluate(() => document.getElementById("boost-value")?.textContent), "100%", "The race starts without a full reserve.");
     assert.ok(race.kit < 1.2 && Math.abs(race.airbrake) < 1e-6, `The race inherits the demo: kit ${race.kit}, airbrake ${race.airbrake}.`);
     assert.deepEqual(errors, [], "Page errors during the showroom demo.");
@@ -233,7 +239,25 @@ try {
     await context.close();
     console.log("Reduced motion: the demo runs and the craft holds still.");
   }
-  console.log("Garage showroom PASS: BOOST through four quarters, BRAKE at 60°, rest, swap, launch and reduced motion.");
+  // 5. Tideline: the circuit rule reworks the jets' shader for fog as the race
+  // loads, after the bay taught it the plume profile; both must hold.
+  {
+    const { context, tab, errors } = await openPage(browser, "&map=tideline");
+    await tab.evaluate(() => document.getElementById("start-button")?.click());
+    await tab.waitForFunction(() => document.body.dataset.phase === "race", null, { timeout: 120_000 });
+    const jets = await tab.evaluate(() => {
+      let found = null;
+      for (const scene of window.__scenes) scene.traverse((object) => { if (object.name === "TE_twin_layered_exhaust") found = object.material; });
+      return found && { profile: found.uniforms.uProfile?.value.toArray().map((value) => Math.round(value * 100) / 100), shader: found.vertexShader };
+    });
+    assert.deepEqual(jets?.profile, [0.9, 1, 1.1], `On Tideline CORONA's jets wear ${jets?.profile}, not its plume.`);
+    assert.ok(jets.shader.includes("position * uProfile") && jets.shader.includes("fog_pars_vertex"),
+      "On Tideline the jets' shader lost the plume profile or the fog rule.");
+    assert.deepEqual(errors, [], "Page errors on Tideline.");
+    await context.close();
+    console.log("Tideline: the plume profile and the fog rule share the jets' shader.");
+  }
+  console.log("Garage showroom PASS: BOOST through four quarters, BRAKE at 60°, rest, swap, launch, reduced motion, plume profiles and Tideline.");
 } finally {
   await browser.close();
   await server.close();
