@@ -319,8 +319,8 @@ const CELL_Z = [-1.7, 1.7] as const;
 const PAD_Z = 2.0;
 const PAD_X = 0.4;
 const GAUGE_NAME = "TE_boost_gauge";
-/** The kit idles its boost lamp at 0.85 at most and fires it at 2.1. */
-const FIRING = 1.2;
+/** Lit quarters glow this far past the kit's lamp, so a count reads at 720p; not while firing, when the lamp is already white-hot. */
+const LIT = 1.8;
 
 /**
  * Gives CORONA's cells and rear pads their own copy of the kit's live boost
@@ -333,10 +333,11 @@ const FIRING = 1.2;
  * the pads fill from the left, like the HUD bar, so the two always show the
  * same count. Under a quarter, and not firing, the lit band breathes between
  * 60 % and full at 2 Hz: a "nearly out" cue that never goes dark, held steady
- * under reduced motion. Every mesh is re-dressed before the one await, so a
+ * under reduced motion. While firing, lit quarters take the kit's own lamp
+ * unboosted, so they keep its colour under the plume instead of going white. Every mesh is re-dressed before the one await, so a
  * second refit that lands meanwhile finds no `TE_boost` left to dress again.
  */
-async function fitCellGauge(body: THREE.Object3D, reserve: () => number, circuit: string, still: boolean): Promise<void> {
+async function fitCellGauge(body: THREE.Object3D, craft: { reserve: () => number; firing: () => boolean }, circuit: string, still: boolean): Promise<void> {
   const cells: THREE.Mesh[] = [];
   body.traverse((object) => {
     const mesh = object as THREE.Mesh;
@@ -369,7 +370,7 @@ float cellLevel() {
 }
 ${shader.fragmentShader}`
         .replace("#include <color_fragment>", "#include <color_fragment>\ndiffuseColor.rgb *= mix(0.12, 1.0, cellLevel());")
-        .replace("#include <emissivemap_fragment>", "#include <emissivemap_fragment>\ntotalEmissiveRadiance *= mix(0.0, 1.8, cellLevel()) * uPulse;");
+        .replace("#include <emissivemap_fragment>", `#include <emissivemap_fragment>\ntotalEmissiveRadiance *= mix(0.0, ${LIT.toFixed(1)}, cellLevel()) * uPulse;`);
     };
     gauge.customProgramCacheKey = () => `${treatedKey()}|cell-gauge`;
     gauge.needsUpdate = true;
@@ -379,9 +380,9 @@ ${shader.fragmentShader}`
       gauge.color.copy(lamp.color);
       gauge.emissive.copy(lamp.emissive);
       gauge.emissiveIntensity = lamp.emissiveIntensity;
-      fill.value = reserve();
-      pulse.value = !still && fill.value < 0.25 && lamp.emissiveIntensity < FIRING
-        ? 0.8 + 0.2 * Math.cos(performance.now() * 0.004 * Math.PI) : 1;
+      fill.value = craft.reserve();
+      pulse.value = craft.firing() ? 1 / LIT
+        : !still && fill.value < 0.25 ? 0.8 + 0.2 * Math.cos(performance.now() * 0.004 * Math.PI) : 1;
     };
   }
   await applyCircuitRule(circuit, ...cells);
@@ -424,7 +425,7 @@ export async function applyCraftLook(
   // the kit is still loading, the cells hold the GLB's own lamp; the refit
   // main.ts issues after `initialize()` dresses them on the kit's.
   const craft = vehicle.craftSurfaces();
-  if (body?.parent && craft.flame && frame === "corona") await fitCellGauge(body, craft.reserve, circuit, options.still ?? false);
+  if (body?.parent && craft.flame && frame === "corona") await fitCellGauge(body, craft, circuit, options.still ?? false);
   if (serials.get(vehicle) !== serial) return;
 
   const fit = garage.fleet[frame];

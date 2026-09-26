@@ -313,12 +313,13 @@ assert.match(totem, /mountBody\(body: THREE\.Object3D \| null\): void/, "TotemVe
   }));
   assert.equal(quarters.size, 4, `corona.glb: the rear gauge lights ${quarters.size} quarters, not four.`);
   for (const needle of ["const CELL_Z = [-1.7, 1.7] as const;", "const PAD_Z = 2.0;", "const PAD_X = 0.4;", "applyPs2MaterialTreatment(mesh);",
-    "fill.value = reserve();", 'if (body?.parent && craft.flame && frame === "corona") await fitCellGauge(', "await applyCircuitRule(circuit, ...cells);"]) {
+    "fill.value = craft.reserve();", "pulse.value = craft.firing() ? 1 / LIT", 'if (body?.parent && craft.flame && frame === "corona") await fitCellGauge(', "await applyCircuitRule(circuit, ...cells);"]) {
     assert.ok(look.includes(needle), `garage-look.ts lost part of CORONA's cell gauge: ${needle}`);
   }
-  // The pulse tells idle from firing by the kit's own lamp numbers.
-  assert.ok(evolution.includes("firing ? 2.1 : 0.35 + reserve * 0.5") && look.includes("const FIRING = 1.2;"),
-    "The kit's boost lamp levels changed; re-check FIRING in garage-look.ts.");
+  // The gauge knows the kit is firing from the kit itself, not from its lamp's level.
+  assert.ok(evolution.includes("const firing = this.firing = state.boostActive || overdrive;")
+    && totem.includes("firing: () => this.evolution?.firing ?? false"),
+    "The kit no longer hands its firing state to CORONA's gauge.");
   // CORONA's and HALO's rings hang below their skids; the wash is measured from the hull and skids alone.
   for (const needle of ['at.name === "stabiliser_ring_pivot"', "userData.washFloor as number"]) {
     assert.ok(look.includes(needle), `garage-look.ts measures the wash from the ring again: ${needle}`);

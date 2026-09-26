@@ -33,6 +33,7 @@
     "validate:persistence": "node scripts/validate-persistence.mjs",
     "validate:garage": "node scripts/validate-garage.mjs",
     "validate:garage-frames": "node scripts/validate-garage-frames.mjs",
+    "check:garage-binding": "node scripts/visual/garage-binding.mjs",
     "validate:physics": "node scripts/validate-physics.mjs",
     "validate:pose": "node scripts/validate-pose.mjs",
     "validate:race": "node scripts/validate-race-rules.mjs",
