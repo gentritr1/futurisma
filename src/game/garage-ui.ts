@@ -1,31 +1,4 @@
-/**
- * Garage — the works bay. Five tabs over one save: CRAFT (buy and choose a
- * frame), PARTS (stage the frame on the grid), PAINT (body paint, lights,
- * boost flame, underglow and its pattern), CONTRACTS (the board that sends the
- * driver round all seven circuits) and DAILY (the day's three jobs, the week's
- * one and the streak).
- *
- * Nothing in the paint shop is bought blind: pointing at a finish, or tabbing
- * onto it, shows it on the craft behind the panel from a trial garage; the
- * click is the purchase, and leaving the row puts the fitted look back.
- *
- * Lazy: `main.ts` imports this on the first GARAGE press, so none of it is in
- * the initial shell. It is built node by node with the DOM API, because
- * string-to-markup sinks are banned tree-wide (`validate-security.mjs`), and
- * it speaks the service terminal's vocabulary — `.intro-panel`, `.chip`,
- * `.ghost-button`, `.dispatch__key` — with `style-garage.css` adding only what
- * those do not already cover.
- *
- * Every purchase is a pure transaction in `garage-economy.js`; this module
- * renders, commits the returned garage through `save.setGarage`, and asks the
- * game to refit. The craft behind the panel changes as the driver browses:
- * viewing a frame in the showroom previews its stance and signature colours on
- * the real TOTEM, and leaving the tab puts the fitted craft back.
- *
- * Modal the way the service terminal is (`menu-navigation.ts`): a capture
- * listener keeps every key from reaching the race loop while the bay is open,
- * keys aimed at the panel reach the panel, and Escape closes.
- */
+/** B2 service bay. Saved transactions remain in garage-economy; this screen owns navigation and confirmations. */
 import {
   FRAME_CARDS,
   PAINT_CARDS,
@@ -37,7 +10,6 @@ import {
   STAT_ROWS,
   frameCard,
   formatCredits,
-  paintCard,
   resolvePaint,
   schemeCard,
   statFill,
@@ -78,9 +50,16 @@ import {
   type FrameFit,
   type Garage,
   type Handling,
+  type PartCode,
 } from "./garage-rules.js";
-import { demoCraft, restCraft, turnCraft, type DemoHold } from "./garage-look";
+import { demoCraft, restCraft, type DemoHold } from "./garage-look";
+import { GarageScene, type GarageView } from "./garage-scene";
+import { FLEET_CODES, TEAM_COLORS, FRAME_ANCHORS } from "./garage-anchors";
+import { refreshRewardOffer } from "./garage-reward";
 import { ShowroomSound } from "./garage-sound";
+import { GarageMotion } from "./garage-motion";
+import { GarageMusic } from "./garage-music";
+import { PART_BENEFITS, PART_HARDWARE } from "./garage-upgrades";
 import { markDaily, msToMidnight, today, type GarageStore } from "./garage-purse";
 
 /**
@@ -95,7 +74,10 @@ export interface GarageHooks {
    * saved one, a frame the showroom is viewing, or — with `trial` — a scheme or
    * pattern the paint shop is showing before it is bought.
    */
-  refit(previewFrame: string | null, trial?: Garage | null): void;
+  refit(previewFrame: string | null, trial?: Garage | null): Promise<void>;
+  setView(view: GarageView | null): void;
+  toggleSound(): void;
+  confirmHeld(): boolean;
   /** One more paddock frame (the paddock only draws on request). */
   requestRender(): void;
   /** `resolveReducedMotion` from `query-probes.ts`: patterns hold still. */
@@ -109,7 +91,7 @@ export interface GarageHooks {
   /** `save` from `persistence.ts`. */
   save: GarageStore & {
     /** The listener's master volume, which the showroom's engine plays at. */
-    readonly settings: { readonly masterVolume: number };
+    readonly settings: { readonly masterVolume: number; readonly musicVolume: number };
     readonly livery: string;
     setTrack(track: string): string;
     setRaceMode(mode: string): string;
@@ -121,29 +103,14 @@ export interface GarageHooks {
   tracks: readonly { selection: string; label: string; mapCode: string }[];
 }
 
-type Tab = "craft" | "parts" | "paint" | "contracts" | "daily";
+type Tab = "craft" | "parts" | "paint" | "test" | "contracts" | "daily";
 const TABS: readonly { code: Tab; label: string }[] = [
-  { code: "craft", label: "CRAFT" },
-  { code: "parts", label: "PARTS" },
-  { code: "paint", label: "PAINT" },
-  { code: "contracts", label: "CONTRACTS" },
-  { code: "daily", label: "DAILY" },
+  { code: "craft", label: "FLEET" }, { code: "parts", label: "UPGRADE" },
+  { code: "paint", label: "PAINT" }, { code: "test", label: "TEST" },
 ];
 const TIER_ORDER = ["rookie", "works", "feral"];
-/** One turn of the showroom every 24 s, in radians per millisecond. */
-const TURN_RATE = (Math.PI * 2) / 24_000;
-/** Reduced motion's still showroom angle: a three-quarter view of the flank. */
-const STILL_YAW = -0.7;
-/**
- * Where the demo turns the craft and how far up the track it moves it (m), so
- * a boosted plume stays clear of the panel, the holds and the screen's edges
- * (check:garage-framing measures it): an upright screen, whose panel keeps to
- * the top half, looks straight down the tail; a wider one, whose panel keeps
- * to the left, takes a shallow rear three-quarter.
- */
-const DEMO_FRAMING = { wide: [-0.25, 4], upright: [0, 4] } as const;
-/** The bay's upright layout, as `style-garage.css` lays it out. */
-const UPRIGHT_SCREEN = "(orientation: portrait)";
+type PaintSlot = "body" | "flame" | "glow" | "under" | "pattern";
+interface Purchase { label: string; price: number; key: string; confirm: () => Transaction; }
 const ROMAN = ["", "I", "II", "III"];
 
 function node<K extends keyof HTMLElementTagNameMap>(tag: K, className = "", text = ""): HTMLElementTagNameMap[K] {
@@ -184,14 +151,14 @@ export class GarageScreen {
   private tab: Tab = "craft";
   private viewed = "totem";
   private returnFocus: HTMLElement | null = null;
+  private readonly background = new Map<HTMLElement, boolean>();
   private opened = false;
   /** The paint shop's what-if: the saved garage with one finish changed. */
   private trial: Garage | null = null;
-  /** The showroom's own frame loop: the turntable, and the demo while it runs. */
+  /** The bay's camera transition and test hold loop. */
   private animation = 0;
   private last = 0;
-  private yaw = 0;
-  private push = 0;
+
   /** The showroom demo: two momentary holds under CRAFT and PAINT. */
   private readonly demoStrip = node("div", "garage__demo");
   private readonly boostHold: HTMLButtonElement;
@@ -203,127 +170,174 @@ export class GarageScreen {
   private quarters = 4;
   private rollCheck = 0;
   private readonly sound: ShowroomSound;
-  private readonly upright = matchMedia(UPRIGHT_SCREEN);
+  private readonly music: GarageMusic;
+  private readonly motion: GarageMotion;
+  private readonly scene: GarageScene;
+  private readonly slab = node("div", "garage__slab");
+  private readonly footer = node("nav", "garage__footer");
+  private readonly soundButton: HTMLButtonElement;
+  private readonly jobsButton: HTMLButtonElement;
+  private readonly marker = node("div", "garage__anchor");
+  private readonly leader = node("div", "garage__leader");
+  private selectedPart: PartCode | null = null;
+  private previewUpgrade = false;
+  private fittedPart: PartCode | null = null;
+  private pending: Purchase | null = null;
+  private paintSlot: PaintSlot = "flame";
+  private fitting = 0;
+  private lastSound = "";
+  private padWasDown = false;
+  private padHold: DemoHold = null;
+  private lastDevice = "";
+  private backgrounded = false;
 
   constructor(private readonly hooks: GarageHooks) {
     this.screen.id = "garage-screen";
     this.screen.hidden = true;
-    this.screen.setAttribute("aria-label", "Garage");
-    const panel = node("div", "intro-panel options-panel garage");
-    const code = node("p", "intro-code", "KAIRO DYNAMICS · KD-0714 · WORKS BAY");
-    const head = node("div", "garage__head");
-    head.append(node("h2", "options-title", "GARAGE"), this.credits);
-    const tabs = node("div", "garage__tabs");
-    tabs.setAttribute("role", "tablist");
+    this.screen.setAttribute("role", "dialog");
+    this.screen.setAttribute("aria-modal", "true");
+    this.screen.setAttribute("aria-label", "Garage service bay");
+    this.scene = new GarageScene(hooks.reducedMotion, point => this.positionOrder(point));
+    this.motion = new GarageMotion(hooks.reducedMotion);
+    this.music = new GarageMusic(() => hooks.save.settings);
+    const header = node("header", "garage__header");
+    this.closeButton = button("garage__button", "close", () => this.hide());
+    this.closeButton.id = "garage-close";
+    this.closeButton.append(node("span", "", "◂ RETURN TO GRID"), this.keycap("back", "ESC"));
+    this.soundButton = button("garage__button garage__sound", "sound", () => { hooks.toggleSound(); this.syncSound(); });
+    this.jobsButton = button("garage__button garage__jobs-button", "jobs", () => this.showTab("contracts"));
+    this.jobsButton.textContent = "JOBS";
+    const wallet = node("div", "garage__wallet");
+    wallet.append(node("small", "", "CREDITS"), this.credits);
+    this.credits.setAttribute("aria-live", "polite");
+    const tabs = node("nav", "garage__tabs");
+    tabs.setAttribute("aria-label", "Garage modes");
     for (const [index, entry] of TABS.entries()) {
-      const tab = button("chip garage__tab", `tab-${entry.code}`, () => this.showTab(entry.code));
-      tab.setAttribute("role", "tab");
-      tab.append(node("strong", "", entry.label), node("small", "", String(index + 1)));
-      this.tabButtons.push(tab);
-      tabs.append(tab);
+      const tab = button("garage__tab", `tab-${entry.code}`, () => this.showTab(entry.code));
+      tab.append(node("small", "", String(index + 1)), node("strong", "", entry.label));
+      this.tabButtons.push(tab); tabs.append(tab);
     }
     tabs.addEventListener("keydown", this.handleTabKeys);
-    this.body.setAttribute("role", "tabpanel");
+    header.append(this.closeButton, tabs, this.jobsButton, this.soundButton, wallet);
     this.note.setAttribute("role", "status");
-    this.closeButton = button("ghost-button", "close", () => this.hide());
-    this.closeButton.id = "garage-close";
-    const back = node("kbd");
-    back.dataset.prompt = "back";
-    // The service terminal's own ESC keycap is kept current by `input-prompts`,
-    // so it is the label for the active device; a device change afterwards
-    // re-labels this one too, because it carries the same `data-prompt`.
-    back.textContent = document.querySelector('kbd[data-prompt="back"]')?.textContent || "ESC";
-    this.closeButton.append(node("span", "", "RETURN TO PADDOCK"), back);
-    this.sound = new ShowroomSound(() => this.hooks.save.settings.masterVolume);
+    this.sound = new ShowroomSound(() => hooks.save.settings.masterVolume);
     this.boostHold = this.holdButton("boost", "BOOST");
     this.brakeHold = this.holdButton("brake", "BRAKE");
     const meter = node("span", "garage__meter");
     meter.setAttribute("aria-hidden", "true");
-    for (let quarter = 0; quarter < 4; quarter += 1) this.meter.push(meter.appendChild(node("i")));
-    this.boostHold.append(meter);
-    this.syncMeter(1, false);
+    for (let quarter = 0; quarter < 4; quarter++) this.meter.push(meter.appendChild(node("i")));
+    this.boostHold.append(meter); this.syncMeter(1, false);
     this.boostHold.setAttribute("aria-label", "Hold to boost · reserve 4 of 4");
     this.brakeHold.setAttribute("aria-label", "Hold to brake");
     this.demoStrip.setAttribute("role", "group");
-    this.demoStrip.setAttribute("aria-label", "Showroom");
-    this.demoStrip.append(this.boostHold, this.brakeHold);
-    panel.append(code, head, tabs, this.body, this.demoStrip, this.note, this.closeButton);
-    this.screen.append(panel);
+    this.demoStrip.setAttribute("aria-label", "Test craft");
+    this.demoStrip.append(node("p", "garage__test-copy", "PLASMA RESERVE · HOLD TO TEST"), this.brakeHold, this.boostHold);
+    this.leader.setAttribute("aria-hidden", "true");
+    this.marker.setAttribute("aria-hidden", "true");
+    this.screen.append(header, this.slab, this.body, this.footer, this.leader, this.marker, this.demoStrip, this.note);
     this.screen.addEventListener("keydown", this.handlePanelKeys);
-    this.screen.addEventListener("pointerdown", (event) => {
-      // A touched preview stays through a demo hold: that is how a flame is heard and seen before it is bought.
-      if (event.pointerType === "touch" && !(event.target instanceof Element && event.target.closest(".garage__paints, .garage__demo"))) {
-        this.previewLook(null);
-      }
-    });
+    this.screen.addEventListener("pointerdown", this.resumeMusic);
+    this.screen.addEventListener("keydown", this.resumeMusic);
     (document.getElementById("app") ?? document.body).append(this.screen);
     window.addEventListener("keydown", this.handleWindowKeys, { capture: true });
-    // Leaving the page ends the demo at once: a hidden tab runs no frame to end it on.
     window.addEventListener("blur", this.interrupt);
+    window.addEventListener("focus", this.resumeMusic);
     document.addEventListener("visibilitychange", this.interrupt);
+  }
+
+  private keycap(prompt: string, label: string): HTMLElement {
+    const key = node("kbd", "", document.querySelector(`kbd[data-prompt="${prompt}"]`)?.textContent || label);
+    key.dataset.prompt = prompt; return key;
+  }
+
+  private syncSound(): void {
+    const label = document.body.dataset.muted === "true" ? "SOUND OFF" : "SOUND ON";
+    if (label === this.lastSound) return;
+    this.lastSound = label; this.soundButton.textContent = label;
+    this.soundButton.setAttribute("aria-label", `${label}, toggle sound`);
+    this.music.sync(0, this.demoing);
+    if (label === "SOUND ON") this.music.resume();
+  }
+
+  private positionOrder(point: {x: number; y: number; ready: boolean}): void {
+    const shown = this.selectedPart !== null && point.ready;
+    this.marker.hidden = this.leader.hidden = !shown;
+    this.screen.dataset.modelReady = String(point.ready);
+    if (!shown) return;
+    this.marker.style.transform = `translate(${point.x}px, ${point.y}px)`;
+    const order = this.body.querySelector<HTMLElement>(".garage__work-order");
+    if (!order) return;
+    const rect = order.getBoundingClientRect();
+    const portrait = window.innerWidth / window.innerHeight < .85;
+    const x = portrait ? Math.max(rect.left + 24, Math.min(rect.right - 24, point.x)) : rect.left;
+    const y = portrait ? rect.top : rect.top + Math.min(80, rect.height / 2);
+    this.leader.style.width = `${Math.hypot(x - point.x, y - point.y)}px`;
+    this.leader.style.transform = `translate(${point.x}px, ${point.y}px) rotate(${Math.atan2(y - point.y, x - point.x)}rad)`;
   }
 
   get isOpen(): boolean {
     return this.opened;
   }
 
-  show(tab: Tab = this.tab): void {
+  show(tab: Tab = "craft", frame?: string, confirm = false): void {
     if (!this.opened) {
       this.returnFocus = document.activeElement as HTMLElement | null;
-      this.viewed = this.hooks.save.garage.chassis;
-      this.opened = true;
-      this.screen.hidden = false;
+      this.opened = true; this.screen.hidden = false;
       document.body.dataset.garage = "true";
-      this.hooks.suspendInput();
-      // A finish that closed a job lands the next visit on DAILY, once.
-      const garage = this.hooks.save.garage;
-      if (hasNews(readDaily(garage.daily, today()))) {
-        tab = "daily";
-        this.hooks.save.setGarage(seenDaily(garage));
+      for (const element of document.querySelectorAll<HTMLElement>("#start-screen, #result-screen")) {
+        this.background.set(element, element.inert); element.inert = true;
       }
-    }
+      this.closeButton.querySelector("span")!.textContent = document.body.dataset.phase === "result" ? "◂ RETURN TO RESULTS" : "◂ RETURN TO GRID";
+      this.viewed = frame ?? this.hooks.save.garage.chassis;
+      this.scene.show(); this.hooks.setView(this.scene);
+      this.backgrounded = false; this.music.show();
+      this.hooks.suspendInput();
+    } else if (frame) this.viewed = frame;
     this.setNote("", "idle");
     this.showTab(tab);
-    this.tabButtons[TABS.findIndex((entry) => entry.code === this.tab)]?.focus({ preventScroll: true });
+    if (confirm && frame && !Object.hasOwn(this.hooks.save.garage.fleet, frame)) this.offerFrame();
+    this.tabButtons[TABS.findIndex(entry => entry.code === tab)]?.focus({preventScroll: true});
   }
 
   hide(): void {
     if (!this.opened) return;
-    this.opened = false;
-    this.trial = null;
-    this.animate();
-    this.screen.hidden = true;
-    document.body.dataset.garage = "false";
-    this.refit(null);
-    this.hooks.suspendInput();
-    this.returnFocus?.focus({ preventScroll: true });
-    this.returnFocus = null;
+    this.opened = false; this.pending = null; this.selectedPart = null; this.trial = null;
+    cancelAnimationFrame(this.animation); this.animation = 0; clearTimeout(this.rollCheck);
+    this.endDemo(); this.sound.rest(); this.music.hide(); this.motion.cancel(); this.scene.hide(); this.hooks.setView(null);
+    this.screen.hidden = true; document.body.dataset.garage = "false";
+    for (const [element, inert] of this.background) element.inert = inert;
+    this.background.clear();
+    this.refit(null); this.hooks.suspendInput();
+    refreshRewardOffer(this.hooks.save.garage);
+    this.returnFocus?.focus({preventScroll: true}); this.returnFocus = null;
   }
 
   dispose(): void {
-    cancelAnimationFrame(this.animation);
-    clearTimeout(this.rollCheck);
-    this.sound.dispose();
-    window.removeEventListener("keydown", this.handleWindowKeys, { capture: true });
+    this.hide(); this.scene.dispose(); this.sound.dispose(); this.music.dispose();
+    window.removeEventListener("keydown", this.handleWindowKeys, {capture: true});
     window.removeEventListener("blur", this.interrupt);
+    window.removeEventListener("focus", this.resumeMusic);
     document.removeEventListener("visibilitychange", this.interrupt);
-    this.screen.remove();
-    delete document.body.dataset.garage;
+    this.screen.remove(); delete document.body.dataset.garage;
   }
 
   private showTab(tab: Tab): void {
+    const direction = TABS.findIndex(entry => entry.code === tab) >= TABS.findIndex(entry => entry.code === this.tab) ? 1 : -1;
+    this.endDemo(); this.pending = null; this.selectedPart = null; this.fittedPart = null; this.trial = null;
+    this.previewUpgrade = false;
     this.tab = tab;
+    if (tab !== "craft") this.viewed = this.hooks.save.garage.chassis;
     for (const [index, entry] of TABS.entries()) {
-      const selected = entry.code === tab;
-      this.tabButtons[index].setAttribute("aria-selected", String(selected));
-      this.tabButtons[index].tabIndex = selected ? 0 : -1;
+      this.tabButtons[index].setAttribute("aria-pressed", String(entry.code === tab));
     }
-    // The showroom previews the frame being looked at; every other tab shows
-    // the craft that will actually race.
-    this.trial = null;
-    this.refit(tab === "craft" && this.viewed !== this.hooks.save.garage.chassis ? this.viewed : null);
-    this.render();
-    this.animate();
+    if (tab === "daily") this.hooks.save.setGarage(seenDaily(this.hooks.save.garage));
+    this.refit(this.viewed === this.hooks.save.garage.chassis ? null : this.viewed);
+    this.render(); this.animate();
+    this.sound.cue();
+    this.motion.enter(this.body, direction * 18, 0);
+    this.motion.enter(this.slab, -12, 0, 180);
+    this.motion.enter(this.footer, 0, 10, 200);
+    this.motion.enter(this.demoStrip, 0, 12);
   }
 
   /**
@@ -334,6 +348,7 @@ export class GarageScreen {
   private previewLook(change: Partial<FrameFit> | null): void {
     const garage = this.hooks.save.garage;
     if (change === null) {
+      if (this.pending) return;
       if (!this.trial) return;
       this.trial = null;
       this.refit(null);
@@ -383,87 +398,54 @@ export class GarageScreen {
     return row;
   }
 
-  /**
-   * The showroom turntable. While the bay is open the craft turns slowly in
-   * place, so a body and its paint are seen from every side rather than only
-   * from the chase camera behind it; the same frame loop draws an underglow
-   * pattern in motion, because the paddock only draws when asked. Under
-   * reduced motion nothing turns: the craft is held at a still three-quarter
-   * angle instead, and closing the bay puts it back exactly as it races.
-   *
-   * The same loop runs the showroom demo, under reduced motion too: while a
-   * hold is on, or its reserve is still refilling, the craft eases round to
-   * show its tail (`DEMO_FRAMING`) and a few metres up the track, where its
-   * jets, gauge and airbrakes face the camera in frame. Under reduced motion
-   * it cuts there on the press and stays until the driver's next move.
-   */
   private animate(): void {
-    const still = this.hooks.reducedMotion();
-    if (!this.opened) {
-      cancelAnimationFrame(this.animation);
-      this.animation = 0;
-      this.endDemo();
-      this.yaw = 0;
-      this.push = 0;
-      turnCraft(0);
-      this.hooks.requestRender();
-      return;
-    }
-    if (this.demoing || !still) {
-      // From the three-quarter view, not the race pose the driver just left.
-      if (this.yaw === 0) this.yaw = STILL_YAW;
-      if (!this.animation) {
-        this.last = performance.now();
-        this.animation = requestAnimationFrame(this.tick);
-      }
-      return;
-    }
-    cancelAnimationFrame(this.animation);
-    this.animation = 0;
-    this.yaw = STILL_YAW;
-    this.push = 0;
-    turnCraft(this.yaw);
-    this.hooks.requestRender();
+    if (!this.opened || this.animation) return;
+    this.last = performance.now();
+    this.animation = requestAnimationFrame(this.tick);
   }
 
   private readonly tick = (now: number): void => {
-    const seconds = Math.min(0.1, (now - this.last) / 1000);
-    this.last = now;
-    const still = this.hooks.reducedMotion();
-    const ease = 1 - Math.exp(-seconds * 10);
-    // Read every frame, so turning the phone mid-hold reframes the craft.
-    const [demoYaw, demoPush] = DEMO_FRAMING[this.upright.matches ? "upright" : "wide"];
-    // Taken before the demo can end below: held still, the craft keeps the
-    // demo's framing when the reserve refills, rather than cutting away on its
-    // own, until the driver next does something (`animate()` puts it back).
-    const push = this.demoing ? demoPush : 0;
+    const seconds = Math.max(0, Math.min(.1, (now - this.last) / 1000)); this.last = now;
+    this.syncSound();
+    this.music.sync(seconds, this.demoing);
+    this.pollPadHold();
     if (this.demoing) {
-      // The short way round to the demo's angle.
-      const yaw = Math.atan2(Math.sin(this.yaw), Math.cos(this.yaw));
-      const turn = Math.atan2(Math.sin(demoYaw - yaw), Math.cos(demoYaw - yaw));
-      this.yaw = still ? demoYaw : yaw + turn * ease;
-      const frame = demoCraft(this.hold, seconds, still);
+      const frame = demoCraft(this.hold, seconds, this.hooks.reducedMotion());
       this.sound.set(frame.throttle, frame.speedRatio, frame.brake, frame.firing, frame.recharging);
       this.syncMeter(frame.reserve, frame.recharging);
-      // Let go and refilled: the craft goes back to rest and the turntable resumes.
       if (!this.hold && frame.reserve >= 1) this.endDemo();
-    } else if (!still) {
-      this.yaw = (this.yaw + seconds * 1000 * TURN_RATE) % (Math.PI * 2);
-    } else {
-      // Held still with no demo on: the setting came on mid-turn, or the demo
-      // was cut short by a blur or a hidden tab.
-      this.yaw = STILL_YAW;
-    }
-    this.push = still ? push : this.push + (push - this.push) * ease;
-    turnCraft(this.yaw, this.push);
-    this.hooks.requestRender();
-    this.animation = this.opened && (this.demoing || !still) ? requestAnimationFrame(this.tick) : 0;
+      this.hooks.requestRender();
+    } else if (!this.backgrounded && !document.hidden && this.scene.animating) this.hooks.requestRender();
+    this.animation = this.opened ? requestAnimationFrame(this.tick) : 0;
   };
 
-  /** Every refit from the bay ends the demo first, on the body it is on now. */
+  private pollPadHold(): void {
+    const device = document.body.dataset.inputDevice ?? "keyboard";
+    if (device !== this.lastDevice && !this.rolling()) {
+      this.lastDevice = device;
+      for (const button of [this.boostHold, this.brakeHold]) button.querySelector("small")!.textContent = device === "gamepad" ? "HOLD · A" : "HOLD · SPACE";
+    }
+    const down = this.hooks.confirmHeld();
+    const focused = document.activeElement;
+    const kind = focused === this.boostHold ? "boost" : focused === this.brakeHold ? "brake" : null;
+    if (this.padHold && (!down || kind !== this.padHold || this.tab !== "test")) {
+      this.endHold(this.padHold); this.padHold = null;
+    }
+    if (down && !this.padWasDown && kind && this.tab === "test" && !this.hold) {
+      this.startHold(kind); this.padHold = kind;
+    }
+    this.padWasDown = down;
+  }
+
   private refit(previewFrame: string | null, trial?: Garage | null): void {
     this.endDemo();
-    this.hooks.refit(previewFrame, trial);
+    const serial = ++this.fitting;
+    this.screen.dataset.loading = "true";
+    void this.hooks.refit(previewFrame, trial).finally(() => {
+      if (serial !== this.fitting) return;
+      this.screen.dataset.loading = "false";
+      this.scene.animating = true; this.hooks.requestRender();
+    });
   }
 
   /** A momentary button: held by pointer, or by Space or Enter while focused. */
@@ -496,6 +478,8 @@ export class GarageScreen {
 
   private startHold(kind: "boost" | "brake"): void {
     if (!this.opened || this.hold || this.rolling()) return;
+    this.scene.select(this.viewed, null, true);
+    this.scene.animating = true;
     this.hold = kind;
     this.demoing = true;
     this.demoStrip.dataset.running = "true";
@@ -510,7 +494,8 @@ export class GarageScreen {
     delete (kind === "boost" ? this.boostHold : this.brakeHold).dataset.held;
   }
 
-  private readonly interrupt = (): void => this.endDemo();
+  private readonly resumeMusic = (): void => { if (this.opened) { this.backgrounded = false; this.music.resume(); } };
+  private readonly interrupt = (): void => { this.backgrounded = true; this.endDemo(); this.sound.rest(); this.music.interrupt(); this.motion.cancel(); };
 
   private readonly releaseHold = (): void => {
     if (this.hold) this.endHold(this.hold);
@@ -525,6 +510,7 @@ export class GarageScreen {
     restCraft();
     this.sound.rest();
     this.syncMeter(1, false);
+    this.hooks.requestRender();
   }
 
   private syncMeter(reserve: number, recharging: boolean): void {
@@ -551,7 +537,7 @@ export class GarageScreen {
   /** The strip on CRAFT and PAINT only, disabled while the craft is still rolling. */
   private syncStrip(): void {
     clearTimeout(this.rollCheck);
-    const shown = this.tab === "craft" || this.tab === "paint";
+    const shown = this.tab === "test";
     this.demoStrip.hidden = !shown;
     const rolling = shown && this.rolling();
     for (const hold of [this.boostHold, this.brakeHold]) {
@@ -566,150 +552,253 @@ export class GarageScreen {
     const focusKey = (document.activeElement as HTMLElement | null)?.dataset.key ?? null;
     const garage = this.hooks.save.garage;
     this.credits.textContent = formatCredits(garage.credits);
-    const walletLine = document.getElementById("garage-credits");
-    if (walletLine) walletLine.textContent = formatCredits(garage.credits);
+    const wallet = document.getElementById("garage-credits");
+    if (wallet) wallet.textContent = formatCredits(garage.credits);
     markDaily(garage);
-    this.body.replaceChildren(
-      ...(this.tab === "craft" ? this.renderCraft(garage)
-        : this.tab === "parts" ? this.renderParts(garage)
-        : this.tab === "paint" ? this.renderPaint(garage)
-        : this.tab === "contracts" ? this.renderContracts(garage)
-        : this.renderDaily(garage)),
-    );
-    this.syncStrip();
-    if (focusKey) {
-      const target = this.screen.querySelector<HTMLElement>(`[data-key="${focusKey}"]`);
-      if (target && !target.hasAttribute("disabled")) target.focus({ preventScroll: true });
-      else this.tabButtons[TABS.findIndex((entry) => entry.code === this.tab)]?.focus({ preventScroll: true });
+    this.screen.dataset.tab = this.tab;
+    this.screen.dataset.service = String(this.selectedPart !== null);
+    this.screen.style.setProperty("--team", TEAM_COLORS[this.viewed]);
+    this.jobsButton.dataset.news = String(hasNews(readDaily(garage.daily, today())));
+    const card = frameCard(this.viewed);
+    this.slab.replaceChildren(node("span", "garage__fleet-code", FLEET_CODES[this.viewed]),
+      node("div", "garage__identity", card.label.split(" ")[0]), node("p", "garage__deck", card.deck),
+      node("p", "garage__tradeoff", card.note), node("small", "garage__service-label", "SERVICE"));
+    this.body.replaceChildren(...(this.tab === "craft" ? this.renderCraft(garage)
+      : this.tab === "parts" ? this.renderParts(garage)
+      : this.tab === "paint" ? this.renderPaint(garage)
+      : this.tab === "test" ? [node("p", "garage__test-instruction", "Feel the response. Hold BRAKE or BOOST.")]
+      : this.tab === "contracts" ? this.renderContracts(garage) : this.renderDaily(garage)));
+    if (this.tab === "contracts" || this.tab === "daily") {
+      const tabs = node("nav", "garage__job-tabs");
+      for (const [key, label] of [["contracts", "CONTRACTS"], ["daily", "DAILY + WEEKLY"]] as const) {
+        const tab = button("garage__button", key, () => this.showTab(key));
+        tab.textContent = label; tab.setAttribute("aria-pressed", String(this.tab === key)); tabs.append(tab);
+      }
+      this.body.prepend(tabs);
+    }
+    this.renderFooter(garage);
+    this.scene.select(this.viewed, this.selectedPart, this.tab === "test", this.tab === "paint");
+    this.scene.animating = true; this.hooks.requestRender(); this.syncStrip();
+    this.marker.hidden = this.leader.hidden = !this.selectedPart;
+    if (focusKey) this.screen.querySelector<HTMLElement>(`[data-key="${focusKey}"]`)?.focus({preventScroll: true});
+  }
+
+  private renderFooter(garage: Garage): void {
+    this.footer.replaceChildren();
+    this.footer.hidden = this.tab !== "craft" && !this.selectedPart;
+    this.footer.setAttribute("aria-label", this.selectedPart ? "Switch service part" : "Choose craft");
+    if (this.selectedPart) {
+      const back = button("garage__button", "whole", () => this.back());
+      back.id = "garage-back"; back.append(node("span", "", "WHOLE CRAFT"), this.keycap("back", "ESC"));
+      this.footer.append(back);
+      for (const part of PART_CARDS) {
+        const code = part.code as PartCode;
+        const stage = garage.fleet[garage.chassis]?.parts[code] ?? 0;
+        const chip = button("garage__part-chip", `switch-${code}`, () => this.choosePart(code));
+        chip.append(node("strong", "", part.label), node("small", "", stage ? `STAGE ${ROMAN[stage]}` : "STOCK"));
+        chip.setAttribute("aria-pressed", String(code === this.selectedPart)); this.footer.append(chip);
+      }
+    } else {
+      for (const card of FRAME_CARDS) {
+        const chip = button("garage__frame", `frame-${card.code}`, () => { this.viewed = card.code; this.showTab("craft"); });
+        chip.setAttribute("aria-label", `${card.label}, ${garage.chassis === card.code ? "on the grid" : Object.hasOwn(garage.fleet, card.code) ? "owned" : formatCredits(card.price)}`);
+        chip.setAttribute("aria-pressed", String(card.code === this.viewed));
+        chip.style.setProperty("--frame-team", TEAM_COLORS[card.code]);
+        chip.append(node("b", "", FLEET_CODES[card.code]), node("span", "", card.label.split(" ")[0]),
+          node("small", "", garage.chassis === card.code ? "GRID" : Object.hasOwn(garage.fleet, card.code) ? "OWNED" : formatCredits(card.price)));
+        this.footer.append(chip);
+      }
     }
   }
 
-  private stats(handling: Readonly<Handling>, reference: Readonly<Handling> | null): HTMLElement {
+  private stats(handling: Readonly<Handling>, reference: Readonly<Handling>): HTMLElement {
     const list = node("dl", "garage__stats");
     for (const row of STAT_ROWS) {
+      const rating = Math.round(statFill(row.stat, handling[row.stat]) * 100);
+      const stock = Math.round(statFill(row.stat, reference[row.stat]) * 100);
+      const delta = rating - stock;
       const item = node("div", "garage__stat");
       const bar = node("span", "garage__bar");
-      const fill = node("i", "garage__fill");
-      fill.style.setProperty("--fill", statFill(row.stat, handling[row.stat]).toFixed(3));
-      bar.append(fill);
-      if (reference) {
-        const mark = node("b", "garage__mark");
-        mark.style.setProperty("--fill", statFill(row.stat, reference[row.stat]).toFixed(3));
-        bar.append(mark);
-      }
-      const delta = Math.round((handling[row.stat] - 1) * 1000) / 10;
-      const value = node("span", "garage__stat-value", delta === 0 ? "WORKS" : `${delta > 0 ? "+" : ""}${delta.toFixed(1)}%`);
-      value.dataset.tone = delta > 0 ? "up" : delta < 0 ? "down" : "flat";
-      const term = node("dt", "", row.label);
+      const fill = node("i", "garage__fill"); fill.style.setProperty("--fill", String(rating / 100));
+      const mark = node("b", "garage__mark"); mark.style.setProperty("--fill", String(stock / 100)); bar.append(fill, mark);
       const detail = node("dd");
-      detail.append(bar, value);
-      item.append(term, detail);
-      list.append(item);
+      detail.append(node("strong", "", String(rating)), node("span", "garage__comparison", `vs ${stock}`), node("b", "garage__delta", `${delta > 0 ? "+" : delta === 0 ? "±" : ""}${delta}`), bar);
+      item.append(node("dt", "", row.label), detail); list.append(item);
     }
     return list;
   }
 
   private renderCraft(garage: Garage): HTMLElement[] {
-    const frames = node("div", "garage__frames");
-    for (const card of FRAME_CARDS) {
-      const owned = Object.hasOwn(garage.fleet, card.code);
-      const entry = button("chip garage__frame", `frame-${card.code}`, () => {
-        this.viewed = card.code;
-        this.setNote("", "idle");
-        this.showTab("craft");
-      });
-      entry.setAttribute("aria-pressed", String(this.viewed === card.code));
-      entry.dataset.state = garage.chassis === card.code ? "grid" : owned ? "owned" : "shop";
-      entry.append(
-        node("strong", "", card.label),
-        node("small", "", card.deck),
-        node("span", "garage__tag", garage.chassis === card.code ? "ON THE GRID"
-          : owned ? "IN THE BAY"
-          : garage.contracts.done < card.licence ? `LICENCE ${garage.contracts.done}/${card.licence}`
-          : formatCredits(card.price)),
-      );
-      frames.append(entry);
+    const card = frameCard(this.viewed), owned = Object.hasOwn(garage.fleet, this.viewed);
+    const stockGarage = { ...garage, fleet: { ...garage.fleet, [this.viewed]: defaultFit() } };
+    const detail = node("div", "garage__comparison-panel");
+    detail.append(node("h2", "garage__card-title", "HEAD TO HEAD"), node("p", "garage__card-note", this.viewed === garage.chassis ? "FITTED VS STOCK · RATINGS / 100" : "THIS FRAME VS YOUR GRID CRAFT · RATINGS / 100"),
+      this.stats(frameHandling(garage, this.viewed), frameHandling(this.viewed === garage.chassis ? stockGarage : garage, this.viewed === garage.chassis ? this.viewed : garage.chassis)));
+    const commerce = node("div", "garage__commerce");
+    const short = Math.max(0, card.price - garage.credits), licence = garage.contracts.done < card.licence;
+    commerce.append(node("p", "garage__status", owned ? "IN YOUR FLEET" : licence ? `${card.licence} CONTRACTS REQUIRED` : short ? `${formatCredits(short)} SHORT` : "AVAILABLE TO BUY"));
+    if (this.pending) commerce.append(this.purchaseOrder());
+    else {
+      const action = button("garage__button garage__primary", "frame-action", () => owned
+        ? this.commit(selectFrame(this.hooks.save.garage, card.code), `${card.label} ON THE GRID`)
+        : this.offerFrame());
+      action.textContent = card.code === garage.chassis ? "ON THE GRID" : owned ? "SET ON GRID" : `BUY ${FLEET_CODES[card.code]} · ${formatCredits(card.price)}`;
+      action.disabled = card.code === garage.chassis || !owned && (short > 0 || licence); commerce.append(action);
     }
+    if (!owned && (short || licence)) {
+      const earn = button("garage__button", "earn", () => this.showTab("contracts")); earn.textContent = "FIND A PAYING CONTRACT"; commerce.append(earn);
+    }
+    if (card.code === garage.chassis) {
+      const fit = garage.fleet[card.code] ?? defaultFit();
+      const ready = PART_CARDS.filter(part => fit.parts[part.code as PartCode] < 3 && part.prices[fit.parts[part.code as PartCode]] <= garage.credits).length;
+      const upgrade = button("garage__button garage__primary", "upgrade-craft", () => this.showTab("parts"));
+      upgrade.textContent = ready ? `UPGRADE CRAFT · ${ready} READY` : "PLAN YOUR NEXT UPGRADE";
+      commerce.append(upgrade);
+    }
+    detail.append(commerce); return [detail];
+  }
+
+  private offerFrame(): void {
     const card = frameCard(this.viewed);
-    const owned = Object.hasOwn(garage.fleet, card.code);
-    const detail = node("div", "garage__card");
-    detail.append(
-      node("p", "garage__card-title", `${card.label} · ${card.deck}`),
-      node("p", "garage__card-note", card.note),
-      this.stats(frameHandling(garage, card.code), card.code === garage.chassis ? null : handlingFor(garage)),
-    );
-    if (card.code !== garage.chassis) {
-      const action = button("launch-button garage__action", "frame-action", () => {
-        this.commit(owned ? selectFrame(this.hooks.save.garage, card.code) : buyFrame(this.hooks.save.garage, card.code),
-          owned ? `${card.label} ON THE GRID` : `${card.label} SIGNED · ON THE GRID`, `frame-${card.code}`);
-      });
-      action.append(node("span", "", owned ? "PUT ON THE GRID" : `BUY · ${formatCredits(card.price)}`));
-      detail.append(action);
-    } else {
-      detail.append(node("p", "garage__card-grid", "ON THE GRID · THE MARK ON EACH BAR IS THIS FRAME"));
-    }
-    return [frames, detail];
+    this.pending = {label: card.label, price: card.price, key: "frame-action", confirm: () => buyFrame(this.hooks.save.garage, card.code)};
+    this.render(); this.focusConfirm();
+  }
+
+  private purchaseOrder(): HTMLElement {
+    const pending = this.pending!;
+    const order = node("div", "garage__purchase"); order.setAttribute("role", "group"); order.setAttribute("aria-label", `Confirm ${pending.label}`);
+    const balance = this.hooks.save.garage.credits - pending.price;
+    order.append(node("strong", "", pending.label), node("p", "", `${formatCredits(pending.price)} · ${balance < 0 ? `NEED ${formatCredits(-balance)} MORE` : `LEAVES ${formatCredits(balance)}`}`));
+    const confirm = button("garage__button garage__primary", "confirm-purchase", () => this.commit(pending.confirm(), `${pending.label} FITTED`, pending.key));
+    confirm.textContent = "CONFIRM PURCHASE"; confirm.disabled = this.hooks.save.garage.credits < pending.price;
+    const cancel = button("garage__button", "cancel-purchase", () => this.back()); cancel.textContent = "CANCEL"; cancel.id = "garage-back";
+    order.append(confirm, cancel); return order;
+  }
+
+  private choosePart(part: PartCode): void {
+    this.setNote("", "idle");
+    this.selectedPart = part; this.fittedPart = null; this.pending = null; this.endDemo();
+    this.previewUpgrade = (this.hooks.save.garage.fleet[this.viewed]?.parts[part] ?? 0) < MAX_PART_STAGE;
+    this.previewPart(); this.render(); this.motion.enter(this.body, 16, 0);
+    this.sound.cue();
+    (this.body.querySelector<HTMLButtonElement>('[data-key="fit-part"]:not(:disabled), [data-key="done-part"]') ?? this.body.querySelector<HTMLButtonElement>('[data-key="cancel-part"]'))?.focus({preventScroll: true});
+  }
+
+  private previewPart(): void {
+    const garage = this.hooks.save.garage, part = this.selectedPart;
+    const fit = garage.fleet[garage.chassis] ?? defaultFit();
+    this.trial = part && this.previewUpgrade ? {...garage, fleet: {...garage.fleet, [garage.chassis]: {...fit, parts: {...fit.parts, [part]: Math.min(MAX_PART_STAGE, fit.parts[part] + 1)}}}} : null;
+    this.refit(null, this.trial);
   }
 
   private renderParts(garage: Garage): HTMLElement[] {
     const fit = garage.fleet[garage.chassis] ?? defaultFit();
-    const title = node("p", "garage__card-title", `${frameCard(garage.chassis).label} · FITTED PARTS`);
-    const list = node("ul", "garage__parts");
-    for (const card of PART_CARDS) {
-      const part = PARTS.find((entry) => entry.code === card.code);
-      const stage = fit.parts[card.code as keyof typeof fit.parts];
-      const row = node("li", "garage__part");
-      const name = node("span", "garage__part-name");
-      name.append(
-        node("strong", "", card.label),
-        node("small", "", `${card.stat} +${Math.round((part?.step ?? 0) * 1000) / 10}% PER STAGE`),
-      );
-      const pips = node("span", "garage__pips");
-      pips.setAttribute("aria-label", `STAGE ${stage} OF ${MAX_PART_STAGE}`);
-      for (let index = 0; index < MAX_PART_STAGE; index += 1) {
-        const pip = node("i");
-        pip.dataset.on = String(index < stage);
-        pips.append(pip);
+    if (!this.selectedPart) {
+      const list = node("div", "garage__parts");
+      const available = PART_CARDS.filter(card => fit.parts[card.code as PartCode] < MAX_PART_STAGE && card.prices[fit.parts[card.code as PartCode]] <= garage.credits).length;
+      const remaining = PART_CARDS.filter(card => fit.parts[card.code as PartCode] < MAX_PART_STAGE);
+      const gap = remaining.length ? Math.max(0, Math.min(...remaining.map(card => card.prices[fit.parts[card.code as PartCode]])) - garage.credits) : 0;
+      list.append(node("h2", "garage__card-title", available ? `${available} UPGRADES READY` : remaining.length ? "YOUR NEXT UPGRADE" : "BUILD COMPLETE"),
+        node("p", "garage__card-note", available ? `${formatCredits(garage.credits)} TO SPEND · CHOOSE ONE TO PREVIEW` : remaining.length ? `${formatCredits(gap)} TO YOUR NEXT PART · RACE CONTRACTS TO EARN` : "EVERY PART AT STAGE III · TAKE IT TO THE GRID"));
+      const current = handlingFor(garage);
+      for (const card of PART_CARDS) {
+        const code = card.code as PartCode, stage = fit.parts[code];
+        const rule = PARTS.find(part => part.code === code)!;
+        const next = handlingFor({...garage, fleet: {...garage.fleet, [garage.chassis]: {...fit, parts: {...fit.parts, [code]: Math.min(3,stage + 1)}}}});
+        const from = Math.round(statFill(rule.stat, current[rule.stat]) * 100), to = Math.round(statFill(rule.stat, next[rule.stat]) * 100);
+        const price = card.prices[stage] ?? 0, affordable = stage < 3 && garage.credits >= price;
+        const part = button("garage__part", `part-${code}`, () => this.choosePart(code));
+        part.dataset.affordable = String(affordable);
+        part.append(node("strong", "", card.label), node("span", "", stage === 3 ? `${card.stat} ${from} · MAX` : `${card.stat} ${from} → ${to} · +${to - from}`),
+          node("b", "", stage === 3 ? "III / III" : `${stage ? ROMAN[stage] : "STOCK"} → ${ROMAN[stage + 1]}`),
+          node("small", "", stage === 3 ? "FULLY FITTED" : affordable ? `FIT NOW · ${formatCredits(price)}` : `NEED ${formatCredits(price - garage.credits)} MORE`));
+        const progress = node("div", "garage__stages"); progress.setAttribute("aria-hidden", "true");
+        for (let step = 1; step <= 3; step++) { const bar = node("i"); bar.dataset.fitted = String(step <= stage); bar.dataset.next = String(step === stage + 1); progress.append(bar); }
+        part.append(progress);
+        list.append(part);
       }
-      const maxed = stage >= MAX_PART_STAGE;
-      const action = button("chip garage__buy", `part-${card.code}`, () => {
-        this.commit(buyPart(this.hooks.save.garage, card.code), `${card.label} STAGE ${ROMAN[stage + 1]} FITTED`, `part-${card.code}`);
-      });
-      action.append(node("strong", "", maxed ? "MAXED" : `STAGE ${ROMAN[stage + 1]}`));
-      if (!maxed) action.append(node("small", "", formatCredits(card.prices[stage])));
-      action.disabled = maxed;
-      row.append(name, pips, action);
-      list.append(row);
+      if (!available && remaining.length) {
+        const jobs = button("garage__button garage__primary", "earn-upgrades", () => this.showTab("contracts")); jobs.textContent = "FIND A PAYING CONTRACT"; list.append(jobs);
+      }
+      return [list];
     }
-    return [title, this.stats(handlingFor(garage), null), list];
+    const code = this.selectedPart, card = PART_CARDS.find(part => part.code === code)!;
+    const stage = fit.parts[code], maxed = stage === MAX_PART_STAGE, fitted = this.fittedPart === code;
+    const part = PARTS.find(part => part.code === code)!;
+    const current = handlingFor(garage);
+    const next = handlingFor({...garage, fleet: {...garage.fleet, [garage.chassis]: {...fit, parts: {...fit.parts, [code]: Math.min(3, stage + 1)}}}});
+    const from = Math.round(statFill(part.stat, current[part.stat]) * 100), to = Math.round(statFill(part.stat, next[part.stat]) * 100);
+    const price = maxed ? 0 : card.prices[stage], short = Math.max(0, price - garage.credits);
+    const order = node("section", "garage__work-order");
+    order.dataset.fitted = String(fitted);
+    order.setAttribute("aria-label", `${card.label} work order`);
+    order.append(node("p", "garage__order-label", fitted ? "FITTED · READY FOR THE GRID" : "WORK ORDER · SERVICE"), node("h2", "", card.label),
+      node("p", "garage__stage", fitted || maxed ? `STAGE ${ROMAN[stage]}` : `${stage ? ROMAN[stage] : "STOCK"} → ${ROMAN[stage + 1]}`),
+      node("p", "garage__rating", `${card.stat} RATING ${from}${maxed || fitted ? "" : ` → ${to} · +${to - from}`}`), node("small", "garage__part-location", FRAME_ANCHORS[this.viewed][code].label));
+    order.append(node("p", "garage__benefit", PART_BENEFITS[code]), node("p", "garage__hardware", PART_HARDWARE[code][Math.max(0, (fitted || maxed ? stage : stage + 1) - 1)]));
+    if (!fitted && !maxed) {
+      const compare = node("div", "garage__compare-build"); compare.setAttribute("role", "group"); compare.setAttribute("aria-label", "Preview upgrade hardware");
+      for (const [next,label] of [[false,"FITTED"],[true,`PREVIEW ${ROMAN[stage + 1]}`]] as const) {
+        const toggle = button("garage__button", next ? "preview-next" : "preview-fitted", () => { this.previewUpgrade = next; this.previewPart(); this.render(); });
+        toggle.textContent = label; toggle.setAttribute("aria-pressed", String(this.previewUpgrade === next)); compare.append(toggle);
+      }
+      order.append(compare, node("small", "garage__preview-label", this.previewUpgrade ? "NEXT STAGE ON CRAFT · NOT PURCHASED" : "YOUR CURRENT FITTED HARDWARE"));
+    }
+    if (!fitted && !maxed) order.append(node("strong", "garage__price", formatCredits(price)), node("p", "garage__balance", short ? `NEED ${formatCredits(short)} MORE` : `YOU HAVE ${formatCredits(garage.credits)} · LEAVES ${formatCredits(garage.credits - price)}`));
+    if (short && !fitted) {
+      const contract = garage.contracts.active.map(contractFor).sort((a,b) => b.reward - a.reward)[0];
+      const earn = button("garage__button garage__earn", "earn", () => this.showTab("contracts"));
+      earn.textContent = `${this.hooks.tracks.find(track => track.selection === contract.track)?.label ?? contract.track} · +${formatCredits(contract.reward)}`;
+      order.append(earn);
+    }
+    const actions = node("div", "garage__order-actions");
+    const cancel = button("garage__button", "cancel-part", () => this.back()); cancel.textContent = "CANCEL";
+    if (maxed || fitted) {
+      const done = button("garage__button garage__primary", "done-part", () => this.back()); done.textContent = "DONE"; actions.append(done);
+    } else {
+      const confirm = button("garage__button garage__primary", "fit-part", () => this.commit(buyPart(this.hooks.save.garage, code), `${card.label} FITTED`));
+      confirm.textContent = `FIT ${ROMAN[stage + 1]}`; confirm.disabled = short > 0; actions.append(cancel, confirm);
+    }
+    order.append(actions); return [order];
+  }
+
+  private focusConfirm(): void { this.body.querySelector<HTMLButtonElement>('[data-key="confirm-purchase"]')?.focus({preventScroll: true}); }
+
+  private offerPaint(label: string, price: number, confirm: () => Transaction, key: string): void {
+    if (price === 0) { this.commit(confirm(), label, key); return; }
+    this.pending = {label, price, confirm, key}; this.render(); this.focusConfirm();
   }
 
   private renderPaint(garage: Garage): HTMLElement[] {
     const fit = garage.fleet[garage.chassis] ?? defaultFit();
-    const label = frameCard(garage.chassis).label;
-    const title = node("p", "garage__card-title", `${label} · PAINT SHOP`);
-    const hint = node("p", "garage__card-note", "POINT AT A FINISH TO SEE IT ON THE CRAFT · BODY PAINT IS PER FRAME, COLOURS AND PATTERNS FIT ANY");
-    const slots = PAINT_SLOTS.map((slot) => {
-      const chips = node("div", "chip-row garage__paints");
+    const tabs = node("nav", "garage__paint-tabs"); tabs.setAttribute("aria-label", "Paint slot");
+    for (const [code, label] of [["flame", "FLAME"], ["body", "BODY"], ["glow", "LIGHTS"], ["under", "UNDERGLOW"], ["pattern", "PATTERN"]] as const) {
+      const tab = button("garage__button", `slot-${code}`, () => { this.pending = null; this.paintSlot = code; this.previewLook(null); this.render(); });
+      tab.textContent = label; tab.setAttribute("aria-pressed", String(this.paintSlot === code)); tabs.append(tab);
+    }
+    let row: HTMLElement;
+    if (this.paintSlot === "body") row = this.renderBody(garage, fit, frameCard(garage.chassis).label);
+    else if (this.paintSlot === "pattern") row = this.renderPatterns(garage, fit)[0];
+    else {
+      const slot = PAINT_SLOTS.find(slot => slot.code === this.paintSlot)!;
+      const chips = node("div", "garage__paints");
       for (const paint of PAINT_CARDS) {
         if (slot.code === "under" ? paint.code === "stock" : paint.code === "off") continue;
-        const owned = garage.paints.includes(paint.code);
-        const chip = this.previewable(button("chip garage__paint", `paint-${slot.code}-${paint.code}`, () => {
-          this.commit(fitPaint(this.hooks.save.garage, slot.code, paint.code),
-            owned ? `${slot.label} · ${paint.label}` : `${paint.label} BOUGHT · ${slot.label}`, `paint-${slot.code}-${paint.code}`);
-        }), { [slot.code]: paint.code });
-        chip.setAttribute("role", "radio");
-        chip.setAttribute("aria-checked", String(fit[slot.code] === paint.code));
-        const swatch = node("i", "garage__swatch");
-        const shown = resolvePaint(garage.chassis, slot.code, paint.code);
+        const owned = garage.paints.includes(paint.code), price = owned ? 0 : paint.price;
+        const chip = this.previewable(button("garage__paint", `paint-${slot.code}-${paint.code}`, () => this.offerPaint(`${slot.label} · ${paint.label}`, price,
+          () => fitPaint(this.hooks.save.garage, slot.code, paint.code), `paint-${slot.code}-${paint.code}`)), {[slot.code]: paint.code});
+        chip.setAttribute("role", "radio"); chip.setAttribute("aria-checked", String(fit[slot.code] === paint.code));
+        const swatch = node("i", "garage__swatch"), shown = resolvePaint(garage.chassis, slot.code, paint.code);
         if (shown !== null) swatch.style.setProperty("--swatch", hexColor(shown));
         else swatch.dataset.swatch = paint.code === "off" ? "off" : "works";
-        chip.append(swatch, node("strong", "", paint.label), node("small", "", owned ? "OWNED" : formatCredits(paintCard(paint.code).price)));
-        chips.append(chip);
+        chip.dataset.affordable = String(!owned && garage.credits >= price);
+        chip.append(swatch, node("strong", "", paint.label), node("small", "", owned ? "OWNED · FIT FREE" : garage.credits < price ? `${formatCredits(price - garage.credits)} SHORT` : formatCredits(price))); chips.append(chip);
       }
-      return this.paintRow(slot.label, chips);
-    });
-    return [title, hint, this.renderBody(garage, fit, label), ...slots, ...this.renderPatterns(garage, fit)];
+      row = this.paintRow(slot.label, chips);
+    }
+    const panel = node("div", "garage__paint-panel"); panel.append(tabs, row);
+    if (this.pending) panel.append(this.purchaseOrder());
+    return [panel];
   }
 
   private paintRow(key: string, chips: HTMLElement): HTMLElement {
@@ -749,7 +838,7 @@ export class GarageScreen {
       const card = schemeCard(code);
       const owned = code === "factory" || (code === "gold" ? garage.goldLeaf : garage.schemes.includes(`${frame}:${code}`));
       const chip = this.previewable(button("chip garage__paint", `body-${code}`, () => {
-        this.commit(fitBody(this.hooks.save.garage, code), owned ? `${card.label} ON ${label}` : `${card.label} BOUGHT · ON ${label}`, `body-${code}`);
+        this.offerPaint(`${card.label} · ${label}`, owned ? 0 : card.price ?? 0, () => fitBody(this.hooks.save.garage, code), `body-${code}`);
       }), { body: code });
       chip.setAttribute("role", "radio");
       chip.setAttribute("aria-checked", String(fit.body === code));
@@ -761,7 +850,7 @@ export class GarageScreen {
       swatch.style.setProperty("--swatch", paint);
       swatch.style.setProperty("--swatch-accent", accent);
       chip.append(swatch, node("strong", "", card.label), node("small", "",
-        owned ? (code === "gold" ? "UNLOCKED" : "OWNED") : card.price === null ? "STREAK" : formatCredits(card.price)));
+        owned ? "OWNED · FIT FREE" : card.price === null ? "7-DAY STREAK" : garage.credits < card.price ? `${formatCredits(card.price - garage.credits)} SHORT` : formatCredits(card.price)));
       chips.append(chip);
     }
     return this.paintRow("BODY", chips);
@@ -778,8 +867,7 @@ export class GarageScreen {
     for (const pattern of PATTERN_CARDS) {
       const owned = garage.patterns.includes(pattern.code);
       const chip = this.previewable(button("chip garage__paint", `pattern-${pattern.code}`, () => {
-        this.commit(fitPattern(this.hooks.save.garage, pattern.code),
-          owned ? `UNDERGLOW · ${pattern.label}` : `${pattern.label} BOUGHT · UNDERGLOW`, `pattern-${pattern.code}`);
+        this.offerPaint(`UNDERGLOW · ${pattern.label}`, owned ? 0 : pattern.price, () => fitPattern(this.hooks.save.garage, pattern.code), `pattern-${pattern.code}`);
       }), { pattern: pattern.code, under });
       chip.setAttribute("role", "radio");
       chip.setAttribute("aria-checked", String(fit.pattern === pattern.code));
@@ -966,7 +1054,13 @@ export class GarageScreen {
       this.hooks.save.setGarage(result.garage);
       if (this.tab === "craft") this.viewed = this.hooks.save.garage.chassis;
       this.setNote(result.spent > 0 ? `${success} · −${formatCredits(result.spent)}` : success, "ok");
-      this.showTab(this.tab);
+      this.pending = null;
+      if (this.selectedPart) this.fittedPart = this.selectedPart;
+      this.previewUpgrade = false;
+      this.trial = null; this.refit(null); this.render(); this.animate();
+      this.motion.fitted(this.body); this.motion.fitted(this.credits); this.sound.cue(true);
+      this.screen.querySelector<HTMLButtonElement>(this.selectedPart ? '[data-key="done-part"]' : `[data-key="${key || "frame-action"}"]`)?.focus({preventScroll: true});
+      refreshRewardOffer(this.hooks.save.garage);
       // A purchase lands with a one-shot flash on the chip it bought (never on
       // a refusal, never under reduced motion).
       const bought = key && result.spent > 0 && !this.hooks.reducedMotion()
@@ -987,8 +1081,9 @@ export class GarageScreen {
   }
 
   private setNote(text: string, tone: "idle" | "ok" | "refused"): void {
-    this.note.textContent = text || "PREVIEW ON THE CRAFT BEHIND THIS PANEL · CHANGES SAVE AS YOU MAKE THEM";
+    this.note.textContent = text;
     this.note.dataset.tone = tone;
+    this.note.hidden = !text;
   }
 
   private readonly handleTabKeys = (event: KeyboardEvent): void => {
@@ -1001,6 +1096,13 @@ export class GarageScreen {
     this.tabButtons[TABS.findIndex((entry) => entry.code === next)]?.focus({ preventScroll: true });
   };
 
+  private back(): void {
+    if (this.pending) { const key = this.pending.key; this.pending = null; this.previewLook(null); this.render(); this.screen.querySelector<HTMLButtonElement>(`[data-key="${key}"]`)?.focus({preventScroll: true}); return; }
+    if (this.selectedPart) { this.selectedPart = null; this.fittedPart = null; this.previewUpgrade = false; this.trial = null; this.refit(null); this.render(); this.motion.enter(this.body, -16, 0); this.body.querySelector<HTMLButtonElement>("button")?.focus(); return; }
+    if (this.tab === "contracts" || this.tab === "daily") { this.showTab("craft"); return; }
+    this.hide();
+  }
+
   /** Keys aimed at the panel stay in the panel; Tab still moves focus. */
   private readonly handlePanelKeys = (event: KeyboardEvent): void => {
     const digit = Number(event.key);
@@ -1008,15 +1110,21 @@ export class GarageScreen {
       this.showTab(TABS[digit - 1].code);
       this.tabButtons[digit - 1]?.focus({ preventScroll: true });
     }
-    if (event.key !== "Tab") event.stopPropagation();
+    if (event.key === "Tab") {
+      const controls = [...this.screen.querySelectorAll<HTMLElement>('button:not(:disabled), [tabindex="0"]')].filter(control => control.getClientRects().length > 0 && control.tabIndex >= 0);
+      const first = controls[0], last = controls.at(-1);
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+    } else event.stopPropagation();
   };
 
   private readonly handleWindowKeys = (event: KeyboardEvent): void => {
     if (!this.opened) return;
+    if (event.key.toLowerCase() === "m") { event.preventDefault(); event.stopPropagation(); if (!event.repeat) this.hooks.toggleSound(); this.syncSound(); return; }
     if (event.key === "Escape") {
       event.preventDefault();
       event.stopPropagation();
-      this.hide();
+      this.back();
       return;
     }
     if (event.target instanceof Node && this.screen.contains(event.target)) return;

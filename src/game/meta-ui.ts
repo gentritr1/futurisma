@@ -20,7 +20,6 @@ import { save } from "./persistence";
 import { applyInterfaceScale } from "./interface-scale.js";
 import {
   RACE_MODES,
-  RACE_MODE_DECKS,
   RACE_MODE_LABELS,
   RIVAL_TIERS,
   RIVAL_TIER_DECKS,
@@ -31,6 +30,7 @@ import type { GameUi } from "./ui";
 
 /** Everything the meta layer needs from the running game, and nothing more. */
 export interface MetaUiHooks {
+  previewRace?(key: "map" | "mode" | "tier", value: string): boolean;
   /** Swaps the player's decal sheet and re-issues the field, live. */
   applyLivery(code: string): Promise<void>;
   setMasterVolume(volume: number): void;
@@ -203,37 +203,19 @@ export class MetaUi {
       TRACKS.map((track) => ({
         value: track.selection,
         label: track.label,
-        note: `${track.mapCode} · ${track.deck}`,
       })),
-      "confirm",
+      "select",
       (value) => this.dispatchCircuit(value as MapSelection),
     );
-    // G4 — the format and the field. Both commit with `"confirm"` and both
-    // dispatch by navigating, for exactly the reason the circuit row does: the
-    // lap count, whether a fleet is spawned at all and which pace table it
-    // drives are all read once at load, so changing one means relinking with
-    // the `?mode=` / `?tier=` a soak command already uses. An arrow key must
-    // never be able to reload the page by drifting across the row.
+    // Browsing changes the pending selection. LaunchMenu owns the live facts
+    // and dispatches the selected runtime only when the player launches.
     this.formatGroup = new ChipGroup(
       requiredElement<HTMLElement>("format-select"),
       RACE_MODES.map((mode) => ({
         value: mode,
         label: RACE_MODE_LABELS[mode],
-        // Phase D — Dream Island's row says what each format DOES to the map's
-        // one mechanic, because that is the choice being made: the clock
-        // strikes on the last lap of a race, on lap 2 of the sprint, and the
-        // solo run keeps the night turn because there is no field to hide it
-        // behind. The lap counts are the course's own (3, and the sprint's 2),
-        // not the five-lap default this row prints for the older circuits.
-        note: selection === "dreamisland"
-          ? mode === "sprint" ? "2 LAPS · DEFEND · NIGHT ON LAP 2"
-            : mode === "timeattack" ? "3 LAPS · SOLO + GHOST · NIGHT LAP"
-            : "3 LAPS · FULL FIELD · NIGHT LAP"
-          : selection === "polarity" || selection === "tideline"
-          ? mode === "sprint" ? "2 LAPS · DEFEND" : mode === "timeattack" ? "3 LAPS · SOLO" : "3 LAPS · FULL FIELD"
-          : selection === "nightshift" ? RACE_MODE_DECKS[mode].replace("5 LAPS", "3 LAPS") : RACE_MODE_DECKS[mode],
       })),
-      "confirm",
+      "select",
       (value) => this.dispatchFormat("mode", value),
     );
     this.tierGroup = new ChipGroup(
@@ -243,7 +225,7 @@ export class MetaUi {
         label: RIVAL_TIER_LABELS[tier],
         note: RIVAL_TIER_DECKS[tier],
       })),
-      "confirm",
+      "select",
       (value) => this.dispatchFormat("tier", value),
     );
     this.liveryGroup = new ChipGroup(
@@ -359,6 +341,10 @@ export class MetaUi {
     );
   }
 
+  syncLaunchSelection(track: MapSelection, mode: string, tier: string): void {
+    this.trackGroup.setValue(track); this.formatGroup.setValue(mode); this.tierGroup.setValue(tier);
+  }
+
   /** Garage — the bay issued a livery; the paddock's LIVERY row follows it. */
   showLivery(code: string): void {
     this.liveryGroup.setValue(code);
@@ -399,6 +385,7 @@ export class MetaUi {
    * lands on the same circuit.
    */
   private dispatchCircuit(track: MapSelection): void {
+    if (this.hooks.previewRace?.("map", track)) return;
     save.setTrack(track);
     if (track === this.selection) {
       this.trackGroup.setValue(track);
@@ -424,6 +411,7 @@ export class MetaUi {
    * `?diagnostics=` through the panel must not lose them by picking a tier.
    */
   private dispatchFormat(parameter: "mode" | "tier", value: string): void {
+    if (this.hooks.previewRace?.(parameter, value)) return;
     const active = parameter === "mode" ? raceModes.mode : raceModes.tier;
     if (parameter === "mode") save.setRaceMode(value);
     else save.setTier(value);

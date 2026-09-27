@@ -16,6 +16,7 @@
  * answers "what did it buy", so it sits under them and reads in the same
  * mono dispatch voice: itemised lines, a total, the balance.
  */
+import { beginRewardOffer } from "./garage-reward";
 import { formatCredits } from "./garage-catalog.js";
 import { jobDone, readDaily, settleRace, type RaceFacts, type Settlement } from "./garage-economy.js";
 import type { Garage } from "./garage-rules.js";
@@ -71,6 +72,7 @@ export function markDaily(garage: Garage): void {
     }
     label.textContent = done === 3 ? "· DAILY SWEPT" : `· DAILY ${done}/3`;
   }
+  window.dispatchEvent(new Event('garage-purse-updated'));
 }
 
 /** The race as the economy sees it: only facts the race already measured. */
@@ -130,7 +132,9 @@ function renderPurse(settlement: Settlement, balance: number): void {
   // Every result screen ends pointing at the next race worth running.
   const next = node("p", "purse__next", settlement.next);
   next.hidden = !settlement.next;
-  panel.replaceChildren(head, list, foot, next);
+  const breakdown = node("details", "purse__breakdown");
+  breakdown.append(node("summary", "", "PAYOUT BREAKDOWN"), list);
+  panel.replaceChildren(head, breakdown, foot, next);
   panel.dataset.contract = String(settlement.completed.length > 0);
   panel.hidden = false;
 }
@@ -151,9 +155,11 @@ export function settleFinish(
   try {
     const facts = raceFacts(summary, inputs, laps, track);
     if (!facts) return;
+    const previousBalance = save.garage.credits;
     const settlement = settleRace(save.garage, facts);
     const stored = settlement.demo ? save.garage : save.setGarage(settlement.garage);
     renderPurse(settlement, stored.credits);
+    beginRewardOffer(stored, previousBalance, settlement.demo);
     const credits = document.getElementById("garage-credits");
     if (credits) credits.textContent = formatCredits(stored.credits);
     markDaily(stored);

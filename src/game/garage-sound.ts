@@ -33,6 +33,18 @@ export class ShowroomSound {
   /** `volume` reads the listener's master volume (0..1) when a frame plays. */
   constructor(private readonly volume: () => number) {}
 
+  /** Short mechanical selection/fit feedback; never a sound on mere hover. */
+  cue(fitted = false): void {
+    if (document.body.dataset.muted === "true") return;
+    this.wake();
+    const context = this.context!;
+    for (const gain of [this.engineGain, this.harmonicGain, this.windGain, this.roarGain]) gain?.gain.setTargetAtTime(0, context.currentTime, .015);
+    this.master?.gain.setTargetAtTime(CEILING * this.volume(), context.currentTime, .005);
+    this.tone(fitted ? 180 : 640, fitted ? .12 : .045, fitted ? .035 : .012, "triangle", 0, fitted ? 1.5 : .68);
+    if (fitted) this.tone(720, .14, .018, "sine", .09, 1.25);
+    this.sleep = window.setTimeout(() => this.rest(), fitted ? 260 : 100);
+  }
+
   /** Builds (once) or wakes the voice. Call inside the gesture that began a hold. */
   wake(): void {
     clearTimeout(this.sleep);
@@ -160,6 +172,7 @@ export class ShowroomSound {
     gain.gain.exponentialRampToValueAtTime(0.0001, at + duration);
     oscillator.connect(gain);
     gain.connect(this.master);
+    oscillator.onended = () => { oscillator.disconnect(); gain.disconnect(); };
     oscillator.start(at);
     oscillator.stop(at + duration + 0.02);
   }

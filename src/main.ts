@@ -2,7 +2,7 @@ import { FuturismaGame } from "./game/game";
 import type { RaceCourse } from "./game/course";
 import { InputController } from "./game/input";
 import { TRACKS, resolveMapSelection } from "./game/map-selection";
-import { craftNames, handlingFor, installHandling, type Garage } from "./game/garage-rules.js";
+import { craftNames, defaultGarage, handlingFor, installHandling, type Garage } from "./game/garage-rules.js";
 import type { GarageScreen } from "./game/garage-bay";
 import { loadGarageBay, restoreStoredLivery } from "./game/meta-runtime";
 import { MetaUi } from "./game/meta-ui";
@@ -62,6 +62,7 @@ const game = new FuturismaGame(
   performance.now() - courseAssemblyStartedAt,
 );
 
+let launchMenu: import("./game/launch-menu").LaunchMenu | null = null;
 const meta = new MetaUi(
   ui,
   selection,
@@ -82,6 +83,7 @@ const meta = new MetaUi(
     setMusicVolume: (volume) => game.setMusicVolume(volume),
     suspendInput: () => input.suspendActionsUntilRelease(),
     openGarage: () => openGarage(),
+    previewRace: (key, value) => launchMenu?.choose(key, value) ?? false,
   },
 );
 
@@ -102,8 +104,8 @@ if (garageCredits) garageCredits.textContent = `CR ${save.garage.credits.toLocal
  */
 const liveryRow = document.getElementById("livery-select")?.parentElement ?? null;
 let refits = 0;
-const refitCraft = (preview: string | null, trial: Garage | null = null): void => {
-  if (stockCraft) return;
+const refitCraft = (preview: string | null, trial: Garage | null = null): Promise<void> => {
+  if (stockCraft) return Promise.resolve();
   const garage = save.garage;
   installHandling(handlingFor(garage));
   // Named now, from the shell's own table, so the grid, the ladder and the
@@ -131,6 +133,7 @@ const refitCraft = (preview: string | null, trial: Garage | null = null): void =
     clearTimeout(busy);
     if (serial === refits) ui.setFitting(null);
   });
+  return fitting;
 };
 
 // Fetch the fitted frame's body now, alongside the course, rather than after
@@ -144,8 +147,17 @@ const openGarage = (): void => {
   const body = document.body.dataset;
   if (!["intro", "result"].includes(body.phase ?? "") || body.options === "true" || body.controls === "true") return;
   garageScreen ??= loadGarageBay().then(({ GarageScreen }) => new GarageScreen({
-    refit: refitCraft,
+    // A stock/autopilot run can still use the bay; only its look is borrowed.
+    // Its baseline handling and stock body return when the bay closes.
+    refit: (preview, trial) => stockCraft ? game.refitCraft(async vehicle => {
+      const { applyCraftLook } = await loadGarageBay();
+      const garage = document.body.dataset.garage === "true" ? trial ?? save.garage : defaultGarage();
+      await applyCraftLook(vehicle, garage, preview, selection, {still: resolveReducedMotion()});
+    }) : refitCraft(preview, trial),
     requestRender: () => game.requestRender(),
+    setView: game.setGarageView,
+    toggleSound: game.toggleAudio,
+    confirmHeld: () => input.isGamepadConfirmHeld(),
     reducedMotion: resolveReducedMotion,
     liveries: LIVERIES,
     setLivery: (code) => {
@@ -158,7 +170,10 @@ const openGarage = (): void => {
     tracks: TRACKS,
   }));
   // A chunk that fails to arrive is retried on the next press, not cached.
-  void garageScreen.then((screen) => screen.show(), () => {
+  const reward = document.getElementById("result-garage-button")?.dataset;
+  const frame = reward?.frame;
+  if (reward) delete reward.frame;
+  void garageScreen.then((screen) => screen.show("craft", frame, Boolean(frame)), () => {
     garageScreen = null;
   });
 };
@@ -173,7 +188,8 @@ async function beginTrial(): Promise<void> {
 }
 
 const handleStartClick = (): void => {
-  void beginTrial();
+  if (launchMenu) void launchMenu.launch();
+  else void beginTrial();
 };
 
 // A finished race may have entered a new best on file, so the paddock's record
@@ -194,10 +210,24 @@ circuitSelect.addEventListener('click',handleCircuitSelect);
 ui.startButton.addEventListener("click", handleStartClick);
 ui.restartButton.addEventListener("click", handleRestartClick);
 
+// Lazy presentation keeps the game shell lean and circuit runtimes separate.
+const launchMenuReady = new URLSearchParams(location.search).has("launchCapture")
+  ? Promise.resolve(null)
+  : import("./game/launch-menu").then(async ({ LaunchMenu, stylesheetReady }) => {
+    await stylesheetReady;
+    launchMenu = new LaunchMenu(selection, raceModes.mode, raceModes.tier, {
+      sync: (track, mode, tier) => meta.syncLaunchSelection(track, mode, tier),
+      suspend: () => input.suspendActionsUntilRelease(), start: beginTrial, sound: game.toggleAudio,
+    });
+    ui.onLaunchCountdown = value => launchMenu?.countdown(value);
+    return launchMenu;
+  });
+
 game
   .initialize()
   .then(async (initialized) => {
-    if (!initialized) return;
+    await launchMenuReady;
+    if (!initialized) { launchMenu?.fail(); return; }
     // P17.1 — the stored livery goes ON THE CRAFT, not just in the chip row.
     // Here rather than in `MetaUi.syncFromSave` because the panel is built
     // before this promise resolves, so at sync time there is no loaded model to
@@ -215,9 +245,10 @@ game
       && parameters.has("demo")
       && parameters.get("start") === "manual";
     if (parameters.has("demo") && !manualDemoStart) void game.startTrial();
-    else ui.showReady();
+    else { ui.showReady(); await launchMenu?.ready(); }
   })
   .catch((error: unknown) => {
+    launchMenu?.fail();
     const message = error instanceof Error ? error.message : "Unknown assembly error";
     ui.showError(message);
   });
@@ -229,6 +260,7 @@ if (import.meta.hot) {
     circuitSelect.removeEventListener('click',handleCircuitSelect);
     for (const button of garageButtons) button?.removeEventListener("click", openGarage);
     void garageScreen?.then((screen) => screen.dispose(), () => undefined);
+    launchMenu?.dispose();
     meta.dispose();
     game.dispose();
   });

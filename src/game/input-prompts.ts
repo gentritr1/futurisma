@@ -20,6 +20,8 @@ export function bindInputPrompts(input: InputController): void {
     const controls=document.body.dataset.controls==='true';
     const garage=document.body.dataset.garage==='true';
     if(!options&&!controls&&!garage&&!['intro','paused','result'].includes(phase??''))return false;
+    if (document.body.dataset.launch && phase==='intro') return true;
+    if(phase==='intro'&&!options&&!controls&&!garage&&(button===4||button===5)){click(button===4?'launch-prev':'launch-next');return true;}
     if(button===0||button===9){
       const focused=document.activeElement;
       if(focused instanceof HTMLButtonElement&&focused.id!=='pause-quit')focused.click();
@@ -27,13 +29,15 @@ export function bindInputPrompts(input: InputController): void {
     }else if(button===1){
       if(options)click('options-close');
       else if(controls)click('controls-close');
-      else if(garage)click('garage-close');
+      else if(phase==='intro'&&document.getElementById('launch-grid-toggle')?.getAttribute('aria-expanded')==='true')click('launch-grid-toggle');
+      else if(garage)click(document.getElementById('garage-back')?'garage-back':'garage-close');
       else if(phase==='paused'&&document.activeElement?.id!=='pause-quit')click('pause-resume');
     }else if(button===3&&!garage)click('options-button');
     else if(button===2&&!garage)click('controls-button');
     else if(button>=12&&button<=15){
       const surface=document.getElementById(options?'options-screen':controls?'controls-screen':garage?'garage-screen':phase==='intro'?'start-screen':phase==='paused'?'pause-panel':'result-screen');
-      const targets=Array.from(surface?.querySelectorAll<HTMLElement>('button,input,[role="radio"]')??[]).filter(node=>node.getClientRects().length&&!node.hasAttribute('disabled'));
+      const header=phase==='intro'&&!options&&!controls&&!garage?document.querySelectorAll<HTMLElement>('.launch-top button'):[];
+      const targets=[...Array.from(surface?.querySelectorAll<HTMLElement>('button,input,[role="radio"]')??[]),...header].filter(node=>node.getClientRects().length&&!node.hasAttribute('disabled'));
       const index=targets.indexOf(document.activeElement as HTMLElement),direction=button===12||button===14?-1:1;
       targets[(index+direction+targets.length)%targets.length]?.focus();
     }else return false;

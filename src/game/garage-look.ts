@@ -41,7 +41,8 @@
 import * as THREE from "three";
 import { applyPs2MaterialTreatment, type TotemVehicle, type TotemVisualState } from "./totem";
 import { resolvePaint } from "./garage-catalog.js";
-import { PATTERN_CODES, type Garage } from "./garage-rules.js";
+import { PATTERN_CODES, defaultFit, type Garage } from "./garage-rules.js";
+import { fitUpgradeHardware, seatPowerHardpoints } from "./garage-upgrades";
 
 const UNDERGLOW_NAME = "garage_underglow";
 const WORKS_FLAME = 0xff581d;
@@ -70,6 +71,7 @@ const schemeMaps = new Map<string, Promise<THREE.Texture | null>>();
 const factoryMaps = new WeakMap<THREE.MeshStandardMaterial, THREE.Texture | null>();
 /** The craft the last refit dressed: the one the showroom turns. */
 let showroomCraft: TotemVehicle | null = null;
+export const showroomHull = (): THREE.Group | null => showroomCraft?.craftSurfaces().hull ?? null;
 
 /**
  * The showroom turntable: yaws the craft's visual group (which the race loop
@@ -353,6 +355,7 @@ function bodyFor(vehicle: TotemVehicle, frame: string, circuit: string): Promise
     // the linear painterly class, like the baked environment GLBs.
     body = vehicle.loadBody(`/assets/garage/frames/${frame}.glb`, { textureCharacter: "painterly" })
       .then(async (loaded) => {
+        seatPowerHardpoints(loaded, frame);
         // The wash lies under the hull and skids. CORONA's and HALO's rings hang
         // lower than both, so they are left out of the floor it is measured from.
         const floor = new THREE.Box3();
@@ -544,6 +547,18 @@ export async function applyCraftLook(
   if (serials.get(vehicle) !== serial) return;
 
   const fit = garage.fleet[frame];
+  for (const group of fitUpgradeHardware(craft.hull, body ? frame : "totem", fit ?? defaultFit())) {
+    if (group.userData.treated) continue;
+    group.userData.treated = true;
+    applyPs2MaterialTreatment(group);
+    group.traverse(object => {
+      if (!(object instanceof THREE.Mesh) || !(object.material instanceof THREE.MeshStandardMaterial) || object.material.name !== "UPGRADE_conductor") return;
+      const material = object.material;
+      object.onBeforeRender = () => { material.emissiveIntensity = .45 + craft.reserve() * .15 + (craft.firing() ? .8 : 0); };
+    });
+    await applyCircuitRule(circuit, group);
+  }
+  if (serials.get(vehicle) !== serial) return;
   const glow = resolvePaint(frame, "glow", fit?.glow ?? "stock");
   const flame = resolvePaint(frame, "flame", fit?.flame ?? "stock");
   const under = resolvePaint(frame, "under", fit?.under ?? "off");

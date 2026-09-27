@@ -16,7 +16,7 @@
  */
 const sheet = document.createElement("link");
 sheet.rel = "stylesheet";
-sheet.href = new URL("./style-garage.css", import.meta.url).href;
+sheet.href = new URL("./style-garage-b2.css", import.meta.url).href;
 document.head.append(sheet);
 
 export { GarageScreen } from "./garage-ui";

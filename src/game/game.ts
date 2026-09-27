@@ -541,15 +541,16 @@ export class FuturismaGame {
   /** P7 — the two listener volumes; the authored mix ceiling stays in audio.ts. */
   readonly setMasterVolume = (volume: number): void => this.audio.setMasterVolume(volume);
   readonly setMusicVolume = (volume: number): void => this.audio.setMusicVolume(volume);
+  readonly toggleAudio = (): void => this.ui.setAudioMuted(this.audio.toggleMute());
 
   /** P7 — the meta layer's one hook into the live scene; see `meta-runtime`. */
   readonly applyLivery = async (code: string): Promise<void> => {
     await applyRaceLivery(this.vehicle, this.rivalFleet, code, this.ui);
     this.renderRequested = true;
   };
-  /** Garage — one more paddock frame, for a showroom underglow pattern in motion. */
   readonly requestRender = (): void => { this.renderRequested = true; };
-  /** Garage — the latest refit of the player's craft (lazy `garage-look.ts`); every launch path waits for it. */
+  private garageView: import("./garage-scene").GarageView | null = null;
+  readonly setGarageView = (view: typeof this.garageView): void => { this.garageView = view; this.audio.setPaused(view !== null || this.phase === "paused"); this.requestRender(); };
   private refitting: Promise<void> = Promise.resolve();
   readonly refitCraft = (fit: (vehicle: TotemVehicle) => Promise<void>): Promise<void> => (this.refitting = fit(this.vehicle).then(() => { this.renderRequested = true; }, () => undefined));
 
@@ -637,28 +638,24 @@ export class FuturismaGame {
       && !this.trialStartPending
       && (this.phase === "standby" || this.phase === "finished");
   }
-
   private readonly frame = (timestamp: number): void => {
     if (!this.running) return;
     this.timer.update(timestamp);
     const delta = Math.min(this.timer.getDelta(), 0.05);
     const input = this.input.read();
 
-    if (this.input.consumeStart() && !this.contextLost) {
+    const launch = this.input.consumeStart(), pause = this.input.consumePause();
+    if ((launch || pause) && !this.contextLost) {
       if (
-        this.phase === "running"
-        || this.phase === "countdown"
-        || this.phase === "paused"
-        || this.phase === "resuming"
+        this.phase === "running" || this.phase === "countdown"
+        || this.phase === "paused" || this.phase === "resuming"
       ) this.togglePause();
-      else if (this.canStart()) void this.startTrial();
+      else if (launch && this.canStart()) this.phase === "standby" ? this.ui.startButton.click() : void this.startTrial();
     }
     if (this.input.consumeReset()) {
       if (this.phase === "running" || this.phase === "countdown") this.recoverVehicle();
     }
-    if (this.input.consumeMute()) {
-      this.ui.setAudioMuted(this.audio.toggleMute());
-    }
+    if (this.input.consumeMute()) this.toggleAudio();
     if (this.circuitRuntime?.handleActions(this.phase === "running", this.progress, this.position, this.lateral, this.demoAutopilot)) {
       this.lateral *= -1;
       this.syncPresentationPose();
@@ -675,8 +672,9 @@ export class FuturismaGame {
       this.renderRequested,
       this.contextLost,
     )) {
-      this.sceneAssets.authoredEnvironment?.updateVisibility(this.camera);
-      this.renderer.render(this.scene, this.camera);
+      if (!this.garageView) this.sceneAssets.authoredEnvironment?.updateVisibility(this.camera);
+      this.garageView?.update();
+      this.renderer.render(this.garageView?.scene ?? this.scene, this.garageView?.camera ?? this.camera);
       this.renderRequested = false;
       this.diagnosticRenderedFrames += 1;
     } else if (!this.contextLost) {
@@ -2559,6 +2557,7 @@ export class FuturismaGame {
 
   dispose(): void {
     if (this.disposed) return;
+    this.garageView?.hide();
     this.circuitRuntime?.dispose();
     this.disposed = true;
     this.running = false;

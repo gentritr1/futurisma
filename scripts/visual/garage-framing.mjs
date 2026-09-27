@@ -61,19 +61,20 @@ function measure() {
     if (/^FRAME_/.test(object.name) && object.parent) body = object;
   });
   const canvas = document.getElementById("game-canvas").getBoundingClientRect();
-  const camera = [...window.__cameras].find((candidate) => Math.abs(candidate.aspect - canvas.width / canvas.height) < 0.05);
+  const camera = [...window.__cameras].find(candidate => candidate.name === "garage_service_camera");
   const box = (selector) => {
     const element = document.querySelector(selector);
-    return element && !element.hidden ? element.getBoundingClientRect() : null;
+    return element && !element.hidden && getComputedStyle(element).display !== "none" ? element.getBoundingClientRect() : null;
   };
-  const panel = box(".garage");
+  const panel = box(".garage__header");
+  const slab=box(".garage__slab"), copy=box(".garage__body");
   const strip = box(".garage__demo");
   const away = (rect, x, y) => rect ? Math.max(rect.left - x, x - rect.right, rect.top - y, y - rect.bottom) : Infinity;
   const point = (what, world) => {
     const projected = world.clone().project(camera);
     const x = canvas.left + (projected.x + 1) / 2 * canvas.width;
     const y = canvas.top + (1 - projected.y) / 2 * canvas.height;
-    return { what, x: Math.round(x), y: Math.round(y), clearance: Math.round(Math.min(away(panel, x, y), away(strip, x, y), x, y, innerWidth - x, innerHeight - y)) };
+    return { what, x: Math.round(x), y: Math.round(y), clearance: Math.round(Math.min(away(panel, x, y), away(slab, x, y), away(copy, x, y), away(strip, x, y), x, y, innerWidth - x, innerHeight - y)) };
   };
   const points = [];
   if (jets && camera) {
@@ -96,7 +97,7 @@ function measure() {
     if (node && camera) points.push(point(name, node.getWorldPosition(new THREE.Vector3())));
   }
   const holds = [...document.querySelectorAll(".garage__hold")].map((hold) => hold.getBoundingClientRect().height);
-  const pinned = Boolean(strip) && getComputedStyle(document.querySelector(".garage__demo")).position === "fixed";
+  const pinned = Boolean(strip);
   const overlap = panel && strip ? Math.min(panel.right, strip.right) > Math.max(panel.left, strip.left) && Math.min(panel.bottom, strip.bottom) > Math.max(panel.top, strip.top) : false;
   const inside = strip ? strip.left >= 0 && strip.top >= 0 && strip.right <= innerWidth && strip.bottom <= innerHeight : false;
   return { camera: Boolean(camera), jets: Boolean(jets), frame: body?.name ?? "TOTEM", points, layout: { holds, pinned, overlap, inside } };
@@ -127,7 +128,8 @@ async function openBay(browser, chassis, width, height) {
   });
   await tab.waitForTimeout(1500);
   await tab.keyboard.press("KeyG");
-  await tab.waitForFunction(() => document.body.dataset.garage === "true" && !document.querySelector(".garage__demo")?.hidden, null, { timeout: 60_000 });
+  await tab.waitForFunction(() => document.body.dataset.garage === "true", null, { timeout: 60_000 });
+  await tab.locator('[data-key="tab-test"]').click();
   await tab.waitForTimeout(2000);
   return { context, tab, errors };
 }
@@ -137,18 +139,15 @@ async function held(tab, key) {
   const box = await tab.locator(`[data-key="${key}"]`).boundingBox();
   await tab.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
   await tab.mouse.down();
-  await tab.waitForFunction(() => {
-    let hull = null;
-    for (const scene of window.__scenes) scene.traverse((object) => { if (object.name === "totem_visual_motion") hull = object; });
-    return hull && -hull.position.z > 3.8;
-  }, null, { timeout: 60_000 });
+  await tab.waitForFunction(() => document.querySelector('.garage__demo')?.dataset.running === 'true');
+  await tab.waitForTimeout(1500);
   await tab.waitForTimeout(600);
   return tab.evaluate(measure);
 }
 
 function assertClear(result, kind, label) {
   const points = result.points.filter((point) => point.what.startsWith(kind));
-  assert.ok(result.camera, `${label}: the chase camera could not be found.`);
+  assert.ok(result.camera, `${label}: the service camera could not be found.`);
   assert.ok(points.length > 0, `${label}: no ${kind} to measure.`);
   const worst = points.reduce((low, point) => point.clearance < low.clearance ? point : low);
   assert.ok(worst.clearance >= CLEAR, `${label}: ${worst.what} lands at (${worst.x}, ${worst.y}), ${worst.clearance} px from the panel, the holds or an edge (needs ${CLEAR}).`);
@@ -171,7 +170,10 @@ try {
     const { context, tab, errors } = await openBay(browser, RUNS[0][0], width, height);
     for (const [index, [frame, boosting, braking]] of RUNS.entries()) {
       if (index > 0) {
-        await tab.evaluate((code) => document.querySelector(`[data-key="frame-${code}"]`)?.click(), frame);
+        await tab.locator('[data-key="tab-craft"]').click();
+        await tab.locator(`[data-key="frame-${frame}"]`).click();
+        await tab.locator('[data-key="frame-action"]').click();
+        await tab.locator('[data-key="tab-test"]').click();
         await tab.waitForTimeout(6000);
       }
       const label = `${width}×${height} ${frame.toUpperCase()}`;

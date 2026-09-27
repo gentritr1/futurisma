@@ -1,0 +1,12 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>B2 garage test fixtures</title>
+<style>body{background:#101719;color:#e7eddd;font:18px system-ui;max-width:800px;margin:48px auto;padding:24px}button{font:inherit;padding:16px;margin:8px}p{line-height:1.6}</style>
+<h1>B2 garage · local test fixtures</h1><p>Development only. Each button replaces this origin's test save and opens the game. Use a separate local port from your normal save.</p><div id="fixtures"></div>
+<script type="module">
+import { save } from '/src/game/persistence.ts';
+import { defaultGarage, defaultFit, FRAME_CODES } from '/src/game/garage-rules.js';
+for (const frame of FRAME_CODES) {
+ const button=document.createElement('button');button.textContent=`Service ${frame.toUpperCase()}`;
+ button.onclick=()=>{const garage=defaultGarage();garage.credits=50000;garage.contracts.done=20;garage.chassis=frame;garage.fleet=Object.fromEntries(FRAME_CODES.map(code=>[code,defaultFit()]));save.setGarage(garage);location.href='/?map=nightshift&minimap=aplus';};document.getElementById('fixtures').append(button);
+}
+const starter=document.createElement('button');starter.textContent='New driver · CR 400';starter.onclick=()=>{save.setGarage(defaultGarage());location.href='/?map=nightshift&minimap=aplus';};document.getElementById('fixtures').append(starter);
+</script></html>

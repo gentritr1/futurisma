@@ -19,6 +19,7 @@ import {
   SECTOR_DELTA_HOLD_MS,
   deltaTone,
   formatDeltaSeconds,
+  modeHasField,
   startingGridRows,
 } from "./race-modes-rules.js";
 import type { RaceResultSummary } from "./race-modes";
@@ -162,7 +163,7 @@ export interface RaceCoursePresentation {
   startLabel: string;
   /** The circuit's own paddock copy, from its lazy course chunk. */
   flavour: string;
-  briefing(laps: string, craft: string): string;
+  briefing(laps: string, craft: string, solo: boolean): string;
 }
 
 type PauseReason = "FOCUS LOST" | "GRAPHICS LINK LOST" | "GRAPHICS LINK RESTORED";
@@ -178,6 +179,7 @@ function requiredElement<T extends HTMLElement>(id: string): T {
 export { formatRaceTime };
 
 export class GameUi {
+  onLaunchCountdown: ((value: string) => void) | null = null;
   readonly startButton = requiredElement<HTMLButtonElement>("start-button");
   readonly restartButton = requiredElement<HTMLButtonElement>("restart-button");
   /** Owned here so DOM lookups stay in the UI module; drawn by `Minimap`. */
@@ -408,7 +410,7 @@ export class GameUi {
 
   /** The briefing under the circuit name, which names the craft bringing it home. */
   private renderDeck(): void {
-    if (this.lastDeck) this.introDeck.textContent = this.lastDeck.course.briefing(this.lastDeck.lapLabel, this.craft.short);
+    if (this.lastDeck) this.introDeck.textContent = this.lastDeck.course.briefing(this.lastDeck.lapLabel, this.craft.short, !modeHasField(this.raceMode));
   }
 
   /**
@@ -660,6 +662,7 @@ export class GameUi {
   }
 
   setCountdown(value: string): void {
+    this.onLaunchCountdown?.(value);
     const countable = value === "GO" || /^[0-9]$/.test(value);
     if (countable) this.countdown.dataset.value = value === "GO" ? "go" : "count";
     if (countable && value !== this.countdown.textContent && !this.reducedMotion) {

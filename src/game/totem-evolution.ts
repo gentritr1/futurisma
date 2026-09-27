@@ -297,6 +297,9 @@ export class TotemEvolution {
       [this.shieldDevice, this.shieldDeployment, state.shieldActive === true],
     ] as const) {
       if (!device) continue;
+      // Empty pickup slots are stowed inside the hull. Only carried/active
+      // powers deploy; these are not permanent garage upgrade components.
+      device.root.visible = deployment > .015;
       device.root.position.y = this.anchors.deviceY + deployment * .46;
       device.root.scale.setScalar(.42 + deployment * .2);
       device.update(state.elapsed, state.reducedMotion, deployment > .05 ? charge : .12, active ? activation : 0);
@@ -312,13 +315,15 @@ export class TotemEvolution {
       if (this.surgeConduit.instanceColor) this.surgeConduit.instanceColor.needsUpdate = true;
     }
     if (this.powerMounts) {
+      this.powerMounts.visible = this.surgeDeployment > .015 || this.shieldDeployment > .015;
       for (let side = 0; side < 2; side += 1) {
         const device = side === 0 ? this.surgeDevice : this.shieldDevice;
         if (!device) continue;
         const height = Math.max(.08, device.root.position.y - device.root.scale.x * .46 - this.anchors.mountBase);
         for (let support = 0; support < 2; support += 1) {
           this.placement.position.set((side === 0 ? -1 : 1) * this.anchors.deviceX, this.anchors.mountBase + height / 2, this.anchors.deviceZ + (support === 0 ? -.14 : .14));
-          this.placement.scale.set(1, height, 1);
+          this.placement.scale.setScalar(device.root.visible ? 1 : 0);
+          this.placement.scale.y *= height;
           this.placement.updateMatrix();
           this.powerMounts.setMatrixAt(side * 2 + support, this.placement.matrix);
         }
@@ -394,6 +399,8 @@ export class TotemEvolution {
 
   reset(): void {
     this.surgeDeployment = this.shieldDeployment = 0;
+    for (const device of [this.surgeDevice, this.shieldDevice]) if (device) device.root.visible = false;
+    if (this.powerMounts) this.powerMounts.visible = false;
     this.rotorSpeed = 0;
     this.rotor.rotation.set(0, 0, 0);
     this.engineStrength = 0;

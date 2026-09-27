@@ -351,7 +351,7 @@ assert.ok(totem.includes("if (this.body) { const body = this.body; this.body = n
     assert.ok(look.includes(needle), `garage-look.ts lost part of the showroom demo: ${needle}`);
   }
   assert.equal(bay.split("this.hooks.refit(").length, 2, "garage-ui.ts refits the craft outside its one refit helper.");
-  assert.ok(bay.includes("this.endDemo();\n    this.hooks.refit(previewFrame, trial);"), "The bay's refit no longer ends the demo first.");
+  assert.match(bay, /private refit[\s\S]*?this\.endDemo\(\);[\s\S]*?this\.hooks\.refit\(previewFrame, trial\)/, "Refit must end the demo before replacing the body.");
   assert.ok(bay.includes('document.getElementById("speed-value")?.textContent !== "000"')
     && hud.includes('this.speedValue.textContent = Math.round(frame.speedKph).toString().padStart(3, "0");'),
     "The showroom's RESULT gate no longer reads the HUD's speed as the race writes it.");
@@ -373,40 +373,22 @@ assert.ok(totem.includes("if (this.body) { const body = this.body; this.body = n
   }
   assert.ok(hud.includes("document.body.dataset.muted = String(muted);") && sound.includes('document.body.dataset.muted === "true"'),
     "The showroom engine no longer hears the game's mute.");
-  // The demo frames its plume per screen (measured by check:garage-framing),
-  // turning by the short way; it ends at once on blur or a hidden tab; and the
-  // boost carries its roar (band-pass 250 Hz Q 0.7, low-pass 1.4 kHz, 0.075,
-  // 60 ms attack and 180 ms release).
-  for (const needle of ["const DEMO_FRAMING = { wide: [-0.25, 4], upright: [0, 4] } as const;",
-    'const [demoYaw, demoPush] = DEMO_FRAMING[this.upright.matches ? "upright" : "wide"];',
-    "const turn = Math.atan2(Math.sin(demoYaw - yaw), Math.cos(demoYaw - yaw));",
-    'window.addEventListener("blur", this.interrupt);', 'document.addEventListener("visibilitychange", this.interrupt);',
-    "private readonly interrupt = (): void => this.endDemo();"]) {
-    assert.ok(bay.includes(needle), `garage-ui.ts lost part of the showroom demo: ${needle}`);
+  // B2 owns a separate camera and scene. Background interruption must still
+  // settle visuals and release audio synchronously, without waiting for rAF.
+  for (const needle of ['window.addEventListener("blur", this.interrupt);',
+    'document.addEventListener("visibilitychange", this.interrupt);',
+    "this.syncMeter(1, false);"]) {
+    assert.ok(bay.includes(needle), `B2 lost a showroom lifecycle guard: ${needle}`);
   }
-  assert.ok(look.includes("hull.position.z = -push;"), "turnCraft no longer frames the demo by pushing the craft up the track.");
-  // Held still, the demo's framing is read before the demo can end in a frame,
-  // so a refilled reserve never cuts the craft away on its own.
-  assert.ok(/const push = this\.demoing \? demoPush : 0;\s*if \(this\.demoing\) \{/.test(bay),
-    "The demo's push must be taken before the demo can end, or reduced motion cuts away when the reserve refills.");
-  // The framing's layouts are the sheet's: the upright query in both files, the
-  // column's never overlapping it, and the pinned holds' rules on both.
-  const sheet = await read("src/game/style-garage.css");
-  const [upright, column] = ["(orientation: portrait)", "(orientation: landscape) and (max-width: 1279px), (orientation: landscape) and (max-width: 1439px) and (max-aspect-ratio: 17/10)"];
-  assert.ok(bay.includes(`const UPRIGHT_SCREEN = "${upright}";`) && bay.includes("private readonly upright = matchMedia(UPRIGHT_SCREEN);")
-    && sheet.includes(`@media ${upright} {`) && sheet.includes(`@media ${column} {`),
-    "The demo's framing and the bay's upright and column layouts no longer share their media queries.");
-  const pinned = sheet.match(new RegExp(`@media ${`${upright}, ${column}`.replace(/[()]/g, "\\$&")} \\{([\\s\\S]*?)\\n\\}`))?.[1] ?? "";
-  assert.ok(pinned.includes("min-height: 44px;"), "Wherever the holds are pinned they must be 44 px.");
-  // The panel enters by fading only where the holds are pinned, or its 240 ms
-  // slide carries them. The override outranks the shell's entrance rule by a
-  // class, so it holds whichever sheet is later.
-  const shell = await read("src/style.css");
-  assert.ok(/@starting-style \{\s*\.screen\.screen--garage:not\(\[hidden\]\) \.garage \{\s*transform: none;/.test(pinned),
-    "Where the holds are pinned, the panel must enter without sliding them.");
-  assert.ok(/@starting-style \{\s*\.screen:not\(\[hidden\]\) :is\(\.intro-panel, \.result-panel\) \{\s*transform: translateY\(18px\);/.test(shell)
-    && shell.includes("transform 240ms var(--ease-out),") && bay.includes('node("div", "intro-panel options-panel garage")'),
-    "The shell's panel entrance changed; re-check that the garage's override still outranks it.");
+  assert.match(bay, /private readonly interrupt[^\n]+this\.endDemo\(\)[^\n]+this\.sound\.rest\(\)[^\n]+this\.music\.interrupt\(\)/,
+    "Background interruption must settle the craft, effects voice and music in the same task.");
+  const scene = await read("src/game/garage-scene.ts");
+  assert.ok(scene.includes('this.parent.add(this.hull);') && scene.includes('this.hull.quaternion.copy(this.savedRotation)'),
+    "B2 must restore the real craft to its race parent and rotation.");
+  assert.ok(scene.includes('this.test ? 15 : portrait ? 8.4 : 10.7'), "TEST must retain its wider plume composition.");
+  const sheet = await read("src/game/style-garage-b2.css");
+  assert.ok(sheet.includes("min-height: 60px;") && sheet.includes("(max-aspect-ratio: 17/20)"),
+    "B2 must retain usable hold controls and a portrait composition.");
   for (const needle of ["band.frequency.value = 250;", "band.Q.value = 0.7;", "smooth.frequency.value = 1_400;",
     "this.roarGain?.gain.setTargetAtTime(firing ? 0.075 : 0, now, firing ? 0.02 : 0.06);"]) {
     assert.ok(sound.includes(needle), `garage-sound.ts lost part of the boost roar: ${needle}`);
@@ -471,9 +453,9 @@ assert.match(look, /hull\.rotation\.y = radians/, "turnCraft no longer yaws the 
     "MOVING_PHASES must be exactly the paddock phases that draw every frame (frame-scheduling.js).");
 }
 const hide = bay.slice(bay.indexOf("  hide(): void {"), bay.indexOf("  dispose(): void {"));
-assert.ok(hide.indexOf("this.animate()") >= 0 && hide.indexOf("this.animate()") < hide.indexOf("this.refit(null)"),
-  "hide() must stop the turntable (animate) before it refits the paddock.");
-assert.match(bay, /if \(!this\.opened\) \{[^}]*this\.endDemo\(\);\s*this\.yaw = 0;\s*this\.push = 0;\s*turnCraft\(0\);/,
-  "a closed bay must end the showroom demo and turn the craft back to zero.");
+assert.ok(hide.indexOf("this.scene.hide()") >= 0 && hide.indexOf("this.scene.hide()") < hide.indexOf("this.refit(null)"),
+  "hide() must restore the craft to the paddock before refitting.");
+assert.match(hide, /this\.endDemo\(\);[^\n]+this\.scene\.hide\(\); this\.hooks\.setView\(null\)/,
+  "Closing B2 must settle the demo, restore the craft and release its camera.");
 
-console.log(`Garage frames PASS: ${report.join("; ")}; the showroom turntable owns the visual group's yaw and zeroes it before the paddock refits; ${atlases} paint schemes built (${(atlasBytes / 1024).toFixed(0)} KiB, fetched one at a time), each matching its catalog swatch; pivots identity and mirrored, airbrakes forward of their hinges, anchors mirrored, jets on the kit's line, single-sided role materials with all four kit lamps, manifest current; bodies mount (never scale), refits serialize and a launch waits for the latest.`);
+console.log(`Garage frames PASS: ${report.join("; ")}; B2 restores the real craft and releases its camera before paddock refits; ${atlases} paint schemes built (${(atlasBytes / 1024).toFixed(0)} KiB, fetched one at a time), each matching its catalog swatch; pivots identity and mirrored, airbrakes forward of their hinges, anchors mirrored, jets on the kit's line, single-sided role materials with all four kit lamps, manifest current; bodies mount (never scale), refits serialize and a launch waits for the latest.`);

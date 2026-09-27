@@ -751,7 +751,7 @@ for (const needle of [
 const main = await read("src/main.ts");
 assert.match(main, /if \(!stockCraft\) installHandling\(handlingFor\(save\.garage\)\);/, "main.ts must install the fitted handling at boot.");
 assert.match(main, /has\("demo"\)/, "a demo must race the works craft.");
-const lazy = /^garage-(bay|ui|look|purse|economy|catalog)\b/;
+const lazy = /^garage-(bay|ui|look|purse|economy|catalog|anchors|scene|reward|reward-rules|upgrades|motion|music)\b/;
 const sourceRoot = new URL("../src/", import.meta.url);
 async function* sources(directory) {
   for (const entry of await readdir(directory, { withFileTypes: true })) {
@@ -764,6 +764,8 @@ for await (const { name, path } of sources(sourceRoot)) {
   if (lazy.test(name)) continue;
   const source = await readFile(path, "utf8");
   for (const match of source.matchAll(/^import\s+(?!type\b)[^;]*?from\s+["']\.\/(?:game\/)?(garage-[\w-]+)/gm)) {
+    // LaunchMenu is itself dynamically loaded and shares only the small motion helper.
+    if (name === 'launch-menu.ts' && match[1] === 'garage-motion') continue;
     assert.ok(!lazy.test(match[1]), `${name} statically imports the lazy ${match[1]}; the garage must stay out of the shell.`);
   }
 }

@@ -89,7 +89,14 @@ export class PauseMenu {
 
   setPaused(paused: boolean, reason?: string): void {
     if (this.panel) this.panel.hidden = !paused;
-    if (this.reason && paused) this.reason.textContent = reason ?? "PAUSED";
+    if (this.reason && paused) this.reason.textContent = reason === "PAUSED" || !reason ? "RACE ON HOLD" : reason;
+    if (paused) {
+      const context = document.getElementById("pause-context");
+      const course = document.getElementById("course-name")?.textContent?.split(" / ")[0] ?? "";
+      const lap = document.getElementById("lap-value")?.textContent?.replace(/^LAP\s*/, "") ?? "";
+      const position = document.getElementById("position-value")?.textContent?.split(" / ")[0] ?? "";
+      if (context) context.textContent = `${course} · LAP ${lap} · ${position}`;
+    }
     if (!paused) {
       this.buttonHeld = false;
       this.writeProgress(0);

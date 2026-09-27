@@ -177,7 +177,11 @@ export function modeFieldSize(mode, fieldCount = 3) {
  * fieldless case expressible at all.
  *
  * The field's own grid wins whenever the format has one, so the names and
- * liveries the craft are actually wearing stay the single source of truth. A
+ * liveries the craft are actually wearing stay the single source of truth. The
+ * sprint lists that field in the order it really starts: the rivals' slots are
+ * handed out back to front ({@link reverseGridOrder}), so the rows are too, and
+ * the paddock never says the quickest rival starts right behind you when it
+ * starts last. A
  * field format that has no grid YET answers with nothing rather than with a
  * lone row: at boot the fleet does not exist, and a list that said "one craft"
  * for a moment before saying "four" would be a second wrong answer rather than
@@ -191,8 +195,11 @@ export function modeFieldSize(mode, fieldCount = 3) {
  * @returns {readonly StartingGridRow[]} rows to paint, or empty to leave as-is
  */
 export function startingGridRows(mode, fieldGrid, playerTeam) {
-  if (modeHasField(mode)) return fieldGrid;
-  return [{ position: 1, name: "TOTEM", team: playerTeam, player: true }];
+  if (!modeHasField(mode)) return [{ position: 1, name: "TOTEM", team: playerTeam, player: true }];
+  if (!modeReversesGrid(mode) || fieldGrid.length === 0) return fieldGrid;
+  const leaders = fieldGrid.filter((row) => row.player);
+  const rivals = reverseGridOrder(fieldGrid.filter((row) => !row.player));
+  return [...leaders, ...rivals].map((row, index) => ({ ...row, position: index + 1 }));
 }
 
 /**

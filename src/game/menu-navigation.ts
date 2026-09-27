@@ -22,13 +22,13 @@ export class MenuNavigation {
   }
 
   show(surface:'options'|'controls'):void {
-    if(this.surface===surface||this.surface==='options'&&surface==='controls')return;
+    if(this.surface===surface)return;
     if(surface==='options'){
       this.returnTo=this.surface==='controls'?'controls':document.body.dataset.phase??'intro';
       this.returnFocus=document.activeElement as HTMLElement|null;
       this.options.dataset.returnTo=this.returnTo;
     }else{
-      this.controlsReturnFocus=document.activeElement as HTMLElement|null;
+      this.controlsReturnFocus=this.surface==='options'?document.getElementById('controls-button'):document.activeElement as HTMLElement|null;
       this.controls.dataset.returnTo=document.body.dataset.phase??'intro';
     }
     this.surface=surface;this.sync();
@@ -57,7 +57,12 @@ export class MenuNavigation {
     event.preventDefault();event.stopPropagation();
   };
   private readonly panelKeyDown=(event:KeyboardEvent):void=>{
-    if(event.key!=='Tab')event.stopPropagation();
+    if(event.key!=='Tab'){event.stopPropagation();return;}
+    const panel=event.currentTarget as HTMLElement;
+    const targets=Array.from(panel.querySelectorAll<HTMLElement>('button,input,[tabindex="0"]')).filter(node=>node.getClientRects().length&&!node.hasAttribute('disabled'));
+    const first=targets[0],last=targets[targets.length-1];
+    if(event.shiftKey&&document.activeElement===first){event.preventDefault();last?.focus();}
+    else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus();}
   };
   dispose():void {
     this.optionsClose.removeEventListener('click',this.close);this.controlsClose.removeEventListener('click',this.close);

@@ -1,0 +1,26 @@
+// Standalone development fixture: real result renderer, purse and economy;
+// deterministic test race inputs and an in-memory store, never a saved race.
+import { GameUi } from '/src/game/ui.ts';
+import { defaultGarage, defaultFit } from '/src/game/garage-rules.js';
+import { settleRace } from '/src/game/garage-economy.js';
+import { settleFinish, today } from '/src/game/garage-purse.ts';
+import { refreshRewardOffer } from '/src/game/garage-reward.ts';
+const shell=new DOMParser().parseFromString(await (await fetch('/')).text(),'text/html');
+for(const script of shell.querySelectorAll('script'))script.remove();
+document.body.replaceChildren(...shell.body.children);
+document.getElementById('loading-screen').hidden=true;
+document.getElementById('start-screen').hidden=true;
+const ui=new GameUi();
+const summary={mode:'race',tier:'works',newBestLap:true,previousBestLapMs:36000,topSpeedKph:390,nearMisses:3,cleanGateChain:9,slipstreamSeconds:2};
+const finish={position:1,racerCount:4,driftCashes:3,demo:false};
+const garage=defaultGarage();garage.contracts.done=20;garage.chassis='lance';
+for(const frame of ['lance','sidewinder','bulwark'])garage.fleet[frame]=defaultFit();
+const facts={...summary,...finish,laps:3,track:'greenwater',day:today()};
+const amount=settleRace(garage,facts).total;garage.credits=3421-amount;
+const store={garage,setGarage(value){this.garage=value;return value;}};
+ui.showResult(105421,3,34401,[35400,34401,35620],1,4,[],null);
+settleFinish(summary,{finish},3,store,'greenwater');
+const state=new URLSearchParams(location.search).get('state');
+if(state==='short')store.garage={...store.garage,credits:1921};
+if(state==='owned')store.garage={...store.garage,credits:221,chassis:'corona',fleet:{...store.garage.fleet,corona:defaultFit()}};
+refreshRewardOffer(store.garage);
