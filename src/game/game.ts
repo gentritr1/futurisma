@@ -644,14 +644,13 @@ export class FuturismaGame {
     const delta = Math.min(this.timer.getDelta(), 0.05);
     const input = this.input.read();
 
-    if (this.input.consumeStart() && !this.contextLost) {
+    const launch = this.input.consumeStart(), pause = this.input.consumePause();
+    if ((launch || pause) && !this.contextLost) {
       if (
-        this.phase === "running"
-        || this.phase === "countdown"
-        || this.phase === "paused"
-        || this.phase === "resuming"
+        this.phase === "running" || this.phase === "countdown"
+        || this.phase === "paused" || this.phase === "resuming"
       ) this.togglePause();
-      else if (this.canStart()) void this.startTrial();
+      else if (launch && this.canStart()) void this.startTrial(); // Escape / P never launch
     }
     if (this.input.consumeReset()) {
       if (this.phase === "running" || this.phase === "countdown") this.recoverVehicle();

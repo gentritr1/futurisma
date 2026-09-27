@@ -448,15 +448,28 @@ assert.equal(startingGridRows("timeattack", [], "NEEDLE 16")[0].team, "NEEDLE 16
 // stale fleet can never put rivals back on a solo grid.
 assert.equal(startingGridRows("timeattack", FIELD_GRID, "WORKS 07").length, 1);
 
-// Every format that HAS a field still lists the field verbatim, by identity:
-// the names and liveries the craft are wearing stay the single source of truth.
+// Every format that HAS a field lists the fleet's own rows: the names and
+// liveries the craft are wearing stay the single source of truth. A format that
+// keeps the authored order lists the grid verbatim, by identity; the sprint
+// lists it in the order it really starts (the rivals back to front, the player
+// still on pole), renumbered, with every row's name and livery untouched.
 for (const mode of RACE_MODES.filter((candidate) => modeHasField(candidate))) {
-  assert.equal(
-    startingGridRows(mode, FIELD_GRID, "WORKS 07"),
-    FIELD_GRID,
-    `\`${mode}\` must list the fleet's own grid, not a recomposition of it.`,
-  );
-  assert.equal(startingGridRows(mode, FIELD_GRID, "WORKS 07").length, 4);
+  const rows = startingGridRows(mode, FIELD_GRID, "WORKS 07");
+  if (!modeReversesGrid(mode)) {
+    assert.equal(rows, FIELD_GRID, `\`${mode}\` must list the fleet's own grid, not a recomposition of it.`);
+  } else {
+    assert.deepEqual(
+      rows.map((row) => [row.position, row.name, row.team, row.player]),
+      [
+        [1, "TOTEM", "WORKS 07", true],
+        [2, "NEEDLE 16", "FIELD TOTEM", false],
+        [3, "NIGHTFORM 24", "FIELD TOTEM", false],
+        [4, "PRIVATEER 13", "FIELD TOTEM", false],
+      ],
+      `\`${mode}\` must list the rivals in the order their reversed grid slots put them.`,
+    );
+  }
+  assert.equal(rows.length, 4);
   // Nothing yet is NOT "one craft": at boot the fleet does not exist, and an
   // empty answer is what tells `GameUi` to leave the list alone until it does.
   assert.deepEqual(

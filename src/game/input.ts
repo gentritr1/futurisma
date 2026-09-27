@@ -33,7 +33,13 @@ const DRIVING_KEYS = new Set([
   "Space",
 ]);
 
-const START_KEYS = new Set(["Enter", "Escape", "KeyP"]);
+/**
+ * Enter launches from the paddock and toggles pause in a race. Escape and P only
+ * ever pause or resume: they are also "back" in every menu, so letting them
+ * launch meant a stray Escape on the paddock started a race.
+ */
+const START_KEYS = new Set(["Enter"]);
+const PAUSE_KEYS = new Set(["Escape", "KeyP"]);
 /**
  * The keys a focused control owns.
  *
@@ -68,7 +74,7 @@ function targetOwnsKeys(target: EventTarget | null): boolean {
     ),
   );
 }
-const ACTION_KEYS = new Set([...START_KEYS, "KeyR", "KeyM", "Space", "KeyE"]);
+const ACTION_KEYS = new Set([...START_KEYS, ...PAUSE_KEYS, "KeyR", "KeyM", "Space", "KeyE"]);
 
 function hasHeldKeyboardAction(keys: ReadonlySet<string>): boolean {
   for (const code of ACTION_KEYS) {
@@ -101,6 +107,7 @@ export class InputController {
     boost: false,
   };
   private startRequested = false;
+  private pauseRequested = false;
   private resetRequested = false;
   private muteRequested = false;
   private flipRequested = false;
@@ -293,6 +300,13 @@ export class InputController {
     return requested;
   }
 
+  /** Escape / P: pause or resume a race in progress; never a launch. */
+  consumePause(): boolean {
+    const requested = this.pauseRequested;
+    this.pauseRequested = false;
+    return requested;
+  }
+
   consumeReset(): boolean {
     const requested = this.resetRequested;
     this.resetRequested = false;
@@ -336,6 +350,7 @@ export class InputController {
     if (START_KEYS.has(event.code)) {
       this.startRequested = true;
     }
+    if (PAUSE_KEYS.has(event.code)) this.pauseRequested = true;
     if (event.code === "KeyR") this.resetRequested = true;
     if (event.code === "KeyM") this.muteRequested = true;
     if (this.gravityControls && event.code === "Space") this.flipRequested = true;
@@ -355,6 +370,7 @@ export class InputController {
     this.flipRequested = false;
     this.powerRequested = false;
     this.startRequested = false;
+    this.pauseRequested = false;
     this.resetRequested = false;
     this.muteRequested = false;
     this.controlIntentRequested = false;

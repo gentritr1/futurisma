@@ -319,9 +319,11 @@ export interface RaceCourse {
   /**
    * The paddock briefing under the circuit name. The circuit's own copy lives
    * here, in its lazy chunk, rather than in the first-paint UI; `laps` is the
-   * lap label ("3 laps") and `craft` the fitted frame's short name.
+   * lap label ("3 laps"), `craft` the fitted frame's short name, and `solo`
+   * whether the format spawns no field (TIME ATTACK), so the copy never counts
+   * ships that will not be on track.
    */
-  briefing(laps: string, craft: string): string;
+  briefing(laps: string, craft: string, solo: boolean): string;
   readonly startLabel: string;
   readonly startProgress: number;
   readonly startLateral: number;
@@ -1274,8 +1276,8 @@ export class GreenwaterCourse implements RaceCourse {
   readonly mapCode = "MAP 01";
   readonly flavour = "KAIRO DYNAMICS · KD-0714";
 
-  briefing(laps: string, craft: string): string {
-    return `Four ships. ${laps} through Greenwater Strip. Follow the amber turn markers, clear all eight gates, and bring ${craft} home through The Cradle.`;
+  briefing(laps: string, craft: string, solo: boolean): string {
+    return `${solo ? "Solo against the clock." : "Four ships."} ${laps} through Greenwater Strip. Follow the amber turn markers, clear all eight gates, and bring ${craft} home through The Cradle.`;
   }
   readonly finishName = "The Cradle";
   readonly startLabel = "RUNWAY 09";

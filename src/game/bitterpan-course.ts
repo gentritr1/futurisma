@@ -692,8 +692,8 @@ export class BitterpanCourse implements RaceCourse {
   readonly finishName = "the Loadout Apron";
   readonly flavour = "KAIRO DYNAMICS · KD-0714";
 
-  briefing(laps: string, craft: string): string {
-    return `Four ships. ${laps} through ${this.mapName}. Follow the amber turn markers, clear all ${this.checkpointCount} sector gates, and bring ${craft} home through ${this.finishName}.`;
+  briefing(laps: string, craft: string, solo: boolean): string {
+    return `${solo ? "Solo against the clock." : "Four ships."} ${laps} through ${this.mapName}. Follow the amber turn markers, clear all ${this.checkpointCount} sector gates, and bring ${craft} home through ${this.finishName}.`;
   }
   readonly startLabel = "LOADOUT APRON";
   readonly startProgress = 3045 / COURSE_LENGTH_METRES;
