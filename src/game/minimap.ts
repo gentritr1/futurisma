@@ -130,6 +130,12 @@ export class Minimap {
   private contactCount = 0;
   private nearestRivalMeters: number | null = null;
   private drawOps = 0;
+  /**
+   * DEV-ONLY direction A+ (`?minimap=aplus` on the dev server). `declare`, so a
+   * production build emits nothing; every use sits behind
+   * `import.meta.env?.DEV`, which Vite folds to `false` in a build.
+   */
+  declare private aplus?: import("./minimap-aplus").MinimapAPlus;
 
   constructor(
     private readonly canvas: HTMLCanvasElement,
@@ -181,6 +187,11 @@ export class Minimap {
     }
 
     this.rebuild();
+    if (import.meta.env?.DEV && new URLSearchParams(window.location.search).get("minimap") === "aplus") {
+      void import("./minimap-aplus").then(({ MinimapAPlus }) => {
+        this.aplus = new MinimapAPlus(canvas, course, reducedMotion);
+      });
+    }
   }
 
   /**
@@ -300,6 +311,11 @@ export class Minimap {
     elapsedSeconds: number,
     alternateRoad = false,
   ): void {
+    if (import.meta.env?.DEV && this.aplus) {
+      this.contactCount = Math.max(0, Math.min(contactCount, this.contacts.length));
+      this.aplus.update(playerRaceDistanceMeters, playerProgress, this.contacts, this.contactCount, elapsedSeconds);
+      return;
+    }
     const ratio = Math.min(window.devicePixelRatio || 1, 2);
     if (ratio !== this.pixelRatio) this.rebuild();
 
@@ -397,6 +413,15 @@ export class Minimap {
   }
 
   diagnostics(): MinimapDiagnostics {
+    if (import.meta.env?.DEV && this.aplus) {
+      // The shipped fields (read with the delegate detached) plus A+'s own; this
+      // shape keeps the production body of this method byte-identical.
+      const shipped = this.aplus;
+      this.aplus = undefined;
+      const merged = { ...this.diagnostics(), ...shipped.diagnostics() };
+      this.aplus = shipped;
+      return merged;
+    }
     return {
       minimapAnimated: !this.reducedMotion,
       minimapStations: this.outline.stationCount,
