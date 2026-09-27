@@ -1,0 +1,289 @@
+[
+ {
+  "name": "nightshift-844x390",
+  "announcements": 3,
+  "samples": 12,
+  "hits": [],
+  "unreadable": 0,
+  "offscreen": [],
+  "clipped": false,
+  "plates": [
+   "S2/8MOTEL MILE",
+   "S3/8CLOSED ARCADE",
+   "S4/8NORTH TENEMENTS"
+  ],
+  "maxPlateW": 304.6,
+  "errors": []
+ },
+ {
+  "name": "nightshift-667x375",
+  "announcements": 3,
+  "samples": 12,
+  "hits": [],
+  "unreadable": 0,
+  "offscreen": [],
+  "clipped": false,
+  "plates": [
+   "S2/8MOTEL MILE",
+   "S3/8CLOSED ARCADE",
+   "S4/8CLOSED ARCADE"
+  ],
+  "maxPlateW": 243.7,
+  "errors": []
+ },
+ {
+  "name": "nightshift-390x844",
+  "announcements": 3,
+  "samples": 12,
+  "hits": [],
+  "unreadable": 0,
+  "offscreen": [],
+  "clipped": false,
+  "plates": [
+   "S2/8MOTEL MILE",
+   "S3/8CLOSED ARCADE",
+   "S4/8NORTH TENEMENTS"
+  ],
+  "maxPlateW": 243.7,
+  "errors": []
+ },
+ {
+  "name": "greenwater-844x390",
+  "announcements": 3,
+  "samples": 12,
+  "hits": [],
+  "unreadable": 0,
+  "offscreen": [],
+  "clipped": false,
+  "plates": [
+   "S2/9CRADLE BEND",
+   "S3/9WATER TABLE",
+   "S4/9HANGAR SIX"
+  ],
+  "maxPlateW": 304.6,
+  "errors": []
+ },
+ {
+  "name": "greenwater-667x375",
+  "announcements": 3,
+  "samples": 12,
+  "hits": [],
+  "unreadable": 0,
+  "offscreen": [],
+  "clipped": false,
+  "plates": [
+   "S2/9CRADLE BEND",
+   "S3/9WATER TABLE",
+   "S4/9HANGAR SIX"
+  ],
+  "maxPlateW": 243.7,
+  "errors": []
+ },
+ {
+  "name": "greenwater-390x844",
+  "announcements": 3,
+  "samples": 12,
+  "hits": [],
+  "unreadable": 0,
+  "offscreen": [],
+  "clipped": false,
+  "plates": [
+   "S2/9CRADLE BEND",
+   "S3/9WATER TABLE",
+   "S4/9HANGAR SIX"
+  ],
+  "maxPlateW": 243.7,
+  "errors": []
+ },
+ {
+  "name": "tideline-844x390",
+  "announcements": 4,
+  "samples": 16,
+  "hits": [],
+  "unreadable": 0,
+  "offscreen": [],
+  "clipped": false,
+  "plates": [
+   "S2/8PUMP HALL",
+   "S3/8PORT AFTERLIGHT",
+   "S4/8PORT AFTERLIGHT",
+   "S5/8THE SERVICE QUAY"
+  ],
+  "maxPlateW": 304.6,
+  "errors": []
+ },
+ {
+  "name": "tideline-667x375",
+  "announcements": 4,
+  "samples": 16,
+  "hits": [],
+  "unreadable": 0,
+  "offscreen": [],
+  "clipped": false,
+  "plates": [
+   "S2/8PUMP HALL",
+   "S3/8PORT AFTERLIGHT",
+   "S4/8PORT AFTERLIGHT",
+   "S5/8THE SERVICE QUAY"
+  ],
+  "maxPlateW": 243.7,
+  "errors": []
+ },
+ {
+  "name": "tideline-390x844",
+  "announcements": 4,
+  "samples": 16,
+  "hits": [],
+  "unreadable": 0,
+  "offscreen": [],
+  "clipped": false,
+  "plates": [
+   "S2/8PUMP HALL",
+   "S3/8PORT AFTERLIGHT",
+   "S4/8PORT AFTERLIGHT",
+   "S5/8THE SERVICE QUAY"
+  ],
+  "maxPlateW": 243.7,
+  "errors": []
+ },
+ {
+  "name": "dreamisland-844x390",
+  "announcements": 3,
+  "samples": 12,
+  "hits": [],
+  "unreadable": 0,
+  "offscreen": [],
+  "clipped": false,
+  "plates": [
+   "S2/8BEACH STRAIGHT",
+   "S3/8PALM GROVE",
+   "S4/8BASIN CAUSEWAY"
+  ],
+  "maxPlateW": 270.6,
+  "errors": []
+ },
+ {
+  "name": "dreamisland-667x375",
+  "announcements": 3,
+  "samples": 12,
+  "hits": [],
+  "unreadable": 0,
+  "offscreen": [],
+  "clipped": false,
+  "plates": [
+   "S2/8BEACH STRAIGHT",
+   "S3/8PALM GROVE",
+   "S4/8WATCHTOWER POINT"
+  ],
+  "maxPlateW": 216.5,
+  "errors": []
+ },
+ {
+  "name": "dreamisland-390x844",
+  "announcements": 3,
+  "samples": 12,
+  "hits": [],
+  "unreadable": 0,
+  "offscreen": [],
+  "clipped": false,
+  "plates": [
+   "S2/8BEACH STRAIGHT",
+   "S3/8PALM GROVE",
+   "S4/8WATCHTOWER POINT"
+  ],
+  "maxPlateW": 216.5,
+  "errors": []
+ },
+ {
+  "name": "nightshift-844x390-reduced",
+  "announcements": 3,
+  "samples": 12,
+  "hits": [],
+  "unreadable": 0,
+  "offscreen": [],
+  "clipped": false,
+  "plates": [
+   "S2/8MOTEL MILE",
+   "S3/8CLOSED ARCADE",
+   "S4/8NORTH TENEMENTS"
+  ],
+  "maxPlateW": 304.6,
+  "errors": []
+ },
+ {
+  "name": "nightshift-667x375-reduced",
+  "announcements": 3,
+  "samples": 12,
+  "hits": [],
+  "unreadable": 0,
+  "offscreen": [],
+  "clipped": false,
+  "plates": [
+   "S2/8MOTEL MILE",
+   "S3/8CLOSED ARCADE",
+   "S4/8CLOSED ARCADE"
+  ],
+  "maxPlateW": 243.7,
+  "errors": []
+ },
+ {
+  "name": "greenwater-844x390-reduced",
+  "announcements": 3,
+  "samples": 12,
+  "hits": [],
+  "unreadable": 0,
+  "offscreen": [],
+  "clipped": false,
+  "plates": [
+   "S2/9CRADLE BEND",
+   "S3/9WATER TABLE",
+   "S4/9HANGAR SIX"
+  ],
+  "maxPlateW": 304.6,
+  "errors": []
+ },
+ {
+  "name": "greenwater-667x375-reduced",
+  "announcements": 3,
+  "samples": 12,
+  "hits": [],
+  "unreadable": 0,
+  "offscreen": [],
+  "clipped": false,
+  "plates": [
+   "S2/9CRADLE BEND",
+   "S3/9WATER TABLE",
+   "S4/9HANGAR SIX"
+  ],
+  "maxPlateW": 243.7,
+  "errors": []
+ },
+ {
+  "name": "greenwater-844x390-longname",
+  "announcements": 1,
+  "samples": 4,
+  "hits": [],
+  "unreadable": 0,
+  "offscreen": [],
+  "clipped": true,
+  "plates": [
+   "S2/9THE VERY LONG SECTOR NAME TEST"
+  ],
+  "maxPlateW": 304.6,
+  "errors": []
+ },
+ {
+  "name": "greenwater-667x375-longname",
+  "announcements": 1,
+  "samples": 4,
+  "hits": [],
+  "unreadable": 0,
+  "offscreen": [],
+  "clipped": true,
+  "plates": [
+   "S2/9THE VERY LONG SECTOR NAME TEST"
+  ],
+  "maxPlateW": 243.7,
+  "errors": []
+ }
+]

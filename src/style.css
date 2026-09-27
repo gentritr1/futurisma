@@ -2236,6 +2236,71 @@ body[data-options="true"] .hud {
   }
 }
 
+/*
+  Gate strip on phones. At its desktop 500px it crossed the P-plate, the lap
+  block and the race clock at 844x390 (the HUD runs at scale 1 there) and ran
+  off both edges at 390x844. Measured with rects, not eyeballed: in landscape
+  the only region no block reaches on any circuit is bottom-right, in portrait
+  the band under the turn cue and banner slot. Two rows (gate + chain / sector + distance) keep
+  every fact in 300px. `.hud-gate__left` dissolves into the grid, so the dev
+  A+ sector plate that replaces the gate text takes the freed first cell.
+*/
+@media (max-width: 700px), (max-height: 520px) {
+  .hud-gate {
+    width: 300px;
+  }
+
+  .hud-gate__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "gate chain" "sector finish";
+    gap: 5px 10px;
+  }
+
+  .hud-gate__left {
+    display: contents;
+  }
+
+  #checkpoint-value {
+    grid-area: gate;
+  }
+
+  #clean-chain {
+    grid-area: chain;
+    justify-self: end;
+  }
+
+  .hud-gate__sector {
+    grid-area: sector;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .hud-gate__finish {
+    grid-area: finish;
+    justify-self: end;
+  }
+}
+
+@media (max-width: 700px) {
+  /* Below the turn cue (136px) and the alert/banner slot, which measures
+     196-255px when active on every circuit at 390x844. */
+  .hud-gate {
+    top: 264px;
+  }
+}
+
+@media (max-height: 520px) {
+  .hud-gate {
+    left: auto;
+    right: 34px;
+    top: auto;
+    bottom: 16px;
+    transform-origin: bottom right;
+    transform: scale(var(--hud-scale));
+  }
+}
+
 @media (max-height: 520px) and (min-width: 560px) {
   .result-laps {
     width: 100%;
