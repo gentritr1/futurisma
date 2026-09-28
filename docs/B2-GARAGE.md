@@ -17,7 +17,7 @@ The A+ minimap stays behind its existing development flag.
 
 `garage-scene.ts` owns the bay and camera and temporarily reparents the actual visual group. It restores the original parent, position and rotation on close/disposal. It never disposes the borrowed model. Part locations are explicit per-frame entries in `garage-anchors.ts`.
 
-The bay/UI/reward code stays behind `garage-bay.ts`; no new dependencies. The bay streams the existing original score on first use. The renderer seam in `game.ts` remains within the existing 2,584-line ceiling. Initial shell: approximately 281.0 KiB gzip, below the 282 KiB ceiling. New scene lighting has no shadow maps.
+The bay/UI/reward code stays behind `garage-bay.ts`; no new dependencies. The bay streams the existing original score on first use. The renderer seam in `game.ts` remains within the existing 2,584-line ceiling. The clean-lockfile review build measures 281.72 KiB gzip for the initial shell, below the unchanged 282 KiB ceiling (see LAUNCH-MENU.md). New scene lighting has no shadow maps.
 
 The authored hulls are preserved. All five upgrade types now add stage I–III hardware, kept for racing: engine collars/liners, servo/fin braces, skid shoes and plasma cooling/conductors. Hardware is fitted to each frame's actual nodes; fin attachments use a surface ray instead of a bounding-box corner. Moving parts inherit their parent's animation. Geometry is merged by attachment/material, cached for unchanged fits and disposed on refit. Fully upgraded hardware peaks at 16 draws and 2,184 added triangles. No extra texture or model download is required.
 
@@ -45,4 +45,6 @@ Run the game locally and open GARAGE. For compact A+, append `?map=nightshift&mi
 - `scripts/visual/garage-b2-fixture.html` seeds an isolated local test origin through the real save API.
 - `scripts/visual/garage-b2-results.html` renders deterministic test race data through the real results/purse modules, using an in-memory store. `?state=short` and `?state=owned` show the other offer states.
 
-The full code suite has three existing missing-art-input failures in this checkout: tidal pump orthographic reference, Tideline atlas provenance, and Dream Island works calibration. All other suite commands were run separately and passed. Generated Dream Island evidence changes were restored, not folded into this feature.
+The full `npm run test:code` gate passes with a fresh lockfile install. The three previously missing art inputs were excluded by the local sparse checkout, not missing from the repository. The review checkout includes the Tideline references/textures and Dream Island calibration. Generated historical Dream Island reports are restored after validation and are not part of this change.
+
+Phone service layout reserves separate grid rows for the scrolling work order and parts switcher, with a 12 px gap. It overrides the legacy 300 px minimum height and keeps the order actions inside the scrolling viewport. The shop browser check covers every part at 390×844 and 390×680, including whether each button owns its touch target.

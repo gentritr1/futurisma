@@ -52,6 +52,7 @@ export class LaunchMenu {
   private readonly sequenceStatus=el('p','launch-sequence__status','PREPARING THE GRID');
   private readonly startButton=required('start-button') as HTMLButtonElement;
   private readonly motion=new GarageMotion(resolveReducedMotion);
+  private briefFade:Animation|null=null;
   private readonly syncPanels=installLaunchPanels();
   private readonly observer:MutationObserver;
   private readonly header:LaunchHeader;
@@ -127,7 +128,12 @@ export class LaunchMenu {
     this.screen.style.setProperty('--circuit',colour);this.screen.dataset.track=this.track;
     this.screen.dataset.reduced=String(resolveReducedMotion());
     this.hooks.sync(this.track,this.mode,this.tier);
-    this.number.textContent=track.mapCode.slice(-2);this.name.textContent=track.label;this.deck.textContent=track.deck;
+    this.number.textContent=track.mapCode.slice(-2);
+    const words=track.label.split(' ');
+    this.name.replaceChildren(...words.map((word,i)=>el('span','',word+(i<words.length-1?' ':''))));
+    this.slab.style.setProperty('--name-size',String(Math.min(92,Math.floor(214/(Math.max(...words.map(word=>word.length))*.44)))));
+    this.slab.style.setProperty('--name-lines',String(words.length));
+    this.deck.textContent=track.deck;
     this.backgrounds.querySelectorAll<HTMLElement>('img').forEach(image=>image.dataset.selected=String(image.dataset.track===this.track));
     this.twist.textContent=guide.title;this.note.textContent=guide.note;this.feature.textContent=guide.feature;
     this.detail.replaceChildren(...[['LAP',`${(data.length/1000).toFixed(2)} KM`],['GATES',String(data.gates.length)],['TIME OF DAY',guide.time]].map(([label,value])=>{const pair=el('div');pair.append(el('small','',label),el('strong','',value));return pair;}));
@@ -138,7 +144,12 @@ export class LaunchMenu {
     const nextFacts=`${laps} LAPS · ${distance} KM · ${best===null?'NO LAP YET':`BEST ${time(best)}`}`;
     if(this.facts.textContent!==nextFacts)this.updateFacts(nextFacts);
     const pace={rookie:'off the pace',works:'at factory pace',feral:'ahead of factory pace'}[this.tier];
-    this.brief.textContent=this.mode==='timeattack'?`Solo against the clock. ${['polarity','tideline'].includes(this.track)?'Set your best lap.':'Chase your saved ghost.'}`:`Three rivals ${pace}. ${this.mode==='sprint'?'Two laps. Defend the lead.':'Finish first.'} Purse ×${{rookie:'0.8',works:'1.0',feral:'1.4'}[this.tier]}.`;
+    const brief=this.mode==='timeattack'?`Solo against the clock. ${['polarity','tideline'].includes(this.track)?'Set your best lap.':'Chase your saved ghost.'}`:`Three rivals ${pace}. ${this.mode==='sprint'?'Two laps. Defend the lead.':'Finish first.'} Purse ×${{rookie:'0.8',works:'1.0',feral:'1.4'}[this.tier]}.`;
+    if(this.brief.textContent!==brief){
+      const opacity=this.briefFade?.playState==='running'?getComputedStyle(this.brief).opacity:'0.55';
+      this.briefFade?.cancel();this.brief.textContent=brief;
+      this.briefFade=this.brief.animate([{opacity},{opacity:1}],{duration:resolveReducedMotion()?120:140,easing:'ease-out'});
+    }
     required('tier-select').setAttribute('aria-label',this.mode==='timeattack'?'Record category (solo: no rival field)':'Field pace');
     this.screen.querySelectorAll<HTMLElement>('#format-select [data-value]').forEach(chip=>{
       const m=chip.dataset.value as RaceMode;chip.setAttribute('aria-label',`${RACE_MODE_LABELS[m]}, ${launchFacts(this.track,m).laps} laps`);
@@ -186,6 +197,7 @@ export class LaunchMenu {
     this.overlay.querySelector('strong')!.textContent=trackFor(this.track).label;
     this.overlay.dataset.stage='loading';this.overlay.dataset.reduced=String(resolveReducedMotion());
     document.body.dataset.launch='loading';this.renderGrid(this.sequenceGrid);
+    delete document.documentElement.dataset.launchBoot;
   }
 
   async launch():Promise<void> {
@@ -248,5 +260,5 @@ export class LaunchMenu {
   };
   private readonly pointerDown=(e:PointerEvent):void=>{if(e.pointerType==='touch')this.swipe={x:e.clientX,y:e.clientY};};
   private readonly pointerUp=(e:PointerEvent):void=>{const start=this.swipe;this.swipe=null;if(start&&Math.abs(e.clientX-start.x)>50&&Math.abs(e.clientY-start.y)<60)this.step(e.clientX<start.x?1:-1);};
-  dispose():void {this.disposed=true;this.observer.disconnect();this.motion.cancel();window.removeEventListener('keydown',this.keyDown,{capture:true});this.screen.removeEventListener('click',this.outsideGrid);this.backgrounds.removeEventListener('pointerdown',this.pointerDown);this.backgrounds.removeEventListener('pointerup',this.pointerUp);this.overlay.getAnimations().forEach(a=>a.cancel());this.overlay.remove();this.header.dispose();delete document.body.dataset.launch;}
+  dispose():void {this.disposed=true;this.observer.disconnect();this.motion.cancel();this.briefFade?.cancel();window.removeEventListener('keydown',this.keyDown,{capture:true});this.screen.removeEventListener('click',this.outsideGrid);this.backgrounds.removeEventListener('pointerdown',this.pointerDown);this.backgrounds.removeEventListener('pointerup',this.pointerUp);this.overlay.getAnimations().forEach(a=>a.cancel());this.overlay.remove();this.header.dispose();delete document.body.dataset.launch;}
 }

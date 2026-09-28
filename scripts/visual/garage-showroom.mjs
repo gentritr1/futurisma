@@ -155,7 +155,7 @@ async function holdFor(tab, key, milliseconds) {
   await tab.waitForTimeout(milliseconds);
 }
 
-const server = await createServer({ server: { host: "127.0.0.1", port: PORT, strictPort: true }, logLevel: "error" });
+const server = await createServer({ server: { host: "127.0.0.1", port: PORT, strictPort: true, hmr: false, watch: null }, logLevel: "error" });
 await server.listen();
 const browser = await chromium.launch({ args: ["--use-gl=angle", "--use-angle=swiftshader", "--ignore-gpu-blocklist", "--autoplay-policy=no-user-gesture-required"] });
 try {
@@ -509,11 +509,30 @@ try {
     await tab.waitForTimeout(600);
     const layout=await tab.evaluate(()=>{
       const anchor=document.querySelector('.garage__anchor').getBoundingClientRect(),body=document.querySelector('.garage__body').getBoundingClientRect();
-      return {y:anchor.top,top:body.top,buttons:[...document.querySelectorAll('.garage__order-actions button')].map(b=>{const r=b.getBoundingClientRect();return {top:r.top,bottom:r.bottom};})};
+      const footer=document.querySelector('.garage__footer').getBoundingClientRect();
+      return {y:anchor.top,top:body.top,bottom:body.bottom,footerTop:footer.top,buttons:[...document.querySelectorAll('.garage__order-actions button')].map(b=>{const r=b.getBoundingClientRect();return {top:r.top,bottom:r.bottom};})};
     });
-    assert.ok(layout.y<layout.top,'phone upgrade stays above the order');
-    assert.ok(layout.buttons.every(b=>b.top>0&&b.bottom<844),'phone actions stay reachable');
     await tab.screenshot({path:'shots/garage-energy/phone-next-upgrade.png'});
+    assert.ok(layout.y<layout.top,'phone upgrade stays above the order: '+JSON.stringify(layout));
+    assert.ok(layout.buttons.every(b=>b.top>0&&b.bottom<844),'phone actions stay reachable');
+    assert.ok(layout.bottom+10<=layout.footerTop,'phone work-order viewport stays clear of the parts row');
+    assert.ok(layout.buttons.every(b=>b.bottom<=layout.bottom),'phone action buttons remain inside the work-order viewport');
+    for(const height of [844,680]) {
+      await tab.setViewportSize({width:390,height});
+      for(const part of ['engine','thrusters','stabilisers','skid','plasma']) {
+        await tab.locator(`[data-key="switch-${part}"]`).click();
+        await tab.locator('.garage__body').evaluate(el=>Promise.all(el.getAnimations().map(animation=>animation.finished)));
+        const bounds=await tab.evaluate(()=>{
+          const body=document.querySelector('.garage__body').getBoundingClientRect();
+          const footer=document.querySelector('.garage__footer').getBoundingClientRect();
+          return {top:body.top,bottom:body.bottom,footerTop:footer.top,actions:[...document.querySelectorAll('.garage__order-actions button')].map(button=>{
+            const r=button.getBoundingClientRect();return {top:r.top,bottom:r.bottom,hit:document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)?.closest('button')===button};
+          })};
+        });
+        assert.ok(bounds.bottom+10<=bounds.footerTop,`${part}/${height}: work order clear of parts row`);
+        assert.ok(bounds.actions.every(b=>b.top>=bounds.top&&b.bottom<=bounds.bottom&&b.hit),`${part}/${height}: actions fully visible and own their touch targets: ${JSON.stringify(bounds)}`);
+      }
+    }
     await tab.locator('[data-key="earn"]').click();assert.equal(await tab.locator('#garage-screen').getAttribute('data-tab'),'contracts');
     assert.equal(await tab.evaluate(()=>JSON.parse(localStorage.getItem('futurisma.save.v1')).garage.credits),50);
     assert.deepEqual(errors,[],'shop affordability and cancellation page errors');await context.close();

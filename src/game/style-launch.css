@@ -181,8 +181,8 @@ body[data-controls="true"] .launch-menu #controls-button,body[data-options="true
   .control-section {margin-top:12px;font-size:22px;}.control-note {font-size:10px;}.control-menu-hint {margin-top:12px;padding:10px;}
 }
 @media(max-width:700px) {
-  body:has(.launch-menu) .launch-paper {width:100%;padding:24px 18px;clip-path:none;}
-  .launch-paper__header {position:sticky;top:-24px;z-index:1;background:#f3f4f1;padding:14px 0;margin-top:-14px;}
+  body:has(.launch-menu) .launch-paper {width:100%;padding:0 18px 24px;clip-path:none;}
+  .launch-paper__header {position:sticky;top:0;z-index:1;background:#f3f4f1;padding:24px 0 14px;margin-top:0;}
   .launch-paper .options-title {font-size:42px;}.launch-paper .intro-code {font-size:10px;}
   .control-row {grid-template-columns:.9fr 1.6fr .85fr;gap:6px;}.control-row>strong {font-size:18px;}
   .control-key {font-size:10px;min-width:23px;min-height:29px;padding:4px 5px;}.control-keys,.control-pad {gap:3px;}
@@ -232,8 +232,10 @@ body[data-controls="true"] .launch-top #controls-button,body[data-options="true"
 @media(min-width:1101px) and (min-height:701px) {
   .launch-slab {width:21%;clip-path:polygon(0 0,100% 0,50% 100%,0 100%);padding:0 0 0 24px;overflow:visible;}
   .launch-number {position:relative;left:-70px;top:-6px;font:900 330px/.8 var(--condensed);letter-spacing:-.02em;transform:skewX(-9deg);white-space:nowrap;}
-  .launch-name {position:absolute;left:24px;top:246px;font:900 92px/.86 var(--condensed);letter-spacing:.005em;transform:skewX(-9deg);transform-origin:left bottom;margin:0;max-width:260px;width:18vw;text-wrap:initial;}
-  .launch-deck {position:absolute;left:24px;top:425px;font:900 23px/1 var(--condensed);transform:skewX(-9deg);max-width:200px;}
+  .launch-slab {--name-font:min(92px,calc(var(--name-size) * 1vw / 14.4));}
+  .launch-name {position:absolute;left:24px;top:246px;font:900 var(--name-font)/.86 var(--condensed);letter-spacing:.005em;transform:skewX(-9deg);transform-origin:left bottom;margin:0;max-width:none;width:max-content;text-wrap:initial;}
+  .launch-name span {display:block;}
+  .launch-deck {position:absolute;left:24px;top:calc(246px + var(--name-lines) * var(--name-font) * .86 + 22px);font:900 clamp(16px,1.6vw,23px)/1 var(--condensed);transform:skewX(-9deg);max-width:min(200px,calc(21vw - 100px));}
   .launch-guide {top:96px;right:16px;width:26.12%;max-width:410px;padding:6px 14px 14px;border-top-width:4px;max-height:calc(100dvh - 306px);}
   .launch-map {height:300px;}.launch-twist {font-size:26px;font-weight:900;}.launch-note {font:500 13px/1.42 var(--mono);letter-spacing:.01em;}.launch-detail {font-size:11px;}.launch-feature {font-size:11px;}
   .launch-setup {left:13.89%;right:29.17%;bottom:120px;gap:8px;}.launch-setup__row {min-height:42px;}
@@ -267,10 +269,14 @@ body[data-controls="true"] .launch-top #controls-button,body[data-options="true"
 @media(min-width:1101px) and (min-height:701px) {
   .launch-slab {clip-path:none;background:transparent;}
   .launch-slab::before {content:'';position:absolute;inset:0;clip-path:polygon(0 0,100% 0,50% 100%,0 100%);background:var(--circuit);transition:background-color 200ms var(--ease-out);}
-  .launch-menu[data-track="greenwater"] .launch-name {font-size:72px;}
-  .launch-menu[data-track="bitterpan"] .launch-name,.launch-menu[data-track="ascension"] .launch-name {font-size:82px;}
-  .launch-menu[data-track="greenwater"] .launch-deck {top:385px;}
-  .launch-menu[data-track="bitterpan"] .launch-deck,.launch-menu[data-track="ascension"] .launch-deck {top:400px;}
+}
+/* A phone sheet owns the screen; no header action may cover RETURN. */
+@media(max-width:700px), (max-height:480px) {
+  body:is([data-controls="true"],[data-options="true"]) .launch-top {display:none!important;}
+}
+@media(max-height:480px) and (orientation:landscape) {
+  body:has(.launch-menu) .launch-paper {padding-top:0;}
+  .launch-paper__header {position:sticky;top:0;z-index:1;background:#f3f4f1;padding:14px 0;margin-top:0;}
 }
 .launch-map__line {stroke-width:4;}.launch-map__base {stroke-width:5;}
 .launch-map__tick {stroke:#f4f6f5;stroke-width:2;}

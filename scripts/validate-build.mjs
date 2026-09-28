@@ -4,12 +4,13 @@ import { readFile, readdir, writeFile, mkdir } from "node:fs/promises";
 
 import { PIT_RADIO_IDS } from "../src/game/pit-radio-lines.js";
 
-const assetsDirectory = new URL("../dist/assets/", import.meta.url);
+const distDirectory = new URL("../dist/", import.meta.url);
+const assetsDirectory = new URL("assets/", distDirectory);
 const html = await readFile(new URL("../dist/index.html", import.meta.url));
 const productionHeaders = await readFile(new URL("../dist/_headers", import.meta.url), "utf8");
 const htmlSource = html.toString("utf8");
 const initialAssetNames = [...htmlSource.matchAll(
-  /(?:src|href)="\/assets\/([^"?]+\.(?:js|css))"/g,
+  /(?:src|href)="\/([^"?]+\.(?:js|css))"/g,
 )].map((match) => match[1]);
 const javascriptNames = initialAssetNames.filter((name) => name.endsWith(".js"));
 const stylesheetNames = initialAssetNames.filter((name) => name.endsWith(".css"));
@@ -21,19 +22,20 @@ assert.equal(
   "The production shell repeats an initial asset reference.",
 );
 
-async function measureAssets(names) {
+async function measureAssets(names, directory = assetsDirectory) {
   let rawBytes = 0;
   let gzipBytes = 0;
   for (const name of names) {
-    const bytes = await readFile(new URL(name, assetsDirectory));
+    const bytes = await readFile(new URL(name, directory));
     rawBytes += bytes.byteLength;
     gzipBytes += gzipSync(bytes).byteLength;
   }
   return { rawBytes, gzipBytes };
 }
 
-const javascript = await measureAssets(javascriptNames);
-const stylesheet = await measureAssets(stylesheetNames);
+// Count same-origin boot scripts as well as Vite's /assets chunks.
+const javascript = await measureAssets(javascriptNames, distDirectory);
+const stylesheet = await measureAssets(stylesheetNames, distDirectory);
 const javascriptGzip = javascript.gzipBytes;
 const stylesheetGzip = stylesheet.gzipBytes;
 const shellGzip = gzipSync(html).byteLength + javascriptGzip + stylesheetGzip;
@@ -717,5 +719,5 @@ if(reportDirectory){
  await writeFile(reportDirectory+'/build.json',JSON.stringify({script:'scripts/validate-build.mjs',
   javascriptGzip,shellGzip,stylesheetGzip,htmlGzip:gzipSync(html).byteLength,
   javascriptRaw:javascript.rawBytes,initialChunks:javascriptNames.length,radioBytes,islandAudioBytes,
-  ceilings:{javascriptGzip:266*1024,shellGzip:277*1024,dreamIslandAudio:248504},passed:true},null,2)+'\n');
+  ceilings:{javascriptGzip:270*1024,shellGzip:282*1024,dreamIslandAudio:248504},passed:true},null,2)+'\n');
 }

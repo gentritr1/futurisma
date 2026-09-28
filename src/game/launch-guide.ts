@@ -40,7 +40,8 @@ export function drawLaunchMap(host:HTMLElement,track:MapSelection,mode:RaceMode)
   const d=path(data.points);
   svg.append(svgNode('path',{d,class:'launch-map__base'}),svgNode('path',{d,pathLength:'1',class:'launch-map__line'}));
   data.gates.forEach((p,i)=>{
-    const gate=svgNode('g',{class:'launch-map__gate',style:`animation-delay:${i/data.gates.length*500}ms`});
+    const gate=svgNode('g',{class:'launch-map__gate'}) as SVGElement;
+    gate.style.animationDelay=`${i/data.gates.length*500}ms`;
     const nearest=data.points.reduce((best,q,index)=>Math.hypot(q[0]-p[0],q[1]-p[1])<Math.hypot(data.points[best][0]-p[0],data.points[best][1]-p[1])?index:best,0);
     const before=data.points[(nearest+127)%128],after=data.points[(nearest+1)%128];
     const length=Math.hypot(after[0]-before[0],after[1]-before[1])||1;
