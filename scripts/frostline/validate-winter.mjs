@@ -1,0 +1,30 @@
+import assert from 'node:assert/strict';
+import {sourceModule} from '../visual/dreamisland/modules.mjs';
+const {WinterRoad,snowStrengthAt,snowCoverageAt,WINTER_PICKUPS}=await import(await sourceModule('frostline-snow.ts'));
+const length=3027.565,dt=1/120;
+assert.equal(snowStrengthAt(.03),0);assert.ok(snowStrengthAt(.3)>.95);
+assert.ok(snowCoverageAt(.3,5.5)<snowCoverageAt(.3,0)*.3,'Visible cleared tracks are safer');
+const road=new WinterRoad();road.elapsed=1;
+const sway=road.driftAt(.3,0,80);assert.ok(sway>1);
+assert.equal(road.driftAt(.03,0,80),0);assert.equal(road.driftAt(.3,0,0),0,'Stopped vehicles cannot slide sideways');
+assert.equal(road.driftAt(.3,11,80),0,'Drift fades near the barrier');
+road.stabilizerSeconds=10;assert.ok(Math.abs(road.driftAt(.3,0,80))<Math.abs(sway)*.1);assert.equal(road.gripAt(.3,0),1);
+road.reset();const pickup=WINTER_PICKUPS[0];
+road.step(dt,pickup.progress-1/length,0,1,length);road.step(dt,pickup.progress+1/length,0,1,length);
+assert.equal(road.collected,1);assert.equal(road.stabilizerSeconds,10);
+road.step(dt,pickup.progress,0,1,length);road.step(dt,pickup.progress+1/length,0,1,length);assert.equal(road.collected,1,'No farming a pad on the same lap');
+road.recover();road.step(dt,pickup.progress-1/length,0,2,length);road.step(dt,pickup.progress+1/length,0,2,length);assert.equal(road.collected,2,'Pickup returns next lap');
+const missed=new WinterRoad();missed.step(dt,pickup.progress-1/length,8,1,length);missed.step(dt,pickup.progress+1/length,8,1,length);assert.equal(missed.collected,0);
+const thermal=new WinterRoad();thermal.thermalSeconds=5.5;
+assert.ok(thermal.applySpeed(60,60.1,1,0,dt)>60.1);assert.equal(thermal.applySpeed(60,58,1,1,dt),58,'Thermal never defeats braking');assert.equal(thermal.applySpeed(60,59,0,0,dt),59);
+assert.equal(thermal.applySpeed(110,110.1,1,0,dt),110.1,'Thermal never caps an existing faster boost');
+for(const lead of [-200,0,149,NaN]){const w=new WinterRoad();w.stepSnowball(dt,.503,0,3,lead,length,70);assert.equal(w.snowballPhase,'idle','No punishment in a close race, behind, solo or corrupt lead');}
+function launch(){const w=new WinterRoad();w.stepSnowball(dt,.503,0,1,200,length,70);assert.equal(w.snowballPhase,'flight','Large lead fires immediately, on any lap, with no warning');return w;}
+const shot=launch();for(let i=0;i<134;i++)shot.stepSnowball(dt,shot.snowballTarget,shot.snowballLane,1,200,length,70);
+assert.equal(shot.snowballHits,1);assert.ok(shot.visorSeconds>2);const hits=shot.snowballHits;
+for(let i=0;i<100;i++)shot.stepSnowball(dt,shot.snowballTarget,0,1,200,length,70);assert.equal(shot.snowballHits,hits,'One splat per volley');
+const protectedRoad=launch();protectedRoad.stabilizerSeconds=10;for(let i=0;i<134;i++)protectedRoad.stepSnowball(dt,protectedRoad.snowballTarget,0,1,200,length,70);assert.equal(protectedRoad.snowballHits,0);assert.equal(protectedRoad.snowballBlocks,1);
+const dodge=launch();for(let i=0;i<140;i++)dodge.stepSnowball(dt,dodge.snowballTarget,8,1,200,length,70);assert.equal(dodge.snowballHits,0);
+shot.recover();assert.equal(shot.visorSeconds,0);shot.reset();assert.equal(shot.shotCooldown,0);assert.equal(shot.snowballPhase,'idle');assert.equal(shot.collected,0);
+const tickA=new WinterRoad(),tickB=new WinterRoad();for(let i=0;i<1200;i++)tickA.step(1/120,.3,0,1,length);for(let i=0;i<600;i++)tickB.step(1/60,.3,0,1,length);assert.ok(Math.abs(tickA.driftAt(.3,0,70)-tickB.driftAt(.3,0,70))<1e-9);
+console.log('Winter PASS: shared snow/track grip, speed-scaled bounded sway, stabilizers, pickup lane/lap rules, thermal braking, deterministic ticks, lead-only unannounced snowballs, dodge, shield, visor lifetime and reset.');

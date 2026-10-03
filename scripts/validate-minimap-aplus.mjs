@@ -5,7 +5,7 @@ import { aplusGates, aplusGateState, AplusRivalFocus } from "../src/game/minimap
 import { buildCourseOutline } from "../src/game/minimap-projection.js";
 
 // The finish gate is index zero, in addition to every authored sector gate.
-for (const map of ["nightshift", "polarity", "tideline", "ascension", "dreamisland"]) {
+for (const map of ["nightshift", "polarity", "tideline", "ascension", "dreamisland", "afterglow", "frostline"]) {
   const route = JSON.parse(readFileSync(new URL(`../src/game/data/${map}/route.json`, import.meta.url)));
   const gates = aplusGates({ orderedCheckpointCount: route.checkpoints.length, checkpointProgress: i => route.checkpoints[i] });
   assert.deepEqual(gates, route.checkpoints, `${map}: retain the final gate`);
@@ -41,7 +41,7 @@ class Element {
 }
 const hud = new Element(), left = new Element(), gateStrip = new Element(), checkpoint = new Element();
 const draws = { labels: [] };
-const context = new Proxy({ measureText: text => ({width: text.length * 7}),
+const context = new Proxy({ createRadialGradient: () => ({addColorStop() {}}), measureText: text => ({width: text.length * 7}),
   fillText: text => draws.labels.push(text) }, {get: (target, key) => target[key] ?? (() => {})});
 const canvas = new Element(); canvas.getContext = () => context;
 const timers = new Map(); let nextTimer = 0;
@@ -108,10 +108,25 @@ try {
   minimap.update(0, 0, .002, 0, .6);
   assert.equal(canvas.dataset.rivalLabels, "0");
   assert.equal(plate.hidden, true, "restart cannot replay the old gate");
+  assert.equal(canvas.dataset.signal, "clear", "Unaffected circuits remain clear");
+  const gateBeforeFog = canvas.dataset.nextGate;
+  course.minimapInterference = .86;
+  for (let i = 1; i <= 60; i++) minimap.update(250, 0, .13, 1, .6 + i / 30);
+  assert.equal(canvas.dataset.signal, "degraded");
+  assert.ok(minimap.diagnostics().minimapInterference > .8);
+  assert.equal(minimap.diagnostics().minimapInterferenceTime, 0, "Reduced motion keeps fog/scan lines stationary");
+  assert.ok(draws.labels.includes("SIGNAL DEGRADED"));
+  assert.equal(canvas.dataset.nextGate, gateBeforeFog, "Interference does not invent gate positions");
+  course.minimapInterference = 0;
+  minimap.update(0, 0, .002, 0, 3);
+  assert.equal(canvas.dataset.signal, "clear", "Restart clears the signal immediately");
+  course.minimapInterference = NaN;
+  minimap.update(0, 0, .002, 0, 3.1);
+  assert.equal(minimap.diagnostics().minimapInterference, 0, "Invalid strengths cannot corrupt the canvas");
 } finally {
   for (const [key, descriptor] of original) {
     if (descriptor) Object.defineProperty(globalThis, key, descriptor);
     else delete globalThis[key];
   }
 }
-console.log("A+ PASS: authored final gates, correct rival frame, one rival label, missed gates, 900 ms cleanup without rAF, reduced motion, pause/restart, cached drawing.");
+console.log("A+ PASS: authored final gates, correct rival frame, one rival label, missed gates, 900 ms cleanup without rAF, reduced motion, pause/restart, cached drawing, interference lifecycle and reduced-motion fog.");

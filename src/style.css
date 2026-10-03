@@ -1406,6 +1406,11 @@ body[data-phase="resuming"] .hud::before {
   letter-spacing: 0.12em;
 }
 
+/* Preserve the launch curtain across a circuit reload, before the menu loads. */
+html[data-launch-boot] body,
+html[data-launch-boot] .screen--loading { background: var(--launch-boot-colour); }
+html[data-launch-boot] .screen--loading > * { visibility: hidden; }
+
 .loading-mark {
   width: 74px;
   height: 74px;

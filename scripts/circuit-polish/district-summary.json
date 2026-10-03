@@ -1,0 +1,1126 @@
+{
+  "date": "2026-09-28",
+  "scope": [
+    "bitterpan",
+    "greenwater"
+  ],
+  "placements": {
+    "bitterpan": 67,
+    "greenwater": 89
+  },
+  "newSceneryBatches": {
+    "bitterpan": 24,
+    "greenwater": 21
+  },
+  "benchmarks": [
+    {
+      "map": "bitterpan",
+      "fps": 409.07492270565325,
+      "p95FrameMs": 3.8000001907348633,
+      "recoveries": 0,
+      "missedGates": 0,
+      "errors": []
+    },
+    {
+      "map": "greenwater",
+      "fps": 413.2937009854594,
+      "p95FrameMs": 3.700000286102295,
+      "recoveries": 0,
+      "missedGates": 0,
+      "errors": []
+    }
+  ],
+  "benchmarkEnvironment": "Local Chrome/Metal, uncapped, 1536x864, DPR 1, high quality",
+  "production": [
+    {
+      "map": "greenwater",
+      "errors": [],
+      "minimap": "aplus",
+      "phase": "race"
+    },
+    {
+      "map": "bitterpan",
+      "errors": [],
+      "minimap": "aplus",
+      "phase": "race"
+    },
+    {
+      "map": "nightshift",
+      "errors": [],
+      "minimap": "aplus",
+      "phase": "race"
+    },
+    {
+      "map": "polarity",
+      "errors": [],
+      "minimap": "aplus",
+      "phase": "race"
+    },
+    {
+      "map": "tideline",
+      "errors": [],
+      "minimap": "aplus",
+      "phase": "race"
+    },
+    {
+      "map": "ascension",
+      "errors": [],
+      "minimap": "aplus",
+      "phase": "race"
+    },
+    {
+      "map": "dreamisland",
+      "errors": [],
+      "minimap": "aplus",
+      "phase": "race"
+    },
+    {
+      "map": "afterglow",
+      "errors": [],
+      "minimap": "aplus",
+      "phase": "race"
+    },
+    {
+      "map": "frostline",
+      "errors": [],
+      "minimap": "aplus",
+      "phase": "race"
+    }
+  ],
+  "camera": {
+    "poses": 36,
+    "maxDifference": 0,
+    "errors": []
+  },
+  "validation": [
+    {
+      "map": "bitterpan",
+      "sites": [
+        {
+          "progress": 0.03380327868852451,
+          "clearance": 8.303075836545009,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.030999999999999917,
+          "clearance": 8.76624166724985,
+          "landmark": "silos"
+        },
+        {
+          "progress": 0.04699999999999993,
+          "clearance": 10.101567627453635,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.040999999999999925,
+          "clearance": 53.05315684185213,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.06745454545454543,
+          "clearance": 8.041305651196161,
+          "landmark": "silos"
+        },
+        {
+          "progress": 0.08845454545454556,
+          "clearance": 12.980976223429995,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.07645454545454555,
+          "clearance": 8.023707453027,
+          "landmark": "silos"
+        },
+        {
+          "progress": 0.09245454545454557,
+          "clearance": 10.138332302034096,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.11290909090909085,
+          "clearance": 8.00432635326845,
+          "landmark": "silos"
+        },
+        {
+          "progress": 0.13390909090909098,
+          "clearance": 12.945046705206696,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.13190909090909098,
+          "clearance": 53.05189483876438,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.13371236959761545,
+          "clearance": 8.300046550450286,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.17016691505216097,
+          "clearance": 8.305811038038389,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.16736363636363638,
+          "clearance": 8.76928216556611,
+          "landmark": "silos"
+        },
+        {
+          "progress": 0.1833636363636364,
+          "clearance": 10.103043026339217,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.2038181818181819,
+          "clearance": 8.037170426732153,
+          "landmark": "silos"
+        },
+        {
+          "progress": 0.2248181818181818,
+          "clearance": 12.983588090198428,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.2228181818181818,
+          "clearance": 53.0398564370537,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.2128181818181818,
+          "clearance": 8.018106785082693,
+          "landmark": "silos"
+        },
+        {
+          "progress": 0.2288181818181818,
+          "clearance": 10.143444122219021,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.2228181818181818,
+          "clearance": 53.039783724564415,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.2492727272727273,
+          "clearance": 8.000626852141853,
+          "landmark": "silos"
+        },
+        {
+          "progress": 0.2700760059612519,
+          "clearance": 8.303469718890138,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.30653055141579744,
+          "clearance": 8.297067271411077,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.3037272727272726,
+          "clearance": 8.771812170518515,
+          "landmark": "silos"
+        },
+        {
+          "progress": 0.31972727272727264,
+          "clearance": 10.062170712144935,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.31372727272727285,
+          "clearance": 53.04955034726704,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.35198509687034285,
+          "clearance": 8.2660792248634,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.36098509687034275,
+          "clearance": 8.291159189369036,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.39743964232488826,
+          "clearance": 8.263440669969565,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.40643964232488816,
+          "clearance": 8.255054261041092,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.4428941877794337,
+          "clearance": 8.250124622077944,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.4518941877794338,
+          "clearance": 8.258210526179756,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.4883487332339791,
+          "clearance": 8.275830308537873,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.4973487332339792,
+          "clearance": 8.265971122657934,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.5338032786885245,
+          "clearance": 8.313372692140941,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.5428032786885246,
+          "clearance": 8.303963169738044,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.5792578241430699,
+          "clearance": 8.30010840741652,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.58825782414307,
+          "clearance": 8.30398207381543,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.6247123695976156,
+          "clearance": 8.318621129551541,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.6337123695976157,
+          "clearance": 8.335770735375565,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.670166915052161,
+          "clearance": 8.317860926656149,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.6791669150521611,
+          "clearance": 8.306554664007596,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.7156214605067064,
+          "clearance": 8.299888305914177,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.7128181818181818,
+          "clearance": 8.747749237320825,
+          "landmark": "silos"
+        },
+        {
+          "progress": 0.7288181818181818,
+          "clearance": 10.102768985034944,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.7702727272727272,
+          "clearance": 12.954421749395411,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.7682727272727274,
+          "clearance": 65.04302920547386,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.7582727272727272,
+          "clearance": 8.035435233493452,
+          "landmark": "silos"
+        },
+        {
+          "progress": 0.7742727272727272,
+          "clearance": 10.11102482335909,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.7682727272727274,
+          "clearance": 65.04302915887395,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.8157272727272726,
+          "clearance": 12.981589553231903,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.8155305514157973,
+          "clearance": 8.316745023584705,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.8519850968703429,
+          "clearance": 8.298422326733732,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.8491818181818183,
+          "clearance": 8.757037648489671,
+          "landmark": "silos"
+        },
+        {
+          "progress": 0.8651818181818183,
+          "clearance": 10.10944485153568,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.8591818181818183,
+          "clearance": 65.08523671118283,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.8856363636363636,
+          "clearance": 8.004951414806165,
+          "landmark": "silos"
+        },
+        {
+          "progress": 0.9066363636363637,
+          "clearance": 12.93761996373922,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.8946363636363637,
+          "clearance": 8.02007123705117,
+          "landmark": "silos"
+        },
+        {
+          "progress": 0.9106363636363637,
+          "clearance": 10.101385123199352,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.9520909090909091,
+          "clearance": 12.947201008334812,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.9500909090909091,
+          "clearance": 65.00496073560426,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.9518941877794336,
+          "clearance": 8.311968971663713,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.9883487332339791,
+          "clearance": 8.301902124034381,
+          "landmark": "works"
+        },
+        {
+          "progress": 0.9855454545454547,
+          "clearance": 8.750150799652417,
+          "landmark": "silos"
+        },
+        {
+          "progress": 0.0015454545454545165,
+          "clearance": 10.106696868083995,
+          "landmark": "works"
+        }
+      ],
+      "draws": 24,
+      "activities": 67,
+      "changed": true,
+      "held": true,
+      "bounds": [],
+      "choices": [
+        {
+          "separation": 8.8,
+          "margins": [
+            10.516527,
+            8.116527
+          ],
+          "sameStation": true,
+          "outcomes": [
+            {
+              "collected": 1,
+              "grip": 8,
+              "charge": 0
+            },
+            {
+              "collected": 1,
+              "grip": 0,
+              "charge": 6
+            }
+          ]
+        },
+        {
+          "separation": 8.8,
+          "margins": [
+            9.8,
+            7.4
+          ],
+          "sameStation": true,
+          "outcomes": [
+            {
+              "collected": 1,
+              "grip": 8,
+              "charge": 0
+            },
+            {
+              "collected": 1,
+              "grip": 0,
+              "charge": 6
+            }
+          ]
+        },
+        {
+          "separation": 8.8,
+          "margins": [
+            9.8,
+            7.4
+          ],
+          "sameStation": true,
+          "outcomes": [
+            {
+              "collected": 1,
+              "grip": 8,
+              "charge": 0
+            },
+            {
+              "collected": 1,
+              "grip": 0,
+              "charge": 6
+            }
+          ]
+        },
+        {
+          "separation": 8.8,
+          "margins": [
+            9.8,
+            7.4
+          ],
+          "sameStation": true,
+          "outcomes": [
+            {
+              "collected": 1,
+              "grip": 8,
+              "charge": 0
+            },
+            {
+              "collected": 1,
+              "grip": 0,
+              "charge": 6
+            }
+          ]
+        }
+      ],
+      "disposal": {
+        "counts": {
+          "geometry": 23,
+          "material": 14,
+          "texture": 5,
+          "instances": 24
+        },
+        "expected": {
+          "geometry": 23,
+          "material": 14,
+          "texture": 5,
+          "instances": 24
+        },
+        "detached": true
+      },
+      "errors": []
+    },
+    {
+      "map": "greenwater",
+      "sites": [
+        {
+          "progress": 0.02200000000000002,
+          "clearance": 16.504771377658585,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.04299999999999993,
+          "clearance": 15.400453125572781,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.040999999999999925,
+          "clearance": 54.75445197612443,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.030999999999999917,
+          "clearance": 23.74524964170369,
+          "landmark": "tower"
+        },
+        {
+          "progress": 0.04299999999999993,
+          "clearance": 15.400453125572781,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.040999999999999925,
+          "clearance": 54.75445197612443,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.0775555555555556,
+          "clearance": 22.83341351372248,
+          "landmark": "tower"
+        },
+        {
+          "progress": 0.09855555555555551,
+          "clearance": 15.192171747317119,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.0865555555555555,
+          "clearance": 14.465895950427292,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.09855555555555551,
+          "clearance": 15.191534806167859,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.13311111111111118,
+          "clearance": 12.676621804314813,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.1541111111111111,
+          "clearance": 15.293898405722473,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.15211111111111109,
+          "clearance": 54.4229554044059,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.14211111111111108,
+          "clearance": 12.70029391978646,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.1541111111111111,
+          "clearance": 15.29115313014313,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.15211111111111109,
+          "clearance": 54.456244341674974,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.18866666666666676,
+          "clearance": 16.518476937189284,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.20966666666666667,
+          "clearance": 15.401600772570646,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.19766666666666666,
+          "clearance": 16.518015760437436,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.24422222222222212,
+          "clearance": 14.73900242240629,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.26522222222222225,
+          "clearance": 15.410507244109802,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.26322222222222225,
+          "clearance": 46.95214977574885,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.25322222222222224,
+          "clearance": 14.706965823157557,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.26522222222222225,
+          "clearance": 15.402953050340109,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.26322222222222225,
+          "clearance": 54.79268195444823,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.2997777777777779,
+          "clearance": 12.966479124174562,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.32077777777777783,
+          "clearance": 15.41122371670825,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.3087777777777778,
+          "clearance": 22.029433004386814,
+          "landmark": "tower"
+        },
+        {
+          "progress": 0.32077777777777783,
+          "clearance": 15.41122371670825,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.3553333333333333,
+          "clearance": 15.54966853556082,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.3763333333333334,
+          "clearance": 14.565086808858482,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.3743333333333334,
+          "clearance": 58.88026042078447,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.3643333333333334,
+          "clearance": 22.756912810767826,
+          "landmark": "tower"
+        },
+        {
+          "progress": 0.3763333333333334,
+          "clearance": 14.564826764861138,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.3743333333333334,
+          "clearance": 58.9007127265597,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.41088888888888886,
+          "clearance": 21.925684512614183,
+          "landmark": "tower"
+        },
+        {
+          "progress": 0.431888888888889,
+          "clearance": 14.571373042817484,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.419888888888889,
+          "clearance": 13.739708055729576,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.431888888888889,
+          "clearance": 14.573164995371712,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.46644444444444444,
+          "clearance": 12.926349361563283,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.48744444444444435,
+          "clearance": 15.434291094519352,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.48544444444444457,
+          "clearance": 60.75746285432294,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.47544444444444434,
+          "clearance": 22.019708113146514,
+          "landmark": "tower"
+        },
+        {
+          "progress": 0.48744444444444435,
+          "clearance": 15.439766607725673,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.48544444444444457,
+          "clearance": 60.759681827806475,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.522,
+          "clearance": 23.720869593834376,
+          "landmark": "tower"
+        },
+        {
+          "progress": 0.5430000000000001,
+          "clearance": 15.451954427450922,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.5310000000000001,
+          "clearance": 16.50001834132331,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.5430000000000001,
+          "clearance": 15.443920964912188,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.5775555555555556,
+          "clearance": 14.726308984912496,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.5985555555555555,
+          "clearance": 15.358420326947737,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.5965555555555557,
+          "clearance": 48.95005831427531,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.5865555555555555,
+          "clearance": 22.858347790909,
+          "landmark": "tower"
+        },
+        {
+          "progress": 0.5985555555555555,
+          "clearance": 15.415644618562524,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.5965555555555557,
+          "clearance": 60.763327155493954,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.6331111111111112,
+          "clearance": 22.022989730577923,
+          "landmark": "tower"
+        },
+        {
+          "progress": 0.6541111111111113,
+          "clearance": 15.424594198863119,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.6421111111111113,
+          "clearance": 12.906107600654018,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.6541111111111113,
+          "clearance": 15.424594198863119,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.6886666666666668,
+          "clearance": 16.505835707504744,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.7096666666666667,
+          "clearance": 15.428937684272796,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.7076666666666667,
+          "clearance": 66.7517668330194,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.6976666666666667,
+          "clearance": 16.5048779412409,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.7096666666666667,
+          "clearance": 15.431143394967762,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.7076666666666667,
+          "clearance": 66.7508476951707,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.7442222222222221,
+          "clearance": 14.701979182054682,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.7652222222222222,
+          "clearance": 15.422609710883599,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.7532222222222222,
+          "clearance": 14.709463434193854,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.7652222222222222,
+          "clearance": 15.421207000802987,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.7997777777777779,
+          "clearance": 12.900666977148646,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.8207777777777778,
+          "clearance": 15.415057960218775,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.8187777777777778,
+          "clearance": 66.75001101099575,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.8087777777777778,
+          "clearance": 12.914290443371854,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.8207777777777778,
+          "clearance": 15.415057960218775,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.8187777777777778,
+          "clearance": 66.75001101099575,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.8553333333333333,
+          "clearance": 16.395473044512123,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.8763333333333334,
+          "clearance": 15.318023189586576,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.8643333333333334,
+          "clearance": 23.62049918958159,
+          "landmark": "tower"
+        },
+        {
+          "progress": 0.8763333333333334,
+          "clearance": 15.31612682521586,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.9108888888888889,
+          "clearance": 22.856434646301707,
+          "landmark": "tower"
+        },
+        {
+          "progress": 0.931888888888889,
+          "clearance": 15.405127688232348,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.9298888888888888,
+          "clearance": 66.75086762983257,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.919888888888889,
+          "clearance": 14.714771858321196,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.931888888888889,
+          "clearance": 15.405127688232348,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.9298888888888888,
+          "clearance": 66.75086762983257,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.9664444444444444,
+          "clearance": 12.902060028094702,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.9874444444444443,
+          "clearance": 15.40215740534881,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.9754444444444443,
+          "clearance": 12.936061722744732,
+          "landmark": "hall"
+        },
+        {
+          "progress": 0.9874444444444443,
+          "clearance": 15.40215740534881,
+          "landmark": "hall"
+        }
+      ],
+      "draws": 21,
+      "activities": 89,
+      "changed": true,
+      "held": true,
+      "bounds": [],
+      "choices": [
+        {
+          "separation": 8.8,
+          "margins": [
+            8.8,
+            6.4
+          ],
+          "sameStation": true,
+          "outcomes": [
+            {
+              "collected": 1,
+              "grip": 8,
+              "charge": 0
+            },
+            {
+              "collected": 1,
+              "grip": 0,
+              "charge": 6
+            }
+          ]
+        },
+        {
+          "separation": 8.8,
+          "margins": [
+            6.3,
+            3.9000000000000004
+          ],
+          "sameStation": true,
+          "outcomes": [
+            {
+              "collected": 1,
+              "grip": 8,
+              "charge": 0
+            },
+            {
+              "collected": 1,
+              "grip": 0,
+              "charge": 6
+            }
+          ]
+        },
+        {
+          "separation": 8.8,
+          "margins": [
+            6.46188,
+            4.06188
+          ],
+          "sameStation": true,
+          "outcomes": [
+            {
+              "collected": 1,
+              "grip": 8,
+              "charge": 0
+            },
+            {
+              "collected": 1,
+              "grip": 0,
+              "charge": 6
+            }
+          ]
+        },
+        {
+          "separation": 8.8,
+          "margins": [
+            8.3,
+            5.9
+          ],
+          "sameStation": true,
+          "outcomes": [
+            {
+              "collected": 1,
+              "grip": 8,
+              "charge": 0
+            },
+            {
+              "collected": 1,
+              "grip": 0,
+              "charge": 6
+            }
+          ]
+        }
+      ],
+      "disposal": {
+        "counts": {
+          "geometry": 22,
+          "material": 14,
+          "texture": 5,
+          "instances": 21
+        },
+        "expected": {
+          "geometry": 22,
+          "material": 14,
+          "texture": 5,
+          "instances": 21
+        },
+        "detached": true
+      },
+      "errors": []
+    },
+    {
+      "assetFailure": "race remains playable with original scenery"
+    }
+  ],
+  "asset": {
+    "bytes": 1639240,
+    "prototypeTriangles": 13328,
+    "meshNodes": 19,
+    "embeddedAtlases": 1
+  },
+  "build": {
+    "passed": true,
+    "initialRawKiB": 994.0,
+    "initialGzipKiB": 274.4,
+    "shellGzipKiB": 286.7,
+    "limitsRaised": false
+  },
+  "visualReview": {
+    "initialScore": 4.2,
+    "finalScore": 7.4,
+    "targetScore": 8,
+    "targetReached": false,
+    "remaining": [
+      "More localized amber lighting",
+      "Stronger primary-landmark hierarchy",
+      "Subtler silo weathering"
+    ]
+  },
+  "multiplayerPreparation": {
+    "pairedPowerStationsPerLap": 4,
+    "choiceSpacingMeters": 8.8,
+    "landmarkDistrictNames": true,
+    "onlineNetworkingImplemented": false
+  }
+}

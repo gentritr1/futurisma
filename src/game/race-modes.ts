@@ -322,7 +322,10 @@ class RaceModes {
     ghost: unknown,
     inputs: RaceResultInputs,
   ): RaceResultSummary {
-    const applied = save.recordRace(this.mapCode, {
+    // Demonstrations can show lap statistics, but cannot replace earned records or ghosts.
+    const applied = inputs.finish?.demo
+      ? {newBestLap: false, previousBestLapMs: save.bestFor(this.mapCode, this.recordKey).bestLapMs}
+      : save.recordRace(this.mapCode, {
       bestLapMs,
       raceMs,
       laps: lapTimesMs.length,

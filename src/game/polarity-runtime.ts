@@ -53,6 +53,7 @@ export class PolarityRuntime {
   get isFlipping(): boolean { return this.simulation.isFlipping; }
   get ceiling(): boolean { return this.simulation.state.lane === 1; }
   get blend(): number { return this.simulation.blend; }
+  get gravityBlend(): number {return this.blend;}
   get surgeActive(): boolean { return this.simulation.surgeActive; }
   get shieldActive(): boolean { return this.simulation.shieldActive; }
   get boostRechargeScale(): number { return this.simulation.boostRechargeScale; }

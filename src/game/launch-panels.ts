@@ -75,8 +75,21 @@ export function installLaunchPanels(): (track: MapSelection) => void {
   row('PAUSE', ['ESC', '/', 'P'], ['START']);
   row('MUTE', ['M'], ['BACK']);
   controls.querySelector('.controls-list')!.replaceWith(table);
-  const menuHint = element('p', 'control-menu-hint', 'IN THIS MENU · LB / RB circuit · D-PAD focus · A select · B return · Y options · X controls · R grid');
-  controls.insertBefore(menuHint, document.getElementById('controls-options'));
+  const descriptions: Record<string, string> = {
+    'option-hud-scale': 'Size of the speed, timer and map instruments.',
+    'option-menu-scale': 'Text size in menus and service sheets.',
+    'option-motion': 'Reduce camera movement and interface animation.',
+    'option-voice': 'Spoken race calls. The race stays readable with sound off.',
+    'option-quality': 'Adaptive balances resolution and frame rate. High favours detail.',
+    'option-render': 'Filmic shading or a softer early-console image.',
+  };
+  for (const [id, description] of Object.entries(descriptions)) {
+    const control = document.getElementById(id)!;
+    const note = element('p', 'option-description', description);
+    note.id = `${id}-description`;
+    control.setAttribute('aria-describedby', note.id);
+    control.closest('.option')!.append(note);
+  }
 
   options.querySelector('.intro-code')!.textContent = 'SET THE FEEL · TUNE YOUR RACE';
   const audioHeading = element('h3', 'control-section', 'AUDIO');
@@ -98,6 +111,7 @@ export function installLaunchPanels(): (track: MapSelection) => void {
     abilityNote.textContent = gravity
       ? 'Space changes roads at marked junctions. Shift keeps boost separate.'
       : power ? 'Use power when your circuit device is ready. Space boosts too.'
-      : `No circuit abilities on ${track.label}. Space boosts too.`;
+      : selection === 'frostline' ? 'Drive over cyan stabilizers or amber thermal pickups to activate them.'
+      : 'Drive over cyan grip or amber thrust devices to activate them automatically. Space boosts too.';
   };
 }

@@ -35,6 +35,14 @@ const DRAINED_LIGHTING: CourseLightingProfile = {
   hemisphereIntensity:.50,keyIntensity:1.1,rimIntensity:.3,
   keyDirection:FLOODED_LIGHTING.keyDirection,
 };
+// The exposed docks receive moonlight, independent of the reactor's tide cycle.
+// Atmosphere eases between profiles as the racer enters and leaves the chamber.
+const PORT_LIGHTING: CourseLightingProfile = {
+  sky:new THREE.Color(0x8399ad),ground:new THREE.Color(0x202a30),
+  key:new THREE.Color(0xb7d2e3),rim:new THREE.Color(0x779ca8),
+  hemisphereIntensity:.72,keyIntensity:.85,rimIntensity:.26,
+  keyDirection:FLOODED_LIGHTING.keyDirection,
+};
 const FLOODED_FOG={color:new THREE.Color(0x1b3537),density:.0032};
 const DRAINED_FOG={color:new THREE.Color(0x4c3825),density:.0035};
 const PORT_FOG={color:new THREE.Color(0x242f33),density:.0018};
@@ -287,7 +295,11 @@ export class TidelineCourse implements RaceCourse {
     if (this.travelModeAt(progress)==="submerged") return FLOODED_FOG;
     return this.tide.lap>=2 && this.sample(progress,this.branchScratch).position.y<-3 ? DRAINED_FOG : PORT_FOG;
   }
-  lightingAt(_progress=0): CourseLightingProfile { return this.tide.lap===1 ? FLOODED_LIGHTING : DRAINED_LIGHTING; }
+  lightingAt(progress=0): CourseLightingProfile {
+    const index=Math.floor(THREE.MathUtils.euclideanModulo(progress,1)*route.count);
+    if(route.stations[index].p[1]>=-3) return PORT_LIGHTING;
+    return this.tide.lap===1 ? FLOODED_LIGHTING : DRAINED_LIGHTING;
+  }
   edgeType(): "A" { return "A"; }
   apronAt(sample: CourseSample, lateral: number,
     target: ApronResolution = createApronResolution()): ApronResolution {

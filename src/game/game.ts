@@ -193,7 +193,6 @@ export class FuturismaGame {
   private readonly poseProjection: CourseProjection;
   private readonly cameraProjection: CourseProjection;
   private readonly cameraSurfaceProjection: CourseProjection;
-  private readonly cameraLookAhead: ReturnType<RaceCourse["createSampleScratch"]>;
   private readonly totalLaps: number;
   private readonly vehicle = new TotemVehicle();
   private rivalFleet: RivalFleet | null = null;
@@ -325,6 +324,8 @@ export class FuturismaGame {
   private readonly contactPose = { lateralMeters: 0, speedMetersPerSecond: 0 };
   private impactShake = 0;
   private physicsAccumulator = 0;
+  private raceTick = 0;
+  private raceRound = 0;
   private adaptiveQualityDebt = 0;
   private adaptiveQualityCredit = 0;
   private nextHudAt = 0;
@@ -454,7 +455,7 @@ export class FuturismaGame {
     courseAssemblyMs = 0,
   ) {
     this.course = course;
-    this.pauseMenu = new PauseMenu(input, () => this.togglePause());
+    this.pauseMenu = new PauseMenu(input, () => this.togglePause(), () => this.restartPausedTrial());
     this.minimap = new Minimap(ui.minimapCanvas, course, this.reducedMotion);
     this.camera = new THREE.PerspectiveCamera(
       58,
@@ -472,7 +473,6 @@ export class FuturismaGame {
     this.poseProjection = this.course.createProjectionScratch();
     this.cameraProjection = this.course.createProjectionScratch();
     this.cameraSurfaceProjection = this.course.createProjectionScratch();
-    this.cameraLookAhead = this.course.createSampleScratch();
     this.totalLaps = resolveLapCount(this.course);
     // Before `setRaceFormat` composes the panel below. See `RaceCourse`.
     this.course.selectRaceFormat?.(raceModes.mode, this.totalLaps);
@@ -613,6 +613,15 @@ export class FuturismaGame {
     return true;
   }
 
+  private restartPausedTrial(): void {
+    if (this.phase !== "paused" || this.contextLost || this.disposed || this.trialStartPending) return;
+    this.input.suspendActionsUntilRelease();
+    this.pausedBeforeStart = false;
+    this.pauseMenu.setPaused(false);
+    this.phase = "standby";
+    void this.startTrial();
+  }
+
   async startTrial(): Promise<void> {
     if (!this.canStart()) return;
     this.trialStartPending = true;
@@ -726,6 +735,7 @@ export class FuturismaGame {
         this.updateCoast(FIXED_STEP);
       }
       this.physicsAccumulator -= FIXED_STEP;
+      this.raceTick += 1;
     }
 
     this.interpolatePresentationPose(
@@ -808,6 +818,7 @@ export class FuturismaGame {
       this.countdownStage = nextStage;
       this.ui.setCountdown(nextStage);
       if (nextStage) this.audio.playCountdown(nextStage === "GO");
+      if (nextStage === "GO") this.input.pulse(0.18, 0.32, 140);
     }
     if (this.countdown <= 0) {
       this.phase = "running";
@@ -889,7 +900,7 @@ export class FuturismaGame {
   }
 
   private updateRace(delta: number, input: InputFrame): void {
-    this.circuitRuntime?.step(delta, this.progress, this.lateral, this.lap);
+    this.circuitRuntime?.step(delta, this.progress, this.lateral, this.lap, this.rivalFleet?.leadOverField(this.playerRaceDistance()) ?? 0);
     if (this.diagnosticsMode) this.diagnosticPhysicsSteps += 1;
     this.recoveryImmunity = Math.max(0, this.recoveryImmunity - delta);
     this.hazardTripCooldown = Math.max(0, this.hazardTripCooldown - delta);
@@ -1032,6 +1043,7 @@ export class FuturismaGame {
     );
 
     this.position.addScaledVector(this.travelDirection, this.speed * delta);
+    this.position.addScaledVector(beforeMove.right, (this.course.lateralDriftAt?.(this.progress, this.lateral, this.speed) ?? 0) * delta);
     const previousProgress = this.progress;
     const afterMove = this.course.project(
       this.position,
@@ -1085,7 +1097,7 @@ export class FuturismaGame {
       this.audio.playImpact(0.88);
       this.input.pulse(0.68, 0.82, 150);
       this.ui.flashImpact(cableTripSide < 0 ? "LEFT" : "RIGHT");
-      this.ui.flashHazard(this.circuitRuntime ? "PHASE FIELD · USE SHIELD OR CHANGE LANE" : "CABLE STRIKE");
+      this.ui.flashHazard(this.circuitRuntime && this.circuitRuntime.ownsCamera !== false ? "PHASE FIELD · USE SHIELD OR CHANGE LANE" : "CABLE STRIKE");
       if (this.diagnosticsMode) {
         this.diagnosticImpacts += 1;
         this.diagnosticImpactLocations.push(
@@ -1449,7 +1461,7 @@ export class FuturismaGame {
       groundBlobVisible(!this.circuitRuntime?.isFlipping, this.course.travelModeAt?.(this.progress)),
     );
 
-    if (this.diagnosticsMode && !this.circuitRuntime) this.recordHullClearance(vehiclePosition.y, sample);
+    if (this.diagnosticsMode && (!this.circuitRuntime || this.circuitRuntime.ownsCamera === false)) this.recordHullClearance(vehiclePosition.y, sample);
     if (delta > 0) this.impactShake = Math.max(0, this.impactShake - delta * 3.6);
     return sample;
   }
@@ -1761,7 +1773,7 @@ export class FuturismaGame {
     brake: number,
     sample: CourseProjection,
   ): void {
-    if (this.circuitRuntime) {
+    if (this.circuitRuntime && this.circuitRuntime.ownsCamera !== false) {
       this.circuitRuntime.updateCamera(this.camera, delta, this.vehicle.root.position, this.presentationForward, this.speed);
       return;
     }
@@ -1773,10 +1785,9 @@ export class FuturismaGame {
       .addScaledVector(this.presentationForward, -5)
       .addScaledVector(sample.up, 2.2);
     const anchor = this.vehicle.worldPosition("CAMERA_chase_target", fallback, this.scratchC);
-    const bitterpan = this.course.kind === "bitterpan";
     const desired = anchor
-      .addScaledVector(this.presentationForward, bitterpan ? -4.2 : -2.7)
-      .addScaledVector(sample.up, bitterpan ? 1.8 : 1.25)
+      .addScaledVector(this.presentationForward, -2.7)
+      .addScaledVector(sample.up, 1.25)
       .addScaledVector(
         vehicleRight,
         -steer * (0.45 + this.driftIntensity * 0.55),
@@ -1787,18 +1798,6 @@ export class FuturismaGame {
       .addScaledVector(this.presentationTravelDirection, this.speed * 0.025)
       .addScaledVector(sample.up, 0.8)
       .addScaledVector(vehicleRight, steer * this.driftIntensity * 0.6);
-
-    if (bitterpan) {
-      const lookAheadDistance = 42 + this.speed * 0.42;
-      const routeLook = this.course.sample(
-        sample.progress + lookAheadDistance / this.course.length,
-        this.cameraLookAhead,
-      );
-      target.lerp(
-        routeLook.position.addScaledVector(routeLook.up, 1.35),
-        0.58,
-      );
-    }
 
     const cameraSurface = this.course.project(
       desired,
@@ -1936,11 +1935,8 @@ export class FuturismaGame {
     );
     this.cameraTarget
       .copy(this.vehicle.root.position)
-      .addScaledVector(
-        this.presentationForward,
-        this.course.kind === "bitterpan" ? -10.5 : -9,
-      )
-      .addScaledVector(sample.up, this.course.kind === "bitterpan" ? 4.6 : 4);
+      .addScaledVector(this.presentationForward, -9)
+      .addScaledVector(sample.up, 4);
     this.cameraLook
       .copy(this.vehicle.root.position)
       .addScaledVector(this.presentationForward, 10)
@@ -2035,6 +2031,15 @@ export class FuturismaGame {
       gapToAheadMs: this.raceStatus.gapToAheadMs,
       gapToBehindMs: this.raceStatus.gapToBehindMs,
     });
+  }
+
+  async captureRaceSnapshot(playerId = 'local'): Promise<import('./race-session-protocol.js').RaceSnapshot> {
+    const {createRaceSnapshot} = await import('./race-session-protocol.js');
+    return createRaceSnapshot({playerId, circuit: this.course.kind, seed: RACE_SEED, phase: this.phase, tick: this.raceTick, round: this.raceRound,
+      elapsedMs: this.elapsedMs, position: this.position.toArray(), forward: this.forward.toArray(),
+      progress: this.progress, lateral: this.lateral, speed: this.speed, steer: this.steerAmount,
+      boost: this.boostReserve, boostActive: this.boostActive, lap: this.lap, nextCheckpoint: this.nextCheckpointIndex,
+      ceiling: Boolean(this.circuitRuntime?.ceiling), alternateRoad: Boolean(this.afterMoveProjection.alternateRoad)});
   }
 
   private finishRace(): void {
@@ -2150,6 +2155,7 @@ export class FuturismaGame {
     this.autopilot.reset();
     this.lap = 1;
     this.elapsedMs = 0;
+    this.raceTick = 0;this.raceRound += 1;
     this.lapStartElapsedMs = 0;
     this.lastLapMs = null;
     this.bestLapMs = null;

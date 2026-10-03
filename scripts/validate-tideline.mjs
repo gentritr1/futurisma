@@ -33,6 +33,14 @@ const TidelineCourse = await courseForEdition(false);
 const FoundryCourse = await courseForEdition(true);
 const course = new TidelineCourse();
 const foundry = new FoundryCourse();
+// Above-water port visibility must not inherit the underwater reactor palette.
+const reactorLight=course.lightingAt(.12),portLight=course.lightingAt(.37);
+assert.ok(portLight.hemisphereIntensity>reactorLight.hemisphereIntensity);
+course.tide.lap=3;
+assert.equal(course.lightingAt(.37),portLight,'Dock moonlight stays stable through drainage.');
+assert.notEqual(course.lightingAt(.12),reactorLight,'Drained chamber retains its own warm profile.');
+course.tide.lap=1;
+
 // Test the production selector independently of the fixed values used to
 // instantiate both visual branches side-by-side in this one Node process.
 const styleFile = new URL("../src/game/tideline-style.ts", import.meta.url);

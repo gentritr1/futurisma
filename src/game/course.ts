@@ -270,7 +270,7 @@ export interface TimeOfDayStop {
   keyScale: number;
 }
 
-export type CourseKind = "greenwater" | "bitterpan" | "nightshift" | "polarity" | "tideline" | "ascension" | "dreamisland";
+export type CourseKind = "greenwater" | "bitterpan" | "nightshift" | "polarity" | "tideline" | "ascension" | "dreamisland" | "afterglow" | "frostline";
 
 export interface RivalGridStart {
   raceDistanceMeters: number;
@@ -301,7 +301,11 @@ export interface RivalPaceTable {
 }
 
 export interface RaceCourse {
+  /** Optional lazy presentation hook, installed and removed by the circuit runtime. */
+  finishEnvironment?(root:THREE.Object3D|undefined):Promise<void>;
   readonly scheduleLabel?: string;
+  /** Optional race-local radar interference, from zero (clear) to one. */
+  readonly minimapInterference?: number;
   readonly kind: CourseKind;
   readonly group: THREE.Group;
   readonly length: number;
@@ -371,6 +375,8 @@ export interface RaceCourse {
     target?: ApronResolution,
   ): ApronResolution;
   surfaceGripAt(progress: number, lateral: number, halfWidth: number): number;
+  /** Bounded surface drift in metres/second; applied before the normal road clamp. */
+  lateralDriftAt?(progress: number, lateral: number, speed: number): number;
   cableTripSideAt(progress: number, lateral: number): -1 | 0 | 1;
   /**
    * G2 — the lateral gap to the nearest cable coil whose station the craft

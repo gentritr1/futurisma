@@ -1,0 +1,56 @@
+[
+  {
+    "circuit": "greenwater",
+    "triangles": 3932,
+    "meshes": 11,
+    "bytes": 547704
+  },
+  {
+    "circuit": "bitterpan",
+    "triangles": 4028,
+    "meshes": 7,
+    "bytes": 558128
+  },
+  {
+    "circuit": "nightshift",
+    "triangles": 3560,
+    "meshes": 13,
+    "bytes": 508240
+  },
+  {
+    "circuit": "polarity",
+    "triangles": 3056,
+    "meshes": 8,
+    "bytes": 474176
+  },
+  {
+    "circuit": "tideline",
+    "triangles": 2652,
+    "meshes": 15,
+    "bytes": 461420
+  },
+  {
+    "circuit": "ascension",
+    "triangles": 3588,
+    "meshes": 9,
+    "bytes": 507888
+  },
+  {
+    "circuit": "dreamisland",
+    "triangles": 2840,
+    "meshes": 11,
+    "bytes": 466792
+  },
+  {
+    "circuit": "afterglow",
+    "triangles": 5868,
+    "meshes": 8,
+    "bytes": 642228
+  },
+  {
+    "circuit": "frostline",
+    "triangles": 4924,
+    "meshes": 11,
+    "bytes": 630128
+  }
+]

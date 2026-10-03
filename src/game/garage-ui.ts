@@ -577,6 +577,8 @@ export class GarageScreen {
       this.body.prepend(tabs);
     }
     this.renderFooter(garage);
+    const closeKey = this.closeButton.querySelector("kbd");
+    if (closeKey) closeKey.hidden = !!this.screen.querySelector("#garage-back");
     this.scene.select(this.viewed, this.selectedPart, this.tab === "test", this.tab === "paint");
     this.scene.animating = true; this.hooks.requestRender(); this.syncStrip();
     this.marker.hidden = this.leader.hidden = !this.selectedPart;
@@ -757,7 +759,7 @@ export class GarageScreen {
       const done = button("garage__button garage__primary", "done-part", () => this.back()); done.textContent = "DONE"; actions.append(done);
     } else {
       const confirm = button("garage__button garage__primary", "fit-part", () => this.commit(buyPart(this.hooks.save.garage, code), `${card.label} FITTED`));
-      confirm.textContent = `FIT ${ROMAN[stage + 1]}`; confirm.disabled = short > 0; actions.append(cancel, confirm);
+      confirm.textContent = short > 0 ? `NEED ${formatCredits(short)} MORE` : `FIT ${ROMAN[stage + 1]}`; confirm.disabled = short > 0; actions.append(cancel, confirm);
     }
     order.append(actions); return [order];
   }

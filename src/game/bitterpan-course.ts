@@ -1343,7 +1343,10 @@ export class BitterpanCourse implements RaceCourse {
       transform.position.copy(sample.position)
         .addScaledVector(sample.up, checkpoint.height_m - 0.18);
       transform.quaternion.copy(quaternion);
-      transform.scale.set(checkpoint.half_width_m * 2, 0.28, 0.72);
+      // The shared box is 0.52 m wide. Span the actual posts, including their
+      // outer faces, rather than treating this geometry as a unit-width beam.
+      const gateHalfSpan = resolveGatePostLateral(sample.halfWidth, checkpoint.half_width_m, 1);
+      transform.scale.set((gateHalfSpan * 2 + 0.52) / 0.52, 0.28, 0.72);
       transform.updateMatrix();
       indicators.setMatrixAt(checkpoint.order * 3 + 2, transform.matrix);
     }

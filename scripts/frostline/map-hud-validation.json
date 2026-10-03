@@ -1,0 +1,66 @@
+{
+  "themes": [
+    {
+      "map": "greenwater",
+      "accent": "#b8d99a",
+      "assetLoaded": true
+    },
+    {
+      "map": "bitterpan",
+      "accent": "#ffd193",
+      "assetLoaded": true
+    },
+    {
+      "map": "nightshift",
+      "accent": "#f9a0ce",
+      "assetLoaded": true
+    },
+    {
+      "map": "polarity",
+      "accent": "#c1b9ff",
+      "assetLoaded": true
+    },
+    {
+      "map": "tideline",
+      "accent": "#a3e4ca",
+      "assetLoaded": true
+    },
+    {
+      "map": "ascension",
+      "accent": "#ffc596",
+      "assetLoaded": true
+    },
+    {
+      "map": "dreamisland",
+      "accent": "#b5efed",
+      "assetLoaded": true
+    },
+    {
+      "map": "afterglow",
+      "accent": "#d9c5ff",
+      "assetLoaded": true
+    },
+    {
+      "map": "frostline",
+      "accent": "#d8eff8",
+      "assetLoaded": true
+    }
+  ],
+  "pauseFreezes": true,
+  "keyboardAndGamepad": true,
+  "mobileLayouts": true,
+  "reducedMotion": [
+    "query",
+    "os"
+  ],
+  "errors": [],
+  "actualRaceStarts": [
+    "frostline",
+    "afterglow",
+    "dreamisland",
+    "polarity"
+  ],
+  "themedControlsChart": true,
+  "islandDayNightPreserved": true,
+  "gravityControlsPreserved": true
+}

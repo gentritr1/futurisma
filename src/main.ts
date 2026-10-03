@@ -5,7 +5,6 @@ import { TRACKS, resolveMapSelection } from "./game/map-selection";
 import { craftNames, defaultGarage, handlingFor, installHandling, type Garage } from "./game/garage-rules.js";
 import type { GarageScreen } from "./game/garage-bay";
 import { loadGarageBay, restoreStoredLivery } from "./game/meta-runtime";
-import { MetaUi } from "./game/meta-ui";
 import { save } from "./game/persistence";
 import { raceModes } from "./game/race-modes";
 import { configureRenderMode } from "./game/render-mode.js";
@@ -40,8 +39,14 @@ void import("./game/ability-slots").then(({ bindAbilitySlots }) => bindAbilitySl
 const input = new InputController();
 void import("./game/input-prompts").then(({bindInputPrompts}) => bindInputPrompts(input));
 const courseAssemblyStartedAt = performance.now();
+// Menu bindings can load alongside the circuit, outside the initial shell.
+const metaUiReady = import("./game/meta-ui");
 const selection = resolveMapSelection(window.location.search);
-const course: RaceCourse = selection === "dreamisland"
+const course: RaceCourse = selection === "frostline"
+  ? new (await import("./game/frostline-course")).FrostlineCourse()
+  : selection === "afterglow"
+  ? new (await import("./game/afterglow-course")).AfterglowCourse()
+  : selection === "dreamisland"
   ? new (await import("./game/dreamisland-course")).DreamIslandCourse()
   : selection === "ascension"
   ? new (await import("./game/ascension-course")).AscensionCourse()
@@ -63,6 +68,7 @@ const game = new FuturismaGame(
 );
 
 let launchMenu: import("./game/launch-menu").LaunchMenu | null = null;
+const { MetaUi } = await metaUiReady;
 const meta = new MetaUi(
   ui,
   selection,
@@ -173,7 +179,7 @@ const openGarage = (): void => {
   const reward = document.getElementById("result-garage-button")?.dataset;
   const frame = reward?.frame;
   if (reward) delete reward.frame;
-  void garageScreen.then((screen) => screen.show("craft", frame, Boolean(frame)), () => {
+  void garageScreen.then((screen) => screen.show("craft", frame), () => {
     garageScreen = null;
   });
 };

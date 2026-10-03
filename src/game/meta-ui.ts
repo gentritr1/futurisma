@@ -441,8 +441,8 @@ export class MetaUi {
       || (!this.active.motionForced && settings.reducedMotion !== this.active.reducedMotion);
     this.optionsNote.dataset.pending = pending ? "true" : "false";
     this.optionsNote.textContent = pending
-      ? "CONFIGURATION CHANGED · RELINK TO APPLY"
-      : "LEVELS, RADIO AND INTERFACE SIZE APPLY LIVE · DAMPING, RESOLUTION AND PIPELINE ON NEXT RELINK";
+      ? "Restart the game to apply these changes. Your current run will be lost."
+      : "Sound and interface size apply now. Motion, resolution and image changes require a restart.";
     this.optionsRelink.hidden = !pending;
   }
 

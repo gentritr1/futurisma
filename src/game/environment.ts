@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import {reserveCircuitSignatureVegetation,restoreCircuitSignatureVegetation} from './circuit-signature-parcel';
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import type { RaceCourse } from "./course";
 import { disposeObject3DResources } from "./graphics-resources";
@@ -443,6 +444,7 @@ export class GreenwaterEnvironment {
         throw new Error(`${HANGAR_BARRIER_MESH} is missing.`);
       }
       relocateHangarSixEdgeBarriers(hangarBarrierMesh, course, contractDrift);
+      reserveCircuitSignatureVegetation(runtime,course);
       const cullGroups: CullGroup[] = [];
       let triangles = 0;
       runtime.traverse((object) => {
@@ -506,6 +508,8 @@ export class GreenwaterEnvironment {
       }
       return environment;
     } catch (error) {
+      const signature=course.group.getObjectByName('circuit_signature');
+      if(signature)restoreCircuitSignatureVegetation(signature);
       disposeObject3DResources(scene);
       throw error;
     }

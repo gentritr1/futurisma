@@ -41,8 +41,7 @@ const SECTOR_ACCENTS: Record<string, string> = {
 
 type Point = { x: number; y: number; angle: number };
 
-/** Reuses the race's public minimap seam. No physics, HUD writer or save is
- * changed; the normal renderer remains the default, including in production. */
+/** The approved default renderer, using the race's existing minimap seam. */
 export function installAplusMinimap(minimap: Minimap, options: AplusOptions): void {
   const renderer = new AplusMinimap(options, minimap.contacts);
   minimap.update = renderer.update.bind(renderer);
@@ -79,6 +78,10 @@ class AplusMinimap {
   private livery = "";
   private rivalNumbers: string[] = [];
   private drawOps = 0;
+  private interference = 0;
+  private signalTime = 0;
+  private previousNow = 0;
+  private fogGradient!: CanvasGradient;
 
   constructor(private readonly options: AplusOptions, private readonly contacts: MinimapContact[]) {
     const { canvas, course, reducedMotion } = options;
@@ -121,6 +124,10 @@ class AplusMinimap {
     this.context.setTransform(this.pixelRatio, 0, 0, this.pixelRatio, 0, 0);
     this.context.lineJoin = "round";
     this.context.lineCap = "round";
+    this.fogGradient = this.context.createRadialGradient(0, 0, 0, 0, 0, 1);
+    this.fogGradient.addColorStop(0, "rgba(53,72,89,.98)");
+    this.fogGradient.addColorStop(.55, "rgba(43,61,77,.88)");
+    this.fogGradient.addColorStop(1, "rgba(31,49,65,0)");
     const bounds = { ...outline.bounds };
     if (upperOutline) {
       bounds.minX = Math.min(bounds.minX, upperOutline.bounds.minX);
@@ -212,6 +219,50 @@ class AplusMinimap {
     context.fillText(text, x, y);
   }
 
+  private drawGate(index: number, next: number): void {
+    this.pointAt(this.gates[index], this.point);
+    const normalX = -Math.sin(this.point.angle), normalY = Math.cos(this.point.angle);
+    const half = index === next ? 6 : 3;
+    const context = this.context;
+    context.beginPath();
+    context.moveTo(this.point.x - normalX * half, this.point.y - normalY * half);
+    context.lineTo(this.point.x + normalX * half, this.point.y + normalY * half);
+    this.stroke(CASING, index === next ? 6 : 3);
+    this.stroke(index === next ? AMBER : index === 0 ? INK : "#657272", index === next ? 3 : 1);
+  }
+
+  /** Fog obscures route detail, never moves the true player or next gate.
+   * Slow drift and a displaced echo suggest a failing receiver without flashes. */
+  private drawInterference(): void {
+    if (this.interference < .01) return;
+    const context = this.context, strength = this.interference, time = this.signalTime;
+    context.save();
+    context.globalAlpha = strength * .3;
+    context.translate(Math.sin(time * .8) * 2.5, Math.cos(time * .6) * 1.5);
+    this.stroke("#83b1cb", 2, this.outlinePath);
+    context.restore();
+    for (let cloud = 0; cloud < 3; cloud++) {
+      context.save();
+      context.translate(this.width * (.3 + cloud * .2 + Math.sin(time * .23 + cloud * 2) * .12),
+        this.height * (.22 + cloud * .27 + Math.cos(time * .19 + cloud) * .07));
+      context.scale(this.width * .64, this.height * .31);
+      context.globalAlpha = strength;
+      context.fillStyle = this.fogGradient;
+      context.fillRect(-1, -1, 2, 2);
+      context.restore();
+    }
+    context.save();
+    context.fillStyle = "#92a8b8";
+    context.globalAlpha = strength * .16;
+    const sweep = (time * 5) % 7;
+    for (let y = sweep; y < this.height - 19; y += 7) context.fillRect(5, y, this.width - 10, 1);
+    context.globalAlpha = .9;
+    context.fillStyle = CASING;
+    context.fillRect(3, this.height - 18, this.width - 6, 16);
+    context.restore();
+    this.label("SIGNAL DEGRADED", 8, this.height - 10, "#a9c2d0");
+  }
+
   private hideAnnouncement(): void {
     window.clearTimeout(this.plateTimer);
     this.plate.hidden = true;
@@ -238,6 +289,15 @@ class AplusMinimap {
     const phase = document.body.dataset.phase ?? "intro";
     const reset = phase !== this.lastPhase || Math.abs(distance - this.lastRaceDistance) > course.length * .15;
     if (reset) { this.focus.reset(); this.hideAnnouncement(); this.lastClear = ""; }
+    const requestedInterference = phase === "race" ? course.minimapInterference ?? 0 : 0;
+    const strength = Number.isFinite(requestedInterference) ? Math.max(0, Math.min(1, requestedInterference)) : 0;
+    const delta = Math.max(0, Math.min(.1, now - this.previousNow));
+    this.previousNow = now;
+    // Restart and leaving the race clear immediately; attack phases ease in.
+    this.interference = strength === 0 ? 0 : this.interference + (strength - this.interference) * (1 - Math.exp(-delta * 3));
+    if (!this.options.reducedMotion && phase === "race") this.signalTime += delta;
+    if (strength === 0) this.signalTime = 0;
+    canvas.dataset.signal = this.interference >= .01 ? "degraded" : "clear";
     this.lastPhase = phase;
     this.lastRaceDistance = distance;
     const gateText = this.checkpoint.textContent ?? "";
@@ -270,6 +330,8 @@ class AplusMinimap {
     const context = this.context;
     this.drawOps = 0;
     context.clearRect(0, 0, this.width, this.height);
+    context.save();
+    context.globalAlpha = 1 - this.interference * .35;
     this.stroke(CASING, 7, this.outlinePath);
     this.stroke("#657272", 2.5, this.outlinePath);
     this.segment(progress, 1, INK);
@@ -282,16 +344,7 @@ class AplusMinimap {
       context.setLineDash([]);
     }
     // All authored gates, including the last one. Zero is the finish stripe.
-    for (let index = 0; index < this.gates.length; index++) {
-      this.pointAt(this.gates[index], this.point);
-      const normalX = -Math.sin(this.point.angle), normalY = Math.cos(this.point.angle);
-      const half = index === gate.next ? 6 : 3;
-      context.beginPath();
-      context.moveTo(this.point.x - normalX * half, this.point.y - normalY * half);
-      context.lineTo(this.point.x + normalX * half, this.point.y + normalY * half);
-      this.stroke(CASING, index === gate.next ? 6 : 3);
-      this.stroke(index === gate.next ? AMBER : index === 0 ? INK : "#657272", index === gate.next ? 3 : 1);
-    }
+    for (let index = 0; index < this.gates.length; index++) this.drawGate(index, gate.next);
     for (let index = 0; index < this.count; index++) {
       this.pointAt(this.contacts[index].raceDistanceMeters / course.length, this.point);
       const offset = Math.max(-5, Math.min(5, this.contacts[index].lateralMeters * .45));
@@ -300,6 +353,10 @@ class AplusMinimap {
       this.arrow(this.point, 3.8, index === focus ? AMBER : "#f09880", this.gaps[index] > 0);
       if (index === focus) this.label(this.rivalNumbers[index] ?? "?", this.point.x + 10, this.point.y - 11, INK);
     }
+    context.restore();
+    this.drawInterference();
+    // The next gate and player remain accurate and crisp above the fog.
+    if (this.interference >= .01) this.drawGate(gate.next, gate.next);
     const upper = (course.kind === "polarity" && (course as PolarityCourse).lane === 1) || alternateRoad;
     this.pointAt(progress, this.player, upper && upperOutline ? upperOutline : outline);
     const distanceToGate = ((target - progress + 1) % 1) * course.length;
@@ -315,6 +372,8 @@ class AplusMinimap {
   diagnostics() {
     return {
       minimapAnimated: !this.options.reducedMotion,
+      minimapInterference: Number(this.interference.toFixed(3)),
+      minimapInterferenceTime: Number(this.signalTime.toFixed(3)),
       minimapStations: this.options.outline.stationCount,
       minimapContacts: this.count,
       minimapNearestRivalMeters: this.nearest === null ? null : Number(this.nearest.toFixed(1)),
