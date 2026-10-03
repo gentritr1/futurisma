@@ -1,0 +1,119 @@
+/* Loaded only by the dev-only ?minimap=aplus renderer. */
+.hud[data-minimap="aplus"] .minimap {
+  display: block;
+  width: 180px;
+  height: 210px;
+  right: 24px;
+  background: transparent;
+  clip-path: none;
+}
+
+.hud[data-minimap="aplus"] .hud-gate__row { gap: 12px; min-height: 24px; align-items: center; }
+.hud[data-minimap="aplus"] .hud-gate__left {
+  min-width: 0;
+  flex: 1;
+  gap: 8px;
+  align-items: center;
+}
+.hud[data-minimap="aplus"] .hud-gate__sector {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.hud[data-minimap="aplus"] #checkpoint-value { flex-shrink: 0; }
+.aplus-gate-plate {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  max-width: 100%;
+  min-width: 0;
+  padding: 6px 9px;
+  color: #080e11;
+  background: var(--sector-accent, #ffb47c);
+  text-shadow: none;
+  font: 700 12px/1 var(--mono);
+  letter-spacing: 0.02em;
+}
+.aplus-gate-plate[hidden] { display: none; }
+.aplus-gate-plate b { flex-shrink: 0; }
+.aplus-gate-plate span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hud[data-minimap="aplus"] .hud-gate[data-announcing="true"] .hud-gate__left > :not(.aplus-gate-plate) {
+  display: none;
+}
+.hud[data-minimap="aplus"][data-motion="full"] .hud-gate[data-announcing="true"] .aplus-gate-plate {
+  animation: aplus-gate-in 160ms cubic-bezier(.16, 1, .3, 1) both;
+}
+@keyframes aplus-gate-in {
+  from { opacity: .5; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hud[data-minimap="aplus"] .aplus-gate-plate { animation: none !important; }
+}
+
+/* Reserve space for the instruments, not for inactive status chips. Chips
+ * appear above the cluster without shifting speed or reserve when they change. */
+.hud[data-minimap="aplus"] .hud-drive__chips {
+  position: absolute;
+  left: 34px;
+  bottom: calc(100% - 8px);
+  margin-bottom: 0;
+  text-shadow: var(--hud-shadow);
+}
+
+/* Short/narrow screens reserve separate lanes for standing, time and course
+ * progress. Gate plates use exactly the same slot as the normal gate text. */
+@media (max-width: 1100px), (max-height: 520px) {
+  .hud[data-minimap="aplus"] .hud-standing {
+    left: 18px; top: 42px; transform: scale(.78);
+  }
+  .hud[data-minimap="aplus"] .hud-standing__row { height: 48px; }
+  .hud[data-minimap="aplus"] .hud-standing__tab { padding-inline: 10px; }
+  .hud[data-minimap="aplus"] .hud-standing__tab b { font-size: 44px; }
+  .hud[data-minimap="aplus"] .hud-standing__lap { padding-inline: 10px; gap: 7px; }
+  .hud[data-minimap="aplus"] .hud-standing__lap b { font-size: 30px; }
+  .hud[data-minimap="aplus"] .hud-standing__pips { padding-top: 8px; }
+  .hud[data-minimap="aplus"] .hud-standing__stack { display: none; }
+  .hud[data-minimap="aplus"] .hud-timing {
+    right: 18px; top: 42px; transform: scale(.78);
+  }
+  .hud[data-minimap="aplus"] .hud-timing__clock { font-size: 28px; }
+  .hud[data-minimap="aplus"] .hud-gate {
+    left: 50%; right: auto; top: 91px;
+    width: min(600px, calc(100% - 36px)); transform: translateX(-50%);
+  }
+  .hud[data-minimap="aplus"] .hud-gate__row { font-size: 10px; letter-spacing: .02em; }
+  .hud[data-minimap="aplus"] .hud-cue { top: 138px; gap: 10px; padding: 6px 12px; }
+  .hud[data-minimap="aplus"] .hud-drive { width: 320px; padding: 10px 26px 12px 18px; }
+  .hud[data-minimap="aplus"] .hud-drive__number { font-size: 68px; }
+  .hud[data-minimap="aplus"] .hud-drive__speed,
+  .hud[data-minimap="aplus"] .hud-reserve__copy,
+  .hud[data-minimap="aplus"] .hud-reserve__track,
+  .hud[data-minimap="aplus"] .hud-abilities { width: 100%; }
+  .hud[data-minimap="aplus"] .hud-drive__chips { left: 18px; width: calc(100% - 44px); }
+  .hud[data-minimap="aplus"] .minimap {
+    width: 132px; height: 150px;
+    right: 14px; top: 55%; transform: translateY(-50%);
+  }
+}
+@media (max-height: 520px) {
+  /* Use the player's scale on both sides of the base HUD's 700px breakpoint.
+   * A short screen needs the same compact instruments at 667px and 844px. */
+  .hud[data-minimap="aplus"] { --hud-scale: inherit; }
+  .hud[data-minimap="aplus"] .hud-drive { transform: scale(calc(var(--hud-scale) * .8)); }
+}
+@media (max-width: 520px) {
+  /* The course is already named before the race. Keep the narrow race header
+   * to one identity label so it cannot wrap into the standing row. */
+  body:has(.hud[data-minimap="aplus"]) .course-name { display: none; }
+  .hud[data-minimap="aplus"] .hud-gate__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 5px;
+  }
+  .hud[data-minimap="aplus"] .hud-gate__finish { justify-self: end; font-size: 10px; }
+  .hud[data-minimap="aplus"] .hud-gate__left { height: 24px; width: 100%; }
+  .hud[data-minimap="aplus"] .hud-cue { top: 159px; }
+  .hud[data-minimap="aplus"] .minimap { top: 35%; }
+}

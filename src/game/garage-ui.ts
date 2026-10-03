@@ -312,6 +312,7 @@ export class GarageScreen {
   }
 
   private showTab(tab: Tab): void {
+    const changed = this.tab !== tab;
     this.tab = tab;
     for (const [index, entry] of TABS.entries()) {
       const selected = entry.code === tab;
@@ -323,6 +324,9 @@ export class GarageScreen {
     this.trial = null;
     this.refit(tab === "craft" && this.viewed !== this.hooks.save.garage.chassis ? this.viewed : null);
     this.render();
+    // A new section starts at its heading. Purchases that redraw the current
+    // section retain their scroll position, including long paint lists.
+    if (changed) this.body.parentElement?.scrollTo({ top: 0, behavior: "instant" });
     this.animate();
   }
 

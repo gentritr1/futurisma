@@ -40,10 +40,21 @@ body[data-garage="true"] #game-canvas {
 }
 
 .garage {
+  --garage-pad-block: clamp(24px, 4vw, 48px);
   width: min(640px, 92vw);
   display: flex;
   flex-direction: column;
   gap: 12px;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+  scroll-padding-block: 80px 12px;
+}
+
+/* Own the vertical inset so a sticky tab bar can meet the panel's top edge,
+   instead of leaving a padding-sized window onto scrolled content above it. */
+.garage.options-panel {
+  padding-block: var(--garage-pad-block);
 }
 
 /* The panel scrolls (`.options-panel`) rather than letting a tall tab squeeze
@@ -84,6 +95,17 @@ body[data-garage="true"] #game-canvas {
 
 .garage__frames {
   grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* Tabs remain reachable when a narrow bay scrolls through parts or contracts.
+   An opaque backing keeps the rows underneath from competing with labels. */
+.garage__tabs {
+  position: sticky;
+  top: calc(-1 * var(--garage-pad-block));
+  z-index: 2;
+  padding-block: 6px;
+  background: var(--void);
+  border-bottom: 1px solid var(--line);
 }
 
 .garage__tab {
@@ -150,7 +172,7 @@ body[data-garage="true"] #game-canvas {
 
 .garage__card-note,
 .garage__card-grid {
-  color: var(--dim);
+  color: var(--muted);
   font-size: 0.58rem;
 }
 
@@ -558,7 +580,7 @@ body[data-garage="true"] #game-canvas {
 
 .garage__note {
   min-height: 1.3em;
-  color: var(--dim);
+  color: var(--muted);
   font-size: 0.58rem;
 }
 
@@ -729,7 +751,12 @@ body[data-garage="true"] #game-canvas {
 
   .garage.options-panel {
     width: min(42vw, 380px);
+    height: calc(100dvh - 76px);
     max-height: calc(100dvh - 76px);
+  }
+
+  .garage__note {
+    margin-top: auto;
   }
 
   .garage__demo {
@@ -794,8 +821,18 @@ body[data-garage="true"] #game-canvas {
 }
 
 @media (max-width: 700px) {
+  .garage {
+    --garage-pad-block: 24px;
+  }
+
   .purse__lines {
     grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-height: 520px) and (min-width: 701px) {
+  .garage {
+    --garage-pad-block: 16px;
   }
 }
 

@@ -42,6 +42,7 @@ import * as THREE from "three";
 import { applyPs2MaterialTreatment, type TotemVehicle, type TotemVisualState } from "./totem";
 import { resolvePaint } from "./garage-catalog.js";
 import { PATTERN_CODES, type Garage } from "./garage-rules.js";
+import { fitFrameLighting } from "./garage-lighting";
 
 const UNDERGLOW_NAME = "garage_underglow";
 const WORKS_FLAME = 0xff581d;
@@ -353,6 +354,7 @@ function bodyFor(vehicle: TotemVehicle, frame: string, circuit: string): Promise
     // the linear painterly class, like the baked environment GLBs.
     body = vehicle.loadBody(`/assets/garage/frames/${frame}.glb`, { textureCharacter: "painterly" })
       .then(async (loaded) => {
+        fitFrameLighting(loaded, frame);
         // The wash lies under the hull and skids. CORONA's and HALO's rings hang
         // lower than both, so they are left out of the floor it is measured from.
         const floor = new THREE.Box3();
