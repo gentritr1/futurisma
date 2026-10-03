@@ -1,0 +1,21 @@
+{
+  "instrument": "Chrome via scripts/visual/tideline-v4/browser.mjs; footer text assertion and document.scrollWidth minus innerWidth",
+  "checks": [
+    {
+      "width": 320,
+      "overflow": 0
+    },
+    {
+      "width": 390,
+      "overflow": 0
+    },
+    {
+      "width": 768,
+      "overflow": 0
+    },
+    {
+      "width": 1280,
+      "overflow": 0
+    }
+  ]
+}

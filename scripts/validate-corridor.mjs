@@ -49,6 +49,9 @@ import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
+// The census samples vertices; this independent geometry test also catches
+// the large Hangar wall face whose corners all lie outside the road.
+import "./validate-hangar-opening.mjs";
 
 import {
   CENSUS_ALLOWED_MESHES,

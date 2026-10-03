@@ -1,0 +1,42 @@
+{
+  "instrument": "scripts/visual/grand-tour-controls-review.mjs",
+  "widths": [
+    {
+      "width": 320,
+      "overflow": 0
+    },
+    {
+      "width": 768,
+      "overflow": 0
+    },
+    {
+      "width": 1280,
+      "overflow": 0
+    }
+  ],
+  "errors": [],
+  "contrast": [
+    {
+      "text": "--ink",
+      "background": "--void",
+      "ratio": 16.937763049296617
+    },
+    {
+      "text": "--muted",
+      "background": "--void",
+      "ratio": 8.39117908558637
+    },
+    {
+      "text": "--void",
+      "background": "--acid",
+      "ratio": 15.483300903143814
+    }
+  ],
+  "humanEntry": {
+    "phase": "race",
+    "autopilot": false
+  },
+  "keyboardEntry": "PASS",
+  "leaveWithoutPoints": "PASS",
+  "focusRestore": "PASS"
+}

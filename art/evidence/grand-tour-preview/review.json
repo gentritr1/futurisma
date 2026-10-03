@@ -1,0 +1,158 @@
+{
+  "instrument": "scripts/visual/grand-tour-review.mjs",
+  "rules": "PASS",
+  "ui": {
+    "sampleSequence": "PASS",
+    "sampleLiveSeparation": "PASS",
+    "mobileOverflow": "PASS",
+    "realCupSequence": "PASS",
+    "duplicateFinish": "PASS",
+    "newCup": "PASS"
+  },
+  "races": [
+    {
+      "map": "greenwater",
+      "elapsedMs": 165716.6666666765,
+      "totalLaps": 5,
+      "bestLapMs": 32466.666666674922,
+      "lapTimesMs": [
+        34441.666666665245,
+        32466.666666674922,
+        32966.66666664748,
+        32841.66666665043,
+        33000.00000003842
+      ],
+      "position": 2,
+      "racerCount": 4,
+      "standings": [
+        {
+          "position": 1,
+          "name": "PRIVATEER 13",
+          "team": "FIELD TOTEM",
+          "player": false,
+          "finishTimeMs": 165039.42677996986,
+          "gapMs": 0
+        },
+        {
+          "position": 2,
+          "name": "TOTEM",
+          "team": "WORKS 07",
+          "player": true,
+          "finishTimeMs": 165716.6666666765,
+          "gapMs": 677.2398867066443
+        },
+        {
+          "position": 3,
+          "name": "NIGHTFORM 24",
+          "team": "FIELD TOTEM",
+          "player": false,
+          "finishTimeMs": 167699.8025909993,
+          "gapMs": 2660.3758110294393
+        },
+        {
+          "position": 4,
+          "name": "NEEDLE 16",
+          "team": "FIELD TOTEM",
+          "player": false,
+          "finishTimeMs": 169333.01012827604,
+          "gapMs": 4293.583348306185
+        }
+      ]
+    },
+    {
+      "map": "nightshift",
+      "elapsedMs": 92591.66666665855,
+      "totalLaps": 3,
+      "bestLapMs": 30408.333333318566,
+      "lapTimesMs": [
+        31766.666666664907,
+        30416.66666667508,
+        30408.333333318566
+      ],
+      "position": 4,
+      "racerCount": 4,
+      "standings": [
+        {
+          "position": 1,
+          "name": "PRIVATEER 13",
+          "team": "FIELD TOTEM",
+          "player": false,
+          "finishTimeMs": 71799.06847700015,
+          "gapMs": 0
+        },
+        {
+          "position": 2,
+          "name": "NIGHTFORM 24",
+          "team": "FIELD TOTEM",
+          "player": false,
+          "finishTimeMs": 73494.62404763204,
+          "gapMs": 1695.555570631896
+        },
+        {
+          "position": 3,
+          "name": "NEEDLE 16",
+          "team": "FIELD TOTEM",
+          "player": false,
+          "finishTimeMs": 75204.74623891004,
+          "gapMs": 3405.6777619098852
+        },
+        {
+          "position": 4,
+          "name": "TOTEM",
+          "team": "WORKS 07",
+          "player": true,
+          "finishTimeMs": 92591.66666665855,
+          "gapMs": 20792.598189658405
+        }
+      ]
+    },
+    {
+      "map": "dreamisland",
+      "elapsedMs": 97208.33333332253,
+      "totalLaps": 3,
+      "bestLapMs": 31924.999999981643,
+      "lapTimesMs": [
+        33158.33333333154,
+        32125.00000000935,
+        31924.999999981643
+      ],
+      "position": 1,
+      "racerCount": 4,
+      "standings": [
+        {
+          "position": 1,
+          "name": "TOTEM",
+          "team": "WORKS 07",
+          "player": true,
+          "finishTimeMs": 97208.33333332253,
+          "gapMs": 0
+        },
+        {
+          "position": 2,
+          "name": "PRIVATEER 13",
+          "team": "FIELD TOTEM",
+          "player": false,
+          "finishTimeMs": 97316.24171908438,
+          "gapMs": 107.9083857618599
+        },
+        {
+          "position": 3,
+          "name": "NIGHTFORM 24",
+          "team": "FIELD TOTEM",
+          "player": false,
+          "finishTimeMs": 99314.99481714693,
+          "gapMs": 2106.6614838243963
+        },
+        {
+          "position": 4,
+          "name": "NEEDLE 16",
+          "team": "FIELD TOTEM",
+          "player": false,
+          "finishTimeMs": 101315.90653291107,
+          "gapMs": 4107.5731995885435
+        }
+      ]
+    }
+  ],
+  "errors": []
+}

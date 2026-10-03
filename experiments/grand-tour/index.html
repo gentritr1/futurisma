@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#090d10"><link rel="icon" href="data:,">
+  <title>FUTURISMA · Grand Tour preview</title>
+  <link rel="stylesheet" href="./tour.css">
+</head>
+<body>
+  <main id="tour">
+    <header class="masthead"><a href="./">FUTURISMA</a><span>GRAND TOUR <b>DESIGN PREVIEW</b></span></header>
+    <div class="workspace">
+      <section class="stage" aria-labelledby="tour-title">
+        <img id="scene" src="/art/evidence/map-polish-review/greenwater-55.png" alt="Greenwater's racing surface and industrial verges">
+        <div class="stage-top"><span id="round-label">ROUND 01 / 03</span><span>FIELD RACE · WORKS</span></div>
+        <div class="stage-caption">
+          <p class="series" id="stage-label">GRAND TOUR · OPENING ROUND</p>
+          <h1 id="tour-title">GRAND<br>TOUR</h1>
+          <p class="deck" id="deck">Three circuits. One classification.<br>Carry every finish into the next race.</p>
+          <div class="launch-row"><button id="launch" class="primary">RACE GREENWATER <span aria-hidden="true">↗</span></button><span id="race-note">Your opening round.</span></div>
+        </div>
+      </section>
+      <aside class="classification" aria-labelledby="classification-title">
+        <div class="ledger-heading"><h2 id="classification-title">CUP STANDINGS</h2><span id="round-count">BEFORE ROUND 01</span></div>
+        <p id="verdict" class="verdict" role="status">A clean slate.</p>
+        <p id="verdict-detail" class="detail">Your first finish sets the order.<br>Every place earns points.</p>
+        <table><caption class="sr-only">Championship standings</caption><thead><tr><th scope="col">POS</th><th scope="col">DRIVER</th><th scope="col">PTS</th></tr></thead><tbody id="standings"></tbody></table>
+        <div class="scoring"><h3>EVERY FINISH COUNTS</h3><p>1st <b>4</b> <span>·</span> 2nd <b>3</b> <span>·</span> 3rd <b>2</b> <span>·</span> 4th <b>1</b></p><p>Most points wins. Ties go to the better finish in the final round.</p></div>
+        <p id="feedback" role="alert"></p>
+        <div class="preview-actions"><button id="sample" class="text-button">Preview a finish <span aria-hidden="true">→</span></button><button id="reset" class="text-button" hidden>Return to a fresh cup</button></div>
+        <p id="sample-label" class="sample-label" hidden>SAMPLE RESULTS · NOT A PLAYED RACE</p>
+      </aside>
+    </div>
+    <nav class="itinerary" aria-label="Cup itinerary"><p class="route-line">HUMID CONCRETE → CITY AFTER DARK → ISLAND DAY / NIGHT</p><ol id="rounds"></ol></nav>
+    <footer><span>FUTURISMA / THREE-ROUND CUP</span><span>Cup points reset on reload. Lap records stay in this preview.</span></footer>
+  </main>
+  <section id="race-shell" aria-label="Current race" hidden>
+    <div class="race-toolbar"><span id="race-heading" role="status"></span><button id="leave">LEAVE ROUND</button><button id="continue" hidden>CONTINUE TO CUP</button></div>
+    <iframe id="race" title="FUTURISMA Grand Tour race" allow="autoplay; gamepad; fullscreen"></iframe>
+  </section>
+  <dialog id="leave-dialog"><h2>Leave this round?</h2><p>This unfinished race will not add points to your cup.</p><div><button id="stay" class="primary">KEEP RACING</button><button id="confirm-leave" class="text-button">Leave round</button></div></dialog>
+  <script type="module" src="./tour.js"></script>
+</body>
+</html>

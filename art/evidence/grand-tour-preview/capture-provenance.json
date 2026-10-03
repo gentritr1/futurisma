@@ -1,0 +1,5 @@
+{
+  "instrument": "scripts/visual/grand-tour-capture-results.mjs",
+  "source": "review.json",
+  "method": "Replay recorded real classifications through the preview result adapter; no races run by this capture script."
+}

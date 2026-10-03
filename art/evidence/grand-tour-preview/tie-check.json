@@ -1,0 +1,42 @@
+{
+  "instrument": "standingsFor three-round tied-score fixture",
+  "passed": true,
+  "rows": [
+    {
+      "position": 1,
+      "name": "B",
+      "team": "TEST",
+      "player": false,
+      "key": "B|TEST",
+      "points": 9,
+      "cupPosition": 1
+    },
+    {
+      "position": 2,
+      "name": "A",
+      "team": "TEST",
+      "player": false,
+      "key": "A|TEST",
+      "points": 9,
+      "cupPosition": 2
+    },
+    {
+      "position": 3,
+      "name": "TOTEM",
+      "team": "TEST",
+      "player": true,
+      "key": "player",
+      "points": 9,
+      "cupPosition": 3
+    },
+    {
+      "position": 4,
+      "name": "C",
+      "team": "TEST",
+      "player": false,
+      "key": "C|TEST",
+      "points": 3,
+      "cupPosition": 4
+    }
+  ]
+}

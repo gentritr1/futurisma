@@ -1,0 +1,77 @@
+{
+  "instrument": "scripts/visual/map-polish-report.py",
+  "rows": [
+    {
+      "map": "nightshift",
+      "controlChangedPixels": 0,
+      "trialVsShippedChangedPixels": 0,
+      "changedPixels": 75456,
+      "changedPixelsAbove8": 3109,
+      "maximumChannelDelta": 80,
+      "before": {
+        "frame": "nightshift-before.png",
+        "lumaMean": 36.92,
+        "lumaStd": 22.63,
+        "satMean": 121.97,
+        "satP90": 228.16,
+        "chromaMean": 8.85,
+        "p01": 2.0,
+        "p50": 36.3,
+        "p99": 134.3,
+        "range": 132.3,
+        "blackPct": 19.19,
+        "whitePct": 0.0
+      },
+      "after": {
+        "frame": "nightshift-after.png",
+        "lumaMean": 36.88,
+        "lumaStd": 22.6,
+        "satMean": 121.68,
+        "satP90": 228.16,
+        "chromaMean": 8.81,
+        "p01": 2.0,
+        "p50": 36.3,
+        "p99": 134.3,
+        "range": 132.3,
+        "blackPct": 19.21,
+        "whitePct": 0.0
+      }
+    },
+    {
+      "map": "polarity",
+      "controlChangedPixels": 0,
+      "trialVsShippedChangedPixels": 0,
+      "changedPixels": 16820,
+      "changedPixelsAbove8": 1505,
+      "maximumChannelDelta": 58,
+      "before": {
+        "frame": "polarity-before.png",
+        "lumaMean": 37.17,
+        "lumaStd": 22.91,
+        "satMean": 128.8,
+        "satP90": 234.44,
+        "chromaMean": 8.6,
+        "p01": 2.9,
+        "p50": 38.0,
+        "p99": 141.9,
+        "range": 139.0,
+        "blackPct": 15.61,
+        "whitePct": 0.0
+      },
+      "after": {
+        "frame": "polarity-after.png",
+        "lumaMean": 37.15,
+        "lumaStd": 22.89,
+        "satMean": 128.88,
+        "satP90": 234.44,
+        "chromaMean": 8.6,
+        "p01": 2.9,
+        "p50": 38.0,
+        "p99": 141.7,
+        "range": 138.7,
+        "blackPct": 15.62,
+        "whitePct": 0.0
+      }
+    }
+  ]
+}

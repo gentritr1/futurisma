@@ -34,6 +34,7 @@ export class NeonEnvironment implements RaceEnvironment {
   private readonly projection = new THREE.Matrix4();
   private readonly forward = new THREE.Vector3();
   private readonly lampOffset = new THREE.Vector3();
+  private readonly optics: THREE.InstancedMesh[] = [];
 
   private constructor(root:THREE.Group, lamps:NeonLamp[], private readonly options:NeonEnvironmentOptions) {
     this.root=root;
@@ -68,7 +69,10 @@ export class NeonEnvironment implements RaceEnvironment {
     for(const material of replacements.keys()) material.dispose();
     this.lamps=lamps.map(l=>({position:new THREE.Vector3(...l.p),color:new THREE.Color(this.options.colors[l.color]??0xb4e7cc)}));
     this.root.add(...this.lights);
-    if(options.opticalEffects!==false)this.root.add(this.makeHalos(lamps),this.makeReflections(lamps));
+    if(options.opticalEffects!==false) {
+      this.optics.push(this.makeHalos(lamps),this.makeReflections(lamps));
+      this.root.add(...this.optics);
+    }
     this.stats={meshes:this.groups.length,triangles:this.groups.reduce((n,g)=>n+g.triangles,0),
       materials:replacements.size,textures:textures.size,visibleGroups:0,visibleTriangles:0,
       shaderModel:"lambert",signageSource:"baked",contractDrift:[]};
@@ -85,7 +89,14 @@ export class NeonEnvironment implements RaceEnvironment {
       if(modelResult.status==="fulfilled")disposeObject3DResources(modelResult.value.scene);
       throw new Error(`${options.rootName} could not be loaded.`);
     }
-    return new NeonEnvironment(modelResult.value.scene,lightResult.value,options);
+    const environment=new NeonEnvironment(modelResult.value.scene,lightResult.value,options);
+    if(environment.optics.length) {
+      // Keep the adapter lazy, and give city glow the buildings' fog and tone mapping.
+      // These shaders have no mutable BasicMaterial controls to synchronise.
+      const {applyTidelineRenderRule}=await import("./tideline-render-rule");
+      applyTidelineRenderRule(...environment.optics);
+    }
+    return environment;
   }
   updateVisibility(camera:THREE.Camera):void {
     camera.updateMatrixWorld();

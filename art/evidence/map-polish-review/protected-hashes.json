@@ -1,0 +1,7 @@
+{
+  "src/game/game.ts": "0a791492018e6be71310580559ab37b79d6a1f23605ddc97db5347ef905bf20f",
+  "src/game/autopilot.ts": "93a480602b877572ed92a231296313e713e4f41d7143b88f3693a82fa319cbd5",
+  "src/game/physics.js": "54e45b14519c4951e9ab535080eb56731cd6a159a6ff8ddf7eb53b8a1c6f2b2a",
+  "src/game/dreamisland-powers-config.js": "679b27eac823403b3f03fab58c4b3a25e57a3fc9392838c693bb057dbc4ac351",
+  "src/game/dreamisland-schedule.js": "1f225bb5e5f9e967da4c20883c00f68892aef91a51e6a5eeeea56b9e641be7fc"
+}

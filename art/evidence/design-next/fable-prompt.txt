@@ -1,0 +1,15 @@
+Act as a read-only game-design advisor for FUTURISMA, a Three.js/TypeScript browser hover racer with seven circuits and a restrained remembered-PS2 look. The user explicitly requested Claude Fable 5.1 as their design advisor. Do not edit files, execute code, start agents, or call external services. You may use Read on only these project documents/images:
+PRODUCT.md
+README.md
+art/evidence/map-polish-review/README.md
+art/evidence/map-polish-review/contact-sheet.jpg
+art/evidence/dreamisland-v1/polish-3/contact-sheet.jpg
+
+Review the actual images, distinguish visual observations from hypotheses about fun. Constraints: src/game/game.ts frozen at 2577 lines; physics/autopilot/route/pace/schedule changes forbidden; Dream Island <=110 combined draws and <=180000 combined triangles, prior worst 105/162334; initial shell 283639/283648 bytes; Polarity full race just measured149 combined draws against145. No commits. No multiplayer backend. Existing mechanics: fixed rivals, nitro, drifting, slipstream, clean gates, near misses, surge/shield, three formats, ghosts on supported maps, changing tide/launch/night. Do not recommend existing features as new.
+
+Deliver <=1100 words:
+1. Candid design-taste assessment of each map from the images, and the three highest-value improvements.
+2. Rank five genuinely fun incremental feature candidates by player decision gained vs implementation/render risk. For each state loop, existing signals it can consume, success test with a HUMAN actor, and why it fits this game's identity. Avoid arbitrary measured-looking numerical promises and unnecessary feature count.
+3. Select ONE smallest next feature and outline a bounded implementation that does not require game.ts/physics changes or a budget increase. If the 9-byte shell headroom prevents an honest implementation, explicitly choose a separate prototype/brief until headroom is created.
+4. How Higgsfield-generated references/textures/short videos would help here; distinguish shipped runtime assets from promotional assets. Never claim generation makes a production-ready Blender mesh.
+5. Judge proposed external skills: engine-neutral game-design frameworks, game-feel feedback bundles, gameplay invariants. Reject generic hit-stop/shake advice if it harms racing. Should we depend on your taste, or treat it as hypotheses validated by players? Be critical.

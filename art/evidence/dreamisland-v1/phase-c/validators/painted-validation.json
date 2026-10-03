@@ -2,7 +2,7 @@
   "script": "scripts/validate-dreamisland-painted.mjs",
   "painted": {
     "file": "public/assets/dreamisland/painted.glb",
-    "sha256": "7bb24e916f6345b6e5084ed9cb67e621a6130bb7b4cd03ac679e398fd42ff291",
+    "sha256": "6027368989e3c8a8be66e4be37116297904e0372b94be19dee9e3794ba0533b7",
     "meshes": 10,
     "triangles": 66694,
     "trianglesPerMesh": {

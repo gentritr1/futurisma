@@ -4,6 +4,7 @@ import type { RaceCourse } from "./course";
 import { disposeObject3DResources } from "./graphics-resources";
 import { applyPs2MaterialTreatment } from "./totem";
 import { DECK_TILE_METRES, DECK_TILE_URL, deckTileEnabled } from "./art-pack.js";
+import { openHangarRoadBay } from "./greenwater-hangar-opening.js";
 
 const EXPECTED_RUNTIME_MESHES = 60;
 const HANGAR_BARRIER_MESH = "GW_SECTOR_HANGAR_SIX_concrete";
@@ -438,6 +439,9 @@ export class GreenwaterEnvironment {
         throw new Error("Greenwater runtime root is missing.");
       }
       scene.updateMatrixWorld(true);
+      const roadBay = runtime.getObjectByName("GW_SECTOR_HANGAR_SIX_metal");
+      if (!(roadBay instanceof THREE.Mesh)) throw new Error("Hangar road bay is missing.");
+      roadBay.userData.runtimeOpeningRepair = openHangarRoadBay(roadBay.geometry);
       const hangarBarrierMesh = runtime.getObjectByName(HANGAR_BARRIER_MESH);
       if (!(hangarBarrierMesh instanceof THREE.Mesh)) {
         throw new Error(`${HANGAR_BARRIER_MESH} is missing.`);
