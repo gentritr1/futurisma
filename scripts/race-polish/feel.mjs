@@ -1,0 +1,82 @@
+import assert from 'node:assert/strict';
+import {mkdir,writeFile} from 'node:fs/promises';
+import {chromium} from 'playwright';
+const output='art/evidence/race-feel';await mkdir(output,{recursive:true});
+const browser=await chromium.launch({executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',args:['--use-angle=metal','--enable-gpu','--ignore-gpu-blocklist']});
+const report={finish:'Controlled finish fixture; manual input checks precede it. Complete-lap runs are reported separately.'},errors=[];
+try{
+ const page=await browser.newPage({viewport:{width:1280,height:720}});
+ page.on('pageerror',e=>errors.push(e.message));
+ await page.routeWebSocket('**',socket=>socket.send(JSON.stringify({type:'connected'})));
+ await page.route('**/src/game/game.ts*',async route=>{const response=await route.fetch();await route.fulfill({response,body:(await response.text()).replace('this.renderer.outputColorSpace = THREE.SRGBColorSpace;','this.renderer.outputColorSpace = THREE.SRGBColorSpace; window.__game = this;')});});
+ await page.goto('http://127.0.0.1:5218/?map=greenwater&mode=sprint&tier=rookie&motion=reduce&music=0&voice=0');
+ await page.waitForSelector('.launch-reward');
+ assert.match(await page.locator('.launch-reward').textContent(),/TOUR 0\/9.*FIRST FINISH \+CR 300/);
+ report.viewports=[];
+ for(const [width,height] of [[1280,720],[1440,900],[390,844],[390,680],[844,390]]){
+  await page.setViewportSize({width,height});
+  const bounds=await page.locator('.launch-reward').boundingBox();
+  assert.ok(bounds.y>=0&&bounds.y+bounds.height<=height&&bounds.x>=0&&bounds.x+bounds.width<=width,JSON.stringify({width,height,bounds}));
+  const guide=await page.locator(".launch-guide").boundingBox();
+  assert.ok(guide.y+guide.height<=bounds.y,`Guide overlaps reward at ${width}x${height}: ${JSON.stringify({guide,bounds})}`);
+  report.viewports.push({width,height,bounds,guide});await page.screenshot({path:`${output}/launch-${width}x${height}.png`});
+ }
+ await page.setViewportSize({width:1280,height:720});
+ await page.locator('#controls-button').click();
+ assert.match(await page.locator('.control-note').textContent(),/automatically/);
+ await page.locator('#controls-close').click();await page.locator('#start-button').click();
+ await page.waitForFunction(()=>window.__game?.phase==='running'&&!document.body.dataset.launch,null,{timeout:60000});
+ await page.evaluate(()=>{window.__game.elapsedMs=90000;});
+ await page.waitForFunction(()=>document.querySelector('.map-hud-condition').textContent.includes('THRUST'));
+ await page.evaluate(()=>window.__game.ui.announcePosition(4,false));
+ await page.waitForFunction(()=>document.getElementById('system-status').textContent==='RACE ACTIVE',null,{timeout:8000});
+ report.positionNoticeCleared=true;
+ await page.screenshot({path:`${output}/idle-guidance.png`});
+ await page.keyboard.down('w');await page.waitForTimeout(2300);await page.keyboard.down('Shift');await page.waitForTimeout(600);
+ report.manual=await page.evaluate(()=>({speed:window.__game.speed,boost:window.__game.boostActive,progress:window.__game.progress}));
+ assert.ok(report.manual.speed>20);assert.equal(report.manual.boost,true);
+ await page.keyboard.up('Shift');await page.keyboard.up('w');await page.keyboard.press('p');
+ await page.waitForFunction(()=>window.__game.phase==='paused');
+ await page.keyboard.press('p');
+ await page.waitForFunction(()=>window.__game.phase==='running');
+ await page.evaluate(()=>{
+  const g=window.__game;g.lapTimesMs=[64000,61000];g.elapsedMs=125000;g.bestLapMs=61000;g.finishRace();
+ });
+ await page.waitForSelector('.race-debrief');
+ assert.equal(await page.locator('.race-debrief__title').textContent(),'NEW CIRCUIT LOGGED');
+ assert.match(await page.locator('.race-debrief__progress').textContent(),/1 \/ 9.*\+CR 300/);
+ assert.equal(await page.locator('.race-debrief__next').textContent(),'EXPLORE BITTERPAN WORKS');
+ report.first=await page.locator('#result-purse').innerText();
+ await page.screenshot({path:`${output}/result-desktop.png`});
+ await page.setViewportSize({width:390,height:844});await page.screenshot({path:`${output}/result-mobile.png`,fullPage:true});
+ assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+ await page.setViewportSize({width:1280,height:720});
+ await page.locator('.race-debrief__next').focus();
+ await page.keyboard.press('Space');await page.waitForSelector('.launch-reward');
+ assert.match(page.url(),/map=bitterpan/);assert.match(page.url(),/mode=sprint/);assert.match(page.url(),/tier=rookie/);
+ assert.equal(await page.evaluate(()=>document.body.dataset.phase),'intro','Explore opens the next briefing, not an automatic race');
+ assert.match(await page.locator('.launch-reward').textContent(),/TOUR 1\/9/);
+ await page.screenshot({path:`${output}/next-circuit.png`});
+ // Exercise settled repeat/all-complete/demo outcomes through the real purse API.
+ report.outcomes=await page.evaluate(async()=>{
+  const {save}=await import('/src/game/persistence.ts'),{TRACKS}=await import('/src/game/map-selection.ts'),{settleFinish}=await import('/src/game/garage-purse.ts');
+  const summary={mode:'sprint',tier:'rookie',newBestLap:false,topSpeedKph:280,nearMisses:0,cleanGateChain:4,slipstreamSeconds:0};
+  const inputs={finish:{position:2,racerCount:4,driftCashes:1,demo:false}};
+  settleFinish(summary,inputs,2,save,'greenwater',TRACKS);
+  const repeat={title:document.querySelector('.race-debrief__title').textContent,bonus:!!document.querySelector('[data-code="circuit"]')};
+  save.setGarage({...save.garage,circuits:TRACKS.filter(t=>t.selection!=='bitterpan').map(t=>t.selection)});
+  settleFinish(summary,inputs,2,save,'bitterpan',TRACKS);
+  const complete={title:document.querySelector('.race-debrief__title').textContent,next:!!document.querySelector('.race-debrief__next'),count:save.garage.circuits.length};
+  const {raceModes}=await import('/src/game/race-modes.ts');
+  const before=JSON.stringify(save.snapshot());
+  const demoResult=raceModes.recordFinish(1,1,[1],null,{...inputs,finish:{...inputs.finish,demo:true},contact:{nearMisses:0,peakCleanGateChain:0},topSpeedMetersPerSecond:100});
+  const recordsUntouched=before===JSON.stringify(save.snapshot())&&!demoResult.newBestLap;
+  const balance=save.garage.credits;settleFinish(summary,{finish:{...inputs.finish,demo:true}},2,save,'bitterpan',TRACKS);
+  return {repeat,complete,demo:{recordsUntouched,unchanged:balance===save.garage.credits,journey:!!document.querySelector('.race-debrief')}};
+ });
+ assert.deepEqual(report.outcomes.repeat,{title:'CIRCUIT TOUR',bonus:false});
+ assert.deepEqual(report.outcomes.complete,{title:'TOUR COMPLETE',next:false,count:9});
+ assert.deepEqual(report.outcomes.demo,{recordsUntouched:true,unchanged:true,journey:false});
+ assert.deepEqual(errors,[]);report.errors=errors;
+}finally{await browser.close();await writeFile(`${output}/report.json`,JSON.stringify(report,null,2));}
+console.log('Race feel PASS: visible reward promise at five sizes; persistent idle guidance; real throttle/boost; first/repeat/all-circuit/demo settlements; next-map briefing navigation.');

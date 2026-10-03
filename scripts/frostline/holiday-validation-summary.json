@@ -1,0 +1,55 @@
+{
+  "viewport": "1536x864",
+  "dpr": 1,
+  "quality": "high",
+  "browser": "Headless Chrome / Metal / local",
+  "uncappedFullLap": {
+    "fps": 255.08,
+    "p95FrameMs": 7.1,
+    "recoveries": 0,
+    "missedGates": 0,
+    "errors": []
+  },
+  "holiday": {
+    "sites": 30,
+    "villagers": 50,
+    "skaters": 5,
+    "cocoaCarts": 6,
+    "sleighs": 5,
+    "trainCars": 4,
+    "animatedTransforms": 104,
+    "instancedBatches": 20,
+    "minimumRoadCenterClearanceAfterSiteRadius": 16.09919870688769,
+    "reducedMotionStatic": true,
+    "pauseHolds": true,
+    "repeatablePoses": true
+  },
+  "ambience": {
+    "ticks": 18,
+    "chimes": 6,
+    "fireworks": 7,
+    "sleighBells": 1
+  },
+  "checks": [
+    "Production build and bundle ceilings",
+    "Existing Frostline route and winter mechanics",
+    "Browser motion, pause, clearance, deterministic poses and reduced motion",
+    "Full lap without recovery or missed gates",
+    "git diff --check",
+    "Production browser under actual CSP, A+ minimap and themed HUD"
+  ],
+  "production": [
+    {
+      "map": "afterglow",
+      "errors": [],
+      "minimap": "aplus",
+      "phase": "race"
+    },
+    {
+      "map": "frostline",
+      "errors": [],
+      "minimap": "aplus",
+      "phase": "race"
+    }
+  ]
+}

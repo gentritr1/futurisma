@@ -2,10 +2,10 @@ import { createServer } from 'vite';
 import { writeFile } from 'node:fs/promises';
 import { buildCourseOutline, fitOutlineTransform } from '../src/game/minimap-projection.js';
 
-// Menu previews never import seven circuit runtimes. This small atlas comes
+// Menu previews never import circuit runtimes. This small atlas comes
 // from their real geometry; run again when a centreline or gate moves.
 const server = await createServer({ server: { middlewareMode: true, hmr: false }, appType: 'custom' });
-const entries = [['greenwater','course','GreenwaterCourse'],['bitterpan','bitterpan-course','BitterpanCourse'],['nightshift','nightshift-course','NightshiftCourse'],['polarity','polarity-course','PolarityCourse'],['tideline','tideline-course','TidelineCourse'],['ascension','ascension-course','AscensionCourse'],['dreamisland','dreamisland-course','DreamIslandCourse']];
+const entries = [['greenwater','course','GreenwaterCourse'],['bitterpan','bitterpan-course','BitterpanCourse'],['nightshift','nightshift-course','NightshiftCourse'],['polarity','polarity-course','PolarityCourse'],['tideline','tideline-course','TidelineCourse'],['ascension','ascension-course','AscensionCourse'],['dreamisland','dreamisland-course','DreamIslandCourse'],['afterglow','afterglow-course','AfterglowCourse'],['frostline','frostline-course','FrostlineCourse']];
 // Course constructors also author sign textures. They are not rendered here.
 globalThis.document = {createElement: () => ({width:1,height:1,getContext:()=>new Proxy({measureText:t=>({width:t.length*10}),createImageData:(w,h)=>({data:new Uint8ClampedArray(w*h*4)}),getImageData:(x,y,w,h)=>({data:new Uint8ClampedArray(w*h*4)}),createLinearGradient:()=>({addColorStop(){}}),createRadialGradient:()=>({addColorStop(){}})},{get:(o,k)=>o[k] ?? (()=>{})})})};
 const atlas = {};
@@ -25,5 +25,5 @@ try {
     course.group.traverse(o=>{o.geometry?.dispose();});
   }
   await writeFile('src/game/launch-atlas.json', JSON.stringify(atlas));
-  console.log('Launch atlas: seven real outlines, gate stations and branch paths.');
+  console.log(`Launch atlas: ${entries.length} real outlines, gate stations and branch paths.`);
 } finally { await server.close(); }

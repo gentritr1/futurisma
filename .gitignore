@@ -30,3 +30,6 @@ public/assets/audio/music/*
 # (about 27 MB for the set) next to the committed contact and blueprint JPEGs;
 # only the JPEG sheets are evidence in git.
 art/evidence/garage-frames/*.png
+
+# Dream-loop working references and visual iteration.
+.dream-loop/

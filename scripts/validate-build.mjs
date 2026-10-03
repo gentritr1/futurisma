@@ -4,12 +4,13 @@ import { readFile, readdir, writeFile, mkdir } from "node:fs/promises";
 
 import { PIT_RADIO_IDS } from "../src/game/pit-radio-lines.js";
 
-const assetsDirectory = new URL("../dist/assets/", import.meta.url);
+const distDirectory = new URL("../dist/", import.meta.url);
+const assetsDirectory = new URL("assets/", distDirectory);
 const html = await readFile(new URL("../dist/index.html", import.meta.url));
 const productionHeaders = await readFile(new URL("../dist/_headers", import.meta.url), "utf8");
 const htmlSource = html.toString("utf8");
 const initialAssetNames = [...htmlSource.matchAll(
-  /(?:src|href)="\/assets\/([^"?]+\.(?:js|css))"/g,
+  /(?:src|href)="\/([^"?]+\.(?:js|css))"/g,
 )].map((match) => match[1]);
 const javascriptNames = initialAssetNames.filter((name) => name.endsWith(".js"));
 const stylesheetNames = initialAssetNames.filter((name) => name.endsWith(".css"));
@@ -21,19 +22,24 @@ assert.equal(
   "The production shell repeats an initial asset reference.",
 );
 
-async function measureAssets(names) {
+async function measureAssets(names, directory = assetsDirectory) {
   let rawBytes = 0;
   let gzipBytes = 0;
   for (const name of names) {
-    const bytes = await readFile(new URL(name, assetsDirectory));
+    const bytes = await readFile(new URL(name, directory));
     rawBytes += bytes.byteLength;
     gzipBytes += gzipSync(bytes).byteLength;
   }
   return { rawBytes, gzipBytes };
 }
 
-const javascript = await measureAssets(javascriptNames);
-const stylesheet = await measureAssets(stylesheetNames);
+// September 28 integrated nine-map build, including the shared launch boot:
+// 993.789 KiB raw JS, 274.056 KiB gzip JS, 286.321 KiB gzip shell.
+// Repin with under 1.3 KiB headroom. Afterglow/Frostline route data, art,
+// environment and runtime stay lazy; the approved A+ minimap stays lazy too.
+// Count same-origin boot scripts as well as Vite's /assets chunks.
+const javascript = await measureAssets(javascriptNames, distDirectory);
+const stylesheet = await measureAssets(stylesheetNames, distDirectory);
 const javascriptGzip = javascript.gzipBytes;
 const stylesheetGzip = stylesheet.gzipBytes;
 const shellGzip = gzipSync(html).byteLength + javascriptGzip + stylesheetGzip;
@@ -44,7 +50,7 @@ const shellGzip = gzipSync(html).byteLength + javascriptGzip + stylesheetGzip;
 // The overall 272 KiB shell ceiling is unchanged. Course/environment/sky data
 // and the deterministic ability simulation still load with their circuit.
 for (const name of javascriptNames) {
-  assert.ok(!/tideline-(course|runtime|world|sky|environment)-|dreamisland-|polarity-simulation-/.test(name), "Circuit-specific presentation/rules must stay lazy.");
+  assert.ok(!/tideline-(course|runtime|world|sky|environment)-|dreamisland-|polarity-simulation-|afterglow-|frostline-|map-hud-|circuit-surface-finish-/.test(name), "Circuit-specific presentation/rules must stay lazy.");
 }
 
 // HUD pass (2026-09-09): the approved interface bound to the running game.
@@ -154,9 +160,16 @@ for (const name of javascriptNames) {
 // daily board, the paint shop, the scheme atlases and the day clock is in the
 // lazy `garage-bay` chunk. Only the RAW ceiling moves, 983 -> 986 (measured +
 // ~1.5 KiB), as the two garage rounds before it did.
+// October 2 surface pass: 995.230 KiB raw / 274.926 KiB gzip JS,
+// 287.203 KiB gzip shell, including lazy-load glue and shared render-mode export.
+// Race-feel pass: 995.639 raw / 275.029 gzip JS / 287.309 gzip shell.
+// +0.409 raw and +0.103 gzip buy transient position feedback and the demo
+// record guard. Debrief and onboarding remain lazy. Allow 996 raw / 275.25
+// gzip JS; retain the 287.5 shell ceiling.
+// The shader implementation and its 523,316-byte image stay outside the shell.
 assert.ok(
-  javascript.rawBytes <= 986 * 1024,
-  `Initial JavaScript exceeds 986 KiB raw (${(javascript.rawBytes / 1024).toFixed(1)} KiB).`,
+  javascript.rawBytes <= 996 * 1024,
+  `Initial JavaScript exceeds 996 KiB raw (${(javascript.rawBytes / 1024).toFixed(1)} KiB).`,
 // Merged 2026-09-13 with Phase F ALIVE, whose own note follows; the combined
 // tree measures under the 974 pin (see the phase-F merge commit).
 // Phase F ALIVE (2026-09-12): 972 -> 973 raw. The island's own bytes are all
@@ -391,8 +404,8 @@ assert.ok(
 // chunk-boundary failure rather than its spend failure.
 // 267 -> 270 for the garage; see the measurement table above the raw ceiling.
 assert.ok(
-  javascriptGzip <= 270 * 1024,
-  `JavaScript bundle exceeds 270 KiB gzip (${(javascriptGzip / 1024).toFixed(1)} KiB).`,
+  javascriptGzip <= 275.25 * 1024,
+  `JavaScript bundle exceeds 275.25 KiB gzip (${(javascriptGzip / 1024).toFixed(1)} KiB).`,
 );
 // Re-baselined 2026-08-28 from a measured 4.35 KiB gzip (the 4 KiB ceiling
 // predated the HUD turn-cue and hazard styling) plus headroom for the planned
@@ -463,9 +476,12 @@ assert.ok(
 // ceiling, by moving each circuit's paddock flavour line and briefing out of
 // ui.ts onto its lazy course class: 281.287 KiB, briefings byte-identical on
 // all seven circuits (pinned in validate-module-seams.mjs).
+// Map 08 Afterglow: 282.014 KiB measured with its registration and dispatch
+// arms. Course, route, environment and original assets remain lazy. Allow a
+// further 1 KiB for the eighth map; do not include its art in the initial shell.
 assert.ok(
-  shellGzip <= 282 * 1024,
-  `Initial app shell exceeds 282 KiB gzip (${(shellGzip / 1024).toFixed(3)} KiB; ${shellGzip} B).`,
+  shellGzip <= 287.5 * 1024,
+  `Initial app shell exceeds 287.5 KiB gzip (${(shellGzip / 1024).toFixed(3)} KiB; ${shellGzip} B).`,
 );
 
 // ---------------------------------------------------------------------------
@@ -717,5 +733,5 @@ if(reportDirectory){
  await writeFile(reportDirectory+'/build.json',JSON.stringify({script:'scripts/validate-build.mjs',
   javascriptGzip,shellGzip,stylesheetGzip,htmlGzip:gzipSync(html).byteLength,
   javascriptRaw:javascript.rawBytes,initialChunks:javascriptNames.length,radioBytes,islandAudioBytes,
-  ceilings:{javascriptGzip:266*1024,shellGzip:277*1024,dreamIslandAudio:248504},passed:true},null,2)+'\n');
+  ceilings:{javascriptGzip:275.25*1024,shellGzip:287.5*1024,dreamIslandAudio:248504},passed:true},null,2)+'\n');
 }

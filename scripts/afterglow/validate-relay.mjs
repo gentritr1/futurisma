@@ -1,0 +1,21 @@
+import assert from 'node:assert/strict';
+import {sourceModule} from '../visual/dreamisland/modules.mjs';
+const {RelayAttack}=await import(await sourceModule('afterglow-relay.ts'));
+const length=2727,dt=1/120;
+const idle=new RelayAttack();for(let i=0;i<12000;i++)idle.step(dt,.1,0,2,3,length);
+assert.equal(idle.phase,'idle');assert.equal(idle.interferenceStrength,0,'No interference before final lap');assert.equal(idle.integrity,100);
+function advance(r,phase){let ticks=0;while(r.phase!==phase&&ticks++<2400)r.step(dt,.1,0,3,3,length);assert.equal(r.phase,phase);}
+const attack=new RelayAttack();advance(attack,'mark');const target=attack.targetProgress;assert.equal(attack.interferenceStrength,.7);
+for(let i=0;i<100;i++)attack.step(dt,.15,9,3,3,length);
+assert.equal(attack.targetProgress,target,'Target stays locked after warning');assert.equal(attack.targetLateral,0);
+advance(attack,'strike');assert.equal(attack.interferenceStrength,.86,'Strike is the strongest interference');attack.step(dt,target,0,3,3,length);
+assert.equal(attack.hits,1);assert.equal(attack.integrity,82);
+const slowed=attack.applySpeed(80,80.1,dt);assert.ok(slowed<43,'Beam strike slows the craft');
+for(let i=0;i<100;i++)attack.step(dt,target,0,3,3,length);
+assert.equal(attack.hits,1,'One hit per volley, not one hit per frame');
+const dodge=new RelayAttack();advance(dodge,'strike');dodge.step(dt,dodge.targetProgress,8,3,3,length);assert.equal(dodge.integrity,100,'A clear lane avoids damage');
+const immune=new RelayAttack();advance(immune,'strike');immune.recover();immune.step(dt,immune.targetProgress,0,3,3,length);assert.equal(immune.hits,0);
+attack.recover();assert.equal(attack.integrity,82,'Recovery does not erase race damage');attack.reset();assert.equal(attack.integrity,100);assert.equal(attack.phase,'idle');assert.equal(attack.interferenceStrength,0,'Restart restores the map');
+const sprint=new RelayAttack();sprint.step(dt,.1,0,1,2,length);assert.equal(sprint.phase,'idle');sprint.step(dt,.1,0,2,2,length);assert.equal(sprint.phase,'sky');
+const solo=new RelayAttack();solo.step(dt,.1,0,1,1,length);assert.equal(solo.phase,'sky');
+console.log('Relay PASS: final lap in 1/2/3-lap formats, locked warning, dodge, one-hit volley, slowdown, hull damage, recovery immunity and restart.');

@@ -8,7 +8,7 @@
  */
 import { ghostRuntime } from "./ghost-runtime";
 import { bootLiveryToApply, liveryFor } from "./liveries.js";
-import { resolveMapSelection } from "./map-selection";
+import { resolveMapSelection, TRACKS } from "./map-selection";
 import { save } from "./persistence";
 import { raceModes } from "./race-modes";
 import type { RaceResultInputs, RaceResultSummary } from "./race-modes";
@@ -146,7 +146,7 @@ export function recordFinishedRace(
   // disagree. Warmed chunk: same frame. Cold (a finish inside the first second
   // of a page): one microtask later, into the same result panel.
   const track = resolveMapSelection(window.location.search);
-  const settle = (module: PurseModule): void => module.settleFinish(summary, inputs, lapTimesMs.length, save, track);
+  const settle = (module: PurseModule): void => module.settleFinish(summary, inputs, lapTimesMs.length, save, track, TRACKS);
   if (purse) settle(purse);
   else void loadGarageBay().then(settle, () => undefined);
   return summary;

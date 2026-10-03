@@ -60,6 +60,8 @@ export class NeonEnvironment implements RaceEnvironment {
         replacements.set(source,material);
       }
       object.material=material;
+      object.castShadow=['NS_concrete','NS_old_brick','NS_painted_metal','PL_blue_steel','PL_ceramic_concrete','PL_aluminium'].includes(source.name);
+      object.receiveShadow=object.castShadow;
       object.geometry.computeBoundingSphere();
       const sphere=object.geometry.boundingSphere!.clone().applyMatrix4(object.matrixWorld);
       const triangles=(object.geometry.index?.count??object.geometry.getAttribute("position").count)/3;
@@ -97,9 +99,13 @@ export class NeonEnvironment implements RaceEnvironment {
         group.mesh.updateWorldMatrix(true,false);
         group.sphere.copy(group.mesh.geometry.boundingSphere!).applyMatrix4(group.mesh.matrixWorld);
       }
-      group.mesh.visible=this.frustum.intersectsSphere(group.sphere)
-        && group.sphere.distanceToPoint(camera.position)<=(this.options.maximumDistance??Infinity);
-      if(group.mesh.visible) {this.stats.visibleGroups++;this.stats.visibleTriangles+=group.triangles;}
+      const inView=this.frustum.intersectsSphere(group.sphere);
+      const distance=group.sphere.distanceToPoint(camera.position);
+      const nearby=distance<=(this.options.maximumDistance??Infinity);
+      // Camera culling must not remove structures from the light's shadow pass.
+      // Three still frustum-culls each mesh separately for the color and shadow cameras.
+      group.mesh.visible=nearby&&(inView||(group.mesh.castShadow&&distance<200));
+      if(nearby&&inView) {this.stats.visibleGroups++;this.stats.visibleTriangles+=group.triangles;}
     }
     this.distances.fill(Infinity);this.nearest.fill(-1);
     camera.getWorldDirection(this.forward);

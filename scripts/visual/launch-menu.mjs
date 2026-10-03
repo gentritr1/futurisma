@@ -3,14 +3,17 @@ import {mkdir} from 'node:fs/promises';
 import {chromium} from 'playwright';
 import {createServer} from 'vite';
 
-const server=await createServer({server:{host:'127.0.0.1',port:5359,strictPort:true},logLevel:'error'});
+const server=await createServer({server:{host:'127.0.0.1',port:5359,strictPort:true,hmr:false,watch:null},logLevel:'error'});
 await server.listen();
 const browser=await chromium.launch({args:['--use-gl=angle','--use-angle=swiftshader','--ignore-gpu-blocklist']});
 await mkdir('shots/launch-menu',{recursive:true});
 const errors=[];
-const context=await browser.newContext({viewport:{width:1440,height:900},deviceScaleFactor:1});
+const context=await browser.newContext({viewport:{width:1440,height:900},deviceScaleFactor:1,hasTouch:true});
 const page=await context.newPage();page.on('pageerror',error=>errors.push(error.message));
+page.on('console',message=>{if(message.type()==='error')errors.push(message.text());});
 await page.addInitScript(()=>{
+  window.__policyViolations=[];
+  document.addEventListener('securitypolicyviolation',event=>window.__policyViolations.push(event.violatedDirective));
   window.__launchTestPad=null;
   Object.defineProperty(navigator,'getGamepads',{value:()=>window.__launchTestPad?[window.__launchTestPad]:[]});
 });
@@ -25,6 +28,7 @@ const ready=async(query='')=>{
   await page.goto(`http://127.0.0.1:5359/?map=nightshift&minimap=aplus${query}`);
   await page.waitForFunction(()=>document.body.dataset.phase==='intro'&&document.querySelector('.launch-menu #start-button')&&getComputedStyle(document.querySelector('.launch-background')).position==='absolute',null,{timeout:180000});
   await page.waitForFunction(()=>[...document.querySelectorAll('.launch-background')].every(i=>i.complete&&i.naturalWidth>0));
+  await page.evaluate(()=>document.fonts.ready);
 };
 const choose=async(group,value)=>{await page.locator(`#${group}-select [data-value="${value}"]`).click();};
 try {
@@ -50,6 +54,26 @@ try {
     }
   }
   console.log('63 choices passed');
+  assert.deepEqual(await page.evaluate(()=>window.__policyViolations),[],'Circuit switches must respect CSP.');
+  const delays=await page.locator('.launch-map__gate').evaluateAll(gates=>gates.map(g=>parseFloat(getComputedStyle(g).animationDelay)));
+  assert.ok(delays.every((delay,i)=>i===0||delay>delays[i-1]),'Gate delays actually stagger under CSP.');
+  for(const width of [1440,1920]) {
+    await page.setViewportSize({width,height:900});
+    for(const map of ['greenwater','bitterpan','nightshift','polarity','tideline','ascension','dreamisland']) {
+      await choose('track',map);
+      await page.locator('.launch-name').evaluate(el=>Promise.all(el.getAnimations().map(animation=>animation.finished)));
+      const words=await page.locator('.launch-name').evaluate(name=>{
+        const slab=document.querySelector('.launch-slab').getBoundingClientRect();
+        return [...name.children].map(word=>{
+          const range=document.createRange();range.selectNodeContents(word);
+          const r=range.getBoundingClientRect();
+          return {word:word.textContent,left:r.left,right:r.right,edge:slab.right-slab.width*.5*(r.bottom-slab.top)/slab.height};
+        });
+      });
+      assert.ok(words.every(w=>w.left>=0&&w.right<=w.edge-4),`${map} name leaves its colour strip at ${width}: ${JSON.stringify(words)}`);
+    }
+  }
+  console.log('All seven names fit the angled strip at 1440 and 1920.');
   await choose('track','tideline');await choose('format','sprint');
   assert.match(await page.locator('.launch-note').innerText(),/before the pump hall opens/);
   await page.keyboard.press('KeyR');
@@ -80,7 +104,13 @@ try {
       assert.equal(await page.locator(`#${menu}-screen .launch-paper`).evaluate(el=>getComputedStyle(el).backgroundColor),'rgb(243, 244, 241)');
       assert.equal(await page.locator(`#${menu}-screen .launch-paper`).evaluate(el=>el.scrollWidth>el.clientWidth),false,`${menu} sheet overflows at ${width}`);
       await page.screenshot({path:`shots/launch-menu/${menu}-${width}x${height}.png`});
-      await page.keyboard.press('Escape');
+      if(width===390)await page.locator(`#${menu}-screen .launch-paper`).evaluate(el=>{el.scrollTop=el.scrollHeight;});
+      const close=await page.locator(`#${menu}-close`).boundingBox();
+      const x=close.x+close.width/2,y=close.y+close.height/2;
+      assert.equal(await page.evaluate(({x,y})=>document.elementFromPoint(x,y)?.closest('button')?.id,{x,y}),`${menu}-close`,`${menu} RETURN must own its touch target at ${width}×${height}`);
+      await page.touchscreen.tap(x,y);
+      await page.waitForSelector(`#${menu}-screen[hidden]`,{state:'attached'});
+      assert.notEqual(await page.locator('body').getAttribute('data-garage'),'true','RETURN must not open the garage.');
     }
   }
   if(process.argv.includes('--layout-only')) { assert.deepEqual(errors,[]);console.log('Layout PASS: five sizes, readable facts, controls/options sheets.'); } else {
@@ -129,8 +159,21 @@ try {
   await ready('&motion=reduce');
   assert.equal(await page.locator('.launch-map__line').evaluate(el=>getComputedStyle(el).animationName),'none');
   await choose('track','ascension');await choose('format','sprint');await choose('tier','rookie');
+  // Hold the real entry module back on the changed-circuit navigation. The
+  // same-origin boot script must colour the loader before menu code exists.
+  let releaseEntry;
+  const entryHeld=new Promise(resolve=>{releaseEntry=resolve;});
+  await page.route(/\/src\/main\.ts(?:\?|$)/,async route=>{await entryHeld;await route.continue();});
   await page.locator('#start-button').click();
-  await page.waitForURL(/map=ascension.*mode=sprint.*tier=rookie/,{timeout:30000});
+  await page.waitForURL(/map=ascension.*mode=sprint.*tier=rookie/,{timeout:30000,waitUntil:'commit'});
+  try {
+    await page.waitForSelector('html[data-launch-boot]');
+    await page.waitForSelector('#loading-screen');
+    assert.equal(await page.locator('#loading-screen').evaluate(el=>getComputedStyle(el).backgroundColor),'rgb(255, 111, 79)');
+    assert.equal(await page.locator('#loading-screen p').isVisible(),false,'The default assembly loader must not flash.');
+    assert.equal(await page.locator('#launch-sequence').count(),0,'Check happens before the menu module runs.');
+    await page.screenshot({path:'shots/launch-menu/cross-circuit-early-paint.png'});
+  } finally { releaseEntry(); }
   await page.waitForFunction(()=>document.body.dataset.phase==='race'&&!document.body.dataset.launch,null,{timeout:180000});
   assert.match(await page.locator('#lap-value').innerText(),/\/ 2/);
   assert.match(await page.locator('#course-name').innerText(),/ASCENSION/);

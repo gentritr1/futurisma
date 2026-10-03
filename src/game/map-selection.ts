@@ -1,6 +1,6 @@
 import { save } from "./persistence";
 
-export type MapSelection = "greenwater" | "bitterpan" | "nightshift" | "polarity" | "tideline" | "ascension" | "dreamisland";
+export type MapSelection = "greenwater" | "bitterpan" | "nightshift" | "polarity" | "tideline" | "ascension" | "dreamisland" | "afterglow" | "frostline";
 
 /**
  * The dispatchable circuits. `label` and `mapCode` duplicate what the
@@ -48,6 +48,8 @@ export const TRACKS: readonly TrackEntry[] = [
   },
   {selection:"ascension",label:"ASCENSION PAD",mapCode:"MAP 06",deck:"LAUNCH DAY / DAWN"},
   {selection:"dreamisland",label:"DREAM ISLAND",mapCode:"MAP 07",deck:"DAY INTO NIGHT"},
+  {selection:"afterglow",label:"AFTERGLOW",mapCode:"MAP 08",deck:"RELAY CITY"},
+  {selection:"frostline",label:"FROSTLINE",mapCode:"MAP 09",deck:"MIDNIGHT IN THE MOUNTAINS"},
 ];
 
 export function trackFor(selection: MapSelection): TrackEntry {

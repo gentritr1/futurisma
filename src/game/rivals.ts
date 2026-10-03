@@ -1875,6 +1875,15 @@ export class RivalFleet {
     return count;
   }
 
+  /** Positive only when the player leads every rival, in the same lap-aware frame. */
+  leadOverField(playerDistanceFromStart: number): number {
+    if (!this.states.length) return 0;
+    const player = this.rivalFrameDistance(playerDistanceFromStart);
+    let leader = -Infinity;
+    for (const state of this.states) leader = Math.max(leader, state.raceDistanceMeters);
+    return player - leader;
+  }
+
   /** Live field ranking for the HUD position ladder. */
   fieldOrder(
     playerDistanceFromStart: number,

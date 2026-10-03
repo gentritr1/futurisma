@@ -1,11 +1,15 @@
-const sheet = document.createElement('link');
-sheet.rel = 'stylesheet';
-sheet.href = new URL('./style-launch.css', import.meta.url).href;
-export const stylesheetReady = new Promise<void>((resolve, reject) => {
+// External sheets preserve the game's self-only style policy in dev and builds.
+export const stylesheetReady = Promise.all([
+  new URL('./style-launch.css', import.meta.url),
+  new URL('./style-interface.css', import.meta.url),
+].map(url => new Promise<void>((resolve, reject) => {
+  const sheet = document.createElement('link');
+  sheet.rel = 'stylesheet';
+  sheet.href = url.href;
   sheet.onload = () => resolve();
-  sheet.onerror = () => reject(new Error('The launch menu stylesheet could not load. Please reload.'));
-});
-document.head.append(sheet);
+  sheet.onerror = () => reject(new Error('The menu stylesheet could not load. Please reload.'));
+  document.head.append(sheet);
+})));
 import { TRACKS, trackFor, type MapSelection } from './map-selection';
 import { save } from './persistence';
 import { fieldLiveries, liveryFor } from './liveries.js';
@@ -41,6 +45,7 @@ export class LaunchMenu {
   private readonly note=el('p','launch-note');
   private readonly feature=el('p','launch-feature');
   private readonly facts=el('p','launch-facts');
+  private readonly reward=el('p','launch-reward');
   private readonly detail=el('div','launch-detail');
   private readonly brief=el('p','launch-brief');
   private readonly backgrounds=el('div','launch-backgrounds');
@@ -52,6 +57,7 @@ export class LaunchMenu {
   private readonly sequenceStatus=el('p','launch-sequence__status','PREPARING THE GRID');
   private readonly startButton=required('start-button') as HTMLButtonElement;
   private readonly motion=new GarageMotion(resolveReducedMotion);
+  private briefFade:Animation|null=null;
   private readonly syncPanels=installLaunchPanels();
   private readonly observer:MutationObserver;
   private readonly header:LaunchHeader;
@@ -81,7 +87,8 @@ export class LaunchMenu {
       const row=el('div','launch-setup__row');row.append(el('span','launch-label',label),required(id));setup.append(row);
     }
     this.gridButton=button('launch-grid-toggle','GRID · 4',()=>this.toggleGrid());this.gridButton.setAttribute('aria-expanded','false');this.gridButton.setAttribute('aria-controls','launch-grid');
-    setup.append(this.gridButton,this.brief);
+    setup.lastElementChild!.append(this.gridButton);
+    setup.append(this.brief);
     this.grid.id='launch-grid';this.grid.hidden=true;this.grid.setAttribute('role','region');this.grid.setAttribute('aria-label','Starting grid');
     const cards=el('nav','launch-cards');cards.setAttribute('aria-label','Circuit selection');
     cards.append(button('launch-prev','‹',()=>this.step(-1)),required('track-select'),button('launch-next','›',()=>this.step(1)));
@@ -94,7 +101,7 @@ export class LaunchMenu {
       chip.replaceChildren(image,el('b','',String(i+1).padStart(2,'0')),el('strong','',entry.label));
       if(entry.selection===this.loaded.track)chip.append(el('span','launch-card-tag','LAST'));
     });
-    const dispatch=el('div','launch-dispatch');dispatch.append(this.facts,this.startButton);
+    const dispatch=el('div','launch-dispatch');dispatch.append(this.reward,this.facts,this.startButton);
     this.startButton.replaceChildren(el('span','launch-dispatch__label','LAUNCH'),launchBadge('A',true),launchBadge('↵'));
     this.screen.append(guide,setup,this.grid,cards,dispatch);
     const live=el('p','launch-live');live.id='launch-live';live.setAttribute('role','status');live.setAttribute('aria-live','polite');this.screen.append(live);
@@ -125,20 +132,33 @@ export class LaunchMenu {
     const track=trackFor(this.track),{data,laps,guide,distance}=launchFacts(this.track,this.mode);
     const colour=CIRCUIT_COLOURS[this.track];
     this.screen.style.setProperty('--circuit',colour);this.screen.dataset.track=this.track;
+    required('result-screen').style.setProperty('--circuit',colour);
+    required('result-circuit').textContent=`${track.mapCode} / ${track.label}`;
     this.screen.dataset.reduced=String(resolveReducedMotion());
     this.hooks.sync(this.track,this.mode,this.tier);
-    this.number.textContent=track.mapCode.slice(-2);this.name.textContent=track.label;this.deck.textContent=track.deck;
+    this.number.textContent=track.mapCode.slice(-2);
+    const words=track.label.split(' ');
+    this.name.replaceChildren(...words.map((word,i)=>el('span','',word+(i<words.length-1?' ':''))));
+    this.slab.style.setProperty('--name-size',String(Math.min(92,Math.floor(214/(Math.max(...words.map(word=>word.length))*.44)))));
+    this.slab.style.setProperty('--name-lines',String(words.length));
+    this.deck.textContent=track.deck;
     this.backgrounds.querySelectorAll<HTMLElement>('img').forEach(image=>image.dataset.selected=String(image.dataset.track===this.track));
     this.twist.textContent=guide.title;this.note.textContent=guide.note;this.feature.textContent=guide.feature;
     this.detail.replaceChildren(...[['LAP',`${(data.length/1000).toFixed(2)} KM`],['GATES',String(data.gates.length)],['TIME OF DAY',guide.time]].map(([label,value])=>{const pair=el('div');pair.append(el('small','',label),el('strong','',value));return pair;}));
     const mapKey=`${this.track}:${this.mode}`;
     if(mapKey!==this.mapKey){drawLaunchMap(this.map,this.track,this.mode);this.mapKey=mapKey;}
     this.syncPanels(this.track);
+    this.reward.textContent=`TOUR ${save.garage.circuits.length}/${TRACKS.length} · ${save.garage.circuits.includes(this.track)?'CIRCUIT LOGGED':'FIRST FINISH +CR 300'}`;
     const best=save.bestFor(track.mapCode,bestRecordKey(this.mode,this.tier)).bestLapMs;
     const nextFacts=`${laps} LAPS · ${distance} KM · ${best===null?'NO LAP YET':`BEST ${time(best)}`}`;
     if(this.facts.textContent!==nextFacts)this.updateFacts(nextFacts);
     const pace={rookie:'off the pace',works:'at factory pace',feral:'ahead of factory pace'}[this.tier];
-    this.brief.textContent=this.mode==='timeattack'?`Solo against the clock. ${['polarity','tideline'].includes(this.track)?'Set your best lap.':'Chase your saved ghost.'}`:`Three rivals ${pace}. ${this.mode==='sprint'?'Two laps. Defend the lead.':'Finish first.'} Purse ×${{rookie:'0.8',works:'1.0',feral:'1.4'}[this.tier]}.`;
+    const brief=this.mode==='timeattack'?`Solo against the clock. ${['polarity','tideline'].includes(this.track)?'Set your best lap.':'Chase your saved ghost.'}`:`Three rivals ${pace}. ${this.mode==='sprint'?'Two laps. Defend the lead.':'Finish first.'} Purse ×${{rookie:'0.8',works:'1.0',feral:'1.4'}[this.tier]}.`;
+    if(this.brief.textContent!==brief){
+      const opacity=this.briefFade?.playState==='running'?getComputedStyle(this.brief).opacity:'0.55';
+      this.briefFade?.cancel();this.brief.textContent=brief;
+      this.briefFade=this.brief.animate([{opacity},{opacity:1}],{duration:resolveReducedMotion()?120:140,easing:'ease-out'});
+    }
     required('tier-select').setAttribute('aria-label',this.mode==='timeattack'?'Record category (solo: no rival field)':'Field pace');
     this.screen.querySelectorAll<HTMLElement>('#format-select [data-value]').forEach(chip=>{
       const m=chip.dataset.value as RaceMode;chip.setAttribute('aria-label',`${RACE_MODE_LABELS[m]}, ${launchFacts(this.track,m).laps} laps`);
@@ -186,6 +206,7 @@ export class LaunchMenu {
     this.overlay.querySelector('strong')!.textContent=trackFor(this.track).label;
     this.overlay.dataset.stage='loading';this.overlay.dataset.reduced=String(resolveReducedMotion());
     document.body.dataset.launch='loading';this.renderGrid(this.sequenceGrid);
+    delete document.documentElement.dataset.launchBoot;
   }
 
   async launch():Promise<void> {
@@ -248,5 +269,5 @@ export class LaunchMenu {
   };
   private readonly pointerDown=(e:PointerEvent):void=>{if(e.pointerType==='touch')this.swipe={x:e.clientX,y:e.clientY};};
   private readonly pointerUp=(e:PointerEvent):void=>{const start=this.swipe;this.swipe=null;if(start&&Math.abs(e.clientX-start.x)>50&&Math.abs(e.clientY-start.y)<60)this.step(e.clientX<start.x?1:-1);};
-  dispose():void {this.disposed=true;this.observer.disconnect();this.motion.cancel();window.removeEventListener('keydown',this.keyDown,{capture:true});this.screen.removeEventListener('click',this.outsideGrid);this.backgrounds.removeEventListener('pointerdown',this.pointerDown);this.backgrounds.removeEventListener('pointerup',this.pointerUp);this.overlay.getAnimations().forEach(a=>a.cancel());this.overlay.remove();this.header.dispose();delete document.body.dataset.launch;}
+  dispose():void {this.disposed=true;this.observer.disconnect();this.motion.cancel();this.briefFade?.cancel();window.removeEventListener('keydown',this.keyDown,{capture:true});this.screen.removeEventListener('click',this.outsideGrid);this.backgrounds.removeEventListener('pointerdown',this.pointerDown);this.backgrounds.removeEventListener('pointerup',this.pointerUp);this.overlay.getAnimations().forEach(a=>a.cancel());this.overlay.remove();this.header.dispose();delete document.body.dataset.launch;}
 }

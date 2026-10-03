@@ -189,7 +189,7 @@ export interface CourseRelocationStats {
  * indexed geometry unions through the index buffer, non-indexed through
  * consecutive triangles.
  */
-function findComponents(geometry: THREE.BufferGeometry): number[][] {
+export function findComponents(geometry: THREE.BufferGeometry): number[][] {
   const positions = geometry.getAttribute("position");
   if (!positions) return [];
   const parents = Array.from({ length: positions.count }, (_, i) => i);

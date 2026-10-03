@@ -429,8 +429,8 @@ export function weekOf(day) {
  * The day's three jobs: one total over the day, one single-race best, and
  * the circuit of the day. Dealt from their own shuffled decks by the day
  * number, so consecutive days never repeat a job until the deck turns over.
- * The circuit deck is aligned to the Monday-to-Sunday week, so every week of
- * dailies tours all seven circuits exactly once.
+ * The circuit deck spans the current circuit count. With eight circuits this
+ * is an eight-day tour; weekly rewards still follow the calendar week.
  *
  * @param {number} day
  * @returns {Job[]}

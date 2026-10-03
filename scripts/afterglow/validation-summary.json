@@ -1,0 +1,96 @@
+{
+  "viewport": "1536x864",
+  "dpr": 1,
+  "quality": "high",
+  "browser": "Chrome / Metal / headless",
+  "threeLapRace": {
+    "raceTime": "02:10.774",
+    "fps": 60.01,
+    "p95FrameMs": 17.9,
+    "recoveries": 0,
+    "missedGates": 0,
+    "errors": []
+  },
+  "checks": [
+    "TypeScript + production build",
+    "Production bundle budgets",
+    "Save persistence",
+    "Garage and nine-map daily rotation",
+    "Race formats",
+    "Minimap A+ gates/rendering",
+    "Module seams",
+    "Manual driving controls",
+    "Route closure/projection/boundaries",
+    "Original GLB assets",
+    "git diff --check",
+    "Satellite rules: final lap, dodge, one-hit volley, slowdown, damage, recovery and reset",
+    "Production browser under actual CSP: external CSS, A+ minimap and race start",
+    "Last-lap minimap fog: clear earlier laps, attack-linked intensity, pause, reset, stationary reduced motion"
+  ],
+  "satelliteProbe": {
+    "hit": {
+      "speed": 41.518138717805456,
+      "integrity": 82
+    },
+    "minimap": "aplus",
+    "pauseHolds": true
+  },
+  "minimapInterference": {
+    "normal": {
+      "clear": {
+        "phase": "idle",
+        "minimapAnimated": true,
+        "minimapInterference": 0,
+        "minimapInterferenceTime": 0,
+        "minimapStations": 128,
+        "minimapContacts": 3,
+        "minimapNearestRivalMeters": 33,
+        "minimapAlert": false,
+        "minimapDrawOps": 26,
+        "minimapShortcutPaths": 0
+      },
+      "disturbed": {
+        "phase": "strike",
+        "minimapAnimated": true,
+        "minimapInterference": 0.832,
+        "minimapInterferenceTime": 4.166,
+        "minimapStations": 128,
+        "minimapContacts": 3,
+        "minimapNearestRivalMeters": 5566.4,
+        "minimapAlert": false,
+        "minimapDrawOps": 29,
+        "minimapShortcutPaths": 0
+      },
+      "pauseHolds": true,
+      "resetClears": true
+    },
+    "reducedMotion": {
+      "clear": {
+        "phase": "idle",
+        "minimapAnimated": false,
+        "minimapInterference": 0,
+        "minimapInterferenceTime": 0,
+        "minimapStations": 128,
+        "minimapContacts": 3,
+        "minimapNearestRivalMeters": 33.4,
+        "minimapAlert": false,
+        "minimapDrawOps": 26,
+        "minimapShortcutPaths": 0
+      },
+      "disturbed": {
+        "phase": "strike",
+        "minimapAnimated": false,
+        "minimapInterference": 0.831,
+        "minimapInterferenceTime": 0,
+        "minimapStations": 128,
+        "minimapContacts": 3,
+        "minimapNearestRivalMeters": 5566,
+        "minimapAlert": false,
+        "minimapDrawOps": 29,
+        "minimapShortcutPaths": 0
+      },
+      "pauseHolds": true,
+      "resetClears": true
+    }
+  }
+}

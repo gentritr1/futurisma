@@ -1,0 +1,50 @@
+{
+  "viewport": "1536x864",
+  "dpr": 1,
+  "quality": "high",
+  "browser": "Chrome / Metal / headless",
+  "threeLapRace": {
+    "raceTime": "02:27.408",
+    "fps": 60.01,
+    "p95FrameMs": 18.0,
+    "recoveries": 0,
+    "missedGates": 0,
+    "errors": []
+  },
+  "checks": [
+    "TypeScript + production build",
+    "Production bundle budgets",
+    "Save persistence",
+    "Garage and nine-map daily rotation",
+    "Race formats",
+    "Minimap A+ gates/rendering",
+    "Module seams",
+    "Manual driving controls",
+    "Route closure/projection/boundaries",
+    "Original GLB assets",
+    "git diff --check",
+    "Audio context, clock ticks, shared effect clock, gondolas, pause and midnight fireworks",
+    "Production browser under actual CSP: external CSS, A+ minimap and race start"
+  ],
+  "uncappedFullLap": {
+    "fps": 306.7,
+    "p95FrameMs": 4.8,
+    "cpuRenderMeanMs": 2.79,
+    "errors": []
+  },
+  "ambience": {
+    "ticks": 51,
+    "chimes": 11,
+    "fireworks": 7
+  },
+  "visualReview": {
+    "rounds": [
+      3.9,
+      6.2,
+      6.7,
+      7.0
+    ],
+    "final": 7.0,
+    "residualGaps": "Warm light integration, forest hillside depth and rougher irregular snow/road remain below the generated target. Playable cohesive low-poly milestone; stopped within timebox."
+  }
+}

@@ -21,6 +21,8 @@ import { formatCredits } from "./garage-catalog.js";
 import { jobDone, readDaily, settleRace, type RaceFacts, type Settlement } from "./garage-economy.js";
 import type { Garage } from "./garage-rules.js";
 import type { RaceResultInputs, RaceResultSummary } from "./race-modes";
+import type { TrackEntry } from './map-selection';
+import {renderRaceDebrief} from './race-debrief';
 
 /** The two save calls the purse makes. `save` in `persistence.ts` is one. */
 export interface GarageStore {
@@ -126,7 +128,7 @@ function renderPurse(settlement: Settlement, balance: number): void {
   foot.append(
     node("span", "", settlement.completed.length > 0
       ? `${settlement.completed.length} CONTRACT${settlement.completed.length === 1 ? "" : "S"} CLOSED`
-      : "OPEN THE GARAGE TO SPEND"),
+      : "CREDITS SAVED"),
     node("span", "purse__balance", `BALANCE ${formatCredits(balance)}`),
   );
   // Every result screen ends pointing at the next race worth running.
@@ -151,6 +153,7 @@ export function settleFinish(
   laps: number,
   save: GarageStore,
   track: string,
+  tracks: readonly TrackEntry[] = [],
 ): void {
   try {
     const facts = raceFacts(summary, inputs, laps, track);
@@ -159,6 +162,7 @@ export function settleFinish(
     const settlement = settleRace(save.garage, facts);
     const stored = settlement.demo ? save.garage : save.setGarage(settlement.garage);
     renderPurse(settlement, stored.credits);
+    renderRaceDebrief(settlement, facts, tracks);
     beginRewardOffer(stored, previousBalance, settlement.demo);
     const credits = document.getElementById("garage-credits");
     if (credits) credits.textContent = formatCredits(stored.credits);

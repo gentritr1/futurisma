@@ -342,14 +342,13 @@ export class InputController {
   private readonly handleKeyDown = (event: KeyboardEvent): void => {
     this.setActiveDevice("keyboard");
     if (isMenuOnlyKey(event.code,event.key)) return;
+    // Let focused controls activate natively without also driving the craft.
+    if (CONTROL_OWNED_KEYS.has(event.code) && targetOwnsKeys(event.target)) return;
     if (CONTROL_KEYS.has(event.code)) event.preventDefault();
     this.keys.add(event.code);
     if (DRIVING_KEYS.has(event.code)) this.controlIntentRequested = true;
     if (event.repeat) return;
     if (this.actionsSuppressedUntilRelease && ACTION_KEYS.has(event.code)) return;
-    // The key is already in `keys` above, so a hold that polls `isHeld` still
-    // sees it; what stops here is only the global ACTION it would have fired.
-    if (CONTROL_OWNED_KEYS.has(event.code) && targetOwnsKeys(event.target)) return;
 
     if (START_KEYS.has(event.code)) {
       this.startRequested = true;

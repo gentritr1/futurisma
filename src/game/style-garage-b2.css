@@ -359,13 +359,22 @@ body[data-phase="paused"] #countdown { display: none; }
   .garage__part { padding: 9px 0; }
   .garage__part span { display: block; font-size: 9px; }
   .garage__part small { grid-column: 2; grid-row: 2; }
-  .screen--garage[data-service="true"] .garage__body { top: auto; max-height: 38dvh; bottom: 122px; }
+  .screen--garage[data-service="true"] { display: grid; align-items: stretch; grid-template-rows: minmax(0, 1fr) minmax(0, 38dvh) auto; gap: 12px; padding: 0 12px max(18px, env(safe-area-inset-bottom)); }
+  .screen--garage[data-service="true"] .garage__body { position: relative; grid-row: 2; inset: auto; width: 100%; min-height: 0; max-height: none; }
+  .screen--garage[data-service="true"] .garage__footer { position: relative; grid-row: 3; inset: auto; width: 100%; padding: 0; }
   .garage__benefit { font-size: 15px; margin-top: 7px; }
   .garage__hardware { font-size: 9px; margin-bottom: 8px; }
   .garage__compare-build button { min-height: 44px; }
-  .garage__order-actions { bottom: -13px; }
+  .garage__order-actions { bottom: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
   .screen--garage button:active:not(:disabled), .garage__paint:hover .garage__swatch { scale: 1; }
   .garage__frame:hover:not(:disabled), .garage__part-chip:hover:not(:disabled) { translate: none; }
 }
+
+.race-debrief {margin-top:16px;padding-top:14px;border-top:1px solid var(--line);}
+.race-debrief__title {margin:0 0 6px;font:800 23px/1.15 var(--condensed);color:var(--acid);}
+.race-debrief__progress {margin:0;font:700 11px/1.5 var(--mono);color:#eef2e9;}
+.race-debrief__lesson {margin:10px 0;font:12px/1.6 var(--mono);color:#c7d1ce;max-width:50ch;}
+.race-debrief__next {width:100%;min-height:44px;white-space:normal;justify-content:center;}
+.race-debrief__next:focus-visible {outline:2px solid var(--acid);outline-offset:3px;}

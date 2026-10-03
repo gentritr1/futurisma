@@ -68,7 +68,7 @@ export const NEUTRAL_HANDLING = Object.freeze({
  * for the same reason as above; `scripts/validate-garage.mjs` fails the build
  * the moment the two disagree, so an eighth circuit cannot be missed here.
  */
-export const CIRCUIT_CODES = ["greenwater", "bitterpan", "nightshift", "polarity", "tideline", "ascension", "dreamisland"];
+export const CIRCUIT_CODES = ["greenwater", "bitterpan", "nightshift", "polarity", "tideline", "ascension", "dreamisland", "afterglow", "frostline"];
 
 /**
  * The six frames, as the numbers the race loop multiplies by. Order is garage

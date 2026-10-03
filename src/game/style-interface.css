@@ -1,0 +1,152 @@
+/* Livery identifies the circuit; plates carry race data; paper carries instructions. */
+#result-screen, #pause-panel, #garage-screen, .hud {
+  --condensed: 'Saira Extra Condensed', sans-serif;
+  --mono: 'Chivo Mono', monospace;
+}
+#result-screen, #pause-panel { --acid: #c0f000; --ink: #f3f4f1; --muted: #c5cfcc; --dim: #b8c4c1; }
+#result-screen { padding: 32px 5vw; overflow: hidden; background: linear-gradient(90deg,#080c0ef5,#080c0e99); }
+#result-screen .result-panel { width: min(1120px,100%); height: min(800px,100%); min-height: 0; display: grid; grid-template: auto minmax(0,1fr) auto / minmax(0,1fr); gap: 0; align-items: stretch; overflow: hidden; background: #10191c; text-align: left; }
+#result-screen .result-circuit { margin: 0; padding: 12px 24px; background: var(--circuit,#95c46b); color: #090d10; font: 800 22px/1.15 var(--condensed); letter-spacing: .02em; }
+#result-screen .result-content { min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; display: grid; grid-template-columns: minmax(0,1.1fr) minmax(0,1fr); align-content: start; gap: 32px; padding: 24px; scroll-padding-block: 12px; }
+#result-screen .result-classification { min-width: 0; }
+#result-screen .result-status { color: #c5cfcc; font: 700 18px/1.2 var(--condensed); margin: 0; }
+#result-screen #result-time { margin: 8px 0 16px; color: #f3f4f1; font: 900 96px/.95 var(--condensed); letter-spacing: -.02em; }
+#result-screen #result-detail { margin: 0; font: 400 calc(13px * var(--menu-scale,1))/1.65 var(--mono); letter-spacing: 0; color: #c5cfcc; }
+#result-screen #result-best { color: #f3f4f1; font: 500 13px/1.5 var(--mono); letter-spacing: 0; animation: none; }
+#result-screen #result-laps { display: block; width: 100%; margin: 20px 0; font: 500 calc(13px * var(--menu-scale,1))/1.4 var(--mono); letter-spacing: 0; }
+#result-screen #result-laps li { grid-template-columns: 80px minmax(0,1fr) auto; min-height: 44px; gap: 12px; color: #c5cfcc; }
+#result-screen #result-laps .n { text-align: left; overflow-wrap: anywhere; }
+#result-screen #result-laps strong { color: #c5cfcc; }
+#result-screen #result-laps [data-best="true"] { background: #c0f0000d; }
+#result-screen #result-laps [data-best="true"] span:first-child { color: var(--acid); }
+#result-screen #result-laps [data-best="true"] :is(.n,strong) { color: #f3f4f1; }
+#result-screen #result-stats { width: 100%; gap: 12px; margin: 16px 0 0; }
+#result-screen #result-stats dt { color: #b8c4c1; font-size: 12px; letter-spacing: 0; }
+#result-screen #result-stats dd { color: #f3f4f1; font-size: 18px; }
+#result-screen #result-purse { grid-column: auto; grid-row: auto; padding: 0; margin: 0; border: 0; width: 100%; }
+#result-screen .purse__head { margin-bottom: 12px; }
+#result-screen .purse__total { color: #f3f4f1; font-size: 36px; }
+#result-screen :is(.purse__lines,.purse__foot,.purse__next,.purse__breakdown summary,.race-debrief__progress,.race-debrief__lesson,.garage__reward-detail) { font-size: calc(13px * var(--menu-scale,1)); line-height: 1.6; letter-spacing: 0; color: #c5cfcc; }
+#result-screen .purse__line b { color: #f3f4f1; }
+#result-screen .purse__foot { flex-wrap: wrap; gap: 4px 16px; }
+#result-screen .race-debrief__title { color: #f3f4f1; }
+#result-screen .race-debrief__next { font-size: 19px; }
+#result-screen .garage__reward { padding: 16px 0 0; margin-top: 20px; border: 0; border-top: 1px solid #4b5b60; background: transparent; }
+#result-screen .garage__reward h3 { font-size: 28px; }
+#result-screen .garage__reward-state { color: #c5cfcc; font-size: 18px; margin-bottom: 10px; }
+#result-screen .garage__reward-progress { width: 100%; height: 8px; border: 0; border-radius: 0; background: #39484d; accent-color: var(--circuit); }
+#result-screen .garage__reward-progress::-webkit-progress-bar { background: #39484d; }
+#result-screen .garage__reward-progress::-webkit-progress-value { background: var(--circuit); }
+#result-screen .garage__reward-progress::-moz-progress-bar { background: var(--circuit); }
+#result-screen .garage__reward-detail { margin: 8px 0 0; }
+#result-screen .result-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; padding: 16px 24px; background: #10191c; border-top: 1px solid #4b5b60; }
+#result-screen .result-actions .intro-pair { margin: 0; width: 100%; align-self: stretch; }
+#result-screen .result-actions button { margin: 0; min-height: 56px; width: 100%; font: 800 23px/1 var(--condensed); letter-spacing: 0; }
+#result-screen .result-actions [data-garage-daily] { display: none; }
+#result-screen :is(button,summary):focus-visible, #pause-panel button:focus-visible { outline: 2px solid var(--acid); outline-offset: 3px; }
+#result-screen .result-content button { scroll-margin: 12px; }
+
+/* The scene remains visible to the right; every pause action fits one plate. */
+#pause-panel { justify-content: flex-start; padding: 24px 6vw; overflow-y: auto; background: linear-gradient(90deg,#080c0eef,#080c0e55); }
+#pause-panel .pause-panel__card { width: min(480px,100%); padding: 24px; background: #10191cf5; border-top: 2px solid #c5cfcc; display: flex; flex-direction: column; flex-wrap: nowrap; align-items: stretch; gap: 12px; transform: none; }
+#pause-panel .pause-panel__title { font: 900 76px/.95 var(--condensed); letter-spacing: -.02em; }
+#pause-panel .pause-panel__reason { margin: 0; font-size: 12px; }
+#pause-panel .pause-panel__context { margin: 0; font-size: 13px; }
+#pause-panel .pause-panel__actions { width: 100%; margin: 0; gap: 8px; }
+#pause-panel .pause-panel__actions button { min-height: 48px; font-size: 22px; letter-spacing: 0; }
+#pause-panel .pause-panel__actions #pause-resume { min-height: 56px; font-size: 28px; }
+#pause-panel .pause-panel__hint { display: block; margin: 0; font: 400 12px/1.6 var(--mono); color: #c5cfcc; }
+
+/* Reading sheets use the same material and always keep Return in reach. */
+:is(#controls-screen,#options-screen) .launch-paper { color-scheme: light; background: #f3f4f1; color: #0a0d0e; padding-top: 0; scroll-padding-top: 112px; --dim: #4c5456; --muted: #333b3c; }
+:is(#controls-screen,#options-screen) .launch-paper__header { position: sticky; top: 0; z-index: 2; background: #f3f4f1; padding: 24px 0 16px; }
+body:is([data-options="true"],[data-controls="true"]) .launch-top { visibility: hidden; }
+:is(#controls-screen,#options-screen) .intro-code { font-size: 12px; letter-spacing: 0; }
+:is(#controls-screen,#options-screen) :is(.control-note,.options-note,.option-description) { font: 400 calc(13px * var(--menu-scale,1))/1.6 var(--mono); color: #394345; letter-spacing: 0; }
+#options-screen .option-description { grid-column: 1/-1; margin: 0; max-width: 50ch; }
+#options-screen .chip { min-height: 44px; clip-path: none; }
+#options-screen .chip[aria-checked="true"] { background: #dce2de; color: #0a0d0e; box-shadow: inset 0 -3px #0a0d0e; }
+#controls-screen .control-key { font-size: 12px; }
+#controls-screen .control-columns { font-size: 12px; letter-spacing: 0; }
+#controls-screen .map-controls-note { background: #e0e6e2; border: 0; color: #273235; padding: 16px; font-size: 13px; }
+#controls-screen #controls-options { display: inline-flex; }
+
+/* Menu identity carries into the bay without changing its scene or camera. */
+#garage-screen .garage__tab[aria-pressed="true"], #garage-screen .garage__button[aria-pressed="true"] { background: #f3f4f1; color: #10191c; border-color: #f3f4f1; }
+#garage-screen .garage__tab::after { background: #f3f4f1; }
+#garage-screen .garage__button:disabled { opacity: 1; background: #263237; color: #c5cfcc; border-color: #839391; }
+#garage-screen .garage__work-order { background: #f3f4f1; color: #10191c; --bay-muted: #394345; --bay-black: #f3f4f1; --bay-ink: #10191c; }
+#garage-screen .garage__work-order :is(.garage__order-label,.garage__balance,.garage__hardware,.garage__preview-label) { color: #394345; font-size: 12px; }
+#garage-screen .garage__work-order .garage__button:not(.garage__primary) { background: #f3f4f1; color: #10191c; border-color: #5b6b6c; }
+#garage-screen .garage__work-order .garage__button[aria-pressed="true"] { background: #dce2de; box-shadow: inset 0 -3px #10191c; }
+#garage-screen .garage__order-actions { background: #f3f4f1; }
+
+body[data-phase="race"] .race-header__identity { visibility: hidden; }
+.hud .hud-timing__tag { background: #f3f4f1; color: #10191c; }
+.hud .hud-timing__tag #timing-tag { font-size: 12px; color: #10191c; letter-spacing: .02em; }
+.hud .field-order { background: #10191cf5; padding: 8px 10px; border-top: 1px solid #718489; }
+.hud .field-order li { color: #c5cfcc; }
+.hud .field-order :is(.n,.gap) { color: #f3f4f1; }
+
+#start-screen .launch-guide { clip-path: none; }
+#start-screen .launch-note { font-size: 13px; line-height: 1.5; }
+#start-screen .launch-reward { font-size: 12px; }
+#start-screen .launch-setup__row { flex-wrap: wrap; }
+#start-screen #launch-grid-toggle { border: 0; border-left: 1px solid #6f7e7c; align-self: stretch; }
+#start-screen #track-select .chip { min-width: 108px; flex-basis: 108px; }
+#start-screen #track-select .chip strong { max-width: none; font-size: 14px; white-space: normal; line-height: 1; }
+#start-screen .launch-background { object-position: 50% 40%; }
+
+@media (max-width:700px) {
+  #result-screen { padding: 12px; }
+  #result-screen .result-panel { height: 100%; }
+  #result-screen .result-circuit { padding: 12px 16px; font-size: 20px; }
+  #result-screen .result-content { grid-template-columns: minmax(0,1fr); padding: 16px; gap: 24px; }
+  #result-screen #result-time { font-size: 76px; margin: 6px 0 12px; }
+  #result-screen #result-laps { margin: 14px 0 0; font-size: 12px; }
+  #result-screen #result-laps li { gap: 8px; grid-template-columns: 68px minmax(0,1fr) auto; }
+  #result-screen .result-actions { grid-template-columns: 1fr; gap: 8px; padding: 12px 16px max(12px,env(safe-area-inset-bottom)); }
+  #result-screen .result-actions .intro-pair { display: flex; gap: 8px; }
+  #result-screen .result-actions .intro-pair button { min-height: 44px; font-size: 20px; }
+  #pause-panel { padding: 16px; }
+  #pause-panel .pause-panel__card { padding: 20px; }
+  #pause-panel .pause-panel__title { font-size: 64px; }
+  :is(#controls-screen,#options-screen) .launch-paper { padding-inline: 16px; clip-path: none; }
+  :is(#controls-screen,#options-screen) .launch-paper__header { padding-top: 16px; }
+  #start-screen .launch-guide { grid-template-columns: 112px minmax(0,1fr); }
+  #start-screen .launch-note { font-size: 12px; padding-right: 8px; }
+}
+@media (max-height:480px) and (orientation:landscape) {
+  #result-screen { padding: 12px 24px; }
+  #result-screen .result-circuit { padding: 8px 16px; }
+  #result-screen .result-content { padding: 12px 16px; gap: 24px; }
+  #result-screen #result-time { font-size: 56px; margin: 4px 0 8px; }
+  #result-screen .result-actions { padding: 10px 16px; gap: 24px; }
+  #result-screen .result-actions button { min-height: 44px; font-size: 21px; }
+  #pause-panel { padding: 12px 24px; }
+  #pause-panel .pause-panel__card { width: min(720px,100%); display: grid; grid-template-columns: 1fr 1.2fr; gap: 8px 24px; padding: 16px; }
+  #pause-panel .pause-panel__reason, #pause-panel .pause-panel__title, #pause-panel .pause-panel__context { grid-column: 1; }
+  #pause-panel .pause-panel__title { font-size: 60px; }
+  #pause-panel .pause-panel__actions { grid-column: 2; grid-row: 1/5; }
+  #pause-panel .pause-panel__hint { grid-column: 1; }
+  #pause-panel .pause-panel__actions button { min-height: 44px; }
+}
+@media (prefers-reduced-motion:reduce) {
+  #result-screen *, #pause-panel *, #garage-screen * { animation: none !important; transition: none !important; }
+}
+@media (min-width:701px) {
+  #start-screen .launch-map { height: clamp(100px,calc(100dvh - 570px),220px); }
+}
+@media (max-height:480px) and (orientation:landscape) {
+  #start-screen .launch-guide { display: grid; grid-template-columns: 88px minmax(0,1fr); gap: 6px; width: 35%; max-height: calc(100dvh - 190px); }
+  #start-screen .launch-map { height: 120px; grid-column: 1; grid-row: 1/3; }
+  #start-screen .launch-twist { font-size: 18px; }
+  #start-screen .launch-note { font-size: 12px; line-height: 1.4; }
+  #start-screen .launch-feature { display: none; }
+}
+
+#garage-screen .garage__part-chip[aria-pressed="true"] { background: #f3f4f1; color: #10191c; border-color: #f3f4f1; }
+#garage-screen .garage__work-order { border-color: #5b6b6c; }
+#garage-screen .garage__work-order .garage__stage { color: #10191c; }
+/* Visibility must change immediately when the garage returns focus. */
+:is(.launch-button,.ghost-button,.chip) { transition-property: transform, background-color, border-color, color; }

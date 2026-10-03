@@ -559,13 +559,14 @@ for (let day = 1; day < 800; day += 1) {
   assert.deepEqual(jobs.map((job) => job.reward), [150, 200, 250], `day ${day} pays off-table.`);
   assert.ok(jobs.every((job) => typeof describeJob(job) === "string" && describeJob(job).length > 0));
 }
-// Every Monday-to-Sunday week tours all seven circuits.
+// Calendar weeks stay Monday-aligned. Circuit tours span the current deck.
 for (let week = weekOf(DAY); week < weekOf(DAY) + 60; week += 1) {
   const monday = week * 7 - 3;
   assert.equal(weekOf(monday), week);
   assert.equal(weekOf(monday - 1), week - 1, "weeks do not start on Monday.");
-  const seen = new Set(Array.from({ length: 7 }, (_, index) => dailyJobs(monday + index)[2].track));
-  assert.equal(seen.size, 7, `week ${week} skips a circuit of the day.`);
+  const tourStart = Math.floor((monday + 3) / CIRCUIT_CODES.length) * CIRCUIT_CODES.length - 3;
+  const seen = new Set(Array.from({ length: CIRCUIT_CODES.length }, (_, index) => dailyJobs(tourStart + index)[2].track));
+  assert.deepEqual([...seen].sort(), [...CIRCUIT_CODES].sort(), `tour at ${tourStart} skips a circuit of the day.`);
 }
 
 // A year of perfect days, one race a day: the cap holds, the streak climbs a
