@@ -36,9 +36,11 @@ export class PauseMenu {
 
   constructor(
     private readonly input: InputController,
-    private readonly resume: () => void,
+    resume: () => void,
+    restart: () => void,
   ) {
-    this.resumeButton?.addEventListener("click", () => this.resume());
+    this.resumeButton?.addEventListener("click", resume);
+    document.getElementById("pause-restart")?.addEventListener("race-restart", restart);
     // MetaUi owns the terminal and already permits opening it from a paused
     // race, so this routes through the control that exists rather than
     // threading MetaUi through the race loop for one call.
@@ -62,6 +64,7 @@ export class PauseMenu {
         if (event.key === "Enter" || event.key === " ") this.buttonHeld = false;
       });
       quit.addEventListener("pointerdown", (event) => {
+        quit.focus();
         this.buttonHeld = true;
         quit.setPointerCapture?.(event.pointerId);
       });
@@ -118,8 +121,8 @@ export class PauseMenu {
         paused,
         terminalOpen: (this.optionsScreen ? !this.optionsScreen.hidden : false) || document.body.dataset.controls === "true",
         actionsSuppressed: this.input.actionsSuppressed,
-        escapeHeld: this.input.isHeld("Escape"),
-        buttonHeld: this.buttonHeld || this.input.isGamepadCancelHeld(),
+        escapeHeld: false, // Escape always resumes; only the focused Quit control can discard a run.
+        buttonHeld: this.buttonHeld || this.input.isGamepadConfirmHeld(),
         // Re-tested every frame, so the hold cannot outlive the focus that
         // started it even by one frame.
         buttonFocused: document.activeElement === this.quitButton,

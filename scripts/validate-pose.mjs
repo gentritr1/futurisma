@@ -450,11 +450,11 @@ assert.ok(
 // argue with them.
 // ---------------------------------------------------------------------------
 
-// Measured with `?camguards=0` over three Greenwater and two Bitterpan
-// drive-keys runs (`desiredChaseMeters` / `minimumChaseMeters` in the
-// diagnostics).
+// Greenwater's measured chase offset now applies to both legacy maps.
+// Bitterpan's former extra 1.5 m and route-directed look target were removed
+// to match the shared driving view; the browser camera comparison covers it.
 const DESIRED_CHASE_GREENWATER_METRES = 7.26;
-const DESIRED_CHASE_BITTERPAN_METRES = 8.76;
+const DESIRED_CHASE_BITTERPAN_METRES = 7.26;
 const MEASURED_CHASE_COLLAPSE_METRES = 4.93;
 
 const gameCameraSource = readFileSync(
@@ -483,9 +483,7 @@ assert.ok(
 );
 // 2. And it has to stay INERT on an unbroken frame. Above either map's desired
 //    chase distance the guard would be pushing the camera back every frame,
-//    which is a feel change nobody asked for -- and on Bitterpan, whose damped
-//    camera never once went below its own desired 8.76 m, it would be pure
-//    regression.
+//    which would push both maps away from the shared driving view.
 for (const [map, desired] of [
   ["greenwater", DESIRED_CHASE_GREENWATER_METRES],
   ["bitterpan", DESIRED_CHASE_BITTERPAN_METRES],

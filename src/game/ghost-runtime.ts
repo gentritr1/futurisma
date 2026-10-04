@@ -147,25 +147,10 @@ class GhostRuntime {
    * because a headless probe is not a race and must not be able to write a
    * personal best.
    *
-   * G4 DROPPED `?demo` FROM THAT GATE, and the reason is that it was only ever
-   * half applied. A demo run already writes a personal best: `recordFinishedRace`
-   * has never been demo-gated, so the showcase reel has always been able to put
-   * a lap time on file — the gate stopped the REPLAY of that lap from being
-   * stored beside it. The result was a save holding a `bestLapMs` whose ghost
-   * was either missing or belonged to some earlier lap, which is precisely the
-   * "a ghost that outlived the time it belongs to" failure `save-schema.js`
-   * warns about, arrived at from the other direction.
-   *
-   * The two now agree: a run that may set a best lap may store the ghost of
-   * that lap, and a probe may do neither. It also makes `timeattack` a mode
-   * that works at all under the autopilot, which is the only way it can be
-   * soaked headlessly.
-   *
-   * The cost is bounded and was measured rather than argued: on a fresh profile
-   * the first demo race finds no stored ghost, so `player` stays null, the mesh
-   * stays invisible and `ghostDrawCalls` is 0 — the `race` soak's draw calls
-   * and lap times are unchanged. Only a second run in the same browser profile
-   * pays the +1 draw call, and it pays it for a ghost the player earned.
+   * Demo runs keep the recorder and any existing replay available for visual
+   * checks. RaceModes.recordFinish gates both record and ghost persistence
+   * together, so an autopilot result cannot replace the player's earned lap.
+   * A stored ghost costs one draw call when visible; an empty profile has none.
    */
   attach(course: RaceCourse, vehicle: GhostGeometrySource): THREE.Object3D {
     this.root.clear();

@@ -1,0 +1,77 @@
+{
+  "viewport": "1536x864",
+  "dpr": 1,
+  "quality": "high",
+  "browser": "Chrome / Metal / headless",
+  "threeLapRace": {
+    "fps": 59.88,
+    "p95FrameMs": 17.7,
+    "cpuRenderMeanMs": 1.65,
+    "recoveries": 0,
+    "missedGates": 0,
+    "phase": "finished",
+    "errors": []
+  },
+  "uncappedFullLap": {
+    "fps": 280.39,
+    "p95FrameMs": 5.1,
+    "cpuRenderMeanMs": 3.02,
+    "recoveries": 0,
+    "missedGates": 0,
+    "phase": "finished",
+    "errors": [],
+    "mapHud": true
+  },
+  "winterControls": {
+    "pickup": {
+      "seconds": 9.783333333333346,
+      "grip": 1
+    },
+    "closeRaceSafe": true,
+    "leadThresholdMeters": 150,
+    "unannouncedShot": true,
+    "visorHit": true,
+    "pauseHolds": true,
+    "visorClears": true
+  },
+  "browserErrors": [],
+  "checks": [
+    "TypeScript and production build",
+    "Bundle budgets",
+    "Module seams",
+    "Route geometry and six original GLB kits",
+    "Snow grip, lane tracks, bounded drift, pickups and thermal braking/boost",
+    "Lap-aware lead-only snowballs, shield, dodge, cooldown, recovery/reset",
+    "Live browser pickup, snow grip, close-race immunity, unannounced lead-triggered shots, visor effect and pause",
+    "git diff --check",
+    "Production browser under actual CSP: external HUD styles, generated frost asset, A+ minimap and both new map starts"
+  ],
+  "art": [
+    "Denser roadside lodges, decorated trees, gifts, fences and garlands",
+    "Reusable warm lantern lights illuminate road and craft",
+    "Original generated transparent frost texture replaces prototype circles"
+  ],
+  "catchUp": {
+    "minimumLeadMeters": 150,
+    "requiresRivals": true,
+    "anyLap": true,
+    "advanceWarning": false,
+    "cooldownSeconds": 18,
+    "visorSeconds": 2.4
+  },
+  "production": [
+    {
+      "map": "afterglow",
+      "errors": [],
+      "minimap": "aplus",
+      "phase": "race"
+    },
+    {
+      "map": "frostline",
+      "errors": [],
+      "minimap": "aplus",
+      "phase": "race"
+    }
+  ],
+  "mapHudValidation": "map-hud-validation.json"
+}

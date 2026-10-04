@@ -1,0 +1,184 @@
+{
+  "maps": [
+    {
+      "map": "greenwater",
+      "authoredBooths": true,
+      "stops": 18,
+      "sceneryDrawCalls": 43,
+      "fps": 449.8668290266917,
+      "p95FrameMs": 3.5,
+      "recoveries": 0,
+      "missedGates": 0,
+      "actualPickup": true,
+      "pauseAndAnimationPassed": true,
+      "errors": []
+    },
+    {
+      "map": "bitterpan",
+      "authoredBooths": true,
+      "stops": 18,
+      "sceneryDrawCalls": 37,
+      "fps": 469.0263164799412,
+      "p95FrameMs": 3.5,
+      "recoveries": 0,
+      "missedGates": 0,
+      "actualPickup": true,
+      "pauseAndAnimationPassed": true,
+      "errors": []
+    },
+    {
+      "map": "nightshift",
+      "authoredBooths": true,
+      "stops": 18,
+      "sceneryDrawCalls": 35,
+      "fps": 481.4121591359971,
+      "p95FrameMs": 3.5,
+      "recoveries": 0,
+      "missedGates": 0,
+      "actualPickup": true,
+      "pauseAndAnimationPassed": true,
+      "errors": []
+    }
+  ],
+  "visualReview": [
+    {
+      "round": 1,
+      "score": 5.2,
+      "composition": 2.5,
+      "lighting": 1,
+      "materials": 1.3,
+      "details": 0.4,
+      "gaps": [
+        "Flat emissive window",
+        "Brown matte metal",
+        "Unreadable food",
+        "Missing valance",
+        "Harsh lantern ribs"
+      ]
+    },
+    {
+      "round": 2,
+      "score": 6.3,
+      "composition": 2.5,
+      "lighting": 1.6,
+      "materials": 1.5,
+      "details": 0.7,
+      "gaps": [
+        "Shallow interior shading",
+        "Insufficient curved highlights",
+        "Weak warm spill"
+      ]
+    },
+    {
+      "round": 3,
+      "score": 7,
+      "composition": 2.5,
+      "lighting": 1.9,
+      "materials": 1.8,
+      "details": 0.8,
+      "gaps": [
+        "Silver highlights too uniform",
+        "Interior lighting needs contrast",
+        "Food and lantern details too strong"
+      ]
+    },
+    {
+      "round": 4,
+      "score": 7.4,
+      "composition": 2.5,
+      "lighting": 2.1,
+      "materials": 2,
+      "details": 0.8,
+      "gaps": [
+        "Weak peach light falloff",
+        "Bowl obscured by patron",
+        "Interior depth"
+      ]
+    },
+    {
+      "round": 5,
+      "score": 7.8,
+      "composition": 2.5,
+      "lighting": 2.35,
+      "materials": 2.15,
+      "details": 0.8,
+      "gaps": [
+        "Warm pool too orange and concentrated",
+        "Interior contact shadows",
+        "Metal highlights and lantern volume"
+      ]
+    },
+    {
+      "round": 6,
+      "score": 8,
+      "composition": 2.5,
+      "lighting": 2.45,
+      "materials": 2.25,
+      "details": 0.8,
+      "accepted": true,
+      "gaps": [
+        "Further interior contact shadows could improve depth",
+        "Column reflections remain cooler than target",
+        "Valance could be more shaped"
+      ]
+    }
+  ],
+  "asset": {
+    "bytes": 1987296,
+    "prototypeTriangles": 24520,
+    "nodes": 16,
+    "atlasCount": 1,
+    "source": "art/blender/circuit_booths.blend",
+    "roadFootprintChecked": true
+  },
+  "lighting": {
+    "localPointLights": 2,
+    "shadowCastingLightsAdded": 0
+  },
+  "lifecycle": [
+    {
+      "failAsset": false,
+      "authored": true,
+      "lights": 2,
+      "expected": {
+        "geometry": 16,
+        "materials": 5,
+        "textures": 2
+      },
+      "disposed": {
+        "geometry": 16,
+        "materials": 5,
+        "textures": 2
+      },
+      "detached": true
+    },
+    {
+      "failAsset": true,
+      "authored": false,
+      "lights": 0,
+      "expected": {
+        "geometry": 0,
+        "materials": 0,
+        "textures": 0
+      },
+      "disposed": {
+        "geometry": 0,
+        "materials": 0,
+        "textures": 0
+      },
+      "detached": null
+    }
+  ],
+  "reducedMotion": [
+    "greenwater",
+    "nightshift"
+  ],
+  "build": {
+    "initialJsRawKiB": 994,
+    "initialJsGzipKiB": 274.4,
+    "shellGzipKiB": 286.7,
+    "existingBudgetsPassed": true
+  },
+  "performanceContext": "Local uncapped Chrome/Metal; 1536x864, DPR1, high quality, complete automatic lap. Not a guarantee for other hardware.",
+  "productionEvidence": "production-summary.json"
+}

@@ -1,11 +1,15 @@
-const sheet = document.createElement('link');
-sheet.rel = 'stylesheet';
-sheet.href = new URL('./style-launch.css', import.meta.url).href;
-export const stylesheetReady = new Promise<void>((resolve, reject) => {
+// External sheets preserve the game's self-only style policy in dev and builds.
+export const stylesheetReady = Promise.all([
+  new URL('./style-launch.css', import.meta.url),
+  new URL('./style-interface.css', import.meta.url),
+].map(url => new Promise<void>((resolve, reject) => {
+  const sheet = document.createElement('link');
+  sheet.rel = 'stylesheet';
+  sheet.href = url.href;
   sheet.onload = () => resolve();
-  sheet.onerror = () => reject(new Error('The launch menu stylesheet could not load. Please reload.'));
-});
-document.head.append(sheet);
+  sheet.onerror = () => reject(new Error('The menu stylesheet could not load. Please reload.'));
+  document.head.append(sheet);
+})));
 import { TRACKS, trackFor, type MapSelection } from './map-selection';
 import { save } from './persistence';
 import { fieldLiveries, liveryFor } from './liveries.js';
@@ -41,6 +45,7 @@ export class LaunchMenu {
   private readonly note=el('p','launch-note');
   private readonly feature=el('p','launch-feature');
   private readonly facts=el('p','launch-facts');
+  private readonly reward=el('p','launch-reward');
   private readonly detail=el('div','launch-detail');
   private readonly brief=el('p','launch-brief');
   private readonly backgrounds=el('div','launch-backgrounds');
@@ -82,7 +87,8 @@ export class LaunchMenu {
       const row=el('div','launch-setup__row');row.append(el('span','launch-label',label),required(id));setup.append(row);
     }
     this.gridButton=button('launch-grid-toggle','GRID · 4',()=>this.toggleGrid());this.gridButton.setAttribute('aria-expanded','false');this.gridButton.setAttribute('aria-controls','launch-grid');
-    setup.append(this.gridButton,this.brief);
+    setup.lastElementChild!.append(this.gridButton);
+    setup.append(this.brief);
     this.grid.id='launch-grid';this.grid.hidden=true;this.grid.setAttribute('role','region');this.grid.setAttribute('aria-label','Starting grid');
     const cards=el('nav','launch-cards');cards.setAttribute('aria-label','Circuit selection');
     cards.append(button('launch-prev','‹',()=>this.step(-1)),required('track-select'),button('launch-next','›',()=>this.step(1)));
@@ -95,7 +101,7 @@ export class LaunchMenu {
       chip.replaceChildren(image,el('b','',String(i+1).padStart(2,'0')),el('strong','',entry.label));
       if(entry.selection===this.loaded.track)chip.append(el('span','launch-card-tag','LAST'));
     });
-    const dispatch=el('div','launch-dispatch');dispatch.append(this.facts,this.startButton);
+    const dispatch=el('div','launch-dispatch');dispatch.append(this.reward,this.facts,this.startButton);
     this.startButton.replaceChildren(el('span','launch-dispatch__label','LAUNCH'),launchBadge('A',true),launchBadge('↵'));
     this.screen.append(guide,setup,this.grid,cards,dispatch);
     const live=el('p','launch-live');live.id='launch-live';live.setAttribute('role','status');live.setAttribute('aria-live','polite');this.screen.append(live);
@@ -126,6 +132,8 @@ export class LaunchMenu {
     const track=trackFor(this.track),{data,laps,guide,distance}=launchFacts(this.track,this.mode);
     const colour=CIRCUIT_COLOURS[this.track];
     this.screen.style.setProperty('--circuit',colour);this.screen.dataset.track=this.track;
+    required('result-screen').style.setProperty('--circuit',colour);
+    required('result-circuit').textContent=`${track.mapCode} / ${track.label}`;
     this.screen.dataset.reduced=String(resolveReducedMotion());
     this.hooks.sync(this.track,this.mode,this.tier);
     this.number.textContent=track.mapCode.slice(-2);
@@ -140,6 +148,7 @@ export class LaunchMenu {
     const mapKey=`${this.track}:${this.mode}`;
     if(mapKey!==this.mapKey){drawLaunchMap(this.map,this.track,this.mode);this.mapKey=mapKey;}
     this.syncPanels(this.track);
+    this.reward.textContent=`TOUR ${save.garage.circuits.length}/${TRACKS.length} · ${save.garage.circuits.includes(this.track)?'CIRCUIT LOGGED':'FIRST FINISH +CR 300'}`;
     const best=save.bestFor(track.mapCode,bestRecordKey(this.mode,this.tier)).bestLapMs;
     const nextFacts=`${laps} LAPS · ${distance} KM · ${best===null?'NO LAP YET':`BEST ${time(best)}`}`;
     if(this.facts.textContent!==nextFacts)this.updateFacts(nextFacts);

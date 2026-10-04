@@ -398,8 +398,12 @@ export class SceneAssets {
     try {
       // Both painted circuits add their authored root straight to the scene:
       // they do their own batching and neither needs the culling wrapper.
-      if (this.course.kind === "ascension" || this.course.kind === "dreamisland") {
-        const environment=this.course.kind === "ascension"
+      if (this.course.kind === "frostline" || this.course.kind === "afterglow" || this.course.kind === "ascension" || this.course.kind === "dreamisland") {
+        const environment=this.course.kind === "frostline"
+          ? await (await import("./frostline-environment")).FrostlineEnvironment.load(this.course as import("./frostline-course").FrostlineCourse)
+          : this.course.kind === "afterglow"
+          ? await (await import("./afterglow-environment")).AfterglowEnvironment.load(this.course as import("./afterglow-course").AfterglowCourse)
+          : this.course.kind === "ascension"
           ? await (await import("./ascension-painted-environment")).AscensionPaintedEnvironment.load(this.course as import("./ascension-course").AscensionCourse)
           : await (await import("./dreamisland-painted-environment")).DreamIslandPaintedEnvironment.load(this.course as import("./dreamisland-course").DreamIslandCourse);
         if(this.isDisposed()){disposeObject3DResources(environment.root);return;}
@@ -494,6 +498,7 @@ export class SceneAssets {
       // The accepted Phase 1 prop dressing remains a recoverable visual fallback.
       await this.loadAssetKit();
     } finally {
+      await this.course.finishEnvironment?.(this.authoredEnvironment?.root);this.requestRender();
       this.environmentLoadMs ??= performance.now() - environmentLoadStartedAt;
     }
   }

@@ -371,3 +371,10 @@ body[data-phase="paused"] #countdown { display: none; }
   .screen--garage button:active:not(:disabled), .garage__paint:hover .garage__swatch { scale: 1; }
   .garage__frame:hover:not(:disabled), .garage__part-chip:hover:not(:disabled) { translate: none; }
 }
+
+.race-debrief {margin-top:16px;padding-top:14px;border-top:1px solid var(--line);}
+.race-debrief__title {margin:0 0 6px;font:800 23px/1.15 var(--condensed);color:var(--acid);}
+.race-debrief__progress {margin:0;font:700 11px/1.5 var(--mono);color:#eef2e9;}
+.race-debrief__lesson {margin:10px 0;font:12px/1.6 var(--mono);color:#c7d1ce;max-width:50ch;}
+.race-debrief__next {width:100%;min-height:44px;white-space:normal;justify-content:center;}
+.race-debrief__next:focus-visible {outline:2px solid var(--acid);outline-offset:3px;}

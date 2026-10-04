@@ -1,0 +1,134 @@
+{
+  "maps": [
+    {
+      "map": "greenwater",
+      "sites": 18,
+      "drawCalls": 10,
+      "animatedElements": 288,
+      "minimumRoadClearance": 5.930784983623088,
+      "fps": 485.5640400553292,
+      "p95Ms": 3.4000000953674316,
+      "recoveries": 0,
+      "missedGates": 0,
+      "actualPickup": true,
+      "wallEscape": null,
+      "browserErrors": []
+    },
+    {
+      "map": "bitterpan",
+      "sites": 18,
+      "drawCalls": 10,
+      "animatedElements": 108,
+      "minimumRoadClearance": 6.090093770920419,
+      "fps": 503.6872348074957,
+      "p95Ms": 3.3000001907348633,
+      "recoveries": 0,
+      "missedGates": 0,
+      "actualPickup": true,
+      "wallEscape": null,
+      "browserErrors": []
+    },
+    {
+      "map": "nightshift",
+      "sites": 18,
+      "drawCalls": 9,
+      "animatedElements": 108,
+      "minimumRoadClearance": 3.441590723148437,
+      "fps": 523.4878190894632,
+      "p95Ms": 3.299999713897705,
+      "recoveries": 0,
+      "missedGates": 0,
+      "actualPickup": true,
+      "wallEscape": null,
+      "browserErrors": []
+    },
+    {
+      "map": "polarity",
+      "sites": 18,
+      "drawCalls": 8,
+      "animatedElements": 126,
+      "minimumRoadClearance": 5.595121699781174,
+      "fps": 517.9578955135485,
+      "p95Ms": 3.299999713897705,
+      "recoveries": 0,
+      "missedGates": 0,
+      "actualPickup": null,
+      "wallEscape": null,
+      "browserErrors": []
+    },
+    {
+      "map": "tideline",
+      "sites": 6,
+      "drawCalls": 10,
+      "animatedElements": 48,
+      "minimumRoadClearance": 6.438831218898056,
+      "fps": 397.07295137256506,
+      "p95Ms": 4,
+      "recoveries": 0,
+      "missedGates": 0,
+      "actualPickup": null,
+      "wallEscape": null,
+      "browserErrors": []
+    },
+    {
+      "map": "ascension",
+      "sites": 18,
+      "drawCalls": 10,
+      "animatedElements": 90,
+      "minimumRoadClearance": 6.402704924136007,
+      "fps": 462.95754597255046,
+      "p95Ms": 3.299999713897705,
+      "recoveries": 0,
+      "missedGates": 0,
+      "actualPickup": null,
+      "wallEscape": null,
+      "browserErrors": []
+    },
+    {
+      "map": "dreamisland",
+      "sites": 18,
+      "drawCalls": 11,
+      "animatedElements": 90,
+      "minimumRoadClearance": 6.0506241587692,
+      "fps": 388.52605128016734,
+      "p95Ms": 4.700000286102295,
+      "recoveries": 0,
+      "missedGates": 0,
+      "actualPickup": null,
+      "wallEscape": null,
+      "browserErrors": []
+    },
+    {
+      "map": "afterglow",
+      "sites": 18,
+      "drawCalls": 9,
+      "animatedElements": 108,
+      "minimumRoadClearance": 3.4565165276585503,
+      "fps": 451.4164029281953,
+      "p95Ms": 3.4000000953674316,
+      "recoveries": 0,
+      "missedGates": 0,
+      "actualPickup": true,
+      "wallEscape": {
+        "speed": 18.622056275115316,
+        "lateral": 5.679059363287425,
+        "integrity": 28
+      },
+      "browserErrors": []
+    }
+  ],
+  "newSites": 132,
+  "productionMaps": 9,
+  "productionErrors": 0,
+  "reducedMotion": [
+    "greenwater",
+    "nightshift"
+  ],
+  "benchmark": "Chrome/Metal, uncapped, high quality, 1536x864, DPR 1; one full lap per circuit. Average FPS only; smoke-mode timings include deliberate pauses and are not benchmarks.",
+  "build": {
+    "initialJavaScriptKiB": 993.0,
+    "initialGzipJavaScriptKiB": 273.8,
+    "gzipShellKiB": 286.1
+  },
+  "afterglowFix": "Continuous wall scrub reduced from 24 to 4 m/s\u00b2 so a damaged engine can pull away; initial impact still removes 24% of speed."
+}

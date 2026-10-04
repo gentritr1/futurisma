@@ -38,7 +38,10 @@ export function integrateCameraFov(currentFov, desiredFov, deltaSeconds) {
   const current = Number.isFinite(currentFov) ? currentFov : 56;
   const desired = Number.isFinite(desiredFov) ? desiredFov : 56;
   const delta = Number.isFinite(deltaSeconds) ? Math.max(0, deltaSeconds) : 0;
-  return current + (desired - current) * (1 - Math.exp(-delta * 4.8));
+  // Boost opens the lens promptly; release settles more gently. Both rates
+  // use seconds, so the response remains identical across render frame rates.
+  const response = desired > current ? 8.2 : 4.8;
+  return current + (desired - current) * (1 - Math.exp(-delta * response));
 }
 
 /**

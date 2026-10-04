@@ -3,9 +3,11 @@ import type { MapSelection } from './map-selection';
 import { resolveModeLapCount, type RaceMode } from './race-modes-rules.js';
 
 export const CIRCUIT_COLOURS: Record<MapSelection, string> = {
-  greenwater:'#95c46b', bitterpan:'#f5a524', nightshift:'#ff4fa3', polarity:'#7c7dff', tideline:'#20c2a0', ascension:'#ff6f4f', dreamisland:'#3cc8ff',
+  greenwater:'#95c46b', bitterpan:'#f5a524', nightshift:'#ff4fa3', polarity:'#7c7dff', tideline:'#20c2a0', ascension:'#ff6f4f', dreamisland:'#3cc8ff', afterglow:'#b3a1ec', frostline:'#b7dce8',
 };
 const guides = {
+  frostline: {title:'MIDNIGHT IN THE MOUNTAINS',note:'Follow cleared snow tracks and collect cyan stabilizers. A big lead attracts snowballs. Final lap brings midnight fireworks.',time:'23:58 · NEW YEAR’S EVE',from:.64,to:.78,feature:'SILVER LAKE / ICE'},
+  afterglow: {title:'LAST TRAIN HOME',note:'Sweep past the relay dish, climb the high line and brake for the terminal S. The quay stays wet.',time:'19:48 · BLUE HOUR',from:.48,to:.62,feature:'TERMINAL S'},
   greenwater: {title:'WATER AND STEAM',note:'Standing water takes grip from the left of the track. Steam vents mark Hangar Six; keep your line through the squall.',time:'OVERCAST → DUSK',from:432.271/2515.982,to:586.519/2515.982,feature:'STANDING WATER · LEFT THIRD'},
   bitterpan: {title:'SALT AND CROSSWINDS',note:'Crosswinds sweep the open pans. From lap 2, watch the conveyor lamps: falling salt reduces grip.',time:'NOON → EVENING',from:3005/3050,to:3040/3050,feature:'CONVEYOR SALT DROP'},
   nightshift: {title:'PURE STREET RACING',note:'Tight kerb walls through six neon districts and under the expressway. Just the line.',time:'02:17 · RAIN',from:.515,to:.62,feature:'EXPRESSWAY UNDERPASS'},
@@ -55,7 +57,7 @@ export function drawLaunchMap(host:HTMLElement,track:MapSelection,mode:RaceMode)
   const features=branches.length ? branches.map(b=>b.points) : [Array.from({length:count},(_,i)=>data.points[(from+i)%128])];
   for(const feature of features)svg.append(svgNode('path',{d:path(feature),class:'launch-map__feature','data-closed':String(track==='tideline'&&launchFacts(track,mode).laps<3)}));
   const target=features[0][Math.floor(features[0].length/2)];
-  const labels:Record<MapSelection,string[]>={greenwater:['STANDING WATER','LEFT THIRD'],bitterpan:['SALT DROP','LAP 2+'],nightshift:['UNDERPASS','EXPRESSWAY'],polarity:['UPPER','EXPRESS'],tideline:['PUMP HALL',guide.feature.includes('CLOSED')?'CLOSED':'LAP 3'],ascension:['TRENCH','DELUGE ROAD'],dreamisland:['WET','CAUSEWAY']};
+  const labels:Record<MapSelection,string[]>={greenwater:['STANDING WATER','LEFT THIRD'],bitterpan:['SALT DROP','LAP 2+'],nightshift:['UNDERPASS','EXPRESSWAY'],polarity:['UPPER','EXPRESS'],tideline:['PUMP HALL',guide.feature.includes('CLOSED')?'CLOSED':'LAP 3'],ascension:['TRENCH','DELUGE ROAD'],dreamisland:['WET','CAUSEWAY'],afterglow:['TERMINAL','S-BEND'],frostline:['ICE','OUTSIDE LINE']};
   const labelX=target[0]>120?155:2,labelY=Math.max(12,Math.min(181,target[1]-16));
   const callout=svgNode('g',{class:'launch-map__callout'});
   callout.append(svgNode('path',{d:`M${target[0]},${target[1]}H${labelX>target[0]?labelX:labelX+83}`,class:'launch-map__leader'}));

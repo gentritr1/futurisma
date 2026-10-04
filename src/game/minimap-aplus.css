@@ -1,4 +1,4 @@
-/* Loaded only by the dev-only ?minimap=aplus renderer. */
+/* Shared A+ race instruments, loaded with the default minimap renderer. */
 .hud[data-minimap="aplus"] .minimap {
   display: block;
   width: 180px;

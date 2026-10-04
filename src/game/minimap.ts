@@ -182,9 +182,8 @@ export class Minimap {
 
     this.rebuild();
 
-    // Review-only renderer. Vite removes this entire branch from production;
-    // optional access also keeps the DOM-free Node validators on the baseline.
-    if (import.meta.env?.DEV && new URLSearchParams(window.location.search).get("minimap") === "aplus") {
+    // The approved A+ HUD is the default in development and production.
+    if (typeof window !== "undefined" && new URLSearchParams(window.location.search).get("minimap") !== "classic") {
       void import("./minimap-aplus").then(({ installAplusMinimap }) => {
         installAplusMinimap(this, { canvas, course, reducedMotion,
           outline: this.outline, upperOutline: this.upperOutline,

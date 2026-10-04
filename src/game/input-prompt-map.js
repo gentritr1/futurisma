@@ -2,7 +2,7 @@
 export const INPUT_PROMPTS = {
   confirm: {keyboard: 'ENTER', gamepad: 'A'},
   options: {keyboard: 'O', gamepad: 'Y'},
-  quit: {keyboard: 'HOLD', gamepad: 'B HOLD'},
+  quit: {keyboard: 'HOLD ENTER', gamepad: 'HOLD A'},
   apply: {keyboard: 'APPLY', gamepad: 'A'},
   back: {keyboard: 'ESC', gamepad: 'B'},
   controls: {keyboard: 'C', gamepad: 'X'},

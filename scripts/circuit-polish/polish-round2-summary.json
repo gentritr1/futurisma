@@ -1,0 +1,184 @@
+{
+  "maps": [
+    {
+      "map": "greenwater",
+      "stops": 18,
+      "verges": 162,
+      "midground": 82,
+      "sceneryDrawCalls": 27,
+      "minimumStopClearance": 5.930784983623088,
+      "minimumVergeClearance": 4.379169405757746,
+      "fps": 475.03080212092016,
+      "p95FrameMs": 3.4000000953674316,
+      "recoveries": 0,
+      "missedGates": 0,
+      "pickupContact": true,
+      "beaconRules": {
+        "spentDim": true,
+        "spentArrowHidden": true,
+        "nextLapArrow": true,
+        "reducedMotionStable": true
+      },
+      "wallEscape": null,
+      "errors": []
+    },
+    {
+      "map": "bitterpan",
+      "stops": 18,
+      "verges": 203,
+      "midground": 100,
+      "sceneryDrawCalls": 21,
+      "minimumStopClearance": 6.090093770920419,
+      "minimumVergeClearance": 4.769565375953106,
+      "fps": 498.045620539663,
+      "p95FrameMs": 3.4000000953674316,
+      "recoveries": 0,
+      "missedGates": 0,
+      "pickupContact": true,
+      "beaconRules": {
+        "spentDim": true,
+        "spentArrowHidden": true,
+        "nextLapArrow": true,
+        "reducedMotionStable": true
+      },
+      "wallEscape": null,
+      "errors": []
+    },
+    {
+      "map": "nightshift",
+      "stops": 18,
+      "verges": 124,
+      "midground": 0,
+      "sceneryDrawCalls": 21,
+      "minimumStopClearance": 3.441590723148437,
+      "minimumVergeClearance": 3.255182499483417,
+      "fps": 512.6161851261339,
+      "p95FrameMs": 3.3000001907348633,
+      "recoveries": 0,
+      "missedGates": 0,
+      "pickupContact": true,
+      "beaconRules": {
+        "spentDim": true,
+        "spentArrowHidden": true,
+        "nextLapArrow": true,
+        "reducedMotionStable": true
+      },
+      "wallEscape": null,
+      "errors": []
+    },
+    {
+      "map": "polarity",
+      "stops": 18,
+      "verges": 81,
+      "midground": 0,
+      "sceneryDrawCalls": 15,
+      "minimumStopClearance": 5.595121699781174,
+      "minimumVergeClearance": 4.8004829855051865,
+      "fps": 515.8919235924577,
+      "p95FrameMs": 3.3000001907348633,
+      "recoveries": 0,
+      "missedGates": 0,
+      "pickupContact": null,
+      "beaconRules": null,
+      "wallEscape": null,
+      "errors": []
+    },
+    {
+      "map": "tideline",
+      "stops": 6,
+      "verges": 29,
+      "midground": 0,
+      "sceneryDrawCalls": 21,
+      "minimumStopClearance": 6.438831218898056,
+      "minimumVergeClearance": 4.799999999999982,
+      "fps": 397.0799917746247,
+      "p95FrameMs": 4,
+      "recoveries": 0,
+      "missedGates": 0,
+      "pickupContact": null,
+      "beaconRules": null,
+      "wallEscape": null,
+      "errors": []
+    },
+    {
+      "map": "ascension",
+      "stops": 18,
+      "verges": 100,
+      "midground": 0,
+      "sceneryDrawCalls": 20,
+      "minimumStopClearance": 6.402704924136007,
+      "minimumVergeClearance": 4.791002912640514,
+      "fps": 471.4032608016671,
+      "p95FrameMs": 3.3000001907348633,
+      "recoveries": 0,
+      "missedGates": 0,
+      "pickupContact": null,
+      "beaconRules": null,
+      "wallEscape": null,
+      "errors": []
+    },
+    {
+      "map": "dreamisland",
+      "stops": 18,
+      "verges": 63,
+      "midground": 0,
+      "sceneryDrawCalls": 24,
+      "minimumStopClearance": 6.0506241587692,
+      "minimumVergeClearance": 4.813806076165302,
+      "fps": 382.29950298061476,
+      "p95FrameMs": 5,
+      "recoveries": 0,
+      "missedGates": 0,
+      "pickupContact": null,
+      "beaconRules": null,
+      "wallEscape": null,
+      "errors": []
+    },
+    {
+      "map": "afterglow",
+      "stops": 18,
+      "verges": 106,
+      "midground": 0,
+      "sceneryDrawCalls": 21,
+      "minimumStopClearance": 3.4565165276585503,
+      "minimumVergeClearance": 3.2498165372777477,
+      "fps": 442.40981388275503,
+      "p95FrameMs": 3.4000000953674316,
+      "recoveries": 0,
+      "missedGates": 0,
+      "pickupContact": true,
+      "beaconRules": {
+        "spentDim": true,
+        "spentArrowHidden": true,
+        "nextLapArrow": true,
+        "reducedMotionStable": true
+      },
+      "wallEscape": {
+        "speed": 20.106119797396378,
+        "lateral": 3.7410965661114393,
+        "integrity": 28
+      },
+      "errors": []
+    }
+  ],
+  "totalVerges": 868,
+  "totalMidground": 182,
+  "performanceContext": "Local uncapped Chrome/Metal, 1536x864 DPR 1, high quality, one complete automatic lap per map; not a guarantee for other hardware.",
+  "bitterpanCamera": {
+    "identicalPoseComparisons": 36,
+    "maxDifference": 0,
+    "roadClearanceAndFramingPassed": true,
+    "physics": "Shared steering/acceleration unchanged; salt patches and crosswinds retained."
+  },
+  "reducedMotion": [
+    "greenwater",
+    "nightshift"
+  ],
+  "build": {
+    "initialJsRawKiB": 992.6,
+    "initialJsGzipKiB": 273.7,
+    "shellGzipKiB": 286,
+    "budgetsPassed": true
+  },
+  "productionEvidence": "production-summary.json"
+}

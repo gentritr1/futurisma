@@ -157,6 +157,7 @@ export interface FieldOrderEntry {
 }
 
 export interface RaceCoursePresentation {
+  kind: string;
   mapName: string;
   mapCode: string;
   checkpointCount: number;
@@ -179,6 +180,7 @@ function requiredElement<T extends HTMLElement>(id: string): T {
 export { formatRaceTime };
 
 export class GameUi {
+  private mapHud?: {update(frame: HudFrame): void};
   onLaunchCountdown: ((value: string) => void) | null = null;
   readonly startButton = requiredElement<HTMLButtonElement>("start-button");
   readonly restartButton = requiredElement<HTMLButtonElement>("restart-button");
@@ -288,6 +290,7 @@ export class GameUi {
   private lapEventUntil = 0;
   private impactFlashUntil = 0;
   private systemStatusLabel = "SYSTEM STANDBY";
+  private positionNoticeUntil = 0;
   private demoAutopilot = false;
   private lastFieldOrderKey = "";
   /** The gap each row was last written with, so a live update can tell a real
@@ -370,7 +373,8 @@ export class GameUi {
     const tideline = course.mapCode === "MAP 05";
     const ascension = course.mapCode === "MAP 06";
     const island = course.mapCode === "MAP 07";
-    document.body.dataset.map = island ? "dreamisland" : ascension ? "ascension" : tideline ? "tideline" : polarity ? "polarity" : course.mapCode === "MAP 03" ? "nightshift" : course.mapCode === "MAP 02" ? "bitterpan" : "greenwater";
+    document.body.dataset.map = course.kind;
+    void import("./map-hud").then(({applyMapHud}) => { this.mapHud = applyMapHud(course.kind); });
     /*
       The h1 is the CIRCUIT, on every map. It used to be the craft — `TOTEM` —
       on Greenwater and Bitterpan and the circuit everywhere else, which made
@@ -624,9 +628,7 @@ export class GameUi {
       ? `${RACE_MODE_LABELS[summary.mode]} · ${RIVAL_TIER_LABELS[summary.tier]} · `
       : "";
     const previous=timeAttack?`PREVIOUS BEST ${previousBestLapMs===null?'—':formatRaceTime(previousBestLapMs)} · `:'';
-    this.resultDetail.textContent = `${previous}RACE TIME ${formatRaceTime(elapsedMs)} · ${format}${
-      formatRacePosition(position, racerCount)
-    } · ${this.craft.label} / ${this.craft.team || this.playerLiveryLabel} · ${totalLaps} ${
+    this.resultDetail.textContent = `${previous}RACE TIME ${formatRaceTime(elapsedMs)} · ${format}${this.craft.label} / ${this.craft.team || this.playerLiveryLabel} · ${totalLaps} ${
       totalLaps === 1 ? "LAP" : "LAPS"
     } LOGGED · BEST ${formatRaceTime(bestLapMs)}`;
     // P7 — the flash and the file are decided by one comparison in the save
@@ -651,7 +653,8 @@ export class GameUi {
     this.clearRaceEventState();
     this.setSystemStatus("CLASSIFICATION LOCKED");
     document.body.dataset.phase = "result";
-    this.restartButton.focus({ preventScroll: true });
+    this.resultScreen.querySelector(".result-content")?.scrollTo(0, 0);
+    this.restartButton.focus();
   }
 
   showError(message: string): void {
@@ -818,9 +821,13 @@ export class GameUi {
 
   announcePosition(position: number, gained: boolean): void {
     this.setSystemStatus(`${gained ? "POSITION GAINED" : "POSITION LOST"} · P${position}`);
+    this.positionNoticeUntil = performance.now() + 2800;
   }
 
   update(frame: HudFrame): void {
+    this.mapHud?.update(frame);
+    if (frame.raceActive && this.positionNoticeUntil && performance.now() >= this.positionNoticeUntil)
+      this.setSystemStatus(this.lastRaceStage === 'approach' ? 'FINAL APPROACH' : this.lastRaceStage === 'final' ? 'FINAL LAP' : 'RACE ACTIVE');
     // H2b — the pit radio reads the HUD's own frame, which is what makes
     // PRODUCT.md's "never communicate critical state by audio alone" a
     // structural property rather than a review note: the voice physically
@@ -1341,6 +1348,7 @@ export class GameUi {
   }
 
   private setSystemStatus(label: string): void {
+    this.positionNoticeUntil = 0;
     this.systemStatusLabel = label;
     this.systemStatus.textContent = this.demoAutopilot
       ? `${label} · AUTOPILOT`

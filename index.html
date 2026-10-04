@@ -231,9 +231,8 @@
       </main>
 
       <!--
-        Pause. The three routes out of a paused race, in the order a driver
-        wants them: back in, settings, out. QUIT is a hold rather than a press
-        because it throws the run away and shares a key with the pause itself.
+        Pause keeps Resume first. Restart asks for a second press; Quit requires
+        holding its focused control. Back never discards the run.
       -->
       <section id="pause-panel" class="pause-panel" hidden aria-label="Paused">
         <div class="pause-panel__card">
@@ -245,6 +244,7 @@
               <span>RESUME</span>
               <kbd data-prompt="confirm">ENTER</kbd>
             </button>
+            <button id="pause-restart" class="ghost-button" type="button"><span>RESTART RACE</span></button>
             <button id="pause-options" class="ghost-button" type="button">
               <span>SYSTEM OPTIONS</span>
               <kbd data-prompt="options">O</kbd>
@@ -261,7 +261,7 @@
             </button>
           </div>
           <p id="pause-quit-hint" class="pause-panel__hint">
-            Hold ESC, or hold Enter on QUIT, for <b>0.9s</b>. The run is lost.
+            Escape / B resumes. To quit, hold Enter / A or press and hold QUIT for <b>0.9s</b>. The run is lost.
           </p>
         </div>
       </section>
@@ -368,6 +368,9 @@
 
       <section id="result-screen" class="screen screen--result" hidden>
         <div class="result-panel">
+          <p id="result-circuit" class="result-circuit"></p>
+          <div class="result-content">
+          <div class="result-classification">
           <p class="result-status">CLASSIFICATION LOCKED</p>
           <h2 id="result-time">00:00.000</h2>
           <p id="result-detail">TOTEM / WORKS 07</p>
@@ -385,8 +388,11 @@
             coming back to.
           -->
           <dl id="result-stats" class="result-stats" aria-label="Race statistics" hidden></dl>
+          </div>
           <!-- Garage purse: written by the lazy `garage-purse.ts` at the finish. -->
           <section id="result-purse" class="purse" aria-label="Purse" hidden></section>
+          </div>
+          <footer class="result-actions" aria-label="Next race">
           <button id="restart-button" class="launch-button" type="button">
             <span>RACE AGAIN</span>
             <kbd data-prompt="confirm">ENTER</kbd>
@@ -395,6 +401,7 @@
             <button id="circuit-select-button" class="ghost-button" type="button"><span>CIRCUIT SELECT</span></button>
             <button id="result-garage-button" class="ghost-button" type="button"><span>GARAGE</span><kbd data-prompt="garage">G</kbd></button>
           </div>
+          </footer>
         </div>
       </section>
 
@@ -524,11 +531,11 @@
           </div>
 
           <p id="options-note" class="options-note" data-pending="false">
-            LEVELS, RADIO AND INTERFACE SIZE APPLY LIVE · DAMPING, RESOLUTION AND PIPELINE ON NEXT RELINK
+            Sound and interface size apply now. Motion, resolution and image changes require a restart.
           </p>
 
           <button id="options-relink" class="launch-button" type="button" hidden>
-            <span>RELINK SYSTEM</span>
+            <span>RESTART TO APPLY</span>
             <kbd data-prompt="apply">APPLY</kbd>
           </button>
 
