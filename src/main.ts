@@ -38,6 +38,11 @@ const ui = new GameUi();
 void import("./game/ability-slots").then(({ bindAbilitySlots }) => bindAbilitySlots());
 const input = new InputController();
 void import("./game/input-prompts").then(({bindInputPrompts}) => bindInputPrompts(input));
+// Phone-as-controller prototype: dev server only (`npm run dev:phone`), so the
+// whole branch is dead code in a production build.
+if (import.meta.env.DEV && new URLSearchParams(window.location.search).get("controller") === "phone") {
+  void import("./phone/phone-link").then(({ attachPhoneLink }) => attachPhoneLink(input));
+}
 const courseAssemblyStartedAt = performance.now();
 // Menu bindings can load alongside the circuit, outside the initial shell.
 const metaUiReady = import("./game/meta-ui");

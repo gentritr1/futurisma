@@ -1,0 +1,60 @@
+/* Dev-only pairing card for the phone controller (src/phone/phone-link.ts). */
+.phone-link {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 40;
+  width: 200px;
+  padding: 12px;
+  border: 1px solid rgba(160, 255, 220, 0.35);
+  border-radius: 10px;
+  background: rgba(6, 12, 14, 0.88);
+  color: #dff7ee;
+  font: 12px/1.35 system-ui, sans-serif;
+  text-align: center;
+  cursor: default;
+}
+.phone-link h2 {
+  margin: 0 0 8px;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #8ff5cf;
+}
+.phone-link img {
+  display: block;
+  width: 168px;
+  height: 168px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 4px;
+  image-rendering: pixelated;
+}
+.phone-link__url {
+  margin: 8px 0 4px;
+  word-break: break-all;
+  opacity: 0.7;
+}
+.phone-link__status {
+  margin: 0;
+  font-weight: 600;
+}
+.phone-link--connected {
+  width: auto;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+.phone-link--connected h2,
+.phone-link--connected img,
+.phone-link--connected .phone-link__url {
+  display: none;
+}
+.phone-link--connected .phone-link__status::before {
+  content: "\25CF  phone ";
+  color: #5dff9e;
+}
+.phone-link--connected.phone-link--expanded h2,
+.phone-link--connected.phone-link--expanded img,
+.phone-link--connected.phone-link--expanded .phone-link__url {
+  display: block;
+}

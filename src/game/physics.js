@@ -557,9 +557,14 @@ export function resolveBoostLockout(boostRequested, reserve, previousLockout) {
  * @param {number} current
  * @param {number} target
  * @param {number} delta
+ * @param {number} [responseOverride] per-second response rate, if the source has its own
  */
-export function integrateSteering(current, target, delta) {
-  const responseRate = Math.abs(target) > 0.01 ? 6.2 : 8.5;
+export function integrateSteering(current, target, delta, responseOverride) {
+  // A source may bring its own response (the phone controller: a hand is
+  // already a smooth signal). Keyboard and pad use the game's own rates.
+  const responseRate = responseOverride !== undefined && Number.isFinite(responseOverride) && responseOverride > 0
+    ? responseOverride
+    : Math.abs(target) > 0.01 ? 6.2 : 8.5;
   const response = 1 - Math.exp(-Math.max(0, delta) * responseRate);
   return lerp(current, clamp(target, -1, 1), response);
 }

@@ -1,0 +1,218 @@
+/* Phone controller (controller.html). Landscape-first, thumb-sized targets. */
+:root {
+  --bg: #06090b;
+  --panel: #0e1619;
+  --line: rgba(143, 245, 207, 0.28);
+  --ink: #dff7ee;
+  --dim: rgba(223, 247, 238, 0.55);
+  --gas: #2fe08a;
+  --brake: #ff5a4f;
+  --boost: #59c8ff;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--ink);
+  font: 600 14px/1.2 system-ui, -apple-system, sans-serif;
+  touch-action: none;
+  overscroll-behavior: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  letter-spacing: 0.08em;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel);
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+button.is-down {
+  filter: brightness(1.8);
+  transform: scale(0.97);
+}
+
+.pad {
+  display: grid;
+  grid-template-columns: 1fr minmax(96px, 0.5fr) 1fr;
+  grid-template-rows: auto 1fr;
+  gap: 10px;
+  height: 100%;
+  padding: max(10px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))
+    max(10px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+}
+
+.pad__bar {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+}
+
+.pad__bar button {
+  min-width: 44px;
+  min-height: 40px;
+  padding: 0 10px;
+  font-size: 12px;
+}
+
+.pad__meter {
+  position: relative;
+  flex: 0 0 120px;
+  height: 10px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.pad__meter-dot {
+  position: absolute;
+  left: calc(50% - 6px);
+  top: 0;
+  width: 12px;
+  height: 10px;
+  border-radius: 5px;
+  background: var(--ink);
+}
+
+.pad__status {
+  flex: 1;
+  margin: 0;
+  overflow: hidden;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--dim);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.pad--live .pad__status {
+  color: var(--gas);
+}
+
+.pad__left,
+.pad__right,
+.pad__mid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+}
+
+.pad__big,
+.pad__wheel {
+  flex: 1;
+  font-size: 20px;
+}
+
+.pad__brake {
+  color: var(--brake);
+  border-color: rgba(255, 90, 79, 0.45);
+}
+
+.pad__gas {
+  color: var(--gas);
+  border-color: rgba(47, 224, 138, 0.5);
+}
+
+.pad__boost {
+  flex: 0 0 30%;
+  color: var(--boost);
+  border-color: rgba(89, 200, 255, 0.45);
+}
+
+.pad__mid button {
+  flex: 1;
+  font-size: 13px;
+}
+
+.pad__wheel {
+  display: grid;
+  place-items: center;
+  border: 1px dashed var(--line);
+  border-radius: 12px;
+  color: var(--dim);
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  touch-action: none;
+}
+
+.pad--tilt .pad__wheel,
+.pad--tilt .pad__brake-small,
+.pad--touch .pad__brake {
+  display: none;
+}
+
+.pad__brake-small {
+  color: var(--brake);
+}
+
+.intro,
+.rotate {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 24px;
+  background: var(--bg);
+  text-align: center;
+}
+
+.intro[hidden] {
+  display: none;
+}
+
+.intro h1 {
+  margin: 0;
+  font-size: 22px;
+  letter-spacing: 0.3em;
+}
+
+.intro p {
+  margin: 0;
+  color: var(--dim);
+  font-weight: 500;
+}
+
+.intro button {
+  min-width: 220px;
+  min-height: 56px;
+  font-size: 16px;
+  color: var(--gas);
+}
+
+.intro__note {
+  max-width: 320px;
+}
+
+.rotate {
+  display: none;
+  z-index: 5;
+  font-size: 18px;
+}
+
+@media (orientation: portrait) {
+  .rotate {
+    display: flex;
+  }
+}

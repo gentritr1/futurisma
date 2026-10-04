@@ -33,3 +33,8 @@ art/evidence/garage-frames/*.png
 
 # Dream-loop working references and visual iteration.
 .dream-loop/
+
+# Phone controller dev certificate (npm run dev:phone). Private key: never commit.
+.cert/
+# Phone controller latency logs (npm run dev:phone).
+.phone-logs/

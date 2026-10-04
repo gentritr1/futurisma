@@ -990,7 +990,7 @@ export class FuturismaGame {
     this.steerAmount = integrateSteering(
       this.steerAmount,
       input.steer,
-      delta,
+      delta, input.steerResponse, // a source may bring its own response (phone)
     );
     const turnAuthority = calculateTurnAuthority(speedRatio);
     const turnRate = calculateTurnRate(speedRatio, driftIntent, activeHandling());

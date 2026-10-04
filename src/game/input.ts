@@ -7,7 +7,22 @@ export interface InputFrame {
   brake: number;
   steer: number;
   boost: boolean;
+  /**
+   * Per-second steering response for this frame's steer, when the source wants
+   * other than the game's default (game.ts integrateSteering). Set by the
+   * dev-only phone controller; keyboard and pad leave it undefined.
+   */
+  steerResponse?: number;
 }
+
+/**
+ * An extra input source merged on top of keyboard and pad (the dev-only phone
+ * controller). It writes into the frame and returns REMOTE_* action bits.
+ */
+export interface RemoteInput {
+  apply(frame: InputFrame, acceptActions: boolean): number;
+}
+export const REMOTE_START = 1, REMOTE_RESET = 2, REMOTE_FLIP = 4, REMOTE_POWER = 8, REMOTE_INTENT = 16;
 
 const CONTROL_KEYS = new Set([
   "ArrowUp",
@@ -87,6 +102,7 @@ export class InputController {
   activeDevice: "keyboard" | "gamepad" = "keyboard";
   onDeviceChange: ((device: "keyboard" | "gamepad") => void) | null = null;
   onMenuButton: ((button: number) => boolean) | null = null;
+  remote: RemoteInput | null = null;
   private connectedPadIndex: number | null = null;
 
   private setActiveDevice(device: "keyboard" | "gamepad"): void {
@@ -165,7 +181,7 @@ export class InputController {
       this.frame.brake = keyboardBrake;
       this.frame.steer = keyboardSteer;
       this.frame.boost = keyboardBoost;
-      return this.frame;
+      return this.applyRemote(acceptActions);
     }
 
     const handled = gamepad.buttons.map((button,index) => acceptActions && button.pressed && !this.previousGamepadButtons[index] ? this.onMenuButton?.(index) ?? false : false);
@@ -210,6 +226,17 @@ export class InputController {
       gamepad.axes[0] ?? 0,
     );
     this.frame.boost = keyboardBoost || Boolean(gamepad.buttons[0]?.pressed);
+    return this.applyRemote(acceptActions);
+  }
+
+  private applyRemote(acceptActions: boolean): InputFrame {
+    this.frame.steerResponse = undefined;
+    const bits = this.remote?.apply(this.frame, acceptActions) ?? 0;
+    if (bits & REMOTE_START) this.startRequested = true;
+    if (bits & REMOTE_RESET) this.resetRequested = true;
+    if (bits & REMOTE_FLIP && this.gravityControls) this.flipRequested = true;
+    if (bits & REMOTE_POWER && this.powerControls) this.powerRequested = true;
+    if (bits & REMOTE_INTENT) this.controlIntentRequested = true;
     return this.frame;
   }
 

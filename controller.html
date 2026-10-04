@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#06090b" />
+    <!-- same-origin, not no-referrer: under no-referrer some WebKit builds send
+         `Origin: null` on the pad POST, which the relay must refuse. -->
+    <meta name="referrer" content="same-origin" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link rel="icon" href="data:," />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; worker-src 'none'; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'"
+    />
+    <link rel="stylesheet" href="/src/phone/controller.css" />
+    <title>FUTURISMA · Phone controller</title>
+  </head>
+  <body>
+    <!-- Dev-only phone controller (npm run dev:phone). Not part of the production build. -->
+    <main class="pad pad--tilt" id="pad">
+      <header class="pad__bar">
+        <button type="button" data-tap="st">START</button>
+        <button type="button" data-tap="r">RESET</button>
+        <div class="pad__meter" aria-hidden="true">
+          <div class="pad__meter-dot" id="steer-dot"></div>
+        </div>
+        <p class="pad__status" id="status" role="status">connecting…</p>
+        <button type="button" id="center">CENTER</button>
+        <button type="button" id="preset" aria-label="Steering sensitivity">MED</button>
+        <button type="button" id="mode">TILT</button>
+        <button type="button" id="invert" aria-label="Invert tilt">⇄</button>
+      </header>
+      <section class="pad__left">
+        <button type="button" class="pad__big pad__brake" data-hold="b">BRAKE</button>
+        <div class="pad__wheel" id="wheel">DRAG TO STEER</div>
+      </section>
+      <section class="pad__mid">
+        <button type="button" data-tap="f">FLIP</button>
+        <button type="button" data-tap="p">POWER</button>
+        <button type="button" class="pad__brake-small" data-hold="b">BRAKE</button>
+      </section>
+      <section class="pad__right">
+        <button type="button" class="pad__boost" data-hold="x">BOOST</button>
+        <button type="button" class="pad__big pad__gas" data-hold="g">GAS</button>
+      </section>
+    </main>
+    <div class="intro" id="intro">
+      <h1>FUTURISMA</h1>
+      <p>Hold the phone sideways like a steering wheel.</p>
+      <button type="button" id="go">TAP TO START</button>
+      <p class="intro__note" id="intro-note"></p>
+    </div>
+    <div class="rotate" aria-hidden="true">Rotate to landscape</div>
+    <script type="module" src="/src/phone/controller.ts"></script>
+  </body>
+</html>
