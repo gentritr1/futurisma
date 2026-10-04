@@ -54,7 +54,9 @@ const context = {
 };
 const previousWindow = globalThis.window;
 const previousPath = globalThis.Path2D;
-globalThis.window = { devicePixelRatio: 1 };
+// The classic canvas minimap is what this gate measures; the A+ HUD (the
+// default since 2026-09-28) has its own gate in validate-minimap-aplus.mjs.
+globalThis.window = { devicePixelRatio: 1, location: { search: "?minimap=classic" } };
 globalThis.Path2D = class { moveTo() {} lineTo() {} rect() {} };
 try {
   const minimapUrl = new URL("../src/game/minimap.ts", import.meta.url);
