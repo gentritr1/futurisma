@@ -230,7 +230,9 @@ export class InputController {
   }
 
   private applyRemote(acceptActions: boolean): InputFrame {
-    this.frame.steerResponse = undefined;
+    // Removed rather than set to undefined, so a keyboard/pad frame keeps its
+    // exact shape (validate-hud deep-compares it).
+    if (this.frame.steerResponse !== undefined) delete this.frame.steerResponse;
     const bits = this.remote?.apply(this.frame, acceptActions) ?? 0;
     if (bits & REMOTE_START) this.startRequested = true;
     if (bits & REMOTE_RESET) this.resetRequested = true;
