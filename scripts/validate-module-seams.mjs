@@ -149,7 +149,16 @@ import { readFileSync } from "node:fs";
 // documented line that lets the showroom draw an underglow pattern in motion
 // while the paddock otherwise draws only on request. The paint shop, the
 // DAILY board and the day clock live in `garage-ui.ts` / `garage-purse.ts`.
-const GAME_LINE_BUDGET = 2_584;
+// 2,584 -> 2,589 for the September 28 handoff (Afterglow, Frostline, garage
+// polish), net +6, all wiring: the pause menu's RESTART callback and its
+// four-line `restartPausedTrial`; Frostline's sideways snow push, one line that
+// reads `course.lateralDriftAt` (the drift model lives in frostline-snow.ts);
+// `ownsCamera === false` for circuits that keep the shared chase camera; the
+// countdown's GO rumble; and `captureRaceSnapshot`, which only gathers fields
+// for the lazy race-session-protocol.js. Two removals offset it (Bitterpan's
+// special-cased camera offsets and look-ahead scratch). Measured on the merged
+// tree, which failed this gate at 2,589 before the bump.
+const GAME_LINE_BUDGET = 2_589;
 
 function read(path) {
   return readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
