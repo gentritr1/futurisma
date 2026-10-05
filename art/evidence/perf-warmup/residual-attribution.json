@@ -1,0 +1,399 @@
+{
+ "how": "scripts/perf-warmup/trace2.mjs: cold demo load traced from navigation (devtools.timeline, gpu, disabled-by-default-gpu.service, V8 sampling profiler) on the branch prod build; every main-thread task >50 ms from 1 s before phase=race on.",
+ "reading": "Tasks before 0 are behind the loading screen (warm-up compile/initTexture/render, then EngineAudio.start). The task at ~0 is the first game frame: EngineAudio.update -> ensureAmbience -> AmbienceField bed synthesis (audio-ambience/ambience-beds), and on Dream Island the island loop synthesis (dreamisland-runtime startLoops). No GL/GPU-process work inside them.",
+ "residual": {
+  "greenwater": [
+   {
+    "atMsFromRaceVisible": -746,
+    "ms": 91,
+    "cpuSelf": [
+     "44ms w /assets/three.module-CHIW-3Ag.js:4042:283",
+     "8ms wn /assets/three.module-CHIW-3Ag.js:3998:9544",
+     "5ms Bn /assets/three.module-CHIW-3Ag.js:4008:343",
+     "2ms jt /assets/three.module-CHIW-3Ag.js:4100:36962",
+     "2ms RegExp: ^[ \\t]*#include +<([\\w\\d./]+)> undefined:NaN:undefined"
+    ],
+    "cpuInclusive": [
+     "91ms (root) undefined:NaN:undefined",
+     "90ms n /assets/render-warmup-CaykLueD.js:1:380",
+     "90ms initialize /assets/index-E0Bop8n5.js:118:31639",
+     "89ms Gr.compileAsync /assets/three.module-CHIW-3Ag.js:4100:30830",
+     "89ms Gr.compile /assets/three.module-CHIW-3Ag.js:4100:30249",
+     "88ms (anon) /assets/three.module-CHIW-3Ag.js:4100:30603",
+     "88ms traverse /assets/three.core-NIJS20MN.js:1:59046",
+     "87ms jt /assets/three.module-CHIW-3Ag.js:4100:36962",
+     "87ms St /assets/three.module-CHIW-3Ag.js:4100:30072",
+     "59ms g /assets/three.module-CHIW-3Ag.js:4049:2358"
+    ],
+    "mainChildren": [
+     "BlinkScheduler_PerformMicrotaskCheckpoint 91.2ms@0",
+     "GLES2Implementation::GetProgramiv 22.9ms@21",
+     "ImplementationBase::WaitForCmd 22.9ms@21",
+     "CommandBufferHelper::Finish 22.9ms@21",
+     "CommandBufferProxyImpl::WaitForGetOffset 22.9ms@21"
+    ],
+    "gpuProcess": [
+     "CrGpuMain GpuChannel::ExecuteDeferredRequest 22.6ms@21",
+     "CrGpuMain GPUTask 22.6ms@21",
+     "CrGpuMain WebGL 12.4ms@21",
+     "CrGpuMain CommandBuffer::Flush 12.4ms@21"
+    ]
+   },
+   {
+    "atMsFromRaceVisible": -563,
+    "ms": 282,
+    "cpuSelf": [
+     "118ms Ce /assets/three.module-CHIW-3Ag.js:4076:13552",
+     "105ms w /assets/three.module-CHIW-3Ag.js:4042:283",
+     "15ms n /assets/three.module-CHIW-3Ag.js:1:1049",
+     "8ms Cn /assets/three.module-CHIW-3Ag.js:3998:8810",
+     "4ms a /assets/three.module-CHIW-3Ag.js:3663:15616"
+    ],
+    "cpuInclusive": [
+     "282ms (root) undefined:NaN:undefined",
+     "280ms n /assets/render-warmup-CaykLueD.js:1:380",
+     "166ms Gr.render /assets/three.module-CHIW-3Ag.js:4100:31435",
+     "145ms Gr.renderBufferDirect /assets/three.module-CHIW-3Ag.js:4100:28578",
+     "139ms Ft /assets/three.module-CHIW-3Ag.js:4100:39779",
+     "124ms R /assets/three.module-CHIW-3Ag.js:4076:23255",
+     "124ms ge /assets/three.module-CHIW-3Ag.js:4076:27375",
+     "118ms Ce /assets/three.module-CHIW-3Ag.js:4076:13552",
+     "116ms getUniforms /assets/three.module-CHIW-3Ag.js:4049:280",
+     "115ms w /assets/three.module-CHIW-3Ag.js:4042:283"
+    ],
+    "mainChildren": [
+     "TimerFire 281.6ms@0",
+     "v8.callFunction 281.6ms@0",
+     "CommandBufferProxyImpl::WaitForToken 25.0ms@78",
+     "CommandBufferProxyImpl::WaitForToken 14.9ms@54",
+     "CommandBufferProxyImpl::WaitForToken 13.9ms@31"
+    ],
+    "gpuProcess": [
+     "CrGpuMain GpuChannel::ExecuteDeferredRequest 18.4ms@85",
+     "CrGpuMain GPUTask 18.4ms@85",
+     "CrGpuMain WebGL 18.4ms@85",
+     "CrGpuMain CommandBuffer::Flush 18.4ms@85"
+    ]
+   },
+   {
+    "atMsFromRaceVisible": -262,
+    "ms": 198,
+    "cpuSelf": [
+     "177ms start /assets/index-E0Bop8n5.js:107:20230",
+     "4ms (anon) /assets/audio-space-DErTRNgw.js:1:835",
+     "4ms p /assets/audio-space-DErTRNgw.js:1:891",
+     "3ms installReverb /assets/index-E0Bop8n5.js:107:33872",
+     "2ms (garbage collector) undefined:NaN:undefined"
+    ],
+    "cpuInclusive": [
+     "198ms (root) undefined:NaN:undefined",
+     "195ms start /assets/index-E0Bop8n5.js:107:20230",
+     "10ms installReverb /assets/index-E0Bop8n5.js:107:33872",
+     "7ms p /assets/audio-space-DErTRNgw.js:1:891",
+     "6ms installRivalVoices /assets/index-E0Bop8n5.js:107:34712",
+     "5ms _ /assets/audio-ambience-DkOrn3JO.js:1:250",
+     "5ms S /assets/audio-ambience-DkOrn3JO.js:1:4769",
+     "4ms (anon) /assets/audio-space-DErTRNgw.js:1:835",
+     "4ms b /assets/ambience-beds-qseMFhaB.js:1:5748",
+     "2ms (garbage collector) undefined:NaN:undefined"
+    ],
+    "mainChildren": [
+     "BlinkScheduler_PerformMicrotaskCheckpoint 197.7ms@0"
+    ],
+    "gpuProcess": []
+   },
+   {
+    "atMsFromRaceVisible": 1,
+    "ms": 68,
+    "cpuSelf": [
+     "16ms b /assets/audio-ambience-DkOrn3JO.js:1:645",
+     "14ms b /assets/ambience-beds-qseMFhaB.js:1:5748",
+     "8ms _ /assets/ambience-beds-qseMFhaB.js:1:5126",
+     "6ms (anon) /assets/audio-space-DErTRNgw.js:1:835",
+     "5ms (program) undefined:NaN:undefined"
+    ],
+    "cpuInclusive": [
+     "68ms (root) undefined:NaN:undefined",
+     "62ms frame /assets/index-E0Bop8n5.js:118:34322",
+     "58ms update /assets/index-E0Bop8n5.js:118:35922",
+     "50ms update /assets/index-E0Bop8n5.js:107:22839",
+     "49ms b /assets/audio-ambience-DkOrn3JO.js:1:645",
+     "49ms ensureAmbience /assets/index-E0Bop8n5.js:107:22416",
+     "32ms b /assets/ambience-beds-qseMFhaB.js:1:5748",
+     "8ms _ /assets/ambience-beds-qseMFhaB.js:1:5126",
+     "7ms y /assets/ambience-beds-qseMFhaB.js:1:5416",
+     "7ms u /assets/ambience-beds-qseMFhaB.js:1:5904"
+    ],
+    "mainChildren": [
+     "ProxyMain::BeginMainFrame 67.7ms@0",
+     "FireAnimationFrame 64.1ms@0",
+     "v8.callFunction 64.1ms@0",
+     "FunctionCall 64.1ms@0"
+    ],
+    "gpuProcess": []
+   }
+  ],
+  "nightshift": [
+   {
+    "atMsFromRaceVisible": -647,
+    "ms": 57,
+    "cpuSelf": [
+     "22ms w /assets/three.module-CHIW-3Ag.js:4042:283",
+     "5ms wn /assets/three.module-CHIW-3Ag.js:3998:9544",
+     "3ms (garbage collector) undefined:NaN:undefined",
+     "2ms Bn /assets/three.module-CHIW-3Ag.js:4008:343",
+     "2ms n /assets/three.module-CHIW-3Ag.js:3952:2016"
+    ],
+    "cpuInclusive": [
+     "57ms (root) undefined:NaN:undefined",
+     "55ms initialize /assets/index-E0Bop8n5.js:118:31639",
+     "54ms Gr.compile /assets/three.module-CHIW-3Ag.js:4100:30249",
+     "54ms Gr.compileAsync /assets/three.module-CHIW-3Ag.js:4100:30830",
+     "54ms n /assets/render-warmup-CaykLueD.js:1:380",
+     "52ms St /assets/three.module-CHIW-3Ag.js:4100:30072",
+     "52ms (anon) /assets/three.module-CHIW-3Ag.js:4100:30603",
+     "52ms traverse /assets/three.core-NIJS20MN.js:1:59046",
+     "52ms jt /assets/three.module-CHIW-3Ag.js:4100:36962",
+     "39ms g /assets/three.module-CHIW-3Ag.js:4049:2358"
+    ],
+    "mainChildren": [
+     "BlinkScheduler_PerformMicrotaskCheckpoint 57.4ms@0",
+     "GLES2::GetString 6.2ms@7",
+     "ImplementationBase::GetBucketContents 6.2ms@7",
+     "ImplementationBase::WaitForCmd 6.2ms@7",
+     "CommandBufferHelper::Finish 6.1ms@7"
+    ],
+    "gpuProcess": [
+     "CrGpuMain GpuChannel::ExecuteDeferredRequest 4.3ms@24",
+     "CrGpuMain GPUTask 4.3ms@24",
+     "CrGpuMain WebGL 4.3ms@24",
+     "CrGpuMain CommandBuffer::Flush 4.3ms@24"
+    ]
+   },
+   {
+    "atMsFromRaceVisible": -518,
+    "ms": 182,
+    "cpuSelf": [
+     "92ms w /assets/three.module-CHIW-3Ag.js:4042:283",
+     "40ms n /assets/three.module-CHIW-3Ag.js:1:1049",
+     "23ms Ce /assets/three.module-CHIW-3Ag.js:4076:13552",
+     "3ms Cn /assets/three.module-CHIW-3Ag.js:3998:8810",
+     "1ms ge /assets/three.module-CHIW-3Ag.js:4076:27375"
+    ],
+    "cpuInclusive": [
+     "182ms (root) undefined:NaN:undefined",
+     "181ms n /assets/render-warmup-CaykLueD.js:1:380",
+     "171ms Gr.render /assets/three.module-CHIW-3Ag.js:4100:31435",
+     "124ms Gr.renderBufferDirect /assets/three.module-CHIW-3Ag.js:4100:28578",
+     "120ms Ft /assets/three.module-CHIW-3Ag.js:4100:39779",
+     "96ms getUniforms /assets/three.module-CHIW-3Ag.js:4049:280",
+     "96ms w /assets/three.module-CHIW-3Ag.js:4042:283",
+     "86ms Q /assets/three.module-CHIW-3Ag.js:4100:34502",
+     "85ms At /assets/three.module-CHIW-3Ag.js:4100:36507",
+     "85ms kt /assets/three.module-CHIW-3Ag.js:4100:36275"
+    ],
+    "mainChildren": [
+     "TimerFire 181.7ms@0",
+     "v8.callFunction 181.6ms@0",
+     "CommandBufferProxyImpl::WaitForToken 13.9ms@22",
+     "CommandBufferProxyImpl::WaitForToken 9.2ms@10",
+     "GLES2Implementation::GetProgramiv 7.8ms@92"
+    ],
+    "gpuProcess": [
+     "CrGpuMain GpuChannel::ExecuteDeferredRequest 9.2ms@26",
+     "CrGpuMain GPUTask 9.2ms@26",
+     "CrGpuMain WebGL 9.2ms@26",
+     "CrGpuMain CommandBuffer::Flush 9.2ms@26"
+    ]
+   },
+   {
+    "atMsFromRaceVisible": -517,
+    "ms": 182,
+    "cpuSelf": [
+     "92ms w /assets/three.module-CHIW-3Ag.js:4042:283",
+     "40ms n /assets/three.module-CHIW-3Ag.js:1:1049",
+     "23ms Ce /assets/three.module-CHIW-3Ag.js:4076:13552",
+     "3ms Cn /assets/three.module-CHIW-3Ag.js:3998:8810",
+     "1ms ge /assets/three.module-CHIW-3Ag.js:4076:27375"
+    ],
+    "cpuInclusive": [
+     "182ms (root) undefined:NaN:undefined",
+     "181ms n /assets/render-warmup-CaykLueD.js:1:380",
+     "171ms Gr.render /assets/three.module-CHIW-3Ag.js:4100:31435",
+     "123ms Gr.renderBufferDirect /assets/three.module-CHIW-3Ag.js:4100:28578",
+     "120ms Ft /assets/three.module-CHIW-3Ag.js:4100:39779",
+     "96ms getUniforms /assets/three.module-CHIW-3Ag.js:4049:280",
+     "96ms w /assets/three.module-CHIW-3Ag.js:4042:283",
+     "86ms Q /assets/three.module-CHIW-3Ag.js:4100:34502",
+     "85ms At /assets/three.module-CHIW-3Ag.js:4100:36507",
+     "85ms kt /assets/three.module-CHIW-3Ag.js:4100:36275"
+    ],
+    "mainChildren": [
+     "TimerFire 181.7ms@0",
+     "v8.callFunction 181.6ms@0",
+     "CommandBufferProxyImpl::WaitForToken 13.9ms@21",
+     "CommandBufferProxyImpl::WaitForToken 9.2ms@10",
+     "GLES2Implementation::GetProgramiv 7.8ms@92"
+    ],
+    "gpuProcess": [
+     "CrGpuMain GpuChannel::ExecuteDeferredRequest 9.2ms@26",
+     "CrGpuMain GPUTask 9.2ms@26",
+     "CrGpuMain WebGL 9.2ms@26",
+     "CrGpuMain CommandBuffer::Flush 9.2ms@26"
+    ]
+   },
+   {
+    "atMsFromRaceVisible": -302,
+    "ms": 168,
+    "cpuSelf": [
+     "163ms start /assets/index-E0Bop8n5.js:107:20230",
+     "1ms p /assets/audio-space-DErTRNgw.js:1:891",
+     "1ms (anon) /assets/audio-space-DErTRNgw.js:1:835",
+     "1ms installReverb /assets/index-E0Bop8n5.js:107:33872",
+     "1ms _ /assets/ambience-beds-qseMFhaB.js:1:5126"
+    ],
+    "cpuInclusive": [
+     "168ms (root) undefined:NaN:undefined",
+     "168ms start /assets/index-E0Bop8n5.js:107:20230",
+     "3ms installReverb /assets/index-E0Bop8n5.js:107:33872",
+     "2ms p /assets/audio-space-DErTRNgw.js:1:891",
+     "1ms S /assets/audio-ambience-DkOrn3JO.js:1:4769",
+     "1ms installRivalVoices /assets/index-E0Bop8n5.js:107:34712",
+     "1ms b /assets/ambience-beds-qseMFhaB.js:1:5748",
+     "1ms _ /assets/audio-ambience-DkOrn3JO.js:1:250",
+     "1ms (anon) /assets/audio-space-DErTRNgw.js:1:835",
+     "1ms _ /assets/ambience-beds-qseMFhaB.js:1:5126"
+    ],
+    "mainChildren": [
+     "BlinkScheduler_PerformMicrotaskCheckpoint 168.1ms@0"
+    ],
+    "gpuProcess": []
+   },
+   {
+    "atMsFromRaceVisible": 3,
+    "ms": 82,
+    "cpuSelf": [
+     "21ms b /assets/ambience-beds-qseMFhaB.js:1:5748",
+     "17ms b /assets/audio-ambience-DkOrn3JO.js:1:645",
+     "9ms _ /assets/ambience-beds-qseMFhaB.js:1:5126",
+     "9ms (anon) /assets/audio-space-DErTRNgw.js:1:835",
+     "5ms y /assets/ambience-beds-qseMFhaB.js:1:5416"
+    ],
+    "cpuInclusive": [
+     "82ms (root) undefined:NaN:undefined",
+     "75ms frame /assets/index-E0Bop8n5.js:118:34322",
+     "73ms update /assets/index-E0Bop8n5.js:118:35922",
+     "66ms update /assets/index-E0Bop8n5.js:107:22839",
+     "65ms b /assets/audio-ambience-DkOrn3JO.js:1:645",
+     "65ms ensureAmbience /assets/index-E0Bop8n5.js:107:22416",
+     "47ms b /assets/ambience-beds-qseMFhaB.js:1:5748",
+     "11ms u /assets/ambience-beds-qseMFhaB.js:1:5904",
+     "9ms _ /assets/ambience-beds-qseMFhaB.js:1:5126",
+     "9ms y /assets/ambience-beds-qseMFhaB.js:1:5416"
+    ],
+    "mainChildren": [
+     "ProxyMain::BeginMainFrame 81.6ms@0",
+     "FireAnimationFrame 78.7ms@0",
+     "v8.callFunction 78.7ms@0",
+     "FunctionCall 78.7ms@0"
+    ],
+    "gpuProcess": []
+   }
+  ],
+  "dreamisland": [
+   {
+    "atMsFromRaceVisible": -1008,
+    "ms": 567,
+    "cpuSelf": [
+     "373ms Ce /assets/three.module-CHIW-3Ag.js:4076:13552",
+     "134ms w /assets/three.module-CHIW-3Ag.js:4042:283",
+     "8ms Cn /assets/three.module-CHIW-3Ag.js:3998:8810",
+     "3ms n /assets/three.module-CHIW-3Ag.js:1:1049",
+     "2ms wn /assets/three.module-CHIW-3Ag.js:3998:9544"
+    ],
+    "cpuInclusive": [
+     "567ms (root) undefined:NaN:undefined",
+     "566ms n /assets/render-warmup-CaykLueD.js:1:380",
+     "379ms R /assets/three.module-CHIW-3Ag.js:4076:23255",
+     "378ms ge /assets/three.module-CHIW-3Ag.js:4076:27375",
+     "373ms Ce /assets/three.module-CHIW-3Ag.js:4076:13552",
+     "308ms Gr.render /assets/three.module-CHIW-3Ag.js:4100:31435",
+     "292ms Gr.renderBufferDirect /assets/three.module-CHIW-3Ag.js:4100:28578",
+     "287ms Ft /assets/three.module-CHIW-3Ag.js:4100:39779",
+     "280ms Q /assets/three.module-CHIW-3Ag.js:4100:34502",
+     "280ms At /assets/three.module-CHIW-3Ag.js:4100:36507"
+    ],
+    "mainChildren": [
+     "TimerFire 566.7ms@0",
+     "v8.callFunction 566.7ms@0",
+     "CommandBufferProxyImpl::WaitForToken 29.3ms@346",
+     "CommandBufferProxyImpl::WaitForToken 29.1ms@83",
+     "CommandBufferProxyImpl::WaitForToken 28.0ms@132"
+    ],
+    "gpuProcess": [
+     "CrGpuMain GpuChannel::ExecuteDeferredRequest 29.1ms@346",
+     "CrGpuMain GPUTask 29.1ms@346",
+     "CrGpuMain WebGL 29.1ms@346",
+     "CrGpuMain CommandBuffer::Flush 29.1ms@346"
+    ]
+   },
+   {
+    "atMsFromRaceVisible": -403,
+    "ms": 290,
+    "cpuSelf": [
+     "256ms start /assets/index-E0Bop8n5.js:107:20230",
+     "8ms p /assets/audio-space-DErTRNgw.js:1:891",
+     "7ms (anon) /assets/audio-space-DErTRNgw.js:1:835",
+     "5ms _ /assets/ambience-beds-qseMFhaB.js:1:5126",
+     "4ms installReverb /assets/index-E0Bop8n5.js:107:33872"
+    ],
+    "cpuInclusive": [
+     "290ms (root) undefined:NaN:undefined",
+     "289ms start /assets/index-E0Bop8n5.js:107:20230",
+     "17ms installReverb /assets/index-E0Bop8n5.js:107:33872",
+     "12ms p /assets/audio-space-DErTRNgw.js:1:891",
+     "11ms installRivalVoices /assets/index-E0Bop8n5.js:107:34712",
+     "10ms S /assets/audio-ambience-DkOrn3JO.js:1:4769",
+     "9ms _ /assets/audio-ambience-DkOrn3JO.js:1:250",
+     "8ms b /assets/ambience-beds-qseMFhaB.js:1:5748",
+     "7ms (anon) /assets/audio-space-DErTRNgw.js:1:835",
+     "5ms _ /assets/ambience-beds-qseMFhaB.js:1:5126"
+    ],
+    "mainChildren": [
+     "BlinkScheduler_PerformMicrotaskCheckpoint 290.3ms@0"
+    ],
+    "gpuProcess": []
+   },
+   {
+    "atMsFromRaceVisible": 263,
+    "ms": 141,
+    "cpuSelf": [
+     "98ms p /assets/dreamisland-runtime-Bec7dkmm.js:1:5107",
+     "18ms b /assets/ambience-beds-qseMFhaB.js:1:5748",
+     "10ms _ /assets/ambience-beds-qseMFhaB.js:1:5126",
+     "6ms (program) undefined:NaN:undefined",
+     "3ms (garbage collector) undefined:NaN:undefined"
+    ],
+    "cpuInclusive": [
+     "141ms (root) undefined:NaN:undefined",
+     "133ms frame /assets/index-E0Bop8n5.js:118:34322",
+     "132ms update /assets/index-E0Bop8n5.js:118:35922",
+     "131ms updateHud /assets/index-E0Bop8n5.js:118:60960",
+     "130ms updateHud /assets/dreamisland-runtime-Bec7dkmm.js:1:24061",
+     "130ms updateHud /assets/circuit-enrichment-CTAsKWbI.js:1:26327",
+     "130ms update /assets/dreamisland-runtime-Bec7dkmm.js:1:8555",
+     "130ms update /assets/dreamisland-runtime-Bec7dkmm.js:1:10323",
+     "129ms startLoops /assets/dreamisland-runtime-Bec7dkmm.js:1:7833",
+     "127ms p /assets/dreamisland-runtime-Bec7dkmm.js:1:5107"
+    ],
+    "mainChildren": [
+     "ProxyMain::BeginMainFrame 141.4ms@0",
+     "FireAnimationFrame 140.5ms@0",
+     "v8.callFunction 140.5ms@0",
+     "FunctionCall 140.4ms@0"
+    ],
+    "gpuProcess": []
+   }
+  ]
+ }
+}

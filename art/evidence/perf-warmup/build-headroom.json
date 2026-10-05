@@ -1,0 +1,19 @@
+{
+ "how": "node: same arithmetic as scripts/validate-build.mjs (initial JS raw/gzip, shell = gzip(html)+JS+CSS) against 997 KiB / 276.6 KiB / 289 KiB",
+ "before_origin_main": {
+  "jsRawKiB": "996.416",
+  "jsRawHeadroomB": 598,
+  "jsGzipKiB": "276.120",
+  "jsGzipHeadroomB": 491,
+  "shellGzipKiB": "288.503",
+  "shellHeadroomB": 509
+ },
+ "after_branch": {
+  "jsRawKiB": "996.072",
+  "jsRawHeadroomB": 950,
+  "jsGzipKiB": "276.063",
+  "jsGzipHeadroomB": 550,
+  "shellGzipKiB": "288.444",
+  "shellHeadroomB": 569
+ }
+}

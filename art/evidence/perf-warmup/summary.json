@@ -1,0 +1,1007 @@
+{
+ "greenwater": {
+  "base": {
+   "rounds": 2,
+   "menuVisibleMs": [
+    1173,
+    1300
+   ],
+   "menuStraddleFrameMs": [
+    517,
+    517
+   ],
+   "menuStallsAfterVisibleMaxMs": [
+    933,
+    933
+   ],
+   "menuStallsOver50": [
+    [
+     [
+      150,
+      933
+     ],
+     [
+      1117,
+      67
+     ]
+    ],
+    [
+     [
+      183,
+      933
+     ]
+    ]
+   ],
+   "menuFramesIn5s": [
+    [
+     213,
+     300
+    ],
+    [
+     211,
+     300
+    ]
+   ],
+   "raceClockColdMs": [
+    5865,
+    6149
+   ],
+   "raceClockWarmMs": [
+    5573,
+    5558
+   ],
+   "countdownMaxColdMs": [
+    933,
+    967
+   ],
+   "window20sFramesVsExpected": [
+    [
+     1186,
+     1205
+    ],
+    [
+     1183,
+     1202
+    ]
+   ],
+   "worstFrame20sColdMs": [
+    316.7,
+    333.3
+   ],
+   "worstFrame20sWarmMs": [
+    250,
+    266.7
+   ],
+   "midRaceProgramsCold": [
+    52,
+    51
+   ],
+   "midRaceProgramsWarm": [
+    52,
+    52
+   ],
+   "rendererProgramsAtClockAndEnd": [
+    [
+     72,
+     124
+    ],
+    [
+     72,
+     123
+    ]
+   ],
+   "warmupMsMenuColdDriveWarm": [
+    [
+     null,
+     null,
+     null
+    ],
+    [
+     null,
+     null,
+     null
+    ]
+   ]
+  },
+  "new": {
+   "rounds": 5,
+   "menuVisibleMs": [
+    1514,
+    1168,
+    2698,
+    1757,
+    2152
+   ],
+   "menuStraddleFrameMs": [
+    300,
+    267,
+    333,
+    17,
+    17
+   ],
+   "menuStallsAfterVisibleMaxMs": [
+    33,
+    17,
+    33,
+    33,
+    33
+   ],
+   "menuStallsOver50": [
+    [],
+    [],
+    [],
+    [],
+    []
+   ],
+   "menuFramesIn5s": [
+    [
+     299,
+     300
+    ],
+    [
+     300,
+     300
+    ],
+    [
+     299,
+     300
+    ],
+    [
+     298,
+     300
+    ],
+    [
+     299,
+     300
+    ]
+   ],
+   "raceClockColdMs": [
+    5673,
+    5229,
+    6025,
+    5915,
+    5388
+   ],
+   "raceClockWarmMs": [
+    5679,
+    5148,
+    5863,
+    5023,
+    6045
+   ],
+   "countdownMaxColdMs": [
+    17,
+    17,
+    67,
+    17,
+    17
+   ],
+   "window20sFramesVsExpected": [
+    [
+     1201,
+     1201
+    ],
+    [
+     1206,
+     1206
+    ],
+    [
+     1203,
+     1203
+    ],
+    [
+     1201,
+     1202
+    ],
+    [
+     1204,
+     1207
+    ]
+   ],
+   "worstFrame20sColdMs": [
+    16.8,
+    16.8,
+    16.8,
+    33.4,
+    33.3
+   ],
+   "worstFrame20sWarmMs": [
+    50,
+    16.8,
+    16.8,
+    16.8,
+    33.4
+   ],
+   "midRaceProgramsCold": [
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "midRaceProgramsWarm": [
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "rendererProgramsAtClockAndEnd": [
+    [
+     90,
+     90
+    ],
+    [
+     90,
+     90
+    ],
+    [
+     90,
+     90
+    ],
+    [
+     90,
+     90
+    ],
+    [
+     90,
+     90
+    ]
+   ],
+   "warmupMsMenuColdDriveWarm": [
+    [
+     706,
+     660,
+     563
+    ],
+    [
+     483,
+     425,
+     447
+    ],
+    [
+     585,
+     433,
+     508
+    ],
+    [
+     511,
+     461,
+     461
+    ],
+    [
+     530,
+     489,
+     572
+    ]
+   ]
+  }
+ },
+ "frostline": {
+  "base": {
+   "rounds": 2,
+   "menuVisibleMs": [
+    1230,
+    1118
+   ],
+   "menuStraddleFrameMs": [
+    633,
+    17
+   ],
+   "menuStallsAfterVisibleMaxMs": [
+    33,
+    700
+   ],
+   "menuStallsOver50": [
+    [],
+    [
+     [
+      0,
+      700
+     ]
+    ]
+   ],
+   "menuFramesIn5s": [
+    [
+     263,
+     300
+    ],
+    [
+     259,
+     300
+    ]
+   ],
+   "raceClockColdMs": [
+    5138,
+    5415
+   ],
+   "raceClockWarmMs": [
+    5179,
+    4881
+   ],
+   "countdownMaxColdMs": [
+    17,
+    33
+   ],
+   "window20sFramesVsExpected": [
+    [
+     1202,
+     1203
+    ],
+    [
+     1205,
+     1205
+    ]
+   ],
+   "worstFrame20sColdMs": [
+    33.3,
+    16.8
+   ],
+   "worstFrame20sWarmMs": [
+    16.8,
+    16.8
+   ],
+   "midRaceProgramsCold": [
+    14,
+    14
+   ],
+   "midRaceProgramsWarm": [
+    14,
+    14
+   ],
+   "rendererProgramsAtClockAndEnd": [
+    [
+     89,
+     103
+    ],
+    [
+     89,
+     103
+    ]
+   ],
+   "warmupMsMenuColdDriveWarm": [
+    [
+     null,
+     null,
+     null
+    ],
+    [
+     null,
+     null,
+     null
+    ]
+   ]
+  },
+  "new": {
+   "rounds": 4,
+   "menuVisibleMs": [
+    3003,
+    1294,
+    5447,
+    1253
+   ],
+   "menuStraddleFrameMs": [
+    800,
+    33,
+    3250,
+    533
+   ],
+   "menuStallsAfterVisibleMaxMs": [
+    33,
+    17,
+    133,
+    33
+   ],
+   "menuStallsOver50": [
+    [],
+    [],
+    [
+     [
+      16,
+      133
+     ]
+    ],
+    []
+   ],
+   "menuFramesIn5s": [
+    [
+     299,
+     300
+    ],
+    [
+     298,
+     300
+    ],
+    [
+     293,
+     300
+    ],
+    [
+     299,
+     300
+    ]
+   ],
+   "raceClockColdMs": [
+    6791,
+    5676,
+    6364,
+    5312
+   ],
+   "raceClockWarmMs": [
+    5482,
+    4932,
+    5502,
+    4914
+   ],
+   "countdownMaxColdMs": [
+    17,
+    33,
+    83,
+    17
+   ],
+   "window20sFramesVsExpected": [
+    [
+     1199,
+     1204
+    ],
+    [
+     1199,
+     1201
+    ],
+    [
+     1200,
+     1203
+    ],
+    [
+     1203,
+     1204
+    ]
+   ],
+   "worstFrame20sColdMs": [
+    33.4,
+    33.3,
+    33.3,
+    33.4
+   ],
+   "worstFrame20sWarmMs": [
+    33.4,
+    33.4,
+    33.4,
+    33.4
+   ],
+   "midRaceProgramsCold": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "midRaceProgramsWarm": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "rendererProgramsAtClockAndEnd": [
+    [
+     119,
+     119
+    ],
+    [
+     119,
+     119
+    ],
+    [
+     119,
+     119
+    ],
+    [
+     119,
+     119
+    ]
+   ],
+   "warmupMsMenuColdDriveWarm": [
+    [
+     963,
+     725,
+     746
+    ],
+    [
+     671,
+     692,
+     627
+    ],
+    [
+     4049,
+     712,
+     634
+    ],
+    [
+     674,
+     628,
+     681
+    ]
+   ]
+  }
+ },
+ "nightshift": {
+  "base": {
+   "rounds": 2,
+   "menuVisibleMs": [
+    3151,
+    1091
+   ],
+   "menuStraddleFrameMs": [
+    400,
+    17
+   ],
+   "menuStallsAfterVisibleMaxMs": [
+    17,
+    383
+   ],
+   "menuStallsOver50": [
+    [],
+    [
+     [
+      0,
+      383
+     ]
+    ]
+   ],
+   "menuFramesIn5s": [
+    [
+     281,
+     300
+    ],
+    [
+     278,
+     300
+    ]
+   ],
+   "raceClockColdMs": [
+    6125,
+    5232
+   ],
+   "raceClockWarmMs": [
+    4869,
+    4496
+   ],
+   "countdownMaxColdMs": [
+    100,
+    33
+   ],
+   "window20sFramesVsExpected": [
+    [
+     1206,
+     1207
+    ],
+    [
+     1205,
+     1206
+    ]
+   ],
+   "worstFrame20sColdMs": [
+    33.4,
+    33.3
+   ],
+   "worstFrame20sWarmMs": [
+    33.4,
+    33.4
+   ],
+   "midRaceProgramsCold": [
+    10,
+    10
+   ],
+   "midRaceProgramsWarm": [
+    10,
+    10
+   ],
+   "rendererProgramsAtClockAndEnd": [
+    [
+     47,
+     57
+    ],
+    [
+     47,
+     57
+    ]
+   ],
+   "warmupMsMenuColdDriveWarm": [
+    [
+     null,
+     null,
+     null
+    ],
+    [
+     null,
+     null,
+     null
+    ]
+   ]
+  },
+  "new": {
+   "rounds": 4,
+   "menuVisibleMs": [
+    2298,
+    904,
+    1418,
+    1419
+   ],
+   "menuStraddleFrameMs": [
+    17,
+    150,
+    17,
+    150
+   ],
+   "menuStallsAfterVisibleMaxMs": [
+    33,
+    17,
+    17,
+    17
+   ],
+   "menuStallsOver50": [
+    [],
+    [],
+    [],
+    []
+   ],
+   "menuFramesIn5s": [
+    [
+     299,
+     300
+    ],
+    [
+     300,
+     300
+    ],
+    [
+     300,
+     300
+    ],
+    [
+     300,
+     300
+    ]
+   ],
+   "raceClockColdMs": [
+    6831,
+    null,
+    5938,
+    5053
+   ],
+   "raceClockWarmMs": [
+    5144,
+    null,
+    5352,
+    4756
+   ],
+   "countdownMaxColdMs": [
+    17,
+    null,
+    100,
+    83
+   ],
+   "window20sFramesVsExpected": [
+    [
+     1205,
+     1205
+    ],
+    null,
+    [
+     1205,
+     1205
+    ],
+    [
+     1205,
+     1205
+    ]
+   ],
+   "worstFrame20sColdMs": [
+    16.8,
+    null,
+    16.8,
+    16.8
+   ],
+   "worstFrame20sWarmMs": [
+    16.8,
+    null,
+    16.8,
+    16.8
+   ],
+   "midRaceProgramsCold": [
+    0,
+    null,
+    0,
+    0
+   ],
+   "midRaceProgramsWarm": [
+    0,
+    null,
+    0,
+    0
+   ],
+   "rendererProgramsAtClockAndEnd": [
+    [
+     64,
+     64
+    ],
+    null,
+    [
+     64,
+     64
+    ],
+    [
+     64,
+     64
+    ]
+   ],
+   "warmupMsMenuColdDriveWarm": [
+    [
+     360,
+     420,
+     336
+    ],
+    [
+     298,
+     null,
+     null
+    ],
+    [
+     333,
+     316,
+     279
+    ],
+    [
+     341,
+     286,
+     312
+    ]
+   ]
+  }
+ },
+ "dreamisland": {
+  "base": {
+   "rounds": 2,
+   "menuVisibleMs": [
+    4855,
+    2222
+   ],
+   "menuStraddleFrameMs": [
+    17,
+    17
+   ],
+   "menuStallsAfterVisibleMaxMs": [
+    1050,
+    933
+   ],
+   "menuStallsOver50": [
+    [
+     [
+      0,
+      1050
+     ]
+    ],
+    [
+     [
+      0,
+      933
+     ]
+    ]
+   ],
+   "menuFramesIn5s": [
+    [
+     238,
+     300
+    ],
+    [
+     245,
+     300
+    ]
+   ],
+   "raceClockColdMs": [
+    7930,
+    6283
+   ],
+   "raceClockWarmMs": [
+    4997,
+    5434
+   ],
+   "countdownMaxColdMs": [
+    133,
+    133
+   ],
+   "window20sFramesVsExpected": [
+    [
+     1201,
+     1201
+    ],
+    [
+     1203,
+     1203
+    ]
+   ],
+   "worstFrame20sColdMs": [
+    16.8,
+    16.8
+   ],
+   "worstFrame20sWarmMs": [
+    16.8,
+    16.8
+   ],
+   "midRaceProgramsCold": [
+    11,
+    11
+   ],
+   "midRaceProgramsWarm": [
+    11,
+    11
+   ],
+   "rendererProgramsAtClockAndEnd": [
+    [
+     49,
+     60
+    ],
+    [
+     49,
+     60
+    ]
+   ],
+   "warmupMsMenuColdDriveWarm": [
+    [
+     null,
+     null,
+     null
+    ],
+    [
+     null,
+     null,
+     null
+    ]
+   ]
+  },
+  "new": {
+   "rounds": 4,
+   "menuVisibleMs": [
+    6290,
+    2145,
+    1933,
+    1965
+   ],
+   "menuStraddleFrameMs": [
+    750,
+    800,
+    700,
+    700
+   ],
+   "menuStallsAfterVisibleMaxMs": [
+    33,
+    17,
+    17,
+    33
+   ],
+   "menuStallsOver50": [
+    [],
+    [],
+    [],
+    []
+   ],
+   "menuFramesIn5s": [
+    [
+     299,
+     300
+    ],
+    [
+     300,
+     300
+    ],
+    [
+     300,
+     300
+    ],
+    [
+     299,
+     300
+    ]
+   ],
+   "raceClockColdMs": [
+    11881,
+    5800,
+    6799,
+    6963
+   ],
+   "raceClockWarmMs": [
+    5595,
+    5365,
+    5648,
+    5438
+   ],
+   "countdownMaxColdMs": [
+    150,
+    167,
+    167,
+    150
+   ],
+   "window20sFramesVsExpected": [
+    [
+     1205,
+     1205
+    ],
+    [
+     1205,
+     1205
+    ],
+    [
+     1203,
+     1203
+    ],
+    [
+     1193,
+     1204
+    ]
+   ],
+   "worstFrame20sColdMs": [
+    16.8,
+    16.8,
+    16.8,
+    100
+   ],
+   "worstFrame20sWarmMs": [
+    16.8,
+    16.8,
+    16.8,
+    16.8
+   ],
+   "midRaceProgramsCold": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "midRaceProgramsWarm": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "rendererProgramsAtClockAndEnd": [
+    [
+     76,
+     76
+    ],
+    [
+     76,
+     76
+    ],
+    [
+     76,
+     76
+    ],
+    [
+     76,
+     76
+    ]
+   ],
+   "warmupMsMenuColdDriveWarm": [
+    [
+     952,
+     855,
+     819
+    ],
+    [
+     974,
+     843,
+     815
+    ],
+    [
+     872,
+     807,
+     819
+    ],
+    [
+     896,
+     967,
+     827
+    ]
+   ]
+  }
+ }
+}
