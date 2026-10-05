@@ -1,0 +1,53 @@
+{
+ "shots": [
+  {
+   "target": 5,
+   "clock": 5.124,
+   "file": "after-5s.jpg",
+   "distanceMeters": 248,
+   "sector": "CHRISTMAS SQUARE",
+   "calls": 141,
+   "triangles": 1742332
+  },
+  {
+   "target": 14,
+   "clock": 14.208,
+   "file": "after-14s.jpg",
+   "distanceMeters": 814,
+   "sector": "LANTERN CLIMB",
+   "calls": 228,
+   "triangles": 1753454
+  },
+  {
+   "target": 22,
+   "clock": 22.191,
+   "file": "after-22s.jpg",
+   "distanceMeters": 1268,
+   "sector": "GONDOLA RIDGE",
+   "calls": 180,
+   "triangles": 1751442
+  },
+  {
+   "target": 31,
+   "clock": 31.174,
+   "file": "after-31s.jpg",
+   "distanceMeters": 1816,
+   "sector": "FROSTED FOREST",
+   "calls": 154,
+   "triangles": 1741032
+  }
+ ],
+ "peak": {
+  "calls": 245,
+  "triangles": 1773068,
+  "geometries": 323,
+  "textures": 53,
+  "environmentGroups": 331,
+  "environmentTriangles": 1756794,
+  "frameMs": 16.67,
+  "phase": "running",
+  "sector": "LANTERN CLIMB",
+  "distanceMeters": 870
+ },
+ "errors": []
+}

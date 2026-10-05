@@ -37,4 +37,20 @@ for(const total of [1,2,3]){
   assert.equal(course.minimapInterference,0,'No snow fog before the final lap');
   course.setLapBoard(total,total);assert.equal(course.minimapInterference,.62,'Final lap has snow fog');
 }
-console.log(JSON.stringify({pass:true,length:course.length,stations:960,projectionChecks:2880,minimumRoadSeparation,models:6,gates:course.checkpointCount,tiers:3}));
+// Snow ground (frostline-terrain.ts). Measured 2026-10-05: the snow sits >= 0.209 m under the
+// road everywhere across the deck, and 0.04-1.44 m under it on the 18-24 m shoulder (building
+// and holiday terraces are cut, never filled above the road). The full prop audit is
+// scripts/frostline/grounding-audit.mjs (needs a browser).
+const {FrostlineTerrain}=await import(await sourceModule('frostline-terrain.ts'));
+const {holidaySitePads}=await import(await sourceModule('frostline-holiday-life.ts'));
+const terrain=new FrostlineTerrain(course,undefined,holidaySitePads(course));
+let deckClearance=Infinity,shoulderLow=Infinity,shoulderHigh=-Infinity;
+for(let i=0;i<1920;i++){
+  const s=course.sample(i/1920),height=lateral=>terrain.heightAt(s.position.x+s.right.x*lateral,s.position.z+s.right.z*lateral)-s.position.y;
+  for(let lateral=-13;lateral<=13;lateral++)deckClearance=Math.min(deckClearance,-height(lateral));
+  for(const lateral of [-24,-18,18,24]){const h=height(lateral);shoulderLow=Math.min(shoulderLow,h);shoulderHigh=Math.max(shoulderHigh,h);}
+}
+assert.ok(deckClearance>.15,'Snow ground never rises through the road deck');
+assert.ok(shoulderHigh<0&&shoulderLow>-2,'The shoulder follows the road instead of a flat slab');
+assert.equal(terrain.heightAt(-1500,-1250),-3,'Valley floor at the old slab level');
+console.log(JSON.stringify({pass:true,length:course.length,stations:960,projectionChecks:2880,minimumRoadSeparation,models:6,gates:course.checkpointCount,tiers:3,terrain:{deckClearance:+deckClearance.toFixed(3),shoulder:[+shoulderLow.toFixed(2),+shoulderHigh.toFixed(2)]}}));
