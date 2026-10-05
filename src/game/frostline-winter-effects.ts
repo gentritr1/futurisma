@@ -18,7 +18,7 @@ export class FrostlineWinterEffects {
   private readonly target = new THREE.Vector3();
   private readonly sample: ReturnType<FrostlineCourse['createSampleScratch']>;
 
-  constructor(private readonly course: FrostlineCourse) {
+  constructor(private readonly course: FrostlineCourse, private readonly groundUnder?: (x:number,z:number,radius:number)=>number) {
     this.sample = course.createSampleScratch();
     this.root.name = 'frostline_winter_devices';
     const casing = new THREE.MeshPhongMaterial({color: 0x344f62, shininess: 75, specular: 0x9abcce});
@@ -42,7 +42,7 @@ export class FrostlineWinterEffects {
       const barrel = new THREE.Mesh(new THREE.CylinderGeometry(.85, 1.1, 4.2, 12), casing);barrel.position.set(-side*1.1, 3.8, 0);barrel.rotation.z = side*.95;cannon.add(barrel);
       const rim = new THREE.Mesh(new THREE.TorusGeometry(.91,.15,6,16), new THREE.MeshBasicMaterial({color:0xe5b77d}));rim.position.set(-side*2.7,5,0);rim.rotation.y=Math.PI/2;cannon.add(rim);
       for(let i=0;i<5;i++){const ball=new THREE.Mesh(new THREE.IcosahedronGeometry(.65,1),snow);ball.position.set(1+i%2,2.3+Math.floor(i/2)*.6,.5);cannon.add(ball);}
-      this.place(cannon,progress,side*19,0);this.root.add(cannon);
+      this.place(cannon,progress,side*19,0,2.5);this.root.add(cannon);
     }
     this.projectile = new THREE.Mesh(new THREE.IcosahedronGeometry(.9,2),snow);this.projectile.visible=false;this.root.add(this.projectile);
     const particles:number[]=[];for(let i=0;i<56;i++){const a=i*2.39996,r=.4+(i%7)/7;particles.push(Math.cos(a)*r, .3+(i%9)/9, Math.sin(a)*r);}
@@ -53,8 +53,10 @@ export class FrostlineWinterEffects {
     this.root.add(...this.lanterns,this.deviceLight);
   }
 
-  private place(object:THREE.Object3D, progress:number, lateral:number, height:number) {
+  /** A footprint radius stands the object on the snow ground beside the road (cannons, lantern lights). */
+  private place(object:THREE.Object3D, progress:number, lateral:number, height:number, footprint=-1) {
     this.course.sample(progress,this.sample);object.position.copy(this.sample.position).addScaledVector(this.sample.right,lateral).addScaledVector(UP,height);
+    if(footprint>=0&&this.groundUnder)object.position.y=this.groundUnder(object.position.x,object.position.z,footprint)+height;
   }
 
   update(): void {
@@ -67,7 +69,7 @@ export class FrostlineWinterEffects {
     const nearest=Math.round(this.course.raceProgress*90);
     for(let i=0;i<2;i++){
       const station=nearest+i,progress=station/90,side=station%2?1:-1;
-      this.place(this.lanterns[i],progress,side*16.7,6.95);
+      this.place(this.lanterns[i],progress,side*16.7,6.9,0);
       this.lanterns[i].intensity=520*Math.exp(-Math.pow((this.course.raceProgress-progress)*this.course.length/25,2));
     }
     const protectedCraft=winter.stabilizerSeconds>0,thermal=winter.thermalSeconds>0;
