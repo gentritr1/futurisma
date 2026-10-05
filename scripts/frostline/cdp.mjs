@@ -11,7 +11,7 @@ const until=async(check,ms,label)=>{const end=Date.now()+ms;for(;;){const value=
 
 export async function launch({port=9333,width=1280,height=720,timeoutMs=240000}={}){
   const profile=mkdtempSync(join(process.env.FG_TMP??tmpdir(),'fg-chrome-'));
-  const child=spawn(CHROME,['--headless=new','--remote-debugging-port='+port,'--user-data-dir='+profile,'--window-size='+width+','+height,
+  const child=spawn(CHROME,['--headless=new','--mute-audio','--remote-debugging-port='+port,'--user-data-dir='+profile,'--window-size='+width+','+height,
     '--use-angle=metal','--enable-gpu','--ignore-gpu-blocklist','--autoplay-policy=no-user-gesture-required','--disable-background-timer-throttling',
     '--disable-renderer-backgrounding','--no-first-run','--no-default-browser-check','about:blank'],{stdio:'ignore'});
   let closed=false;
