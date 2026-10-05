@@ -41,8 +41,8 @@
 import * as THREE from "three";
 import { applyPs2MaterialTreatment, type TotemVehicle, type TotemVisualState } from "./totem";
 import { resolvePaint } from "./garage-catalog.js";
-import { PATTERN_CODES, defaultFit, type Garage } from "./garage-rules.js";
-import { fitUpgradeHardware, seatPowerHardpoints } from "./garage-upgrades";
+import { FRAME_CODES, PATTERN_CODES, defaultFit, type Garage } from "./garage-rules.js";
+import { fitUpgradeHardware, seatPowerHardpoints, upgradeMaterial } from "./garage-upgrades";
 
 const UNDERGLOW_NAME = "garage_underglow";
 const WORKS_FLAME = 0xff581d;
@@ -232,25 +232,31 @@ function monochromeCopy(source: THREE.Texture): THREE.Texture | null {
   return texture;
 }
 
-function fitTotemLights(lights: THREE.MeshStandardMaterial, hex: number | null): void {
+/**
+ * The one-channel copy of TOTEM's light map, made once and kept: browsing the
+ * LIGHTS row swaps maps back and forth, and rebuilding the copy cost a 36 ms
+ * frame each time a colour followed STOCK. The warm-up makes it ahead.
+ */
+function monoFor(lights: THREE.MeshStandardMaterial): THREE.Texture | null {
   if (!stockLights.has(lights)) {
     stockLights.set(lights, { map: lights.emissiveMap, emissive: lights.emissive.clone() });
   }
   const stock = stockLights.get(lights)!;
-  if (hex === null) {
-    const mono = monoLights.get(lights);
-    lights.emissiveMap = stock.map;
-    lights.emissive.copy(stock.emissive);
-    if (mono) {
-      mono.dispose();
-      monoLights.delete(lights);
-    }
-    return;
-  }
   let mono = monoLights.get(lights) ?? null;
   if (!mono && stock.map) {
     mono = monochromeCopy(stock.map);
     if (mono) monoLights.set(lights, mono);
+  }
+  return mono;
+}
+
+function fitTotemLights(lights: THREE.MeshStandardMaterial, hex: number | null): void {
+  const mono = monoFor(lights);
+  const stock = stockLights.get(lights)!;
+  if (hex === null) {
+    lights.emissiveMap = stock.map;
+    lights.emissive.copy(stock.emissive);
+    return;
   }
   if (mono) lights.emissiveMap = mono;
   lights.emissive.setHex(hex);
@@ -454,15 +460,21 @@ const LIT = 1.8;
  * unboosted, so they keep its colour under the plume instead of going white. Every mesh is re-dressed before the one await, so a
  * second refit that lands meanwhile finds no `TE_boost` left to dress again.
  */
-async function fitCellGauge(body: THREE.Object3D, craft: { reserve: () => number; firing: () => boolean }, circuit: string, still: boolean): Promise<void> {
-  const cells: THREE.Mesh[] = [];
-  body.traverse((object) => {
-    const mesh = object as THREE.Mesh;
-    const material = mesh.material as THREE.Material | undefined;
-    if (material && !Array.isArray(material) && material.name === "TE_boost") cells.push(mesh);
-  });
-  for (const mesh of cells) {
-    const lamp = mesh.material as THREE.MeshStandardMaterial;
+interface Gauge { material: THREE.MeshStandardMaterial; fill: { value: number }; pulse: { value: number } }
+/**
+ * One gauge per kit lamp, shared by every cell it dresses (each cell's
+ * `onBeforeRender` writes the same reserve), so the showroom warm-up can
+ * compile the very material the first CORONA mount will use.
+ */
+const gauges = new WeakMap<THREE.Material, Gauge>();
+
+function cellGauge(lamp: THREE.MeshStandardMaterial, mesh: THREE.Mesh): Gauge {
+  let made = gauges.get(lamp);
+  if (made) {
+    mesh.material = made.material;
+    return made;
+  }
+  {
     const gauge = lamp.clone();
     gauge.name = GAUGE_NAME;
     mesh.material = gauge;
@@ -491,6 +503,21 @@ ${shader.fragmentShader}`
     };
     gauge.customProgramCacheKey = () => `${treatedKey()}|cell-gauge`;
     gauge.needsUpdate = true;
+    gauges.set(lamp, made = { material: gauge, fill, pulse });
+  }
+  return made;
+}
+
+async function fitCellGauge(body: THREE.Object3D, craft: { reserve: () => number; firing: () => boolean }, circuit: string, still: boolean): Promise<void> {
+  const cells: THREE.Mesh[] = [];
+  body.traverse((object) => {
+    const mesh = object as THREE.Mesh;
+    const material = mesh.material as THREE.Material | undefined;
+    if (material && !Array.isArray(material) && material.name === "TE_boost") cells.push(mesh);
+  });
+  for (const mesh of cells) {
+    const lamp = mesh.material as THREE.MeshStandardMaterial;
+    const { material: gauge, fill, pulse } = cellGauge(lamp, mesh);
     // Follows the kit's lamp (colour, state, intensity) and reads the reserve
     // each frame the gauge is drawn: no hook in the race loop.
     mesh.onBeforeRender = () => {
@@ -575,8 +602,11 @@ export async function applyCraftLook(
 
   let underglow = hull.getObjectByName(UNDERGLOW_NAME) as THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial> | undefined;
   if (under !== null && !underglow) {
-    underglow = createUnderglow();
-    await applyCircuitRule(circuit, underglow);
+    // The warm-up's spare, compiled and circuit-ruled already, if it made one.
+    const spare = spareUnderglow;
+    spareUnderglow = null;
+    underglow = spare ?? createUnderglow();
+    if (!spare) await applyCircuitRule(circuit, underglow);
     if (serials.get(vehicle) !== serial) return;
     hull.add(underglow);
   }
@@ -597,4 +627,66 @@ export async function applyCraftLook(
   underglow.material.uniforms.uInner.value.set(width / (width + 1.2), 1 / 1.15);
   const floor = (body?.userData.washFloor as number | undefined) ?? bounds?.min.y;
   underglow.position.set(0, floor !== undefined ? floor + 0.1 : 0.05, bounds ? (bounds.min.z + bounds.max.z) / 2 : 0.1);
+}
+
+/** The first fitted underglow's mesh, made (and compiled) by the warm-up. */
+let spareUnderglow: THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial> | null = null;
+const KIT_LAMPS = new Set(["TE_boost", "TE_brake", "TE_gravity", "TE_power"]);
+
+/**
+ * Garage warm-up: everything a first visit to the bay draws, as detached roots
+ * for `garage-warm.ts` to compile against the bay's scene, so the first open,
+ * part, frame and wash find their programs linked and textures uploaded. In
+ * order: the craft itself; then per frame, its body (loaded into the craft's
+ * cache, as a preview would) as stand-ins pairing each mesh's geometry with the
+ * material the mount gives it (the kit's live lamps, CORONA's gauge), and the
+ * frame's upgrade pair, treated as a fitted group is; last, a spare underglow
+ * the first fitted wash takes. Nothing here is mounted or shown and no material
+ * the craft wears is re-treated.
+ */
+export async function* showroomWarmup(circuit: string): AsyncGenerator<THREE.Object3D> {
+  const vehicle = showroomCraft;
+  if (!vehicle) return;
+  const { hull, lights: totemLights } = vehicle.craftSurfaces();
+  const mono = totemLights ? monoFor(totemLights) : null;
+  if (mono) hull.userData.warmTextures = [mono];
+  yield hull;
+  delete hull.userData.warmTextures;
+  const lamps = new Map<string, THREE.MeshStandardMaterial>();
+  hull.traverse((object) => {
+    const material = (object as THREE.Mesh).material;
+    if (material instanceof THREE.MeshStandardMaterial && KIT_LAMPS.has(material.name)) lamps.set(material.name, material);
+  });
+  for (const frame of FRAME_CODES) {
+    const body = frame === "totem" ? null : await bodyFor(vehicle, frame, circuit);
+    const stand = new THREE.Group(), cells: THREE.Mesh[] = [];
+    body?.traverse((object) => {
+      const mesh = object as THREE.Mesh;
+      if (!mesh.isMesh || Array.isArray(mesh.material)) return;
+      const lamp = lamps.get(mesh.material.name);
+      const proxy = new THREE.Mesh(mesh.geometry, lamp ?? mesh.material);
+      proxy.castShadow = mesh.castShadow; proxy.receiveShadow = mesh.receiveShadow;
+      if (lamp?.name === "TE_boost" && frame === "corona") { cellGauge(lamp, proxy); cells.push(proxy); }
+      stand.add(proxy);
+    });
+    await applyCircuitRule(circuit, ...cells);
+    const kit = new THREE.Group();
+    for (const lit of [false, true]) {
+      const mesh = new THREE.Mesh(new THREE.BoxGeometry(), upgradeMaterial(frame, lit));
+      mesh.castShadow = mesh.receiveShadow = true;
+      kit.add(mesh);
+    }
+    applyPs2MaterialTreatment(kit);
+    await applyCircuitRule(circuit, kit);
+    stand.add(kit);
+    yield stand;
+  }
+  if (!hull.getObjectByName(UNDERGLOW_NAME)) {
+    if (!spareUnderglow) {
+      const spare = createUnderglow();
+      await applyCircuitRule(circuit, spare);
+      spareUnderglow = spare;
+    }
+    yield spareUnderglow;
+  }
 }

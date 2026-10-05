@@ -52,7 +52,9 @@ import {
   type Handling,
   type PartCode,
 } from "./garage-rules.js";
-import { demoCraft, restCraft, type DemoHold } from "./garage-look";
+import type { WebGLRenderer } from "three";
+import { demoCraft, restCraft, showroomHull, type DemoHold } from "./garage-look";
+import { idle, warmShowroom } from "./garage-warm";
 import { GarageScene, type GarageView } from "./garage-scene";
 import { FLEET_CODES, TEAM_COLORS, FRAME_ANCHORS } from "./garage-anchors";
 import { refreshRewardOffer } from "./garage-reward";
@@ -101,6 +103,11 @@ export interface GarageHooks {
   here: { track: string; mode: string; tier: string };
   /** `TRACKS` from `map-selection.ts`, for the contract board's circuit lines. */
   tracks: readonly { selection: string; label: string; mapCode: string }[];
+  /** The game's renderer: the bay draws in it, and the warm-up compiles for it. */
+  renderer?: WebGLRenderer;
+  /** The page's one AudioContext (`audio-context.ts`) and whether the race mix has claimed it. */
+  audio(): AudioContext;
+  audioClaimed(): boolean;
 }
 
 type Tab = "craft" | "parts" | "paint" | "test" | "contracts" | "daily";
@@ -190,6 +197,10 @@ export class GarageScreen {
   private padHold: DemoHold = null;
   private lastDevice = "";
   private backgrounded = false;
+  /** The last look handed to `hooks.refit`: an unchanged one is not refitted. */
+  private refitKey = "";
+  private warming = false;
+  private disposed = false;
 
   constructor(private readonly hooks: GarageHooks) {
     this.screen.id = "garage-screen";
@@ -220,7 +231,7 @@ export class GarageScreen {
     tabs.addEventListener("keydown", this.handleTabKeys);
     header.append(this.closeButton, tabs, this.jobsButton, this.soundButton, wallet);
     this.note.setAttribute("role", "status");
-    this.sound = new ShowroomSound(() => hooks.save.settings.masterVolume);
+    this.sound = new ShowroomSound(() => hooks.save.settings.masterVolume, hooks.audio, hooks.audioClaimed);
     this.boostHold = this.holdButton("boost", "BOOST");
     this.brakeHold = this.holdButton("brake", "BRAKE");
     const meter = node("span", "garage__meter");
@@ -313,6 +324,7 @@ export class GarageScreen {
   }
 
   dispose(): void {
+    this.disposed = true;
     this.hide(); this.scene.dispose(); this.sound.dispose(); this.music.dispose();
     window.removeEventListener("keydown", this.handleWindowKeys, {capture: true});
     window.removeEventListener("blur", this.interrupt);
@@ -437,15 +449,43 @@ export class GarageScreen {
     this.padWasDown = down;
   }
 
-  private refit(previewFrame: string | null, trial?: Garage | null): void {
+  private refit(previewFrame: string | null, trial?: Garage | null): Promise<void> {
     this.endDemo();
+    // Only a look that changes is refitted: a tab, a slot or a part that shows
+    // the craft as it already is keeps it (and its loading state) as it is.
+    // Open or closed is part of the look (a stock run shows the saved fit only
+    // inside the bay), so closing always refits.
+    const key = `${this.opened}|${previewFrame}|${JSON.stringify(trial ?? this.hooks.save.garage)}`;
+    if (key === this.refitKey) return Promise.resolve();
+    this.refitKey = key;
     const serial = ++this.fitting;
     this.screen.dataset.loading = "true";
-    void this.hooks.refit(previewFrame, trial).finally(() => {
+    return this.hooks.refit(previewFrame, trial).finally(() => {
       if (serial !== this.fitting) return;
       this.screen.dataset.loading = "false";
       this.scene.animating = true; this.hooks.requestRender();
     });
+  }
+
+  /**
+   * Garage warm-up, from the menu on idle (`main.ts`): compiles the bay with
+   * the craft, every frame body, CORONA's gauge, the upgrade hardware and the
+   * underglow (`garage-warm.ts`), then builds the showroom voice on the page's
+   * AudioContext, so the first visit opens and browses without a compile or a
+   * device start-up on any click. Once per bay.
+   */
+  async prewarm(): Promise<void> {
+    const renderer = this.hooks.renderer;
+    if (this.warming || !renderer) return;
+    this.warming = true;
+    // A stock run has no fitted look on the craft yet; the paddock's own refit
+    // (the works TOTEM) names the craft the warm-up compiles.
+    if (!showroomHull()) await this.refit(null);
+    await warmShowroom(renderer, this.scene.scene, this.scene.camera, this.hooks.here.track, () => this.hooks.requestRender(), () => this.disposed);
+    await idle();
+    if (this.disposed) return;
+    this.sound.prepare();
+    this.screen.dataset.warm = "true";
   }
 
   /** A momentary button: held by pointer, or by Space or Enter while focused. */
@@ -663,7 +703,7 @@ export class GarageScreen {
   private offerFrame(): void {
     const card = frameCard(this.viewed);
     this.pending = {label: card.label, price: card.price, key: "frame-action", confirm: () => buyFrame(this.hooks.save.garage, card.code)};
-    this.render(); this.focusConfirm();
+    this.render(); this.focusConfirm(true);
   }
 
   private purchaseOrder(): HTMLElement {
@@ -764,18 +804,27 @@ export class GarageScreen {
     order.append(actions); return [order];
   }
 
-  private focusConfirm(): void { this.body.querySelector<HTMLButtonElement>('[data-key="confirm-purchase"]')?.focus({preventScroll: true}); }
+  /** Focuses the purchase order's CONFIRM; with `enter`, the order slides in as it appears. */
+  private focusConfirm(enter = false): void {
+    const order = this.body.querySelector<HTMLElement>(".garage__purchase");
+    if (enter && order) this.motion.enter(order, 0, 10, 180);
+    this.body.querySelector<HTMLButtonElement>('[data-key="confirm-purchase"]')?.focus({preventScroll: true});
+  }
 
   private offerPaint(label: string, price: number, confirm: () => Transaction, key: string): void {
     if (price === 0) { this.commit(confirm(), label, key); return; }
-    this.pending = {label, price, confirm, key}; this.render(); this.focusConfirm();
+    this.pending = {label, price, confirm, key}; this.render(); this.focusConfirm(true);
   }
 
   private renderPaint(garage: Garage): HTMLElement[] {
     const fit = garage.fleet[garage.chassis] ?? defaultFit();
     const tabs = node("nav", "garage__paint-tabs"); tabs.setAttribute("aria-label", "Paint slot");
     for (const [code, label] of [["flame", "FLAME"], ["body", "BODY"], ["glow", "LIGHTS"], ["under", "UNDERGLOW"], ["pattern", "PATTERN"]] as const) {
-      const tab = button("garage__button", `slot-${code}`, () => { this.pending = null; this.paintSlot = code; this.previewLook(null); this.render(); });
+      const tab = button("garage__button", `slot-${code}`, () => {
+        this.pending = null; this.paintSlot = code; this.previewLook(null); this.render();
+        const row = this.body.querySelector<HTMLElement>(".garage__slot");
+        if (row) this.motion.enter(row, 14, 0, 180);
+      });
       tab.textContent = label; tab.setAttribute("aria-pressed", String(this.paintSlot === code)); tabs.append(tab);
     }
     let row: HTMLElement;

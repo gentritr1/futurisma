@@ -28,6 +28,7 @@ import {
 import type { AudioZone } from "./audio-space.js";
 import { ambienceCue, ambienceEventLevels } from "./ambience-cue.js";
 import { meterDecibels } from "./soundtrack-plan.js";
+import { pageAudioContext } from "./audio-context";
 import { SoundtrackPlayer } from "./soundtrack";
 import type { SoundtrackDiagnostics } from "./soundtrack";
 import {
@@ -413,7 +414,10 @@ export class EngineAudio {
     this.ambienceModule = await import("./audio-ambience.js");
 
     const initializationStartedAt = performance.now();
-    const context = new AudioContext();
+    // The page's one context: the garage may have made it already (and left it
+    // suspended between showroom cues), so it is resumed here either way.
+    const context = pageAudioContext(true);
+    void context.resume().catch(() => undefined);
     const master = context.createGain();
     master.gain.value = MASTER_GAIN_CEILING * this.masterVolume;
     const compressor = context.createDynamicsCompressor();

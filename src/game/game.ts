@@ -174,7 +174,7 @@ export class FuturismaGame {
   private circuitRuntime: CircuitRuntime | null = null;
   private readonly scene = new THREE.Scene();
   private readonly camera: THREE.PerspectiveCamera;
-  private readonly renderer: THREE.WebGLRenderer;
+  readonly renderer: THREE.WebGLRenderer;
   private readonly course: RaceCourse;
   private readonly minimap: Minimap;
   private readonly diagnosticCourseAssemblyMs: number;
