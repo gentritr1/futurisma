@@ -21,6 +21,23 @@ export const PART_HARDWARE: Record<PartCode, readonly string[]> = {
 interface Installation { key: string; groups: THREE.Group[] }
 const installed = new WeakMap<THREE.Object3D, Installation>();
 const NAME = "garage_upgrade_";
+/**
+ * One alloy and one conductor material per frame, kept for the page: a part
+ * preview rebuilds the hardware's geometry, never its material, so the program
+ * stays compiled (a disposed material releases it, and the next preview paid a
+ * fresh link every time).
+ */
+const materials = new Map<string, THREE.MeshStandardMaterial>();
+export function upgradeMaterial(frame: string, lit: boolean): THREE.MeshStandardMaterial {
+  const key = `${frame}:${lit}`;
+  let material = materials.get(key);
+  if (!material) materials.set(key, material = new THREE.MeshStandardMaterial({
+    name: lit ? "UPGRADE_conductor" : "UPGRADE_alloy", color: lit ? TEAM_COLORS[frame] : 0x73858a,
+    roughness: lit ? .48 : .64, metalness: lit ? .12 : .42,
+    emissive: lit ? TEAM_COLORS[frame] : 0, emissiveIntensity: lit ? .55 : 0,
+  }));
+  return material;
+}
 
 /** Bounds in the actual moving part's coordinate system, before adding trim. */
 function localBounds(part: THREE.Object3D): THREE.Box3 {
@@ -59,14 +76,9 @@ class Hardware {
   mount(parent: THREE.Object3D, groups: THREE.Group[]): void {
     for (const [shapes, lit] of [[this.metal, false], [this.lamps, true]] as const) {
       if (!shapes.length) continue;
-      const material = new THREE.MeshStandardMaterial({
-        name: lit ? "UPGRADE_conductor" : "UPGRADE_alloy", color: lit ? TEAM_COLORS[this.frame] : 0x73858a,
-        roughness: lit ? .48 : .64, metalness: lit ? .12 : .42,
-        emissive: lit ? TEAM_COLORS[this.frame] : 0, emissiveIntensity: lit ? .55 : 0,
-      });
       const geometry = mergeGeometries(shapes)!;
       for (const shape of shapes) shape.dispose();
-      const mesh = new THREE.Mesh(geometry, material); mesh.castShadow = mesh.receiveShadow = true;
+      const mesh = new THREE.Mesh(geometry, upgradeMaterial(this.frame, lit)); mesh.castShadow = mesh.receiveShadow = true;
       this.group.add(mesh);
     }
     parent.add(this.group); groups.push(this.group);
@@ -76,10 +88,8 @@ class Hardware {
 function remove(installation: Installation): void {
   for (const group of installation.groups) {
     group.removeFromParent();
-    group.traverse(object => {
-      if (!(object instanceof THREE.Mesh)) return;
-      object.geometry.dispose(); (object.material as THREE.Material).dispose();
-    });
+    // Geometry only: the materials are the frame's shared pair (`upgradeMaterial`).
+    group.traverse(object => { if (object instanceof THREE.Mesh) object.geometry.dispose(); });
   }
 }
 

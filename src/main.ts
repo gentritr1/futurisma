@@ -12,6 +12,7 @@ import { resolveQualityLock, resolveReducedMotion, searchParam } from "./game/qu
 import { GameUi } from "./game/ui";
 import { applyInterfaceScale } from "./game/interface-scale.js";
 import { LIVERIES } from "./game/liveries.js";
+import { pageAudioClaimed, pageAudioContext } from "./game/audio-context";
 
 const canvasElement = document.getElementById("game-canvas");
 if (!(canvasElement instanceof HTMLCanvasElement)) {
@@ -154,10 +155,8 @@ const refitCraft = (preview: string | null, trial: Garage | null = null): Promis
 refitCraft(null);
 
 let garageScreen: Promise<GarageScreen> | null = null;
-const openGarage = (): void => {
-  const body = document.body.dataset;
-  if (!["intro", "result"].includes(body.phase ?? "") || body.options === "true" || body.controls === "true") return;
-  garageScreen ??= loadGarageBay().then(({ GarageScreen }) => new GarageScreen({
+// The bay, built once: on idle from the menu (to warm it) or on the first press.
+const garageBay = (): Promise<GarageScreen> => garageScreen ??= loadGarageBay().then(({ GarageScreen }) => new GarageScreen({
     // A stock/autopilot run can still use the bay; only its look is borrowed.
     // Its baseline handling and stock body return when the bay closes.
     refit: (preview, trial) => stockCraft ? game.refitCraft(async vehicle => {
@@ -179,12 +178,18 @@ const openGarage = (): void => {
     save,
     here: { track: selection, mode: raceModes.mode, tier: raceModes.tier },
     tracks: TRACKS,
+    renderer: game.renderer,
+    audio: pageAudioContext,
+    audioClaimed: pageAudioClaimed,
   }));
+const openGarage = (): void => {
+  const body = document.body.dataset;
+  if (!["intro", "result"].includes(body.phase ?? "") || body.options === "true" || body.controls === "true") return;
   // A chunk that fails to arrive is retried on the next press, not cached.
   const reward = document.getElementById("result-garage-button")?.dataset;
   const frame = reward?.frame;
   if (reward) delete reward.frame;
-  void garageScreen.then((screen) => screen.show("craft", frame), () => {
+  void garageBay().then((screen) => screen.show("craft", frame), () => {
     garageScreen = null;
   });
 };
@@ -256,7 +261,13 @@ game
       && parameters.has("demo")
       && parameters.get("start") === "manual";
     if (parameters.has("demo") && !manualDemoStart) void game.startTrial();
-    else { ui.showReady(); await launchMenu?.ready(); }
+    else {
+      ui.showReady(); await launchMenu?.ready();
+      // Garage warm-up, every run that shows the menu: the bay's chunk, its
+      // programs, the frame bodies and its voice, on idle, so the first visit
+      // opens in a frame. A failed chunk is retried by the first press.
+      setTimeout(() => void garageBay().then((screen) => screen.prewarm(), () => { garageScreen = null; }), 0);
+    }
   })
   .catch((error: unknown) => {
     launchMenu?.fail();

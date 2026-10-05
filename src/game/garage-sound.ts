@@ -9,7 +9,10 @@
  * `playerEngineGains` and the same boost cue as `playBoost` (the validator pins
  * each against the race's own). It plays at the listener's master volume, is
  * silent while the game is muted, and fades out and sleeps when the demo comes
- * to rest. It imports nothing from the running page: the volume is handed in.
+ * to rest. It imports nothing from the running page: the volume and the page's
+ * one AudioContext (`audio-context.ts`, shared with the race mix) are handed
+ * in. It suspends that context between cues only while the race has not
+ * claimed it; once it has, the race decides when it runs.
  */
 
 /** `EngineAudio`'s MASTER_GAIN_CEILING: the level the whole mix was balanced at. */
@@ -30,8 +33,12 @@ export class ShowroomSound {
   private recharging = false;
   private sleep = 0;
 
-  /** `volume` reads the listener's master volume (0..1) when a frame plays. */
-  constructor(private readonly volume: () => number) {}
+  /**
+   * `volume` reads the listener's master volume (0..1) when a frame plays;
+   * `audio` hands over the page's context and `claimed` says whether the race
+   * mix runs on it.
+   */
+  constructor(private readonly volume: () => number, private readonly audio: () => AudioContext, private readonly claimed: () => boolean) {}
 
   /** Short mechanical selection/fit feedback; never a sound on mere hover. */
   cue(fitted = false): void {
@@ -48,8 +55,17 @@ export class ShowroomSound {
   /** Builds (once) or wakes the voice. Call inside the gesture that began a hold. */
   wake(): void {
     clearTimeout(this.sleep);
+    this.prepare();
+    void this.context?.resume().catch(() => undefined);
+  }
+
+  /**
+   * Builds the voice on the page's context without starting it: the bay's
+   * warm-up calls this on idle, so the first cue never pays for the context.
+   */
+  prepare(): void {
     if (!this.context) {
-      const context = new AudioContext();
+      const context = this.audio();
       const master = context.createGain();
       master.gain.value = 0;
       master.connect(context.destination);
@@ -99,8 +115,9 @@ export class ShowroomSound {
       this.roarGain.connect(master);
       wind.start();
       Object.assign(this, { context, master, filter });
+      // Built ahead of a gesture, it sleeps until the first cue wakes it.
+      if (!this.claimed()) void context.suspend().catch(() => undefined);
     }
-    void this.context?.resume().catch(() => undefined);
   }
 
   /** One frame of the demo, on `EngineAudio.update`'s curves, with its edge cues. */
@@ -148,12 +165,13 @@ export class ShowroomSound {
     this.roarGain?.gain.setTargetAtTime(0, context.currentTime, 0.06);
     this.firing = this.braking = this.recharging = false;
     clearTimeout(this.sleep);
-    this.sleep = window.setTimeout(() => void context.suspend().catch(() => undefined), 400);
+    this.sleep = window.setTimeout(() => void (this.claimed() ? undefined : context.suspend().catch(() => undefined)), 400);
   }
 
+  /** Leaves the shared context to the page: the voice is cut from it, never the context closed. */
   dispose(): void {
     clearTimeout(this.sleep);
-    void this.context?.close().catch(() => undefined);
+    this.master?.disconnect();
     this.context = this.master = null;
   }
 

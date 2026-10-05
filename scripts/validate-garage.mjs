@@ -752,7 +752,7 @@ for (const needle of [
 const main = await read("src/main.ts");
 assert.match(main, /if \(!stockCraft\) installHandling\(handlingFor\(save\.garage\)\);/, "main.ts must install the fitted handling at boot.");
 assert.match(main, /has\("demo"\)/, "a demo must race the works craft.");
-const lazy = /^garage-(bay|ui|look|purse|economy|catalog|anchors|scene|reward|reward-rules|upgrades|motion|music)\b/;
+const lazy = /^garage-(bay|ui|look|purse|economy|catalog|anchors|scene|reward|reward-rules|upgrades|motion|music|warm)\b/;
 const sourceRoot = new URL("../src/", import.meta.url);
 async function* sources(directory) {
   for (const entry of await readdir(directory, { withFileTypes: true })) {

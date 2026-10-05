@@ -3,6 +3,37 @@ import { FLEET_CODES, TEAM_COLORS, frameModel, partAnchor } from "./garage-ancho
 import { showroomHull } from "./garage-look";
 import type { PartCode } from "./garage-rules.js";
 
+/**
+ * The bay camera's glide: a critically damped spring (damping ratio 1, natural
+ * frequency 13 s⁻¹) on the camera position, the look target and the framing
+ * offset together, so the subject stays framed all the way. From rest it
+ * starts at zero speed (2.6 % of the move on the first 60 Hz frame), peaks
+ * around frame five, is 90 % there at 300 ms and 99 % at 530 ms, and never
+ * overshoots. Velocity carries across a retarget, so a second tab click
+ * mid-move bends the path instead of snapping it. Integrated with
+ * semi-implicit Euler in substeps of at most 1/240 s (one 60 Hz step would
+ * jump 4.7 % on the first frame); a frame's time is clamped to 50 ms.
+ */
+const OMEGA = 13;
+const SUBSTEP = 1 / 240;
+/** Under this (squared, metres / normalised screen units) the spring is at rest. */
+const REST = 1e-6;
+/** The workshop lamp's level on a part close-up; it idles at zero, never hidden (hiding it changes the light count, so every material would recompile). */
+const SERVICE_LIGHT = .9;
+
+const acceleration = new THREE.Vector3();
+
+/** One frame of the spring towards `target`; `velocity` carries between frames. */
+function spring(value: THREE.Vector3, velocity: THREE.Vector3, target: THREE.Vector3, seconds: number): void {
+  const steps = Math.ceil(seconds / SUBSTEP - 1e-9), step = seconds / Math.max(1, steps);
+  for (let index = 0; index < steps; index++) {
+    // a = ω²(target − x) − 2ζω·v with ζ = 1; v first, then x with the new v.
+    acceleration.copy(target).sub(value).multiplyScalar(OMEGA * OMEGA).addScaledVector(velocity, -2 * OMEGA);
+    velocity.addScaledVector(acceleration, step);
+    value.addScaledVector(velocity, step);
+  }
+}
+
 export interface GarageView {
   scene: THREE.Scene;
   camera: THREE.PerspectiveCamera;
@@ -30,7 +61,14 @@ export class GarageScene implements GarageView {
   private part: PartCode | null = null;
   private test = false;
   private paint = false;
-  private readonly composition = new THREE.Vector2(.54, .48);
+  /** The framing point (share of the screen) the subject sits on; z unused. */
+  private readonly composition = new THREE.Vector3(.54, .48, 0);
+  private readonly framing = new THREE.Vector3();
+  private readonly positionVelocity = new THREE.Vector3();
+  private readonly lookVelocity = new THREE.Vector3();
+  private readonly compositionVelocity = new THREE.Vector3();
+  /** The spring came to rest last frame: the next move starts from one nominal frame, not the idle gap. */
+  private resting = true;
   animating = true;
   private last = 0;
   private screenWidth = 0;
@@ -120,7 +158,10 @@ export class GarageScene implements GarageView {
     const portrait = width / height < .85;
     const narrow = width < 1100;
     const now = performance.now();
-    const delta = this.last ? Math.min(.05, (now - this.last) / 1000) : 0;
+    // The bay draws only while something moves, so after a rest the gap since
+    // the last drawn frame is idle time, not motion time.
+    const delta = Math.min(this.resting ? 1 / 60 : .05, (now - this.last) / 1000);
+    // Reduced motion (the OS setting included, through `still`) cuts every move.
     const cut = !this.last || this.still() || width !== this.screenWidth || height !== this.screenHeight;
     this.last = now; this.screenWidth = width; this.screenHeight = height;
     this.camera.aspect = width / height;
@@ -149,18 +190,26 @@ export class GarageScene implements GarageView {
     const distance = spec ? Math.max(span / (tan * this.camera.aspect * (portrait ? 1.75 : .85)), span * 1.7)
       : Math.max(span / (tan * this.camera.aspect * (portrait ? 1.75 : 1.1)), span * (portrait ? 1.15 : .85));
     this.desiredPosition.multiplyScalar(distance).add(this.target);
-    const ease = cut ? 1 : 1 - Math.exp(-delta * 13);
-    this.camera.position.lerp(this.desiredPosition, ease);
-    this.look.lerp(this.target, ease);
-    this.composition.lerp(new THREE.Vector2(x,y), ease);
+    this.framing.set(x, y, 0);
+    if (cut) {
+      this.camera.position.copy(this.desiredPosition); this.look.copy(this.target); this.composition.copy(this.framing);
+      this.positionVelocity.set(0, 0, 0); this.lookVelocity.set(0, 0, 0); this.compositionVelocity.set(0, 0, 0);
+    } else {
+      spring(this.camera.position, this.positionVelocity, this.desiredPosition, delta);
+      spring(this.look, this.lookVelocity, this.target, delta);
+      spring(this.composition, this.compositionVelocity, this.framing, delta);
+    }
     this.camera.setViewOffset(width, height, (.5 - this.composition.x) * width, (.5 - this.composition.y) * height, width, height);
     this.camera.lookAt(this.look); this.camera.updateMatrixWorld(true);
-    this.serviceLight.visible = this.part !== null;
+    this.serviceLight.intensity = this.part !== null ? SERVICE_LIGHT : 0;
     this.serviceLight.position.copy(this.camera.position);
     this.serviceLight.target.position.copy(this.target);
     this.projected.copy(this.target).project(this.camera);
     this.report({x: (this.projected.x + 1) * width / 2, y: (1 - this.projected.y) * height / 2, ready: true});
-    this.animating = !this.still() && !this.part && !this.test || this.camera.position.distanceToSquared(this.desiredPosition) > .00001 || this.look.distanceToSquared(this.target) > .00001;
+    const moving = this.camera.position.distanceToSquared(this.desiredPosition) > REST || this.look.distanceToSquared(this.target) > REST
+      || this.composition.distanceToSquared(this.framing) > REST * 1e-2 || this.positionVelocity.lengthSq() > REST || this.lookVelocity.lengthSq() > REST;
+    this.resting = !moving;
+    this.animating = !this.still() && !this.part && !this.test || moving;
   };
 
   hide(): void {
