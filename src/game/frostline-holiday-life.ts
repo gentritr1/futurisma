@@ -8,6 +8,34 @@ type Actor = {pose: THREE.Object3D; anchor: THREE.Matrix4; animate: (time: numbe
 type Part = {matrix: THREE.Matrix4; actor?: Actor};
 type Batch = {geometry: THREE.BufferGeometry; material: THREE.Material; parts: Part[]; mesh?: THREE.InstancedMesh};
 
+const VILLAGE_STOPS=[.012,.039,.069,.098,.167,.208,.29,.38,.427,.49,.57,.612,.735,.805,.857,.91,.965];
+const COCOA_STOPS=[.055,.246,.412,.588,.768,.895];
+const SLEIGH_STOPS=[.12,.32,.535,.825,.94];
+/** Every candidate site (progress, lateral, radius), in build order. */
+export const HOLIDAY_SITES:{progress:number;lateral:number;radius:number}[]=[
+  ...VILLAGE_STOPS.map((progress,index)=>({progress,lateral:(index%2?1:-1)*19.7,radius:3.4})),
+  ...COCOA_STOPS.map((progress,index)=>({progress,lateral:(index%2?1:-1)*20.5,radius:4.2})),
+  {progress:.666,lateral:-34,radius:13.5},{progress:.365,lateral:32,radius:12},
+  ...SLEIGH_STOPS.map((progress,index)=>({progress,lateral:(index%2?1:-1)*20.5,radius:4.4})),
+];
+/** Distance from a ground point to the whole route centreline (not only the nearest station). */
+export function routeClearance(course:FrostlineCourse,position:THREE.Vector3):number {
+  let clearance=Infinity;
+  for(let i=0;i<course.points.length;i++){
+    const a=course.points[i],b=course.points[(i+1)%course.points.length];
+    const dx=b.x-a.x,dz=b.z-a.z,t=THREE.MathUtils.clamp(((position.x-a.x)*dx+(position.z-a.z)*dz)/(dx*dx+dz*dz),0,1);
+    clearance=Math.min(clearance,Math.hypot(position.x-a.x-t*dx,position.z-a.z-t*dz));
+  }
+  return clearance;
+}
+/** Sites that pass the clearance rule, as square ground pads (centre, road-right axis, half size). */
+export function holidaySitePads(course:FrostlineCourse){
+  return HOLIDAY_SITES.flatMap(site=>{
+    const s=course.sample(site.progress),p=s.position.clone().addScaledVector(s.right,site.lateral);
+    return routeClearance(course,p)<site.radius+15?[]:[{x:p.x,z:p.z,ax:s.right.x,az:s.right.z,hx:site.radius,hz:site.radius}];
+  });
+}
+
 /** Small roadside stories, drawn in shared batches. All motion reads the same
  * paused/reduced-motion clock as the snow and windows. Nothing enters the road. */
 export class FrostlineHolidayLife {
@@ -27,7 +55,8 @@ export class FrostlineHolidayLife {
   private readonly steamSources: THREE.Vector3[] = [];
   private lastTime = NaN;
 
-  constructor(private readonly course: FrostlineCourse) {
+  /** `groundUnder` gives the snow height under a round footprint; without it sites sit at road height. */
+  constructor(private readonly course: FrostlineCourse, private readonly groundUnder?: (x:number,z:number,radius:number)=>number) {
     this.root.name='frostline_holiday_life';
     const matte=(color:number)=>new THREE.MeshLambertMaterial({color});
     this.palette={
@@ -56,21 +85,17 @@ export class FrostlineHolidayLife {
     for(const batch of this.batches.values()){batch.mesh!.computeBoundingSphere();batch.mesh!.boundingSphere!.radius+=18;}
   }
 
-  private anchor(progress:number,lateral:number):THREE.Matrix4 {
+  private anchor(progress:number,lateral:number,radius=0):THREE.Matrix4 {
     const s=this.course.sample(progress),p=s.position.clone().addScaledVector(s.right,lateral);
+    if(this.groundUnder)p.y=this.groundUnder(p.x,p.z,Math.min(radius,1));
     const q=new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(s.right,UP,s.tangent.clone().negate()));
     return new THREE.Matrix4().compose(p,q,new THREE.Vector3(1,1,1));
   }
 
   private site(name:string,progress:number,lateral:number,radius:number):THREE.Matrix4|null {
-    const anchor=this.anchor(progress,lateral),position=new THREE.Vector3().setFromMatrixPosition(anchor);
-    let clearance=Infinity;
+    const anchor=this.anchor(progress,lateral,radius),position=new THREE.Vector3().setFromMatrixPosition(anchor);
     // Full route, not only the nearest sampled station: protect neighbouring bends.
-    for(let i=0;i<this.course.points.length;i++){
-      const a=this.course.points[i],b=this.course.points[(i+1)%this.course.points.length];
-      const dx=b.x-a.x,dz=b.z-a.z,t=THREE.MathUtils.clamp(((position.x-a.x)*dx+(position.z-a.z)*dz)/(dx*dx+dz*dz),0,1);
-      clearance=Math.min(clearance,Math.hypot(position.x-a.x-t*dx,position.z-a.z-t*dz));
-    }
+    const clearance=routeClearance(this.course,position);
     if(clearance<radius+15)return null;
     this.sites.push({name,progress,radius,clearance});return anchor;
   }
@@ -133,7 +158,7 @@ export class FrostlineHolidayLife {
   }
 
   private populateVillage():void {
-    for(const [index,p] of [.012,.039,.069,.098,.167,.208,.29,.38,.427,.49,.57,.612,.735,.805,.857,.91,.965].entries()){
+    for(const [index,p] of VILLAGE_STOPS.entries()){
       const side=index%2?1:-1,anchor=this.site('village gathering',p,side*19.7,3.4);if(!anchor)continue;
       this.resident(anchor,0,0,index);this.resident(anchor,1.9,-1,index+1);
       if(index%2===0){this.snowman(anchor,-1.8,-2);this.snowman(anchor,-.4,-2.8,.63);}
@@ -146,7 +171,7 @@ export class FrostlineHolidayLife {
   }
 
   private buildCocoaStops():void {
-    for(const [index,p] of [.055,.246,.412,.588,.768,.895].entries()){
+    for(const [index,p] of COCOA_STOPS.entries()){
       const anchor=this.site('cocoa cart',p,(index%2?1:-1)*20.5,4.2);if(!anchor)continue;
       this.part(anchor,'disc','glow',0,.04,1,6,6,1,undefined,-Math.PI/2);
       this.part(anchor,'box','wood',0,1.1,0,3.8,1.5,2);
@@ -158,7 +183,7 @@ export class FrostlineHolidayLife {
       for(let j=0;j<4;j++){this.part(anchor,'box','snow',-.9+j*.55,2.15,.3,.23,.33,.23);this.part(anchor,'ball','wood',-.9+j*.55,2.33,.3,.095,.025,.095);}
       this.steamSources.push(new THREE.Vector3(0,2.4,.3).applyMatrix4(anchor));
       this.resident(anchor,.4,-1.3,index+40);
-      this.sign(anchor,'COCOA & COOKIES',0,3.22,1.53,3.5);
+      this.sign(anchor,'COCOA & COOKIES',0,3.3,1.53,3.5);
       this.part(anchor,'box','green',2.8,.55,.4,.85,1.1,.85);this.part(anchor,'box','gold',2.8,1.13,.4,.15,.08,.95);
     }
   }
@@ -205,9 +230,9 @@ export class FrostlineHolidayLife {
   }
 
   private buildSleighs():void {
-    for(const [index,p] of [.12,.32,.535,.825,.94].entries()){
+    for(const [index,p] of SLEIGH_STOPS.entries()){
       const anchor=this.site('gift sleigh',p,(index%2?1:-1)*20.5,4.4);if(!anchor)continue;
-      for(const z of [-.8,.8])this.part(anchor,'box','gold',0,.24,z,4.4,.15,.12);
+      for(const z of [-.8,.8]){this.part(anchor,'box','gold',0,.24,z,4.4,.15,.12);for(const x of [-1.1,1.1])this.part(anchor,'box','gold',x,.38,z,.1,.2,.1);}
       this.part(anchor,'box','red',0,.8,0,3.2,.7,1.6);this.part(anchor,'box','red',-1.5,1.45,0,.2,1.3,1.7);
       for(let i=0;i<6;i++){const x=-.8+(i%3)*.8,z=(i<3?-.4:.4);this.part(anchor,'box',i%2?'green':'gold',x,1.45,z,.65,.7,.65);this.part(anchor,'box','snow',x,1.81,z,.1,.06,.7);}
       this.resident(anchor,2.4,1,index+90);
