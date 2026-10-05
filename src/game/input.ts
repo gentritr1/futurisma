@@ -248,6 +248,8 @@ export class InputController {
 
   setGravityControls(enabled: boolean): void { this.gravityControls = enabled; this.powerControls = enabled; }
   setPowerControls(enabled: boolean): void { this.powerControls = enabled; }
+  /** Which circuit actions exist right now, for a remote pad's buttons. */
+  remoteCaps(): { flip: boolean; power: boolean } { return { flip: this.gravityControls, power: this.powerControls }; }
   consumeFlip(): boolean {
     const requested = this.flipRequested;
     this.flipRequested = false;

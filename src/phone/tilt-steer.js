@@ -76,6 +76,77 @@ export function tiltAngleDeg(gx, gy, gz, landscapeSign) {
   return Math.asin(clamp((gy * landscapeSign) / magnitude, -1, 1)) * (180 / Math.PI);
 }
 
+/** Below this share of g in the screen plane the in-plane (wheel) angle is unreliable. */
+export const WHEEL_IN_PLANE_SHARE = 0.35;
+
+/** Wrap an angle difference into [-180, 180). @param {number} degrees */
+export function wrapDeg(degrees) {
+  return ((((degrees + 180) % 360) + 360) % 360) - 180;
+}
+
+/**
+ * The wheel angle: the phone's rotation within its own screen plane, read as the
+ * direction of gravity in that plane. `tiltAngleDeg` (asin of gy over |g|) is
+ * exact for tipping one end of the phone down about a horizontal axis but reads
+ * a turn in the screen plane short by cos(lean): 14° for a 20° turn with the
+ * screen tipped back 45°. This is exact for the in-plane turn instead (and
+ * reads that tipping gesture long), so `blendTiltDelta` mixes the two by the
+ * gesture the gyroscope says the player is making.
+ * @param {number} gx @param {number} gy @param {number} gz
+ * @param {-1 | 0 | 1} landscapeSign
+ * @returns {number | null} null when the screen is too flat for an in-plane angle
+ */
+export function wheelAngleDeg(gx, gy, gz, landscapeSign) {
+  const magnitude = Math.hypot(gx, gy, gz);
+  if (!landscapeSign || !Number.isFinite(magnitude) || magnitude < 0.05) return null;
+  if (Math.hypot(gx, gy) / magnitude < WHEEL_IN_PLANE_SHARE) return null;
+  return Math.atan2(gy * landscapeSign, gx * landscapeSign) * (180 / Math.PI);
+}
+
+/**
+ * Which steering gesture one gyroscope sample shows, 0..1: 0 a turn about the
+ * screen's own axis (a wheel), 1 a turn about the horizontal axis pointing away
+ * from the player (tipping one end down). The two axes differ by the screen's
+ * lean, so the measured rotation axis is placed between them. Sign conventions
+ * cancel (a platform reporting gravity inverted flips both terms together).
+ * @param {{x: number, y: number, z: number}} rate rotation rate in device axes
+ *   (spec: beta about x, gamma about y, alpha about z), any unit
+ * @param {number} gx @param {number} gy @param {number} gz gravity, device axes
+ * @returns {number | null} null when the sample cannot tell the gestures apart
+ */
+export function gestureSample(rate, gx, gy, gz) {
+  const g = Math.hypot(gx, gy, gz);
+  const speed = Math.hypot(rate.x, rate.y, rate.z);
+  if (!(g > 0.05) || !(speed > 0)) return null;
+  const inPlane = Math.hypot(gx, gy);
+  if (inPlane < 1e-6) return null;
+  // Basis of the plane holding both candidate axes: the screen normal z, and e,
+  // the in-plane direction of gravity.
+  const ex = gx / inPlane, ey = gy / inPlane;
+  const lean = Math.atan2(-gz / g, inPlane / g); // the tipping axis, folded
+  if (Math.abs(lean) < 15 * (Math.PI / 180)) return null; // upright: same axis
+  let uz = rate.z / speed, ue = (rate.x * ex + rate.y * ey) / speed;
+  // A rotation mostly off this plane is neither gesture (e.g. turning the body).
+  if (Math.hypot(uz, ue) < 0.8) return null;
+  if (uz < 0) { uz = -uz; ue = -ue; }
+  return clamp(Math.atan2(ue, uz) / lean, 0, 1);
+}
+
+/**
+ * Steering angle relative to the calibrated neutrals, blending the wheel and the
+ * tipping reading by the measured gesture (0 = wheel, 1 = tipping).
+ * @param {{tray: number, wheel: number | null}} angle
+ * @param {{tray: number, wheel: number | null}} neutral
+ * @param {number} gesture 0..1
+ */
+export function blendTiltDelta(angle, neutral, gesture) {
+  const tray = angle.tray - neutral.tray;
+  if (angle.wheel === null || neutral.wheel === null) return tray;
+  const wheel = wrapDeg(angle.wheel - neutral.wheel);
+  const weight = clamp(gesture, 0, 1);
+  return (1 - weight) * wheel + weight * tray;
+}
+
 /**
  * Tilt relative to the calibrated neutral, to a steering value in [-1, 1].
  * @param {number} angleDeg @param {number} neutralDeg
@@ -88,7 +159,7 @@ export function shapeTiltSteer(
   deadzoneDeg = TILT_DEADZONE_DEG,
   expo = TILT_EXPO,
 ) {
-  const delta = angleDeg - neutralDeg;
+  const delta = wrapDeg(angleDeg - neutralDeg);
   if (!Number.isFinite(delta)) return 0;
   const magnitude = Math.abs(delta);
   if (magnitude <= deadzoneDeg) return 0;

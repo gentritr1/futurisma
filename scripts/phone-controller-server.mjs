@@ -154,6 +154,8 @@ export function phoneControllerPlugin({
   const stages = { packets: 0, changed: 0, inputToSend: [], uplink: [], clockUncertainty: [], rtt: [] };
   /** The latest report from the game page, merged into the next log line. */
   let gameReport = null;
+  /** Circuit actions the game reported (FLIP / POWER); null until it reports. */
+  let gameCaps = null;
 
   const isLocal = (address) => address === "127.0.0.1" || address === "::1"
     || address === "::ffff:127.0.0.1" || (lan !== null && (address === lan || address === `::ffff:${lan}`));
@@ -255,7 +257,7 @@ export function phoneControllerPlugin({
     pad = { id: message.id, lastSeen: now };
     if (arrived) announcePad();
     pushToGame(state);
-    return reply(response, 200, { game: games.size > 0, srv: state.v });
+    return reply(response, 200, { game: games.size > 0, srv: state.v, caps: gameCaps });
   };
 
   const handleTelemetry = async (request, response) => {
@@ -272,13 +274,20 @@ export function phoneControllerPlugin({
         p95: Math.max(0, Number(value?.p95) || 0),
         max: Math.max(0, Number(value?.max) || 0),
       });
-      gameReport = {
+      const next = {
         at: Date.now(),
         relayToGame: stage(report.relayToGame),
         waitForFrame: stage(report.waitForFrame),
         total: stage(report.total),
         steerResponse: Number(report.steerResponse) || 0,
       };
+      // The game also posts with no samples (to carry caps); an empty window
+      // must not erase the last real latency report.
+      if (next.relayToGame.n || next.total.n) gameReport = next;
+      // Booleans only: nothing else from the game page reaches the phone.
+      if (report.caps && typeof report.caps === "object") {
+        gameCaps = { flip: report.caps.flip === true, power: report.caps.power === true };
+      }
     } catch {
       return reply(response, 400);
     }

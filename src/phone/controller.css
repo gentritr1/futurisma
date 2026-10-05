@@ -1,13 +1,19 @@
-/* Phone controller (controller.html). Landscape-first, thumb-sized targets. */
+/* Phone controller (controller.html). Landscape-first, thumb-sized targets.
+   The stage is counter-rotated from controller.ts when iOS turns the page, so
+   the layout stays fixed in the player's hands (Safari cannot lock rotation). */
 :root {
-  --bg: #06090b;
-  --panel: #0e1619;
-  --line: rgba(143, 245, 207, 0.28);
-  --ink: #dff7ee;
-  --dim: rgba(223, 247, 238, 0.55);
+  --bg: #05080a;
+  --panel: #0c1316;
+  --panel-hi: #121c20;
+  --line: rgba(143, 245, 207, 0.2);
+  --ink: #e6f6f0;
+  --dim: rgba(230, 246, 240, 0.55);
+  --acid: #c0f000;
   --gas: #2fe08a;
   --brake: #ff5a4f;
   --boost: #59c8ff;
+  --warn: #ffb02e;
+  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace;
   color-scheme: dark;
 }
 
@@ -22,7 +28,7 @@ body {
   overflow: hidden;
   background: var(--bg);
   color: var(--ink);
-  font: 600 14px/1.2 system-ui, -apple-system, sans-serif;
+  font: 700 14px/1.2 system-ui, -apple-system, sans-serif;
   touch-action: none;
   overscroll-behavior: none;
   -webkit-user-select: none;
@@ -31,29 +37,44 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
+.stage {
+  position: fixed;
+  inset: 0;
+  transform-origin: 50% 50%;
+}
+
 button {
+  position: relative;
   font: inherit;
   color: inherit;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   border: 1px solid var(--line);
-  border-radius: 12px;
-  background: var(--panel);
+  border-radius: 14px;
+  background: linear-gradient(180deg, var(--panel-hi), var(--panel));
   touch-action: none;
   -webkit-user-select: none;
   user-select: none;
+  transition: transform 70ms ease-out, background-color 70ms ease-out, box-shadow 70ms ease-out, opacity 120ms;
 }
 
 button.is-down {
-  filter: brightness(1.8);
-  transform: scale(0.97);
+  transform: scale(0.965);
+  box-shadow: inset 0 0 0 2px currentColor, 0 0 22px -6px currentColor;
 }
 
+button[hidden] {
+  display: none;
+}
+
+/* ---- layout ------------------------------------------------------------- */
+
 .pad {
+  position: absolute;
+  inset: 0;
   display: grid;
-  grid-template-columns: 1fr minmax(96px, 0.5fr) 1fr;
+  grid-template-columns: 1fr minmax(120px, 0.62fr) 1fr;
   grid-template-rows: auto 1fr;
   gap: 10px;
-  height: 100%;
   padding: max(10px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))
     max(10px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
 }
@@ -62,50 +83,56 @@ button.is-down {
   grid-column: 1 / -1;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   min-height: 44px;
 }
 
+.pad__group {
+  display: flex;
+  gap: 6px;
+}
+
 .pad__bar button {
-  min-width: 44px;
-  min-height: 40px;
-  padding: 0 10px;
-  font-size: 12px;
-}
-
-.pad__meter {
-  position: relative;
-  flex: 0 0 120px;
-  height: 10px;
-  border-radius: 5px;
-  background: rgba(255, 255, 255, 0.08);
-  overflow: hidden;
-}
-
-.pad__meter-dot {
-  position: absolute;
-  left: calc(50% - 6px);
-  top: 0;
-  width: 12px;
-  height: 10px;
-  border-radius: 5px;
-  background: var(--ink);
+  min-width: 48px;
+  min-height: 44px;
+  padding: 0 12px;
+  font: 700 11px/1 var(--mono);
+  border-radius: 10px;
 }
 
 .pad__status {
   flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 0;
   margin: 0;
-  overflow: hidden;
-  font-size: 12px;
-  font-weight: 500;
+  font: 600 11px/1 var(--mono);
+  letter-spacing: 0.06em;
   color: var(--dim);
   white-space: nowrap;
+}
+
+#status-text {
+  overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.pad--live .pad__status {
-  color: var(--gas);
+.pad__status-dot {
+  flex: 0 0 auto;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: rgba(230, 246, 240, 0.3);
 }
+
+.pad__status--good { color: var(--gas); }
+.pad__status--good .pad__status-dot { background: var(--gas); box-shadow: 0 0 10px var(--gas); }
+.pad__status--ok { color: var(--warn); }
+.pad__status--ok .pad__status-dot { background: var(--warn); box-shadow: 0 0 10px var(--warn); }
+.pad__status--bad { color: var(--brake); }
+.pad__status--bad .pad__status-dot { background: var(--brake); box-shadow: 0 0 10px var(--brake); }
 
 .pad__left,
 .pad__right,
@@ -116,42 +143,125 @@ button.is-down {
   min-height: 0;
 }
 
-.pad__big,
-.pad__wheel {
+/* ---- big controls ------------------------------------------------------- */
+
+.pad__big {
   flex: 1;
-  font-size: 20px;
+  font-size: 22px;
+  letter-spacing: 0.16em;
 }
 
 .pad__brake {
   color: var(--brake);
-  border-color: rgba(255, 90, 79, 0.45);
+  border-color: rgba(255, 90, 79, 0.4);
+}
+
+.pad__brake.is-down {
+  background: rgba(255, 90, 79, 0.16);
 }
 
 .pad__gas {
   color: var(--gas);
-  border-color: rgba(47, 224, 138, 0.5);
+  border-color: rgba(47, 224, 138, 0.45);
+}
+
+.pad__gas.is-down {
+  background: rgba(47, 224, 138, 0.16);
 }
 
 .pad__boost {
-  flex: 0 0 30%;
+  flex: 0 0 34%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
   color: var(--boost);
   border-color: rgba(89, 200, 255, 0.45);
+  font-size: 17px;
 }
 
-.pad__mid button {
+.pad__boost small {
+  font: 600 10px/1 var(--mono);
+  letter-spacing: 0.12em;
+  opacity: 0.7;
+}
+
+.pad__boost.is-down {
+  background: rgba(89, 200, 255, 0.18);
+}
+
+/* ---- centre: steering gauge and circuit actions -------------------------- */
+
+.pad__gauge {
   flex: 1;
-  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: radial-gradient(120% 90% at 50% 100%, rgba(192, 240, 0, 0.07), transparent 60%), var(--panel);
+}
+
+.pad__gauge-svg {
+  width: min(100%, 170px);
+  height: auto;
+}
+
+.pad__needle {
+  transform-box: view-box;
+  transform-origin: 60px 62px;
+}
+
+.pad__gauge-value {
+  margin: 2px 0 0;
+  font: 800 20px/1 var(--mono);
+  color: var(--acid);
+  font-variant-numeric: tabular-nums;
+}
+
+.pad__gauge-note {
+  margin: 4px 0 0;
+  font: 600 10px/1 var(--mono);
+  letter-spacing: 0.08em;
+  color: var(--dim);
+}
+
+.pad__actions {
+  display: flex;
+  gap: 8px;
+  flex: 0 0 34%;
+}
+
+.pad__actions[hidden] {
+  display: none;
+}
+
+.pad__actions button {
+  flex: 1;
+  font: 700 12px/1 var(--mono);
+  color: var(--acid);
+  border-color: rgba(192, 240, 0, 0.35);
 }
 
 .pad__wheel {
+  flex: 1;
   display: grid;
   place-items: center;
   border: 1px dashed var(--line);
-  border-radius: 12px;
+  border-radius: 14px;
   color: var(--dim);
-  font-size: 13px;
+  font: 600 12px/1 var(--mono);
   letter-spacing: 0.1em;
   touch-action: none;
+}
+
+.pad__brake-small {
+  flex: 0 0 26%;
+  color: var(--brake);
+  border-color: rgba(255, 90, 79, 0.4);
 }
 
 .pad--tilt .pad__wheel,
@@ -160,13 +270,15 @@ button.is-down {
   display: none;
 }
 
-.pad__brake-small {
-  color: var(--brake);
+.pad--live .pad__gauge {
+  border-color: rgba(192, 240, 0, 0.3);
 }
 
+/* ---- overlays ------------------------------------------------------------ */
+
 .intro,
-.rotate {
-  position: fixed;
+.hold-hint {
+  position: absolute;
   inset: 0;
   display: flex;
   flex-direction: column;
@@ -178,7 +290,8 @@ button.is-down {
   text-align: center;
 }
 
-.intro[hidden] {
+.intro[hidden],
+.hold-hint[hidden] {
   display: none;
 }
 
@@ -198,21 +311,23 @@ button.is-down {
   min-width: 220px;
   min-height: 56px;
   font-size: 16px;
-  color: var(--gas);
+  color: var(--acid);
+  border-color: rgba(192, 240, 0, 0.45);
 }
 
 .intro__note {
   max-width: 320px;
 }
 
-.rotate {
-  display: none;
+.hold-hint {
   z-index: 5;
-  font-size: 18px;
+  background: rgba(5, 8, 10, 0.88);
+  font: 700 16px/1.3 var(--mono);
+  letter-spacing: 0.1em;
 }
 
-@media (orientation: portrait) {
-  .rotate {
-    display: flex;
+@media (prefers-reduced-motion: reduce) {
+  button {
+    transition: none;
   }
 }

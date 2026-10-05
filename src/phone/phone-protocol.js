@@ -14,8 +14,10 @@
 
 export const PHONE_PATH = "/__phone";
 /** The pad resends an unchanged state this often. Steady traffic also keeps the
- * iPhone's Wi-Fi radio out of power save, which otherwise adds 40-200 ms spikes. */
-export const PHONE_HEARTBEAT_MS = 50;
+ * iPhone's Wi-Fi radio out of power save, which otherwise adds 40-200 ms spikes:
+ * 2026-10-05's live log had uplink p50 7 ms at 35-48 msg/s and 50-150 ms at
+ * 8-26 msg/s, so the floor went from 20/s (50 ms) to 40/s. */
+export const PHONE_HEARTBEAT_MS = 25;
 /** A pad state older than this is treated as released: no stuck throttle. */
 export const PHONE_STALE_MS = 200;
 /** A pad silent this long has left; another phone may then take the slot. */

@@ -30,10 +30,14 @@ import {
 import {
   TILT_DEADZONE_DEG,
   TILT_PRESETS,
+  blendTiltDelta,
+  gestureSample,
   gravityVector,
   resolveLandscapeSign,
   shapeTiltSteer,
   tiltAngleDeg,
+  wheelAngleDeg,
+  wrapDeg,
 } from "../src/phone/tilt-steer.js";
 import { readdirSync } from "node:fs";
 
@@ -107,6 +111,67 @@ for (const topLeft of [true, false]) {
   const neutral = tiltAngleDeg(...base, sign);
   assert.equal(shapeTiltSteer(tiltAngleDeg(...reading({ ...pose, steer: 10 * deg }), sign), neutral), 0);
   assert.ok(shapeTiltSteer(tiltAngleDeg(...reading({ ...pose, steer: 25 * deg }), sign), neutral) > 0.15);
+}
+// Wheel vs tipping (owner 2026-10-05: "not accurate sometimes when rotating").
+// A wheel turn rotates the phone about its own screen axis; tipping rotates it
+// about the horizontal axis pointing away from the player. They coincide only
+// with the screen upright. asin(gy/|g|) is exact for tipping and reads a wheel
+// turn short by cos(lean); atan2 in the screen plane is the reverse. The gyro
+// tells the gestures apart, and blendTiltDelta mixes the two readings by it.
+{
+  const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+  const about = (k, a, v) => {
+    const c = Math.cos(a), s = Math.sin(a), kv = cross(k, v), kd = dot(k, v);
+    return v.map((vi, i) => vi * c + kv[i] * s + k[i] * kd * (1 - c));
+  };
+  /** Gravity and the gyro axis (device frame) for a gesture of `steer` radians. */
+  const gesture = ({ topLeft, lean, steer, model, inverted = false }) => {
+    let xd = topLeft ? [0, 0, 1] : [0, 0, -1];
+    let yd = topLeft ? [-1, 0, 0] : [1, 0, 0];
+    xd = rotX(-lean, xd);
+    yd = rotX(-lean, yd);
+    const normal = cross(xd, yd);
+    // Clockwise as the player sees it: about +Y (world) for tipping, about the
+    // screen normal (which faces the player) for the wheel.
+    const axis = model === "tip" ? [0, 1, 0] : normal.map((v) => -v);
+    xd = about(axis, steer, xd);
+    yd = about(axis, steer, yd);
+    const zd = cross(xd, yd);
+    const up = [0, 0, inverted ? -G : G];
+    const rate = { x: dot(axis, xd), y: dot(axis, yd), z: dot(axis, zd) };
+    return { g: [dot(up, xd), dot(up, yd), dot(up, zd)], rate };
+  };
+  const read = (pose, gestureWeight) => {
+    const base = gesture({ ...pose, steer: 0 });
+    const sign = resolveLandscapeSign(...base.g, pose.topLeft ? 90 : -90);
+    const neutral = { tray: tiltAngleDeg(...base.g, sign), wheel: wheelAngleDeg(...base.g, sign) };
+    const now = gesture(pose).g;
+    return blendTiltDelta({ tray: tiltAngleDeg(...now, sign), wheel: wheelAngleDeg(...now, sign) }, neutral, gestureWeight);
+  };
+  // The original failure, reproduced: asin alone reads a 20° wheel turn as 14°.
+  const asinOnly = read({ topLeft: true, lean: 45 * deg, steer: 20 * deg, model: "wheel" }, 1);
+  assert.ok(Math.abs(asinOnly - 14.0) < 0.2, `asin alone undershoots a tipped-back wheel turn (read ${asinOnly.toFixed(1)}°)`);
+  for (const topLeft of [true, false]) for (const inverted of [false, true]) for (const lean of [0, 20, 45, 60]) {
+    for (const model of ["wheel", "tip"]) {
+      const pose = { topLeft, lean: lean * deg, model, inverted };
+      // Classify the gesture from the gyro the way the pad does: an EMA of samples.
+      let weight = 0.5;
+      for (let i = 1; i <= 30; i += 1) {
+        const sample = gesture({ ...pose, steer: (i % 15) * 2 * deg });
+        const g = sample.g, s = gestureSample(sample.rate, ...g);
+        if (s !== null) weight += (s - weight) * 0.15;
+      }
+      const label = `${model} lean ${lean}° ${topLeft ? "top-left" : "top-right"}${inverted ? " inverted" : ""}`;
+      if (lean >= 20) assert.ok(model === "tip" ? weight > 0.9 : weight < 0.1, `${label}: gesture classified (${weight.toFixed(2)})`);
+      const reading = read({ ...pose, steer: 20 * deg }, weight);
+      assert.ok(Math.abs(reading - 20) < 0.6, `${label}: a 20° turn reads ${reading.toFixed(2)}°`);
+      const left = read({ ...pose, steer: -20 * deg }, weight);
+      assert.ok(Math.abs(left + 20) < 0.6, `${label}: a -20° turn reads ${left.toFixed(2)}°`);
+    }
+  }
+  assert.equal(wrapDeg(190), -170);
+  assert.equal(wrapDeg(-190), 170);
+  assert.equal(wheelAngleDeg(0, 0, G, 1), null, "flat phone has no in-plane wheel angle");
 }
 // Feel presets (first iPhone playtest 2026-10-04: "a bit too hard"). MEDIUM is
 // the default and must answer a 15° turn with roughly half of what the
@@ -465,6 +530,14 @@ assert.deepEqual({ ...forwarded, v: 0 }, { t: "s", q: 1, s: 0.4, g: 1, b: 0, x: 
 // The game's half of the breakdown, then the relay's periodic line and JSONL.
 assert.equal((await call(`${PHONE_PATH}/telemetry`, { method: "POST", body: { relayToGame: { n: 3, p50: 0.7, p95: 1.1 }, waitForFrame: { n: 3, p50: 6, p95: 15 }, total: { n: 3, p50: 30, p95: 52 }, steerResponse: 18 } })).status, 204, "this machine posts game-side latency");
 assert.equal(await fromLan(`${PHONE_PATH}/telemetry`, "POST"), 403, "a LAN client cannot post latency reports");
+// Circuit actions: the pad hides FLIP / POWER the circuit does not have (owner
+// 2026-10-05: on Frostline they "did nothing"). Only two booleans pass through.
+assert.equal(acceptedBody.caps, null, "before the game reports, the pad is told nothing about actions");
+assert.equal((await call(`${PHONE_PATH}/telemetry`, { method: "POST", body: { caps: { flip: false, power: "yes", extra: 1 } } })).status, 204);
+const capsBody = JSON.parse((await postPad({ q: 2, s: 0, ch: 0 })).text);
+assert.deepEqual(capsBody.caps, { flip: false, power: false }, "caps are rebuilt as strict booleans");
+assert.equal((await call(`${PHONE_PATH}/telemetry`, { method: "POST", body: { caps: { flip: true, power: true } } })).status, 204);
+assert.deepEqual(JSON.parse((await postPad({ q: 3, s: 0, ch: 0 })).text).caps, { flip: true, power: true }, "a circuit with gravity decks shows both");
 assert.equal((await call(`${PHONE_PATH}/telemetry`, { method: "POST", body: "x".repeat(PHONE_MAX_TELEMETRY + 1) })).status, 413, "an oversized report is refused");
 await new Promise((resolve) => setTimeout(resolve, 450));
 const line = logLines.find((entry) => entry.startsWith("[phone]"));

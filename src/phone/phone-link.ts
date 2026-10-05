@@ -183,15 +183,18 @@ export class PhoneLink implements RemoteInput {
     this.samples.relayToGame = [];
     this.samples.waitForFrame = [];
     this.samples.total = [];
-    if (!total.n && !relayToGame.n) return;
-    this.stats.relayToGameMs = relayToGame.p50;
-    this.stats.waitForFrameMs = waitForFrame.p50;
-    this.stats.totalMs = total.p50;
-    this.overlay.setBreakdown(total, relayToGame, waitForFrame);
+    if (total.n || relayToGame.n) {
+      this.stats.relayToGameMs = relayToGame.p50;
+      this.stats.waitForFrameMs = waitForFrame.p50;
+      this.stats.totalMs = total.p50;
+      this.overlay.setBreakdown(total, relayToGame, waitForFrame);
+    }
+    // Sent every window, samples or not: it also tells the pad which circuit
+    // actions (FLIP / POWER) exist, so a circuit without them never shows dead buttons.
     void fetch(`${PHONE_PATH}/telemetry`, {
       method: "POST",
       headers: { "Content-Type": "text/plain" },
-      body: JSON.stringify({ relayToGame, waitForFrame, total, steerResponse: PHONE_STEER_RESPONSE }),
+      body: JSON.stringify({ relayToGame, waitForFrame, total, steerResponse: PHONE_STEER_RESPONSE, caps: this.input.remoteCaps() }),
       cache: "no-store",
     }).catch(() => undefined);
   }
