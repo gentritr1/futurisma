@@ -1,0 +1,158 @@
+
+g2-base-1.json [cold] menu: worst 633.4 ms, long tasks [], warm-up done - ms after the menu appeared
+  open                           worst  1366.5 ms  links  10  frames 6/90  (1 action)
+  first UPGRADE tab              worst   150.1 ms  links   0  frames 71/84  (1 action)
+  first part (engine)            worst   800.0 ms  links   8  frames 31/84  (1 action)
+  other parts, first             worst    16.8 ms  links   4  frames 336/336  (4 actions)
+  first PAINT tab + slots        worst    16.8 ms  links   0  frames 337/336  (4 actions)
+  first LIGHTS hover             worst    16.8 ms  links   0  frames 84/84  (1 action)
+  first underglow hover          worst    50.1 ms  links   1  frames 82/84  (1 action)
+  first body-paint hover         worst    16.8 ms  links   0  frames 84/84  (1 action)
+  first TEST / JOBS / DAILY      worst    16.8 ms  links   0  frames 252/252  (3 actions)
+  first FLEET tab                worst    16.8 ms  links   0  frames 84/84  (1 action)
+  first LANCE                    worst   466.6 ms  links   3  frames 57/84  (1 action)
+  first CORONA                   worst   133.4 ms  links   1  frames 77/84  (1 action)
+  rounds 2-3 (repeat switches)   worst    16.8 ms  links  10  frames 3530/3528  (42 actions)
+  close                          worst    16.8 ms  links   3  frames 84/84  (1 action)
+  programs after rounds 1/2/3: 108/108/108; links in rounds 2-3: 10; actions 65; errors 0
+
+g2-base-1.json [warm] menu: worst 133.3 ms, long tasks [147], warm-up done - ms after the menu appeared
+  open                           worst    50.0 ms  links  10  frames 82/84  (1 action)
+  first UPGRADE tab              worst    16.8 ms  links   0  frames 84/84  (1 action)
+  first part (engine)            worst    50.0 ms  links   8  frames 82/84  (1 action)
+  other parts, first             worst    16.8 ms  links   4  frames 336/336  (4 actions)
+  first PAINT tab + slots        worst    16.8 ms  links   0  frames 336/336  (4 actions)
+  first LIGHTS hover             worst    16.8 ms  links   0  frames 84/84  (1 action)
+  first underglow hover          worst    16.8 ms  links   1  frames 84/84  (1 action)
+  first body-paint hover         worst    16.8 ms  links   0  frames 84/84  (1 action)
+  first TEST / JOBS / DAILY      worst    16.8 ms  links   0  frames 252/252  (3 actions)
+  first FLEET tab                worst    16.8 ms  links   0  frames 84/84  (1 action)
+  first LANCE                    worst    33.4 ms  links   3  frames 83/84  (1 action)
+  first CORONA                   worst    16.8 ms  links   1  frames 85/84  (1 action)
+  rounds 2-3 (repeat switches)   worst    16.8 ms  links  10  frames 3547/3548  (42 actions)
+  close                          worst    16.8 ms  links   0  frames 85/84  (1 action)
+  programs after rounds 1/2/3: 113/113/113; links in rounds 2-3: 10; actions 65; errors 0
+
+g2-base-2.json [cold] menu: worst 16.8 ms, long tasks [], warm-up done - ms after the menu appeared
+  open                           worst   250.1 ms  links  10  frames 70/84  (1 action)
+  first UPGRADE tab              worst    16.8 ms  links   0  frames 84/84  (1 action)
+  first part (engine)            worst    66.7 ms  links   8  frames 81/84  (1 action)
+  other parts, first             worst    16.8 ms  links   4  frames 336/336  (4 actions)
+  first PAINT tab + slots        worst    16.8 ms  links   0  frames 336/336  (4 actions)
+  first LIGHTS hover             worst    16.8 ms  links   0  frames 85/84  (1 action)
+  first underglow hover          worst    16.8 ms  links   1  frames 84/84  (1 action)
+  first body-paint hover         worst    16.8 ms  links   0  frames 84/84  (1 action)
+  first TEST / JOBS / DAILY      worst    16.8 ms  links   0  frames 252/252  (3 actions)
+  first FLEET tab                worst    16.8 ms  links   0  frames 85/84  (1 action)
+  first LANCE                    worst    33.4 ms  links   3  frames 83/84  (1 action)
+  first CORONA                   worst    16.8 ms  links   1  frames 84/84  (1 action)
+  rounds 2-3 (repeat switches)   worst    16.8 ms  links  10  frames 3527/3528  (42 actions)
+  close                          worst    33.4 ms  links   3  frames 83/84  (1 action)
+  programs after rounds 1/2/3: 108/108/108; links in rounds 2-3: 10; actions 65; errors 0
+
+actions-before.json [cold] menu: worst 16.8 ms, long tasks [], warm-up done - ms after the menu appeared
+  open                           worst   333.3 ms  links  10  frames 65/84  (1 action)
+  first UPGRADE tab              worst    16.8 ms  links   0  frames 84/84  (1 action)
+  first part (engine)            worst    66.7 ms  links   8  frames 81/84  (1 action)
+  other parts, first             worst    16.8 ms  links   4  frames 338/338  (4 actions)
+  first PAINT tab + slots        worst    16.8 ms  links   0  frames 336/336  (4 actions)
+  first LIGHTS hover             worst    16.8 ms  links   0  frames 84/84  (1 action)
+  first underglow hover          worst    16.8 ms  links   1  frames 84/84  (1 action)
+  first body-paint hover         worst    16.8 ms  links   0  frames 84/84  (1 action)
+  first TEST / JOBS / DAILY      worst    16.8 ms  links   0  frames 253/252  (3 actions)
+  first FLEET tab                worst    16.8 ms  links   0  frames 84/84  (1 action)
+  first LANCE                    worst    33.3 ms  links   3  frames 83/84  (1 action)
+  first CORONA                   worst    16.8 ms  links   1  frames 84/84  (1 action)
+  rounds 2-3 (repeat switches)   worst    16.8 ms  links  10  frames 3538/3535  (42 actions)
+  close                          worst    33.3 ms  links   0  frames 84/84  (1 action)
+  programs after rounds 1/2/3: 113/113/113; links in rounds 2-3: 10; actions 65; errors 0
+
+actions-before.json [warm] menu: worst 33.3 ms, long tasks [], warm-up done - ms after the menu appeared
+  open                           worst   166.6 ms  links  10  frames 73/85  (1 action)
+  first UPGRADE tab              worst    16.8 ms  links   0  frames 85/85  (1 action)
+  first part (engine)            worst    83.3 ms  links   8  frames 80/85  (1 action)
+  other parts, first             worst    16.8 ms  links   4  frames 340/339  (4 actions)
+  first PAINT tab + slots        worst    16.8 ms  links   0  frames 340/340  (4 actions)
+  first LIGHTS hover             worst    16.8 ms  links   0  frames 84/84  (1 action)
+  first underglow hover          worst    16.8 ms  links   1  frames 84/84  (1 action)
+  first body-paint hover         worst    16.8 ms  links   0  frames 84/84  (1 action)
+  first TEST / JOBS / DAILY      worst    16.8 ms  links   0  frames 254/253  (3 actions)
+  first FLEET tab                worst    16.8 ms  links   0  frames 84/84  (1 action)
+  first LANCE                    worst    50.0 ms  links   3  frames 82/84  (1 action)
+  first CORONA                   worst    16.8 ms  links   1  frames 84/84  (1 action)
+  rounds 2-3 (repeat switches)   worst    16.8 ms  links  10  frames 3530/3529  (42 actions)
+  close                          worst    16.8 ms  links   0  frames 84/84  (1 action)
+  programs after rounds 1/2/3: 113/113/113; links in rounds 2-3: 10; actions 65; errors 0
+
+actions-after.json [cold] menu: worst 166.7 ms, long tasks [184], warm-up done 4378 ms after the menu appeared
+  open                           worst    50.0 ms  links   0  frames 82/84  (1 action)
+  first UPGRADE tab              worst    16.8 ms  links   0  frames 84/84  (1 action)
+  first part (engine)            worst    16.8 ms  links   0  frames 84/84  (1 action)
+  other parts, first             worst    16.8 ms  links   0  frames 337/337  (4 actions)
+  first PAINT tab + slots        worst    16.8 ms  links   0  frames 337/337  (4 actions)
+  first LIGHTS hover             worst    16.8 ms  links   0  frames 84/84  (1 action)
+  first underglow hover          worst    16.8 ms  links   0  frames 84/84  (1 action)
+  first body-paint hover         worst    16.8 ms  links   0  frames 84/84  (1 action)
+  first TEST / JOBS / DAILY      worst    16.8 ms  links   0  frames 253/252  (3 actions)
+  first FLEET tab                worst    16.8 ms  links   0  frames 84/84  (1 action)
+  first LANCE                    worst    16.8 ms  links   0  frames 84/84  (1 action)
+  first CORONA                   worst    16.8 ms  links   0  frames 84/84  (1 action)
+  rounds 2-3 (repeat switches)   worst    33.3 ms  links   0  frames 3536/3536  (42 actions)
+  close                          worst    16.8 ms  links   0  frames 84/84  (1 action)
+  programs after rounds 1/2/3: 112/112/112; links in rounds 2-3: 0; actions 65; errors 0
+
+actions-after.json [warm] menu: worst 33.3 ms, long tasks [], warm-up done 1664 ms after the menu appeared
+  open                           worst    16.8 ms  links   0  frames 84/84  (1 action)
+  first UPGRADE tab              worst    16.8 ms  links   0  frames 85/84  (1 action)
+  first part (engine)            worst    16.8 ms  links   0  frames 84/84  (1 action)
+  other parts, first             worst    16.8 ms  links   0  frames 336/336  (4 actions)
+  first PAINT tab + slots        worst    16.8 ms  links   0  frames 338/336  (4 actions)
+  first LIGHTS hover             worst    16.8 ms  links   0  frames 84/84  (1 action)
+  first underglow hover          worst    16.8 ms  links   0  frames 84/84  (1 action)
+  first body-paint hover         worst    16.8 ms  links   0  frames 84/84  (1 action)
+  first TEST / JOBS / DAILY      worst    16.8 ms  links   0  frames 252/252  (3 actions)
+  first FLEET tab                worst    16.8 ms  links   0  frames 85/84  (1 action)
+  first LANCE                    worst    16.8 ms  links   0  frames 84/84  (1 action)
+  first CORONA                   worst    16.8 ms  links   0  frames 85/85  (1 action)
+  rounds 2-3 (repeat switches)   worst    16.8 ms  links   0  frames 3544/3541  (42 actions)
+  close                          worst    16.8 ms  links   0  frames 84/84  (1 action)
+  programs after rounds 1/2/3: 110/110/110; links in rounds 2-3: 0; actions 65; errors 0
+
+actions-after-early.json [cold] menu: worst 33.3 ms, long tasks [], warm-up done - ms after the menu appeared
+  open                           worst   400.0 ms  links  16  frames 60/84  (1 action)
+  first UPGRADE tab              worst    16.8 ms  links   0  frames 86/85  (1 action)
+  first part (engine)            worst    16.8 ms  links   0  frames 84/85  (1 action)
+  other parts, first             worst    16.8 ms  links   0  frames 336/337  (4 actions)
+  first PAINT tab + slots        worst    16.8 ms  links   0  frames 337/336  (4 actions)
+  first LIGHTS hover             worst    16.8 ms  links   0  frames 84/84  (1 action)
+  first underglow hover          worst    16.8 ms  links   0  frames 84/84  (1 action)
+  first body-paint hover         worst    16.8 ms  links   0  frames 84/84  (1 action)
+  first TEST / JOBS / DAILY      worst    16.8 ms  links   0  frames 253/253  (3 actions)
+  first FLEET tab                worst    16.8 ms  links   0  frames 84/84  (1 action)
+  first LANCE                    worst    16.8 ms  links   0  frames 84/84  (1 action)
+  first CORONA                   worst    16.8 ms  links   0  frames 84/84  (1 action)
+  rounds 2-3 (repeat switches)   worst   133.2 ms  links   0  frames 3550/3557  (42 actions)
+  close                          worst    16.8 ms  links   0  frames 85/85  (1 action)
+  programs after rounds 1/2/3: 112/112/112; links in rounds 2-3: 0; actions 65; errors 0
+
+camera after (final run):
+{"key":"tab-test","frames":71,"expectedFrames":70,"totalM":8.87,"firstStepPct":2.62,"peakFrame":5,"t90ms":291,"t99ms":525,"overshootPct":0,"offsetPx":[0,0],"firstOffsetStepPct":null,"firstFrameAfterClickMs":8,"dtMs":[16.8,16.3,16.7,17,15.7,17.1]}
+{"key":"tab-paint","frames":72,"expectedFrames":71,"totalM":13.2,"firstStepPct":2.62,"peakFrame":6,"t90ms":291,"t99ms":524,"overshootPct":0,"offsetPx":[0,0],"firstOffsetStepPct":null,"firstFrameAfterClickMs":7,"dtMs":[17.5,16.6,16.6,16.2,17.2,16.7]}
+{"key":"tab-craft","frames":72,"expectedFrames":71,"totalM":13.77,"firstStepPct":2.62,"peakFrame":5,"t90ms":289,"t99ms":521,"overshootPct":0,"offsetPx":[0,0],"firstOffsetStepPct":null,"firstFrameAfterClickMs":5.6,"dtMs":[16.2,17,15.7,17.6,16.2,16.3]}
+{"key":"tab-parts","totalM":0,"note":"no camera move"}
+{"key":"part-engine","frames":71,"expectedFrames":70,"totalM":8.04,"firstStepPct":2.62,"peakFrame":7,"t90ms":306,"t99ms":523,"overshootPct":0,"offsetPx":[141,-6],"firstOffsetStepPct":2.62,"firstFrameAfterClickMs":14.6,"dtMs":[9.5,15.6,16.5,16.5,15.8,17.9]}
+{"key":"switch-plasma","frames":57,"expectedFrames":56,"totalM":0.79,"firstStepPct":2.62,"peakFrame":5,"t90ms":301,"t99ms":517,"overshootPct":0,"offsetPx":[0,0],"firstOffsetStepPct":null,"firstFrameAfterClickMs":4.1,"dtMs":[13.7,16.8,16.1,16.9,17,15.8]}
+{"key":"whole","frames":72,"expectedFrames":71,"totalM":7.53,"firstStepPct":2.62,"peakFrame":5,"t90ms":305,"t99ms":522,"overshootPct":0,"offsetPx":[-141,6],"firstOffsetStepPct":2.62,"firstFrameAfterClickMs":6.9,"dtMs":[13.9,16.6,17.3,17,16.6,16.9]}
+{"key":"tab-craft","totalM":0,"note":"no camera move"}
+retarget {"secondClickAfterMs":114,"retargetStep":7,"worstStepRatio":1.14,"worstTurnDeg":40,"stepsMm":[1153,1039,1025,694,528,604,659,674,728,655,635]}
+
+camera before (origin/main b93ff29):
+{"key":"tab-test","frames":37,"expectedFrames":36,"totalM":8.86,"firstStepPct":19.63,"peakFrame":1,"t90ms":169,"t99ms":353,"overshootPct":0,"offsetPx":[0,0],"firstOffsetStepPct":null,"firstFrameAfterClickMs":2.2,"dtMs":[17.5,16.4,16.9,16.6,16.6,16.2]}
+{"key":"tab-paint","frames":72,"expectedFrames":72,"totalM":13.2,"firstStepPct":47.8,"peakFrame":1,"t90ms":143,"t99ms":327,"overshootPct":0,"offsetPx":[0,0],"firstOffsetStepPct":null,"firstFrameAfterClickMs":9.3,"dtMs":[17.4,16.4,16.8,16.5,16.4,17.2]}
+{"key":"tab-craft","frames":72,"expectedFrames":71,"totalM":13.77,"firstStepPct":20.24,"peakFrame":1,"t90ms":169,"t99ms":352,"overshootPct":0,"offsetPx":[0,0],"firstOffsetStepPct":null,"firstFrameAfterClickMs":2.4,"dtMs":[15.9,17.5,16.7,15.9,16.6,17.4]}
+{"key":"tab-parts","totalM":0,"note":"no camera move"}
+{"key":"part-engine","frames":37,"expectedFrames":36,"totalM":8.03,"firstStepPct":20.97,"peakFrame":1,"t90ms":169,"t99ms":351,"overshootPct":0,"offsetPx":[141,-6],"firstOffsetStepPct":20.97,"firstFrameAfterClickMs":2.5,"dtMs":[17.1,14.9,16.9,17.2,16.7,15.7]}
+{"key":"switch-plasma","frames":24,"expectedFrames":23,"totalM":0.79,"firstStepPct":47.97,"peakFrame":1,"t90ms":138,"t99ms":288,"overshootPct":0,"offsetPx":[0,0],"firstOffsetStepPct":null,"firstFrameAfterClickMs":4.5,"dtMs":[17.2,15.6,16.8,16.9,16.4,17.2]}
+{"key":"whole","frames":72,"expectedFrames":72,"totalM":7.53,"firstStepPct":47.8,"peakFrame":1,"t90ms":145,"t99ms":329,"overshootPct":0,"offsetPx":[-141,6],"firstOffsetStepPct":47.8,"firstFrameAfterClickMs":11.3,"dtMs":[17.3,16.6,16.7,16.1,17.3,16.7]}
+{"key":"tab-craft","totalM":0,"note":"no camera move"}
+retarget {"secondClickAfterMs":114,"retargetStep":6,"worstStepRatio":2.44,"worstTurnDeg":129,"stepsMm":[1410,1148,918,2244,1489,1292,1102,853,687,526,467]}
