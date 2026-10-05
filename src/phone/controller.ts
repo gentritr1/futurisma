@@ -8,10 +8,14 @@ import { PHONE_HEARTBEAT_MS, PHONE_PATH, estimateClockOffset } from "./phone-pro
 import {
   TILT_DEADZONE_DEG,
   TILT_PRESETS,
+  blendTiltDelta,
+  gestureSample,
   gravityVector,
   resolveLandscapeSign,
   shapeTiltSteer,
   tiltAngleDeg,
+  wheelAngleDeg,
+  wrapDeg,
 } from "./tilt-steer.js";
 
 type HoldKey = "g" | "b" | "x";
@@ -28,8 +32,16 @@ let preset: Preset = PRESET_ORDER.includes(hashParameters.get("s") as Preset)
   ? hashParameters.get("s") as Preset
   : "medium";
 const padElement = document.getElementById("pad")!;
+const stageElement = document.getElementById("stage")!;
 const statusElement = document.getElementById("status")!;
-const steerDot = document.getElementById("steer-dot")!;
+const statusText = document.getElementById("status-text")!;
+const gaugeNeedle = document.getElementById("gauge-needle")!;
+const gaugeValue = document.getElementById("gauge-value")!;
+const gaugeNote = document.getElementById("gauge-note")!;
+const actionsElement = document.getElementById("actions")!;
+const flipButton = document.getElementById("flip")!;
+const powerButton = document.getElementById("power")!;
+const holdHint = document.getElementById("hold-hint")!;
 const modeButton = document.getElementById("mode")!;
 const introElement = document.getElementById("intro")!;
 const introNote = document.getElementById("intro-note")!;
@@ -40,10 +52,22 @@ let mode: "tilt" | "touch" = "tilt";
 let tiltSteer = 0;
 let touchSteer = 0;
 let invert = 1;
-let neutral = 0;
 let landscapeSign: -1 | 0 | 1 = 0;
 let needsCalibration = true;
-let smoothedAngle: number | null = null;
+type Angles = { tray: number; wheel: number | null };
+/** Neutral readings, averaged over the first CALIBRATION_MS after a recentre. */
+let neutral: Angles | null = null;
+let calibration: { started: number; samples: Angles[] } | null = null;
+const CALIBRATION_MS = 300;
+/**
+ * The player's steering gesture, learned from the gyroscope: 0 turns the phone
+ * in its own screen plane (a wheel), 1 tips one end down (a tray). Each needs a
+ * different angle formula once the screen leans back; see tilt-steer.js.
+ */
+let gesture = 0.5;
+let smoothedDelta: number | null = null;
+/** Which way the other landscape grip started (event time), for re-grip detection. */
+let regripSince = 0;
 let motionSeen = false;
 /** Epoch ms of the input event behind the current state (sensor or touch). */
 let lastInputAt = 0;
@@ -52,9 +76,15 @@ const eventEpoch = (event: Event): number => performance.timeOrigin + event.time
 
 /** Random per page load; lets the relay tell this phone from a second one. */
 const padId = Array.from(crypto.getRandomValues(new Uint8Array(12)), (byte) => byte.toString(16).padStart(2, "0")).join("");
-/** Requests allowed in flight; beyond this the newest state waits for a slot. */
-const MAX_IN_FLIGHT = 6;
+/** Requests allowed in flight; beyond this the newest state waits for a slot.
+ * 3, not 6: on one HTTP/2 connection a stalled packet holds up every stream
+ * behind it, so a deeper queue only delivers older states later. */
+const MAX_IN_FLIGHT = 3;
 let inFlight = 0;
+/** How often a state had to wait for a free slot (shown in the status line). */
+let queued = 0;
+/** What the current circuit supports, reported by the game through the relay. */
+let caps: { flip: boolean; power: boolean } | null = null;
 let pending = false;
 let paired = false;
 let lastOkAt = 0;
@@ -78,13 +108,16 @@ function currentSteer(): number {
 function sendState(force = false): void {
   if (!token || statusOverride === "auth") return;
   const steer = Math.round(currentSteer() * 100) / 100;
-  const gas = held.g.size ? 1 : 0;
+  // BOOST and GAS sit under the same thumb, and the game only fires reserve
+  // boost with throttle held (game.ts: input.throttle > 0.1), so BOOST drives.
+  const gas = held.g.size || held.x.size ? 1 : 0;
   const brake = held.b.size ? 1 : 0;
   const boost = held.x.size ? 1 : 0;
   const key = `${steer}|${gas}|${brake}|${boost}|${taps.f}|${taps.p}|${taps.st}|${taps.r}`;
   const now = performance.now();
   if (!force && key === lastKey && now - lastSent < PHONE_HEARTBEAT_MS) return;
   if (inFlight >= MAX_IN_FLIGHT) {
+    if (!pending) queued += 1;
     pending = true;
     return;
   }
@@ -119,7 +152,8 @@ async function post(body: Record<string, unknown>, sentAt: number): Promise<void
       credentials: "omit",
     });
     if (response.ok) {
-      const reply = await response.json() as { game?: unknown; srv?: unknown };
+      const reply = await response.json() as { game?: unknown; srv?: unknown; caps?: unknown };
+      applyCaps(reply.caps);
       rtt = performance.now() - startedAt;
       if (typeof reply.srv === "number") {
         clockSamples.push({ sent: sentAt, received: epochNow(), server: reply.srv });
@@ -157,25 +191,43 @@ window.setInterval(() => {
 }, 500);
 
 function renderStatus(): void {
+  let text: string;
+  let tone: "" | "good" | "ok" | "bad" = "";
   if (!token) {
-    statusElement.textContent = "no pairing key - scan the QR on the game screen";
+    text = "no pairing key - scan the QR on the game screen";
   } else if (statusOverride === "auth") {
-    statusElement.textContent = "pairing key rejected - rescan the QR on the game screen";
+    text = "pairing key rejected - rescan the QR";
   } else if (statusOverride === "origin") {
-    statusElement.textContent = "relay refused this browser's origin - open the QR link directly";
+    text = "relay refused this browser - open the QR link directly";
   } else if (statusOverride === "busy") {
-    statusElement.textContent = "another phone is driving";
+    text = "another phone is driving";
   } else if (!paired) {
-    statusElement.textContent = "connecting…";
+    text = "connecting…";
+    tone = "bad";
   } else if (!gameOpen) {
-    statusElement.textContent = "open the game with ?controller=phone";
+    text = "open the game with ?controller=phone";
+    tone = "ok";
   } else {
     const sorted = [...rttSamples].sort((a, b) => a - b);
     const median = sorted.length ? sorted[Math.floor(sorted.length / 2)] : 0;
     const p95 = sorted.length ? sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * 0.95))] : 0;
-    statusElement.textContent = `connected · ${Math.round(median)} ms (p95 ${Math.round(p95)}, n=${sorted.length})`;
+    tone = p95 < 60 ? "good" : median < 80 ? "ok" : "bad";
+    text = `${Math.round(median)} ms · p95 ${Math.round(p95)}${queued ? ` · waited ${queued}` : ""}`;
   }
+  statusText.textContent = text;
+  statusElement.className = `pad__status${tone ? ` pad__status--${tone}` : ""}`;
   padElement.classList.toggle("pad--live", paired && gameOpen);
+}
+
+/** FLIP and POWER only exist on circuits with gravity decks or powers. */
+function applyCaps(raw: unknown): void {
+  if (!raw || typeof raw !== "object") return;
+  const next = { flip: (raw as { flip?: unknown }).flip === true, power: (raw as { power?: unknown }).power === true };
+  if (caps && caps.flip === next.flip && caps.power === next.power) return;
+  caps = next;
+  flipButton.hidden = !next.flip;
+  powerButton.hidden = !next.power;
+  actionsElement.hidden = !next.flip && !next.power;
 }
 
 // ---- tilt ----------------------------------------------------------------
@@ -186,39 +238,148 @@ function screenAngle(): number {
   return screen.orientation?.angle ?? 0;
 }
 
+function averageAngles(samples: Angles[]): Angles {
+  const tray = samples.reduce((sum, sample) => sum + sample.tray, 0) / samples.length;
+  if (samples.some((sample) => sample.wheel === null)) return { tray, wheel: null };
+  const first = samples[0].wheel as number;
+  const offset = samples.reduce((sum, sample) => sum + wrapDeg((sample.wheel as number) - first), 0) / samples.length;
+  return { tray, wheel: wrapDeg(first + offset) };
+}
+
 function handleMotion(event: DeviceMotionEvent): void {
   const gravity = gravityVector(event.accelerationIncludingGravity, event.acceleration);
   if (!gravity) return;
   motionSeen = true;
   const { x, y, z } = gravity;
+  updateHold(x, y, z, event.timeStamp);
   if (needsCalibration) {
     landscapeSign = resolveLandscapeSign(x, y, z, screenAngle());
-    const angle = tiltAngleDeg(x, y, z, landscapeSign);
-    if (angle === null) return;
-    neutral = angle;
-    smoothedAngle = angle;
+    calibration = { started: event.timeStamp, samples: [] };
     needsCalibration = false;
-    tiltSteer = 0;
-  } else {
-    const angle = tiltAngleDeg(x, y, z, landscapeSign);
-    if (angle === null) return;
-    // One-pole smoothing against sensor jitter. Fused gravity is already clean,
-    // so it takes 85% of each step (≈ 3 ms of lag at 60 Hz); the raw reading
-    // shakes with the hand and takes 60%.
-    const follow = gravity.fused ? 0.85 : 0.6;
-    smoothedAngle = smoothedAngle === null ? angle : smoothedAngle + (angle - smoothedAngle) * follow;
-    const { fullLockDeg, expo } = TILT_PRESETS[preset];
-    const next = invert * shapeTiltSteer(smoothedAngle, neutral, fullLockDeg, TILT_DEADZONE_DEG, expo);
-    if (Math.round(next * 100) !== Math.round(tiltSteer * 100)) lastInputAt = eventEpoch(event);
-    tiltSteer = next;
+    neutral = null;
+    smoothedDelta = null;
+    regripSince = 0;
   }
+  const tray = tiltAngleDeg(x, y, z, landscapeSign);
+  if (tray === null) return;
+  const angles: Angles = { tray, wheel: wheelAngleDeg(x, y, z, landscapeSign) };
+  // Learn the gesture from fast, deliberate rotations only.
+  const rate = event.rotationRate;
+  if (rate && Number.isFinite(rate.alpha) && Number.isFinite(rate.beta) && Number.isFinite(rate.gamma)
+    && Math.hypot(rate.alpha!, rate.beta!, rate.gamma!) > 25) {
+    const sample = gestureSample({ x: rate.beta!, y: rate.gamma!, z: rate.alpha! }, x, y, z);
+    if (sample !== null) gesture += (sample - gesture) * 0.08;
+  }
+  // The other landscape grip for 300 ms is a re-grip: recentre for it.
+  const magnitude = Math.hypot(x, y, z);
+  if (Math.abs(x) / magnitude > 0.6 && Math.sign(x) === -landscapeSign) {
+    regripSince ||= event.timeStamp;
+    if (event.timeStamp - regripSince > 300) {
+      recalibrate();
+      return;
+    }
+  } else {
+    regripSince = 0;
+  }
+  if (calibration) {
+    calibration.samples.push(angles);
+    tiltSteer = 0;
+    if (event.timeStamp - calibration.started >= CALIBRATION_MS) {
+      neutral = averageAngles(calibration.samples);
+      calibration = null;
+    }
+    renderSteer();
+    sendState();
+    return;
+  }
+  if (!neutral) return;
+  const delta = blendTiltDelta(angles, neutral, gesture);
+  // One-pole smoothing against sensor jitter. Fused gravity is already clean,
+  // so it takes 85% of each step (≈ 3 ms of lag at 60 Hz); the raw reading
+  // shakes with the hand and takes 60%.
+  const follow = gravity.fused ? 0.85 : 0.6;
+  smoothedDelta = smoothedDelta === null ? delta : smoothedDelta + (delta - smoothedDelta) * follow;
+  const { fullLockDeg, expo } = TILT_PRESETS[preset];
+  const next = invert * shapeTiltSteer(smoothedDelta, 0, fullLockDeg, TILT_DEADZONE_DEG, expo);
+  if (Math.round(next * 100) !== Math.round(tiltSteer * 100)) lastInputAt = eventEpoch(event);
+  tiltSteer = next;
   renderSteer();
   sendState();
 }
 
 function recalibrate(): void {
   needsCalibration = true;
-  smoothedAngle = null;
+  calibration = null;
+  smoothedDelta = null;
+}
+
+// ---- holding the phone ---------------------------------------------------
+//
+// iOS Safari cannot lock rotation, and a hard steer can make it turn the page
+// to portrait mid-corner. Instead of a "rotate" cover (and a recentre), the
+// stage is counter-rotated so the pad stays put under the player's thumbs.
+
+/** Sign of gx when the top of the phone is to the LEFT: +1 per spec, -1 on iOS. */
+let gravityConvention = /iPhone|iPad|iPod/.test(navigator.userAgent) ? -1 : 1;
+/** Physical landscape side, from gravity: 90 = top of the phone to the left. */
+let holdAngle: 90 | -90 | null = null;
+let holdCandidate: 90 | -90 | null = null;
+let holdSince = 0;
+let stageRotation = 0;
+let portraitSince = 0;
+
+function updateHold(gx: number, gy: number, gz: number, at: number): void {
+  const magnitude = Math.hypot(gx, gy, gz);
+  if (!(magnitude > 0.05)) return;
+  const page = screenAngle();
+  // Learn the platform's sign convention whenever the page itself is landscape.
+  if ((page === 90 || page === -90 || page === 270) && Math.abs(gx) / magnitude > 0.6) {
+    const pageAngle = page === 270 ? -90 : page;
+    gravityConvention = Math.sign(gx) * (pageAngle === 90 ? 1 : -1);
+  }
+  if (Math.abs(gx) / magnitude > 0.6) {
+    const side: 90 | -90 = Math.sign(gx) * gravityConvention > 0 ? 90 : -90;
+    if (side !== holdCandidate) {
+      holdCandidate = side;
+      holdSince = at;
+    }
+    if (holdAngle === null || (side !== holdAngle && at - holdSince > 250)) holdAngle = side;
+    portraitSince = 0;
+  } else if (Math.abs(gy) / magnitude > 0.8) {
+    portraitSince ||= at;
+  } else {
+    portraitSince = 0;
+  }
+  holdHint.hidden = !(portraitSince && at - portraitSince > 1200);
+  applyStageRotation();
+}
+
+function applyStageRotation(): void {
+  const page = screenAngle();
+  const pageAngle = page === 270 ? -90 : page;
+  const target = holdAngle === null ? 0 : ((((holdAngle - pageAngle) % 360) + 540) % 360) - 180;
+  if (target === stageRotation) return;
+  stageRotation = target;
+  const style = stageElement.style;
+  if (target === 0) {
+    style.width = "";
+    style.height = "";
+    style.left = "";
+    style.top = "";
+    style.right = "";
+    style.bottom = "";
+    style.transform = "";
+    return;
+  }
+  const quarter = Math.abs(target) === 90;
+  // A quarter turn swaps the stage's width and height.
+  style.width = quarter ? "100vh" : "100vw";
+  style.height = quarter ? "100vw" : "100vh";
+  style.left = "50%";
+  style.top = "50%";
+  style.right = "auto";
+  style.bottom = "auto";
+  style.transform = `translate(-50%, -50%) rotate(${target}deg)`;
 }
 
 async function enableMotion(): Promise<boolean> {
@@ -276,17 +437,22 @@ function bindTap(element: HTMLElement, key: TapKey): void {
 function bindWheel(element: HTMLElement): void {
   let pointer: number | null = null;
   let originX = 0;
+  let originY = 0;
   element.addEventListener("pointerdown", (event) => {
     event.preventDefault();
     if (pointer !== null) return;
     pointer = event.pointerId;
     originX = event.clientX;
+    originY = event.clientY;
     element.setPointerCapture(event.pointerId);
   });
   element.addEventListener("pointermove", (event) => {
     if (event.pointerId !== pointer) return;
-    const span = Math.max(60, window.innerWidth * 0.16);
-    touchSteer = Math.max(-1, Math.min(1, (event.clientX - originX) / span));
+    const span = Math.max(60, stageElement.getBoundingClientRect().width * 0.16);
+    // Along the stage's horizontal, which the counter-rotation may have turned.
+    const turn = stageRotation * (Math.PI / 180);
+    const along = (event.clientX - originX) * Math.cos(turn) + (event.clientY - originY) * Math.sin(turn);
+    touchSteer = Math.max(-1, Math.min(1, along / span));
     lastInputAt = eventEpoch(event);
     renderSteer();
     sendState();
@@ -323,7 +489,15 @@ function setMode(next: "tilt" | "touch"): void {
 }
 
 function renderSteer(): void {
-  steerDot.style.transform = `translateX(${(currentSteer() * 50).toFixed(1)}%)`;
+  const steer = currentSteer();
+  gaugeNeedle.style.transform = `rotate(${(steer * 80).toFixed(1)}deg)`;
+  const amount = Math.round(Math.abs(steer) * 100);
+  gaugeValue.textContent = amount === 0 ? "0" : `${steer < 0 ? "L" : "R"} ${amount}`;
+  gaugeNote.textContent = mode === "touch"
+    ? "drag to steer"
+    : calibration || needsCalibration
+      ? "centring…"
+      : gesture < 0.35 ? "wheel grip" : gesture > 0.65 ? "tilt grip" : "turn like a wheel";
 }
 
 // ---- wake lock -----------------------------------------------------------
@@ -384,8 +558,9 @@ document.getElementById("go")!.addEventListener("click", async () => {
   if (motion) setMode("tilt");
 });
 
-window.addEventListener("orientationchange", recalibrate);
-screen.orientation?.addEventListener?.("change", recalibrate);
+// A page rotation is not a re-grip: keep the centre, just counter-rotate.
+window.addEventListener("orientationchange", applyStageRotation);
+screen.orientation?.addEventListener?.("change", applyStageRotation);
 window.addEventListener("blur", releaseEverything);
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "visible") {

@@ -21,31 +21,50 @@
   </head>
   <body>
     <!-- Dev-only phone controller (npm run dev:phone). Not part of the production build. -->
+    <div class="stage" id="stage">
     <main class="pad pad--tilt" id="pad">
       <header class="pad__bar">
-        <button type="button" data-tap="st">START</button>
-        <button type="button" data-tap="r">RESET</button>
-        <div class="pad__meter" aria-hidden="true">
-          <div class="pad__meter-dot" id="steer-dot"></div>
+        <div class="pad__group">
+          <button type="button" data-tap="st">START</button>
+          <button type="button" data-tap="r">RESET</button>
         </div>
-        <p class="pad__status" id="status" role="status">connecting…</p>
-        <button type="button" id="center">CENTER</button>
-        <button type="button" id="preset" aria-label="Steering sensitivity">MED</button>
-        <button type="button" id="mode">TILT</button>
-        <button type="button" id="invert" aria-label="Invert tilt">⇄</button>
+        <p class="pad__status" id="status" role="status">
+          <span class="pad__status-dot" aria-hidden="true"></span><span id="status-text">connecting…</span>
+        </p>
+        <div class="pad__group">
+          <button type="button" id="center">CENTER</button>
+          <button type="button" id="preset" aria-label="Steering sensitivity">MED</button>
+          <button type="button" id="mode">TILT</button>
+          <button type="button" id="invert" aria-label="Invert tilt">⇄</button>
+        </div>
       </header>
       <section class="pad__left">
-        <button type="button" class="pad__big pad__brake" data-hold="b">BRAKE</button>
+        <button type="button" class="pad__big pad__brake" data-hold="b"><span>BRAKE</span></button>
         <div class="pad__wheel" id="wheel">DRAG TO STEER</div>
       </section>
       <section class="pad__mid">
-        <button type="button" data-tap="f">FLIP</button>
-        <button type="button" data-tap="p">POWER</button>
+        <div class="pad__gauge" aria-hidden="true">
+          <svg class="pad__gauge-svg" viewBox="0 0 120 70">
+            <path d="M12 62 A48 48 0 0 1 108 62" fill="none" stroke="rgba(223,247,238,0.14)" stroke-width="8" stroke-linecap="round"/>
+            <path d="M60 14 L60 22" stroke="rgba(223,247,238,0.4)" stroke-width="2"/>
+            <g class="pad__needle" id="gauge-needle">
+              <path d="M60 62 L60 20" stroke="#c0f000" stroke-width="4" stroke-linecap="round"/>
+            </g>
+            <circle cx="60" cy="62" r="5" fill="#c0f000"/>
+          </svg>
+          <p class="pad__gauge-value" id="gauge-value">0</p>
+          <p class="pad__gauge-note" id="gauge-note">turn like a wheel</p>
+        </div>
+        <!-- Shown only when the game reports the circuit has them (gravity decks / powers). -->
+        <div class="pad__actions" id="actions" hidden>
+          <button type="button" data-tap="f" id="flip" hidden>FLIP</button>
+          <button type="button" data-tap="p" id="power" hidden>POWER</button>
+        </div>
         <button type="button" class="pad__brake-small" data-hold="b">BRAKE</button>
       </section>
       <section class="pad__right">
-        <button type="button" class="pad__boost" data-hold="x">BOOST</button>
-        <button type="button" class="pad__big pad__gas" data-hold="g">GAS</button>
+        <button type="button" class="pad__boost" data-hold="x"><span>BOOST</span><small>+ GAS</small></button>
+        <button type="button" class="pad__big pad__gas" data-hold="g"><span>GAS</span></button>
       </section>
     </main>
     <div class="intro" id="intro">
@@ -54,7 +73,8 @@
       <button type="button" id="go">TAP TO START</button>
       <p class="intro__note" id="intro-note"></p>
     </div>
-    <div class="rotate" aria-hidden="true">Rotate to landscape</div>
+    <div class="hold-hint" id="hold-hint" hidden>Hold the phone sideways</div>
+    </div>
     <script type="module" src="/src/phone/controller.ts"></script>
   </body>
 </html>
