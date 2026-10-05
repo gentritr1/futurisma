@@ -549,19 +549,9 @@ export class SceneAssets {
    * Runs BEFORE `scene.add`, so no frame ever shows the unrepaired placement.
    */
   private async clearCorridorObstacles(root: THREE.Object3D): Promise<void> {
-    const {
-      relocateCorridorObstacles,
-      OBSTACLE_LATERAL_MARGIN_METRES,
-      OBSTACLE_HEIGHT_MIN_METRES,
-      OBSTACLE_HEIGHT_MAX_METRES,
-      OBSTACLE_SEAM_TOLERANCE_METRES,
-    } = await import("./course-repair");
-    this.corridorRelocation = relocateCorridorObstacles(root, this.course, {
-      lateralMargin: OBSTACLE_LATERAL_MARGIN_METRES,
-      heightMin: OBSTACLE_HEIGHT_MIN_METRES,
-      heightMax: OBSTACLE_HEIGHT_MAX_METRES,
-      seamTolerance: OBSTACLE_SEAM_TOLERANCE_METRES,
-    });
+    // Greenwater applies the pass's baked answer (~900 ms -> O(moved vertices));
+    // anything else, or a bake whose preconditions miss, runs the full pass.
+    this.corridorRelocation = await (await import("./corridor-bake")).clearCorridor(root, this.course);
   }
 
   private async loadSurfaceCharacter(): Promise<void> {

@@ -601,14 +601,12 @@ export class FuturismaGame {
     this.resetRaceState();
     this.updatePose(ZERO_INPUT, 0);
     this.snapCamera();
-    if (this.course.kind !== "greenwater") {
-      await this.sceneAssets.loadAuthoredEnvironment();
-      if (this.disposed) return false;
-    }
+    await this.sceneAssets.loadAuthoredEnvironment(); // Greenwater too: its corridor repair is baked (corridor-bake.ts).
+    if (this.disposed) return false;
     this.updateTidelineMaterials = await prepareTidelinePresentation(this.course.kind, this.reducedMotion, this.scene, this.rivalFleet, this.vehicle.root, this.course.group, this.effects.speedLines, this.effects.sparkPoints);
+    await import("./render-warmup").then((m) => m.warmRenderer(this.renderer, this.scene, this.camera, () => this.disposed), () => undefined); // Behind the loading screen; never fatal.
     this.running = true;
     this.animationFrame = requestAnimationFrame(this.frame);
-    if (this.course.kind === "greenwater") void this.sceneAssets.loadAuthoredEnvironment();
     this.diagnosticStartupReadyMs = performance.now();
     return true;
   }

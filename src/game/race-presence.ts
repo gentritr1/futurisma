@@ -467,6 +467,10 @@ export class TotemRacePresence {
     mesh.renderOrder = renderOrder;
     mesh.count = 0;
     mesh.visible = false;
+    // The vertex shader reads `instanceColor`, which `setColorAt` would only
+    // allocate on the first effect. Allocate it now so the program key is final
+    // when render-warmup.ts compiles it (null compiled an invalid shader there).
+    mesh.setColorAt(0, new THREE.Color(1, 1, 1));
     return { mesh, capacity, used: 0 };
   }
 

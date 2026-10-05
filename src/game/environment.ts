@@ -395,6 +395,31 @@ function findLivingTextures(root: THREE.Object3D): GreenwaterLivingTextures {
   return { jungle, emissive };
 }
 
+/**
+ * Every vertex edit `GreenwaterEnvironment.load` makes before material work: the
+ * Hangar Six edge barriers and the signature-parcel marsh plants. Exported so
+ * `scripts/derive-corridor-relocation.mjs` replays the exact runtime input
+ * under Node before it bakes the corridor relocation that follows this.
+ */
+export function repairGreenwaterRuntimeGeometry(
+  scene: THREE.Object3D,
+  course: RaceCourse,
+  contractDrift: string[],
+): THREE.Object3D {
+  const runtime = scene.getObjectByName("GW_ENVIRONMENT_RUNTIME");
+  if (!runtime) {
+    throw new Error("Greenwater runtime root is missing.");
+  }
+  scene.updateMatrixWorld(true);
+  const hangarBarrierMesh = runtime.getObjectByName(HANGAR_BARRIER_MESH);
+  if (!(hangarBarrierMesh instanceof THREE.Mesh)) {
+    throw new Error(`${HANGAR_BARRIER_MESH} is missing.`);
+  }
+  relocateHangarSixEdgeBarriers(hangarBarrierMesh, course, contractDrift);
+  reserveCircuitSignatureVegetation(runtime,course);
+  return runtime;
+}
+
 export class GreenwaterEnvironment {
   readonly root: THREE.Group;
   readonly stats: GreenwaterEnvironmentStats;
@@ -434,17 +459,7 @@ export class GreenwaterEnvironment {
     const scene = (await new GLTFLoader().loadAsync(url)).scene;
     const contractDrift: string[] = [];
     try {
-      const runtime = scene.getObjectByName("GW_ENVIRONMENT_RUNTIME");
-      if (!runtime) {
-        throw new Error("Greenwater runtime root is missing.");
-      }
-      scene.updateMatrixWorld(true);
-      const hangarBarrierMesh = runtime.getObjectByName(HANGAR_BARRIER_MESH);
-      if (!(hangarBarrierMesh instanceof THREE.Mesh)) {
-        throw new Error(`${HANGAR_BARRIER_MESH} is missing.`);
-      }
-      relocateHangarSixEdgeBarriers(hangarBarrierMesh, course, contractDrift);
-      reserveCircuitSignatureVegetation(runtime,course);
+      const runtime = repairGreenwaterRuntimeGeometry(scene, course, contractDrift);
       const cullGroups: CullGroup[] = [];
       let triangles = 0;
       runtime.traverse((object) => {

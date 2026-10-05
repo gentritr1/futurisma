@@ -442,7 +442,12 @@ assert.equal(
   "A non-finite distance must leave the lamps off rather than NaN the intensity.",
 );
 
-// atmosphere.ts must actually hide the lights, not just dim them.
+// atmosphere.ts must keep the lamps in the light set and dim them, never hide
+// them. This inverts the pre-warm-up rule ("hide, don't just dim"): the light
+// COUNT is part of three's program key and intensity is not, so a lamp that
+// toggles `visible` recompiled every Greenwater program on first hangar entry
+// (52 programs, a 4.55 s cold frame on the prod build). A zero-intensity light
+// costs one uniform slot; a visibility flip costs a scene-wide recompile.
 const atmosphereSource = read("src/game/atmosphere.ts");
 assert.ok(
   atmosphereSource.includes("resolveHangarLampLevel("),
@@ -453,15 +458,29 @@ assert.ok(
   atmosphereSource.includes("ATMOSPHERE_UPDATE_INTERVAL_SECONDS"),
   "The flicker must be advanced on the 30 Hz atmosphere tick, not per frame.",
 );
-assert.ok(
-  atmosphereSource.includes("lamp.visible = active;")
-    && atmosphereSource.includes("lamp.intensity = intensity;"),
-  "atmosphere.ts must set both `visible` and `intensity` on the hangar lamps; "
-    + "an intensity-0 light still costs a uniform upload.",
+const lampSource = atmosphereSource.slice(
+  atmosphereSource.indexOf("private installHangarLamps"),
+  atmosphereSource.indexOf("diagnostics(): AtmosphereDiagnostics"),
 );
 assert.ok(
-  atmosphereSource.includes("lamp.visible = false;"),
-  "The hangar lamps must be created hidden.",
+  lampSource.includes("new THREE.PointLight(") && lampSource.includes("resolveHangarLampLevel("),
+  "validate-lighting could not find the hangar-lamp construction and update in "
+    + "atmosphere.ts; the invariant below would be vacuous.",
+);
+assert.ok(
+  /this\.hangarLamps\[index\]\.intensity = intensity;/.test(lampSource),
+  "atmosphere.ts must carry the hangar lamps' on/off state in `intensity`.",
+);
+assert.ok(
+  !/\.visible\s*=(?!=)/.test(lampSource),
+  "atmosphere.ts assigns `visible` in the hangar-lamp code. The lamps must stay "
+    + "visible from creation on, so the light count — part of every program key — "
+    + "never changes mid-race; dim them with intensity instead.",
+);
+assert.ok(
+  !/(presenceLight|hangarLamps\[[^\]]*\]|\blamp)\.visible\s*=(?!=)/.test(atmosphereSource),
+  "atmosphere.ts toggles `visible` on a race light. Keep the light count constant "
+    + "and let intensity carry the state (see render-warmup.ts).",
 );
 
 /* ------------------------------------------------------------------ */

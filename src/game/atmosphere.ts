@@ -116,12 +116,15 @@ const HANGAR_LAMP_COLOR = 0xffb154;
  * The trade, stated because the old comment claimed the opposite: the falloff
  * no longer dies before the shell mouth. It now reaches ~38 m back onto
  * `LINK_APRON` and ~34 m forward onto `HANGAR_EXIT`, which three lamps covering
- * the middle cannot avoid. The lamps are only visible while the player is
+ * the middle cannot avoid. The lamps only carry intensity while the player is
  * inside 618-816 m, so the spill appears and vanishes with them;
  * validate-lighting.mjs pins it so it cannot grow unnoticed.
  *
- * Cost: the in-shell lit-light count goes 6 -> 7, i.e. one extra shader
- * recompile on first entry.
+ * Cost: three point lights in every Greenwater program, lit or not. They stay
+ * `visible` at intensity 0 outside the shell, because the light COUNT is part
+ * of three's program key and intensity is not: toggling `visible` recompiled
+ * 52 programs on first entry (4.55 s cold frame, measured on the prod build).
+ * render-warmup.ts compiles once, behind the loading screen, against this set.
  */
 const HANGAR_LAMP_DISTANCES_METRES = [640, 715, 790] as const;
 const HANGAR_LAMP_HEIGHT_METRES = 14.2;
@@ -386,9 +389,10 @@ export class RaceAtmosphere {
 
   /**
    * Three conditional sodium lamps inside `HANGAR_SIX`. They are added to the
-   * scene once, hidden, and only ever become visible between 618 m and 816 m —
-   * an invisible light is skipped by the renderer's object traversal, so the
-   * lit-light count is 4 everywhere except inside the shell, where it is 7.
+   * scene once, always visible, and only carry intensity between 618 m and
+   * 816 m. An invisible light would drop out of the light count and force a
+   * scene-wide recompile each time it came back, so the count stays constant
+   * and intensity alone says whether a lamp is lit (as `presenceLight` does).
    *
    * Greenwater only: Bitterpan has no hangar and P8 owns its lighting.
    */
@@ -406,7 +410,6 @@ export class RaceAtmosphere {
       lamp.position
         .copy(sample.position)
         .addScaledVector(sample.up, HANGAR_LAMP_HEIGHT_METRES);
-      lamp.visible = false;
       this.hangarLamps.push(lamp);
       this.scene.add(lamp);
     }
@@ -828,12 +831,10 @@ export class RaceAtmosphere {
       this.hangarFlicker,
     );
     this.hangarLampLevel = level;
-    const active = level > 0;
+    // Intensity only: `visible` stays true so the light count never changes.
     const intensity = level * HANGAR_LAMP_PEAK_INTENSITY;
     for (let index = 0; index < this.hangarLamps.length; index += 1) {
-      const lamp = this.hangarLamps[index];
-      lamp.visible = active;
-      lamp.intensity = intensity;
+      this.hangarLamps[index].intensity = intensity;
     }
   }
 

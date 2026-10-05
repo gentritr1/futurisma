@@ -1,0 +1,1479 @@
+{
+ "how": "scripts/perf-warmup/bench.mjs, one line per circuit per round. base-r1/r2 = origin/main b93ff29 prod build; new-r5..r9 = this branch's final warm-up (r5/r6 lacked only the 10 s wait cap; r9 = final build). Fresh --user-data-dir per browser (cold); 'warm' = second navigation in the same browser.",
+ "fields": {
+  "menu.visible": "ms from navigation to the first rAF after phase=intro (the frame that paints the menu)",
+  "menu.straddle": "length of the frame that paints it (loading screen frozen except compositor animation)",
+  "menu.stallsOver50": "[ms after visible, frame ms] for frames fully after the menu was painted, 5 s window",
+  "cold.clock": "ms from navigation to the race clock leaving 00:00.000 (?demo=1&laps=3)",
+  "cold.countdownOver50": "long frames between race view painted and the clock",
+  "cold.win": "[frames, expected at 60 Hz] in the 20 s window after the clock",
+  "cold.max": "worst rAF delta in that window",
+  "cold.progs": "programs created (shaderSource) in that window",
+  "cold.diag": "renderer.info.programs.length at clock and +20 s",
+  "warmupMs": "[FUTURISMA_WARMUP] totalMs"
+ },
+ "machine": "Apple M1 Pro, Chrome headless=new, --use-angle=metal, 1280x720, vite preview on localhost (no network cost). Load average 28-33 from other agents during r5-r9.",
+ "runs": [
+  {
+   "map": "greenwater",
+   "label": "base-r1",
+   "menu": {
+    "visible": 1173,
+    "straddle": 517,
+    "stallsMax": 933,
+    "stallsOver50": [
+     [
+      150,
+      933
+     ],
+     [
+      1117,
+      67
+     ]
+    ],
+    "frames": [
+     213,
+     300
+    ],
+    "warmupMs": null
+   },
+   "cold": {
+    "raceVisible": 1132,
+    "straddle": 17,
+    "clock": 5865,
+    "countdownMax": 933,
+    "countdownOver50": [
+     [
+      0,
+      67
+     ],
+     [
+      200,
+      933
+     ]
+    ],
+    "win": [
+     1186,
+     1205
+    ],
+    "max": 316.7,
+    "over50": 1,
+    "progs": 52,
+    "diag": [
+     72,
+     124
+    ],
+    "warmupMs": null
+   },
+   "warm": {
+    "raceVisible": 965,
+    "straddle": 67,
+    "clock": 5573,
+    "countdownMax": 950,
+    "countdownOver50": [
+     [
+      117,
+      950
+     ],
+     [
+      1100,
+      67
+     ]
+    ],
+    "win": [
+     1188,
+     1202
+    ],
+    "max": 250,
+    "over50": 1,
+    "progs": 52,
+    "diag": [
+     72,
+     124
+    ],
+    "warmupMs": null
+   }
+  },
+  {
+   "map": "frostline",
+   "label": "base-r1",
+   "menu": {
+    "visible": 1230,
+    "straddle": 633,
+    "stallsMax": 33,
+    "stallsOver50": [],
+    "frames": [
+     263,
+     300
+    ],
+    "warmupMs": null
+   },
+   "cold": {
+    "raceVisible": 1383,
+    "straddle": 17,
+    "clock": 5138,
+    "countdownMax": 17,
+    "countdownOver50": [],
+    "win": [
+     1202,
+     1203
+    ],
+    "max": 33.3,
+    "over50": 0,
+    "progs": 14,
+    "diag": [
+     89,
+     103
+    ],
+    "warmupMs": null
+   },
+   "warm": {
+    "raceVisible": 1423,
+    "straddle": 17,
+    "clock": 5179,
+    "countdownMax": 33,
+    "countdownOver50": [],
+    "win": [
+     1207,
+     1207
+    ],
+    "max": 16.8,
+    "over50": 0,
+    "progs": 14,
+    "diag": [
+     89,
+     103
+    ],
+    "warmupMs": null
+   }
+  },
+  {
+   "map": "nightshift",
+   "label": "base-r1",
+   "menu": {
+    "visible": 3151,
+    "straddle": 400,
+    "stallsMax": 17,
+    "stallsOver50": [],
+    "frames": [
+     281,
+     300
+    ],
+    "warmupMs": null
+   },
+   "cold": {
+    "raceVisible": 2335,
+    "straddle": 17,
+    "clock": 6125,
+    "countdownMax": 100,
+    "countdownOver50": [
+     [
+      0,
+      100
+     ]
+    ],
+    "win": [
+     1206,
+     1207
+    ],
+    "max": 33.4,
+    "over50": 0,
+    "progs": 10,
+    "diag": [
+     47,
+     57
+    ],
+    "warmupMs": null
+   },
+   "warm": {
+    "raceVisible": 1140,
+    "straddle": 83,
+    "clock": 4869,
+    "countdownMax": 17,
+    "countdownOver50": [],
+    "win": [
+     1203,
+     1204
+    ],
+    "max": 33.4,
+    "over50": 0,
+    "progs": 10,
+    "diag": [
+     47,
+     57
+    ],
+    "warmupMs": null
+   }
+  },
+  {
+   "map": "dreamisland",
+   "label": "base-r1",
+   "menu": {
+    "visible": 4855,
+    "straddle": 17,
+    "stallsMax": 1050,
+    "stallsOver50": [
+     [
+      0,
+      1050
+     ]
+    ],
+    "frames": [
+     238,
+     300
+    ],
+    "warmupMs": null
+   },
+   "cold": {
+    "raceVisible": 4168,
+    "straddle": 100,
+    "clock": 7930,
+    "countdownMax": 133,
+    "countdownOver50": [
+     [
+      183,
+      133
+     ]
+    ],
+    "win": [
+     1201,
+     1201
+    ],
+    "max": 16.8,
+    "over50": 0,
+    "progs": 11,
+    "diag": [
+     49,
+     60
+    ],
+    "warmupMs": null
+   },
+   "warm": {
+    "raceVisible": 1217,
+    "straddle": 50,
+    "clock": 4997,
+    "countdownMax": 117,
+    "countdownOver50": [
+     [
+      84,
+      117
+     ]
+    ],
+    "win": [
+     1204,
+     1204
+    ],
+    "max": 16.8,
+    "over50": 0,
+    "progs": 11,
+    "diag": [
+     49,
+     60
+    ],
+    "warmupMs": null
+   }
+  },
+  {
+   "map": "greenwater",
+   "label": "base-r2",
+   "menu": {
+    "visible": 1300,
+    "straddle": 517,
+    "stallsMax": 933,
+    "stallsOver50": [
+     [
+      183,
+      933
+     ]
+    ],
+    "frames": [
+     211,
+     300
+    ],
+    "warmupMs": null
+   },
+   "cold": {
+    "raceVisible": 1449,
+    "straddle": 17,
+    "clock": 6149,
+    "countdownMax": 967,
+    "countdownOver50": [
+     [
+      0,
+      67
+     ],
+     [
+      184,
+      967
+     ],
+     [
+      1234,
+      67
+     ]
+    ],
+    "win": [
+     1183,
+     1202
+    ],
+    "max": 333.3,
+    "over50": 1,
+    "progs": 51,
+    "diag": [
+     72,
+     123
+    ],
+    "warmupMs": null
+   },
+   "warm": {
+    "raceVisible": 976,
+    "straddle": 50,
+    "clock": 5558,
+    "countdownMax": 917,
+    "countdownOver50": [
+     [
+      83,
+      917
+     ]
+    ],
+    "win": [
+     1187,
+     1202
+    ],
+    "max": 266.7,
+    "over50": 1,
+    "progs": 52,
+    "diag": [
+     72,
+     124
+    ],
+    "warmupMs": null
+   }
+  },
+  {
+   "map": "frostline",
+   "label": "base-r2",
+   "menu": {
+    "visible": 1118,
+    "straddle": 17,
+    "stallsMax": 700,
+    "stallsOver50": [
+     [
+      0,
+      700
+     ]
+    ],
+    "frames": [
+     259,
+     300
+    ],
+    "warmupMs": null
+   },
+   "cold": {
+    "raceVisible": 1717,
+    "straddle": 17,
+    "clock": 5415,
+    "countdownMax": 33,
+    "countdownOver50": [],
+    "win": [
+     1205,
+     1205
+    ],
+    "max": 16.8,
+    "over50": 0,
+    "progs": 14,
+    "diag": [
+     89,
+     103
+    ],
+    "warmupMs": null
+   },
+   "warm": {
+    "raceVisible": 1093,
+    "straddle": 17,
+    "clock": 4881,
+    "countdownMax": 17,
+    "countdownOver50": [],
+    "win": [
+     1201,
+     1201
+    ],
+    "max": 16.8,
+    "over50": 0,
+    "progs": 14,
+    "diag": [
+     89,
+     103
+    ],
+    "warmupMs": null
+   }
+  },
+  {
+   "map": "nightshift",
+   "label": "base-r2",
+   "menu": {
+    "visible": 1091,
+    "straddle": 17,
+    "stallsMax": 383,
+    "stallsOver50": [
+     [
+      0,
+      383
+     ]
+    ],
+    "frames": [
+     278,
+     300
+    ],
+    "warmupMs": null
+   },
+   "cold": {
+    "raceVisible": 1536,
+    "straddle": 83,
+    "clock": 5232,
+    "countdownMax": 33,
+    "countdownOver50": [],
+    "win": [
+     1205,
+     1206
+    ],
+    "max": 33.3,
+    "over50": 0,
+    "progs": 10,
+    "diag": [
+     47,
+     57
+    ],
+    "warmupMs": null
+   },
+   "warm": {
+    "raceVisible": 759,
+    "straddle": 67,
+    "clock": 4496,
+    "countdownMax": 17,
+    "countdownOver50": [],
+    "win": [
+     1200,
+     1202
+    ],
+    "max": 33.4,
+    "over50": 0,
+    "progs": 10,
+    "diag": [
+     47,
+     57
+    ],
+    "warmupMs": null
+   }
+  },
+  {
+   "map": "dreamisland",
+   "label": "base-r2",
+   "menu": {
+    "visible": 2222,
+    "straddle": 17,
+    "stallsMax": 933,
+    "stallsOver50": [
+     [
+      0,
+      933
+     ]
+    ],
+    "frames": [
+     245,
+     300
+    ],
+    "warmupMs": null
+   },
+   "cold": {
+    "raceVisible": 2292,
+    "straddle": 17,
+    "clock": 6283,
+    "countdownMax": 133,
+    "countdownOver50": [
+     [
+      0,
+      100
+     ],
+     [
+      200,
+      133
+     ]
+    ],
+    "win": [
+     1203,
+     1203
+    ],
+    "max": 16.8,
+    "over50": 0,
+    "progs": 11,
+    "diag": [
+     49,
+     60
+    ],
+    "warmupMs": null
+   },
+   "warm": {
+    "raceVisible": 1594,
+    "straddle": 17,
+    "clock": 5434,
+    "countdownMax": 133,
+    "countdownOver50": [
+     [
+      0,
+      67
+     ],
+     [
+      183,
+      133
+     ]
+    ],
+    "win": [
+     1206,
+     1206
+    ],
+    "max": 16.8,
+    "over50": 0,
+    "progs": 11,
+    "diag": [
+     49,
+     60
+    ],
+    "warmupMs": null
+   }
+  },
+  {
+   "map": "greenwater",
+   "label": "new-r5",
+   "menu": {
+    "visible": 1514,
+    "straddle": 300,
+    "stallsMax": 33,
+    "stallsOver50": [],
+    "frames": [
+     299,
+     300
+    ],
+    "warmupMs": 706
+   },
+   "cold": {
+    "raceVisible": 1919,
+    "straddle": 83,
+    "clock": 5673,
+    "countdownMax": 17,
+    "countdownOver50": [],
+    "win": [
+     1201,
+     1201
+    ],
+    "max": 16.8,
+    "over50": 0,
+    "progs": 0,
+    "diag": [
+     90,
+     90
+    ],
+    "warmupMs": 660
+   },
+   "warm": {
+    "raceVisible": 1931,
+    "straddle": 67,
+    "clock": 5679,
+    "countdownMax": 33,
+    "countdownOver50": [],
+    "win": [
+     1198,
+     1200
+    ],
+    "max": 50,
+    "over50": 0,
+    "progs": 0,
+    "diag": [
+     90,
+     90
+    ],
+    "warmupMs": 563
+   }
+  },
+  {
+   "map": "frostline",
+   "label": "new-r5",
+   "menu": {
+    "visible": 3003,
+    "straddle": 800,
+    "stallsMax": 33,
+    "stallsOver50": [],
+    "frames": [
+     299,
+     300
+    ],
+    "warmupMs": 963
+   },
+   "cold": {
+    "raceVisible": 3012,
+    "straddle": 17,
+    "clock": 6791,
+    "countdownMax": 17,
+    "countdownOver50": [],
+    "win": [
+     1199,
+     1204
+    ],
+    "max": 33.4,
+    "over50": 0,
+    "progs": 0,
+    "diag": [
+     119,
+     119
+    ],
+    "warmupMs": 725
+   },
+   "warm": {
+    "raceVisible": 1656,
+    "straddle": 17,
+    "clock": 5482,
+    "countdownMax": 67,
+    "countdownOver50": [
+     [
+      2917,
+      67
+     ]
+    ],
+    "win": [
+     1201,
+     1202
+    ],
+    "max": 33.4,
+    "over50": 0,
+    "progs": 0,
+    "diag": [
+     119,
+     119
+    ],
+    "warmupMs": 746
+   }
+  },
+  {
+   "map": "nightshift",
+   "label": "new-r5",
+   "menu": {
+    "visible": 2298,
+    "straddle": 17,
+    "stallsMax": 33,
+    "stallsOver50": [],
+    "frames": [
+     299,
+     300
+    ],
+    "warmupMs": 360
+   },
+   "cold": {
+    "raceVisible": 3106,
+    "straddle": 117,
+    "clock": 6831,
+    "countdownMax": 17,
+    "countdownOver50": [],
+    "win": [
+     1205,
+     1205
+    ],
+    "max": 16.8,
+    "over50": 0,
+    "progs": 0,
+    "diag": [
+     64,
+     64
+    ],
+    "warmupMs": 420
+   },
+   "warm": {
+    "raceVisible": 1370,
+    "straddle": 100,
+    "clock": 5144,
+    "countdownMax": 17,
+    "countdownOver50": [],
+    "win": [
+     1203,
+     1203
+    ],
+    "max": 16.8,
+    "over50": 0,
+    "progs": 0,
+    "diag": [
+     64,
+     64
+    ],
+    "warmupMs": 336
+   }
+  },
+  {
+   "map": "dreamisland",
+   "label": "new-r5",
+   "menu": {
+    "visible": 6290,
+    "straddle": 750,
+    "stallsMax": 33,
+    "stallsOver50": [],
+    "frames": [
+     299,
+     300
+    ],
+    "warmupMs": 952
+   },
+   "cold": {
+    "raceVisible": 7998,
+    "straddle": 17,
+    "clock": 11881,
+    "countdownMax": 150,
+    "countdownOver50": [
+     [
+      150,
+      150
+     ]
+    ],
+    "win": [
+     1205,
+     1205
+    ],
+    "max": 16.8,
+    "over50": 0,
+    "progs": 0,
+    "diag": [
+     76,
+     76
+    ],
+    "warmupMs": 855
+   },
+   "warm": {
+    "raceVisible": 1674,
+    "straddle": 17,
+    "clock": 5595,
+    "countdownMax": 200,
+    "countdownOver50": [
+     [
+      100,
+      200
+     ]
+    ],
+    "win": [
+     1205,
+     1205
+    ],
+    "max": 16.8,
+    "over50": 0,
+    "progs": 0,
+    "diag": [
+     76,
+     76
+    ],
+    "warmupMs": 819
+   }
+  },
+  {
+   "map": "greenwater",
+   "label": "new-r6",
+   "menu": {
+    "visible": 1168,
+    "straddle": 267,
+    "stallsMax": 17,
+    "stallsOver50": [],
+    "frames": [
+     300,
+     300
+    ],
+    "warmupMs": 483
+   },
+   "cold": {
+    "raceVisible": 1500,
+    "straddle": 67,
+    "clock": 5229,
+    "countdownMax": 17,
+    "countdownOver50": [],
+    "win": [
+     1206,
+     1206
+    ],
+    "max": 16.8,
+    "over50": 0,
+    "progs": 0,
+    "diag": [
+     90,
+     90
+    ],
+    "warmupMs": 425
+   },
+   "warm": {
+    "raceVisible": 1388,
+    "straddle": 17,
+    "clock": 5148,
+    "countdownMax": 50,
+    "countdownOver50": [],
+    "win": [
+     1206,
+     1206
+    ],
+    "max": 16.8,
+    "over50": 0,
+    "progs": 0,
+    "diag": [
+     90,
+     90
+    ],
+    "warmupMs": 447
+   }
+  },
+  {
+   "map": "frostline",
+   "label": "new-r6",
+   "menu": {
+    "visible": 1294,
+    "straddle": 33,
+    "stallsMax": 17,
+    "stallsOver50": [],
+    "frames": [
+     298,
+     300
+    ],
+    "warmupMs": 671
+   },
+   "cold": {
+    "raceVisible": 1897,
+    "straddle": 17,
+    "clock": 5676,
+    "countdownMax": 33,
+    "countdownOver50": [],
+    "win": [
+     1199,
+     1201
+    ],
+    "max": 33.3,
+    "over50": 0,
+    "progs": 0,
+    "diag": [
+     119,
+     119
+    ],
+    "warmupMs": 692
+   },
+   "warm": {
+    "raceVisible": 1207,
+    "straddle": 17,
+    "clock": 4932,
+    "countdownMax": 17,
+    "countdownOver50": [],
+    "win": [
+     1202,
+     1203
+    ],
+    "max": 33.4,
+    "over50": 0,
+    "progs": 0,
+    "diag": [
+     119,
+     119
+    ],
+    "warmupMs": 627
+   }
+  },
+  {
+   "map": "nightshift",
+   "label": "new-r6",
+   "error": "Error: timeout waiting for race clock",
+   "menu": {
+    "visible": 904,
+    "straddle": 150,
+    "stallsMax": 17,
+    "stallsOver50": [],
+    "frames": [
+     300,
+     300
+    ],
+    "warmupMs": 298
+   }
+  },
+  {
+   "map": "dreamisland",
+   "label": "new-r6",
+   "menu": {
+    "visible": 2145,
+    "straddle": 800,
+    "stallsMax": 17,
+    "stallsOver50": [],
+    "frames": [
+     300,
+     300
+    ],
+    "warmupMs": 974
+   },
+   "cold": {
+    "raceVisible": 1919,
+    "straddle": 17,
+    "clock": 5800,
+    "countdownMax": 167,
+    "countdownOver50": [
+     [
+      183,
+      167
+     ]
+    ],
+    "win": [
+     1205,
+     1205
+    ],
+    "max": 16.8,
+    "over50": 0,
+    "progs": 0,
+    "diag": [
+     76,
+     76
+    ],
+    "warmupMs": 843
+   },
+   "warm": {
+    "raceVisible": 1521,
+    "straddle": 17,
+    "clock": 5365,
+    "countdownMax": 150,
+    "countdownOver50": [
+     [
+      100,
+      150
+     ]
+    ],
+    "win": [
+     1206,
+     1206
+    ],
+    "max": 16.8,
+    "over50": 0,
+    "progs": 0,
+    "diag": [
+     76,
+     76
+    ],
+    "warmupMs": 815
+   }
+  },
+  {
+   "map": "greenwater",
+   "label": "new-r7",
+   "menu": {
+    "visible": 2698,
+    "straddle": 333,
+    "stallsMax": 33,
+    "stallsOver50": [],
+    "frames": [
+     299,
+     300
+    ],
+    "warmupMs": 585
+   },
+   "cold": {
+    "raceVisible": 2231,
+    "straddle": 17,
+    "clock": 6025,
+    "countdownMax": 67,
+    "countdownOver50": [
+     [
+      0,
+      67
+     ]
+    ],
+    "win": [
+     1203,
+     1203
+    ],
+    "max": 16.8,
+    "over50": 0,
+    "progs": 0,
+    "diag": [
+     90,
+     90
+    ],
+    "warmupMs": 433
+   },
+   "warm": {
+    "raceVisible": 2106,
+    "straddle": 67,
+    "clock": 5863,
+    "countdownMax": 17,
+    "countdownOver50": [],
+    "win": [
+     1210,
+     1210
+    ],
+    "max": 16.8,
+    "over50": 0,
+    "progs": 0,
+    "diag": [
+     90,
+     90
+    ],
+    "warmupMs": 508
+   }
+  },
+  {
+   "map": "frostline",
+   "label": "new-r7",
+   "menu": {
+    "visible": 5447,
+    "straddle": 3250,
+    "stallsMax": 133,
+    "stallsOver50": [
+     [
+      16,
+      133
+     ]
+    ],
+    "frames": [
+     293,
+     300
+    ],
+    "warmupMs": 4049
+   },
+   "cold": {
+    "raceVisible": 2604,
+    "straddle": 33,
+    "clock": 6364,
+    "countdownMax": 83,
+    "countdownOver50": [
+     [
+      34,
+      83
+     ]
+    ],
+    "win": [
+     1200,
+     1203
+    ],
+    "max": 33.3,
+    "over50": 0,
+    "progs": 0,
+    "diag": [
+     119,
+     119
+    ],
+    "warmupMs": 712
+   },
+   "warm": {
+    "raceVisible": 1754,
+    "straddle": 17,
+    "clock": 5502,
+    "countdownMax": 17,
+    "countdownOver50": [],
+    "win": [
+     1200,
+     1201
+    ],
+    "max": 33.4,
+    "over50": 0,
+    "progs": 0,
+    "diag": [
+     119,
+     119
+    ],
+    "warmupMs": 634
+   }
+  },
+  {
+   "map": "nightshift",
+   "label": "new-r7",
+   "menu": {
+    "visible": 1418,
+    "straddle": 17,
+    "stallsMax": 17,
+    "stallsOver50": [],
+    "frames": [
+     300,
+     300
+    ],
+    "warmupMs": 333
+   },
+   "cold": {
+    "raceVisible": 2114,
+    "straddle": 17,
+    "clock": 5938,
+    "countdownMax": 100,
+    "countdownOver50": [
+     [
+      0,
+      100
+     ]
+    ],
+    "win": [
+     1205,
+     1205
+    ],
+    "max": 16.8,
+    "over50": 0,
+    "progs": 0,
+    "diag": [
+     64,
+     64
+    ],
+    "warmupMs": 316
+   },
+   "warm": {
+    "raceVisible": 1613,
+    "straddle": 83,
+    "clock": 5352,
+    "countdownMax": 17,
+    "countdownOver50": [],
+    "win": [
+     1202,
+     1202
+    ],
+    "max": 16.8,
+    "over50": 0,
+    "progs": 0,
+    "diag": [
+     64,
+     64
+    ],
+    "warmupMs": 279
+   }
+  },
+  {
+   "map": "dreamisland",
+   "label": "new-r7",
+   "menu": {
+    "visible": 1933,
+    "straddle": 700,
+    "stallsMax": 17,
+    "stallsOver50": [],
+    "frames": [
+     300,
+     300
+    ],
+    "warmupMs": 872
+   },
+   "cold": {
+    "raceVisible": 2868,
+    "straddle": 17,
+    "clock": 6799,
+    "countdownMax": 167,
+    "countdownOver50": [
+     [
+      167,
+      167
+     ]
+    ],
+    "win": [
+     1203,
+     1203
+    ],
+    "max": 16.8,
+    "over50": 0,
+    "progs": 0,
+    "diag": [
+     76,
+     76
+    ],
+    "warmupMs": 807
+   },
+   "warm": {
+    "raceVisible": 1774,
+    "straddle": 17,
+    "clock": 5648,
+    "countdownMax": 150,
+    "countdownOver50": [
+     [
+      133,
+      150
+     ]
+    ],
+    "win": [
+     1202,
+     1202
+    ],
+    "max": 16.8,
+    "over50": 0,
+    "progs": 0,
+    "diag": [
+     76,
+     76
+    ],
+    "warmupMs": 819
+   }
+  },
+  {
+   "map": "greenwater",
+   "label": "new-r8",
+   "menu": {
+    "visible": 1757,
+    "straddle": 17,
+    "stallsMax": 33,
+    "stallsOver50": [],
+    "frames": [
+     298,
+     300
+    ],
+    "warmupMs": 511
+   },
+   "cold": {
+    "raceVisible": 2252,
+    "straddle": 83,
+    "clock": 5915,
+    "countdownMax": 17,
+    "countdownOver50": [],
+    "win": [
+     1201,
+     1202
+    ],
+    "max": 33.4,
+    "over50": 0,
+    "progs": 0,
+    "diag": [
+     90,
+     90
+    ],
+    "warmupMs": 461
+   },
+   "warm": {
+    "raceVisible": 1301,
+    "straddle": 50,
+    "clock": 5023,
+    "countdownMax": 33,
+    "countdownOver50": [],
+    "win": [
+     1205,
+     1205
+    ],
+    "max": 16.8,
+    "over50": 0,
+    "progs": 0,
+    "diag": [
+     90,
+     90
+    ],
+    "warmupMs": 461
+   }
+  },
+  {
+   "map": "frostline",
+   "label": "new-r8",
+   "menu": {
+    "visible": 1253,
+    "straddle": 533,
+    "stallsMax": 33,
+    "stallsOver50": [],
+    "frames": [
+     299,
+     300
+    ],
+    "warmupMs": 674
+   },
+   "cold": {
+    "raceVisible": 1553,
+    "straddle": 17,
+    "clock": 5312,
+    "countdownMax": 17,
+    "countdownOver50": [],
+    "win": [
+     1203,
+     1204
+    ],
+    "max": 33.4,
+    "over50": 0,
+    "progs": 0,
+    "diag": [
+     119,
+     119
+    ],
+    "warmupMs": 628
+   },
+   "warm": {
+    "raceVisible": 1134,
+    "straddle": 17,
+    "clock": 4914,
+    "countdownMax": 17,
+    "countdownOver50": [],
+    "win": [
+     1198,
+     1200
+    ],
+    "max": 33.4,
+    "over50": 0,
+    "progs": 0,
+    "diag": [
+     119,
+     119
+    ],
+    "warmupMs": 681
+   }
+  },
+  {
+   "map": "nightshift",
+   "label": "new-r8",
+   "menu": {
+    "visible": 1419,
+    "straddle": 150,
+    "stallsMax": 17,
+    "stallsOver50": [],
+    "frames": [
+     300,
+     300
+    ],
+    "warmupMs": 341
+   },
+   "cold": {
+    "raceVisible": 1264,
+    "straddle": 17,
+    "clock": 5053,
+    "countdownMax": 83,
+    "countdownOver50": [
+     [
+      0,
+      83
+     ]
+    ],
+    "win": [
+     1205,
+     1205
+    ],
+    "max": 16.8,
+    "over50": 0,
+    "progs": 0,
+    "diag": [
+     64,
+     64
+    ],
+    "warmupMs": 286
+   },
+   "warm": {
+    "raceVisible": 990,
+    "straddle": 83,
+    "clock": 4756,
+    "countdownMax": 17,
+    "countdownOver50": [],
+    "win": [
+     1204,
+     1204
+    ],
+    "max": 16.8,
+    "over50": 0,
+    "progs": 0,
+    "diag": [
+     64,
+     64
+    ],
+    "warmupMs": 312
+   }
+  },
+  {
+   "map": "dreamisland",
+   "label": "new-r8",
+   "menu": {
+    "visible": 1965,
+    "straddle": 700,
+    "stallsMax": 33,
+    "stallsOver50": [],
+    "frames": [
+     299,
+     300
+    ],
+    "warmupMs": 896
+   },
+   "cold": {
+    "raceVisible": 3138,
+    "straddle": 17,
+    "clock": 6963,
+    "countdownMax": 150,
+    "countdownOver50": [
+     [
+      183,
+      150
+     ]
+    ],
+    "win": [
+     1193,
+     1204
+    ],
+    "max": 100,
+    "over50": 2,
+    "progs": 0,
+    "diag": [
+     76,
+     76
+    ],
+    "warmupMs": 967
+   },
+   "warm": {
+    "raceVisible": 1549,
+    "straddle": 17,
+    "clock": 5438,
+    "countdownMax": 150,
+    "countdownOver50": [
+     [
+      100,
+      150
+     ]
+    ],
+    "win": [
+     1203,
+     1203
+    ],
+    "max": 16.8,
+    "over50": 0,
+    "progs": 0,
+    "diag": [
+     76,
+     76
+    ],
+    "warmupMs": 827
+   }
+  },
+  {
+   "map": "greenwater",
+   "label": "new-r9",
+   "menu": {
+    "visible": 2152,
+    "straddle": 17,
+    "stallsMax": 33,
+    "stallsOver50": [],
+    "frames": [
+     299,
+     300
+    ],
+    "warmupMs": 530
+   },
+   "cold": {
+    "raceVisible": 1644,
+    "straddle": 67,
+    "clock": 5388,
+    "countdownMax": 17,
+    "countdownOver50": [],
+    "win": [
+     1204,
+     1207
+    ],
+    "max": 33.3,
+    "over50": 0,
+    "progs": 0,
+    "diag": [
+     90,
+     90
+    ],
+    "warmupMs": 489
+   },
+   "warm": {
+    "raceVisible": 2288,
+    "straddle": 67,
+    "clock": 6045,
+    "countdownMax": 17,
+    "countdownOver50": [],
+    "win": [
+     1201,
+     1202
+    ],
+    "max": 33.4,
+    "over50": 0,
+    "progs": 0,
+    "diag": [
+     90,
+     90
+    ],
+    "warmupMs": 572
+   }
+  }
+ ]
+}
